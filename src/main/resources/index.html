@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>Swingers party</title>
+<script src="socket.io.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript" charset="utf-8">
+	
+    var socket = io.connect('http://localhost:8080', {
+        'reconnection delay' : 2000,
+        'force new connection' : true
+      });
+
+      socket.on('message', function(data) {
+    	  var canvas = document.getElementById("myCanvas");
+    	  var context = canvas.getContext("2d");
+    	  var imageObj = new Image();
+          imageObj.onload = function() {
+            context.drawImage(imageObj, data.x, data.y);
+          };
+          imageObj.src = "swing/"+data.filename;
+      });
+
+  	  socket.on('connect', function() {
+           // connection established, now we can send an objects
+
+           // send json-object to server
+           //var obj = ...
+           socket.send('connection test successful');
+ 	  });
+    </script>
+</head>
+<body>
+	<canvas id="myCanvas" width="1000px" height="800px"></canvas>
+</body>
+</html>
