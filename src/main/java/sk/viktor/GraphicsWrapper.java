@@ -72,6 +72,11 @@ public class GraphicsWrapper extends Graphics2D {
         return dimgs.pop();
     }
 
+    public BufferedImage peekWebImage() {
+        return dimgs.peek();
+    }
+
+    
     @Override
     public Graphics create() {
         return new GraphicsWrapper((Graphics2D) original.create(), (Graphics2D) web.peek().create());

@@ -54,6 +54,9 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         builder.put("javax.swing.JFileChooser", "sk.web.swing.JFileChooser$$BCEL$$");
         builder.put("javax.swing.JComboBox", "sk.web.swing.JComboBox$$BCEL$$");
         builder.put("javax.swing.JLabel", "sk.web.swing.JLabel$$BCEL$$");
+        builder.put("javax.swing.JTextField", "sk.web.swing.JTextField$$BCEL$$");
+        builder.put("javax.swing.JTextArea", "sk.web.swing.JTextArea$$BCEL$$");
+        builder.put("javax.swing.JTextPane", "sk.web.swing.JTextPane$$BCEL$$");
         builder.put("javax.swing.DefaultListCellRenderer", "sk.web.swing.DefaultListCellRenderer$$BCEL$$");
         builder.put("javax.swing.table.DefaultTableCellRenderer", "sk.web.swing.table.DefaultTableCellRenderer$$BCEL$$");
         builder.put("javax.swing.tree.DefaultTreeCellRenderer", "sk.web.swing.tree.DefaultTreeCellRenderer$$BCEL$$");
@@ -61,8 +64,10 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         builder.put("javax.swing.JLayeredPane", "sk.web.swing.JLayeredPane$$BCEL$$");
         builder.put("javax.swing.JDesktopPane", "sk.web.swing.JDesktopPane$$BCEL$$");
         builder.put("javax.swing.JRootPane", "sk.web.swing.JRootPane$$BCEL$$");
+        builder.put("javax.swing.JSplitPane", "sk.web.swing.JSplitPane$$BCEL$$");
         builder.put("javax.swing.JPanel", "sk.web.swing.JPanel$$BCEL$$");
         builder.put("javax.swing.JInternalFrame", "sk.web.swing.JInternalFrame$$BCEL$$");
+        
         classReplacementMapping = builder.build();
 
     }
