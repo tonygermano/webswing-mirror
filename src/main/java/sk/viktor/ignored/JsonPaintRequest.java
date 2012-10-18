@@ -3,8 +3,11 @@ public class JsonPaintRequest{
         public String filename;
         public int x;
         public int y;
-        public JsonPaintRequest(String filename, int x, int y) {
+        public long seq;
+        
+        public JsonPaintRequest(long seq, String filename, int x, int y) {
             super();
+            this.seq=seq;
             this.filename = filename;
             this.x = x;
             this.y = y;
@@ -33,5 +36,14 @@ public class JsonPaintRequest{
         public void setY(int y) {
             this.y = y;
         }
+
         
+        public long getSeq() {
+            return seq;
+        }
+
+        
+        public void setSeq(long seq) {
+            this.seq = seq;
+        }
     }

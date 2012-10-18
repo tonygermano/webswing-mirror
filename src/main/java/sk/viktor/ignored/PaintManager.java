@@ -28,10 +28,9 @@ import com.corundumstudio.socketio.SocketIOClient;
 public class PaintManager {
 
     public static SocketIOClient client;
+    public static Map<String, Long> currentPaintRequestSeq = new HashMap<String, Long>();
     public static Map<String, ChannelBuffer> bufferMap = new HashMap<String, ChannelBuffer>();
 
-    private static List<JComponent> paintStack = new ArrayList<JComponent>();
-    private static List<Graphics> graphicsStack = new ArrayList<Graphics>();
 
     public static void updateComponentImage(String componentId, BufferedImage imageContent) {
         try {
@@ -40,6 +39,7 @@ public class PaintManager {
                     bufferMap.put(componentId, ChannelBuffers.dynamicBuffer());
                 }
             }
+            System.out.println("printing image :"+getObjectIdentity(imageContent));
             ChannelBuffer buffer = bufferMap.get(componentId);
             OutputStream os = new ChannelBufferOutputStream(buffer);
             ImageIO.write(imageContent, "png", ImageIO.createImageOutputStream(os));
@@ -49,66 +49,70 @@ public class PaintManager {
         }
     }
 
-    public static Graphics wrapGraphics(Graphics g, JComponent c) {
+    public static Graphics beforePaintInterceptor(Graphics g, JComponent c) {
         Graphics result;
         if (g instanceof Graphics2D) {
             if (g instanceof GraphicsWrapper) {
-                ((GraphicsWrapper) g).pushWebGraphics();
                 result = g;
             } else {
-                result = new GraphicsWrapper((Graphics2D) g);
+                result = new GraphicsWrapper((Graphics2D) g, getObjectIdentity(c));
             }
         } else {
-            System.out.println("this is not a Graphics2d instance- should not happend");
+            try {
+                throw new Exception("this is not a Graphics2d instance- should not happend");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             result = g;
         }
-        paintStack.add(c);
-        graphicsStack.add(result);
-        System.out.println(paintStack.size() + " wrapped G " + c.getClass().getCanonicalName()+ "clip:" +g.getClip());
         return result;
     }
 
-    public static void paintToWeb(Graphics g, JComponent c) {
-        //resolve drawing sequence
-        if (paintStack.contains(c)) {
-            if (isPaintImmediately()) {
-                doPaintImmediate(c);
-                graphicsStack.clear();
-                paintStack.clear();
-            } else {
-                for (int i = 0; i < paintStack.size(); i++) {
-                    doPaint(graphicsStack.get(i), paintStack.get(i));
-                }
-                graphicsStack.clear();
-                paintStack.clear();
-            }
-        }
-    }
-
-    private static void doPaintImmediate(JComponent c) {
-        BufferedImage result=new BufferedImage(c.getWidth(), c.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
-        System.out.println("result size "+c.getWidth()+"/"+c.getHeight()+" of component "+c.getClass().getCanonicalName());
-        Graphics2D resultGraphics = (Graphics2D) result.getGraphics();
-        for (int i = 0; i <graphicsStack.size(); i++) {
-            GraphicsWrapper gtw = (GraphicsWrapper)graphicsStack.get(i);
-            BufferedImage imageToWrite = gtw.peekWebImage();
-            resultGraphics.drawImage(imageToWrite, 0, 0, null);
-        }
-        updateComponentImage(getComponentIdentity(c), result);
-        Point p = getLocation(c);
-        client.sendJsonObject(new JsonPaintRequest(getComponentIdentity(c), (int) p.x, (int) p.y));
-    }
-
-    protected static void doPaint(Graphics g, JComponent c) {
+    public static void afterPaintInterceptor(Graphics g, JComponent c) {
         if (g instanceof GraphicsWrapper) {
-            GraphicsWrapper gw = ((GraphicsWrapper) g);
-            BufferedImage img = ((GraphicsWrapper) g).popWebImage();
-            if (img != null) {
-                updateComponentImage(getComponentIdentity(c), img);
-                client.sendJsonObject(new JsonPaintRequest(getComponentIdentity(c), (int) gw.getTransform().getTranslateX(), (int) gw.getTransform().getTranslateY()));
+            GraphicsWrapper gw = (GraphicsWrapper) g;
+            if (gw.getComponentId().equals(getObjectIdentity(c))) {
+                if (isPaintImmediately()) {
+                    doPaintImmediate(gw,c);
+                } else  {
+                    doPaint(gw, c);
+                }
             }
         } else {
-            System.out.println("graphics is not wrapped!!");
+            try {
+                throw new Exception("afterPaintInterceptor: g is not wrapped. something is wrong");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void directPaintToWeb(BufferedImage img, int x, int y) {
+        System.out.println("DIRECT PAINT -------");
+        if (img != null) {
+            long seq=nextSeq(client);
+            String identity= getObjectIdentity(img)+seq;
+            updateComponentImage(identity, img);
+            client.sendJsonObject(new JsonPaintRequest(seq, identity, x, y));
+        }
+        System.out.println("DIRECT PAINT ----END---");
+    }
+
+    private static void doPaintImmediate(GraphicsWrapper gw,JComponent c) {
+        Point p = getLocation(c);
+        long seq=nextSeq(client);
+        String identity= getObjectIdentity(c)+seq;
+        updateComponentImage(identity, gw.getImg());
+        client.sendJsonObject(new JsonPaintRequest(seq, identity, (int) p.x, (int) p.y));
+    }
+
+    protected static void doPaint(GraphicsWrapper gw, JComponent c) {
+        BufferedImage img = gw.getImg();
+        if (img != null) {
+            long seq=nextSeq(client);
+            String identity= getObjectIdentity(c)+seq;
+            updateComponentImage(identity, img);
+            client.sendJsonObject(new JsonPaintRequest(seq, identity, (int) gw.getTransform().getTranslateX(), (int) gw.getTransform().getTranslateY()));
         }
     }
 
@@ -136,9 +140,41 @@ public class PaintManager {
         }
         return false;
     }
-    
-    private static String getComponentIdentity(JComponent c){
+
+    public static boolean isForceDoubleBufferedPainting() {
+        StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+        for (StackTraceElement e : trace) {
+            if (e.getClassName().equals("javax.swing.JComponent") && e.getMethodName().equals("paintForceDoubleBuffered")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isPaintDoubleBufferedPainting() {
+        StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+        for (StackTraceElement e : trace) {
+            if (e.getClassName().equals(" javax.swing.RepaintManager.PaintManager") && e.getMethodName().equals("paintDoubleBuffered")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String getObjectIdentity(Object c) {
         return "c" + System.identityHashCode(c);
+    }
+
+    private static long nextSeq(SocketIOClient client) {
+        String id = client.getSessionId().toString();
+        long result = 0;
+        if (currentPaintRequestSeq.containsKey(id)) {
+            result = currentPaintRequestSeq.get(id);
+            currentPaintRequestSeq.put(id, result + 1);
+        } else {
+            currentPaintRequestSeq.put(id, 1L);
+        }
+        return result;
     }
 
 }

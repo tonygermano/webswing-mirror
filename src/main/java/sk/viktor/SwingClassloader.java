@@ -67,6 +67,10 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         builder.put("javax.swing.JSplitPane", "sk.web.swing.JSplitPane$$BCEL$$");
         builder.put("javax.swing.JPanel", "sk.web.swing.JPanel$$BCEL$$");
         builder.put("javax.swing.JInternalFrame", "sk.web.swing.JInternalFrame$$BCEL$$");
+        builder.put("javax.swing.JScrollPane", "sk.web.swing.JScrollPane$$BCEL$$");
+        builder.put("javax.swing.JScrollBar", "sk.web.swing.JScrollBar$$BCEL$$");
+        builder.put("javax.swing.JViewPort", "sk.web.swing.JViewPort$$BCEL$$");
+        builder.put("javax.swing.JFrame", "sk.viktor.ignored.MyJFrame");
         
         classReplacementMapping = builder.build();
 
@@ -100,12 +104,12 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
                     //add to begin
                     il.insert(new ALOAD(1));
                     il.append(new ALOAD(0));
-                    il.insert(f.createInvoke(PaintManager.class.getCanonicalName(), "wrapGraphics", new ObjectType("java.awt.Graphics"), new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
+                    il.insert(f.createInvoke(PaintManager.class.getCanonicalName(), "beforePaintInterceptor", new ObjectType("java.awt.Graphics"), new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
                     il.insert(new ASTORE(1));
                     //add to end 
                     il.append(new ALOAD(1));
                     il.append(new ALOAD(0));
-                    il.append(f.createInvoke(PaintManager.class.getCanonicalName(), "paintToWeb", Type.VOID, new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
+                    il.append(f.createInvoke(PaintManager.class.getCanonicalName(), "afterPaintInterceptor", Type.VOID, new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
                     il.dispose();
                 } else {
                     //add paint method which call super.paint and than PaintManager
@@ -117,14 +121,14 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
                             il, cp);
                     il.append(new ALOAD(1));
                     il.append(new ALOAD(0));
-                    il.append(f.createInvoke(PaintManager.class.getCanonicalName(), "wrapGraphics", new ObjectType("java.awt.Graphics"), new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
+                    il.append(f.createInvoke(PaintManager.class.getCanonicalName(), "beforePaintInterceptor", new ObjectType("java.awt.Graphics"), new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
                     il.append(new ASTORE(1));
                     il.append(new ALOAD(0));
                     il.append(new ALOAD(1));
                     il.append(f.createInvoke(cg.getSuperclassName(), "paint", Type.VOID, new Type[] { new ObjectType("java.awt.Graphics") }, Constants.INVOKESPECIAL));
                     il.append(new ALOAD(1));
                     il.append(new ALOAD(0));
-                    il.append(f.createInvoke(PaintManager.class.getCanonicalName(), "paintToWeb", Type.VOID, new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
+                    il.append(f.createInvoke(PaintManager.class.getCanonicalName(), "afterPaintInterceptor", Type.VOID, new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
                     il.append(InstructionConstants.RETURN);
                     mg.setMaxStack();
                     cg.addMethod(mg.getMethod());
@@ -248,14 +252,14 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
                     il, cp);
             il.append(new ALOAD(1));
             il.append(new ALOAD(0));
-            il.append(factory.createInvoke(PaintManager.class.getCanonicalName(), "wrapGraphics", new ObjectType("java.awt.Graphics"), new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
+            il.append(factory.createInvoke(PaintManager.class.getCanonicalName(), "beforePaintInterceptor", new ObjectType("java.awt.Graphics"), new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
             il.append(new ASTORE(1));
             il.append(new ALOAD(0));
             il.append(new ALOAD(1));
             il.append(factory.createInvoke(superClassName, "paint", Type.VOID, new Type[] { new ObjectType("java.awt.Graphics") }, Constants.INVOKESPECIAL));
             il.append(new ALOAD(1));
             il.append(new ALOAD(0));
-            il.append(factory.createInvoke(PaintManager.class.getCanonicalName(), "paintToWeb", Type.VOID, new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
+            il.append(factory.createInvoke(PaintManager.class.getCanonicalName(), "afterPaintInterceptor", Type.VOID, new Type[] { new ObjectType("java.awt.Graphics"), new ObjectType("javax.swing.JComponent") }, Constants.INVOKESTATIC));
             il.append(InstructionConstants.RETURN);
             mg.setMaxStack();
             cg.addMethod(mg.getMethod());

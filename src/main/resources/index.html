@@ -2,7 +2,9 @@
 <head>
 <title>Swingers party</title>
 <script src="socket.io.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"
+	type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
 	
@@ -11,12 +13,27 @@
         'force new connection' : true
       });
 
-      socket.on('message', function(data) {
+	var imgSeq=0;
+	var earlyImagesMap= {}; 
+    
+    socket.on('message', function(data) {
     	  var canvas = document.getElementById("myCanvas");
     	  var context = canvas.getContext("2d");
     	  var imageObj = new Image();
           imageObj.onload = function() {
-            context.drawImage(imageObj, data.x, data.y);
+            if(imgSeq==0 || imgSeq==data.seq){
+            	context.drawImage(imageObj, data.x, data.y);
+            	console.log("drawing "+ imageObj.src + " seq "+ imgSeq+ " x: "+ data.x +" y: "+ data.y)
+            	imgSeq++;
+            	while(earlyImagesMap[imgSeq]!=null){
+            		var tmp=earlyImagesMap[imgSeq];
+					context.drawImage(tmp[0],tmp[1],tmp[2]);
+					delete imageObj[imgSeq];
+					imgSeq++;	
+            	}
+            }else{
+				earlyImagesMap[data.seq]=[imageObj,data.x,data.y];	
+            }
           };
           imageObj.src = "swing/"+data.filename;
       });
@@ -26,11 +43,14 @@
 
            // send json-object to server
            //var obj = ...
+           imgSeq=0;
            socket.send('connection test successful');
  	  });
     </script>
 </head>
 <body>
-	<canvas id="myCanvas" width="1000px" height="800px"></canvas>
+	<div >
+		<canvas id="myCanvas" width="1000px" height="800px" style="padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block;"></canvas>
+	</div>
 </body>
 </html>
