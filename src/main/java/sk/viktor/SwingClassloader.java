@@ -66,7 +66,6 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         builder.put("javax.swing.JRootPane", "sk.web.swing.JRootPane$$BCEL$$");
         builder.put("javax.swing.JSplitPane", "sk.web.swing.JSplitPane$$BCEL$$");
         builder.put("javax.swing.JPanel", "sk.web.swing.JPanel$$BCEL$$");
-        builder.put("javax.swing.JInternalFrame", "sk.web.swing.JInternalFrame$$BCEL$$");
         builder.put("javax.swing.JScrollPane", "sk.web.swing.JScrollPane$$BCEL$$");
         builder.put("javax.swing.JScrollBar", "sk.web.swing.JScrollBar$$BCEL$$");
         builder.put("javax.swing.JViewPort", "sk.web.swing.JViewPort$$BCEL$$");

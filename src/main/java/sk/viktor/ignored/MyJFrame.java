@@ -12,25 +12,24 @@ import sk.viktor.GraphicsWrapper;
 
 public class MyJFrame extends JFrame {
 
+   private BufferedImage virtualScreen;
     
-    private MyImage bufferImage;
-    
-    private BufferedImage virtualScreen;
-    
+
     @Override
-    public Image createImage(int width, int height) {
-         if(bufferImage==null){
-             bufferImage=new MyImage(this.getWidth(),this.getHeight());
-         }
-         return bufferImage; 
+    public Graphics getGraphics() {
+        if(virtualScreen==null || virtualScreen.getWidth()!=this.getWidth() ||virtualScreen.getHeight()!=this.getHeight()){
+            virtualScreen=new BufferedImage(this.getWidth(),this.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+        }
+        System.out.println("MyFrame: getGraphics:"+virtualScreen);
+        return new GraphicsWrapper((Graphics2D) super.getGraphics(), this);
+    }
+    
+    public BufferedImage getVirtualScreen() {
+        return virtualScreen;
     }
 
-//    @Override
-//    public Graphics getGraphics() {
-//        if(virtualScreen==null || virtualScreen.getWidth()!=this.getWidth() ||virtualScreen.getHeight()!=this.getHeight()){
-//            virtualScreen=new BufferedImage(this.getWidth(),this.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
-//        }
-//        return new GraphicsWrapper((Graphics2D) super.getGraphics(),this.getWidth(),this.getHeight(), this);
-//    }
     
+    public void setVirtualScreen(BufferedImage virtualScreen) {
+        this.virtualScreen = virtualScreen;
+    }
 }

@@ -1,9 +1,11 @@
 package sk.viktor.ignored;
 
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,7 +33,6 @@ public class PaintManager {
     public static Map<String, Long> currentPaintRequestSeq = new HashMap<String, Long>();
     public static Map<String, ChannelBuffer> bufferMap = new HashMap<String, ChannelBuffer>();
 
-
     public static void updateComponentImage(String componentId, BufferedImage imageContent) {
         try {
             synchronized (bufferMap) {
@@ -39,7 +40,7 @@ public class PaintManager {
                     bufferMap.put(componentId, ChannelBuffers.dynamicBuffer());
                 }
             }
-            System.out.println("printing image :"+getObjectIdentity(imageContent));
+            System.out.println("printing image :" + getObjectIdentity(imageContent));
             ChannelBuffer buffer = bufferMap.get(componentId);
             OutputStream os = new ChannelBufferOutputStream(buffer);
             ImageIO.write(imageContent, "png", ImageIO.createImageOutputStream(os));
@@ -50,20 +51,14 @@ public class PaintManager {
     }
 
     public static Graphics beforePaintInterceptor(Graphics g, JComponent c) {
-        Graphics result;
-        if (g instanceof Graphics2D) {
-            if (g instanceof GraphicsWrapper) {
-                result = g;
-            } else {
-                result = new GraphicsWrapper((Graphics2D) g, getObjectIdentity(c));
+        GraphicsWrapper result;
+        if (g instanceof GraphicsWrapper) {
+            result = (GraphicsWrapper) g;
+            if (result.getRootPaintComponent() == null) {
+                result.setRootPaintComponent(c);
             }
         } else {
-            try {
-                throw new Exception("this is not a Graphics2d instance- should not happend");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            result = g;
+            return g;
         }
         return result;
     }
@@ -71,67 +66,42 @@ public class PaintManager {
     public static void afterPaintInterceptor(Graphics g, JComponent c) {
         if (g instanceof GraphicsWrapper) {
             GraphicsWrapper gw = (GraphicsWrapper) g;
-            if (gw.getComponentId().equals(getObjectIdentity(c))) {
-                if (isPaintImmediately()) {
-                    doPaintImmediate(gw,c);
-                } else  {
-                    doPaint(gw, c);
-                }
-            }
-        } else {
-            try {
-                throw new Exception("afterPaintInterceptor: g is not wrapped. something is wrong");
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (getObjectIdentity(gw.getRootPaintComponent()).equals(getObjectIdentity(c))) {
+                doPaint(gw, c);
             }
         }
     }
 
-    public static void directPaintToWeb(BufferedImage img, int x, int y) {
-        System.out.println("DIRECT PAINT -------");
-        if (img != null) {
-            long seq=nextSeq(client);
-            String identity= getObjectIdentity(img)+seq;
-            updateComponentImage(identity, img);
-            client.sendJsonObject(new JsonPaintRequest(seq, identity, x, y));
-        }
-        System.out.println("DIRECT PAINT ----END---");
-    }
-
-    private static void doPaintImmediate(GraphicsWrapper gw,JComponent c) {
-        Point p = getLocation(c);
-        long seq=nextSeq(client);
-        String identity= getObjectIdentity(c)+seq;
-        updateComponentImage(identity, gw.getImg());
-        client.sendJsonObject(new JsonPaintRequest(seq, identity, (int) p.x, (int) p.y));
-    }
-
-    protected static void doPaint(GraphicsWrapper gw, JComponent c) {
+    public static void doPaint(GraphicsWrapper gw, JComponent c) {
         BufferedImage img = gw.getImg();
         if (img != null) {
-            long seq=nextSeq(client);
-            String identity= getObjectIdentity(c)+seq;
+            long seq = nextSeq(client);
+            String identity = "" + seq;
+            System.out.println("printing sq:" +seq);
             updateComponentImage(identity, img);
-            client.sendJsonObject(new JsonPaintRequest(seq, identity, (int) gw.getTransform().getTranslateX(), (int) gw.getTransform().getTranslateY()));
+            client.sendJsonObject(new JsonPaintRequest(seq, identity, 0, 0));
         }
     }
 
     private static Point getLocation(JComponent c) {
         Point result = new Point();
-        JComponent rootJ = c;
+        Component rootJ = c;
         int xOffset = 0, yOffset = 0;
-        while (rootJ != null && rootJ.getParent() instanceof JComponent) {
+        while (rootJ != null) {
             if (rootJ instanceof JComponent) {
                 xOffset += rootJ.getX();
                 yOffset += rootJ.getY();
-                rootJ = (JComponent) rootJ.getParent();
+                rootJ = rootJ.getParent();
+            }
+            if (rootJ instanceof Window) {
+                break;
             }
         }
         result.setLocation(xOffset, yOffset);
         return result;
     }
 
-    private static boolean isPaintImmediately() {
+    public static boolean isPaintImmediately() {
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();
         for (StackTraceElement e : trace) {
             if (e.getClassName().equals("javax.swing.JComponent") && e.getMethodName().equals("paintImmediately")) {
@@ -154,7 +124,7 @@ public class PaintManager {
     public static boolean isPaintDoubleBufferedPainting() {
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();
         for (StackTraceElement e : trace) {
-            if (e.getClassName().equals(" javax.swing.RepaintManager.PaintManager") && e.getMethodName().equals("paintDoubleBuffered")) {
+            if (e.getClassName().equals("javax.swing.RepaintManager$PaintManager") && e.getMethodName().equals("paintDoubleBuffered")) {
                 return true;
             }
         }
