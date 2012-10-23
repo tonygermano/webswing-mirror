@@ -18,7 +18,6 @@ public class Main {
     
     public static void startSwing() throws Exception{
         SwingClassloader cl = new SwingClassloader();
-        
         Class<?> clazz = cl.loadClass("com.sun.swingset3.SwingSet3");
         //Class<?> clazz = cl.loadClass("sk.viktor.Ceiling");
         // Get a class representing the type of the main method's argument

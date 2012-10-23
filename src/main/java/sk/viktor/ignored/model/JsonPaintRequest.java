@@ -1,10 +1,11 @@
-package sk.viktor.ignored;
-public class JsonPaintRequest{
+package sk.viktor.ignored.model;
+public class JsonPaintRequest {
+        public String type="paint";
         public String filename;
         public int x;
         public int y;
         public long seq;
-        
+
         public JsonPaintRequest(long seq, String filename, int x, int y) {
             super();
             this.seq=seq;

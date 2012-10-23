@@ -1,29 +1,22 @@
 package sk.viktor.ignored;
 
-import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBufferOutputStream;
 import org.jboss.netty.buffer.ChannelBuffers;
 
 import sk.viktor.GraphicsWrapper;
-import sun.java2d.SunGraphics2D;
+import sk.viktor.ignored.model.JsonCopyAreaRequest;
+import sk.viktor.ignored.model.JsonPaintRequest;
 
 import com.corundumstudio.socketio.SocketIOClient;
 
@@ -40,7 +33,6 @@ public class PaintManager {
                     bufferMap.put(componentId, ChannelBuffers.dynamicBuffer());
                 }
             }
-            System.out.println("printing image :" + getObjectIdentity(imageContent));
             ChannelBuffer buffer = bufferMap.get(componentId);
             OutputStream os = new ChannelBufferOutputStream(buffer);
             ImageIO.write(imageContent, "png", ImageIO.createImageOutputStream(os));
@@ -77,28 +69,9 @@ public class PaintManager {
         if (img != null) {
             long seq = nextSeq(client);
             String identity = "" + seq;
-            System.out.println("printing sq:" +seq);
             updateComponentImage(identity, img);
             client.sendJsonObject(new JsonPaintRequest(seq, identity, 0, 0));
         }
-    }
-
-    private static Point getLocation(JComponent c) {
-        Point result = new Point();
-        Component rootJ = c;
-        int xOffset = 0, yOffset = 0;
-        while (rootJ != null) {
-            if (rootJ instanceof JComponent) {
-                xOffset += rootJ.getX();
-                yOffset += rootJ.getY();
-                rootJ = rootJ.getParent();
-            }
-            if (rootJ instanceof Window) {
-                break;
-            }
-        }
-        result.setLocation(xOffset, yOffset);
-        return result;
     }
 
     public static boolean isPaintImmediately() {
@@ -145,6 +118,12 @@ public class PaintManager {
             currentPaintRequestSeq.put(id, 1L);
         }
         return result;
+    }
+
+    public static void copyAreaOnWeb(int x, int y, int width, int height, int dx, int dy) {
+        long seq = nextSeq(client);
+        client.sendJsonObject(new JsonCopyAreaRequest(seq, x, y, dx, dy, width, height));
+        
     }
 
 }

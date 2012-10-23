@@ -13,37 +13,45 @@
         'force new connection' : true
       });
 
-	var imgSeq=0;
-	var earlyImagesMap= {}; 
-    
+    var seq=0;
+    var earlyReqMap= {}; 
+
+    function processRequest(data,context)
+    {
+  	  if(data.type=="paint"){
+    	  var imageObj = new Image();
+          imageObj.onload = function() {
+            	context.drawImage(imageObj, data.x, data.y);
+          };
+          imageObj.src = "swing/"+data.filename;
+	  }else if(data.type == "copyArea"){
+          var imageDataToCopy = context.getImageData(data.x, data.y, data.width, data.height);
+          context.putImageData(imageDataToCopy, data.x + data.dx, data.y + data.dy);
+      }
+    }
+        
     socket.on('message', function(data) {
     	  var canvas = document.getElementById("myCanvas");
     	  var context = canvas.getContext("2d");
-    	  var imageObj = new Image();
-          imageObj.onload = function() {
-            if(imgSeq==0 || imgSeq==data.seq){
-            	context.drawImage(imageObj, data.x, data.y);
-            	console.log("drawing "+ imageObj.src + " seq "+ imgSeq+ " x: "+ data.x +" y: "+ data.y)
-            	imgSeq++;
-            	while(earlyImagesMap[imgSeq]!=null){
-            		var tmp=earlyImagesMap[imgSeq];
-					context.drawImage(tmp[0],tmp[1],tmp[2]);
-					delete imageObj[imgSeq];
-					imgSeq++;	
-            	}
-            }else{
-				earlyImagesMap[data.seq]=[imageObj,data.x,data.y];	
-            }
-          };
-          imageObj.src = "swing/"+data.filename;
+    	  if(seq==0 || seq==data.seq){
+			  processRequest(data,context);	
+    		  seq++;
+              while(earlyReqMap[seq]!=null){
+                  var tmp=earlyReqMap[seq];
+                  processRequest(tmp,context);
+                  delete earlyReqMap[seq];
+                  seq++;       
+              }
+          }else{
+        	  earlyReqMap[data.seq]=data;      
+          }  
       });
 
   	  socket.on('connect', function() {
            // connection established, now we can send an objects
-
+			seq=0;
            // send json-object to server
            //var obj = ...
-           imgSeq=0;
            socket.send('connection test successful');
  	  });
     </script>

@@ -20,7 +20,6 @@ public class MyJFrame extends JFrame {
         if(virtualScreen==null || virtualScreen.getWidth()!=this.getWidth() ||virtualScreen.getHeight()!=this.getHeight()){
             virtualScreen=new BufferedImage(this.getWidth(),this.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
         }
-        System.out.println("MyFrame: getGraphics:"+virtualScreen);
         return new GraphicsWrapper((Graphics2D) super.getGraphics(), this);
     }
     

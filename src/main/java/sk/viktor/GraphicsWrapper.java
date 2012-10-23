@@ -25,50 +25,45 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
+import javax.swing.JComponent;
+
+import sk.viktor.ignored.MyJFrame;
+import sk.viktor.ignored.PaintManager;
+
 public class GraphicsWrapper extends Graphics2D {
 
-    private BufferedImage img;
-    
-    private String componentId;
-    
+    private MyJFrame frame;
+
+    private JComponent rootPaintComponent;
+
     private Graphics2D original;
     private Graphics2D web;
 
-    private int height;
-    private int width;
-
-    public GraphicsWrapper(Graphics2D g, int width, int height, String componentId) {
-        this.componentId=componentId;
-        this.width = width;
-        this.height = height;
+    public GraphicsWrapper(Graphics2D g, MyJFrame root) {
+        this.frame = root;
         this.original = g;
         initWebGraphics();
     }
 
-    public GraphicsWrapper(Graphics2D g, String componentId) {
-        this.componentId=componentId;
-        this.original = g;
-        initWebGraphics();
-    }
-
-    public GraphicsWrapper(Graphics2D original, Graphics2D web,String componentId) {
+    public GraphicsWrapper(Graphics2D original, Graphics2D web, MyJFrame root) {
         //create copy
-        this.componentId=componentId;
+        this.frame = root;
         this.web = web;
         this.original = original;
     }
 
     public BufferedImage getImg() {
-        return img;
+        return frame.getVirtualScreen();
     }
 
-    public String getComponentId() {
-        return componentId;
+    public JComponent getRootPaintComponent() {
+        return rootPaintComponent;
     }
 
-    public void setComponentId(String componentId) {
-        this.componentId = componentId;
+    public void setRootPaintComponent(JComponent rootPaintComponent) {
+        this.rootPaintComponent = rootPaintComponent;
     }
+
 
     public Graphics getOriginal() {
         return original;
@@ -76,30 +71,28 @@ public class GraphicsWrapper extends Graphics2D {
 
     public void initWebGraphics() {
         Rectangle originalBounds = original.getClipBounds();
-        if (originalBounds == null) {
-            img=new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
-        } else {
-            img=new BufferedImage(originalBounds.width, originalBounds.height, BufferedImage.TYPE_INT_ARGB_PRE);
-        }
-        web=((Graphics2D) img.getGraphics());
+        web = ((Graphics2D) getImg().getGraphics());
+        web.setClip(originalBounds);
         //set backgound transparent
-        web.setBackground(original.getBackground());
-        web.clearRect(0, 0, img.getWidth(), img.getHeight());
+        web.setBackground(new Color(0,0,0,0));
+        web.clearRect(0, 0, getImg().getWidth(), getImg().getHeight());
         //copy properties from original
-        //web.setBackground(original.getBackground());
+        web.setBackground(original.getBackground());
         web.setClip(original.getClip());
         web.setColor(original.getColor());
         web.setComposite(original.getComposite());
         web.setFont(original.getFont());
         web.setPaint(original.getPaint());
         web.setStroke(original.getStroke());
-        //web.setTransform(original.getTransform());
+        web.setTransform(original.getTransform());
         web.setRenderingHints(original.getRenderingHints());
     }
 
     @Override
     public Graphics create() {
-        return new GraphicsWrapper((Graphics2D) original.create(), (Graphics2D) web.create(), componentId);
+        GraphicsWrapper copy = new GraphicsWrapper((Graphics2D) original.create(), (Graphics2D) web.create(), frame);
+        copy.setRootPaintComponent(rootPaintComponent);
+        return copy;
     }
 
     @Override
@@ -178,6 +171,8 @@ public class GraphicsWrapper extends Graphics2D {
     @Override
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
         original.copyArea(x, y, width, height, dx, dy);
+        System.out.println("copyArea"+ x+" "+y+" "+width+" "+height+" "+dx+" "+dy+" "+getTransform().getTranslateY()+" "+getTransform().getTranslateX());
+        PaintManager.copyAreaOnWeb((int)(x+getTransform().getTranslateX()), (int)(y+getTransform().getTranslateY()), width, height, dx, dy);
         web.copyArea(x, y, width, height, dx, dy);
     }
 
@@ -268,9 +263,9 @@ public class GraphicsWrapper extends Graphics2D {
     @Override
     public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
         web.drawImage(img, x, y, observer);
-        //        if (img instanceof BufferedImage) {
-        //            PaintManager.directPaintToWeb(dimgs.peek(), x, y);
-        //        }
+        if (PaintManager.isPaintDoubleBufferedPainting() || PaintManager.isForceDoubleBufferedPainting()) {
+            PaintManager.doPaint(this, (JComponent) observer);
+        }
         return original.drawImage(img, x, y, observer);
     }
 
