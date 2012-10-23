@@ -24,68 +24,81 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
-import java.util.Stack;
+
+import javax.swing.JComponent;
+
+import sk.viktor.ignored.MyJFrame;
+import sk.viktor.ignored.PaintManager;
 
 public class GraphicsWrapper extends Graphics2D {
 
-    Stack<BufferedImage> dimgs = new Stack<BufferedImage>();
+    private MyJFrame frame;
+
+    private JComponent rootPaintComponent;
 
     private Graphics2D original;
-    private Stack<Graphics2D> web = new Stack<Graphics2D>();
+    private Graphics2D web;
 
-    public GraphicsWrapper(Graphics2D g) {
+    public GraphicsWrapper(Graphics2D g, MyJFrame root) {
+        this.frame = root;
         this.original = g;
-        pushWebGraphics();
+        initWebGraphics();
     }
 
-    public GraphicsWrapper(Graphics2D original, Graphics2D web) {
+    public GraphicsWrapper(Graphics2D original, Graphics2D web, MyJFrame root) {
         //create copy
-        this.web.push(web);
+        this.frame = root;
+        this.web = web;
         this.original = original;
     }
-    
-    public Graphics getOriginal(){
+
+    public BufferedImage getImg() {
+        return frame.getVirtualScreen();
+    }
+
+    public JComponent getRootPaintComponent() {
+        return rootPaintComponent;
+    }
+
+    public void setRootPaintComponent(JComponent rootPaintComponent) {
+        this.rootPaintComponent = rootPaintComponent;
+    }
+
+
+    public Graphics getOriginal() {
         return original;
     }
 
-    public void pushWebGraphics() {
+    public void initWebGraphics() {
         Rectangle originalBounds = original.getClipBounds();
-        dimgs.push(new BufferedImage(originalBounds.width, originalBounds.height, BufferedImage.TYPE_INT_ARGB_PRE));
-        web.push((Graphics2D) dimgs.peek().getGraphics());
+        web = ((Graphics2D) getImg().getGraphics());
+        web.setClip(originalBounds);
         //set backgound transparent
-        web.peek().setBackground(new Color(0,0,0,0));
-        web.peek().clearRect(0,0,dimgs.peek().getWidth(),dimgs.peek().getHeight());
+        web.setBackground(new Color(0,0,0,0));
+        web.clearRect(0, 0, getImg().getWidth(), getImg().getHeight());
         //copy properties from original
-        //web.peek().setBackground(original.getBackground());
-        web.peek().setClip(original.getClip());
-        web.peek().setColor(original.getColor());
-        web.peek().setComposite(original.getComposite());
-        web.peek().setFont(original.getFont());
-        web.peek().setPaint(original.getPaint());
-        web.peek().setStroke(original.getStroke());
-        //web.peek().setTransform(original.getTransform());
-        web.peek().setRenderingHints(original.getRenderingHints());
+        web.setBackground(original.getBackground());
+        web.setClip(original.getClip());
+        web.setColor(original.getColor());
+        web.setComposite(original.getComposite());
+        web.setFont(original.getFont());
+        web.setPaint(original.getPaint());
+        web.setStroke(original.getStroke());
+        web.setTransform(original.getTransform());
+        web.setRenderingHints(original.getRenderingHints());
     }
 
-    public BufferedImage popWebImage() {
-        web.pop().dispose();
-        return dimgs.pop();
-    }
-
-    public BufferedImage peekWebImage() {
-        return dimgs.peek();
-    }
-
-    
     @Override
     public Graphics create() {
-        return new GraphicsWrapper((Graphics2D) original.create(), (Graphics2D) web.peek().create());
+        GraphicsWrapper copy = new GraphicsWrapper((Graphics2D) original.create(), (Graphics2D) web.create(), frame);
+        copy.setRootPaintComponent(rootPaintComponent);
+        return copy;
     }
 
     @Override
     public void translate(int x, int y) {
         original.translate(x, y);
-        web.peek().translate(x, y);
+        web.translate(x, y);
     }
 
     @Override
@@ -96,19 +109,19 @@ public class GraphicsWrapper extends Graphics2D {
     @Override
     public void setColor(Color c) {
         original.setColor(c);
-        web.peek().setColor(c);
+        web.setColor(c);
     }
 
     @Override
     public void setPaintMode() {
         original.setPaintMode();
-        web.peek().setPaintMode();
+        web.setPaintMode();
     }
 
     @Override
     public void setXORMode(Color c1) {
         original.setXORMode(c1);
-        web.peek().setXORMode(c1);
+        web.setXORMode(c1);
     }
 
     @Override
@@ -119,7 +132,7 @@ public class GraphicsWrapper extends Graphics2D {
     @Override
     public void setFont(Font font) {
         original.setFont(font);
-        web.peek().setFont(font);
+        web.setFont(font);
     }
 
     @Override
@@ -135,13 +148,13 @@ public class GraphicsWrapper extends Graphics2D {
     @Override
     public void clipRect(int x, int y, int width, int height) {
         original.clipRect(x, y, width, height);
-        web.peek().clipRect(x, y, width, height);
+        web.clipRect(x, y, width, height);
     }
 
     @Override
     public void setClip(int x, int y, int width, int height) {
         original.setClip(x, y, width, height);
-        web.peek().setClip(x, y, width, height);
+        web.setClip(x, y, width, height);
     }
 
     @Override
@@ -152,192 +165,197 @@ public class GraphicsWrapper extends Graphics2D {
     @Override
     public void setClip(Shape clip) {
         original.setClip(clip);
-        web.peek().setClip(clip);
+        web.setClip(clip);
     }
 
     @Override
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
         original.copyArea(x, y, width, height, dx, dy);
-        web.peek().copyArea(x, y, width, height, dx, dy);
+        System.out.println("copyArea"+ x+" "+y+" "+width+" "+height+" "+dx+" "+dy+" "+getTransform().getTranslateY()+" "+getTransform().getTranslateX());
+        PaintManager.copyAreaOnWeb((int)(x+getTransform().getTranslateX()), (int)(y+getTransform().getTranslateY()), width, height, dx, dy);
+        web.copyArea(x, y, width, height, dx, dy);
     }
 
     @Override
     public void drawLine(int x1, int y1, int x2, int y2) {
         original.drawLine(x1, y1, x2, y2);
-        web.peek().drawLine(x1, y1, x2, y2);
+        web.drawLine(x1, y1, x2, y2);
     }
 
     @Override
     public void fillRect(int x, int y, int width, int height) {
         original.fillRect(x, y, width, height);
-        web.peek().fillRect(x, y, width, height);
+        web.fillRect(x, y, width, height);
     }
 
     @Override
     public void clearRect(int x, int y, int width, int height) {
         original.clearRect(x, y, width, height);
-        web.peek().clearRect(x, y, width, height);
+        web.clearRect(x, y, width, height);
     }
 
     @Override
     public void drawRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
         original.drawRoundRect(x, y, width, height, arcWidth, arcHeight);
-        web.peek().drawRoundRect(x, y, width, height, arcWidth, arcHeight);
+        web.drawRoundRect(x, y, width, height, arcWidth, arcHeight);
     }
 
     @Override
     public void fillRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
         original.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
-        web.peek().fillRoundRect(x, y, width, height, arcWidth, arcHeight);
+        web.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
     }
 
     @Override
     public void drawOval(int x, int y, int width, int height) {
         original.drawOval(x, y, width, height);
-        web.peek().drawOval(x, y, width, height);
+        web.drawOval(x, y, width, height);
     }
 
     @Override
     public void fillOval(int x, int y, int width, int height) {
         original.fillOval(x, y, width, height);
-        web.peek().fillOval(x, y, width, height);
+        web.fillOval(x, y, width, height);
     }
 
     @Override
     public void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
         original.drawArc(x, y, width, height, startAngle, arcAngle);
-        web.peek().drawArc(x, y, width, height, startAngle, arcAngle);
+        web.drawArc(x, y, width, height, startAngle, arcAngle);
     }
 
     @Override
     public void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
         original.fillArc(x, y, width, height, startAngle, arcAngle);
-        web.peek().fillArc(x, y, width, height, startAngle, arcAngle);
+        web.fillArc(x, y, width, height, startAngle, arcAngle);
     }
 
     @Override
     public void drawPolyline(int[] xPoints, int[] yPoints, int nPoints) {
         original.drawPolyline(xPoints, yPoints, nPoints);
-        web.peek().drawPolyline(xPoints, yPoints, nPoints);
+        web.drawPolyline(xPoints, yPoints, nPoints);
     }
 
     @Override
     public void drawPolygon(int[] xPoints, int[] yPoints, int nPoints) {
         original.drawPolygon(xPoints, yPoints, nPoints);
-        web.peek().drawPolygon(xPoints, yPoints, nPoints);
+        web.drawPolygon(xPoints, yPoints, nPoints);
     }
 
     @Override
     public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints) {
         original.fillPolygon(xPoints, yPoints, nPoints);
-        web.peek().fillPolygon(xPoints, yPoints, nPoints);
+        web.fillPolygon(xPoints, yPoints, nPoints);
     }
 
     @Override
     public void drawString(String str, int x, int y) {
         original.drawString(str, x, y);
-        web.peek().drawString(str, x, y);
+        web.drawString(str, x, y);
     }
 
     @Override
     public void drawString(AttributedCharacterIterator iterator, int x, int y) {
         original.drawString(iterator, x, y);
-        web.peek().drawString(iterator, x, y);
+        web.drawString(iterator, x, y);
     }
 
     @Override
     public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
-        web.peek().drawImage(img, x, y, observer);
+        web.drawImage(img, x, y, observer);
+        if (PaintManager.isPaintDoubleBufferedPainting() || PaintManager.isForceDoubleBufferedPainting()) {
+            PaintManager.doPaint(this, (JComponent) observer);
+        }
         return original.drawImage(img, x, y, observer);
     }
 
     @Override
     public boolean drawImage(Image img, int x, int y, int width, int height, ImageObserver observer) {
-        web.peek().drawImage(img, x, y, width, height, observer);
+        web.drawImage(img, x, y, width, height, observer);
         return original.drawImage(img, x, y, width, height, observer);
     }
 
     @Override
     public boolean drawImage(Image img, int x, int y, Color bgcolor, ImageObserver observer) {
-        web.peek().drawImage(img, x, y, bgcolor, observer);
+        web.drawImage(img, x, y, bgcolor, observer);
         return original.drawImage(img, x, y, bgcolor, observer);
     }
 
     @Override
     public boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
-        web.peek().drawImage(img, x, y, width, height, bgcolor, observer);
+        web.drawImage(img, x, y, width, height, bgcolor, observer);
         return original.drawImage(img, x, y, width, height, bgcolor, observer);
     }
 
     @Override
     public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
-        web.peek().drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
+        web.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
         return original.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
     }
 
     @Override
     public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgcolor, ImageObserver observer) {
-        web.peek().drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
+        web.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
         return original.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
     }
 
     @Override
     public void dispose() {
-        web.peek().dispose();
+        web.dispose();
         original.dispose();
     }
 
     @Override
     public void draw(Shape s) {
         original.draw(s);
-        web.peek().draw(s);
+        web.draw(s);
     }
 
     @Override
     public boolean drawImage(Image img, AffineTransform xform, ImageObserver obs) {
-        web.peek().drawImage(img, xform, obs);
+        web.drawImage(img, xform, obs);
         return original.drawImage(img, xform, obs);
     }
 
     @Override
     public void drawImage(BufferedImage img, BufferedImageOp op, int x, int y) {
-        web.peek().drawImage(img, op, x, y);
+        web.drawImage(img, op, x, y);
         original.drawImage(img, op, x, y);
     }
 
     @Override
     public void drawRenderedImage(RenderedImage img, AffineTransform xform) {
-        web.peek().drawRenderedImage(img, xform);
+        web.drawRenderedImage(img, xform);
         original.drawRenderedImage(img, xform);
     }
 
     @Override
     public void drawRenderableImage(RenderableImage img, AffineTransform xform) {
-        web.peek().drawRenderableImage(img, xform);
+        web.drawRenderableImage(img, xform);
         original.drawRenderableImage(img, xform);
     }
 
     @Override
     public void drawString(String str, float x, float y) {
-        web.peek().drawString(str, x, y);
+        web.drawString(str, x, y);
         original.drawString(str, x, y);
     }
 
     @Override
     public void drawString(AttributedCharacterIterator iterator, float x, float y) {
-        web.peek().drawString(iterator, x, y);
+        web.drawString(iterator, x, y);
         original.drawString(iterator, x, y);
     }
 
     @Override
     public void drawGlyphVector(GlyphVector g, float x, float y) {
-        this.web.peek().drawGlyphVector(g, x, y);
+        this.web.drawGlyphVector(g, x, y);
         this.original.drawGlyphVector(g, x, y);
     }
 
     @Override
     public void fill(Shape s) {
-        web.peek().fill(s);
+        web.fill(s);
         original.fill(s);
     }
 
@@ -353,25 +371,25 @@ public class GraphicsWrapper extends Graphics2D {
 
     @Override
     public void setComposite(Composite comp) {
-        web.peek().setComposite(comp);
+        web.setComposite(comp);
         original.setComposite(comp);
     }
 
     @Override
     public void setPaint(Paint paint) {
-        web.peek().setPaint(paint);
+        web.setPaint(paint);
         original.setPaint(paint);
     }
 
     @Override
     public void setStroke(Stroke s) {
-        web.peek().setStroke(s);
+        web.setStroke(s);
         original.setStroke(s);
     }
 
     @Override
     public void setRenderingHint(Key hintKey, Object hintValue) {
-        web.peek().setRenderingHint(hintKey, hintValue);
+        web.setRenderingHint(hintKey, hintValue);
         original.setRenderingHint(hintKey, hintValue);
     }
 
@@ -382,13 +400,13 @@ public class GraphicsWrapper extends Graphics2D {
 
     @Override
     public void setRenderingHints(Map<?, ?> hints) {
-        web.peek().setRenderingHints(hints);
+        web.setRenderingHints(hints);
         original.setRenderingHints(hints);
     }
 
     @Override
     public void addRenderingHints(Map<?, ?> hints) {
-        web.peek().addRenderingHints(hints);
+        web.addRenderingHints(hints);
         original.addRenderingHints(hints);
     }
 
@@ -399,43 +417,43 @@ public class GraphicsWrapper extends Graphics2D {
 
     @Override
     public void translate(double tx, double ty) {
-        web.peek().translate(tx, ty);
+        web.translate(tx, ty);
         original.translate(tx, ty);
     }
 
     @Override
     public void rotate(double theta) {
-        web.peek().rotate(theta);
+        web.rotate(theta);
         original.rotate(theta);
     }
 
     @Override
     public void rotate(double theta, double x, double y) {
-        web.peek().rotate(theta, x, y);
+        web.rotate(theta, x, y);
         original.rotate(theta, x, y);
     }
 
     @Override
     public void scale(double sx, double sy) {
-        web.peek().scale(sx, sy);
+        web.scale(sx, sy);
         original.scale(sx, sy);
     }
 
     @Override
     public void shear(double shx, double shy) {
-        web.peek().shear(shx, shy);
+        web.shear(shx, shy);
         original.shear(shx, shy);
     }
 
     @Override
     public void transform(AffineTransform Tx) {
-        web.peek().transform(Tx);
+        web.transform(Tx);
         original.transform(Tx);
     }
 
     @Override
     public void setTransform(AffineTransform Tx) {
-        web.peek().setTransform(Tx);
+        web.setTransform(Tx);
         original.setTransform(Tx);
     }
 
@@ -457,7 +475,7 @@ public class GraphicsWrapper extends Graphics2D {
     @Override
     public void setBackground(Color color) {
         original.setBackground(color);
-        web.peek().setBackground(color);
+        web.setBackground(color);
     }
 
     @Override
@@ -472,7 +490,7 @@ public class GraphicsWrapper extends Graphics2D {
 
     @Override
     public void clip(Shape s) {
-        web.peek().clip(s);
+        web.clip(s);
         original.clip(s);
     }
 

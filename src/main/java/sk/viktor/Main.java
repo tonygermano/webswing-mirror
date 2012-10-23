@@ -2,6 +2,8 @@ package sk.viktor;
 
 import java.lang.reflect.Method;
 
+import javax.swing.RepaintManager;
+
 import sk.viktor.server.SwingServer;
 
 
