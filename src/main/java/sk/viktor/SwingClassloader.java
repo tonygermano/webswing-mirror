@@ -69,19 +69,26 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         builder.put("javax.swing.JScrollPane", "sk.web.swing.JScrollPane$$BCEL$$");
         builder.put("javax.swing.JScrollBar", "sk.web.swing.JScrollBar$$BCEL$$");
         builder.put("javax.swing.JViewPort", "sk.web.swing.JViewPort$$BCEL$$");
-        builder.put("javax.swing.JFrame", "sk.viktor.ignored.MyJFrame");
+        builder.put("javax.swing.JOptionPane", "sk.web.swing.JOptionPane$$BCEL$$");
+        builder.put("javax.swing.JFrame", "sk.viktor.ignored.containers.WebJFrame");
+        builder.put("javax.swing.JDialog", "sk.viktor.ignored.containers.WebJDialog");
+        builder.put("javax.swing.JWindow", "sk.viktor.ignored.containers.WebJWindow");
         
         classReplacementMapping = builder.build();
 
     }
 
     public SwingClassloader() {
-        super(new String[] { "java.", "javax.", "sun.", "sk.viktor.ignored" });
+        super(new String[]{"java.", "javax.", "sun.", "org.xml.sax"});
     }
 
     @Override
     protected JavaClass modifyClass(JavaClass clazz) {
-
+        //do not modify classes placed in directory that contains "ignored"
+        if(isInPackage(clazz.getPackageName(),new String[]{"sk.viktor.ignored"})){
+            return clazz;
+        }
+        
         Package s = super.getPackage(clazz.getPackageName());
         if (s == null) {
             definePackage(clazz.getPackageName(), null, null, null, null, null, null, null);
@@ -307,6 +314,16 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         }
     }
 
+    private static boolean isInPackage(String packageInspected, String[] packagePrefixed){
+        for(String prefix:packagePrefixed){
+            if(packageInspected!=null && packageInspected.startsWith(prefix)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
     private static String[] createArgNames(int number) {
         String[] result = new String[number];
         for (int i = 0; i < number; i++) {

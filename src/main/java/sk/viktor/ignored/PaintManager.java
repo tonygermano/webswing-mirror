@@ -14,7 +14,6 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBufferOutputStream;
 import org.jboss.netty.buffer.ChannelBuffers;
 
-import sk.viktor.GraphicsWrapper;
 import sk.viktor.ignored.model.JsonCopyAreaRequest;
 import sk.viktor.ignored.model.JsonPaintRequest;
 
@@ -70,7 +69,7 @@ public class PaintManager {
             long seq = nextSeq(client);
             String identity = "" + seq;
             updateComponentImage(identity, img);
-            client.sendJsonObject(new JsonPaintRequest(seq, identity, 0, 0));
+            client.sendJsonObject(new JsonPaintRequest(seq, identity, 0, 0, gw.getWindowInfo()));
         }
     }
 
@@ -104,7 +103,7 @@ public class PaintManager {
         return false;
     }
 
-    private static String getObjectIdentity(Object c) {
+    public static String getObjectIdentity(Object c) {
         return "c" + System.identityHashCode(c);
     }
 
@@ -120,9 +119,9 @@ public class PaintManager {
         return result;
     }
 
-    public static void copyAreaOnWeb(int x, int y, int width, int height, int dx, int dy) {
+    public static void copyAreaOnWeb(GraphicsWrapper gw,int x, int y, int width, int height, int dx, int dy) {
         long seq = nextSeq(client);
-        client.sendJsonObject(new JsonCopyAreaRequest(seq, x, y, dx, dy, width, height));
+        client.sendJsonObject(new JsonCopyAreaRequest(seq, x, y, dx, dy, width, height,gw.getWindowInfo()));
         
     }
 

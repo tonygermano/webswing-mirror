@@ -2,9 +2,9 @@
 <head>
 <title>Swingers party</title>
 <script src="socket.io.min.js" type="text/javascript" charset="utf-8"></script>
-<script
-	src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"
-	type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="jquery-ui.css" />
+<script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+<script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
 
 <script type="text/javascript" charset="utf-8">
 	
@@ -15,26 +15,48 @@
 
     var seq=0;
     var earlyReqMap= {}; 
-
-    function processRequest(data,context)
+    
+    function processRequest(data)
     {
-  	  if(data.type=="paint"){
-    	  var imageObj = new Image();
-          imageObj.onload = function() {
-            	context.drawImage(imageObj, data.x, data.y);
-          };
-          imageObj.src = "swing/"+data.filename;
-	  }else if(data.type == "copyArea"){
-          var imageDataToCopy = context.getImageData(data.x, data.y, data.width, data.height);
-          context.putImageData(imageDataToCopy, data.x + data.dx, data.y + data.dy);
-      }
-    }
         
+    	var canvas = document.getElementById(data.windowInfo.id);
+    	if(canvas==null){
+    		createCanvasWinodow(data.windowInfo.id,data.windowInfo.title,data.windowInfo.width,data.windowInfo.height);
+    		canvas=document.getElementById(data.windowInfo.id);
+        }
+   	 	var context = canvas.getContext("2d");
+   		if(data.type=="paint"){
+    	  	var imageObj = new Image();
+          	imageObj.onload = function() {
+            	context.drawImage(imageObj, data.x, data.y);
+            	var currentDialog=$("#"+data.windowInfo.id+"Window");
+            	if(currentDialog.dialog("isOpen")==false){
+                	currentDialog.dialog("open");
+                }
+            	if(data.windowInfo.hasFocus){
+            		currentDialog.dialog("moveToTop");
+            	}
+          	};
+          	imageObj.src = "swing/"+data.filename;
+	  	}else if(data.type == "copyArea"){
+          	var imageDataToCopy = context.getImageData(data.x, data.y, data.width, data.height);
+          	context.putImageData(imageDataToCopy, data.x + data.dx, data.y + data.dy);
+      	}
+    }
+
+	function createCanvasWinodow(name,title,width,height){
+		$("#root").append('<div id="'+name+'Window"><canvas id="'+name+'" width="'+width+'" height="'+height+'"/></div>');
+		$("#"+name+"Window" ).dialog({
+            width: "auto",
+            heigth: "auto",
+            title: title,
+            resizable: "false"
+        });	
+	}
+       
     socket.on('message', function(data) {
-    	  var canvas = document.getElementById("myCanvas");
-    	  var context = canvas.getContext("2d");
     	  if(seq==0 || seq==data.seq){
-			  processRequest(data,context);	
+			  processRequest(data);	
     		  seq++;
               while(earlyReqMap[seq]!=null){
                   var tmp=earlyReqMap[seq];
@@ -56,9 +78,7 @@
  	  });
     </script>
 </head>
-<body>
-	<div >
-		<canvas id="myCanvas" width="1000px" height="800px" style="padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block;"></canvas>
-	</div>
+<body bgcolor="#AAA">
+	<div id="root"></div>
 </body>
 </html>
