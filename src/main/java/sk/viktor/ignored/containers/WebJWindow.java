@@ -12,8 +12,8 @@ import sk.viktor.ignored.PaintManager;
 import sk.viktor.ignored.WebWindow;
 import sk.viktor.ignored.model.JsonWindowInfo;
 
-
 public class WebJWindow extends JWindow implements WebWindow {
+
     /**
      * 
      */
@@ -31,7 +31,7 @@ public class WebJWindow extends JWindow implements WebWindow {
     public BufferedImage getVirtualScreen() {
         return virtualScreen;
     }
-    
+
     public Graphics2D getWebGraphics() {
         return (Graphics2D) virtualScreen.getGraphics();
     }
@@ -53,7 +53,18 @@ public class WebJWindow extends JWindow implements WebWindow {
     }
 
     public Point getFrameTranslation() {
-        return new Point(0,0);
+        return new Point(0, 0);
     }
 
+    @Override
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        PaintManager.registerWindow(this);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        PaintManager.disposeWindow(this);
+    }
 }

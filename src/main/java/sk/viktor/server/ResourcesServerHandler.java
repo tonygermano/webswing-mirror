@@ -59,27 +59,30 @@ public class ResourcesServerHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        HttpRequest request = (HttpRequest) e.getMessage();
-        if(request.getUri().startsWith(urlMapping)){
-            InputStream input = this.getClass().getClassLoader().getResourceAsStream(request.getUri().substring(urlMapping.length()));
-            if (input != null) {
-                BufferedReader bufread = new BufferedReader(new InputStreamReader(input));
-                String read;
-                while ((read = bufread.readLine()) != null) {
-                    responseContent.append(read + "\r\n");
+        if (e.getMessage() instanceof HttpRequest) {
+            HttpRequest request = (HttpRequest) e.getMessage();
+            if (request.getUri().startsWith(urlMapping)) {
+                InputStream input = this.getClass().getClassLoader().getResourceAsStream(request.getUri().substring(urlMapping.length()));
+                if (input != null) {
+                    BufferedReader bufread = new BufferedReader(new InputStreamReader(input));
+                    String read;
+                    while ((read = bufread.readLine()) != null) {
+                        responseContent.append(read + "\r\n");
+                    }
+                    String contenttype = new MimetypesFileTypeMap().getContentType(request.getUri().substring(urlMapping.length()));
+                    writeResponse(contenttype, e);
+                } else {
+                    ctx.sendUpstream(e);
                 }
-                String contenttype=new MimetypesFileTypeMap().getContentType(request.getUri().substring(urlMapping.length()));
-                writeResponse(contenttype,e);
-            }else{
+            } else {
                 ctx.sendUpstream(e);
             }
         }else{
             ctx.sendUpstream(e);
         }
-        
     }
 
-    private void writeResponse(String contentType,MessageEvent e) {
+    private void writeResponse(String contentType, MessageEvent e) {
         ChannelBuffer buf = ChannelBuffers.copiedBuffer(responseContent.toString().getBytes());
         responseContent.setLength(0);
         // Build the response object.

@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Swingers party</title>
+<title>Webswing</title>
 <script src="socket.io.min.js" type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" href="jquery-ui.css" />
 <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
@@ -18,11 +18,9 @@
     
     function processRequest(data)
     {
-        
     	var canvas = document.getElementById(data.windowInfo.id);
     	if(canvas==null){
-    		createCanvasWinodow(data.windowInfo.id,data.windowInfo.title,data.windowInfo.width,data.windowInfo.height);
-    		canvas=document.getElementById(data.windowInfo.id);
+    		canvas= createCanvasWinodow(data.windowInfo.id,data.windowInfo.title,data.windowInfo.width,data.windowInfo.height);
         }
    	 	var context = canvas.getContext("2d");
    		if(data.type=="paint"){
@@ -51,7 +49,39 @@
             heigth: "auto",
             title: title,
             resizable: "false"
-        });	
+        });
+		canvas=document.getElementById(name);	
+        registerEventListeners(canvas);
+        return canvas;
+	}
+
+	var isDragging;
+	var latestMouseMoveEvent;
+	setInterval(mouseMoveEventFilter, 100);
+	function mouseMoveEventFilter(){
+		if(latestMouseMoveEvent!=null){
+			socket.json.send(latestMouseMoveEvent);
+			latestMouseMoveEvent=null;
+		}
+	}
+	
+	function registerEventListeners(canvas){
+		canvas.addEventListener('mousedown', function(evt) {
+          	  var mousePos = getMousePos(canvas, evt,'mousedown');
+			  isDragging=true;
+			  latestMouseMoveEvent=null;
+			  socket.json.send(mousePos);
+		}, true);
+		canvas.addEventListener('mousemove', function(evt) {
+	          var mousePos = getMousePos(canvas, evt,isDragging?'mousedrag':'mousemove');
+        	  latestMouseMoveEvent=mousePos;
+		}, true);
+		canvas.addEventListener('mouseup', function(evt) {
+        	  var mousePos = getMousePos(canvas, evt,'mouseup');
+        	  isDragging=false;
+        	  latestMouseMoveEvent=null;
+			  socket.json.send(mousePos);
+		}, true);
 	}
        
     socket.on('message', function(data) {
@@ -60,7 +90,7 @@
     		  seq++;
               while(earlyReqMap[seq]!=null){
                   var tmp=earlyReqMap[seq];
-                  processRequest(tmp,context);
+                  processRequest(tmp);
                   delete earlyReqMap[seq];
                   seq++;       
               }
@@ -69,12 +99,22 @@
           }  
       });
 
+    function getMousePos(canvas, evt, type) {
+        var rect = canvas.getBoundingClientRect(), root = document.documentElement;
+
+        // return relative mouse position
+        var mouseX = evt.clientX - rect.left - root.scrollTop;
+        var mouseY = evt.clientY - rect.top - root.scrollLeft;
+        return { '@class' : 'sk.viktor.ignored.event.model.JsonEventMouse',
+            	 'windowId': canvas.id,
+          		 'x': mouseX,
+          		 'y': mouseY,
+          		 'type':type
+        };
+      }
+    
   	  socket.on('connect', function() {
-           // connection established, now we can send an objects
 			seq=0;
-           // send json-object to server
-           //var obj = ...
-           socket.send('connection test successful');
  	  });
     </script>
 </head>

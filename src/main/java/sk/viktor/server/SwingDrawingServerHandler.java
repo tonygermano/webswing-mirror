@@ -24,13 +24,17 @@ public class SwingDrawingServerHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        HttpRequest request = (HttpRequest) e.getMessage();
-        if (request.getUri().startsWith(urlMapping)) {
-            synchronized (PaintManager.bufferMap) {
-                if (PaintManager.bufferMap.containsKey(request.getUri().substring(urlMapping.length()))) {
-                    ChannelBuffer image = PaintManager.bufferMap.get(request.getUri().substring(urlMapping.length()));
-                    writeResponse(image, e);
+        if (e.getMessage() instanceof HttpRequest) {
+            HttpRequest request = (HttpRequest) e.getMessage();
+            if (request.getUri().startsWith(urlMapping)) {
+                synchronized (PaintManager.bufferMap) {
+                    if (PaintManager.bufferMap.containsKey(request.getUri().substring(urlMapping.length()))) {
+                        ChannelBuffer image = PaintManager.bufferMap.get(request.getUri().substring(urlMapping.length()));
+                        writeResponse(image, e);
+                    }
                 }
+            } else {
+                ctx.sendUpstream(e);
             }
         } else {
             ctx.sendUpstream(e);

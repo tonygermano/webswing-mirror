@@ -61,5 +61,16 @@ public class WebJDialog extends JDialog implements WebWindow {
         return new Point(this.getRootPane().getX(), this.getRootPane().getY());
     }
 
-
+    
+    @Override
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        PaintManager.registerWindow(this);
+    }
+    
+    @Override
+    public void dispose() {
+        super.dispose();
+        PaintManager.disposeWindow(this);
+    }
 }

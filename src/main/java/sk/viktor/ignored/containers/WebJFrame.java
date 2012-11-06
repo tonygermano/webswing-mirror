@@ -20,6 +20,10 @@ public class WebJFrame extends JFrame implements WebWindow {
     private static final long serialVersionUID = -2131755526938257553L;
     private BufferedImage virtualScreen;
 
+    public WebJFrame(String title) {
+        super(title);
+    }
+
     @Override
     public Graphics getGraphics() {
         if (virtualScreen == null || virtualScreen.getWidth() != this.getWidth() || virtualScreen.getHeight() != this.getHeight()) {
@@ -55,6 +59,18 @@ public class WebJFrame extends JFrame implements WebWindow {
 
     public Point getFrameTranslation() {
         return new Point(this.getRootPane().getX(), this.getRootPane().getY());
+    }
+
+    @Override
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        PaintManager.registerWindow(this);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        PaintManager.disposeWindow(this);
     }
 
 }
