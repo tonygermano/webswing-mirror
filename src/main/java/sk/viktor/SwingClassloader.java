@@ -84,6 +84,7 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
 
     @Override
     protected JavaClass modifyClass(JavaClass clazz) {
+
         //do not modify classes placed in directory that contains "ignored"
         if(isInPackage(clazz.getPackageName(),new String[]{"sk.viktor.ignored"})){
             return clazz;
@@ -294,7 +295,7 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
 
     private Method getPaintMethod(JavaClass clazz) {
         for (Method m : clazz.getMethods()) {
-            if (m.getName().equals("paint") && m.isPublic() && m.getArgumentTypes().length == 1 && m.getArgumentTypes()[0].getSignature().equals("java.awt.Graphics")) {
+            if (m.getName().equals("paint") && m.isPublic() && m.getArgumentTypes().length == 1 && m.getArgumentTypes()[0].getSignature().equals("Ljava/awt/Graphics;")) {
                 return m;
             }
         }

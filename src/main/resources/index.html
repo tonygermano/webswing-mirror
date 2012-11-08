@@ -55,7 +55,6 @@
         return canvas;
 	}
 
-	var isDragging;
 	var latestMouseMoveEvent;
 	setInterval(mouseMoveEventFilter, 100);
 	function mouseMoveEventFilter(){
@@ -68,17 +67,15 @@
 	function registerEventListeners(canvas){
 		canvas.addEventListener('mousedown', function(evt) {
           	  var mousePos = getMousePos(canvas, evt,'mousedown');
-			  isDragging=true;
 			  latestMouseMoveEvent=null;
 			  socket.json.send(mousePos);
 		}, true);
 		canvas.addEventListener('mousemove', function(evt) {
-	          var mousePos = getMousePos(canvas, evt,isDragging?'mousedrag':'mousemove');
+	          var mousePos = getMousePos(canvas, evt,'mousemove');
         	  latestMouseMoveEvent=mousePos;
 		}, true);
 		canvas.addEventListener('mouseup', function(evt) {
         	  var mousePos = getMousePos(canvas, evt,'mouseup');
-        	  isDragging=false;
         	  latestMouseMoveEvent=null;
 			  socket.json.send(mousePos);
 		}, true);
@@ -109,7 +106,8 @@
             	 'windowId': canvas.id,
           		 'x': mouseX,
           		 'y': mouseY,
-          		 'type':type
+          		 'type':type,
+          		 'button':evt.which
         };
       }
     

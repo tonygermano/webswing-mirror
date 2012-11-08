@@ -1,6 +1,7 @@
 package sk.viktor.ignored;
 
 import java.awt.AWTEvent;
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBufferOutputStream;
@@ -55,23 +57,16 @@ public class PaintManager {
                 result.setRootPaintComponent(c);
             }
         } else {
-            if(!isPaintDoubleBufferedPainting()){
-                System.out.println("something s wrong "+ g);
-            }
             return g;
         }
         return result;
     }
-
+    
     public static void afterPaintInterceptor(Graphics g, JComponent c) {
         if (g instanceof GraphicsWrapper) {
             GraphicsWrapper gw = (GraphicsWrapper) g;
             if (getObjectIdentity(gw.getRootPaintComponent()).equals(getObjectIdentity(c))) {
                 doPaint(gw, c);
-            }
-        }else{
-            if(!isPaintDoubleBufferedPainting()){
-                System.out.println("something s wrong "+ g);
             }
         }
     }
@@ -95,7 +90,7 @@ public class PaintManager {
         }
         return false;
     }
-
+    
     public static boolean isForceDoubleBufferedPainting() {
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();
         for (StackTraceElement e : trace) {
@@ -150,32 +145,23 @@ public class PaintManager {
         AWTEvent e = null;
         Window w=windows.get(event.getWindowId());
         if(event instanceof JsonEventMouse){
+            JsonEventMouse mouseEvt=(JsonEventMouse) event;
             WebWindow ww= (WebWindow) w;
-            int x= ((JsonEventMouse) event).getX()+ww.getFrameTranslation().x;
-            int y= ((JsonEventMouse) event).getY()+ww.getFrameTranslation().y;
+            int x= mouseEvt.getX()+ww.getFrameTranslation().x;
+            int y= mouseEvt.getY()+ww.getFrameTranslation().y;
             long when = System.currentTimeMillis();
-            int modifiers= 0;
+            int modifiers= getMouseModifiersAWTFlag(mouseEvt.button);
             int id = 0;
-            int buttons = 0;
-            switch (((JsonEventMouse) event).getType()) {
+            int buttons = getMouseButtonsAWTFlag(mouseEvt.button);
+            switch (mouseEvt.getType()) {
                 case mousemove:
-                    id= MouseEvent.MOUSE_MOVED;
-                    buttons= MouseEvent.NOBUTTON;
+                    id= mouseEvt.button==1?MouseEvent.MOUSE_DRAGGED:MouseEvent.MOUSE_MOVED;
                     break;
                 case mouseup:
-                    modifiers=MouseEvent.BUTTON1_DOWN_MASK;
                     id= MouseEvent.MOUSE_RELEASED;
-                    buttons= MouseEvent.BUTTON1;
                     break;
                 case mousedown:
-                    modifiers=MouseEvent.BUTTON1_DOWN_MASK;
                     id= MouseEvent.MOUSE_PRESSED;
-                    buttons= MouseEvent.BUTTON1;
-                    break;
-                case mousedrag:
-                    modifiers=MouseEvent.BUTTON1_DOWN_MASK;
-                    id= MouseEvent.MOUSE_DRAGGED;
-                    buttons= MouseEvent.BUTTON1;
                     break;
                 default:
                     break;
@@ -183,5 +169,23 @@ public class PaintManager {
             e= new MouseEvent(w, id, when, modifiers, x, y, 0, false, buttons);
         }
         windows.get(event.getWindowId()).dispatchEvent(e);
+    }
+
+    private static int getMouseButtonsAWTFlag(int button) {
+        switch(button){
+            case 1:return MouseEvent.BUTTON1;
+            case 2:return MouseEvent.BUTTON2;
+            case 3:return MouseEvent.BUTTON3;
+            case 0:return MouseEvent.NOBUTTON;
+        }
+        return 0;
+    }
+    private static int getMouseModifiersAWTFlag(int button) {
+        switch(button){
+            case 1:return MouseEvent.BUTTON1_DOWN_MASK;
+            case 2:return MouseEvent.BUTTON2_DOWN_MASK;
+            case 3:return MouseEvent.BUTTON3_DOWN_MASK;
+        }
+        return 0;
     }
 }

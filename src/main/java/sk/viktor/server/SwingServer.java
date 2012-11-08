@@ -1,7 +1,5 @@
 package sk.viktor.server;
 
-import java.awt.event.MouseEvent;
-
 import org.jboss.netty.channel.ChannelPipeline;
 
 import sk.viktor.Main;
@@ -49,7 +47,6 @@ public class SwingServer {
 
             public void onData(SocketIOClient arg0, JsonEventMouse mouseEvt, AckRequest arg2) {
                 PaintManager.dispatchEvent(mouseEvt);
-                System.out.println("sending " +mouseEvt);
             }
         });
         

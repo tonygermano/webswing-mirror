@@ -3,9 +3,7 @@ package sk.viktor.ignored.event.model;
 public class JsonEventMouse implements JsonEvent {
 
     public enum Type {
-
         mousemove,
-        mousedrag,
         mousedown,
         mouseup;
     }
@@ -13,6 +11,7 @@ public class JsonEventMouse implements JsonEvent {
     public Type type;
     public int x;
     public int y;
+    public int button;
     public String windowId;
 
     public int getX() {
