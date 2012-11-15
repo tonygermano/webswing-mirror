@@ -1,4 +1,4 @@
-package sk.viktor.ignored.containers;
+package sk.viktor.containers;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -7,10 +7,12 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JWindow;
 
-import sk.viktor.ignored.GraphicsWrapper;
-import sk.viktor.ignored.PaintManager;
-import sk.viktor.ignored.WebWindow;
-import sk.viktor.ignored.model.JsonWindowInfo;
+import sk.viktor.SwingClassloader;
+import sk.viktor.ignored.common.GraphicsWrapper;
+import sk.viktor.ignored.common.PaintManager;
+import sk.viktor.ignored.common.WebWindow;
+import sk.viktor.ignored.model.s2c.JsonWindowInfo;
+import sk.viktor.util.Util;
 
 public class WebJWindow extends JWindow implements WebWindow {
 
@@ -45,9 +47,9 @@ public class WebJWindow extends JWindow implements WebWindow {
         result.setHeight(this.getHeight());
         result.setWidth(this.getWidth());
         result.setHasFocus(this.isFocused());
-        result.setId(PaintManager.getObjectIdentity(this));
+        result.setId(Util.getObjectIdentity(this));
         if (this.getParent() != null) {
-            result.setParentId(PaintManager.getObjectIdentity(this.getParent()));
+            result.setParentId(Util.getObjectIdentity(this.getParent()));
         }
         return result;
     }
@@ -56,15 +58,22 @@ public class WebJWindow extends JWindow implements WebWindow {
         return new Point(0, 0);
     }
 
+    public String getClientId(){
+        if(this.getClass().getClassLoader() instanceof SwingClassloader){
+            return ((SwingClassloader)Util.class.getClassLoader()).getClientId();
+        }
+        return null;
+    }
+    
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);
-        PaintManager.registerWindow(this);
+        PaintManager.getInstance(getClientId()).registerWindow(this);
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        PaintManager.disposeWindow(this);
+        PaintManager.getInstance(getClientId()).disposeWindow(this);
     }
 }

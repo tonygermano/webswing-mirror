@@ -1,5 +1,7 @@
 package sk.viktor.server;
 
+import java.util.Map;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -12,7 +14,8 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
-import sk.viktor.ignored.PaintManager;
+import sk.viktor.ignored.common.PaintManager;
+
 
 public class SwingDrawingServerHandler extends SimpleChannelUpstreamHandler {
 
@@ -27,9 +30,11 @@ public class SwingDrawingServerHandler extends SimpleChannelUpstreamHandler {
         if (e.getMessage() instanceof HttpRequest) {
             HttpRequest request = (HttpRequest) e.getMessage();
             if (request.getUri().startsWith(urlMapping)) {
-                synchronized (PaintManager.bufferMap) {
-                    if (PaintManager.bufferMap.containsKey(request.getUri().substring(urlMapping.length()))) {
-                        ChannelBuffer image = PaintManager.bufferMap.get(request.getUri().substring(urlMapping.length()));
+                String[] requestStrings = request.getUri().substring(urlMapping.length()).split("/");
+                Map<String, ChannelBuffer> buffer = PaintManager.getInstance(requestStrings[0]).bufferMap;
+                synchronized (buffer) {
+                    if (buffer.containsKey(requestStrings[1])) {
+                        ChannelBuffer image = buffer.get(requestStrings[1]);
                         writeResponse(image, e);
                     }
                 }

@@ -1,4 +1,4 @@
-package sk.viktor.ignored.model;
+package sk.viktor.ignored.model.s2c;
 
 public class JsonCopyAreaRequest {
 
@@ -10,11 +10,13 @@ public class JsonCopyAreaRequest {
     public int width;
     public int height;
     public long seq;
+    public String clientId;
     public JsonWindowInfo windowInfo;
 
-    public JsonCopyAreaRequest(long seq, int x, int y, int dx, int dy, int width, int height,JsonWindowInfo windowInfo) {
+    public JsonCopyAreaRequest(String clientId,long seq, int x, int y, int dx, int dy, int width, int height,JsonWindowInfo windowInfo) {
         super();
         this.seq = seq;
+        this.clientId=clientId;
         this.x = x;
         this.y = y;
         this.dx = dx;

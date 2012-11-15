@@ -1,4 +1,4 @@
-package sk.viktor.ignored.model;
+package sk.viktor.ignored.model.s2c;
 
 public class JsonWindowInfo {
 

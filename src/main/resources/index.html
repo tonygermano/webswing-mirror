@@ -7,10 +7,10 @@
 <script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
 
 <script type="text/javascript" charset="utf-8">
-	
+	var clientId=GUID();
     var socket = io.connect('http://localhost:8080', {
         'reconnection delay' : 2000,
-        'force new connection' : true
+        'sync disconnect on unload':true
       });
 
     var seq=0;
@@ -35,7 +35,7 @@
             		currentDialog.dialog("moveToTop");
             	}
           	};
-          	imageObj.src = "swing/"+data.filename;
+          	imageObj.src = "swing/"+clientId+"/"+data.filename;
 	  	}else if(data.type == "copyArea"){
           	var imageDataToCopy = context.getImageData(data.x, data.y, data.width, data.height);
           	context.putImageData(imageDataToCopy, data.x + data.dx, data.y + data.dy);
@@ -102,8 +102,9 @@
         // return relative mouse position
         var mouseX = evt.clientX - rect.left - root.scrollTop;
         var mouseY = evt.clientY - rect.top - root.scrollLeft;
-        return { '@class' : 'sk.viktor.ignored.event.model.JsonEventMouse',
+        return { '@class' : 'sk.viktor.ignored.model.c2s.JsonEventMouse',
             	 'windowId': canvas.id,
+            	 'clientId': clientId,
           		 'x': mouseX,
           		 'y': mouseY,
           		 'type':type,
@@ -111,8 +112,27 @@
         };
       }
     
+	  function GUID (){
+	        var S4 = function ()
+	        {
+	            return Math.floor(
+	                    Math.random() * 0x10000 /* 65536 */
+	                ).toString(16);
+	        };
+	
+	        return (
+	                S4() + S4() + "-" +
+	                S4() + "-" +
+	                S4() + "-" +
+	                S4() + "-" +
+	                S4() + S4() + S4()
+	            );
+	  }
+    
   	  socket.on('connect', function() {
-			seq=0;
+  	  	  seq=0;
+  	  	  socket.json.send({'@class':'sk.viktor.ignored.model.c2s.JsonConnectionHandshake',
+  	  	  	  				'clientId': clientId});
  	  });
     </script>
 </head>

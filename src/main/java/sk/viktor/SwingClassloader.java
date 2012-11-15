@@ -1,8 +1,5 @@
 package sk.viktor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantClass;
@@ -25,7 +22,8 @@ import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.SyntheticRepository;
 
-import sk.viktor.ignored.PaintManager;
+import sk.viktor.ignored.common.PaintManager;
+import sk.viktor.util.CLUtil;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -70,23 +68,26 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         builder.put("javax.swing.JScrollBar", "sk.web.swing.JScrollBar$$BCEL$$");
         builder.put("javax.swing.JViewPort", "sk.web.swing.JViewPort$$BCEL$$");
         builder.put("javax.swing.JOptionPane", "sk.web.swing.JOptionPane$$BCEL$$");
-        builder.put("javax.swing.JFrame", "sk.viktor.ignored.containers.WebJFrame");
-        builder.put("javax.swing.JDialog", "sk.viktor.ignored.containers.WebJDialog");
-        builder.put("javax.swing.JWindow", "sk.viktor.ignored.containers.WebJWindow");
+        builder.put("javax.swing.JFrame", "sk.viktor.containers.WebJFrame");
+        builder.put("javax.swing.JDialog", "sk.viktor.containers.WebJDialog");
+        builder.put("javax.swing.JWindow", "sk.viktor.containers.WebJWindow");
         
         classReplacementMapping = builder.build();
 
     }
 
-    public SwingClassloader() {
-        super(new String[]{"java.", "javax.", "sun.", "org.xml.sax"});
+    private String clientId;
+    
+    public SwingClassloader(String clientId) {
+        super(new String[]{"java.", "javax.", "sun.", "org.xml.sax","sk.viktor.ignored"});
+        this.clientId=clientId;
     }
 
     @Override
     protected JavaClass modifyClass(JavaClass clazz) {
-
+        System.out.println(clazz.getClassName());
         //do not modify classes placed in directory that contains "ignored"
-        if(isInPackage(clazz.getPackageName(),new String[]{"sk.viktor.ignored"})){
+        if(CLUtil.isInPackage(clazz.getPackageName(),new String[]{"sk.viktor.containers"})){
             return clazz;
         }
         
@@ -101,11 +102,11 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
             InstructionFactory f = new InstructionFactory(cg);
 
             //if this class is subclass of javax.swing.JComponent extend it with paint method which will call PaintManager
-            if (isSubClassOfJComponent(clazz)) {
+            if (CLUtil.isSubClassOfJComponent(clazz)) {
                 //PAINT METHOD
                 //modify existing paint method
-                if (getPaintMethod(clazz) != null) {
-                    Method m = getPaintMethod(clazz);
+                if (CLUtil.getPaintMethod(clazz) != null) {
+                    Method m = CLUtil.getPaintMethod(clazz);
                     MethodGen mg = new MethodGen(m, clazz.getClassName(), cp);
                     InstructionList il = mg.getInstructionList();
                     //add to begin
@@ -124,7 +125,7 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
                     MethodGen mg = new MethodGen(Constants.ACC_PUBLIC, // access flags
                             Type.VOID, // return type
                             new Type[] { new ObjectType("java.awt.Graphics") }, // arg types
-                            createArgNames(1), "paint", clazz.getClassName(), // method, class
+                            CLUtil.createArgNames(1), "paint", clazz.getClassName(), // method, class
                             il, cp);
                     il.append(new ALOAD(1));
                     il.append(new ALOAD(0));
@@ -177,7 +178,7 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
                                     }
                                     String myProxyClassName = classReplacementMapping.get(referencedClassName);
                                     int myProxyConstantClassPosition = cp.lookupClass(myProxyClassName);
-                                    InstructionHandle handle = findInstructionHandle(il, i);
+                                    InstructionHandle handle = CLUtil.findInstructionHandle(il, i);
                                     i.setIndex(myProxyConstantClassPosition);
                                     handle.setInstruction(i);
                                     dirtyFlag = true;
@@ -210,14 +211,6 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         }
     }
 
-    private InstructionHandle findInstructionHandle(InstructionList il, Instruction i) {
-        for (InstructionHandle ih = il.getStart(); ih != null; ih = ih.getNext()) {
-            if (ih.getInstruction().equals(i)) {
-                return ih;
-            }
-        }
-        return null;
-    }
 
     @Override
     protected JavaClass createClass(String className) {
@@ -233,12 +226,12 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
             InstructionFactory factory = new InstructionFactory(cg);
 
             //generate constructors
-            for (Method constructor : getAllConstructors(superClass)) {
+            for (Method constructor : CLUtil.getAllConstructors(superClass)) {
                 InstructionList il = new InstructionList();
                 MethodGen mg = new MethodGen(Constants.ACC_PUBLIC, // access flags
                         Type.VOID, // return type
                         constructor.getArgumentTypes(), // arg types
-                        createArgNames(constructor.getArgumentTypes().length), "<init>", className, // method, class
+                        CLUtil.createArgNames(constructor.getArgumentTypes().length), "<init>", className, // method, class
                         il, cp);
                 for (int i = 0; i <= constructor.getArgumentTypes().length; i++) {
                     il.append(new ALOAD(i));
@@ -255,7 +248,7 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
             MethodGen mg = new MethodGen(Constants.ACC_PUBLIC, // access flags
                     Type.VOID, // return type
                     new Type[] { new ObjectType("java.awt.Graphics") }, // arg types
-                    createArgNames(1), "paint", className, // method, class
+                    CLUtil.createArgNames(1), "paint", className, // method, class
                     il, cp);
             il.append(new ALOAD(1));
             il.append(new ALOAD(0));
@@ -283,53 +276,8 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         }
     }
 
-    private List<Method> getAllConstructors(JavaClass clazz) {
-        List<Method> result = new ArrayList<Method>();
-        for (Method m : clazz.getMethods()) {
-            if (m.getName().equals("<init>")) {
-                result.add(m);
-            }
-        }
-        return result;
+    public String getClientId() {
+        return clientId;
     }
 
-    private Method getPaintMethod(JavaClass clazz) {
-        for (Method m : clazz.getMethods()) {
-            if (m.getName().equals("paint") && m.isPublic() && m.getArgumentTypes().length == 1 && m.getArgumentTypes()[0].getSignature().equals("Ljava/awt/Graphics;")) {
-                return m;
-            }
-        }
-        return null;
-    }
-
-    private boolean isSubClassOfJComponent(JavaClass clazz) {
-        try {
-            for (JavaClass c : clazz.getSuperClasses()) {
-                if (c.getClassName().equals("javax.swing.JComponent")) {
-                    return true;
-                }
-            }
-            return false;
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static boolean isInPackage(String packageInspected, String[] packagePrefixed){
-        for(String prefix:packagePrefixed){
-            if(packageInspected!=null && packageInspected.startsWith(prefix)){
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    
-    private static String[] createArgNames(int number) {
-        String[] result = new String[number];
-        for (int i = 0; i < number; i++) {
-            result[i] = "arg" + i;
-        }
-        return result;
-    }
 }

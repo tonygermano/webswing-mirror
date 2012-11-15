@@ -1,4 +1,4 @@
-package sk.viktor.ignored;
+package sk.viktor.ignored.common;
 
 import java.awt.Color;
 import java.awt.Composite;
@@ -27,7 +27,8 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
-import sk.viktor.ignored.model.JsonWindowInfo;
+import sk.viktor.ignored.model.s2c.JsonWindowInfo;
+import sk.viktor.util.Util;
 
 public class GraphicsWrapper extends Graphics2D {
 
@@ -53,6 +54,10 @@ public class GraphicsWrapper extends Graphics2D {
 
     public BufferedImage getImg() {
         return webWindow.getVirtualScreen();
+    }
+
+    public WebWindow getWebWindow() {
+        return webWindow;
     }
 
     public JComponent getRootPaintComponent() {
@@ -170,7 +175,7 @@ public class GraphicsWrapper extends Graphics2D {
     @Override
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
         original.copyArea(x, y, width, height, dx, dy);
-        PaintManager.copyAreaOnWeb(this,(int)(x-webWindow.getFrameTranslation().x+getTransform().getTranslateX()), (int)(y- webWindow.getFrameTranslation().y+getTransform().getTranslateY()), width, height, dx, dy);
+        PaintManager.getInstance(webWindow.getClientId()).copyAreaOnWeb(this,(int)(x-webWindow.getFrameTranslation().x+getTransform().getTranslateX()), (int)(y- webWindow.getFrameTranslation().y+getTransform().getTranslateY()), width, height, dx, dy);
         web.copyArea(x, y, width, height, dx, dy);
     }
 
@@ -261,8 +266,8 @@ public class GraphicsWrapper extends Graphics2D {
     @Override
     public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
         web.drawImage(img, x, y, observer);
-        if (PaintManager.isPaintDoubleBufferedPainting() || PaintManager.isForceDoubleBufferedPainting()) {
-            PaintManager.doPaint(this, (JComponent) observer);
+        if (Util.isPaintDoubleBufferedPainting() || Util.isForceDoubleBufferedPainting()) {
+            PaintManager.getInstance(webWindow.getClientId()).doPaint(this, (JComponent) observer);
         }
         return original.drawImage(img, x, y, observer);
     }

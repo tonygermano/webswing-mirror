@@ -59,14 +59,18 @@ public class ResourcesServerHandler extends SimpleChannelUpstreamHandler {
         if (e.getMessage() instanceof HttpRequest) {
             HttpRequest request = (HttpRequest) e.getMessage();
             if (request.getUri().startsWith(urlMapping)) {
-                InputStream input = this.getClass().getClassLoader().getResourceAsStream(request.getUri().substring(urlMapping.length()));
+                String reqResource=request.getUri().substring(urlMapping.length());
+                if(reqResource.trim().isEmpty()){
+                    reqResource="index.html";
+                }
+                InputStream input = this.getClass().getClassLoader().getResourceAsStream(reqResource);
                 if (input != null) {
                     BufferedReader bufread = new BufferedReader(new InputStreamReader(input));
                     String read;
                     while ((read = bufread.readLine()) != null) {
                         responseContent.append(read + "\r\n");
                     }
-                    String contenttype = new MimetypesFileTypeMap().getContentType(request.getUri().substring(urlMapping.length()));
+                    String contenttype = new MimetypesFileTypeMap().getContentType(reqResource);
                     writeResponse(contenttype, e);
                 } else {
                     ctx.sendUpstream(e);

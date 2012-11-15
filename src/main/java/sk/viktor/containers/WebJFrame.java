@@ -1,16 +1,18 @@
-package sk.viktor.ignored.containers;
+package sk.viktor.containers;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Method;
 
 import javax.swing.JFrame;
 
-import sk.viktor.ignored.GraphicsWrapper;
-import sk.viktor.ignored.PaintManager;
-import sk.viktor.ignored.WebWindow;
-import sk.viktor.ignored.model.JsonWindowInfo;
+import sk.viktor.ignored.common.GraphicsWrapper;
+import sk.viktor.ignored.common.PaintManager;
+import sk.viktor.ignored.common.WebWindow;
+import sk.viktor.ignored.model.s2c.JsonWindowInfo;
+import sk.viktor.util.Util;
 
 public class WebJFrame extends JFrame implements WebWindow {
 
@@ -53,7 +55,7 @@ public class WebJFrame extends JFrame implements WebWindow {
         result.setWidth(this.getVirtualScreen().getWidth());
         result.setHasFocus(this.isFocused());
         result.setTitle(this.getTitle());
-        result.setId(PaintManager.getObjectIdentity(this));
+        result.setId(Util.getObjectIdentity(this));
         return result;
     }
 
@@ -61,16 +63,29 @@ public class WebJFrame extends JFrame implements WebWindow {
         return new Point(this.getRootPane().getX(), this.getRootPane().getY());
     }
 
+    public String getClientId(){
+        if(this.getClass().getClassLoader().getClass().getCanonicalName().equals("sk.viktor.SwingClassloader") ){
+            try {
+                Method m=this.getClass().getClassLoader().getClass().getMethod("getClientId");
+                String result=(String) m.invoke(this.getClass().getClassLoader());
+                return result;
+            } catch (Exception e) {
+                e.printStackTrace();
+            } 
+        }
+        return null;
+    }
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);
-        PaintManager.registerWindow(this);
+        System.out.println("getting PM for "+getClientId()+" PaintManager static cl"+ PaintManager.class.getClassLoader());
+        PaintManager.getInstance(getClientId()).registerWindow(this);
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        PaintManager.disposeWindow(this);
+        PaintManager.getInstance(getClientId()).disposeWindow(this);
     }
 
 }
