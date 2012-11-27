@@ -85,7 +85,6 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
 
     @Override
     protected JavaClass modifyClass(JavaClass clazz) {
-        System.out.println(clazz.getClassName());
         //do not modify classes placed in directory that contains "ignored"
         if(CLUtil.isInPackage(clazz.getPackageName(),new String[]{"sk.viktor.containers"})){
             return clazz;

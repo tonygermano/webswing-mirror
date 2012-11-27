@@ -5,23 +5,15 @@ import java.awt.Graphics;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.swing.JComponent;
-
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBufferOutputStream;
-import org.jboss.netty.buffer.ChannelBuffers;
 
 import sk.viktor.SwingClassloader;
 import sk.viktor.ignored.model.c2s.JsonConnectionHandshake;
 import sk.viktor.ignored.model.c2s.JsonEventMouse;
-import sk.viktor.ignored.model.s2c.JsonCopyAreaRequest;
 import sk.viktor.ignored.model.s2c.JsonPaintRequest;
 import sk.viktor.util.Util;
 
@@ -29,32 +21,13 @@ import com.corundumstudio.socketio.SocketIOClient;
 
 public class PaintManager {
 
-    private static Map<String, PaintManager> instances= new HashMap<String, PaintManager>();
-    private String clientId;
+    private static Map<String, PaintManager> instances = new HashMap<String, PaintManager>();
     private SocketIOClient client;
     private Map<String, Window> windows = new HashMap<String, Window>();
     private Long currentPaintRequestSeq = 0L;
-    public Map<String, ChannelBuffer> bufferMap = new HashMap<String, ChannelBuffer>();
 
     public PaintManager(String clientId, SocketIOClient client) {
-        this.clientId = clientId;
         this.client = client;
-    }
-
-    public void updateComponentImage(String componentId, BufferedImage imageContent) {
-        try {
-            synchronized (bufferMap) {
-                if (!bufferMap.containsKey(componentId)) {
-                    bufferMap.put(componentId, ChannelBuffers.dynamicBuffer());
-                }
-            }
-            ChannelBuffer buffer = bufferMap.get(componentId);
-            OutputStream os = new ChannelBufferOutputStream(buffer);
-            ImageIO.write(imageContent, "png", ImageIO.createImageOutputStream(os));
-            os.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static Graphics beforePaintInterceptor(Graphics g, JComponent c) {
@@ -74,17 +47,17 @@ public class PaintManager {
         if (g instanceof GraphicsWrapper) {
             GraphicsWrapper gw = (GraphicsWrapper) g;
             if (Util.getObjectIdentity(gw.getRootPaintComponent()).equals(Util.getObjectIdentity(c))) {
-                getInstance(Util.resolveClientId(c)).doPaint(gw, c);
+                getInstance(Util.resolveClientId(c)).doSendPaintRequest(gw, c);
             }
         }
     }
 
-    public void doPaint(GraphicsWrapper gw, JComponent c) {
+    public void doSendPaintRequest(GraphicsWrapper gw, JComponent c) {
         BufferedImage img = gw.getImg();
         if (img != null) {
             long seq = nextSeq(client);
             String identity = "" + seq;
-            updateComponentImage(identity, img);
+            gw.getWebWindow().addChangesToDiff();
             client.sendJsonObject(new JsonPaintRequest(Util.resolveClientId(c), seq, identity, 0, 0, gw.getWindowInfo()));
         }
     }
@@ -96,18 +69,16 @@ public class PaintManager {
         return result;
     }
 
-    public void copyAreaOnWeb(GraphicsWrapper gw, int x, int y, int width, int height, int dx, int dy) {
-        long seq = nextSeq(client);
-        client.sendJsonObject(new JsonCopyAreaRequest(gw.getWebWindow().getClientId(), seq, x, y, dx, dy, width, height, gw.getWindowInfo()));
-
-    }
-
     public void disposeWindow(Window webWindow) {
         windows.remove(webWindow);
     }
 
     public void registerWindow(Window webWindow) {
         windows.put(Util.getObjectIdentity(webWindow), webWindow);
+    }
+
+    public WebWindow getWebWindow(String guid) {
+        return (WebWindow) windows.get(guid);
     }
 
     public void dispatchEvent(JsonEventMouse event) {
@@ -155,9 +126,8 @@ public class PaintManager {
             try {
                 SwingClassloader cl = new SwingClassloader(handshake.clientId);
                 Class<?> clazz = cl.loadClass("com.sun.swingset3.SwingSet3");
-                //Class<?> clazz = cl.loadClass("sk.viktor.Ceiling");
                 // Get a class representing the type of the main method's argument
-                Class mainArgType[] = { (new String[0]).getClass() };
+                Class<?> mainArgType[] = { (new String[0]).getClass() };
                 String progArgs[] = new String[0];
 
                 // Find the standard main method in the class

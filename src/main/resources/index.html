@@ -13,11 +13,12 @@
         'sync disconnect on unload':true
       });
 
-    var seq=0;
-    var earlyReqMap= {}; 
+    var busy=false;
+	var nextRequest;
     
     function processRequest(data)
     {
+        busy=true;
     	var canvas = document.getElementById(data.windowInfo.id);
     	if(canvas==null){
     		canvas= createCanvasWinodow(data.windowInfo.id,data.windowInfo.title,data.windowInfo.width,data.windowInfo.height);
@@ -34,12 +35,15 @@
             	if(data.windowInfo.hasFocus){
             		currentDialog.dialog("moveToTop");
             	}
+            	if(nextRequest!=null && nextRequest!=data){
+            		processRequest(nextRequest);
+                }else{
+                	nextRequest=null;
+                	busy=false;
+                }
           	};
-          	imageObj.src = "swing/"+clientId+"/"+data.filename;
-	  	}else if(data.type == "copyArea"){
-          	var imageDataToCopy = context.getImageData(data.x, data.y, data.width, data.height);
-          	context.putImageData(imageDataToCopy, data.x + data.dx, data.y + data.dy);
-      	}
+          	imageObj.src = "swing/"+clientId+"/"+data.windowInfo.id;
+	  	}
     }
 
 	function createCanvasWinodow(name,title,width,height){
@@ -82,23 +86,15 @@
 	}
        
     socket.on('message', function(data) {
-    	  if(seq==0 || seq==data.seq){
+    	  if(!busy){
 			  processRequest(data);	
-    		  seq++;
-              while(earlyReqMap[seq]!=null){
-                  var tmp=earlyReqMap[seq];
-                  processRequest(tmp);
-                  delete earlyReqMap[seq];
-                  seq++;       
-              }
           }else{
-        	  earlyReqMap[data.seq]=data;      
+        	  nextRequest=data;      
           }  
       });
 
     function getMousePos(canvas, evt, type) {
         var rect = canvas.getBoundingClientRect(), root = document.documentElement;
-
         // return relative mouse position
         var mouseX = evt.clientX - rect.left - root.scrollTop;
         var mouseY = evt.clientY - rect.top - root.scrollLeft;
@@ -113,24 +109,13 @@
       }
     
 	  function GUID (){
-	        var S4 = function ()
-	        {
-	            return Math.floor(
-	                    Math.random() * 0x10000 /* 65536 */
-	                ).toString(16);
+	        var S4 = function (){
+	            return Math.floor(Math.random() * 0x10000).toString(16);
 	        };
-	
-	        return (
-	                S4() + S4() + "-" +
-	                S4() + "-" +
-	                S4() + "-" +
-	                S4() + "-" +
-	                S4() + S4() + S4()
-	            );
+	        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 	  }
     
   	  socket.on('connect', function() {
-  	  	  seq=0;
   	  	  socket.json.send({'@class':'sk.viktor.ignored.model.c2s.JsonConnectionHandshake',
   	  	  	  				'clientId': clientId});
  	  });

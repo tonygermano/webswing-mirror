@@ -1,7 +1,5 @@
 package sk.viktor;
 
-import java.lang.reflect.Method;
-
 import sk.viktor.server.SwingServer;
 
 

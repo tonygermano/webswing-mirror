@@ -30,7 +30,6 @@ import javax.activation.MimetypesFileTypeMap;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
@@ -92,7 +91,7 @@ public class ResourcesServerHandler extends SimpleChannelUpstreamHandler {
         response.setHeader(HttpHeaders.Names.CONTENT_TYPE, contentType);
         response.setHeader(HttpHeaders.Names.CONNECTION, "keep-alive");
         response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(buf.readableBytes()));
-        ChannelFuture future = e.getChannel().write(response);
+        e.getChannel().write(response);
     }
 
 }

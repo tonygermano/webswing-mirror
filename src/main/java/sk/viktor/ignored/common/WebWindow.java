@@ -6,18 +6,21 @@ import java.awt.image.BufferedImage;
 
 import sk.viktor.ignored.model.s2c.JsonWindowInfo;
 
-
 public interface WebWindow {
-    
+
     public BufferedImage getVirtualScreen();
-    
-    public void setVirtualScreen(BufferedImage virtualScreen) ;
-    
+
+    public void setVirtualScreen(BufferedImage virtualScreen);
+
     public JsonWindowInfo getWindowInfo();
-    
+
     public Graphics2D getWebGraphics();
-    
+
     public Point getFrameTranslation();
-    
-    public  String getClientId();
+
+    public String getClientId();
+
+    public byte[] getDiffWebData();
+
+    public void addChangesToDiff();
 }

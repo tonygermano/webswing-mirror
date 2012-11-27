@@ -1,13 +1,14 @@
 package sk.viktor.containers;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Method;
 
 import javax.swing.JWindow;
 
-import sk.viktor.SwingClassloader;
 import sk.viktor.ignored.common.GraphicsWrapper;
 import sk.viktor.ignored.common.PaintManager;
 import sk.viktor.ignored.common.WebWindow;
@@ -21,17 +22,44 @@ public class WebJWindow extends JWindow implements WebWindow {
      */
     private static final long serialVersionUID = 2961442461315724672L;
     private BufferedImage virtualScreen;
+    private BufferedImage diffScreen;
 
     @Override
     public Graphics getGraphics() {
         if (virtualScreen == null || virtualScreen.getWidth() != this.getWidth() || virtualScreen.getHeight() != this.getHeight()) {
             virtualScreen = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+            diffScreen = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
         }
         return new GraphicsWrapper((Graphics2D) super.getGraphics(), this);
     }
 
     public BufferedImage getVirtualScreen() {
         return virtualScreen;
+    }
+
+    public byte[] getDiffWebData() {
+        synchronized (this) {
+            byte[] res;
+            res = Util.getPngImage(diffScreen);
+            resetScreen(diffScreen);
+            return res;
+        }
+    }
+
+    public void resetScreen(BufferedImage img) {
+        Graphics2D g = (Graphics2D) img.getGraphics();
+        g.setBackground(new Color(0, 0, 0, 0));
+        g.clearRect(0, 0, img.getWidth(), img.getHeight());
+        g.dispose();
+    }
+
+    public void addChangesToDiff() {
+        synchronized (this) {
+            Graphics g = diffScreen.getGraphics();
+            g.drawImage(virtualScreen, 0, 0, null);
+            g.dispose();
+            resetScreen(virtualScreen);
+        }
     }
 
     public Graphics2D getWebGraphics() {
@@ -58,13 +86,19 @@ public class WebJWindow extends JWindow implements WebWindow {
         return new Point(0, 0);
     }
 
-    public String getClientId(){
-        if(this.getClass().getClassLoader() instanceof SwingClassloader){
-            return ((SwingClassloader)Util.class.getClassLoader()).getClientId();
+    public String getClientId() {
+        if (this.getClass().getClassLoader().getClass().getCanonicalName().equals("sk.viktor.SwingClassloader")) {
+            try {
+                Method m = this.getClass().getClassLoader().getClass().getMethod("getClientId");
+                String result = (String) m.invoke(this.getClass().getClassLoader());
+                return result;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
-    
+
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);

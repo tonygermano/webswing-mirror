@@ -77,9 +77,6 @@ public class GraphicsWrapper extends Graphics2D {
         Rectangle originalBounds = original.getClipBounds();
         web = ((Graphics2D) webWindow.getWebGraphics());
         web.setClip(originalBounds);
-        //set backgound transparent
-        web.setBackground(new Color(0,0,0,0));
-        web.clearRect(0, 0, getImg().getWidth(), getImg().getHeight());
         //copy properties from original
         web.setBackground(original.getBackground());
         web.setClip(original.getClip());
@@ -175,7 +172,6 @@ public class GraphicsWrapper extends Graphics2D {
     @Override
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
         original.copyArea(x, y, width, height, dx, dy);
-        PaintManager.getInstance(webWindow.getClientId()).copyAreaOnWeb(this,(int)(x-webWindow.getFrameTranslation().x+getTransform().getTranslateX()), (int)(y- webWindow.getFrameTranslation().y+getTransform().getTranslateY()), width, height, dx, dy);
         web.copyArea(x, y, width, height, dx, dy);
     }
 
@@ -267,7 +263,7 @@ public class GraphicsWrapper extends Graphics2D {
     public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
         web.drawImage(img, x, y, observer);
         if (Util.isPaintDoubleBufferedPainting() || Util.isForceDoubleBufferedPainting()) {
-            PaintManager.getInstance(webWindow.getClientId()).doPaint(this, (JComponent) observer);
+            PaintManager.getInstance(webWindow.getClientId()).doSendPaintRequest(this, (JComponent) observer);
         }
         return original.drawImage(img, x, y, observer);
     }
