@@ -1,127 +1,17 @@
 <html>
-<head>
-<title>Webswing</title>
-<script src="socket.io.min.js" type="text/javascript" charset="utf-8"></script>
-<link rel="stylesheet" href="jquery-ui.css" />
-<script src="http://code.jquery.com/jquery-1.8.2.js"></script>
-<script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
+	<head>
+		<title>Webswing</title>
+		<script src="socket.io.min.js" type="text/javascript" charset="utf-8" ></script>
+		<script src="jquery-1.8.3.js" type="text/javascript" charset="utf-8" ></script>
+		<script src="jquery-ui-1.9.2.custom.min.js" ></script>
+		<script src="webswing.js" type="text/javascript" charset="utf-8" ></script>
+		<link rel="stylesheet" href="css/smoothness/jquery-ui-1.9.2.custom.css" />
 
-<script type="text/javascript" charset="utf-8">
-	var clientId=GUID();
-    var socket = io.connect('http://localhost:8080', {
-        'reconnection delay' : 2000,
-        'sync disconnect on unload':true
-      });
-
-    var busy=false;
-	var nextRequest;
-    
-    function processRequest(data)
-    {
-        busy=true;
-    	var canvas = document.getElementById(data.windowInfo.id);
-    	if(canvas==null){
-    		canvas= createCanvasWinodow(data.windowInfo.id,data.windowInfo.title,data.windowInfo.width,data.windowInfo.height);
-        }
-   	 	var context = canvas.getContext("2d");
-   		if(data.type=="paint"){
-    	  	var imageObj = new Image();
-          	imageObj.onload = function() {
-            	context.drawImage(imageObj, data.x, data.y);
-            	var currentDialog=$("#"+data.windowInfo.id+"Window");
-            	if(currentDialog.dialog("isOpen")==false){
-                	currentDialog.dialog("open");
-                }
-            	if(data.windowInfo.hasFocus){
-            		currentDialog.dialog("moveToTop");
-            	}
-            	if(nextRequest!=null && nextRequest!=data){
-            		processRequest(nextRequest);
-                }else{
-                	nextRequest=null;
-                	busy=false;
-                }
-          	};
-          	imageObj.src = "swing/"+clientId+"/"+data.windowInfo.id;
-	  	}
-    }
-
-	function createCanvasWinodow(name,title,width,height){
-		$("#root").append('<div id="'+name+'Window"><canvas id="'+name+'" width="'+width+'" height="'+height+'"/></div>');
-		$("#"+name+"Window" ).dialog({
-            width: "auto",
-            heigth: "auto",
-            title: title,
-            resizable: "false"
-        });
-		canvas=document.getElementById(name);	
-        registerEventListeners(canvas);
-        return canvas;
-	}
-
-	var latestMouseMoveEvent;
-	setInterval(mouseMoveEventFilter, 100);
-	function mouseMoveEventFilter(){
-		if(latestMouseMoveEvent!=null){
-			socket.json.send(latestMouseMoveEvent);
-			latestMouseMoveEvent=null;
-		}
-	}
-	
-	function registerEventListeners(canvas){
-		canvas.addEventListener('mousedown', function(evt) {
-          	  var mousePos = getMousePos(canvas, evt,'mousedown');
-			  latestMouseMoveEvent=null;
-			  socket.json.send(mousePos);
-		}, true);
-		canvas.addEventListener('mousemove', function(evt) {
-	          var mousePos = getMousePos(canvas, evt,'mousemove');
-        	  latestMouseMoveEvent=mousePos;
-		}, true);
-		canvas.addEventListener('mouseup', function(evt) {
-        	  var mousePos = getMousePos(canvas, evt,'mouseup');
-        	  latestMouseMoveEvent=null;
-			  socket.json.send(mousePos);
-		}, true);
-	}
-       
-    socket.on('message', function(data) {
-    	  if(!busy){
-			  processRequest(data);	
-          }else{
-        	  nextRequest=data;      
-          }  
-      });
-
-    function getMousePos(canvas, evt, type) {
-        var rect = canvas.getBoundingClientRect(), root = document.documentElement;
-        // return relative mouse position
-        var mouseX = evt.clientX - rect.left - root.scrollTop;
-        var mouseY = evt.clientY - rect.top - root.scrollLeft;
-        return { '@class' : 'sk.viktor.ignored.model.c2s.JsonEventMouse',
-            	 'windowId': canvas.id,
-            	 'clientId': clientId,
-          		 'x': mouseX,
-          		 'y': mouseY,
-          		 'type':type,
-          		 'button':evt.which
-        };
-      }
-    
-	  function GUID (){
-	        var S4 = function (){
-	            return Math.floor(Math.random() * 0x10000).toString(16);
-	        };
-	        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
-	  }
-    
-  	  socket.on('connect', function() {
-  	  	  socket.json.send({'@class':'sk.viktor.ignored.model.c2s.JsonConnectionHandshake',
-  	  	  	  				'clientId': clientId});
- 	  });
-    </script>
-</head>
-<body bgcolor="#AAA">
-	<div id="root"></div>
-</body>
+		<script type="text/javascript" charset="utf-8">
+			start();
+		</script>
+	</head>
+	<body bgcolor="#AAA">
+		<div id="root"></div>
+	</body>
 </html>

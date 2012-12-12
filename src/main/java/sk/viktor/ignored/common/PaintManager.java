@@ -4,6 +4,7 @@ import java.awt.AWTEvent;
 import java.awt.Graphics;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -13,7 +14,9 @@ import javax.swing.JComponent;
 
 import sk.viktor.SwingClassloader;
 import sk.viktor.ignored.model.c2s.JsonConnectionHandshake;
+import sk.viktor.ignored.model.c2s.JsonEvent;
 import sk.viktor.ignored.model.c2s.JsonEventMouse;
+import sk.viktor.ignored.model.c2s.JsonEventWindow;
 import sk.viktor.ignored.model.s2c.JsonPaintRequest;
 import sk.viktor.util.Util;
 
@@ -22,6 +25,7 @@ import com.corundumstudio.socketio.SocketIOClient;
 public class PaintManager {
 
     private static Map<String, PaintManager> instances = new HashMap<String, PaintManager>();
+
     private SocketIOClient client;
     private Map<String, Window> windows = new HashMap<String, Window>();
     private Long currentPaintRequestSeq = 0L;
@@ -81,7 +85,21 @@ public class PaintManager {
         return (WebWindow) windows.get(guid);
     }
 
-    public void dispatchEvent(JsonEventMouse event) {
+    public void dispatchEvent(JsonEvent event) {
+        if (event instanceof JsonEventMouse) {
+            dispatchMouseEvent((JsonEventMouse) event);
+        }
+        if (event instanceof JsonEventWindow) {
+            dispatchWindowEvent((JsonEventWindow) event);
+        }
+    }
+
+    private void dispatchWindowEvent(JsonEventWindow event) {
+        Window w = windows.get(event.windowId);
+        w.dispose();
+    }
+
+    private void dispatchMouseEvent(JsonEventMouse event) {
         AWTEvent e = null;
         Window w = windows.get(event.windowId);
         WebWindow ww = (WebWindow) w;
@@ -90,21 +108,34 @@ public class PaintManager {
         long when = System.currentTimeMillis();
         int modifiers = Util.getMouseModifiersAWTFlag(event.button);
         int id = 0;
+        int clickcount = 0;
         int buttons = Util.getMouseButtonsAWTFlag(event.button);
         switch (event.type) {
             case mousemove:
                 id = event.button == 1 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
+                e = new MouseEvent(w, id, when, modifiers, x, y, x, y, clickcount, false, buttons);
                 break;
             case mouseup:
                 id = MouseEvent.MOUSE_RELEASED;
+                boolean popupTrigger = (buttons == 3) ? true : false;
+                clickcount = 1;
+                e = new MouseEvent(w, id, when, modifiers, x, y, x, y, clickcount, popupTrigger, buttons);
                 break;
             case mousedown:
                 id = MouseEvent.MOUSE_PRESSED;
+                clickcount = 1;
+                e = new MouseEvent(w, id, when, modifiers, x, y, x, y, clickcount, false, buttons);
+                break;
+            case mousewheel:
+                id = MouseEvent.MOUSE_WHEEL;
+                buttons = 0;
+                modifiers = 0;
+                e = new MouseWheelEvent(w, id, when, modifiers, x, y, clickcount, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 3, event.wheelDelta);
                 break;
             default:
                 break;
         }
-        e = new MouseEvent(w, id, when, modifiers, x, y, 0, false, buttons);
+
         windows.get(event.windowId).dispatchEvent(e);
     }
 
@@ -120,30 +151,46 @@ public class PaintManager {
         return null;
     }
 
-    public static void clientConnected(SocketIOClient client, JsonConnectionHandshake handshake) {
+    public static void clientConnected(SocketIOClient client, final JsonConnectionHandshake handshake) {
         if (!instances.containsKey(handshake.clientId)) {
             instances.put(handshake.clientId, new PaintManager(handshake.clientId, client));
             try {
-                SwingClassloader cl = new SwingClassloader(handshake.clientId);
-                Class<?> clazz = cl.loadClass("com.sun.swingset3.SwingSet3");
-                // Get a class representing the type of the main method's argument
-                Class<?> mainArgType[] = { (new String[0]).getClass() };
-                String progArgs[] = new String[0];
+                new Thread(new ThreadGroup(handshake.clientId), new Runnable() {
 
-                // Find the standard main method in the class
-                Method main = clazz.getMethod("main", mainArgType);
+                    public void run() {
+                        try {
+                            SwingClassloader cl = new SwingClassloader(handshake.clientId);
+                            Class<?> clazz = cl.loadClass("com.sun.swingset3.SwingSet3");
+                            // Get a class representing the type of the main method's argument
+                            Class<?> mainArgType[] = { (new String[0]).getClass() };
+                            String progArgs[] = new String[0];
 
-                // Create a list containing the arguments -- in this case,
-                // an array of strings
-                Object argsArray[] = { progArgs };
+                            // Find the standard main method in the class
+                            Method main = clazz.getMethod("main", mainArgType);
 
-                // Call the method
-                main.invoke(null, argsArray);
+                            // Create a list containing the arguments -- in this case,
+                            // an array of strings
+                            Object argsArray[] = { progArgs };
+
+                            // Call the method
+                            main.invoke(null, argsArray);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             instances.get(handshake.clientId).currentPaintRequestSeq = 0L;
+        }
+    }
+
+    public void disposeApplication() {
+        for (Window w : windows.values()) {
+            w.dispose();
         }
     }
 }

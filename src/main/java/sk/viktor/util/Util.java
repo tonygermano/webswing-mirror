@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -72,7 +73,7 @@ public class Util {
             case 2:
                 return MouseEvent.BUTTON2_DOWN_MASK;
             case 3:
-                return MouseEvent.BUTTON3_DOWN_MASK;
+                return MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK;
         }
         return 0;
     }
@@ -85,9 +86,22 @@ public class Util {
         return null;
     }
 
+    public static String resolveClientId(Class<?> clazz) {
+        if (clazz.getClassLoader().getClass().getCanonicalName().equals("sk.viktor.SwingClassloader")) {
+            try {
+                Method m = clazz.getClassLoader().getClass().getMethod("getClientId");
+                String result = (String) m.invoke(clazz.getClassLoader());
+                return result;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     public static byte[] getPngImage(BufferedImage imageContent) {
         try {
-            ByteArrayOutputStream baos= new ByteArrayOutputStream(); 
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
             ImageIO.write(imageContent, "png", ios);
             byte[] result = baos.toByteArray();
@@ -98,7 +112,7 @@ public class Util {
         }
         return null;
     }
-    
+
     public static void savePngImage(BufferedImage imageContent, String name) {
         try {
             OutputStream os = new FileOutputStream(new File(name));

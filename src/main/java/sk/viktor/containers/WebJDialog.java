@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Method;
 
 import javax.swing.JDialog;
 
@@ -96,16 +95,7 @@ public class WebJDialog extends JDialog implements WebWindow {
     }
 
     public String getClientId() {
-        if (this.getClass().getClassLoader().getClass().getCanonicalName().equals("sk.viktor.SwingClassloader")) {
-            try {
-                Method m = this.getClass().getClassLoader().getClass().getMethod("getClientId");
-                String result = (String) m.invoke(this.getClass().getClassLoader());
-                return result;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+        return Util.resolveClientId(this.getClass());
     }
 
 
@@ -120,4 +110,9 @@ public class WebJDialog extends JDialog implements WebWindow {
         super.dispose();
         PaintManager.getInstance(getClientId()).disposeWindow(this);
     }
+    
+//    @Override
+//    public void setDefaultCloseOperation(int operation) {
+//        super.setDefaultCloseOperation(operation==EXIT_ON_CLOSE?DISPOSE_ON_CLOSE:operation);
+//    }
 }

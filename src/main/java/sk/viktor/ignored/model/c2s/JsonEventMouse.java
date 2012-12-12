@@ -1,11 +1,12 @@
 package sk.viktor.ignored.model.c2s;
 
-public class JsonEventMouse  {
+public class JsonEventMouse implements JsonEvent {
 
     public enum Type {
         mousemove,
         mousedown,
-        mouseup;
+        mouseup,
+        mousewheel;
     }
 
     public Type type;
@@ -13,5 +14,6 @@ public class JsonEventMouse  {
     public int x;
     public int y;
     public int button;
+    public int wheelDelta;
     public String windowId;
 }

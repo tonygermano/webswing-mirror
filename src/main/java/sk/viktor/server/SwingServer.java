@@ -5,6 +5,7 @@ import org.jboss.netty.channel.ChannelPipeline;
 import sk.viktor.ignored.common.PaintManager;
 import sk.viktor.ignored.model.c2s.JsonConnectionHandshake;
 import sk.viktor.ignored.model.c2s.JsonEventMouse;
+import sk.viktor.ignored.model.c2s.JsonEventWindow;
 
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.Configuration;
@@ -41,6 +42,13 @@ public class SwingServer {
 
             public void onData(SocketIOClient arg0, JsonEventMouse mouseEvt, AckRequest arg2) {
                 PaintManager.getInstance(mouseEvt.clientId).dispatchEvent(mouseEvt);
+            }
+        });
+        
+        server.addJsonObjectListener(JsonEventWindow.class,new DataListener<JsonEventWindow>() {
+
+            public void onData(SocketIOClient arg0, JsonEventWindow windowEvt, AckRequest arg2) {
+                PaintManager.getInstance(windowEvt.clientId).dispatchEvent(windowEvt);
             }
         });
         
