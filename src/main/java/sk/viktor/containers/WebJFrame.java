@@ -98,21 +98,28 @@ public class WebJFrame extends JFrame implements WebWindow {
         return Util.resolveClientId(this.getClass());
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public void show() {
+        PaintManager.getInstance(getClientId()).registerWindow(this);
+        super.show();
+    }
+
     @Override
     public void setVisible(boolean b) {
-        super.setVisible(b);
         PaintManager.getInstance(getClientId()).registerWindow(this);
+        super.setVisible(b);
     }
 
     @Override
     public void dispose() {
-        super.dispose();
         PaintManager.getInstance(getClientId()).disposeWindow(this);
+        super.dispose();
     }
-    
-//    @Override
-//    public void setDefaultCloseOperation(int operation) {
-//        super.setDefaultCloseOperation(operation==EXIT_ON_CLOSE?DISPOSE_ON_CLOSE:operation);
-//    }
+
+    //    @Override
+    //    public void setDefaultCloseOperation(int operation) {
+    //        super.setDefaultCloseOperation(operation==EXIT_ON_CLOSE?DISPOSE_ON_CLOSE:operation);
+    //    }
 
 }

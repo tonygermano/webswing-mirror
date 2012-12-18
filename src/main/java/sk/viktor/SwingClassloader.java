@@ -81,14 +81,40 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         Builder<String, String> methodBuilder = new ImmutableBiMap.Builder<String, String>();
         methodBuilder.put("java.lang.Runtime exit (I)V", "sk.viktor.special.RedirectedMethods exit (I)V");
         methodBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "sk.viktor.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
-        methodReplacementMapping = methodBuilder.build();
+        methodBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;","sk.viktor.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;");
+        methodBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;","sk.viktor.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");
+        methodBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;","sk.viktor.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;");
+        methodBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;","sk.viktor.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");
+        methodBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;","sk.viktor.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;");
+        methodBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;","sk.viktor.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+        methodBuilder.put("javax.swing.JOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V","sk.viktor.special.RedirectedJOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V");
+        methodBuilder.put("javax.swing.JOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V","sk.viktor.special.RedirectedJOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V");
+        methodBuilder.put("javax.swing.JOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V","sk.viktor.special.RedirectedJOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V");
+        methodBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I","sk.viktor.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I");
+        methodBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I","sk.viktor.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I");
+        methodBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I","sk.viktor.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I");
+        methodBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I","sk.viktor.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I");
+        methodBuilder.put("javax.swing.JOptionPane showOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I","sk.viktor.special.RedirectedJOptionPane showOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I");
+        methodBuilder.put("javax.swing.JOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V","sk.viktor.special.RedirectedJOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V");
+        methodBuilder.put("javax.swing.JOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V","sk.viktor.special.RedirectedJOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V");
+        methodBuilder.put("javax.swing.JOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V","sk.viktor.special.RedirectedJOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V");
+        methodBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I","sk.viktor.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I");
+        methodBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I","sk.viktor.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I");
+        methodBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I","sk.viktor.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I");
+        methodBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I","sk.viktor.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I");
+        methodBuilder.put("javax.swing.JOptionPane showInternalOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I","sk.viktor.special.RedirectedJOptionPane showInternalOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I");
+        methodBuilder.put("javax.swing.JOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;","sk.viktor.special.RedirectedJOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;");
+        methodBuilder.put("javax.swing.JOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;","sk.viktor.special.RedirectedJOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;");
+        methodBuilder.put("javax.swing.JOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;","sk.viktor.special.RedirectedJOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
         
+        methodReplacementMapping = methodBuilder.build();
+
     }
 
     private String clientId;
 
     public SwingClassloader(String clientId) {
-        super(new String[] { "java.","javax.", "sun.", "org.xml.sax", "sk.viktor.ignored" });
+        super(new String[] { "java.", "javax.", "sun.", "org.xml.sax", "sk.viktor.ignored" });
         this.clientId = clientId;
     }
 
@@ -96,7 +122,7 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
     protected JavaClass modifyClass(JavaClass clazz) {
 
         //do not modify classes placed in this list
-        if (CLUtil.isInPackage(clazz.getPackageName(), new String[] { "sk.viktor.containers","sk.viktor.special" })) {
+        if (CLUtil.isInPackage(clazz.getPackageName(), new String[] { "sk.viktor.containers" })) {
             return clazz;
         }
 
@@ -121,10 +147,9 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
 
             //dump
             //            try {
-            //                if (print)
+            //                if (cg.getClassName().equals("sk.viktor.special.RedirectedJOptionPane"))
             //                    cg.getJavaClass().dump(cg.getClassName() + ".class");
-            //                print = false;
-            //            } catch (IOException ex) {
+            //            } catch (Exception ex) {
             //                ex.printStackTrace();
             //            }
             //end dump
@@ -135,20 +160,20 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
     }
 
     private void rerouteMehods(JavaClass clazz, ClassGen cg, ConstantPoolGen cp, InstructionFactory f) {
-        Map<Integer,Integer> indexReplacementMap= new HashMap<Integer, Integer>();
+        Map<Integer, Integer> indexReplacementMap = new HashMap<Integer, Integer>();
         //find methods to replace in current class
-        for(String methodDef:methodReplacementMapping.keySet()){
-            String[] md=methodDef.split(" ");
+        for (String methodDef : methodReplacementMapping.keySet()) {
+            String[] md = methodDef.split(" ");
             int methodIndex = cp.lookupMethodref(md[0], md[1], md[2]);
-            if(methodIndex !=-1){
+            if (methodIndex != -1) {
                 //method found in current class, create a replacement MethodRefConstant in cp
-                String[] replace=methodReplacementMapping.get(methodDef).split(" ");
+                String[] replace = methodReplacementMapping.get(methodDef).split(" ");
                 int replacementIndex = cp.addMethodref(replace[0], replace[1], replace[2]);
                 indexReplacementMap.put(methodIndex, replacementIndex);
             }
         }
         //replace methodRef indexes in instructions
-        if(indexReplacementMap.size()>0){
+        if (indexReplacementMap.size() > 0) {
             for (Method m : cg.getMethods()) {
                 MethodGen mg = new MethodGen(m, clazz.getClassName(), cp);
                 InstructionList il = mg.getInstructionList();
@@ -157,12 +182,12 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
                     for (Instruction instruction : il.getInstructions()) {
                         if (instruction instanceof CPInstruction) {
                             CPInstruction i = (CPInstruction) instruction;
-                            if(indexReplacementMap.containsKey(i.getIndex())){
-                               InstructionHandle handle = CLUtil.findInstructionHandle(il, i);
-                               INVOKESTATIC replacedInstruction = new INVOKESTATIC(indexReplacementMap.get(i.getIndex()));
-                               handle.setInstruction(replacedInstruction);
-                               dirtyFlag = true;
-                               System.out.println("Replacing "+mg.getName()+ " in "+clazz.getClassName());
+                            if (indexReplacementMap.containsKey(i.getIndex())) {
+                                InstructionHandle handle = CLUtil.findInstructionHandle(il, i);
+                                INVOKESTATIC replacedInstruction = new INVOKESTATIC(indexReplacementMap.get(i.getIndex()));
+                                handle.setInstruction(replacedInstruction);
+                                dirtyFlag = true;
+                                System.out.println("Replacing " + mg.getName() + " in " + clazz.getClassName());
                             }
                         }
                     }
@@ -177,7 +202,7 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
                     }
                 }
             }
-            
+
         }
     }
 
@@ -342,11 +367,6 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
             cg.addMethod(mg.getMethod());
             il.dispose();
 
-            //            try {
-            //                cg.getJavaClass().dump(className + ".class");
-            //            } catch (java.io.IOException e) {
-            //                System.err.println(e);
-            //            }
             return cg.getJavaClass();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);

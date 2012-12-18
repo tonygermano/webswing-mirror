@@ -89,16 +89,23 @@ public class WebJWindow extends JWindow implements WebWindow {
         return Util.resolveClientId(this.getClass());
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public void show() {
+        PaintManager.getInstance(getClientId()).registerWindow(this);
+        super.show();
+    }
+
     @Override
     public void setVisible(boolean b) {
-        super.setVisible(b);
         PaintManager.getInstance(getClientId()).registerWindow(this);
+        super.setVisible(b);
     }
 
     @Override
     public void dispose() {
-        super.dispose();
         PaintManager.getInstance(getClientId()).disposeWindow(this);
+        super.dispose();
     }
-    
+
 }

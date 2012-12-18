@@ -1,6 +1,8 @@
 package sk.viktor.containers;
 
 import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -23,6 +25,14 @@ public class WebJDialog extends JDialog implements WebWindow {
     private BufferedImage virtualScreen;
     private BufferedImage diffScreen;
 
+    public WebJDialog(Dialog owner, String title, boolean modal) {
+        super(owner, title, modal);
+    }
+
+    public WebJDialog(Frame owner, String title, boolean modal) {
+        super(owner, title, modal);
+    }
+
     @Override
     public Graphics getGraphics() {
         if (virtualScreen == null || virtualScreen.getWidth() != this.getWidth() || virtualScreen.getHeight() != this.getHeight()) {
@@ -44,7 +54,7 @@ public class WebJDialog extends JDialog implements WebWindow {
             byte[] res;
             if (this.getRootPane() != null) {
                 res = Util.getPngImage(diffScreen.getSubimage(this.getRootPane().getX(), this.getRootPane().getY(), this.getRootPane().getWidth(), this.getRootPane().getHeight()));
-            }else {
+            } else {
                 res = Util.getPngImage(diffScreen);
             }
             resetScreen(diffScreen);
@@ -98,21 +108,23 @@ public class WebJDialog extends JDialog implements WebWindow {
         return Util.resolveClientId(this.getClass());
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public void show() {
+        PaintManager.getInstance(getClientId()).registerWindow(this);
+        super.show();
+    }
 
     @Override
     public void setVisible(boolean b) {
-        super.setVisible(b);
         PaintManager.getInstance(getClientId()).registerWindow(this);
+        super.setVisible(b);
     }
 
     @Override
     public void dispose() {
-        super.dispose();
         PaintManager.getInstance(getClientId()).disposeWindow(this);
+        super.dispose();
     }
-    
-//    @Override
-//    public void setDefaultCloseOperation(int operation) {
-//        super.setDefaultCloseOperation(operation==EXIT_ON_CLOSE?DISPOSE_ON_CLOSE:operation);
-//    }
+
 }
