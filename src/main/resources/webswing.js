@@ -1,14 +1,14 @@
 var clientId = GUID();
-var socket = io.connect('http://localhost:8080', {
+var socket = io.connect('http://localhost:7070', {
 	'reconnection delay' : 2000,
 	'sync disconnect on unload' : true
 });
-var busy = false;
-var nextRequest;
+var busy={};
+var nextRequest={};
 var latestMouseMoveEvent;
 
 function processRequest(data) {
-	busy = true;
+	busy[data.windowInfo.id] = true;
 	var canvas = document.getElementById(data.windowInfo.id);
 	if (canvas == null) {
 		canvas = createCanvasWinodow(data.windowInfo.id, data.windowInfo.title,
@@ -26,11 +26,11 @@ function processRequest(data) {
 			if (data.windowInfo.hasFocus) {
 				currentDialog.dialog("moveToTop");
 			}
-			if (nextRequest != null && nextRequest != data) {
-				processRequest(nextRequest);
+			if (nextRequest[data.windowInfo.id] != null && nextRequest[data.windowInfo.id] != data) {
+				processRequest(nextRequest[data.windowInfo.id]);
 			} else {
-				nextRequest = null;
-				busy = false;
+				delete nextRequest[data.windowInfo.id];
+				busy[data.windowInfo.id] = false;
 			}
 		};
 		imageObj.src = "swing/" + clientId + "/" + data.windowInfo.id;
@@ -141,10 +141,10 @@ function start() {
 
 	setInterval(mouseMoveEventFilter, 100);
 	socket.on('message', function(data) {
-		if (!busy) {
+		if (!(data.windowInfo.id in data) || busy[data.windowInfo.id]!=true ) {
 			processRequest(data);
 		} else {
-			nextRequest = data;
+			nextRequest[data.windowInfo.id] = data;
 		}
 	});
 	socket.on('connect', function() {

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 import sk.viktor.SwingClassloader;
 import sk.viktor.ignored.model.c2s.JsonConnectionHandshake;
@@ -135,8 +136,18 @@ public class PaintManager {
             default:
                 break;
         }
+        dispatchEventInSwing(w,e);
+    }
 
-        windows.get(event.windowId).dispatchEvent(e);
+    private void dispatchEventInSwing(final Window w,final AWTEvent e) {
+        Runnable callDispatchEvent = new Runnable() {
+
+            public void run() {
+                w.dispatchEvent(e);
+            }
+        };
+        SwingUtilities.invokeLater(callDispatchEvent);
+        
     }
 
     public static PaintManager getInstance(String clientId) {
@@ -161,6 +172,7 @@ public class PaintManager {
                         try {
                             SwingClassloader cl = new SwingClassloader(handshake.clientId);
                             Class<?> clazz = cl.loadClass("com.sun.swingset3.SwingSet3");
+                            //Class<?> clazz = cl.loadClass("com.sun.swingset3.demos.filechooser.FileChooserDemo");
                             // Get a class representing the type of the main method's argument
                             Class<?> mainArgType[] = { (new String[0]).getClass() };
                             String progArgs[] = new String[0];

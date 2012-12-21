@@ -19,7 +19,7 @@ public class SwingServer {
     public static void startServer() throws Exception {
         Configuration config = new Configuration();
         config.setHostname("localhost");
-        config.setPort(8080);
+        config.setPort(7070);
         SocketIOServer server = new SocketIOServer(config);
         
         server.setPipelineFactory(new SocketIOPipelineFactory() {
