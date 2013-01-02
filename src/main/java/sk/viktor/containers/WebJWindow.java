@@ -99,6 +99,9 @@ public class WebJWindow extends JWindow implements WebWindow {
     @Override
     public void setVisible(boolean b) {
         PaintManager.getInstance(getClientId()).registerWindow(this);
+        if(!b){
+            PaintManager.getInstance(getClientId()).hideWindowInBrowser(this);    
+        }
         super.setVisible(b);
     }
 

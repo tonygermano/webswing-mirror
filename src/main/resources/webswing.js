@@ -141,6 +141,13 @@ function start() {
 
 	setInterval(mouseMoveEventFilter, 100);
 	socket.on('message', function(data) {
+		if(data.clazz == 'sk.viktor.ignored.model.s2c.JsonWindowRequest'){
+			$("#" + data.windowId + "Window").dialog("close");
+			delete nextRequest[data.windowId];
+			delete busy[data.windowId];
+			return;
+		}
+		
 		if (!(data.windowInfo.id in data) || busy[data.windowInfo.id]!=true ) {
 			processRequest(data);
 		} else {

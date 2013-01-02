@@ -2,7 +2,6 @@ package sk.viktor;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantClass;
@@ -28,6 +27,7 @@ import org.apache.bcel.util.SyntheticRepository;
 
 import sk.viktor.ignored.common.PaintManager;
 import sk.viktor.util.CLUtil;
+import sk.viktor.util.Util;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -420,6 +420,22 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
             cg.addMethod(mg.getMethod());
             il.dispose();
 
+            //XXXXXXXXXX JComboBox (popup fix)XXXXXXXXXXX
+            if(superClassName.equals("javax.swing.JComboBox")){
+                InstructionList ilx = new InstructionList();
+                MethodGen mgx = new MethodGen(Constants.ACC_PUBLIC, // access flags
+                        Type.STRING, // return type
+                        new Type[] {}, // arg types
+                        new String[]{}, "getUIClassID", className, // method, class
+                        ilx, cp);
+                ilx.append(factory.createConstant(Main.comboboxUI));
+                ilx.append(factory.createInvoke(Util.class.getCanonicalName(), "resolveComboboxUIClassId", Type.STRING, new Type[] {Type.STRING}, Constants.INVOKESTATIC));
+                ilx.append(InstructionConstants.ARETURN);
+                mgx.setMaxStack();
+                cg.addMethod(mgx.getMethod());
+                ilx.dispose();
+            }
+            
             //+++++++++ Override methods that needs to be modified +++++++++++++
             overrideMehods(cg, cp, factory);
 

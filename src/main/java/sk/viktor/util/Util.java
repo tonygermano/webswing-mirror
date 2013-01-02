@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JComponent;
+import javax.swing.UIManager;
 
 import sk.viktor.ignored.common.WebWindow;
 
@@ -123,5 +124,19 @@ public class Util {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String resolveComboboxUIClassId(String newUIid) {
+        String className = (String) UIManager.get(newUIid);
+        for (StackTraceElement e : Thread.currentThread().getStackTrace()) {
+            if (e.getClassName().equals(UIManager.class.getCanonicalName()) && e.getMethodName().equals("getUI") ) {
+                return newUIid;
+            }
+            if(e.getClassName().equals(className) && e.getMethodName().equals("<init>") ){
+                break;
+            }
+        }
+        return "ComboBoxUI";
+
     }
 }
