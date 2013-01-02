@@ -1,6 +1,7 @@
 package sk.viktor.ignored.common;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -14,6 +15,7 @@ import java.awt.RenderingHints;
 import java.awt.RenderingHints.Key;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.Window;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
@@ -26,6 +28,7 @@ import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
 import javax.swing.JComponent;
+import javax.swing.RepaintManager;
 
 import sk.viktor.ignored.model.s2c.JsonWindowInfo;
 import sk.viktor.util.Util;
@@ -172,7 +175,8 @@ public class GraphicsWrapper extends Graphics2D {
     @Override
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
         original.copyArea(x, y, width, height, dx, dy);
-        web.copyArea(x, y, width, height, dx, dy);
+        //repaint area
+        RepaintManager.currentManager((Component)webWindow).addDirtyRegion((Window) webWindow,  (int)getTransform().getTranslateX()+x+dx, (int)getTransform().getTranslateY()+y+dy, width, height);
     }
 
     @Override

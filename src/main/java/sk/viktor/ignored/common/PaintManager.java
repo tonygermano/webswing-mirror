@@ -18,7 +18,6 @@ import sk.viktor.ignored.model.c2s.JsonConnectionHandshake;
 import sk.viktor.ignored.model.c2s.JsonEvent;
 import sk.viktor.ignored.model.c2s.JsonEventMouse;
 import sk.viktor.ignored.model.c2s.JsonEventWindow;
-import sk.viktor.ignored.model.c2s.JsonEventWindow.Type;
 import sk.viktor.ignored.model.s2c.JsonPaintRequest;
 import sk.viktor.ignored.model.s2c.JsonWindowRequest;
 import sk.viktor.util.Util;
