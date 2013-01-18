@@ -3,6 +3,7 @@ package sk.viktor.ignored.common;
 import java.awt.AWTEvent;
 import java.awt.Graphics;
 import java.awt.Window;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
@@ -16,6 +17,7 @@ import javax.swing.SwingUtilities;
 import sk.viktor.SwingClassloader;
 import sk.viktor.ignored.model.c2s.JsonConnectionHandshake;
 import sk.viktor.ignored.model.c2s.JsonEvent;
+import sk.viktor.ignored.model.c2s.JsonEventKeyboard;
 import sk.viktor.ignored.model.c2s.JsonEventMouse;
 import sk.viktor.ignored.model.c2s.JsonEventWindow;
 import sk.viktor.ignored.model.s2c.JsonPaintRequest;
@@ -83,10 +85,10 @@ public class PaintManager {
         windows.put(Util.getObjectIdentity(webWindow), webWindow);
     }
 
-    public void hideWindowInBrowser(Window webWindow){
-        client.sendJsonObject(new JsonWindowRequest(((WebWindow)webWindow).getWindowInfo().getId()));
+    public void hideWindowInBrowser(Window webWindow) {
+        client.sendJsonObject(new JsonWindowRequest(((WebWindow) webWindow).getWindowInfo().getId()));
     }
-    
+
     public WebWindow getWebWindow(String guid) {
         return (WebWindow) windows.get(guid);
     }
@@ -98,11 +100,28 @@ public class PaintManager {
         if (event instanceof JsonEventWindow) {
             dispatchWindowEvent((JsonEventWindow) event);
         }
+        if (event instanceof JsonEventKeyboard) {
+            dispatchKeyboardEvent((JsonEventKeyboard) event);
+        }
     }
 
     private void dispatchWindowEvent(JsonEventWindow event) {
         Window w = windows.get(event.windowId);
         w.dispose();
+    }
+
+    private void dispatchKeyboardEvent(JsonEventKeyboard event) {
+        Window w = windows.get(event.windowId);
+        long when = System.currentTimeMillis();
+        int modifiers = Util.getKeyModifiersAWTFlag(event);
+        int type = Util.getKeyType(event.type);
+        if (type == KeyEvent.KEY_TYPED) {
+            AWTEvent e = new KeyEvent(w.getFocusOwner(), KeyEvent.KEY_TYPED, when, modifiers, 0, (char) event.character);
+            dispatchEventInSwing(w, e);
+        } else {
+            AWTEvent e = new KeyEvent(w.getFocusOwner(), type, when, modifiers, event.keycode, (char) event.character);
+            dispatchEventInSwing(w, e);
+        }
     }
 
     private void dispatchMouseEvent(JsonEventMouse event) {
@@ -141,10 +160,10 @@ public class PaintManager {
             default:
                 break;
         }
-        dispatchEventInSwing(w,e);
+        dispatchEventInSwing(w, e);
     }
 
-    private void dispatchEventInSwing(final Window w,final AWTEvent e) {
+    private void dispatchEventInSwing(final Window w, final AWTEvent e) {
         Runnable callDispatchEvent = new Runnable() {
 
             public void run() {
@@ -152,7 +171,7 @@ public class PaintManager {
             }
         };
         SwingUtilities.invokeLater(callDispatchEvent);
-        
+
     }
 
     public static PaintManager getInstance(String clientId) {

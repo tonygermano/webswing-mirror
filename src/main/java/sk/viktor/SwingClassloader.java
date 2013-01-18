@@ -128,7 +128,7 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
     protected JavaClass modifyClass(JavaClass clazz) {
 
         //do not modify classes placed in this list
-        if (CLUtil.isInPackage(clazz.getPackageName(), new String[] { "sk.viktor.containers" })) {
+        if (CLUtil.isInPackage(clazz.getPackageName(), new String[] { "sk.viktor.containers","sk.viktor.special" })) {
             return clazz;
         }
 
@@ -240,7 +240,6 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
                                 INVOKESTATIC replacedInstruction = new INVOKESTATIC(indexReplacementMap.get(i.getIndex()));
                                 handle.setInstruction(replacedInstruction);
                                 dirtyFlag = true;
-                                System.out.println("Replacing " + mg.getName() + " in " + clazz.getClassName());
                             }
                         }
                     }

@@ -3,16 +3,16 @@ var socket = io.connect('http://localhost:7070', {
 	'reconnection delay' : 2000,
 	'sync disconnect on unload' : true
 });
-var busy={};
-var nextRequest={};
+var busy = {};
+var nextRequest = {};
 var latestMouseMoveEvent;
+var canvasIndex = 1;
 
 function processRequest(data) {
 	busy[data.windowInfo.id] = true;
 	var canvas = document.getElementById(data.windowInfo.id);
 	if (canvas == null) {
-		canvas = createCanvasWinodow(data.windowInfo.id, data.windowInfo.title,
-				data.windowInfo.width, data.windowInfo.height);
+		canvas = createCanvasWinodow(data.windowInfo.id, data.windowInfo.title, data.windowInfo.width, data.windowInfo.height);
 	}
 	var context = canvas.getContext("2d");
 	if (data.type == "paint") {
@@ -38,27 +38,26 @@ function processRequest(data) {
 }
 
 function createCanvasWinodow(name, title, width, height) {
-	$("#root").append(
-			'<div id="' + name + 'Window"><canvas id="' + name + '" width="'
-					+ width + '" height="' + height + '"/></div>');
+	$("#root").append('<div id="' + name + 'Window"><canvas id="' + name + '" width="' + width + '" height="' + height + '" tabindex="-1"/></div>');
 	$("#" + name + "Window").dialog({
 		width : "auto",
 		heigth : "auto",
 		title : title,
 		resizable : "false",
-		beforeClose: sendCloseWindowEvent
+		beforeClose : sendCloseWindowEvent
 	});
 	canvas = document.getElementById(name);
 	registerEventListeners(canvas);
 	return canvas;
 }
 
-function sendCloseWindowEvent( event, ui ) {
-	var e=	{	'@class' : 'sk.viktor.ignored.model.c2s.JsonEventWindow',
-				'type' : 'close',
-				'windowId' : this.id.substring(0,this.id.length-6),
-				'clientId' : clientId
-			};
+function sendCloseWindowEvent(event, ui) {
+	var e = {
+		'@class' : 'sk.viktor.ignored.model.c2s.JsonEventWindow',
+		'type' : 'close',
+		'windowId' : this.id.substring(0, this.id.length - 6),
+		'clientId' : clientId
+	};
 	socket.json.send(e);
 }
 
@@ -74,6 +73,7 @@ function registerEventListeners(canvas) {
 		var mousePos = getMousePos(canvas, evt, 'mousedown');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
+		canvas.focus();
 		return false;
 	}, false);
 	canvas.addEventListener('mousemove', function(evt) {
@@ -95,17 +95,48 @@ function registerEventListeners(canvas) {
 		return false;
 	}, false);
 	// firefox
-	canvas.addEventListener("DOMMouseScroll",function(evt) {
+	canvas.addEventListener("DOMMouseScroll", function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousewheel');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
 		return false;
 	}, false);
 	canvas.oncontextmenu = function(event) {
-	    event.preventDefault();
-	    event.stopPropagation();
-	    return false;
+		event.preventDefault();
+		event.stopPropagation();
+		return false;
 	};
+
+	canvas.addEventListener('keydown', function(event) {
+		// 48-57
+		// 65-90
+		// 186-192
+		// 219-222
+		// 226
+		var kc = event.keyCode;
+		if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226))) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+		var keyevt = getKBKey('keydown', canvas, event);
+		socket.json.send(keyevt);
+		return false;
+	}, false);
+	canvas.addEventListener('keypress', function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		var keyevt = getKBKey('keypress', canvas, event);
+		socket.json.send(keyevt);
+		return false;
+	}, false);
+	canvas.addEventListener('keyup', function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		var keyevt = getKBKey('keyup', canvas, event);
+		socket.json.send(keyevt);
+		return false;
+	}, false);
+
 }
 
 function getMousePos(canvas, evt, type) {
@@ -113,9 +144,9 @@ function getMousePos(canvas, evt, type) {
 	// return relative mouse position
 	var mouseX = evt.clientX - rect.left - root.scrollTop;
 	var mouseY = evt.clientY - rect.top - root.scrollLeft;
-	var delta=0;
-	if (type == 'mousewheel'){
-		 delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
+	var delta = 0;
+	if (type == 'mousewheel') {
+		delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 	}
 	return {
 		'@class' : 'sk.viktor.ignored.model.c2s.JsonEventMouse',
@@ -129,26 +160,41 @@ function getMousePos(canvas, evt, type) {
 	};
 }
 
+function getKBKey(type, canvas, evt) {
+	return {
+		'@class' : 'sk.viktor.ignored.model.c2s.JsonEventKeyboard',
+		'windowId' : canvas.id,
+		'clientId' : clientId,
+		'type' : type,
+		'character' : evt.which,
+		'keycode' : evt.keyCode,
+		'alt' : evt.altKey,
+		'ctrl' : evt.ctrlKey,
+		'shift' : evt.shiftKey,
+		'meta' : evt.metaKey,
+		'altgr' : evt.altGraphKey
+	}
+}
+
 function GUID() {
 	var S4 = function() {
 		return Math.floor(Math.random() * 0x10000).toString(16);
 	};
-	return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4()
-			+ S4() + S4());
+	return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 }
 
 function start() {
 
 	setInterval(mouseMoveEventFilter, 100);
 	socket.on('message', function(data) {
-		if(data.clazz == 'sk.viktor.ignored.model.s2c.JsonWindowRequest'){
+		if (data.clazz == 'sk.viktor.ignored.model.s2c.JsonWindowRequest') {
 			$("#" + data.windowId + "Window").dialog("close");
 			delete nextRequest[data.windowId];
 			delete busy[data.windowId];
 			return;
 		}
-		
-		if (!(data.windowInfo.id in data) || busy[data.windowInfo.id]!=true ) {
+
+		if (!(data.windowInfo.id in data) || busy[data.windowInfo.id] != true) {
 			processRequest(data);
 		} else {
 			nextRequest[data.windowInfo.id] = data;

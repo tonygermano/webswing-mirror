@@ -1,6 +1,7 @@
 package sk.viktor.util;
 
 import java.awt.Component;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -16,6 +17,8 @@ import javax.swing.JComponent;
 import javax.swing.UIManager;
 
 import sk.viktor.ignored.common.WebWindow;
+import sk.viktor.ignored.model.c2s.JsonEventKeyboard;
+import sk.viktor.ignored.model.c2s.JsonEventKeyboard.Type;
 
 public class Util {
 
@@ -138,5 +141,34 @@ public class Util {
         }
         return "ComboBoxUI";
 
+    }
+
+    public static int getKeyModifiersAWTFlag(JsonEventKeyboard event) {
+        int modifiers = 0;
+        if(event.alt){
+            modifiers=modifiers&KeyEvent.ALT_MASK;
+        }
+        if(event.ctrl){
+            modifiers=modifiers&KeyEvent.CTRL_MASK;
+        }
+        if(event.shift){
+            modifiers=modifiers&KeyEvent.SHIFT_MASK;
+        }
+        if(event.altgr){
+            modifiers=modifiers&KeyEvent.ALT_GRAPH_MASK;
+        }
+        if(event.meta){
+            modifiers=modifiers&KeyEvent.META_MASK;
+        }
+        return modifiers;
+    }
+
+    public static int getKeyType(Type type) {
+        switch(type){
+            case keydown:return KeyEvent.KEY_PRESSED;
+            case keypress:return KeyEvent.KEY_TYPED;
+            case keyup:return KeyEvent.KEY_RELEASED;
+        }
+        return 0;
     }
 }

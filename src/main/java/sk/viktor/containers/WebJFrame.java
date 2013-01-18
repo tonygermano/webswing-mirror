@@ -104,6 +104,13 @@ public class WebJFrame extends JFrame implements WebWindow {
         PaintManager.getInstance(getClientId()).registerWindow(this);
         super.show();
     }
+    
+    @SuppressWarnings("deprecation")
+    @Override
+    public void hide() {
+        PaintManager.getInstance(getClientId()).hideWindowInBrowser(this);
+        super.hide();
+    }
 
     @Override
     public void setVisible(boolean b) {

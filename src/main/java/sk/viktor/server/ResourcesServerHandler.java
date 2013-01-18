@@ -22,9 +22,7 @@
  */
 package sk.viktor.server;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -64,13 +62,16 @@ public class ResourcesServerHandler extends SimpleChannelUpstreamHandler {
                 }
                 InputStream input = this.getClass().getClassLoader().getResourceAsStream(reqResource);
                 if (input != null) {
-                    BufferedReader bufread = new BufferedReader(new InputStreamReader(input));
-                    String read;
-                    while ((read = bufread.readLine()) != null) {
-                        responseContent.append(read + "\r\n");
+                    ChannelBuffer channel = ChannelBuffers.dynamicBuffer();
+                    byte[] bs = new byte[1024];
+                    int length=0;
+                    while ((length=input.read(bs)) > 0) {
+                         channel.writeBytes(bs,0,length);
+                         bs= new byte[1024];
                     }
+                    input.close();
                     String contenttype = new MimetypesFileTypeMap().getContentType(reqResource);
-                    writeResponse(contenttype, e);
+                    writeResponse(channel,contenttype, e);
                 } else {
                     ctx.sendUpstream(e);
                 }
@@ -82,8 +83,7 @@ public class ResourcesServerHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
-    private void writeResponse(String contentType, MessageEvent e) {
-        ChannelBuffer buf = ChannelBuffers.copiedBuffer(responseContent.toString().getBytes());
+    private void writeResponse(ChannelBuffer buf, String contentType, MessageEvent e) {
         responseContent.setLength(0);
         // Build the response object.
         HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
