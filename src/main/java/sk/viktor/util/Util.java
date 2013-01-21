@@ -19,6 +19,7 @@ import javax.swing.UIManager;
 import sk.viktor.ignored.common.WebWindow;
 import sk.viktor.ignored.model.c2s.JsonEventKeyboard;
 import sk.viktor.ignored.model.c2s.JsonEventKeyboard.Type;
+import sk.viktor.ignored.model.c2s.JsonEventMouse;
 
 public class Util {
 
@@ -70,16 +71,32 @@ public class Util {
         return 0;
     }
 
-    public static int getMouseModifiersAWTFlag(int button) {
-        switch (button) {
+    public static int getMouseModifiersAWTFlag(JsonEventMouse evt) {
+        int result = 0;
+        switch (evt.button) {
             case 1:
-                return MouseEvent.BUTTON1_DOWN_MASK;
+                result = MouseEvent.BUTTON1_DOWN_MASK;
+                break;
             case 2:
-                return MouseEvent.BUTTON2_DOWN_MASK;
+                result = MouseEvent.BUTTON2_DOWN_MASK;
+                break;
             case 3:
-                return MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK;
+                result = MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK;
+                break;
         }
-        return 0;
+        if (evt.ctrl) {
+            result = result | MouseEvent.CTRL_DOWN_MASK;
+        }
+        if (evt.alt) {
+            result = result | MouseEvent.ALT_DOWN_MASK;
+        }
+        if (evt.shift) {
+            result = result | MouseEvent.SHIFT_DOWN_MASK;
+        }
+        if (evt.meta) {
+            result = result | MouseEvent.META_DOWN_MASK;
+        }
+        return result;
     }
 
     public static String resolveClientId(JComponent c) {
@@ -132,10 +149,10 @@ public class Util {
     public static String resolveComboboxUIClassId(String newUIid) {
         String className = (String) UIManager.get(newUIid);
         for (StackTraceElement e : Thread.currentThread().getStackTrace()) {
-            if (e.getClassName().equals(UIManager.class.getCanonicalName()) && e.getMethodName().equals("getUI") ) {
+            if (e.getClassName().equals(UIManager.class.getCanonicalName()) && e.getMethodName().equals("getUI")) {
                 return newUIid;
             }
-            if(e.getClassName().equals(className) && e.getMethodName().equals("<init>") ){
+            if (e.getClassName().equals(className) && e.getMethodName().equals("<init>")) {
                 break;
             }
         }
@@ -145,29 +162,32 @@ public class Util {
 
     public static int getKeyModifiersAWTFlag(JsonEventKeyboard event) {
         int modifiers = 0;
-        if(event.alt){
-            modifiers=modifiers&KeyEvent.ALT_MASK;
+        if (event.alt) {
+            modifiers = modifiers & KeyEvent.ALT_MASK;
         }
-        if(event.ctrl){
-            modifiers=modifiers&KeyEvent.CTRL_MASK;
+        if (event.ctrl) {
+            modifiers = modifiers & KeyEvent.CTRL_MASK;
         }
-        if(event.shift){
-            modifiers=modifiers&KeyEvent.SHIFT_MASK;
+        if (event.shift) {
+            modifiers = modifiers & KeyEvent.SHIFT_MASK;
         }
-        if(event.altgr){
-            modifiers=modifiers&KeyEvent.ALT_GRAPH_MASK;
+        if (event.altgr) {
+            modifiers = modifiers & KeyEvent.ALT_GRAPH_MASK;
         }
-        if(event.meta){
-            modifiers=modifiers&KeyEvent.META_MASK;
+        if (event.meta) {
+            modifiers = modifiers & KeyEvent.META_MASK;
         }
         return modifiers;
     }
 
     public static int getKeyType(Type type) {
-        switch(type){
-            case keydown:return KeyEvent.KEY_PRESSED;
-            case keypress:return KeyEvent.KEY_TYPED;
-            case keyup:return KeyEvent.KEY_RELEASED;
+        switch (type) {
+            case keydown:
+                return KeyEvent.KEY_PRESSED;
+            case keypress:
+                return KeyEvent.KEY_TYPED;
+            case keyup:
+                return KeyEvent.KEY_RELEASED;
         }
         return 0;
     }

@@ -1,6 +1,7 @@
 package sk.viktor.ignored.common;
 
 import java.awt.AWTEvent;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
@@ -33,6 +34,7 @@ public class PaintManager {
     private SocketIOClient client;
     private Map<String, Window> windows = new HashMap<String, Window>();
     private Long currentPaintRequestSeq = 0L;
+    private MouseEvent lastMouseEvent;
 
     public PaintManager(String clientId, SocketIOClient client) {
         this.client = client;
@@ -115,23 +117,24 @@ public class PaintManager {
         long when = System.currentTimeMillis();
         int modifiers = Util.getKeyModifiersAWTFlag(event);
         int type = Util.getKeyType(event.type);
+        Component src = w.getFocusOwner()==null?w:w.getFocusOwner();
         if (type == KeyEvent.KEY_TYPED) {
-            AWTEvent e = new KeyEvent(w.getFocusOwner(), KeyEvent.KEY_TYPED, when, modifiers, 0, (char) event.character);
+            AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, modifiers, 0, (char) event.character);
             dispatchEventInSwing(w, e);
         } else {
-            AWTEvent e = new KeyEvent(w.getFocusOwner(), type, when, modifiers, event.keycode, (char) event.character);
+            AWTEvent e = new KeyEvent(src, type, when, modifiers, event.keycode, (char) event.character);
             dispatchEventInSwing(w, e);
         }
     }
 
     private void dispatchMouseEvent(JsonEventMouse event) {
-        AWTEvent e = null;
+        MouseEvent e = null;
         Window w = windows.get(event.windowId);
         WebWindow ww = (WebWindow) w;
         int x = event.x + ww.getFrameTranslation().x;
         int y = event.y + ww.getFrameTranslation().y;
         long when = System.currentTimeMillis();
-        int modifiers = Util.getMouseModifiersAWTFlag(event.button);
+        int modifiers = Util.getMouseModifiersAWTFlag(event);
         int id = 0;
         int clickcount = 0;
         int buttons = Util.getMouseButtonsAWTFlag(event.button);
@@ -139,28 +142,43 @@ public class PaintManager {
             case mousemove:
                 id = event.button == 1 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
                 e = new MouseEvent(w, id, when, modifiers, x, y, x, y, clickcount, false, buttons);
+                dispatchEventInSwing(w, e);
+                lastMouseEvent=e;
                 break;
             case mouseup:
                 id = MouseEvent.MOUSE_RELEASED;
                 boolean popupTrigger = (buttons == 3) ? true : false;
                 clickcount = 1;
                 e = new MouseEvent(w, id, when, modifiers, x, y, x, y, clickcount, popupTrigger, buttons);
+                dispatchEventInSwing(w, e);
+                if(lastMouseEvent!=null && lastMouseEvent.getID()==MouseEvent.MOUSE_PRESSED && lastMouseEvent.getX()==x && lastMouseEvent.getY()==y){
+                    e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, x, y, clickcount, popupTrigger, buttons);
+                    dispatchEventInSwing(w, e);
+                    lastMouseEvent=null;
+                }
                 break;
             case mousedown:
                 id = MouseEvent.MOUSE_PRESSED;
                 clickcount = 1;
                 e = new MouseEvent(w, id, when, modifiers, x, y, x, y, clickcount, false, buttons);
+                dispatchEventInSwing(w, e);
+                lastMouseEvent=e;
                 break;
             case mousewheel:
                 id = MouseEvent.MOUSE_WHEEL;
                 buttons = 0;
                 modifiers = 0;
                 e = new MouseWheelEvent(w, id, when, modifiers, x, y, clickcount, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 3, event.wheelDelta);
+                dispatchEventInSwing(w, e);
+                lastMouseEvent=e;
+                break;
+            case dblclick:
+                e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, x, y, clickcount, false, buttons);
+                dispatchEventInSwing(w, e);
                 break;
             default:
                 break;
         }
-        dispatchEventInSwing(w, e);
     }
 
     private void dispatchEventInSwing(final Window w, final AWTEvent e) {

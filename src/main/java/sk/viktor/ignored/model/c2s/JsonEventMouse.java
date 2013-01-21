@@ -6,7 +6,8 @@ public class JsonEventMouse implements JsonEvent {
         mousemove,
         mousedown,
         mouseup,
-        mousewheel;
+        mousewheel,
+        dblclick;
     }
 
     public Type type;
@@ -16,4 +17,8 @@ public class JsonEventMouse implements JsonEvent {
     public int button;
     public int wheelDelta;
     public String windowId;
+    public boolean ctrl;
+    public boolean alt;
+    public boolean shift;
+    public boolean meta;
 }

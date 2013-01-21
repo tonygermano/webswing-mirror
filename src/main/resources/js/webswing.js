@@ -7,6 +7,8 @@ var busy = {};
 var nextRequest = {};
 var latestMouseMoveEvent;
 var canvasIndex = 1;
+var seq=0;
+var mouseDown = 0;
 
 function processRequest(data) {
 	busy[data.windowInfo.id] = true;
@@ -33,7 +35,7 @@ function processRequest(data) {
 				busy[data.windowInfo.id] = false;
 			}
 		};
-		imageObj.src = "swing/" + clientId + "/" + data.windowInfo.id;
+		imageObj.src = 'swing/' + clientId + '/' + data.windowInfo.id+'/'+(seq++);
 	}
 }
 
@@ -46,7 +48,7 @@ function createCanvasWinodow(name, title, width, height) {
 		resizable : "false",
 		beforeClose : sendCloseWindowEvent
 	});
-	canvas = document.getElementById(name);
+	var canvas = document.getElementById(name);
 	registerEventListeners(canvas);
 	return canvas;
 }
@@ -75,9 +77,17 @@ function registerEventListeners(canvas) {
 		socket.json.send(mousePos);
 		canvas.focus();
 		return false;
-	}, false);
+	}, false); 
+	canvas.addEventListener('dblclick', function(evt) {
+		var mousePos = getMousePos(canvas, evt, 'dblclick');
+		latestMouseMoveEvent = null;
+		socket.json.send(mousePos);
+		canvas.focus();
+		return false;
+	}, false); 
 	canvas.addEventListener('mousemove', function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousemove');
+		mousePos.button=mouseDown;
 		latestMouseMoveEvent = mousePos;
 		return false;
 	}, false);
@@ -156,8 +166,12 @@ function getMousePos(canvas, evt, type) {
 		'y' : mouseY,
 		'type' : type,
 		'wheelDelta' : delta,
-		'button' : evt.which
-	};
+		'button' : evt.which,
+		'ctrl' : evt.ctrlKey,
+		'alt' : evt.altKey,
+		'shift' : evt.shiftKey,
+		'meta' : evt.metaKey
+ 	};
 }
 
 function getKBKey(type, canvas, evt) {
@@ -206,4 +220,11 @@ function start() {
 			'clientId' : clientId
 		});
 	});
+	
+	document.body.onmousedown = function() { 
+	  ++mouseDown;
+	}
+	document.body.onmouseup = function() {
+	  --mouseDown;
+	}
 }
