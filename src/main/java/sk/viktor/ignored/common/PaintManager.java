@@ -173,7 +173,7 @@ public class PaintManager {
                 lastMouseEvent=e;
                 break;
             case dblclick:
-                e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, x, y, clickcount, false, buttons);
+                e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, x, y, 2, false, buttons);
                 dispatchEventInSwing(w, e);
                 break;
             default:

@@ -7,7 +7,7 @@ var busy = {};
 var nextRequest = {};
 var latestMouseMoveEvent;
 var canvasIndex = 1;
-var seq=0;
+var seq = 0;
 var mouseDown = 0;
 
 function processRequest(data) {
@@ -35,7 +35,7 @@ function processRequest(data) {
 				busy[data.windowInfo.id] = false;
 			}
 		};
-		imageObj.src = 'swing/' + clientId + '/' + data.windowInfo.id+'/'+(seq++);
+		imageObj.src = 'swing/' + clientId + '/' + data.windowInfo.id + '/' + (seq++);
 	}
 }
 
@@ -71,53 +71,53 @@ function mouseMoveEventFilter() {
 }
 
 function registerEventListeners(canvas) {
-	canvas.addEventListener('mousedown', function(evt) {
+	bindEvent(canvas,'mousedown', function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousedown');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
 		canvas.focus();
 		return false;
-	}, false); 
-	canvas.addEventListener('dblclick', function(evt) {
+	}, false);
+	bindEvent(canvas,'dblclick', function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'dblclick');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
 		canvas.focus();
 		return false;
-	}, false); 
-	canvas.addEventListener('mousemove', function(evt) {
+	}, false);
+	bindEvent(canvas,'mousemove', function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousemove');
-		mousePos.button=mouseDown;
+		mousePos.button = mouseDown;
 		latestMouseMoveEvent = mousePos;
 		return false;
 	}, false);
-	canvas.addEventListener('mouseup', function(evt) {
+	bindEvent(canvas,'mouseup', function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mouseup');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
 		return false;
 	}, false);
 	// IE9, Chrome, Safari, Opera
-	canvas.addEventListener("mousewheel", function(evt) {
+	bindEvent(canvas,"mousewheel", function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousewheel');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
 		return false;
 	}, false);
 	// firefox
-	canvas.addEventListener("DOMMouseScroll", function(evt) {
+	bindEvent(canvas,"DOMMouseScroll", function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousewheel');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
 		return false;
 	}, false);
-	canvas.oncontextmenu = function(event) {
+	bindEvent(canvas,'contextmenu', function(event) {
 		event.preventDefault();
 		event.stopPropagation();
 		return false;
-	};
+	});
 
-	canvas.addEventListener('keydown', function(event) {
+	bindEvent(canvas,'keydown', function(event) {
 		// 48-57
 		// 65-90
 		// 186-192
@@ -132,14 +132,14 @@ function registerEventListeners(canvas) {
 		socket.json.send(keyevt);
 		return false;
 	}, false);
-	canvas.addEventListener('keypress', function(event) {
+	bindEvent(canvas,'keypress', function(event) {
 		event.preventDefault();
 		event.stopPropagation();
 		var keyevt = getKBKey('keypress', canvas, event);
 		socket.json.send(keyevt);
 		return false;
 	}, false);
-	canvas.addEventListener('keyup', function(event) {
+	bindEvent(canvas,'keyup', function(event) {
 		event.preventDefault();
 		event.stopPropagation();
 		var keyevt = getKBKey('keyup', canvas, event);
@@ -171,7 +171,7 @@ function getMousePos(canvas, evt, type) {
 		'alt' : evt.altKey,
 		'shift' : evt.shiftKey,
 		'meta' : evt.metaKey
- 	};
+	};
 }
 
 function getKBKey(type, canvas, evt) {
@@ -197,6 +197,14 @@ function GUID() {
 	return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 }
 
+function bindEvent(el, eventName, eventHandler) {
+	if (el.addEventListener) {
+		el.addEventListener(eventName, eventHandler, false);
+	} else if (el.attachEvent) {
+		el.attachEvent('on' + eventName, eventHandler);
+	}
+}
+
 function start() {
 
 	setInterval(mouseMoveEventFilter, 100);
@@ -220,11 +228,11 @@ function start() {
 			'clientId' : clientId
 		});
 	});
-	
-	document.body.onmousedown = function() { 
-	  ++mouseDown;
-	}
-	document.body.onmouseup = function() {
-	  --mouseDown;
-	}
+
+	bindEvent(document,'mousedown', function(evt) {
+		++mouseDown;
+	});
+	bindEvent(document,'mouseup', function(evt) {
+		--mouseDown;
+	});
 }

@@ -127,9 +127,9 @@ public class WebJFrame extends JFrame implements WebWindow {
         super.dispose();
     }
 
-    //    @Override
-    //    public void setDefaultCloseOperation(int operation) {
-    //        super.setDefaultCloseOperation(operation==EXIT_ON_CLOSE?DISPOSE_ON_CLOSE:operation);
-    //    }
+    @Override
+    public void setDefaultCloseOperation(int operation) {
+        super.setDefaultCloseOperation(operation == EXIT_ON_CLOSE ? DISPOSE_ON_CLOSE : operation);
+    }
 
 }
