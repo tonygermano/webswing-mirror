@@ -1,12 +1,13 @@
 var clientId = GUID();
-var socket = io.connect('http://localhost:7070', {
-	'reconnection delay' : 2000,
+var serverpath = location.protocol == 'file:' ? "http://localhost" : location.protocol + "//" + location.host;
+var serverport = 7070;
+socket = io.connect(serverpath + ":" + serverport)
+var socket = io.connect(serverpath, {
 	'sync disconnect on unload' : true
 });
 var busy = {};
 var nextRequest = {};
 var latestMouseMoveEvent;
-var canvasIndex = 1;
 var seq = 0;
 var mouseDown = 0;
 
@@ -71,53 +72,53 @@ function mouseMoveEventFilter() {
 }
 
 function registerEventListeners(canvas) {
-	bindEvent(canvas,'mousedown', function(evt) {
+	bindEvent(canvas, 'mousedown', function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousedown');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
 		canvas.focus();
 		return false;
 	}, false);
-	bindEvent(canvas,'dblclick', function(evt) {
+	bindEvent(canvas, 'dblclick', function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'dblclick');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
 		canvas.focus();
 		return false;
 	}, false);
-	bindEvent(canvas,'mousemove', function(evt) {
+	bindEvent(canvas, 'mousemove', function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousemove');
 		mousePos.button = mouseDown;
 		latestMouseMoveEvent = mousePos;
 		return false;
 	}, false);
-	bindEvent(canvas,'mouseup', function(evt) {
+	bindEvent(canvas, 'mouseup', function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mouseup');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
 		return false;
 	}, false);
 	// IE9, Chrome, Safari, Opera
-	bindEvent(canvas,"mousewheel", function(evt) {
+	bindEvent(canvas, "mousewheel", function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousewheel');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
 		return false;
 	}, false);
 	// firefox
-	bindEvent(canvas,"DOMMouseScroll", function(evt) {
+	bindEvent(canvas, "DOMMouseScroll", function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousewheel');
 		latestMouseMoveEvent = null;
 		socket.json.send(mousePos);
 		return false;
 	}, false);
-	bindEvent(canvas,'contextmenu', function(event) {
+	bindEvent(canvas, 'contextmenu', function(event) {
 		event.preventDefault();
 		event.stopPropagation();
 		return false;
 	});
 
-	bindEvent(canvas,'keydown', function(event) {
+	bindEvent(canvas, 'keydown', function(event) {
 		// 48-57
 		// 65-90
 		// 186-192
@@ -132,14 +133,14 @@ function registerEventListeners(canvas) {
 		socket.json.send(keyevt);
 		return false;
 	}, false);
-	bindEvent(canvas,'keypress', function(event) {
+	bindEvent(canvas, 'keypress', function(event) {
 		event.preventDefault();
 		event.stopPropagation();
 		var keyevt = getKBKey('keypress', canvas, event);
 		socket.json.send(keyevt);
 		return false;
 	}, false);
-	bindEvent(canvas,'keyup', function(event) {
+	bindEvent(canvas, 'keyup', function(event) {
 		event.preventDefault();
 		event.stopPropagation();
 		var keyevt = getKBKey('keyup', canvas, event);
@@ -227,12 +228,17 @@ function start() {
 			'@class' : 'sk.viktor.ignored.model.c2s.JsonConnectionHandshake',
 			'clientId' : clientId
 		});
+		$('#root').html('online');
 	});
 
-	bindEvent(document,'mousedown', function(evt) {
+	socket.on('disconnect', function() {
+		$('#root').html('offline');
+	});
+	
+	bindEvent(document, 'mousedown', function(evt) {
 		++mouseDown;
 	});
-	bindEvent(document,'mouseup', function(evt) {
+	bindEvent(document, 'mouseup', function(evt) {
 		--mouseDown;
 	});
 }
