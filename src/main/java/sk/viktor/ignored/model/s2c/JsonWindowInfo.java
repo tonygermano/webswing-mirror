@@ -1,7 +1,10 @@
 package sk.viktor.ignored.model.s2c;
 
-public class JsonWindowInfo {
+import java.io.Serializable;
 
+public class JsonWindowInfo implements Serializable {
+    private static final long serialVersionUID = 5192907046398894082L;
+    
     String id;
     String parentId;
     String title;

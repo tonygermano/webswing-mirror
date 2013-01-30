@@ -22,7 +22,8 @@ public class WebJWindow extends JWindow implements WebWindow {
     private static final long serialVersionUID = 2961442461315724672L;
     private BufferedImage virtualScreen;
     private BufferedImage diffScreen;
-
+    private boolean webDirty=false;
+    
     @Override
     public Graphics getGraphics() {
         if (virtualScreen == null || virtualScreen.getWidth() != this.getWidth() || virtualScreen.getHeight() != this.getHeight()) {
@@ -41,6 +42,7 @@ public class WebJWindow extends JWindow implements WebWindow {
             byte[] res;
             res = Util.getPngImage(diffScreen);
             resetScreen(diffScreen);
+            webDirty=false;
             return res;
         }
     }
@@ -58,6 +60,7 @@ public class WebJWindow extends JWindow implements WebWindow {
             g.drawImage(virtualScreen, 0, 0, null);
             g.dispose();
             resetScreen(virtualScreen);
+            webDirty=true;
         }
     }
 
@@ -73,7 +76,7 @@ public class WebJWindow extends JWindow implements WebWindow {
         JsonWindowInfo result = new JsonWindowInfo();
         result.setHeight(this.getHeight());
         result.setWidth(this.getWidth());
-        result.setHasFocus(this.isFocused());
+        result.setHasFocus(true);
         result.setId(Util.getObjectIdentity(this));
         if (this.getParent() != null) {
             result.setParentId(Util.getObjectIdentity(this.getParent()));
@@ -85,37 +88,37 @@ public class WebJWindow extends JWindow implements WebWindow {
         return new Point(0, 0);
     }
 
-    public String getClientId() {
-        return Util.resolveClientId(this.getClass());
-    }
-
     @SuppressWarnings("deprecation")
     @Override
     public void show() {
-        PaintManager.getInstance(getClientId()).registerWindow(this);
+        PaintManager.getInstance().registerWindow(this);
         super.show();
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public void hide() {
-        PaintManager.getInstance(getClientId()).hideWindowInBrowser(this);
+        PaintManager.getInstance().hideWindowInBrowser(this);
         super.hide();
     }
 
     @Override
     public void setVisible(boolean b) {
-        PaintManager.getInstance(getClientId()).registerWindow(this);
+        PaintManager.getInstance().registerWindow(this);
         if (!b) {
-            PaintManager.getInstance(getClientId()).hideWindowInBrowser(this);
+            PaintManager.getInstance().hideWindowInBrowser(this);
         }
         super.setVisible(b);
     }
 
     @Override
     public void dispose() {
-        PaintManager.getInstance(getClientId()).disposeWindow(this);
+        PaintManager.getInstance().disposeWindow(this);
         super.dispose();
+    }
+
+    public boolean isWebDirty() {
+        return webDirty;
     }
 
 }

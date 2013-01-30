@@ -24,6 +24,7 @@ public class WebJDialog extends JDialog implements WebWindow {
     private static final long serialVersionUID = 7233902228541154553L;
     private BufferedImage virtualScreen;
     private BufferedImage diffScreen;
+    private boolean webDirty=false;
 
     public WebJDialog(Dialog owner, String title, boolean modal) {
         super(owner, title, modal);
@@ -58,6 +59,7 @@ public class WebJDialog extends JDialog implements WebWindow {
                 res = Util.getPngImage(diffScreen);
             }
             resetScreen(diffScreen);
+            webDirty=false;
             return res;
         }
     }
@@ -75,6 +77,7 @@ public class WebJDialog extends JDialog implements WebWindow {
             g.drawImage(virtualScreen, 0, 0, null);
             g.dispose();
             resetScreen(virtualScreen);
+            webDirty=true;
         }
     }
 
@@ -104,37 +107,37 @@ public class WebJDialog extends JDialog implements WebWindow {
         return new Point(this.getRootPane().getX(), this.getRootPane().getY());
     }
 
-    public String getClientId() {
-        return Util.resolveClientId(this.getClass());
-    }
-
     @SuppressWarnings("deprecation")
     @Override
     public void show() {
-        PaintManager.getInstance(getClientId()).registerWindow(this);
+        PaintManager.getInstance().registerWindow(this);
         super.show();
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public void hide() {
-        PaintManager.getInstance(getClientId()).hideWindowInBrowser(this);
+        PaintManager.getInstance().hideWindowInBrowser(this);
         super.hide();
     }
 
     @Override
     public void setVisible(boolean b) {
-        PaintManager.getInstance(getClientId()).registerWindow(this);
+        PaintManager.getInstance().registerWindow(this);
         if (!b) {
-            PaintManager.getInstance(getClientId()).hideWindowInBrowser(this);
+            PaintManager.getInstance().hideWindowInBrowser(this);
         }
         super.setVisible(b);
     }
 
     @Override
     public void dispose() {
-        PaintManager.getInstance(getClientId()).disposeWindow(this);
+        PaintManager.getInstance().disposeWindow(this);
         super.dispose();
+    }
+
+    public boolean isWebDirty() {
+        return webDirty;
     }
 
 }

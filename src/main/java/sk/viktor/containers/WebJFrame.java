@@ -22,7 +22,8 @@ public class WebJFrame extends JFrame implements WebWindow {
     private static final long serialVersionUID = -2131755526938257553L;
     private BufferedImage virtualScreen;
     private BufferedImage diffScreen;
-
+    private boolean webDirty=false;
+    
     public WebJFrame(String title) {
         super(title);
     }
@@ -52,6 +53,7 @@ public class WebJFrame extends JFrame implements WebWindow {
                 res = Util.getPngImage(diffScreen);
             }
             resetScreen(diffScreen);
+            webDirty=false;
             return res;
         }
     }
@@ -69,6 +71,7 @@ public class WebJFrame extends JFrame implements WebWindow {
             g.drawImage(virtualScreen, 0, 0, null);
             g.dispose();
             resetScreen(virtualScreen);
+            webDirty=true;
         }
     }
 
@@ -94,42 +97,42 @@ public class WebJFrame extends JFrame implements WebWindow {
         return new Point(this.getRootPane().getX(), this.getRootPane().getY());
     }
 
-    public String getClientId() {
-        return Util.resolveClientId(this.getClass());
-    }
-
     @SuppressWarnings("deprecation")
     @Override
     public void show() {
-        PaintManager.getInstance(getClientId()).registerWindow(this);
+        PaintManager.getInstance().registerWindow(this);
         super.show();
     }
     
     @SuppressWarnings("deprecation")
     @Override
     public void hide() {
-        PaintManager.getInstance(getClientId()).hideWindowInBrowser(this);
+        PaintManager.getInstance().hideWindowInBrowser(this);
         super.hide();
     }
 
     @Override
     public void setVisible(boolean b) {
-        PaintManager.getInstance(getClientId()).registerWindow(this);
+        PaintManager.getInstance().registerWindow(this);
         if(!b){
-            PaintManager.getInstance(getClientId()).hideWindowInBrowser(this);    
+            PaintManager.getInstance().hideWindowInBrowser(this);    
         }
         super.setVisible(b);
     }
 
     @Override
     public void dispose() {
-        PaintManager.getInstance(getClientId()).disposeWindow(this);
+        PaintManager.getInstance().disposeWindow(this);
         super.dispose();
     }
 
-    @Override
-    public void setDefaultCloseOperation(int operation) {
-        super.setDefaultCloseOperation(operation == EXIT_ON_CLOSE ? DISPOSE_ON_CLOSE : operation);
+    public boolean isWebDirty() {
+        return webDirty;
     }
+
+//    @Override
+//    public void setDefaultCloseOperation(int operation) {
+//        super.setDefaultCloseOperation(operation == EXIT_ON_CLOSE ? DISPOSE_ON_CLOSE : operation);
+//    }
 
 }

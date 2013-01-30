@@ -18,9 +18,9 @@ public interface WebWindow {
 
     public Point getFrameTranslation();
 
-    public String getClientId();
-
     public byte[] getDiffWebData();
 
     public void addChangesToDiff();
+    
+    public boolean isWebDirty();
 }

@@ -26,6 +26,7 @@ import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.SyntheticRepository;
 
 import sk.viktor.ignored.common.PaintManager;
+import sk.viktor.ignored.special.UIManagerConfigurator;
 import sk.viktor.util.CLUtil;
 import sk.viktor.util.Util;
 
@@ -80,7 +81,7 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         classReplacementMapping = classBuilder.build();
 
         Builder<String, String> methodReplacementBuilder = new ImmutableBiMap.Builder<String, String>();
-        methodReplacementBuilder.put("java.lang.Runtime exit (I)V", "sk.viktor.special.RedirectedMethods exit (I)V");
+        //methodReplacementBuilder.put("java.lang.Runtime exit (I)V", "sk.viktor.special.RedirectedMethods exit (I)V");
         methodReplacementBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "sk.viktor.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
         methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;", "sk.viktor.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;");
         methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", "sk.viktor.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");
@@ -117,11 +118,9 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
 
     }
 
-    private String clientId;
 
-    public SwingClassloader(String clientId) {
+    public SwingClassloader() {
         super(new String[] { "java.", "javax.", "sun.", "org.xml.sax", "sk.viktor.ignored" });
-        this.clientId = clientId;
     }
 
     @Override
@@ -427,7 +426,7 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
                         new Type[] {}, // arg types
                         new String[]{}, "getUIClassID", className, // method, class
                         ilx, cp);
-                ilx.append(factory.createConstant(Main.comboboxUI));
+                ilx.append(factory.createConstant(UIManagerConfigurator.comboboxUI));
                 ilx.append(factory.createInvoke(Util.class.getCanonicalName(), "resolveComboboxUIClassId", Type.STRING, new Type[] {Type.STRING}, Constants.INVOKESTATIC));
                 ilx.append(InstructionConstants.ARETURN);
                 mgx.setMaxStack();
@@ -442,10 +441,6 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public String getClientId() {
-        return clientId;
     }
 
 }

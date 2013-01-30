@@ -28,6 +28,7 @@ import sk.viktor.containers.WebJDialog;
 
 public class RedirectedJColorChooser {
 
+    @SuppressWarnings("deprecation")
     public static Color showDialog(Component component, String title, Color initialColor) throws HeadlessException {
 
         final JColorChooser pane = new JColorChooser(initialColor != null ? initialColor : Color.white);
@@ -55,7 +56,8 @@ public class RedirectedJColorChooser {
 }
 
 class ColorTracker implements ActionListener, Serializable {
-
+    private static final long serialVersionUID = 1876374781602673947L;
+    
     JColorChooser chooser;
     Color color;
 
@@ -73,7 +75,7 @@ class ColorTracker implements ActionListener, Serializable {
 }
 
 class ColorChooserDialog extends WebJDialog {
-
+    private static final long serialVersionUID = -2276440774202603305L;
     private Color initialColor;
     private JColorChooser chooserPane;
     private JButton cancelButton;
@@ -170,7 +172,9 @@ class ColorChooserDialog extends WebJDialog {
     }
 
     class Closer extends WindowAdapter implements Serializable {
+        private static final long serialVersionUID = 5484664744441925700L;
 
+        @SuppressWarnings("deprecation")
         public void windowClosing(WindowEvent e) {
             cancelButton.doClick(0);
             Window w = e.getWindow();
@@ -179,6 +183,7 @@ class ColorChooserDialog extends WebJDialog {
     }
 
     static class DisposeOnClose extends ComponentAdapter implements Serializable {
+        private static final long serialVersionUID = -4556663716987001929L;
 
         public void componentHidden(ComponentEvent e) {
             Window w = (Window) e.getComponent();

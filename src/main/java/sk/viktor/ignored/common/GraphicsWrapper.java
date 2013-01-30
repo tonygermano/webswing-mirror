@@ -267,7 +267,7 @@ public class GraphicsWrapper extends Graphics2D {
     public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
         web.drawImage(img, x, y, observer);
         if (Util.isPaintDoubleBufferedPainting() || Util.isForceDoubleBufferedPainting()) {
-            PaintManager.getInstance(webWindow.getClientId()).doSendPaintRequest(this, (JComponent) observer);
+            PaintManager.getInstance().paintToWeb(this, (JComponent) observer);
         }
         return original.drawImage(img, x, y, observer);
     }

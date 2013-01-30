@@ -1,22 +1,19 @@
 package sk.viktor.ignored.model.s2c;
 
-public class JsonPaintRequest {
+import java.io.Serializable;
+import java.util.Map;
+
+public class JsonPaintRequest implements Serializable{
+
+    private static final long serialVersionUID = 6019708608380425820L;
 
     public String type = "paint";
-    public String filename;
-    public int x;
-    public int y;
-    public long seq;
-    public String clientId;
-    public JsonWindowInfo windowInfo;
+    public Map<String,String> b64images;
+    public Map<String,JsonWindowInfo> windowInfos;
 
-    public JsonPaintRequest(String clientId,long seq, String filename, int x, int y, JsonWindowInfo info) {
+    public JsonPaintRequest(Map<String,String> b64images, Map<String,JsonWindowInfo> infos) {
         super();
-        this.clientId=clientId;
-        this.seq = seq;
-        this.filename = filename;
-        this.x = x;
-        this.y = y;
-        this.windowInfo=info;
+        this.b64images=b64images;
+        this.windowInfos=infos;
     }
 }

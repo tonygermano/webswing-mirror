@@ -5,39 +5,40 @@ socket = io.connect(serverpath + ":" + serverport)
 var socket = io.connect(serverpath, {
 	'sync disconnect on unload' : true
 });
-var busy = {};
-var nextRequest = {};
 var latestMouseMoveEvent;
-var seq = 0;
 var mouseDown = 0;
 
 function processRequest(data) {
-	busy[data.windowInfo.id] = true;
-	var canvas = document.getElementById(data.windowInfo.id);
-	if (canvas == null) {
-		canvas = createCanvasWinodow(data.windowInfo.id, data.windowInfo.title, data.windowInfo.width, data.windowInfo.height);
-	}
-	var context = canvas.getContext("2d");
+	var key;
 	if (data.type == "paint") {
-		var imageObj = new Image();
-		imageObj.onload = function() {
-			context.drawImage(imageObj, data.x, data.y);
-			var currentDialog = $("#" + data.windowInfo.id + "Window");
-			if (currentDialog.dialog("isOpen") == false) {
-				currentDialog.dialog("open");
+		for ( key in data.b64images) {
+			if (data.b64images.hasOwnProperty(key)) {
+				draw(data.windowInfos[key],data.b64images[key]);
 			}
-			if (data.windowInfo.hasFocus) {
-				currentDialog.dialog("moveToTop");
-			}
-			if (nextRequest[data.windowInfo.id] != null && nextRequest[data.windowInfo.id] != data) {
-				processRequest(nextRequest[data.windowInfo.id]);
-			} else {
-				delete nextRequest[data.windowInfo.id];
-				busy[data.windowInfo.id] = false;
-			}
-		};
-		imageObj.src = 'swing/' + clientId + '/' + data.windowInfo.id + '/' + (seq++);
+		}
+		socket.send("paintAck" + clientId);
 	}
+}
+
+function draw(windowInfo,b64image){
+	var canvas,context,imageObj;
+	canvas = document.getElementById(windowInfo.id);
+	if (canvas == null) {
+		canvas = createCanvasWinodow(windowInfo.id, windowInfo.title, windowInfo.width, windowInfo.height);
+	}
+	context = canvas.getContext("2d");
+	imageObj = new Image();
+	imageObj.onload = function() {
+		context.drawImage(imageObj, 0, 0);
+		var currentDialog = $("#" + windowInfo.id + "Window");
+		if (currentDialog.dialog("isOpen") == false) {
+			currentDialog.dialog("open");
+		}
+		if (windowInfo.hasFocus) {
+			currentDialog.dialog("moveToTop");
+		}
+	};
+	imageObj.src = 'data:image/png;base64,' + b64image;
 }
 
 function createCanvasWinodow(name, title, width, height) {
@@ -212,16 +213,9 @@ function start() {
 	socket.on('message', function(data) {
 		if (data.clazz == 'sk.viktor.ignored.model.s2c.JsonWindowRequest') {
 			$("#" + data.windowId + "Window").dialog("close");
-			delete nextRequest[data.windowId];
-			delete busy[data.windowId];
 			return;
 		}
-
-		if (!(data.windowInfo.id in data) || busy[data.windowInfo.id] != true) {
-			processRequest(data);
-		} else {
-			nextRequest[data.windowInfo.id] = data;
-		}
+		processRequest(data);
 	});
 	socket.on('connect', function() {
 		socket.json.send({
@@ -234,11 +228,18 @@ function start() {
 	socket.on('disconnect', function() {
 		$('#root').html('offline');
 	});
-	
+
 	bindEvent(document, 'mousedown', function(evt) {
-		++mouseDown;
+		if(evt.which==1){
+			mouseDown=1;
+		}
+	});
+	bindEvent(document, 'mouseout', function(evt) {
+		mouseDown=0;
 	});
 	bindEvent(document, 'mouseup', function(evt) {
-		--mouseDown;
+		if(evt.which==1){
+			mouseDown=0;
+		}
 	});
 }

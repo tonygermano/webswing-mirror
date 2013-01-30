@@ -2,6 +2,10 @@ package sk.viktor.ignored.model.c2s;
 
 public class JsonEventMouse implements JsonEvent {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2726469537317513925L;
     public enum Type {
         mousemove,
         mousedown,

@@ -1,6 +1,6 @@
 package sk.viktor.util;
 
-import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -9,17 +9,21 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
-import javax.swing.JComponent;
 import javax.swing.UIManager;
+
+import org.apache.commons.codec.binary.Base64;
 
 import sk.viktor.ignored.common.WebWindow;
 import sk.viktor.ignored.model.c2s.JsonEventKeyboard;
 import sk.viktor.ignored.model.c2s.JsonEventKeyboard.Type;
 import sk.viktor.ignored.model.c2s.JsonEventMouse;
+import sk.viktor.ignored.model.s2c.JsonWindowInfo;
 
 public class Util {
 
@@ -99,27 +103,6 @@ public class Util {
         return result;
     }
 
-    public static String resolveClientId(JComponent c) {
-        Component parent = c;
-        while ((parent = parent.getParent()) instanceof WebWindow) {
-            return ((WebWindow) parent).getClientId();
-        }
-        return null;
-    }
-
-    public static String resolveClientId(Class<?> clazz) {
-        if (clazz.getClassLoader().getClass().getCanonicalName().equals("sk.viktor.SwingClassloader")) {
-            try {
-                Method m = clazz.getClassLoader().getClass().getMethod("getClientId");
-                String result = (String) m.invoke(clazz.getClassLoader());
-                return result;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
     public static byte[] getPngImage(BufferedImage imageContent) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -190,5 +173,36 @@ public class Util {
                 return KeyEvent.KEY_RELEASED;
         }
         return 0;
+    }
+
+    public static Map<String, String> createEncodedPaintMap(Map<String, Window> windows) {
+        Map<String, String> result = new HashMap<String, String>();
+        for (String windowKey : windows.keySet()) {
+            WebWindow ww = (WebWindow) windows.get(windowKey);
+            if (ww.isWebDirty()) {
+                result.put(windowKey, Base64.encodeBase64String(ww.getDiffWebData()));
+            }
+        }
+        return result;
+    }
+
+    public static Map<String, JsonWindowInfo> createJsonWindowInfoMap(Set<String> keys, Map<String, Window> windows) {
+        Map<String, JsonWindowInfo> result = new HashMap<String, JsonWindowInfo>();
+        for (String windowKey : keys) {
+            WebWindow ww = (WebWindow) windows.get(windowKey);
+            result.put(windowKey, ww.getWindowInfo());
+        }
+        return result;
+    }
+
+    public static boolean needPainting(Map<String, Window> windows) {
+        Map<String,Window> copy= new HashMap<String, Window>(windows);
+        for (String windowKey : copy.keySet()) {
+            WebWindow ww = (WebWindow) copy.get(windowKey);
+            if(ww.isWebDirty()){
+                return true;
+            }
+        }
+        return false;
     }
 }

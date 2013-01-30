@@ -2,6 +2,10 @@ package sk.viktor.ignored.model.c2s;
 
 public class JsonEventKeyboard implements JsonEvent {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -642542361370871927L;
     public enum Type {
         keypress,
         keydown,
