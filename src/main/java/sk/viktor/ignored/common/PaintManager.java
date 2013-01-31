@@ -27,12 +27,12 @@ import sk.viktor.util.Util;
 public class PaintManager {
 
     private static PaintManager paintManager = new PaintManager();
-    private WebSwingServer jmsService;
+    private ServerJvmConnection jmsService;
     Map<String, Window> windows = new HashMap<String, Window>();
     private MouseEvent lastMouseEvent;
 
     public PaintManager() {
-        this.jmsService = new WebSwingServer(this);
+        this.jmsService = new ServerJvmConnection(this);
     }
 
     public static Graphics beforePaintInterceptor(Graphics g, JComponent c) {

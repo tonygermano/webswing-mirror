@@ -112,7 +112,7 @@ public class Util {
             baos.close();
             return result;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Writing image interupted:"+e.getMessage());
         }
         return null;
     }

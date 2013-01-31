@@ -23,12 +23,14 @@ import com.corundumstudio.socketio.listener.DataListener;
 
 public class SwingServer {
 
-    public  static final String PAINT_ACK_PREFIX = "paintAck";
-    public  static final String SWING_SHUTDOWN_NOTIFICATION = "shutDownNotification";
+    public static final String PAINT_ACK_PREFIX = "paintAck";
+    public static final String UNLOAD_PREFIX = "unload";
+    public static final String SWING_SHUTDOWN_NOTIFICATION = "shutDownNotification";
+    public static final String SWING_KILL_SIGNAL = "killSwing";
 
     private static Connection connection;
 
-    private static Map<String, WebSwingApplication> swingInstanceMap = new HashMap<String, WebSwingApplication>();
+    private static Map<String, SwingJvmConnection> swingInstanceMap = new HashMap<String, SwingJvmConnection>();
 
     static {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
@@ -42,10 +44,10 @@ public class SwingServer {
         }
     }
 
-    public static void removeSwingClientApplication(String clientId){
+    public static void removeSwingClientApplication(String clientId) {
         swingInstanceMap.remove(clientId);
     }
-    
+
     public static void startServer() throws Exception {
         Configuration config = new Configuration();
         config.setHostname("localhost");
@@ -66,10 +68,15 @@ public class SwingServer {
         server.addJsonObjectListener(JsonConnectionHandshake.class, new DataListener<JsonConnectionHandshake>() {
 
             public void onData(SocketIOClient client, JsonConnectionHandshake handshake, AckRequest paramAckRequest) {
+                System.out.println("connected to " + handshake.clientId);
+
                 if (!swingInstanceMap.containsKey(handshake.clientId)) {
-                    WebSwingApplication appl = new WebSwingApplication(handshake.clientId, connection, client);
+                    SwingJvmConnection appl = new SwingJvmConnection(handshake.clientId, connection, client);
                     swingInstanceMap.put(handshake.clientId, appl);
                     appl.start();
+                } else {
+                    SwingJvmConnection appl = swingInstanceMap.get(handshake.clientId);
+                    appl.setClient(client);
                 }
             }
         });
@@ -101,9 +108,13 @@ public class SwingServer {
                 if (msg.startsWith(PAINT_ACK_PREFIX)) {
                     String clientId = msg.substring(PAINT_ACK_PREFIX.length());
                     swingInstanceMap.get(clientId).sendMsg(PAINT_ACK_PREFIX);
+                } else if (msg.startsWith(UNLOAD_PREFIX)) {
+                    String clientId = msg.substring(UNLOAD_PREFIX.length());
+                    swingInstanceMap.get(clientId).sendKill();
                 }
             }
         });
+
         server.start();
     }
 }

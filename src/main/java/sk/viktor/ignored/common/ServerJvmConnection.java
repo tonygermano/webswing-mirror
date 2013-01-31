@@ -20,14 +20,14 @@ import sk.viktor.server.JmsService;
 import sk.viktor.server.SwingServer;
 import sk.viktor.util.Util;
 
-public class WebSwingServer implements MessageListener {
+public class ServerJvmConnection implements MessageListener {
 
     private Session session;
     private MessageProducer producer;
     private transient boolean readyToReceive = true;
     private PaintManager paintManager;
 
-    public WebSwingServer(PaintManager pm) {
+    public ServerJvmConnection(PaintManager pm) {
         try {
             this.paintManager = pm;
             String clientId = System.getProperty("clientId");
@@ -82,6 +82,8 @@ public class WebSwingServer implements MessageListener {
                             this.readyToReceive = true;
                         }
                     }
+                }else if(tmsg.getText().equals(SwingServer.SWING_KILL_SIGNAL)){
+                    System.exit(0);
                 }
             }
         } catch (JMSException e) {

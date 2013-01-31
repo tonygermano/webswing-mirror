@@ -1,9 +1,9 @@
 var clientId = GUID();
 var serverpath = location.protocol == 'file:' ? "http://localhost" : location.protocol + "//" + location.host;
 var serverport = 7070;
-socket = io.connect(serverpath + ":" + serverport)
+var socket = io.connect(serverpath + ":" + serverport)
 var socket = io.connect(serverpath, {
-	'sync disconnect on unload' : true
+	'sync disconnect on unload' : false
 });
 var latestMouseMoveEvent;
 var mouseDown = 0;
@@ -11,17 +11,17 @@ var mouseDown = 0;
 function processRequest(data) {
 	var key;
 	if (data.type == "paint") {
-		for ( key in data.b64images) {
+		for (key in data.b64images) {
 			if (data.b64images.hasOwnProperty(key)) {
-				draw(data.windowInfos[key],data.b64images[key]);
+				draw(data.windowInfos[key], data.b64images[key]);
 			}
 		}
 		socket.send("paintAck" + clientId);
 	}
 }
 
-function draw(windowInfo,b64image){
-	var canvas,context,imageObj;
+function draw(windowInfo, b64image) {
+	var canvas, context, imageObj;
 	canvas = document.getElementById(windowInfo.id);
 	if (canvas == null) {
 		canvas = createCanvasWinodow(windowInfo.id, windowInfo.title, windowInfo.width, windowInfo.height);
@@ -211,6 +211,24 @@ function start() {
 
 	setInterval(mouseMoveEventFilter, 100);
 	socket.on('message', function(data) {
+		if (typeof data == "string") {
+			if (data == "shutDownNotification") {
+				$(".ui-dialog").remove();
+				$("#root").append('<div id="shutDownNotification" title="Application closed"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application have been closed. Would you like to restart the application?</p></div>');
+				$("#shutDownNotification").dialog({
+					modal : true,
+					height : 200,
+					width : 450,
+					draggable : false,
+					resizable : false,
+					buttons : {
+						"Restart" : function() {
+							location.reload();
+						}
+					}
+				});
+			}
+		}
 		if (data.clazz == 'sk.viktor.ignored.model.s2c.JsonWindowRequest') {
 			$("#" + data.windowId + "Window").dialog("close");
 			return;
@@ -218,28 +236,33 @@ function start() {
 		processRequest(data);
 	});
 	socket.on('connect', function() {
-		socket.json.send({
-			'@class' : 'sk.viktor.ignored.model.c2s.JsonConnectionHandshake',
-			'clientId' : clientId
-		});
-		$('#root').html('online');
+		if ($('#root').text() != "online") {
+			socket.json.send({
+				'@class' : 'sk.viktor.ignored.model.c2s.JsonConnectionHandshake',
+				'clientId' : clientId
+			});
+			$('#root').html('online');
+		}
 	});
 
 	socket.on('disconnect', function() {
 		$('#root').html('offline');
 	});
 
+	$(window).bind("beforeunload", function() {
+		socket.send('unload' + clientId);
+	});
 	bindEvent(document, 'mousedown', function(evt) {
-		if(evt.which==1){
-			mouseDown=1;
+		if (evt.which == 1) {
+			mouseDown = 1;
 		}
 	});
 	bindEvent(document, 'mouseout', function(evt) {
-		mouseDown=0;
+		mouseDown = 0;
 	});
 	bindEvent(document, 'mouseup', function(evt) {
-		if(evt.which==1){
-			mouseDown=0;
+		if (evt.which == 1) {
+			mouseDown = 0;
 		}
 	});
 }

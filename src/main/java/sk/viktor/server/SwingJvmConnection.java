@@ -1,7 +1,6 @@
 package sk.viktor.server;
 
 import java.io.File;
-import java.io.PrintStream;
 import java.io.Serializable;
 
 import javax.jms.Connection;
@@ -17,7 +16,6 @@ import javax.jms.TextMessage;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
-import org.apache.tools.ant.DemuxOutputStream;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Environment.Variable;
@@ -26,7 +24,7 @@ import sk.viktor.SwingMain;
 
 import com.corundumstudio.socketio.SocketIOClient;
 
-public class WebSwingApplication implements MessageListener {
+public class SwingJvmConnection implements MessageListener {
 
     private Session session;
     private MessageProducer producer;
@@ -34,7 +32,7 @@ public class WebSwingApplication implements MessageListener {
     private SocketIOClient client;
     private String clientId;
 
-    public WebSwingApplication(String clientId, Connection c, SocketIOClient client) {
+    public SwingJvmConnection(String clientId, Connection c, SocketIOClient client) {
         this.client = client;
         this.clientId = clientId;
         try {
@@ -64,6 +62,14 @@ public class WebSwingApplication implements MessageListener {
             e.printStackTrace();
         }
     }
+    
+    public void sendKill(){
+        try {
+            producer.send(session.createTextMessage(SwingServer.SWING_KILL_SIGNAL));
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void onMessage(Message m) {
         try {
@@ -75,6 +81,8 @@ public class WebSwingApplication implements MessageListener {
                     consumer.close();
                     producer.close();
                     session.close();
+                    System.out.println("notifying browser shutdown");
+                    client.sendMessage(SwingServer.SWING_SHUTDOWN_NOTIFICATION);
                     client.disconnect();
                     SwingServer.removeSwingClientApplication(clientId);
                 }
@@ -97,8 +105,8 @@ public class WebSwingApplication implements MessageListener {
                 logger.setOutputPrintStream(System.out);
                 logger.setErrorPrintStream(System.err);
                 logger.setMessageOutputLevel(Project.MSG_INFO);
-                System.setOut(new PrintStream(new DemuxOutputStream(project, false)));
-                System.setErr(new PrintStream(new DemuxOutputStream(project, true)));
+                //System.setOut(new PrintStream(new DemuxOutputStream(project, false)));
+                //System.setErr(new PrintStream(new DemuxOutputStream(project, true)));
                 project.fireBuildStarted();
                 Throwable caught = null;
                 try {
@@ -123,6 +131,19 @@ public class WebSwingApplication implements MessageListener {
                 project.fireBuildFinished(caught);
             }
         }).start();
+    }
+
+    
+    public SocketIOClient getClient() {
+        return client;
+    }
+
+    public void setClient(SocketIOClient client) {
+        this.client=client;
+    }
+    
+    public String getClientId() {
+        return clientId;
     }
 
 }
