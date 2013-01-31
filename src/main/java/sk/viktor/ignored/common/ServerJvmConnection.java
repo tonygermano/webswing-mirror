@@ -30,7 +30,7 @@ public class ServerJvmConnection implements MessageListener {
     public ServerJvmConnection(PaintManager pm) {
         try {
             this.paintManager = pm;
-            String clientId = System.getProperty("clientId");
+            String clientId = System.getProperty(SwingServer.SWING_START_SYS_PROP_CLIENT_ID);
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(JmsService.JMS_URL);
             Connection connection = connectionFactory.createConnection();
             connection.start();

@@ -28,6 +28,12 @@ public class SwingServer {
     public static final String SWING_SHUTDOWN_NOTIFICATION = "shutDownNotification";
     public static final String SWING_KILL_SIGNAL = "killSwing";
 
+    
+    public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
+    public static final String SWING_START_SYS_PROP_MAIN_CLASS = "webswing.mainClass";
+    
+   
+
     private static Connection connection;
 
     private static Map<String, SwingJvmConnection> swingInstanceMap = new HashMap<String, SwingJvmConnection>();
@@ -50,8 +56,8 @@ public class SwingServer {
 
     public static void startServer() throws Exception {
         Configuration config = new Configuration();
-        config.setHostname("localhost");
-        config.setPort(7070);
+        config.setHostname(sk.viktor.Configuration.getInstance().getHost());
+        config.setPort(Integer.valueOf(sk.viktor.Configuration.getInstance().getPort()));
         SocketIOServer server = new SocketIOServer(config);
 
         server.setPipelineFactory(new SocketIOPipelineFactory() {

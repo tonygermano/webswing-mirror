@@ -1,10 +1,6 @@
 var clientId = GUID();
 var serverpath = location.protocol == 'file:' ? "http://localhost" : location.protocol + "//" + location.host;
-var serverport = 7070;
-var socket = io.connect(serverpath + ":" + serverport)
-var socket = io.connect(serverpath, {
-	'sync disconnect on unload' : false
-});
+var socket = io.connect(serverpath);
 var latestMouseMoveEvent;
 var mouseDown = 0;
 
@@ -242,11 +238,13 @@ function start() {
 				'clientId' : clientId
 			});
 			$('#root').html('online');
+			$('#root').removeClass().addClass('ui-online ui-widget-header ui-corner-all');
 		}
 	});
 
 	socket.on('disconnect', function() {
 		$('#root').html('offline');
+		$('#root').removeClass().addClass('ui-offline ui-widget-header ui-corner-all');
 	});
 
 	$(window).bind("beforeunload", function() {

@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 
 import sk.viktor.ignored.common.PaintManager;
 import sk.viktor.ignored.special.UIManagerConfigurator;
+import sk.viktor.server.SwingServer;
 
 public class SwingMain {
 
@@ -18,7 +19,8 @@ public class SwingMain {
         });
 
         SwingClassloader cl = new SwingClassloader();
-        Class<?> clazz = cl.loadClass("com.sun.swingset3.SwingSet3");
+        Class<?> clazz = cl.loadClass(System.getProperty(SwingServer.SWING_START_SYS_PROP_MAIN_CLASS));
+        //Class<?> clazz = cl.loadClass("com.sun.swingset3.SwingSet3");
         //Class<?> clazz = cl.loadClass("com.sun.swingset3.demos.filechooser.FileChooserDemo");
         // Get a class representing the type of the main method's argument
         Class<?> mainArgType[] = { (new String[0]).getClass() };

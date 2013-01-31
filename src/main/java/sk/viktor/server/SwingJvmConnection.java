@@ -20,6 +20,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Environment.Variable;
 
+import sk.viktor.Configuration;
 import sk.viktor.SwingMain;
 
 import com.corundumstudio.socketio.SocketIOClient;
@@ -117,11 +118,19 @@ public class SwingJvmConnection implements MessageListener {
                     javaTask.setCloneVm(true);
                     javaTask.setFailonerror(true);
                     javaTask.setClassname(SwingMain.class.getName());
-                    javaTask.setJvmargs("-noverify ");
+                    javaTask.setArgs(Configuration.getInstance().getArgs());
+                    javaTask.setJvmargs("-noverify "+ Configuration.getInstance().getVmargs());
+
                     Variable clientIdVar = new Variable();
-                    clientIdVar.setKey("clientId");
+                    clientIdVar.setKey(SwingServer.SWING_START_SYS_PROP_CLIENT_ID);
                     clientIdVar.setValue(clientId);
                     javaTask.addSysproperty(clientIdVar);
+                    
+                    Variable mainClass = new Variable();
+                    mainClass.setKey(SwingServer.SWING_START_SYS_PROP_MAIN_CLASS);
+                    mainClass.setValue(Configuration.getInstance().getMain());
+                    javaTask.addSysproperty(mainClass);
+                    
                     javaTask.init();
                     javaTask.executeJava();
                 } catch (BuildException e) {
