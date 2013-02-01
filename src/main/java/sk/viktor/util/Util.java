@@ -19,6 +19,8 @@ import javax.swing.UIManager;
 
 import org.apache.commons.codec.binary.Base64;
 
+import com.objectplanet.image.PngEncoder;
+
 import sk.viktor.ignored.common.WebWindow;
 import sk.viktor.ignored.model.c2s.JsonEventKeyboard;
 import sk.viktor.ignored.model.c2s.JsonEventKeyboard.Type;
@@ -26,6 +28,15 @@ import sk.viktor.ignored.model.c2s.JsonEventMouse;
 import sk.viktor.ignored.model.s2c.JsonWindowInfo;
 
 public class Util {
+
+    private static PngEncoder encoder;
+    static {
+        try {
+            encoder = new PngEncoder(PngEncoder.COLOR_TRUECOLOR_ALPHA, PngEncoder.BEST_SPEED);
+        } catch (Exception e) {
+            System.out.println("Library for fast image encoding not found. Download the library from http://objectplanet.com/pngencoder/");
+        }
+    }
 
     public static boolean isPaintImmediately() {
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();
@@ -106,8 +117,12 @@ public class Util {
     public static byte[] getPngImage(BufferedImage imageContent) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
-            ImageIO.write(imageContent, "png", ios);
+            if(encoder!=null){
+                encoder.encode(imageContent, baos);
+            }else{
+                ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
+                ImageIO.write(imageContent, "png", ios);
+            }
             byte[] result = baos.toByteArray();
             baos.close();
             return result;
@@ -196,10 +211,10 @@ public class Util {
     }
 
     public static boolean needPainting(Map<String, Window> windows) {
-        Map<String,Window> copy= new HashMap<String, Window>(windows);
+        Map<String, Window> copy = new HashMap<String, Window>(windows);
         for (String windowKey : copy.keySet()) {
             WebWindow ww = (WebWindow) copy.get(windowKey);
-            if(ww.isWebDirty()){
+            if (ww.isWebDirty()) {
                 return true;
             }
         }
