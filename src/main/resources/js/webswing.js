@@ -53,7 +53,7 @@ function createCanvasWinodow(name, title, width, height) {
 
 function sendCloseWindowEvent(event, ui) {
 	var e = {
-		'@class' : 'sk.viktor.ignored.model.c2s.JsonEventWindow',
+		'@class' : 'org.webswing.ignored.model.c2s.JsonEventWindow',
 		'type' : 'close',
 		'windowId' : this.id.substring(0, this.id.length - 6),
 		'clientId' : clientId
@@ -157,7 +157,7 @@ function getMousePos(canvas, evt, type) {
 		delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 	}
 	return {
-		'@class' : 'sk.viktor.ignored.model.c2s.JsonEventMouse',
+		'@class' : 'org.webswing.ignored.model.c2s.JsonEventMouse',
 		'windowId' : canvas.id,
 		'clientId' : clientId,
 		'x' : mouseX,
@@ -174,7 +174,7 @@ function getMousePos(canvas, evt, type) {
 
 function getKBKey(type, canvas, evt) {
 	return {
-		'@class' : 'sk.viktor.ignored.model.c2s.JsonEventKeyboard',
+		'@class' : 'org.webswing.ignored.model.c2s.JsonEventKeyboard',
 		'windowId' : canvas.id,
 		'clientId' : clientId,
 		'type' : type,
@@ -240,7 +240,7 @@ function start() {
 				});
 			}
 		}
-		if (data.clazz == 'sk.viktor.ignored.model.s2c.JsonWindowRequest') {
+		if (data.clazz == 'org.webswing.ignored.model.s2c.JsonWindowRequest') {
 			$("#" + data.windowId + "Window").dialog("close");
 			return;
 		}
@@ -249,7 +249,7 @@ function start() {
 	socket.on('connect', function() {
 		if ($('#root').text() != "online") {
 			socket.json.send({
-				'@class' : 'sk.viktor.ignored.model.c2s.JsonConnectionHandshake',
+				'@class' : 'org.webswing.ignored.model.c2s.JsonConnectionHandshake',
 				'clientId' : clientId
 			});
 			$('#root').html('online');
