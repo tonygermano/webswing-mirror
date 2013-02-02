@@ -18,8 +18,9 @@ public class Main {
 
         // create the Options
         Options options = new Options();
-        options.addOption("h", "host", true, "Local interface address where the web server will listen.");
-        options.addOption("p", "port", true, "Port where the web server will listen.");
+        options.addOption("h", "host", true, "Local interface address where the web server will listen.(localhost)");
+        options.addOption("p", "port", true, "Port where the web server will listen.(8080)");
+        options.addOption("c", "clients", true, "Maximum number of simultaneous swing connections.(10)");
         options.addOption("m", "mainClass", true, "Swing application main class.");
         options.addOption("a", "args", true, "Commandline arguments for swing application.");
         options.addOption("v", "vmargs", true, "JVM arguments for swing application.");
@@ -48,6 +49,9 @@ public class Main {
             }
             if (line.getOptionValue('v') != null) {
                 cimpl.setVmargs(line.getOptionValue('v'));
+            }
+            if (line.getOptionValue('c') != null) {
+                cimpl.setClients(Integer.valueOf(line.getOptionValue('c')));
             }
         } catch (ParseException exp) {
             System.out.println(exp.getMessage());

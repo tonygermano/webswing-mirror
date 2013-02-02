@@ -6,8 +6,6 @@ import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.apache.activemq.usage.MemoryUsage;
 import org.apache.activemq.usage.SystemUsage;
-import org.apache.activemq.usage.Usage;
-import org.apache.activemq.usage.UsageListener;
 
 public class JmsService {
 

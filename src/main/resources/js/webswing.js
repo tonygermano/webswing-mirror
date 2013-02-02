@@ -210,7 +210,7 @@ function start() {
 		if (typeof data == "string") {
 			if (data == "shutDownNotification") {
 				$(".ui-dialog").remove();
-				$("#root").append('<div id="shutDownNotification" title="Application closed"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application have been closed. Would you like to restart the application?</p></div>');
+				$("#root").append('<div id="shutDownNotification" title="Application closed"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application is closed. Would you like to restart the application?</p></div>');
 				$("#shutDownNotification").dialog({
 					modal : true,
 					height : 200,
@@ -219,6 +219,21 @@ function start() {
 					resizable : false,
 					buttons : {
 						"Restart" : function() {
+							location.reload();
+						}
+					}
+				});
+			}else if(data == "tooManyClientsNotification"){
+				$(".ui-dialog").remove();
+				$("#root").append('<div id="tooManyClientsNotification" title="Server busy"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application can not be started, because there is too many clients using it at the moment. Please try again later.</p></div>');
+				$("#tooManyClientsNotification").dialog({
+					modal : true,
+					height : 200,
+					width : 650,
+					draggable : false,
+					resizable : false,
+					buttons : {
+						"Try again..." : function() {
 							location.reload();
 						}
 					}

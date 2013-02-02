@@ -30,7 +30,9 @@ public class SwingServer {
 
     public static final String PAINT_ACK_PREFIX = "paintAck";
     public static final String UNLOAD_PREFIX = "unload";
+    
     public static final String SWING_SHUTDOWN_NOTIFICATION = "shutDownNotification";
+    public static final String TOO_MANY_CLIENTS_NOTIFICATION = "tooManyClientsNotification";
     public static final String SWING_KILL_SIGNAL = "killSwing";
 
     public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
@@ -77,6 +79,12 @@ public class SwingServer {
         server.addJsonObjectListener(JsonConnectionHandshake.class, new DataListener<JsonConnectionHandshake>() {
 
             public void onData(SocketIOClient client, JsonConnectionHandshake handshake, AckRequest paramAckRequest) {
+                if(swingInstanceMap.size()>=sk.viktor.Configuration.getInstance().getClients()){
+                    System.out.println("too many connections:" +swingInstanceMap.size());
+                    client.sendMessage(TOO_MANY_CLIENTS_NOTIFICATION);
+                    client.disconnect();
+                    return;
+                }
                 System.out.println("connected to " + handshake.clientId);
 
                 if (!swingInstanceMap.containsKey(handshake.clientId)) {

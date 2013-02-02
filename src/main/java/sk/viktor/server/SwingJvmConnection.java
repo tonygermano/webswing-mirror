@@ -88,6 +88,9 @@ public class SwingJvmConnection implements MessageListener, Runnable {
                     client.sendMessage(SwingServer.SWING_SHUTDOWN_NOTIFICATION);
                     SwingServer.removeSwingClientApplication(clientId);
                     client.disconnect();
+                    if(this.getExitSchedule()!=null){
+                        this.getExitSchedule().cancel(false);
+                    }
                 }
             }
         } catch (JMSException e) {

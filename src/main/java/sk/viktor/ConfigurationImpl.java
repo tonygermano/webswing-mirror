@@ -7,8 +7,7 @@ public class ConfigurationImpl extends Configuration {
     private String args = "";
     private String vmargs = "";
     private String main = "";
-
-
+    private int clients = 10;
 
     public String getHost() {
         return host;
@@ -28,6 +27,14 @@ public class ConfigurationImpl extends Configuration {
 
     public String getMain() {
         return main;
+    }
+
+    public int getClients() {
+        return clients;
+    }
+
+    protected void setClients(int clients) {
+        this.clients = clients;
     }
 
     protected void setHost(String host) {
