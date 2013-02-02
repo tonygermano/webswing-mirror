@@ -8,15 +8,16 @@ import sk.viktor.server.SwingServer;
 
 public class SwingMain {
 
+    public static Thread notifyExitThread=new Thread() {
+        @Override
+        public void run() {
+            PaintManager.getInstance().notifyShutDown();
+        }
+    };
+    
     public static void main(String[] args) throws Exception {
         UIManagerConfigurator.configureUI();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                PaintManager.getInstance().notifyShutDown();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(notifyExitThread);
 
         SwingClassloader cl = new SwingClassloader();
         Class<?> clazz = cl.loadClass(System.getProperty(SwingServer.SWING_START_SYS_PROP_MAIN_CLASS));

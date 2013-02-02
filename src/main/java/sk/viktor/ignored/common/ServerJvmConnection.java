@@ -3,6 +3,7 @@ package sk.viktor.ignored.common;
 import java.io.Serializable;
 
 import javax.jms.Connection;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -14,6 +15,7 @@ import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
+import sk.viktor.SwingMain;
 import sk.viktor.ignored.model.c2s.JsonEvent;
 import sk.viktor.ignored.model.s2c.JsonPaintRequest;
 import sk.viktor.server.JmsService;
@@ -39,6 +41,14 @@ public class ServerJvmConnection implements MessageListener {
             Queue producerDest = session.createQueue(clientId + JmsService.SWING2SERVER);
             producer = session.createProducer(producerDest);
             session.createConsumer(consumerDest).setMessageListener(this);
+            connection.setExceptionListener(new ExceptionListener() {
+                
+                public void onException(JMSException e) {
+                        System.out.println("Exiting application for inactivity. ");
+                        Runtime.getRuntime().removeShutdownHook(SwingMain.notifyExitThread);
+                        System.exit(1);
+                }
+            });
         } catch (JMSException e) {
             e.printStackTrace();
         }

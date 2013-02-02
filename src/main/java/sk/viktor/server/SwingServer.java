@@ -1,7 +1,11 @@
 package sk.viktor.server;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
@@ -20,6 +24,7 @@ import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOPipelineFactory;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.DataListener;
+import com.corundumstudio.socketio.listener.DisconnectListener;
 
 public class SwingServer {
 
@@ -28,15 +33,13 @@ public class SwingServer {
     public static final String SWING_SHUTDOWN_NOTIFICATION = "shutDownNotification";
     public static final String SWING_KILL_SIGNAL = "killSwing";
 
-    
     public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
     public static final String SWING_START_SYS_PROP_MAIN_CLASS = "webswing.mainClass";
-    
-   
 
     private static Connection connection;
-
-    private static Map<String, SwingJvmConnection> swingInstanceMap = new HashMap<String, SwingJvmConnection>();
+    private static ScheduledExecutorService scheduler=Executors.newSingleThreadScheduledExecutor();
+    
+    private static Map<String, SwingJvmConnection> swingInstanceMap = new ConcurrentHashMap<String, SwingJvmConnection>();
 
     static {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
@@ -82,6 +85,10 @@ public class SwingServer {
                     appl.start();
                 } else {
                     SwingJvmConnection appl = swingInstanceMap.get(handshake.clientId);
+                    if(appl.getExitSchedule()!=null){
+                        appl.getExitSchedule().cancel(false);
+                        appl.setExitSchedule(null);
+                    }
                     appl.setClient(client);
                 }
             }
@@ -118,6 +125,28 @@ public class SwingServer {
                     String clientId = msg.substring(UNLOAD_PREFIX.length());
                     swingInstanceMap.get(clientId).sendKill();
                 }
+            }
+        });
+
+        server.addDisconnectListener(new DisconnectListener() {
+
+            public void onDisconnect(SocketIOClient client) {
+                SwingJvmConnection current = null;
+                for (SwingJvmConnection c : swingInstanceMap.values()) {
+                    if (c.getClient() == client) {
+                        current = c;
+                    }
+                }
+                if (current != null) {
+                    if(current.getExitSchedule()!=null){
+                        current.getExitSchedule().cancel(false);
+                        current.setExitSchedule(null);
+                    }
+                    ScheduledFuture<?> schedule = scheduler.schedule(current, 30, TimeUnit.SECONDS);
+                    current.setExitTimer(schedule);
+                    System.out.println("disconected");
+                }
+
             }
         });
 

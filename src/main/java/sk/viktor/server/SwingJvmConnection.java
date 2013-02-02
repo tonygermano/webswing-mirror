@@ -2,6 +2,7 @@ package sk.viktor.server;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.concurrent.ScheduledFuture;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
@@ -25,13 +26,14 @@ import sk.viktor.SwingMain;
 
 import com.corundumstudio.socketio.SocketIOClient;
 
-public class SwingJvmConnection implements MessageListener {
+public class SwingJvmConnection implements MessageListener, Runnable {
 
     private Session session;
     private MessageProducer producer;
     private MessageConsumer consumer;
     private SocketIOClient client;
     private String clientId;
+    private ScheduledFuture<?> exitSchedule;
 
     public SwingJvmConnection(String clientId, Connection c, SocketIOClient client) {
         this.client = client;
@@ -63,8 +65,8 @@ public class SwingJvmConnection implements MessageListener {
             e.printStackTrace();
         }
     }
-    
-    public void sendKill(){
+
+    public void sendKill() {
         try {
             producer.send(session.createTextMessage(SwingServer.SWING_KILL_SIGNAL));
         } catch (JMSException e) {
@@ -76,16 +78,16 @@ public class SwingJvmConnection implements MessageListener {
         try {
             if (m instanceof ObjectMessage) {
                 client.sendJsonObject(((ObjectMessage) m).getObject());
-            }else if (m instanceof TextMessage){
-                String text=((TextMessage) m).getText();
-                if(text.equals(SwingServer.SWING_SHUTDOWN_NOTIFICATION)){
+            } else if (m instanceof TextMessage) {
+                String text = ((TextMessage) m).getText();
+                if (text.equals(SwingServer.SWING_SHUTDOWN_NOTIFICATION)) {
                     consumer.close();
                     producer.close();
                     session.close();
                     System.out.println("notifying browser shutdown");
                     client.sendMessage(SwingServer.SWING_SHUTDOWN_NOTIFICATION);
-                    client.disconnect();
                     SwingServer.removeSwingClientApplication(clientId);
+                    client.disconnect();
                 }
             }
         } catch (JMSException e) {
@@ -119,18 +121,18 @@ public class SwingJvmConnection implements MessageListener {
                     javaTask.setFailonerror(true);
                     javaTask.setClassname(SwingMain.class.getName());
                     javaTask.setArgs(Configuration.getInstance().getArgs());
-                    javaTask.setJvmargs("-noverify "+ Configuration.getInstance().getVmargs());
+                    javaTask.setJvmargs("-noverify " + Configuration.getInstance().getVmargs());
 
                     Variable clientIdVar = new Variable();
                     clientIdVar.setKey(SwingServer.SWING_START_SYS_PROP_CLIENT_ID);
                     clientIdVar.setValue(clientId);
                     javaTask.addSysproperty(clientIdVar);
-                    
+
                     Variable mainClass = new Variable();
                     mainClass.setKey(SwingServer.SWING_START_SYS_PROP_MAIN_CLASS);
                     mainClass.setValue(Configuration.getInstance().getMain());
                     javaTask.addSysproperty(mainClass);
-                    
+
                     javaTask.init();
                     javaTask.executeJava();
                 } catch (BuildException e) {
@@ -142,17 +144,32 @@ public class SwingJvmConnection implements MessageListener {
         }).start();
     }
 
-    
     public SocketIOClient getClient() {
         return client;
     }
 
     public void setClient(SocketIOClient client) {
-        this.client=client;
+        this.client = client;
     }
-    
+
     public String getClientId() {
         return clientId;
+    }
+
+    public void run() {
+        sendKill();
+    }
+
+    public void setExitTimer(ScheduledFuture<?> schedule) {
+        this.exitSchedule = schedule;
+    }
+
+    protected ScheduledFuture<?> getExitSchedule() {
+        return exitSchedule;
+    }
+
+    protected void setExitSchedule(ScheduledFuture<?> exitSchedule) {
+        this.exitSchedule = exitSchedule;
     }
 
 }
