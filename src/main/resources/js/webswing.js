@@ -38,6 +38,7 @@ function draw(windowInfo, b64image) {
 }
 
 function createCanvasWinodow(name, title, width, height) {
+	$(".info").remove();
 	$("#root").append('<div id="' + name + 'Window"><canvas id="' + name + '" width="' + width + '" height="' + height + '" tabindex="-1"/></div>');
 	$("#" + name + "Window").dialog({
 		width : "auto",
@@ -210,7 +211,7 @@ function start() {
 		if (typeof data == "string") {
 			if (data == "shutDownNotification") {
 				$(".ui-dialog").remove();
-				$("#root").append('<div id="shutDownNotification" title="Application closed"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application is closed. Would you like to restart the application?</p></div>');
+				$("#root").append('<div class="info" id="shutDownNotification" title="Application closed"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application is closed. Would you like to restart the application?</p></div>');
 				$("#shutDownNotification").dialog({
 					modal : true,
 					height : 200,
@@ -225,7 +226,7 @@ function start() {
 				});
 			}else if(data == "tooManyClientsNotification"){
 				$(".ui-dialog").remove();
-				$("#root").append('<div id="tooManyClientsNotification" title="Server busy"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application can not be started, because there is too many clients using it at the moment. Please try again later.</p></div>');
+				$("#root").append('<div class="info" id="tooManyClientsNotification" title="Server busy"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application can not be started, because there is too many clients using it at the moment. Please try again later.</p></div>');
 				$("#tooManyClientsNotification").dialog({
 					modal : true,
 					height : 200,
@@ -254,6 +255,16 @@ function start() {
 			});
 			$('#root').html('online');
 			$('#root').removeClass().addClass('ui-online ui-widget-header ui-corner-all');
+			
+			$(".ui-dialog").remove();
+			$("#root").append('<div class="info" id="loader" title="Application starting..."><p>Application starting. please wait..<image src="/css/smoothness/images/loading32.gif"/></div>');
+			$("#loader").dialog({
+				modal : true,
+				height : 100,
+				width : 400,
+				draggable : false,
+				resizable : false,
+			});
 		}
 	});
 

@@ -32,7 +32,7 @@ public class Util {
     private static PngEncoder encoder;
     static {
         try {
-            encoder = new PngEncoder(PngEncoder.COLOR_TRUECOLOR_ALPHA, PngEncoder.BEST_SPEED);
+            encoder = new PngEncoder(PngEncoder.COLOR_TRUECOLOR_ALPHA, PngEncoder.BEST_COMPRESSION);
         } catch (Exception e) {
             System.out.println("Library for fast image encoding not found. Download the library from http://objectplanet.com/pngencoder/");
         }
