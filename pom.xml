@@ -97,7 +97,24 @@
 	</dependencies>
 
 	<build>
+		<finalName>webswing-${project.version}</finalName>
 		<plugins>
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>yuicompressor-maven-plugin</artifactId>
+				<version>1.0</version>
+				<configuration>
+					<nosuffix>true</nosuffix>
+					<jswarn>false</jswarn>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compress</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -128,6 +145,13 @@
 							<mainClass>org.webswing.Main</mainClass>
 						</manifest>
 					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-2</version>
+				<configuration>
+					<descriptor>src/main/assembly/dist.xml</descriptor>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -11,7 +11,7 @@ import org.webswing.server.SwingServer;
 
 
 public class Main {
-
+    
     public static void main(String[] args) throws Exception {
         // create the command line parser
         CommandLineParser parser = new PosixParser();
@@ -33,6 +33,7 @@ public class Main {
                 System.out.println("Please specify swing application's main class");
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.printHelp("webswing", options);
+                System.exit(1);
             }
             ConfigurationImpl cimpl = (ConfigurationImpl) Configuration.getInstance();
             if (line.getOptionValue('h') != null) {

@@ -45,6 +45,7 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
 public class ResourcesServerHandler extends SimpleChannelUpstreamHandler {
 
     private String urlMapping;
+    private static final String WEB_RESOURCE_PREFIX="web/";
     private final StringBuilder responseContent = new StringBuilder();
 
     public ResourcesServerHandler(String urlMapping) {
@@ -56,9 +57,9 @@ public class ResourcesServerHandler extends SimpleChannelUpstreamHandler {
         if (e.getMessage() instanceof HttpRequest) {
             HttpRequest request = (HttpRequest) e.getMessage();
             if (request.getUri().startsWith(urlMapping)) {
-                String reqResource=request.getUri().substring(urlMapping.length());
-                if(reqResource.trim().isEmpty()){
-                    reqResource="index.html";
+                String reqResource=WEB_RESOURCE_PREFIX+request.getUri().substring(urlMapping.length());
+                if(reqResource.trim().equals(WEB_RESOURCE_PREFIX)){
+                    reqResource=WEB_RESOURCE_PREFIX+"index.html";
                 }
                 InputStream input = this.getClass().getClassLoader().getResourceAsStream(reqResource);
                 if (input != null) {

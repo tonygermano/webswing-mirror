@@ -71,7 +71,6 @@ public class SwingServer {
             public ChannelPipeline getPipeline() throws Exception {
                 ChannelPipeline pipe = super.getPipeline();
                 pipe.addBefore(PACKET_HANDLER, "localResourceHandler", new ResourcesServerHandler("/"));
-                //pipe.addBefore(PACKET_HANDLER, "swingHandler", new SwingDrawingServerHandler("/swing"));
                 return pipe;
             }
         });
