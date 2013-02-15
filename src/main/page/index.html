@@ -32,7 +32,6 @@ body {
 	text-align: center;
 }
 
-
 .hero-unit .lead {
 	font-size: 24px;
 	line-height: 1.25;
@@ -102,6 +101,9 @@ body {
 	margin-right: 10px;
 	box-shadow: 0px 0px 2px #666;
 }
+.popover {
+ width:400px;
+}
 </style>
 
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -115,14 +117,16 @@ body {
 	<div class="container">
 
 		<div class="masthead">
-			<h3 class="muted"><span class="logo size32" align="left"> <image
-						src="img/webswinglogo.png" alt="Webswing" />Webswing</h3>
+			<h3 class="muted">
+				<span class="logo size32" align="left"> <image
+						src="img/webswinglogo.png" alt="Webswing" />Webswing
+			</h3>
 			<div class="navbar">
 				<div class="navbar-inner">
 					<div class="container">
 						<ul class="nav">
 							<li class="active"><a href="#">Home</a></li>
-							<li><a href="swing.html">Demo</a></li>
+							<li><a href="#" id="demopopover" data-toggle="popover" data-placement="bottom" data-content="Best way is to <a href='https://bitbucket.org/meszarv/webswing/downloads'>download</a> 	and try it on your own computer. But if you are vey patient, you can run it on our very slow server. Beware that due to lack of	hardware resources only one user at a time can use the online demo application. To run the online demo click <a href='swing.html'>here</a>" title="" data-original-title="Demo">Demo</a></li>
 							<li><a href="https://bitbucket.org/meszarv/webswing/src">Source</a></li>
 							<li><a
 								href="https://bitbucket.org/meszarv/webswing/downloads">Downloads</a></li>
@@ -146,7 +150,8 @@ body {
 
 
 			<p class="lead">Bring swing applications to present.</p>
-			<a class="btn btn-large btn-success" href="#">Download and try!</a>
+			<a class="btn btn-large btn-danger" href="https://bitbucket.org/meszarv/webswing/downloads">Download and
+				try!</a>
 		</div>
 
 		<!-- Example row of columns -->
@@ -154,24 +159,31 @@ body {
 			<div class="span12"></div>
 			<div class="span12">
 				<h2>What is Webswing?</h2>
-				<p>Webswing is a web server, that allows you to run any swing application inside your web browser using only pure HTML5.</p>
+				<p>Webswing is a web server, that allows you to run any swing
+					application inside your web browser using only pure HTML5.</p>
 			</div>
 			<div class="span12"></div>
 			<div class="span12">
 				<h2>What are the benefits of using Webswing?</h2>
 				<ul>
-					<li>Webswing offers the <b>most secure</b> way of providing
-						<b>rich-client</b> experience <b>through web.</b></li>
-					<li>Webswing works with all major browsers (incl. <b>IE9, Chrome
-						and Firefox</b>).</li>
-					<li>Webswing provide <b>100% same user experience</b> for your swing
-						application as on desktop.</li>
-					<li>You <b>don't need to change</b> single line of <b>source code</b> of your
-						swing application.</li>
-					<li>With Webswing your clients <b>don't need JRE</b> installed, so you
-						don't need to worry about security issues in JVM.</li>
+					<li>Webswing offers the <b>most secure</b> way of providing <b>rich-client</b>
+						experience <b>through web.</b></li>
+					<li>Webswing works with all major browsers (incl. <b>IE9,
+							Chrome and Firefox</b>).
+					</li>
+					<li>Webswing provide <b>100% same user experience</b> for your
+						swing application as on desktop.
+					</li>
+					<li>You <b>don't need to change</b> single line of <b>source
+							code</b> of your swing application.
+					</li>
+					<li>With Webswing your clients <b>don't need JRE</b>
+						installed, so you don't need to worry about security issues in
+						JVM.
+					</li>
 					<li>With Webswing you don't need to think about distributing
-						the swing application to clients, <b>only deploy it on server</b>.</li>
+						the swing application to clients, <b>only deploy it on server</b>.
+					</li>
 				</ul>
 			</div>
 			<div class="span12"></div>
@@ -196,28 +208,43 @@ body {
 			<div class="span12"></div>
 			<div class="span12">
 				<h2>How to use Webswing?</h2>
-				<p>Easiest way to try Webswing on your computer is to run demo application. For that you only need to download the latest distribution, unzip it, 
-					execute 
-					<code>start.bat</code>or <code>start.sh</code> open browser and load <code>http://localhost:8080</code></p>
-				<p>If you want to try your own swing application, you need to adjust the starting command in the script. Webswing offers following command line options for this:
+				<p>
+					Easiest way to try Webswing on your computer is to run demo
+					application. For that you only need to download the latest
+					distribution, unzip it, execute
+					<code>start.bat</code>
+					or
+					<code>start.sh</code>
+					open browser and load
+					<code>http://localhost:8080</code>
+				</p>
+				<p>If you want to try your own swing application, you need to
+					adjust the starting command in the script. Webswing offers
+					following command line options for this:
 				<pre>
  -h,--host <arg>        Local interface address where the web server will listen.(localhost)
  -p,--port <arg>        Port where the web server will listen.(8080)
  -c,--clients <arg>     Maximum number of simultaneous swing connections.(10)
  -m,--mainClass <arg>   Swing application main class.
  -a,--args <arg>        Commandline arguments for swing application.
- -v,--vmargs <arg>      JVM arguments for swing application.</pre>
-				Main class name is the only required option to successfully start Webswing. But you need to place your application and its required libs to <code>swinglib</code> directory in flat structure (no sub-directories).
+ -v,--vmargs <arg>      JVM arguments for swing application.
+				</pre>
+				Main class name is the only required option to successfully start
+				Webswing. But you need to place your application and its required
+				libs to
+				<code>swinglib</code>
+				directory in flat structure (no sub-directories).
 				</p>
 			</div>
 		</div>
 		<hr>
 		<section id="contact">
-		<div class="span12">
-			<div id="wufoo-z7x3p3">
-				Fill out my <a href="http://meszarv.wufoo.com/forms/z7x3p3">online form</a>.
-			</div>
-			<script type="text/javascript">var z7x3p3;(function(d, t) {
+			<div class="span12">
+				<div id="wufoo-z7x3p3">
+					Fill out my <a href="http://meszarv.wufoo.com/forms/z7x3p3">online
+						form</a>.
+				</div>
+				<script type="text/javascript">var z7x3p3;(function(d, t) {
 				var s = d.createElement(t), options = {
 				'userName':'meszarv', 
 				'formHash':'z7x3p3', 
@@ -232,16 +259,16 @@ body {
 				var scr = d.getElementsByTagName(t)[0], par = scr.parentNode; par.insertBefore(s, scr);
 				})(document, 'script');
 			</script>
-		</div>
+			</div>
 		</section>
-		
+
 		<hr>
 
-		
+
 		<div class="footer">
 
-			<p>Webswing by Viktor Meszaros. <br>
-				Code licensed under <a
+			<p>
+				Webswing by Viktor Meszaros. <br> Code licensed under <a
 					href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache
 					License v2.0</a>.
 			</p>
@@ -255,5 +282,10 @@ body {
 	<!-- Placed at the end of the document so the pages load faster -->
 	<script src="js/jquery.js"></script>
 	<script src="js/bootstrap.min.js"></script>
+	<script>
+$(function ()  
+{ $("#demopopover").popover({ html : true });  
+}); 
+</script>
 </body>
 </html>
