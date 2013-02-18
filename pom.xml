@@ -170,62 +170,20 @@
 
 	<profiles>
 		<profile>
-			<id>page</id>
+			<id>live</id>
 			<build>
 				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.7</version>
-						<dependencies>
-							<dependency>
-								<groupId>commons-net</groupId>
-								<artifactId>commons-net</artifactId>
-								<version>3.2</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.ant</groupId>
-								<artifactId>ant-commons-net</artifactId>
-								<version>1.8.4</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.ant</groupId>
-								<artifactId>ant-nodeps</artifactId>
-								<version>1.8.1</version>
-							</dependency>
-						</dependencies>
-						<executions>
-							<execution>
-								<phase>process-resources</phase>
-								<configuration>
-									<target>
-										<move file="${project.build.outputDirectory}/web/index.html"
-											toFile="${project.build.outputDirectory}/web/swing.html" />
-										<copy todir="${project.build.outputDirectory}/web">
-											<fileset dir="${basedir}/src/main/page/web">
-											</fileset>
-										</copy>
-									</target>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
 					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<version>2.2-beta-2</version>
 						<configuration>
-							<finalName>webswing-${project.version}-page</finalName>
+							<finalName>webswing-${project.version}-live</finalName>
 							<outputDirectory>dist</outputDirectory>
-							<descriptor>src/main/assembly/page.xml</descriptor>
+							<descriptor>src/main/assembly/live.xml</descriptor>
 						</configuration>
 					</plugin>
 				</plugins>
 			</build>
-			<properties>
-				<ftp.host>webswing.org</ftp.host>
-			</properties>
 		</profile>
 	</profiles>
 </project>

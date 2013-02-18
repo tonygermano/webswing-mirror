@@ -23,7 +23,7 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>${basedir}/src/main/page/bin</directory>
+			<directory>${basedir}/src/main/live/bin</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>start.*</include>
