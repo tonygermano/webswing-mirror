@@ -205,7 +205,18 @@ function bindEvent(el, eventName, eventHandler) {
 }
 
 function start() {
-
+	$('#status').html('initializing');
+	$('#status').removeClass().addClass('ui-initializing ui-widget-header ui-corner-all');
+	$(".ui-dialog").remove();
+	$("#root").append('<div class="info" id="init" title="Initializing"><p>Initializing connection to server..<image src="/css/smoothness/images/loading32.gif"/></p></div>');
+	$("#init").dialog({
+		modal : true,
+		height : 100,
+		width : 400,
+		draggable : false,
+		resizable : false,
+	});
+	
 	setInterval(mouseMoveEventFilter, 100);
 	socket.on('message', function(data) {
 		if (typeof data == "string") {
@@ -253,11 +264,11 @@ function start() {
 				'@class' : 'org.webswing.ignored.model.c2s.JsonConnectionHandshake',
 				'clientId' : clientId
 			});
-			$('#root').html('online');
-			$('#root').removeClass().addClass('ui-online ui-widget-header ui-corner-all');
+			$('#status').html('online');
+			$('#status').removeClass().addClass('ui-online ui-widget-header ui-corner-all');
 			
 			$(".ui-dialog").remove();
-			$("#root").append('<div class="info" id="loader" title="Application starting..."><p>Application starting. please wait..<image src="/css/smoothness/images/loading32.gif"/></div>');
+			$("#root").append('<div class="info" id="loader" title="Application starting..."><p>Application starting. please wait..<image src="/css/smoothness/images/loading32.gif"/></p></div>');
 			$("#loader").dialog({
 				modal : true,
 				height : 100,
@@ -269,8 +280,8 @@ function start() {
 	});
 
 	socket.on('disconnect', function() {
-		$('#root').html('offline');
-		$('#root').removeClass().addClass('ui-offline ui-widget-header ui-corner-all');
+		$('#status').html('offline');
+		$('#status').removeClass().addClass('ui-offline ui-widget-header ui-corner-all');
 	});
 
 	$(window).bind("beforeunload", function() {

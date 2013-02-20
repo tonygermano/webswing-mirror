@@ -486,3 +486,10 @@ body .ui-tooltip { border-width:2px; }
     text-align: center;
     color: rgb(223, 83, 83);
 }
+
+.ui-initializing{
+    width: 100px;
+    border-color: rgb(112, 112, 112);
+    text-align: center;
+    color: black;
+}
