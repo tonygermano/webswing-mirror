@@ -53,13 +53,15 @@ function createCanvasWinodow(name, title, width, height) {
 }
 
 function sendCloseWindowEvent(event, ui) {
-	var e = {
-		'@class' : 'org.webswing.ignored.model.c2s.JsonEventWindow',
-		'type' : 'close',
-		'windowId' : this.id.substring(0, this.id.length - 6),
-		'clientId' : clientId
-	};
-	socket.json.send(e);
+	if(event.hasOwnProperty('originalEvent')){
+		var e = {
+			'@class' : 'org.webswing.ignored.model.c2s.JsonEventWindow',
+			'type' : 'close',
+			'windowId' : this.id.substring(0, this.id.length - 6),
+			'clientId' : clientId
+		};
+		socket.json.send(e);
+	}
 }
 
 function mouseMoveEventFilter() {

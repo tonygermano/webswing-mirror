@@ -81,7 +81,8 @@ public class SwingClassloader extends org.apache.bcel.util.ClassLoader {
         classReplacementMapping = classBuilder.build();
 
         Builder<String, String> methodReplacementBuilder = new ImmutableBiMap.Builder<String, String>();
-        //methodReplacementBuilder.put("java.lang.Runtime exit (I)V", "org.webswing.special.RedirectedMethods exit (I)V");
+        methodReplacementBuilder.put("java.lang.System setErr (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy ()V");
+        methodReplacementBuilder.put("java.lang.System setOut (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy2 ()V");
         methodReplacementBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
         methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;");
         methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");

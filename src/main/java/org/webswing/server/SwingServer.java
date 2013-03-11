@@ -70,7 +70,7 @@ public class SwingServer {
             @Override
             public ChannelPipeline getPipeline() throws Exception {
                 ChannelPipeline pipe = super.getPipeline();
-                pipe.addBefore(PACKET_HANDLER, "localResourceHandler", new ResourcesServerHandler("/"));
+                pipe.addAfter(HTTP_ENCODER, "localResourceHandler", new ResourcesServerHandler("/"));
                 return pipe;
             }
         });
