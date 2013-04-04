@@ -4,6 +4,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+
+import javax.swing.SwingUtilities;
+
 import org.apache.bcel.Constants;
 import org.apache.bcel.util.Repository;
 import org.apache.bcel.util.SyntheticRepository;
@@ -123,8 +126,15 @@ public class SwingClassloader extends ClassLoader {
 
     }
     
+    public static Thread notifyExitThread=new Thread() {
+        @Override
+        public void run() {
+            PaintManager.getInstance().notifyShutDown();
+        }
+    };
+    
     public static void startSwing(ClassLoader parent, String[] args) throws Exception{
-        SwingClassloader cl = new SwingClassloader(parent);
+        final SwingClassloader cl = new SwingClassloader(parent);
         Class<?> clazz = cl.loadClass(System.getProperty(org.webswing.Constants.SWING_START_SYS_PROP_MAIN_CLASS));
 
         // Get a class representing the type of the main method's argument
@@ -136,7 +146,11 @@ public class SwingClassloader extends ClassLoader {
         
         // well-behaved Java packages work relative to the
         // context classloader.  Others don't (like commons-logging)
-        //????Thread.currentThread().setContextClassLoader(cl);
+        Thread.currentThread().setContextClassLoader(cl);
+        
+        //configure shutdown notification. (We need to configure this after the contextClassloader is set up)
+        UIManagerConfigurator.configureUI();
+        Runtime.getRuntime().addShutdownHook(notifyExitThread);
         
         // Create a list containing the arguments -- in this case,
         // an array of strings

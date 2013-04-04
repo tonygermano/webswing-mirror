@@ -16,7 +16,6 @@ import org.webswing.ignored.common.WebWindow;
 import org.webswing.ignored.model.s2c.JsonWindowInfo;
 import org.webswing.util.Util;
 
-
 public class WebJDialog extends JDialog implements WebWindow {
 
     /**
@@ -25,7 +24,7 @@ public class WebJDialog extends JDialog implements WebWindow {
     private static final long serialVersionUID = 7233902228541154553L;
     private BufferedImage virtualScreen;
     private BufferedImage diffScreen;
-    private boolean webDirty=false;
+    private boolean webDirty = false;
 
     public WebJDialog(Dialog owner, String title, boolean modal) {
         super(owner, title, modal);
@@ -60,7 +59,7 @@ public class WebJDialog extends JDialog implements WebWindow {
                 res = PaintManager.getInstance().getJmsService().getPngImage(diffScreen);
             }
             resetScreen(diffScreen);
-            webDirty=false;
+            webDirty = false;
             return res;
         }
     }
@@ -78,7 +77,7 @@ public class WebJDialog extends JDialog implements WebWindow {
             g.drawImage(virtualScreen, 0, 0, null);
             g.dispose();
             resetScreen(virtualScreen);
-            webDirty=true;
+            webDirty = true;
         }
     }
 

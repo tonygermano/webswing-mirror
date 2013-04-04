@@ -9,21 +9,14 @@ import java.util.List;
 
 import org.webswing.ignored.common.PaintManager;
 import org.webswing.ignored.common.ServerJvmConnection;
-import org.webswing.ignored.special.UIManagerConfigurator;
 
 
 public class SwingMain {
 
-    public static Thread notifyExitThread=new Thread() {
-        @Override
-        public void run() {
-            PaintManager.getInstance().notifyShutDown();
-        }
-    };
+
     
     public static void main(String[] args) throws Exception {
-        UIManagerConfigurator.configureUI();
-        Runtime.getRuntime().addShutdownHook(notifyExitThread);
+
 
         
         //set up instance of ExtLibImpl class providing jms connection and other services in separated classloader to prevent classpath pollution of swing application.  

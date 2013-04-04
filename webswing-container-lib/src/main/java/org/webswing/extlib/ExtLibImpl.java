@@ -73,7 +73,7 @@ public class ExtLibImpl implements MessageListener,ServerJvmConnection{
                 
                 public void onException(JMSException e) {
                         System.out.println("Exiting application for inactivity. ");
-                        Runtime.getRuntime().removeShutdownHook(SwingMain.notifyExitThread);
+                        Runtime.getRuntime().removeShutdownHook(SwingClassloader.notifyExitThread);
                         System.exit(1);
                 }
             });

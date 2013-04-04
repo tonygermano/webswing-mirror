@@ -24,7 +24,6 @@ import org.webswing.ignored.model.s2c.JsonWindowInfo;
 import org.webswing.ignored.model.s2c.JsonWindowRequest;
 import org.webswing.util.Util;
 
-
 public class PaintManager {
 
     private static PaintManager paintManager = new PaintManager();
@@ -33,7 +32,7 @@ public class PaintManager {
     private MouseEvent lastMouseEvent;
 
     public PaintManager() {
-    
+
     }
 
     public static Graphics beforePaintInterceptor(Graphics g, JComponent c) {
@@ -190,8 +189,8 @@ public class PaintManager {
     public static PaintManager getInstance() {
         return paintManager;
     }
-    
-    public void notifyShutDown(){
+
+    public void notifyShutDown() {
         jmsService.sendShutdownNotification();
     }
 
@@ -199,16 +198,12 @@ public class PaintManager {
         return windows;
     }
 
-    
     public ServerJvmConnection getJmsService() {
         return jmsService;
     }
 
-    
     public void setJmsService(ServerJvmConnection jmsService) {
         this.jmsService = jmsService;
     }
-    
-    
-    
+
 }
