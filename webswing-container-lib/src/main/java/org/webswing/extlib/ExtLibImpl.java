@@ -24,7 +24,6 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.codec.binary.Base64;
 import org.webswing.Constants;
-import org.webswing.SwingMain;
 import org.webswing.ignored.common.PaintManager;
 import org.webswing.ignored.common.ServerJvmConnection;
 import org.webswing.ignored.common.WebWindow;

@@ -5,11 +5,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.swing.SwingUtilities;
-
 import org.apache.bcel.Constants;
-import org.apache.bcel.util.Repository;
-import org.apache.bcel.util.SyntheticRepository;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantClass;
 import org.apache.bcel.classfile.JavaClass;
@@ -31,11 +27,11 @@ import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.ClassLoaderRepository;
+import org.apache.bcel.util.Repository;
 import org.webswing.ignored.common.PaintManager;
 import org.webswing.ignored.special.UIManagerConfigurator;
 import org.webswing.util.CLUtil;
 import org.webswing.util.Util;
-
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -118,6 +114,11 @@ public class SwingClassloader extends ClassLoader {
         methodReplacementBuilder.put("javax.swing.JOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", "org.webswing.special.RedirectedJOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
         methodReplacementBuilder.put("javax.swing.JColorChooser showDialog (Ljava/awt/Component;Ljava/lang/String;Ljava/awt/Color;)Ljava/awt/Color;", "org.webswing.special.RedirectedJColorChooser showDialog (Ljava/awt/Component;Ljava/lang/String;Ljava/awt/Color;)Ljava/awt/Color;");
         methodReplacementBuilder.put("javax.swing.JColorChooser createDialog (Ljava/awt/Component;Ljava/lang/String;ZLjavax/swing/JColorChooser;Ljava/awt/event/ActionListener;Ljava/awt/event/ActionListener;)Ljavax/swing/JDialog;", "org.webswing.special.RedirectedJColorChooser createDialog (Ljava/awt/Component;Ljava/lang/String;ZLjavax/swing/JColorChooser;Ljava/awt/event/ActionListener;Ljava/awt/event/ActionListener;)Ljavax/swing/JDialog;");
+        methodReplacementBuilder.put("java.awt.Desktop isDesktopSupported ()Z", "org.webswing.special.RedirectedDesktop isDesktopSupported ()Z");
+        methodReplacementBuilder.put("java.awt.Desktop isSupported (Ljava/awt/Desktop/Action;)Z", "org.webswing.special.RedirectedDesktop isSupported (Ljava/awt/Desktop/Action;)Z");
+        methodReplacementBuilder.put("java.awt.Desktop browse (Ljava/net/URI;)V", "org.webswing.special.RedirectedDesktop browse (Ljava/net/URI;)V");
+        methodReplacementBuilder.put("java.awt.Desktop mail (Ljava/net/URI;)V", "org.webswing.special.RedirectedDesktop mail (Ljava/net/URI;)V");
+        methodReplacementBuilder.put("java.awt.Desktop mail ()V", "org.webswing.special.RedirectedDesktop mail ()V");
         methodReplacementMapping = methodReplacementBuilder.build();
 
         Builder<String, String> methodOverrideBuilder = new ImmutableBiMap.Builder<String, String>();
@@ -161,7 +162,7 @@ public class SwingClassloader extends ClassLoader {
     }
 
 
-    private Hashtable classes = new Hashtable(); // Hashtable is synchronized thus thread-safe
+    private Hashtable<String, Class<?>> classes = new Hashtable<String, Class<?>>(); // Hashtable is synchronized thus thread-safe
     private String[] ignored_packages;
     private Repository repository;
 
@@ -172,11 +173,11 @@ public class SwingClassloader extends ClassLoader {
         this.repository = new ClassLoaderRepository(parent);
     }
 
-    protected Class loadClass( String class_name, boolean resolve ) throws ClassNotFoundException {
-        Class cl = null;
+    protected Class<?> loadClass( String class_name, boolean resolve ) throws ClassNotFoundException {
+        Class<?> cl = null;
         /* First try: lookup hash table.
          */
-        if ((cl = (Class) classes.get(class_name)) == null) {
+        if ((cl = classes.get(class_name)) == null) {
             /* Second try: Load system class using system class loader. You better
              * don't mess around with them.
              */

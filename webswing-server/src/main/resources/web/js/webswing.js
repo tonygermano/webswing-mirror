@@ -258,6 +258,10 @@ function start() {
 			$("#" + data.windowId + "Window").dialog("close");
 			return;
 		}
+		if (data.clazz == 'org.webswing.ignored.model.s2c.JsonDesktopRequest') {
+			window.open(data.url,'_blank');
+		}
+		
 		processRequest(data);
 	});
 	socket.on('connect', function() {
