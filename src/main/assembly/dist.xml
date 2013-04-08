@@ -4,19 +4,50 @@
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 	<id>distribution</id>
 	<formats>
-		<format>zip</format>
+		<format>dir</format>
 	</formats>
+	<moduleSets>
+		<moduleSet>
+			<includes>
+				<include>org.webswing:webswing-server</include>
+			</includes>
+			<binaries>
+				<includeDependencies>true</includeDependencies>
+				<dependencySets>
+					<dependencySet>
+						<outputDirectory>server-lib</outputDirectory>
+					</dependencySet>
+				</dependencySets>
+				<unpack>false</unpack>
+				<outputFileNameMapping>${module.artifactId}.${module.extension}</outputFileNameMapping>
+			</binaries>
+		</moduleSet>
+		<moduleSet>
+			<includes>
+				<include>org.webswing:webswing-container</include>
+			</includes>
+			<binaries>
+				<includeDependencies>false</includeDependencies>
+				<unpack>false</unpack>
+				<outputFileNameMapping>${module.artifactId}.${module.extension}</outputFileNameMapping>
+			</binaries>
+		</moduleSet>
+		<moduleSet>
+			<includes>
+				<include>org.webswing:webswing-container-lib</include>
+			</includes>
+			<binaries>
+				<includeDependencies>true</includeDependencies>
+				<outputDirectory>lib</outputDirectory>
+				<unpack>false</unpack>
+				<outputFileNameMapping>${module.artifactId}.${module.extension}</outputFileNameMapping>
+			</binaries>
+		</moduleSet>
+
+	</moduleSets>
 	<fileSets>
 		<fileSet>
-			<directory>${project.build.directory}</directory>
-			<outputDirectory>/</outputDirectory>
-			<includes>
-				<include>lib/*</include>
-				<include>webswing*.jar</include>
-			</includes>
-		</fileSet>
-		<fileSet>
-			<directory>${basedir}/src/test/demo</directory>
+			<directory>${basedir}/src/main/demo</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>*</include>
