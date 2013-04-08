@@ -38,10 +38,10 @@ public class WebJWindow extends JWindow implements WebWindow {
         return virtualScreen;
     }
 
-    public byte[] getDiffWebData() {
+    public BufferedImage getDiffWebData() {
         synchronized (this) {
-            byte[] res;
-            res = PaintManager.getInstance().getJmsService().getPngImage(diffScreen);
+            BufferedImage res;
+            res = Util.deepCopy(diffScreen);
             resetScreen(diffScreen);
             webDirty=false;
             return res;

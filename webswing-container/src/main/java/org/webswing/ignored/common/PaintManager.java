@@ -12,6 +12,9 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import javax.swing.JComponent;
 
@@ -30,6 +33,8 @@ public class PaintManager {
     private ServerJvmConnection jmsService;
     Map<String, Window> windows = new HashMap<String, Window>();
     private MouseEvent lastMouseEvent;
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
+
 
     public PaintManager() {
 
@@ -69,9 +74,16 @@ public class PaintManager {
 
     public void doSendPaintRequest() {
         Map<String, Window> copy = new HashMap<String, Window>(windows);
-        Map<String, String> paintMap = jmsService.createEncodedPaintMap(copy);
-        Map<String, JsonWindowInfo> windowInfoMap = Util.createJsonWindowInfoMap(paintMap.keySet(), copy);
-        jmsService.sendJsonObject(new JsonPaintRequest(paintMap, windowInfoMap));
+        final Map<String, BufferedImage> paintMap = Util.getImagesToPaint(copy);
+        final Map<String, JsonWindowInfo> windowInfoMap = Util.createJsonWindowInfoMap(paintMap.keySet(), copy);
+        executor.submit(new Runnable() {
+            
+            public void run() {
+                Map<String, String> paintB64Strings = jmsService.createEncodedPaintMap(paintMap);
+                jmsService.sendJsonObject(new JsonPaintRequest(paintB64Strings, windowInfoMap));        
+            }
+        });
+        
     }
 
     public void disposeWindow(Window webWindow) {

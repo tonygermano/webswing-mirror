@@ -2,6 +2,8 @@ var clientId = GUID();
 var serverpath = location.protocol == 'file:' ? "http://localhost" : location.protocol + "//" + location.host;
 var socket = io.connect(serverpath);
 var latestMouseMoveEvent;
+var latestMouseWheelEvent;
+
 var mouseDown = 0;
 
 function processRequest(data) {
@@ -53,7 +55,7 @@ function createCanvasWinodow(name, title, width, height) {
 }
 
 function sendCloseWindowEvent(event, ui) {
-	if(event.hasOwnProperty('originalEvent')){
+	if (event.hasOwnProperty('originalEvent')) {
 		var e = {
 			'@class' : 'org.webswing.ignored.model.c2s.JsonEventWindow',
 			'type' : 'close',
@@ -68,6 +70,10 @@ function mouseMoveEventFilter() {
 	if (latestMouseMoveEvent != null) {
 		socket.json.send(latestMouseMoveEvent);
 		latestMouseMoveEvent = null;
+	}
+	if (latestMouseWheelEvent != null) {
+		socket.json.send(latestMouseWheelEvent);
+		latestMouseWheelEvent = null;
 	}
 }
 
@@ -102,14 +108,20 @@ function registerEventListeners(canvas) {
 	bindEvent(canvas, "mousewheel", function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousewheel');
 		latestMouseMoveEvent = null;
-		socket.json.send(mousePos);
+		if (latestMouseWheelEvent != null) {
+			mousePos.wheelDelta += latestMouseWheelEvent.wheelDelta;
+		}
+		latestMouseWheelEvent = mousePos;
 		return false;
 	}, false);
 	// firefox
 	bindEvent(canvas, "DOMMouseScroll", function(evt) {
 		var mousePos = getMousePos(canvas, evt, 'mousewheel');
 		latestMouseMoveEvent = null;
-		socket.json.send(mousePos);
+		if (latestMouseWheelEvent != null) {
+			mousePos.wheelDelta += latestMouseWheelEvent.wheelDelta;
+		}
+		latestMouseWheelEvent = mousePos;
 		return false;
 	}, false);
 	bindEvent(canvas, 'contextmenu', function(event) {
@@ -218,52 +230,57 @@ function start() {
 		draggable : false,
 		resizable : false,
 	});
-	
+
 	setInterval(mouseMoveEventFilter, 100);
-	socket.on('message', function(data) {
-		if (typeof data == "string") {
-			if (data == "shutDownNotification") {
-				$(".ui-dialog").remove();
-				$("#root").append('<div class="info" id="shutDownNotification" title="Application closed"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application is closed. Would you like to restart the application?</p></div>');
-				$("#shutDownNotification").dialog({
-					modal : true,
-					height : 200,
-					width : 450,
-					draggable : false,
-					resizable : false,
-					buttons : {
-						"Restart" : function() {
-							location.reload();
+	socket
+			.on(
+					'message',
+					function(data) {
+						if (typeof data == "string") {
+							if (data == "shutDownNotification") {
+								$(".ui-dialog").remove();
+								$("#root").append('<div class="info" id="shutDownNotification" title="Application closed"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application is closed. Would you like to restart the application?</p></div>');
+								$("#shutDownNotification").dialog({
+									modal : true,
+									height : 200,
+									width : 450,
+									draggable : false,
+									resizable : false,
+									buttons : {
+										"Restart" : function() {
+											location.reload();
+										}
+									}
+								});
+							} else if (data == "tooManyClientsNotification") {
+								$(".ui-dialog").remove();
+								$("#root")
+										.append(
+												'<div class="info" id="tooManyClientsNotification" title="Server busy"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application can not be started, because there is too many clients using it at the moment. Please try again later.</p></div>');
+								$("#tooManyClientsNotification").dialog({
+									modal : true,
+									height : 200,
+									width : 650,
+									draggable : false,
+									resizable : false,
+									buttons : {
+										"Try again..." : function() {
+											location.reload();
+										}
+									}
+								});
+							}
 						}
-					}
-				});
-			}else if(data == "tooManyClientsNotification"){
-				$(".ui-dialog").remove();
-				$("#root").append('<div class="info" id="tooManyClientsNotification" title="Server busy"><p><span class="ui-icon ui-icon-info" style="float: left; margin: 0 7px 20px 0;"></span>Application can not be started, because there is too many clients using it at the moment. Please try again later.</p></div>');
-				$("#tooManyClientsNotification").dialog({
-					modal : true,
-					height : 200,
-					width : 650,
-					draggable : false,
-					resizable : false,
-					buttons : {
-						"Try again..." : function() {
-							location.reload();
+						if (data.clazz == 'org.webswing.ignored.model.s2c.JsonWindowRequest') {
+							$("#" + data.windowId + "Window").dialog("close");
+							return;
 						}
-					}
-				});
-			}
-		}
-		if (data.clazz == 'org.webswing.ignored.model.s2c.JsonWindowRequest') {
-			$("#" + data.windowId + "Window").dialog("close");
-			return;
-		}
-		if (data.clazz == 'org.webswing.ignored.model.s2c.JsonDesktopRequest') {
-			window.open(data.url,'_blank');
-		}
-		
-		processRequest(data);
-	});
+						if (data.clazz == 'org.webswing.ignored.model.s2c.JsonDesktopRequest') {
+							window.open(data.url, '_blank');
+						}
+
+						processRequest(data);
+					});
 	socket.on('connect', function() {
 		if ($('#root').text() != "online") {
 			socket.json.send({
@@ -272,7 +289,7 @@ function start() {
 			});
 			$('#status').html('online');
 			$('#status').removeClass().addClass('ui-online ui-widget-header ui-corner-all');
-			
+
 			$(".ui-dialog").remove();
 			$("#root").append('<div class="info" id="loader" title="Application starting..."><p>Application starting. please wait..<image src="/css/smoothness/images/loading32.gif"/></p></div>');
 			$("#loader").dialog({

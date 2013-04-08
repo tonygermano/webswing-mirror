@@ -19,7 +19,7 @@ public interface WebWindow {
 
     public Point getFrameTranslation();
 
-    public byte[] getDiffWebData();
+    public BufferedImage getDiffWebData();
 
     public void addChangesToDiff();
     

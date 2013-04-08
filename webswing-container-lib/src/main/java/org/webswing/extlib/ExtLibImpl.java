@@ -1,6 +1,5 @@
 package org.webswing.extlib;
 
-import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,7 +25,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.webswing.Constants;
 import org.webswing.ignored.common.PaintManager;
 import org.webswing.ignored.common.ServerJvmConnection;
-import org.webswing.ignored.common.WebWindow;
 import org.webswing.ignored.model.c2s.JsonEvent;
 import org.webswing.ignored.model.s2c.JsonPaintRequest;
 import org.webswing.util.Util;
@@ -139,13 +137,11 @@ public class ExtLibImpl implements MessageListener,ServerJvmConnection{
         return readyToReceive;
     }
     
-    public Map<String, String> createEncodedPaintMap(Map<String, Window> windows) {
+    public Map<String, String> createEncodedPaintMap(Map<String, BufferedImage> windows) {
         Map<String, String> result = new HashMap<String, String>();
         for (String windowKey : windows.keySet()) {
-            WebWindow ww = (WebWindow) windows.get(windowKey);
-            if (ww.isWebDirty()) {
-                result.put(windowKey, Base64.encodeBase64String(ww.getDiffWebData()));
-            }
+            BufferedImage bi = windows.get(windowKey);
+            result.put(windowKey, Base64.encodeBase64String(getPngImage(bi)));
         }
         return result;
     }

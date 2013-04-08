@@ -45,13 +45,13 @@ public class WebJFrame extends JFrame implements WebWindow {
         return virtualScreen;
     }
 
-    public byte[] getDiffWebData() {
+    public BufferedImage getDiffWebData() {
         synchronized (this) {
-            byte[] res;
+            BufferedImage res;
             if (this.getRootPane() != null) {
-                res = PaintManager.getInstance().getJmsService().getPngImage(diffScreen.getSubimage(this.getRootPane().getX(), this.getRootPane().getY(), this.getRootPane().getWidth(), this.getRootPane().getHeight()));
+                res = Util.deepCopy(diffScreen).getSubimage(this.getRootPane().getX(), this.getRootPane().getY(), this.getRootPane().getWidth(), this.getRootPane().getHeight());
             } else {
-                res = PaintManager.getInstance().getJmsService().getPngImage(diffScreen);
+                res = Util.deepCopy(diffScreen);
             }
             resetScreen(diffScreen);
             webDirty=false;

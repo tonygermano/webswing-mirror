@@ -175,9 +175,10 @@ public class GraphicsWrapper extends Graphics2D {
 
     @Override
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
-        original.copyArea(x, y, width, height, dx, dy);
+        //original.copyArea(x, y, width, height, dx, dy);
         //repaint area
         RepaintManager.currentManager((Component)webWindow).addDirtyRegion((Window) webWindow,  (int)getTransform().getTranslateX()+x+dx, (int)getTransform().getTranslateY()+y+dy, width, height);
+        RepaintManager.currentManager((Component)webWindow).paintDirtyRegions();
     }
 
     @Override

@@ -4,6 +4,8 @@ import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,10 +24,7 @@ import org.webswing.ignored.model.c2s.JsonEventKeyboard.Type;
 import org.webswing.ignored.model.c2s.JsonEventMouse;
 import org.webswing.ignored.model.s2c.JsonWindowInfo;
 
-
 public class Util {
-
-
 
     public static boolean isPaintImmediately() {
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();
@@ -103,7 +102,6 @@ public class Util {
         return result;
     }
 
-
     public static void savePngImage(BufferedImage imageContent, String name) {
         try {
             OutputStream os = new FileOutputStream(new File(name));
@@ -180,5 +178,24 @@ public class Util {
             }
         }
         return false;
+    }
+
+    public static BufferedImage deepCopy(BufferedImage bi) {
+        ColorModel cm = bi.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = bi.copyData(null);
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    }
+
+    
+    public static Map<String, BufferedImage> getImagesToPaint(Map<String, Window> windows){
+        Map<String, BufferedImage> result = new HashMap<String, BufferedImage>();
+        for (String windowKey : windows.keySet()) {
+            WebWindow ww = (WebWindow) windows.get(windowKey);
+            if (ww.isWebDirty()) {
+                result.put(windowKey, ww.getDiffWebData());
+            }
+        }
+        return result;
     }
 }
