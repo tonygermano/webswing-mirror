@@ -19,6 +19,7 @@ import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import javax.swing.SwingUtilities;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.codec.binary.Base64;
@@ -27,17 +28,15 @@ import org.webswing.ignored.common.PaintManager;
 import org.webswing.ignored.common.ServerJvmConnection;
 import org.webswing.ignored.model.c2s.JsonEvent;
 import org.webswing.ignored.model.s2c.JsonPaintRequest;
-import org.webswing.util.Util;
 
 import com.objectplanet.image.PngEncoder;
-
 
 /**
  * @author Viktor_Meszaros
  * This class is needed to achieve classpath isolation for swing application, all functionality dependent on external libs is implemented here.
  */
-public class ExtLibImpl implements MessageListener,ServerJvmConnection{
-    
+public class ExtLibImpl implements MessageListener, ServerJvmConnection {
+
     private static ExtLibImpl impl;
     private PngEncoder encoder;
     private Session session;
@@ -45,15 +44,14 @@ public class ExtLibImpl implements MessageListener,ServerJvmConnection{
     private transient boolean readyToReceive = true;
     private PaintManager paintManager;
 
-    public static ServerJvmConnection getInstance(PaintManager pm){
-        if(impl==null){
-            impl=new ExtLibImpl(pm);
+    public static ServerJvmConnection getInstance(PaintManager pm) {
+        if (impl == null) {
+            impl = new ExtLibImpl(pm);
         }
         return impl;
-        
+
     }
-    
-    
+
     public ExtLibImpl(PaintManager pm) {
         try {
             this.paintManager = pm;
@@ -67,26 +65,26 @@ public class ExtLibImpl implements MessageListener,ServerJvmConnection{
             producer = session.createProducer(producerDest);
             session.createConsumer(consumerDest).setMessageListener(this);
             connection.setExceptionListener(new ExceptionListener() {
-                
+
                 public void onException(JMSException e) {
-                        System.out.println("Exiting application for inactivity. ");
-                        Runtime.getRuntime().removeShutdownHook(SwingClassloader.notifyExitThread);
-                        System.exit(1);
+                    System.out.println("Exiting application for inactivity. ");
+                    Runtime.getRuntime().removeShutdownHook(SwingClassloader.notifyExitThread);
+                    System.exit(1);
                 }
             });
         } catch (JMSException e) {
             e.printStackTrace();
         }
-        
+
         try {
             encoder = new PngEncoder(PngEncoder.COLOR_TRUECOLOR_ALPHA, PngEncoder.BEST_COMPRESSION);
         } catch (Exception e) {
             System.out.println("Library for fast image encoding not found. Download the library from http://objectplanet.com/pngencoder/");
         }
-    
+
     }
-    
-    public void sendShutdownNotification(){
+
+    public void sendShutdownNotification() {
         try {
             producer.send(session.createTextMessage(Constants.SWING_SHUTDOWN_NOTIFICATION));
         } catch (JMSException e) {
@@ -98,7 +96,7 @@ public class ExtLibImpl implements MessageListener,ServerJvmConnection{
         try {
             synchronized (this) {
                 producer.send(session.createObjectMessage(o));
-                if(o instanceof JsonPaintRequest){
+                if (o instanceof JsonPaintRequest) {
                     readyToReceive = false;
                 }
             }
@@ -117,14 +115,15 @@ public class ExtLibImpl implements MessageListener,ServerJvmConnection{
             } else if (msg instanceof TextMessage) {
                 TextMessage tmsg = (TextMessage) msg;
                 if (tmsg.getText().equals(Constants.PAINT_ACK_PREFIX)) {
-                    if (Util.needPainting(paintManager.getWindows())) {
-                        paintManager.doSendPaintRequest();
-                    } else {
-                        synchronized (this) {
-                            this.readyToReceive = true;
-                        }
+                    synchronized (this) {
+                        this.readyToReceive = true;
                     }
-                }else if(tmsg.getText().equals(Constants.SWING_KILL_SIGNAL)){
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            paintManager.repaintIfNecessary();
+                        }
+                    });
+                } else if (tmsg.getText().equals(Constants.SWING_KILL_SIGNAL)) {
                     System.exit(0);
                 }
             }
@@ -136,7 +135,7 @@ public class ExtLibImpl implements MessageListener,ServerJvmConnection{
     public boolean isReadyToReceive() {
         return readyToReceive;
     }
-    
+
     public Map<String, String> createEncodedPaintMap(Map<String, BufferedImage> windows) {
         Map<String, String> result = new HashMap<String, String>();
         for (String windowKey : windows.keySet()) {
@@ -146,13 +145,12 @@ public class ExtLibImpl implements MessageListener,ServerJvmConnection{
         return result;
     }
 
-
     public byte[] getPngImage(BufferedImage imageContent) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            if(encoder!=null){
+            if (encoder != null) {
                 encoder.encode(imageContent, baos);
-            }else{
+            } else {
                 ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
                 ImageIO.write(imageContent, "png", ios);
             }
@@ -160,7 +158,7 @@ public class ExtLibImpl implements MessageListener,ServerJvmConnection{
             baos.close();
             return result;
         } catch (IOException e) {
-            System.out.println("Writing image interupted:"+e.getMessage());
+            System.out.println("Writing image interupted:" + e.getMessage());
         }
         return null;
     }

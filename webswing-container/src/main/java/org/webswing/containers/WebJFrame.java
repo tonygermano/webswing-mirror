@@ -91,6 +91,7 @@ public class WebJFrame extends JFrame implements WebWindow {
         result.setHasFocus(this.isFocused());
         result.setTitle(this.getTitle());
         result.setId(Util.getObjectIdentity(this));
+        result.setResizable(this.isResizable());
         return result;
     }
 
@@ -108,6 +109,7 @@ public class WebJFrame extends JFrame implements WebWindow {
     @SuppressWarnings("deprecation")
     @Override
     public void hide() {
+        webDirty=false;
         PaintManager.getInstance().hideWindowInBrowser(this);
         super.hide();
     }
@@ -116,6 +118,7 @@ public class WebJFrame extends JFrame implements WebWindow {
     public void setVisible(boolean b) {
         PaintManager.getInstance().registerWindow(this);
         if(!b){
+            webDirty=false;
             PaintManager.getInstance().hideWindowInBrowser(this);    
         }
         super.setVisible(b);

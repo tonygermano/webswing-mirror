@@ -12,6 +12,7 @@ public class JsonWindowInfo implements Serializable {
     int height;
     boolean modal;
     boolean hasFocus;
+    boolean resizable;
     
 
     public String getId() {
@@ -72,6 +73,16 @@ public class JsonWindowInfo implements Serializable {
     
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    
+    public boolean isResizable() {
+        return resizable;
+    }
+
+    
+    public void setResizable(boolean resizable) {
+        this.resizable = resizable;
     }
 
     

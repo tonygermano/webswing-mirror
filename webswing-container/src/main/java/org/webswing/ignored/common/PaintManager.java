@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.Future;
 
 import javax.swing.JComponent;
 
@@ -34,8 +34,8 @@ public class PaintManager {
     Map<String, Window> windows = new HashMap<String, Window>();
     private MouseEvent lastMouseEvent;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
-
-
+    private Future<?> execution;
+    
     public PaintManager() {
 
     }
@@ -66,24 +66,28 @@ public class PaintManager {
         BufferedImage img = gw.getImg();
         if (img != null) {
             gw.getWebWindow().addChangesToDiff();
-            if (jmsService.isReadyToReceive()) {
+            if (jmsService.isReadyToReceive() && (execution==null || execution.isDone())) {
                 doSendPaintRequest();
             }
         }
+    }
+    
+    public void repaintIfNecessary(){
+        if (Util.needPainting(windows) && jmsService.isReadyToReceive() && (execution==null || execution.isDone())) {
+            doSendPaintRequest();
+        }      
     }
 
     public void doSendPaintRequest() {
         Map<String, Window> copy = new HashMap<String, Window>(windows);
         final Map<String, BufferedImage> paintMap = Util.getImagesToPaint(copy);
         final Map<String, JsonWindowInfo> windowInfoMap = Util.createJsonWindowInfoMap(paintMap.keySet(), copy);
-        executor.submit(new Runnable() {
-            
+        execution= executor.submit(new Runnable() {
             public void run() {
                 Map<String, String> paintB64Strings = jmsService.createEncodedPaintMap(paintMap);
-                jmsService.sendJsonObject(new JsonPaintRequest(paintB64Strings, windowInfoMap));        
+                jmsService.sendJsonObject(new JsonPaintRequest(paintB64Strings, windowInfoMap));
             }
         });
-        
     }
 
     public void disposeWindow(Window webWindow) {
@@ -95,6 +99,7 @@ public class PaintManager {
     }
 
     public void hideWindowInBrowser(Window webWindow) {
+        disposeWindow(webWindow);
         jmsService.sendJsonObject(new JsonWindowRequest(Util.getObjectIdentity(webWindow)));
     }
 
@@ -117,7 +122,14 @@ public class PaintManager {
     private void dispatchWindowEvent(JsonEventWindow event) {
         Window w = windows.get(event.windowId);
         if (w != null) {
-            dispatchEventInSwing(w, new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
+            switch (event.type) {
+                case close:
+                    dispatchEventInSwing(w, new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
+                    break;
+                case resize:
+                    w.setSize(event.newWidth,event.newHeight);
+                    break;
+            }
         }
     }
 

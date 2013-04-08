@@ -100,6 +100,7 @@ public class WebJDialog extends JDialog implements WebWindow {
             result.setParentId(Util.getObjectIdentity(this.getParent()));
         }
         result.setModal(this.isModal());
+        result.setResizable(this.isResizable());
         return result;
     }
 
@@ -117,6 +118,7 @@ public class WebJDialog extends JDialog implements WebWindow {
     @SuppressWarnings("deprecation")
     @Override
     public void hide() {
+        webDirty=false;
         PaintManager.getInstance().hideWindowInBrowser(this);
         super.hide();
     }
@@ -125,6 +127,7 @@ public class WebJDialog extends JDialog implements WebWindow {
     public void setVisible(boolean b) {
         PaintManager.getInstance().registerWindow(this);
         if (!b) {
+            webDirty=false;
             PaintManager.getInstance().hideWindowInBrowser(this);
         }
         super.setVisible(b);

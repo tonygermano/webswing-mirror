@@ -82,6 +82,7 @@ public class WebJWindow extends JWindow implements WebWindow {
         if (this.getParent() != null) {
             result.setParentId(Util.getObjectIdentity(this.getParent()));
         }
+        result.setResizable(false);
         return result;
     }
 
@@ -99,6 +100,7 @@ public class WebJWindow extends JWindow implements WebWindow {
     @SuppressWarnings("deprecation")
     @Override
     public void hide() {
+        webDirty=false;
         PaintManager.getInstance().hideWindowInBrowser(this);
         super.hide();
     }
@@ -107,6 +109,7 @@ public class WebJWindow extends JWindow implements WebWindow {
     public void setVisible(boolean b) {
         PaintManager.getInstance().registerWindow(this);
         if (!b) {
+            webDirty=false;
             PaintManager.getInstance().hideWindowInBrowser(this);
         }
         super.setVisible(b);

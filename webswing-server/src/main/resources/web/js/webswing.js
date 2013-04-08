@@ -22,7 +22,11 @@ function draw(windowInfo, b64image) {
 	var canvas, context, imageObj;
 	canvas = document.getElementById(windowInfo.id);
 	if (canvas == null) {
-		canvas = createCanvasWinodow(windowInfo.id, windowInfo.title, windowInfo.width, windowInfo.height);
+		canvas = createCanvasWinodow(windowInfo.id, windowInfo.title, windowInfo.width, windowInfo.height, windowInfo.resizable);
+	}
+	if(canvas.width!=windowInfo.width || canvas.height!=windowInfo.height){
+		canvas.width=windowInfo.width;
+		canvas.height=windowInfo.height;
 	}
 	context = canvas.getContext("2d");
 	imageObj = new Image();
@@ -39,15 +43,16 @@ function draw(windowInfo, b64image) {
 	imageObj.src = 'data:image/png;base64,' + b64image;
 }
 
-function createCanvasWinodow(name, title, width, height) {
+function createCanvasWinodow(name, title, width, height,resizable) {
 	$(".info").remove();
 	$("#root").append('<div id="' + name + 'Window"><canvas id="' + name + '" width="' + width + '" height="' + height + '" tabindex="-1"/></div>');
 	$("#" + name + "Window").dialog({
 		width : "auto",
 		heigth : "auto",
 		title : title,
-		resizable : "false",
-		beforeClose : sendCloseWindowEvent
+		resizable : resizable,
+		beforeClose : sendCloseWindowEvent,
+		resizeStop : sendResizeWindowEvent
 	});
 	var canvas = document.getElementById(name);
 	registerEventListeners(canvas);
@@ -61,6 +66,20 @@ function sendCloseWindowEvent(event, ui) {
 			'type' : 'close',
 			'windowId' : this.id.substring(0, this.id.length - 6),
 			'clientId' : clientId
+		};
+		socket.json.send(e);
+	}
+}
+
+function sendResizeWindowEvent(event, ui) {
+	if (event.hasOwnProperty('originalEvent')) {
+		var e = {
+			'@class' : 'org.webswing.ignored.model.c2s.JsonEventWindow',
+			'type' : 'resize',
+			'windowId' : this.id.substring(0, this.id.length - 6),
+			'clientId' : clientId,
+			'newWidth' : ui.size.width,
+			'newHeight': ui.size.height
 		};
 		socket.json.send(e);
 	}
