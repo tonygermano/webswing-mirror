@@ -17,6 +17,6 @@ public interface Constants {
     public static final String SWING2SERVER = "Swing2Server";
     public static final String SERVER2SWING = "Server2Swing";
 
-    public static final String JMS_URL = "nio://localhost:61616";
+    public static final String JMS_URL = "nio://127.0.0.1:34455";
 
 }

@@ -3,12 +3,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.webswing</groupId>
 	<artifactId>webswing</artifactId>
-	<version>1.1</version>
+	<version>2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>webswing-server</module>
+		<module>webswing-toolkit</module>
 		<module>webswing-container</module>
-		<module>webswing-container-lib</module>
+		<module>webswing-ext-lib</module>
 	</modules>
 	<build>
 		<finalName>webswing</finalName>

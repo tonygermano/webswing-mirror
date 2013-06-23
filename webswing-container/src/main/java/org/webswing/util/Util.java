@@ -1,5 +1,7 @@
 package org.webswing.util;
 
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -102,11 +104,14 @@ public class Util {
         return result;
     }
 
-    public static void savePngImage(BufferedImage imageContent, String name) {
+    public static void savePngImage(Image imageContent, String name) {
         try {
+            BufferedImage bi= new BufferedImage(imageContent.getWidth(null), imageContent.getHeight(null), BufferedImage.TYPE_4BYTE_ABGR_PRE);
+            Graphics g = bi.getGraphics();
+            g.drawImage(imageContent, 0, 0, null);
             OutputStream os = new FileOutputStream(new File(name));
             ImageOutputStream ios = ImageIO.createImageOutputStream(os);
-            ImageIO.write(imageContent, "png", ios);
+            ImageIO.write(bi, "png", ios);
             ios.close();
             os.close();
         } catch (IOException e) {

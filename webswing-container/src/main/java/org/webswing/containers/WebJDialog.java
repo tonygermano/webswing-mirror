@@ -40,7 +40,7 @@ public class WebJDialog extends JDialog implements WebWindow {
             virtualScreen = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
             diffScreen = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
         }
-        return new GraphicsWrapper((Graphics2D) super.getGraphics(), this);
+        return new GraphicsWrapper((Graphics2D) super.getGraphics(),null);
     }
 
     public BufferedImage getVirtualScreen() {

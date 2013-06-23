@@ -28,6 +28,7 @@ import org.webswing.ignored.common.PaintManager;
 import org.webswing.ignored.common.ServerJvmConnection;
 import org.webswing.ignored.model.c2s.JsonEvent;
 import org.webswing.ignored.model.s2c.JsonPaintRequest;
+import org.webswing.toolkit.WebToolkit;
 
 import com.objectplanet.image.PngEncoder;
 
@@ -42,19 +43,17 @@ public class ExtLibImpl implements MessageListener, ServerJvmConnection {
     private Session session;
     private MessageProducer producer;
     private transient boolean readyToReceive = true;
-    private PaintManager paintManager;
 
-    public static ServerJvmConnection getInstance(PaintManager pm) {
+    public static ServerJvmConnection getInstance() {
         if (impl == null) {
-            impl = new ExtLibImpl(pm);
+            impl = new ExtLibImpl();
         }
         return impl;
 
     }
 
-    public ExtLibImpl(PaintManager pm) {
+    public ExtLibImpl() {
         try {
-            this.paintManager = pm;
             String clientId = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID);
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Constants.JMS_URL);
             Connection connection = connectionFactory.createConnection();
@@ -110,7 +109,7 @@ public class ExtLibImpl implements MessageListener, ServerJvmConnection {
             if (msg instanceof ObjectMessage) {
                 ObjectMessage omsg = (ObjectMessage) msg;
                 if (omsg.getObject() instanceof JsonEvent) {
-                    paintManager.dispatchEvent((JsonEvent) omsg.getObject());
+                   // webToolkit.dispatchEvent((JsonEvent) omsg.getObject());
                 }
             } else if (msg instanceof TextMessage) {
                 TextMessage tmsg = (TextMessage) msg;
@@ -120,7 +119,7 @@ public class ExtLibImpl implements MessageListener, ServerJvmConnection {
                     }
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            paintManager.repaintIfNecessary();
+                          //  webToolkit.repaintIfNecessary();
                         }
                     });
                 } else if (tmsg.getText().equals(Constants.SWING_KILL_SIGNAL)) {

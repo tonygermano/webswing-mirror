@@ -41,35 +41,35 @@ public class PaintManager {
     }
 
     public static Graphics beforePaintInterceptor(Graphics g, JComponent c) {
-        GraphicsWrapper result;
-        if (g instanceof GraphicsWrapper) {
-            result = (GraphicsWrapper) g;
-            if (result.getRootPaintComponent() == null) {
-                result.setRootPaintComponent(c);
-            }
-        } else {
-            return g;
-        }
+        GraphicsWrapper result = null;
+//        if (g instanceof GraphicsWrapper) {
+//            result = (GraphicsWrapper) g;
+//            if (result.getRootPaintComponent() == null) {
+//                result.setRootPaintComponent(c);
+//            }
+//        } else {
+//            return g;
+//        }
         return result;
     }
 
     public static void afterPaintInterceptor(Graphics g, JComponent c) {
-        if (g instanceof GraphicsWrapper) {
-            GraphicsWrapper gw = (GraphicsWrapper) g;
-            if (Util.getObjectIdentity(gw.getRootPaintComponent()).equals(Util.getObjectIdentity(c))) {
-                paintManager.paintToWeb(gw, c);
-            }
-        }
+//        if (g instanceof GraphicsWrapper) {
+//            GraphicsWrapper gw = (GraphicsWrapper) g;
+//            if (Util.getObjectIdentity(gw.getRootPaintComponent()).equals(Util.getObjectIdentity(c))) {
+//                paintManager.paintToWeb(gw, c);
+//            }
+//        }
     }
 
     public void paintToWeb(GraphicsWrapper gw, JComponent c) {
-        BufferedImage img = gw.getImg();
-        if (img != null) {
-            gw.getWebWindow().addChangesToDiff();
-            if (jmsService.isReadyToReceive() && (execution==null || execution.isDone())) {
-                doSendPaintRequest();
-            }
-        }
+//        BufferedImage img = gw.getImg();
+//        if (img != null) {
+//            gw.getWebWindow().addChangesToDiff();
+//            if (jmsService.isReadyToReceive() && (execution==null || execution.isDone())) {
+//                doSendPaintRequest();
+//            }
+//        }
     }
     
     public void repaintIfNecessary(){

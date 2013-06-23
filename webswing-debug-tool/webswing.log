@@ -1,0 +1,266 @@
+2013-05-29 19:00:14,940 ERROR [main] (BrokerService.java:556) Failed to start Apache ActiveMQ (localhost, null). Reason: java.io.IOException: org.apache.activemq.store.kahadb.KahaDBPersistenceAdapter
+java.io.IOException: org.apache.activemq.store.kahadb.KahaDBPersistenceAdapter
+	at org.apache.activemq.util.IOExceptionSupport.create(IOExceptionSupport.java:39)
+	at org.apache.activemq.broker.BrokerService.createPersistenceAdapter(BrokerService.java:2215)
+	at org.apache.activemq.broker.BrokerService.getPersistenceAdapter(BrokerService.java:1111)
+	at org.apache.activemq.broker.BrokerService.doStartPersistenceAdapter(BrokerService.java:592)
+	at org.apache.activemq.broker.BrokerService.startPersistenceAdapter(BrokerService.java:587)
+	at org.apache.activemq.broker.BrokerService.start(BrokerService.java:552)
+	at org.apache.activemq.transport.vm.VMTransportFactory.doCompositeConnect(VMTransportFactory.java:124)
+	at org.apache.activemq.transport.vm.VMTransportFactory.doConnect(VMTransportFactory.java:54)
+	at org.apache.activemq.transport.TransportFactory.connect(TransportFactory.java:64)
+	at org.apache.activemq.ActiveMQConnectionFactory.createTransport(ActiveMQConnectionFactory.java:250)
+	at org.apache.activemq.ActiveMQConnectionFactory.createActiveMQConnection(ActiveMQConnectionFactory.java:265)
+	at org.apache.activemq.ActiveMQConnectionFactory.createActiveMQConnection(ActiveMQConnectionFactory.java:238)
+	at org.apache.activemq.ActiveMQConnectionFactory.createConnection(ActiveMQConnectionFactory.java:184)
+	at org.webswing.debug.tool.Main.<clinit>(Main.java:18)
+Caused by: java.lang.ClassNotFoundException: org.apache.activemq.store.kahadb.KahaDBPersistenceAdapter
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:200)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:188)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:307)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:301)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:252)
+	at org.apache.activemq.broker.BrokerService.createPersistenceAdapter(BrokerService.java:2210)
+	... 12 more
+2013-05-29 19:00:14,952 INFO  [main] (BrokerService.java:693) Apache ActiveMQ 5.8.0 (localhost, null) is shutting down
+2013-05-29 19:00:15,052 INFO  [main] (BrokerService.java:756) Apache ActiveMQ 5.8.0 (localhost, null) uptime 0.823 seconds
+2013-05-29 19:00:15,053 INFO  [main] (BrokerService.java:759) Apache ActiveMQ 5.8.0 (localhost, null) is shutdown
+2013-05-29 19:09:32,389 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-05-29 19:09:32,722 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54178-1369847372412-0:1) is starting
+2013-05-29 19:09:32,747 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-05-29 19:09:32,806 INFO  [main] (TransportConnector.java:254) Connector udp://localhost:61616 Started
+2013-05-29 19:09:32,828 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54178-1369847372412-0:1) started
+2013-05-29 19:09:32,828 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-05-29 19:13:12,058 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-05-29 19:13:12,099 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-62548-1369847591945-2:1) is starting
+2013-05-29 19:13:12,104 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-05-29 19:13:12,106 INFO  [main] (TransportConnector.java:254) Connector udp://localhost:61616 Started
+2013-05-29 19:13:12,107 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-62548-1369847591945-2:1) started
+2013-05-29 19:13:12,107 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-05-30 12:59:44,895 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-05-30 12:59:45,103 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-57496-1369911584637-2:1) is starting
+2013-05-30 12:59:45,116 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-05-30 12:59:45,120 INFO  [main] (TransportConnector.java:254) Connector udp://localhost:61616 Started
+2013-05-30 12:59:45,146 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-57496-1369911584637-2:1) started
+2013-05-30 12:59:45,146 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-05-30 14:55:22,692 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-05-30 14:55:22,740 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-60590-1369918522565-2:1) is starting
+2013-05-30 14:55:22,744 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-05-30 14:55:22,746 INFO  [main] (TransportConnector.java:254) Connector udp://localhost:61616 Started
+2013-05-30 14:55:22,748 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-60590-1369918522565-2:1) started
+2013-05-30 14:55:22,748 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-05-30 14:56:58,165 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-05-30 14:56:58,332 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-61033-1369918617988-2:1) is starting
+2013-05-30 14:56:58,346 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-05-30 14:56:58,350 INFO  [main] (TransportConnector.java:254) Connector udp://localhost:61616 Started
+2013-05-30 14:56:58,354 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-61033-1369918617988-2:1) started
+2013-05-30 14:56:58,355 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-05-30 14:57:55,404 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-05-30 14:57:55,530 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-61046-1369918675244-2:1) is starting
+2013-05-30 14:57:55,545 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-05-30 14:57:55,549 INFO  [main] (TransportConnector.java:254) Connector udp://localhost:61616 Started
+2013-05-30 14:57:55,552 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-61046-1369918675244-2:1) started
+2013-05-30 14:57:55,553 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-05-30 14:58:01,978 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-05-30 14:58:02,142 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-61049-1369918681802-2:1) is starting
+2013-05-30 14:58:02,157 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-06-02 15:29:44,966 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-02 15:29:45,344 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-51508-1370179784684-2:1) is starting
+2013-06-02 15:29:45,361 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-06-02 15:29:45,369 INFO  [main] (TransportConnector.java:254) Connector udp://localhost:61616 Started
+2013-06-02 15:29:45,407 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-51508-1370179784684-2:1) started
+2013-06-02 15:29:45,407 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-02 18:27:34,585 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-02 18:27:34,640 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63625-1370190454465-2:1) is starting
+2013-06-02 18:27:34,647 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-06-02 18:27:34,650 INFO  [main] (TransportConnector.java:254) Connector udp://localhost:61616 Started
+2013-06-02 18:27:34,652 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63625-1370190454465-2:1) started
+2013-06-02 18:27:34,653 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-02 19:02:06,556 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-02 19:02:06,598 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63655-1370192526443-2:1) is starting
+2013-06-02 19:02:06,603 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-06-02 19:02:06,605 INFO  [main] (TransportConnector.java:254) Connector udp://localhost:61616 Started
+2013-06-02 19:02:06,606 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63655-1370192526443-2:1) started
+2013-06-02 19:02:06,606 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-02 19:02:11,244 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-02 19:02:11,383 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63658-1370192531077-2:1) is starting
+2013-06-02 19:02:11,397 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-06-06 10:14:21,378 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-06 10:14:21,576 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-58355-1370506461157-2:1) is starting
+2013-06-06 10:14:21,589 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-06-06 10:14:21,593 INFO  [main] (TransportConnector.java:254) Connector udp://localhost:61616 Started
+2013-06-06 10:14:21,624 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-58355-1370506461157-2:1) started
+2013-06-06 10:14:21,625 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 18:49:10,002 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 18:49:10,205 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-56953-1370882949772-2:1) is starting
+2013-06-10 18:49:10,213 INFO  [main] (UdpTransportServer.java:81) Starting UdpTransportServer@UdpServer@61616
+2013-06-10 18:49:10,217 INFO  [main] (TransportConnector.java:254) Connector udp://localhost:61616 Started
+2013-06-10 18:49:10,234 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-56953-1370882949772-2:1) started
+2013-06-10 18:49:10,234 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 20:31:26,478 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 20:31:26,649 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-52625-1370889086492-0:1) is starting
+2013-06-10 20:31:26,657 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-10 20:31:26,659 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-10 20:31:26,661 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-52625-1370889086492-0:1) started
+2013-06-10 20:31:26,662 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 21:03:06,840 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 21:03:07,023 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54087-1370890986854-0:1) is starting
+2013-06-10 21:03:07,030 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-10 21:03:07,033 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-10 21:03:07,035 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54087-1370890986854-0:1) started
+2013-06-10 21:03:07,035 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 21:04:32,845 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 21:04:33,014 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63263-1370891072859-0:1) is starting
+2013-06-10 21:04:33,022 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-10 21:04:33,024 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-10 21:04:33,031 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63263-1370891072859-0:1) started
+2013-06-10 21:04:33,032 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 21:05:09,351 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 21:05:09,635 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63280-1370891109374-0:1) is starting
+2013-06-10 21:05:09,651 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-10 21:05:09,654 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-10 21:05:09,674 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63280-1370891109374-0:1) started
+2013-06-10 21:05:09,674 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 21:14:50,490 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 21:14:50,762 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63310-1370891690517-0:1) is starting
+2013-06-10 21:14:50,787 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-10 21:14:50,791 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-10 21:14:50,798 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63310-1370891690517-0:1) started
+2013-06-10 21:14:50,799 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 21:35:12,295 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 21:35:12,562 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63356-1370892912320-0:1) is starting
+2013-06-10 21:35:12,577 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-10 21:35:12,580 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-10 21:35:12,587 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63356-1370892912320-0:1) started
+2013-06-10 21:35:12,588 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 21:35:42,645 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 21:35:42,919 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63367-1370892942672-0:1) is starting
+2013-06-10 21:35:42,933 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-10 21:35:42,937 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-10 21:35:42,943 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63367-1370892942672-0:1) started
+2013-06-10 21:35:42,943 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 21:37:13,662 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 21:37:13,839 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63387-1370893033675-0:1) is starting
+2013-06-10 21:37:13,846 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-10 21:37:13,849 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-10 21:37:13,851 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63387-1370893033675-0:1) started
+2013-06-10 21:37:13,851 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 21:38:03,101 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 21:38:03,271 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63402-1370893083115-0:1) is starting
+2013-06-10 21:38:03,279 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-10 21:38:03,281 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-10 21:38:03,284 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63402-1370893083115-0:1) started
+2013-06-10 21:38:03,284 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 21:39:40,715 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 21:39:40,892 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63416-1370893180728-0:1) is starting
+2013-06-10 21:39:40,901 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-10 21:39:40,903 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-10 21:39:40,906 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63416-1370893180728-0:1) started
+2013-06-10 21:39:40,906 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-10 21:40:35,740 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-10 21:40:35,912 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63430-1370893235753-0:1) is starting
+2013-06-10 21:40:35,920 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-10 21:40:35,923 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-10 21:40:35,925 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63430-1370893235753-0:1) started
+2013-06-10 21:40:35,925 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-11 15:06:00,954 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-11 15:06:01,115 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-62720-1370955960969-0:1) is starting
+2013-06-11 15:06:01,123 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-11 15:06:01,125 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-11 15:06:01,133 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-62720-1370955960969-0:1) started
+2013-06-11 15:06:01,133 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-11 15:08:07,876 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-11 15:08:08,047 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-62776-1370956087890-0:1) is starting
+2013-06-11 15:08:08,055 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-11 15:08:08,058 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-11 15:08:08,060 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-62776-1370956087890-0:1) started
+2013-06-11 15:08:08,060 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-11 15:11:54,474 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-11 15:11:54,652 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54614-1370956314488-0:1) is starting
+2013-06-11 15:11:54,660 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-11 15:11:54,663 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-11 15:11:54,665 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54614-1370956314488-0:1) started
+2013-06-11 15:11:54,665 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-11 15:12:40,443 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-11 15:12:40,616 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54630-1370956360457-0:1) is starting
+2013-06-11 15:12:40,624 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-11 15:12:40,626 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-11 15:12:40,628 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54630-1370956360457-0:1) started
+2013-06-11 15:12:40,628 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-11 15:13:32,056 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-11 15:13:32,231 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54645-1370956412070-0:1) is starting
+2013-06-11 15:13:32,240 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-11 15:13:32,243 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-11 15:13:32,245 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54645-1370956412070-0:1) started
+2013-06-11 15:13:32,245 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-11 15:14:32,692 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-11 15:14:32,856 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54664-1370956472705-0:1) is starting
+2013-06-11 15:14:32,863 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-11 15:14:32,867 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-11 15:14:32,869 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-54664-1370956472705-0:1) started
+2013-06-11 15:14:32,870 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-11 15:28:05,624 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-11 15:28:05,780 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-52408-1370957285640-0:1) is starting
+2013-06-11 15:28:05,788 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-11 15:28:05,791 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-11 15:28:05,793 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-52408-1370957285640-0:1) started
+2013-06-11 15:28:05,794 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-11 15:29:03,366 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-11 15:29:03,526 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-52427-1370957343379-0:1) is starting
+2013-06-11 15:29:03,534 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-11 15:29:03,537 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-11 15:29:03,539 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-52427-1370957343379-0:1) started
+2013-06-11 15:29:03,539 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-11 15:30:23,570 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-11 15:30:23,741 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-61925-1370957423584-0:1) is starting
+2013-06-11 15:30:23,750 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-11 15:30:23,752 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-11 15:30:23,755 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-61925-1370957423584-0:1) started
+2013-06-11 15:30:23,755 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-12 17:31:57,631 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-12 17:31:57,850 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63180-1371051117670-0:1) is starting
+2013-06-12 17:31:57,864 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-12 17:31:57,871 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-12 17:31:57,875 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-63180-1371051117670-0:1) started
+2013-06-12 17:31:57,875 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-12 20:38:25,631 WARN  [ActiveMQ InactivityMonitor Worker] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:63189 failed: org.apache.activemq.transport.InactivityIOException: Channel was inactive for too (>30000) long: tcp://127.0.0.1:63189
+2013-06-22 20:19:44,139 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-22 20:19:44,720 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-61673-1371925184213-0:1) is starting
+2013-06-22 20:19:44,767 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-22 20:19:44,789 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-22 20:19:44,837 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-61673-1371925184213-0:1) started
+2013-06-22 20:19:44,837 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-22 21:36:52,628 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-22 21:36:52,794 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-49620-1371929812641-0:1) is starting
+2013-06-22 21:36:52,801 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-22 21:36:52,803 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-22 21:36:52,805 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-49620-1371929812641-0:1) started
+2013-06-22 21:36:52,805 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-22 22:06:21,382 WARN  [ActiveMQ NIO Worker 27] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:49633 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-22 22:14:05,966 WARN  [ActiveMQ NIO Worker 35] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:49655 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-22 22:15:13,616 WARN  [ActiveMQ NIO Worker 39] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:63228 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-22 22:16:59,415 WARN  [ActiveMQ NIO Worker 40] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:63238 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-22 22:36:59,246 WARN  [ActiveMQ NIO Worker 58] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:63247 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-23 10:53:00,669 WARN  [ActiveMQ NIO Worker 454] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:63265 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-23 10:57:50,793 WARN  [ActiveMQ NIO Worker 463] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:49668 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-23 11:01:50,848 WARN  [ActiveMQ NIO Worker 469] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:49677 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-23 11:09:28,060 WARN  [ActiveMQ NIO Worker 480] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:49687 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-23 11:16:17,226 WARN  [ActiveMQ NIO Worker 489] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:49698 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-23 11:38:23,043 WARN  [ActiveMQ NIO Worker 518] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:49706 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-23 11:38:37,973 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-23 11:38:38,164 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-49716-1371980317987-0:1) is starting
+2013-06-23 11:38:38,173 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-23 11:38:38,176 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-23 11:38:38,192 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-49716-1371980317987-0:1) started
+2013-06-23 11:38:38,192 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-23 11:39:53,550 INFO  [main] (BrokerService.java:594) Using Persistence Adapter: MemoryPersistenceAdapter
+2013-06-23 11:39:53,719 INFO  [main] (BrokerService.java:633) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-49730-1371980393565-0:1) is starting
+2013-06-23 11:39:53,726 INFO  [main] (TransportServerThreadSupport.java:72) Listening for connections at: nio://127.0.0.1:34455
+2013-06-23 11:39:53,729 INFO  [main] (TransportConnector.java:254) Connector nio://127.0.0.1:34455 Started
+2013-06-23 11:39:53,731 INFO  [main] (BrokerService.java:657) Apache ActiveMQ 5.8.0 (localhost, ID:WN7X64-2609VM1-49730-1371980393565-0:1) started
+2013-06-23 11:39:53,731 INFO  [main] (BrokerService.java:659) For help or more information please see: http://activemq.apache.org
+2013-06-23 11:44:55,183 WARN  [ActiveMQ NIO Worker 12] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:49745 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-23 11:45:16,687 WARN  [ActiveMQ NIO Worker 12] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:49758 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-23 11:47:05,681 WARN  [ActiveMQ NIO Worker 17] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:49764 failed: java.io.IOException: An existing connection was forcibly closed by the remote host
+2013-06-23 11:47:43,538 WARN  [ActiveMQ NIO Worker 19] (TransportConnection.java:238) Transport Connection to: tcp://127.0.0.1:49770 failed: java.io.IOException: An existing connection was forcibly closed by the remote host

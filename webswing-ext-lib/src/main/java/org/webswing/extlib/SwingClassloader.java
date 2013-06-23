@@ -45,75 +45,75 @@ public class SwingClassloader extends ClassLoader {
 
     static {
         Builder<String, String> classBuilder = new ImmutableBiMap.Builder<String, String>();
-        classBuilder.put("javax.swing.JComponent", "sk.web.swing.JComponent$$BCEL$$");
-        classBuilder.put("javax.swing.JButton", "sk.web.swing.JButton$$BCEL$$");
-        classBuilder.put("javax.swing.JCheckBoxMenuItem", "sk.web.swing.JCheckBoxMenuItem$$BCEL$$");
-        classBuilder.put("javax.swing.JMenu", "sk.web.swing.JMenu$$BCEL$$");
-        classBuilder.put("javax.swing.JMenuBar", "sk.web.swing.JMenuBar$$BCEL$$");
-        classBuilder.put("javax.swing.JMenuItem", "sk.web.swing.JMenuItem$$BCEL$$");
-        classBuilder.put("javax.swing.JToolBar", "sk.web.swing.JToolBar$$BCEL$$");
-        classBuilder.put("javax.swing.JPopupMenu", "sk.web.swing.JPopupMenu$$BCEL$$");
-        classBuilder.put("javax.swing.JRadioButtonMenuItem", "sk.web.swing.JRadioButtonMenuItem$$BCEL$$");
-        classBuilder.put("javax.swing.JToggleButton", "sk.web.swing.JToggleButton$$BCEL$$");
-        classBuilder.put("javax.swing.JCheckBox", "sk.web.swing.JCheckBox$$BCEL$$");
-        classBuilder.put("javax.swing.JRadioButton", "sk.web.swing.JRadioButton$$BCEL$$");
-        classBuilder.put("javax.swing.Box", "sk.web.swing.Box$$BCEL$$");
-        classBuilder.put("javax.swing.JColorChooser", "sk.web.swing.JColorChooser$$BCEL$$");
-        classBuilder.put("javax.swing.JFileChooser", "sk.web.swing.JFileChooser$$BCEL$$");
-        classBuilder.put("javax.swing.JComboBox", "sk.web.swing.JComboBox$$BCEL$$");
-        classBuilder.put("javax.swing.JLabel", "sk.web.swing.JLabel$$BCEL$$");
-        classBuilder.put("javax.swing.JTextField", "sk.web.swing.JTextField$$BCEL$$");
-        classBuilder.put("javax.swing.JTextArea", "sk.web.swing.JTextArea$$BCEL$$");
-        classBuilder.put("javax.swing.JTextPane", "sk.web.swing.JTextPane$$BCEL$$");
-        classBuilder.put("javax.swing.DefaultListCellRenderer", "sk.web.swing.DefaultListCellRenderer$$BCEL$$");
-        classBuilder.put("javax.swing.table.DefaultTableCellRenderer", "sk.web.swing.table.DefaultTableCellRenderer$$BCEL$$");
-        classBuilder.put("javax.swing.tree.DefaultTreeCellRenderer", "sk.web.swing.tree.DefaultTreeCellRenderer$$BCEL$$");
-        classBuilder.put("javax.swing.JList", "sk.web.swing.JList$$BCEL$$");
-        classBuilder.put("javax.swing.JLayeredPane", "sk.web.swing.JLayeredPane$$BCEL$$");
-        classBuilder.put("javax.swing.JDesktopPane", "sk.web.swing.JDesktopPane$$BCEL$$");
-        classBuilder.put("javax.swing.JRootPane", "sk.web.swing.JRootPane$$BCEL$$");
-        classBuilder.put("javax.swing.JSplitPane", "sk.web.swing.JSplitPane$$BCEL$$");
-        classBuilder.put("javax.swing.JPanel", "sk.web.swing.JPanel$$BCEL$$");
-        classBuilder.put("javax.swing.JScrollPane", "sk.web.swing.JScrollPane$$BCEL$$");
-        classBuilder.put("javax.swing.JScrollBar", "sk.web.swing.JScrollBar$$BCEL$$");
-        classBuilder.put("javax.swing.JViewPort", "sk.web.swing.JViewPort$$BCEL$$");
-        classBuilder.put("javax.swing.JOptionPane", "sk.web.swing.JOptionPane$$BCEL$$");
-        classBuilder.put("javax.swing.JFrame", "org.webswing.containers.WebJFrame");
-        classBuilder.put("javax.swing.JDialog", "org.webswing.containers.WebJDialog");
-        classBuilder.put("javax.swing.JWindow", "org.webswing.containers.WebJWindow");
+//        classBuilder.put("javax.swing.JComponent", "sk.web.swing.JComponent$$BCEL$$");
+//        classBuilder.put("javax.swing.JButton", "sk.web.swing.JButton$$BCEL$$");
+//        classBuilder.put("javax.swing.JCheckBoxMenuItem", "sk.web.swing.JCheckBoxMenuItem$$BCEL$$");
+//        classBuilder.put("javax.swing.JMenu", "sk.web.swing.JMenu$$BCEL$$");
+//        classBuilder.put("javax.swing.JMenuBar", "sk.web.swing.JMenuBar$$BCEL$$");
+//        classBuilder.put("javax.swing.JMenuItem", "sk.web.swing.JMenuItem$$BCEL$$");
+//        classBuilder.put("javax.swing.JToolBar", "sk.web.swing.JToolBar$$BCEL$$");
+//        classBuilder.put("javax.swing.JPopupMenu", "sk.web.swing.JPopupMenu$$BCEL$$");
+//        classBuilder.put("javax.swing.JRadioButtonMenuItem", "sk.web.swing.JRadioButtonMenuItem$$BCEL$$");
+//        classBuilder.put("javax.swing.JToggleButton", "sk.web.swing.JToggleButton$$BCEL$$");
+//        classBuilder.put("javax.swing.JCheckBox", "sk.web.swing.JCheckBox$$BCEL$$");
+//        classBuilder.put("javax.swing.JRadioButton", "sk.web.swing.JRadioButton$$BCEL$$");
+//        classBuilder.put("javax.swing.Box", "sk.web.swing.Box$$BCEL$$");
+//        classBuilder.put("javax.swing.JColorChooser", "sk.web.swing.JColorChooser$$BCEL$$");
+//        classBuilder.put("javax.swing.JFileChooser", "sk.web.swing.JFileChooser$$BCEL$$");
+//        classBuilder.put("javax.swing.JComboBox", "sk.web.swing.JComboBox$$BCEL$$");
+//        classBuilder.put("javax.swing.JLabel", "sk.web.swing.JLabel$$BCEL$$");
+//        classBuilder.put("javax.swing.JTextField", "sk.web.swing.JTextField$$BCEL$$");
+//        classBuilder.put("javax.swing.JTextArea", "sk.web.swing.JTextArea$$BCEL$$");
+//        classBuilder.put("javax.swing.JTextPane", "sk.web.swing.JTextPane$$BCEL$$");
+//        classBuilder.put("javax.swing.DefaultListCellRenderer", "sk.web.swing.DefaultListCellRenderer$$BCEL$$");
+//        classBuilder.put("javax.swing.table.DefaultTableCellRenderer", "sk.web.swing.table.DefaultTableCellRenderer$$BCEL$$");
+//        classBuilder.put("javax.swing.tree.DefaultTreeCellRenderer", "sk.web.swing.tree.DefaultTreeCellRenderer$$BCEL$$");
+//        classBuilder.put("javax.swing.JList", "sk.web.swing.JList$$BCEL$$");
+//        classBuilder.put("javax.swing.JLayeredPane", "sk.web.swing.JLayeredPane$$BCEL$$");
+//        classBuilder.put("javax.swing.JDesktopPane", "sk.web.swing.JDesktopPane$$BCEL$$");
+//        classBuilder.put("javax.swing.JRootPane", "sk.web.swing.JRootPane$$BCEL$$");
+//        classBuilder.put("javax.swing.JSplitPane", "sk.web.swing.JSplitPane$$BCEL$$");
+//        classBuilder.put("javax.swing.JPanel", "sk.web.swing.JPanel$$BCEL$$");
+//        classBuilder.put("javax.swing.JScrollPane", "sk.web.swing.JScrollPane$$BCEL$$");
+//        classBuilder.put("javax.swing.JScrollBar", "sk.web.swing.JScrollBar$$BCEL$$");
+//        classBuilder.put("javax.swing.JViewPort", "sk.web.swing.JViewPort$$BCEL$$");
+//        classBuilder.put("javax.swing.JOptionPane", "sk.web.swing.JOptionPane$$BCEL$$");
+//        classBuilder.put("javax.swing.JFrame", "org.webswing.containers.WebJFrame");
+//        classBuilder.put("javax.swing.JDialog", "org.webswing.containers.WebJDialog");
+//        classBuilder.put("javax.swing.JWindow", "org.webswing.containers.WebJWindow");
         classReplacementMapping = classBuilder.build();
 
         Builder<String, String> methodReplacementBuilder = new ImmutableBiMap.Builder<String, String>();
         methodReplacementBuilder.put("java.lang.System setErr (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy ()V");
         methodReplacementBuilder.put("java.lang.System setOut (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy2 ()V");
         methodReplacementBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V", "org.webswing.special.RedirectedJOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V", "org.webswing.special.RedirectedJOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V", "org.webswing.special.RedirectedJOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I", "org.webswing.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I", "org.webswing.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I", "org.webswing.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I", "org.webswing.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I", "org.webswing.special.RedirectedJOptionPane showOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V", "org.webswing.special.RedirectedJOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V", "org.webswing.special.RedirectedJOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V", "org.webswing.special.RedirectedJOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I", "org.webswing.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I", "org.webswing.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I", "org.webswing.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I", "org.webswing.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I", "org.webswing.special.RedirectedJOptionPane showInternalOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;");
-        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", "org.webswing.special.RedirectedJOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-        methodReplacementBuilder.put("javax.swing.JColorChooser showDialog (Ljava/awt/Component;Ljava/lang/String;Ljava/awt/Color;)Ljava/awt/Color;", "org.webswing.special.RedirectedJColorChooser showDialog (Ljava/awt/Component;Ljava/lang/String;Ljava/awt/Color;)Ljava/awt/Color;");
-        methodReplacementBuilder.put("javax.swing.JColorChooser createDialog (Ljava/awt/Component;Ljava/lang/String;ZLjavax/swing/JColorChooser;Ljava/awt/event/ActionListener;Ljava/awt/event/ActionListener;)Ljavax/swing/JDialog;", "org.webswing.special.RedirectedJColorChooser createDialog (Ljava/awt/Component;Ljava/lang/String;ZLjavax/swing/JColorChooser;Ljava/awt/event/ActionListener;Ljava/awt/event/ActionListener;)Ljavax/swing/JDialog;");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V", "org.webswing.special.RedirectedJOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V", "org.webswing.special.RedirectedJOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V", "org.webswing.special.RedirectedJOptionPane showMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I", "org.webswing.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I", "org.webswing.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I", "org.webswing.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I", "org.webswing.special.RedirectedJOptionPane showConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I", "org.webswing.special.RedirectedJOptionPane showOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V", "org.webswing.special.RedirectedJOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;)V");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V", "org.webswing.special.RedirectedJOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)V");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V", "org.webswing.special.RedirectedJOptionPane showInternalMessageDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;)V");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I", "org.webswing.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;)I");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I", "org.webswing.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)I");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I", "org.webswing.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;II)I");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I", "org.webswing.special.RedirectedJOptionPane showInternalConfirmDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;)I");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I", "org.webswing.special.RedirectedJOptionPane showInternalOptionDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;IILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)I");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/String;");
+//        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", "org.webswing.special.RedirectedJOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+//        methodReplacementBuilder.put("javax.swing.JColorChooser showDialog (Ljava/awt/Component;Ljava/lang/String;Ljava/awt/Color;)Ljava/awt/Color;", "org.webswing.special.RedirectedJColorChooser showDialog (Ljava/awt/Component;Ljava/lang/String;Ljava/awt/Color;)Ljava/awt/Color;");
+//        methodReplacementBuilder.put("javax.swing.JColorChooser createDialog (Ljava/awt/Component;Ljava/lang/String;ZLjavax/swing/JColorChooser;Ljava/awt/event/ActionListener;Ljava/awt/event/ActionListener;)Ljavax/swing/JDialog;", "org.webswing.special.RedirectedJColorChooser createDialog (Ljava/awt/Component;Ljava/lang/String;ZLjavax/swing/JColorChooser;Ljava/awt/event/ActionListener;Ljava/awt/event/ActionListener;)Ljavax/swing/JDialog;");
         methodReplacementBuilder.put("java.awt.Desktop isDesktopSupported ()Z", "org.webswing.special.RedirectedDesktop isDesktopSupported ()Z");
         methodReplacementBuilder.put("java.awt.Desktop isSupported (Ljava/awt/Desktop/Action;)Z", "org.webswing.special.RedirectedDesktop isSupported (Ljava/awt/Desktop/Action;)Z");
         methodReplacementBuilder.put("java.awt.Desktop browse (Ljava/net/URI;)V", "org.webswing.special.RedirectedDesktop browse (Ljava/net/URI;)V");
@@ -122,7 +122,7 @@ public class SwingClassloader extends ClassLoader {
         methodReplacementMapping = methodReplacementBuilder.build();
 
         Builder<String, String> methodOverrideBuilder = new ImmutableBiMap.Builder<String, String>();
-        methodOverrideBuilder.put("sk.web.swing.JFileChooser$$BCEL$$ createDialog (Ljava/awt/Component;)Ljavax/swing/JDialog;","org.webswing.special.OverridenMethods createDialog");
+//        methodOverrideBuilder.put("sk.web.swing.JFileChooser$$BCEL$$ createDialog (Ljava/awt/Component;)Ljavax/swing/JDialog;","org.webswing.special.OverridenMethods createDialog");
         methodOverrideMapping = methodOverrideBuilder.build();
 
     }
@@ -150,7 +150,7 @@ public class SwingClassloader extends ClassLoader {
         Thread.currentThread().setContextClassLoader(cl);
         
         //configure shutdown notification. (We need to configure this after the contextClassloader is set up)
-        UIManagerConfigurator.configureUI();
+        //UIManagerConfigurator.configureUI();
         Runtime.getRuntime().addShutdownHook(notifyExitThread);
         
         // Create a list containing the arguments -- in this case,
@@ -233,10 +233,10 @@ public class SwingClassloader extends ClassLoader {
             InstructionFactory f = new InstructionFactory(cg);
 
             //+++++++++ Rerouting swing component classes to generated subclasses with intercepted paint methods +++++++
-            rerouteSwingClasses(clazz, cg, cp);
+            //rerouteSwingClasses(clazz, cg, cp);
 
             //+++++++++ Intercept paint method if current class is subclass of JComponent +++++++
-            interceptPaintMethod(clazz, cg, cp, f);
+            //interceptPaintMethod(clazz, cg, cp, f);
 
             //+++++++++ Reroute (static) methods that require special handling +++++++++++++ 
             rerouteMehods(clazz, cg, cp, f);
