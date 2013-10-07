@@ -62,7 +62,7 @@ function createCanvasWinodow(name, title, width, height,resizable) {
 function sendCloseWindowEvent(event, ui) {
 	if (event.hasOwnProperty('originalEvent')) {
 		var e = {
-			'@class' : 'org.webswing.ignored.model.c2s.JsonEventWindow',
+			'@class' : 'org.webswing.model.c2s.JsonEventWindow',
 			'type' : 'close',
 			'windowId' : this.id.substring(0, this.id.length - 6),
 			'clientId' : clientId
@@ -74,7 +74,7 @@ function sendCloseWindowEvent(event, ui) {
 function sendResizeWindowEvent(event, ui) {
 	if (event.hasOwnProperty('originalEvent')) {
 		var e = {
-			'@class' : 'org.webswing.ignored.model.c2s.JsonEventWindow',
+			'@class' : 'org.webswing.model.c2s.JsonEventWindow',
 			'type' : 'resize',
 			'windowId' : this.id.substring(0, this.id.length - 6),
 			'clientId' : clientId,
@@ -191,7 +191,7 @@ function getMousePos(canvas, evt, type) {
 		delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 	}
 	return {
-		'@class' : 'org.webswing.ignored.model.c2s.JsonEventMouse',
+		'@class' : 'org.webswing.model.c2s.JsonEventMouse',
 		'windowId' : canvas.id,
 		'clientId' : clientId,
 		'x' : mouseX,
@@ -208,7 +208,7 @@ function getMousePos(canvas, evt, type) {
 
 function getKBKey(type, canvas, evt) {
 	return {
-		'@class' : 'org.webswing.ignored.model.c2s.JsonEventKeyboard',
+		'@class' : 'org.webswing.model.c2s.JsonEventKeyboard',
 		'windowId' : canvas.id,
 		'clientId' : clientId,
 		'type' : type,
@@ -290,11 +290,11 @@ function start() {
 								});
 							}
 						}
-						if (data.clazz == 'org.webswing.ignored.model.s2c.JsonWindowRequest') {
+						if (data.clazz == 'org.webswing.model.s2c.JsonWindowRequest') {
 							$("#" + data.windowId + "Window").dialog("close");
 							return;
 						}
-						if (data.clazz == 'org.webswing.ignored.model.s2c.JsonDesktopRequest') {
+						if (data.clazz == 'org.webswing.model.s2c.JsonLinkAction') {
 							window.open(data.url, '_blank');
 						}
 
@@ -303,7 +303,7 @@ function start() {
 	socket.on('connect', function() {
 		if ($('#root').text() != "online") {
 			socket.json.send({
-				'@class' : 'org.webswing.ignored.model.c2s.JsonConnectionHandshake',
+				'@class' : 'org.webswing.model.c2s.JsonConnectionHandshake',
 				'clientId' : clientId
 			});
 			$('#status').html('online');

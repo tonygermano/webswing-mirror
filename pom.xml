@@ -7,9 +7,9 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>webswing-server</module>
-		<module>webswing-toolkit</module>
-		<module>webswing-container</module>
-		<module>webswing-ext-lib</module>
+		<module>webswing-app-toolkit</module>
+		<module>webswing-app-launcher</module>
+		<module>webswing-app-interface</module>
 	</modules>
 	<build>
 		<finalName>webswing</finalName>

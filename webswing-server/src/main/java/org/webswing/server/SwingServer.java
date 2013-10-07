@@ -13,10 +13,10 @@ import javax.jms.JMSException;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.webswing.Constants;
-import org.webswing.ignored.model.c2s.JsonConnectionHandshake;
-import org.webswing.ignored.model.c2s.JsonEventKeyboard;
-import org.webswing.ignored.model.c2s.JsonEventMouse;
-import org.webswing.ignored.model.c2s.JsonEventWindow;
+import org.webswing.model.c2s.JsonConnectionHandshake;
+import org.webswing.model.c2s.JsonEventKeyboard;
+import org.webswing.model.c2s.JsonEventMouse;
+import org.webswing.model.c2s.JsonEventWindow;
 
 
 import com.corundumstudio.socketio.AckRequest;
