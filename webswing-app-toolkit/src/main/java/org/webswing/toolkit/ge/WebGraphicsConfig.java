@@ -13,11 +13,10 @@ import java.awt.image.WritableRaster;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
-
 import sun.awt.image.BufferedImageGraphicsConfig;
 import sun.awt.image.OffScreenImage;
 
+@SuppressWarnings("restriction")
 public class WebGraphicsConfig extends GraphicsConfiguration {
 
     private static Map<Integer, WebGraphicsConfig> configs = new HashMap<Integer, WebGraphicsConfig>();

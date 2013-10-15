@@ -25,17 +25,23 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
+import javax.swing.SwingUtilities;
+
 import org.webswing.toolkit.WebComponentPeer;
 
 public class GraphicsWrapper extends Graphics2D {
 
     private WebComponentPeer rootPaintComponent;
-
+    private Rectangle dirtyArea = new Rectangle();
+    
     private boolean rootGraphics;
     
     private Graphics2D original;
 
-    public GraphicsWrapper(Graphics2D g,WebComponentPeer wcp, boolean rootGraphics) {
+    public GraphicsWrapper(Graphics2D g,WebComponentPeer wcp, boolean rootGraphics, Rectangle dirtyArea) {
+        if(dirtyArea!=null){
+            this.dirtyArea=dirtyArea;
+        }
         this.original = g;
         this.rootPaintComponent=wcp;
         this.rootGraphics= rootGraphics;
@@ -47,7 +53,11 @@ public class GraphicsWrapper extends Graphics2D {
     }
     private void addDirtyRectangleArea(Rectangle r) {
         r.translate((int)getTransform().getTranslateX(), (int)getTransform().getTranslateY());
-        rootPaintComponent.addDirtyArea(r);
+        if (this.dirtyArea == null) {
+            this.dirtyArea = r;
+        } else {
+            SwingUtilities.computeUnion(r.x, r.y, r.width, r.height, this.dirtyArea);
+        }
     }
 
     public WebComponentPeer getRootPaintComponent() {
@@ -64,7 +74,7 @@ public class GraphicsWrapper extends Graphics2D {
 
     @Override
     public Graphics create() {
-        GraphicsWrapper copy = new GraphicsWrapper((Graphics2D) original.create(),rootPaintComponent,false);
+        GraphicsWrapper copy = new GraphicsWrapper((Graphics2D) original.create(),rootPaintComponent,false,dirtyArea);
         return copy;
     }
 
@@ -268,7 +278,7 @@ public class GraphicsWrapper extends Graphics2D {
     public void dispose() {
         original.dispose();
         if(rootGraphics){
-            rootPaintComponent.sendPaint();
+            rootPaintComponent.updatePaintArea(dirtyArea);
         }
     }
 

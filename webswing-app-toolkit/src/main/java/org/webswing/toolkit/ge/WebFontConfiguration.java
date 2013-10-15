@@ -5,6 +5,7 @@ import sun.awt.FontConfiguration;
 import sun.java2d.SunGraphicsEnvironment;
 
 
+@SuppressWarnings("restriction")
 public class WebFontConfiguration extends FontConfiguration{
 
     public WebFontConfiguration(SunGraphicsEnvironment paramSunGraphicsEnvironment) {

@@ -26,9 +26,8 @@ import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 import java.util.UUID;
 
-import javax.swing.SwingUtilities;
-
 import org.webswing.common.GraphicsWrapper;
+import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.dispatch.update.Update;
 import org.webswing.dispatch.update.UpdateBounds;
 import org.webswing.dispatch.update.UpdateGraphics;
@@ -45,6 +44,7 @@ import sun.awt.image.SunVolatileImage;
 import sun.awt.image.SurfaceManager;
 import sun.awt.image.ToolkitImage;
 import sun.java2d.InvalidPipeException;
+import sun.java2d.ScreenUpdateManager;
 import sun.java2d.SunGraphics2D;
 import sun.java2d.SurfaceData;
 import sun.java2d.pipe.Region;
@@ -52,35 +52,32 @@ import sun.java2d.pipe.Region;
 @SuppressWarnings("restriction")
 public class WebComponentPeer implements ComponentPeer {
 
-    private Rectangle dirtyArea = new Rectangle();
     private String guid = UUID.randomUUID().toString();
 
     public String getGuid() {
         return guid;
     }
 
-    public void sendPaint() {
-        if (getDirtyArea() != null) {
-            BufferedImage subimagecopy = Util.deepCopy(image).getSubimage(getDirtyArea().x, getDirtyArea().y, getDirtyArea().width, getDirtyArea().height);
-            Util.getWebToolkit().getPaintDispatcher().update(new UpdateGraphics(subimagecopy, new Rectangle(getDirtyArea()), getGuid()));
-            dirtyArea = null;
+    public void updatePaintArea(Rectangle r) {
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            if (safeImage == null) {
+                safeImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+            }
+            Graphics g = safeImage.getGraphics();
+            g.drawImage(image, 0, 0, null);
+            g.dispose();
+            Util.getWebToolkit().getPaintDispatcher().enqueueUpdate(new UpdateGraphics(r, getGuid()));
         }
+    }
+
+    public BufferedImage extractSafeImage() {
+        BufferedImage result = safeImage;
+        safeImage = null;
+        return result;
     }
 
     public void sendUpdate(Update u) {
-        Util.getWebToolkit().getPaintDispatcher().update(u);
-    }
-
-    public Rectangle getDirtyArea() {
-        return dirtyArea;
-    }
-
-    public void addDirtyArea(Rectangle dirtyArea) {
-        if (this.dirtyArea == null) {
-            this.dirtyArea = dirtyArea;
-        } else {
-            SwingUtilities.computeUnion(dirtyArea.x, dirtyArea.y, dirtyArea.width, dirtyArea.height, this.dirtyArea);
-        }
+        Util.getWebToolkit().getPaintDispatcher().enqueueUpdate(u);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,6 +92,7 @@ public class WebComponentPeer implements ComponentPeer {
     private int oldHeight;
     private SurfaceData surfaceData;
     private OffScreenImage image;
+    private BufferedImage safeImage;
     private Object background;
     private Object foreground;
     private Font font;
@@ -150,22 +148,22 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void paint(Graphics paramGraphics) {
-        System.out.println("paint");
-        ((Component) this.target).paint(paramGraphics);
+       ((Component) this.target).paint(paramGraphics);
     }
 
     public void repaint(long paramLong, int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
-        System.out.println("repaint()");
+        ((Component) this.target).repaint(paramLong,paramInt1,paramInt2,paramInt3,paramInt4);
     }
 
     public void print(Graphics paramGraphics) {
         // not supported now
-
     }
 
     public void setBounds(int x, int y, int w, int h, int paramInt5) {
-        System.out.println("setting bounds..." + x + "," + y + "," + w + "," + h + "," + paramInt5 + "," + this);
-        sendUpdate(new UpdateBounds(getGuid(), x, y, w, h));
+        if (((Component) target).isShowing()) {
+            Point location = ((Component) target).getLocationOnScreen();
+            sendUpdate(new UpdateBounds(getGuid(), location.x, location.y, w, h));
+        }
         if ((w != this.oldWidth) || (h != this.oldHeight)) {
             try {
                 replaceSurfaceData(x, y, w, h);
@@ -199,11 +197,10 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void handleEvent(AWTEvent paramAWTEvent) {
-        System.out.println(paramAWTEvent);
+        //System.out.println(paramAWTEvent);
     }
 
     public void coalescePaintEvent(PaintEvent paramPaintEvent) {
-        System.out.println("coalescePaintEvent");
         Rectangle localRectangle = paramPaintEvent.getUpdateRect();
         if (!(paramPaintEvent instanceof IgnorePaintEvent))
             this.paintArea.add(localRectangle, paramPaintEvent.getID());
@@ -214,15 +211,13 @@ public class WebComponentPeer implements ComponentPeer {
         Rectangle localRectangle = AWTAccessor.getComponentAccessor().getBounds(localComponent);
         if (!(((Component) this.target).getIgnoreRepaint())) {
             PaintEvent localPaintEvent = PaintEventDispatcher.getPaintEventDispatcher().createPaintEvent((Component) this.target, 0, 0, localRectangle.width, localRectangle.height);
-
             if (localPaintEvent != null)
                 postEvent(localPaintEvent);
         }
-
     }
 
     public Point getLocationOnScreen() {
-        return new Point(0, 0);
+        return getBounds().getLocation();
     }
 
     public Dimension getPreferredSize() {
@@ -246,7 +241,7 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public Graphics getGraphics() {
-        System.out.println("getGraphics");
+        //System.out.println("getGraphics");
         //try{throw new Exception();}catch(Exception e){e.printStackTrace();if(e!=null){return null;}}
 
         SurfaceData localSurfaceData = this.surfaceData;
@@ -263,7 +258,7 @@ public class WebComponentPeer implements ComponentPeer {
             if (localFont == null) {
                 localFont = defaultFont;
             }
-            return new GraphicsWrapper(new SunGraphics2D(localSurfaceData, (Color) localObject2, (Color) localObject1, localFont), this, true);
+            return new GraphicsWrapper(new SunGraphics2D(localSurfaceData, (Color) localObject2, (Color) localObject1, localFont), this, true, null);
         }
         return null;
     }
@@ -274,8 +269,12 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void dispose() {
-        // TODO Auto-generated method stub
-
+        SurfaceData localSurfaceData = this.surfaceData;
+        this.surfaceData = null;
+        ScreenUpdateManager.getInstance().dropScreenSurface(localSurfaceData);
+        localSurfaceData.invalidate();
+        
+        WebToolkit.targetDisposedPeer(this.target, this);
     }
 
     public void setForeground(Color paramColor) {

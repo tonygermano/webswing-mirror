@@ -1,5 +1,8 @@
 package org.webswing.util;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
@@ -11,18 +14,23 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
+import org.webswing.common.ImageServiceIfc;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventKeyboard.Type;
 import org.webswing.model.c2s.JsonEventMouse;
+import org.webswing.model.s2c.JsonAppFrame;
+import org.webswing.model.s2c.JsonWindow;
+import org.webswing.model.s2c.JsonWindowPartialContent;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 
 public class Util {
-
 
     public static int getMouseButtonsAWTFlag(int button) {
         switch (button) {
@@ -78,7 +86,6 @@ public class Util {
         }
     }
 
-
     public static int getKeyModifiersAWTFlag(JsonEventKeyboard event) {
         int modifiers = 0;
         if (event.alt) {
@@ -117,12 +124,20 @@ public class Util {
         WritableRaster raster = bi.copyData(null);
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
-    
-    public static WebToolkit getWebToolkit(){
+
+    public static Rectangle[] concatRectangleArrays(Rectangle[] A, Rectangle[] B) {
+        int aLen = A.length;
+        int bLen = B.length;
+        Rectangle[] C = new Rectangle[aLen + bLen];
+        System.arraycopy(A, 0, C, 0, aLen);
+        System.arraycopy(B, 0, C, aLen, bLen);
+        return C;
+    }
+
+    public static WebToolkit getWebToolkit() {
         return ((WebToolkit) Toolkit.getDefaultToolkit());
     }
 
-    
     public static WebWindowPeer findWindowPeerById(String id) {
         for (Window w : Window.getWindows()) {
             Object peer = WebToolkit.targetToPeer(w);
@@ -136,4 +151,32 @@ public class Util {
         return null;
     }
 
+    public static void extractWindowImages(Map<String, BufferedImage> windowImages, JsonAppFrame json) {
+        for (JsonWindow window : json.getWindows()) {
+            WebWindowPeer w = findWindowPeerById(window.getId());
+            windowImages.put(window.getId(), w.extractSafeImage());
+        }
+    }
+
+    public static void encodeWindowImages(Map<String, BufferedImage> windowImages, Map<String, List<Rectangle>> windowNonVisibleAreas, JsonAppFrame json, ImageServiceIfc imageService) {
+        for (JsonWindow window : json.getWindows()) {
+            BufferedImage result = windowImages.get(window.getId());
+            if(windowNonVisibleAreas.containsKey(window.getId())){
+                Graphics2D g=(Graphics2D) result.getGraphics();
+                g.setBackground(new Color(0x000000,true));
+                for(Rectangle n:windowNonVisibleAreas.get(window.getId())){
+                    g.clearRect(n.x-window.getPosX(), n.y-window.getPosX(), n.width, n.height);
+                }
+                g.dispose();
+            }
+            if (result != null) {
+                JsonWindowPartialContent c = window.getContent();
+                if (c != null && c.getPositionX() != null && c.getPositionY() != null && c.getWidth() != null && c.getHeight() != null) {
+                    BufferedImage cropped = result.getSubimage(c.getPositionX(), c.getPositionY(), c.getWidth(), c.getHeight());
+                    String base64Content = imageService.encodeImage(cropped);
+                    window.getContent().setBase64Content(base64Content);
+                }
+            }
+        }
+    }
 }

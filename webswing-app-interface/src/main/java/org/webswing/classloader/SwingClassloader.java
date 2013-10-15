@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.naming.OperationNotSupportedException;
-
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantClass;

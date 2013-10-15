@@ -4,6 +4,9 @@ import java.awt.Dialog;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
 
+import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.util.Util;
+
 public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 
 
@@ -14,16 +17,16 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
     }
 
     public void toFront() {
-        System.out.println("toFront()");
+        WindowManager.getInstance().bringToFront((Window)target);
     }
 
     public void toBack() {
-        // TODO Auto-generated method stub
+       WindowManager.getInstance().bringToBack((Window)target);
 
     }
-
+    
     public void setAlwaysOnTop(boolean paramBoolean) {
-        // TODO Auto-generated method stub
+        WindowManager.getInstance().bringToFront((Window)target);
 
     }
 
@@ -71,5 +74,12 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
         System.out.println("updateWindow");
 
     }
+    
+    public void show() {
+        Util.getWebToolkit().getWindowManager().bringToFront((Window) (Window)target);
+    }
 
+    public void hide() {
+        Util.getWebToolkit().getWindowManager().removeWindow((Window) (Window)target);
+    }
 }

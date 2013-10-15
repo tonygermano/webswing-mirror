@@ -7,6 +7,7 @@ import java.awt.CheckboxMenuItem;
 import java.awt.Choice;
 import java.awt.Desktop;
 import java.awt.Dialog;
+import java.awt.EventQueue;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
@@ -68,8 +69,10 @@ import org.webswing.common.ServerConnectionIfc;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.toolkit.ge.WebGraphicsEnvironment;
 
 import sun.awt.SunToolkit;
+import sun.awt.Win32GraphicsEnvironment;
 
 @SuppressWarnings("restriction")
 public class WebToolkit extends SunToolkit {
@@ -79,19 +82,24 @@ public class WebToolkit extends SunToolkit {
 
     private WebEventDispatcher eventDispatcher = new WebEventDispatcher();
     private WebPaintDispatcher paintDispatcher;
-    
-    private WindowManager wm;
-    
+
+    private WindowManager windowManager;
+
     public void init() {
         paintDispatcher = new WebPaintDispatcher(serverConnection, imageService);
-        wm=WindowManager.getInstance();
+        windowManager = WindowManager.getInstance();
     }
 
     public void initSize(Integer desktopWidth, Integer desktopHeight) {
-        screenWidth=desktopWidth==null?1000:desktopWidth;
-        screenHeight=desktopHeight==null?800:desktopHeight;
+        screenWidth = desktopWidth == null ? 1000 : desktopWidth;
+        screenHeight = desktopHeight == null ? 800 : desktopHeight;
+        displayChanged();
     }
-    
+
+    protected WindowManager getWindowManager() {
+        return windowManager;
+    }
+
     public WebEventDispatcher getEventDispatcher() {
         return eventDispatcher;
     }
@@ -116,11 +124,15 @@ public class WebToolkit extends SunToolkit {
 
     private static GraphicsConfiguration config;
     private Hashtable<String, FontPeer> cacheFontPeer;
-    private int screenHeight=1000;
-    private int screenWidth=800;
+    public static int screenWidth = 1000;
+    public static int screenHeight = 800;
 
     public static final Object targetToPeer(Object paramObject) {
         return SunToolkit.targetToPeer(paramObject);
+    }
+
+    public static final void targetDisposedPeer(Object paramObject1, Object paramObject2) {
+        SunToolkit.targetDisposedPeer(paramObject1, paramObject2);
     }
 
     public boolean needUpdateWindow() {
@@ -138,8 +150,15 @@ public class WebToolkit extends SunToolkit {
     }
 
     public DialogPeer createDialog(Dialog paramDialog) throws HeadlessException {
-        // TODO Auto-generated method stub
-        return null;
+        WebDialogPeer localdialogPeer = new WebDialogPeer(paramDialog);
+        targetCreatedPeer(paramDialog, localdialogPeer);
+        return localdialogPeer;
+    }
+
+    public WindowPeer createWindow(Window paramWindow) throws HeadlessException {
+        WebWindowPeer localwindowPeer = new WebWindowPeer(paramWindow);
+        targetCreatedPeer(paramWindow, localwindowPeer);
+        return localwindowPeer;
     }
 
     public FontPeer getFontPeer(String paramString, int paramInt) {
@@ -167,11 +186,6 @@ public class WebToolkit extends SunToolkit {
         throw new SecurityException("test");
     }
 
-    public WindowPeer createWindow(Window paramWindow) throws HeadlessException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public DragSourceContextPeer createDragSourceContextPeer(DragGestureEvent paramDragGestureEvent) throws InvalidDnDOperationException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
@@ -197,7 +211,7 @@ public class WebToolkit extends SunToolkit {
     }
 
     public void sync() {
-        //send images to web
+        //?
     }
 
     public Map<TextAttribute, ?> mapInputMethodHighlight(InputMethodHighlight paramInputMethodHighlight) throws HeadlessException {
@@ -209,6 +223,15 @@ public class WebToolkit extends SunToolkit {
         config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     }
 
+    public static void displayChanged() {
+        EventQueue.invokeLater(new Runnable() {
+
+            public void run() {
+                ((WebGraphicsEnvironment) GraphicsEnvironment.getLocalGraphicsEnvironment()).displayChanged();
+            }
+        });
+    }
+
     public InputMethodDescriptor getInputMethodAdapterDescriptor() throws AWTException {
         return new WebInputMethodDescriptor();
     }
@@ -218,11 +241,11 @@ public class WebToolkit extends SunToolkit {
     }
 
     public void grab(Window paramWindow) {
-        throw new UnsupportedOperationException();
+        //dont know what this is good for. called when popup window is created
     }
 
     public void ungrab(Window paramWindow) {
-        throw new UnsupportedOperationException();
+        //dont know what this is good for. called when popup window is ?closed?
     }
 
     public ButtonPeer createButton(Button paramButton) throws HeadlessException {
@@ -306,7 +329,7 @@ public class WebToolkit extends SunToolkit {
     }
 
     public boolean isWindowOpacityControlSupported() {
-        return false;
+        return true;
     }
 
     public boolean isWindowShapingSupported() {

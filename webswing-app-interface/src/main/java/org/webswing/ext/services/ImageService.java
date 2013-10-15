@@ -3,15 +3,12 @@ package org.webswing.ext.services;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
 import org.webswing.common.ImageServiceIfc;
-import org.webswing.common.ServerConnectionIfc;
 
 import com.objectplanet.image.PngEncoder;
 

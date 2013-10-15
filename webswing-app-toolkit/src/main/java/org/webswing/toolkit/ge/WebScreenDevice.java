@@ -1,19 +1,16 @@
 package org.webswing.toolkit.ge;
 
-import sun.awt.image.BufferedImageDevice;
-import sun.awt.image.BufferedImageGraphicsConfig;
-
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 
-public class WebScreenDevice extends GraphicsDevice {
+import sun.awt.image.BufferedImageDevice;
+
+@SuppressWarnings("restriction")
+public class WebScreenDevice extends GraphicsDevice{
 
     BufferedImageDevice imageDevice;
     GraphicsConfiguration c;
-
+    
     public WebScreenDevice(GraphicsDevice imageDevice,GraphicsConfiguration c) {
         this.imageDevice = (BufferedImageDevice) imageDevice;
         this.c=c;

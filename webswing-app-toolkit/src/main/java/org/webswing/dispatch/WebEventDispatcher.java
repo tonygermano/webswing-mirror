@@ -9,16 +9,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowEvent;
 
-import javax.swing.SwingUtilities;
-
 import org.webswing.Constants;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEvent;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventWindow;
-import org.webswing.toolkit.WebToolkit;
-import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Util;
 
@@ -82,8 +78,8 @@ public class WebEventDispatcher {
 
     private void dispatchMouseEvent(JsonEventMouse event) {
         Window w = (Window) WindowManager.getInstance().getVisibleWindowOnPosition(event.x, event.y);
-        if(!WindowManager.getInstance().isWindowActive(w)){
-            WindowManager.getInstance().activateWindow(w);
+        if(w==null){
+            return;
         }
         if (w != null) {
             MouseEvent e = null;

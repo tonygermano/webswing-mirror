@@ -34,7 +34,7 @@ public class JsonAppFrame implements Serializable {
                     return w;
                 }
             }
-        }{
+        }else{
             windows= new ArrayList<JsonWindow>();
         }
         JsonWindow window = new JsonWindow();

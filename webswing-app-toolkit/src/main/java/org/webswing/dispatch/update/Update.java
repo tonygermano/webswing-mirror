@@ -5,10 +5,10 @@ import org.webswing.model.s2c.JsonAppFrame;
 
 public abstract class Update {
     
-    public void prepareUpdate(){
-        
-    }
-    
+    /**
+     * Updates the information in json message object. HAS TO BE FAST BECAUSE IT IS SYNCHRONIZED
+     * @param req
+     */
     public abstract void updateAppFrame(JsonAppFrame req);
 
 }

@@ -3,10 +3,11 @@ package org.webswing.toolkit.ge;
 import java.awt.GraphicsDevice;
 import java.awt.image.BufferedImage;
 
-import sun.awt.FontConfiguration;
-import  sun.awt.image.BufferedImageDevice;
-import  sun.awt.image.BufferedImageGraphicsConfig;
+import org.webswing.toolkit.WebToolkit;
 
+import sun.awt.FontConfiguration;
+
+@SuppressWarnings("restriction")
 public class WebGraphicsEnvironment extends sun.java2d.SunGraphicsEnvironment{
 
     @Override
@@ -16,7 +17,8 @@ public class WebGraphicsEnvironment extends sun.java2d.SunGraphicsEnvironment{
 
     @Override
     protected GraphicsDevice makeScreenDevice(int paramInt) {
-        return WebGraphicsConfig.getWebGraphicsConfig(new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB)).getDevice();
+        
+        return WebGraphicsConfig.getWebGraphicsConfig(new BufferedImage(WebToolkit.screenWidth, WebToolkit.screenHeight, BufferedImage.TYPE_INT_ARGB)).getDevice();
     }
 
     @Override
@@ -29,4 +31,9 @@ public class WebGraphicsEnvironment extends sun.java2d.SunGraphicsEnvironment{
         return new WebFontConfiguration(this);
     }
 
+    @Override
+    public void displayChanged() {
+        screens[0]=makeScreenDevice(1);
+        super.displayChanged();
+    }
 }

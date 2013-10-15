@@ -22,7 +22,7 @@ public class SwingMain {
 //        Thread.sleep(30000);
         //set up instance of ExtLibImpl class providing jms connection and other services in separated classloader to prevent classpath pollution of swing application.  
         List<URL> urls = new ArrayList<URL>();
-        for (File f : new File(SwingMain.class.getClassLoader().getSystemResource("lib").toURI()).listFiles()) {
+        for (File f : new File(SwingMain.class.getClassLoader().getResource("lib").toURI()).listFiles()) {
             urls.add(f.toURI().toURL());
         }
         if(System.getProperty("path.to.ifc.lib")!=null){
@@ -42,7 +42,7 @@ public class SwingMain {
         
         //create classloader with swinglib classpath 
         List<URL> swingurls = new ArrayList<URL>();
-        for (File f : new File(SwingMain.class.getClassLoader().getSystemResource("swinglib").toURI()).listFiles()) {
+        for (File f : new File(SwingMain.class.getClassLoader().getResource("swinglib").toURI()).listFiles()) {
             swingurls.add(f.toURI().toURL());
         }
         ClassLoader swingLibClassloader = new URLClassLoader(swingurls.toArray(new URL[0]));    

@@ -12,18 +12,13 @@ import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.swing.SwingUtilities;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.webswing.Constants;
 import org.webswing.classloader.SwingClassloader;
 import org.webswing.common.ServerConnectionIfc;
-import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEvent;
-import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.util.Util;
-
-import com.objectplanet.image.PngEncoder;
 
 /**
  * @author Viktor_Meszaros

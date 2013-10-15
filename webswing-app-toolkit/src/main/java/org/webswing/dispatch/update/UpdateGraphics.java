@@ -1,49 +1,65 @@
 package org.webswing.dispatch.update;
 
+import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 
 import org.webswing.model.s2c.JsonAppFrame;
-import org.webswing.model.s2c.JsonWindowPartialContent;
 import org.webswing.model.s2c.JsonWindow;
+import org.webswing.model.s2c.JsonWindowPartialContent;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.util.Util;
 
-
 public class UpdateGraphics extends Update {
 
-    BufferedImage img; 
-    String base64img;
     Rectangle dirtyArea;
     String windowId;
-    
-    public UpdateGraphics(BufferedImage deepCopy, Rectangle dirtyArea, String windowId) {
+    boolean resize;
+
+    public UpdateGraphics(Rectangle dirtyArea, String windowId) {
         super();
-        this.img = deepCopy;
         this.dirtyArea = dirtyArea;
         this.windowId = windowId;
     }
 
+    public UpdateGraphics(Rectangle dirtyArea, String windowId, boolean resize) {
+        super();
+        this.dirtyArea = dirtyArea;
+        this.windowId = windowId;
+    }
 
     @Override
-    public void prepareUpdate() {
-        base64img=Util.getWebToolkit().getPaintDispatcher().getImageService().encodeImage(img);
-        this.img=null;
-    }
-    
-    @Override
     public void updateAppFrame(JsonAppFrame req) {
-        JsonWindow window = req.getOrCreateWindowById(windowId);
-        JsonWindowPartialContent content=new JsonWindowPartialContent();
         WebWindowPeer ww = Util.findWindowPeerById(windowId);
-        window.setPosX(ww.getBounds().x);
-        window.setPosY(ww.getBounds().y);
-        window.setWidth(ww.getBounds().width);
-        window.setHeight(ww.getBounds().height);
-        content.setBase64Content(base64img);
-        content.setPositionX(dirtyArea.x);
-        content.setPositionY(dirtyArea.y);
-        window.setContent(content);
+        if (ww != null) {
+            JsonWindow window = req.getOrCreateWindowById(windowId);
+            Point location = ww.getLocationOnScreen();
+            window.setPosX(location.x);
+            window.setPosY(location.y);
+            window.setWidth(ww.getBounds().width);
+            window.setHeight(ww.getBounds().height);
+            JsonWindowPartialContent content = window.getContent() == null ? new JsonWindowPartialContent() : window.getContent();
+            if (content.getPositionX() == null || resize) {
+                content.setPositionX(dirtyArea.x);
+            } else {
+                Math.min(content.getPositionX(), dirtyArea.x);
+            }
+            if (content.getPositionY() == null || resize) {
+                content.setPositionY(dirtyArea.y);
+            } else {
+                Math.min(content.getPositionY(), dirtyArea.y);
+            }
+            if (content.getWidth() == null || resize) {
+                content.setWidth(dirtyArea.width);
+            } else {
+                Math.max(content.getWidth(), dirtyArea.width);
+            }
+            if (content.getHeight() == null || resize) {
+                content.setHeight(dirtyArea.height);
+            } else {
+                Math.max(content.getHeight(), dirtyArea.height);
+            }
+            window.setContent(content);
+        }
     }
 
 }
