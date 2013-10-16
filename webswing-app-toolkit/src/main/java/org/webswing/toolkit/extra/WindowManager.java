@@ -133,7 +133,7 @@ public class WindowManager {
             Window underlying = zorder.get(i);
             Rectangle uBounds = underlying.getBounds();
             SwingUtilities.computeIntersection(uBounds.x, uBounds.y, uBounds.width, uBounds.height, bounds);
-            underlying.repaint(bounds.x, bounds.y, bounds.width, bounds.height);
+            underlying.repaint(bounds.x-uBounds.x, bounds.y-uBounds.y, bounds.width, bounds.height);
         }
 
     }

@@ -76,10 +76,10 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
     }
     
     public void show() {
-        Util.getWebToolkit().getWindowManager().bringToFront((Window) (Window)target);
+        Util.getWebToolkit().getWindowManager().bringToFront((Window)target);
     }
 
     public void hide() {
-        Util.getWebToolkit().getWindowManager().removeWindow((Window) (Window)target);
+        Util.getWebToolkit().getWindowManager().removeWindow((Window)target);
     }
 }
