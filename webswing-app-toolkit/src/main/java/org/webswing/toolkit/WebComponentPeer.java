@@ -28,9 +28,6 @@ import java.util.UUID;
 
 import org.webswing.common.GraphicsWrapper;
 import org.webswing.dispatch.WebPaintDispatcher;
-import org.webswing.dispatch.update.Update;
-import org.webswing.dispatch.update.UpdateBounds;
-import org.webswing.dispatch.update.UpdateGraphics;
 import org.webswing.toolkit.ge.WebGraphicsConfig;
 import org.webswing.util.Util;
 
@@ -53,31 +50,17 @@ import sun.java2d.pipe.Region;
 public class WebComponentPeer implements ComponentPeer {
 
     private String guid = UUID.randomUUID().toString();
-
+    
     public String getGuid() {
         return guid;
     }
 
-    public void updatePaintArea(Rectangle r) {
-        synchronized (WebPaintDispatcher.webPaintLock) {
-            if (safeImage == null) {
-                safeImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-            }
-            Graphics g = safeImage.getGraphics();
-            g.drawImage(image, 0, 0, null);
-            g.dispose();
-            Util.getWebToolkit().getPaintDispatcher().enqueueUpdate(new UpdateGraphics(r, getGuid()));
-        }
-    }
-
-    public BufferedImage extractSafeImage() {
-        BufferedImage result = safeImage;
-        safeImage = null;
-        return result;
-    }
-
-    public void sendUpdate(Update u) {
-        Util.getWebToolkit().getPaintDispatcher().enqueueUpdate(u);
+    public BufferedImage extractSafeImage(Rectangle sub) {
+        BufferedImage safeImage = new BufferedImage(sub.width, sub.height, BufferedImage.TYPE_4BYTE_ABGR);
+        Graphics g = safeImage.getGraphics();
+        g.drawImage(image, 0, 0,sub.width, sub.height,sub.x, sub.y,sub.x+sub.width, sub.y+sub.height, null);
+        g.dispose();
+        return safeImage;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +75,6 @@ public class WebComponentPeer implements ComponentPeer {
     private int oldHeight;
     private SurfaceData surfaceData;
     private OffScreenImage image;
-    private BufferedImage safeImage;
     private Object background;
     private Object foreground;
     private Font font;
@@ -160,20 +142,21 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void setBounds(int x, int y, int w, int h, int paramInt5) {
-        if (((Component) target).isShowing()) {
-            Point location = ((Component) target).getLocationOnScreen();
-            sendUpdate(new UpdateBounds(getGuid(), location.x, location.y, w, h));
-        }
-        if ((w != this.oldWidth) || (h != this.oldHeight)) {
-            try {
-                replaceSurfaceData(x, y, w, h);
-            } catch (InvalidPipeException e) {
-                e.printStackTrace();
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            if (((Component) target).isShowing()) {
+                Point location = ((Component) target).getLocationOnScreen();
+                Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(location.x, location.y, w, h));
             }
-            this.oldWidth = w;
-            this.oldHeight = h;
+            if ((w != this.oldWidth) || (h != this.oldHeight)) {
+                try {
+                    replaceSurfaceData(x, y, w, h);
+                } catch (InvalidPipeException e) {
+                    e.printStackTrace();
+                }
+                this.oldWidth = w;
+                this.oldHeight = h;
+            }
         }
-
     }
 
     public void replaceSurfaceData(int x, int y, int w, int h) {
@@ -258,7 +241,7 @@ public class WebComponentPeer implements ComponentPeer {
             if (localFont == null) {
                 localFont = defaultFont;
             }
-            return new GraphicsWrapper(new SunGraphics2D(localSurfaceData, (Color) localObject2, (Color) localObject1, localFont), this, true, null);
+            return new GraphicsWrapper(new SunGraphics2D(localSurfaceData, (Color) localObject2, (Color) localObject1, localFont), this, true);
         }
         return null;
     }
@@ -269,12 +252,14 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void dispose() {
-        SurfaceData localSurfaceData = this.surfaceData;
-        this.surfaceData = null;
-        ScreenUpdateManager.getInstance().dropScreenSurface(localSurfaceData);
-        localSurfaceData.invalidate();
-        
-        WebToolkit.targetDisposedPeer(this.target, this);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            Util.getWebToolkit().getPaintDispatcher().notifyWindowClosed(getGuid());
+            SurfaceData localSurfaceData = this.surfaceData;
+            this.surfaceData = null;
+            ScreenUpdateManager.getInstance().dropScreenSurface(localSurfaceData);
+            localSurfaceData.invalidate();
+            WebToolkit.targetDisposedPeer(this.target, this);
+        }
     }
 
     public void setForeground(Color paramColor) {

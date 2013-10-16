@@ -2,6 +2,7 @@ package org.webswing.util;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -151,31 +152,74 @@ public class Util {
         return null;
     }
 
-    public static void extractWindowImages(Map<String, BufferedImage> windowImages, JsonAppFrame json) {
-        for (JsonWindow window : json.getWindows()) {
-            WebWindowPeer w = findWindowPeerById(window.getId());
-            windowImages.put(window.getId(), w.extractSafeImage());
+    public static void extractWindowImages(Map<String, BufferedImage> windowImages, Map<String, Rectangle> currentAreasToUpdate) {
+        for (String windowId : currentAreasToUpdate.keySet()) {
+            WebWindowPeer w = findWindowPeerById(windowId);
+            windowImages.put(windowId, w.extractSafeImage(currentAreasToUpdate.get(windowId)));
         }
     }
 
     public static void encodeWindowImages(Map<String, BufferedImage> windowImages, Map<String, List<Rectangle>> windowNonVisibleAreas, JsonAppFrame json, ImageServiceIfc imageService) {
         for (JsonWindow window : json.getWindows()) {
             BufferedImage result = windowImages.get(window.getId());
-            if(windowNonVisibleAreas.containsKey(window.getId())){
-                Graphics2D g=(Graphics2D) result.getGraphics();
-                g.setBackground(new Color(0x000000,true));
-                for(Rectangle n:windowNonVisibleAreas.get(window.getId())){
-                    g.clearRect(n.x-window.getPosX(), n.y-window.getPosX(), n.width, n.height);
+            JsonWindowPartialContent c = window.getContent();
+            if (windowNonVisibleAreas.containsKey(window.getId())) {
+                Graphics2D g = (Graphics2D) result.getGraphics();
+                g.setBackground(new Color(0x000000, true));
+                g.translate(-c.getPositionX(), -c.getPositionY());
+                for (Rectangle n : windowNonVisibleAreas.get(window.getId())) {
+                    g.clearRect(n.x - window.getPosX(), n.y - window.getPosY(), n.width, n.height);
                 }
                 g.dispose();
             }
             if (result != null) {
-                JsonWindowPartialContent c = window.getContent();
-                if (c != null && c.getPositionX() != null && c.getPositionY() != null && c.getWidth() != null && c.getHeight() != null) {
-                    BufferedImage cropped = result.getSubimage(c.getPositionX(), c.getPositionY(), c.getWidth(), c.getHeight());
-                    String base64Content = imageService.encodeImage(cropped);
-                    window.getContent().setBase64Content(base64Content);
+                String base64Content = imageService.encodeImage(result);
+                window.getContent().setBase64Content(base64Content);
+            }
+            //            if (result != null) {
+            //                JsonWindowPartialContent c = window.getContent();
+            //                c.setPositionX(0);
+            //                c.setPositionY(0);
+            //                BufferedImage cropped = result;
+            //                String base64Content = imageService.encodeImage(cropped);
+            //                window.getContent().setBase64Content(base64Content);
+            //            }
+        }
+    }
+
+    public static void fillJsonWithWindowsData(Map<String, Rectangle> currentAreasToUpdate, JsonAppFrame json) {
+        for (String windowId : currentAreasToUpdate.keySet()) {
+            WebWindowPeer ww = Util.findWindowPeerById(windowId);
+            if (ww != null) {
+                JsonWindow window = json.getOrCreateWindowById(windowId);
+                Point location = ww.getLocationOnScreen();
+                window.setPosX(location.x);
+                window.setPosY(location.y);
+                window.setWidth(ww.getBounds().width);
+                window.setHeight(ww.getBounds().height);
+                JsonWindowPartialContent content = window.getContent() == null ? new JsonWindowPartialContent() : window.getContent();
+                Rectangle dirtyArea = currentAreasToUpdate.get(windowId);
+                if (content.getPositionX() == null) {
+                    content.setPositionX(dirtyArea.x);
+                } else {
+                    Math.min(content.getPositionX(), dirtyArea.x);
                 }
+                if (content.getPositionY() == null) {
+                    content.setPositionY(dirtyArea.y);
+                } else {
+                    Math.min(content.getPositionY(), dirtyArea.y);
+                }
+                if (content.getWidth() == null) {
+                    content.setWidth(dirtyArea.width);
+                } else {
+                    Math.max(content.getWidth(), dirtyArea.width);
+                }
+                if (content.getHeight() == null) {
+                    content.setHeight(dirtyArea.height);
+                } else {
+                    Math.max(content.getHeight(), dirtyArea.height);
+                }
+                window.setContent(content);
             }
         }
     }

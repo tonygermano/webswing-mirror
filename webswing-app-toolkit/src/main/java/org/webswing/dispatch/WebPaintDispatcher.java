@@ -6,15 +6,14 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.SwingUtilities;
+
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.ServerConnectionIfc;
-import org.webswing.dispatch.update.Update;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Util;
@@ -25,7 +24,7 @@ public class WebPaintDispatcher {
     private ServerConnectionIfc serverConnection;
     private ImageServiceIfc imageService;
 
-    private Queue<Update> updateQueue = new ConcurrentLinkedQueue<Update>();
+    Map<String, Rectangle> areasToUpdate = new HashMap<String, Rectangle>();
 
     private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1);
 
@@ -37,20 +36,21 @@ public class WebPaintDispatcher {
             public void run() {
                 try {
                     JsonAppFrame json = new JsonAppFrame();
-                    if (updateQueue.size() > 0) {
-                        Map<String,BufferedImage> windowImages=new HashMap<String, BufferedImage>();
-                        Map<String,List<Rectangle>> windowNonVisibleAreas=new HashMap<String, List<Rectangle>>();
-                        synchronized (webPaintLock) {
-                            Update update;
-                            while ((update = updateQueue.poll()) != null) {
-                                update.updateAppFrame(json);
-                            }
-                            Util.extractWindowImages(windowImages,json);
-                            WindowManager.getInstance().extractNonVisibleAreas(windowNonVisibleAreas);
+                    Map<String, BufferedImage> windowImages = new HashMap<String, BufferedImage>();
+                    Map<String, List<Rectangle>> windowNonVisibleAreas = new HashMap<String, List<Rectangle>>();
+                    Map<String, Rectangle> currentAreasToUpdate = null;
+                    synchronized (webPaintLock) {
+                        if (areasToUpdate.size() == 0) {
+                            return;
                         }
-                        Util.encodeWindowImages(windowImages,windowNonVisibleAreas,json,imageService);
-                        serverConnection.sendJsonObject(json);
+                        currentAreasToUpdate = areasToUpdate;
+                        areasToUpdate = new HashMap<String, Rectangle>();
+                        Util.fillJsonWithWindowsData(currentAreasToUpdate,json);
+                        Util.extractWindowImages(windowImages, currentAreasToUpdate);
+                        WindowManager.getInstance().extractNonVisibleAreas(windowNonVisibleAreas);
                     }
+                    Util.encodeWindowImages(windowImages, windowNonVisibleAreas, json, imageService);
+                    serverConnection.sendJsonObject(json);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -71,8 +71,28 @@ public class WebPaintDispatcher {
         return imageService;
     }
 
-    public void enqueueUpdate(Update updateGraphics) {
-        updateQueue.add(updateGraphics);
+    public void notifyWindowAreaRepainted(String guid, Rectangle repaintedArea) {
+        synchronized (webPaintLock) {
+            if (areasToUpdate.containsKey(guid)) {
+                Rectangle r = areasToUpdate.get(guid);
+                Rectangle newR = SwingUtilities.computeUnion(r.x, r.y, r.width, r.height, repaintedArea);
+                areasToUpdate.put(guid, newR);
+            } else {
+                areasToUpdate.put(guid, repaintedArea);
+            }
+        }
+    }
+
+    public void notifyWindowBoundsChanged(String guid, Rectangle newBounds) {
+        synchronized (webPaintLock) {
+            areasToUpdate.put(guid, newBounds);
+        }
+    }
+    
+    public void notifyWindowClosed(String guid){
+        synchronized (webPaintLock) {
+            areasToUpdate.remove(guid);
+        }
     }
 
 }

@@ -12,7 +12,6 @@ import javax.swing.SwingUtilities;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
-import org.webswing.util.Util;
 
 public class WindowManager {
 

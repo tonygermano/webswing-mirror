@@ -2,6 +2,7 @@ package org.webswing.dispatch;
 
 import java.awt.AWTEvent;
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
@@ -21,6 +22,7 @@ import org.webswing.util.Util;
 public class WebEventDispatcher {
 
     private MouseEvent lastMouseEvent;
+    private Point lastMousePosition=new Point();
 
     public void dispatchEvent(JsonEvent event) {
         if (event instanceof JsonEventMouse) {
@@ -85,6 +87,8 @@ public class WebEventDispatcher {
             MouseEvent e = null;
             int x = event.x-w.getX();
             int y = event.y-w.getY();
+            lastMousePosition.x=x;
+            lastMousePosition.y=y;
             long when = System.currentTimeMillis();
             int modifiers = Util.getMouseModifiersAWTFlag(event);
             int id = 0;
@@ -134,6 +138,9 @@ public class WebEventDispatcher {
         }
     }
 
+    public Point getLastMousePosition(){
+        return lastMousePosition;
+    }
 
     private void dispatchEventInSwing(final Window w, final AWTEvent e) {
         Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);

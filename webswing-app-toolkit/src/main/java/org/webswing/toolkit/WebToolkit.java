@@ -51,6 +51,7 @@ import java.awt.peer.ListPeer;
 import java.awt.peer.MenuBarPeer;
 import java.awt.peer.MenuItemPeer;
 import java.awt.peer.MenuPeer;
+import java.awt.peer.MouseInfoPeer;
 import java.awt.peer.PopupMenuPeer;
 import java.awt.peer.RobotPeer;
 import java.awt.peer.ScrollPanePeer;
@@ -72,7 +73,6 @@ import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.ge.WebGraphicsEnvironment;
 
 import sun.awt.SunToolkit;
-import sun.awt.Win32GraphicsEnvironment;
 
 @SuppressWarnings("restriction")
 public class WebToolkit extends SunToolkit {
@@ -118,6 +118,8 @@ public class WebToolkit extends SunToolkit {
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////// Toolkit Implementation//////////////////////////////////////////////////
+    private static WebMouseInfoPeer mPeer;
+
     public WebToolkit() {
 
     }
@@ -159,6 +161,16 @@ public class WebToolkit extends SunToolkit {
         WebWindowPeer localwindowPeer = new WebWindowPeer(paramWindow);
         targetCreatedPeer(paramWindow, localwindowPeer);
         return localwindowPeer;
+    }
+    
+    @Override
+    protected synchronized MouseInfoPeer getMouseInfoPeer() {
+       {
+         if (mPeer == null) {
+           mPeer = new WebMouseInfoPeer();
+         }
+         return mPeer;
+       }   
     }
 
     public FontPeer getFontPeer(String paramString, int paramInt) {

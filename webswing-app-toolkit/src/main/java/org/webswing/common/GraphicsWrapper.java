@@ -25,23 +25,19 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
-import javax.swing.SwingUtilities;
-
+import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.WebComponentPeer;
+import org.webswing.util.Util;
 
 public class GraphicsWrapper extends Graphics2D {
 
     private WebComponentPeer rootPaintComponent;
-    private Rectangle dirtyArea = new Rectangle();
     
     private boolean rootGraphics;
     
     private Graphics2D original;
 
-    public GraphicsWrapper(Graphics2D g,WebComponentPeer wcp, boolean rootGraphics, Rectangle dirtyArea) {
-        if(dirtyArea!=null){
-            this.dirtyArea=dirtyArea;
-        }
+    public GraphicsWrapper(Graphics2D g,WebComponentPeer wcp, boolean rootGraphics) {
         this.original = g;
         this.rootPaintComponent=wcp;
         this.rootGraphics= rootGraphics;
@@ -53,11 +49,7 @@ public class GraphicsWrapper extends Graphics2D {
     }
     private void addDirtyRectangleArea(Rectangle r) {
         r.translate((int)getTransform().getTranslateX(), (int)getTransform().getTranslateY());
-        if (this.dirtyArea == null) {
-            this.dirtyArea = r;
-        } else {
-            SwingUtilities.computeUnion(r.x, r.y, r.width, r.height, this.dirtyArea);
-        }
+        Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(rootPaintComponent.getGuid(),r);
     }
 
     public WebComponentPeer getRootPaintComponent() {
@@ -74,7 +66,7 @@ public class GraphicsWrapper extends Graphics2D {
 
     @Override
     public Graphics create() {
-        GraphicsWrapper copy = new GraphicsWrapper((Graphics2D) original.create(),rootPaintComponent,false,dirtyArea);
+        GraphicsWrapper copy = new GraphicsWrapper((Graphics2D) original.create(),rootPaintComponent,false);
         return copy;
     }
 
@@ -145,195 +137,266 @@ public class GraphicsWrapper extends Graphics2D {
 
     @Override
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
-        original.copyArea(x, y, width, height, dx, dy);
-        Rectangle r = new Rectangle(x+dx,y+dx,width+dx,height+dy);
-        addDirtyRectangleArea(r);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.copyArea(x, y, width, height, dx, dy);
+            Rectangle r = new Rectangle(x + dx, y + dx, width + dx, height + dy);
+            addDirtyRectangleArea(r);
+        }
     }
 
 
     @Override
     public void drawLine(int x1, int y1, int x2, int y2) {
-        original.drawLine(x1, y1, x2, y2);
-        Rectangle r = new Rectangle(x1, y1, x2, y2);
-        addDirtyRectangleArea(r);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawLine(x1, y1, x2, y2);
+            Rectangle r = new Rectangle(x1, y1, x2, y2);
+            addDirtyRectangleArea(r);
+        }
     }
 
     @Override
     public void fillRect(int x, int y, int width, int height) {
-        original.fillRect(x, y, width, height);
-        addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.fillRect(x, y, width, height);
+            addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        }
     }
 
     @Override
     public void clearRect(int x, int y, int width, int height) {
-        original.clearRect(x, y, width, height);
-        addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        synchronized (original) {
+            original.clearRect(x, y, width, height);
+            addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        }
     }
 
     @Override
     public void drawRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
-        original.drawRoundRect(x, y, width, height, arcWidth, arcHeight);
-        addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawRoundRect(x, y, width, height, arcWidth, arcHeight);
+            addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        }
     }
 
     @Override
     public void fillRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
-        original.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
-        addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
+            addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        }
     }
 
     @Override
     public void drawOval(int x, int y, int width, int height) {
-        original.drawOval(x, y, width, height);
-        addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawOval(x, y, width, height);
+            addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        }
     }
 
     @Override
     public void fillOval(int x, int y, int width, int height) {
-        original.fillOval(x, y, width, height);
-        addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.fillOval(x, y, width, height);
+            addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        }
     }
 
     @Override
     public void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
-        original.drawArc(x, y, width, height, startAngle, arcAngle);
-        addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawArc(x, y, width, height, startAngle, arcAngle);
+            addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        }
     }
 
     @Override
     public void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
-        original.fillArc(x, y, width, height, startAngle, arcAngle);
-        addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.fillArc(x, y, width, height, startAngle, arcAngle);
+            addDirtyRectangleArea(new Rectangle(x, y, width, height));
+        }
     }
 
     @Override
     public void drawPolyline(int[] xPoints, int[] yPoints, int nPoints) {
-        original.drawPolyline(xPoints, yPoints, nPoints);
-        addDirtyClipArea();
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawPolyline(xPoints, yPoints, nPoints);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public void drawPolygon(int[] xPoints, int[] yPoints, int nPoints) {
-        original.drawPolygon(xPoints, yPoints, nPoints);
-        addDirtyClipArea();
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawPolygon(xPoints, yPoints, nPoints);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints) {
-        original.fillPolygon(xPoints, yPoints, nPoints);
-        addDirtyClipArea();
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.fillPolygon(xPoints, yPoints, nPoints);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public void drawString(String str, int x, int y) {
-        original.drawString(str, x, y);
-        addDirtyClipArea();
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawString(str, x, y);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public void drawString(AttributedCharacterIterator iterator, int x, int y) {
-        original.drawString(iterator, x, y);
-        addDirtyClipArea();
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawString(iterator, x, y);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
-        addDirtyClipArea();
-        return original.drawImage(img, x, y, observer);
+        boolean result;
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            result = original.drawImage(img, x, y, observer);
+            addDirtyClipArea();
+        }
+        return result;
     }
 
 
 
     @Override
     public boolean drawImage(Image img, int x, int y, int width, int height, ImageObserver observer) {
-        addDirtyClipArea();
-        return original.drawImage(img, x, y, width, height, observer);
+        boolean result;
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            result = original.drawImage(img, x, y, width, height, observer);
+            addDirtyClipArea();
+        }
+        return result;
     }
 
     @Override
     public boolean drawImage(Image img, int x, int y, Color bgcolor, ImageObserver observer) {
-        addDirtyClipArea();
-        return original.drawImage(img, x, y, bgcolor, observer);
+        boolean result;
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            result = original.drawImage(img, x, y, bgcolor, observer);
+            addDirtyClipArea();
+        }
+        return result;
     }
 
     @Override
     public boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
-        addDirtyClipArea();
-        return original.drawImage(img, x, y, width, height, bgcolor, observer);
+        boolean result;
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            result = original.drawImage(img, x, y, width, height, bgcolor, observer);
+            addDirtyClipArea();
+        }
+        return result;
     }
 
     @Override
     public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
-        addDirtyClipArea();
-        return original.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
+        boolean result;
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            result = original.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
+            addDirtyClipArea();
+        }
+        return result;
     }
 
     @Override
     public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgcolor, ImageObserver observer) {
-        addDirtyClipArea();
-        return original.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
+        boolean result;
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            result = original.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
+            addDirtyClipArea();
+        }
+        return result;
     }
 
     @Override
     public void dispose() {
         original.dispose();
-        if(rootGraphics){
-            rootPaintComponent.updatePaintArea(dirtyArea);
-        }
     }
 
     @Override
     public void draw(Shape s) {
-        addDirtyClipArea();
-        original.draw(s);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.draw(s);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public boolean drawImage(Image img, AffineTransform xform, ImageObserver obs) {
-        addDirtyClipArea();
-        return original.drawImage(img, xform, obs);
+        boolean result;
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            result = original.drawImage(img, xform, obs);
+            addDirtyClipArea();
+        }
+        return result;
     }
 
     @Override
     public void drawImage(BufferedImage img, BufferedImageOp op, int x, int y) {
-        addDirtyClipArea();
-        original.drawImage(img, op, x, y);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawImage(img, op, x, y);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public void drawRenderedImage(RenderedImage img, AffineTransform xform) {
-        addDirtyClipArea();
-        original.drawRenderedImage(img, xform);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawRenderedImage(img, xform);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public void drawRenderableImage(RenderableImage img, AffineTransform xform) {
-        addDirtyClipArea();
-        original.drawRenderableImage(img, xform);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawRenderableImage(img, xform);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public void drawString(String str, float x, float y) {
-        addDirtyClipArea();
-        original.drawString(str, x, y);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawString(str, x, y);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public void drawString(AttributedCharacterIterator iterator, float x, float y) {
-        addDirtyClipArea();
-        original.drawString(iterator, x, y);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.drawString(iterator, x, y);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public void drawGlyphVector(GlyphVector g, float x, float y) {
-        addDirtyClipArea();
-        this.original.drawGlyphVector(g, x, y);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            this.original.drawGlyphVector(g, x, y);
+            addDirtyClipArea();
+        }
     }
 
     @Override
     public void fill(Shape s) {
-        addDirtyClipArea();
-        original.fill(s);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.fill(s);
+            addDirtyClipArea();
+        }
     }
 
     @Override
@@ -393,8 +456,10 @@ public class GraphicsWrapper extends Graphics2D {
 
     @Override
     public void rotate(double theta) {
-        addDirtyClipArea();
-        original.rotate(theta);
+        synchronized (WebPaintDispatcher.webPaintLock) {
+            original.rotate(theta);
+            addDirtyClipArea();
+        }
     }
 
     @Override
