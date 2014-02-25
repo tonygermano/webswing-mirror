@@ -92,8 +92,17 @@ public class WindowManager{
             return false;
         }
     }
-
+    public void activateWindow(Window w) {
+        activateWindow(w, 0, 0);
+    }
+    
     public void activateWindow(Window w, int x, int y) {
+        if(activeWindow!=null && activeWindow instanceof java.awt.Dialog){
+            if(((java.awt.Dialog)activeWindow).isModal()){
+                return;
+            }
+        }
+        
         bringToFront(w);
         Component focusOwner = SwingUtilities.getDeepestComponentAt(w, x, y);
 

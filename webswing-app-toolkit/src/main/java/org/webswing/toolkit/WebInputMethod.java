@@ -10,7 +10,6 @@ import java.util.Locale;
 public class WebInputMethod extends sun.awt.im.InputMethodAdapter implements InputMethod {
 
     public void activate() {
-System.out.println("activate");        
     }
 
     public void deactivate(boolean isTemporary) {

@@ -15,6 +15,7 @@ import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEvent;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
+import org.webswing.model.c2s.JsonEventMouse.Type;
 import org.webswing.model.c2s.JsonEventWindow;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Util;
@@ -96,7 +97,7 @@ public class WebEventDispatcher {
             int id = 0;
             int clickcount = 0;
             int buttons = Util.getMouseButtonsAWTFlag(event.button);
-            if(buttons!=0){ 
+            if(buttons!=0 && event.type== Type.mousedown){ 
                 WindowManager.getInstance().activateWindow(w,x,y);
             }
             switch (event.type) {
