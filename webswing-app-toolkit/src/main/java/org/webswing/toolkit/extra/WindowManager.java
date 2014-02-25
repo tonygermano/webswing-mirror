@@ -1,7 +1,13 @@
 package org.webswing.toolkit.extra;
 
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.Window;
+import java.awt.event.FocusEvent;
+import java.awt.event.WindowEvent;
+import java.awt.peer.KeyboardFocusManagerPeer;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,11 +15,14 @@ import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
+import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 
-public class WindowManager {
+import sun.awt.CausedFocusEvent;
+
+public class WindowManager{
 
     private static WindowManager singleton = null;
 
@@ -84,9 +93,18 @@ public class WindowManager {
         }
     }
 
-    public void activateWindow(Window w) {
+    public void activateWindow(Window w, int x, int y) {
         bringToFront(w);
-        this.activeWindow = w;
+        Component focusOwner = SwingUtilities.getDeepestComponentAt(w, x, y);
+
+        FocusEvent gainedFocusEvent = new FocusEvent(focusOwner, FocusEvent.FOCUS_GAINED, false);
+        WebEventDispatcher.dispatchEventInSwing(w, gainedFocusEvent);
+
+        if (this.activeWindow != w) {
+            WindowEvent gainedFocusWindowEvent = new WindowEvent(w, WindowEvent.WINDOW_GAINED_FOCUS, activeWindow, 0, 0);
+            WebEventDispatcher.dispatchEventInSwing(w, gainedFocusWindowEvent);
+            this.activeWindow = w;
+        }
     }
 
     public Window getVisibleWindowOnPosition(int x, int y) {
@@ -101,12 +119,12 @@ public class WindowManager {
     public void extractNonVisibleAreas(Map<String, List<Rectangle>> map) {
         if (zorder.size() > 0) {
             Rectangle previous = zorder.get(0).getBounds();
-            SwingUtilities.convertPointToScreen(previous.getLocation(),zorder.get(0));
+            //SwingUtilities.convertPointToScreen(previous.getLocation(),zorder.get(0));
             List<Rectangle> previousDifferences = new ArrayList<Rectangle>();
             for (int i = 1; i < zorder.size(); i++) {
                 String id = ((WebWindowPeer) WebToolkit.targetToPeer(zorder.get(i))).getGuid();
                 Rectangle current = zorder.get(i).getBounds();
-                SwingUtilities.convertPointToScreen(current.getLocation(),zorder.get(i));
+                //SwingUtilities.convertPointToScreen(current.getLocation(),zorder.get(i));
                 List<Rectangle> currentDifferences = new ArrayList<Rectangle>();
                 for (Rectangle diff : previousDifferences) {
                     Rectangle intersect = SwingUtilities.computeIntersection(current.x, current.y, current.width, current.height, diff);
@@ -132,10 +150,12 @@ public class WindowManager {
         for (int i = index; i < zorder.size(); i++) {
             Window underlying = zorder.get(i);
             Rectangle uBounds = underlying.getBounds();
-            SwingUtilities.computeIntersection(uBounds.x, uBounds.y, uBounds.width, uBounds.height, bounds);
-            underlying.repaint(bounds.x-uBounds.x, bounds.y-uBounds.y, bounds.width, bounds.height);
+            Rectangle boundsCopy = new Rectangle(bounds);
+            SwingUtilities.computeIntersection(uBounds.x, uBounds.y, uBounds.width, uBounds.height, boundsCopy);
+            underlying.repaint(boundsCopy.x - uBounds.x, boundsCopy.y - uBounds.y, boundsCopy.width, boundsCopy.height);
         }
 
     }
+
 
 }

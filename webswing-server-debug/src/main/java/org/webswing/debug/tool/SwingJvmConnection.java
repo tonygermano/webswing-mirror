@@ -4,6 +4,7 @@ import java.awt.AWTEvent;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
@@ -25,10 +26,13 @@ import javax.jms.TextMessage;
 import org.apache.commons.codec.binary.Base64;
 import org.webswing.Constants;
 import org.webswing.debug.tool.ui.DebugFrame;
+import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventMouse.Type;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.model.s2c.JsonWindow;
+
+import com.fasterxml.jackson.core.JsonEncoding;
 
 public class SwingJvmConnection implements MessageListener, Runnable, AWTEventListener {
 
@@ -56,6 +60,8 @@ public class SwingJvmConnection implements MessageListener, Runnable, AWTEventLi
         Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.MOUSE_EVENT_MASK);
         Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.MOUSE_MOTION_EVENT_MASK);
         Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.MOUSE_WHEEL_EVENT_MASK);
+        Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.KEY_EVENT_MASK);
+
     }
 
     public void send(Serializable o) {
@@ -181,6 +187,32 @@ public class SwingJvmConnection implements MessageListener, Runnable, AWTEventLi
                     return;
             }
             send(msg);
+        }else if (event instanceof KeyEvent){
+            KeyEvent ke=(KeyEvent) event;
+            JsonEventKeyboard key= new JsonEventKeyboard();
+            key.alt=ke.isAltDown();
+            key.altgr=ke.isAltGraphDown();
+            key.character=ke.getKeyChar();
+            key.clientId="debug";
+            key.ctrl=ke.isControlDown();
+            key.keycode=ke.getKeyCode();
+            key.meta=ke.isMetaDown();
+            key.shift=ke.isShiftDown();
+            switch(ke.getID()){
+                case KeyEvent.KEY_PRESSED:
+                    key.type=JsonEventKeyboard.Type.keydown;
+                    break;
+                case KeyEvent.KEY_RELEASED:
+                    key.type=JsonEventKeyboard.Type.keyup;
+                    break;
+                case KeyEvent.KEY_TYPED:
+                    key.type=JsonEventKeyboard.Type.keypress;
+                    break;
+                default:
+                    return;
+            }
+            send(key);
+            
         }
 
     }

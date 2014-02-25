@@ -1,5 +1,6 @@
 package org.webswing.toolkit;
 
+import java.awt.AWTEvent;
 import java.awt.AWTException;
 import java.awt.Button;
 import java.awt.Checkbox;
@@ -14,6 +15,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
+import java.awt.KeyboardFocusManager;
 import java.awt.Label;
 import java.awt.List;
 import java.awt.Menu;
@@ -27,12 +29,14 @@ import java.awt.Scrollbar;
 import java.awt.SystemTray;
 import java.awt.TextArea;
 import java.awt.TextField;
+import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.dnd.peer.DragSourceContextPeer;
+import java.awt.event.AWTEventListener;
 import java.awt.font.TextAttribute;
 import java.awt.im.InputMethodHighlight;
 import java.awt.im.spi.InputMethodDescriptor;
@@ -46,6 +50,7 @@ import java.awt.peer.DialogPeer;
 import java.awt.peer.FileDialogPeer;
 import java.awt.peer.FontPeer;
 import java.awt.peer.FramePeer;
+import java.awt.peer.KeyboardFocusManagerPeer;
 import java.awt.peer.LabelPeer;
 import java.awt.peer.ListPeer;
 import java.awt.peer.MenuBarPeer;
@@ -88,6 +93,14 @@ public class WebToolkit extends SunToolkit {
     public void init() {
         paintDispatcher = new WebPaintDispatcher(serverConnection, imageService);
         windowManager = WindowManager.getInstance();
+        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener(){
+
+            public void eventDispatched(AWTEvent event) {
+                System.out.println(event);
+            }
+            
+        }, AWTEvent.WINDOW_EVENT_MASK|AWTEvent.WINDOW_FOCUS_EVENT_MASK|AWTEvent.WINDOW_STATE_EVENT_MASK);
+
     }
 
     public void initSize(Integer desktopWidth, Integer desktopHeight) {
@@ -144,7 +157,12 @@ public class WebToolkit extends SunToolkit {
     public boolean isTranslucencyCapable(GraphicsConfiguration paramGraphicsConfiguration) {
         return true;
     }
-
+    
+    @Override
+    public KeyboardFocusManagerPeer createKeyboardFocusManagerPeer(KeyboardFocusManager paramKeyboardFocusManager) throws HeadlessException {
+        return super.createKeyboardFocusManagerPeer(paramKeyboardFocusManager);
+    }
+    
     public FramePeer createFrame(Frame frame) throws HeadlessException {
         WebFramePeer localWFramePeer = new WebFramePeer(frame);
         targetCreatedPeer(frame, localWFramePeer);

@@ -53,16 +53,18 @@ public class WebEventDispatcher {
             switch (event.type) {
                 case close:
                     dispatchEventInSwing(w, new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
+                    //TODO: WindowManager handle
                     break;
                 case resize:
                     w.setSize(event.newWidth, event.newHeight);
+                    //TODO:windowmanager active
                     break;
             }
         }
     }
 
     private void dispatchKeyboardEvent(JsonEventKeyboard event) {
-        Window w = (Window) Util.findWindowPeerById(event.windowId).getTarget();
+        Window w = (Window) WindowManager.getInstance().getActiveWindow();
         if (w != null) {
             long when = System.currentTimeMillis();
             int modifiers = Util.getKeyModifiersAWTFlag(event);
@@ -94,6 +96,9 @@ public class WebEventDispatcher {
             int id = 0;
             int clickcount = 0;
             int buttons = Util.getMouseButtonsAWTFlag(event.button);
+            if(buttons!=0){ 
+                WindowManager.getInstance().activateWindow(w,x,y);
+            }
             switch (event.type) {
                 case mousemove:
                     id = event.button == 1 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
@@ -142,7 +147,7 @@ public class WebEventDispatcher {
         return lastMousePosition;
     }
 
-    private void dispatchEventInSwing(final Window w, final AWTEvent e) {
+    public static void dispatchEventInSwing(final Window w, final AWTEvent e) {
         Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
     }
 }
