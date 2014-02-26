@@ -22,7 +22,7 @@ import org.webswing.toolkit.WebWindowPeer;
 
 import sun.awt.CausedFocusEvent;
 
-public class WindowManager{
+public class WindowManager {
 
     private static WindowManager singleton = null;
 
@@ -68,6 +68,9 @@ public class WindowManager{
                 Rectangle bounds = target.getBounds();
                 zorder.remove(target);
                 requestRepaintUnderlyingAfterWindowClosed(index, bounds);
+                if(index==0 && zorder.size()>0){
+                    activateWindow(zorder.get(0));
+                }
             }
         }
     }
@@ -92,28 +95,31 @@ public class WindowManager{
             return false;
         }
     }
+
     public void activateWindow(Window w) {
         activateWindow(w, 0, 0);
     }
-    
+
     public void activateWindow(Window w, int x, int y) {
-        if(activeWindow!=null && activeWindow instanceof java.awt.Dialog){
-            if(((java.awt.Dialog)activeWindow).isModal()){
-                return;
+        if (activeWindow != null && activeWindow instanceof java.awt.Dialog && ((java.awt.Dialog) activeWindow).isModal() && activeWindow.isShowing()) {
+            if (!(w instanceof java.awt.Dialog) || !((java.awt.Dialog) w).isModal()) {
+                bringToFront(activeWindow);
+                w = activeWindow;
             }
         }
-        
-        bringToFront(w);
-        Component focusOwner = SwingUtilities.getDeepestComponentAt(w, x, y);
 
-        FocusEvent gainedFocusEvent = new FocusEvent(focusOwner, FocusEvent.FOCUS_GAINED, false);
-        WebEventDispatcher.dispatchEventInSwing(w, gainedFocusEvent);
-
+        Component newFocusOwner = SwingUtilities.getDeepestComponentAt(w, x, y);
+        if (w.getFocusOwner() != newFocusOwner &&  newFocusOwner!=null && newFocusOwner.isFocusable()) {
+            FocusEvent gainedFocusEvent = new FocusEvent(newFocusOwner, FocusEvent.FOCUS_GAINED, false);
+            WebEventDispatcher.dispatchEventInSwing(w, gainedFocusEvent);
+        }
         if (this.activeWindow != w) {
             WindowEvent gainedFocusWindowEvent = new WindowEvent(w, WindowEvent.WINDOW_GAINED_FOCUS, activeWindow, 0, 0);
             WebEventDispatcher.dispatchEventInSwing(w, gainedFocusWindowEvent);
             this.activeWindow = w;
+            bringToFront(w);
         }
+
     }
 
     public Window getVisibleWindowOnPosition(int x, int y) {
@@ -165,6 +171,5 @@ public class WindowManager{
         }
 
     }
-
 
 }
