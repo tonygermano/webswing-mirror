@@ -6,3 +6,4 @@ dist/
 .settings/
 .project
 .classpath
+webswing-server-debug/webswing.log

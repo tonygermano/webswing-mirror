@@ -4,6 +4,10 @@ import java.awt.Container;
 import java.awt.Insets;
 import java.awt.peer.ContainerPeer;
 
+import javax.swing.JWindow;
+
+import org.webswing.util.Util;
+
 public class WebContainerPeer extends WebComponentPeer implements ContainerPeer {
 
 
@@ -13,7 +17,11 @@ public class WebContainerPeer extends WebComponentPeer implements ContainerPeer 
     
     
     public Insets getInsets() {
-       return new Insets(0, 0, 0, 0);
+       if(target!=null && target instanceof JWindow){
+           return new Insets(0,0,0,0);
+       }else{
+           return Util.getWebToolkit().getImageService().getWindowDecorationTheme().getInsets();
+       }
     }
 
     

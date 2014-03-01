@@ -26,6 +26,8 @@ import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 import java.util.UUID;
 
+import javax.swing.JWindow;
+
 import org.webswing.common.GraphicsWrapper;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.ge.WebGraphicsConfig;
@@ -50,7 +52,7 @@ import sun.java2d.pipe.Region;
 public class WebComponentPeer implements ComponentPeer {
 
     private String guid = UUID.randomUUID().toString();
-    
+
     public String getGuid() {
         return guid;
     }
@@ -58,13 +60,18 @@ public class WebComponentPeer implements ComponentPeer {
     public BufferedImage extractSafeImage(Rectangle sub) {
         BufferedImage safeImage = new BufferedImage(sub.width, sub.height, BufferedImage.TYPE_4BYTE_ABGR);
         Graphics g = safeImage.getGraphics();
-        g.drawImage(image, 0, 0,sub.width, sub.height,sub.x, sub.y,sub.x+sub.width, sub.y+sub.height, null);
+        g.drawImage(image, 0, 0, sub.width, sub.height, sub.x, sub.y, sub.x + sub.width, sub.y + sub.height, null);
+        g.drawImage(windowDecorationImage, 0, 0, sub.width, sub.height, sub.x, sub.y, sub.x + sub.width, sub.y + sub.height, null);
         g.dispose();
         return safeImage;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////// WebComponentPeer Implementation//////////////////////////////////////////////////
+
+    public Image getWindowDecorationImage() {
+        return windowDecorationImage;
+    }
 
     private static final Font defaultFont = new Font("Dialog", 0, 12);
     protected long pData; //???
@@ -75,6 +82,7 @@ public class WebComponentPeer implements ComponentPeer {
     private int oldHeight;
     private SurfaceData surfaceData;
     private OffScreenImage image;
+    private Image windowDecorationImage;
     private Object background;
     private Object foreground;
     private Font font;
@@ -130,11 +138,11 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void paint(Graphics paramGraphics) {
-       ((Component) this.target).paint(paramGraphics);
+        ((Component) this.target).paint(paramGraphics);
     }
 
     public void repaint(long paramLong, int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
-        ((Component) this.target).repaint(paramLong,paramInt1,paramInt2,paramInt3,paramInt4);
+        ((Component) this.target).repaint(paramLong, paramInt1, paramInt2, paramInt3, paramInt4);
     }
 
     public void print(Graphics paramGraphics) {
@@ -143,10 +151,7 @@ public class WebComponentPeer implements ComponentPeer {
 
     public void setBounds(int x, int y, int w, int h, int paramInt5) {
         synchronized (WebPaintDispatcher.webPaintLock) {
-            if (((Component) target).isShowing()) {
-                Point location = ((Component) target).getLocationOnScreen();
-                Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(location.x, location.y, w, h));
-            }
+            Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
             if ((w != this.oldWidth) || (h != this.oldHeight)) {
                 try {
                     replaceSurfaceData(x, y, w, h);
@@ -167,6 +172,9 @@ public class WebComponentPeer implements ComponentPeer {
                 this.image = (OffScreenImage) localWebGraphicsConfig.createAcceleratedImage((Component) this.target, w, h);
                 localSurfaceData = this.surfaceData;
                 this.surfaceData = SurfaceManager.getManager(this.image).getDestSurfaceData();
+                if (target != null && !(target instanceof JWindow)) {
+                    windowDecorationImage = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getWindowDecoration(target, w, h);
+                }
                 repaintPeerTarget();
                 if (localSurfaceData != null) {
                     localSurfaceData.invalidate();

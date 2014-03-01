@@ -93,13 +93,13 @@ public class WebToolkit extends SunToolkit {
     public void init() {
         paintDispatcher = new WebPaintDispatcher(serverConnection, imageService);
         windowManager = WindowManager.getInstance();
-        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener(){
+        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
 
             public void eventDispatched(AWTEvent event) {
                 System.out.println(event);
             }
-            
-        }, AWTEvent.WINDOW_EVENT_MASK|AWTEvent.WINDOW_FOCUS_EVENT_MASK|AWTEvent.WINDOW_STATE_EVENT_MASK);
+
+        }, AWTEvent.WINDOW_EVENT_MASK | AWTEvent.WINDOW_FOCUS_EVENT_MASK | AWTEvent.WINDOW_STATE_EVENT_MASK);
 
     }
 
@@ -127,6 +127,10 @@ public class WebToolkit extends SunToolkit {
 
     public void setImageService(ImageServiceIfc imageService) {
         this.imageService = imageService;
+    }
+
+    public ImageServiceIfc getImageService() {
+        return imageService;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,12 +161,12 @@ public class WebToolkit extends SunToolkit {
     public boolean isTranslucencyCapable(GraphicsConfiguration paramGraphicsConfiguration) {
         return true;
     }
-    
+
     @Override
     public KeyboardFocusManagerPeer createKeyboardFocusManagerPeer(KeyboardFocusManager paramKeyboardFocusManager) throws HeadlessException {
         return super.createKeyboardFocusManagerPeer(paramKeyboardFocusManager);
     }
-    
+
     public FramePeer createFrame(Frame frame) throws HeadlessException {
         WebFramePeer localWFramePeer = new WebFramePeer(frame);
         targetCreatedPeer(frame, localWFramePeer);
@@ -180,15 +184,15 @@ public class WebToolkit extends SunToolkit {
         targetCreatedPeer(paramWindow, localwindowPeer);
         return localwindowPeer;
     }
-    
+
     @Override
     protected synchronized MouseInfoPeer getMouseInfoPeer() {
-       {
-         if (mPeer == null) {
-           mPeer = new WebMouseInfoPeer();
-         }
-         return mPeer;
-       }   
+        {
+            if (mPeer == null) {
+                mPeer = new WebMouseInfoPeer();
+            }
+            return mPeer;
+        }
     }
 
     public FontPeer getFontPeer(String paramString, int paramInt) {

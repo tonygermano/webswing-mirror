@@ -19,13 +19,13 @@ import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
+import org.webswing.util.Util;
 
 import sun.awt.CausedFocusEvent;
 
 public class WindowManager {
 
     private static WindowManager singleton = null;
-
     LinkedList<Window> zorder = new LinkedList<Window>();
     Window activeWindow = null;
 
@@ -57,7 +57,11 @@ public class WindowManager {
                     zorder.addFirst(w);
                 }
             }
+            activeWindow=w;
+            WindowEvent gainedFocusWindowEvent = new WindowEvent(w, WindowEvent.WINDOW_GAINED_FOCUS, activeWindow, 0, 0);
+            WebEventDispatcher.dispatchEventInSwing(w, gainedFocusWindowEvent);
             w.repaint();
+            Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(w);
         }
     }
 
@@ -65,6 +69,9 @@ public class WindowManager {
         synchronized (WebPaintDispatcher.webPaintLock) {
             if (zorder.contains(target)) {
                 int index = zorder.indexOf(target);
+                if(target.isAlwaysOnTop()){
+                    index=0;
+                }
                 Rectangle bounds = target.getBounds();
                 zorder.remove(target);
                 requestRepaintUnderlyingAfterWindowClosed(index, bounds);
@@ -103,7 +110,6 @@ public class WindowManager {
     public void activateWindow(Window w, int x, int y) {
         if (activeWindow != null && activeWindow instanceof java.awt.Dialog && ((java.awt.Dialog) activeWindow).isModal() && activeWindow.isShowing()) {
             if (!(w instanceof java.awt.Dialog) || !((java.awt.Dialog) w).isModal()) {
-                bringToFront(activeWindow);
                 w = activeWindow;
             }
         }
@@ -114,8 +120,6 @@ public class WindowManager {
             WebEventDispatcher.dispatchEventInSwing(w, gainedFocusEvent);
         }
         if (this.activeWindow != w) {
-            WindowEvent gainedFocusWindowEvent = new WindowEvent(w, WindowEvent.WINDOW_GAINED_FOCUS, activeWindow, 0, 0);
-            WebEventDispatcher.dispatchEventInSwing(w, gainedFocusWindowEvent);
             this.activeWindow = w;
             bringToFront(w);
         }
@@ -134,12 +138,10 @@ public class WindowManager {
     public void extractNonVisibleAreas(Map<String, List<Rectangle>> map) {
         if (zorder.size() > 0) {
             Rectangle previous = zorder.get(0).getBounds();
-            //SwingUtilities.convertPointToScreen(previous.getLocation(),zorder.get(0));
             List<Rectangle> previousDifferences = new ArrayList<Rectangle>();
             for (int i = 1; i < zorder.size(); i++) {
                 String id = ((WebWindowPeer) WebToolkit.targetToPeer(zorder.get(i))).getGuid();
                 Rectangle current = zorder.get(i).getBounds();
-                //SwingUtilities.convertPointToScreen(current.getLocation(),zorder.get(i));
                 List<Rectangle> currentDifferences = new ArrayList<Rectangle>();
                 for (Rectangle diff : previousDifferences) {
                     Rectangle intersect = SwingUtilities.computeIntersection(current.x, current.y, current.width, current.height, diff);
@@ -167,7 +169,8 @@ public class WindowManager {
             Rectangle uBounds = underlying.getBounds();
             Rectangle boundsCopy = new Rectangle(bounds);
             SwingUtilities.computeIntersection(uBounds.x, uBounds.y, uBounds.width, uBounds.height, boundsCopy);
-            underlying.repaint(boundsCopy.x - uBounds.x, boundsCopy.y - uBounds.y, boundsCopy.width, boundsCopy.height);
+            WebWindowPeer peer=(WebWindowPeer) WebToolkit.targetToPeer(underlying);
+            Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(peer.getGuid(),new Rectangle(boundsCopy.x - uBounds.x, boundsCopy.y - uBounds.y, boundsCopy.width, boundsCopy.height));
         }
 
     }

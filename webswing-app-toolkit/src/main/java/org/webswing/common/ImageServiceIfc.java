@@ -7,5 +7,8 @@ public interface ImageServiceIfc {
     String encodeImage(BufferedImage window);
 
     byte[] getPngImage(BufferedImage image);
+    
+    WindowDecoratorThemeIfc getWindowDecorationTheme();
+
 
 }

@@ -1,6 +1,7 @@
 package org.webswing.dispatch;
 
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -15,6 +16,8 @@ import javax.swing.SwingUtilities;
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.ServerConnectionIfc;
 import org.webswing.model.s2c.JsonAppFrame;
+import org.webswing.toolkit.WebToolkit;
+import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Util;
 
@@ -44,7 +47,10 @@ public class WebPaintDispatcher {
                             return;
                         }
                         currentAreasToUpdate = areasToUpdate;
-                        areasToUpdate = new HashMap<String, Rectangle>();
+                        areasToUpdate = Util.postponeNonShowingAreas(currentAreasToUpdate);
+                        if(currentAreasToUpdate.size()==0){
+                            return;
+                        }
                         Util.fillJsonWithWindowsData(currentAreasToUpdate,json);
                         Util.extractWindowImages(windowImages, currentAreasToUpdate);
                         WindowManager.getInstance().extractNonVisibleAreas(windowNonVisibleAreas);
@@ -65,10 +71,6 @@ public class WebPaintDispatcher {
 
     public void sendJsonObject(Serializable object) {
         serverConnection.sendJsonObject(object);
-    }
-
-    public ImageServiceIfc getImageService() {
-        return imageService;
     }
 
     public void notifyWindowAreaRepainted(String guid, Rectangle repaintedArea) {
@@ -93,6 +95,12 @@ public class WebPaintDispatcher {
         synchronized (webPaintLock) {
             areasToUpdate.remove(guid);
         }
+    }
+
+    public void notifyWindowRepaint(Window w) {
+        Rectangle bounds = w.getBounds();
+        WebWindowPeer peer = (WebWindowPeer)WebToolkit.targetToPeer(w);
+        notifyWindowAreaRepainted(peer.getGuid(), new Rectangle(0,0,bounds.width,bounds.height));        
     }
 
 }

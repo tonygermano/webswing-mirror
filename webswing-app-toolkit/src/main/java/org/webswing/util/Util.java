@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -222,5 +223,21 @@ public class Util {
                 window.setContent(content);
             }
         }
+    }
+
+    public static Map<String, Rectangle> postponeNonShowingAreas(Map<String, Rectangle> currentAreasToUpdate) {
+        Map<String, Rectangle> forLaterProcessing = new HashMap<String, Rectangle>();
+        for (String windowId : currentAreasToUpdate.keySet()) {
+            WebWindowPeer ww = Util.findWindowPeerById(windowId);
+            if (ww != null) {
+                if (!((Window) ww.getTarget()).isShowing()) {
+                    forLaterProcessing.put(windowId, currentAreasToUpdate.get(windowId));
+                }
+            }
+        }
+        for (String later : forLaterProcessing.keySet()) {
+            currentAreasToUpdate.remove(later);
+        }
+        return forLaterProcessing;
     }
 }
