@@ -82,6 +82,7 @@ import sun.awt.SunToolkit;
 @SuppressWarnings("restriction")
 public class WebToolkit extends SunToolkit {
 
+    public static final String BACKGROUND_WINDOW_ID = "backgroundWindowId";
     private ServerConnectionIfc serverConnection;
     private ImageServiceIfc imageService;
 

@@ -25,7 +25,6 @@ public class WebPaintDispatcher {
 
     public static final Object webPaintLock = new Object();
     private ServerConnectionIfc serverConnection;
-    private ImageServiceIfc imageService;
 
     Map<String, Rectangle> areasToUpdate = new HashMap<String, Rectangle>();
 
@@ -33,7 +32,6 @@ public class WebPaintDispatcher {
 
     public WebPaintDispatcher(final ServerConnectionIfc serverConnection, final ImageServiceIfc imageService) {
         this.serverConnection = serverConnection;
-        this.imageService = imageService;
         Runnable sendUpdate = new Runnable() {
 
             public void run() {
@@ -101,6 +99,11 @@ public class WebPaintDispatcher {
         Rectangle bounds = w.getBounds();
         WebWindowPeer peer = (WebWindowPeer)WebToolkit.targetToPeer(w);
         notifyWindowAreaRepainted(peer.getGuid(), new Rectangle(0,0,bounds.width,bounds.height));        
+    }
+
+    public void notifyBackgroundRepainted(Rectangle toRepaint) {
+        notifyWindowAreaRepainted(WebToolkit.BACKGROUND_WINDOW_ID, toRepaint);
+        
     }
 
 }

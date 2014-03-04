@@ -1,7 +1,9 @@
 package org.webswing.util;
 
+import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -21,6 +23,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import javax.swing.SwingUtilities;
 
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.model.c2s.JsonEventKeyboard;
@@ -156,7 +159,11 @@ public class Util {
     public static void extractWindowImages(Map<String, BufferedImage> windowImages, Map<String, Rectangle> currentAreasToUpdate) {
         for (String windowId : currentAreasToUpdate.keySet()) {
             WebWindowPeer w = findWindowPeerById(windowId);
-            windowImages.put(windowId, w.extractSafeImage(currentAreasToUpdate.get(windowId)));
+            if (windowId.equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
+                windowImages.put(windowId,(BufferedImage) getWebToolkit().getImageService().getWindowDecorationTheme().repaintBackground(currentAreasToUpdate.get(windowId)));
+            } else {
+                windowImages.put(windowId, w.extractSafeImage(currentAreasToUpdate.get(windowId)));
+            }
         }
     }
 
@@ -188,16 +195,24 @@ public class Util {
         }
     }
 
+    @SuppressWarnings("restriction")
     public static void fillJsonWithWindowsData(Map<String, Rectangle> currentAreasToUpdate, JsonAppFrame json) {
         for (String windowId : currentAreasToUpdate.keySet()) {
             WebWindowPeer ww = Util.findWindowPeerById(windowId);
-            if (ww != null) {
+            if (ww != null || windowId.equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
                 JsonWindow window = json.getOrCreateWindowById(windowId);
-                Point location = ww.getLocationOnScreen();
-                window.setPosX(location.x);
-                window.setPosY(location.y);
-                window.setWidth(ww.getBounds().width);
-                window.setHeight(ww.getBounds().height);
+                if (windowId.equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
+                    window.setPosX(0);
+                    window.setPosY(0);
+                    window.setWidth(getWebToolkit().getScreenSize().width);
+                    window.setHeight(getWebToolkit().getScreenSize().height);
+                } else {
+                    Point location = ww.getLocationOnScreen();
+                    window.setPosX(location.x);
+                    window.setPosY(location.y);
+                    window.setWidth(ww.getBounds().width);
+                    window.setHeight(ww.getBounds().height);
+                }
                 JsonWindowPartialContent content = window.getContent() == null ? new JsonWindowPartialContent() : window.getContent();
                 Rectangle dirtyArea = currentAreasToUpdate.get(windowId);
                 if (content.getPositionX() == null) {
@@ -239,5 +254,18 @@ public class Util {
             currentAreasToUpdate.remove(later);
         }
         return forLaterProcessing;
+    }
+
+    public static boolean isWindowDecorationEvent(Window w, AWTEvent e) {
+        if(e instanceof MouseEvent){
+            Rectangle inner=w.getBounds();
+            Insets i=w.getInsets();
+            inner.x=i.left;
+            inner.y=i.top;
+            inner.width-=i.left+i.right;
+            inner.height-=i.top+i.bottom;
+            return !SwingUtilities.isRectangleContainingRectangle(inner, new Rectangle(((MouseEvent) e).getX(),((MouseEvent) e).getY(),0,0));
+        }
+        return false;
     }
 }

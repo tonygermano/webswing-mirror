@@ -23,7 +23,7 @@ import org.webswing.util.Util;
 public class WebEventDispatcher {
 
     private MouseEvent lastMouseEvent;
-    private Point lastMousePosition=new Point();
+    private Point lastMousePosition = new Point();
 
     public void dispatchEvent(JsonEvent event) {
         if (event instanceof JsonEventMouse) {
@@ -41,24 +41,21 @@ public class WebEventDispatcher {
         }
     }
 
-    public void dispatchMessage(String message){
+    public void dispatchMessage(String message) {
         if (message.equals(Constants.SWING_KILL_SIGNAL)) {
             System.exit(0);
         }
     }
-    
-    
+
     private void dispatchWindowEvent(JsonEventWindow event) {
         Window w = (Window) Util.findWindowPeerById(event.windowId).getTarget();
         if (w != null) {
             switch (event.type) {
                 case close:
                     dispatchEventInSwing(w, new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
-                    //TODO: WindowManager handle
                     break;
                 case resize:
                     w.setSize(event.newWidth, event.newHeight);
-                    //TODO:windowmanager active
                     break;
             }
         }
@@ -83,22 +80,22 @@ public class WebEventDispatcher {
 
     private void dispatchMouseEvent(JsonEventMouse event) {
         Window w = (Window) WindowManager.getInstance().getVisibleWindowOnPosition(event.x, event.y);
-        if(w==null){
+        if (w == null) {
             return;
         }
         if (w != null) {
             MouseEvent e = null;
-            int x = event.x-w.getX();
-            int y = event.y-w.getY();
-            lastMousePosition.x=x;
-            lastMousePosition.y=y;
+            int x = event.x - w.getX();
+            int y = event.y - w.getY();
+            lastMousePosition.x = x;
+            lastMousePosition.y = y;
             long when = System.currentTimeMillis();
             int modifiers = Util.getMouseModifiersAWTFlag(event);
             int id = 0;
             int clickcount = 0;
             int buttons = Util.getMouseButtonsAWTFlag(event.button);
-            if(buttons!=0 && event.type== Type.mousedown){ 
-                WindowManager.getInstance().activateWindow(w,x,y);
+            if (buttons != 0 && event.type == Type.mousedown) {
+                WindowManager.getInstance().activateWindow(w, x, y);
             }
             switch (event.type) {
                 case mousemove:
@@ -144,11 +141,15 @@ public class WebEventDispatcher {
         }
     }
 
-    public Point getLastMousePosition(){
+    public Point getLastMousePosition() {
         return lastMousePosition;
     }
 
     public static void dispatchEventInSwing(final Window w, final AWTEvent e) {
-        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
+        if (e instanceof MouseEvent && (Util.isWindowDecorationEvent(w,e))) {
+            WindowManager.getInstance().handleWindowDecorationEvent(w,(MouseEvent) e);
+        } else {
+            Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
+        }
     }
 }

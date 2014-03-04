@@ -1,13 +1,13 @@
 package org.webswing.toolkit.extra;
 
 import java.awt.Component;
-import java.awt.KeyboardFocusManager;
+import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
-import java.awt.peer.KeyboardFocusManagerPeer;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,13 +15,12 @@ import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
+import org.webswing.common.WindowActionType;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.util.Util;
-
-import sun.awt.CausedFocusEvent;
 
 public class WindowManager {
 
@@ -135,13 +134,14 @@ public class WindowManager {
         return null;
     }
 
+    @SuppressWarnings("restriction")
     public void extractNonVisibleAreas(Map<String, List<Rectangle>> map) {
         if (zorder.size() > 0) {
             Rectangle previous = zorder.get(0).getBounds();
             List<Rectangle> previousDifferences = new ArrayList<Rectangle>();
-            for (int i = 1; i < zorder.size(); i++) {
-                String id = ((WebWindowPeer) WebToolkit.targetToPeer(zorder.get(i))).getGuid();
-                Rectangle current = zorder.get(i).getBounds();
+            for (int i = 1; i < zorder.size()+1; i++) {
+                String id = i==zorder.size()?WebToolkit.BACKGROUND_WINDOW_ID:((WebWindowPeer) WebToolkit.targetToPeer(zorder.get(i))).getGuid();
+                Rectangle current = i==zorder.size()? new Rectangle(Util.getWebToolkit().getScreenSize()):zorder.get(i).getBounds();
                 List<Rectangle> currentDifferences = new ArrayList<Rectangle>();
                 for (Rectangle diff : previousDifferences) {
                     Rectangle intersect = SwingUtilities.computeIntersection(current.x, current.y, current.width, current.height, diff);
@@ -172,7 +172,18 @@ public class WindowManager {
             WebWindowPeer peer=(WebWindowPeer) WebToolkit.targetToPeer(underlying);
             Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(peer.getGuid(),new Rectangle(boundsCopy.x - uBounds.x, boundsCopy.y - uBounds.y, boundsCopy.width, boundsCopy.height));
         }
+        Rectangle boundsCopy = new Rectangle(bounds);
+        Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
+        SwingUtilities.computeIntersection(0,0, screensize.width,screensize.height, boundsCopy);
+        Util.getWebToolkit().getPaintDispatcher().notifyBackgroundRepainted(boundsCopy);
+    }
 
+    public void handleWindowDecorationEvent(Window w, MouseEvent e) {
+        if(MouseEvent.MOUSE_WHEEL!=e.getID() && MouseEvent.MOUSE_MOVED!=e.getID()){
+            WindowActionType wat=Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(w,e);
+            System.out.println(wat);
+        }
+            
     }
 
 }
