@@ -1,5 +1,6 @@
 package org.webswing.toolkit.extra;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -15,6 +16,7 @@ public class WindowEventHandler {
     private WindowActionType lockEventType;
     private Point referenceMouseLocation;
     private Window window;
+    private static final Dimension DEFAULT_MINIMUM_WINDOW_SIZE = new Dimension(100, 25);
 
     public void handle(WindowActionType wat, MouseEvent e) {
         if (!lockedOnEvent) {
@@ -22,35 +24,111 @@ public class WindowEventHandler {
                 lockedOnEvent = true;
                 lockEventType = wat;
                 referenceMouseLocation = e.getPoint();
-                window=(Window) e.getSource();
+                window = (Window) e.getSource();
             }
         } else {
             switch (lockEventType) {
+                case minimize:
+                    if (MouseEvent.MOUSE_RELEASED == e.getID()) {
+                        Window w = (Window) e.getSource();
+                        Rectangle o = w.getBounds();
+                        resizeWindow(w, 0, 0);
+                        Rectangle r = w.getBounds();
+                        //move to the middle of original size
+                        moveWindow(w, ((o.x + o.width) / 2) - (r.width / 2), ((o.y + o.height) / 2) - (r.height / 2));
+                        lockedOnEvent = false;
+                    }
+                    break;
+                case maximize:
+                    if (MouseEvent.MOUSE_RELEASED == e.getID()) {
+                        if (wat.equals(WindowActionType.maximize)) {
+                            Window w = (Window) e.getSource();
+                            moveWindow(w, 0, 0);
+                            Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+                            resizeWindow(w, size.width, size.height);
+                        }
+                        lockedOnEvent = false;
+                    }
+                    break;
                 case close:
-                    if (wat.equals(WindowActionType.close) && MouseEvent.MOUSE_RELEASED == e.getID()) {
-                        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new WindowEvent((Window) e.getSource(), WindowEvent.WINDOW_CLOSING));
+                    if (MouseEvent.MOUSE_RELEASED == e.getID()) {
+                        if (wat.equals(WindowActionType.close)) {
+                            Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new WindowEvent((Window) e.getSource(), WindowEvent.WINDOW_CLOSING));
+                        }
                         lockedOnEvent = false;
                     }
                     break;
                 case move:
-                    if ( MouseEvent.MOUSE_RELEASED == e.getID()) {
+                    if (MouseEvent.MOUSE_RELEASED == e.getID()) {
                         lockedOnEvent = false;
                     }
-                    if ( MouseEvent.MOUSE_DRAGGED == e.getID()) {
+                    if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
                         Window w = (Window) e.getSource();
-                        Rectangle originalPos = new Rectangle(w.getLocation().x,w.getLocation().y,w.getWidth(),w.getHeight());
-                        w.setLocation(e.getXOnScreen()-referenceMouseLocation.x,e.getYOnScreen()-referenceMouseLocation.y);
-                        //TODO:optimize on client side and remove repaint call
-                        WindowManager.getInstance().requestRepaintAfterMove(originalPos);
-                        w.repaint();
+                        moveWindow(w, e.getXOnScreen() - referenceMouseLocation.x, e.getYOnScreen() - referenceMouseLocation.y);
                     }
                     break;
                 case resizeUni:
+                    if (MouseEvent.MOUSE_RELEASED == e.getID()) {
+                        lockedOnEvent = false;
+                    }
+                    if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
+                        Window w = (Window) e.getSource();
+                        resizeWindow(w, e.getXOnScreen() - w.getX(), e.getYOnScreen() - w.getY());
+                    }
+                    break;
+                case resizeRight:
+                    if (MouseEvent.MOUSE_RELEASED == e.getID()) {
+                        lockedOnEvent = false;
+                    }
+                    if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
+                        Window w = (Window) e.getSource();
+                        resizeWindow(w, e.getXOnScreen() - w.getX(), w.getSize().height);
+                    }
+                    break;
+                case resizeBottom:
+                    if (MouseEvent.MOUSE_RELEASED == e.getID()) {
+                        lockedOnEvent = false;
+                    }
+                    if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
+                        Window w = (Window) e.getSource();
+                        resizeWindow(w, w.getSize().width, e.getYOnScreen() - w.getY());
+                    }
+                    break;
                 default:
                     lockedOnEvent = false;
 
             }
         }
+    }
+
+    private void moveWindow(Window w, int x, int y) {
+        Rectangle originalPos = new Rectangle(w.getLocation().x, w.getLocation().y, w.getWidth(), w.getHeight());
+        w.setLocation(x, y);
+        //TODO:optimize on client side and remove repaint call
+        WindowManager.getInstance().requestRepaintAfterMove(originalPos);
+        w.repaint();
+    }
+
+    private void resizeWindow(Window w, int width, int height) {
+        Dimension originalSize = w.getSize();
+        Dimension newSize = new Dimension(width, height);
+        validateSize(w, newSize);
+        if (!originalSize.equals(newSize)) {
+            w.setSize(newSize);
+            WindowManager.getInstance().requestRepaintAfterMove(new Rectangle(w.getX(), w.getY(), originalSize.width, originalSize.height));
+            w.invalidate();
+            w.validate();
+            w.repaint();
+        }
+    }
+
+    private void validateSize(Window w, Dimension newSize) {
+        Dimension min = w.getMinimumSize();
+        newSize.width = Math.max(min.width, newSize.width);
+        newSize.width = Math.max(DEFAULT_MINIMUM_WINDOW_SIZE.width, newSize.width);
+        newSize.height = Math.max(min.height, newSize.height);
+        newSize.height = Math.max(DEFAULT_MINIMUM_WINDOW_SIZE.height, newSize.height);
+
     }
 
     public boolean isEventHandlingLocked() {

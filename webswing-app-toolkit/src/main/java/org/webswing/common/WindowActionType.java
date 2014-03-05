@@ -6,9 +6,7 @@ public enum WindowActionType {
     minimize,
     maximize,
     move,
-    resizeTop,
     resizeBottom,
     resizeRight,
-    resizeLeft,
     resizeUni
 }

@@ -161,14 +161,8 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
         if(e.getX() > (w.getWidth() -10) && e.getY() > (w.getHeight() -10)){
             return WindowActionType.resizeUni;
         }
-        if (e.getX() < i.left) {
-            return WindowActionType.resizeLeft;
-        }
         if (e.getX() > (w.getWidth() - i.right)) {
             return WindowActionType.resizeRight;
-        }
-        if (e.getY() < i.bottom) {
-            return WindowActionType.resizeTop;
         }
         if (e.getY() > (w.getHeight() - i.bottom)) {
             return WindowActionType.resizeBottom;
