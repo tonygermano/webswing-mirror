@@ -46,10 +46,10 @@ public class WebPaintDispatcher {
                         }
                         currentAreasToUpdate = areasToUpdate;
                         areasToUpdate = Util.postponeNonShowingAreas(currentAreasToUpdate);
-                        if(currentAreasToUpdate.size()==0){
+                        if (currentAreasToUpdate.size() == 0) {
                             return;
                         }
-                        Util.fillJsonWithWindowsData(currentAreasToUpdate,json);
+                        Util.fillJsonWithWindowsData(currentAreasToUpdate, json);
                         Util.extractWindowImages(windowImages, currentAreasToUpdate);
                         WindowManager.getInstance().extractNonVisibleAreas(windowNonVisibleAreas);
                     }
@@ -73,23 +73,35 @@ public class WebPaintDispatcher {
 
     public void notifyWindowAreaRepainted(String guid, Rectangle repaintedArea) {
         synchronized (webPaintLock) {
-            if (areasToUpdate.containsKey(guid)) {
-                Rectangle r = areasToUpdate.get(guid);
-                Rectangle newR = SwingUtilities.computeUnion(r.x, r.y, r.width, r.height, repaintedArea);
-                areasToUpdate.put(guid, newR);
-            } else {
-                areasToUpdate.put(guid, repaintedArea);
+            if (validBounds(repaintedArea)) {
+                if (areasToUpdate.containsKey(guid)) {
+                    Rectangle r = areasToUpdate.get(guid);
+                    Rectangle newR = SwingUtilities.computeUnion(r.x, r.y, r.width, r.height, repaintedArea);
+                    areasToUpdate.put(guid, newR);
+                } else {
+                    areasToUpdate.put(guid, repaintedArea);
+                }
             }
         }
     }
 
     public void notifyWindowBoundsChanged(String guid, Rectangle newBounds) {
         synchronized (webPaintLock) {
-            areasToUpdate.put(guid, newBounds);
+            if (validBounds(newBounds)) {
+                areasToUpdate.put(guid, newBounds);
+            }
         }
     }
-    
-    public void notifyWindowClosed(String guid){
+
+    private boolean validBounds(Rectangle newBounds) {
+        if (newBounds.width > 0 && newBounds.height > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void notifyWindowClosed(String guid) {
         synchronized (webPaintLock) {
             areasToUpdate.remove(guid);
         }
@@ -97,13 +109,13 @@ public class WebPaintDispatcher {
 
     public void notifyWindowRepaint(Window w) {
         Rectangle bounds = w.getBounds();
-        WebWindowPeer peer = (WebWindowPeer)WebToolkit.targetToPeer(w);
-        notifyWindowAreaRepainted(peer.getGuid(), new Rectangle(0,0,bounds.width,bounds.height));        
+        WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(w);
+        notifyWindowAreaRepainted(peer.getGuid(), new Rectangle(0, 0, bounds.width, bounds.height));
     }
 
     public void notifyBackgroundRepainted(Rectangle toRepaint) {
         notifyWindowAreaRepainted(WebToolkit.BACKGROUND_WINDOW_ID, toRepaint);
-        
+
     }
 
 }

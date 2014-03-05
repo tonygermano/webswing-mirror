@@ -257,7 +257,7 @@ public class Util {
     }
 
     public static boolean isWindowDecorationEvent(Window w, AWTEvent e) {
-        if(e instanceof MouseEvent){
+        if(e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL!=e.getID() && MouseEvent.MOUSE_MOVED!=e.getID() && ((MouseEvent)e).getButton()==1){
             Rectangle inner=w.getBounds();
             Insets i=w.getInsets();
             inner.x=i.left;

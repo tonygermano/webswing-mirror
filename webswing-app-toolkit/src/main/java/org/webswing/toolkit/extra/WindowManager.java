@@ -27,6 +27,7 @@ public class WindowManager {
     private static WindowManager singleton = null;
     LinkedList<Window> zorder = new LinkedList<Window>();
     Window activeWindow = null;
+    WindowEventHandler eventhandler=new WindowEventHandler();
 
     private WindowManager() {
     }
@@ -73,7 +74,7 @@ public class WindowManager {
                 }
                 Rectangle bounds = target.getBounds();
                 zorder.remove(target);
-                requestRepaintUnderlyingAfterWindowClosed(index, bounds);
+                requestRepaintUnderlying(index, bounds);
                 if(index==0 && zorder.size()>0){
                     activateWindow(zorder.get(0));
                 }
@@ -137,33 +138,29 @@ public class WindowManager {
     @SuppressWarnings("restriction")
     public void extractNonVisibleAreas(Map<String, List<Rectangle>> map) {
         if (zorder.size() > 0) {
-            Rectangle previous = zorder.get(0).getBounds();
-            List<Rectangle> previousDifferences = new ArrayList<Rectangle>();
             for (int i = 1; i < zorder.size()+1; i++) {
                 String id = i==zorder.size()?WebToolkit.BACKGROUND_WINDOW_ID:((WebWindowPeer) WebToolkit.targetToPeer(zorder.get(i))).getGuid();
                 Rectangle current = i==zorder.size()? new Rectangle(Util.getWebToolkit().getScreenSize()):zorder.get(i).getBounds();
                 List<Rectangle> currentDifferences = new ArrayList<Rectangle>();
-                for (Rectangle diff : previousDifferences) {
-                    Rectangle intersect = SwingUtilities.computeIntersection(current.x, current.y, current.width, current.height, diff);
+                for (int j=i-1; j>=0;j--) {
+                    Rectangle previousBounds = zorder.get(j).getBounds();
+                    Rectangle intersect = SwingUtilities.computeIntersection(current.x, current.y, current.width, current.height, (Rectangle) previousBounds.clone());
                     if (!intersect.isEmpty()) {
                         currentDifferences.add(intersect);
                     }
                 }
-                Rectangle intersect = SwingUtilities.computeIntersection(current.x, current.y, current.width, current.height, previous);
-                if (!intersect.isEmpty()) {
-                    currentDifferences.add(intersect);
-                }
-
-                previous = current;
-                previousDifferences = currentDifferences;
-                if (previousDifferences.size() != 0) {
-                    map.put(id, previousDifferences);
+                if (currentDifferences.size() != 0) {
+                    map.put(id, currentDifferences);
                 }
             }
         }
     }
 
-    private void requestRepaintUnderlyingAfterWindowClosed(int index, Rectangle bounds) {
+    public void requestRepaintAfterMove(Rectangle originalPosition) {
+        requestRepaintUnderlying(0, originalPosition);
+    }
+    
+    private void requestRepaintUnderlying(int index, Rectangle bounds) {
         for (int i = index; i < zorder.size(); i++) {
             Window underlying = zorder.get(i);
             Rectangle uBounds = underlying.getBounds();
@@ -179,11 +176,16 @@ public class WindowManager {
     }
 
     public void handleWindowDecorationEvent(Window w, MouseEvent e) {
-        if(MouseEvent.MOUSE_WHEEL!=e.getID() && MouseEvent.MOUSE_MOVED!=e.getID()){
             WindowActionType wat=Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(w,e);
-            System.out.println(wat);
-        }
-            
+            eventhandler.handle(wat,e);
+    }
+    
+    public boolean isLockedToWindowDecorationHandler() {
+       return  eventhandler.isEventHandlingLocked();
+    }
+    
+    public Window getLockedToWindow(){
+        return  eventhandler.getLockedToWindow();
     }
 
 }

@@ -79,7 +79,12 @@ public class WebEventDispatcher {
     }
 
     private void dispatchMouseEvent(JsonEventMouse event) {
-        Window w = (Window) WindowManager.getInstance().getVisibleWindowOnPosition(event.x, event.y);
+        Window w=null;
+        if(WindowManager.getInstance().isLockedToWindowDecorationHandler()){
+            w = WindowManager.getInstance().getLockedToWindow();
+        }else{
+            w = (Window) WindowManager.getInstance().getVisibleWindowOnPosition(event.x, event.y);
+        }
         if (w == null) {
             return;
         }
@@ -100,7 +105,7 @@ public class WebEventDispatcher {
             switch (event.type) {
                 case mousemove:
                     id = event.button == 1 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
-                    e = new MouseEvent(w, id, when, modifiers, x, y, x, y, clickcount, false, buttons);
+                    e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, false, buttons);
                     dispatchEventInSwing(w, e);
                     lastMouseEvent = e;
                     break;
@@ -108,10 +113,10 @@ public class WebEventDispatcher {
                     id = MouseEvent.MOUSE_RELEASED;
                     boolean popupTrigger = (buttons == 3) ? true : false;
                     clickcount = 1;
-                    e = new MouseEvent(w, id, when, modifiers, x, y, x, y, clickcount, popupTrigger, buttons);
+                    e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
                     dispatchEventInSwing(w, e);
                     if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMouseEvent.getX() == x && lastMouseEvent.getY() == y) {
-                        e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, x, y, clickcount, popupTrigger, buttons);
+                        e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
                         dispatchEventInSwing(w, e);
                         lastMouseEvent = null;
                     }
@@ -119,7 +124,7 @@ public class WebEventDispatcher {
                 case mousedown:
                     id = MouseEvent.MOUSE_PRESSED;
                     clickcount = 1;
-                    e = new MouseEvent(w, id, when, modifiers, x, y, x, y, clickcount, false, buttons);
+                    e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, false, buttons);
                     dispatchEventInSwing(w, e);
                     lastMouseEvent = e;
                     break;
@@ -132,7 +137,7 @@ public class WebEventDispatcher {
                     lastMouseEvent = e;
                     break;
                 case dblclick:
-                    e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, x, y, 2, false, buttons);
+                    e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.x, event.y, 2, false, buttons);
                     dispatchEventInSwing(w, e);
                     break;
                 default:
@@ -146,7 +151,7 @@ public class WebEventDispatcher {
     }
 
     public static void dispatchEventInSwing(final Window w, final AWTEvent e) {
-        if (e instanceof MouseEvent && (Util.isWindowDecorationEvent(w,e))) {
+        if (Util.isWindowDecorationEvent(w,e)||WindowManager.getInstance().isLockedToWindowDecorationHandler()) {
             WindowManager.getInstance().handleWindowDecorationEvent(w,(MouseEvent) e);
         } else {
             Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
