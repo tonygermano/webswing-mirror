@@ -5,7 +5,32 @@
 	<groupId>org.webswing</groupId>
 	<version>2.0-SNAPSHOT</version>
 
+	<properties>
+		<jetty.version>8.1.14.v20131031</jetty.version>
+	</properties>
+
 	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.atmosphere</groupId>
+			<artifactId>atmosphere-runtime</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.atmosphere.client</groupId>
+			<artifactId>javascript</artifactId>
+			<version>2.1.4</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.13</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-broker</artifactId>
@@ -20,22 +45,6 @@
 			<groupId>org.apache.ant</groupId>
 			<artifactId>ant</artifactId>
 			<version>1.8.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.corundumstudio.socketio</groupId>
-			<artifactId>netty-socketio</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>slf4j-api</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -70,21 +79,13 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>server-lib/</classpathPrefix>
-							<mainClass>org.webswing.Main</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>${jetty.version}</version>
 			</plugin>
-
 		</plugins>
 	</build>
 
 
+	<packaging>war</packaging>
 </project>

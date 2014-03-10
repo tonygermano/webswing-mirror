@@ -1,5 +1,9 @@
 package org.webswing.server;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
+
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
@@ -8,9 +12,28 @@ import org.apache.activemq.usage.MemoryUsage;
 import org.apache.activemq.usage.SystemUsage;
 import org.webswing.Constants;
 
-public class JmsService {
+@WebListener
+public class JmsService implements ServletContextListener {
 
-    public static void startService() throws Exception {
+    private BrokerService broker;
+
+    public void contextInitialized(ServletContextEvent event) {
+        try {
+            broker = startService();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void contextDestroyed(ServletContextEvent event) {
+        try {
+            broker.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public BrokerService startService() throws Exception {
         // BrokerService broker= BrokerFactory.createBroker("xbean:mq.xml");
 
         BrokerService broker = new BrokerService();
@@ -35,5 +58,9 @@ public class JmsService {
         broker.addConnector(Constants.JMS_URL);
 
         broker.start();
+        return broker;
+                
     }
 }
+
+    

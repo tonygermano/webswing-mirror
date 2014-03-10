@@ -8,7 +8,6 @@ import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.WindowEvent;
 
 import org.webswing.Constants;
 import org.webswing.model.c2s.JsonConnectionHandshake;
@@ -16,7 +15,6 @@ import org.webswing.model.c2s.JsonEvent;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventMouse.Type;
-import org.webswing.model.c2s.JsonEventWindow;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Util;
 
@@ -28,9 +26,6 @@ public class WebEventDispatcher {
     public void dispatchEvent(JsonEvent event) {
         if (event instanceof JsonEventMouse) {
             dispatchMouseEvent((JsonEventMouse) event);
-        }
-        if (event instanceof JsonEventWindow) {
-            dispatchWindowEvent((JsonEventWindow) event);
         }
         if (event instanceof JsonEventKeyboard) {
             dispatchKeyboardEvent((JsonEventKeyboard) event);
@@ -47,19 +42,6 @@ public class WebEventDispatcher {
         }
     }
 
-    private void dispatchWindowEvent(JsonEventWindow event) {
-        Window w = (Window) Util.findWindowPeerById(event.windowId).getTarget();
-        if (w != null) {
-            switch (event.type) {
-                case close:
-                    dispatchEventInSwing(w, new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
-                    break;
-                case resize:
-                    w.setSize(event.newWidth, event.newHeight);
-                    break;
-            }
-        }
-    }
 
     private void dispatchKeyboardEvent(JsonEventKeyboard event) {
         Window w = (Window) WindowManager.getInstance().getActiveWindow();

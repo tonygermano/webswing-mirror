@@ -14,12 +14,12 @@ public class JsonEventMouse implements JsonEvent {
         dblclick;
     }
 
-    public Type type;
     public String clientId;
     public int x;
     public int y;
-    public int button;
+    public Type type;
     public int wheelDelta;
+    public int button;
     public boolean ctrl;
     public boolean alt;
     public boolean shift;

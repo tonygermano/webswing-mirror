@@ -7,7 +7,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.webswing.server.JmsService;
-import org.webswing.server.SwingServer;
 
 
 public class Main {
@@ -60,8 +59,8 @@ public class Main {
             formatter.printHelp("webswing", options);
         }
 
-        JmsService.startService();
-        SwingServer.startServer();
+        //JmsService.startService();
+        //SwingServer.startServer();
 
     }
 

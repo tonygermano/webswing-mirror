@@ -19,7 +19,7 @@ public class SwingMain {
     //-noverify -Dwebswing.mainClass=com.sun.swingset3.SwingSet3 -Dwebswing.clientId=debug
     
     public static void main(String[] args) throws Exception {
-//        Thread.sleep(30000);
+
         //set up instance of ExtLibImpl class providing jms connection and other services in separated classloader to prevent classpath pollution of swing application.  
         List<URL> urls = new ArrayList<URL>();
         for (File f : new File(SwingMain.class.getClassLoader().getResource("lib").toURI()).listFiles()) {

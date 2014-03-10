@@ -15,30 +15,53 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Environment.Variable;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.Broadcaster;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.Configuration;
 import org.webswing.Constants;
-
-import com.corundumstudio.socketio.SocketIOClient;
+import org.webswing.model.c2s.JsonConnectionHandshake;
 
 public class SwingJvmConnection implements MessageListener, Runnable {
 
+    private static final Logger log= LoggerFactory.getLogger(SwingJvmConnection.class);
+
+    private static Connection connection;
+    static {
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
+        try {
+            // Create a Connection
+            connection = connectionFactory.createConnection();
+            connection.start();
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
     private Session session;
     private MessageProducer producer;
     private MessageConsumer consumer;
-    private SocketIOClient client;
+    private Broadcaster client;
     private String clientId;
     private ScheduledFuture<?> exitSchedule;
+    private Integer screenWidth;
+    private Integer screenHeight;
 
-    public SwingJvmConnection(String clientId, Connection c, SocketIOClient client) {
+    public SwingJvmConnection(JsonConnectionHandshake handshake, Broadcaster client) {
         this.client = client;
-        this.clientId = clientId;
+        this.clientId = handshake.clientId;
+        this.screenWidth = handshake.desktopWidth;
+        this.screenHeight = handshake.desktopHeight;
         try {
-            session = c.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Queue producerQueue = session.createQueue(clientId + Constants.SERVER2SWING);
             Queue consumerQueue = session.createQueue(clientId + Constants.SWING2SERVER);
             consumer = session.createConsumer(consumerQueue);
@@ -74,9 +97,10 @@ public class SwingJvmConnection implements MessageListener, Runnable {
     }
 
     public void onMessage(Message m) {
+        log.info("received message "+m);
         try {
             if (m instanceof ObjectMessage) {
-                client.sendJsonObject(((ObjectMessage) m).getObject());
+                client.broadcast(((ObjectMessage) m).getObject());
             } else if (m instanceof TextMessage) {
                 String text = ((TextMessage) m).getText();
                 if (text.equals(Constants.SWING_SHUTDOWN_NOTIFICATION)) {
@@ -84,15 +108,17 @@ public class SwingJvmConnection implements MessageListener, Runnable {
                     producer.close();
                     session.close();
                     System.out.println("notifying browser shutdown");
-                    client.sendMessage(Constants.SWING_SHUTDOWN_NOTIFICATION);
-                    SwingServer.removeSwingClientApplication(clientId);
-                    client.disconnect();
+                    client.broadcast(Constants.SWING_SHUTDOWN_NOTIFICATION);
+                    //SwingServer.removeSwingClientApplication(clientId);
+                    for(AtmosphereResource ar:client.getAtmosphereResources()){
+                        ar.close();
+                    }
                     if(this.getExitSchedule()!=null){
                         this.getExitSchedule().cancel(false);
                     }
                 }
             }
-        } catch (JMSException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -143,14 +169,6 @@ public class SwingJvmConnection implements MessageListener, Runnable {
                 project.fireBuildFinished(caught);
             }
         }).start();
-    }
-
-    public SocketIOClient getClient() {
-        return client;
-    }
-
-    public void setClient(SocketIOClient client) {
-        this.client = client;
     }
 
     public String getClientId() {

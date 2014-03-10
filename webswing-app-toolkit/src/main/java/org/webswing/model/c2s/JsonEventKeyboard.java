@@ -12,15 +12,14 @@ public class JsonEventKeyboard implements JsonEvent {
         keyup;
     }
 
-    public String windowId;
     public String clientId;
-    public boolean alt;
-    public boolean shift;
-    public boolean ctrl;
-    public boolean altgr;
-    public boolean meta;
-    public int keycode;
-    public int character;
     public Type type;
+    public int character;
+    public int keycode;
+    public boolean alt;
+    public boolean ctrl;
+    public boolean shift;
+    public boolean meta;
+    public boolean altgr;
 
 }
