@@ -8,14 +8,6 @@ public abstract class Configuration {
 
     public abstract String getPort();
 
-    public abstract String getArgs();
-
-    public abstract String getVmargs();
-
-    public abstract String getMain();
-
-    public abstract int getClients();
-
     public static Configuration getInstance() {
         return singleton;
     }

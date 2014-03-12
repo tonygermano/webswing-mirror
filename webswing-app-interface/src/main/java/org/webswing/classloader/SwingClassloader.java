@@ -34,7 +34,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableBiMap.Builder;
 
-public class SwingClassloader extends ClassLoader {
+public class SwingClassloader extends ClassLoader{
 
     private static BiMap<String, String> classReplacementMapping;
     private static BiMap<String, String> methodReplacementMapping;
@@ -111,53 +111,18 @@ public class SwingClassloader extends ClassLoader {
 //        methodReplacementBuilder.put("javax.swing.JOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", "org.webswing.special.RedirectedJOptionPane showInternalInputDialog (Ljava/awt/Component;Ljava/lang/Object;Ljava/lang/String;ILjavax/swing/Icon;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 //        methodReplacementBuilder.put("javax.swing.JColorChooser showDialog (Ljava/awt/Component;Ljava/lang/String;Ljava/awt/Color;)Ljava/awt/Color;", "org.webswing.special.RedirectedJColorChooser showDialog (Ljava/awt/Component;Ljava/lang/String;Ljava/awt/Color;)Ljava/awt/Color;");
 //        methodReplacementBuilder.put("javax.swing.JColorChooser createDialog (Ljava/awt/Component;Ljava/lang/String;ZLjavax/swing/JColorChooser;Ljava/awt/event/ActionListener;Ljava/awt/event/ActionListener;)Ljavax/swing/JDialog;", "org.webswing.special.RedirectedJColorChooser createDialog (Ljava/awt/Component;Ljava/lang/String;ZLjavax/swing/JColorChooser;Ljava/awt/event/ActionListener;Ljava/awt/event/ActionListener;)Ljavax/swing/JDialog;");
-        methodReplacementBuilder.put("java.awt.Desktop isDesktopSupported ()Z", "org.webswing.special.RedirectedDesktop isDesktopSupported ()Z");
-        methodReplacementBuilder.put("java.awt.Desktop isSupported (Ljava/awt/Desktop/Action;)Z", "org.webswing.special.RedirectedDesktop isSupported (Ljava/awt/Desktop/Action;)Z");
-        methodReplacementBuilder.put("java.awt.Desktop browse (Ljava/net/URI;)V", "org.webswing.special.RedirectedDesktop browse (Ljava/net/URI;)V");
-        methodReplacementBuilder.put("java.awt.Desktop mail (Ljava/net/URI;)V", "org.webswing.special.RedirectedDesktop mail (Ljava/net/URI;)V");
-        methodReplacementBuilder.put("java.awt.Desktop mail ()V", "org.webswing.special.RedirectedDesktop mail ()V");
-        methodReplacementMapping = methodReplacementBuilder.build();
+//        methodReplacementBuilder.put("java.awt.Desktop isDesktopSupported ()Z", "org.webswing.special.RedirectedDesktop isDesktopSupported ()Z");
+//        methodReplacementBuilder.put("java.awt.Desktop isSupported (Ljava/awt/Desktop/Action;)Z", "org.webswing.special.RedirectedDesktop isSupported (Ljava/awt/Desktop/Action;)Z");
+//        methodReplacementBuilder.put("java.awt.Desktop browse (Ljava/net/URI;)V", "org.webswing.special.RedirectedDesktop browse (Ljava/net/URI;)V");
+//        methodReplacementBuilder.put("java.awt.Desktop mail (Ljava/net/URI;)V", "org.webswing.special.RedirectedDesktop mail (Ljava/net/URI;)V");
+//        methodReplacementBuilder.put("java.awt.Desktop mail ()V", "org.webswing.special.RedirectedDesktop mail ()V");
+       methodReplacementMapping = methodReplacementBuilder.build();
 
         Builder<String, String> methodOverrideBuilder = new ImmutableBiMap.Builder<String, String>();
 //        methodOverrideBuilder.put("sk.web.swing.JFileChooser$$BCEL$$ createDialog (Ljava/awt/Component;)Ljavax/swing/JDialog;","org.webswing.special.OverridenMethods createDialog");
         methodOverrideMapping = methodOverrideBuilder.build();
 
     }
-    
-    public static Thread notifyExitThread=new Thread() {
-        @Override
-        public void run() {
-            Util.getWebToolkit().getPaintDispatcher().notifyShutdown();
-        }
-    };
-    
-    public static void startSwing(ClassLoader parent, String[] args) throws Exception{
-        final SwingClassloader cl = new SwingClassloader(parent);
-        Class<?> clazz = cl.loadClass(System.getProperty(org.webswing.Constants.SWING_START_SYS_PROP_MAIN_CLASS));
-
-        // Get a class representing the type of the main method's argument
-        Class<?> mainArgType[] = { (new String[0]).getClass() };
-        String progArgs[] = args;
-
-        // Find the standard main method in the class
-        java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
-        
-        // well-behaved Java packages work relative to the
-        // context classloader.  Others don't (like commons-logging)
-        Thread.currentThread().setContextClassLoader(cl);
-        
-        //configure shutdown notification. (We need to configure this after the contextClassloader is set up)
-        //UIManagerConfigurator.configureUI();
-        Runtime.getRuntime().addShutdownHook(notifyExitThread);
-        
-        // Create a list containing the arguments -- in this case,
-        // an array of strings
-        Object argsArray[] = { progArgs };
-
-        // Call the method
-        main.invoke(null, argsArray);
-    }
-
 
     private Hashtable<String, Class<?>> classes = new Hashtable<String, Class<?>>(); // Hashtable is synchronized thus thread-safe
     private String[] ignored_packages;

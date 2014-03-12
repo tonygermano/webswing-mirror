@@ -15,6 +15,7 @@ import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.webswing.Constants;
+import org.webswing.SwingMain;
 import org.webswing.classloader.SwingClassloader;
 import org.webswing.common.ServerConnectionIfc;
 import org.webswing.model.c2s.JsonEvent;
@@ -54,7 +55,7 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
 
                 public void onException(JMSException e) {
                     System.out.println("Exiting application for inactivity. ");
-                    Runtime.getRuntime().removeShutdownHook(SwingClassloader.notifyExitThread);
+                    Runtime.getRuntime().removeShutdownHook(SwingMain.notifyExitThread);
                     System.exit(1);
                 }
             });

@@ -72,6 +72,7 @@ import java.util.Properties;
 
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.ServerConnectionIfc;
+import org.webswing.common.SwingClassLoaderFactoryIfc;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.extra.WindowManager;
@@ -85,6 +86,7 @@ public class WebToolkit extends SunToolkit {
     public static final String BACKGROUND_WINDOW_ID = "backgroundWindowId";
     private ServerConnectionIfc serverConnection;
     private ImageServiceIfc imageService;
+    private SwingClassLoaderFactoryIfc webswingClassLoaderFactory;
 
     private WebEventDispatcher eventDispatcher = new WebEventDispatcher();
     private WebPaintDispatcher paintDispatcher;
@@ -132,6 +134,14 @@ public class WebToolkit extends SunToolkit {
 
     public ImageServiceIfc getImageService() {
         return imageService;
+    }
+
+    public SwingClassLoaderFactoryIfc getWebswingClassLoaderFactory() {
+        return webswingClassLoaderFactory;
+    }
+
+    public void setWebswingClassLoaderFactory(SwingClassLoaderFactoryIfc webswingClassLoader) {
+        this.webswingClassLoaderFactory = webswingClassLoader;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////

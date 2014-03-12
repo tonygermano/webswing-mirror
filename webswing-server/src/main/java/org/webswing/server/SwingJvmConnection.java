@@ -15,6 +15,7 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
@@ -147,8 +148,8 @@ public class SwingJvmConnection implements MessageListener, Runnable {
                     javaTask.setFork(true);
                     javaTask.setFailonerror(true);
                     javaTask.setJar(new File("webswing-container.jar"));
-                    javaTask.setArgs(Configuration.getInstance().getArgs());
-                    javaTask.setJvmargs("-noverify " + Configuration.getInstance().getVmargs());
+                    //javaTask.setArgs(Configuration.getInstance().getArgs());
+                    //javaTask.setJvmargs("-noverify " + Configuration.getInstance().getVmargs());
 
                     Variable clientIdVar = new Variable();
                     clientIdVar.setKey(Constants.SWING_START_SYS_PROP_CLIENT_ID);
@@ -157,7 +158,7 @@ public class SwingJvmConnection implements MessageListener, Runnable {
 
                     Variable mainClass = new Variable();
                     mainClass.setKey(Constants.SWING_START_SYS_PROP_MAIN_CLASS);
-                    mainClass.setValue(Configuration.getInstance().getMain());
+                    //mainClass.setValue(Configuration.getInstance().getMain());
                     javaTask.addSysproperty(mainClass);
 
                     javaTask.init();
