@@ -38,7 +38,6 @@
 			<groupId>com.objectplanet.image</groupId>
 			<artifactId>pngencoder</artifactId>
 			<version>1</version>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

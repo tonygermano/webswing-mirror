@@ -15,7 +15,6 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
@@ -26,13 +25,14 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.Broadcaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.Configuration;
 import org.webswing.Constants;
 import org.webswing.model.c2s.JsonConnectionHandshake;
+import org.webswing.server.model.SwingApplicationDescriptor;
+import org.webswing.toolkit.WebToolkit;
 
 public class SwingJvmConnection implements MessageListener, Runnable {
 
-    private static final Logger log= LoggerFactory.getLogger(SwingJvmConnection.class);
+    private static final Logger log = LoggerFactory.getLogger(SwingJvmConnection.class);
 
     private static Connection connection;
     static {
@@ -45,8 +45,7 @@ public class SwingJvmConnection implements MessageListener, Runnable {
             e.printStackTrace();
         }
     }
-    
-    
+
     private Session session;
     private MessageProducer producer;
     private MessageConsumer consumer;
@@ -56,7 +55,7 @@ public class SwingJvmConnection implements MessageListener, Runnable {
     private Integer screenWidth;
     private Integer screenHeight;
 
-    public SwingJvmConnection(JsonConnectionHandshake handshake, Broadcaster client) {
+    public SwingJvmConnection(JsonConnectionHandshake handshake, SwingApplicationDescriptor appConfig, Broadcaster client) {
         this.client = client;
         this.clientId = handshake.clientId;
         this.screenWidth = handshake.desktopWidth;
@@ -68,6 +67,7 @@ public class SwingJvmConnection implements MessageListener, Runnable {
             consumer = session.createConsumer(consumerQueue);
             consumer.setMessageListener(this);
             producer = session.createProducer(producerQueue);
+            start(appConfig);
         } catch (JMSException e) {
             e.printStackTrace();
         }
@@ -98,7 +98,7 @@ public class SwingJvmConnection implements MessageListener, Runnable {
     }
 
     public void onMessage(Message m) {
-        log.info("received message "+m);
+        log.info("received message " + m);
         try {
             if (m instanceof ObjectMessage) {
                 client.broadcast(((ObjectMessage) m).getObject());
@@ -111,10 +111,10 @@ public class SwingJvmConnection implements MessageListener, Runnable {
                     System.out.println("notifying browser shutdown");
                     client.broadcast(Constants.SWING_SHUTDOWN_NOTIFICATION);
                     //SwingServer.removeSwingClientApplication(clientId);
-                    for(AtmosphereResource ar:client.getAtmosphereResources()){
+                    for (AtmosphereResource ar : client.getAtmosphereResources()) {
                         ar.close();
                     }
-                    if(this.getExitSchedule()!=null){
+                    if (this.getExitSchedule() != null) {
                         this.getExitSchedule().cancel(false);
                     }
                 }
@@ -125,12 +125,24 @@ public class SwingJvmConnection implements MessageListener, Runnable {
 
     }
 
-    public void start() {
+    public void start(final SwingApplicationDescriptor appConfig) {
         new Thread(new Runnable() {
 
             public void run() {
                 Project project = new Project();
-                project.setBaseDir(new File(System.getProperty("user.dir")));
+                //set home directory
+                String dirString;
+                if (appConfig.isHomeDirPerSession()) {
+                    dirString = appConfig.getHomeDir() + File.separator + clientId;
+                } else {
+                    dirString = appConfig.getHomeDir();
+                }
+                File homeDir = new File(dirString);
+                if (!homeDir.exists()) {
+                    homeDir.mkdirs();
+                }
+                project.setBaseDir(homeDir);
+                //setup logging
                 project.init();
                 DefaultLogger logger = new DefaultLogger();
                 project.addBuildListener(logger);
@@ -147,19 +159,42 @@ public class SwingJvmConnection implements MessageListener, Runnable {
                     javaTask.setProject(project);
                     javaTask.setFork(true);
                     javaTask.setFailonerror(true);
-                    javaTask.setJar(new File("webswing-container.jar"));
-                    //javaTask.setArgs(Configuration.getInstance().getArgs());
-                    //javaTask.setJvmargs("-noverify " + Configuration.getInstance().getVmargs());
+                    javaTask.setJar(new File(System.getProperty(Constants.WAR_FILE_LOCATION).substring(6)));
+                    javaTask.setArgs(appConfig.getArgs());
+                    String webSwingToolkitJarPath = WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm().substring(6);
+                    String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPath;
+                    String debug = System.getProperty(Constants.SWING_DEBUG_FLAG).equals("true")?" -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y ":"";
+                    javaTask.setJvmargs(bootCp + debug+" -noverify " + appConfig.getVmArgs());
 
                     Variable clientIdVar = new Variable();
                     clientIdVar.setKey(Constants.SWING_START_SYS_PROP_CLIENT_ID);
                     clientIdVar.setValue(clientId);
                     javaTask.addSysproperty(clientIdVar);
 
+                    Variable classpathVar = new Variable();
+                    classpathVar.setKey(Constants.SWING_START_SYS_PROP_CLASS_PATH);
+                    classpathVar.setValue(appConfig.generateClassPathString());
+                    javaTask.addSysproperty(classpathVar);
+
+                    Variable tempDirVar = new Variable();
+                    tempDirVar.setKey(Constants.TEMP_DIR_PATH);
+                    tempDirVar.setValue(System.getProperty(Constants.TEMP_DIR_PATH));
+                    javaTask.addSysproperty(tempDirVar);
+
                     Variable mainClass = new Variable();
                     mainClass.setKey(Constants.SWING_START_SYS_PROP_MAIN_CLASS);
-                    //mainClass.setValue(Configuration.getInstance().getMain());
+                    mainClass.setValue(appConfig.getMainClass());
                     javaTask.addSysproperty(mainClass);
+
+                    Variable toolkitImplClass = new Variable();
+                    toolkitImplClass.setKey("awt.toolkit");
+                    toolkitImplClass.setValue("org.webswing.toolkit.WebToolkit");
+                    javaTask.addSysproperty(toolkitImplClass);
+
+                    Variable graphicsConfigImplClass = new Variable();
+                    graphicsConfigImplClass.setKey("java.awt.graphicsenv");
+                    graphicsConfigImplClass.setValue("org.webswing.toolkit.ge.WebGraphicsEnvironment");
+                    javaTask.addSysproperty(graphicsConfigImplClass);
 
                     javaTask.init();
                     javaTask.executeJava();

@@ -69,12 +69,6 @@
 			<groupId>org.webswing</groupId>
 			<artifactId>webswing-app-interface</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-simple</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 
@@ -90,9 +84,6 @@
 					<packagingExcludes>
 						WEB-INF/lib/jetty-*.jar,
 						WEB-INF/lib/javax.servlet-*.jar,
-						WEB-INF/lib/activemq-client-*.jar,
-						WEB-INF/lib/geronimo-*.jar,
-						WEB-INF/lib/hawtbuf-*.jar,
 						WEB-INF/lib/commons-codec-*.jar,
 						WEB-INF/lib/commons-cli-*.jar,
 						WEB-INF/lib/bcel-*.jar,
@@ -102,7 +93,8 @@
 						WEB-INF/lib/pngencoder-*.jar,
 						WEB-INF/lib/webswing-app-interface-*.jar,
 						WEB-INF/lib/webswing-app-launcher-*.jar,
-						WEB-INF/lib/webswing-server-launcher-*.jar
+						WEB-INF/lib/webswing-server-launcher-*.jar,
+						WEB-INF/lib/slf4j-simple-*.jar
 					</packagingExcludes>
 					<archive>
 						<manifest>
@@ -137,7 +129,7 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/swing-lib</outputDirectory>
 							<includeArtifactIds>
-								webswing-app-interface,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,bcel,jakarta-regexp,guava, jsr305,pngencoder
+								webswing-app-interface,webswing-app-launcher,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple
 							</includeArtifactIds>
 						</configuration>
 					</execution>

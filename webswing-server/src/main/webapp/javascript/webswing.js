@@ -6,7 +6,7 @@
 	var startingDialog=$('#startingDialog');
 	var stoppedDialog=$('#stoppedDialog');
 	var tooManyConnectionsDialog=$('#tooManyConnectionsDialog');
-	var clientId = 'debug';//GUID();
+	var clientId = GUID();
 	var uuid=null;
 	var latestMouseMoveEvent=null;
 	var latestMouseWheelEvent=null;
@@ -45,6 +45,7 @@
 		request.onOpen = function(response) {
 			uuid = response.request.uuid;
 			var handshake={
+				applicationName : "SwingSet3",
 				clientId : clientId,
 				sessionId : uuid,
 				desktopWidth : canvas.width,

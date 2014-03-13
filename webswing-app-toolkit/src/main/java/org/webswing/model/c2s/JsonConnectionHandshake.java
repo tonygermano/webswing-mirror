@@ -8,4 +8,5 @@ public class JsonConnectionHandshake implements JsonEvent{
     public String sessionId;
     public Integer desktopWidth;
     public Integer desktopHeight;
+    public String applicationName;
 }

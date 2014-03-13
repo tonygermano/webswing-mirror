@@ -12,7 +12,7 @@ import org.apache.activemq.usage.MemoryUsage;
 import org.apache.activemq.usage.SystemUsage;
 import org.webswing.Constants;
 
-@WebListener
+
 public class JmsService implements ServletContextListener {
 
     private BrokerService broker;

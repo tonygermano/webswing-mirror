@@ -16,6 +16,9 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AtmosphereServlet</servlet-name>
-		<url-pattern>/async/*</url-pattern>
+		<url-pattern>/async/swing</url-pattern>
 	</servlet-mapping>
+	<listener>
+        <listener-class>org.webswing.server.JmsService</listener-class>
+    </listener>
 </web-app>

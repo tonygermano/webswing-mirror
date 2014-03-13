@@ -61,11 +61,11 @@ public class ImageService implements ImageServiceIfc {
             String implClassName=System.getProperty(WindowDecoratorThemeIfc.DECORATION_THEME_IMPL_PROP,WindowDecoratorThemeIfc.DECORATION_THEME_IMPL_DEFAULT);
             Class<?> implclass = null;
             try {
-                implclass= this.getClass().getClassLoader().loadClass(implClassName);
+                implclass= ImageService.class.getClassLoader().loadClass(implClassName);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
                 try {
-                    implclass=this.getClass().getClassLoader().loadClass(WindowDecoratorThemeIfc.DECORATION_THEME_IMPL_DEFAULT);
+                    implclass= ImageService.class.getClassLoader().loadClass(WindowDecoratorThemeIfc.DECORATION_THEME_IMPL_DEFAULT);
                 } catch (ClassNotFoundException e1) {
                     System.err.println("Fatal error:Default decoration theme not found.");
                     System.exit(1);

@@ -22,4 +22,7 @@ public interface Constants {
     public static final String WAR_FILE_LOCATION = "webswing.warLocation";
 
     public static final String TEMP_DIR_PATH="webswing.tempDirPath";
+    public static final String CONFIG_FILE_PATH = "webswing.configFile";
+    public static final String DEFAULT_CONFIG_FILE_NAME = "webswing.config";
+    public static final String SWING_DEBUG_FLAG = "webswing.debugClient";
 }

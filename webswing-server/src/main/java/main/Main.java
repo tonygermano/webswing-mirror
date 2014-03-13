@@ -76,7 +76,7 @@ public class Main {
     }
 
     private static void initializeExtLibServices(List<URL> urls) throws Exception {
-        ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[0]));
+        ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[0]),null);
         Class<?> serverConnectionServiceclazz = extLibClassLoader.loadClass("org.webswing.ext.services.ServerConnectionService");
         Method getInstanceOfServerConnectionServiceMethod = serverConnectionServiceclazz.getMethod("getInstance");
         ServerConnectionIfc connService = (ServerConnectionIfc) getInstanceOfServerConnectionServiceMethod.invoke(null);
@@ -118,7 +118,7 @@ public class Main {
             String name = jarEntry.getName().replace('/', '_');
             int i = name.lastIndexOf(".");
             String extension = i > -1 ? name.substring(i) : "";
-            File file = new File(getTempDir().getAbsolutePath() + File.separator + name.substring(0, name.length() - extension.length()) + "." + extension);
+            File file = new File(getTempDir().getAbsolutePath() + File.separator + name.substring(0, name.length() - extension.length()) + extension);
             if (!file.exists()) {
                 file.createNewFile();
                 file.deleteOnExit();

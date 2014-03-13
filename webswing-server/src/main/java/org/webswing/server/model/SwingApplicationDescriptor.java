@@ -10,11 +10,11 @@ public class SwingApplicationDescriptor implements Serializable{
      */
     private static final long serialVersionUID = 3708498208353403978L;
     
-    private String mainClass;
+    private String mainClass="";
     private List<String> classPathEntries;
-    private String vmArgs;
-    private String args;
-    private String homeDir;
+    private String vmArgs="";
+    private String args="";
+    private String homeDir=System.getProperty("user.dir");
     private boolean homeDirPerSession;
     
     public String getMainClass() {
@@ -27,6 +27,17 @@ public class SwingApplicationDescriptor implements Serializable{
     
     public List<String> getClassPathEntries() {
         return classPathEntries;
+    }
+    
+    public String generateClassPathString(){
+        String result="";
+        if(classPathEntries!=null){
+            for(String cpe:classPathEntries){
+                result+=cpe+";";
+            }
+            result=result.substring(0,result.length()-1);
+        }
+        return result;
     }
     
     public void setClassPathEntries(List<String> classPathEntries) {
