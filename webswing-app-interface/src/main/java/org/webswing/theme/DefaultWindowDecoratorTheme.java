@@ -38,9 +38,9 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
 
     public DefaultWindowDecoratorTheme() {
         try {
-            x = ImageIO.read(DefaultWindowDecoratorTheme.class.getClassLoader().getResource("img/x2.png"));
-            min = ImageIO.read(DefaultWindowDecoratorTheme.class.getClassLoader().getResource("img/min2.png"));
-            max = ImageIO.read(DefaultWindowDecoratorTheme.class.getClass().getClassLoader().getResource("img/max2.png"));
+            x = ImageIO.read(getClass().getClassLoader().getResource("img/X2.png"));
+            min = ImageIO.read(getClass().getClassLoader().getResource("img/min2.png"));
+            max = ImageIO.read(getClass().getClassLoader().getResource("img/max2.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

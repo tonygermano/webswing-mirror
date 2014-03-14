@@ -53,9 +53,13 @@ public class SwingAsyncManagedService {
     public Serializable onMessage(Object message) {
         if (message instanceof JsonConnectionHandshake) {
             JsonConnectionHandshake h = (JsonConnectionHandshake) message;
-            SwingApplicationDescriptor app = applications.get(h.applicationName);
-            if (app != null) {
-                clients.put(h.clientId, new SwingJvmConnection(h, app, resourceMap.get(h.sessionId).getBroadcaster()));
+            if (!clients.containsKey(h.clientId)) {
+                SwingApplicationDescriptor app = applications.get(h.applicationName);
+                if (app != null) {
+                    clients.put(h.clientId, new SwingJvmConnection(h, app, resourceMap.get(h.sessionId).getBroadcaster()));
+                }
+            }else{
+                clients.get(h.clientId).send(h);
             }
         } else if (message instanceof JsonEventKeyboard) {
             JsonEventKeyboard k = (JsonEventKeyboard) message;

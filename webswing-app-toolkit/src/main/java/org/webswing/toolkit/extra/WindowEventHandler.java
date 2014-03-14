@@ -128,7 +128,6 @@ public class WindowEventHandler {
         newSize.width = Math.max(DEFAULT_MINIMUM_WINDOW_SIZE.width, newSize.width);
         newSize.height = Math.max(min.height, newSize.height);
         newSize.height = Math.max(DEFAULT_MINIMUM_WINDOW_SIZE.height, newSize.height);
-
     }
 
     public boolean isEventHandlingLocked() {

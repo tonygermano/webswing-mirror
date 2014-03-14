@@ -113,6 +113,14 @@ public class WebPaintDispatcher {
         notifyWindowAreaRepainted(peer.getGuid(), new Rectangle(0, 0, bounds.width, bounds.height));
     }
 
+    public void notifyWindowRepaintAll() {
+        for(Window w:Window.getWindows()){
+            if(w.isShowing()){
+                notifyWindowRepaint(w);
+            }
+        }
+    }
+    
     public void notifyBackgroundRepainted(Rectangle toRepaint) {
         notifyWindowAreaRepainted(WebToolkit.BACKGROUND_WINDOW_ID, toRepaint);
 

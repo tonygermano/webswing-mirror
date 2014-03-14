@@ -15,4 +15,7 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<finalName>webswing-app-launcher</finalName>
+	</build>
 </project>

@@ -70,6 +70,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
+import org.webswing.Constants;
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.ServerConnectionIfc;
 import org.webswing.common.SwingClassLoaderFactoryIfc;
@@ -107,9 +108,10 @@ public class WebToolkit extends SunToolkit {
     }
 
     public void initSize(Integer desktopWidth, Integer desktopHeight) {
-        screenWidth = desktopWidth == null ? 1000 : desktopWidth;
-        screenHeight = desktopHeight == null ? 800 : desktopHeight;
+        screenWidth =desktopWidth;
+        screenHeight = desktopHeight;
         displayChanged();
+        getPaintDispatcher().notifyWindowRepaintAll();
     }
 
     protected WindowManager getWindowManager() {
@@ -154,8 +156,8 @@ public class WebToolkit extends SunToolkit {
 
     private static GraphicsConfiguration config;
     private Hashtable<String, FontPeer> cacheFontPeer;
-    public static int screenWidth = 1000;
-    public static int screenHeight = 800;
+    public static int screenWidth = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_WIDTH, Constants.SWING_SCREEN_WIDTH_MIN+""));
+    public static int screenHeight = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_HEIGHT, Constants.SWING_SCREEN_HEIGHT_MIN+""));
 
     public static final Object targetToPeer(Object paramObject) {
         return SunToolkit.targetToPeer(paramObject);
@@ -286,11 +288,9 @@ public class WebToolkit extends SunToolkit {
     }
 
     public void grab(Window paramWindow) {
-        //dont know what this is good for. called when popup window is created
     }
 
     public void ungrab(Window paramWindow) {
-        //dont know what this is good for. called when popup window is ?closed?
     }
 
     public ButtonPeer createButton(Button paramButton) throws HeadlessException {

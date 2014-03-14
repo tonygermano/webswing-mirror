@@ -1,36 +1,37 @@
 (function() {
 	"use strict";
-	
-	var initializingDialog=$('#initializingDialog');
-	var connectingDialog=$('#connectingDialog');
-	var startingDialog=$('#startingDialog');
-	var stoppedDialog=$('#stoppedDialog');
-	var tooManyConnectionsDialog=$('#tooManyConnectionsDialog');
+
+	var initializingDialog = $('#initializingDialog');
+	var connectingDialog = $('#connectingDialog');
+	var startingDialog = $('#startingDialog');
+	var stoppedDialog = $('#stoppedDialog');
+	var tooManyConnectionsDialog = $('#tooManyConnectionsDialog');
 	var clientId = GUID();
-	var uuid=null;
-	var latestMouseMoveEvent=null;
-	var latestMouseWheelEvent=null;
+	var appName = "SwingSet3";
+	var uuid = null;
+	var latestMouseMoveEvent = null;
+	var latestMouseWheelEvent = null;
+	var latestWindowResizeEvent = null;
 	var mouseDown = 0;
-	var canvas=null;
-	var socket=null;
+	var canvas = null;
+	var socket = null;
 	var transport = 'websocket';
 	var fallbackTransport = 'long-polling';
-	
-	
+
 	start();
 
 	function start() {
 		createCanvas();
 		showDialog(initializingDialog);
 		connect();
-		setInterval(mouseMoveEventFilter, 100);
+		setInterval(mouseMoveEventFilter, 250);
 
 		$(window).bind("beforeunload", function() {
 			socket.push('unload' + clientId);
 		});
 
 	}
-	
+
 	function connect() {
 		var request = {
 			url : document.location.toString() + 'async/swing',
@@ -44,14 +45,7 @@
 
 		request.onOpen = function(response) {
 			uuid = response.request.uuid;
-			var handshake={
-				applicationName : "SwingSet3",
-				clientId : clientId,
-				sessionId : uuid,
-				desktopWidth : canvas.width,
-				desktopHeight : canvas.height
-			};
-			socket.push(atmosphere.util.stringifyJSON(handshake));
+			socket.push(atmosphere.util.stringifyJSON(getHandShake()));
 			showDialog(startingDialog);
 			transport = response.transport;
 		};
@@ -78,34 +72,34 @@
 		};
 
 		request.onError = function(response) {
-			//TODO:handle
+			// TODO:handle
 		};
 
 		request.onReconnect = function(request, response) {
-			//TODO: handle
+			// TODO: handle
 		};
 
 		socket = atmosphere.subscribe(request);
 	}
-	
+
 	function processRequest(data) {
 		showDialog(null);
-		
+
 		if (data.linkAction != null) {
 			window.open(data.linkAction.url, '_blank');
 		}
 
-		for (var i in data.windows) {
-			var win=data.windows[i];
-			var winContent=win.content;
-			if(winContent!=null){
-				draw(win.posX+winContent.positionX,win.posY+winContent.positionY, winContent.base64Content);
+		for ( var i in data.windows) {
+			var win = data.windows[i];
+			var winContent = win.content;
+			if (winContent != null) {
+				draw(win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.base64Content);
 			}
 		}
 		socket.push("paintAck" + clientId);
 	}
 
-	function draw(x,y, b64image) {
+	function draw(x, y, b64image) {
 		var context, imageObj;
 		context = canvas.getContext("2d");
 		imageObj = new Image();
@@ -123,6 +117,10 @@
 		if (latestMouseWheelEvent != null) {
 			socket.push(atmosphere.util.stringifyJSON(latestMouseWheelEvent));
 			latestMouseWheelEvent = null;
+		}
+		if (latestWindowResizeEvent != null) {
+			socket.push(atmosphere.util.stringifyJSON(latestWindowResizeEvent));
+			latestWindowResizeEvent = null;
 		}
 	}
 
@@ -260,6 +258,17 @@
 		};
 	}
 
+	function getHandShake() {
+		var handshake = {
+			applicationName : appName,
+			clientId : clientId,
+			sessionId : uuid,
+			desktopWidth : canvas.width,
+			desktopHeight : canvas.height
+		};
+		return handshake;
+	}
+
 	function GUID() {
 		var S4 = function() {
 			return Math.floor(Math.random() * 0x10000).toString(16);
@@ -274,30 +283,34 @@
 			el.attachEvent('on' + eventName, eventHandler);
 		}
 	}
-	
+
 	function createCanvas() {
-		//$("#root").append('<canvas id="canvas" width="' + $(window).width + '" height="' +  $(window).height + '" tabindex="-1"/>');
-		$("#root").append('<canvas id="canvas" width="' + 1000 + '" height="' +  800 + '" tabindex="-1"/>');
+		$("#body").append('<canvas id="canvas" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
 		canvas = document.getElementById("canvas");
 		registerEventListeners(canvas);
+		window.onresize = function() {
+			canvas.width = width();
+			canvas.height = height();
+			latestWindowResizeEvent=getHandShake();
+		};
 		return canvas;
 	}
 
-	
-	function showDialog(dialog){
+	function showDialog(dialog) {
 		connectingDialog.modal('hide');
 		startingDialog.modal('hide');
 		initializingDialog.modal('hide');
 		stoppedDialog.modal('hide');
-		if(dialog!=null){
+		if (dialog != null) {
 			dialog.modal('show');
 		}
 	}
-	
+
+	function width() {
+		return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || 0;
+	}
+
+	function height() {
+		return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || 0;
+	}
 })();
-
-
-
-
-
-

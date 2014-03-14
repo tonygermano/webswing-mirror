@@ -98,7 +98,6 @@ public class SwingJvmConnection implements MessageListener, Runnable {
     }
 
     public void onMessage(Message m) {
-        log.info("received message " + m);
         try {
             if (m instanceof ObjectMessage) {
                 client.broadcast(((ObjectMessage) m).getObject());
@@ -163,8 +162,8 @@ public class SwingJvmConnection implements MessageListener, Runnable {
                     javaTask.setArgs(appConfig.getArgs());
                     String webSwingToolkitJarPath = WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm().substring(6);
                     String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPath;
-                    String debug = System.getProperty(Constants.SWING_DEBUG_FLAG).equals("true")?" -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y ":"";
-                    javaTask.setJvmargs(bootCp + debug+" -noverify " + appConfig.getVmArgs());
+                    String debug = System.getProperty(Constants.SWING_DEBUG_FLAG).equals("true") ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
+                    javaTask.setJvmargs(bootCp + debug + " -noverify " + appConfig.getVmArgs());
 
                     Variable clientIdVar = new Variable();
                     clientIdVar.setKey(Constants.SWING_START_SYS_PROP_CLIENT_ID);
@@ -196,6 +195,16 @@ public class SwingJvmConnection implements MessageListener, Runnable {
                     graphicsConfigImplClass.setValue("org.webswing.toolkit.ge.WebGraphicsEnvironment");
                     javaTask.addSysproperty(graphicsConfigImplClass);
 
+                    Variable screenWidthVar = new Variable();
+                    screenWidthVar.setKey(Constants.SWING_SCREEN_WIDTH);
+                    screenWidthVar.setValue(((screenWidth == null || screenWidth < Constants.SWING_SCREEN_WIDTH_MIN) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth)+"");
+                    javaTask.addSysproperty(screenWidthVar);
+                    
+                    Variable screenHeigthVar = new Variable();
+                    screenHeigthVar.setKey(Constants.SWING_SCREEN_HEIGHT);
+                    screenHeigthVar.setValue(((screenHeight == null || screenHeight < Constants.SWING_SCREEN_HEIGHT_MIN) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight)+"");
+                    javaTask.addSysproperty(screenHeigthVar);
+            
                     javaTask.init();
                     javaTask.executeJava();
                 } catch (BuildException e) {

@@ -37,7 +37,6 @@ import sun.awt.AWTAccessor;
 import sun.awt.CausedFocusEvent.Cause;
 import sun.awt.PaintEventDispatcher;
 import sun.awt.RepaintArea;
-import sun.awt.event.IgnorePaintEvent;
 import sun.awt.image.OffScreenImage;
 import sun.awt.image.SunVolatileImage;
 import sun.awt.image.SurfaceManager;
@@ -152,9 +151,10 @@ public class WebComponentPeer implements ComponentPeer {
     public void setBounds(int x, int y, int w, int h, int paramInt5) {
         synchronized (WebPaintDispatcher.webPaintLock) {
             Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
+            Point validPosition = validate(x, y);
             if ((w != this.oldWidth) || (h != this.oldHeight)) {
                 try {
-                    replaceSurfaceData(x, y, w, h);
+                    replaceSurfaceData(validPosition.x, validPosition.y, w, h);
                 } catch (InvalidPipeException e) {
                     e.printStackTrace();
                 }
@@ -162,6 +162,15 @@ public class WebComponentPeer implements ComponentPeer {
                 this.oldHeight = h;
             }
         }
+    }
+
+    private Point validate(int x, int y) {
+        Point result = new Point(x, y);
+        if (y < 0) {
+            result.y = 0;
+            ((Component) target).setLocation(result);
+        }
+        return result;
     }
 
     public void replaceSurfaceData(int x, int y, int w, int h) {
@@ -193,8 +202,8 @@ public class WebComponentPeer implements ComponentPeer {
 
     public void coalescePaintEvent(PaintEvent paramPaintEvent) {
         Rectangle localRectangle = paramPaintEvent.getUpdateRect();
-        if (!(paramPaintEvent instanceof IgnorePaintEvent))
-            this.paintArea.add(localRectangle, paramPaintEvent.getID());
+        //if (!(paramPaintEvent instanceof IgnorePaintEvent))
+        this.paintArea.add(localRectangle, paramPaintEvent.getID());
     }
 
     private void repaintPeerTarget() {

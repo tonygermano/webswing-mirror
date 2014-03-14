@@ -30,4 +30,7 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<finalName>webswing-server-launcher</finalName>
+	</build>
 </project>

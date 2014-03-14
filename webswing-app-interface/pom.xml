@@ -47,20 +47,6 @@
 	</dependencies>
 
 	<build>
-		<finalName>webswing</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<classpathPrefix>lib/</classpathPrefix>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-
-		</plugins>
+		<finalName>webswing-app-interface</finalName>
 	</build>
 </project>
