@@ -40,6 +40,9 @@ public class WebEventDispatcher {
         if (message.equals(Constants.SWING_KILL_SIGNAL)) {
             System.exit(0);
         }
+        if(message.startsWith(Constants.PAINT_ACK_PREFIX)){
+            Util.getWebToolkit().getPaintDispatcher().clientReadyToReceive();
+        }
     }
 
 

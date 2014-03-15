@@ -293,7 +293,6 @@
 			canvas.height = height();
 			latestWindowResizeEvent=getHandShake();
 		};
-		return canvas;
 	}
 
 	function showDialog(dialog) {

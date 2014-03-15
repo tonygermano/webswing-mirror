@@ -12,6 +12,7 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
@@ -58,7 +59,7 @@ public class SwingAsyncManagedService {
                 if (app != null) {
                     clients.put(h.clientId, new SwingJvmConnection(h, app, resourceMap.get(h.sessionId).getBroadcaster()));
                 }
-            }else{
+            } else {
                 clients.get(h.clientId).send(h);
             }
         } else if (message instanceof JsonEventKeyboard) {
@@ -67,6 +68,16 @@ public class SwingAsyncManagedService {
         } else if (message instanceof JsonEventMouse) {
             JsonEventMouse m = (JsonEventMouse) message;
             clients.get(m.clientId).send(m);
+        } else if (message instanceof String) {
+            String sm=(String) message;
+            if(sm.startsWith(Constants.PAINT_ACK_PREFIX)){
+                clients.get(sm.substring(Constants.PAINT_ACK_PREFIX.length())).send(sm);
+            }else if(sm.startsWith(Constants.UNLOAD_PREFIX)){
+                clients.get(sm.substring(Constants.UNLOAD_PREFIX.length())).send(sm);
+            }else{
+                return sm;
+            }
+            
         } else if (message instanceof JsonAppFrame) {
             return (JsonAppFrame) message;
         }

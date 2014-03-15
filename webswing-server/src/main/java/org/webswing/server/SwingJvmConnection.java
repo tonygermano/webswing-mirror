@@ -162,7 +162,7 @@ public class SwingJvmConnection implements MessageListener, Runnable {
                     javaTask.setArgs(appConfig.getArgs());
                     String webSwingToolkitJarPath = WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm().substring(6);
                     String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPath;
-                    String debug = System.getProperty(Constants.SWING_DEBUG_FLAG).equals("true") ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
+                    String debug = System.getProperty(Constants.SWING_DEBUG_FLAG,"").equals("true") ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
                     javaTask.setJvmargs(bootCp + debug + " -noverify " + appConfig.getVmArgs());
 
                     Variable clientIdVar = new Variable();

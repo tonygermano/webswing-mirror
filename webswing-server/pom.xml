@@ -2,6 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>webswing-server</artifactId>
+	<packaging>war</packaging>
 	<parent>
 		<artifactId>webswing</artifactId>
 		<groupId>org.webswing</groupId>
@@ -144,11 +145,18 @@
 						<phase>package</phase>
 						<configuration>
 							<target>
-							
-								<war destfile="${project.build.directory}/${project.build.finalName}.war" update="true">
-									<fileset dir="${project.build.directory}/${project.build.finalName}" includes="/WEB-INF/swing-lib/*.jar" />
-									<fileset dir="${project.build.directory}/${project.build.finalName}" includes="/WEB-INF/server-lib/*.jar" />
-									<fileset dir="${project.build.directory}/${project.build.finalName}/WEB-INF/classes/" includes="/main/*.class" />
+
+								<war destfile="${project.build.directory}/${project.build.finalName}.war"
+									update="true">
+									<fileset
+										dir="${project.build.directory}/${project.build.finalName}"
+										includes="/WEB-INF/swing-lib/*.jar" />
+									<fileset
+										dir="${project.build.directory}/${project.build.finalName}"
+										includes="/WEB-INF/server-lib/*.jar" />
+									<fileset
+										dir="${project.build.directory}/${project.build.finalName}/WEB-INF/classes/"
+										includes="/main/*.class" />
 								</war>
 							</target>
 						</configuration>
@@ -183,5 +191,4 @@
 	</build>
 
 
-	<packaging>war</packaging>
 </project>

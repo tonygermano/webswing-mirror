@@ -16,7 +16,6 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.webswing.Constants;
 import org.webswing.SwingMain;
-import org.webswing.classloader.SwingClassloader;
 import org.webswing.common.ServerConnectionIfc;
 import org.webswing.model.c2s.JsonEvent;
 import org.webswing.util.Util;

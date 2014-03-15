@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import javax.swing.SwingUtilities;
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.ServerConnectionIfc;
 import org.webswing.model.s2c.JsonAppFrame;
+import org.webswing.model.s2c.JsonLinkAction;
+import org.webswing.model.s2c.JsonLinkAction.JsonLinkActionType;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.extra.WindowManager;
@@ -26,8 +29,9 @@ public class WebPaintDispatcher {
     public static final Object webPaintLock = new Object();
     private ServerConnectionIfc serverConnection;
 
-    Map<String, Rectangle> areasToUpdate = new HashMap<String, Rectangle>();
-
+    private volatile Map<String, Rectangle> areasToUpdate = new HashMap<String, Rectangle>();
+    private volatile boolean clientReadyToReceive=true;
+    
     private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1);
 
     public WebPaintDispatcher(final ServerConnectionIfc serverConnection, final ImageServiceIfc imageService) {
@@ -41,7 +45,7 @@ public class WebPaintDispatcher {
                     Map<String, List<Rectangle>> windowNonVisibleAreas = new HashMap<String, List<Rectangle>>();
                     Map<String, Rectangle> currentAreasToUpdate = null;
                     synchronized (webPaintLock) {
-                        if (areasToUpdate.size() == 0) {
+                        if (areasToUpdate.size() == 0 && clientReadyToReceive) {
                             return;
                         }
                         currentAreasToUpdate = areasToUpdate;
@@ -52,6 +56,7 @@ public class WebPaintDispatcher {
                         Util.fillJsonWithWindowsData(currentAreasToUpdate, json);
                         Util.extractWindowImages(windowImages, currentAreasToUpdate);
                         WindowManager.getInstance().extractNonVisibleAreas(windowNonVisibleAreas);
+                        clientReadyToReceive=false;
                     }
                     Util.encodeWindowImages(windowImages, windowNonVisibleAreas, json, imageService);
                     serverConnection.sendJsonObject(json);
@@ -60,8 +65,14 @@ public class WebPaintDispatcher {
                 }
             }
         };
-        contentSender.scheduleWithFixedDelay(sendUpdate, 10, 10, TimeUnit.MILLISECONDS);
+        contentSender.scheduleWithFixedDelay(sendUpdate, 100, 100, TimeUnit.MILLISECONDS);
     }
+    
+    public void clientReadyToReceive(){
+        synchronized (webPaintLock) {
+            clientReadyToReceive=true;
+        }
+    }   
 
     public void notifyShutdown() {
         serverConnection.sendShutdownNotification();
@@ -114,16 +125,22 @@ public class WebPaintDispatcher {
     }
 
     public void notifyWindowRepaintAll() {
-        for(Window w:Window.getWindows()){
-            if(w.isShowing()){
+        for (Window w : Window.getWindows()) {
+            if (w.isShowing()) {
                 notifyWindowRepaint(w);
             }
         }
     }
-    
+
     public void notifyBackgroundRepainted(Rectangle toRepaint) {
         notifyWindowAreaRepainted(WebToolkit.BACKGROUND_WINDOW_ID, toRepaint);
-
     }
 
+    public void notifyOpenLinkAction(URI uri){
+        JsonAppFrame f= new JsonAppFrame();
+        JsonLinkAction linkAction=new JsonLinkAction(JsonLinkActionType.url, uri.toString());
+        f.setLinkAction(linkAction);
+        serverConnection.sendJsonObject(f);
+    }
+    
 }

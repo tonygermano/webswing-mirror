@@ -2,7 +2,6 @@ package org.webswing.server;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
 
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrategy;

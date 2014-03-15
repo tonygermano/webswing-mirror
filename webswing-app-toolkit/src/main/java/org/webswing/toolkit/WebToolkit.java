@@ -370,7 +370,7 @@ public class WebToolkit extends SunToolkit {
     }
 
     public boolean isDesktopSupported() {
-        return false;
+        return true;
     }
 
     public boolean isWindowOpacityControlSupported() {
@@ -386,7 +386,7 @@ public class WebToolkit extends SunToolkit {
     }
 
     protected DesktopPeer createDesktopPeer(Desktop paramDesktop) throws HeadlessException {
-        throw new UnsupportedOperationException();
+        return new WebDesktopPeer(paramDesktop);
     }
 
     public PrintJob getPrintJob(Frame paramFrame, String paramString, Properties paramProperties) {
