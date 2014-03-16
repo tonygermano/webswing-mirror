@@ -111,6 +111,7 @@ public class WebToolkit extends SunToolkit {
         screenWidth =desktopWidth;
         screenHeight = desktopHeight;
         displayChanged();
+        getPaintDispatcher().clientReadyToReceive();
         getPaintDispatcher().notifyWindowRepaintAll();
     }
 

@@ -12,6 +12,9 @@ public class JsonEncoder implements Encoder<Serializable, String> {
 
     public String encode(Serializable m) {
             try {
+                if(m instanceof String){
+                    return (String) m;
+                }
                 return mapper.writeValueAsString(m);
             } catch (IOException e) {
                 e.printStackTrace();

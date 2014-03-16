@@ -5,8 +5,10 @@
 	var connectingDialog = $('#connectingDialog');
 	var startingDialog = $('#startingDialog');
 	var stoppedDialog = $('#stoppedDialog');
+	var disconnectedDialog = $('#disconnectedDialog');
+	var continueOldSessionDialog = $('#continueOldSessionDialog');
 	var tooManyConnectionsDialog = $('#tooManyConnectionsDialog');
-	var clientId = GUID();
+	var clientId = setupClientID();
 	var appName = "SwingSet3";
 	var uuid = null;
 	var latestMouseMoveEvent = null;
@@ -18,18 +20,30 @@
 	var transport = 'websocket';
 	var fallbackTransport = 'long-polling';
 
+	window.webswing = {
+		continueSession : function(toContinue) {
+			if (toContinue) {
+				showDialog(null);
+				socket.push('repaint' + clientId);
+				socket.push('paintAck' + clientId);
+			} else {
+				eraseCookie('webswingID');
+				location.reload();
+			}
+		}
+	};
+
 	start();
 
 	function start() {
 		createCanvas();
 		showDialog(initializingDialog);
 		connect();
-		setInterval(mouseMoveEventFilter, 250);
-
+		setInterval(mouseMoveEventFilter, 100);
+		setInterval(heartbeat, 10000);
 		$(window).bind("beforeunload", function() {
 			socket.push('unload' + clientId);
 		});
-
 	}
 
 	function connect() {
@@ -61,14 +75,20 @@
 					showDialog(stoppedDialog);
 				} else if (message == "tooManyClientsNotification") {
 					showDialog(tooManyConnectionsDialog);
+				} else if (message == "continueOldSession") {
+					showDialog(continueOldSessionDialog);
 				}
 				return;
 			}
-			processRequest(data);
+			if (!continueOldSessionDialog.hasClass('in')) {// check if open
+				processRequest(data);
+			}
 		};
 
 		request.onClose = function(response) {
-			socket.push('disconnecting');
+			if (!stoppedDialog.hasClass('in')) {
+				showDialog(disconnectedDialog);
+			}
 		};
 
 		request.onError = function(response) {
@@ -76,7 +96,7 @@
 		};
 
 		request.onReconnect = function(request, response) {
-			// TODO: handle
+			showDialog(initializingDialog);
 		};
 
 		socket = atmosphere.subscribe(request);
@@ -122,6 +142,10 @@
 			socket.push(atmosphere.util.stringifyJSON(latestWindowResizeEvent));
 			latestWindowResizeEvent = null;
 		}
+	}
+
+	function heartbeat() {
+		socket.push('hb' + clientId);
 	}
 
 	function registerEventListeners(canvas) {
@@ -269,11 +293,53 @@
 		return handshake;
 	}
 
+	function setupClientID() {
+		var cookieName = 'webswingID';
+		var id = readCookie(cookieName);
+		if (id != null) {
+			eraseCookie(cookieName);
+		} else {
+			id = GUID();
+		}
+		createCookie(cookieName, id, 1);
+		return id;
+	}
+
 	function GUID() {
 		var S4 = function() {
 			return Math.floor(Math.random() * 0x10000).toString(16);
 		};
 		return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+	}
+
+	function createCookie(name, value, days) {
+		var expires;
+
+		if (days) {
+			var date = new Date();
+			date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+			expires = "; expires=" + date.toGMTString();
+		} else {
+			expires = "";
+		}
+		document.cookie = escape(name) + "=" + escape(value) + expires + "; path=/";
+	}
+
+	function readCookie(name) {
+		var nameEQ = escape(name) + "=";
+		var ca = document.cookie.split(';');
+		for ( var i = 0; i < ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0) === ' ')
+				c = c.substring(1, c.length);
+			if (c.indexOf(nameEQ) === 0)
+				return unescape(c.substring(nameEQ.length, c.length));
+		}
+		return null;
+	}
+
+	function eraseCookie(name) {
+		createCookie(name, "", -1);
 	}
 
 	function bindEvent(el, eventName, eventHandler) {
@@ -291,7 +357,7 @@
 		window.onresize = function() {
 			canvas.width = width();
 			canvas.height = height();
-			latestWindowResizeEvent=getHandShake();
+			latestWindowResizeEvent = getHandShake();
 		};
 	}
 
@@ -300,6 +366,8 @@
 		startingDialog.modal('hide');
 		initializingDialog.modal('hide');
 		stoppedDialog.modal('hide');
+		disconnectedDialog.modal('hide');
+		continueOldSessionDialog.modal('hide');
 		if (dialog != null) {
 			dialog.modal('show');
 		}

@@ -1,6 +1,9 @@
 package org.webswing.ext.services;
 
 import java.io.Serializable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.jms.Connection;
 import javax.jms.ExceptionListener;
@@ -14,8 +17,9 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.SwingMain;
 import org.webswing.common.ServerConnectionIfc;
 import org.webswing.model.c2s.JsonEvent;
 import org.webswing.util.Util;
@@ -26,24 +30,48 @@ import org.webswing.util.Util;
  */
 public class ServerConnectionService implements MessageListener, ServerConnectionIfc {
 
+    private static final Logger log = LoggerFactory.getLogger(ServerConnectionService.class);
     private static ServerConnectionService impl;
+    private static ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Constants.JMS_URL);
 
+    private Connection connection;
     private Session session;
     private MessageProducer producer;
+    private long lastMessageTimestamp=System.currentTimeMillis();
+
+    private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor();
 
     public static ServerConnectionIfc getInstance() {
         if (impl == null) {
             impl = new ServerConnectionService();
         }
         return impl;
-
     }
 
     public ServerConnectionService() {
+        initialize();
+        Runnable watchdog=new Runnable() {
+            
+            @Override
+            public void run() {
+                long diff=System.currentTimeMillis()-lastMessageTimestamp;
+                int timeout=Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC,"300"))*1000;
+                if(diff/1000>10){
+                    log.info("Inactive for " +diff/1000+ " seconds.");
+                }
+                if(diff>timeout){
+                    log.info("Exiting swing application due to inactivity for "+diff/1000+ " seconds.");
+                    System.exit(1);
+                }
+            }
+        };
+        exitScheduler.scheduleWithFixedDelay(watchdog, 10, 10, TimeUnit.SECONDS);
+    }
+
+    private void initialize() {
         try {
             String clientId = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID);
-            ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Constants.JMS_URL);
-            Connection connection = connectionFactory.createConnection();
+            connection = connectionFactory.createConnection();
             connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Queue consumerDest = session.createQueue(clientId + Constants.SERVER2SWING);
@@ -52,14 +80,22 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
             session.createConsumer(consumerDest).setMessageListener(this);
             connection.setExceptionListener(new ExceptionListener() {
 
-                public void onException(JMSException e) {
-                    System.out.println("Exiting application for inactivity. ");
-                    Runtime.getRuntime().removeShutdownHook(SwingMain.notifyExitThread);
-                    System.exit(1);
+                @Override
+                public void onException(JMSException paramJMSException) {
+                    log.warn("JMS clien connection error: " + paramJMSException.getMessage());
+                    try {
+                        producer.close();
+                        session.close();
+                        connection.close();
+                    } catch (JMSException e) {
+                        //do nothing, will try to reinitialize.
+                    }
+                    ServerConnectionService.this.initialize();
                 }
             });
         } catch (JMSException e) {
-            e.printStackTrace();
+            log.error("Exiting swing application because could not connect to JMS:" +e.getMessage(),e);
+            System.exit(1);
         }
     }
 
@@ -83,19 +119,19 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
 
     public void onMessage(Message msg) {
         try {
+            lastMessageTimestamp=System.currentTimeMillis();
             if (msg instanceof ObjectMessage) {
                 ObjectMessage omsg = (ObjectMessage) msg;
                 if (omsg.getObject() instanceof JsonEvent) {
-                   Util.getWebToolkit().getEventDispatcher().dispatchEvent((JsonEvent) omsg.getObject());
+                    Util.getWebToolkit().getEventDispatcher().dispatchEvent((JsonEvent) omsg.getObject());
                 }
             } else if (msg instanceof TextMessage) {
                 TextMessage tmsg = (TextMessage) msg;
-                Util.getWebToolkit().getEventDispatcher().dispatchMessage( tmsg.getText());
+                Util.getWebToolkit().getEventDispatcher().dispatchMessage(tmsg.getText());
             }
         } catch (JMSException e) {
             e.printStackTrace();
         }
     }
-
 
 }

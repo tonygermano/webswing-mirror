@@ -30,8 +30,9 @@ public class WebPaintDispatcher {
     private ServerConnectionIfc serverConnection;
 
     private volatile Map<String, Rectangle> areasToUpdate = new HashMap<String, Rectangle>();
-    private volatile boolean clientReadyToReceive=true;
-    
+    private volatile boolean clientReadyToReceive = true;
+    private long lastReadyStateTime;
+
     private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1);
 
     public WebPaintDispatcher(final ServerConnectionIfc serverConnection, final ImageServiceIfc imageService) {
@@ -40,14 +41,23 @@ public class WebPaintDispatcher {
 
             public void run() {
                 try {
-                    JsonAppFrame json = new JsonAppFrame();
-                    Map<String, BufferedImage> windowImages = new HashMap<String, BufferedImage>();
-                    Map<String, List<Rectangle>> windowNonVisibleAreas = new HashMap<String, List<Rectangle>>();
+                    JsonAppFrame json;
+                    Map<String, BufferedImage> windowImages;
+                    Map<String, List<Rectangle>> windowNonVisibleAreas;
                     Map<String, Rectangle> currentAreasToUpdate = null;
                     synchronized (webPaintLock) {
-                        if (areasToUpdate.size() == 0 && clientReadyToReceive) {
+                        if (clientReadyToReceive) {
+                            lastReadyStateTime = System.currentTimeMillis();
+                        }
+                        if (areasToUpdate.size() == 0 || !clientReadyToReceive) {
+                            if (!clientReadyToReceive && (System.currentTimeMillis() - lastReadyStateTime) > 5000) {
+                                clientReadyToReceive = true;
+                            }
                             return;
                         }
+                        json = new JsonAppFrame();
+                        windowImages = new HashMap<String, BufferedImage>();
+                        windowNonVisibleAreas = new HashMap<String, List<Rectangle>>();
                         currentAreasToUpdate = areasToUpdate;
                         areasToUpdate = Util.postponeNonShowingAreas(currentAreasToUpdate);
                         if (currentAreasToUpdate.size() == 0) {
@@ -56,7 +66,7 @@ public class WebPaintDispatcher {
                         Util.fillJsonWithWindowsData(currentAreasToUpdate, json);
                         Util.extractWindowImages(windowImages, currentAreasToUpdate);
                         WindowManager.getInstance().extractNonVisibleAreas(windowNonVisibleAreas);
-                        clientReadyToReceive=false;
+                        clientReadyToReceive = false;
                     }
                     Util.encodeWindowImages(windowImages, windowNonVisibleAreas, json, imageService);
                     serverConnection.sendJsonObject(json);
@@ -65,14 +75,14 @@ public class WebPaintDispatcher {
                 }
             }
         };
-        contentSender.scheduleWithFixedDelay(sendUpdate, 100, 100, TimeUnit.MILLISECONDS);
+        contentSender.scheduleWithFixedDelay(sendUpdate, 50, 50, TimeUnit.MILLISECONDS);
     }
-    
-    public void clientReadyToReceive(){
+
+    public void clientReadyToReceive() {
         synchronized (webPaintLock) {
-            clientReadyToReceive=true;
+            clientReadyToReceive = true;
         }
-    }   
+    }
 
     public void notifyShutdown() {
         serverConnection.sendShutdownNotification();
@@ -136,11 +146,11 @@ public class WebPaintDispatcher {
         notifyWindowAreaRepainted(WebToolkit.BACKGROUND_WINDOW_ID, toRepaint);
     }
 
-    public void notifyOpenLinkAction(URI uri){
-        JsonAppFrame f= new JsonAppFrame();
-        JsonLinkAction linkAction=new JsonLinkAction(JsonLinkActionType.url, uri.toString());
+    public void notifyOpenLinkAction(URI uri) {
+        JsonAppFrame f = new JsonAppFrame();
+        JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.url, uri.toString());
         f.setLinkAction(linkAction);
         serverConnection.sendJsonObject(f);
     }
-    
+
 }

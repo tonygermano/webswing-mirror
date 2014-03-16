@@ -27,7 +27,7 @@ public class SwingAsyncManagedService {
 
     private static final Logger log = LoggerFactory.getLogger(SwingAsyncManagedService.class);
 
-    private Map<String, SwingJvmConnection> clients = new HashMap<String, SwingJvmConnection>();
+    protected static Map<String, SwingJvmConnection> clients = new HashMap<String, SwingJvmConnection>();
     private Map<String, AtmosphereResource> resourceMap = new HashMap<String, AtmosphereResource>();
     private Map<String, SwingApplicationDescriptor> applications = new HashMap<String, SwingApplicationDescriptor>();
 
@@ -39,10 +39,9 @@ public class SwingAsyncManagedService {
         }
     }
 
-    @Ready(value = Ready.DELIVER_TO.RESOURCE)
-    public String onReady(final AtmosphereResource r) {
+    @Ready
+    public void onReady(final AtmosphereResource r) {
         resourceMap.put(r.uuid(), r);
-        return "debug";
     }
 
     @Disconnect
@@ -52,36 +51,59 @@ public class SwingAsyncManagedService {
 
     @Message(encoders = { JsonEncoder.class }, decoders = { JsonDecoder.class })
     public Serializable onMessage(Object message) {
-        if (message instanceof JsonConnectionHandshake) {
-            JsonConnectionHandshake h = (JsonConnectionHandshake) message;
-            if (!clients.containsKey(h.clientId)) {
-                SwingApplicationDescriptor app = applications.get(h.applicationName);
-                if (app != null) {
-                    clients.put(h.clientId, new SwingJvmConnection(h, app, resourceMap.get(h.sessionId).getBroadcaster()));
+        try {
+            if (message instanceof JsonConnectionHandshake) {
+                JsonConnectionHandshake h = (JsonConnectionHandshake) message;
+                if (!clients.containsKey(h.clientId)) {
+                    SwingApplicationDescriptor app = applications.get(h.applicationName);
+                    if (app != null) {
+                        SwingJvmConnection connection = new SwingJvmConnection(h, app, resourceMap.get(h.sessionId));
+                        clients.put(h.clientId, connection);
+                        if (!connection.isNewAppStarted()) {
+                            return Constants.CONTINUE_OLD_SESSION_QUESTION;
+                        }
+                    }
+                } else {
+                    send(h.clientId, h);
                 }
-            } else {
-                clients.get(h.clientId).send(h);
+            } else if (message instanceof JsonEventKeyboard) {
+                JsonEventKeyboard k = (JsonEventKeyboard) message;
+                send(k.clientId, k);
+            } else if (message instanceof JsonEventMouse) {
+                JsonEventMouse m = (JsonEventMouse) message;
+                send(m.clientId, m);
+            } else if (message instanceof String) {
+                String sm = (String) message;
+                if (sm.startsWith(Constants.PAINT_ACK_PREFIX)) {
+                    send(sm.substring(Constants.PAINT_ACK_PREFIX.length()), sm);
+                } else if (sm.startsWith(Constants.UNLOAD_PREFIX)) {
+                    send(sm.substring(Constants.UNLOAD_PREFIX.length()), sm);
+                } else if (sm.startsWith(Constants.HEARTBEAT_MSG_PREFIX)) {
+                    send(sm.substring(Constants.HEARTBEAT_MSG_PREFIX.length()), sm);
+                } else if (sm.startsWith(Constants.REPAINT_REQUEST_PREFIX)) {
+                    send(sm.substring(Constants.REPAINT_REQUEST_PREFIX.length()), sm);
+                } else {
+                    return sm;
+                }
+            } else if (message instanceof JsonAppFrame) {
+                return (JsonAppFrame) message;
             }
-        } else if (message instanceof JsonEventKeyboard) {
-            JsonEventKeyboard k = (JsonEventKeyboard) message;
-            clients.get(k.clientId).send(k);
-        } else if (message instanceof JsonEventMouse) {
-            JsonEventMouse m = (JsonEventMouse) message;
-            clients.get(m.clientId).send(m);
-        } else if (message instanceof String) {
-            String sm=(String) message;
-            if(sm.startsWith(Constants.PAINT_ACK_PREFIX)){
-                clients.get(sm.substring(Constants.PAINT_ACK_PREFIX.length())).send(sm);
-            }else if(sm.startsWith(Constants.UNLOAD_PREFIX)){
-                clients.get(sm.substring(Constants.UNLOAD_PREFIX.length())).send(sm);
-            }else{
-                return sm;
-            }
-            
-        } else if (message instanceof JsonAppFrame) {
-            return (JsonAppFrame) message;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
+    }
+
+    private void send(String clientId, Serializable o) {
+        if (clients.containsKey(clientId)) {
+            SwingJvmConnection client = clients.get(clientId);
+            if (o instanceof String) {
+                client.sendMsg((String) o);
+            } else {
+                client.send(o);
+            }
+        }
+
     }
 
 }

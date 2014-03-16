@@ -8,29 +8,42 @@
 		<link rel="stylesheet" href="javascript/webswing.css" />
 	</head>
 	<body bgcolor="#FFFFFF" id="body" >
-		<div id="initializingDialog" class="modal hide fade" >
+		<div id="initializingDialog" class="modal hide fade" data-backdrop="static">
 			<div class="modal-body">
    				<p>Initializing…</p>
   			</div>
 		</div>
-		<div id="connectingDialog" class="modal hide fade" >
+		<div id="connectingDialog" class="modal hide fade" data-backdrop="static">
 			<div class="modal-body">
    				<p>Connecting…</p>
   			</div>
 		</div>
-		<div id="startingDialog" class="modal hide fade" >
+		<div id="startingDialog" class="modal hide fade" data-backdrop="static">
 			<div class="modal-body">
    				<p>Starting…</p>
   			</div>
 		</div>
-		<div id="stoppedDialog" class="modal hide fade" >
+		<div id="disconnectedDialog" class="modal hide fade" data-backdrop="static">
+			<div class="modal-body">
+   				<p>Disconnected…</p>
+  			</div>
+		</div>
+		<div id="stoppedDialog" class="modal hide fade" data-backdrop="static">
 			<div class="modal-body">
    				<p>Application stopped...</p>
   			</div>
 		</div>
-		<div id="tooManyConnectionsDialog" class="modal hide fade" >
+		<div id="tooManyConnectionsDialog" class="modal hide fade" data-backdrop="static">
 			<div class="modal-body">
    				<p>Too many connections. Please try again later...</p>
+  			</div>
+		</div>
+		<div id="continueOldSessionDialog" class="modal hide fade" data-backdrop="static">
+			<div class="modal-body">
+   				<p>Continue old session?</p>
+   				<a href="javascript:webswing.continueSession(true);">Yes, continue.</a>
+   				<br/>
+   				<a href="javascript:webswing.continueSession(false);">No, start new session.</a>
   			</div>
 		</div>
     	<script src="javascript/atmosphere.js"  type="text/javascript"></script>

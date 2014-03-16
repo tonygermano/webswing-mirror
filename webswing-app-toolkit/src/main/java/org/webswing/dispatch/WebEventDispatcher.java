@@ -43,6 +43,9 @@ public class WebEventDispatcher {
         if(message.startsWith(Constants.PAINT_ACK_PREFIX)){
             Util.getWebToolkit().getPaintDispatcher().clientReadyToReceive();
         }
+        if(message.startsWith(Constants.REPAINT_REQUEST_PREFIX)){
+            Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaintAll();
+        }
     }
 
 

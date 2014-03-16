@@ -146,19 +146,21 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
             int maxOffsetx = w.getWidth() - i.right - headerMargin - (2 * (buttonWidth + buttonMargin));
             int closeOffsetx = w.getWidth() - i.right - headerMargin - (1 * (buttonWidth + buttonMargin));
 
-            if(e.getX()>minOffsetx && e.getX()<minOffsetx+buttonWidth){
-                return WindowActionType.minimize;
+            if (!(w instanceof Dialog)) {
+                if (e.getX() > minOffsetx && e.getX() < minOffsetx + buttonWidth) {
+                    return WindowActionType.minimize;
+                }
+                if (e.getX() > maxOffsetx && e.getX() < maxOffsetx + buttonWidth) {
+                    return WindowActionType.maximize;
+                }
             }
-            if(e.getX()>maxOffsetx && e.getX()<maxOffsetx+buttonWidth){
-                return WindowActionType.maximize;
-            }
-            if(e.getX()>closeOffsetx && e.getX()<closeOffsetx+buttonWidth){
+            if (e.getX() > closeOffsetx && e.getX() < closeOffsetx + buttonWidth) {
                 return WindowActionType.close;
             }
         }
 
         //resize
-        if(e.getX() > (w.getWidth() -10) && e.getY() > (w.getHeight() -10)){
+        if (e.getX() > (w.getWidth() - 10) && e.getY() > (w.getHeight() - 10)) {
             return WindowActionType.resizeUni;
         }
         if (e.getX() > (w.getWidth() - i.right)) {
