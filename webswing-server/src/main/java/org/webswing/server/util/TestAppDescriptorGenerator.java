@@ -36,6 +36,15 @@ desc.setClassPathEntries(Arrays.asList("f:\\DATA\\Workspaces\\sources\\webswing-
         ,"f:\\DATA\\Workspaces\\sources\\webswing-1.1\\swinglib\\swingx.jar"
         ,"f:\\DATA\\Workspaces\\sources\\webswing-1.1\\swinglib\\TimingFramework.jar"));   
 
+
+        SwingApplicationDescriptor desc1=new SwingApplicationDescriptor();
+        desc1.setArgs("");
+        desc1.setVmArgs("");
+        desc1.setHomeDir("F:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target");
+        desc1.setMainClass("test\\Main");
+        desc1.setClassPathEntries(Arrays.asList("test.jar"));
+        apps.put("test1", desc1);
+
         mapper.defaultPrettyPrintingWriter().writeValue(new File("F:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target\\webswing.config"),apps);
     }
 

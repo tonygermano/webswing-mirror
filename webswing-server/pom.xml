@@ -85,7 +85,6 @@
 					<packagingExcludes>
 						WEB-INF/lib/jetty-*.jar,
 						WEB-INF/lib/javax.servlet-*.jar,
-						WEB-INF/lib/commons-codec-*.jar,
 						WEB-INF/lib/commons-cli-*.jar,
 						WEB-INF/lib/bcel-*.jar,
 						WEB-INF/lib/jakarta-regexp-*.jar,

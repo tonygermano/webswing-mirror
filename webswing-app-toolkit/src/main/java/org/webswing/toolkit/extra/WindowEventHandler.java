@@ -7,11 +7,14 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.webswing.common.WindowActionType;
 
 public class WindowEventHandler {
 
+    private Map<Window, Rectangle> previousSize = new HashMap<Window, Rectangle>();
     private boolean lockedOnEvent;
     private WindowActionType lockEventType;
     private Point referenceMouseLocation;
@@ -33,9 +36,17 @@ public class WindowEventHandler {
                         Window w = (Window) e.getSource();
                         Rectangle o = w.getBounds();
                         resizeWindow(w, 0, 0);
-                        Rectangle r = w.getBounds();
-                        //move to the middle of original size
-                        moveWindow(w, ((o.x + o.width) / 2) - (r.width / 2), ((o.y + o.height) / 2) - (r.height / 2));
+                        if (o.getSize().equals(w.getSize()) && previousSize.containsKey(w)) {
+                            //restore previous size
+                            o = previousSize.get(w);
+                            moveWindow(w, o.x, o.y);
+                            resizeWindow(w, o.width, o.height);
+                        } else {
+                            Rectangle r = w.getBounds();
+                            //move to the middle of original size
+                            moveWindow(w, (o.x + (o.width / 2)) - (r.width / 2), (o.y + (o.height / 2)) - (r.height / 2));
+                        }
+                        previousSize.put(w, o);
                         lockedOnEvent = false;
                     }
                     break;
@@ -43,9 +54,18 @@ public class WindowEventHandler {
                     if (MouseEvent.MOUSE_RELEASED == e.getID()) {
                         if (wat.equals(WindowActionType.maximize)) {
                             Window w = (Window) e.getSource();
-                            moveWindow(w, 0, 0);
+                            Rectangle o = w.getBounds();
                             Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
-                            resizeWindow(w, size.width, size.height);
+                            if (o.x == 0 && o.y == 0 && o.width == size.width && o.height == size.height && previousSize.containsKey(w)) {
+                                //restore previous size
+                                o=previousSize.get(w);
+                                moveWindow(w, o.x, o.y);
+                                resizeWindow(w, o.width, o.height);
+                            } else {
+                                moveWindow(w, 0, 0);
+                                resizeWindow(w, size.width, size.height);
+                            }
+                            previousSize.put(w, o);
                         }
                         lockedOnEvent = false;
                     }
@@ -60,6 +80,8 @@ public class WindowEventHandler {
                     break;
                 case move:
                     if (MouseEvent.MOUSE_RELEASED == e.getID()) {
+                        Window w = (Window) e.getSource();
+                        previousSize.remove(w);
                         lockedOnEvent = false;
                     }
                     if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
@@ -69,6 +91,8 @@ public class WindowEventHandler {
                     break;
                 case resizeUni:
                     if (MouseEvent.MOUSE_RELEASED == e.getID()) {
+                        Window w = (Window) e.getSource();
+                        previousSize.remove(w);
                         lockedOnEvent = false;
                     }
                     if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
@@ -78,6 +102,8 @@ public class WindowEventHandler {
                     break;
                 case resizeRight:
                     if (MouseEvent.MOUSE_RELEASED == e.getID()) {
+                        Window w = (Window) e.getSource();
+                        previousSize.remove(w);
                         lockedOnEvent = false;
                     }
                     if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
@@ -87,6 +113,8 @@ public class WindowEventHandler {
                     break;
                 case resizeBottom:
                     if (MouseEvent.MOUSE_RELEASED == e.getID()) {
+                        Window w = (Window) e.getSource();
+                        previousSize.remove(w);
                         lockedOnEvent = false;
                     }
                     if (MouseEvent.MOUSE_DRAGGED == e.getID()) {

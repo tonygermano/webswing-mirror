@@ -8,8 +8,9 @@ public class JsonAppFrame implements Serializable {
 
     private static final long serialVersionUID = 6019708608380425820L;
 
-    JsonLinkAction linkAction;
-    List<JsonWindow> windows;
+    public List<JsonApplication> applications;
+    public JsonLinkAction linkAction;
+    public List<JsonWindow> windows;
 
     public JsonLinkAction getLinkAction() {
         return linkAction;

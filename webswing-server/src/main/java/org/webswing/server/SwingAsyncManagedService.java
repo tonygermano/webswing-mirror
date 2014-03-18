@@ -8,6 +8,7 @@ import org.atmosphere.config.service.Disconnect;
 import org.atmosphere.config.service.ManagedService;
 import org.atmosphere.config.service.Message;
 import org.atmosphere.config.service.Ready;
+import org.atmosphere.config.service.Ready.DELIVER_TO;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.slf4j.Logger;
@@ -39,9 +40,12 @@ public class SwingAsyncManagedService {
         }
     }
 
-    @Ready
-    public void onReady(final AtmosphereResource r) {
+    @Ready(value = DELIVER_TO.RESOURCE, encoders = { JsonEncoder.class })
+    public Serializable onReady(final AtmosphereResource r) {
         resourceMap.put(r.uuid(), r);
+        JsonAppFrame appInfo = new JsonAppFrame();
+        appInfo.applications = ServerUtil.createApplicationJsonInfo(applications);
+        return appInfo;
     }
 
     @Disconnect

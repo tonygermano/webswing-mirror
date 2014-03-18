@@ -10,12 +10,14 @@ public class SwingApplicationDescriptor implements Serializable{
      */
     private static final long serialVersionUID = 3708498208353403978L;
     
+    private String icon;
     private String mainClass="";
     private List<String> classPathEntries;
     private String vmArgs="";
     private String args="";
     private String homeDir=System.getProperty("user.dir");
     private boolean homeDirPerSession;
+    private int maxClinets;
     
     public String getMainClass() {
         return mainClass;
@@ -74,6 +76,22 @@ public class SwingApplicationDescriptor implements Serializable{
     
     public void setHomeDirPerSession(boolean homeDirPerSession) {
         this.homeDirPerSession = homeDirPerSession;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public int getMaxClinets() {
+        return maxClinets;
+    }
+
+    public void setMaxClinets(int maxClinets) {
+        this.maxClinets = maxClinets;
     }
 
 

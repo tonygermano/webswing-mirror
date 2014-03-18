@@ -12,19 +12,7 @@ public class WebDialogPeer extends WebWindowPeer implements DialogPeer {
         super(t);
     }
 
-    public void setTitle(String title) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void setResizable(boolean resizeable) {
-        // TODO Auto-generated method stub
-        
-    }
-
     public void blockWindows(List<Window> windows) {
-        // TODO Auto-generated method stub
-        
     }
 
 }

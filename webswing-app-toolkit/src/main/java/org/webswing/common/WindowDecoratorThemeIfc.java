@@ -1,6 +1,5 @@
 package org.webswing.common;
 
-import java.awt.AWTEvent;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Rectangle;

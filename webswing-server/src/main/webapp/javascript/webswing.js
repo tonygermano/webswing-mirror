@@ -3,13 +3,14 @@
 
 	var initializingDialog = $('#initializingDialog');
 	var connectingDialog = $('#connectingDialog');
+	var applicationSelectorDialog = $('#applicationSelectorDialog');
+	var continueOldSessionDialog = $('#continueOldSessionDialog');
 	var startingDialog = $('#startingDialog');
 	var stoppedDialog = $('#stoppedDialog');
 	var disconnectedDialog = $('#disconnectedDialog');
-	var continueOldSessionDialog = $('#continueOldSessionDialog');
 	var tooManyConnectionsDialog = $('#tooManyConnectionsDialog');
 	var clientId = setupClientID();
-	var appName = "SwingSet3";
+	var appName = null;
 	var uuid = null;
 	var latestMouseMoveEvent = null;
 	var latestMouseWheelEvent = null;
@@ -30,6 +31,11 @@
 				eraseCookie('webswingID');
 				location.reload();
 			}
+		},
+		startApplication : function(name){
+			appName=name;
+            socket.push(atmosphere.util.stringifyJSON(getHandShake()));
+            showDialog(startingDialog);
 		}
 	};
 
@@ -59,8 +65,6 @@
 
 		request.onOpen = function(response) {
 			uuid = response.request.uuid;
-			socket.push(atmosphere.util.stringifyJSON(getHandShake()));
-			showDialog(startingDialog);
 			transport = response.transport;
 		};
 
@@ -80,8 +84,12 @@
 				}
 				return;
 			}
-			if (!continueOldSessionDialog.hasClass('in')) {// check if open
-				processRequest(data);
+			if(appName==null){
+				selectApplication(data);
+			}else{
+				if (!continueOldSessionDialog.hasClass('in')) {// check if open
+					processRequest(data);
+				}
 			}
 		};
 
@@ -102,6 +110,18 @@
 		socket = atmosphere.subscribe(request);
 	}
 
+	function selectApplication(data){
+		for ( var i in data.applications) {
+			var app = data.applications[i];
+			$('#applicationsList').append('<div class="thumbnail" onclick="webswing.startApplication(\''+app.name+'\')"><img src="data:image/png;base64,'+app.base64Icon+'" class="img-circle"/><div class="caption">'+app.name+'</div></div>');
+		}
+		if(i==0){
+			webswing.startApplication(data.applications[i]);
+		}else{
+			showDialog(applicationSelectorDialog);
+		}
+	}
+	
 	function processRequest(data) {
 		showDialog(null);
 
@@ -368,6 +388,7 @@
 		stoppedDialog.modal('hide');
 		disconnectedDialog.modal('hide');
 		continueOldSessionDialog.modal('hide');
+		applicationSelectorDialog.modal('hide');
 		if (dialog != null) {
 			dialog.modal('show');
 		}

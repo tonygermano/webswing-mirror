@@ -1,6 +1,12 @@
 package org.webswing.toolkit;
 
+import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
 
@@ -9,7 +15,6 @@ import org.webswing.util.Util;
 
 public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 
-
     //////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////// WebWindowPeer Implementation//////////////////////////////////////////////////
     public WebWindowPeer(Window t) {
@@ -17,69 +22,84 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
     }
 
     public void toFront() {
-        WindowManager.getInstance().bringToFront((Window)target);
+        WindowManager.getInstance().bringToFront((Window) target);
     }
 
     public void toBack() {
-       WindowManager.getInstance().bringToBack((Window)target);
-
+        WindowManager.getInstance().bringToBack((Window) target);
     }
-    
-    public void setAlwaysOnTop(boolean paramBoolean) {
-        WindowManager.getInstance().bringToFront((Window)target);
 
+    public void setAlwaysOnTop(boolean paramBoolean) {
+        WindowManager.getInstance().bringToFront((Window) target);
     }
 
     public void updateFocusableWindowState() {
-        // TODO Auto-generated method stub
-
     }
 
     public boolean requestWindowFocus() {
-        // TODO Auto-generated method stub
+        Util.getWebToolkit().getWindowManager().activateWindow((Window) target);
         return true;
     }
 
     public void setModalBlocked(Dialog paramDialog, boolean paramBoolean) {
-        // TODO Auto-generated method stub
-
     }
 
     public void updateMinimumSize() {
-        // TODO Auto-generated method stub
-
     }
 
     public void updateIconImages() {
-        // TODO Auto-generated method stub
-
     }
 
     public void setOpacity(float paramFloat) {
-        // TODO Auto-generated method stub
-
     }
 
     public void setOpaque(boolean paramBoolean) {
-        // TODO Auto-generated method stub
-
     }
 
     public void repositionSecurityWarning() {
-        // TODO Auto-generated method stub
-
     }
 
     public void updateWindow() {
-        System.out.println("updateWindow");
-
     }
-    
+
     public void show() {
-        Util.getWebToolkit().getWindowManager().activateWindow((Window)target);
+        Util.getWebToolkit().getWindowManager().activateWindow((Window) target);
     }
 
     public void hide() {
-        Util.getWebToolkit().getWindowManager().removeWindow((Window)target);
+        Util.getWebToolkit().getWindowManager().removeWindow((Window) target);
+    }
+
+    public void setTitle(String title) {
+        updateWindowDecorationImage();
+        Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(this.getGuid(), new Rectangle(0,0,getBounds().width,getInsets().top));
+    }
+
+    public void setResizable(boolean resizeable) {
+    }
+
+    protected Point validate(int x, int y, int w, int h) {
+        Point result = new Point(x, y);
+        if (w == 0 && h == 0) {
+            return result;
+        }
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        Insets insets = this.getInsets();
+        if (y < 0) {
+            result.y = 0;
+        }
+        if (y > (screen.height - insets.top)) {
+            result.y = screen.height - insets.top;
+        }
+        if (x < ((w - 40) * (-1))) {
+            result.x = (w - 40) * (-1);
+        }
+        if (x > (screen.width - 40)) {
+            result.x = (screen.width - 40);
+        }
+        if (result.x != x || result.y != y) {
+            ((Component) target).setLocation(result);
+        }
+        return result;
     }
 }

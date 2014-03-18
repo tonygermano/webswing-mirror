@@ -16,6 +16,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.PaintEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -27,6 +28,7 @@ import java.awt.peer.ContainerPeer;
 import java.util.UUID;
 
 import javax.swing.JWindow;
+import javax.swing.SwingUtilities;
 
 import org.webswing.common.GraphicsWrapper;
 import org.webswing.dispatch.WebPaintDispatcher;
@@ -64,13 +66,16 @@ public class WebComponentPeer implements ComponentPeer {
         g.dispose();
         return safeImage;
     }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////// WebComponentPeer Implementation//////////////////////////////////////////////////
-
+    
     public Image getWindowDecorationImage() {
         return windowDecorationImage;
     }
+    
+    public void updateWindowDecorationImage(){
+        windowDecorationImage = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getWindowDecoration(target, image.getWidth(), image.getHeight());
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////// WebComponentPeer Implementation//////////////////////////////////////////////////
 
     private static final Font defaultFont = new Font("Dialog", 0, 12);
     protected long pData; //???
@@ -145,13 +150,13 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void print(Graphics paramGraphics) {
-        // not supported now
+        ((Component) this.target).print(paramGraphics);
     }
 
     public void setBounds(int x, int y, int w, int h, int paramInt5) {
         synchronized (WebPaintDispatcher.webPaintLock) {
             Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
-            Point validPosition = validate(x, y);
+            Point validPosition = validate(x, y, w, h);
             if ((w != this.oldWidth) || (h != this.oldHeight)) {
                 try {
                     replaceSurfaceData(validPosition.x, validPosition.y, w, h);
@@ -164,13 +169,9 @@ public class WebComponentPeer implements ComponentPeer {
         }
     }
 
-    private Point validate(int x, int y) {
-        Point result = new Point(x, y);
-        if (y < 0) {
-            result.y = 0;
-            ((Component) target).setLocation(result);
-        }
-        return result;
+    protected Point validate(int x, int y, int w, int h) {
+        //overriden in WebWindowPeer
+        return new Point(x, y);
     }
 
     public void replaceSurfaceData(int x, int y, int w, int h) {
@@ -182,7 +183,7 @@ public class WebComponentPeer implements ComponentPeer {
                 localSurfaceData = this.surfaceData;
                 this.surfaceData = SurfaceManager.getManager(this.image).getDestSurfaceData();
                 if (target != null && !(target instanceof JWindow)) {
-                    windowDecorationImage = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getWindowDecoration(target, w, h);
+                    updateWindowDecorationImage();
                 }
                 repaintPeerTarget();
                 if (localSurfaceData != null) {
@@ -197,7 +198,6 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void handleEvent(AWTEvent paramAWTEvent) {
-        //System.out.println(paramAWTEvent);
     }
 
     public void coalescePaintEvent(PaintEvent paramPaintEvent) {
@@ -241,9 +241,6 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public Graphics getGraphics() {
-        //System.out.println("getGraphics");
-        //try{throw new Exception();}catch(Exception e){e.printStackTrace();if(e!=null){return null;}}
-
         SurfaceData localSurfaceData = this.surfaceData;
         if (localSurfaceData != null) {
             Object localObject1 = this.background;
@@ -264,7 +261,6 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public FontMetrics getFontMetrics(Font paramFont) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -293,18 +289,16 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void updateCursorImmediately() {
-        // TODO Auto-generated method stub
-
     }
 
     public boolean requestFocus(Component paramComponent, boolean paramBoolean1, boolean paramBoolean2, long paramLong, Cause paramCause) {
-        // TODO Auto-generated method stub
-        return false;
+        Point p = SwingUtilities.convertPoint(paramComponent, new Point(0, 0), (Component) target);
+        Util.getWebToolkit().getWindowManager().activateWindow((Window) target, p.x, p.y);
+        return true;
     }
 
     public boolean isFocusable() {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     public Image createImage(ImageProducer paramImageProducer) {
@@ -333,7 +327,6 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public boolean handlesWheelScrolling() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -346,18 +339,12 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void flip(int paramInt1, int paramInt2, int paramInt3, int paramInt4, FlipContents paramFlipContents) {
-        // TODO Auto-generated method stub
-
     }
 
     public void destroyBuffers() {
-        // TODO Auto-generated method stub
-
     }
 
     public void reparent(ContainerPeer paramContainerPeer) {
-        // TODO Auto-generated method stub
-
     }
 
     public boolean isReparentSupported() {
@@ -389,7 +376,6 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void enable() {
-
     }
 
     public void disable() {

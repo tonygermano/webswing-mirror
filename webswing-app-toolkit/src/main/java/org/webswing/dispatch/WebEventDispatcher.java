@@ -60,7 +60,14 @@ public class WebEventDispatcher {
                 AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, modifiers, 0, (char) event.character);
                 dispatchEventInSwing(w, e);
             } else {
-                AWTEvent e = new KeyEvent(src, type, when, modifiers, event.keycode, (char) event.character);
+                if(event.keycode==13){//enter keycode
+                    event.keycode=10;
+                    event.character=10;
+                }else if(event.keycode==46){//delete keycode
+                    event.keycode=127;
+                    event.character=127;
+                }
+                AWTEvent e = new KeyEvent(src, type, when, modifiers, event.keycode, (char) event.character,KeyEvent.KEY_LOCATION_STANDARD);
                 dispatchEventInSwing(w, e);
             }
         }

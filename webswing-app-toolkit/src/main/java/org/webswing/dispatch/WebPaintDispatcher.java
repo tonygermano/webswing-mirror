@@ -50,7 +50,7 @@ public class WebPaintDispatcher {
                             lastReadyStateTime = System.currentTimeMillis();
                         }
                         if (areasToUpdate.size() == 0 || !clientReadyToReceive) {
-                            if (!clientReadyToReceive && (System.currentTimeMillis() - lastReadyStateTime) > 5000) {
+                            if (!clientReadyToReceive && (System.currentTimeMillis() - lastReadyStateTime) > 2000) {
                                 clientReadyToReceive = true;
                             }
                             return;
@@ -151,6 +151,14 @@ public class WebPaintDispatcher {
         JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.url, uri.toString());
         f.setLinkAction(linkAction);
         serverConnection.sendJsonObject(f);
+    }
+
+    public void resetWindowsPosition() {
+        for (Window w : Window.getWindows()) {
+            WebWindowPeer peer=(WebWindowPeer) WebToolkit.targetToPeer(w);
+            Rectangle b = w.getBounds();
+            peer.setBounds(b.x, b.y, b.width, b.height, 0);
+        }
     }
 
 }

@@ -97,13 +97,13 @@ public class WebToolkit extends SunToolkit {
     public void init() {
         paintDispatcher = new WebPaintDispatcher(serverConnection, imageService);
         windowManager = WindowManager.getInstance();
-        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-
-            public void eventDispatched(AWTEvent event) {
-                System.out.println(event);
-            }
-
-        }, AWTEvent.WINDOW_EVENT_MASK | AWTEvent.WINDOW_FOCUS_EVENT_MASK | AWTEvent.WINDOW_STATE_EVENT_MASK);
+//        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+//
+//            public void eventDispatched(AWTEvent event) {
+//                System.out.println(event);
+//            }
+//
+//        }, AWTEvent.WINDOW_EVENT_MASK | AWTEvent.WINDOW_FOCUS_EVENT_MASK | AWTEvent.WINDOW_STATE_EVENT_MASK);
 
     }
 
@@ -112,6 +112,7 @@ public class WebToolkit extends SunToolkit {
         screenHeight = desktopHeight;
         displayChanged();
         getPaintDispatcher().clientReadyToReceive();
+        getPaintDispatcher().resetWindowsPosition();//in case windows moved out of screen by resizing screen.
         getPaintDispatcher().notifyWindowRepaintAll();
     }
 

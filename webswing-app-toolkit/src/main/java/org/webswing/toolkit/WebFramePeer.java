@@ -13,19 +13,7 @@ public class WebFramePeer extends WebWindowPeer implements FramePeer {
         super(t);
     }
 
-    public void setTitle(String paramString) {
-        // TODO Auto-generated method stub
-
-    }
-
     public void setMenuBar(MenuBar paramMenuBar) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void setResizable(boolean paramBoolean) {
-        // TODO Auto-generated method stub
-
     }
 
     public void setState(int paramInt) {
@@ -37,17 +25,12 @@ public class WebFramePeer extends WebWindowPeer implements FramePeer {
     }
 
     public void setMaximizedBounds(Rectangle paramRectangle) {
-        // TODO Auto-generated method stub
-
     }
 
     public void setBoundsPrivate(int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
-        // TODO Auto-generated method stub
-
     }
 
     public Rectangle getBoundsPrivate() {
-        // TODO Auto-generated method stub
         return null;
     }
 
