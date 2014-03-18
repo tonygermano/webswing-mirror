@@ -35,7 +35,7 @@ desc.setClassPathEntries(Arrays.asList("f:\\DATA\\Workspaces\\sources\\webswing-
         ,"f:\\DATA\\Workspaces\\sources\\webswing-1.1\\swinglib\\swing-worker.jar"
         ,"f:\\DATA\\Workspaces\\sources\\webswing-1.1\\swinglib\\swingx.jar"
         ,"f:\\DATA\\Workspaces\\sources\\webswing-1.1\\swinglib\\TimingFramework.jar"));   
-
+        desc.setMaxClients(1);
 
         SwingApplicationDescriptor desc1=new SwingApplicationDescriptor();
         desc1.setArgs("");

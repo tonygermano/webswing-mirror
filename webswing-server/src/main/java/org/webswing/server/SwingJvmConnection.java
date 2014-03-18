@@ -3,7 +3,9 @@ package org.webswing.server;
 import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -41,41 +43,76 @@ public class SwingJvmConnection implements MessageListener {
 
     private static final Logger log = LoggerFactory.getLogger(SwingJvmConnection.class);
     private static ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
-    private static Map<String, Future<?>> runningSwingApps = new HashMap<String, Future<?>>();
+    private static Map<String, Map<String, Future<?>>> runningSwingApps = new HashMap<String, Map<String, Future<?>>>();//map of users per application
 
     private Connection connection;
     private Session session;
     private MessageProducer producer;
     private MessageConsumer consumer;
     private AtmosphereResource client;
+    private String applicationName;
     private String clientId;
+    private String sessionId;
     private Integer screenWidth;
     private Integer screenHeight;
     private boolean newAppStarted = false;
     private ExecutorService swingAppExecutor = Executors.newSingleThreadExecutor();
+    private boolean initialized=false;
 
-    public SwingJvmConnection(JsonConnectionHandshake handshake, SwingApplicationDescriptor appConfig, AtmosphereResource client) {
+    public SwingJvmConnection(JsonConnectionHandshake handshake, String appName, SwingApplicationDescriptor appConfig, AtmosphereResource client) {
         this.client = client;
+        this.applicationName = appName;
         client.addEventListener(new AtmosphereResourceEventListenerAdapter() {
 
             @Override
             public void onDisconnect(AtmosphereResourceEvent event) {
-                close();
+                close(true);
             }
         });
         this.clientId = handshake.clientId;
+        this.sessionId = handshake.sessionId;
         this.screenWidth = handshake.desktopWidth;
         this.screenHeight = handshake.desktopHeight;
         try {
-            initialize();
-            Future<?> app = runningSwingApps.get(clientId);
+            Future<?> app = getUserMap().get(clientId);
             if (app == null || app.isDone() || app.isCancelled()) {
-                runningSwingApps.put(clientId, start(appConfig));
-                newAppStarted = true;
+                if (reachedMaxConnections(appConfig.getMaxClients())) {
+                    client.getBroadcaster().broadcast(Constants.TOO_MANY_CLIENTS_NOTIFICATION, client);
+                } else {
+                    initialize();
+                    getUserMap().put(clientId, start(appConfig));
+                    newAppStarted = true;
+                }
+            }else{
+                initialize();
             }
         } catch (JMSException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean reachedMaxConnections(int maxClients) {
+        int count = 0;
+        for (Iterator<Entry<String, Future<?>>> i = getUserMap().entrySet().iterator(); i.hasNext();) {
+            Entry<String, Future<?>> entry = i.next();
+            if (entry.getValue().isCancelled() || entry.getValue().isDone()) {
+                i.remove();
+            } else {
+                count += 1;
+            }
+        }
+        if (count < maxClients) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private Map<String, Future<?>> getUserMap() {
+        if (!runningSwingApps.containsKey(applicationName)) {
+            runningSwingApps.put(applicationName, new HashMap<String, Future<?>>());
+        }
+        return runningSwingApps.get(applicationName);
     }
 
     private void initialize() throws JMSException {
@@ -107,6 +144,7 @@ public class SwingJvmConnection implements MessageListener {
                 }
             }
         });
+        initialized=true;
     }
 
     public void send(Serializable o) {
@@ -140,7 +178,7 @@ public class SwingJvmConnection implements MessageListener {
             } else if (m instanceof TextMessage) {
                 String text = ((TextMessage) m).getText();
                 if (text.equals(Constants.SWING_SHUTDOWN_NOTIFICATION)) {
-                    close();
+                    close(true);
                 }
             }
         } catch (Exception e) {
@@ -149,7 +187,7 @@ public class SwingJvmConnection implements MessageListener {
 
     }
 
-    public void close() {
+    public void close(boolean withShutdownEvent) {
         try {
             consumer.close();
             producer.close();
@@ -158,12 +196,14 @@ public class SwingJvmConnection implements MessageListener {
         } catch (JMSException e) {
             e.printStackTrace();
         }
-        client.getBroadcaster().broadcast(Constants.SWING_SHUTDOWN_NOTIFICATION, client);
+        if (withShutdownEvent) {
+            client.getBroadcaster().broadcast(Constants.SWING_SHUTDOWN_NOTIFICATION, client);
+        }
         SwingAsyncManagedService.clients.remove(clientId);
     }
 
     public Future<?> start(final SwingApplicationDescriptor appConfig) {
-        return swingAppExecutor.submit(new Runnable() {
+        Future<?> future = swingAppExecutor.submit(new Runnable() {
 
             public void run() {
                 Project project = new Project();
@@ -201,7 +241,8 @@ public class SwingJvmConnection implements MessageListener {
                     String webSwingToolkitJarPath = WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm().substring(6);
                     String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPath;
                     String debug = System.getProperty(Constants.SWING_DEBUG_FLAG, "").equals("true") ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
-                    javaTask.setJvmargs(bootCp + debug + " -noverify " + appConfig.getVmArgs());
+                    String aaFonts = System.getProperty(Constants.SWING_AA_FONT, "true").equals("true") ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
+                    javaTask.setJvmargs(bootCp + debug + aaFonts + " -noverify " + appConfig.getVmArgs());
 
                     Variable clientIdVar = new Variable();
                     clientIdVar.setKey(Constants.SWING_START_SYS_PROP_CLIENT_ID);
@@ -252,6 +293,7 @@ public class SwingJvmConnection implements MessageListener {
                 project.fireBuildFinished(caught);
             }
         });
+        return future;
     }
 
     public String getClientId() {
@@ -260,6 +302,14 @@ public class SwingJvmConnection implements MessageListener {
 
     protected boolean isNewAppStarted() {
         return newAppStarted;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+    
+    public boolean isInitialized() {
+        return initialized;
     }
 
 }

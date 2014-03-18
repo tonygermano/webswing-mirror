@@ -7,6 +7,7 @@ public interface Constants {
     public static final String HEARTBEAT_MSG_PREFIX = "hb";
     public static final String REPAINT_REQUEST_PREFIX = "repaint";
 
+    public static final String APPLICATION_ALREADY_RUNNING = "applicationAlreadyRunning";
     public static final String SWING_SHUTDOWN_NOTIFICATION = "shutDownNotification";
     public static final String TOO_MANY_CLIENTS_NOTIFICATION = "tooManyClientsNotification";
     public static final String SWING_KILL_SIGNAL = "killSwing";
@@ -26,6 +27,7 @@ public interface Constants {
     public static final String CONFIG_FILE_PATH = "webswing.configFile";
     public static final String DEFAULT_CONFIG_FILE_NAME = "webswing.config";
     public static final String SWING_DEBUG_FLAG = "webswing.debugClient";
+    public static final String SWING_AA_FONT = "webswing.antialiasingFonts";
     public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutAfterDisconectSec";
 
     public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";

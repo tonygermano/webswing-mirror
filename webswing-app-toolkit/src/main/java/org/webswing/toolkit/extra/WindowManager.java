@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.WindowActionType;
@@ -27,7 +28,7 @@ public class WindowManager {
     private static WindowManager singleton = null;
     LinkedList<Window> zorder = new LinkedList<Window>();
     Window activeWindow = null;
-    WindowEventHandler eventhandler=new WindowEventHandler();
+    WindowEventHandler eventhandler = new WindowEventHandler();
 
     private WindowManager() {
     }
@@ -45,19 +46,21 @@ public class WindowManager {
             if (w.isAlwaysOnTop()) {
                 zorder.addFirst(w);
             } else {
-                Window firstNotAlwaysOnTopWindow = null;
+                Window lastAlwaysOnTopWindow = null;
                 for (Window z : zorder) {
-                    if (!z.isAlwaysOnTop()) {
-                        firstNotAlwaysOnTopWindow = z;
+                    if (z.isAlwaysOnTop()) {
+                        lastAlwaysOnTopWindow = z;
                     }
                 }
-                if (firstNotAlwaysOnTopWindow != null) {
-                    zorder.add(zorder.indexOf(firstNotAlwaysOnTopWindow), w);
+                if (lastAlwaysOnTopWindow != null) {
+                    zorder.add(zorder.indexOf(lastAlwaysOnTopWindow) + 1, w);
                 } else {
                     zorder.addFirst(w);
                 }
             }
-            activeWindow=w;
+            if (!(w instanceof JWindow)) {
+                activeWindow = w;
+            }
             WindowEvent gainedFocusWindowEvent = new WindowEvent(w, WindowEvent.WINDOW_GAINED_FOCUS, activeWindow, 0, 0);
             WebEventDispatcher.dispatchEventInSwing(w, gainedFocusWindowEvent);
             w.repaint();
@@ -69,13 +72,13 @@ public class WindowManager {
         synchronized (WebPaintDispatcher.webPaintLock) {
             if (zorder.contains(target)) {
                 int index = zorder.indexOf(target);
-                if(target.isAlwaysOnTop()){
-                    index=0;
+                if (target.isAlwaysOnTop()) {
+                    index = 0;
                 }
                 Rectangle bounds = target.getBounds();
                 zorder.remove(target);
                 requestRepaintUnderlying(index, bounds);
-                if(index==0 && zorder.size()>0){
+                if (index == 0 && zorder.size() > 0) {
                     activateWindow(zorder.get(0));
                 }
             }
@@ -115,12 +118,11 @@ public class WindowManager {
         }
 
         Component newFocusOwner = SwingUtilities.getDeepestComponentAt(w, x, y);
-        if (w.getFocusOwner() != newFocusOwner &&  newFocusOwner!=null && newFocusOwner.isFocusable()) {
+        if (w.getFocusOwner() != newFocusOwner && newFocusOwner != null && newFocusOwner.isFocusable()) {
             FocusEvent gainedFocusEvent = new FocusEvent(newFocusOwner, FocusEvent.FOCUS_GAINED, false);
             WebEventDispatcher.dispatchEventInSwing(w, gainedFocusEvent);
         }
         if (this.activeWindow != w) {
-            this.activeWindow = w;
             bringToFront(w);
         }
 
@@ -138,11 +140,11 @@ public class WindowManager {
     @SuppressWarnings("restriction")
     public void extractNonVisibleAreas(Map<String, List<Rectangle>> map) {
         if (zorder.size() > 0) {
-            for (int i = 1; i < zorder.size()+1; i++) {
-                String id = i==zorder.size()?WebToolkit.BACKGROUND_WINDOW_ID:((WebWindowPeer) WebToolkit.targetToPeer(zorder.get(i))).getGuid();
-                Rectangle current = i==zorder.size()? new Rectangle(Util.getWebToolkit().getScreenSize()):zorder.get(i).getBounds();
+            for (int i = 1; i < zorder.size() + 1; i++) {
+                String id = i == zorder.size() ? WebToolkit.BACKGROUND_WINDOW_ID : ((WebWindowPeer) WebToolkit.targetToPeer(zorder.get(i))).getGuid();
+                Rectangle current = i == zorder.size() ? new Rectangle(Util.getWebToolkit().getScreenSize()) : zorder.get(i).getBounds();
                 List<Rectangle> currentDifferences = new ArrayList<Rectangle>();
-                for (int j=i-1; j>=0;j--) {
+                for (int j = i - 1; j >= 0; j--) {
                     Rectangle previousBounds = zorder.get(j).getBounds();
                     Rectangle intersect = SwingUtilities.computeIntersection(current.x, current.y, current.width, current.height, (Rectangle) previousBounds.clone());
                     if (!intersect.isEmpty()) {
@@ -159,33 +161,33 @@ public class WindowManager {
     public void requestRepaintAfterMove(Rectangle originalPosition) {
         requestRepaintUnderlying(0, originalPosition);
     }
-    
+
     private void requestRepaintUnderlying(int index, Rectangle bounds) {
         for (int i = index; i < zorder.size(); i++) {
             Window underlying = zorder.get(i);
             Rectangle uBounds = underlying.getBounds();
             Rectangle boundsCopy = new Rectangle(bounds);
             SwingUtilities.computeIntersection(uBounds.x, uBounds.y, uBounds.width, uBounds.height, boundsCopy);
-            WebWindowPeer peer=(WebWindowPeer) WebToolkit.targetToPeer(underlying);
-            Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(peer.getGuid(),new Rectangle(boundsCopy.x - uBounds.x, boundsCopy.y - uBounds.y, boundsCopy.width, boundsCopy.height));
+            WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(underlying);
+            Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(peer.getGuid(), new Rectangle(boundsCopy.x - uBounds.x, boundsCopy.y - uBounds.y, boundsCopy.width, boundsCopy.height));
         }
         Rectangle boundsCopy = new Rectangle(bounds);
         Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
-        SwingUtilities.computeIntersection(0,0, screensize.width,screensize.height, boundsCopy);
+        SwingUtilities.computeIntersection(0, 0, screensize.width, screensize.height, boundsCopy);
         Util.getWebToolkit().getPaintDispatcher().notifyBackgroundRepainted(boundsCopy);
     }
 
     public void handleWindowDecorationEvent(Window w, MouseEvent e) {
-            WindowActionType wat=Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(w,e);
-            eventhandler.handle(wat,e);
+        WindowActionType wat = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(w, e);
+        eventhandler.handle(wat, e);
     }
-    
+
     public boolean isLockedToWindowDecorationHandler() {
-       return  eventhandler.isEventHandlingLocked();
+        return eventhandler.isEventHandlingLocked();
     }
-    
-    public Window getLockedToWindow(){
-        return  eventhandler.getLockedToWindow();
+
+    public Window getLockedToWindow() {
+        return eventhandler.getLockedToWindow();
     }
 
 }

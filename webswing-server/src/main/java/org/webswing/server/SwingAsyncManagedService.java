@@ -18,8 +18,8 @@ import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.s2c.JsonAppFrame;
-import org.webswing.server.coder.JsonEncoder;
 import org.webswing.server.coder.JsonDecoder;
+import org.webswing.server.coder.JsonEncoder;
 import org.webswing.server.model.SwingApplicationDescriptor;
 import org.webswing.server.util.ServerUtil;
 
@@ -61,14 +61,26 @@ public class SwingAsyncManagedService {
                 if (!clients.containsKey(h.clientId)) {
                     SwingApplicationDescriptor app = applications.get(h.applicationName);
                     if (app != null) {
-                        SwingJvmConnection connection = new SwingJvmConnection(h, app, resourceMap.get(h.sessionId));
-                        clients.put(h.clientId, connection);
-                        if (!connection.isNewAppStarted()) {
-                            return Constants.CONTINUE_OLD_SESSION_QUESTION;
+                        SwingJvmConnection connection = new SwingJvmConnection(h, h.applicationName, app, resourceMap.get(h.sessionId));
+                        if (connection.isInitialized()) {
+                            clients.put(h.clientId, connection);
+                            if (!connection.isNewAppStarted()) {
+                                AtmosphereResource resource = resourceMap.get(h.sessionId);
+                                if (resource != null) {
+                                    resource.getBroadcaster().broadcast(Constants.CONTINUE_OLD_SESSION_QUESTION, resource);
+                                }
+                            }
                         }
                     }
                 } else {
-                    send(h.clientId, h);
+                    if (h.sessionId != null && h.sessionId.equals(clients.get(h.clientId).getSessionId())) {
+                        send(h.clientId, h);
+                    } else {
+                        AtmosphereResource resource = resourceMap.get(h.sessionId);
+                        if (resource != null) {
+                            resource.getBroadcaster().broadcast(Constants.APPLICATION_ALREADY_RUNNING, resource);
+                        }
+                    }
                 }
             } else if (message instanceof JsonEventKeyboard) {
                 JsonEventKeyboard k = (JsonEventKeyboard) message;

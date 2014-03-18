@@ -9,6 +9,7 @@
 	var stoppedDialog = $('#stoppedDialog');
 	var disconnectedDialog = $('#disconnectedDialog');
 	var tooManyConnectionsDialog = $('#tooManyConnectionsDialog');
+	var applicationAlreadyRunningDialog = $('#applicationAlreadyRunningDialog');
 	var clientId = setupClientID();
 	var appName = null;
 	var uuid = null;
@@ -32,10 +33,10 @@
 				location.reload();
 			}
 		},
-		startApplication : function(name){
-			appName=name;
-            socket.push(atmosphere.util.stringifyJSON(getHandShake()));
-            showDialog(startingDialog);
+		startApplication : function(name) {
+			appName = name;
+			socket.push(atmosphere.util.stringifyJSON(getHandShake()));
+			showDialog(startingDialog);
 		}
 	};
 
@@ -68,7 +69,9 @@
 			transport = response.transport;
 		};
 
-		request.onReopen = request.onOpen;
+		request.onReopen = function(response) {
+			showDialog(null);
+		};
 
 		request.onMessage = function(response) {
 			var message = response.responseBody;
@@ -77,16 +80,21 @@
 			} catch (e) {
 				if (message == "shutDownNotification") {
 					showDialog(stoppedDialog);
+					atmosphere.unsubscribe();
+				} else if (message == "applicationAlreadyRunning") {
+					showDialog(applicationAlreadyRunningDialog);
+					atmosphere.unsubscribe();
 				} else if (message == "tooManyClientsNotification") {
 					showDialog(tooManyConnectionsDialog);
+					atmosphere.unsubscribe();
 				} else if (message == "continueOldSession") {
 					showDialog(continueOldSessionDialog);
 				}
 				return;
 			}
-			if(appName==null){
+			if (appName == null) {
 				selectApplication(data);
-			}else{
+			} else {
 				if (!continueOldSessionDialog.hasClass('in')) {// check if open
 					processRequest(data);
 				}
@@ -94,9 +102,12 @@
 		};
 
 		request.onClose = function(response) {
-			if (!stoppedDialog.hasClass('in')) {
-				showDialog(disconnectedDialog);
-			}
+			// need to wait until animated transition finish
+			setTimeout(function() { 
+				if (!stoppedDialog.hasClass('in') && !applicationAlreadyRunningDialog.hasClass('in') && !tooManyConnectionsDialog.hasClass('in')) {
+					showDialog(disconnectedDialog);
+				}
+			}, 3000);
 		};
 
 		request.onError = function(response) {
@@ -110,18 +121,18 @@
 		socket = atmosphere.subscribe(request);
 	}
 
-	function selectApplication(data){
+	function selectApplication(data) {
 		for ( var i in data.applications) {
 			var app = data.applications[i];
-			$('#applicationsList').append('<div class="thumbnail" onclick="webswing.startApplication(\''+app.name+'\')"><img src="data:image/png;base64,'+app.base64Icon+'" class="img-circle"/><div class="caption">'+app.name+'</div></div>');
+			$('#applicationsList').append('<div class="col-sm-6 col-md-4"><div class="thumbnail" onclick="webswing.startApplication(\'' + app.name + '\')"><img src="data:image/png;base64,' + app.base64Icon + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>');
 		}
-		if(i==0){
-			webswing.startApplication(data.applications[i]);
-		}else{
+		if (i == 0) {
+			webswing.startApplication(data.applications[i].name);
+		} else {
 			showDialog(applicationSelectorDialog);
 		}
 	}
-	
+
 	function processRequest(data) {
 		showDialog(null);
 
@@ -389,6 +400,8 @@
 		disconnectedDialog.modal('hide');
 		continueOldSessionDialog.modal('hide');
 		applicationSelectorDialog.modal('hide');
+		applicationAlreadyRunningDialog.modal('hide');
+		tooManyConnectionsDialog.modal('hide');
 		if (dialog != null) {
 			dialog.modal('show');
 		}

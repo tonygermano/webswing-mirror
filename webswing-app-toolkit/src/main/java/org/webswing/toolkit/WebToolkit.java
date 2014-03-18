@@ -1,6 +1,5 @@
 package org.webswing.toolkit;
 
-import java.awt.AWTEvent;
 import java.awt.AWTException;
 import java.awt.Button;
 import java.awt.Checkbox;
@@ -29,14 +28,12 @@ import java.awt.Scrollbar;
 import java.awt.SystemTray;
 import java.awt.TextArea;
 import java.awt.TextField;
-import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.dnd.peer.DragSourceContextPeer;
-import java.awt.event.AWTEventListener;
 import java.awt.font.TextAttribute;
 import java.awt.im.InputMethodHighlight;
 import java.awt.im.spi.InputMethodDescriptor;
