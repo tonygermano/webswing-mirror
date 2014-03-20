@@ -17,9 +17,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -156,47 +162,39 @@ public class Util {
         return null;
     }
 
-    public static void extractWindowImages(Map<String, BufferedImage> windowImages, Map<String, Rectangle> currentAreasToUpdate) {
-        for (String windowId : currentAreasToUpdate.keySet()) {
-            WebWindowPeer w = findWindowPeerById(windowId);
-            if (windowId.equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
-                windowImages.put(windowId,(BufferedImage) getWebToolkit().getImageService().getWindowDecorationTheme().repaintBackground(currentAreasToUpdate.get(windowId)));
+    public static void extractWindowImages(Map<String, Map<Integer, BufferedImage>> windowImages, JsonAppFrame json) {
+        for (JsonWindow window : json.getWindows()) {
+            WebWindowPeer w = findWindowPeerById(window.getId());
+            if (window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
+                windowImages.put(window.getId(), new HashMap<Integer, BufferedImage>());//background image is handled on client
             } else {
-                windowImages.put(windowId, w.extractSafeImage(currentAreasToUpdate.get(windowId)));
+                Map<Integer, BufferedImage> imageMap = new HashMap<Integer, BufferedImage>();
+                for (int i = 0; i < window.getContent().length; i++) {
+                    JsonWindowPartialContent wpc = window.getContent()[i];
+                    imageMap.put(i, w.extractSafeImage(new Rectangle(wpc.getPositionX(), wpc.getPositionY(), wpc.getWidth(), wpc.getHeight())));
+                }
+                windowImages.put(window.getId(), imageMap);
             }
         }
     }
 
-    public static void encodeWindowImages(Map<String, BufferedImage> windowImages, Map<String, List<Rectangle>> windowNonVisibleAreas, JsonAppFrame json, ImageServiceIfc imageService) {
+    public static void encodeWindowImages(Map<String, Map<Integer, BufferedImage>> windowImages, JsonAppFrame json, ImageServiceIfc imageService) {
         for (JsonWindow window : json.getWindows()) {
-            BufferedImage result = windowImages.get(window.getId());
-            JsonWindowPartialContent c = window.getContent();
-            if (windowNonVisibleAreas.containsKey(window.getId())) {
-                Graphics2D g = (Graphics2D) result.getGraphics();
-                g.setBackground(new Color(0x000000, true));
-                g.translate(-c.getPositionX(), -c.getPositionY());
-                for (Rectangle n : windowNonVisibleAreas.get(window.getId())) {
-                    g.clearRect(n.x - window.getPosX(), n.y - window.getPosY(), n.width, n.height);
+            if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
+                Map<Integer, BufferedImage> imageMap = windowImages.get(window.getId());
+                for (int i = 0; i < window.getContent().length; i++) {
+                    JsonWindowPartialContent c = window.getContent()[i];
+                    if (imageMap.containsKey(i)) {
+                        String base64Content = imageService.encodeImage(imageMap.get(i));
+                        c.setBase64Content(base64Content);
+                    }
                 }
-                g.dispose();
             }
-            if (result != null) {
-                String base64Content = imageService.encodeImage(result);
-                window.getContent().setBase64Content(base64Content);
-            }
-            //            if (result != null) {
-            //                JsonWindowPartialContent c = window.getContent();
-            //                c.setPositionX(0);
-            //                c.setPositionY(0);
-            //                BufferedImage cropped = result;
-            //                String base64Content = imageService.encodeImage(cropped);
-            //                window.getContent().setBase64Content(base64Content);
-            //            }
         }
     }
 
     @SuppressWarnings("restriction")
-    public static void fillJsonWithWindowsData(Map<String, Rectangle> currentAreasToUpdate, JsonAppFrame json) {
+    public static void fillJsonWithWindowsData(Map<String, Set<Rectangle>> currentAreasToUpdate, Map<String, List<Rectangle>> windowNonVisibleAreas, JsonAppFrame json) {
         for (String windowId : currentAreasToUpdate.keySet()) {
             WebWindowPeer ww = Util.findWindowPeerById(windowId);
             if (ww != null || windowId.equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
@@ -213,35 +211,23 @@ public class Util {
                     window.setWidth(ww.getBounds().width);
                     window.setHeight(ww.getBounds().height);
                 }
-                JsonWindowPartialContent content = window.getContent() == null ? new JsonWindowPartialContent() : window.getContent();
-                Rectangle dirtyArea = currentAreasToUpdate.get(windowId);
-                if (content.getPositionX() == null) {
-                    content.setPositionX(dirtyArea.x);
-                } else {
-                    Math.min(content.getPositionX(), dirtyArea.x);
+                List<Rectangle> toPaint = joinRectangles(getGrid(new ArrayList<Rectangle>(currentAreasToUpdate.get(windowId)), windowNonVisibleAreas.get(windowId)));
+                List<JsonWindowPartialContent> partialContentList = new ArrayList<JsonWindowPartialContent>();
+                for (Rectangle r : toPaint) {
+                    JsonWindowPartialContent content = new JsonWindowPartialContent();
+                    content.setPositionX(r.x);
+                    content.setPositionY(r.y);
+                    content.setWidth(r.width);
+                    content.setHeight(r.height);
+                    partialContentList.add(content);
                 }
-                if (content.getPositionY() == null) {
-                    content.setPositionY(dirtyArea.y);
-                } else {
-                    Math.min(content.getPositionY(), dirtyArea.y);
-                }
-                if (content.getWidth() == null) {
-                    content.setWidth(dirtyArea.width);
-                } else {
-                    Math.max(content.getWidth(), dirtyArea.width);
-                }
-                if (content.getHeight() == null) {
-                    content.setHeight(dirtyArea.height);
-                } else {
-                    Math.max(content.getHeight(), dirtyArea.height);
-                }
-                window.setContent(content);
+                window.setContent(partialContentList.toArray(new JsonWindowPartialContent[partialContentList.size()]));
             }
         }
     }
 
-    public static Map<String, Rectangle> postponeNonShowingAreas(Map<String, Rectangle> currentAreasToUpdate) {
-        Map<String, Rectangle> forLaterProcessing = new HashMap<String, Rectangle>();
+    public static Map<String, Set<Rectangle>> postponeNonShowingAreas(Map<String, Set<Rectangle>> currentAreasToUpdate) {
+        Map<String, Set<Rectangle>> forLaterProcessing = new HashMap<String, Set<Rectangle>>();
         for (String windowId : currentAreasToUpdate.keySet()) {
             WebWindowPeer ww = Util.findWindowPeerById(windowId);
             if (ww != null) {
@@ -257,15 +243,140 @@ public class Util {
     }
 
     public static boolean isWindowDecorationEvent(Window w, AWTEvent e) {
-        if(e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL!=e.getID() && MouseEvent.MOUSE_MOVED!=e.getID() && ((MouseEvent)e).getButton()==1){
-            Rectangle inner=w.getBounds();
-            Insets i=w.getInsets();
-            inner.x=i.left;
-            inner.y=i.top;
-            inner.width-=i.left+i.right;
-            inner.height-=i.top+i.bottom;
-            return !SwingUtilities.isRectangleContainingRectangle(inner, new Rectangle(((MouseEvent) e).getX(),((MouseEvent) e).getY(),0,0));
+        if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID() && MouseEvent.MOUSE_MOVED != e.getID() && ((MouseEvent) e).getButton() == 1) {
+            Rectangle inner = w.getBounds();
+            Insets i = w.getInsets();
+            inner.x = i.left;
+            inner.y = i.top;
+            inner.width -= i.left + i.right;
+            inner.height -= i.top + i.bottom;
+            return !SwingUtilities.isRectangleContainingRectangle(inner, new Rectangle(((MouseEvent) e).getX(), ((MouseEvent) e).getY(), 0, 0));
         }
         return false;
+    }
+
+    public static Set<Rectangle> getGrid(List<Rectangle> dirtyAreas, List<Rectangle> topWindows) {
+        Set<Rectangle> result = new HashSet<Rectangle>();
+        Set<Integer> xLines = new TreeSet<Integer>();
+        Set<Integer> yLines = new TreeSet<Integer>();
+        for (Rectangle r : dirtyAreas) {
+            xLines.add(r.x);
+            xLines.add(r.x + r.width);
+            yLines.add(r.y);
+            yLines.add(r.y + r.height);
+        }
+        if (topWindows != null) {
+            for (Rectangle r : topWindows) {
+                xLines.add(r.x);
+                xLines.add(r.x + r.width);
+                yLines.add(r.y);
+                yLines.add(r.y + r.height);
+            }
+        }
+        Integer[] y = yLines.toArray(new Integer[yLines.size()]);
+        Integer[] x = xLines.toArray(new Integer[xLines.size()]);
+        for (int row = 0; row < y.length - 1; row++) {
+            for (int col = 0; col < x.length - 1; col++) {
+                Rectangle potential = new Rectangle(x[col], y[row], x[col + 1] - x[col], y[row + 1] - y[row]);
+                //filter
+                boolean insideDirtyAreas = false;
+                for (Rectangle da : dirtyAreas) {
+                    if (SwingUtilities.isRectangleContainingRectangle(da, potential)) {
+                        insideDirtyAreas = true;
+                        break;
+                    }
+                }
+                if (insideDirtyAreas) {
+                    boolean insideTopWindow = false;
+                    if (topWindows != null) {
+                        for (Rectangle tw : topWindows) {
+                            if (SwingUtilities.isRectangleContainingRectangle(tw, potential)) {
+                                insideTopWindow = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!insideTopWindow) {
+                        result.add(potential);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static List<Rectangle> joinRectangles(Set<Rectangle> grid) {
+        List<Rectangle> result = new ArrayList<Rectangle>();
+        List<Rectangle> gridList = new ArrayList<Rectangle>(grid);
+        //join by rows
+        List<Rectangle> joinedRows = new ArrayList<Rectangle>();
+        Collections.sort(gridList, new Comparator<Rectangle>() {
+
+            @Override
+            public int compare(Rectangle o1, Rectangle o2) {
+                if (o1.y > o2.y) {
+                    return 1;
+                } else if (o1.y == o2.y) {
+                    if (o1.x > o2.x) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    return -1;
+                }
+            }
+        });
+        Rectangle current = null;
+        for (Rectangle r : gridList) {
+            if (current == null) {
+                current = r;
+            } else {
+                if (current.y == r.y && current.height == r.height && current.x + current.width == r.x) {//is joinable on row
+                    current.width += r.width;
+                } else {
+                    joinedRows.add(current);
+                    current = r;
+                }
+            }
+        }
+        if (current != null) {
+            joinedRows.add(current);
+        }
+        //join by cols
+        Collections.sort(joinedRows, new Comparator<Rectangle>() {
+
+            @Override
+            public int compare(Rectangle o1, Rectangle o2) {
+                if (o1.x > o2.x) {
+                    return 1;
+                } else if (o1.x == o2.x) {
+                    if (o1.y > o2.y) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    return -1;
+                }
+            }
+        });
+        Rectangle currentX = null;
+        for (Rectangle r : joinedRows) {
+            if (currentX == null) {
+                currentX = r;
+            } else {
+                if (currentX.x == r.x && currentX.width == r.width && currentX.y + currentX.height == r.y) {//is joinable on row
+                    currentX.height += r.height;
+                } else {
+                    result.add(currentX);
+                    currentX = r;
+                }
+            }
+        }
+        if (currentX != null) {
+            result.add(currentX);
+        }
+        return result;
     }
 }

@@ -103,7 +103,7 @@
 
 		request.onClose = function(response) {
 			// need to wait until animated transition finish
-			setTimeout(function() { 
+			setTimeout(function() {
 				if (!stoppedDialog.hasClass('in') && !applicationAlreadyRunningDialog.hasClass('in') && !tooManyConnectionsDialog.hasClass('in')) {
 					showDialog(disconnectedDialog);
 				}
@@ -142,9 +142,15 @@
 
 		for ( var i in data.windows) {
 			var win = data.windows[i];
-			var winContent = win.content;
-			if (winContent != null) {
-				draw(win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.base64Content);
+			for ( var x in win.content) {
+				var winContent = win.content[x];
+				if (winContent != null) {
+					if (win.id == 'backgroundWindowId') {
+						clear(win.posX + winContent.positionX, win.posY + winContent.positionY,winContent.width,winContent.height);
+					} else {
+						draw(win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.base64Content);
+					}
+				}
 			}
 		}
 		socket.push("paintAck" + clientId);
@@ -158,6 +164,12 @@
 			context.drawImage(imageObj, x, y);
 		};
 		imageObj.src = 'data:image/png;base64,' + b64image;
+	}
+
+	function clear(x, y, w, h) {
+		var context, imageObj;
+		context = canvas.getContext("2d");
+		context.clearRect(x, y, w, h);
 	}
 
 	function mouseMoveEventFilter() {

@@ -6,8 +6,10 @@ import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +31,7 @@ public class WebPaintDispatcher {
     public static final Object webPaintLock = new Object();
     private ServerConnectionIfc serverConnection;
 
-    private volatile Map<String, Rectangle> areasToUpdate = new HashMap<String, Rectangle>();
+    private volatile Map<String, Set<Rectangle>> areasToUpdate = new HashMap<String,Set<Rectangle>>();
     private volatile boolean clientReadyToReceive = true;
     private long lastReadyStateTime;
 
@@ -42,9 +44,9 @@ public class WebPaintDispatcher {
             public void run() {
                 try {
                     JsonAppFrame json;
-                    Map<String, BufferedImage> windowImages;
+                    Map<String,  Map<Integer,BufferedImage>> windowImages;
                     Map<String, List<Rectangle>> windowNonVisibleAreas;
-                    Map<String, Rectangle> currentAreasToUpdate = null;
+                    Map<String, Set<Rectangle>> currentAreasToUpdate = null;
                     synchronized (webPaintLock) {
                         if (clientReadyToReceive) {
                             lastReadyStateTime = System.currentTimeMillis();
@@ -56,19 +58,19 @@ public class WebPaintDispatcher {
                             return;
                         }
                         json = new JsonAppFrame();
-                        windowImages = new HashMap<String, BufferedImage>();
+                        windowImages = new HashMap<String, Map<Integer,BufferedImage>>();
                         windowNonVisibleAreas = new HashMap<String, List<Rectangle>>();
                         currentAreasToUpdate = areasToUpdate;
                         areasToUpdate = Util.postponeNonShowingAreas(currentAreasToUpdate);
                         if (currentAreasToUpdate.size() == 0) {
                             return;
                         }
-                        Util.fillJsonWithWindowsData(currentAreasToUpdate, json);
-                        Util.extractWindowImages(windowImages, currentAreasToUpdate);
                         WindowManager.getInstance().extractNonVisibleAreas(windowNonVisibleAreas);
+                        Util.fillJsonWithWindowsData(currentAreasToUpdate,windowNonVisibleAreas, json);
+                        Util.extractWindowImages(windowImages, json);
                         clientReadyToReceive = false;
                     }
-                    Util.encodeWindowImages(windowImages, windowNonVisibleAreas, json, imageService);
+                    Util.encodeWindowImages(windowImages,json, imageService);
                     serverConnection.sendJsonObject(json);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -96,11 +98,12 @@ public class WebPaintDispatcher {
         synchronized (webPaintLock) {
             if (validBounds(repaintedArea)) {
                 if (areasToUpdate.containsKey(guid)) {
-                    Rectangle r = areasToUpdate.get(guid);
-                    Rectangle newR = SwingUtilities.computeUnion(r.x, r.y, r.width, r.height, repaintedArea);
-                    areasToUpdate.put(guid, newR);
+                    Set<Rectangle> rset = areasToUpdate.get(guid);
+                    rset.add(repaintedArea);
                 } else {
-                    areasToUpdate.put(guid, repaintedArea);
+                    Set<Rectangle> rset= new HashSet<Rectangle>();  
+                    rset.add(repaintedArea);
+                    areasToUpdate.put(guid, rset);
                 }
             }
         }
@@ -109,7 +112,15 @@ public class WebPaintDispatcher {
     public void notifyWindowBoundsChanged(String guid, Rectangle newBounds) {
         synchronized (webPaintLock) {
             if (validBounds(newBounds)) {
-                areasToUpdate.put(guid, newBounds);
+                Set<Rectangle> rset;
+                if (areasToUpdate.containsKey(guid)) {
+                    rset=areasToUpdate.get(guid);
+                    rset.clear();
+                }else{
+                    rset= new HashSet<Rectangle>(); 
+                    areasToUpdate.put(guid, rset);
+                }
+                rset.add(newBounds);
             }
         }
     }

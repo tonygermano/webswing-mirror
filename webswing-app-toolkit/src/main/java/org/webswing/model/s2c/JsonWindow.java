@@ -7,7 +7,7 @@ public class JsonWindow implements Serializable {
     
     String id;
     String parentId;
-    JsonWindowPartialContent content;
+    JsonWindowPartialContent[] content;
     String title;
     Integer posX;
     Integer posY;
@@ -33,11 +33,11 @@ public class JsonWindow implements Serializable {
         this.parentId = parentId;
     }
     
-    public JsonWindowPartialContent getContent() {
+    public JsonWindowPartialContent[] getContent() {
         return content;
     }
     
-    public void setContent(JsonWindowPartialContent content) {
+    public void setContent(JsonWindowPartialContent[] content) {
         this.content = content;
     }
     

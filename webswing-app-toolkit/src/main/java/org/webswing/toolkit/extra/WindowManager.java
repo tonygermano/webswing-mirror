@@ -148,6 +148,7 @@ public class WindowManager {
                     Rectangle previousBounds = zorder.get(j).getBounds();
                     Rectangle intersect = SwingUtilities.computeIntersection(current.x, current.y, current.width, current.height, (Rectangle) previousBounds.clone());
                     if (!intersect.isEmpty()) {
+                        intersect.setLocation(intersect.x-previousBounds.x, intersect.y-previousBounds.y);
                         currentDifferences.add(intersect);
                     }
                 }
