@@ -155,9 +155,9 @@ public class WebComponentPeer implements ComponentPeer {
 
     public void setBounds(int x, int y, int w, int h, int paramInt5) {
         synchronized (WebPaintDispatcher.webPaintLock) {
-            Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
             Point validPosition = validate(x, y, w, h);
             if ((w != this.oldWidth) || (h != this.oldHeight)) {
+                Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
                 try {
                     replaceSurfaceData(validPosition.x, validPosition.y, w, h);
                 } catch (InvalidPipeException e) {

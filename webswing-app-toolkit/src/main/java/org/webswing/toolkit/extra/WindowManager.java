@@ -9,6 +9,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -138,7 +139,8 @@ public class WindowManager {
     }
 
     @SuppressWarnings("restriction")
-    public void extractNonVisibleAreas(Map<String, List<Rectangle>> map) {
+    public Map<String, List<Rectangle>> extractNonVisibleAreas() {
+        Map<String, List<Rectangle>> result = new HashMap<String, List<Rectangle>>();
         if (zorder.size() > 0) {
             for (int i = 1; i < zorder.size() + 1; i++) {
                 String id = i == zorder.size() ? WebToolkit.BACKGROUND_WINDOW_ID : ((WebWindowPeer) WebToolkit.targetToPeer(zorder.get(i))).getGuid();
@@ -148,19 +150,29 @@ public class WindowManager {
                     Rectangle previousBounds = zorder.get(j).getBounds();
                     Rectangle intersect = SwingUtilities.computeIntersection(current.x, current.y, current.width, current.height, (Rectangle) previousBounds.clone());
                     if (!intersect.isEmpty()) {
-                        intersect.setLocation(intersect.x-previousBounds.x, intersect.y-previousBounds.y);
+                        intersect.setLocation(intersect.x - current.x, intersect.y - current.y);
                         currentDifferences.add(intersect);
                     }
                 }
                 if (currentDifferences.size() != 0) {
-                    map.put(id, currentDifferences);
+                    result.put(id, currentDifferences);
                 }
             }
         }
+        return result;
     }
 
-    public void requestRepaintAfterMove(Rectangle originalPosition) {
-        requestRepaintUnderlying(0, originalPosition);
+    public void requestRepaintAfterMove(Window w, Rectangle originalPosition) {
+        requestRepaintUnderlying(zorder.indexOf(w) + 1, originalPosition);
+        Rectangle newPosition = w.getBounds();
+        if (originalPosition.x != newPosition.x || originalPosition.y != newPosition.y) {
+            //just to notify that a window was moved, the moving handled by client
+            if (zorder.indexOf(w) == 0) {
+                Util.getWebToolkit().getPaintDispatcher().notifyWindowMoved(w, originalPosition, newPosition);
+            } else {
+                Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(w);
+            }
+        }
     }
 
     private void requestRepaintUnderlying(int index, Rectangle bounds) {

@@ -132,9 +132,8 @@ public class WindowEventHandler {
     private void moveWindow(Window w, int x, int y) {
         Rectangle originalPos = new Rectangle(w.getLocation().x, w.getLocation().y, w.getWidth(), w.getHeight());
         w.setLocation(x, y);
-        //TODO:optimize on client side and remove repaint call
-        WindowManager.getInstance().requestRepaintAfterMove(originalPos);
-        w.repaint();
+        WindowManager.getInstance().requestRepaintAfterMove(w,originalPos);
+        
     }
 
     private void resizeWindow(Window w, int width, int height) {
@@ -143,7 +142,7 @@ public class WindowEventHandler {
         validateSize(w, newSize);
         if (!originalSize.equals(newSize)) {
             w.setSize(newSize);
-            WindowManager.getInstance().requestRepaintAfterMove(new Rectangle(w.getX(), w.getY(), originalSize.width, originalSize.height));
+            WindowManager.getInstance().requestRepaintAfterMove(w,new Rectangle(w.getX(), w.getY(), originalSize.width, originalSize.height));
             w.invalidate();
             w.validate();
             w.repaint();

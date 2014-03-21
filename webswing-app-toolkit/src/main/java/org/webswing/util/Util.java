@@ -162,7 +162,8 @@ public class Util {
         return null;
     }
 
-    public static void extractWindowImages(Map<String, Map<Integer, BufferedImage>> windowImages, JsonAppFrame json) {
+    public static Map<String, Map<Integer, BufferedImage>> extractWindowImages( JsonAppFrame json) {
+        Map<String, Map<Integer, BufferedImage>> windowImages=new HashMap<String, Map<Integer,BufferedImage>>();
         for (JsonWindow window : json.getWindows()) {
             WebWindowPeer w = findWindowPeerById(window.getId());
             if (window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
@@ -176,6 +177,7 @@ public class Util {
                 windowImages.put(window.getId(), imageMap);
             }
         }
+        return windowImages;
     }
 
     public static void encodeWindowImages(Map<String, Map<Integer, BufferedImage>> windowImages, JsonAppFrame json, ImageServiceIfc imageService) {
@@ -194,7 +196,8 @@ public class Util {
     }
 
     @SuppressWarnings("restriction")
-    public static void fillJsonWithWindowsData(Map<String, Set<Rectangle>> currentAreasToUpdate, Map<String, List<Rectangle>> windowNonVisibleAreas, JsonAppFrame json) {
+    public static JsonAppFrame fillJsonWithWindowsData(Map<String, Set<Rectangle>> currentAreasToUpdate, Map<String, List<Rectangle>> windowNonVisibleAreas) {
+        JsonAppFrame json = new JsonAppFrame();
         for (String windowId : currentAreasToUpdate.keySet()) {
             WebWindowPeer ww = Util.findWindowPeerById(windowId);
             if (ww != null || windowId.equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
@@ -224,6 +227,7 @@ public class Util {
                 window.setContent(partialContentList.toArray(new JsonWindowPartialContent[partialContentList.size()]));
             }
         }
+        return json;
     }
 
     public static Map<String, Set<Rectangle>> postponeNonShowingAreas(Map<String, Set<Rectangle>> currentAreasToUpdate) {

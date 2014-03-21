@@ -139,14 +139,16 @@
 		if (data.linkAction != null) {
 			window.open(data.linkAction.url, '_blank');
 		}
-
+		if (data.moveAction != null) {
+			copy(data.moveAction.sx,data.moveAction.sy,data.moveAction.dx,data.moveAction.dy,data.moveAction.width,data.moveAction.height);
+		}
 		for ( var i in data.windows) {
 			var win = data.windows[i];
 			for ( var x in win.content) {
 				var winContent = win.content[x];
 				if (winContent != null) {
 					if (win.id == 'backgroundWindowId') {
-						clear(win.posX + winContent.positionX, win.posY + winContent.positionY,winContent.width,winContent.height);
+						clear(win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height);
 					} else {
 						draw(win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.base64Content);
 					}
@@ -167,9 +169,16 @@
 	}
 
 	function clear(x, y, w, h) {
-		var context, imageObj;
+		var context;
 		context = canvas.getContext("2d");
 		context.clearRect(x, y, w, h);
+	}
+
+	function copy(sx, sy, dx, dy, w, h) {
+		var context;
+		context = canvas.getContext("2d");
+		var copy = context.getImageData(sx, sy, w, h);
+		context.putImageData(copy, dx, dy);
 	}
 
 	function mouseMoveEventFilter() {
