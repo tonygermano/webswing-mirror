@@ -5,10 +5,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.jms.Connection;
 import javax.jms.ExceptionListener;
@@ -36,6 +38,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.c2s.JsonConnectionHandshake;
+import org.webswing.model.s2c.JsonAppFrame;
+import org.webswing.model.s2c.JsonLinkAction;
+import org.webswing.model.s2c.OpenFileResult;
+import org.webswing.model.s2c.PrinterJobResult;
+import org.webswing.model.s2c.JsonLinkAction.JsonLinkActionType;
 import org.webswing.server.model.SwingApplicationDescriptor;
 import org.webswing.toolkit.WebToolkit;
 
@@ -174,6 +181,23 @@ public class SwingJvmConnection implements MessageListener {
     public void onMessage(Message m) {
         try {
             if (m instanceof ObjectMessage) {
+                if(((ObjectMessage) m).getObject() instanceof PrinterJobResult){
+                    PrinterJobResult pj=(PrinterJobResult) ((ObjectMessage) m).getObject();
+                    FileServlet.registerFile(pj.getPdf(), pj.getId(), 30, TimeUnit.MINUTES, pj.getClientId());
+                    JsonAppFrame f = new JsonAppFrame();
+                    JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.print, pj.getId());
+                    f.setLinkAction(linkAction);
+                    client.getBroadcaster().broadcast(f, client);
+                }
+                if(((ObjectMessage) m).getObject() instanceof OpenFileResult){
+                    OpenFileResult fr= (OpenFileResult) ((ObjectMessage) m).getObject();
+                    String id = UUID.randomUUID().toString();
+                    FileServlet.registerFile(fr.getF(), id, 30, TimeUnit.MINUTES, fr.getClientId());
+                    JsonAppFrame f = new JsonAppFrame();
+                    JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.file,id);
+                    f.setLinkAction(linkAction);
+                    client.getBroadcaster().broadcast(f, client);
+                }
                 client.getBroadcaster().broadcast(((ObjectMessage) m).getObject(), client);
             } else if (m instanceof TextMessage) {
                 String text = ((TextMessage) m).getText();
@@ -273,6 +297,11 @@ public class SwingJvmConnection implements MessageListener {
                     graphicsConfigImplClass.setKey("java.awt.graphicsenv");
                     graphicsConfigImplClass.setValue("org.webswing.toolkit.ge.WebGraphicsEnvironment");
                     javaTask.addSysproperty(graphicsConfigImplClass);
+
+                    Variable printerJobImplClass = new Variable();
+                    printerJobImplClass.setKey("java.awt.printerjob");
+                    printerJobImplClass.setValue("org.webswing.toolkit.WebPrinterJob");
+                    javaTask.addSysproperty(printerJobImplClass);
 
                     Variable screenWidthVar = new Variable();
                     screenWidthVar.setKey(Constants.SWING_SCREEN_WIDTH);

@@ -17,7 +17,7 @@ public class SwingApplicationDescriptor implements Serializable {
     private String args = "";
     private String homeDir = System.getProperty("user.dir");
     private boolean homeDirPerSession;
-    private int maxClients;
+    private int maxClients=1;
 
     public String getMainClass() {
         return mainClass;

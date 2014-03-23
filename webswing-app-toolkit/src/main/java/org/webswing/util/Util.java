@@ -152,7 +152,7 @@ public class Util {
     public static WebWindowPeer findWindowPeerById(String id) {
         for (Window w : Window.getWindows()) {
             Object peer = WebToolkit.targetToPeer(w);
-            if (peer instanceof WebWindowPeer) {
+            if (peer!=null && peer instanceof WebWindowPeer) {
                 if (((WebWindowPeer) peer).getGuid().equals(id)) {
                     return (WebWindowPeer) peer;
                 }

@@ -14,9 +14,19 @@
 		<load-on-startup>0</load-on-startup>
 		<async-supported>true</async-supported>
 	</servlet>
+	<servlet>
+		<description>FileServlet</description>
+		<servlet-name>FileServlet</servlet-name>
+		<servlet-class>org.webswing.server.FileServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>AtmosphereServlet</servlet-name>
 		<url-pattern>/async/swing</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>FileServlet</servlet-name>
+		<url-pattern>/file</url-pattern>
 	</servlet-mapping>
 	<listener>
         <listener-class>org.webswing.server.JmsService</listener-class>

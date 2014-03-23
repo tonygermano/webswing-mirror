@@ -40,10 +40,12 @@ desc.setClassPathEntries(Arrays.asList("f:\\DATA\\Workspaces\\sources\\webswing-
         SwingApplicationDescriptor desc1=new SwingApplicationDescriptor();
         desc1.setArgs("");
         desc1.setVmArgs("");
-        desc1.setHomeDir("F:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target");
-        desc1.setMainClass("test\\Main");
-        desc1.setClassPathEntries(Arrays.asList("test.jar"));
-        apps.put("test1", desc1);
+        desc1.setHomeDir("f:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\print");
+        desc1.setMainClass("Main");
+        desc1.setClassPathEntries(Arrays.asList("print.jar"));
+        desc1.setMaxClients(1);
+
+        apps.put("Printing", desc1);
 
         mapper.defaultPrettyPrintingWriter().writeValue(new File("F:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target\\webswing.config"),apps);
     }

@@ -7,6 +7,8 @@ public interface Constants {
     public static final String HEARTBEAT_MSG_PREFIX = "hb";
     public static final String REPAINT_REQUEST_PREFIX = "repaint";
 
+    public static final String CLIENT_ID_COOKIE = "webswingID";
+
     public static final String APPLICATION_ALREADY_RUNNING = "applicationAlreadyRunning";
     public static final String SWING_SHUTDOWN_NOTIFICATION = "shutDownNotification";
     public static final String TOO_MANY_CLIENTS_NOTIFICATION = "tooManyClientsNotification";

@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -27,11 +26,9 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
     Color basicBorder = new Color(60, 150, 160);
     Color basicButton = new Color(70, 170, 70);
     Color basicText = new Color(16, 40, 16);
-    Color backgroundColor = new Color(255, 255, 255);
     int buttonWidth = 32;
     int buttonMargin = 1;
     int headerMargin = 5;
-    BufferedImage backgroundImage;
     Image x;
     Image max;
     Image min;
@@ -91,24 +88,6 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
         g.drawImage(this.x, buttonOffsetx + (buttonWidth / 4), buttonOffsetY, buttonWidth / 2, buttonWidth / 2, null);
         g.dispose();
         return image;
-    }
-
-    public Image repaintBackground(Rectangle sub) {
-        int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
-        int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
-
-        if (backgroundImage == null || screenHeight != backgroundImage.getHeight() || screenWidth != backgroundImage.getWidth()) {
-            backgroundImage = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_4BYTE_ABGR);
-            Graphics g = backgroundImage.getGraphics();
-            g.setColor(backgroundColor);
-            g.fillRect(0, 0, screenWidth, screenHeight);
-            g.dispose();
-        }
-        BufferedImage result = new BufferedImage(sub.width, sub.height, BufferedImage.TYPE_4BYTE_ABGR);
-        Graphics g = result.getGraphics();
-        g.drawImage(backgroundImage, 0, 0, sub.width, sub.height, sub.x, sub.y, sub.x + sub.width, sub.y + sub.height, null);
-        g.dispose();
-        return result;
     }
 
     private static String getTitle(Object o) {

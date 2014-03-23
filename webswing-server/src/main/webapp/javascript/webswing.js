@@ -137,10 +137,16 @@
 		showDialog(null);
 
 		if (data.linkAction != null) {
-			window.open(data.linkAction.url, '_blank');
+			if (data.linkAction.action == 'url') {
+				window.open(data.linkAction.url, '_blank');
+			} else if (data.linkAction.action == 'print') {
+				window.open('/print/viewer.html?file=' + encodeURIComponent('../file?id=' + data.linkAction.url), '_blank');
+			} else if (data.linkAction.action == 'file') {
+				downloadURL('/file?id=' + data.linkAction.url);
+			}
 		}
 		if (data.moveAction != null) {
-			copy(data.moveAction.sx,data.moveAction.sy,data.moveAction.dx,data.moveAction.dy,data.moveAction.width,data.moveAction.height);
+			copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height);
 		}
 		for ( var i in data.windows) {
 			var win = data.windows[i];
@@ -428,6 +434,17 @@
 		}
 	}
 
+	function downloadURL(url) {
+		var hiddenIFrameID = 'hiddenDownloader', iframe = document.getElementById(hiddenIFrameID);
+		if (iframe === null) {
+			iframe = document.createElement('iframe');
+			iframe.id = hiddenIFrameID;
+			iframe.style.display = 'none';
+			document.body.appendChild(iframe);
+		}
+		iframe.src = url;
+	}
+	;
 	function width() {
 		return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || 0;
 	}

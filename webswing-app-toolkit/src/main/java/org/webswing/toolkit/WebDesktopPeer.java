@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+import org.webswing.Constants;
+import org.webswing.model.s2c.OpenFileResult;
 import org.webswing.util.Util;
 
 public class WebDesktopPeer implements DesktopPeer {
@@ -20,10 +22,10 @@ public class WebDesktopPeer implements DesktopPeer {
         switch (action) {
             case BROWSE:
             case MAIL:
-                return true;
             case EDIT:
             case OPEN:
             case PRINT:
+                return true;
             default:
                 return false;
         }
@@ -32,17 +34,24 @@ public class WebDesktopPeer implements DesktopPeer {
 
     @Override
     public void open(File file) throws IOException {
-        //not supported yet
+        sendFile(file);
     }
 
     @Override
     public void edit(File file) throws IOException {
-        //not supported yet
+        sendFile(file);
     }
 
     @Override
     public void print(File file) throws IOException {
-        //TODO:
+        sendFile(file);
+    }
+
+    private void sendFile(File file) {
+        OpenFileResult f= new OpenFileResult();
+        f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
+        f.setF(file);
+        Util.getWebToolkit().getPaintDispatcher().sendJsonObject(f);
     }
 
     @Override

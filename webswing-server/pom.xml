@@ -94,7 +94,11 @@
 						WEB-INF/lib/webswing-app-interface-*.jar,
 						WEB-INF/lib/webswing-app-launcher-*.jar,
 						WEB-INF/lib/webswing-server-launcher-*.jar,
-						WEB-INF/lib/slf4j-simple-*.jar
+						WEB-INF/lib/slf4j-simple-*.jar,
+						WEB-INF/lib/pdfbox-*.jar,
+						WEB-INF/lib/jempbox-*.jar,
+						WEB-INF/lib/fontbox-*.jar,
+						WEB-INF/lib/commons-logging*.jar
 					</packagingExcludes>
 					<archive>
 						<manifest>
@@ -129,7 +133,7 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/swing-lib</outputDirectory>
 							<includeArtifactIds>
-								webswing-app-interface,webswing-app-launcher,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple
+								webswing-app-interface,webswing-app-launcher,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging
 							</includeArtifactIds>
 						</configuration>
 					</execution>
@@ -173,8 +177,12 @@
 			<plugin>
 				<groupId>net.alchim31.maven</groupId>
 				<artifactId>yuicompressor-maven-plugin</artifactId>
-				<version>1.0</version>
+				<version>1.1</version>
 				<configuration>
+					<excludes>
+						<exclude>**/pdf.worker.js</exclude>
+						<exclude>**/*.min.js</exclude>
+					</excludes>
 					<nosuffix>true</nosuffix>
 					<jswarn>false</jswarn>
 				</configuration>

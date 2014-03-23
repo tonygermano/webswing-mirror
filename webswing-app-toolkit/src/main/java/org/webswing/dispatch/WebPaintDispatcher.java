@@ -1,6 +1,5 @@
 package org.webswing.dispatch;
 
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
@@ -55,7 +54,7 @@ public class WebPaintDispatcher {
                         if (clientReadyToReceive) {
                             lastReadyStateTime = System.currentTimeMillis();
                         }
-                        if ((areasToUpdate.size() == 0 && moveAction==null)|| !clientReadyToReceive) {
+                        if ((areasToUpdate.size() == 0 && moveAction == null) || !clientReadyToReceive) {
                             if (!clientReadyToReceive && (System.currentTimeMillis() - lastReadyStateTime) > 2000) {
                                 clientReadyToReceive = true;
                             }
@@ -64,15 +63,15 @@ public class WebPaintDispatcher {
                         windowImages = new HashMap<String, Map<Integer, BufferedImage>>();
                         currentAreasToUpdate = areasToUpdate;
                         areasToUpdate = Util.postponeNonShowingAreas(currentAreasToUpdate);
-                        if (currentAreasToUpdate.size() == 0 && moveAction==null) {
+                        if (currentAreasToUpdate.size() == 0 && moveAction == null) {
                             return;
                         }
                         windowNonVisibleAreas = WindowManager.getInstance().extractNonVisibleAreas();
                         json = Util.fillJsonWithWindowsData(currentAreasToUpdate, windowNonVisibleAreas);
                         windowImages = Util.extractWindowImages(json);
-                        if(moveAction!=null){
-                            json.moveAction=moveAction;
-                            moveAction=null;
+                        if (moveAction != null) {
+                            json.moveAction = moveAction;
+                            moveAction = null;
                         }
                         clientReadyToReceive = false;
                     }
@@ -173,8 +172,10 @@ public class WebPaintDispatcher {
     public void resetWindowsPosition() {
         for (Window w : Window.getWindows()) {
             WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(w);
-            Rectangle b = w.getBounds();
-            peer.setBounds(b.x, b.y, b.width, b.height, 0);
+            if (peer != null) {
+                Rectangle b = w.getBounds();
+                peer.setBounds(b.x, b.y, b.width, b.height, 0);
+            }
         }
     }
 
@@ -182,39 +183,39 @@ public class WebPaintDispatcher {
         synchronized (webPaintLock) {
             if (moveAction == null) {
                 moveAction = new JsonWindowMoveAction(from.x, from.y, to.x, to.y, from.width, from.height);
-                notifyRepaintOffScreenAreas(w,moveAction);
-            }else if(moveAction.dx==from.x && moveAction.dy==from.y && moveAction.width==from.width && moveAction.height==from.height){
-                moveAction.dx=to.x;
-                moveAction.dy=to.y;
-                notifyRepaintOffScreenAreas(w,moveAction);
-            }else{
+                notifyRepaintOffScreenAreas(w, moveAction);
+            } else if (moveAction.dx == from.x && moveAction.dy == from.y && moveAction.width == from.width && moveAction.height == from.height) {
+                moveAction.dx = to.x;
+                moveAction.dy = to.y;
+                notifyRepaintOffScreenAreas(w, moveAction);
+            } else {
                 notifyWindowRepaint(w);
             }
         }
     }
 
     @SuppressWarnings("restriction")
-    private void notifyRepaintOffScreenAreas(Window w,JsonWindowMoveAction m) {
+    private void notifyRepaintOffScreenAreas(Window w, JsonWindowMoveAction m) {
         Rectangle screen = new Rectangle(Util.getWebToolkit().getScreenSize());
-        Rectangle before = new Rectangle(m.sx,m.sy,m.width,m.height);
-        Rectangle after = new Rectangle(m.dx,m.dy,m.width,m.height);
-        int xdiff=m.sx-m.dx;
-        int ydiff=m.sy-m.dy;
-        Rectangle[] invisibleBefore=SwingUtilities.computeDifference(before, screen);
-        if(invisibleBefore.length!=0){
-            for(Rectangle r:invisibleBefore){
-                r.setLocation(r.x-xdiff,r.y-ydiff);
+        Rectangle before = new Rectangle(m.sx, m.sy, m.width, m.height);
+        Rectangle after = new Rectangle(m.dx, m.dy, m.width, m.height);
+        int xdiff = m.sx - m.dx;
+        int ydiff = m.sy - m.dy;
+        Rectangle[] invisibleBefore = SwingUtilities.computeDifference(before, screen);
+        if (invisibleBefore.length != 0) {
+            for (Rectangle r : invisibleBefore) {
+                r.setLocation(r.x - xdiff, r.y - ydiff);
             }
-            Rectangle[] invisibleAfter= SwingUtilities.computeDifference(after, screen);
+            Rectangle[] invisibleAfter = SwingUtilities.computeDifference(after, screen);
             List<Rectangle> toRepaint = Util.joinRectangles(Util.getGrid(Arrays.asList(invisibleBefore), Arrays.asList(invisibleAfter)));
             WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(w);
-            for(Rectangle r:toRepaint){
-                r.setLocation(r.x-w.getX(),r.y-w.getY());
+            for (Rectangle r : toRepaint) {
+                r.setLocation(r.x - w.getX(), r.y - w.getY());
                 notifyWindowAreaRepainted(peer.getGuid(), r);
             }
-            
+
         }
-        
+
     }
 
 }
