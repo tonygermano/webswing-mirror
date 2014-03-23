@@ -148,6 +148,9 @@
 		if (data.moveAction != null) {
 			copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height);
 		}
+		if (data.cursorChange != null) {
+			canvas.style.cursor = data.cursorChange.cursor;
+		}
 		for ( var i in data.windows) {
 			var win = data.windows[i];
 			for ( var x in win.content) {

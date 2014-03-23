@@ -1,7 +1,7 @@
 package org.webswing.common;
 
 public enum WindowActionType {
-    empty,
+    cursorChanged,
     close,
     minimize,
     maximize,

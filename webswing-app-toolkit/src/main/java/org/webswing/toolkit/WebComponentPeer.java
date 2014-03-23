@@ -6,6 +6,7 @@ import java.awt.BufferCapabilities;
 import java.awt.BufferCapabilities.FlipContents;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -31,6 +32,7 @@ import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.GraphicsWrapper;
+import org.webswing.common.WindowActionType;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.ge.WebGraphicsConfig;
 import org.webswing.util.Util;
@@ -66,14 +68,15 @@ public class WebComponentPeer implements ComponentPeer {
         g.dispose();
         return safeImage;
     }
-    
+
     public Image getWindowDecorationImage() {
         return windowDecorationImage;
     }
-    
-    public void updateWindowDecorationImage(){
+
+    public void updateWindowDecorationImage() {
         windowDecorationImage = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getWindowDecoration(target, image.getWidth(), image.getHeight());
     }
+
     //////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////// WebComponentPeer Implementation//////////////////////////////////////////////////
 
@@ -202,7 +205,6 @@ public class WebComponentPeer implements ComponentPeer {
 
     public void coalescePaintEvent(PaintEvent paramPaintEvent) {
         Rectangle localRectangle = paramPaintEvent.getUpdateRect();
-        //if (!(paramPaintEvent instanceof IgnorePaintEvent))
         this.paintArea.add(localRectangle, paramPaintEvent.getID());
     }
 
@@ -289,7 +291,33 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void updateCursorImmediately() {
+        Point location = Util.getWebToolkit().getEventDispatcher().getLastMousePosition();
+        if (location != null) {
+            Window window = (Window) target;
+            boolean b = Util.isWindowDecorationPosition( window, location);
+            if (b) {
+                WindowActionType wat = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(window,new Point(location.x - window.getX(), location.y - window.getY()));
+                Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(mapActionToCursor(wat));
+            } else {
+                Component component = SwingUtilities.getDeepestComponentAt(window, location.x - window.getX(), location.y - window.getY());
+                component = component == null ? window : component;
+                Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(component.getCursor());
+            }
+        }
     }
+    
+    private  Cursor mapActionToCursor(WindowActionType wat) {
+        if (wat.equals(WindowActionType.resizeRight)) {
+            return Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR);
+        } else if (wat.equals(WindowActionType.resizeBottom)) {
+            return Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR);
+        } else if (wat.equals(WindowActionType.resizeUni)) {
+            return Cursor.getPredefinedCursor(Cursor.SW_RESIZE_CURSOR);
+        } else {
+            return Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+        }
+    }
+
 
     public boolean requestFocus(Component paramComponent, boolean paramBoolean1, boolean paramBoolean2, long paramLong, Cause paramCause) {
         Point p = SwingUtilities.convertPoint(paramComponent, new Point(0, 0), (Component) target);

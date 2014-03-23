@@ -1,8 +1,6 @@
 package org.webswing.util;
 
 import java.awt.AWTEvent;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -152,7 +150,7 @@ public class Util {
     public static WebWindowPeer findWindowPeerById(String id) {
         for (Window w : Window.getWindows()) {
             Object peer = WebToolkit.targetToPeer(w);
-            if (peer!=null && peer instanceof WebWindowPeer) {
+            if (peer != null && peer instanceof WebWindowPeer) {
                 if (((WebWindowPeer) peer).getGuid().equals(id)) {
                     return (WebWindowPeer) peer;
                 }
@@ -162,8 +160,8 @@ public class Util {
         return null;
     }
 
-    public static Map<String, Map<Integer, BufferedImage>> extractWindowImages( JsonAppFrame json) {
-        Map<String, Map<Integer, BufferedImage>> windowImages=new HashMap<String, Map<Integer,BufferedImage>>();
+    public static Map<String, Map<Integer, BufferedImage>> extractWindowImages(JsonAppFrame json) {
+        Map<String, Map<Integer, BufferedImage>> windowImages = new HashMap<String, Map<Integer, BufferedImage>>();
         for (JsonWindow window : json.getWindows()) {
             WebWindowPeer w = findWindowPeerById(window.getId());
             if (window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
@@ -247,16 +245,26 @@ public class Util {
     }
 
     public static boolean isWindowDecorationEvent(Window w, AWTEvent e) {
-        if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID() && MouseEvent.MOUSE_MOVED != e.getID() && ((MouseEvent) e).getButton() == 1) {
+        if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID()) {
+            return isWindowDecorationPosition(w, new Point(((MouseEvent) e).getXOnScreen(), ((MouseEvent) e).getYOnScreen()));
+        }
+        return false;
+    }
+
+    public static boolean isWindowDecorationPosition(Window w, Point locationOnScreen) {
+        if (w != null && locationOnScreen != null) {
             Rectangle inner = w.getBounds();
             Insets i = w.getInsets();
             inner.x = i.left;
             inner.y = i.top;
             inner.width -= i.left + i.right;
             inner.height -= i.top + i.bottom;
-            return !SwingUtilities.isRectangleContainingRectangle(inner, new Rectangle(((MouseEvent) e).getX(), ((MouseEvent) e).getY(), 0, 0));
+            boolean isInInnerWindow = SwingUtilities.isRectangleContainingRectangle(inner, new Rectangle(locationOnScreen.x-w.getX(),locationOnScreen.y-w.getY(), 0, 0));
+            boolean isInWindow = SwingUtilities.isRectangleContainingRectangle(w.getBounds(), new Rectangle(locationOnScreen.x,locationOnScreen.y, 0, 0));
+            return !isInInnerWindow && isInWindow;
+        } else {
+            return false;
         }
-        return false;
     }
 
     public static Set<Rectangle> getGrid(List<Rectangle> dirtyAreas, List<Rectangle> topWindows) {

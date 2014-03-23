@@ -2,8 +2,8 @@ package org.webswing.common;
 
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Window;
-import java.awt.event.MouseEvent;
 
 public interface WindowDecoratorThemeIfc {
 
@@ -16,6 +16,6 @@ public interface WindowDecoratorThemeIfc {
 
     Image getWindowDecoration(Object window, int w, int h);
 
-    WindowActionType getAction(Window w, MouseEvent e);
+    WindowActionType getAction(Window w, Point e);
 
 }

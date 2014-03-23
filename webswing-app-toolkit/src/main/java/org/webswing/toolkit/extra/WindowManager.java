@@ -2,6 +2,7 @@ package org.webswing.toolkit.extra;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -20,6 +21,7 @@ import javax.swing.SwingUtilities;
 import org.webswing.common.WindowActionType;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.model.s2c.JsonCursorChange;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.util.Util;
@@ -27,9 +29,10 @@ import org.webswing.util.Util;
 public class WindowManager {
 
     private static WindowManager singleton = null;
-    LinkedList<Window> zorder = new LinkedList<Window>();
-    Window activeWindow = null;
-    WindowEventHandler eventhandler = new WindowEventHandler();
+    private LinkedList<Window> zorder = new LinkedList<Window>();
+    private Window activeWindow = null;
+    private WindowEventHandler eventhandler = new WindowEventHandler();
+    private String currentCursor = JsonCursorChange.DEFAULT_CURSOR;
 
     private WindowManager() {
     }
@@ -191,7 +194,7 @@ public class WindowManager {
     }
 
     public void handleWindowDecorationEvent(Window w, MouseEvent e) {
-        WindowActionType wat = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(w, e);
+        WindowActionType wat = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(w, new Point(e.getX(),e.getY()));
         eventhandler.handle(wat, e);
     }
 
@@ -201,6 +204,14 @@ public class WindowManager {
 
     public Window getLockedToWindow() {
         return eventhandler.getLockedToWindow();
+    }
+
+    public String getCurrentCursor() {
+        return currentCursor;
+    }
+
+    public void setCurrentCursor(String currentCursor) {
+        this.currentCursor = currentCursor;
     }
 
 }

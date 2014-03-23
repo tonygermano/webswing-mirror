@@ -11,6 +11,7 @@ public class JsonAppFrame implements Serializable {
     public List<JsonApplication> applications;
     public JsonLinkAction linkAction;
     public JsonWindowMoveAction moveAction;
+    public JsonCursorChange cursorChange;
     public List<JsonWindow> windows;
 
     public JsonLinkAction getLinkAction() {

@@ -1,5 +1,6 @@
 package org.webswing.dispatch;
 
+import java.awt.Cursor;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
@@ -20,6 +21,7 @@ import javax.swing.SwingUtilities;
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.ServerConnectionIfc;
 import org.webswing.model.s2c.JsonAppFrame;
+import org.webswing.model.s2c.JsonCursorChange;
 import org.webswing.model.s2c.JsonLinkAction;
 import org.webswing.model.s2c.JsonLinkAction.JsonLinkActionType;
 import org.webswing.model.s2c.JsonWindowMoveAction;
@@ -216,6 +218,55 @@ public class WebPaintDispatcher {
 
         }
 
+    }
+
+    public void notifyCursorUpdate(Cursor cursor) {
+        String webcursorName = null;
+        switch (cursor.getType()) {
+            case Cursor.DEFAULT_CURSOR:
+                webcursorName = JsonCursorChange.DEFAULT_CURSOR;
+                break;
+            case Cursor.HAND_CURSOR:
+                webcursorName = JsonCursorChange.HAND_CURSOR;
+                break;
+            case Cursor.CROSSHAIR_CURSOR:
+                webcursorName = JsonCursorChange.CROSSHAIR_CURSOR;
+                break;
+            case Cursor.MOVE_CURSOR:
+                webcursorName = JsonCursorChange.MOVE_CURSOR;
+                break;
+            case Cursor.TEXT_CURSOR:
+                webcursorName = JsonCursorChange.TEXT_CURSOR;
+                break;
+            case Cursor.WAIT_CURSOR:
+                webcursorName = JsonCursorChange.WAIT_CURSOR;
+                break;
+            case Cursor.E_RESIZE_CURSOR:
+            case Cursor.W_RESIZE_CURSOR:
+                webcursorName = JsonCursorChange.EW_RESIZE_CURSOR;
+                break;
+            case Cursor.N_RESIZE_CURSOR:
+            case Cursor.S_RESIZE_CURSOR:
+                webcursorName = JsonCursorChange.NS_RESIZE_CURSOR;
+                break;
+            case Cursor.NW_RESIZE_CURSOR:
+            case Cursor.SE_RESIZE_CURSOR:
+                webcursorName = JsonCursorChange.SLASH_RESIZE_CURSOR;
+                break;
+            case Cursor.NE_RESIZE_CURSOR:
+            case Cursor.SW_RESIZE_CURSOR:
+                webcursorName = JsonCursorChange.BACKSLASH_RESIZE_CURSOR;
+                break;
+            default:
+                webcursorName = JsonCursorChange.DEFAULT_CURSOR;
+        }
+        if (!WindowManager.getInstance().getCurrentCursor().equals(webcursorName)) {
+            JsonAppFrame f = new JsonAppFrame();
+            JsonCursorChange cursorChange = new JsonCursorChange(webcursorName);
+            f.cursorChange = cursorChange;
+            WindowManager.getInstance().setCurrentCursor(webcursorName);
+            serverConnection.sendJsonObject(f);
+        }
     }
 
 }

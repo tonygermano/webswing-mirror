@@ -6,9 +6,9 @@ import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
@@ -112,8 +112,8 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
         return null;
     }
 
-    public WindowActionType getAction(Window w, MouseEvent e) {
-        Rectangle eventPoint = new Rectangle(e.getX(), e.getY(), 0, 0);
+    public WindowActionType getAction(Window w, Point e) {
+        Rectangle eventPoint = new Rectangle((int)e.getX(), (int)e.getY(), 0, 0);
         Insets i = w.getInsets();
         int buttonsoffsetx = w.getWidth() - i.right - headerMargin - (3 * (buttonWidth + buttonMargin));
         int buttonsWidth = 3 * (buttonWidth + buttonMargin);
@@ -153,7 +153,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
             //move
             return WindowActionType.move;
         }
-        return WindowActionType.empty;
+        return WindowActionType.cursorChanged;
 
     }
 

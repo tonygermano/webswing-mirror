@@ -2,6 +2,7 @@ package org.webswing.dispatch;
 
 import java.awt.AWTEvent;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -40,14 +41,13 @@ public class WebEventDispatcher {
         if (message.equals(Constants.SWING_KILL_SIGNAL)) {
             System.exit(0);
         }
-        if(message.startsWith(Constants.PAINT_ACK_PREFIX)){
+        if (message.startsWith(Constants.PAINT_ACK_PREFIX)) {
             Util.getWebToolkit().getPaintDispatcher().clientReadyToReceive();
         }
-        if(message.startsWith(Constants.REPAINT_REQUEST_PREFIX)){
+        if (message.startsWith(Constants.REPAINT_REQUEST_PREFIX)) {
             Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaintAll();
         }
     }
-
 
     private void dispatchKeyboardEvent(JsonEventKeyboard event) {
         Window w = (Window) WindowManager.getInstance().getActiveWindow();
@@ -60,35 +60,36 @@ public class WebEventDispatcher {
                 AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, modifiers, 0, (char) event.character);
                 dispatchEventInSwing(w, e);
             } else {
-                if(event.keycode==13){//enter keycode
-                    event.keycode=10;
-                    event.character=10;
-                }else if(event.keycode==46){//delete keycode
-                    event.keycode=127;
-                    event.character=127;
+                if (event.keycode == 13) {//enter keycode
+                    event.keycode = 10;
+                    event.character = 10;
+                } else if (event.keycode == 46) {//delete keycode
+                    event.keycode = 127;
+                    event.character = 127;
                 }
-                AWTEvent e = new KeyEvent(src, type, when, modifiers, event.keycode, (char) event.character,KeyEvent.KEY_LOCATION_STANDARD);
+                AWTEvent e = new KeyEvent(src, type, when, modifiers, event.keycode, (char) event.character, KeyEvent.KEY_LOCATION_STANDARD);
                 dispatchEventInSwing(w, e);
             }
         }
     }
 
     private void dispatchMouseEvent(JsonEventMouse event) {
-        Window w=null;
-        if(WindowManager.getInstance().isLockedToWindowDecorationHandler()){
+        Window w = null;
+        if (WindowManager.getInstance().isLockedToWindowDecorationHandler()) {
             w = WindowManager.getInstance().getLockedToWindow();
-        }else{
+        } else {
             w = (Window) WindowManager.getInstance().getVisibleWindowOnPosition(event.x, event.y);
         }
         if (w == null) {
+            Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             return;
         }
         if (w != null) {
             MouseEvent e = null;
             int x = event.x - w.getX();
             int y = event.y - w.getY();
-            lastMousePosition.x = x;
-            lastMousePosition.y = y;
+            lastMousePosition.x = event.x;
+            lastMousePosition.y = event.y;
             long when = System.currentTimeMillis();
             int modifiers = Util.getMouseModifiersAWTFlag(event);
             int id = 0;
@@ -146,8 +147,11 @@ public class WebEventDispatcher {
     }
 
     public static void dispatchEventInSwing(final Window w, final AWTEvent e) {
-        if (Util.isWindowDecorationEvent(w,e)||WindowManager.getInstance().isLockedToWindowDecorationHandler()) {
-            WindowManager.getInstance().handleWindowDecorationEvent(w,(MouseEvent) e);
+        if (e instanceof MouseEvent) {
+            w.setCursor(w.getCursor());//force cursor update
+        }
+        if (Util.isWindowDecorationEvent(w, e) || WindowManager.getInstance().isLockedToWindowDecorationHandler()) {
+            WindowManager.getInstance().handleWindowDecorationEvent(w, (MouseEvent) e);
         } else {
             Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
         }
