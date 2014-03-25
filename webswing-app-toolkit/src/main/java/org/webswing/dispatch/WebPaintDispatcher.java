@@ -21,6 +21,7 @@ import javax.swing.SwingUtilities;
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.ServerConnectionIfc;
 import org.webswing.model.s2c.JsonAppFrame;
+import org.webswing.model.s2c.JsonCopyEvent;
 import org.webswing.model.s2c.JsonCursorChange;
 import org.webswing.model.s2c.JsonLinkAction;
 import org.webswing.model.s2c.JsonLinkAction.JsonLinkActionType;
@@ -267,6 +268,14 @@ public class WebPaintDispatcher {
             WindowManager.getInstance().setCurrentCursor(webcursorName);
             serverConnection.sendJsonObject(f);
         }
+    }
+
+    public void notifyCopyEvent(String content) {
+        JsonAppFrame f = new JsonAppFrame();
+        JsonCopyEvent copyEvent;
+        copyEvent = new JsonCopyEvent(content);
+        f.copyEvent = copyEvent;
+        serverConnection.sendJsonObject(f);
     }
 
 }

@@ -7,6 +7,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
+import org.webswing.model.c2s.JsonEventPaste;
 
 public class JsonDecoder implements Decoder<String, Object> {
 
@@ -18,11 +19,15 @@ public class JsonDecoder implements Decoder<String, Object> {
         } catch (IOException e) {
             try {
                 return mapper.readValue(s, JsonEventKeyboard.class);
-            }  catch (IOException e1) {
+            } catch (IOException e1) {
                 try {
                     return mapper.readValue(s, JsonConnectionHandshake.class);
-                }  catch (IOException e2) {
-                    return null;
+                } catch (IOException e2) {
+                    try {
+                        return mapper.readValue(s, JsonEventPaste.class);
+                    } catch (IOException e3) {
+                        return null;
+                    }
                 }
             }
         }

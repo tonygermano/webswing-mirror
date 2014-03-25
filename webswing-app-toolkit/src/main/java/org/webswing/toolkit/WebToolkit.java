@@ -94,18 +94,18 @@ public class WebToolkit extends SunToolkit {
     public void init() {
         paintDispatcher = new WebPaintDispatcher(serverConnection, imageService);
         windowManager = WindowManager.getInstance();
-//        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-//
-//            public void eventDispatched(AWTEvent event) {
-//                System.out.println(event);
-//            }
-//
-//        }, AWTEvent.WINDOW_EVENT_MASK | AWTEvent.WINDOW_FOCUS_EVENT_MASK | AWTEvent.WINDOW_STATE_EVENT_MASK);
+        //        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+        //
+        //            public void eventDispatched(AWTEvent event) {
+        //                System.out.println(event);
+        //            }
+        //
+        //        }, AWTEvent.WINDOW_EVENT_MASK | AWTEvent.WINDOW_FOCUS_EVENT_MASK | AWTEvent.WINDOW_STATE_EVENT_MASK);
 
     }
 
     public void initSize(Integer desktopWidth, Integer desktopHeight) {
-        screenWidth =desktopWidth;
+        screenWidth = desktopWidth;
         screenHeight = desktopHeight;
         displayChanged();
         getPaintDispatcher().clientReadyToReceive();
@@ -155,8 +155,10 @@ public class WebToolkit extends SunToolkit {
 
     private static GraphicsConfiguration config;
     private Hashtable<String, FontPeer> cacheFontPeer;
-    public static int screenWidth = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_WIDTH, Constants.SWING_SCREEN_WIDTH_MIN+""));
-    public static int screenHeight = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_HEIGHT, Constants.SWING_SCREEN_HEIGHT_MIN+""));
+    private Clipboard clipboard;
+    private Clipboard selectionClipboard;
+    public static int screenWidth = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_WIDTH, Constants.SWING_SCREEN_WIDTH_MIN + ""));
+    public static int screenHeight = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_HEIGHT, Constants.SWING_SCREEN_HEIGHT_MIN + ""));
 
     public static final Object targetToPeer(Object paramObject) {
         return SunToolkit.targetToPeer(paramObject);
@@ -229,7 +231,21 @@ public class WebToolkit extends SunToolkit {
     }
 
     public Clipboard getSystemClipboard() throws HeadlessException {
-        throw new SecurityException("test");
+        synchronized (this) {
+            if (this.clipboard == null) {
+                this.clipboard = new WebClipboard("default",true);
+            }
+        }
+        return this.clipboard;
+    }
+
+    public Clipboard getSystemSelection() throws HeadlessException {
+        synchronized (this) {
+            if (this.selectionClipboard == null) {
+                this.selectionClipboard = new WebClipboard("selection",false);
+            }
+        }
+        return this.selectionClipboard;
     }
 
     public DragSourceContextPeer createDragSourceContextPeer(DragGestureEvent paramDragGestureEvent) throws InvalidDnDOperationException {

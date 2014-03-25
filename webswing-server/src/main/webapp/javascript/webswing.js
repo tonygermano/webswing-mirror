@@ -151,6 +151,9 @@
 		if (data.cursorChange != null) {
 			canvas.style.cursor = data.cursorChange.cursor;
 		}
+		if (data.copyEvent != null) {
+			window.prompt("Copy to clipboard: Ctrl+C, Enter", data.copyEvent.content);
+		}
 		for ( var i in data.windows) {
 			var win = data.windows[i];
 			for ( var x in win.content) {
@@ -274,7 +277,17 @@
 				event.stopPropagation();
 			}
 			var keyevt = getKBKey('keydown', canvas, event);
-			socket.push(atmosphere.util.stringifyJSON(keyevt));
+			// hanle paste event
+			if (keyevt.ctrl && keyevt.character == 86) {// ctrl+v
+				var text = prompt('Press ctrl+v and enter..');
+				var pasteEvent = {
+					content : text,
+					clientId : clientId
+				};
+				socket.push(atmosphere.util.stringifyJSON(pasteEvent));
+			} else {
+				socket.push(atmosphere.util.stringifyJSON(keyevt));
+			}
 			return false;
 		}, false);
 		bindEvent(canvas, 'keypress', function(event) {
@@ -455,4 +468,5 @@
 	function height() {
 		return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || 0;
 	}
+
 })();

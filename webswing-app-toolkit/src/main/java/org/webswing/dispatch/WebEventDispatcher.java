@@ -3,19 +3,28 @@ package org.webswing.dispatch;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+
+import javax.swing.text.JTextComponent;
 
 import org.webswing.Constants;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEvent;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
+import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.c2s.JsonEventMouse.Type;
+import org.webswing.toolkit.WebClipboard;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Util;
 
@@ -23,6 +32,12 @@ public class WebEventDispatcher {
 
     private MouseEvent lastMouseEvent;
     private Point lastMousePosition = new Point();
+    private ClipboardOwner owner = new ClipboardOwner() {
+
+        @Override
+        public void lostOwnership(Clipboard clipboard, Transferable contents) {
+        }
+    };
 
     public void dispatchEvent(JsonEvent event) {
         if (event instanceof JsonEventMouse) {
@@ -34,6 +49,10 @@ public class WebEventDispatcher {
         if (event instanceof JsonConnectionHandshake) {
             JsonConnectionHandshake handshake = (JsonConnectionHandshake) event;
             Util.getWebToolkit().initSize(handshake.desktopWidth, handshake.desktopHeight);
+        }
+        if (event instanceof JsonEventPaste) {
+            JsonEventPaste paste = (JsonEventPaste) event;
+            handlePasteEvent(paste.content);
         }
     }
 
@@ -68,7 +87,17 @@ public class WebEventDispatcher {
                     event.character = 127;
                 }
                 AWTEvent e = new KeyEvent(src, type, when, modifiers, event.keycode, (char) event.character, KeyEvent.KEY_LOCATION_STANDARD);
-                dispatchEventInSwing(w, e);
+
+                //filter out ctrl+c for copy
+                if (event.type == JsonEventKeyboard.Type.keydown && event.character == 67 && event.ctrl == true && event.altgr == false && event.altgr == false && event.meta == false && event.shift == false) {
+                    Transferable copied = Util.getWebToolkit().getSystemSelection().getContents(DataFlavor.stringFlavor);
+                    Util.getWebToolkit().getSystemClipboard().setContents(copied, owner);
+                }
+                if (event.type == JsonEventKeyboard.Type.keydown && event.character == 86 && event.ctrl == true && event.altgr == false && event.altgr == false && event.meta == false && event.shift == false) {
+                    //on paste event -do nothing
+                } else {
+                    dispatchEventInSwing(w, e);
+                }
             }
         }
     }
@@ -139,6 +168,16 @@ public class WebEventDispatcher {
                 default:
                     break;
             }
+        }
+    }
+
+    private void handlePasteEvent(String content) {
+        Component c=KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        if(c!=null && c instanceof JTextComponent){
+            JTextComponent txtc=(JTextComponent) c;
+            WebClipboard wc=(WebClipboard) Util.getWebToolkit().getSystemClipboard();
+            wc.setContent(content);
+            txtc.paste();
         }
     }
 

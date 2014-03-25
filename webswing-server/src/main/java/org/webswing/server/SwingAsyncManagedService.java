@@ -17,6 +17,7 @@ import org.webswing.Constants;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
+import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.server.coder.JsonDecoder;
 import org.webswing.server.coder.JsonEncoder;
@@ -88,6 +89,9 @@ public class SwingAsyncManagedService {
             } else if (message instanceof JsonEventMouse) {
                 JsonEventMouse m = (JsonEventMouse) message;
                 send(m.clientId, m);
+            } else if (message instanceof JsonEventPaste) {
+                JsonEventPaste p = (JsonEventPaste) message;
+                send(p.clientId, p);
             } else if (message instanceof String) {
                 String sm = (String) message;
                 if (sm.startsWith(Constants.PAINT_ACK_PREFIX)) {
