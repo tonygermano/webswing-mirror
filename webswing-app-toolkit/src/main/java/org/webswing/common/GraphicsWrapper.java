@@ -139,8 +139,10 @@ public class GraphicsWrapper extends Graphics2D {
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
         synchronized (WebPaintDispatcher.webPaintLock) {
             original.copyArea(x, y, width, height, dx, dy);
-            Rectangle r = new Rectangle(x + dx, y + dx, width + dx, height + dy);
+            Rectangle r = new Rectangle(x + dx, y + dy, width + dx, height + dy);
+            Rectangle r2 = new Rectangle(x, y , width , height);
             addDirtyRectangleArea(r);
+            addDirtyRectangleArea(r2);
         }
     }
 

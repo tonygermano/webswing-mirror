@@ -252,11 +252,11 @@ public class WebPaintDispatcher {
                 break;
             case Cursor.NW_RESIZE_CURSOR:
             case Cursor.SE_RESIZE_CURSOR:
-                webcursorName = JsonCursorChange.SLASH_RESIZE_CURSOR;
+                webcursorName = JsonCursorChange.BACKSLASH_RESIZE_CURSOR;
                 break;
             case Cursor.NE_RESIZE_CURSOR:
             case Cursor.SW_RESIZE_CURSOR:
-                webcursorName = JsonCursorChange.BACKSLASH_RESIZE_CURSOR;
+                webcursorName = JsonCursorChange.SLASH_RESIZE_CURSOR;
                 break;
             default:
                 webcursorName = JsonCursorChange.DEFAULT_CURSOR;
