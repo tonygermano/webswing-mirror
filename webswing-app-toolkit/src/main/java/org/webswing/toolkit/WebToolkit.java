@@ -100,7 +100,7 @@ public class WebToolkit extends SunToolkit {
         //                System.out.println(event);
         //            }
         //
-        //        }, AWTEvent.WINDOW_EVENT_MASK | AWTEvent.WINDOW_FOCUS_EVENT_MASK | AWTEvent.WINDOW_STATE_EVENT_MASK);
+        //        }, AWTEvent.KEY_EVENT_MASK);
 
     }
 

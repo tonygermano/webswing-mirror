@@ -312,7 +312,7 @@ public class WebComponentPeer implements ComponentPeer {
         } else if (wat.equals(WindowActionType.resizeBottom)) {
             return Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR);
         } else if (wat.equals(WindowActionType.resizeUni)) {
-            return Cursor.getPredefinedCursor(Cursor.SW_RESIZE_CURSOR);
+            return Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR);
         } else {
             return Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
         }

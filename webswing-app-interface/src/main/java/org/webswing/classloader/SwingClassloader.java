@@ -28,7 +28,6 @@ import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.ClassLoaderRepository;
 import org.apache.bcel.util.Repository;
 import org.webswing.util.CLUtil;
-import org.webswing.util.Util;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -131,7 +130,7 @@ public class SwingClassloader extends ClassLoader{
     
     public SwingClassloader(ClassLoader parent) {
         super(parent);
-        this.ignored_packages = new String[] { "java.", "javax.", "sun.", "org.xml.sax", "org.webswing.ignored" };
+        this.ignored_packages = new String[] { "java.", "javax.", "sun.", "org.xml.sax", "org.omg.CORBA", "org.webswing.ignored" };
         this.repository = new ClassLoaderRepository(parent);
     }
 
@@ -314,6 +313,7 @@ public class SwingClassloader extends ClassLoader{
         }
     }
 
+    @SuppressWarnings("unused")
     private void rerouteSwingClasses(JavaClass clazz, ClassGen cg, ConstantPoolGen cp) {
         //Reroute all swing components to our own proxy component 
         //1.add class constant to constant pool

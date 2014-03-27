@@ -15,6 +15,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
+import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import org.webswing.Constants;
@@ -97,7 +98,13 @@ public class WebEventDispatcher {
                     //on paste event -do nothing
                 } else {
                     dispatchEventInSwing(w, e);
+
+                    if (event.keycode == 32 && event.type == JsonEventKeyboard.Type.keydown) {//space keycode handle press
+                        event.type = JsonEventKeyboard.Type.keypress;
+                        dispatchEvent(event);
+                    }
                 }
+
             }
         }
     }
@@ -171,13 +178,19 @@ public class WebEventDispatcher {
         }
     }
 
-    private void handlePasteEvent(String content) {
-        Component c=KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-        if(c!=null && c instanceof JTextComponent){
-            JTextComponent txtc=(JTextComponent) c;
-            WebClipboard wc=(WebClipboard) Util.getWebToolkit().getSystemClipboard();
-            wc.setContent(content);
-            txtc.paste();
+    private void handlePasteEvent(final String content) {
+        final Component c = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        if (c != null && c instanceof JTextComponent) {
+            SwingUtilities.invokeLater(new Runnable() {
+                
+                @Override
+                public void run() {
+                    JTextComponent txtc = (JTextComponent) c;
+                    WebClipboard wc = (WebClipboard) Util.getWebToolkit().getSystemClipboard();
+                    wc.setContent(content);
+                    txtc.paste();      
+                }
+            });
         }
     }
 
