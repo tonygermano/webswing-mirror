@@ -202,7 +202,7 @@ public class WebEventDispatcher {
         if (e instanceof MouseEvent) {
             w.setCursor(w.getCursor());//force cursor update
         }
-        if (Util.isWindowDecorationEvent(w, e) || WindowManager.getInstance().isLockedToWindowDecorationHandler()) {
+        if ((Util.isWindowDecorationEvent(w, e) || WindowManager.getInstance().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
             WindowManager.getInstance().handleWindowDecorationEvent(w, (MouseEvent) e);
         } else {
             Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);

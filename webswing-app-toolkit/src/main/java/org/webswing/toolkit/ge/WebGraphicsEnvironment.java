@@ -17,8 +17,7 @@ public class WebGraphicsEnvironment extends sun.java2d.SunGraphicsEnvironment{
 
     @Override
     protected GraphicsDevice makeScreenDevice(int paramInt) {
-        
-        return WebGraphicsConfig.getWebGraphicsConfig(new BufferedImage(WebToolkit.screenWidth, WebToolkit.screenHeight, BufferedImage.TYPE_INT_ARGB)).getDevice();
+        return WebGraphicsConfig.getWebGraphicsConfig(WebToolkit.screenWidth, WebToolkit.screenHeight).getDevice();
     }
 
     @Override
@@ -33,7 +32,7 @@ public class WebGraphicsEnvironment extends sun.java2d.SunGraphicsEnvironment{
 
     @Override
     public void displayChanged() {
-        screens[0]=makeScreenDevice(1);
+        screens=null;
         super.displayChanged();
     }
 }

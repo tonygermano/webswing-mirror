@@ -75,6 +75,7 @@ import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.ge.WebGraphicsEnvironment;
+import org.webswing.util.Util;
 
 import sun.awt.SunToolkit;
 
@@ -108,6 +109,8 @@ public class WebToolkit extends SunToolkit {
         screenWidth = desktopWidth;
         screenHeight = desktopHeight;
         displayChanged();
+        resetGC();
+        Util.resetWindowsGC(screenWidth,screenHeight);
         getPaintDispatcher().clientReadyToReceive();
         getPaintDispatcher().resetWindowsPosition();//in case windows moved out of screen by resizing screen.
         getPaintDispatcher().notifyWindowRepaintAll();

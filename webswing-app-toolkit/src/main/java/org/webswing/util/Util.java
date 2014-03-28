@@ -1,6 +1,7 @@
 package org.webswing.util;
 
 import java.awt.AWTEvent;
+import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,6 +29,7 @@ import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.ImageServiceIfc;
@@ -259,8 +262,8 @@ public class Util {
             inner.y = i.top;
             inner.width -= i.left + i.right;
             inner.height -= i.top + i.bottom;
-            boolean isInInnerWindow = SwingUtilities.isRectangleContainingRectangle(inner, new Rectangle(locationOnScreen.x-w.getX(),locationOnScreen.y-w.getY(), 0, 0));
-            boolean isInWindow = SwingUtilities.isRectangleContainingRectangle(w.getBounds(), new Rectangle(locationOnScreen.x,locationOnScreen.y, 0, 0));
+            boolean isInInnerWindow = SwingUtilities.isRectangleContainingRectangle(inner, new Rectangle(locationOnScreen.x - w.getX(), locationOnScreen.y - w.getY(), 0, 0));
+            boolean isInWindow = SwingUtilities.isRectangleContainingRectangle(w.getBounds(), new Rectangle(locationOnScreen.x, locationOnScreen.y, 0, 0));
             return !isInInnerWindow && isInWindow;
         } else {
             return false;
@@ -390,5 +393,24 @@ public class Util {
             result.add(currentX);
         }
         return result;
+    }
+
+    public static void resetWindowsGC(int width, int height) {
+        for (Window w : Window.getWindows()) {
+            try {
+                Class<?> windowClazz = w.getClass();
+                while (windowClazz != Window.class && windowClazz != null) {
+                    windowClazz = windowClazz.getSuperclass();
+                }
+                if (windowClazz != null) {
+                    Method m = windowClazz.getDeclaredMethod("resetGC");
+                    m.setAccessible(true);
+                    m.invoke(w);
+                }
+                RepaintManager.currentManager(w).setDoubleBufferMaximumSize(new Dimension(width,height));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

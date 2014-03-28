@@ -10,8 +10,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DirectColorModel;
 import java.awt.image.WritableRaster;
-import java.util.HashMap;
-import java.util.Map;
 
 import sun.awt.image.BufferedImageGraphicsConfig;
 import sun.awt.image.OffScreenImage;
@@ -19,29 +17,29 @@ import sun.awt.image.OffScreenImage;
 @SuppressWarnings("restriction")
 public class WebGraphicsConfig extends GraphicsConfiguration {
 
-    private static Map<Integer, WebGraphicsConfig> configs = new HashMap<Integer, WebGraphicsConfig>();
-    private static Map<Integer, WebScreenDevice> devices = new HashMap<Integer, WebScreenDevice>();
-
+    private static BufferedImage template = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+    
     BufferedImageGraphicsConfig imageConfig;
+    WebScreenDevice device;
+    int width;
+    int height;
 
-    public static WebGraphicsConfig getWebGraphicsConfig(BufferedImage image) {
-        if (!configs.containsKey(System.identityHashCode(image))) {
-            configs.put(System.identityHashCode(image), new WebGraphicsConfig(image));
-        }
-        return configs.get(System.identityHashCode(image));
-
+    public static WebGraphicsConfig getWebGraphicsConfig(int width,int height) {
+        return new WebGraphicsConfig(width,height);
     }
 
-    private WebGraphicsConfig(BufferedImage image) {
-        imageConfig = BufferedImageGraphicsConfig.getConfig(image);
+    private WebGraphicsConfig(int width,int height) {
+        this.width=width;
+        this.height=height;
+        imageConfig = BufferedImageGraphicsConfig.getConfig(template);
     }
 
     @Override
     public GraphicsDevice getDevice() {
-        if (!devices.containsKey(System.identityHashCode(imageConfig.getDevice()))) {
-            devices.put(System.identityHashCode(imageConfig.getDevice()), new WebScreenDevice(imageConfig.getDevice(), this));
+        if (device==null) {
+            device =new WebScreenDevice(imageConfig.getDevice(), this);
         }
-        return devices.get(System.identityHashCode(imageConfig.getDevice()));
+        return device;
     }
 
     @Override
@@ -70,7 +68,6 @@ public class WebGraphicsConfig extends GraphicsConfiguration {
 
     @Override
     public AffineTransform getDefaultTransform() {
-
         return imageConfig.getDefaultTransform();
     }
 
@@ -81,7 +78,7 @@ public class WebGraphicsConfig extends GraphicsConfiguration {
 
     @Override
     public Rectangle getBounds() {
-        return imageConfig.getBounds();
+        return new Rectangle(0,0,width,height);
     }
 
     public Image createAcceleratedImage(Component target, int paramInt1, int paramInt2) {
