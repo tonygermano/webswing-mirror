@@ -34,7 +34,7 @@ public class ImageService implements ImageServiceIfc {
 
     public ImageService() {
         try {
-            encoder = new PngEncoder(PngEncoder.COLOR_TRUECOLOR_ALPHA, PngEncoder.BEST_COMPRESSION);
+            encoder = new PngEncoder(PngEncoder.COLOR_TRUECOLOR_ALPHA, PngEncoder.BEST_SPEED);
         } catch (Exception e) {
             System.out.println("Library for fast image encoding not found. Download the library from http://objectplanet.com/pngencoder/");
         }

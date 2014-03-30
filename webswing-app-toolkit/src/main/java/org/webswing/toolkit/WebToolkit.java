@@ -22,6 +22,7 @@ import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.PrintJob;
+import java.awt.RenderingHints;
 import java.awt.Robot;
 import java.awt.ScrollPane;
 import java.awt.Scrollbar;
@@ -250,9 +251,26 @@ public class WebToolkit extends SunToolkit {
         }
         return this.selectionClipboard;
     }
+    
+    @Override
+    protected Object lazilyLoadDesktopProperty(String name) {
+        if("awt.font.desktophints".equals(name)){
+            return SunToolkit.getDesktopFontHints();
+        }
+        
+        return super.lazilyLoadDesktopProperty(name);
+    }
+    
+    @Override
+    protected RenderingHints getDesktopAAHints() {
+        RenderingHints hints = new RenderingHints(null);
+        hints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        hints.put(RenderingHints.KEY_TEXT_LCD_CONTRAST, 140);
+        return hints;
+         
+    }
 
     public DragSourceContextPeer createDragSourceContextPeer(DragGestureEvent paramDragGestureEvent) throws InvalidDnDOperationException {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
     }
 

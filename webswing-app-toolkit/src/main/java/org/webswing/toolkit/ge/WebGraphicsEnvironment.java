@@ -1,7 +1,6 @@
 package org.webswing.toolkit.ge;
 
 import java.awt.GraphicsDevice;
-import java.awt.image.BufferedImage;
 
 import org.webswing.toolkit.WebToolkit;
 
