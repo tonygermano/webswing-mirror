@@ -21,4 +21,11 @@ public class JsonCursorChange implements Serializable{
         super();
         this.cursor = cursor;
     }
+
+    @Override
+    public String toString() {
+        return "JsonCursorChange [cursor=" + cursor + "]";
+    }
+    
+    
 }

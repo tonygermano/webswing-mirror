@@ -102,6 +102,8 @@ public class SwingAsyncManagedService {
                     send(sm.substring(Constants.HEARTBEAT_MSG_PREFIX.length()), sm);
                 } else if (sm.startsWith(Constants.REPAINT_REQUEST_PREFIX)) {
                     send(sm.substring(Constants.REPAINT_REQUEST_PREFIX.length()), sm);
+                }  else if (sm.startsWith(Constants.SWING_KILL_SIGNAL)) {
+                    send(sm.substring(Constants.SWING_KILL_SIGNAL.length()), sm);
                 } else {
                     return sm;
                 }

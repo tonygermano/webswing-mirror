@@ -1,6 +1,7 @@
 package org.webswing.model.s2c;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class JsonWindow implements Serializable {
     private static final long serialVersionUID = 5192907046398894082L;
@@ -108,6 +109,10 @@ public class JsonWindow implements Serializable {
     public void setResizable(Boolean resizable) {
         this.resizable = resizable;
     }
+
+    @Override
+    public String toString() {
+        return "JsonWindow [id=" + id + ", content=" + Arrays.toString(content) + ", title=" + title + ", posX=" + posX + ", posY=" + posY + ", width=" + width + ", height=" + height + "]";
+    }
     
-     
 }

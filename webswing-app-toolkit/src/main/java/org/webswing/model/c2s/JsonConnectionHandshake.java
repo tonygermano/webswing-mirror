@@ -9,4 +9,10 @@ public class JsonConnectionHandshake implements JsonEvent{
     public Integer desktopWidth;
     public Integer desktopHeight;
     public String applicationName;
+    
+    
+    @Override
+    public String toString() {
+        return "JsonConnectionHandshake [clientId=" + clientId + ", sessionId=" + sessionId + ", desktopWidth=" + desktopWidth + ", desktopHeight=" + desktopHeight + ", applicationName=" + applicationName + "]";
+    }
 }

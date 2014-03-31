@@ -46,5 +46,12 @@ public class JsonAppFrame implements Serializable {
         windows.add(window);
         return window;
     }
+
+    @Override
+    public String toString() {
+        return "JsonAppFrame [applications=" + applications + ", linkAction=" + linkAction + ", moveAction=" + moveAction + ", cursorChange=" + cursorChange + ", copyEvent=" + copyEvent + ", windows=" + windows + "]";
+    }
+    
+    
     
 }

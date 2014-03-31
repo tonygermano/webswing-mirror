@@ -2,8 +2,8 @@ package org.webswing.model.s2c;
 
 import java.io.Serializable;
 
-
 public class JsonWindowMoveAction implements Serializable {
+
     private static final long serialVersionUID = 8034971938226651461L;
     public int sx;
     public int sy;
@@ -11,6 +11,7 @@ public class JsonWindowMoveAction implements Serializable {
     public int dy;
     public int width;
     public int height;
+
     public JsonWindowMoveAction(int sx, int sy, int dx, int dy, int width, int height) {
         super();
         this.sx = sx;
@@ -20,4 +21,10 @@ public class JsonWindowMoveAction implements Serializable {
         this.width = width;
         this.height = height;
     }
+
+    @Override
+    public String toString() {
+        return "JsonWindowMoveAction [sx=" + sx + ", sy=" + sy + ", dx=" + dx + ", dy=" + dy + ", width=" + width + ", height=" + height + "]";
+    }
+
 }

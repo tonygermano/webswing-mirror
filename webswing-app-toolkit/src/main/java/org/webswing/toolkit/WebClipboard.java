@@ -6,6 +6,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 
+import org.webswing.util.Logger;
 import org.webswing.util.Util;
 
 public class WebClipboard extends Clipboard {
@@ -37,7 +38,7 @@ public class WebClipboard extends Clipboard {
                     String content = (String) contents.getTransferData(DataFlavor.stringFlavor);
                     Util.getWebToolkit().getPaintDispatcher().notifyCopyEvent(content);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Logger.error("WebClipboard:setContent", e);
                 }
             }
         }

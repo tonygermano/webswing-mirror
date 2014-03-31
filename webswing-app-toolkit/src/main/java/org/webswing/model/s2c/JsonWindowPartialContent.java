@@ -52,4 +52,9 @@ public class JsonWindowPartialContent implements Serializable {
         this.height = height;
     }
 
+    @Override
+    public String toString() {
+        return "JsonWindowPartialContent [positionX=" + positionX + ", positionY=" + positionY + ", width=" + width + ", height=" + height + "]";
+    }
+
 }

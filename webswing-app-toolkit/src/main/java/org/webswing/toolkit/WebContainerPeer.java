@@ -26,30 +26,23 @@ public class WebContainerPeer extends WebComponentPeer implements ContainerPeer 
 
     
     public void beginValidate() {
-        System.out.println("begin Validate");        
     }
 
     
     public void endValidate() {
-        System.out.println("end Validate");        
         
     }
 
     
     public void beginLayout() {
-        // TODO Auto-generated method stub
-        
     }
 
     
     public void endLayout() {
-        // TODO Auto-generated method stub
-        
     }
 
     
     public boolean isPaintPending() {
-        // TODO Auto-generated method stub
         return false;
     }
 

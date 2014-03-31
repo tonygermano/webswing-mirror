@@ -18,6 +18,7 @@ import javax.swing.SwingUtilities;
 
 import org.webswing.common.WindowActionType;
 import org.webswing.common.WindowDecoratorThemeIfc;
+import org.webswing.util.Logger;
 
 public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
 
@@ -39,7 +40,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
             min = ImageIO.read(getClass().getClassLoader().getResource("img/min2.png"));
             max = ImageIO.read(getClass().getClassLoader().getResource("img/max2.png"));
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.error("DefaultWindowDecoratorTheme:init",e);
         }
     }
 

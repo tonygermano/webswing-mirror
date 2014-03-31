@@ -21,5 +21,12 @@ public class JsonEventKeyboard implements JsonEvent {
     public boolean shift;
     public boolean meta;
     public boolean altgr;
+    
+    @Override
+    public String toString() {
+        return "JsonEventKeyboard [clientId=" + clientId + ", type=" + type + ", character=" + character + ", keycode=" + keycode + ", alt=" + alt + ", ctrl=" + ctrl + ", shift=" + shift + ", meta=" + meta + ", altgr=" + altgr + "]";
+    }
 
+    
+    
 }

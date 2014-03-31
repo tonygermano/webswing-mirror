@@ -6,4 +6,9 @@ public class JsonEventPaste implements JsonEvent {
     public String clientId;
     public String content;
 
+    @Override
+    public String toString() {
+        return "JsonEventPaste [clientId=" + clientId + ", content=" + content + "]";
+    }
+
 }

@@ -94,7 +94,7 @@ public class Util {
             ios.close();
             os.close();
         } catch (IOException e) {
-            e.printStackTrace();
+           Logger.error("Util:savePngImage",e);
         }
     }
 
@@ -409,7 +409,7 @@ public class Util {
                 }
                 RepaintManager.currentManager(w).setDoubleBufferMaximumSize(new Dimension(width,height));
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.error("Util:resetWindowsGC", e);
             }
         }
     }

@@ -35,6 +35,7 @@ import org.webswing.common.GraphicsWrapper;
 import org.webswing.common.WindowActionType;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.ge.WebGraphicsConfig;
+import org.webswing.util.Logger;
 import org.webswing.util.Util;
 
 import sun.awt.AWTAccessor;
@@ -164,7 +165,7 @@ public class WebComponentPeer implements ComponentPeer {
                 try {
                     replaceSurfaceData(validPosition.x, validPosition.y, w, h);
                 } catch (InvalidPipeException e) {
-                    e.printStackTrace();
+                    Logger.error("WebComponentPeer:setBounds", e);
                 }
                 this.oldWidth = w;
                 this.oldHeight = h;

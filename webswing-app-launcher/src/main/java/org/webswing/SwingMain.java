@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.webswing.toolkit.WebToolkit;
+import org.webswing.util.Logger;
 import org.webswing.util.Util;
 
 public class SwingMain {
@@ -33,7 +34,7 @@ public class SwingMain {
                 if (file.exists()) {
                     swingurls.add(file.toURI().toURL());
                 } else {
-                    System.err.println("ERROR: Required classpath file '" + f + "' does not exist!");
+                    Logger.error("SwingMain:main ERROR: Required classpath file '" + f + "' does not exist!");
                     System.exit(1);
                 }
             }
@@ -47,7 +48,7 @@ public class SwingMain {
             Object argsArray[] = { progArgs };
             main.invoke(null, argsArray);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.fatal("SwingMain:main", e);
             System.exit(1);
         }
     }

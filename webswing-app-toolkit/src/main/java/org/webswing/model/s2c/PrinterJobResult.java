@@ -33,5 +33,10 @@ public class PrinterJobResult implements Serializable {
         this.clientId = clientId;
     }
 
+    @Override
+    public String toString() {
+        return "PrinterJobResult [id=" + id + ", clientId=" + clientId + "]";
+    }
+
  
 }

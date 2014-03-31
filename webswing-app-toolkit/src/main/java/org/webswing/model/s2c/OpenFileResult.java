@@ -25,4 +25,9 @@ public class OpenFileResult implements Serializable {
         this.clientId = clientId;
     }
 
+    @Override
+    public String toString() {
+        return "OpenFileResult [f=" + f + ", clientId=" + clientId + "]";
+    }
+
 }

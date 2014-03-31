@@ -26,7 +26,7 @@ public class TestAppDescriptorGenerator {
         apps.put("SwingSet3", desc);
 
         desc.setArgs("");
-        desc.setVmArgs("");
+        desc.setVmArgs("-Xmx128m");
         desc.setHomeDir("F:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target");
         desc.setMainClass("com.sun.swingset3.SwingSet3");
 desc.setClassPathEntries(Arrays.asList("f:\\DATA\\Workspaces\\sources\\webswing-1.1\\swinglib\\AppFramework.jar"

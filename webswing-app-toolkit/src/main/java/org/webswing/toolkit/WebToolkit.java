@@ -96,14 +96,6 @@ public class WebToolkit extends SunToolkit {
     public void init() {
         paintDispatcher = new WebPaintDispatcher(serverConnection, imageService);
         windowManager = WindowManager.getInstance();
-        //        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-        //
-        //            public void eventDispatched(AWTEvent event) {
-        //                System.out.println(event);
-        //            }
-        //
-        //        }, AWTEvent.KEY_EVENT_MASK);
-
     }
 
     public void initSize(Integer desktopWidth, Integer desktopHeight) {
@@ -294,11 +286,9 @@ public class WebToolkit extends SunToolkit {
     }
 
     public void sync() {
-        //?
     }
 
     public Map<TextAttribute, ?> mapInputMethodHighlight(InputMethodHighlight paramInputMethodHighlight) throws HeadlessException {
-        // TODO Auto-generated method stub
         return null;
     }
 

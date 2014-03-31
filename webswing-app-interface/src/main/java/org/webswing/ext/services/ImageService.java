@@ -16,6 +16,7 @@ import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.WindowDecoratorThemeIfc;
+import org.webswing.util.Logger;
 
 import com.objectplanet.image.PngEncoder;
 
@@ -36,7 +37,7 @@ public class ImageService implements ImageServiceIfc {
         try {
             encoder = new PngEncoder(PngEncoder.COLOR_TRUECOLOR_ALPHA, PngEncoder.BEST_SPEED);
         } catch (Exception e) {
-            System.out.println("Library for fast image encoding not found. Download the library from http://objectplanet.com/pngencoder/");
+            Logger.warn("ImageService:Library for fast image encoding not found. Download the library from http://objectplanet.com/pngencoder/");
         }
     }
 
@@ -57,7 +58,7 @@ public class ImageService implements ImageServiceIfc {
             baos.close();
             return result;
         } catch (IOException e) {
-            System.out.println("Writing image interupted:" + e.getMessage());
+            Logger.error("ImageService:Writing image interupted:" + e.getMessage(),e);
         }
         return null;
     }
@@ -69,11 +70,11 @@ public class ImageService implements ImageServiceIfc {
             try {
                 implclass = ImageService.class.getClassLoader().loadClass(implClassName);
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                Logger.error("ImageService: WindowDecoratorTheme class not found",e);
                 try {
                     implclass = ImageService.class.getClassLoader().loadClass(WindowDecoratorThemeIfc.DECORATION_THEME_IMPL_DEFAULT);
                 } catch (ClassNotFoundException e1) {
-                    System.err.println("Fatal error:Default decoration theme not found.");
+                    Logger.fatal("ImageService: Fatal error:Default decoration theme not found.");
                     System.exit(1);
                 }
             }
@@ -82,10 +83,11 @@ public class ImageService implements ImageServiceIfc {
                     WindowDecoratorThemeIfc theme = (WindowDecoratorThemeIfc) implclass.newInstance();
                     this.windowDecorationTheme = theme;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Logger.fatal("ImageService: exception when creating instance of "+implclass.getCanonicalName(),e);
+                    System.exit(1);
                 }
             } else {
-                System.err.println("Fatal error: Decoration theme not instance of WindowDecoratorThemeIfc:" + implclass.getCanonicalName());
+                Logger.fatal("ImageService: Fatal error: Decoration theme not instance of WindowDecoratorThemeIfc:" + implclass.getCanonicalName());
                 System.exit(1);
             }
         }
@@ -109,7 +111,7 @@ public class ImageService implements ImageServiceIfc {
             doc.save(os);
             doc.close();
         } catch (Exception ie) {
-            ie.printStackTrace();
+            Logger.error("ImageService: Error during PDF generation", ie);
         }
         return os.toByteArray();
     }

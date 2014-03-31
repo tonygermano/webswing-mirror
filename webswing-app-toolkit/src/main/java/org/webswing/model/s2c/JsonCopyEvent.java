@@ -12,4 +12,9 @@ public class JsonCopyEvent implements Serializable {
         this.content = content;
     }
 
+    @Override
+    public String toString() {
+        return "JsonCopyEvent [content=" + content + "]";
+    }
+
 }

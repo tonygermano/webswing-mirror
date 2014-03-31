@@ -17,11 +17,10 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.common.ServerConnectionIfc;
 import org.webswing.model.c2s.JsonEvent;
+import org.webswing.util.Logger;
 import org.webswing.util.Util;
 
 /**
@@ -30,7 +29,6 @@ import org.webswing.util.Util;
  */
 public class ServerConnectionService implements MessageListener, ServerConnectionIfc {
 
-    private static final Logger log = LoggerFactory.getLogger(ServerConnectionService.class);
     private static ServerConnectionService impl;
     private static ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Constants.JMS_URL);
 
@@ -57,10 +55,10 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
                 long diff=System.currentTimeMillis()-lastMessageTimestamp;
                 int timeout=Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC,"300"))*1000;
                 if(diff/1000>10){
-                    log.info("Inactive for " +diff/1000+ " seconds.");
+                    Logger.info("Inactive for " +diff/1000+ " seconds.");
                 }
                 if(diff>timeout){
-                    log.info("Exiting swing application due to inactivity for "+diff/1000+ " seconds.");
+                    Logger.info("Exiting swing application due to inactivity for "+diff/1000+ " seconds.");
                     System.exit(1);
                 }
             }
@@ -82,7 +80,7 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
 
                 @Override
                 public void onException(JMSException paramJMSException) {
-                    log.warn("JMS clien connection error: " + paramJMSException.getMessage());
+                    Logger.warn("JMS clien connection error: " + paramJMSException.getMessage());
                     try {
                         producer.close();
                         session.close();
@@ -94,7 +92,7 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
                 }
             });
         } catch (JMSException e) {
-            log.error("Exiting swing application because could not connect to JMS:" +e.getMessage(),e);
+            Logger.error("Exiting swing application because could not connect to JMS:" +e.getMessage(),e);
             System.exit(1);
         }
     }
@@ -103,7 +101,7 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
         try {
             producer.send(session.createTextMessage(Constants.SWING_SHUTDOWN_NOTIFICATION));
         } catch (JMSException e) {
-            e.printStackTrace();
+            Logger.error("ServerConnectionService.sendShutdownNotification", e);
         }
     }
 
@@ -113,7 +111,7 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
                 producer.send(session.createObjectMessage(o));
             }
         } catch (JMSException e) {
-            e.printStackTrace();
+            Logger.error("ServerConnectionService.sendJsonObject", e);
         }
     }
 
@@ -130,7 +128,7 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
                 Util.getWebToolkit().getEventDispatcher().dispatchMessage(tmsg.getText());
             }
         } catch (JMSException e) {
-            e.printStackTrace();
+            Logger.error("ServerConnectionService.onMessage", e);
         }
     }
 

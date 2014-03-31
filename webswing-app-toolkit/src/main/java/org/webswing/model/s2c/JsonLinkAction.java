@@ -19,6 +19,9 @@ public class JsonLinkAction implements Serializable{
         this.url = url;
     }
 
-    
+    @Override
+    public String toString() {
+        return "JsonLinkAction [action=" + action + ", url=" + url + "]";
+    }
     
 }

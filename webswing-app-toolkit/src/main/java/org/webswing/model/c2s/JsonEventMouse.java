@@ -24,4 +24,12 @@ public class JsonEventMouse implements JsonEvent {
     public boolean alt;
     public boolean shift;
     public boolean meta;
+    
+    
+    @Override
+    public String toString() {
+        return "JsonEventMouse [clientId=" + clientId + ", x=" + x + ", y=" + y + ", type=" + type + ", wheelDelta=" + wheelDelta + ", button=" + button + ", ctrl=" + ctrl + ", alt=" + alt + ", shift=" + shift + ", meta=" + meta + "]";
+    }
+    
+    
 }

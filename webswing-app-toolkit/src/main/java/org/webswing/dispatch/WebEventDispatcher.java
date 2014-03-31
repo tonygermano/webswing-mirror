@@ -27,6 +27,7 @@ import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.c2s.JsonEventMouse.Type;
 import org.webswing.toolkit.WebClipboard;
 import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.util.Logger;
 import org.webswing.util.Util;
 
 public class WebEventDispatcher {
@@ -41,6 +42,8 @@ public class WebEventDispatcher {
     };
 
     public void dispatchEvent(JsonEvent event) {
+        Logger.debug("WebEventDispatcher.dispatchEvent:", event);
+        
         if (event instanceof JsonEventMouse) {
             dispatchMouseEvent((JsonEventMouse) event);
         }
@@ -58,7 +61,8 @@ public class WebEventDispatcher {
     }
 
     public void dispatchMessage(String message) {
-        if (message.equals(Constants.SWING_KILL_SIGNAL)) {
+        Logger.debug("WebEventDispatcher.dispatchMessage", message);
+        if (message.startsWith(Constants.SWING_KILL_SIGNAL)) {
             System.exit(0);
         }
         if (message.startsWith(Constants.PAINT_ACK_PREFIX)) {
@@ -98,13 +102,11 @@ public class WebEventDispatcher {
                     //on paste event -do nothing
                 } else {
                     dispatchEventInSwing(w, e);
-
                     if (event.keycode == 32 && event.type == JsonEventKeyboard.Type.keydown) {//space keycode handle press
                         event.type = JsonEventKeyboard.Type.keypress;
                         dispatchEvent(event);
                     }
                 }
-
             }
         }
     }
@@ -179,6 +181,7 @@ public class WebEventDispatcher {
     }
 
     private void handlePasteEvent(final String content) {
+        Logger.debug("WebEventDispatcher.handlePasteEvent", content);
         final Component c = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
         if (c != null && c instanceof JTextComponent) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -203,8 +206,10 @@ public class WebEventDispatcher {
             w.setCursor(w.getCursor());//force cursor update
         }
         if ((Util.isWindowDecorationEvent(w, e) || WindowManager.getInstance().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
+            Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
             WindowManager.getInstance().handleWindowDecorationEvent(w, (MouseEvent) e);
         } else {
+            Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
             Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
         }
     }

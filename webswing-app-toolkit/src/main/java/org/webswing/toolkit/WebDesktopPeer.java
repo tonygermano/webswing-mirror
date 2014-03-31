@@ -9,6 +9,7 @@ import java.net.URI;
 
 import org.webswing.Constants;
 import org.webswing.model.s2c.OpenFileResult;
+import org.webswing.util.Logger;
 import org.webswing.util.Util;
 
 public class WebDesktopPeer implements DesktopPeer {
@@ -34,16 +35,19 @@ public class WebDesktopPeer implements DesktopPeer {
 
     @Override
     public void open(File file) throws IOException {
+        Logger.info("WebDesktopPeer:open", file);
         sendFile(file);
     }
 
     @Override
     public void edit(File file) throws IOException {
+        Logger.info("WebDesktopPeer:edit", file);
         sendFile(file);
     }
 
     @Override
     public void print(File file) throws IOException {
+        Logger.info("WebDesktopPeer:print", file);
         sendFile(file);
     }
 

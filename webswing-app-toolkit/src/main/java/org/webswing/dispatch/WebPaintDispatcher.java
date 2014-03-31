@@ -29,6 +29,7 @@ import org.webswing.model.s2c.JsonWindowMoveAction;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.util.Logger;
 import org.webswing.util.Util;
 
 public class WebPaintDispatcher {
@@ -59,6 +60,7 @@ public class WebPaintDispatcher {
                         }
                         if ((areasToUpdate.size() == 0 && moveAction == null) || !clientReadyToReceive) {
                             if (!clientReadyToReceive && (System.currentTimeMillis() - lastReadyStateTime) > 2000) {
+                                Logger.info("contentSender.readyToReceive re-enabled after timeout");
                                 clientReadyToReceive = true;
                             }
                             return;
@@ -78,10 +80,13 @@ public class WebPaintDispatcher {
                         }
                         clientReadyToReceive = false;
                     }
+                    Logger.trace("contentSender:paintJson", json);
+                    Logger.trace("contentSender:pngEncodingStart",json.hashCode());
                     Util.encodeWindowImages(windowImages, json, imageService);
+                    Logger.trace("contentSender:pngEncodingDone",json.hashCode());
                     serverConnection.sendJsonObject(json);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Logger.error("contentSender:error", e);
                 }
             }
         };
@@ -95,10 +100,12 @@ public class WebPaintDispatcher {
     }
 
     public void notifyShutdown() {
+        Logger.info("WebPaintDispatcher:notifyShutdown");
         serverConnection.sendShutdownNotification();
     }
 
     public void sendJsonObject(Serializable object) {
+        Logger.info("WebPaintDispatcher:sendJsonObject", object);
         serverConnection.sendJsonObject(object);
     }
 
@@ -113,6 +120,7 @@ public class WebPaintDispatcher {
                     rset.add(repaintedArea);
                     areasToUpdate.put(guid, rset);
                 }
+                Logger.trace("WebPaintDispatcher:notifyWindowAreaRepainted", guid,repaintedArea);
             }
         }
     }
@@ -129,6 +137,7 @@ public class WebPaintDispatcher {
                     areasToUpdate.put(guid, rset);
                 }
                 rset.add(newBounds);
+                Logger.trace("WebPaintDispatcher:notifyWindowBoundsChanged", guid,newBounds);
             }
         }
     }
@@ -143,6 +152,7 @@ public class WebPaintDispatcher {
 
     public void notifyWindowClosed(String guid) {
         synchronized (webPaintLock) {
+            Logger.info("WebPaintDispatcher:notifyWindowClosed", guid);
             areasToUpdate.remove(guid);
         }
     }
@@ -169,6 +179,7 @@ public class WebPaintDispatcher {
         JsonAppFrame f = new JsonAppFrame();
         JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.url, uri.toString());
         f.setLinkAction(linkAction);
+        Logger.info("WebPaintDispatcher:notifyOpenLinkAction",uri);
         serverConnection.sendJsonObject(f);
     }
 
@@ -266,6 +277,7 @@ public class WebPaintDispatcher {
             JsonCursorChange cursorChange = new JsonCursorChange(webcursorName);
             f.cursorChange = cursorChange;
             WindowManager.getInstance().setCurrentCursor(webcursorName);
+            Logger.debug("WebPaintDispatcher:notifyCursorUpdate", f);
             serverConnection.sendJsonObject(f);
         }
     }
@@ -275,6 +287,7 @@ public class WebPaintDispatcher {
         JsonCopyEvent copyEvent;
         copyEvent = new JsonCopyEvent(content);
         f.copyEvent = copyEvent;
+        Logger.debug("WebPaintDispatcher:notifyCopyEvent", f);
         serverConnection.sendJsonObject(f);
     }
 

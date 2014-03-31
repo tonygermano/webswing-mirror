@@ -1,12 +1,13 @@
 package org.webswing.server;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -28,7 +29,6 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.listener.TimestampedLogger;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Environment.Variable;
 import org.atmosphere.cpr.AtmosphereResource;
@@ -40,10 +40,12 @@ import org.webswing.Constants;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.model.s2c.JsonLinkAction;
+import org.webswing.model.s2c.JsonLinkAction.JsonLinkActionType;
 import org.webswing.model.s2c.OpenFileResult;
 import org.webswing.model.s2c.PrinterJobResult;
-import org.webswing.model.s2c.JsonLinkAction.JsonLinkActionType;
 import org.webswing.server.model.SwingApplicationDescriptor;
+import org.webswing.server.util.Los;
+import org.webswing.server.util.SwingAntTimestampedLogger;
 import org.webswing.toolkit.WebToolkit;
 
 public class SwingJvmConnection implements MessageListener {
@@ -170,14 +172,6 @@ public class SwingJvmConnection implements MessageListener {
         }
     }
 
-    public void sendKill() {
-        try {
-            producer.send(session.createTextMessage(Constants.SWING_KILL_SIGNAL));
-        } catch (JMSException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void onMessage(Message m) {
         try {
             if (m instanceof ObjectMessage) {
@@ -245,10 +239,11 @@ public class SwingJvmConnection implements MessageListener {
                 project.setBaseDir(homeDir);
                 //setup logging
                 project.init();
-                DefaultLogger logger = new TimestampedLogger();
+                DefaultLogger logger = new SwingAntTimestampedLogger();
                 project.addBuildListener(logger);
-                logger.setOutputPrintStream(System.out);
-                logger.setErrorPrintStream(System.err);
+                PrintStream os = new PrintStream(new Los(clientId));
+                logger.setOutputPrintStream(os);
+                logger.setErrorPrintStream(os);
                 logger.setMessageOutputLevel(Project.MSG_INFO);
                 //System.setOut(new PrintStream(new DemuxOutputStream(project, false)));
                 //System.setErr(new PrintStream(new DemuxOutputStream(project, true)));

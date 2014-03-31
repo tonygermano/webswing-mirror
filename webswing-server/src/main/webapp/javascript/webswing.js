@@ -29,6 +29,7 @@
 				socket.push('repaint' + clientId);
 				socket.push('paintAck' + clientId);
 			} else {
+				socket.push('killSwing' + clientId);
 				eraseCookie('webswingID');
 				location.reload();
 			}
@@ -176,6 +177,8 @@
 		imageObj = new Image();
 		imageObj.onload = function() {
 			context.drawImage(imageObj, x, y);
+			imageObj.onload=null;
+			imageObj.src=null;
 		};
 		imageObj.src = 'data:image/png;base64,' + b64image;
 	}
