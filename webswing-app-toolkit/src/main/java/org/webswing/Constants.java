@@ -28,8 +28,9 @@ public interface Constants {
     public static final String TEMP_DIR_PATH = "webswing.tempDirPath";
     public static final String CONFIG_FILE_PATH = "webswing.configFile";
     public static final String DEFAULT_CONFIG_FILE_NAME = "webswing.config";
+    public static final String USER_FILE_PATH = "webswing.configFile";
+    public static final String DEFAULT_USER_FILE_NAME = "user.properties";
     public static final String SWING_DEBUG_FLAG = "webswing.debugClient";
-    public static final String SWING_AA_FONT = "webswing.antialiasingFonts";
     public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutAfterDisconectSec";
 
     public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";

@@ -22,13 +22,32 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AtmosphereServlet</servlet-name>
-		<url-pattern>/async/swing</url-pattern>
+		<url-pattern>/async/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>FileServlet</servlet-name>
 		<url-pattern>/file</url-pattern>
 	</servlet-mapping>
+	
 	<listener>
-        <listener-class>org.webswing.server.JmsService</listener-class>
-    </listener>
+		<listener-class>org.webswing.server.JmsService</listener-class>
+	</listener>
+	
+	<listener>
+		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+	</listener>
+
+	<filter>
+		<filter-name>ShiroFilter</filter-name>
+		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>ShiroFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
 </web-app>

@@ -26,10 +26,7 @@ import org.webswing.common.SwingClassLoaderFactoryIfc;
 import org.webswing.toolkit.WebToolkit;
 
 public class Main {
-    // to run client as debug:
-    //-Dawt.toolkit=org.webswing.toolkit.WebToolkit -Djava.awt.graphicsenv=org.webswing.toolkit.ge.WebGraphicsEnvironment
-    //-noverify -Dwebswing.mainClass=com.sun.swingset3.SwingSet3 -Dwebswing.clientId=debug -Dwebswing.classPath="<semicolon separated paths to swing application libraries and class paths>"
-    
+ 
 
     public static void main(String[] args) throws Exception {
         boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
@@ -38,7 +35,6 @@ public class Main {
         System.setProperty(Constants.WAR_FILE_LOCATION, location.toExternalForm());
 
         List<URL> urls = new ArrayList<URL>();
-        //populateClasspathFromDir("WEB-INF/lib", urls);
         if (client) {
             populateClasspathFromDir("WEB-INF/swing-lib", urls);
             initializeExtLibServices(urls);

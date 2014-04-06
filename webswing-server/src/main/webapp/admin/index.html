@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" ng-app="ws-console">
+<head>
+ <meta charset="utf-8">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <meta name="description" content="">
+ <title>Webswing.org console</title>
+ <link rel="stylesheet" href="../css/bootstrap.css"/>
+ <link rel="stylesheet" href="css/app.css"/>
+</head>
+<body ng-controller="Application">
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Webswing.org</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-left">
+          <li><a href="#/dashboard/overview" ng-click="location='dashboard'">Dashboard</a></li>
+          <li><a href="#/settings/overview" ng-click="location='settings'">Settings</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar" ng-switch on="location">
+        <div ng-switch-when="dashboard">
+          <div ng-include="'partials/dashboard-sidebar.html'"></div>
+        </div>
+        <div ng-switch-when="settings">
+          <div ng-include="'partials/settings-sidebar.html'"></div>
+        </div>
+      </div>
+      <div ng-view class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main"></div>
+    </div>
+  </div>
+  <script src="js/angular.js"></script>
+  <script src="js/angular-route.js"></script>
+  <script src="js/ui-ace.js"></script>
+  <script src="../javascript/jquery-2.1.0.min.js"></script>
+  <script src="../javascript/bootstrap.js"></script>
+  <script src="../javascript/atmosphere.js"></script>
+  <script src="appjs/app.js"></script>
+  <script src="appjs/services.js"></script>
+  <script src="appjs/controllers.js"></script>
+  <script src="appjs/filters.js"></script>
+  <script src="appjs/directives.js"></script>
+  <script src="acejs/ace.js" data-ace-base="acejs" type="text/javascript" charset="utf-8"></script>
+</body>
+</html>

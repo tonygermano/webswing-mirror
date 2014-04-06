@@ -19,8 +19,7 @@ import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.s2c.JsonAppFrame;
-import org.webswing.server.coder.JsonDecoder;
-import org.webswing.server.coder.JsonEncoder;
+import org.webswing.server.coder.SwingJsonCoder;
 import org.webswing.server.model.SwingApplicationDescriptor;
 import org.webswing.server.util.ServerUtil;
 
@@ -31,21 +30,13 @@ public class SwingAsyncManagedService {
 
     protected static Map<String, SwingJvmConnection> clients = new HashMap<String, SwingJvmConnection>();
     private Map<String, AtmosphereResource> resourceMap = new HashMap<String, AtmosphereResource>();
-    private Map<String, SwingApplicationDescriptor> applications = new HashMap<String, SwingApplicationDescriptor>();
 
-    public SwingAsyncManagedService() {
-        try {
-            applications = ServerUtil.loadApplicationConfiguration();
-        } catch (Exception e) {
-            log.error("No application configuration to start");
-        }
-    }
 
-    @Ready(value = DELIVER_TO.RESOURCE, encoders = { JsonEncoder.class })
+    @Ready(value = DELIVER_TO.RESOURCE, encoders = { SwingJsonCoder.class })
     public Serializable onReady(final AtmosphereResource r) {
         resourceMap.put(r.uuid(), r);
         JsonAppFrame appInfo = new JsonAppFrame();
-        appInfo.applications = ServerUtil.createApplicationJsonInfo(applications);
+        appInfo.applications = ServerUtil.createApplicationJsonInfo(ConfigurationManager.getInsatnce().getApplications());
         return appInfo;
     }
 
@@ -54,13 +45,13 @@ public class SwingAsyncManagedService {
         resourceMap.remove(event.getResource().uuid());
     }
 
-    @Message(encoders = { JsonEncoder.class }, decoders = { JsonDecoder.class })
+    @Message(encoders = { SwingJsonCoder.class }, decoders = { SwingJsonCoder.class })
     public Serializable onMessage(Object message) {
         try {
             if (message instanceof JsonConnectionHandshake) {
                 JsonConnectionHandshake h = (JsonConnectionHandshake) message;
                 if (!clients.containsKey(h.clientId)) {
-                    SwingApplicationDescriptor app = applications.get(h.applicationName);
+                    SwingApplicationDescriptor app = ConfigurationManager.getInsatnce().getApplication(h.applicationName);
                     if (app != null) {
                         SwingJvmConnection connection = new SwingJvmConnection(h, h.applicationName, app, resourceMap.get(h.sessionId));
                         if (connection.isInitialized()) {
@@ -111,7 +102,7 @@ public class SwingAsyncManagedService {
                 return (JsonAppFrame) message;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Exception while processing websocket message.",e);
         }
         return null;
     }

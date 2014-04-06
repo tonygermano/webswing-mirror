@@ -13,11 +13,8 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.Constants;
 import org.webswing.model.s2c.JsonApplication;
 import org.webswing.server.model.SwingApplicationDescriptor;
 
@@ -27,26 +24,6 @@ public class ServerUtil {
     private static final Logger log = LoggerFactory.getLogger(ServerUtil.class);
     private static final Map<String, String> iconMap = new HashMap<String, String>();
 
-    private static final ObjectMapper mapper = new ObjectMapper();
-
-    public static Map<String, SwingApplicationDescriptor> loadApplicationConfiguration() throws Exception {
-        Map<String, SwingApplicationDescriptor> result = new HashMap<String, SwingApplicationDescriptor>();
-        String configFile = System.getProperty(Constants.CONFIG_FILE_PATH);
-        if (configFile == null) {
-            String war = System.getProperty(Constants.WAR_FILE_LOCATION);
-            configFile = war.substring(6, war.lastIndexOf("/") + 1) + Constants.DEFAULT_CONFIG_FILE_NAME;
-            System.setProperty(configFile, Constants.CONFIG_FILE_PATH);
-        }
-        File config = new File(configFile);
-        if (config.exists()) {
-            result = mapper.readValue(config, new TypeReference<Map<String, SwingApplicationDescriptor>>() {
-            });
-            return result;
-        } else {
-            log.error("Configuration file " + configFile + " does not exist!");
-            return null;
-        }
-    }
 
     public static List<JsonApplication> createApplicationJsonInfo(Map<String, SwingApplicationDescriptor> applications) {
         List<JsonApplication> apps = new ArrayList<JsonApplication>();
@@ -104,7 +81,7 @@ public class ServerUtil {
             baos.close();
             return result;
         } catch (IOException e) {
-            log.error("Writing image interupted:" + e.getMessage());
+            log.error("Writing image interupted:" + e.getMessage(),e);
         }
         return null;
     }

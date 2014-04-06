@@ -1,15 +1,17 @@
 package org.webswing.server.coder;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.atmosphere.config.managed.Decoder;
+import org.atmosphere.config.managed.Encoder;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventPaste;
 
-public class JsonDecoder implements Decoder<String, Object> {
+public class SwingJsonCoder implements Decoder<String, Object>,Encoder<Serializable, String> {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -32,4 +34,17 @@ public class JsonDecoder implements Decoder<String, Object> {
             }
         }
     }
+
+    public String encode(Serializable m) {
+        try {
+            if (m instanceof String) {
+                return (String) m;
+            }
+            return mapper.writeValueAsString(m);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

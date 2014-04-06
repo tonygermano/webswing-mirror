@@ -12,7 +12,6 @@ public class ServerMain {
 
 
         Server server = new Server(Integer.parseInt(config.getPort()));
-        
         WebAppContext webapp  = new WebAppContext();
         webapp.setContextPath("/");
         //webapp.setWar("f:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target\\webswing-server.war");

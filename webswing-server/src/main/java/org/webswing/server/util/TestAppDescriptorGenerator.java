@@ -2,6 +2,7 @@ package org.webswing.server.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.webswing.server.model.SwingApplicationDescriptor;
+import org.webswing.server.model.WebswingConfiguration;
 
 
 public class TestAppDescriptorGenerator {
@@ -46,8 +48,17 @@ desc.setClassPathEntries(Arrays.asList("f:\\DATA\\Workspaces\\sources\\webswing-
         desc1.setMaxClients(1);
 
         apps.put("Printing", desc1);
-
-        mapper.defaultPrettyPrintingWriter().writeValue(new File("F:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target\\webswing.config"),apps);
+        
+        
+        WebswingConfiguration config= new WebswingConfiguration();
+        config.setSwingDebugEnabled(false);
+        config.setApplications(apps);
+        mapper.defaultPrettyPrintingWriter().writeValue(new File("F:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target\\webswing.config"),config);
+        
+        
+        PrintWriter out = new PrintWriter("F:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target\\user.properties");
+        out.write("user.admin = pwd,admin\nuser.user=pwd,Printing");
+        out.close();
     }
 
 }

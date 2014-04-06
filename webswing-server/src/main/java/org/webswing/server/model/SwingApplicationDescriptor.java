@@ -16,8 +16,9 @@ public class SwingApplicationDescriptor implements Serializable {
     private String vmArgs = "";
     private String args = "";
     private String homeDir = System.getProperty("user.dir");
-    private boolean homeDirPerSession;
-    private int maxClients=1;
+    private int maxClients = 1;
+    private boolean antiAliasText = true;
+    private int swingSessionTimeout = 300;
 
     public String getMainClass() {
         return mainClass;
@@ -70,12 +71,12 @@ public class SwingApplicationDescriptor implements Serializable {
         this.homeDir = homeDir;
     }
 
-    public boolean isHomeDirPerSession() {
-        return homeDirPerSession;
+    public boolean isAntiAliasText() {
+        return antiAliasText;
     }
 
-    public void setHomeDirPerSession(boolean homeDirPerSession) {
-        this.homeDirPerSession = homeDirPerSession;
+    public void setAntiAliasText(boolean antiAliasText) {
+        this.antiAliasText = antiAliasText;
     }
 
     public String getIcon() {
@@ -92,6 +93,14 @@ public class SwingApplicationDescriptor implements Serializable {
 
     public void setMaxClients(int maxClients) {
         this.maxClients = maxClients;
+    }
+
+    public int getSwingSessionTimeout() {
+        return swingSessionTimeout;
+    }
+
+    public void setSwingSessionTimeout(int swingSessionTimeout) {
+        this.swingSessionTimeout = swingSessionTimeout;
     }
 
 }

@@ -226,12 +226,7 @@ public class SwingJvmConnection implements MessageListener {
             public void run() {
                 Project project = new Project();
                 //set home directory
-                String dirString;
-                if (appConfig.isHomeDirPerSession()) {
-                    dirString = appConfig.getHomeDir() + File.separator + clientId;
-                } else {
-                    dirString = appConfig.getHomeDir();
-                }
+                String dirString= appConfig.getHomeDir();
                 File homeDir = new File(dirString);
                 if (!homeDir.exists()) {
                     homeDir.mkdirs();
@@ -260,7 +255,7 @@ public class SwingJvmConnection implements MessageListener {
                     String webSwingToolkitJarPath = WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm().substring(6);
                     String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPath;
                     String debug = System.getProperty(Constants.SWING_DEBUG_FLAG, "").equals("true") ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
-                    String aaFonts = System.getProperty(Constants.SWING_AA_FONT, "true").equals("true") ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
+                    String aaFonts = appConfig.isAntiAliasText() ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
                     javaTask.setJvmargs(bootCp + debug + aaFonts + " -noverify " + appConfig.getVmArgs());
 
                     Variable clientIdVar = new Variable();
@@ -282,6 +277,11 @@ public class SwingJvmConnection implements MessageListener {
                     mainClass.setKey(Constants.SWING_START_SYS_PROP_MAIN_CLASS);
                     mainClass.setValue(appConfig.getMainClass());
                     javaTask.addSysproperty(mainClass);
+                    
+                    Variable inactivityTimeout = new Variable();
+                    inactivityTimeout.setKey(Constants.SWING_SESSION_TIMEOUT_SEC);
+                    inactivityTimeout.setValue(appConfig.getSwingSessionTimeout()+"");
+                    javaTask.addSysproperty(inactivityTimeout);
 
                     Variable toolkitImplClass = new Variable();
                     toolkitImplClass.setKey("awt.toolkit");
