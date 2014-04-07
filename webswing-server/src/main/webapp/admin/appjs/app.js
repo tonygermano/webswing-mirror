@@ -5,6 +5,7 @@
 angular.module('ws-console', [
   'ngRoute',
   'ui.ace',
+  'ui.jq',
   'ws-console.filters',
   'ws-console.services',
   'ws-console.directives',

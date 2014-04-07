@@ -23,8 +23,8 @@
       </div>
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-left">
-          <li><a href="#/dashboard/overview" ng-click="location='dashboard'">Dashboard</a></li>
-          <li><a href="#/settings/overview" ng-click="location='settings'">Settings</a></li>
+          <li><a href="#/dashboard/overview" ng-click="location='dashboard';active='overview'">Dashboard</a></li>
+          <li><a href="#/settings/overview" ng-click="location='settings';active='overview'">Settings</a></li>
         </ul>
       </div>
     </div>
@@ -42,11 +42,12 @@
       <div ng-view class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main"></div>
     </div>
   </div>
+  <script src="../javascript/jquery-2.1.0.min.js"></script>
+  <script src="../javascript/bootstrap.js"></script>
   <script src="js/angular.js"></script>
   <script src="js/angular-route.js"></script>
   <script src="js/ui-ace.js"></script>
-  <script src="../javascript/jquery-2.1.0.min.js"></script>
-  <script src="../javascript/bootstrap.js"></script>
+  <script src="js/ui-utils.js"></script>
   <script src="../javascript/atmosphere.js"></script>
   <script src="appjs/app.js"></script>
   <script src="appjs/services.js"></script>

@@ -21,12 +21,21 @@ angular.module('ws-console.directives', [])
 		"</label>"
 	};
 }])
-.directive('wsJsonEditor',[ function() {
+.directive('wsOutput',[ function() {
 	return {
-		restrict: 'A',
-		link: function (scope, element, attrs){
-			var editor = ace.edit(element[0]);
-		    editor.getSession().setMode("ace/mode/json");
-		}
+		restrict: 'E',
+		scope:{label:'=',value:'='},
+		template: "	<div class='form-group'>"+
+		"<label class='col-sm-4 control-label'>{{label}}</label>"+
+		"<div class='col-sm-8'>"+
+		"<p class='form-control-static'>{{value}}</p>"+
+		"</div>	</div>"
+	};
+}])
+.directive('wsInputText',[ function() {
+	return {
+		restrict: 'E',
+		scope:{label:'=',value:'=',help:'='},
+		templateUrl: "partials/component/text-input-template.html"
 	};
 }]);

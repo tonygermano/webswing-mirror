@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,11 +35,20 @@ public class ConfigurationManager {
     }
 
     public Map<String, SwingApplicationDescriptor> getApplications() {
-        return liveConfiguration.getApplications();
+        Map<String, SwingApplicationDescriptor> result = new HashMap<String, SwingApplicationDescriptor>();
+        for (SwingApplicationDescriptor app : liveConfiguration.getApplications()) {
+            result.put(app.getName(), app);
+        }
+        return result;
     }
 
     public SwingApplicationDescriptor getApplication(String name) {
-        return liveConfiguration.getApplications().get(name);
+        for(SwingApplicationDescriptor app: liveConfiguration.getApplications()){
+            if(name!=null && name.equals(app.getName())){
+                return app;
+            }
+        }
+        return null;
     }
 
     public void reloadConfiguration() {

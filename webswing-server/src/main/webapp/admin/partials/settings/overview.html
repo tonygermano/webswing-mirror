@@ -1,49 +1,19 @@
 <h1 class="page-header">Runtime</h1>
 
 <div class="form-horizontal">
-	<div class="form-group">
-		<label class="col-sm-2 control-label">Host</label>
-		<div class="col-sm-10">
-			<p class="form-control-static">{{host}}</p>
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="col-sm-2 control-label">Port</label>
-		<div class="col-sm-10">
-			<p class="form-control-static">{{port}}</p>
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="col-sm-2 control-label">Configuration file</label>
-		<div class="col-sm-10">
-			<p class="form-control-static">{{configFile}}</p>
-		</div>
-	</div>	
-	<div class="form-group">
-		<label class="col-sm-2 control-label">Temp folder</label>
-		<div class="col-sm-10">
-			<p class="form-control-static">{{tempFolder}}</p>
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="col-sm-2 control-label">JMS server URL</label>
-		<div class="col-sm-10">
-			<p class="form-control-static">{{jmsUrl}}</p>
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="col-sm-2 control-label">WebSwing war location</label>
-		<div class="col-sm-10">
-			<p class="form-control-static">{{warLocation}}</p>
-		</div>
-	</div>
+	<ws-output label="'Host'" value="runtime.host"></ws-output>
+	<ws-output label="'Port'" value="runtime.port"></ws-output>
+	<ws-output label="'Configuration file'" value="runtime.configFile"></ws-output>
+	<ws-output label="'Temp folder'" value="runtime.tempFolder"></ws-output>
+	<ws-output label="'JMS server URL'" value="runtime.jmsUrl"></ws-output>
+	<ws-output label="'WebSwing war location'" value="runtime.warLocation"></ws-output>
 
 	<h2 class="sub-header"><small>Swing applications</small></h2>
 	<div class="row">
 		<div class="col-md-4">
 			<ul class="list-group">
-				<li class="list-group-item" ng-repeat="app in applications">
-					{{app}}
+				<li class="list-group-item" ng-repeat="app in liveCfg.applications">
+					{{app.name}}
 				</li>
 			</ul>
 		</div>

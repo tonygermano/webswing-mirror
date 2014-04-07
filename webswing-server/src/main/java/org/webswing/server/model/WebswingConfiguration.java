@@ -1,15 +1,17 @@
 package org.webswing.server.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WebswingConfiguration implements Serializable {
 
     private static final long serialVersionUID = 7439369522912189703L;
 
-    private boolean swingDebugEnabled=false;
-    private Map<String, SwingApplicationDescriptor> applications=new HashMap<String, SwingApplicationDescriptor>();
+    private boolean swingDebugEnabled = false;
+    private List<SwingApplicationDescriptor> applications = new ArrayList<SwingApplicationDescriptor>();
 
     public boolean isSwingDebugEnabled() {
         return swingDebugEnabled;
@@ -19,12 +21,12 @@ public class WebswingConfiguration implements Serializable {
         this.swingDebugEnabled = swingDebugEnabled;
     }
 
-    public Map<String, SwingApplicationDescriptor> getApplications() {
-        return applications;
+    public void setApplications(List<SwingApplicationDescriptor> applications) {
+        this.applications = applications;
     }
 
-    public void setApplications(Map<String, SwingApplicationDescriptor> applications) {
-        this.applications = applications;
+    public List<SwingApplicationDescriptor> getApplications() {
+        return applications;
     }
 
 }

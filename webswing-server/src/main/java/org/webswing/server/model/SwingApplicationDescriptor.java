@@ -10,6 +10,7 @@ public class SwingApplicationDescriptor implements Serializable {
      */
     private static final long serialVersionUID = 3708498208353403978L;
 
+    private String name;
     private String icon;
     private String mainClass = "";
     private List<String> classPathEntries;
@@ -19,6 +20,15 @@ public class SwingApplicationDescriptor implements Serializable {
     private int maxClients = 1;
     private boolean antiAliasText = true;
     private int swingSessionTimeout = 300;
+    
+    public String getName() {
+        return name;
+    }
+
+    
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getMainClass() {
         return mainClass;

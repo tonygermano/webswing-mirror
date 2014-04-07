@@ -5,8 +5,8 @@ body {
 /*
  * Global add-ons
  */
-.ace_editor { height: 500px; }
-.sub-header {
+ .ace_editor { height: 500px; }
+ .sub-header {
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
 }
@@ -16,7 +16,7 @@ body {
  * Sidebar
  */
 
-@media (min-width: 768px) {
+ @media (min-width: 768px) {
   .sidebar {
     position: fixed;
     top: 51px;
@@ -53,7 +53,7 @@ body {
  * Main content
  */
 
-.main {
+ .main {
   padding: 20px;
 }
 @media (min-width: 768px) {
@@ -71,7 +71,7 @@ body {
  * Placeholder dashboard ideas
  */
 
-.placeholders {
+ .placeholders {
   margin-bottom: 30px;
   text-align: center;
 }
@@ -84,4 +84,46 @@ body {
 .placeholder img {
   display: inline-block;
   border-radius: 50%;
+}
+
+
+/*
+ * Application editing panel
+ */
+ .edit-app-panel{
+  border: 1px solid #dddddd;
+  margin-left: 0;
+  margin-right: 0;
+  background-color: #fff;
+  border-width: 1px;
+  border-radius: 4px;
+  box-shadow: none;
+  position: relative;
+  padding: 15px;
+}
+.edit-app-arrow{
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  left: -22px;
+  border-left-width: 0;
+  border-right-color: #dddddd;
+  border-width: 11px;
+}
+.edit-app-arrow:after{
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  content: " ";
+  left: -9px;
+  bottom: -10px;
+  border-left-width: 0;
+  border-right-color: #fff;
+  border-width: 10px;
 }
