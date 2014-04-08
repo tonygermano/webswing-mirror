@@ -13,7 +13,7 @@
 		<div class="col-sm-9">
 			<input type="text" class="form-control" name="main" ng-model="currentApp().mainClass" required>
 			<div  ng-show="appForm.main.$invalid">
-				<span class="label label-danger" ng-show="appForm.main.$error.required">Main Class fully qualified name is mandatory.</span>
+				<span class="label label-danger" ng-show="appForm.main.$error.required">Main class' fully qualified name is mandatory.</span>
 			</div>
 		</div>
 	</div>
@@ -24,7 +24,7 @@
 		</div>
 	</div>
 	<div class="form-group">
-		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Swing application main method arguments. This string will be passed to the main method's (String[] args) ">JVM arguments</label>
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Swing application main method arguments. This string will be passed to the main method's (String[] args) ">Main arguments</label>
 		<div class="col-sm-9">
 			<input type="text" class="form-control" name="args" ng-model="currentApp().args" required>
 		</div>
@@ -35,6 +35,22 @@
 			<input type="text" class="form-control" name="homeDir" ng-model="currentApp().homeDir" required>
 			<div  ng-show="appForm.homeDir.$invalid">
 				<span class="label label-danger" ng-show="appForm.homeDir.$error.required">Home directory is mandatory. Use '.' for server's home directory</span>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Swing application's classpath. Absolute or relative path to jar file or classes directory. At least one classPath entry should be specified containing the main class.">Classpath entries</label>
+		<div ng-class="{'col-sm-offset-3': !$first,'col-sm-9':true, 'edit-app-list-entry':true} " ng-repeat="cp in currentApp().classPathEntries track by $index">
+			<div class="input-group">
+				<input type="text" class="form-control" ng-model="cp" >
+				<div class="input-group-btn">
+					<button class="btn btn-default" ng-if="$last" type="button" ng-click="createCp()">
+						<span class="glyphicon glyphicon-plus"></span>
+					</button>
+					<button class="btn btn-default" ng-hide="currentApp().classPathEntries.length ==1" type="button" ng-click="deleteCp($index)">
+						<span class="glyphicon glyphicon-remove"></span>
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>

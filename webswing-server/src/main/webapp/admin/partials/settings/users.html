@@ -1,1 +1,24 @@
-settings-users.html
+<h1 class="page-header">
+	<div class="row">
+		<div class="col-md-4">
+			User management
+		</div>
+	</div>
+</h1>
+<h2 class="sub-header">
+	<div class="row">
+		<div class="col-md-12">
+			<button type="button" class="btn btn-primary btn-sm" title="Reset user configuration." ui-jq="tooltip" ng-click="resetUsers()"><span class="glyphicon glyphicon-repeat"></span> Reset
+			</button>
+			<button type="button" class="btn btn-primary btn-sm" title="Save this configuration to filesystem." ui-jq="tooltip" ng-click="saveUsers()"><span class="glyphicon glyphicon-save"></span> Save
+			</button>
+			<button type="button" class="btn btn-primary btn-sm" title="Use this configuration in server runtime." ui-jq="tooltip" ng-click="applyUsers()"><span class="glyphicon glyphicon-ok"></span> Apply
+			</button>
+		</div>
+	</div>
+</h2>
+<div class="row">
+  <div class="col-md10">
+  	<div ui-ace="{}" ng-model="config.users"></div>
+  </div>
+</div>

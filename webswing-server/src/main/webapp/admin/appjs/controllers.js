@@ -30,7 +30,8 @@ angular.module('ws-console.controllers', [])
 	$scope.reset= function(){
 		$scope.config={
 			form:$scope.currentCfg,
-			json: JSON.stringify($scope.currentCfg,undefined,2)
+			json: JSON.stringify($scope.currentCfg,undefined,2),
+			users: 'asdfasdfasdfasdf\nasdfasdfasfdadsf'
 		};
 	}
 	$scope.edit= function(index){
@@ -44,13 +45,28 @@ angular.module('ws-console.controllers', [])
 		$scope.config.form.applications.splice(index,1);
 	}
 	$scope.create= function(){
-		$scope.config.form.applications.push({'name': '','homeDir': '.','maxClients': 1,'swingSessionTimeout': 300,'antiAliasText': true });	
+		$scope.config.form.applications.push({'name': '','homeDir': '.','classPathEntries':[''],'maxClients': 1,'swingSessionTimeout': 300,'antiAliasText': true });	
 	}
+
+	$scope.deleteCp= function(index){
+		$scope.config.form.applications[$scope.currentEditApplication].classPathEntries.splice(index,1);
+	}
+	$scope.createCp= function(){
+		$scope.config.form.applications[$scope.currentEditApplication].classPathEntries.push('');
+	}
+
 	$scope.currentApp=function(){
 		if($scope.currentEditApplication!=null){
 			return $scope.config.form.applications[$scope.currentEditApplication];
 		}
 	} 
+	$scope.save= function(){
+		//TODO
+	}
+	$scope.apply= function(){
+		//TODO
+	}
+	
 	$scope.reset();
 
 }]);
