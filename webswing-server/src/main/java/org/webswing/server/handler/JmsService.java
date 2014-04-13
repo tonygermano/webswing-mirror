@@ -1,4 +1,4 @@
-package org.webswing.server;
+package org.webswing.server.handler;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;

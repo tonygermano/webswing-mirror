@@ -13,9 +13,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.server.model.SwingApplicationDescriptor;
-import org.webswing.server.model.WebswingConfiguration;
-import org.webswing.server.model.WebswingConfigurationBackup;
+import org.webswing.model.server.SwingApplicationDescriptor;
+import org.webswing.model.server.WebswingConfiguration;
+import org.webswing.model.server.WebswingConfigurationBackup;
 
 public class ConfigurationManager {
 

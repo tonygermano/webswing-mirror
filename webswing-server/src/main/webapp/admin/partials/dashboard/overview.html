@@ -1,47 +1,54 @@
 <h1 class="page-header">Dashboard</h1>
 
-<div class="row placeholders">
-	<div class="col-xs-6 col-sm-3 placeholder">
-		<img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-		<h4>Label</h4>
-		<span class="text-muted">Something else</span>
-	</div>
-	<div class="col-xs-6 col-sm-3 placeholder">
-		<img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
-		<h4>Label</h4>
-		<span class="text-muted">Something else</span>
-	</div>
-	<div class="col-xs-6 col-sm-3 placeholder">
-		<img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-		<h4>Label</h4>
-		<span class="text-muted">Something else</span>
-	</div>
-	<div class="col-xs-6 col-sm-3 placeholder">
-		<img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
-		<h4>Label</h4>
-		<span class="text-muted">Something else</span>
-	</div>
-</div>
-
-<h2 class="sub-header">Section title</h2>
+<h2 class="sub-header">Swing sessions</h2>
 <div class="table-responsive">
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>#</th>
-				<th>Header</th>
-				<th>Header</th>
-				<th>Header</th>
-				<th>Header</th>
+				<th>Id</th>
+				<th>User</th>
+				<th>Application</th>
+				<th>Started at</th>
+				<th>Status</th>
+				<th>Memory</th>
+				<th>Actions</th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<td>1,001</td>
-				<td>Lorem</td>
-				<td>ipsum</td>
-				<td>dolor</td>
-				<td>sit</td>
+			<tr ng-repeat="session in sessions.sessions">
+				<td>
+					{{$index+1}}
+				</td>
+				<td>
+					{{session.user}}
+				</td>
+				<td>
+					{{session.application}}
+				</td>
+				<td>
+					{{session.startedAt | date:'dd MMM h:mm:ss'}}
+				</td>
+				<td>
+					<div ng-switch on="session.connected">
+						<div ng-switch-when="true" >
+							<span  class="label label-success">Connected</span>
+						</div>
+						<div ng-switch-when="false" >
+							<span class="label label-danger" ui-jq="tooltip" title="Disconnected at {{session.disconnectedSince| date:'dd MMM h:mm:ss'}}">Disconnected</span>
+						</div>
+					</div>
+				</td>
+				<td>
+					<div class="progress" ng-if="session.state!=null">
+						<div class="progress-bar" role="progressbar" aria-valuenow="{{session.state.heapSizeUsed/session.state.heapSize*1000}}" aria-valuemin="0" aria-valuemax="1000" ng-style="{width: (session.state.heapSizeUsed/session.state.heapSize*100)+'%'}">
+							{{session.state.heapSizeUsed/session.state.heapSize*100 |number:1}}%
+						</div>
+					</div>
+
+				</td>
+				<td>
+					actions
+				</td>
 			</tr>
 
 		</tbody>

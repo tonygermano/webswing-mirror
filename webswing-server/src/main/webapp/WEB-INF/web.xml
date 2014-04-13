@@ -9,7 +9,7 @@
 		<!-- Use it with mvn jetty:run -->
 		<init-param>
 			<param-name>org.atmosphere.cpr.packages</param-name>
-			<param-value>org.webswing.server</param-value>
+			<param-value>org.webswing.server.handler</param-value>
 		</init-param>
 		<load-on-startup>0</load-on-startup>
 		<async-supported>true</async-supported>
@@ -17,7 +17,7 @@
 	<servlet>
 		<description>FileServlet</description>
 		<servlet-name>FileServlet</servlet-name>
-		<servlet-class>org.webswing.server.FileServlet</servlet-class>
+		<servlet-class>org.webswing.server.handler.FileServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
@@ -30,7 +30,7 @@
 	</servlet-mapping>
 	
 	<listener>
-		<listener-class>org.webswing.server.JmsService</listener-class>
+		<listener-class>org.webswing.server.handler.JmsService</listener-class>
 	</listener>
 	
 	<listener>

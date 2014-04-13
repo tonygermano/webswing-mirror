@@ -31,11 +31,4 @@ angular.module('ws-console.directives', [])
 		"<p class='form-control-static'>{{value}}</p>"+
 		"</div>	</div>"
 	};
-}])
-.directive('wsInputText',[ function() {
-	return {
-		restrict: 'E',
-		scope:{label:'=',value:'=',help:'='},
-		templateUrl: "partials/component/text-input-template.html"
-	};
 }]);

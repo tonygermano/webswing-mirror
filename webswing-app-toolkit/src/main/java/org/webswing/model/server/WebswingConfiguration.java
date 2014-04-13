@@ -1,10 +1,8 @@
-package org.webswing.server.model;
+package org.webswing.model.server;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class WebswingConfiguration implements Serializable {
 

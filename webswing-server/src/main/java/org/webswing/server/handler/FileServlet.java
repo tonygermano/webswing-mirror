@@ -1,4 +1,4 @@
-package org.webswing.server;
+package org.webswing.server.handler;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

@@ -15,8 +15,10 @@ import javax.imageio.stream.ImageOutputStream;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.model.admin.s2c.JsonSwingSession;
 import org.webswing.model.s2c.JsonApplication;
-import org.webswing.server.model.SwingApplicationDescriptor;
+import org.webswing.model.server.SwingApplicationDescriptor;
+import org.webswing.server.SwingInstance;
 
 public class ServerUtil {
 
@@ -84,5 +86,19 @@ public class ServerUtil {
             log.error("Writing image interupted:" + e.getMessage(),e);
         }
         return null;
+    }
+
+    public static JsonSwingSession composeSwingInstanceStatus(SwingInstance si) {
+        JsonSwingSession result=new JsonSwingSession();
+        result.setId(si.getClientId());
+        result.setApplication(si.getApplicationName());
+        result.setConnected(si.getSessionId()!=null);
+        if(!result.getConnected()){
+            result.setDisconnectedSince(si.getDisconnectedSince());
+        }
+        result.setStartedAt(si.getStartedAt());
+        result.setUser(si.getUser());
+        result.setState(si.getStats());
+        return result;
     }
 }

@@ -12,8 +12,8 @@ import java.util.Map;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.webswing.server.model.SwingApplicationDescriptor;
-import org.webswing.server.model.WebswingConfiguration;
+import org.webswing.model.server.SwingApplicationDescriptor;
+import org.webswing.model.server.WebswingConfiguration;
 
 public class TestAppDescriptorGenerator {
 

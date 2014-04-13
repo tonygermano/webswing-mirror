@@ -1,4 +1,4 @@
-package org.webswing.server;
+package org.webswing.server.handler;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -19,8 +19,9 @@ import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.s2c.JsonAppFrame;
+import org.webswing.server.ConfigurationManager;
+import org.webswing.server.SwingInstanceManager;
 import org.webswing.server.coder.SwingJsonCoder;
-import org.webswing.server.model.SwingApplicationDescriptor;
 import org.webswing.server.util.ServerUtil;
 
 @ManagedService(path = "/async/swing")
@@ -28,9 +29,7 @@ public class SwingAsyncManagedService {
 
     private static final Logger log = LoggerFactory.getLogger(SwingAsyncManagedService.class);
 
-    protected static Map<String, SwingJvmConnection> clients = new HashMap<String, SwingJvmConnection>();
     private Map<String, AtmosphereResource> resourceMap = new HashMap<String, AtmosphereResource>();
-
 
     @Ready(value = DELIVER_TO.RESOURCE, encoders = { SwingJsonCoder.class })
     public Serializable onReady(final AtmosphereResource r) {
@@ -43,6 +42,7 @@ public class SwingAsyncManagedService {
     @Disconnect
     public void onDisconnect(AtmosphereResourceEvent event) {
         resourceMap.remove(event.getResource().uuid());
+        SwingInstanceManager.getInstance().disconnectSwingInstance(event.getResource().uuid());
     }
 
     @Message(encoders = { SwingJsonCoder.class }, decoders = { SwingJsonCoder.class })
@@ -50,30 +50,8 @@ public class SwingAsyncManagedService {
         try {
             if (message instanceof JsonConnectionHandshake) {
                 JsonConnectionHandshake h = (JsonConnectionHandshake) message;
-                if (!clients.containsKey(h.clientId)) {
-                    SwingApplicationDescriptor app = ConfigurationManager.getInsatnce().getApplication(h.applicationName);
-                    if (app != null) {
-                        SwingJvmConnection connection = new SwingJvmConnection(h, h.applicationName, app, resourceMap.get(h.sessionId));
-                        if (connection.isInitialized()) {
-                            clients.put(h.clientId, connection);
-                            if (!connection.isNewAppStarted()) {
-                                AtmosphereResource resource = resourceMap.get(h.sessionId);
-                                if (resource != null) {
-                                    resource.getBroadcaster().broadcast(Constants.CONTINUE_OLD_SESSION_QUESTION, resource);
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    if (h.sessionId != null && h.sessionId.equals(clients.get(h.clientId).getSessionId())) {
-                        send(h.clientId, h);
-                    } else {
-                        AtmosphereResource resource = resourceMap.get(h.sessionId);
-                        if (resource != null) {
-                            resource.getBroadcaster().broadcast(Constants.APPLICATION_ALREADY_RUNNING, resource);
-                        }
-                    }
-                }
+                AtmosphereResource resource = resourceMap.get(h.sessionId);
+                SwingInstanceManager.getInstance().connectSwingInstance(resource, h);
             } else if (message instanceof JsonEventKeyboard) {
                 JsonEventKeyboard k = (JsonEventKeyboard) message;
                 send(k.clientId, k);
@@ -108,14 +86,8 @@ public class SwingAsyncManagedService {
     }
 
     private void send(String clientId, Serializable o) {
-        if (clients.containsKey(clientId)) {
-            SwingJvmConnection client = clients.get(clientId);
-            if (o instanceof String) {
-                client.sendMsg((String) o);
-            } else {
-                client.send(o);
-            }
-        }
+        SwingInstanceManager.getInstance().sendMessageToSwing(clientId,o);
+
 
     }
 

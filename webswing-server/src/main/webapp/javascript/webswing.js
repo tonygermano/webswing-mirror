@@ -36,6 +36,7 @@
 		},
 		startApplication : function(name) {
 			appName = name;
+			clientId = clientId+appName;
 			socket.push(atmosphere.util.stringifyJSON(getHandShake()));
 			showDialog(startingDialog);
 		}

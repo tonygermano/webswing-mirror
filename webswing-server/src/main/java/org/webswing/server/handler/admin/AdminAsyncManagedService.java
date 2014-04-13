@@ -1,4 +1,4 @@
-package org.webswing.server.adminconsole.config;
+package org.webswing.server.handler.admin;
 
 import java.io.Serializable;
 
@@ -11,8 +11,8 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.webswing.server.coder.SwingJsonCoder;
 
-@ManagedService(path = "/async/admin/config")
-public class ConfigurationAsyncManagedService {
+@ManagedService(path = "/async/admin")
+public class AdminAsyncManagedService {
 
     @Ready(value = DELIVER_TO.RESOURCE, encoders = { SwingJsonCoder.class })
     public Serializable onReady(final AtmosphereResource r) {

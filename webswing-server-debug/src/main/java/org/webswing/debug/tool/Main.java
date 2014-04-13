@@ -12,7 +12,7 @@ import org.apache.activemq.usage.MemoryUsage;
 import org.apache.activemq.usage.SystemUsage;
 import org.webswing.Constants;
 import org.webswing.debug.tool.ui.DebugFrame;
-import org.webswing.server.JmsService;
+import org.webswing.server.handler.JmsService;
 
 
 public class Main {

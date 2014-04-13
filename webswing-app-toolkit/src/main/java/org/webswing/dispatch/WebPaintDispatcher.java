@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +21,7 @@ import javax.swing.SwingUtilities;
 
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.ServerConnectionIfc;
+import org.webswing.model.admin.s2c.JsonSwingJvmStats;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.model.s2c.JsonCopyEvent;
 import org.webswing.model.s2c.JsonCursorChange;
@@ -81,9 +83,9 @@ public class WebPaintDispatcher {
                         clientReadyToReceive = false;
                     }
                     Logger.trace("contentSender:paintJson", json);
-                    Logger.trace("contentSender:pngEncodingStart",json.hashCode());
+                    Logger.trace("contentSender:pngEncodingStart", json.hashCode());
                     Util.encodeWindowImages(windowImages, json, imageService);
-                    Logger.trace("contentSender:pngEncodingDone",json.hashCode());
+                    Logger.trace("contentSender:pngEncodingDone", json.hashCode());
                     serverConnection.sendJsonObject(json);
                 } catch (Exception e) {
                     Logger.error("contentSender:error", e);
@@ -91,6 +93,20 @@ public class WebPaintDispatcher {
             }
         };
         contentSender.scheduleWithFixedDelay(sendUpdate, 50, 50, TimeUnit.MILLISECONDS);
+        
+        Runnable sendStateUpdate = new Runnable() {
+
+            public void run() {
+                JsonSwingJvmStats status= new JsonSwingJvmStats();
+                int mb = 1024*1024;
+                Runtime runtime = Runtime.getRuntime();
+                status.setHeapSize(runtime.totalMemory()/mb);
+                status.setHeapSizeUsed((runtime.totalMemory() - runtime.freeMemory()) / mb);
+                status.setSnapshotTime(new Date());
+                serverConnection.sendJsonObject(status);
+            }
+        };
+        contentSender.scheduleWithFixedDelay(sendStateUpdate, 1, 10, TimeUnit.SECONDS);
     }
 
     public void clientReadyToReceive() {
@@ -120,7 +136,7 @@ public class WebPaintDispatcher {
                     rset.add(repaintedArea);
                     areasToUpdate.put(guid, rset);
                 }
-                Logger.trace("WebPaintDispatcher:notifyWindowAreaRepainted", guid,repaintedArea);
+                Logger.trace("WebPaintDispatcher:notifyWindowAreaRepainted", guid, repaintedArea);
             }
         }
     }
@@ -137,7 +153,7 @@ public class WebPaintDispatcher {
                     areasToUpdate.put(guid, rset);
                 }
                 rset.add(newBounds);
-                Logger.trace("WebPaintDispatcher:notifyWindowBoundsChanged", guid,newBounds);
+                Logger.trace("WebPaintDispatcher:notifyWindowBoundsChanged", guid, newBounds);
             }
         }
     }
@@ -179,7 +195,7 @@ public class WebPaintDispatcher {
         JsonAppFrame f = new JsonAppFrame();
         JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.url, uri.toString());
         f.setLinkAction(linkAction);
-        Logger.info("WebPaintDispatcher:notifyOpenLinkAction",uri);
+        Logger.info("WebPaintDispatcher:notifyOpenLinkAction", uri);
         serverConnection.sendJsonObject(f);
     }
 

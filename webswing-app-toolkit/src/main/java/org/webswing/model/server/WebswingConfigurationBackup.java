@@ -1,4 +1,4 @@
-package org.webswing.server.model;
+package org.webswing.model.server;
 
 import java.util.Date;
 import java.util.Map;
