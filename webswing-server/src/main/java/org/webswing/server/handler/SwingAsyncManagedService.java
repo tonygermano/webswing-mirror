@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.shiro.SecurityUtils;
+import org.atmosphere.client.TrackMessageSizeInterceptor;
+import org.atmosphere.config.managed.ManagedServiceInterceptor;
 import org.atmosphere.config.service.Disconnect;
 import org.atmosphere.config.service.ManagedService;
 import org.atmosphere.config.service.Message;
@@ -11,6 +14,10 @@ import org.atmosphere.config.service.Ready;
 import org.atmosphere.config.service.Ready.DELIVER_TO;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
+import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
+import org.atmosphere.interceptor.HeartbeatInterceptor;
+import org.atmosphere.interceptor.ShiroInterceptor;
+import org.atmosphere.interceptor.SuspendTrackerInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -24,7 +31,7 @@ import org.webswing.server.SwingInstanceManager;
 import org.webswing.server.coder.SwingJsonCoder;
 import org.webswing.server.util.ServerUtil;
 
-@ManagedService(path = "/async/swing")
+@ManagedService(path = "/async/swing", interceptors = { AtmosphereResourceLifecycleInterceptor.class, ManagedServiceInterceptor.class, TrackMessageSizeInterceptor.class, HeartbeatInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class })
 public class SwingAsyncManagedService {
 
     private static final Logger log = LoggerFactory.getLogger(SwingAsyncManagedService.class);
@@ -35,6 +42,7 @@ public class SwingAsyncManagedService {
     public Serializable onReady(final AtmosphereResource r) {
         resourceMap.put(r.uuid(), r);
         JsonAppFrame appInfo = new JsonAppFrame();
+        appInfo.user= SecurityUtils.getSubject().getPrincipal().toString();
         appInfo.applications = ServerUtil.createApplicationJsonInfo(ConfigurationManager.getInsatnce().getApplications());
         return appInfo;
     }
@@ -71,7 +79,7 @@ public class SwingAsyncManagedService {
                     send(sm.substring(Constants.HEARTBEAT_MSG_PREFIX.length()), sm);
                 } else if (sm.startsWith(Constants.REPAINT_REQUEST_PREFIX)) {
                     send(sm.substring(Constants.REPAINT_REQUEST_PREFIX.length()), sm);
-                }  else if (sm.startsWith(Constants.SWING_KILL_SIGNAL)) {
+                } else if (sm.startsWith(Constants.SWING_KILL_SIGNAL)) {
                     send(sm.substring(Constants.SWING_KILL_SIGNAL.length()), sm);
                 } else {
                     return sm;
@@ -80,14 +88,13 @@ public class SwingAsyncManagedService {
                 return (JsonAppFrame) message;
             }
         } catch (Exception e) {
-            log.error("Exception while processing websocket message.",e);
+            log.error("Exception while processing websocket message.", e);
         }
         return null;
     }
 
     private void send(String clientId, Serializable o) {
-        SwingInstanceManager.getInstance().sendMessageToSwing(clientId,o);
-
+        SwingInstanceManager.getInstance().sendMessageToSwing(clientId, o);
 
     }
 

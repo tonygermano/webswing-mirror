@@ -20,6 +20,11 @@
 		<servlet-class>org.webswing.server.handler.FileServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<servlet>
+		<description>LoginServlet</description>
+		<servlet-name>LoginServlet</servlet-name>
+		<servlet-class>org.webswing.server.handler.LoginServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>AtmosphereServlet</servlet-name>
 		<url-pattern>/async/*</url-pattern>
@@ -27,6 +32,10 @@
 	<servlet-mapping>
 		<servlet-name>FileServlet</servlet-name>
 		<url-pattern>/file</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>LoginServlet</servlet-name>
+		<url-pattern>/login</url-pattern>
 	</servlet-mapping>
 	
 	<listener>

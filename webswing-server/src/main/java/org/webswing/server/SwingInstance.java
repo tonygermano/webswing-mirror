@@ -20,6 +20,7 @@ public class SwingInstance implements WebSessionListener {
     private SwingJvmConnection connection;
     private Date disconnectedSince;
     private final Date startedAt = new Date();
+    private Date endedAt = new Date();
 
     public SwingInstance(JsonConnectionHandshake h, SwingApplicationDescriptor app, AtmosphereResource resource) {
         this.application = app;
@@ -75,6 +76,7 @@ public class SwingInstance implements WebSessionListener {
     }
 
     public void notifyClose() {
+        endedAt = new Date();
         SwingInstanceManager.getInstance().notifySwingClose(this);
     }
 
@@ -115,8 +117,12 @@ public class SwingInstance implements WebSessionListener {
     public Date getStartedAt() {
         return startedAt;
     }
-    
-    public JsonSwingJvmStats getStats(){
+
+    public Date getEndedAt() {
+        return endedAt;
+    }
+
+    public JsonSwingJvmStats getStats() {
         return connection.getCurrentStatus();
     }
 

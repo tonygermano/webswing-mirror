@@ -6,8 +6,27 @@
 <meta charset="utf-8" />
 <link rel="stylesheet" href="css/bootstrap.css" />
 <link rel="stylesheet" href="css/webswing.css" />
+<link href="css/login.css" rel="stylesheet">
+
 </head>
 <body id="body">
+	<div id="loginDialog" class="modal fade" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+			      <form id="loginForm" class="form-signin" accept-charset="UTF-8" role="form">
+			        <h2 class="form-signin-heading">Please sign in</h2>
+			        <input type="text" class="form-control" placeholder="User name" name="username" required autofocus>
+			        <input type="password" class="form-control" placeholder="Password" name="password" required>
+			        <label class="checkbox">
+			          <input type="checkbox" name="rememberMe" value="true"> Remember me
+			        </label>
+			      </form>
+		          <button class="btn btn-lg btn-primary pull-right" onclick="webswing.login()">Sign in</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div id="initializingDialog" class="modal fade" data-backdrop="static">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -92,7 +111,8 @@
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h4 class="modal-title" id="myModalLabel">Select application:</h4>
+					<span class="pull-right"><a href="/logout">Logout</a></span>
+					<h4 class="modal-title" id="myModalLabel">Hello <span id="userName"></span>. Select your application:</h4>
 				</div>
 				<div class="modal-body">
 					<div class="row" id="applicationsList"></div>

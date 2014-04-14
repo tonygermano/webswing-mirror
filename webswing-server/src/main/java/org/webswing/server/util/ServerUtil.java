@@ -99,6 +99,7 @@ public class ServerUtil {
         result.setStartedAt(si.getStartedAt());
         result.setUser(si.getUser());
         result.setState(si.getStats());
+        result.setEndedAt(si.getEndedAt());
         return result;
     }
 }

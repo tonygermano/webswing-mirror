@@ -10,6 +10,7 @@ public class JsonSwingSession implements Serializable {
     private String user;
     private String application;
     private Date startedAt;
+    private Date endedAt;
     private Boolean connected;
     private Date disconnectedSince;
     private JsonSwingJvmStats state;
@@ -68,6 +69,14 @@ public class JsonSwingSession implements Serializable {
 
     public void setState(JsonSwingJvmStats state) {
         this.state = state;
+    }
+
+    public Date getEndedAt() {
+        return endedAt;
+    }
+
+    public void setEndedAt(Date endedAt) {
+        this.endedAt = endedAt;
     }
 
 }

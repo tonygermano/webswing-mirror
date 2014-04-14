@@ -8,6 +8,7 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.webswing.Constants;
 import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
+import org.webswing.model.admin.s2c.JsonSwingSession;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.util.ServerUtil;
@@ -16,6 +17,7 @@ public class SwingInstanceManager {
 
     private static SwingInstanceManager instance = new SwingInstanceManager();
 
+    private List<JsonSwingSession> closedInstances = new ArrayList<JsonSwingSession>();
     private List<SwingInstance> swingInstances = new ArrayList<SwingInstance>();
     private SwingInstanceChangeListener changeListener;
 
@@ -128,13 +130,16 @@ public class SwingInstanceManager {
     }
 
     public synchronized void notifySwingClose(SwingInstance swingInstance) {
+        closedInstances.add(ServerUtil.composeSwingInstanceStatus(swingInstance));
         swingInstances.remove(swingInstance);
+        changeListener.swingInstancesChanged();
     }
 
     public synchronized JsonAdminConsoleFrame extractStatus() {
         JsonAdminConsoleFrame result = new JsonAdminConsoleFrame();
         for (SwingInstance si : swingInstances) {
             result.getSessions().add(ServerUtil.composeSwingInstanceStatus(si));
+            result.setClosedSessions(closedInstances);
         }
         return result;
     }
@@ -144,7 +149,6 @@ public class SwingInstanceManager {
     }
 
     public interface SwingInstanceChangeListener {
-
         void swingInstancesChanged();
     }
 }

@@ -1,6 +1,7 @@
 (function() {
 	"use strict";
 
+	var loginDialog = $('#loginDialog');
 	var initializingDialog = $('#initializingDialog');
 	var connectingDialog = $('#connectingDialog');
 	var applicationSelectorDialog = $('#applicationSelectorDialog');
@@ -36,13 +37,24 @@
 		},
 		startApplication : function(name) {
 			appName = name;
-			clientId = clientId+appName;
+			clientId = clientId + appName;
 			socket.push(atmosphere.util.stringifyJSON(getHandShake()));
 			showDialog(startingDialog);
+		},
+		login : function() {
+			$.ajax({
+				type : 'POST',
+				url : '/login',
+				data : $("#loginForm").serialize(),
+				success : function(data) {
+					start();
+				}
+			});
 		}
 	};
 
-	start();
+	webswing.login();//check if already logged in
+	showDialog(loginDialog);
 
 	function start() {
 		createCanvas();
@@ -124,15 +136,12 @@
 	}
 
 	function selectApplication(data) {
+		$('#userName').append(data.user);
 		for ( var i in data.applications) {
 			var app = data.applications[i];
 			$('#applicationsList').append('<div class="col-sm-6 col-md-4"><div class="thumbnail" onclick="webswing.startApplication(\'' + app.name + '\')"><img src="data:image/png;base64,' + app.base64Icon + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>');
 		}
-		if (i == 0) {
-			webswing.startApplication(data.applications[i].name);
-		} else {
-			showDialog(applicationSelectorDialog);
-		}
+		showDialog(applicationSelectorDialog);
 	}
 
 	function processRequest(data) {
@@ -178,8 +187,8 @@
 		imageObj = new Image();
 		imageObj.onload = function() {
 			context.drawImage(imageObj, x, y);
-			imageObj.onload=null;
-			imageObj.src=null;
+			imageObj.onload = null;
+			imageObj.src = null;
 		};
 		imageObj.src = 'data:image/png;base64,' + b64image;
 	}
@@ -440,6 +449,7 @@
 	}
 
 	function showDialog(dialog) {
+		loginDialog.modal('hide');
 		connectingDialog.modal('hide');
 		startingDialog.modal('hide');
 		initializingDialog.modal('hide');
