@@ -43,7 +43,7 @@ public class SwingAsyncManagedService {
         resourceMap.put(r.uuid(), r);
         JsonAppFrame appInfo = new JsonAppFrame();
         appInfo.user= SecurityUtils.getSubject().getPrincipal().toString();
-        appInfo.applications = ServerUtil.createApplicationJsonInfo(ConfigurationManager.getInsatnce().getApplications());
+        appInfo.applications = ServerUtil.createApplicationJsonInfo(ConfigurationManager.getInstance().getApplications());
         return appInfo;
     }
 

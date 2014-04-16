@@ -1,5 +1,7 @@
 package org.webswing;
 
+import java.util.Properties;
+
 public interface Constants {
 
     public static final String PAINT_ACK_PREFIX = "paintAck";
@@ -30,6 +32,8 @@ public interface Constants {
     public static final String CONFIG_FILE_PATH = "webswing.configFile";
     public static final String DEFAULT_CONFIG_FILE_NAME = "webswing.config";
     public static final String USER_FILE_PATH = "webswing.configFile";
+    public static final String SERVER_HOST = "webswing.host";
+    public static final String SERVER_PORT = "webswing.port";
     public static final String DEFAULT_USER_FILE_NAME = "user.properties";
     public static final String SWING_DEBUG_FLAG = "webswing.debugClient";
     public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutAfterDisconectSec";
@@ -38,4 +42,6 @@ public interface Constants {
     public static final String SWING_SCREEN_HEIGHT = "webswing.screenHeight";
     public static final int SWING_SCREEN_WIDTH_MIN = 300;
     public static final int SWING_SCREEN_HEIGHT_MIN = 300;
+    
+    public static final String ADMIN_ROLE = "admin";
 }

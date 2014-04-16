@@ -21,7 +21,17 @@ public class LoginServlet  extends HttpServlet{
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Subject currentUser = SecurityUtils.getSubject();
         if(currentUser.isAuthenticated()){
-            resp.setStatus(HttpServletResponse.SC_OK);
+            String role=req.getParameter("role");
+            if(role==null){
+                resp.setStatus(HttpServletResponse.SC_OK);
+            }else{
+                boolean inRole=currentUser.hasRole(role);
+                if(inRole){
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                }else{
+                    resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                }
+            }
         }else{
             try {
                 AuthenticationToken token =  new UsernamePasswordToken(req.getParameter("username"), req.getParameter("password"));

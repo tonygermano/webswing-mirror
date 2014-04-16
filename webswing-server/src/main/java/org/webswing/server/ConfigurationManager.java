@@ -1,6 +1,7 @@
 package org.webswing.server;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -13,9 +14,13 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
+import org.webswing.model.admin.s2c.JsonServerProperties;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
 import org.webswing.model.server.WebswingConfigurationBackup;
+import org.webswing.server.util.ServerUtil;
+
+import com.google.common.io.Files;
 
 public class ConfigurationManager {
 
@@ -25,6 +30,7 @@ public class ConfigurationManager {
     private static ConfigurationManager instance = new ConfigurationManager();
 
     private WebswingConfiguration liveConfiguration = new WebswingConfiguration();
+    private ConfigurationChangeListener listener;
 
     private ConfigurationManager() {
         reloadConfiguration();
@@ -32,6 +38,18 @@ public class ConfigurationManager {
 
     public WebswingConfiguration getLiveConfiguration() {
         return liveConfiguration;
+    }
+
+    public JsonServerProperties getServerProperties() {
+        JsonServerProperties result = new JsonServerProperties();
+        result.setTempFolder(System.getProperty(Constants.TEMP_DIR_PATH));
+        result.setJmsServerUrl(System.getProperty(Constants.JMS_URL));
+        result.setConfigFile(System.getProperty(Constants.CONFIG_FILE_PATH));
+        result.setWarLocation(System.getProperty(Constants.WAR_FILE_LOCATION));
+        result.setPort(System.getProperty(Constants.SERVER_PORT));
+        result.setHost(System.getProperty(Constants.SERVER_HOST));
+        result.setUserProps(ServerUtil.getUserPropsFileName());
+        return result;
     }
 
     public Map<String, SwingApplicationDescriptor> getApplications() {
@@ -43,8 +61,8 @@ public class ConfigurationManager {
     }
 
     public SwingApplicationDescriptor getApplication(String name) {
-        for(SwingApplicationDescriptor app: liveConfiguration.getApplications()){
-            if(name!=null && name.equals(app.getName())){
+        for (SwingApplicationDescriptor app : liveConfiguration.getApplications()) {
+            if (name != null && name.equals(app.getName())) {
                 return app;
             }
         }
@@ -53,9 +71,10 @@ public class ConfigurationManager {
 
     public void reloadConfiguration() {
         try {
-            WebswingConfiguration loaded = ConfigurationManager.loadApplicationConfiguration();
+            WebswingConfiguration loaded = loadApplicationConfiguration();
             if (loaded != null) {
                 liveConfiguration = loaded;
+                notifyChange();
             }
         } catch (Exception e) {
             log.error("Webswing application configuration failed to load:", e);
@@ -63,14 +82,15 @@ public class ConfigurationManager {
     }
 
     public void saveApplicationConfiguration(WebswingConfiguration configuration) throws Exception {
-        if (configuration != null &&  !EqualsBuilder.reflectionEquals(liveConfiguration, configuration)) {
+        if (configuration != null && !EqualsBuilder.reflectionEquals(liveConfiguration, configuration)) {
             backupApplicationConfiguration(liveConfiguration);
             File config = getConfigFile();
             mapper.writerWithDefaultPrettyPrinter().writeValue(config, configuration);
+            notifyChange();
         }
     }
 
-    public static void backupApplicationConfiguration(WebswingConfiguration configuration) throws Exception {
+    private void backupApplicationConfiguration(WebswingConfiguration configuration) throws Exception {
         File backupFile = getConfigBackupFile();
         WebswingConfigurationBackup backup = null;
         if (backupFile.exists()) {
@@ -93,39 +113,66 @@ public class ConfigurationManager {
         mapper.writerWithDefaultPrettyPrinter().writeValue(backupFile, backup);
     }
 
-    public static WebswingConfigurationBackup loadApplicationConfigurationBackup() throws Exception {
-        WebswingConfigurationBackup result = new WebswingConfigurationBackup();
-        File backup = getConfigBackupFile();
-        if (backup.exists()) {
-            result = mapper.readValue(backup, WebswingConfigurationBackup.class);
-            return result;
-        } else {
-            log.error("Configuration backup file " + backup.getPath() + " does not exist!");
+    public WebswingConfigurationBackup loadApplicationConfigurationBackup() {
+        try {
+            WebswingConfigurationBackup result = new WebswingConfigurationBackup();
+            File backup = getConfigBackupFile();
+            if (backup.exists()) {
+                result = mapper.readValue(backup, WebswingConfigurationBackup.class);
+                return result;
+            } else {
+                log.warn("Configuration backup file " + backup.getPath() + " does not exist.");
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("Failed to load backup configuration file:", e);
             return null;
         }
     }
 
-    public static WebswingConfiguration loadApplicationConfiguration() throws Exception {
-        WebswingConfiguration result = new WebswingConfiguration();
-        File config = getConfigFile();
-        if (config.exists()) {
-            result = mapper.readValue(config, WebswingConfiguration.class);
-            return result;
-        } else {
-            log.error("Configuration file " + config.getPath() + " does not exist!");
+    public String loadUserProperties() {
+        try {
+            String result = new String();
+            File users = new File(ServerUtil.getUserPropsFileName());
+            if (users.exists()) {
+                result = Files.toString(users, Charset.forName("UTF-8"));
+                return result;
+            } else {
+                log.warn("User properties file " + users.getPath() + " does not exist.");
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("Failed to load user properties file:", e);
             return null;
         }
     }
 
-    private static File getConfigFile() {
+    public WebswingConfiguration loadApplicationConfiguration() {
+        try {
+            WebswingConfiguration result = new WebswingConfiguration();
+            File config = getConfigFile();
+            if (config.exists()) {
+                result = mapper.readValue(config, WebswingConfiguration.class);
+                return result;
+            } else {
+                log.error("Configuration file " + config.getPath() + " does not exist!");
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("Failed to load configuration file:", e);
+            return null;
+        }
+    }
+
+    private File getConfigFile() {
         return getConfigFile(false);
     }
 
-    private static File getConfigBackupFile() {
+    private File getConfigBackupFile() {
         return getConfigFile(true);
     }
 
-    private static File getConfigFile(boolean backup) {
+    private File getConfigFile(boolean backup) {
         String configFile = System.getProperty(Constants.CONFIG_FILE_PATH);
         if (configFile == null) {
             String war = System.getProperty(Constants.WAR_FILE_LOCATION);
@@ -137,7 +184,23 @@ public class ConfigurationManager {
         return config;
     }
 
-    public static ConfigurationManager getInsatnce() {
+    public static ConfigurationManager getInstance() {
         return instance;
     }
+
+    public void setListener(ConfigurationChangeListener listener) {
+        this.listener = listener;
+    }
+
+    private void notifyChange() {
+        if (listener != null) {
+            listener.notifyChange();
+        }
+    }
+
+    public interface ConfigurationChangeListener {
+
+        void notifyChange();
+    }
+
 }

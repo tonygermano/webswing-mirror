@@ -15,6 +15,7 @@ import javax.imageio.stream.ImageOutputStream;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
 import org.webswing.model.admin.s2c.JsonSwingSession;
 import org.webswing.model.s2c.JsonApplication;
 import org.webswing.model.server.SwingApplicationDescriptor;
@@ -86,6 +87,16 @@ public class ServerUtil {
             log.error("Writing image interupted:" + e.getMessage(),e);
         }
         return null;
+    }
+    
+    public static String getUserPropsFileName(){
+        String userFile = System.getProperty(Constants.USER_FILE_PATH);
+        if (userFile == null) {
+            String war = System.getProperty(Constants.WAR_FILE_LOCATION);
+            userFile = war.substring(6, war.lastIndexOf("/") + 1) + Constants.DEFAULT_USER_FILE_NAME;
+            System.setProperty(userFile, Constants.USER_FILE_PATH);
+        }
+        return userFile;
     }
 
     public static JsonSwingSession composeSwingInstanceStatus(SwingInstance si) {

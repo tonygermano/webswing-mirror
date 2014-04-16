@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.atmosphere.cpr.AtmosphereResource;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.webswing.Constants;
 import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
 import org.webswing.model.admin.s2c.JsonSwingSession;
@@ -22,17 +21,6 @@ public class SwingInstanceManager {
     private SwingInstanceChangeListener changeListener;
 
     private SwingInstanceManager() {
-        setChangeListener(new SwingInstanceChangeListener() {
-
-            @Override
-            public void swingInstancesChanged() {
-                try {
-                    System.err.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(extractStatus()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     public static SwingInstanceManager getInstance() {
@@ -55,7 +43,7 @@ public class SwingInstanceManager {
     public void connectSwingInstance(AtmosphereResource resource, JsonConnectionHandshake h) {
         SwingInstance swingInstance = findSwingInstance(h.clientId);
         if (swingInstance == null) {//start new swing app
-            SwingApplicationDescriptor app = ConfigurationManager.getInsatnce().getApplication(h.applicationName);
+            SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(h.applicationName);
             if (app != null && !h.mirrored) {
                 if (!reachedMaxConnections(app)) {
                     swingInstance = new SwingInstance(h, app, resource);
