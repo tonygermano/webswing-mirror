@@ -8,9 +8,11 @@ angular.module('ws-console.controllers', [])
 	var split=$location.url().split( '/' );
 	$scope.location = split[1]==null?'dashboard':split[1];
 	$scope.active = split[2]==null?'overview':split[2];
+	var masterData=$scope.masterData = {};
+
 
 	$scope.connected=false;
-	$scope.login=function(data){
+	$scope.login=function(){
 		$http({
 			method: 'POST', 
 			url: '/login?role=admin',
@@ -20,15 +22,18 @@ angular.module('ws-console.controllers', [])
 			if($scope.loginDialog==null){
 				$scope.loginDialog=$modal.open({
 					templateUrl : 'partials/login.html',
+					scope : $scope,
 					backdrop : 'static',
 					keyboard : 'false'
 				});
 			}
 		}).success(function(data, status, headers, config) {
-			$scope.loginDialog.close();
-			$scope.loginDialog=null;
-			atmosphereService.subscribe({
-				url : document.location.toString() + 'async/admin',
+			if($scope.loginDialog!=null){
+				$scope.loginDialog.close();
+				$scope.loginDialog=null;
+			}
+			$scope.socket=atmosphereService.subscribe({
+				url : '/async/admin',
 				contentType : "application/json",
 				logLevel : 'debug',
 				transport :  'websocket',
@@ -36,12 +41,19 @@ angular.module('ws-console.controllers', [])
 				reconnectInterval : 5000,
 				fallbackTransport : 'long-polling',
 				onMessage: function(response){
-					$scope.currentCfg = response.configuration != null ? response.configuration : $scope.currentCfg;
-					$scope.liveCfg = response.liveConfiguration != null ? response.liveConfiguration : $scope.liveCfg;
-					$scope.sessions = response.sessions != null ? response.sessions : $scope.sessions;
-					$scope.closedSessions = response.closedSessions != null ? response.closedSessions : $scope.closedSessions;
-					$scope.serverProps = response.serverProperties != null ? response.serverProperties : $scope.serverProps;
-					$scope.configurationBackup = response.configurationBackup != null ? response.configurationBackup : $scope.configurationBackup;
+					var message = response.responseBody;
+					try {
+						var data = atmosphere.util.parseJSON(message);
+						masterData.currentCfg = data.configuration != null ? data.configuration : masterData.currentCfg;
+						masterData.liveCfg = data.liveConfiguration != null ? data.liveConfiguration : masterData.liveCfg;
+						masterData.sessions = data.sessions != null ? data.sessions : masterData.sessions;
+						masterData.closedSessions = data.closedSessions != null ? data.closedSessions : masterData.closedSessions;
+						masterData.serverProps = data.serverProperties != null ? data.serverProperties : masterData.serverProps;
+						masterData.configurationBackup = data.configurationBackup != null ? data.configurationBackup : masterData.configurationBackup;
+						masterData.userConfig = data.userConfig != null ? data.userConfig : masterData.userConfig;
+					} catch (e) {
+						return;
+					}
 				},
 				onOpen : function(response){
 					$scope.connected=true;
@@ -59,6 +71,7 @@ $scope.login();
 }])
 .controller('Settings', ['$scope',function($scope) {
 	//edit
+	$scope.config={};
 	$scope.editType='form';
 	$scope.$watch('editType', function(newValue, oldValue) {
 		if(newValue == 'json'){
@@ -70,11 +83,8 @@ $scope.login();
 	$scope.currentEditApplication=null;
 	$scope.arrowPos={'top':18+'px'};
 	$scope.reset= function(){
-		$scope.config={
-			form:$scope.currentCfg,
-			json: JSON.stringify($scope.currentCfg,undefined,2),
-			users: 'asdfasdfasdfasdf\nasdfasdfasfdadsf'
-		};
+		$scope.config.form = $scope.masterData.currentCfg;
+		$scope.config.json = JSON.stringify($scope.masterData.currentCfg,undefined,2);
 	}
 	$scope.edit= function(index){
 		$scope.currentEditApplication=index;
@@ -109,6 +119,14 @@ $scope.login();
 		//TODO
 	}
 	
+	$scope.resetUsers = function(){
+		$scope.config.users=$scope.masterData.userConfig;
+	}
+
+	$scope.applyUsers = function(){
+	}
+	
 	$scope.reset();
+	$scope.resetUsers();
 
 }]);

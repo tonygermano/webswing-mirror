@@ -41,6 +41,7 @@ import org.webswing.model.s2c.PrinterJobResult;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.handler.FileServlet;
 import org.webswing.server.util.Los;
+import org.webswing.server.util.ServerUtil;
 import org.webswing.server.util.SwingAntTimestampedLogger;
 import org.webswing.toolkit.WebToolkit;
 
@@ -127,6 +128,7 @@ public class SwingJvmConnection implements MessageListener {
             if (m instanceof ObjectMessage) {
                 if (((ObjectMessage) m).getObject() instanceof JsonSwingJvmStats) {
                     currentStatus = (JsonSwingJvmStats) ((ObjectMessage) m).getObject();
+                    SwingInstanceManager.getInstance().notifySwingChangeChange();
                 }
                 if (((ObjectMessage) m).getObject() instanceof PrinterJobResult) {
                     PrinterJobResult pj = (PrinterJobResult) ((ObjectMessage) m).getObject();
@@ -204,7 +206,7 @@ public class SwingJvmConnection implements MessageListener {
                         javaTask.setProject(project);
                         javaTask.setFork(true);
                         javaTask.setFailonerror(true);
-                        javaTask.setJar(new File(System.getProperty(Constants.WAR_FILE_LOCATION).substring(6)));
+                        javaTask.setJar(new File(ServerUtil.getWarFileLocation().substring(6)));
                         javaTask.setArgs(appConfig.getArgs());
                         String webSwingToolkitJarPath = WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm().substring(6);
                         String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPath;

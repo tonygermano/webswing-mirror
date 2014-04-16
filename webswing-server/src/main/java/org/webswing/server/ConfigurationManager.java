@@ -43,9 +43,9 @@ public class ConfigurationManager {
     public JsonServerProperties getServerProperties() {
         JsonServerProperties result = new JsonServerProperties();
         result.setTempFolder(System.getProperty(Constants.TEMP_DIR_PATH));
-        result.setJmsServerUrl(System.getProperty(Constants.JMS_URL));
-        result.setConfigFile(System.getProperty(Constants.CONFIG_FILE_PATH));
-        result.setWarLocation(System.getProperty(Constants.WAR_FILE_LOCATION));
+        result.setJmsServerUrl(Constants.JMS_URL);
+        result.setConfigFile(getConfigFile().getAbsolutePath());
+        result.setWarLocation(ServerUtil.getWarFileLocation());
         result.setPort(System.getProperty(Constants.SERVER_PORT));
         result.setHost(System.getProperty(Constants.SERVER_HOST));
         result.setUserProps(ServerUtil.getUserPropsFileName());
@@ -175,7 +175,7 @@ public class ConfigurationManager {
     private File getConfigFile(boolean backup) {
         String configFile = System.getProperty(Constants.CONFIG_FILE_PATH);
         if (configFile == null) {
-            String war = System.getProperty(Constants.WAR_FILE_LOCATION);
+            String war = ServerUtil.getWarFileLocation();
             configFile = war.substring(6, war.lastIndexOf("/") + 1) + Constants.DEFAULT_CONFIG_FILE_NAME;
             System.setProperty(configFile, Constants.CONFIG_FILE_PATH);
         }

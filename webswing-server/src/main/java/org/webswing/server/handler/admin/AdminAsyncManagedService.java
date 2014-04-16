@@ -103,6 +103,7 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
             message.setConfigurationBackup(ConfigurationManager.getInstance().loadApplicationConfigurationBackup());
             message.setLiveConfiguration(ConfigurationManager.getInstance().getLiveConfiguration());
             message.setUserConfig(ConfigurationManager.getInstance().loadUserProperties());
+            message.setServerProperties(ConfigurationManager.getInstance().getServerProperties());
         }
         return message;
     }

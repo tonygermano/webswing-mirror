@@ -13,33 +13,44 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 
-
-public class LoginServlet  extends HttpServlet{
+public class LoginServlet extends HttpServlet {
 
     private static final long serialVersionUID = -425026725411077089L;
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Subject currentUser = SecurityUtils.getSubject();
-        if(currentUser.isAuthenticated()){
-            String role=req.getParameter("role");
-            if(role==null){
+        String role = req.getParameter("role");
+        try {
+            AuthenticationToken token = new UsernamePasswordToken(req.getParameter("username"), req.getParameter("password"));
+            currentUser.login(token);
+            if (checkRole(role, currentUser)) {
                 resp.setStatus(HttpServletResponse.SC_OK);
-            }else{
-                boolean inRole=currentUser.hasRole(role);
-                if(inRole){
+            } else {
+                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
+            //WebUtils.redirectToSavedRequest(req, resp, "index.xhtml");
+        } catch (AuthenticationException e) {
+            if (currentUser.isAuthenticated()) {
+                if (checkRole(role, currentUser)) {
                     resp.setStatus(HttpServletResponse.SC_OK);
-                }else{
+                } else {
                     resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 }
-            }
-        }else{
-            try {
-                AuthenticationToken token =  new UsernamePasswordToken(req.getParameter("username"), req.getParameter("password"));
-                currentUser.login(token);
-                resp.setStatus(HttpServletResponse.SC_OK);
-                //WebUtils.redirectToSavedRequest(req, resp, "index.xhtml");
-            } catch (AuthenticationException e) {
+            } else {
                 resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
+        }
+    }
+
+    private boolean checkRole(String role, Subject currentUser) {
+        if (role == null) {
+            return true;
+        } else {
+            boolean inRole = currentUser.hasRole(role);
+            if (inRole) {
+                return true;
+            } else {
+                return false;
             }
         }
     }

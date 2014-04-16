@@ -48,7 +48,7 @@ public class SwingInstanceManager {
                 if (!reachedMaxConnections(app)) {
                     swingInstance = new SwingInstance(h, app, resource);
                     addSwingInstance(swingInstance);
-                    changeListener.swingInstancesChanged();
+                    notifySwingChangeChange();
                 } else {
                     resource.getBroadcaster().broadcast(Constants.TOO_MANY_CLIENTS_NOTIFICATION, resource);
                 }
@@ -68,25 +68,12 @@ public class SwingInstanceManager {
                     boolean result = swingInstance.registerPrimaryWebSession(resource);
                     if (result) {
                         resource.getBroadcaster().broadcast(Constants.CONTINUE_OLD_SESSION_QUESTION, resource);
-                        changeListener.swingInstancesChanged();
+                        notifySwingChangeChange();
                     } else {
                         resource.getBroadcaster().broadcast(Constants.APPLICATION_ALREADY_RUNNING, resource);
                     }
                 }
             }
-        }
-    }
-
-    public synchronized void disconnectSwingInstance(String sessionID) {
-        if (sessionID != null) {
-            for (SwingInstance si : swingInstances) {
-                if (sessionID.equals(si.getSessionId())) {
-                    si.registerPrimaryWebSession(null);
-                } else if (sessionID.equals(si.getMirroredSessionId())) {
-                    si.registerMirroredWebSession(null);
-                }
-            }
-            changeListener.swingInstancesChanged();
         }
     }
 
@@ -120,18 +107,24 @@ public class SwingInstanceManager {
     public synchronized void notifySwingClose(SwingInstance swingInstance) {
         closedInstances.add(ServerUtil.composeSwingInstanceStatus(swingInstance));
         swingInstances.remove(swingInstance);
-        changeListener.swingInstancesChanged();
+        notifySwingChangeChange();
     }
 
     public synchronized JsonAdminConsoleFrame extractStatus() {
         JsonAdminConsoleFrame result = new JsonAdminConsoleFrame();
         for (SwingInstance si : swingInstances) {
             result.getSessions().add(ServerUtil.composeSwingInstanceStatus(si));
-            result.setClosedSessions(closedInstances);
         }
+        result.setClosedSessions(closedInstances);
         return result;
     }
 
+    public void notifySwingChangeChange(){
+        if(changeListener!=null){
+            changeListener.swingInstancesChanged();
+        }
+    }
+    
     public void setChangeListener(SwingInstanceChangeListener changeListener) {
         this.changeListener = changeListener;
     }

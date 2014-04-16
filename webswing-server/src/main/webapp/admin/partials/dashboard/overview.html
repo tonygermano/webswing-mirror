@@ -13,7 +13,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="session in sessions.sessions">
+			<tr ng-repeat="session in masterData.sessions">
 				<td>
 					<span title="app Id: {{session.id}}" ui-jq="tooltip">{{$index+1}}</span>
 				</td>
@@ -55,7 +55,7 @@
 							<span class="sr-only">Toggle Dropdown</span>
 						</button>
 						<ul class="dropdown-menu pull-right" role="menu">
-							<li><a href="" ng-click="killSignal(session)">Delete</a></li>
+							<li><a href="" ng-click="killSignal(session)">Kill session</a></li>
 						</ul>   		
 					</div>
 				</td>
@@ -77,7 +77,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="session in sessions.closedSessions">
+			<tr ng-repeat="session in masterData.closedSessions">
 				<td>
 					<span title="app Id: {{session.id}}" ui-jq="tooltip">{{$index+1}}</span>
 				</td>
@@ -91,7 +91,7 @@
 					{{session.startedAt | date:'dd MMM h:mm:ss'}}
 				</td>
 				<td>
-					{{session.endedAt | date:'dd MMM h:mm:ss'}}
+					{{(session.endedAt | date:'dd MMM h:mm:ss')+ ' ('+(session.endedAt-session.startedAt | duration)+')'}}
 				</td>
 			</tr>
 		</tbody>

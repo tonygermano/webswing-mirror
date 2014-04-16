@@ -50,7 +50,6 @@ public class SwingAsyncManagedService {
     @Disconnect
     public void onDisconnect(AtmosphereResourceEvent event) {
         resourceMap.remove(event.getResource().uuid());
-        SwingInstanceManager.getInstance().disconnectSwingInstance(event.getResource().uuid());
     }
 
     @Message(encoders = { SwingJsonCoder.class }, decoders = { SwingJsonCoder.class })

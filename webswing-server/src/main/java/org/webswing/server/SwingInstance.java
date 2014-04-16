@@ -10,6 +10,7 @@ import org.webswing.model.admin.s2c.JsonSwingJvmStats;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.SwingJvmConnection.WebSessionListener;
+import org.webswing.server.util.ServerUtil;
 
 public class SwingInstance implements WebSessionListener {
 
@@ -24,6 +25,7 @@ public class SwingInstance implements WebSessionListener {
 
     public SwingInstance(JsonConnectionHandshake h, SwingApplicationDescriptor app, AtmosphereResource resource) {
         this.application = app;
+        this.user = ServerUtil.getUserName(resource);
         registerPrimaryWebSession(resource);
         this.connection = new SwingJvmConnection(h, app, this);
     }
@@ -37,6 +39,7 @@ public class SwingInstance implements WebSessionListener {
                 public void onDisconnect(AtmosphereResourceEvent event) {
                     SwingInstance.this.resource = null;
                     SwingInstance.this.disconnectedSince = new Date();
+                    SwingInstanceManager.getInstance().notifySwingChangeChange();
                 }
             });
             return true;

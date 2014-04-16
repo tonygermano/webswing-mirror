@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +14,12 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
+import main.Main;
+
 import org.apache.commons.codec.binary.Base64;
+import org.apache.shiro.subject.Subject;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.FrameworkConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -92,11 +99,26 @@ public class ServerUtil {
     public static String getUserPropsFileName(){
         String userFile = System.getProperty(Constants.USER_FILE_PATH);
         if (userFile == null) {
-            String war = System.getProperty(Constants.WAR_FILE_LOCATION);
+            String war = ServerUtil.getWarFileLocation();
             userFile = war.substring(6, war.lastIndexOf("/") + 1) + Constants.DEFAULT_USER_FILE_NAME;
             System.setProperty(userFile, Constants.USER_FILE_PATH);
         }
         return userFile;
+    }
+    
+    public static String getWarFileLocation(){
+        String warFile = System.getProperty(Constants.WAR_FILE_LOCATION);
+        if (warFile == null) {
+            ProtectionDomain domain = Main.class.getProtectionDomain();
+            URL location = domain.getCodeSource().getLocation();
+            String locationString=location.toExternalForm();
+            if(locationString.endsWith("/WEB-INF/classes/")){
+                locationString=locationString.substring(0, locationString.length()-"/WEB-INF/classes/".length());
+            }
+            System.setProperty(Constants.WAR_FILE_LOCATION, locationString);
+            return locationString;
+        }
+        return warFile;
     }
 
     public static JsonSwingSession composeSwingInstanceStatus(SwingInstance si) {
@@ -112,5 +134,21 @@ public class ServerUtil {
         result.setState(si.getStats());
         result.setEndedAt(si.getEndedAt());
         return result;
+    }
+
+    public static String getUserName(AtmosphereResource resource) {
+        Subject sub=(Subject) resource.getRequest().getAttribute(FrameworkConfig.SECURITY_SUBJECT);
+        if(sub!=null){
+            return sub.getPrincipal()+"";
+        }
+        return null;
+    }
+    
+    public static boolean isUserinRole(AtmosphereResource resource,String role) {
+        Subject sub=(Subject) resource.getRequest().getAttribute(FrameworkConfig.SECURITY_SUBJECT);
+        if(sub!=null){
+            return sub.hasRole(role);
+        }
+        return false;
     }
 }

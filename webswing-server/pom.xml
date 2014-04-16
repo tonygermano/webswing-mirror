@@ -68,7 +68,7 @@
 			<artifactId>shiro-web</artifactId>
 			<version>1.2.3</version>
 		</dependency>
-		
+
 		<!-- TO BE EXCLUDED FROM WEB-INF/lib -->
 		<dependency>
 			<groupId>org.webswing</groupId>
@@ -97,7 +97,6 @@
 						WEB-INF/lib/commons-cli-*.jar,
 						WEB-INF/lib/bcel-*.jar,
 						WEB-INF/lib/jakarta-regexp-*.jar,
-						WEB-INF/lib/guava-*.jar,
 						WEB-INF/lib/jsr305-*.jar,
 						WEB-INF/lib/pngencoder-*.jar,
 						WEB-INF/lib/webswing-app-interface-*.jar,
@@ -181,10 +180,11 @@
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>8.1.14.v20131031</version>
+				<configuration>
+					<war>${basedir}/target/webswing-server.war</war>
+				</configuration>
 			</plugin>
 
 		</plugins>
 	</build>
-
-
 </project>
