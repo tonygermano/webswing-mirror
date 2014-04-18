@@ -131,3 +131,9 @@ body {
 .edit-app-list-entry{
   margin-bottom: 5px
 }
+
+.admin-connection-status{
+  margin-top: 15px;
+  margin-right: 30px;
+  display: block;
+}

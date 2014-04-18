@@ -24,7 +24,7 @@ angular.module('ws-console.controllers', [])
 					templateUrl : 'partials/login.html',
 					scope : $scope,
 					backdrop : 'static',
-					keyboard : 'false'
+					keyboard : false
 				});
 			}
 		}).success(function(data, status, headers, config) {
@@ -66,8 +66,37 @@ angular.module('ws-console.controllers', [])
 };
 $scope.login();
 }])
-.controller('Dashboard', [function() {
-
+.controller('Dashboard', ['$scope','$modal',function($scope,$modal) {
+	$scope.view= function(session){
+		$scope.mirrorSession=session;
+		$scope.mirrorDialog=$modal.open({
+			templateUrl : 'partials/dashboard/mirror-viewer.html',
+			scope : $scope,
+			backdrop : 'static',
+			keyboard : false
+		});
+		var ws= WebswingBase({
+			send : function(message){
+				if($scope.socket!=null){
+					if(typeof message == "string"){
+						$scope.socket.push(message)
+					}
+					if(typeof message === "object"){
+						$scope.socket.push(atmosphere.util.stringifyJSON(message));
+					}
+				}
+			},
+			onErrorMessage : function(text){
+				console.log(text);
+			},
+			onBeforePaint : function(){
+				showDialog(null);
+			},
+			clientId : session.id,
+			hasControl : false
+		});
+		ws.setCanvas($('#canvas'));
+	}
 }])
 .controller('Settings', ['$scope',function($scope) {
 	//edit

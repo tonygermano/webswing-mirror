@@ -1,11 +1,12 @@
 <div class="modal-body">
 	<form id="loginForm" class="form-signin" accept-charset="UTF-8" role="form">
 		<h2 class="form-signin-heading">Please sign in</h2>
-		<input type="text" class="form-control" placeholder="User name" name="username" required autofocus ng-model="loginForm.username">
-		<input type="password" class="form-control" placeholder="Password" name="password" required ng-model="loginForm.password">
-		<label class="checkbox">
-			<input type="checkbox" name="rememberMe" value="true" ng-model="loginForm.rememberMe"> Remember me
-		</label>
+		<div class="form-group">
+			<input type="text" class="form-control" placeholder="User name" name="username" required autofocus ng-model="loginForm.username">
+		</div>
+		<div class="form-group">
+			<input type="password" class="form-control" placeholder="Password" name="password" required ng-model="loginForm.password">
+		</div>
 	</form>
 	<button class="btn btn-lg btn-primary" ng-click="login()">Sign in</button>
 </div>

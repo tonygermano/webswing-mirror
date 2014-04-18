@@ -6,7 +6,6 @@
 <meta charset="utf-8" />
 <link rel="stylesheet" href="css/bootstrap.css" />
 <link rel="stylesheet" href="css/webswing.css" />
-<link href="css/login.css" rel="stylesheet">
 
 </head>
 <body id="body">
@@ -16,11 +15,12 @@
 				<div class="modal-body">
 			      <form id="loginForm" class="form-signin" accept-charset="UTF-8" role="form">
 			        <h2 class="form-signin-heading">Please sign in</h2>
-			        <input type="text" class="form-control" placeholder="User name" name="username" required autofocus>
-			        <input type="password" class="form-control" placeholder="Password" name="password" required>
-			        <label class="checkbox">
-			          <input type="checkbox" name="rememberMe" value="true"> Remember me
-			        </label>
+	        		<div class="form-group">
+			        	<input type="text" class="form-control" placeholder="User name" name="username" required autofocus>
+					</div>
+	        		<div class="form-group">
+				        <input type="password" class="form-control" placeholder="Password" name="password" required>
+					</div>
 			      </form>
 		          <button class="btn btn-lg btn-primary" onclick="webswing.login()">Sign in</button>
 				</div>
@@ -63,31 +63,11 @@
 			</div>
 		</div>
 	</div>
-	<div id="stoppedDialog" class="modal fade" data-backdrop="static">
+	<div id="messageDialog" class="modal fade" data-backdrop="static">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-body">
-					<p>Application stopped...</p>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="tooManyConnectionsDialog" class="modal fade"
-		data-backdrop="static">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-body">
-					<p>Too many connections. Please try again later...</p>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="applicationAlreadyRunningDialog" class="modal fade"
-		data-backdrop="static">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-body">
-					<p>Application already running in other browser window...</p>
+					<p id="messageDialogText"></p>
 				</div>
 			</div>
 		</div>
@@ -123,6 +103,7 @@
 	<script src="javascript/atmosphere.js" type="text/javascript"></script>
 	<script src="javascript/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="javascript/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+	<script src="javascript/webswing-base.js" type="text/javascript"	charset="utf-8"></script>
 	<script src="javascript/webswing.js" type="text/javascript"	charset="utf-8"></script>
 </body>
 </html>
