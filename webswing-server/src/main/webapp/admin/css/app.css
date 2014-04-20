@@ -137,3 +137,25 @@ body {
   margin-right: 30px;
   display: block;
 }
+
+.mirror-view-modal-dialog > .modal-dialog{
+  width: 90%;
+  max-height: 100%;
+}
+
+
+.mirror-view-canvas{
+  border-style: solid;
+  border-width: 2px;
+}
+.mirror-view-dialog-body{
+  overflow: auto;
+  padding: 0;
+}
+.mirror-view-dialog-header{
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.mirror-view-dialog-header-table{
+  margin:  0;
+}

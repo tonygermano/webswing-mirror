@@ -11,6 +11,7 @@ public class JsonAdminConsoleFrame implements Serializable {
 
     private static final long serialVersionUID = -607390486198389246L;
 
+    private String type="admin";
     private List<JsonSwingSession> sessions = new ArrayList<JsonSwingSession>();
     private List<JsonSwingSession> closedSessions = new ArrayList<JsonSwingSession>();
     private WebswingConfiguration configuration;
@@ -73,6 +74,10 @@ public class JsonAdminConsoleFrame implements Serializable {
 
     public void setUserConfig(String userConfig) {
         this.userConfig = userConfig;
+    }
+    
+    public String getType() {
+        return type;
     }
 
 }

@@ -8,6 +8,7 @@ public class JsonAppFrame implements Serializable {
 
     private static final long serialVersionUID = 6019708608380425820L;
 
+    private String type="app";
     public List<JsonApplication> applications;
     public JsonLinkAction linkAction;
     public JsonWindowMoveAction moveAction;
@@ -51,6 +52,11 @@ public class JsonAppFrame implements Serializable {
     @Override
     public String toString() {
         return "JsonAppFrame [applications=" + applications + ", linkAction=" + linkAction + ", moveAction=" + moveAction + ", cursorChange=" + cursorChange + ", copyEvent=" + copyEvent + ", windows=" + windows + "]";
+    }
+
+    
+    public String getType() {
+        return type;
     }
     
     

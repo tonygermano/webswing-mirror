@@ -129,6 +129,7 @@ public class SwingJvmConnection implements MessageListener {
                 if (((ObjectMessage) m).getObject() instanceof JsonSwingJvmStats) {
                     currentStatus = (JsonSwingJvmStats) ((ObjectMessage) m).getObject();
                     SwingInstanceManager.getInstance().notifySwingChangeChange();
+                    return;
                 }
                 if (((ObjectMessage) m).getObject() instanceof PrinterJobResult) {
                     PrinterJobResult pj = (PrinterJobResult) ((ObjectMessage) m).getObject();

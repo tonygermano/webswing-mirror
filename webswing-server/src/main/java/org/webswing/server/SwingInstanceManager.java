@@ -2,7 +2,11 @@ package org.webswing.server;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.webswing.Constants;
@@ -17,7 +21,7 @@ public class SwingInstanceManager {
     private static SwingInstanceManager instance = new SwingInstanceManager();
 
     private List<JsonSwingSession> closedInstances = new ArrayList<JsonSwingSession>();
-    private List<SwingInstance> swingInstances = new ArrayList<SwingInstance>();
+    private Map<String, SwingInstance> swingInstances = new ConcurrentHashMap<String, SwingInstance>();
     private SwingInstanceChangeListener changeListener;
 
     private SwingInstanceManager() {
@@ -27,27 +31,22 @@ public class SwingInstanceManager {
         return instance;
     }
 
-    private synchronized SwingInstance findSwingInstance(String clientId) {
-        for (SwingInstance si : swingInstances) {
-            if (si.getClientId().equals(clientId)) {
-                return si;
-            }
+    private synchronized Set<SwingInstance> getSwingInstanceSet() {
+        Set<SwingInstance> set = new HashSet<SwingInstance>();
+        for (SwingInstance si : swingInstances.values()) {
+            set.add(si);
         }
-        return null;
-    }
-
-    private synchronized void addSwingInstance(SwingInstance si) {
-        swingInstances.add(si);
+        return set;
     }
 
     public void connectSwingInstance(AtmosphereResource resource, JsonConnectionHandshake h) {
-        SwingInstance swingInstance = findSwingInstance(h.clientId);
+        SwingInstance swingInstance = swingInstances.get(h.clientId);
         if (swingInstance == null) {//start new swing app
             SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(h.applicationName);
             if (app != null && !h.mirrored) {
                 if (!reachedMaxConnections(app)) {
                     swingInstance = new SwingInstance(h, app, resource);
-                    addSwingInstance(swingInstance);
+                    swingInstances.put(h.clientId, swingInstance);
                     notifySwingChangeChange();
                 } else {
                     resource.getBroadcaster().broadcast(Constants.TOO_MANY_CLIENTS_NOTIFICATION, resource);
@@ -57,13 +56,14 @@ public class SwingInstanceManager {
             }
         } else {
             if (h.mirrored) {//connect as mirror viewer
+                notifySessionDisconnected(resource.uuid());//disconnect possible running mirror sessions
                 boolean result = swingInstance.registerMirroredWebSession(resource);
                 if (!result) {
                     resource.getBroadcaster().broadcast(Constants.APPLICATION_ALREADY_RUNNING, resource);
                 }
             } else {//continue old session?
                 if (h.sessionId != null && h.sessionId.equals(swingInstance.getSessionId())) {
-                    swingInstance.sendToSwing(h);
+                    swingInstance.sendToSwing(resource, h);
                 } else {
                     boolean result = swingInstance.registerPrimaryWebSession(resource);
                     if (result) {
@@ -77,21 +77,14 @@ public class SwingInstanceManager {
         }
     }
 
-    public void sendMessageToSwing(String clientId, Serializable o) {
-        SwingInstance si = findSwingInstance(clientId);
-        if (si != null) {
-            si.sendToSwing(o);
-        }
-    }
-
-    private synchronized boolean reachedMaxConnections(SwingApplicationDescriptor app) {
+    private boolean reachedMaxConnections(SwingApplicationDescriptor app) {
         if (app.getMaxClients() < 0) {
             return false;
         } else if (app.getMaxClients() == 0) {
             return true;
         } else {
             int count = 0;
-            for (SwingInstance si : swingInstances) {
+            for (SwingInstance si : getSwingInstanceSet()) {
                 if (app.getName().equals(si.getApplicationName()) && si.isRunning()) {
                     count++;
                 }
@@ -106,30 +99,49 @@ public class SwingInstanceManager {
 
     public synchronized void notifySwingClose(SwingInstance swingInstance) {
         closedInstances.add(ServerUtil.composeSwingInstanceStatus(swingInstance));
-        swingInstances.remove(swingInstance);
+        swingInstances.remove(swingInstance.getClientId());
         notifySwingChangeChange();
     }
 
     public synchronized JsonAdminConsoleFrame extractStatus() {
         JsonAdminConsoleFrame result = new JsonAdminConsoleFrame();
-        for (SwingInstance si : swingInstances) {
+        for (SwingInstance si : getSwingInstanceSet()) {
             result.getSessions().add(ServerUtil.composeSwingInstanceStatus(si));
         }
         result.setClosedSessions(closedInstances);
         return result;
     }
 
-    public void notifySwingChangeChange(){
-        if(changeListener!=null){
+    public void notifySessionDisconnected(String uuid) {
+        Set<SwingInstance> set = getSwingInstanceSet();
+        for (SwingInstance i : set) {
+            if (i.getSessionId() != null && i.getSessionId().equals(uuid)) {
+                i.registerPrimaryWebSession(null);
+            } else if (i.getMirroredSessionId() != null && i.getMirroredSessionId().equals(uuid)) {
+                i.registerMirroredWebSession(null);
+            }
+        }
+    }
+
+    public void notifySwingChangeChange() {
+        if (changeListener != null) {
             changeListener.swingInstancesChanged();
         }
     }
-    
+
     public void setChangeListener(SwingInstanceChangeListener changeListener) {
         this.changeListener = changeListener;
     }
 
     public interface SwingInstanceChangeListener {
+
         void swingInstancesChanged();
+    }
+
+    public void sendMessageToSwing(AtmosphereResource r, String clientId, Serializable o) {
+        SwingInstance client = swingInstances.get(clientId);
+        if (client != null) {
+            client.sendToSwing(r, o);
+        }
     }
 }

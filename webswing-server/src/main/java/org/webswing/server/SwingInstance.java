@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.AtmosphereResourceEvent;
-import org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter;
+import org.webswing.Constants;
 import org.webswing.model.admin.s2c.JsonSwingJvmStats;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.server.SwingApplicationDescriptor;
@@ -34,31 +33,25 @@ public class SwingInstance implements WebSessionListener {
         if (this.resource == null) {
             this.resource = resource;
             this.disconnectedSince = null;
-            resource.addEventListener(new AtmosphereResourceEventListenerAdapter() {
-
-                public void onDisconnect(AtmosphereResourceEvent event) {
-                    SwingInstance.this.resource = null;
-                    SwingInstance.this.disconnectedSince = new Date();
-                    SwingInstanceManager.getInstance().notifySwingChangeChange();
-                }
-            });
             return true;
         } else {
+            if (resource == null) {
+                SwingInstance.this.resource = null;
+                SwingInstance.this.disconnectedSince = new Date();
+                SwingInstanceManager.getInstance().notifySwingChangeChange();
+            }
             return false;
         }
     }
 
     public boolean registerMirroredWebSession(AtmosphereResource resource) {
-        if (this.resource == null) {
+        if (this.mirroredResource == null) {
             this.mirroredResource = resource;
-            resource.addEventListener(new AtmosphereResourceEventListenerAdapter() {
-
-                public void onDisconnect(AtmosphereResourceEvent event) {
-                    SwingInstance.this.mirroredResource = null;
-                }
-            });
             return true;
         } else {
+            if (resource == null) {
+                SwingInstance.this.mirroredResource = null;
+            }
             return false;
         }
     }
@@ -72,9 +65,19 @@ public class SwingInstance implements WebSessionListener {
         }
     }
 
-    public void sendToSwing(Serializable h) {
+    public void sendToSwing(AtmosphereResource r, Serializable h) {
         if (connection.isRunning()) {
-            connection.send(h);
+            if (h instanceof String) {
+                if (((String) h).startsWith(Constants.PAINT_ACK_PREFIX) && ((resource != null && r.uuid().equals(resource.uuid())) || (resource == null && mirroredResource != null && r.uuid().equals(mirroredResource.uuid())))) {
+                    connection.send(h);
+                }else if( ((String) h).startsWith(Constants.UNLOAD_PREFIX)){
+                    SwingInstanceManager.getInstance().notifySessionDisconnected(r.uuid());
+                }else{
+                    connection.send(h);
+                }
+            } else {
+                connection.send(h);
+            }
         }
     }
 

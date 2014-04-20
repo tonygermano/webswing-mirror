@@ -1,16 +1,26 @@
-<div class="modal-header">
-	<table class="table table-striped">
+<div class="modal-header mirror-view-dialog-header">
+	<table class="table mirror-view-dialog-header-table">
 		<tr>
 			<td>
-				{{mirrorSession.user}}
+				<small>User:</small>
+				<div>
+					{{mirrorSession.user}}
+				</div>
 			</td>
 			<td>
-				{{mirrorSession.application}}
+				<small>Application:</small>
+				<div>
+					{{mirrorSession.application}}
+				</div>
 			</td>
 			<td>
-				{{mirrorSession.startedAt | date:'dd MMM h:mm:ss'}}
+				<small>Start time:</small>
+				<div>
+				 {{mirrorSession.startedAt | date:'dd MMM h:mm:ss'}}
+				</div>
 			</td>
 			<td>
+				<small>User connection status:</small>
 				<div ng-switch on="mirrorSession.connected">
 					<div ng-switch-when="true" >
 						<span  class="label label-success">Connected</span>
@@ -21,22 +31,24 @@
 				</div>
 			</td>
 			<td>
-				<div title="Measured on {{mirrorSession.state.snapshotTime | date:'dd MMM h:mm:ss'}}" ui-jq="tooltip" class="progress" ng-if="mirrorSession.state!=null">
-					<div class="progress-bar" role="progressbar" aria-valuenow="{{mirrorSession.state.heapSizeUsed/mirrorSession.state.heapSize*1000}}" aria-valuemin="0" aria-valuemax="1000" ng-style="{width: (mirrorSession.state.heapSizeUsed/mirrorSession.state.heapSize*100)+'%'}">
-					</div>
-					<div>
-						{{(mirrorSession.state.heapSizeUsed/mirrorSession.state.heapSize*100 |number:1) +'%  '+(mirrorSession.state.heapSizeUsed|number:1)+'MB/'+(mirrorSession.state.heapSize|number:0)+'MB'}}
-					</div>
-				</div>
+				<small>Memory:</small>
+				<progressbar max="mirrorSession.state.heapSize" value="mirrorSession.state.heapSizeUsed"><span style="color:black; white-space:nowrap;">{{(mirrorSession.state.heapSizeUsed/mirrorSession.state.heapSize*100 |number:1) +'%  '+(mirrorSession.state.heapSizeUsed|number:1)+'MB/'+(mirrorSession.state.heapSize|number:0)+'MB'}}</span></progressbar>
 			</td>
 			<td>
+				<button type="button" class="btn btn-primary" ng-model="wsConfig.hasControl" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
+        			Control: {{ wsConfig.hasControl|bool:'ON':'OFF' }}
+   				</button>
 				<button type="button" class="btn btn-primary" ng-click="kill(mirrorSession)">
-					<span class="glyphicon glyphicon-remove"></span> Kill session
+					<span class="glyphicon glyphicon-off"></span> Kill swing 
+				</button>
+
+				<button type="button" class="btn btn-primary" ng-click="closeMirrorView()">
+					<span class="glyphicon glyphicon-remove"></span>Close
 				</button>
 			</td>
 		</tr>
 	</table>
 </div>
-<div class="modal-body">
-	<canvas id="canvas" widht="800" height="600" />
+<div class="modal-body mirror-view-dialog-body">
+	<canvas class="mirror-view-canvas" id="canvas" width="800" height="600" tabindex="-1"/>
 </div>

@@ -1,6 +1,5 @@
 package org.webswing;
 
-import java.util.Properties;
 
 public interface Constants {
 

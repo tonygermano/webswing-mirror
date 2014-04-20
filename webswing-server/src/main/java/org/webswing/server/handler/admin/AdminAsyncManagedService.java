@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.config.managed.ManagedServiceInterceptor;
 import org.atmosphere.config.service.Disconnect;
@@ -20,14 +21,18 @@ import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
 import org.atmosphere.interceptor.HeartbeatInterceptor;
 import org.atmosphere.interceptor.ShiroInterceptor;
 import org.atmosphere.interceptor.SuspendTrackerInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstanceManager;
 import org.webswing.server.coder.SwingJsonCoder;
+import org.webswing.server.handler.SwingAsyncManagedService;
 
 @ManagedService(path = "/async/admin", interceptors = { AtmosphereResourceLifecycleInterceptor.class, ManagedServiceInterceptor.class, TrackMessageSizeInterceptor.class, HeartbeatInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class })
 public class AdminAsyncManagedService implements ConfigurationManager.ConfigurationChangeListener, SwingInstanceManager.SwingInstanceChangeListener {
+    private static final Logger log = LoggerFactory.getLogger(AdminAsyncManagedService.class);
 
     private Map<String, AtmosphereResource> resourceMap = new HashMap<String, AtmosphereResource>();
 
@@ -38,11 +43,13 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
 
     @Ready(value = DELIVER_TO.RESOURCE, encoders = { SwingJsonCoder.class })
     public Serializable onReady(final AtmosphereResource r) {
-        if (SecurityUtils.getSubject().hasRole(Constants.ADMIN_ROLE)) {
+        Subject sub = SecurityUtils.getSubject();
+        if (sub.hasRole(Constants.ADMIN_ROLE)) {
             resourceMap.put(r.uuid(), r);
             JsonAdminConsoleFrame result = createAdminConsoleUpdate(true, true);
             return result;
         } else {
+            log.warn("Unauthorized connection atempt from "+ sub.getPrincipal());
             try {
                 r.close();
             } catch (IOException e) {
@@ -56,13 +63,21 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
     public void onDisconnect(AtmosphereResourceEvent event) {
         if (resourceMap.containsKey(event.getResource().uuid())) {
             resourceMap.remove(event.getResource().uuid());
+            SwingInstanceManager.getInstance().notifySessionDisconnected(event.getResource().uuid());
         }
     }
 
     @Message(encoders = { SwingJsonCoder.class }, decoders = { SwingJsonCoder.class })
-    public Serializable onMessage(Object message) {
-        if (message instanceof JsonAdminConsoleFrame) {
-            return (JsonAdminConsoleFrame) message;
+    public Serializable onMessage(AtmosphereResource r, Object message) {
+        try {
+            Serializable result = SwingAsyncManagedService.processWebswingMessage(r, message);
+            if(result!=null ){
+                return result;
+            }else if (message instanceof JsonAdminConsoleFrame) {
+                return (JsonAdminConsoleFrame) message;
+            }
+        } catch (Exception e) {
+            log.error("Exception while processing websocket message.", e);
         }
         return null;
     }
