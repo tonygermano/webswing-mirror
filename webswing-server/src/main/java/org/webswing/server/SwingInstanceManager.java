@@ -44,6 +44,9 @@ public class SwingInstanceManager {
 
     public void connectSwingInstance(AtmosphereResource resource, JsonConnectionHandshake h) {
         SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(h.applicationName);
+        if(app==null){
+            throw new RuntimeException("Application "+h.applicationName+" is not configured.");
+        }
         if (ServerUtil.isUserAuthorizedForApplication(resource, app)) {
             SwingInstance swingInstance = swingInstances.get(h.clientId);
             if (swingInstance == null) {//start new swing app
