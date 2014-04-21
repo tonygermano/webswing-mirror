@@ -19,7 +19,7 @@ public class JsonAdminConsoleFrame implements Serializable {
     private WebswingConfigurationBackup configurationBackup;
     private JsonServerProperties serverProperties;
     private String userConfig;
-    private String errorMessage;
+    private JsonMessage message;
 
     public List<JsonSwingSession> getSessions() {
         return sessions;
@@ -81,12 +81,12 @@ public class JsonAdminConsoleFrame implements Serializable {
         return type;
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    public JsonMessage getMessage() {
+        return message;
     }
 
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
+    public void setMessage(JsonMessage message) {
+        this.message = message;
     }
 
 }

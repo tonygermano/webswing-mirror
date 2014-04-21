@@ -48,7 +48,12 @@ body {
   background-color: #428bca;
 }
 
-
+.message-area{
+  position: fixed;
+  bottom: 0;
+  z-index: 1001;
+  width: 16%;
+}
 /*
  * Main content
  */

@@ -88,6 +88,7 @@ public class ConfigurationManager {
             backupApplicationConfiguration(liveConfiguration);
             File config = getConfigFile();
             mapper.writerWithDefaultPrettyPrinter().writeValue(config, configuration);
+            reloadConfiguration();
             notifyChange();
         }
     }

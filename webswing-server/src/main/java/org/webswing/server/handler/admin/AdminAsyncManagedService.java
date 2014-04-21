@@ -79,25 +79,20 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
             } else if (message instanceof JsonAdminConsoleFrame) {
                 return (JsonAdminConsoleFrame) message;
             } else if (message instanceof JsonApplyConfiguration) {
-                JsonApplyConfiguration jac=(JsonApplyConfiguration) message;
-                if(jac.getType().equals(JsonApplyConfiguration.Type.user)){
-                    try {
-                        ServerUtil.validateUserFile(jac.getConfigContent());
-                        ConfigurationManager.getInstance().applyUserProperties(jac.getConfigContent());
-                    } catch (Exception e) {
-                        return ServerUtil.composeAdminErrorReply(e);
-                    }
-                }else if(jac.getType().equals(JsonApplyConfiguration.Type.config)){
-                    try {
-                        ServerUtil.validateConfigFile(jac.getConfigContent());
-                        ConfigurationManager.getInstance().applyApplicationConfiguration(jac.getConfigContent());
-                    } catch (Exception e) {
-                        return ServerUtil.composeAdminErrorReply(e);
-                    }
+                JsonApplyConfiguration jac = (JsonApplyConfiguration) message;
+                if (jac.getType().equals(JsonApplyConfiguration.Type.user)) {
+                    ServerUtil.validateUserFile(jac.getConfigContent());
+                    ConfigurationManager.getInstance().applyUserProperties(jac.getConfigContent());
+                    return ServerUtil.composeAdminSuccessReply("User configuration saved successfully.");
+                } else if (jac.getType().equals(JsonApplyConfiguration.Type.config)) {
+                    ServerUtil.validateConfigFile(jac.getConfigContent());
+                    ConfigurationManager.getInstance().applyApplicationConfiguration(jac.getConfigContent());
+                    return ServerUtil.composeAdminSuccessReply("Server configuration saved successfully.");
                 }
             }
         } catch (Exception e) {
             log.error("Exception while processing websocket message.", e);
+            return ServerUtil.composeAdminErrorReply(e);
         }
         return null;
     }
@@ -142,4 +137,5 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
         }
         return message;
     }
+    
 }

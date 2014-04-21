@@ -4,10 +4,10 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URL;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
+import org.webswing.model.admin.s2c.JsonMessage;
+import org.webswing.model.admin.s2c.JsonMessage.Type;
 import org.webswing.model.admin.s2c.JsonSwingSession;
 import org.webswing.model.s2c.JsonApplication;
 import org.webswing.model.server.SwingApplicationDescriptor;
@@ -49,7 +51,7 @@ public class ServerUtil {
         } else {
             for (String name : applications.keySet()) {
                 SwingApplicationDescriptor descriptor = applications.get(name);
-                if(!isUserAuthorizedForApplication(r,descriptor)){
+                if (!isUserAuthorizedForApplication(r, descriptor)) {
                     continue;
                 }
                 JsonApplication app = new JsonApplication();
@@ -179,24 +181,37 @@ public class ServerUtil {
         }
         return false;
     }
-    
-    public static boolean validateConfigFile(byte[] content) throws Exception{
+
+    public static boolean validateConfigFile(byte[] content) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         mapper.readValue(content, WebswingConfiguration.class);
         return true;
     }
-    
+
     public static boolean validateUserFile(byte[] content) throws IOException {
         PropertiesRealm r = new PropertiesRealm();
-        String tmpFileName=FileServlet.registerFile(content, UUID.randomUUID().toString(), 10, TimeUnit.SECONDS, "");
+        String tmpFileName = FileServlet.registerFile(content, UUID.randomUUID().toString(), 10, TimeUnit.SECONDS, "");
         r.setResourcePath(tmpFileName);
         r.init();
         return true;
     }
 
-    public static Serializable composeAdminErrorReply(Exception e) {
+    public static JsonAdminConsoleFrame composeAdminErrorReply(Exception e) {
+        return createJsonMessageFrame(Type.danger, e.getMessage());
+    }
+
+    public static JsonAdminConsoleFrame composeAdminSuccessReply(String s) {
+        return createJsonMessageFrame(Type.success, s);
+    }
+
+    private static JsonAdminConsoleFrame createJsonMessageFrame(Type t, String text) {
         JsonAdminConsoleFrame response = new JsonAdminConsoleFrame();
-        response.setErrorMessage(e.getMessage());
+        JsonMessage message = new JsonMessage();
+        message.setType(t);
+        message.setText(text);
+        message.setTime(new Date());
+        response.setMessage(message);
         return response;
     }
+
 }

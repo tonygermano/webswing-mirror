@@ -40,18 +40,9 @@
 					<progressbar  animate="false" max="session.state.heapSize" value="session.state.heapSizeUsed"><span style="color:black; white-space:nowrap;">{{(session.state.heapSizeUsed/session.state.heapSize*100 |number:1) +'%  '+(session.state.heapSizeUsed|number:1)+'MB/'+(session.state.heapSize|number:0)+'MB'}}</span></progressbar>
 				</td>
 				<td>
-					<div class="btn-group">
-						<button type="button" class="btn btn-primary" ng-click="view(session)">
-							<span class="glyphicon glyphicon-camera"></span> View
-						</button>
-						<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-							<span class="caret"></span>
-							<span class="sr-only">Toggle Dropdown</span>
-						</button>
-						<ul class="dropdown-menu pull-right" role="menu">
-							<li><a href="" ng-click="kill(session)">Kill session</a></li>
-						</ul>   		
-					</div>
+					<button type="button" class="btn btn-primary" ng-click="view(session)">
+						<span class="glyphicon glyphicon-camera"></span> View
+					</button>
 				</td>
 			</tr>
 		</tbody>

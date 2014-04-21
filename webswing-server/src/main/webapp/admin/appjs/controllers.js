@@ -3,8 +3,24 @@
 /* Controllers */
 
 angular.module('ws-console.controllers', [])
-	.controller('Application', ['$scope', '$location', 'atmosphereService', '$http', '$modal',
-		function($scope, $location, atmosphereService, $http, $modal) {
+	.controller('Application', ['$scope', '$location', 'atmosphereService', '$http', '$modal', '$timeout',
+		function($scope, $location, atmosphereService, $http, $modal, $timeout) {
+			$scope.messages = [];
+			$scope.closeMessage = function(index) {
+				$timeout.cancel($scope.messages[index].timer);
+				$scope.messages.splice(index, 1);
+			};
+			$scope.addMessage = function(data) {
+				if ($scope.messages.length >= 3) {
+					$scope.closeMessage(0);
+				}
+				data.timer = $timeout(function(data) {
+					var i = $scope.messages.indexOf(data);
+					$scope.messages.splice(i, 1);
+				}, 10000);
+				$scope.messages.push(data);
+			};
+
 			$scope.loginForm = {};
 			var split = $location.url().split('/');
 			$scope.location = split[1] == null ? 'dashboard' : split[1];
@@ -17,6 +33,8 @@ angular.module('ws-console.controllers', [])
 					$scope.login();
 				}
 			}
+
+			$scope.config = {};
 
 			$scope.connected = false;
 			$scope.loginErrorMsg = null;
@@ -59,12 +77,21 @@ angular.module('ws-console.controllers', [])
 								var data = atmosphere.util.parseJSON(message);
 								if (data.type == 'admin') {
 									masterData.currentCfg = data.configuration != null ? data.configuration : masterData.currentCfg;
+									if ($scope.config.form == null) {
+										$scope.config.form = angular.copy($scope.masterData.currentCfg);
+									}
 									masterData.liveCfg = data.liveConfiguration != null ? data.liveConfiguration : masterData.liveCfg;
 									masterData.sessions = data.sessions != null ? data.sessions : masterData.sessions;
 									masterData.closedSessions = data.closedSessions != null ? data.closedSessions : masterData.closedSessions;
 									masterData.serverProps = data.serverProperties != null ? data.serverProperties : masterData.serverProps;
 									masterData.configurationBackup = data.configurationBackup != null ? data.configurationBackup : masterData.configurationBackup;
 									masterData.userConfig = data.userConfig != null ? data.userConfig : masterData.userConfig;
+									if ($scope.config.users == null) {
+										$scope.config.users = angular.copy($scope.masterData.userConfig);
+									}
+									if (data.message != null) {
+										$scope.addMessage(data.message);
+									}
 								} else if (data.type == 'app') {
 									$scope.appDataProcessor(data);
 								}
@@ -168,23 +195,28 @@ angular.module('ws-console.controllers', [])
 	function($scope, base64Encoder) {
 
 		//edit
-		$scope.config = {};
 		$scope.editType = 'form';
-		$scope.$watch('editType', function(newValue, oldValue) {
-			if (newValue == 'json') {
-				$scope.config.json =angular.toJson($scope.config.form,true);
-			} else if (newValue == 'form') {
-				$scope.config.form = angular.fromJson($scope.config.json);
+		$scope.$watch('config.form', function(newValue, oldValue) {
+			if ($scope.editType == 'form') {
+				$scope.config.json = angular.toJson(newValue, true);
 			}
-		});
+		}, true);
+		$scope.$watch('config.json', function(newValue, oldValue) {
+			if ($scope.editType == 'json') {
+				$scope.config.form = angular.fromJson(newValue);
+			}
+		}, true);
 		$scope.currentEditApplication = null;
 		$scope.currentViewApplication = null;
 		$scope.arrowPos = {
 			'top': 18 + 'px'
 		};
 		$scope.reset = function() {
-			$scope.config.form = $scope.masterData.currentCfg;
-			$scope.config.json = angular.toJson($scope.masterData.currentCfg,true);
+			if ($scope.editType == 'form') {
+				$scope.config.form = angular.copy($scope.masterData.currentCfg);
+			}else{
+				$scope.config.json = angular.toJson(angular.copy($scope.masterData.currentCfg), true);
+			}
 		}
 		$scope.edit = function(index) {
 			$scope.currentEditApplication = index;
@@ -234,15 +266,15 @@ angular.module('ws-console.controllers', [])
 			}
 		}
 		$scope.apply = function() {
-			var content = $scope.editType == 'form' ? $scope.config.form : $scope.config.json;
+			var content = $scope.editType == 'form' ? angular.toJson($scope.config.form, true) : $scope.config.json;
 			$scope.socket.push(atmosphere.util.stringifyJSON({
 				type: 'config',
-				configContent: base64Encoder().encode(angular.toJson(content,true))
+				configContent: base64Encoder().encode(content)
 			}));
 		}
 
 		$scope.resetUsers = function() {
-			$scope.config.users = $scope.masterData.userConfig;
+			$scope.config.users = angular.copy($scope.masterData.userConfig);
 		}
 
 		$scope.applyUsers = function() {
@@ -251,9 +283,5 @@ angular.module('ws-console.controllers', [])
 				configContent: base64Encoder().encode($scope.config.users)
 			}));
 		}
-
-		$scope.reset();
-		$scope.resetUsers();
-
 	}
 ]);

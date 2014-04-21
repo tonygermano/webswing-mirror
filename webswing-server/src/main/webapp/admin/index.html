@@ -50,6 +50,7 @@
         </div>
       </div>
       <div ng-view class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main"></div>
+      <div class="message-area"><alert ng-repeat="m in messages" type="m.type" close="closeMessage($index)"><small>{{(m.time|date:"h:mm:ss")}} <br/> {{m.text}}</small></alert></div>
     </div>
   </div>
   <script src="../javascript/jquery-2.1.0.min.js"></script>
