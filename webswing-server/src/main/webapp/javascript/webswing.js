@@ -37,6 +37,9 @@ var webswing = function() {
 				var app = apps[i];
 				$('#applicationsList').append('<div class="col-sm-6 col-md-4"><div class="thumbnail" onclick="webswing.startApplication(\'' + app.name + '\')"><img src="data:image/png;base64,' + app.base64Icon + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>');
 			}
+			if(apps.length==0){
+				$('#applicationsList').append('Sorry, there is no application available for you.')	
+			}
 			showDialog(applicationSelectorDialog);
 		},
 		onBeforePaint: function() {
@@ -58,15 +61,29 @@ var webswing = function() {
 
 	var ws = WebswingBase(config);
 	login(); //check if already logged in
-	showDialog(loginDialog);
+
+	$("#passwordInput").keyup(function(event) {
+		if (event.keyCode == 13) {
+			login();
+		}
+	});
 
 	function login() {
+		var errorMsg = $('#loginErrorMsg');
 		$.ajax({
 			type: 'POST',
 			url: '/login',
 			data: $("#loginForm").serialize(),
 			success: function(data) {
+				errorMsg.html('')
 				start();
+			},
+			error: function(data) {
+				if (!loginDialog.hasClass('in')) {
+					showDialog(loginDialog);
+				}else{
+					errorMsg.html('<div class="alert alert-danger">'+data.responseText+'</div>');
+				}
 			}
 		});
 	}
@@ -75,9 +92,9 @@ var webswing = function() {
 		createCanvas();
 		showDialog(initializingDialog);
 		connect();
-        $(window).bind("beforeunload", function() {
-            socket.push('unload' + config.clientId);
-        });
+		$(window).bind("beforeunload", function() {
+			socket.push('unload' + config.clientId);
+		});
 	}
 
 	function connect() {
@@ -113,7 +130,7 @@ var webswing = function() {
 		request.onClose = function(response) {
 			// need to wait until animated transition finish
 			setTimeout(function() {
-				if (!messageDialog.hasClass('in') ) {
+				if (!messageDialog.hasClass('in')) {
 					showDialog(disconnectedDialog);
 				}
 			}, 1000);
@@ -243,7 +260,7 @@ var webswing = function() {
 			}
 		},
 		startApplication: function(name) {
-			ws.setClientId(ws.getClientId() + name);
+			ws.setClientId(ws.getUser()+ws.getClientId() + name);
 			ws.setApplication(name);
 			ws.canPaint(true);
 			ws.handshake();

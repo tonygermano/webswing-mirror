@@ -24,14 +24,17 @@ import org.atmosphere.interceptor.SuspendTrackerInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
+import org.webswing.model.admin.c2s.JsonApplyConfiguration;
 import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstanceManager;
 import org.webswing.server.coder.SwingJsonCoder;
 import org.webswing.server.handler.SwingAsyncManagedService;
+import org.webswing.server.util.ServerUtil;
 
 @ManagedService(path = "/async/admin", interceptors = { AtmosphereResourceLifecycleInterceptor.class, ManagedServiceInterceptor.class, TrackMessageSizeInterceptor.class, HeartbeatInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class })
 public class AdminAsyncManagedService implements ConfigurationManager.ConfigurationChangeListener, SwingInstanceManager.SwingInstanceChangeListener {
+
     private static final Logger log = LoggerFactory.getLogger(AdminAsyncManagedService.class);
 
     private Map<String, AtmosphereResource> resourceMap = new HashMap<String, AtmosphereResource>();
@@ -49,7 +52,7 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
             JsonAdminConsoleFrame result = createAdminConsoleUpdate(true, true);
             return result;
         } else {
-            log.warn("Unauthorized connection atempt from "+ sub.getPrincipal());
+            log.warn("Unauthorized connection atempt from " + sub.getPrincipal());
             try {
                 r.close();
             } catch (IOException e) {
@@ -71,10 +74,27 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
     public Serializable onMessage(AtmosphereResource r, Object message) {
         try {
             Serializable result = SwingAsyncManagedService.processWebswingMessage(r, message);
-            if(result!=null ){
+            if (result != null) {
                 return result;
-            }else if (message instanceof JsonAdminConsoleFrame) {
+            } else if (message instanceof JsonAdminConsoleFrame) {
                 return (JsonAdminConsoleFrame) message;
+            } else if (message instanceof JsonApplyConfiguration) {
+                JsonApplyConfiguration jac=(JsonApplyConfiguration) message;
+                if(jac.getType().equals(JsonApplyConfiguration.Type.user)){
+                    try {
+                        ServerUtil.validateUserFile(jac.getConfigContent());
+                        ConfigurationManager.getInstance().applyUserProperties(jac.getConfigContent());
+                    } catch (Exception e) {
+                        return ServerUtil.composeAdminErrorReply(e);
+                    }
+                }else if(jac.getType().equals(JsonApplyConfiguration.Type.config)){
+                    try {
+                        ServerUtil.validateConfigFile(jac.getConfigContent());
+                        ConfigurationManager.getInstance().applyApplicationConfiguration(jac.getConfigContent());
+                    } catch (Exception e) {
+                        return ServerUtil.composeAdminErrorReply(e);
+                    }
+                }
             }
         } catch (Exception e) {
             log.error("Exception while processing websocket message.", e);
@@ -108,9 +128,9 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
 
     private JsonAdminConsoleFrame createAdminConsoleUpdate(boolean swingInstances, boolean configuration) {
         JsonAdminConsoleFrame message;
-        if(swingInstances){
-            message =SwingInstanceManager.getInstance().extractStatus();
-        }else{
+        if (swingInstances) {
+            message = SwingInstanceManager.getInstance().extractStatus();
+        } else {
             message = new JsonAdminConsoleFrame();
         }
         if (configuration) {

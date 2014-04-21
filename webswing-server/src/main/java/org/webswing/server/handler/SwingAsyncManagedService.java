@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.shiro.SecurityUtils;
 import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.config.managed.ManagedServiceInterceptor;
 import org.atmosphere.config.service.Disconnect;
@@ -42,8 +41,8 @@ public class SwingAsyncManagedService {
     public Serializable onReady(final AtmosphereResource r) {
         resourceMap.put(r.uuid(), r);
         JsonAppFrame appInfo = new JsonAppFrame();
-        appInfo.user = SecurityUtils.getSubject().getPrincipal().toString();
-        appInfo.applications = ServerUtil.createApplicationJsonInfo(ConfigurationManager.getInstance().getApplications());
+        appInfo.user = ServerUtil.getUserName(r);
+        appInfo.applications = ServerUtil.createApplicationJsonInfo(r,ConfigurationManager.getInstance().getApplications());
         return appInfo;
     }
 

@@ -32,11 +32,11 @@
 			</td>
 			<td>
 				<small>Memory:</small>
-				<progressbar max="mirrorSession.state.heapSize" value="mirrorSession.state.heapSizeUsed"><span style="color:black; white-space:nowrap;">{{(mirrorSession.state.heapSizeUsed/mirrorSession.state.heapSize*100 |number:1) +'%  '+(mirrorSession.state.heapSizeUsed|number:1)+'MB/'+(mirrorSession.state.heapSize|number:0)+'MB'}}</span></progressbar>
+				<progressbar  animate="false" max="mirrorSession.state.heapSize" value="mirrorSession.state.heapSizeUsed"><span style="color:black; white-space:nowrap;">{{(mirrorSession.state.heapSizeUsed/mirrorSession.state.heapSize*100 |number:1) +'%  '+(mirrorSession.state.heapSizeUsed|number:1)+'MB/'+(mirrorSession.state.heapSize|number:0)+'MB'}}</span></progressbar>
 			</td>
 			<td>
 				<button type="button" class="btn btn-primary" ng-model="wsConfig.hasControl" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
-        			Control: {{ wsConfig.hasControl|bool:'ON':'OFF' }}
+        			Control: {{ wsConfig.hasControl|bool:'ON ':'OFF' }}
    				</button>
 				<button type="button" class="btn btn-primary" ng-click="kill(mirrorSession)">
 					<span class="glyphicon glyphicon-off"></span> Kill swing 

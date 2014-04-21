@@ -9,4 +9,6 @@ public class WebSwingPropertiesRealm extends PropertiesRealm {
         String userFile = ServerUtil.getUserPropsFileName();
         setResourcePath(userFile);
     }
+
+
 }

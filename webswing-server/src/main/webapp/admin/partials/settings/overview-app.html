@@ -1,0 +1,32 @@
+<div>
+	<ws-output label="'Name'" value="currentViewApp().name"></ws-output>
+	<ws-output label="'Icon'" value="currentViewApp().icon"></ws-output>
+	<ws-output label="'Main class'" value="currentViewApp().mainClass"></ws-output>
+	<ws-output label="'JVM arguments'" value="currentViewApp().vmArgs"></ws-output>
+	<ws-output label="'Main arguments'" value="currentViewApp().args"></ws-output>
+	<ws-output label="'Home directory'" value="currentViewApp().homeDir"></ws-output>
+	<div class="form-group">
+		<label  class="col-sm-4 control-label">Classpath entries</label>
+		<div ng-class="{'col-sm-offset-4': !$first,'col-sm-8':true, 'edit-app-list-entry':true} " ng-repeat="cp in currentViewApp().classPathEntries track by $index">
+			<p class='form-control-static'>{{cp}}</p>
+		</div>
+	</div>
+	<ws-output label="'Max client count'" value="currentViewApp().maxClients"></ws-output>
+	<ws-output label="'Session timeout'" value="currentViewApp().swingSessionTimeout"></ws-output>
+	<div class="form-group">
+		<label  class="col-sm-4 control-label">Anti alias text</label>
+		<div class="col-sm-8">
+			<div class="checkbox">
+				<input type="checkbox" ng-model="currentViewApp().antiAliasText" onclick="return false">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-4 control-label">Requires authorization</label>
+		<div class="col-sm-8">
+			<div class="checkbox">
+				<input type="checkbox" ng-model="currentViewApp().authorization" onclick="return false">
+			</div>
+		</div>
+	</div>
+</div>

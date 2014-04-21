@@ -37,7 +37,7 @@
 					</div>
 				</td>
 				<td>
-					<progressbar max="session.state.heapSize" value="session.state.heapSizeUsed"><span style="color:black; white-space:nowrap;">{{(session.state.heapSizeUsed/session.state.heapSize*100 |number:1) +'%  '+(session.state.heapSizeUsed|number:1)+'MB/'+(session.state.heapSize|number:0)+'MB'}}</span></progressbar>
+					<progressbar  animate="false" max="session.state.heapSize" value="session.state.heapSizeUsed"><span style="color:black; white-space:nowrap;">{{(session.state.heapSizeUsed/session.state.heapSize*100 |number:1) +'%  '+(session.state.heapSizeUsed|number:1)+'MB/'+(session.state.heapSize|number:0)+'MB'}}</span></progressbar>
 				</td>
 				<td>
 					<div class="btn-group">

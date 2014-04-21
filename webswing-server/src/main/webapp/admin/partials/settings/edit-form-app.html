@@ -9,6 +9,12 @@
 		</div>
 	</div>
 	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Path to icon displayed in application selection dialog.">Icon</label>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" name="icon" ng-model="currentApp().icon">
+		</div>
+	</div>
+	<div class="form-group">
 		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Swing application fully qualiffied class name. (ie. 'com.mypackage.Main')">Main class</label>
 		<div class="col-sm-9">
 			<input type="text" class="form-control" name="main" ng-model="currentApp().mainClass" required>
@@ -77,6 +83,14 @@
 		<div class="col-sm-9">
 			<div class="checkbox">
 				<input type="checkbox" name="antiAliasText" ng-model="currentApp().antiAliasText" required>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Set authorized access to this application. Only users in role '{{currentApp().name}}' can access this application.">Requires authorization</label>
+		<div class="col-sm-9">
+			<div class="checkbox">
+				<input type="checkbox" name="authorization" ng-model="currentApp().authorization" required>
 			</div>
 		</div>
 	</div>

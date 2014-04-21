@@ -133,7 +133,7 @@ public class SwingJvmConnection implements MessageListener {
                 }
                 if (((ObjectMessage) m).getObject() instanceof PrinterJobResult) {
                     PrinterJobResult pj = (PrinterJobResult) ((ObjectMessage) m).getObject();
-                    FileServlet.registerFile(pj.getPdf(), pj.getId(), 30, TimeUnit.MINUTES, pj.getClientId());
+                    FileServlet.registerFile(pj.getPdf(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser());
                     JsonAppFrame f = new JsonAppFrame();
                     JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.print, pj.getId());
                     f.setLinkAction(linkAction);
@@ -142,7 +142,7 @@ public class SwingJvmConnection implements MessageListener {
                 if (((ObjectMessage) m).getObject() instanceof OpenFileResult) {
                     OpenFileResult fr = (OpenFileResult) ((ObjectMessage) m).getObject();
                     String id = UUID.randomUUID().toString();
-                    FileServlet.registerFile(fr.getF(), id, 30, TimeUnit.MINUTES, fr.getClientId());
+                    FileServlet.registerFile(fr.getF(), id, 30, TimeUnit.MINUTES, webListener.getUser());
                     JsonAppFrame f = new JsonAppFrame();
                     JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.file, id);
                     f.setLinkAction(linkAction);
@@ -292,6 +292,8 @@ public class SwingJvmConnection implements MessageListener {
     }
 
     public interface WebSessionListener {
+
+        String getUser();
 
         void sendToWeb(Serializable o);
 

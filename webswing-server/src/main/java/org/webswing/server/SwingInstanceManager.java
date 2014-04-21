@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.atmosphere.cpr.AtmosphereResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
 import org.webswing.model.admin.s2c.JsonSwingSession;
@@ -19,6 +21,7 @@ import org.webswing.server.util.ServerUtil;
 public class SwingInstanceManager {
 
     private static SwingInstanceManager instance = new SwingInstanceManager();
+    private static final Logger log = LoggerFactory.getLogger(SwingInstanceManager.class);
 
     private List<JsonSwingSession> closedInstances = new ArrayList<JsonSwingSession>();
     private Map<String, SwingInstance> swingInstances = new ConcurrentHashMap<String, SwingInstance>();
@@ -40,40 +43,44 @@ public class SwingInstanceManager {
     }
 
     public void connectSwingInstance(AtmosphereResource resource, JsonConnectionHandshake h) {
-        SwingInstance swingInstance = swingInstances.get(h.clientId);
-        if (swingInstance == null) {//start new swing app
-            SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(h.applicationName);
-            if (app != null && !h.mirrored) {
-                if (!reachedMaxConnections(app)) {
-                    swingInstance = new SwingInstance(h, app, resource);
-                    swingInstances.put(h.clientId, swingInstance);
-                    notifySwingChangeChange();
-                } else {
-                    resource.getBroadcaster().broadcast(Constants.TOO_MANY_CLIENTS_NOTIFICATION, resource);
-                }
-            } else {
-                resource.getBroadcaster().broadcast(Constants.CONFIGURATION_ERROR, resource);
-            }
-        } else {
-            if (h.mirrored) {//connect as mirror viewer
-                notifySessionDisconnected(resource.uuid());//disconnect possible running mirror sessions
-                boolean result = swingInstance.registerMirroredWebSession(resource);
-                if (!result) {
-                    resource.getBroadcaster().broadcast(Constants.APPLICATION_ALREADY_RUNNING, resource);
-                }
-            } else {//continue old session?
-                if (h.sessionId != null && h.sessionId.equals(swingInstance.getSessionId())) {
-                    swingInstance.sendToSwing(resource, h);
-                } else {
-                    boolean result = swingInstance.registerPrimaryWebSession(resource);
-                    if (result) {
-                        resource.getBroadcaster().broadcast(Constants.CONTINUE_OLD_SESSION_QUESTION, resource);
+        SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(h.applicationName);
+        if (ServerUtil.isUserAuthorizedForApplication(resource, app)) {
+            SwingInstance swingInstance = swingInstances.get(h.clientId);
+            if (swingInstance == null) {//start new swing app
+                if (app != null && !h.mirrored) {
+                    if (!reachedMaxConnections(app)) {
+                        swingInstance = new SwingInstance(h, app, resource);
+                        swingInstances.put(h.clientId, swingInstance);
                         notifySwingChangeChange();
                     } else {
+                        resource.getBroadcaster().broadcast(Constants.TOO_MANY_CLIENTS_NOTIFICATION, resource);
+                    }
+                } else {
+                    resource.getBroadcaster().broadcast(Constants.CONFIGURATION_ERROR, resource);
+                }
+            } else {
+                if (h.mirrored) {//connect as mirror viewer
+                    notifySessionDisconnected(resource.uuid());//disconnect possible running mirror sessions
+                    boolean result = swingInstance.registerMirroredWebSession(resource);
+                    if (!result) {
                         resource.getBroadcaster().broadcast(Constants.APPLICATION_ALREADY_RUNNING, resource);
+                    }
+                } else {//continue old session?
+                    if (h.sessionId != null && h.sessionId.equals(swingInstance.getSessionId())) {
+                        swingInstance.sendToSwing(resource, h);
+                    } else {
+                        boolean result = swingInstance.registerPrimaryWebSession(resource);
+                        if (result) {
+                            resource.getBroadcaster().broadcast(Constants.CONTINUE_OLD_SESSION_QUESTION, resource);
+                            notifySwingChangeChange();
+                        } else {
+                            resource.getBroadcaster().broadcast(Constants.APPLICATION_ALREADY_RUNNING, resource);
+                        }
                     }
                 }
             }
+        }else{
+            log.error("Authorization error: User "+ServerUtil.getUserName(resource)+" is not authorized to connect to application "+ app.getName());
         }
     }
 

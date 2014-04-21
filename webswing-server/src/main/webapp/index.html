@@ -19,8 +19,9 @@
 			        	<input type="text" class="form-control" placeholder="User name" name="username" required autofocus>
 					</div>
 	        		<div class="form-group">
-				        <input type="password" class="form-control" placeholder="Password" name="password" required>
+				        <input id="passwordInput" type="password" class="form-control" placeholder="Password" name="password" required>
 					</div>
+					<div id="loginErrorMsg"></div>
 			      </form>
 		          <button class="btn btn-lg btn-primary" onclick="webswing.login()">Sign in</button>
 				</div>

@@ -20,12 +20,12 @@ public class SwingApplicationDescriptor implements Serializable {
     private int maxClients = 1;
     private boolean antiAliasText = true;
     private int swingSessionTimeout = 300;
-    
+    private boolean authorization = false;
+
     public String getName() {
         return name;
     }
 
-    
     public void setName(String name) {
         this.name = name;
     }
@@ -111,6 +111,14 @@ public class SwingApplicationDescriptor implements Serializable {
 
     public void setSwingSessionTimeout(int swingSessionTimeout) {
         this.swingSessionTimeout = swingSessionTimeout;
+    }
+
+    public boolean isAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(boolean authorization) {
+        this.authorization = authorization;
     }
 
 }

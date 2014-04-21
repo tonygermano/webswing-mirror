@@ -159,3 +159,8 @@ body {
 .mirror-view-dialog-header-table{
   margin:  0;
 }
+
+.disabled-input{
+  cursor: auto !important;
+  background-color: #ffffff !important;
+}

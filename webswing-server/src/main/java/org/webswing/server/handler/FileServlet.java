@@ -15,11 +15,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.SecurityUtils;
 import org.webswing.Constants;
 
 public class FileServlet extends HttpServlet {
@@ -36,18 +36,14 @@ public class FileServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String fileId = request.getParameter("id");
-        String clientId= null;
-        for(Cookie c:request.getCookies()){
-            if(Constants.CLIENT_ID_COOKIE.equals(c.getName())){
-                clientId=c.getValue();
-            }
-        }
+        String userId= (String) SecurityUtils.getSubject().getPrincipal();
+        
         if (!fileMap.containsKey(fileId) || fileMap.get(fileId).file == null || !fileMap.get(fileId).file.exists()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
             return;
         }
         
-        if(clientId==null || !clientId.equals(fileMap.get(fileId).clientId)){
+        if(userId==null || !userId.equals(fileMap.get(fileId).userId)){
             response.sendError(HttpServletResponse.SC_FORBIDDEN); // 403.
             return;
         }
@@ -97,36 +93,36 @@ public class FileServlet extends HttpServlet {
         public File file;
         @SuppressWarnings("unused")
         public Future<?> invalidateScheduleTask;
-        public String clientId;
+        public String userId;
         public boolean temporary;
 
-        public FileDescriptor(File file, String clientId) {
+        public FileDescriptor(File file, String userId) {
             super();
             this.file = file;
-            this.clientId = clientId;
+            this.userId = userId;
         }
     }
 
-    public static void registerFile(byte[] content, final String id, long validForTime, TimeUnit timeUnit, String validForClient) throws IOException {
+    public static String registerFile(byte[] content, final String id, long validForTime, TimeUnit timeUnit, String validForClient) throws IOException {
         if (currentServlet != null) {
             String tempDir = System.getProperty(Constants.TEMP_DIR_PATH, System.getProperty("java.io.tmpdir"));
             File f = new File(tempDir + File.separator + id + ".pdf");
             FileOutputStream output = new FileOutputStream(f);
             output.write(content);
             output.close();
-            registerFile(f, id, validForTime, timeUnit, validForClient, true);
+            return registerFile(f, id, validForTime, timeUnit, validForClient, true);
         } else {
             throw new IOException("File servlet not yet initialized!");
         }
     }
 
-    public static void registerFile(File file, final String id, long validForTime, TimeUnit timeUnit, String validForClient) throws IOException {
-        registerFile(file, id, validForTime, timeUnit, validForClient, false);
+    public static String registerFile(File file, final String id, long validForTime, TimeUnit timeUnit, String validForUser) throws IOException {
+        return registerFile(file, id, validForTime, timeUnit, validForUser, false);
     }
 
-    private static void registerFile(File file, final String id, long validForTime, TimeUnit timeUnit, String validForClient, boolean temp) throws IOException {
+    private static String registerFile(File file, final String id, long validForTime, TimeUnit timeUnit, String validForUser, boolean temp) throws IOException {
         if (currentServlet != null) {
-            final FileDescriptor fd = new FileDescriptor(file, validForClient);
+            final FileDescriptor fd = new FileDescriptor(file, validForUser);
             fd.temporary = temp;
             synchronized (currentServlet.fileMap) {
                 currentServlet.fileMap.put(id, fd);
@@ -144,6 +140,7 @@ public class FileServlet extends HttpServlet {
                     fd.invalidateScheduleTask = invalidateTask;
                 }
             }
+            return file.getAbsolutePath();
         } else {
             throw new IOException("File servlet not yet initialized!");
         }

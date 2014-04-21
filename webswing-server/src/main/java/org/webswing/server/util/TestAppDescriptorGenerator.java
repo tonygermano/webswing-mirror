@@ -45,6 +45,7 @@ public class TestAppDescriptorGenerator {
         desc1.setMainClass("Main");
         desc1.setClassPathEntries(Arrays.asList("print.jar"));
         desc1.setMaxClients(1);
+        desc1.setAuthorization(true);
 
         apps.add(desc1);
 
@@ -54,7 +55,7 @@ public class TestAppDescriptorGenerator {
         mapper.defaultPrettyPrintingWriter().writeValue(new File("F:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target\\webswing.config"), config);
 
         PrintWriter out = new PrintWriter("F:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target\\user.properties");
-        out.write("user.admin = pwd,admin\nuser.user=pwd,Printing");
+        out.write("user.admin = pwd,admin\nuser.user=pwd,Printing\nuser.guest=guest");
         out.close();
     }
 

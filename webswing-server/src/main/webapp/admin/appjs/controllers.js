@@ -12,8 +12,14 @@ angular.module('ws-console.controllers', [])
 			var masterData = $scope.masterData = {};
 			$scope.appDataProcessor = function() {};
 			$scope.appMsgProcessor = function() {};
+			$scope.handleLoginEnter = function(event) {
+				if (event.keyCode == 13) {
+					$scope.login();
+				}
+			}
 
 			$scope.connected = false;
+			$scope.loginErrorMsg = null;
 			$scope.login = function() {
 				$http({
 					method: 'POST',
@@ -30,8 +36,11 @@ angular.module('ws-console.controllers', [])
 							backdrop: 'static',
 							keyboard: false
 						});
+					} else {
+						$scope.loginErrorMsg = data;
 					}
 				}).success(function(data, status, headers, config) {
+					$scope.loginErrorMsg = null;
 					if ($scope.loginDialog != null) {
 						$scope.loginDialog.close();
 						$scope.loginDialog = null;
@@ -137,6 +146,7 @@ angular.module('ws-console.controllers', [])
 					};
 					$scope.ws.setCanvas($('#canvas')[0]);
 					$scope.ws.canPaint(true);
+					$scope.ws.setApplication(session.application);
 					$scope.ws.handshake();
 					$scope.ws.repaint();
 				}, 1000);
@@ -146,36 +156,44 @@ angular.module('ws-console.controllers', [])
 			}, function() {});
 		};
 		$scope.kill = function(session) {
-			if ($scope.mirrorDialog != null) {
-				$scope.mirrorDialog.close();
+			if ($scope.mirrorDialog != null && $scope.ws != null) {
+				$scope.ws.kill();
 			}
 		}
 	}
 ])
 
 
-.controller('Settings', ['$scope',
-	function($scope) {
+.controller('Settings', ['$scope', 'base64Encoder',
+	function($scope, base64Encoder) {
+
 		//edit
 		$scope.config = {};
 		$scope.editType = 'form';
 		$scope.$watch('editType', function(newValue, oldValue) {
 			if (newValue == 'json') {
-				$scope.config.json = JSON.stringify($scope.config.form, undefined, 2);
+				$scope.config.json =angular.toJson($scope.config.form,true);
 			} else if (newValue == 'form') {
 				$scope.config.form = angular.fromJson($scope.config.json);
 			}
 		});
 		$scope.currentEditApplication = null;
+		$scope.currentViewApplication = null;
 		$scope.arrowPos = {
 			'top': 18 + 'px'
 		};
 		$scope.reset = function() {
 			$scope.config.form = $scope.masterData.currentCfg;
-			$scope.config.json = JSON.stringify($scope.masterData.currentCfg, undefined, 2);
+			$scope.config.json = angular.toJson($scope.masterData.currentCfg,true);
 		}
 		$scope.edit = function(index) {
 			$scope.currentEditApplication = index;
+			$scope.arrowPos = {
+				'top': 18 + index * 55 + 'px'
+			};
+		}
+		$scope.view = function(index) {
+			$scope.currentViewApplication = index;
 			$scope.arrowPos = {
 				'top': 18 + index * 55 + 'px'
 			};
@@ -193,7 +211,8 @@ angular.module('ws-console.controllers', [])
 				'classPathEntries': [''],
 				'maxClients': 1,
 				'swingSessionTimeout': 300,
-				'antiAliasText': true
+				'antiAliasText': true,
+				'authorization': false
 			});
 		}
 
@@ -209,18 +228,29 @@ angular.module('ws-console.controllers', [])
 				return $scope.config.form.applications[$scope.currentEditApplication];
 			}
 		}
-		$scope.save = function() {
-			//TODO
+		$scope.currentViewApp = function() {
+			if ($scope.currentViewApplication != null) {
+				return $scope.masterData.liveCfg.applications[$scope.currentViewApplication];
+			}
 		}
 		$scope.apply = function() {
-			//TODO
+			var content = $scope.editType == 'form' ? $scope.config.form : $scope.config.json;
+			$scope.socket.push(atmosphere.util.stringifyJSON({
+				type: 'config',
+				configContent: base64Encoder().encode(angular.toJson(content,true))
+			}));
 		}
 
 		$scope.resetUsers = function() {
 			$scope.config.users = $scope.masterData.userConfig;
 		}
 
-		$scope.applyUsers = function() {}
+		$scope.applyUsers = function() {
+			$scope.socket.push(atmosphere.util.stringifyJSON({
+				type: 'user',
+				configContent: base64Encoder().encode($scope.config.users)
+			}));
+		}
 
 		$scope.reset();
 		$scope.resetUsers();

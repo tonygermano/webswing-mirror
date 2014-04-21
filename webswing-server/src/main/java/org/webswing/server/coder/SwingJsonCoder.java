@@ -6,6 +6,7 @@ import java.io.Serializable;
 import org.atmosphere.config.managed.Decoder;
 import org.atmosphere.config.managed.Encoder;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.webswing.model.admin.c2s.JsonApplyConfiguration;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
@@ -28,7 +29,11 @@ public class SwingJsonCoder implements Decoder<String, Object>,Encoder<Serializa
                     try {
                         return mapper.readValue(s, JsonEventPaste.class);
                     } catch (IOException e3) {
-                        return null;
+                        try {
+                            return mapper.readValue(s, JsonApplyConfiguration.class);
+                        } catch (IOException e4) {
+                            return null;
+                        }
                     }
                 }
             }

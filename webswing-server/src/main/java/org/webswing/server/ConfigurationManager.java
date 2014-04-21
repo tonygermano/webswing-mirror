@@ -81,13 +81,21 @@ public class ConfigurationManager {
         }
     }
 
-    public void saveApplicationConfiguration(WebswingConfiguration configuration) throws Exception {
+    public void applyApplicationConfiguration(byte[] content) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        WebswingConfiguration configuration = mapper.readValue(content, WebswingConfiguration.class);
         if (configuration != null && !EqualsBuilder.reflectionEquals(liveConfiguration, configuration)) {
             backupApplicationConfiguration(liveConfiguration);
             File config = getConfigFile();
             mapper.writerWithDefaultPrettyPrinter().writeValue(config, configuration);
             notifyChange();
         }
+    }
+
+    public void applyUserProperties(byte[] content) throws Exception {
+        File usersFile = new File(ServerUtil.getUserPropsFileName());
+        Files.write(content, usersFile);
+        notifyChange();
     }
 
     private void backupApplicationConfiguration(WebswingConfiguration configuration) throws Exception {

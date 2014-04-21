@@ -149,10 +149,10 @@ function WebswingBase(c) {
 		if (data.moveAction != null) {
 			copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height, context);
 		}
-		if (data.cursorChange != null && hasControl) {
+		if (data.cursorChange != null && config.hasControl) {
 			canvas.style.cursor = data.cursorChange.cursor;
 		}
-		if (data.copyEvent != null && hasControl) {
+		if (data.copyEvent != null && config.hasControl) {
 			window.prompt("Copy to clipboard: Ctrl+C, Enter", data.copyEvent.content);
 		}
 		//firs is always the background
