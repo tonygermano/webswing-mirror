@@ -211,7 +211,7 @@ public class SwingJvmConnection implements MessageListener {
                         javaTask.setArgs(appConfig.getArgs());
                         String webSwingToolkitJarPath = WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm().substring(6);
                         String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPath;
-                        String debug = System.getProperty(Constants.SWING_DEBUG_FLAG, "").equals("true") ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
+                        String debug = appConfig.isDebug() ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
                         String aaFonts = appConfig.isAntiAliasText() ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
                         javaTask.setJvmargs(bootCp + debug + aaFonts + " -noverify " + appConfig.getVmArgs());
 

@@ -146,7 +146,7 @@ public class WebToolkit extends SunToolkit {
     private static WebMouseInfoPeer mPeer;
 
     public WebToolkit() {
-
+        SunToolkit.setDataTransfererClassName("org.webswing.toolkit.WebDataTransfer");
     }
 
     private static GraphicsConfiguration config;
@@ -263,7 +263,7 @@ public class WebToolkit extends SunToolkit {
     }
 
     public DragSourceContextPeer createDragSourceContextPeer(DragGestureEvent paramDragGestureEvent) throws InvalidDnDOperationException {
-        throw new UnsupportedOperationException();
+        return WebDragSourceContextPeer.createDragSourceContextPeer(paramDragGestureEvent);
     }
 
     protected int getScreenWidth() {

@@ -46,11 +46,10 @@ public class TestAppDescriptorGenerator {
         desc1.setClassPathEntries(Arrays.asList("print.jar"));
         desc1.setMaxClients(1);
         desc1.setAuthorization(true);
-
+        desc1.setDebug(true);
         apps.add(desc1);
 
         WebswingConfiguration config = new WebswingConfiguration();
-        config.setSwingDebugEnabled(false);
         config.setApplications(apps);
         mapper.defaultPrettyPrintingWriter().writeValue(new File("F:\\DATA\\Workspaces\\play\\WebSwingServer2.0.git\\webswing\\webswing-server\\target\\webswing.config"), config);
 

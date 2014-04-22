@@ -28,6 +28,7 @@ import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 import java.util.UUID;
 
+import javax.swing.JFrame;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
@@ -187,7 +188,11 @@ public class WebComponentPeer implements ComponentPeer {
                 localSurfaceData = this.surfaceData;
                 this.surfaceData = SurfaceManager.getManager(this.image).getDestSurfaceData();
                 if (target != null && !(target instanceof JWindow)) {
-                    updateWindowDecorationImage();
+                    if (target instanceof JFrame && ((JFrame) target).isUndecorated()) {
+                        //window decoration is not painted
+                    }else{
+                        updateWindowDecorationImage();
+                    }
                 }
                 repaintPeerTarget();
                 if (localSurfaceData != null) {
@@ -295,9 +300,9 @@ public class WebComponentPeer implements ComponentPeer {
         Point location = Util.getWebToolkit().getEventDispatcher().getLastMousePosition();
         if (location != null) {
             Window window = (Window) target;
-            boolean b = Util.isWindowDecorationPosition( window, location);
+            boolean b = Util.isWindowDecorationPosition(window, location);
             if (b) {
-                WindowActionType wat = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(window,new Point(location.x - window.getX(), location.y - window.getY()));
+                WindowActionType wat = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(window, new Point(location.x - window.getX(), location.y - window.getY()));
                 Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(mapActionToCursor(wat));
             } else {
                 Component component = SwingUtilities.getDeepestComponentAt(window, location.x - window.getX(), location.y - window.getY());
@@ -306,8 +311,8 @@ public class WebComponentPeer implements ComponentPeer {
             }
         }
     }
-    
-    private  Cursor mapActionToCursor(WindowActionType wat) {
+
+    private Cursor mapActionToCursor(WindowActionType wat) {
         if (wat.equals(WindowActionType.resizeRight)) {
             return Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR);
         } else if (wat.equals(WindowActionType.resizeBottom)) {
@@ -318,7 +323,6 @@ public class WebComponentPeer implements ComponentPeer {
             return Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
         }
     }
-
 
     public boolean requestFocus(Component paramComponent, boolean paramBoolean1, boolean paramBoolean2, long paramLong, Cause paramCause) {
         Point p = SwingUtilities.convertPoint(paramComponent, new Point(0, 0), (Component) target);

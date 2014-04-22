@@ -21,6 +21,7 @@ public class SwingApplicationDescriptor implements Serializable {
     private boolean antiAliasText = true;
     private int swingSessionTimeout = 300;
     private boolean authorization = false;
+    private boolean debug = false;
 
     public String getName() {
         return name;
@@ -119,6 +120,14 @@ public class SwingApplicationDescriptor implements Serializable {
 
     public void setAuthorization(boolean authorization) {
         this.authorization = authorization;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
     }
 
 }
