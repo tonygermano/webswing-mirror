@@ -15,6 +15,7 @@ public class JsonCursorChange implements Serializable{
     public static final String NS_RESIZE_CURSOR = "n-resize";
     public static final String SLASH_RESIZE_CURSOR = "ne-resize";
     public static final String BACKSLASH_RESIZE_CURSOR = "se-resize";
+    public static final String NOT_ALLOWED_CURSOR = "not-allowed";
     public String cursor;
 
     public JsonCursorChange(String cursor) {

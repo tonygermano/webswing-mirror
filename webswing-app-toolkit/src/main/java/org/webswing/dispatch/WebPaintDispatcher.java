@@ -93,14 +93,14 @@ public class WebPaintDispatcher {
             }
         };
         contentSender.scheduleWithFixedDelay(sendUpdate, 50, 50, TimeUnit.MILLISECONDS);
-        
+
         Runnable sendStateUpdate = new Runnable() {
 
             public void run() {
-                JsonSwingJvmStats status= new JsonSwingJvmStats();
-                int mb = 1024*1024;
+                JsonSwingJvmStats status = new JsonSwingJvmStats();
+                int mb = 1024 * 1024;
                 Runtime runtime = Runtime.getRuntime();
-                status.setHeapSize(runtime.totalMemory()/mb);
+                status.setHeapSize(runtime.totalMemory() / mb);
                 status.setHeapSizeUsed((runtime.totalMemory() - runtime.freeMemory()) / mb);
                 status.setSnapshotTime(new Date());
                 serverConnection.sendJsonObject(status);
@@ -251,44 +251,52 @@ public class WebPaintDispatcher {
     }
 
     public void notifyCursorUpdate(Cursor cursor) {
+        notifyCursorUpdate(cursor, null);
+    }
+
+    public void notifyCursorUpdate(Cursor cursor, String overridenCursorName) {
         String webcursorName = null;
-        switch (cursor.getType()) {
-            case Cursor.DEFAULT_CURSOR:
-                webcursorName = JsonCursorChange.DEFAULT_CURSOR;
-                break;
-            case Cursor.HAND_CURSOR:
-                webcursorName = JsonCursorChange.HAND_CURSOR;
-                break;
-            case Cursor.CROSSHAIR_CURSOR:
-                webcursorName = JsonCursorChange.CROSSHAIR_CURSOR;
-                break;
-            case Cursor.MOVE_CURSOR:
-                webcursorName = JsonCursorChange.MOVE_CURSOR;
-                break;
-            case Cursor.TEXT_CURSOR:
-                webcursorName = JsonCursorChange.TEXT_CURSOR;
-                break;
-            case Cursor.WAIT_CURSOR:
-                webcursorName = JsonCursorChange.WAIT_CURSOR;
-                break;
-            case Cursor.E_RESIZE_CURSOR:
-            case Cursor.W_RESIZE_CURSOR:
-                webcursorName = JsonCursorChange.EW_RESIZE_CURSOR;
-                break;
-            case Cursor.N_RESIZE_CURSOR:
-            case Cursor.S_RESIZE_CURSOR:
-                webcursorName = JsonCursorChange.NS_RESIZE_CURSOR;
-                break;
-            case Cursor.NW_RESIZE_CURSOR:
-            case Cursor.SE_RESIZE_CURSOR:
-                webcursorName = JsonCursorChange.BACKSLASH_RESIZE_CURSOR;
-                break;
-            case Cursor.NE_RESIZE_CURSOR:
-            case Cursor.SW_RESIZE_CURSOR:
-                webcursorName = JsonCursorChange.SLASH_RESIZE_CURSOR;
-                break;
-            default:
-                webcursorName = JsonCursorChange.DEFAULT_CURSOR;
+        if (overridenCursorName == null) {
+            switch (cursor.getType()) {
+                case Cursor.DEFAULT_CURSOR:
+                    webcursorName = JsonCursorChange.DEFAULT_CURSOR;
+                    break;
+                case Cursor.HAND_CURSOR:
+                    webcursorName = JsonCursorChange.HAND_CURSOR;
+                    break;
+                case Cursor.CROSSHAIR_CURSOR:
+                    webcursorName = JsonCursorChange.CROSSHAIR_CURSOR;
+                    break;
+                case Cursor.MOVE_CURSOR:
+                    webcursorName = JsonCursorChange.MOVE_CURSOR;
+                    break;
+                case Cursor.TEXT_CURSOR:
+                    webcursorName = JsonCursorChange.TEXT_CURSOR;
+                    break;
+                case Cursor.WAIT_CURSOR:
+                    webcursorName = JsonCursorChange.WAIT_CURSOR;
+                    break;
+                case Cursor.E_RESIZE_CURSOR:
+                case Cursor.W_RESIZE_CURSOR:
+                    webcursorName = JsonCursorChange.EW_RESIZE_CURSOR;
+                    break;
+                case Cursor.N_RESIZE_CURSOR:
+                case Cursor.S_RESIZE_CURSOR:
+                    webcursorName = JsonCursorChange.NS_RESIZE_CURSOR;
+                    break;
+                case Cursor.NW_RESIZE_CURSOR:
+                case Cursor.SE_RESIZE_CURSOR:
+                    webcursorName = JsonCursorChange.BACKSLASH_RESIZE_CURSOR;
+                    break;
+                case Cursor.NE_RESIZE_CURSOR:
+                case Cursor.SW_RESIZE_CURSOR:
+                    webcursorName = JsonCursorChange.SLASH_RESIZE_CURSOR;
+                    break;
+                default:
+                    webcursorName = JsonCursorChange.DEFAULT_CURSOR;
+            }
+        } else {
+            webcursorName = overridenCursorName;
         }
         if (!WindowManager.getInstance().getCurrentCursor().equals(webcursorName)) {
             JsonAppFrame f = new JsonAppFrame();

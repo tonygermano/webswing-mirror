@@ -26,6 +26,8 @@ import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.c2s.JsonEventMouse.Type;
 import org.webswing.toolkit.WebClipboard;
+import org.webswing.toolkit.WebDragSourceContextPeer;
+import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Logger;
 import org.webswing.util.Util;
@@ -34,6 +36,8 @@ public class WebEventDispatcher {
 
     private MouseEvent lastMouseEvent;
     private Point lastMousePosition = new Point();
+    private static final DndEventHandler dndHandler=new DndEventHandler();
+
     private ClipboardOwner owner = new ClipboardOwner() {
 
         @Override
@@ -43,7 +47,7 @@ public class WebEventDispatcher {
 
     public void dispatchEvent(JsonEvent event) {
         Logger.debug("WebEventDispatcher.dispatchEvent:", event);
-        
+
         if (event instanceof JsonEventMouse) {
             dispatchMouseEvent((JsonEventMouse) event);
         }
@@ -63,6 +67,7 @@ public class WebEventDispatcher {
     public void dispatchMessage(String message) {
         Logger.debug("WebEventDispatcher.dispatchMessage", message);
         if (message.startsWith(Constants.SWING_KILL_SIGNAL)) {
+            Logger.info("Received kill signal. Swing application shutting down.");
             System.exit(0);
         }
         if (message.startsWith(Constants.PAINT_ACK_PREFIX)) {
@@ -185,13 +190,13 @@ public class WebEventDispatcher {
         final Component c = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
         if (c != null && c instanceof JTextComponent) {
             SwingUtilities.invokeLater(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     JTextComponent txtc = (JTextComponent) c;
                     WebClipboard wc = (WebClipboard) Util.getWebToolkit().getSystemClipboard();
                     wc.setContent(content);
-                    txtc.paste();      
+                    txtc.paste();
                 }
             });
         }
@@ -201,6 +206,10 @@ public class WebEventDispatcher {
         return lastMousePosition;
     }
 
+    public void dragStart(WebDragSourceContextPeer peer,Transferable transferable, long[] formats) {
+        dndHandler.dragStart(peer,transferable, formats);
+    }
+
     public static void dispatchEventInSwing(final Window w, final AWTEvent e) {
         if (e instanceof MouseEvent) {
             w.setCursor(w.getCursor());//force cursor update
@@ -208,7 +217,9 @@ public class WebEventDispatcher {
         if ((Util.isWindowDecorationEvent(w, e) || WindowManager.getInstance().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
             Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
             WindowManager.getInstance().handleWindowDecorationEvent(w, (MouseEvent) e);
-        } else {
+        } else if(dndHandler.isDndInProgress() && (e instanceof MouseEvent || e instanceof KeyEvent)){
+            dndHandler.processMouseEvent(w,e);
+        }else{
             Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
             Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
         }

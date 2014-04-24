@@ -35,6 +35,7 @@ import javax.swing.SwingUtilities;
 import org.webswing.common.GraphicsWrapper;
 import org.webswing.common.WindowActionType;
 import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.ge.WebGraphicsConfig;
 import org.webswing.util.Logger;
 import org.webswing.util.Util;
@@ -190,7 +191,7 @@ public class WebComponentPeer implements ComponentPeer {
                 if (target != null && !(target instanceof JWindow)) {
                     if (target instanceof JFrame && ((JFrame) target).isUndecorated()) {
                         //window decoration is not painted
-                    }else{
+                    } else {
                         updateWindowDecorationImage();
                     }
                 }
@@ -297,17 +298,21 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void updateCursorImmediately() {
-        Point location = Util.getWebToolkit().getEventDispatcher().getLastMousePosition();
-        if (location != null) {
-            Window window = (Window) target;
-            boolean b = Util.isWindowDecorationPosition(window, location);
-            if (b) {
-                WindowActionType wat = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(window, new Point(location.x - window.getX(), location.y - window.getY()));
-                Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(mapActionToCursor(wat));
-            } else {
-                Component component = SwingUtilities.getDeepestComponentAt(window, location.x - window.getX(), location.y - window.getY());
-                component = component == null ? window : component;
-                Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(component.getCursor());
+        if (DndEventHandler.isDndInProgress()) {
+            Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(null,DndEventHandler.getCurrentDropTargetCursorName());
+        } else {
+            Point location = Util.getWebToolkit().getEventDispatcher().getLastMousePosition();
+            if (location != null) {
+                Window window = (Window) target;
+                boolean b = Util.isWindowDecorationPosition(window, location);
+                if (b) {
+                    WindowActionType wat = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(window, new Point(location.x - window.getX(), location.y - window.getY()));
+                    Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(mapActionToCursor(wat));
+                } else {
+                    Component component = SwingUtilities.getDeepestComponentAt(window, location.x - window.getX(), location.y - window.getY());
+                    component = component == null ? window : component;
+                    Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(component.getCursor());
+                }
             }
         }
     }
