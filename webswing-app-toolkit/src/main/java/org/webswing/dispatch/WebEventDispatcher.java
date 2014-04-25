@@ -217,7 +217,7 @@ public class WebEventDispatcher {
         if ((Util.isWindowDecorationEvent(w, e) || WindowManager.getInstance().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
             Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
             WindowManager.getInstance().handleWindowDecorationEvent(w, (MouseEvent) e);
-        } else if(dndHandler.isDndInProgress() && (e instanceof MouseEvent || e instanceof KeyEvent)){
+        } else if(DndEventHandler.isDndInProgress() && (e instanceof MouseEvent || e instanceof KeyEvent)){
             dndHandler.processMouseEvent(w,e);
         }else{
             Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);

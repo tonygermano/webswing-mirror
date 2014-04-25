@@ -103,7 +103,7 @@ public class WebToolkit extends SunToolkit {
         screenHeight = desktopHeight;
         displayChanged();
         resetGC();
-        Util.resetWindowsGC(screenWidth,screenHeight);
+        Util.resetWindowsGC(screenWidth, screenHeight);
         getPaintDispatcher().clientReadyToReceive();
         getPaintDispatcher().resetWindowsPosition();//in case windows moved out of screen by resizing screen.
         getPaintDispatcher().notifyWindowRepaintAll();
@@ -162,6 +162,13 @@ public class WebToolkit extends SunToolkit {
 
     public static final void targetDisposedPeer(Object paramObject1, Object paramObject2) {
         SunToolkit.targetDisposedPeer(paramObject1, paramObject2);
+    }
+
+    @Override
+    protected void initializeDesktopProperties() {
+        if (System.getProperty("os.name", "").startsWith("Windows")) {
+            this.desktopProperties.put("Shell.shellFolderManager", "sun.awt.shell.Win32ShellFolderManager2");
+        }
     }
 
     public boolean needUpdateWindow() {
@@ -229,7 +236,7 @@ public class WebToolkit extends SunToolkit {
     public Clipboard getSystemClipboard() throws HeadlessException {
         synchronized (this) {
             if (this.clipboard == null) {
-                this.clipboard = new WebClipboard("default",true);
+                this.clipboard = new WebClipboard("default", true);
             }
         }
         return this.clipboard;
@@ -238,28 +245,28 @@ public class WebToolkit extends SunToolkit {
     public Clipboard getSystemSelection() throws HeadlessException {
         synchronized (this) {
             if (this.selectionClipboard == null) {
-                this.selectionClipboard = new WebClipboard("selection",false);
+                this.selectionClipboard = new WebClipboard("selection", false);
             }
         }
         return this.selectionClipboard;
     }
-    
+
     @Override
     protected Object lazilyLoadDesktopProperty(String name) {
-        if("awt.font.desktophints".equals(name)){
+        if ("awt.font.desktophints".equals(name)) {
             return SunToolkit.getDesktopFontHints();
         }
-        
+
         return super.lazilyLoadDesktopProperty(name);
     }
-    
+
     @Override
     protected RenderingHints getDesktopAAHints() {
         RenderingHints hints = new RenderingHints(null);
         hints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         hints.put(RenderingHints.KEY_TEXT_LCD_CONTRAST, 140);
         return hints;
-         
+
     }
 
     public DragSourceContextPeer createDragSourceContextPeer(DragGestureEvent paramDragGestureEvent) throws InvalidDnDOperationException {
