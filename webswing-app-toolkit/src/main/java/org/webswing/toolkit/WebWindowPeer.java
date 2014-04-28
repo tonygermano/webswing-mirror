@@ -72,7 +72,7 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 
     public void setTitle(String title) {
         updateWindowDecorationImage();
-        Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(this.getGuid(), new Rectangle(0,0,getBounds().width,getInsets().top));
+        Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(this.getGuid(), new Rectangle(0, 0, getBounds().width, getInsets().top));
     }
 
     public void setResizable(boolean resizeable) {
@@ -101,5 +101,8 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
             ((Component) target).setLocation(result);
         }
         return result;
+    }
+
+    public void updateAlwaysOnTopState() {
     }
 }
