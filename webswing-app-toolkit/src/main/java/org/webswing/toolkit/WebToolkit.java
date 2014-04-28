@@ -5,6 +5,7 @@ import java.awt.Button;
 import java.awt.Checkbox;
 import java.awt.CheckboxMenuItem;
 import java.awt.Choice;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.EventQueue;
@@ -33,7 +34,11 @@ import java.awt.TrayIcon;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragGestureRecognizer;
+import java.awt.dnd.DragSource;
 import java.awt.dnd.InvalidDnDOperationException;
+import java.awt.dnd.MouseDragGestureRecognizer;
 import java.awt.dnd.peer.DragSourceContextPeer;
 import java.awt.font.TextAttribute;
 import java.awt.im.InputMethodHighlight;
@@ -271,6 +276,14 @@ public class WebToolkit extends SunToolkit {
 
     public DragSourceContextPeer createDragSourceContextPeer(DragGestureEvent paramDragGestureEvent) throws InvalidDnDOperationException {
         return WebDragSourceContextPeer.createDragSourceContextPeer(paramDragGestureEvent);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends DragGestureRecognizer> T createDragGestureRecognizer(Class<T> type, DragSource dragSource, Component component, int act, DragGestureListener listener) {
+        if (MouseDragGestureRecognizer.class.equals(type)) {
+            return (T) new WebMouseDragGestureRecognizer(dragSource, component, act, listener);
+        }
+        return null;
     }
 
     protected int getScreenWidth() {

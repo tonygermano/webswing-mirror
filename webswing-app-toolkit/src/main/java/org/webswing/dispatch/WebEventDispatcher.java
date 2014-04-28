@@ -36,7 +36,7 @@ public class WebEventDispatcher {
 
     private MouseEvent lastMouseEvent;
     private Point lastMousePosition = new Point();
-    private static final DndEventHandler dndHandler=new DndEventHandler();
+    private static final DndEventHandler dndHandler = new DndEventHandler();
 
     private ClipboardOwner owner = new ClipboardOwner() {
 
@@ -146,23 +146,24 @@ public class WebEventDispatcher {
                     id = event.button == 1 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
                     e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, false, buttons);
                     dispatchEventInSwing(w, e);
-                    lastMouseEvent = e;
                     break;
                 case mouseup:
                     id = MouseEvent.MOUSE_RELEASED;
                     boolean popupTrigger = (buttons == 3) ? true : false;
-                    clickcount = 1;
+                    clickcount = computeClickCount(x, y, buttons, false);
                     e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
                     dispatchEventInSwing(w, e);
                     if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMouseEvent.getX() == x && lastMouseEvent.getY() == y) {
                         e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
                         dispatchEventInSwing(w, e);
-                        lastMouseEvent = null;
+                        lastMouseEvent = e;
+                    } else {
+                        lastMouseEvent = e;
                     }
                     break;
                 case mousedown:
                     id = MouseEvent.MOUSE_PRESSED;
-                    clickcount = 1;
+                    clickcount = computeClickCount(x, y, buttons, true);
                     e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, false, buttons);
                     dispatchEventInSwing(w, e);
                     lastMouseEvent = e;
@@ -173,16 +174,28 @@ public class WebEventDispatcher {
                     modifiers = 0;
                     e = new MouseWheelEvent(w, id, when, modifiers, x, y, clickcount, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 3, event.wheelDelta);
                     dispatchEventInSwing(w, e);
-                    lastMouseEvent = e;
                     break;
                 case dblclick:
-                    e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.x, event.y, 2, false, buttons);
-                    dispatchEventInSwing(w, e);
-                    break;
+                    //                    e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.x, event.y, 2, false, buttons);
+                    //                    dispatchEventInSwing(w, e);
+                    //                    break;
                 default:
                     break;
             }
         }
+    }
+
+    private int computeClickCount(int x, int y, int buttons, boolean isPressed) {
+        if (isPressed) {
+            if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_CLICKED && lastMouseEvent.getButton() == buttons && lastMouseEvent.getX() == x && lastMouseEvent.getY() == y) {
+                return lastMouseEvent.getClickCount() + 1;
+            }
+        }else{
+            if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMouseEvent.getButton() == buttons ) {
+                return lastMouseEvent.getClickCount();
+            }
+        }
+        return 1;
     }
 
     private void handlePasteEvent(final String content) {
@@ -206,8 +219,8 @@ public class WebEventDispatcher {
         return lastMousePosition;
     }
 
-    public void dragStart(WebDragSourceContextPeer peer,Transferable transferable, long[] formats) {
-        dndHandler.dragStart(peer,transferable, formats);
+    public void dragStart(WebDragSourceContextPeer peer, Transferable transferable, int actions, long[] formats,boolean useDropTarget) {
+        dndHandler.dragStart(peer, transferable, actions,formats,useDropTarget);
     }
 
     public static void dispatchEventInSwing(final Window w, final AWTEvent e) {
@@ -217,9 +230,9 @@ public class WebEventDispatcher {
         if ((Util.isWindowDecorationEvent(w, e) || WindowManager.getInstance().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
             Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
             WindowManager.getInstance().handleWindowDecorationEvent(w, (MouseEvent) e);
-        } else if(DndEventHandler.isDndInProgress() && (e instanceof MouseEvent || e instanceof KeyEvent)){
-            dndHandler.processMouseEvent(w,e);
-        }else{
+        } else if (DndEventHandler.isDndInProgress() && (e instanceof MouseEvent || e instanceof KeyEvent)) {
+            dndHandler.processMouseEvent(w, e);
+        } else {
             Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
             Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
         }

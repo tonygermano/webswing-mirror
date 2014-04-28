@@ -80,6 +80,10 @@ public class SwingClassloader extends ClassLoader{
         classReplacementMapping = classBuilder.build();
 
         Builder<String, String> methodReplacementBuilder = new ImmutableBiMap.Builder<String, String>();
+        methodReplacementBuilder.put("java.lang.ClassLoader getSystemClassLoader ()Ljava/lang/ClassLoader;", "org.webswing.special.RedirectedMethods getSystemClassLoader ()Ljava/lang/ClassLoader;");
+        methodReplacementBuilder.put("java.lang.ClassLoader getSystemResource (Ljava/lang/String;)Ljava/net/URL;", "org.webswing.special.RedirectedMethods getSystemResource (Ljava/lang/String;)Ljava/net/URL;");
+        methodReplacementBuilder.put("java.lang.ClassLoader getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;", "org.webswing.special.RedirectedMethods getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;");
+        methodReplacementBuilder.put("java.lang.ClassLoader getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;", "org.webswing.special.RedirectedMethods getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;");
         methodReplacementBuilder.put("java.lang.System setErr (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy ()V");
         methodReplacementBuilder.put("java.lang.System setOut (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy2 ()V");
         methodReplacementBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
@@ -130,7 +134,7 @@ public class SwingClassloader extends ClassLoader{
     
     public SwingClassloader(ClassLoader parent) {
         super(parent);
-        this.ignored_packages = new String[] { "java.", "javax.", "sun.", "org.xml.sax", "org.omg.CORBA", "org.webswing.ignored" };
+        this.ignored_packages = new String[] { "java.", "javax.", "sun.", "org.xml.sax", "org.omg.CORBA", "org.webswing.special" };
         this.repository = new ClassLoaderRepository(parent);
     }
 
@@ -183,7 +187,7 @@ public class SwingClassloader extends ClassLoader{
     protected JavaClass modifyClass(JavaClass clazz) {
 
         //do not modify classes placed in this list
-        if (CLUtil.isInPackage(clazz.getPackageName(), new String[] { "org.webswing.containers","org.webswing.special" })) {
+        if (CLUtil.isInPackage(clazz.getPackageName(), new String[] { "org.webswing.containers" })) {
             return clazz;
         }
 

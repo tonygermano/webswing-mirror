@@ -13,6 +13,8 @@ import org.webswing.util.Util;
 
 public class SwingMain {
 
+    public static ClassLoader swingLibClassloader;
+    
     public static Thread notifyExitThread = new Thread() {
 
         @Override
@@ -38,7 +40,7 @@ public class SwingMain {
                     System.exit(1);
                 }
             }
-            ClassLoader swingLibClassloader = new URLClassLoader(swingurls.toArray(new URL[0]));
+            swingLibClassloader = new URLClassLoader(swingurls.toArray(new URL[0]),SwingMain.class.getClassLoader());
             ClassLoader swingClassloader = ((WebToolkit) Toolkit.getDefaultToolkit()).getWebswingClassLoaderFactory().createSwingClassLoader(swingLibClassloader);
             Class<?> clazz = swingClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
             Class<?> mainArgType[] = { (new String[0]).getClass() };

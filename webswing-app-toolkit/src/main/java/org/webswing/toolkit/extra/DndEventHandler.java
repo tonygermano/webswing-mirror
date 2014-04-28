@@ -19,6 +19,7 @@ public class DndEventHandler {
     private long[] formats;
     private boolean entered;
     private WebDragSourceContextPeer dragSource;
+    private int actions;
     private static boolean dropSupported;
 
     public void processMouseEvent(Window w, AWTEvent e) {
@@ -26,27 +27,27 @@ public class DndEventHandler {
             MouseEvent me = (MouseEvent) e;
             if (e.getID() == MouseEvent.MOUSE_RELEASED || me.getButton() != 1) {
                 if (dropSupported) {
-                    dropTarget.handleDropMessage(w, me.getX(), me.getY(), 1, 1, formats, 1073741824);
-                    dragEnd(e, true);
+                    dropTarget.handleDropMessage(w, me.getX(), me.getY(), getDragAction(me), this.actions, formats, 1073741824);
+                    dragEnd(e, true, getDragAction(me));
                     WindowManager.getInstance().activateWindow(w, me.getX(), me.getY());
                 } else {
-                    dragEnd(e, false);
+                    dragEnd(e, false, getDragAction(me));
                 }
             } else {
                 if (e.getID() == MouseEvent.MOUSE_DRAGGED && w != null) {
                     if (!entered) {
                         entered = true;
-                        int enterdrag = dropTarget.handleEnterMessage(w, me.getX(), me.getY(), 1, 1, this.formats, 1073741824);
+                        int enterdrag = dropTarget.handleEnterMessage(w, me.getX(), me.getY(), getDragAction(me), this.actions, this.formats, 1073741824);
                         if (enterdrag == 1) {
-                            dragSource.dragEnter(1, me.getModifiers(), me.getX(), me.getY());
+                            dragSource.dragEnter(getDragAction(me), me.getModifiers(), me.getX(), me.getY());
                             dropSupported = true;
                         } else {
                             dropSupported = false;
                         }
                     }
-                    int motiondrag = dropTarget.handleMotionMessage(w, me.getX(), me.getY(), 1, 1, this.formats, 1073741824);
+                    int motiondrag = dropTarget.handleMotionMessage(w, me.getX(), me.getY(), getDragAction(me), this.actions, this.formats, 1073741824);
                     if (motiondrag == 1) {
-                        dragSource.dragMotion(1, me.getModifiers(), me.getX(), me.getY());
+                        dragSource.dragMotion(getDragAction(me), me.getModifiers(), me.getX(), me.getY());
                         dropSupported = true;
                     } else {
                         dropSupported = false;
@@ -56,20 +57,29 @@ public class DndEventHandler {
 
         } else if (e instanceof KeyEvent) {
             if (e.getID() == KeyEvent.KEY_PRESSED && ((KeyEvent) e).getKeyCode() == KeyEvent.VK_ESCAPE) {
-                dragEnd(e, false);
+                dragEnd(e, false, 0);
             }
         }
 
     }
 
-    public void dragStart(WebDragSourceContextPeer dragSource, Transferable transferable, long[] formats) {
+    private int getDragAction(MouseEvent me) {
+        int result = 2;
+        if ((me.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) == MouseEvent.CTRL_DOWN_MASK) {
+            result = 1;
+        }
+        return result;
+    }
+
+    public void dragStart(WebDragSourceContextPeer dragSource, Transferable transferable, int actions, long[] formats, boolean useDropTarget) {
         this.dragSource = dragSource;
         this.formats = formats;
+        this.actions = actions;
         dropTarget = WebDropTargetContextPeer.getWebDropTargetContextPeer();
         this.entered = false;
     }
 
-    private void dragEnd(AWTEvent e, boolean success) {
+    private void dragEnd(AWTEvent e, boolean success, int dropAction) {
         if (isDndInProgress()) {
             dropTarget.handleExitMessage((Component) e.getSource(), 1073741824);
             int x = 0;
@@ -79,12 +89,15 @@ public class DndEventHandler {
                 y = ((MouseEvent) e).getY();
             }
             dragSource.dragExit2(x, y);
-            dragSource.dragFinished(success, 1, x, y);
+            dragSource.dragFinished(success, dropAction, x, y);
         }
     }
 
     public void setDndInProgress(boolean value) {
-        WebDragSourceContextPeer.setDragDropInProgress(value);
+        try {
+            WebDragSourceContextPeer.setDragDropInProgress(value);
+        } catch (InvalidDnDOperationException e) {
+        }
     }
 
     public static String getCurrentDropTargetCursorName() {
