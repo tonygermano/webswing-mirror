@@ -6,7 +6,6 @@ import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.util.Map;
 
-import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.util.Util;
 
 @SuppressWarnings("restriction")

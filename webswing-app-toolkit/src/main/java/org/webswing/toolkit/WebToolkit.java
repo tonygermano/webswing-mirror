@@ -104,13 +104,15 @@ public class WebToolkit extends SunToolkit {
     }
 
     public void initSize(Integer desktopWidth, Integer desktopHeight) {
+        int oldWidht = screenWidth;
+        int oldHeight = screenHeight;
         screenWidth = desktopWidth;
         screenHeight = desktopHeight;
         displayChanged();
         resetGC();
         Util.resetWindowsGC(screenWidth, screenHeight);
         getPaintDispatcher().clientReadyToReceive();
-        getPaintDispatcher().resetWindowsPosition();//in case windows moved out of screen by resizing screen.
+        getPaintDispatcher().resetWindowsPosition(oldWidht, oldHeight);//in case windows moved out of screen by resizing screen.
         getPaintDispatcher().notifyWindowRepaintAll();
     }
 

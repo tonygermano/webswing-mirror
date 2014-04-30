@@ -1,6 +1,7 @@
 package org.webswing.dispatch;
 
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
@@ -201,11 +202,33 @@ public class WebPaintDispatcher {
         serverConnection.sendJsonObject(f);
     }
 
-    public void resetWindowsPosition() {
+    @SuppressWarnings("restriction")
+    public void resetWindowsPosition(int oldWidht, int oldHeight) {
         for (Window w : Window.getWindows()) {
             WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(w);
             if (peer != null) {
                 Rectangle b = w.getBounds();
+                //move the window position to same position relative to previous size;
+                if (oldWidht != 0 && oldHeight != 0) {
+                    Dimension current = Util.getWebToolkit().getScreenSize();
+                    int xCenterWinPoint = b.x + (b.width / 2);
+                    int yCenterWinPoint = b.y + (b.height / 2);
+                    boolean xCenterValid = b.width < oldWidht;
+                    boolean yCenterValid = b.height < oldHeight;
+                    double xrelative = (double) xCenterWinPoint / (double) oldWidht;
+                    double yrelative = (double) yCenterWinPoint / (double) oldHeight;
+                    int xCenterCurrent = (int) (current.width * xrelative);
+                    int yCenterCurrent = (int) (current.height * yrelative);
+                    int newx = xCenterCurrent - (b.width / 2);
+                    int newy = yCenterCurrent - (b.height / 2);
+                    if (xCenterValid || newx < b.x) {
+                        b.x = newx >= 0 ? newx : 0;
+                    }
+                    if (yCenterValid || newy <b.y) {
+                        b.y = newy >= 0 ? newy : 0;
+                    }
+                    w.setLocation(b.x, b.y);
+                }
                 peer.setBounds(b.x, b.y, b.width, b.height, 0);
             }
         }
