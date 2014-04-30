@@ -6,6 +6,7 @@ import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.util.Map;
 
+import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.util.Util;
 
 @SuppressWarnings("restriction")
@@ -56,6 +57,6 @@ public class WebDragSourceContextPeer extends sun.awt.dnd.SunDragSourceContextPe
     }
 
     public void dragFinished(boolean success, int dropAction, int x, int y) {
-        dragDropFinished(success, dropAction, x, y);
+            dragDropFinished(success, dropAction, x, y);
     }
 }
