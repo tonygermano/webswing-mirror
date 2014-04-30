@@ -4,6 +4,7 @@ import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Window;
 import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -12,6 +13,8 @@ import org.webswing.model.s2c.JsonCursorChange;
 import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.WebDropTargetContextPeer;
 
+import sun.awt.dnd.SunDragSourceContextPeer;
+
 @SuppressWarnings("restriction")
 public class DndEventHandler {
 
@@ -19,42 +22,39 @@ public class DndEventHandler {
     private long[] formats;
     private boolean entered;
     private WebDragSourceContextPeer dragSource;
-    private int actions;
-    private static boolean dropSupported;
+    private int sourceActions;
+    private int lastMouseModifiers = -1;
+    private int lastDropTargetAction = 3;
 
     public void processMouseEvent(Window w, AWTEvent e) {
         if (e instanceof MouseEvent) {
             MouseEvent me = (MouseEvent) e;
-            if (e.getID() == MouseEvent.MOUSE_RELEASED || me.getButton() != 1) {
-                if (dropSupported) {
-                    dropTarget.handleDropMessage(w, me.getX(), me.getY(), getDragAction(me), this.actions, formats, 1073741824);
-                    dragEnd(e, true, getDragAction(me));
-                    WindowManager.getInstance().activateWindow(w, me.getX(), me.getY());
+            int currentDropAction = WebDragSourceContextPeer.convertModifiersToDropAction(me.getModifiersEx(), sourceActions);
+            if (e.getID() == MouseEvent.MOUSE_DRAGGED && w != null) {
+                if (lastMouseModifiers == me.getModifiersEx() || lastMouseModifiers == -1) {
+                    dragSource.dragMouseMoved(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
                 } else {
-                    dragEnd(e, false, getDragAction(me));
+                    dragSource.dragOperationChanged(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
                 }
-            } else {
-                if (e.getID() == MouseEvent.MOUSE_DRAGGED && w != null) {
+                lastMouseModifiers = me.getModifiersEx();
+                if (currentDropAction != DnDConstants.ACTION_NONE) {
                     if (!entered) {
-                        entered = true;
-                        int enterdrag = dropTarget.handleEnterMessage(w, me.getX(), me.getY(), getDragAction(me), this.actions, this.formats, 1073741824);
-                        if (enterdrag == 1) {
-                            dragSource.dragEnter(getDragAction(me), me.getModifiers(), me.getX(), me.getY());
-                            dropSupported = true;
-                        } else {
-                            dropSupported = false;
-                        }
-                    }
-                    int motiondrag = dropTarget.handleMotionMessage(w, me.getX(), me.getY(), getDragAction(me), this.actions, this.formats, 1073741824);
-                    if (motiondrag == 1) {
-                        dragSource.dragMotion(getDragAction(me), me.getModifiers(), me.getX(), me.getY());
-                        dropSupported = true;
+                        dragSource.dragEnter(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
                     } else {
-                        dropSupported = false;
+                        dragSource.dragMotion(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
+                    }
+                } else {
+                    if (entered) {
+                        dragSource.dragExit2(me.getXOnScreen(), me.getYOnScreen());
                     }
                 }
+                
+                //dropTargetLogic
+            } else if (e.getID() == MouseEvent.MOUSE_RELEASED || me.getButton() != 1) {
+                dropTarget.handleDropMessage(w, me.getX(), me.getY(), currentDropAction, this.sourceActions, formats, 1073741824);
+                dragEnd(e, currentDropAction != 0, currentDropAction);
+                WindowManager.getInstance().activateWindow(w, me.getX(), me.getY());
             }
-
         } else if (e instanceof KeyEvent) {
             if (e.getID() == KeyEvent.KEY_PRESSED && ((KeyEvent) e).getKeyCode() == KeyEvent.VK_ESCAPE) {
                 dragEnd(e, false, 0);
@@ -63,18 +63,10 @@ public class DndEventHandler {
 
     }
 
-    private int getDragAction(MouseEvent me) {
-        int result = 2;
-        if ((me.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) == MouseEvent.CTRL_DOWN_MASK) {
-            result = 1;
-        }
-        return result;
-    }
-
-    public void dragStart(WebDragSourceContextPeer dragSource, Transferable transferable, int actions, long[] formats, boolean useDropTarget) {
+    public void dragStart(WebDragSourceContextPeer dragSource, Transferable transferable, int actions, long[] formats) {
         this.dragSource = dragSource;
         this.formats = formats;
-        this.actions = actions;
+        this.sourceActions = actions;
         dropTarget = WebDropTargetContextPeer.getWebDropTargetContextPeer();
         this.entered = false;
     }
@@ -85,27 +77,19 @@ public class DndEventHandler {
             int x = 0;
             int y = 0;
             if (e instanceof MouseEvent) {
-                x = ((MouseEvent) e).getX();
-                y = ((MouseEvent) e).getY();
+                x = ((MouseEvent) e).getXOnScreen();
+                y = ((MouseEvent) e).getYOnScreen();
             }
             dragSource.dragExit2(x, y);
             dragSource.dragFinished(success, dropAction, x, y);
         }
     }
 
-    public void setDndInProgress(boolean value) {
-        try {
-            WebDragSourceContextPeer.setDragDropInProgress(value);
-        } catch (InvalidDnDOperationException e) {
-        }
-    }
-
     public static String getCurrentDropTargetCursorName() {
-        if (dropSupported) {
-            return JsonCursorChange.MOVE_CURSOR;
-        } else {
-            return JsonCursorChange.NOT_ALLOWED_CURSOR;
-        }
+        return JsonCursorChange.MOVE_CURSOR;
+        //                else {
+        //                    return JsonCursorChange.NOT_ALLOWED_CURSOR;
+        //                }
 
     }
 

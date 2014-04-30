@@ -219,8 +219,8 @@ public class WebEventDispatcher {
         return lastMousePosition;
     }
 
-    public void dragStart(WebDragSourceContextPeer peer, Transferable transferable, int actions, long[] formats,boolean useDropTarget) {
-        dndHandler.dragStart(peer, transferable, actions,formats,useDropTarget);
+    public void dragStart(WebDragSourceContextPeer peer, Transferable transferable, int actions, long[] formats) {
+        dndHandler.dragStart(peer, transferable, actions,formats);
     }
 
     public static void dispatchEventInSwing(final Window w, final AWTEvent e) {

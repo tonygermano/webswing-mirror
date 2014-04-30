@@ -26,11 +26,8 @@ public class WebDragSourceContextPeer extends sun.awt.dnd.SunDragSourceContextPe
     @Override
     protected void startDrag(Transferable paramTransferable, long[] paramArrayOfLong, Map paramMap) {
         WebDropTargetContextPeer.setCurrentJVMLocalSourceTransferable(paramTransferable);
-        boolean useDropTarget=true;
-        if(getTrigger().getSourceAsDragGestureRecognizer() instanceof WebMouseDragGestureRecognizer){
-            useDropTarget=false;
-        }
-        Util.getWebToolkit().getEventDispatcher().dragStart(this, paramTransferable, getTrigger().getSourceAsDragGestureRecognizer().getSourceActions(), paramArrayOfLong,useDropTarget);
+
+        Util.getWebToolkit().getEventDispatcher().dragStart(this, paramTransferable, getTrigger().getSourceAsDragGestureRecognizer().getSourceActions(), paramArrayOfLong);
     }
 
     @Override
@@ -48,6 +45,14 @@ public class WebDragSourceContextPeer extends sun.awt.dnd.SunDragSourceContextPe
 
     public void dragExit2(int x, int y) {
         dragExit(x, y);
+    }
+
+    public void dragMouseMoved(int dropAction, int eventModifiers, int x, int y) {
+        postDragSourceDragEvent(dropAction, eventModifiers, x, y, 6);
+    }
+
+    public void dragOperationChanged(int dropAction, int eventModifiers, int x, int y) {
+        postDragSourceDragEvent(dropAction, eventModifiers, x, y, 3);
     }
 
     public void dragFinished(boolean success, int dropAction, int x, int y) {
