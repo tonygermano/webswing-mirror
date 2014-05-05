@@ -20,7 +20,7 @@ public class WebGraphicsConfig extends BufferedImageGraphicsConfig {
     }
 
     private WebGraphicsConfig(int width,int height) {
-        super(new BufferedImage(width,width,BufferedImage.TYPE_INT_ARGB),null);
+        super(new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB),null);
     }
 
     @Override

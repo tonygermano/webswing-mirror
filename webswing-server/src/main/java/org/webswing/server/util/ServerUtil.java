@@ -70,6 +70,11 @@ public class ServerUtil {
                 }
                 apps.add(app);
             }
+            if(isUserinRole(r, Constants.ADMIN_ROLE)){
+                JsonApplication adminConsole = new JsonApplication();
+                adminConsole.name = Constants.ADMIN_CONSOLE_APP_NAME;
+                apps.add(adminConsole);
+            }
         }
         return apps;
     }

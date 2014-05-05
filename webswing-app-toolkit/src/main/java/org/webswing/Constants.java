@@ -43,4 +43,5 @@ public interface Constants {
     public static final int SWING_SCREEN_HEIGHT_MIN = 300;
     
     public static final String ADMIN_ROLE = "admin";
+    public static final String ADMIN_CONSOLE_APP_NAME = "adminConsoleApplicationName";
 }

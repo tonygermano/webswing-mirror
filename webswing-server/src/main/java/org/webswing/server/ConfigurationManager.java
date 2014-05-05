@@ -30,7 +30,7 @@ public class ConfigurationManager {
     private static ConfigurationManager instance = new ConfigurationManager();
 
     private WebswingConfiguration liveConfiguration = new WebswingConfiguration();
-    private ConfigurationChangeListener listener;
+    private List<ConfigurationChangeListener> changeListeners= new ArrayList<ConfigurationChangeListener>();
 
     private ConfigurationManager() {
         reloadConfiguration();
@@ -96,6 +96,7 @@ public class ConfigurationManager {
     public void applyUserProperties(byte[] content) throws Exception {
         File usersFile = new File(ServerUtil.getUserPropsFileName());
         Files.write(content, usersFile);
+
         notifyChange();
     }
 
@@ -197,13 +198,15 @@ public class ConfigurationManager {
         return instance;
     }
 
-    public void setListener(ConfigurationChangeListener listener) {
-        this.listener = listener;
+    public void registerListener(ConfigurationChangeListener listener) {
+        this.changeListeners.add(listener);
     }
 
     private void notifyChange() {
-        if (listener != null) {
-            listener.notifyChange();
+        for (ConfigurationChangeListener listener : changeListeners) {
+            if (listener != null) {
+                listener.notifyChange();
+            }
         }
     }
 

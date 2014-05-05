@@ -35,7 +35,11 @@ var webswing = function() {
 			$('#userName').append(ws.getUser());
 			for (var i in apps) {
 				var app = apps[i];
-				$('#applicationsList').append('<div class="col-sm-6 col-md-4"><div class="thumbnail" onclick="webswing.startApplication(\'' + app.name + '\')"><img src="data:image/png;base64,' + app.base64Icon + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>');
+				if(app.name == 'adminConsoleApplicationName'){
+					$('#applicationsList').append('<div class="col-sm-6 col-md-4"><div class="thumbnail" onclick="window.location.href = \'/admin\';"><img src="/admin/img/admin.png" class="img-thumbnail"/><div class="caption">Admin console</div></div></div>');
+				}else{
+					$('#applicationsList').append('<div class="col-sm-6 col-md-4"><div class="thumbnail" onclick="webswing.startApplication(\'' + app.name + '\')"><img src="data:image/png;base64,' + app.base64Icon + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>');
+				}
 			}
 			if(apps.length==0){
 				$('#applicationsList').append('Sorry, there is no application available for you.')	

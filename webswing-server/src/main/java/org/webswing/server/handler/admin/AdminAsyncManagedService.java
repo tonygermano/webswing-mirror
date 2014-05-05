@@ -40,7 +40,7 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
     private Map<String, AtmosphereResource> resourceMap = new HashMap<String, AtmosphereResource>();
 
     public AdminAsyncManagedService() {
-        ConfigurationManager.getInstance().setListener(this);
+        ConfigurationManager.getInstance().registerListener(this);
         SwingInstanceManager.getInstance().setChangeListener(this);
     }
 

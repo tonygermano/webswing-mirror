@@ -11,6 +11,18 @@
 			<param-name>org.atmosphere.cpr.packages</param-name>
 			<param-value>org.webswing.server.handler</param-value>
 		</init-param>
+		<init-param>
+			<param-name>org.atmosphere.websocket.bufferSize</param-name>
+			<param-value>1048576</param-value>
+		</init-param>
+		<init-param>
+			<param-name>org.atmosphere.websocket.maxTextMessageSize</param-name>
+			<param-value>1048576</param-value>
+		</init-param>
+		<init-param>
+			<param-name>org.atmosphere.websocket.maxBinaryMessageSize</param-name>
+			<param-value>1048576</param-value>
+		</init-param>
 		<load-on-startup>0</load-on-startup>
 		<async-supported>true</async-supported>
 	</servlet>
