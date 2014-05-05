@@ -185,7 +185,7 @@ public class ConfigurationManager {
         String configFile = System.getProperty(Constants.CONFIG_FILE_PATH);
         if (configFile == null) {
             String war = ServerUtil.getWarFileLocation();
-            configFile = war.substring(6, war.lastIndexOf("/") + 1) + Constants.DEFAULT_CONFIG_FILE_NAME;
+            configFile = war.substring(5, war.lastIndexOf("/") + 1) + Constants.DEFAULT_CONFIG_FILE_NAME;
             System.setProperty(configFile, Constants.CONFIG_FILE_PATH);
         }
         configFile = backup ? configFile + ".backup" : configFile;

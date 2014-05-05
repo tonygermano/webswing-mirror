@@ -207,9 +207,9 @@ public class SwingJvmConnection implements MessageListener {
                         javaTask.setProject(project);
                         javaTask.setFork(true);
                         javaTask.setFailonerror(true);
-                        javaTask.setJar(new File(ServerUtil.getWarFileLocation().substring(6)));
+                        javaTask.setJar(new File(ServerUtil.getWarFileLocation().substring(5)));
                         javaTask.setArgs(appConfig.getArgs());
-                        String webSwingToolkitJarPath = WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm().substring(6);
+                        String webSwingToolkitJarPath = WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm().substring(5);
                         String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPath;
                         String debug = appConfig.isDebug() ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
                         String aaFonts = appConfig.isAntiAliasText() ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
@@ -244,6 +244,11 @@ public class SwingJvmConnection implements MessageListener {
                         toolkitImplClass.setKey("awt.toolkit");
                         toolkitImplClass.setValue("org.webswing.toolkit.WebToolkit");
                         javaTask.addSysproperty(toolkitImplClass);
+
+                        Variable headless = new Variable();
+                        headless.setKey("java.awt.headless");
+                        headless.setValue("false");
+                        javaTask.addSysproperty(headless);
 
                         Variable graphicsConfigImplClass = new Variable();
                         graphicsConfigImplClass.setKey("java.awt.graphicsenv");

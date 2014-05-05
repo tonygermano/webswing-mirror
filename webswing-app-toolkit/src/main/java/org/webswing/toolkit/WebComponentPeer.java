@@ -49,7 +49,6 @@ import sun.awt.image.SunVolatileImage;
 import sun.awt.image.SurfaceManager;
 import sun.awt.image.ToolkitImage;
 import sun.java2d.InvalidPipeException;
-import sun.java2d.ScreenUpdateManager;
 import sun.java2d.SunGraphics2D;
 import sun.java2d.SurfaceData;
 import sun.java2d.pipe.Region;
@@ -278,7 +277,6 @@ public class WebComponentPeer implements ComponentPeer {
             Util.getWebToolkit().getPaintDispatcher().notifyWindowClosed(getGuid());
             SurfaceData localSurfaceData = this.surfaceData;
             this.surfaceData = null;
-            ScreenUpdateManager.getInstance().dropScreenSurface(localSurfaceData);
             localSurfaceData.invalidate();
             WebToolkit.targetDisposedPeer(this.target, this);
         }

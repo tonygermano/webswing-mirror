@@ -130,7 +130,7 @@ public class ServerUtil {
         String userFile = System.getProperty(Constants.USER_FILE_PATH);
         if (userFile == null) {
             String war = ServerUtil.getWarFileLocation();
-            userFile = war.substring(6, war.lastIndexOf("/") + 1) + Constants.DEFAULT_USER_FILE_NAME;
+            userFile = war.substring(5, war.lastIndexOf("/") + 1) + Constants.DEFAULT_USER_FILE_NAME;
             System.setProperty(userFile, Constants.USER_FILE_PATH);
         }
         return userFile;

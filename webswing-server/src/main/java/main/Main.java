@@ -94,7 +94,7 @@ public class Main {
 
     private static List<URL> getFilesFromPath(URL r) throws IOException {
         List<URL> urls = new ArrayList<URL>();
-        String jar = r.getPath().split("\\!/")[0].substring(6);
+        String jar = r.getPath().split("\\!/")[0].substring(5);
         String path = r.getPath().split("\\!/")[1];
         JarFile jarFile = new JarFile(jar);
         Enumeration<JarEntry> jarEntries = jarFile.entries();

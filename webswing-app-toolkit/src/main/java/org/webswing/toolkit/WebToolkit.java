@@ -188,7 +188,7 @@ public class WebToolkit extends SunToolkit {
 
     @Override
     public KeyboardFocusManagerPeer createKeyboardFocusManagerPeer(KeyboardFocusManager paramKeyboardFocusManager) throws HeadlessException {
-        return super.createKeyboardFocusManagerPeer(paramKeyboardFocusManager);
+        return new WebKeyboardFocusManagerPeer();
     }
 
     public FramePeer createFrame(Frame frame) throws HeadlessException {
