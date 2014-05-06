@@ -27,47 +27,45 @@ public class DndEventHandler {
     private boolean finished;
     private static String cursorName = JsonCursorChange.MOVE_CURSOR;
 
-    public synchronized void processMouseEvent(Window w, AWTEvent e) {
-        if (isDndInProgress()) {
-            if (e instanceof MouseEvent) {
-                MouseEvent me = (MouseEvent) e;
-                int currentDropAction = WebDragSourceContextPeer.convertModifiersToDropAction(me.getModifiersEx(), sourceActions);
-                if (e.getID() == MouseEvent.MOUSE_DRAGGED && w != null) {
-                    if (lastMouseModifiers == me.getModifiersEx() || lastMouseModifiers == -1) {
-                        dragSource.dragMouseMoved(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
+    public void processMouseEvent(Window w, AWTEvent e) {
+        if (e instanceof MouseEvent) {
+            MouseEvent me = (MouseEvent) e;
+            int currentDropAction = WebDragSourceContextPeer.convertModifiersToDropAction(me.getModifiersEx(), sourceActions);
+            if (e.getID() == MouseEvent.MOUSE_DRAGGED && w != null) {
+                if (lastMouseModifiers == me.getModifiersEx() || lastMouseModifiers == -1) {
+                    dragSource.dragMouseMoved(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
+                } else {
+                    dragSource.dragOperationChanged(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
+                }
+                lastMouseModifiers = me.getModifiersEx();
+                if (currentDropAction != DnDConstants.ACTION_NONE) {
+                    if (!entered) {
+                        dragSource.dragEnter(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
+                        entered = true;
                     } else {
-                        dragSource.dragOperationChanged(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
+                        dragSource.dragMotion(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
                     }
-                    lastMouseModifiers = me.getModifiersEx();
-                    if (currentDropAction != DnDConstants.ACTION_NONE) {
-                        if (!entered) {
-                            dragSource.dragEnter(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
-                            entered = true;
-                        } else {
-                            dragSource.dragMotion(currentDropAction & lastDropTargetAction, me.getModifiersEx(), me.getXOnScreen(), me.getYOnScreen());
-                        }
-                    } else {
-                        if (entered) {
-                            dragSource.dragExit2(me.getXOnScreen(), me.getYOnScreen());
-                        }
+                } else {
+                    if (entered) {
+                        dragSource.dragExit2(me.getXOnScreen(), me.getYOnScreen());
                     }
-                    if (lastPotentialDropWindow == null || lastPotentialDropWindow != w) {
-                        if (lastPotentialDropWindow != w && lastPotentialDropWindow != null) {
-                            dropTarget.handleExitMessage(lastPotentialDropWindow, 123123123);
-                        }
-                        lastDropTargetAction = dropTarget.handleEnterMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
-                        updateCursor();
-                        lastPotentialDropWindow = w;
+                }
+                if (lastPotentialDropWindow == null || lastPotentialDropWindow != w) {
+                    if (lastPotentialDropWindow != w && lastPotentialDropWindow != null) {
+                        dropTarget.handleExitMessage(lastPotentialDropWindow, 123123123);
                     }
-                    lastDropTargetAction = dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
+                    lastDropTargetAction = dropTarget.handleEnterMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
                     updateCursor();
-                } else if (e.getID() == MouseEvent.MOUSE_RELEASED) {
-                    dragEnd(w, e, lastDropTargetAction != 0, lastDropTargetAction);
+                    lastPotentialDropWindow = w;
                 }
-            } else if (e instanceof KeyEvent) {
-                if (e.getID() == KeyEvent.KEY_PRESSED && ((KeyEvent) e).getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    dragEnd(w, e, false, 0);
-                }
+                lastDropTargetAction = dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
+                updateCursor();
+            } else if (e.getID() == MouseEvent.MOUSE_RELEASED) {
+                dragEnd(w, e, lastDropTargetAction != 0, lastDropTargetAction);
+            }
+        } else if (e instanceof KeyEvent) {
+            if (e.getID() == KeyEvent.KEY_PRESSED && ((KeyEvent) e).getKeyCode() == KeyEvent.VK_ESCAPE) {
+                dragEnd(w, e, false, 0);
             }
         }
     }
@@ -91,7 +89,7 @@ public class DndEventHandler {
     }
 
     private void dragEnd(Window w, AWTEvent e, boolean success, int dropAction) {
-        if (isDndInProgress() && !finished) {
+        if (!finished) {
             MouseEvent me = ((MouseEvent) e);
             if (w != null) {
                 if (success && lastPotentialDropWindow != null && entered && !dropped) {
