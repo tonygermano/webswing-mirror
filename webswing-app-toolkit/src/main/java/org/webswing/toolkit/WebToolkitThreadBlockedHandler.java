@@ -12,6 +12,7 @@ public class WebToolkitThreadBlockedHandler extends sun.awt.Mutex implements Too
         }
         try {
             unlock();
+            Thread.sleep(100);
         } catch (Exception e) {
         }
         lock();
