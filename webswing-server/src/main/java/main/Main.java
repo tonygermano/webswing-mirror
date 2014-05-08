@@ -9,10 +9,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +29,6 @@ import org.webswing.common.SwingClassLoaderFactoryIfc;
 import org.webswing.toolkit.WebToolkit;
 
 public class Main {
- 
 
     public static void main(String[] args) throws Exception {
         boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
@@ -40,6 +42,7 @@ public class Main {
             initializeExtLibServices(urls);
             retainOnlyLauncherUrl(urls);
         } else {
+            initTempDirPath(args);
             populateClasspathFromDir("WEB-INF/server-lib", urls);
         }
         ClassLoader defaultCL = new URLClassLoader(urls.toArray(new URL[0]), null);
@@ -64,7 +67,7 @@ public class Main {
     private static void retainOnlyLauncherUrl(List<URL> urls) {
         for (Iterator<URL> i = urls.iterator(); i.hasNext();) {
             URL thisurl = i.next();
-            if (!thisurl.getFile().contains("webswing-app-launcher")){
+            if (!thisurl.getFile().contains("webswing-app-launcher")) {
                 i.remove();
             }
         }
@@ -72,7 +75,7 @@ public class Main {
     }
 
     private static void initializeExtLibServices(List<URL> urls) throws Exception {
-        ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[0]),null);
+        ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[0]), null);
         Class<?> serverConnectionServiceclazz = extLibClassLoader.loadClass("org.webswing.ext.services.ServerConnectionService");
         Method getInstanceOfServerConnectionServiceMethod = serverConnectionServiceclazz.getMethod("getInstance");
         ServerConnectionIfc connService = (ServerConnectionIfc) getInstanceOfServerConnectionServiceMethod.invoke(null);
@@ -94,9 +97,10 @@ public class Main {
 
     private static List<URL> getFilesFromPath(URL r) throws IOException {
         List<URL> urls = new ArrayList<URL>();
-        String jar = r.getPath().split("\\!/")[0].substring(5);
-        String path = r.getPath().split("\\!/")[1];
-        JarFile jarFile = new JarFile(jar);
+        String[] splitPath = r.getPath().split("\\!/");
+        String jar = splitPath[0];
+        String path = splitPath[1];
+        JarFile jarFile = new JarFile(new File(URI.create(jar)));
         Enumeration<JarEntry> jarEntries = jarFile.entries();
         while (jarEntries.hasMoreElements()) {
             JarEntry jarEntry = jarEntries.nextElement();
@@ -145,20 +149,35 @@ public class Main {
 
     public static File getTempDir() {
         if (System.getProperty(Constants.TEMP_DIR_PATH) == null) {
-            File baseDir = new File(System.getProperty("java.io.tmpdir"));
-            String baseName = System.currentTimeMillis() + "-";
+            File baseDir = new File(System.getProperty(Constants.TEMP_DIR_PATH_BASE, System.getProperty("java.io.tmpdir")));
+            if (!baseDir.exists()) {
+                baseDir.mkdirs();
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd-HH-mm-ss");
+            String baseName = sdf.format(new Date()) + "-";
 
-            for (int counter = 0; counter < 100; counter++) {
+            for (int counter = 0; counter < 10; counter++) {
                 File tempDir = new File(baseDir, baseName + counter);
                 if (tempDir.mkdir()) {
-                    System.setProperty(Constants.TEMP_DIR_PATH, tempDir.getAbsolutePath());
+                    System.setProperty(Constants.TEMP_DIR_PATH, tempDir.toURI().toString());
                     return tempDir;
                 }
             }
-            throw new IllegalStateException("Failed to create directory within " + 100 + " attempts (tried " + baseName + "0 to " + baseName + (100 - 1) + ')');
+            throw new IllegalStateException("Failed to create directory within " + 10 + " attempts (tried " + baseName + " to " + baseName + (100 - 1) + ')');
         } else {
-            return new File(System.getProperty(Constants.TEMP_DIR_PATH));
+            return new File(URI.create(System.getProperty(Constants.TEMP_DIR_PATH)));
         }
     }
 
+    private static void initTempDirPath(String[] args) {
+        if (args != null) {
+            for (int i = 0; i < args.length-1; i++) {
+                if("-t".equals(args[i]) || "-temp".equals(args[i])){
+                    System.setProperty(Constants.TEMP_DIR_PATH_BASE,args[i+1]);
+                    return;
+                }
+            }
+        }
+        System.setProperty(Constants.TEMP_DIR_PATH_BASE,"tmp");
+    }
 }

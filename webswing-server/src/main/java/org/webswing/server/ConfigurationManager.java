@@ -1,6 +1,7 @@
 package org.webswing.server;
 
 import java.io.File;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +45,7 @@ public class ConfigurationManager {
         JsonServerProperties result = new JsonServerProperties();
         result.setTempFolder(System.getProperty(Constants.TEMP_DIR_PATH));
         result.setJmsServerUrl(Constants.JMS_URL);
-        result.setConfigFile(getConfigFile().getAbsolutePath());
+        result.setConfigFile(getConfigFile().toURI().toString());
         result.setWarLocation(ServerUtil.getWarFileLocation());
         result.setPort(System.getProperty(Constants.SERVER_PORT));
         result.setHost(System.getProperty(Constants.SERVER_HOST));
@@ -94,7 +95,7 @@ public class ConfigurationManager {
     }
 
     public void applyUserProperties(byte[] content) throws Exception {
-        File usersFile = new File(ServerUtil.getUserPropsFileName());
+        File usersFile = new File(URI.create(ServerUtil.getUserPropsFileName()));
         Files.write(content, usersFile);
 
         notifyChange();
@@ -143,7 +144,7 @@ public class ConfigurationManager {
     public String loadUserProperties() {
         try {
             String result = new String();
-            File users = new File(ServerUtil.getUserPropsFileName());
+            File users = new File(URI.create(ServerUtil.getUserPropsFileName()));
             if (users.exists()) {
                 result = Files.toString(users, Charset.forName("UTF-8"));
                 return result;
@@ -186,11 +187,11 @@ public class ConfigurationManager {
         String configFile = System.getProperty(Constants.CONFIG_FILE_PATH);
         if (configFile == null) {
             String war = ServerUtil.getWarFileLocation();
-            configFile = war.substring(5, war.lastIndexOf("/") + 1) + Constants.DEFAULT_CONFIG_FILE_NAME;
+            configFile = war.substring(0, war.lastIndexOf("/") + 1) + Constants.DEFAULT_CONFIG_FILE_NAME;
             System.setProperty(configFile, Constants.CONFIG_FILE_PATH);
         }
         configFile = backup ? configFile + ".backup" : configFile;
-        File config = new File(configFile);
+        File config = new File(URI.create(configFile));
         return config;
     }
 

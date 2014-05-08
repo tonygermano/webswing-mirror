@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -105,8 +106,8 @@ public class FileServlet extends HttpServlet {
 
     public static String registerFile(byte[] content, final String id, long validForTime, TimeUnit timeUnit, String validForClient) throws IOException {
         if (currentServlet != null) {
-            String tempDir = System.getProperty(Constants.TEMP_DIR_PATH, System.getProperty("java.io.tmpdir"));
-            File f = new File(tempDir + File.separator + id + ".pdf");
+            String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
+            File f = new File(URI.create(tempDir + "/" + id + ".pdf"));
             FileOutputStream output = new FileOutputStream(f);
             output.write(content);
             output.close();

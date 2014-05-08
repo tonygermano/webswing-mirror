@@ -8,6 +8,10 @@ public abstract class Configuration {
 
     public abstract String getPort();
 
+    public abstract String getConfigFile();
+    
+    public abstract String getUsersFile();
+
     public static Configuration getInstance() {
         return singleton;
     }
