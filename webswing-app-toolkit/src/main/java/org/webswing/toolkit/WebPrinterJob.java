@@ -89,7 +89,11 @@ public class WebPrinterJob extends PrinterJob {
         printResult.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
         printResult.setId(UUID.randomUUID().toString());
         printResult.setPdf(out.toByteArray());
-        Util.getWebToolkit().getPaintDispatcher().sendJsonObject(printResult);
+        if (printResult.getPdf().length < 80000000) {
+            Util.getWebToolkit().getPaintDispatcher().sendJsonObject(printResult);
+        } else {
+            System.err.println("Document size too large. size=" + printResult.getPdf().length);
+        }
     }
 
     private int paintPfd(Graphics2D resultPdf, PageFormat pageFormat2, Printable printable2, int i) throws PrinterException {
@@ -101,9 +105,7 @@ public class WebPrinterJob extends PrinterJob {
             double[] m = pageFormat2.getMatrix();
             resultPdf.setTransform(new AffineTransform(m[0], m[1], m[2], m[3], m[4], m[5]));
             int result = printable2.print(resultPdf, pageFormat2, i);
-            if (result != Printable.NO_SUCH_PAGE) {
-                Util.getWebToolkit().getImageService().endPagePDFGraphics(resultPdf);
-            }
+            Util.getWebToolkit().getImageService().endPagePDFGraphics(resultPdf);
             return result;
         }
         return Printable.NO_SUCH_PAGE;

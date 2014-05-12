@@ -49,7 +49,7 @@ public class JmsService implements ServletContextListener {
 
         SystemUsage memoryManager = new SystemUsage();
         MemoryUsage memoryLimit = new MemoryUsage();
-        memoryLimit.setLimit(20000000);
+        memoryLimit.setLimit(80000000);
 
         memoryManager.setMemoryUsage(memoryLimit);
         broker.setSystemUsage(memoryManager);
