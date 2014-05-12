@@ -15,12 +15,14 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
+import java.awt.JobAttributes;
 import java.awt.KeyboardFocusManager;
 import java.awt.Label;
 import java.awt.List;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
+import java.awt.PageAttributes;
 import java.awt.PopupMenu;
 import java.awt.PrintJob;
 import java.awt.RenderingHints;
@@ -84,6 +86,7 @@ import org.webswing.toolkit.ge.WebGraphicsEnvironment;
 import org.webswing.util.Util;
 
 import sun.awt.SunToolkit;
+import sun.print.PrintJob2D;
 
 @SuppressWarnings("restriction")
 public class WebToolkit extends SunToolkit {
@@ -437,8 +440,18 @@ public class WebToolkit extends SunToolkit {
         return new WebDesktopPeer(paramDesktop);
     }
 
-    public PrintJob getPrintJob(Frame paramFrame, String paramString, Properties paramProperties) {
-        throw new UnsupportedOperationException();
+    public PrintJob getPrintJob(Frame frame, String jobtitle, JobAttributes jobAttributes, PageAttributes pageAttributes) {
+        PrintJob2D localPrintJob2D = new PrintJob2D(frame, jobtitle, jobAttributes, pageAttributes);
+
+        if (!localPrintJob2D.printDialog()) {
+            localPrintJob2D = null;
+        }
+
+        return localPrintJob2D;
+    }
+
+    public PrintJob getPrintJob(Frame frame, String jobtitle, Properties paramProperties) {
+        return getPrintJob(frame, jobtitle, null, null);
     }
 
     public void beep() {

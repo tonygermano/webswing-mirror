@@ -1,19 +1,19 @@
 package org.webswing.ext.services;
 
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
+import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
+import javax.imageio.spi.IIORegistry;
+import javax.imageio.spi.ServiceRegistry;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
+import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.WindowDecoratorThemeIfc;
 import org.webswing.util.Logger;
@@ -35,6 +35,11 @@ public class ImageService implements ImageServiceIfc {
 
     public ImageService() {
         try {
+            ClassLoader currentContextClassLoader = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+            IIORegistry.getDefaultInstance().registerApplicationClasspathSpis();
+            Thread.currentThread().setContextClassLoader(currentContextClassLoader);
+            
             encoder = new PngEncoder(PngEncoder.COLOR_TRUECOLOR_ALPHA, PngEncoder.BEST_SPEED);
         } catch (Exception e) {
             Logger.warn("ImageService:Library for fast image encoding not found. Download the library from http://objectplanet.com/pngencoder/");
@@ -95,25 +100,35 @@ public class ImageService implements ImageServiceIfc {
     }
 
     @Override
-    public byte[] generatePDF(List<BufferedImage> pages) {
-        ByteArrayOutputStream os= new ByteArrayOutputStream();
-        PDDocument doc = null;
-        try {
-            doc = new PDDocument();
-            for (BufferedImage image : pages) {
-                PDPage page = new PDPage();
-                PDPageContentStream content = new PDPageContentStream(doc, page);
-                PDXObjectImage ximage = new PDPixelMap(doc, image);
-                content.drawImage(ximage, 0, 0);
-                content.close();
-                doc.addPage(page);
-            }
-            doc.save(os);
-            doc.close();
-        } catch (Exception ie) {
-            Logger.error("ImageService: Error during PDF generation", ie);
-        }
-        return os.toByteArray();
+    public Graphics2D createPDFGraphics(OutputStream out, Dimension size) {
+        PDFGraphics2D graphics = new PDFGraphics2D(out, size);
+        graphics.setMultiPage(true);
+        graphics.startExport();
+        return graphics;
     }
 
+    @Override
+    public void startPagePDFGraphics(Graphics2D pdfGrapthics,Dimension size) {
+        try {
+            ((PDFGraphics2D)pdfGrapthics).openPage(size,"");
+        } catch (IOException e) {
+            ((PDFGraphics2D)pdfGrapthics).endExport();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void endPagePDFGraphics(Graphics2D pdfGrapthics) {
+        try {
+            ((PDFGraphics2D)pdfGrapthics).closePage();
+        } catch (IOException e) {
+            ((PDFGraphics2D)pdfGrapthics).endExport();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void closePDFGraphics(Graphics2D pdfGrapthics) {
+        ((PDFGraphics2D)pdfGrapthics).endExport();
+    }
 }

@@ -1,17 +1,18 @@
 package org.webswing.toolkit;
 
-import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.HeadlessException;
-import java.awt.image.BufferedImage;
+import java.awt.geom.AffineTransform;
 import java.awt.print.PageFormat;
 import java.awt.print.Pageable;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.ByteArrayOutputStream;
 import java.util.UUID;
+
+import javax.print.PrintService;
 
 import org.webswing.Constants;
 import org.webswing.model.s2c.PrinterJobResult;
@@ -24,6 +25,7 @@ public class WebPrinterJob extends PrinterJob {
     private PageFormat pageFormat;
     private int copies;
     private String jobName;
+    private PrintService service = new WebPrintService();
 
     @Override
     public void setPrintable(Printable painter) {
@@ -63,59 +65,53 @@ public class WebPrinterJob extends PrinterJob {
 
     @Override
     public void print() throws PrinterException {
-        List<BufferedImage> bis=new ArrayList<BufferedImage>();
-        if(printable!=null){
-            int i=0;
-            boolean tryNext=true;
-            while(tryNext){
-                BufferedImage img=createImage(this.pageFormat,printable,i);
-                if(img==null){
-                    tryNext=false;
-                }else{
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Graphics2D resultPdf = Util.getWebToolkit().getImageService().createPDFGraphics(out, new Dimension(1, 1));
+        if (printable != null) {
+            int i = 0;
+            boolean tryNext = true;
+            while (tryNext) {
+                int result = paintPfd(resultPdf, this.pageFormat, printable, i);
+                if (result == Printable.NO_SUCH_PAGE) {
+                    tryNext = false;
+                } else {
                     i++;
-                    bis.add(img);
                 }
             }
-        }else if(pageable!=null){
-            int no=this.pageable.getNumberOfPages();
-            for(int i=0;i<no;i++){
-                bis.add(createImage(this.pageFormat,printable,i));
+        } else if (pageable != null) {
+            int no = this.pageable.getNumberOfPages();
+            for (int i = 0; i < no; i++) {
+                paintPfd(resultPdf, this.pageable.getPageFormat(i), this.pageable.getPrintable(i), i);
             }
         }
-        byte[] result = Util.getWebToolkit().getImageService().generatePDF(bis);
-        PrinterJobResult printResult=new PrinterJobResult();
+        Util.getWebToolkit().getImageService().closePDFGraphics(resultPdf);
+        PrinterJobResult printResult = new PrinterJobResult();
         printResult.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
         printResult.setId(UUID.randomUUID().toString());
-        printResult.setPdf(result);
+        printResult.setPdf(out.toByteArray());
         Util.getWebToolkit().getPaintDispatcher().sendJsonObject(printResult);
     }
 
-    private BufferedImage createImage(PageFormat pageFormat2, Printable printable2, int i) throws PrinterException {
-        pageFormat2=pageFormat2==null?defaultPage():pageFormat2;
-        int width= (int) pageFormat2.getPaper().getWidth();
-        int height= (int) pageFormat2.getPaper().getHeight();
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-        Graphics2D g= (Graphics2D) img.getGraphics();
-        g.setBackground(Color.WHITE);
-        g.setColor(Color.BLACK);
-        g.clearRect(0, 0, width, height);
-        double[] m = pageFormat2.getMatrix();
-        g.getTransform().setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
-        g.setClip((int)pageFormat2.getImageableX(),(int) pageFormat2.getImageableY(),(int) pageFormat2.getImageableWidth(),(int) pageFormat2.getImageableHeight());
-        if(printable2!=null){
-            int result=printable2.print(g, pageFormat2, i);
-            if(result== Printable.NO_SUCH_PAGE){
-                g.dispose();
-                return null;
+    private int paintPfd(Graphics2D resultPdf, PageFormat pageFormat2, Printable printable2, int i) throws PrinterException {
+        pageFormat2 = pageFormat2 == null ? defaultPage() : pageFormat2;
+        int width = (int) pageFormat2.getPaper().getWidth();
+        int height = (int) pageFormat2.getPaper().getHeight();
+        if (printable2 != null) {
+            Util.getWebToolkit().getImageService().startPagePDFGraphics(resultPdf, new Dimension(width, height));
+            double[] m = pageFormat2.getMatrix();
+            resultPdf.setTransform(new AffineTransform(m[0], m[1], m[2], m[3], m[4], m[5]));
+            int result = printable2.print(resultPdf, pageFormat2, i);
+            if (result != Printable.NO_SUCH_PAGE) {
+                Util.getWebToolkit().getImageService().endPagePDFGraphics(resultPdf);
             }
+            return result;
         }
-        g.dispose();
-        return img;
+        return Printable.NO_SUCH_PAGE;
     }
 
     @Override
     public void setCopies(int copies) {
-        this.copies=copies;
+        this.copies = copies;
     }
 
     @Override
@@ -130,7 +126,7 @@ public class WebPrinterJob extends PrinterJob {
 
     @Override
     public void setJobName(String jobName) {
-        this.jobName=jobName;
+        this.jobName = jobName;
 
     }
 
@@ -146,6 +142,11 @@ public class WebPrinterJob extends PrinterJob {
     @Override
     public boolean isCancelled() {
         return false;
+    }
+
+    @Override
+    public PrintService getPrintService() {
+        return service;
     }
 
 }

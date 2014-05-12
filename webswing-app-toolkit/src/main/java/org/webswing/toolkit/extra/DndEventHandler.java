@@ -43,13 +43,13 @@ public class DndEventHandler {
         }
     }
 
-    private void updateCursor() {
-        if (lastDropTargetAction == 0) {
-            cursorName = JsonCursorChange.NOT_ALLOWED_CURSOR;
-        } else {
-            cursorName = JsonCursorChange.MOVE_CURSOR;
-        }
-    }
+    //    private void updateCursor() {
+    //        if (lastDropTargetAction == 0) {
+    //            cursorName = JsonCursorChange.NOT_ALLOWED_CURSOR;
+    //        } else {
+    //            cursorName = JsonCursorChange.MOVE_CURSOR;
+    //        }
+    //    }
 
     public void dragStart(WebDragSourceContextPeer dragSource, Transferable transferable, int actions, long[] formats) {
         this.dragSource = dragSource;
