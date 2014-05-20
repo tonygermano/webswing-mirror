@@ -90,19 +90,7 @@ function WebswingBase(c) {
 	function dispose() {
 		clearInterval(timer1);
 		clearInterval(timer2);
-		unbindEvent(canvas, 'mousedown')
-		unbindEvent(canvas, 'dblclick')
-		unbindEvent(canvas, 'mousemove')
-		unbindEvent(canvas, 'mouseup')
-		unbindEvent(canvas, "mousewheel")
-		unbindEvent(canvas, "DOMMouseScroll")
-		unbindEvent(canvas, 'contextmenu')
-		unbindEvent(canvas, 'keydown')
-		unbindEvent(canvas, 'keypress')
-		unbindEvent(canvas, 'keyup')
-		unbindEvent(document, 'mousedown')
-		unbindEvent(document, 'mouseout')
-		unbindEvent(document, 'mouseup')
+		canvas.parentNode.replaceChild(canvas.cloneNode(true), canvas);
 		unload();
 		c = {};
 	}
@@ -371,10 +359,6 @@ function WebswingBase(c) {
 
 	function bindEvent(el, eventName, eventHandler) {
 		el.addEventListener(eventName, eventHandler, false);
-	}
-
-	function unbindEvent(el, eventName) {
-		el.removeEventListener(eventName);
 	}
 
 	return {

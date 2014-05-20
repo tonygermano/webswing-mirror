@@ -97,7 +97,7 @@ var webswing = function() {
 		showDialog(initializingDialog);
 		connect();
 		$(window).bind("beforeunload", function() {
-			socket.push('unload' + config.clientId);
+			ws.dispose();
 		});
 	}
 

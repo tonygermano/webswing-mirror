@@ -9,7 +9,6 @@ import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
-import javax.imageio.spi.ServiceRegistry;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
