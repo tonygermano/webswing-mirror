@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Webswing</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta charset="utf-8" />
+<link rel="stylesheet" href="css/bootstrap.css" />
+<link rel="stylesheet" href="css/webswing.css" />
+
+</head>
+<body id="body">
+	<div id="loginDialog" class="modal" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+			      <form id="loginForm" class="form-signin" accept-charset="UTF-8" role="form">
+			        <h2 class="form-signin-heading">Please sign in</h2>
+	        		<div class="form-group">
+			        	<input type="text" class="form-control" placeholder="User name" name="username" required autofocus>
+					</div>
+	        		<div class="form-group">
+				        <input id="passwordInput" type="password" class="form-control" placeholder="Password" name="password" required>
+					</div>
+					<div id="loginErrorMsg"></div>
+			      </form>
+		          <button class="btn btn-lg btn-primary" onclick="webswing.login()">Sign in</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="initializingDialog" class="modal" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<p>Initializing…</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="connectingDialog" class="modal" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<p>Connecting…</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="startingDialog" class="modal" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<p>Starting…</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="disconnectedDialog" class="modal" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<p>Disconnected…</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="messageDialog" class="modal" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<p id="messageDialogText"></p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="continueOldSessionDialog" class="modal"
+		data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<p>Continue old session?</p>
+					<a href="javascript:webswing.continueSession(true);">Yes,
+						continue.</a> <br /> <a
+						href="javascript:webswing.continueSession(false);">No, start
+						new session.</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="applicationSelectorDialog" class="modal" tabindex="-1"
+		data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<span class="pull-right"><a href="/logout">Logout</a></span>
+					<h4 class="modal-title" id="myModalLabel">Hello <span id="userName"></span>. Select your application:</h4>
+				</div>
+				<div class="modal-body">
+					<div class="row" id="applicationsList"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="javascript/atmosphere.js" type="text/javascript"></script>
+	<script src="javascript/jquery-2.1.0.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="javascript/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+	<script src="javascript/webswing-base.js" type="text/javascript"	charset="utf-8"></script>
+	<script src="javascript/webswing.js" type="text/javascript"	charset="utf-8"></script>
+</body>
+</html>

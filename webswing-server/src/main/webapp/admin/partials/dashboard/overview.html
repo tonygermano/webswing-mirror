@@ -1,0 +1,84 @@
+<h2 class="sub-header">Running sessions</h2>
+<div class="table-responsive">
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>No. (Id)</th>
+				<th>User</th>
+				<th>Application</th>
+				<th>Start time</th>
+				<th>Client status</th>
+				<th>Used memory</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="session in masterData.sessions">
+				<td>
+					<span title="app Id: {{session.id}}" ui-jq="tooltip">{{$index+1}}</span>
+				</td>
+				<td>
+					{{session.user}}
+				</td>
+				<td>
+					{{session.application}}
+				</td>
+				<td>
+					{{session.startedAt | date:'dd MMM h:mm:ss'}}
+				</td>
+				<td>
+					<div ng-switch on="session.connected">
+						<div ng-switch-when="true" >
+							<span  class="label label-success">Connected</span>
+						</div>
+						<div ng-switch-when="false" >
+							<span class="label label-danger" ui-jq="tooltip" title="Disconnected at {{session.disconnectedSince| date:'dd MMM h:mm:ss'}}">Disconnected</span>
+						</div>
+					</div>
+				</td>
+				<td>
+					<progressbar  animate="false" max="session.state.heapSize" value="session.state.heapSizeUsed"><span style="color:black; white-space:nowrap;">{{(session.state.heapSizeUsed/session.state.heapSize*100 |number:1) +'%  '+(session.state.heapSizeUsed|number:1)+'MB/'+(session.state.heapSize|number:0)+'MB'}}</span></progressbar>
+				</td>
+				<td>
+					<button type="button" class="btn btn-primary" ng-click="view(session)">
+						<span class="glyphicon glyphicon-camera"></span> View
+					</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<h2 class="sub-header">Finished sessions</h2>
+<div class="table-responsive">
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>No. (Id)</th>
+				<th>User</th>
+				<th>Application</th>
+				<th>Start time</th>
+				<th>End time</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="session in masterData.closedSessions">
+				<td>
+					<span title="app Id: {{session.id}}" ui-jq="tooltip">{{$index+1}}</span>
+				</td>
+				<td>
+					{{session.user}}
+				</td>
+				<td>
+					{{session.application}}
+				</td>
+				<td>
+					{{session.startedAt | date:'dd MMM h:mm:ss'}}
+				</td>
+				<td>
+					{{(session.endedAt | date:'dd MMM h:mm:ss')+ ' ('+(session.endedAt-session.startedAt | duration)+')'}}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

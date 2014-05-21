@@ -1,0 +1,106 @@
+<form name="appForm" novalidate>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Swing application name.">Name</label>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" name="name" ng-model="currentApp().name" required>
+			<div  ng-show="appForm.name.$invalid">
+				<span class="label label-danger" ng-show="appForm.name.$error.required">Application name must not be empty.</span>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Path to icon displayed in application selection dialog.">Icon</label>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" name="icon" ng-model="currentApp().icon">
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Swing application fully qualiffied class name. (ie. 'com.mypackage.Main')">Main class</label>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" name="main" ng-model="currentApp().mainClass" required>
+			<div  ng-show="appForm.main.$invalid">
+				<span class="label label-danger" ng-show="appForm.main.$error.required">Main class' fully qualified name is mandatory.</span>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Commandline arguments processed by Oracle's Java Virtual Machine. (ie. '-Xmx128m') ">JVM arguments</label>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" name="vmargs" ng-model="currentApp().vmArgs" required>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Swing application main method arguments. This string will be passed to the main method's (String[] args) ">Main arguments</label>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" name="args" ng-model="currentApp().args" required>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Swing application's home directory. Swing application instances will be executed from this directory. This will also be the base directory of any relative classpath entries specified.">Home directory</label>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" name="homeDir" ng-model="currentApp().homeDir" required>
+			<div  ng-show="appForm.homeDir.$invalid">
+				<span class="label label-danger" ng-show="appForm.homeDir.$error.required">Home directory is mandatory. Use '.' for server's home directory</span>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Swing application's classpath. Absolute or relative path to jar file or classes directory. At least one classPath entry should be specified containing the main class.">Classpath entries</label>
+		<div ng-class="{'col-sm-offset-3': !$first,'col-sm-9':true, 'edit-app-list-entry':true} " ng-repeat="cp in currentApp().classPathEntries track by $index">
+			<div class="input-group">
+				<input type="text" class="form-control" ng-model="cp" >
+				<div class="input-group-btn">
+					<button class="btn btn-default" ng-if="$last" type="button" ng-click="createCp()">
+						<span class="glyphicon glyphicon-plus"></span>
+					</button>
+					<button class="btn btn-default" ng-hide="currentApp().classPathEntries.length ==1" type="button" ng-click="deleteCp($index)">
+						<span class="glyphicon glyphicon-remove"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Maximum number of allowed simultaneous connections for this application.">Max client count</label>
+		<div class="col-sm-9">
+			<input type="number" class="form-control" name="maxClients" ng-model="currentApp().maxClients" required>
+			<div  ng-show="appForm.maxClients.$invalid">
+				<span class="label label-danger" ng-show="appForm.maxClients.$error.required">Specify maximum number of clients.</span>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Specifies how long (seconds) will be the swing application left running after the user closes the browser. User can reconnect in this interval and continue in last session.">Session timeout</label>
+		<div class="col-sm-9">
+			<input type="number" class="form-control" name="swingSessionTimeout" ng-model="currentApp().swingSessionTimeout" required>
+			<div  ng-show="appForm.swingSessionTimeout.$invalid">
+				<span class="label label-danger" ng-show="appForm.swingSessionTimeout.$error.required">Specify the timeout interval.</span>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Enables rendering of anti-aliased text. Smoothens the edges of the text.">Anti alias text</label>
+		<div class="col-sm-9">
+			<div class="checkbox">
+				<input type="checkbox" name="antiAliasText" ng-model="currentApp().antiAliasText" required>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Set authorized access to this application. Only users with role same as application's name can access this application.">Requires authorization</label>
+		<div class="col-sm-9">
+			<div class="checkbox">
+				<input type="checkbox" name="authorization" ng-model="currentApp().authorization" required>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Enables remote debug for this application. After the application is started from browser, it will wait for remote debugger connection on port 8000">Debug mode</label>
+		<div class="col-sm-9">
+			<div class="checkbox">
+				<input type="checkbox" name="debug" ng-model="currentApp().debug" required>
+			</div>
+		</div>
+	</div>
+
+</form>
