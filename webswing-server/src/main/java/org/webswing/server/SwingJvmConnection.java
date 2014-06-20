@@ -46,6 +46,8 @@ import org.webswing.server.util.Los;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.server.util.SwingAntTimestampedLogger;
 import org.webswing.toolkit.WebToolkit;
+import org.webswing.toolkit.WebToolkit6;
+import org.webswing.toolkit.WebToolkit7;
 
 public class SwingJvmConnection implements MessageListener {
 
@@ -212,8 +214,20 @@ public class SwingJvmConnection implements MessageListener {
                         javaTask.setJar(new File(URI.create(ServerUtil.getWarFileLocation())));
                         javaTask.setArgs(appConfig.getArgs());
                         String webSwingToolkitJarPath = "\"" + URLDecoder.decode(WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
-                        System.out.println(webSwingToolkitJarPath);
-                        String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPath;
+                        String webSwingToolkitJarPathSpecific;
+                        String webToolkitClass;
+                        if (System.getProperty("java.version").startsWith("1.6")) {
+                            webSwingToolkitJarPathSpecific = "\"" + URLDecoder.decode(WebToolkit6.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
+                            webToolkitClass=WebToolkit6.class.getCanonicalName();
+                        } else if (System.getProperty("java.version").startsWith("1.7")) {
+                            webSwingToolkitJarPathSpecific = "\"" + URLDecoder.decode(WebToolkit7.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
+                            webToolkitClass=WebToolkit7.class.getCanonicalName();
+                        } else {
+                            log.error("Java version " + System.getProperty("java.version") + " not supported in this version. Check www.webswing.org for supported versions.");
+                            throw new RuntimeException("Java version not supported");
+                        }
+                        String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPathSpecific + File.pathSeparatorChar + webSwingToolkitJarPath;
+                        log.info("Setting bootclasspath to: "+bootCp);
                         String debug = appConfig.isDebug() ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
                         String aaFonts = appConfig.isAntiAliasText() ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
                         javaTask.setJvmargs(bootCp + debug + aaFonts + " -noverify " + appConfig.getVmArgs());
@@ -245,7 +259,7 @@ public class SwingJvmConnection implements MessageListener {
 
                         Variable toolkitImplClass = new Variable();
                         toolkitImplClass.setKey("awt.toolkit");
-                        toolkitImplClass.setValue("org.webswing.toolkit.WebToolkit");
+                        toolkitImplClass.setValue(webToolkitClass);
                         javaTask.addSysproperty(toolkitImplClass);
 
                         Variable headless = new Variable();

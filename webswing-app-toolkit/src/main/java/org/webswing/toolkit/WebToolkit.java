@@ -8,7 +8,6 @@ import java.awt.Choice;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dialog;
-import java.awt.EventQueue;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
@@ -82,14 +81,13 @@ import org.webswing.common.SwingClassLoaderFactoryIfc;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.extra.WindowManager;
-import org.webswing.toolkit.ge.WebGraphicsEnvironment;
 import org.webswing.util.Util;
 
 import sun.awt.SunToolkit;
 import sun.print.PrintJob2D;
 
 @SuppressWarnings("restriction")
-public class WebToolkit extends SunToolkit {
+public abstract class WebToolkit extends SunToolkit {
 
     public static final String BACKGROUND_WINDOW_ID = "BG";
     private ServerConnectionIfc serverConnection;
@@ -189,7 +187,6 @@ public class WebToolkit extends SunToolkit {
         return true;
     }
 
-    @Override
     public KeyboardFocusManagerPeer createKeyboardFocusManagerPeer(KeyboardFocusManager paramKeyboardFocusManager) throws HeadlessException {
         return new WebKeyboardFocusManagerPeer();
     }
@@ -321,15 +318,15 @@ public class WebToolkit extends SunToolkit {
         config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     }
 
-    public static void displayChanged() {
-        EventQueue.invokeLater(new Runnable() {
-
-            public void run() {
-                ((WebGraphicsEnvironment) GraphicsEnvironment.getLocalGraphicsEnvironment()).displayChanged();
-            }
-        });
-    }
-
+    public abstract void displayChanged(); 
+//        EventQueue.invokeLater(new Runnable() {
+//
+//            public void run() {
+//                ((WebGraphicsEnvironment) GraphicsEnvironment.getLocalGraphicsEnvironment()).displayChanged();
+//            }
+//        });
+//    }
+    
     public InputMethodDescriptor getInputMethodAdapterDescriptor() throws AWTException {
         return new WebInputMethodDescriptor();
     }
