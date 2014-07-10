@@ -277,7 +277,9 @@ public class WebComponentPeer implements ComponentPeer {
             Util.getWebToolkit().getPaintDispatcher().notifyWindowClosed(getGuid());
             SurfaceData localSurfaceData = this.surfaceData;
             this.surfaceData = null;
-            localSurfaceData.invalidate();
+            if (localSurfaceData != null) {
+                localSurfaceData.invalidate();
+            }
             WebToolkit.targetDisposedPeer(this.target, this);
         }
     }
@@ -297,7 +299,7 @@ public class WebComponentPeer implements ComponentPeer {
 
     public void updateCursorImmediately() {
         if (DndEventHandler.isDndInProgress()) {
-            Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(null,DndEventHandler.getCurrentDropTargetCursorName());
+            Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(null, DndEventHandler.getCurrentDropTargetCursorName());
         } else {
             Point location = Util.getWebToolkit().getEventDispatcher().getLastMousePosition();
             if (location != null) {
