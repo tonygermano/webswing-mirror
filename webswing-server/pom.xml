@@ -64,6 +64,11 @@
 			<version>2.6</version>
 		</dependency>
 		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.1.1</version>
@@ -132,6 +137,19 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>copyWarlibs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
+							<includeArtifactIds>
+								rt-win-shell
+							</includeArtifactIds>
+						</configuration>
+					</execution>
+					<execution>
 						<id>copyServerlibs</id>
 						<phase>package</phase>
 						<goals>
@@ -153,7 +171,7 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/swing-lib</outputDirectory>
 							<includeArtifactIds>
-								webswing-app-interface,webswing-app-launcher,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging,freehep-graphicsio-pdf,freehep-graphics2d,freehep-graphicsbase,freehep-graphicsio,freehep-io
+								webswing-app-interface,webswing-app-launcher,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,commons-io,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging,freehep-graphicsio-pdf,freehep-graphics2d,freehep-graphicsbase,freehep-graphicsio,freehep-io
 							</includeArtifactIds>
 						</configuration>
 					</execution>
@@ -168,9 +186,11 @@
 						<phase>package</phase>
 						<configuration>
 							<target>
-
 								<war destfile="${project.build.directory}/${project.build.finalName}.war"
 									update="true">
+									<fileset
+										dir="${project.build.directory}/${project.build.finalName}"
+										includes="WEB-INF/lib/rt-win-shell*.jar" />
 									<fileset
 										dir="${project.build.directory}/${project.build.finalName}"
 										includes="WEB-INF/swing-lib/*.jar" />

@@ -44,8 +44,8 @@ public class SwingInstanceManager {
 
     public void connectSwingInstance(AtmosphereResource resource, JsonConnectionHandshake h) {
         SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(h.applicationName);
-        if(app==null){
-            throw new RuntimeException("Application "+h.applicationName+" is not configured.");
+        if (app == null) {
+            throw new RuntimeException("Application " + h.applicationName + " is not configured.");
         }
         if (ServerUtil.isUserAuthorizedForApplication(resource, app)) {
             SwingInstance swingInstance = swingInstances.get(h.clientId);
@@ -82,8 +82,8 @@ public class SwingInstanceManager {
                     }
                 }
             }
-        }else{
-            log.error("Authorization error: User "+ServerUtil.getUserName(resource)+" is not authorized to connect to application "+ app.getName());
+        } else {
+            log.error("Authorization error: User " + ServerUtil.getUserName(resource) + " is not authorized to connect to application " + app.getName());
         }
     }
 
@@ -148,10 +148,13 @@ public class SwingInstanceManager {
         void swingInstancesChanged();
     }
 
-    public void sendMessageToSwing(AtmosphereResource r, String clientId, Serializable o) {
+    public boolean sendMessageToSwing(AtmosphereResource r, String clientId, Serializable o) {
         SwingInstance client = swingInstances.get(clientId);
         if (client != null) {
-            client.sendToSwing(r, o);
+            return client.sendToSwing(r, o);
+        } else {
+            return false;
         }
     }
+
 }

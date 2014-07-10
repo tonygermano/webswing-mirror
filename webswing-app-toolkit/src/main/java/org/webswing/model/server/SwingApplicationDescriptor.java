@@ -21,6 +21,7 @@ public class SwingApplicationDescriptor implements Serializable {
     private boolean antiAliasText = true;
     private int swingSessionTimeout = 300;
     private boolean authorization = false;
+    private boolean isolatedFs = false;
     private boolean debug = false;
 
     public String getName() {
@@ -129,5 +130,17 @@ public class SwingApplicationDescriptor implements Serializable {
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
+
+    
+    public boolean isIsolatedFs() {
+        return isolatedFs;
+    }
+
+    
+    public void setIsolatedFs(boolean isolatedFs) {
+        this.isolatedFs = isolatedFs;
+    }
+    
+    
 
 }

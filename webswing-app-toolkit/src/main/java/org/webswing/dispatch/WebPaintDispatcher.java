@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Arrays;
@@ -18,17 +19,22 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
+import org.webswing.Constants;
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.ServerConnectionIfc;
 import org.webswing.model.admin.s2c.JsonSwingJvmStats;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.model.s2c.JsonCopyEvent;
 import org.webswing.model.s2c.JsonCursorChange;
+import org.webswing.model.s2c.JsonFileDialogEvent;
+import org.webswing.model.s2c.JsonFileDialogEvent.FileDialogEventType;
 import org.webswing.model.s2c.JsonLinkAction;
 import org.webswing.model.s2c.JsonLinkAction.JsonLinkActionType;
 import org.webswing.model.s2c.JsonWindowMoveAction;
+import org.webswing.model.s2c.OpenFileResult;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.extra.WindowManager;
@@ -44,6 +50,7 @@ public class WebPaintDispatcher {
     private volatile JsonWindowMoveAction moveAction;
     private volatile boolean clientReadyToReceive = true;
     private long lastReadyStateTime;
+    private JFileChooser fileChooserDialog;
 
     private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1);
 
@@ -224,7 +231,7 @@ public class WebPaintDispatcher {
                     if (xCenterValid || newx < b.x) {
                         b.x = newx >= 0 ? newx : 0;
                     }
-                    if (yCenterValid || newy <b.y) {
+                    if (yCenterValid || newy < b.y) {
                         b.y = newy >= 0 ? newy : 0;
                     }
                     w.setLocation(b.x, b.y);
@@ -268,9 +275,7 @@ public class WebPaintDispatcher {
                 r.setLocation(r.x - w.getX(), r.y - w.getY());
                 notifyWindowAreaRepainted(peer.getGuid(), r);
             }
-
         }
-
     }
 
     public void notifyCursorUpdate(Cursor cursor) {
@@ -338,6 +343,58 @@ public class WebPaintDispatcher {
         f.copyEvent = copyEvent;
         Logger.debug("WebPaintDispatcher:notifyCopyEvent", f);
         serverConnection.sendJsonObject(f);
+    }
+
+    public void notifyFileDialogActive(WebWindowPeer webWindowPeer) {
+        JsonAppFrame f = new JsonAppFrame();
+        JsonFileDialogEvent fdEvent = new JsonFileDialogEvent();
+        fdEvent.eventType = FileDialogEventType.Open;
+        f.fileDialogEvent = fdEvent;
+        Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
+        fileChooserDialog = Util.discoverFileChooser(webWindowPeer);
+        serverConnection.sendJsonObject(f);
+    }
+
+    public void notifyFileDialogHidden(WebWindowPeer webWindowPeer) {
+        JsonAppFrame f = new JsonAppFrame();
+        JsonFileDialogEvent fdEvent = new JsonFileDialogEvent();
+        fdEvent.eventType = FileDialogEventType.Close;
+        f.fileDialogEvent = fdEvent;
+        Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
+        fileChooserDialog = null;
+        serverConnection.sendJsonObject(f);
+    }
+
+    public JFileChooser getFileChooserDialog() {
+        return fileChooserDialog;
+    }
+
+    public void notifyDownloadSelectedFile() {
+        if (fileChooserDialog != null) {
+            File file = fileChooserDialog.getSelectedFile();
+            if (file!=null && file.exists() && !file.isDirectory() && file.canRead()) {
+                OpenFileResult f = new OpenFileResult();
+                f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
+                f.setF(file);
+                Util.getWebToolkit().getPaintDispatcher().sendJsonObject(f);
+            }
+        }
+    }
+
+    public void notifyDeleteSelectedFile() {
+        if (fileChooserDialog != null) {
+            File[] selected = fileChooserDialog.getSelectedFiles();
+            if ((selected == null || selected.length == 0) && fileChooserDialog.getSelectedFile() != null) {
+                selected = new File[] { fileChooserDialog.getSelectedFile() };
+            }
+            for (File f : selected) {
+                if (f.exists() && f.canWrite()) {
+                    f.delete();
+                }
+            }
+            fileChooserDialog.rescanCurrentDirectory();
+        }
+
     }
 
 }

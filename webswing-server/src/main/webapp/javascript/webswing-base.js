@@ -9,6 +9,7 @@ function WebswingBase(c) {
 		onLinkOpenAction: c.onLinkOpenAction || function() {},
 		onPrintAction: c.onPrintAction || function() {},
 		onFileDownloadAction: c.onFileDownloadAction || function() {},
+		onFileDialogAction: c.onFileDialogAction || function() {},
 		clientId: c.clientId || '',
 		hasControl: c.hasControl || false,
 		mirrorMode: c.mirrorMode || false
@@ -78,7 +79,15 @@ function WebswingBase(c) {
 	function unload() {
 		send('unload' + clientId);
 	}
+	
+	function requestDownloadFile() {
+		send('downloadFile' + clientId);
+	}
 
+	function requestDeleteFile() {
+		send('deleteFile' + clientId);
+	}
+	
 	function handshake() {
 		send(getHandShake());
 	}
@@ -142,6 +151,9 @@ function WebswingBase(c) {
 		}
 		if (data.copyEvent != null && config.hasControl) {
 			window.prompt("Copy to clipboard: Ctrl+C, Enter", data.copyEvent.content);
+		}
+		if (data.fileDialogEvent != null && config.hasControl){
+			config.onFileDialogAction(data.fileDialogEvent);
 		}
 		//firs is always the background
 		for (var i in data.windows) {
@@ -373,6 +385,12 @@ function WebswingBase(c) {
 		},
 		handshake: function() {
 			handshake();
+		},
+		requestDownloadFile: function() {
+			requestDownloadFile();
+		},
+		requestDeleteFile: function() {
+			requestDeleteFile();
 		},
 		setUuid: function(param) {
 			uuid = param;

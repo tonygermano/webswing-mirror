@@ -174,8 +174,12 @@ public abstract class WebToolkit extends SunToolkit {
 
     @Override
     protected void initializeDesktopProperties() {
-        if (System.getProperty("os.name", "").startsWith("Windows")) {
-            this.desktopProperties.put("Shell.shellFolderManager", "sun.awt.shell.Win32ShellFolderManager2");
+        if(System.getProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS,"").equalsIgnoreCase("true")){
+            this.desktopProperties.put("Shell.shellFolderManager", "org.webswing.toolkit.extra.WebShellFolderManager");
+        }else{
+            if (System.getProperty("os.name", "").startsWith("Windows")) {
+                this.desktopProperties.put("Shell.shellFolderManager", "sun.awt.shell.Win32ShellFolderManager2");
+            }
         }
     }
 

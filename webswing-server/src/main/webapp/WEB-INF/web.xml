@@ -33,6 +33,16 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
+		<description>UploadServlet</description>
+		<servlet-name>UploadServlet</servlet-name>
+		<servlet-class>org.webswing.server.handler.UploadServlet</servlet-class>
+		<multipart-config>
+			<max-file-size>10485760</max-file-size>
+			<max-request-size>20971520</max-request-size>
+			<file-size-threshold>5242880</file-size-threshold>
+		</multipart-config>
+	</servlet>
+	<servlet>
 		<description>LoginServlet</description>
 		<servlet-name>LoginServlet</servlet-name>
 		<servlet-class>org.webswing.server.handler.LoginServlet</servlet-class>
@@ -46,14 +56,18 @@
 		<url-pattern>/file</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
+		<servlet-name>UploadServlet</servlet-name>
+		<url-pattern>/upload</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>LoginServlet</servlet-name>
 		<url-pattern>/login</url-pattern>
 	</servlet-mapping>
-	
+
 	<listener>
 		<listener-class>org.webswing.server.handler.JmsService</listener-class>
 	</listener>
-	
+
 	<listener>
 		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
 	</listener>

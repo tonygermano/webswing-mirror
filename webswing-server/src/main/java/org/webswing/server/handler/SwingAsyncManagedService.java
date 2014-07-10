@@ -87,6 +87,10 @@ public class SwingAsyncManagedService {
                 send(r, sm.substring(Constants.REPAINT_REQUEST_PREFIX.length()), sm);
             } else if (sm.startsWith(Constants.SWING_KILL_SIGNAL)) {
                 send(r, sm.substring(Constants.SWING_KILL_SIGNAL.length()), sm);
+            } else if (sm.startsWith(Constants.DELETE_FILE_PREFIX)) {
+                send(r, sm.substring(Constants.DELETE_FILE_PREFIX.length()), sm);
+            } else if (sm.startsWith(Constants.DOWNLOAD_FILE_PREFIX)) {
+                send(r, sm.substring(Constants.DOWNLOAD_FILE_PREFIX.length()), sm);
             } else {
                 return sm;
             }

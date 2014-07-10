@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -12,6 +13,7 @@ import javax.imageio.spi.IIORegistry;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.webswing.common.ImageServiceIfc;
 import org.webswing.common.WindowDecoratorThemeIfc;
@@ -129,5 +131,10 @@ public class ImageService implements ImageServiceIfc {
     @Override
     public void closePDFGraphics(Graphics2D pdfGrapthics) {
         ((PDFGraphics2D)pdfGrapthics).endExport();
+    }
+
+    @Override
+    public void moveFile(File srcFile, File destFile) throws IOException {
+            FileUtils.moveFile(srcFile, destFile);
     }
 }

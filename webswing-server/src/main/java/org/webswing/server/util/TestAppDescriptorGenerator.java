@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -47,6 +45,7 @@ public class TestAppDescriptorGenerator {
         desc1.setMaxClients(1);
         desc1.setAuthorization(true);
         desc1.setDebug(true);
+        desc1.setIsolatedFs(true);
         apps.add(desc1);
 
         WebswingConfiguration config = new WebswingConfiguration();

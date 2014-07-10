@@ -14,7 +14,10 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.io.File;
+import java.io.IOException;
 
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
@@ -23,8 +26,9 @@ import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEvent;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
-import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.c2s.JsonEventMouse.Type;
+import org.webswing.model.c2s.JsonEventPaste;
+import org.webswing.model.c2s.JsonEventUpload;
 import org.webswing.toolkit.WebClipboard;
 import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.extra.DndEventHandler;
@@ -62,6 +66,30 @@ public class WebEventDispatcher {
             JsonEventPaste paste = (JsonEventPaste) event;
             handlePasteEvent(paste.content);
         }
+        if (event instanceof JsonEventUpload) {
+            JsonEventUpload upload = (JsonEventUpload) event;
+            JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
+            if (dialog != null) {
+                switch (upload.type) {
+                    case Upload:
+                        File currentDir=dialog.getCurrentDirectory();
+                        File tempFile= new File(upload.tempFileLocation);
+                        String validfilename=Util.resolveFilename(currentDir, upload.fileName);
+                        if(currentDir.canWrite() && tempFile.exists()){
+                            try {
+                                Util.getWebToolkit().getImageService().moveFile(tempFile, new File(currentDir,validfilename));
+                                dialog.rescanCurrentDirectory();
+                            } catch (IOException e) {
+                                System.err.println("Error while moving uploaded file to target folder.");
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 
     public void dispatchMessage(String message) {
@@ -75,6 +103,12 @@ public class WebEventDispatcher {
         }
         if (message.startsWith(Constants.REPAINT_REQUEST_PREFIX)) {
             Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaintAll();
+        }
+        if (message.startsWith(Constants.DOWNLOAD_FILE_PREFIX)) {
+            Util.getWebToolkit().getPaintDispatcher().notifyDownloadSelectedFile();
+        }
+        if (message.startsWith(Constants.DELETE_FILE_PREFIX)) {
+            Util.getWebToolkit().getPaintDispatcher().notifyDeleteSelectedFile();
         }
     }
 
@@ -124,7 +158,9 @@ public class WebEventDispatcher {
             w = (Window) WindowManager.getInstance().getVisibleWindowOnPosition(event.x, event.y);
         }
         if (w == null) {
-            Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            if (Util.getWebToolkit().getPaintDispatcher() != null) {
+                Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
             return;
         }
         if (w != null) {
@@ -190,8 +226,8 @@ public class WebEventDispatcher {
             if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_CLICKED && lastMouseEvent.getButton() == buttons && lastMouseEvent.getX() == x && lastMouseEvent.getY() == y) {
                 return lastMouseEvent.getClickCount() + 1;
             }
-        }else{
-            if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMouseEvent.getButton() == buttons ) {
+        } else {
+            if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMouseEvent.getButton() == buttons) {
                 return lastMouseEvent.getClickCount();
             }
         }
@@ -220,7 +256,7 @@ public class WebEventDispatcher {
     }
 
     public void dragStart(WebDragSourceContextPeer peer, Transferable transferable, int actions, long[] formats) {
-        dndHandler.dragStart(peer, transferable, actions,formats);
+        dndHandler.dragStart(peer, transferable, actions, formats);
     }
 
     public static void dispatchEventInSwing(final Window w, final AWTEvent e) {

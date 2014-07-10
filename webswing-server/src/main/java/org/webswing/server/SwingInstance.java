@@ -65,7 +65,7 @@ public class SwingInstance implements WebSessionListener {
         }
     }
 
-    public void sendToSwing(AtmosphereResource r, Serializable h) {
+    public boolean sendToSwing(AtmosphereResource r, Serializable h) {
         if (connection.isRunning()) {
             if (h instanceof String) {
                 if (((String) h).startsWith(Constants.PAINT_ACK_PREFIX) && ((resource != null && r.uuid().equals(resource.uuid())) || (resource == null && mirroredResource != null && r.uuid().equals(mirroredResource.uuid())))) {
@@ -78,6 +78,9 @@ public class SwingInstance implements WebSessionListener {
             } else {
                 connection.send(h);
             }
+            return true;
+        }else{
+            return false;
         }
     }
 

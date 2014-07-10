@@ -8,6 +8,15 @@
 		<version>2.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
+	<dependencies>
+		<dependency>
+			<groupId>com.oracle.java</groupId>
+			<artifactId>rt-win-shell</artifactId>
+			<version>1.6.0_45</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/../lib/rt-win-shell.jar</systemPath>
+		</dependency>
+	</dependencies>
 	<build>
 		<finalName>webswing-app-toolkit</finalName>
 		<!-- <plugins>

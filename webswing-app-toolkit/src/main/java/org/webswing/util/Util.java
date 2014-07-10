@@ -1,6 +1,7 @@
 package org.webswing.util;
 
 import java.awt.AWTEvent;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Point;
@@ -29,6 +30,8 @@ import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
@@ -94,7 +97,7 @@ public class Util {
             ios.close();
             os.close();
         } catch (IOException e) {
-           Logger.error("Util:savePngImage",e);
+            Logger.error("Util:savePngImage", e);
         }
     }
 
@@ -407,10 +410,51 @@ public class Util {
                     m.setAccessible(true);
                     m.invoke(w);
                 }
-                RepaintManager.currentManager(w).setDoubleBufferMaximumSize(new Dimension(width,height));
+                RepaintManager.currentManager(w).setDoubleBufferMaximumSize(new Dimension(width, height));
             } catch (Exception e) {
                 Logger.error("Util:resetWindowsGC", e);
             }
         }
     }
+
+    public static JFileChooser discoverFileChooser(WebWindowPeer windowPeer) {
+        Window w = (Window) windowPeer.getTarget();
+        if (w instanceof JDialog) {
+            Component[] coms = ((JDialog) w).getContentPane().getComponents();
+            if (coms != null && coms.length > 0 && coms[0] instanceof JFileChooser) {
+                return (JFileChooser) coms[0];
+            }
+        }
+        return null;
+    }
+
+    public static String resolveFilename(File currentDir, String fileName) {
+        if (!existsFilename(currentDir, fileName)) {
+            return fileName;
+        } else {
+            int i = fileName.lastIndexOf('.');
+            String base = i > 0 ? fileName.substring(0, i) : fileName;
+            String ext = i > 0 ? fileName.substring(i) : null;
+            int next=1;
+            while(true){
+                String nextFN= base+" "+next+ext;
+                if(!existsFilename(currentDir,nextFN)){
+                    return nextFN;
+                }
+                next++;
+            }
+        }
+    }
+
+    public static boolean existsFilename(File currentDir, String fileName) {
+        if (currentDir != null && currentDir.exists() && currentDir.isDirectory()) {
+            for (File f : currentDir.listFiles()) {
+                if (f.getName().equals(fileName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

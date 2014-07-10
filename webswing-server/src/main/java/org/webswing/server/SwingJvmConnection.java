@@ -227,7 +227,12 @@ public class SwingJvmConnection implements MessageListener {
                             throw new RuntimeException("Java version not supported");
                         }
                         String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPathSpecific + File.pathSeparatorChar + webSwingToolkitJarPath;
-                        log.info("Setting bootclasspath to: "+bootCp);
+                        
+                        if(!System.getProperty("os.name", "").startsWith("Windows")){
+                            //filesystem isolation support on non windows systems:
+                            bootCp +=  File.pathSeparatorChar + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator))+File.separator+"rt-win-shell-1.6.0_45.jar\"";
+                        }
+                                                log.info("Setting bootclasspath to: "+bootCp);
                         String debug = appConfig.isDebug() ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
                         String aaFonts = appConfig.isAntiAliasText() ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
                         javaTask.setJvmargs(bootCp + debug + aaFonts + " -noverify " + appConfig.getVmArgs());
@@ -251,6 +256,12 @@ public class SwingJvmConnection implements MessageListener {
                         mainClass.setKey(Constants.SWING_START_SYS_PROP_MAIN_CLASS);
                         mainClass.setValue(appConfig.getMainClass());
                         javaTask.addSysproperty(mainClass);
+                        
+                        Variable isolatedFs = new Variable();
+                        isolatedFs.setKey(Constants.SWING_START_SYS_PROP_ISOLATED_FS);
+                        isolatedFs.setValue(appConfig.isIsolatedFs()+"");
+                        javaTask.addSysproperty(isolatedFs);
+
 
                         Variable inactivityTimeout = new Variable();
                         inactivityTimeout.setKey(Constants.SWING_SESSION_TIMEOUT_SEC);
