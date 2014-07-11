@@ -458,6 +458,11 @@ public abstract class WebToolkit extends SunToolkit {
     public void beep() {
 
     }
+    
+    @Override
+    public boolean getLockingKeyState(int keyCode) throws UnsupportedOperationException {
+        return false;
+    }
 
     public GraphicsConfiguration getGraphicsConfig() {
         if (config == null) {

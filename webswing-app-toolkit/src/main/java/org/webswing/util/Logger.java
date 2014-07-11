@@ -16,27 +16,27 @@ public class Logger {
     private int thresshold = 3;
 
     public static void trace(String message, Object... o) {
-        log(TRACE, "T " + message);
+        log(TRACE, "T " + message, o);
     }
 
     public static void debug(String message, Object... o) {
-        log(DEBUG, "D " + message);
+        log(DEBUG, "D " + message, o);
     }
 
     public static void info(String message, Object... o) {
-        log(INFO, "I " + message);
+        log(INFO, "I " + message, o);
     }
 
     public static void warn(String message, Object... o) {
-        log(WARNING, "W " + message);
+        log(WARNING, "W " + message, o);
     }
 
     public static void error(String message, Object... o) {
-        log(ERROR, "E " + message);
+        log(ERROR, "E " + message, o);
     }
 
     public static void fatal(String message, Object... o) {
-        log(FATAL, "F " + message);
+        log(FATAL, "F " + message, o);
     }
 
     public static void log(int level, String message, Object... o) {

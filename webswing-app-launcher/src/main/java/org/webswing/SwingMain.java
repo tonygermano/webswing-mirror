@@ -7,6 +7,8 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
+
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.util.Logger;
 import org.webswing.util.Util;
@@ -47,10 +49,18 @@ public class SwingMain {
             String progArgs[] = args;
             java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
             Thread.currentThread().setContextClassLoader(swingClassloader);
+            SwingUtilities.invokeLater(new Runnable() {
+                ClassLoader contextClassloader = Thread.currentThread().getContextClassLoader();
+                
+                @Override
+                public void run() {
+                    Thread.currentThread().setContextClassLoader(contextClassloader);
+                }
+            });
             Object argsArray[] = { progArgs };
             main.invoke(null, argsArray);
         } catch (Exception e) {
-            Logger.fatal("SwingMain:main", e);
+            Logger.fatal("SwingMain:main",e);
             System.exit(1);
         }
     }
