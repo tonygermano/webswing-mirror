@@ -1,5 +1,6 @@
 package org.webswing.special;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -40,5 +41,10 @@ public class RedirectedMethods {
 
     public static Enumeration<URL> getSystemResources(String name) throws IOException {
         return SwingMain.swingLibClassloader.getResources(name);
+    }
+    
+    @SuppressWarnings("restriction")
+    public static File[] listRoots(){
+        return (File[]) sun.awt.shell.ShellFolder.get("roots");
     }
 }

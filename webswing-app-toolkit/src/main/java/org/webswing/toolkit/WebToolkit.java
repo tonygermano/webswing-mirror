@@ -174,9 +174,9 @@ public abstract class WebToolkit extends SunToolkit {
 
     @Override
     protected void initializeDesktopProperties() {
-        if(System.getProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS,"").equalsIgnoreCase("true")){
+        if (System.getProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS, "").equalsIgnoreCase("true")) {
             this.desktopProperties.put("Shell.shellFolderManager", "org.webswing.toolkit.extra.WebShellFolderManager");
-        }else{
+        } else {
             if (System.getProperty("os.name", "").startsWith("Windows")) {
                 this.desktopProperties.put("Shell.shellFolderManager", "sun.awt.shell.Win32ShellFolderManager2");
             }
@@ -322,15 +322,16 @@ public abstract class WebToolkit extends SunToolkit {
         config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     }
 
-    public abstract void displayChanged(); 
-//        EventQueue.invokeLater(new Runnable() {
-//
-//            public void run() {
-//                ((WebGraphicsEnvironment) GraphicsEnvironment.getLocalGraphicsEnvironment()).displayChanged();
-//            }
-//        });
-//    }
-    
+    public abstract void displayChanged();
+
+    //        EventQueue.invokeLater(new Runnable() {
+    //
+    //            public void run() {
+    //                ((WebGraphicsEnvironment) GraphicsEnvironment.getLocalGraphicsEnvironment()).displayChanged();
+    //            }
+    //        });
+    //    }
+
     public InputMethodDescriptor getInputMethodAdapterDescriptor() throws AWTException {
         return new WebInputMethodDescriptor();
     }
@@ -418,7 +419,7 @@ public abstract class WebToolkit extends SunToolkit {
     }
 
     public RobotPeer createRobot(Robot paramRobot, GraphicsDevice paramGraphicsDevice) throws AWTException {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     public boolean isDesktopSupported() {
@@ -458,7 +459,7 @@ public abstract class WebToolkit extends SunToolkit {
     public void beep() {
 
     }
-    
+
     @Override
     public boolean getLockingKeyState(int keyCode) throws UnsupportedOperationException {
         return false;

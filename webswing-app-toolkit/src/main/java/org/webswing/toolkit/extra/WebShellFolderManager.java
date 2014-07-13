@@ -17,10 +17,11 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
     private boolean windows;
     private Object defaultManager;
 
-    private File root ;
+    private File root;
 
     public WebShellFolderManager() {
-        root = new File(System.getProperty("user.dir"));
+        root = new IsolatedRootFile(System.getProperty("user.dir"));
+        System.setProperty("user.home", root.getAbsolutePath());
         if (System.getProperty("os.name", "").startsWith("Windows")) {
             windows = true;
         }
@@ -76,7 +77,7 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
                 return null;
             }
         } catch (IOException e) {
-            System.err.println("Error while creating ShellFolder. "+e.getMessage());
+            System.err.println("Error while creating ShellFolder. " + e.getMessage());
             return null;
         }
     }

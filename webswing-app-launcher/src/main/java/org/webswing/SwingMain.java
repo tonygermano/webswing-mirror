@@ -1,7 +1,9 @@
 package org.webswing;
 
+import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -54,7 +56,16 @@ public class SwingMain {
                 
                 @Override
                 public void run() {
-                    Thread.currentThread().setContextClassLoader(contextClassloader);
+                    try {
+                        EventQueue q= Toolkit.getDefaultToolkit().getSystemEventQueue();
+                        Class<?> systemQueue=q.getClass();
+                        Field cl = systemQueue.getDeclaredField("classLoader");
+                        cl.setAccessible(true);
+                        cl.set(q, contextClassloader);
+                    } catch (Exception e) {
+                        System.err.println("Error in SwingMain: EventQueue thread - setting context classloader failed."+e.getMessage());
+                        e.printStackTrace();
+                    }                     
                 }
             });
             Object argsArray[] = { progArgs };
