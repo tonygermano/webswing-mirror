@@ -190,6 +190,7 @@ public abstract class WebToolkit extends SunToolkit {
                 this.desktopProperties.put("Shell.shellFolderManager", "sun.awt.shell.Win32ShellFolderManager2");
             }
         }
+        this.desktopProperties.put("win.highContrast.on", Boolean.FALSE);
     }
 
     public boolean needUpdateWindow() {
