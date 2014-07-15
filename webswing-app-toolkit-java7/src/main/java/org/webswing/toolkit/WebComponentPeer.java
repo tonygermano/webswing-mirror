@@ -279,7 +279,9 @@ public class WebComponentPeer implements ComponentPeer {
             Util.getWebToolkit().getPaintDispatcher().notifyWindowClosed(getGuid());
             SurfaceData localSurfaceData = this.surfaceData;
             this.surfaceData = null;
-            localSurfaceData.invalidate();
+            if (localSurfaceData != null) {
+                localSurfaceData.invalidate();
+            }
             WebToolkit.targetDisposedPeer(this.target, this);
         }
     }

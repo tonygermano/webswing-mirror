@@ -70,6 +70,7 @@ import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.TrayIconPeer;
 import java.awt.peer.WindowPeer;
+import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
@@ -102,6 +103,14 @@ public abstract class WebToolkit extends SunToolkit {
     public void init() {
         paintDispatcher = new WebPaintDispatcher(serverConnection, imageService);
         windowManager = WindowManager.getInstance();
+        try{
+            Class<?> c= ClassLoader.getSystemClassLoader().loadClass("sun.awt.X11GraphicsEnvironment");
+            Method initDisplayMethod = c.getDeclaredMethod("initDisplay", Boolean.TYPE);
+            initDisplayMethod.setAccessible(true);
+            initDisplayMethod.invoke(null, false);
+        }catch(Exception e){
+            //do nothing
+        }
     }
 
     public void initSize(Integer desktopWidth, Integer desktopHeight) {
@@ -383,7 +392,7 @@ public abstract class WebToolkit extends SunToolkit {
     }
 
     public FileDialogPeer createFileDialog(FileDialog paramFileDialog) throws HeadlessException {
-        throw new UnsupportedOperationException();
+        return new WebFileDialogPeer(paramFileDialog);
     }
 
     public MenuBarPeer createMenuBar(MenuBar paramMenuBar) throws HeadlessException {

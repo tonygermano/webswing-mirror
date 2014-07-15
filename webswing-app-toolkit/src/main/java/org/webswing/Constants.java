@@ -34,7 +34,7 @@ public interface Constants {
     public static final String TEMP_DIR_PATH = "webswing.tempDirPath";
     public static final String CONFIG_FILE_PATH = "webswing.configFile";
     public static final String DEFAULT_CONFIG_FILE_NAME = "webswing.config";
-    public static final String USER_FILE_PATH = "webswing.configFile";
+    public static final String USER_FILE_PATH = "webswing.usersFilePath";
     public static final String SERVER_HOST = "webswing.host";
     public static final String SERVER_PORT = "webswing.port";
     public static final String DEFAULT_USER_FILE_NAME = "user.properties";
