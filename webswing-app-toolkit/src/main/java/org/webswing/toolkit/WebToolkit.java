@@ -103,12 +103,14 @@ public abstract class WebToolkit extends SunToolkit {
     public void init() {
         paintDispatcher = new WebPaintDispatcher(serverConnection, imageService);
         windowManager = WindowManager.getInstance();
-        try{
-            Class<?> c= ClassLoader.getSystemClassLoader().loadClass("sun.awt.X11GraphicsEnvironment");
-            Method initDisplayMethod = c.getDeclaredMethod("initDisplay", Boolean.TYPE);
-            initDisplayMethod.setAccessible(true);
-            initDisplayMethod.invoke(null, false);
-        }catch(Exception e){
+        try {
+            if (!System.getProperty("os.name", "").startsWith("Windows")) {
+                Class<?> c = ClassLoader.getSystemClassLoader().loadClass("sun.awt.X11GraphicsEnvironment");
+                Method initDisplayMethod = c.getDeclaredMethod("initDisplay", Boolean.TYPE);
+                initDisplayMethod.setAccessible(true);
+                initDisplayMethod.invoke(null, false);
+            }
+        } catch (Exception e) {
             //do nothing
         }
     }

@@ -18,7 +18,7 @@ import org.webswing.util.Util;
 public class SwingMain {
 
     public static ClassLoader swingLibClassloader;
-    
+
     public static Thread notifyExitThread = new Thread() {
 
         @Override
@@ -44,34 +44,27 @@ public class SwingMain {
                     System.exit(1);
                 }
             }
-            swingLibClassloader = new URLClassLoader(swingurls.toArray(new URL[0]),SwingMain.class.getClassLoader());
+            swingLibClassloader = new URLClassLoader(swingurls.toArray(new URL[0]), SwingMain.class.getClassLoader());
             ClassLoader swingClassloader = ((WebToolkit) Toolkit.getDefaultToolkit()).getWebswingClassLoaderFactory().createSwingClassLoader(swingLibClassloader);
             Class<?> clazz = swingClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
             Class<?> mainArgType[] = { (new String[0]).getClass() };
             String progArgs[] = args;
             java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
             Thread.currentThread().setContextClassLoader(swingClassloader);
-            SwingUtilities.invokeLater(new Runnable() {
-                ClassLoader contextClassloader = Thread.currentThread().getContextClassLoader();
-                
-                @Override
-                public void run() {
-                    try {
-                        EventQueue q= Toolkit.getDefaultToolkit().getSystemEventQueue();
-                        Class<?> systemQueue=q.getClass();
-                        Field cl = systemQueue.getDeclaredField("classLoader");
-                        cl.setAccessible(true);
-                        cl.set(q, contextClassloader);
-                    } catch (Exception e) {
-                        System.err.println("Error in SwingMain: EventQueue thread - setting context classloader failed."+e.getMessage());
-                        e.printStackTrace();
-                    }                     
-                }
-            });
+            try {
+                EventQueue q = Toolkit.getDefaultToolkit().getSystemEventQueue();
+                Class<?> systemQueue = q.getClass();
+                Field cl = systemQueue.getDeclaredField("classLoader");
+                cl.setAccessible(true);
+                cl.set(q, Thread.currentThread().getContextClassLoader());
+            } catch (Exception e) {
+                System.err.println("Error in SwingMain: EventQueue thread - setting context classloader failed." + e.getMessage());
+                e.printStackTrace();
+            }
             Object argsArray[] = { progArgs };
             main.invoke(null, argsArray);
         } catch (Exception e) {
-            Logger.fatal("SwingMain:main",e);
+            Logger.fatal("SwingMain:main", e);
             System.exit(1);
         }
     }
