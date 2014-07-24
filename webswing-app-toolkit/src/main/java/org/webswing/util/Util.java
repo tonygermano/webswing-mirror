@@ -406,9 +406,13 @@ public class Util {
                     windowClazz = windowClazz.getSuperclass();
                 }
                 if (windowClazz != null) {
-                    Method m = windowClazz.getDeclaredMethod("resetGC");
-                    m.setAccessible(true);
-                    m.invoke(w);
+                    try {
+                        Method m = windowClazz.getDeclaredMethod("resetGC");
+                        m.setAccessible(true);
+                        m.invoke(w);
+                    } catch (Exception e) {
+                        //do nothing (java7 don't have this method)
+                    }
                 }
                 RepaintManager.currentManager(w).setDoubleBufferMaximumSize(new Dimension(width, height));
             } catch (Exception e) {

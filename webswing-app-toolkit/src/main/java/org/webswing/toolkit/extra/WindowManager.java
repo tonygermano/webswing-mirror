@@ -117,7 +117,10 @@ public class WindowManager {
     @SuppressWarnings("restriction")
     public void activateWindow(Window w, int x, int y) {
         if (activeWindow != null && activeWindow instanceof java.awt.Dialog && ((java.awt.Dialog) activeWindow).isModal() && activeWindow.isShowing()) {
-            if (!(w instanceof sun.awt.ModalExclude) && (!(w instanceof java.awt.Dialog) || !((java.awt.Dialog) w).isModal() )) {
+            if (!(w instanceof sun.awt.ModalExclude) && (w.getParent()==null || !w.getParent().equals(activeWindow))) {
+                if(!zorder.contains(w)){
+                    zorder.add(w);
+                }
                 w = activeWindow;
             }
         }
