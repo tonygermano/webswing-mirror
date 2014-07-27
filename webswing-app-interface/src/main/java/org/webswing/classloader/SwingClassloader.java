@@ -143,7 +143,7 @@ public class SwingClassloader extends ClassLoader {
 
     public SwingClassloader(ClassLoader parent) {
         super(parent);
-        this.ignored_packages = new String[] { "java.", "javax.", "sun.", "org.xml.sax", "org.omg.CORBA", "org.webswing.special" };
+        this.ignored_packages = new String[] { "java.", "javax.", "sun.", "org.xml.sax", "org.omg.CORBA", "org.w3c.dom", "org.webswing.special" };
         this.repository = new ClassLoaderRepository(parent);
     }
 
