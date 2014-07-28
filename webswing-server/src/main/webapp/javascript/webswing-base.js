@@ -1,18 +1,27 @@
 function WebswingBase(c) {
 	"use strict";
 	var config = {
-		send: c.send || function() {},
-		onErrorMessage: c.onErrorMessage || function() {},
-		onContinueOldSession: c.onContinueOldSession || function() {},
-		onApplicationSelection: c.onApplicationSelection || function() {},
-		onBeforePaint: c.onBeforePaint || function() {},
-		onLinkOpenAction: c.onLinkOpenAction || function() {},
-		onPrintAction: c.onPrintAction || function() {},
-		onFileDownloadAction: c.onFileDownloadAction || function() {},
-		onFileDialogAction: c.onFileDialogAction || function() {},
-		clientId: c.clientId || '',
-		hasControl: c.hasControl || false,
-		mirrorMode: c.mirrorMode || false
+		send : c.send || function() {
+		},
+		onErrorMessage : c.onErrorMessage || function() {
+		},
+		onContinueOldSession : c.onContinueOldSession || function() {
+		},
+		onApplicationSelection : c.onApplicationSelection || function() {
+		},
+		onBeforePaint : c.onBeforePaint || function() {
+		},
+		onLinkOpenAction : c.onLinkOpenAction || function() {
+		},
+		onPrintAction : c.onPrintAction || function() {
+		},
+		onFileDownloadAction : c.onFileDownloadAction || function() {
+		},
+		onFileDialogAction : c.onFileDialogAction || function() {
+		},
+		clientId : c.clientId || '',
+		hasControl : c.hasControl || false,
+		mirrorMode : c.mirrorMode || false
 	}
 
 	var clientId = config.clientId;
@@ -79,7 +88,7 @@ function WebswingBase(c) {
 	function unload() {
 		send('unload' + clientId);
 	}
-	
+
 	function requestDownloadFile() {
 		send('downloadFile' + clientId);
 	}
@@ -87,7 +96,7 @@ function WebswingBase(c) {
 	function requestDeleteFile() {
 		send('deleteFile' + clientId);
 	}
-	
+
 	function handshake() {
 		send(getHandShake());
 	}
@@ -129,7 +138,6 @@ function WebswingBase(c) {
 		}
 	}
 
-
 	function processRequest(data) {
 		config.onBeforePaint();
 		var context;
@@ -152,17 +160,17 @@ function WebswingBase(c) {
 		if (data.copyEvent != null && config.hasControl) {
 			window.prompt("Copy to clipboard: Ctrl+C, Enter", data.copyEvent.content);
 		}
-		if (data.fileDialogEvent != null && config.hasControl){
+		if (data.fileDialogEvent != null && config.hasControl) {
 			config.onFileDialogAction(data.fileDialogEvent);
 		}
-		//firs is always the background
-		for (var i in data.windows) {
+		// firs is always the background
+		for ( var i in data.windows) {
 			var win = data.windows[i];
 			if (win.id == 'BG') {
 				if (mirrorMode) {
 					adjustCanvasSize(win.width, win.height);
 				}
-				for (var x in win.content) {
+				for ( var x in win.content) {
 					var winContent = win.content[x];
 					if (winContent != null) {
 						clear(win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height, context);
@@ -172,10 +180,10 @@ function WebswingBase(c) {
 				break;
 			}
 		}
-		//regular windows (background removed)
-		for (var i in data.windows) {
+		// regular windows (background removed)
+		for ( var i in data.windows) {
 			var win = data.windows[i];
-			for (var x in win.content) {
+			for ( var x in win.content) {
 				var winContent = win.content[x];
 				if (winContent != null) {
 					draw(win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.base64Content, context);
@@ -271,8 +279,9 @@ function WebswingBase(c) {
 			// 186-192
 			// 219-222
 			// 226
+			// FF (163, 171, 173, ) -> en layout ]\/ keys
 			var kc = event.keyCode;
-			if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226))) {
+			if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226) || (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173))) {
 				event.preventDefault();
 				event.stopPropagation();
 			}
@@ -281,8 +290,8 @@ function WebswingBase(c) {
 			if (keyevt.ctrl && keyevt.character == 86) { // ctrl+v
 				var text = prompt('Press ctrl+v and enter..');
 				var pasteEvent = {
-					content: text,
-					clientId: clientId
+					content : text,
+					clientId : clientId
 				};
 				sendInput(pasteEvent);
 			} else {
@@ -320,8 +329,8 @@ function WebswingBase(c) {
 	}
 
 	function getMousePos(canvas, evt, type) {
-		var rect = canvas.getBoundingClientRect(),
-			root = document.documentElement;
+		var rect = canvas.getBoundingClientRect();
+		var root = document.documentElement;
 		// return relative mouse position
 		var mouseX = evt.clientX - rect.left - root.scrollTop;
 		var mouseY = evt.clientY - rect.top - root.scrollLeft;
@@ -330,41 +339,49 @@ function WebswingBase(c) {
 			delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 		}
 		return {
-			clientId: clientId,
-			x: mouseX,
-			y: mouseY,
-			type: type,
-			wheelDelta: delta,
-			button: evt.which,
-			ctrl: evt.ctrlKey,
-			alt: evt.altKey,
-			shift: evt.shiftKey,
-			meta: evt.metaKey
+			clientId : clientId,
+			x : mouseX,
+			y : mouseY,
+			type : type,
+			wheelDelta : delta,
+			button : evt.which,
+			ctrl : evt.ctrlKey,
+			alt : evt.altKey,
+			shift : evt.shiftKey,
+			meta : evt.metaKey
 		};
 	}
 
 	function getKBKey(type, canvas, evt) {
+		var char = evt.which;
+		if (char == 0 && evt.key != null) {
+			char = evt.key.charCodeAt(0);
+		}
+		var kk = evt.keyCode;
+		if (kk == 0) {
+			kk = char;
+		}
 		return {
-			clientId: clientId,
-			type: type,
-			character: evt.which,
-			keycode: evt.keyCode,
-			alt: evt.altKey,
-			ctrl: evt.ctrlKey,
-			shift: evt.shiftKey,
-			meta: evt.metaKey,
-			altgr: evt.altGraphKey
+			clientId : clientId,
+			type : type,
+			character : char,
+			keycode : kk,
+			alt : evt.altKey,
+			ctrl : evt.ctrlKey,
+			shift : evt.shiftKey,
+			meta : evt.metaKey,
+			altgr : evt.altGraphKey
 		};
 	}
 
 	function getHandShake() {
 		var handshake = {
-			applicationName: appName,
-			clientId: clientId,
-			sessionId: uuid,
-			desktopWidth: canvas.width,
-			desktopHeight: canvas.height,
-			mirrored: mirrorMode
+			applicationName : appName,
+			clientId : clientId,
+			sessionId : uuid,
+			desktopWidth : canvas.width,
+			desktopHeight : canvas.height,
+			mirrored : mirrorMode
 		};
 		return handshake;
 	}
@@ -374,58 +391,58 @@ function WebswingBase(c) {
 	}
 
 	return {
-		repaint: function() {
+		repaint : function() {
 			repaint();
 		},
-		ack: function() {
+		ack : function() {
 			ack();
 		},
-		kill: function() {
+		kill : function() {
 			kill();
 		},
-		handshake: function() {
+		handshake : function() {
 			handshake();
 		},
-		requestDownloadFile: function() {
+		requestDownloadFile : function() {
 			requestDownloadFile();
 		},
-		requestDeleteFile: function() {
+		requestDeleteFile : function() {
 			requestDeleteFile();
 		},
-		setUuid: function(param) {
+		setUuid : function(param) {
 			uuid = param;
 		},
-		getUser: function() {
+		getUser : function() {
 			return user;
 		},
-		resizedWindow: function() {
+		resizedWindow : function() {
 			resizedWindow();
 		},
-		setCanvas: function(c) {
+		setCanvas : function(c) {
 			setCanvas(c);
 		},
-		setApplication: function(app) {
+		setApplication : function(app) {
 			appName = app;
 		},
-		getClientId: function() {
+		getClientId : function() {
 			return clientId;
 		},
-		setClientId: function(id) {
+		setClientId : function(id) {
 			clientId = id;
 		},
-		canPaint: function(bool) {
+		canPaint : function(bool) {
 			canPaint = bool;
 		},
-		canControl: function(bool) {
+		canControl : function(bool) {
 			config.hasControl = bool;
 		},
-		processTxtMessage: function(message) {
+		processTxtMessage : function(message) {
 			processTxtMessage(message);
 		},
-		processJsonMessage: function(data) {
+		processJsonMessage : function(data) {
 			processJsonMessage(data);
 		},
-		dispose: function() {
+		dispose : function() {
 			dispose();
 		}
 	};
