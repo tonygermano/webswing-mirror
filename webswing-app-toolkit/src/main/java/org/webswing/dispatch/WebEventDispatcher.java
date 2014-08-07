@@ -187,6 +187,7 @@ public class WebEventDispatcher {
                     id = MouseEvent.MOUSE_RELEASED;
                     boolean popupTrigger = (buttons == 3) ? true : false;
                     clickcount = computeClickCount(x, y, buttons, false);
+                    modifiers= modifiers & (((1 << 6)-1)| (~((1 << 14)-1)));
                     e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
                     dispatchEventInSwing(w, e);
                     if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMouseEvent.getX() == x && lastMouseEvent.getY() == y) {
