@@ -48,7 +48,7 @@
 		<label  class="col-sm-3 control-label" ui-jq="tooltip" title="Swing application's classpath. Absolute or relative path to jar file or classes directory. At least one classPath entry should be specified containing the main class.">Classpath entries</label>
 		<div ng-class="{'col-sm-offset-3': !$first,'col-sm-9':true, 'edit-app-list-entry':true} " ng-repeat="cp in currentApp().classPathEntries track by $index">
 			<div class="input-group">
-				<input type="text" class="form-control" ng-model="cp" >
+				<input type="text" class="form-control" ng-model="currentApp().classPathEntries[$index]" >
 				<div class="input-group-btn">
 					<button class="btn btn-default" ng-if="$last" type="button" ng-click="createCp()">
 						<span class="glyphicon glyphicon-plus"></span>
