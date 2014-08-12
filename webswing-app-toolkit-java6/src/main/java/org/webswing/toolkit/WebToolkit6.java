@@ -5,6 +5,10 @@ import java.awt.GraphicsEnvironment;
 
 import org.webswing.toolkit.ge.WebGraphicsEnvironment;
 
+import sun.awt.image.SurfaceManager;
+import sun.java2d.SurfaceData;
+
+@SuppressWarnings("restriction")
 public class WebToolkit6 extends WebToolkit {
 
     @Override
@@ -15,6 +19,16 @@ public class WebToolkit6 extends WebToolkit {
                 ((WebGraphicsEnvironment) GraphicsEnvironment.getLocalGraphicsEnvironment()).displayChanged();
             }
         });
+    }
+
+    @Override
+    public boolean webConpoenentPeerUpdateGraphicsData() {
+        return false;
+    }
+
+    @Override
+    public SurfaceData webComponentPeerReplaceSurfaceData(SurfaceManager mgr) {
+        return mgr.getDestSurfaceData();
     }
 
 }

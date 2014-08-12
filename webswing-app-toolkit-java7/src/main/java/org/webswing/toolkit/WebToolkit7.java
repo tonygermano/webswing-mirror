@@ -7,6 +7,10 @@ import java.awt.peer.KeyboardFocusManagerPeer;
 
 import org.webswing.toolkit.ge.WebGraphicsEnvironment;
 
+import sun.awt.image.SurfaceManager;
+import sun.java2d.SurfaceData;
+
+@SuppressWarnings("restriction")
 public class WebToolkit7 extends WebToolkit {
 
     private KeyboardFocusManagerPeer kfmp;
@@ -32,6 +36,17 @@ public class WebToolkit7 extends WebToolkit {
     @Override
     protected boolean syncNativeQueue(long paramLong) {
         return false;
+    }
+
+    @Override
+    public boolean webConpoenentPeerUpdateGraphicsData() {
+        ((WebGraphicsEnvironment) GraphicsEnvironment.getLocalGraphicsEnvironment()).displayChanged();
+        return true;
+    }
+
+    @Override
+    public SurfaceData webComponentPeerReplaceSurfaceData(SurfaceManager mgr) {
+        return mgr.getPrimarySurfaceData();
     }
 
 }

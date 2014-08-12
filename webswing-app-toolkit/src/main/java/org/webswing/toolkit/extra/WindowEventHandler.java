@@ -129,10 +129,7 @@ public class WindowEventHandler {
     }
 
     private void moveWindow(Window w, int x, int y) {
-        Rectangle originalPos = new Rectangle(w.getLocation().x, w.getLocation().y, w.getWidth(), w.getHeight());
         w.setLocation(x, y);
-        WindowManager.getInstance().requestRepaintAfterMove(w, originalPos);
-
     }
 
     private void resizeWindow(Window w, int width, int height) {

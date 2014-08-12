@@ -28,6 +28,7 @@ import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
 import java.util.UUID;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
@@ -36,6 +37,7 @@ import org.webswing.common.GraphicsWrapper;
 import org.webswing.common.WindowActionType;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.extra.DndEventHandler;
+import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.ge.WebGraphicsConfig;
 import org.webswing.util.Logger;
 import org.webswing.util.Util;
@@ -89,6 +91,8 @@ public class WebComponentPeer implements ComponentPeer {
     private RepaintArea paintArea;
     private int oldWidth;
     private int oldHeight;
+    private int oldX;
+    private int oldY;
     private SurfaceData surfaceData;
     private OffScreenImage image;
     private Image windowDecorationImage;
@@ -161,6 +165,13 @@ public class WebComponentPeer implements ComponentPeer {
     public void setBounds(int x, int y, int w, int h, int paramInt5) {
         synchronized (WebPaintDispatcher.webPaintLock) {
             Point validPosition = validate(x, y, w, h);
+            if ((x != this.oldX) || (y != this.oldY)) {
+                if (oldWidth != 0 && oldHeight != 0) {
+                    WindowManager.getInstance().requestRepaintAfterMove((Window) target, new Rectangle(oldX, oldY, oldWidth, oldHeight));
+                }
+                oldX=validPosition.x;
+                oldY=validPosition.y;
+            }
             if ((w != this.oldWidth) || (h != this.oldHeight)) {
                 Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
                 try {
@@ -186,9 +197,9 @@ public class WebComponentPeer implements ComponentPeer {
                 WebGraphicsConfig localWebGraphicsConfig = (WebGraphicsConfig) getGraphicsConfiguration();
                 this.image = (OffScreenImage) localWebGraphicsConfig.createAcceleratedImage((Component) this.target, w, h);
                 localSurfaceData = this.surfaceData;
-                this.surfaceData = SurfaceManager.getManager(this.image).getDestSurfaceData();
+                this.surfaceData = Util.getWebToolkit().webComponentPeerReplaceSurfaceData(SurfaceManager.getManager(this.image));// java6 vs java7 difference
                 if (target != null && !(target instanceof JWindow)) {
-                    if (target instanceof JFrame && ((JFrame) target).isUndecorated()) {
+                    if ((target instanceof JFrame && ((JFrame) target).isUndecorated()) || (target instanceof JDialog && ((JDialog) target).isUndecorated())) {
                         //window decoration is not painted
                     } else {
                         updateWindowDecorationImage();
@@ -428,6 +439,14 @@ public class WebComponentPeer implements ComponentPeer {
 
     public Object getTarget() {
         return target;
+    }
+
+    public void setZOrder(ComponentPeer above) {
+        //do nothing
+    }
+
+    public boolean updateGraphicsData(GraphicsConfiguration gc) {
+        return Util.getWebToolkit().webConpoenentPeerUpdateGraphicsData();
     }
 
 }

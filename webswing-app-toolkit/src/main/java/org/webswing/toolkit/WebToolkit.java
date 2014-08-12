@@ -86,6 +86,8 @@ import org.webswing.util.Util;
 
 import sun.awt.SunToolkit;
 import sun.print.PrintJob2D;
+import sun.awt.image.SurfaceManager;
+import sun.java2d.SurfaceData;
 
 @SuppressWarnings("restriction")
 public abstract class WebToolkit extends SunToolkit {
@@ -516,4 +518,8 @@ public abstract class WebToolkit extends SunToolkit {
             systemColors[25]=0xff000000;
         }
     }
+    
+    abstract public boolean webConpoenentPeerUpdateGraphicsData();
+    
+    abstract public SurfaceData webComponentPeerReplaceSurfaceData(SurfaceManager mgr);
 }
