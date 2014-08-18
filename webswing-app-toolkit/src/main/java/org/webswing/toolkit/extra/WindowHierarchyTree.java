@@ -257,7 +257,7 @@ public class WindowHierarchyTree {
         Rectangle newPosition = w.getBounds();
         if (originalPosition.x != newPosition.x || originalPosition.y != newPosition.y) {
             //just to notify that a window was moved, the moving handled by client
-            if (zOrder.indexOf(lookup.get(w)) == 0) {
+            if (zOrder.indexOf(lookup.get(w)) == 0 && w.getWidth()==originalPosition.width && w.getHeight()==originalPosition.height) {
                 Util.getWebToolkit().getPaintDispatcher().notifyWindowMoved(w, originalPosition, newPosition);
             } else {
                 Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(w);

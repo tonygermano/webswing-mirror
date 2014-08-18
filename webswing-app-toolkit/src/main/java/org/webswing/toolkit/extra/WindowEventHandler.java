@@ -139,9 +139,6 @@ public class WindowEventHandler {
         if (!originalSize.equals(newSize)) {
             w.setSize(newSize);
             WindowManager.getInstance().requestRepaintAfterMove(w, new Rectangle(w.getX(), w.getY(), originalSize.width, originalSize.height));
-            w.invalidate();
-            w.validate();
-            w.repaint();
         }
     }
 

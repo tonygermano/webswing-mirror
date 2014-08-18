@@ -171,23 +171,25 @@ public class WebComponentPeer implements ComponentPeer {
     public void setBounds(int x, int y, int w, int h, int paramInt5) {
         synchronized (WebPaintDispatcher.webPaintLock) {
             Point validPosition = validate(x, y, w, h);
-            if ((x != this.oldX) || (y != this.oldY)) {
-                if (oldWidth != 0 && oldHeight != 0) {
-                    WindowManager.getInstance().requestRepaintAfterMove((Window) target, new Rectangle(oldX, oldY, oldWidth, oldHeight));
-                }
-                oldX = validPosition.x;
-                oldY = validPosition.y;
-            }
             if ((w != this.oldWidth) || (h != this.oldHeight)) {
-                Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
                 try {
                     replaceSurfaceData(validPosition.x, validPosition.y, w, h);
                 } catch (InvalidPipeException e) {
                     Logger.error("WebComponentPeer:setBounds", e);
                 }
+            }
+
+            if ((validPosition.x != this.oldX) || (validPosition.y != this.oldY) || (w != this.oldWidth) || (h != this.oldHeight)) {
+                if (oldWidth != 0 && oldHeight != 0) {
+                    WindowManager.getInstance().requestRepaintAfterMove((Window) target, new Rectangle(oldX, oldY, oldWidth, oldHeight));
+                }
+                Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
+                this.oldX = validPosition.x;
+                this.oldY = validPosition.y;
                 this.oldWidth = w;
                 this.oldHeight = h;
             }
+
         }
     }
 
@@ -205,10 +207,10 @@ public class WebComponentPeer implements ComponentPeer {
                 localSurfaceData = this.surfaceData;
                 this.surfaceData = Util.getWebToolkit().webComponentPeerReplaceSurfaceData(SurfaceManager.getManager(this.image));// java6 vs java7 difference
                 updateWindowDecorationImage();
-                repaintPeerTarget();
                 if (localSurfaceData != null) {
                     localSurfaceData.invalidate();
                 }
+                repaintPeerTarget();
             }
         }
         if (localSurfaceData != null) {
@@ -229,6 +231,8 @@ public class WebComponentPeer implements ComponentPeer {
         Component localComponent = (Component) this.target;
         Rectangle localRectangle = AWTAccessor.getComponentAccessor().getBounds(localComponent);
         if (!(((Component) this.target).getIgnoreRepaint())) {
+            ((Component) this.target).invalidate();
+            ((Component) this.target).validate();
             PaintEvent localPaintEvent = PaintEventDispatcher.getPaintEventDispatcher().createPaintEvent((Component) this.target, 0, 0, localRectangle.width, localRectangle.height);
             if (localPaintEvent != null)
                 postEvent(localPaintEvent);

@@ -107,7 +107,7 @@ public class WindowManager {
             return;
         }
         Component newFocusOwner = SwingUtilities.getDeepestComponentAt(w, x, y);
-        if (w.getFocusOwner() != newFocusOwner && newFocusOwner != null && newFocusOwner.isFocusable() && w.isFocusableWindow()) {
+        if (newFocusOwner != null && newFocusOwner.isFocusable() && w.isFocusableWindow()) {
             FocusEvent gainedFocusEvent = new FocusEvent(newFocusOwner, FocusEvent.FOCUS_GAINED, false);
             WebEventDispatcher.dispatchEventInSwing(w, gainedFocusEvent);
         }

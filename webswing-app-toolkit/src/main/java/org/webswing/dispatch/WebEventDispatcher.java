@@ -39,6 +39,7 @@ import org.webswing.util.Util;
 public class WebEventDispatcher {
 
     private MouseEvent lastMouseEvent;
+    private MouseEvent lastMousePressEvent;
     private Point lastMousePosition = new Point();
     private static final DndEventHandler dndHandler = new DndEventHandler();
 
@@ -156,7 +157,7 @@ public class WebEventDispatcher {
             w = WindowManager.getInstance().getLockedToWindow();
         } else {
             w = WindowManager.getInstance().getVisibleWindowOnPosition(event.x, event.y);
-            if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED && ((event.type == Type.mousemove && event.button == 1) || (event.type == Type.mouseup))) {
+            if (lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED||lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.type == Type.mousemove && event.button == 1) || (event.type == Type.mouseup))) {
                 w = (Window) lastMouseEvent.getSource();
             }
         }
@@ -191,15 +192,17 @@ public class WebEventDispatcher {
                     id = MouseEvent.MOUSE_RELEASED;
                     boolean popupTrigger = (buttons == 3) ? true : false;
                     clickcount = computeClickCount(x, y, buttons, false);
-                    modifiers = modifiers & (((1 << 6) - 1) | (~((1 << 14) - 1)));
+                    modifiers = modifiers & (((1 << 6) - 1) | (~((1 << 14) - 1)) | MouseEvent.CTRL_DOWN_MASK | MouseEvent.ALT_DOWN_MASK | MouseEvent.SHIFT_DOWN_MASK| MouseEvent.META_DOWN_MASK);
                     e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
                     dispatchEventInSwing(w, e);
-                    if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMouseEvent.getX() == x && lastMouseEvent.getY() == y) {
+                    if (lastMousePressEvent != null &&  lastMousePressEvent.getX() == x && lastMousePressEvent.getY() == y) {
                         e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
                         dispatchEventInSwing(w, e);
                         lastMouseEvent = e;
+                        lastMousePressEvent=e;
                     } else {
                         lastMouseEvent = e;
+                        lastMousePressEvent=e;
                     }
                     break;
                 case mousedown:
@@ -207,6 +210,7 @@ public class WebEventDispatcher {
                     clickcount = computeClickCount(x, y, buttons, true);
                     e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, false, buttons);
                     dispatchEventInSwing(w, e);
+                    lastMousePressEvent=e;
                     lastMouseEvent = e;
                     break;
                 case mousewheel:
@@ -228,12 +232,12 @@ public class WebEventDispatcher {
 
     private int computeClickCount(int x, int y, int buttons, boolean isPressed) {
         if (isPressed) {
-            if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_CLICKED && lastMouseEvent.getButton() == buttons && lastMouseEvent.getX() == x && lastMouseEvent.getY() == y) {
-                return lastMouseEvent.getClickCount() + 1;
+            if (lastMousePressEvent != null && lastMousePressEvent.getID() == MouseEvent.MOUSE_CLICKED && lastMousePressEvent.getButton() == buttons && lastMousePressEvent.getX() == x && lastMousePressEvent.getY() == y) {
+                return lastMousePressEvent.getClickCount() + 1;
             }
         } else {
-            if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMouseEvent.getButton() == buttons) {
-                return lastMouseEvent.getClickCount();
+            if (lastMousePressEvent != null && lastMousePressEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMousePressEvent.getButton() == buttons) {
+                return lastMousePressEvent.getClickCount();
             }
         }
         return 1;
