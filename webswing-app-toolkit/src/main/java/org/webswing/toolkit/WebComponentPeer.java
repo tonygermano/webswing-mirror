@@ -78,7 +78,13 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public void updateWindowDecorationImage() {
-        windowDecorationImage = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getWindowDecoration(target, image.getWidth(), image.getHeight());
+        if (target != null && !(target instanceof JWindow)) {
+            if ((target instanceof JFrame && ((JFrame) target).isUndecorated()) || (target instanceof JDialog && ((JDialog) target).isUndecorated())) {
+                //window decoration is not painted
+            } else {
+                windowDecorationImage = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getWindowDecoration(target, image.getWidth(), image.getHeight());
+            }
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,8 +175,8 @@ public class WebComponentPeer implements ComponentPeer {
                 if (oldWidth != 0 && oldHeight != 0) {
                     WindowManager.getInstance().requestRepaintAfterMove((Window) target, new Rectangle(oldX, oldY, oldWidth, oldHeight));
                 }
-                oldX=validPosition.x;
-                oldY=validPosition.y;
+                oldX = validPosition.x;
+                oldY = validPosition.y;
             }
             if ((w != this.oldWidth) || (h != this.oldHeight)) {
                 Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
@@ -198,13 +204,7 @@ public class WebComponentPeer implements ComponentPeer {
                 this.image = (OffScreenImage) localWebGraphicsConfig.createAcceleratedImage((Component) this.target, w, h);
                 localSurfaceData = this.surfaceData;
                 this.surfaceData = Util.getWebToolkit().webComponentPeerReplaceSurfaceData(SurfaceManager.getManager(this.image));// java6 vs java7 difference
-                if (target != null && !(target instanceof JWindow)) {
-                    if ((target instanceof JFrame && ((JFrame) target).isUndecorated()) || (target instanceof JDialog && ((JDialog) target).isUndecorated())) {
-                        //window decoration is not painted
-                    } else {
-                        updateWindowDecorationImage();
-                    }
-                }
+                updateWindowDecorationImage();
                 repaintPeerTarget();
                 if (localSurfaceData != null) {
                     localSurfaceData.invalidate();

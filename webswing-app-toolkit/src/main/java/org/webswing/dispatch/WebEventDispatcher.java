@@ -72,12 +72,12 @@ public class WebEventDispatcher {
             if (dialog != null) {
                 switch (upload.type) {
                     case Upload:
-                        File currentDir=dialog.getCurrentDirectory();
-                        File tempFile= new File(upload.tempFileLocation);
-                        String validfilename=Util.resolveFilename(currentDir, upload.fileName);
-                        if(currentDir.canWrite() && tempFile.exists()){
+                        File currentDir = dialog.getCurrentDirectory();
+                        File tempFile = new File(upload.tempFileLocation);
+                        String validfilename = Util.resolveFilename(currentDir, upload.fileName);
+                        if (currentDir.canWrite() && tempFile.exists()) {
                             try {
-                                Util.getWebToolkit().getImageService().moveFile(tempFile, new File(currentDir,validfilename));
+                                Util.getWebToolkit().getImageService().moveFile(tempFile, new File(currentDir, validfilename));
                                 dialog.rescanCurrentDirectory();
                             } catch (IOException e) {
                                 System.err.println("Error while moving uploaded file to target folder.");
@@ -133,11 +133,11 @@ public class WebEventDispatcher {
                 AWTEvent e = new KeyEvent(src, type, when, modifiers, event.keycode, (char) event.character, KeyEvent.KEY_LOCATION_STANDARD);
 
                 //filter out ctrl+c for copy
-                if (event.type == JsonEventKeyboard.Type.keydown && event.character == 67 && event.ctrl == true && event.altgr == false && event.altgr == false && event.meta == false && event.shift == false) {
+                if (event.type == JsonEventKeyboard.Type.keydown && event.character == 67 && event.ctrl == true && event.alt == false && event.altgr == false && event.meta == false && event.shift == false) {
                     Transferable copied = Util.getWebToolkit().getSystemSelection().getContents(DataFlavor.stringFlavor);
                     Util.getWebToolkit().getSystemClipboard().setContents(copied, owner);
                 }
-                if (event.type == JsonEventKeyboard.Type.keydown && event.character == 86 && event.ctrl == true && event.altgr == false && event.altgr == false && event.meta == false && event.shift == false) {
+                if (event.type == JsonEventKeyboard.Type.keydown && event.character == 86 && event.ctrl == true && event.alt == false && event.altgr == false && event.meta == false && event.shift == false) {
                     //on paste event -do nothing
                 } else {
                     dispatchEventInSwing(w, e);
@@ -155,7 +155,10 @@ public class WebEventDispatcher {
         if (WindowManager.getInstance().isLockedToWindowDecorationHandler()) {
             w = WindowManager.getInstance().getLockedToWindow();
         } else {
-            w = (Window) WindowManager.getInstance().getVisibleWindowOnPosition(event.x, event.y);
+            w = WindowManager.getInstance().getVisibleWindowOnPosition(event.x, event.y);
+            if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED && ((event.type == Type.mousemove && event.button == 1) || (event.type == Type.mouseup))) {
+                w = (Window) lastMouseEvent.getSource();
+            }
         }
         if (w == null) {
             if (Util.getWebToolkit().getPaintDispatcher() != null) {
@@ -181,13 +184,14 @@ public class WebEventDispatcher {
                 case mousemove:
                     id = event.button == 1 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
                     e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, false, buttons);
+                    lastMouseEvent = e;
                     dispatchEventInSwing(w, e);
                     break;
                 case mouseup:
                     id = MouseEvent.MOUSE_RELEASED;
                     boolean popupTrigger = (buttons == 3) ? true : false;
                     clickcount = computeClickCount(x, y, buttons, false);
-                    modifiers= modifiers & (((1 << 6)-1)| (~((1 << 14)-1)));
+                    modifiers = modifiers & (((1 << 6) - 1) | (~((1 << 14) - 1)));
                     e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
                     dispatchEventInSwing(w, e);
                     if (lastMouseEvent != null && lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMouseEvent.getX() == x && lastMouseEvent.getY() == y) {

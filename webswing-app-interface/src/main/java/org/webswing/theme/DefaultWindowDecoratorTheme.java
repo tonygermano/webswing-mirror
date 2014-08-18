@@ -2,6 +2,7 @@ package org.webswing.theme;
 
 import java.awt.Color;
 import java.awt.Dialog;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -18,6 +19,7 @@ import javax.swing.SwingUtilities;
 
 import org.webswing.common.WindowActionType;
 import org.webswing.common.WindowDecoratorThemeIfc;
+import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Logger;
 
 public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
@@ -49,6 +51,8 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
     }
 
     public Image getWindowDecoration(Object window, int w, int h) {
+        boolean activeWindow=WindowManager.getInstance().getActiveWindow()==window;
+        
         BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
         Graphics g = image.getGraphics();
         g.setColor(new Color(0, 0, 0, 0));
@@ -60,6 +64,9 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
         g.fillRect(0, h - insets.bottom, w, insets.bottom);
         g.setColor(basicBorder);
         g.drawRect(0, 0, w - 1, h - 1);
+        if(activeWindow){
+            g.drawRect(1, 1, w - 3, h - 3);
+        }
         g.setColor(basicText);
         int offsetx = insets.left + headerMargin;
         int offsety = (insets.top / 4) * 3;
@@ -69,6 +76,9 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
             offsetx += 21;
         }
         if (getTitle(window) != null) {
+            if(activeWindow){
+                g.setFont(g.getFont().deriveFont(g.getFont().getStyle()|Font.BOLD));
+            }
             g.drawString(getTitle(window), offsetx, offsety);
         }
 
