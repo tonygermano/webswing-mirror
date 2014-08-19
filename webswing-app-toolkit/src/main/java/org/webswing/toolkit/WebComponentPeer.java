@@ -177,13 +177,13 @@ public class WebComponentPeer implements ComponentPeer {
                 } catch (InvalidPipeException e) {
                     Logger.error("WebComponentPeer:setBounds", e);
                 }
+                Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
             }
 
             if ((validPosition.x != this.oldX) || (validPosition.y != this.oldY) || (w != this.oldWidth) || (h != this.oldHeight)) {
                 if (oldWidth != 0 && oldHeight != 0) {
                     WindowManager.getInstance().requestRepaintAfterMove((Window) target, new Rectangle(oldX, oldY, oldWidth, oldHeight));
                 }
-                Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
                 this.oldX = validPosition.x;
                 this.oldY = validPosition.y;
                 this.oldWidth = w;
