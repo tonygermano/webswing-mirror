@@ -295,6 +295,10 @@ function WebswingBase(c) {
 				};
 				sendInput(pasteEvent);
 			} else {
+				// default action prevented
+                if (keyevt.ctrl || keyevt.alt || keyevt.altgr) {
+                    event.preventDefault();
+                }
 				sendInput(keyevt);
 			}
 			return false;

@@ -104,19 +104,19 @@ public class Util {
     public static int getKeyModifiersAWTFlag(JsonEventKeyboard event) {
         int modifiers = 0;
         if (event.alt) {
-            modifiers = modifiers & KeyEvent.ALT_MASK;
+            modifiers = modifiers | KeyEvent.ALT_MASK;
         }
         if (event.ctrl) {
-            modifiers = modifiers & KeyEvent.CTRL_MASK;
+            modifiers = modifiers | KeyEvent.CTRL_MASK;
         }
         if (event.shift) {
-            modifiers = modifiers & KeyEvent.SHIFT_MASK;
+            modifiers = modifiers | KeyEvent.SHIFT_MASK;
         }
         if (event.altgr) {
-            modifiers = modifiers & KeyEvent.ALT_GRAPH_MASK;
+            modifiers = modifiers | KeyEvent.ALT_GRAPH_MASK;
         }
         if (event.meta) {
-            modifiers = modifiers & KeyEvent.META_MASK;
+            modifiers = modifiers | KeyEvent.META_MASK;
         }
         return modifiers;
     }
