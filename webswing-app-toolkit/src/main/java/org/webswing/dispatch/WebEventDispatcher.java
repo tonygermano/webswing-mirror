@@ -121,7 +121,7 @@ public class WebEventDispatcher {
             int type = Util.getKeyType(event.type);
             Component src = w.getFocusOwner() == null ? w : w.getFocusOwner();
             if (type == KeyEvent.KEY_TYPED) {
-                AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, modifiers, 0, (char) event.character);
+                AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, 0, 0, (char) event.character);
                 dispatchEventInSwing(w, e);
             } else {
                 if (event.keycode == 13) {//enter keycode

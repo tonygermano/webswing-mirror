@@ -23,7 +23,7 @@ public class PerformanceStatsMonitor {
                 for(SwingInstance si:SwingInstanceManager.getInstance().getSwingInstanceSet()){
                     JsonSwingJvmStats stats = si.collectStats();
                     stats.setSnapshotTime(new Date());
-                    System.out.println(stats);
+                    //System.out.println(stats);
                 }
                 SwingInstanceManager.getInstance().notifySwingChangeChange();
             }
