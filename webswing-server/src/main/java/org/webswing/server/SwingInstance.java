@@ -10,6 +10,7 @@ import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.SwingJvmConnection.WebSessionListener;
 import org.webswing.server.util.ServerUtil;
+import org.webswing.server.util.StatUtils;
 
 public class SwingInstance implements WebSessionListener {
 
@@ -18,6 +19,7 @@ public class SwingInstance implements WebSessionListener {
     private AtmosphereResource mirroredResource;
     private SwingApplicationDescriptor application;
     private SwingJvmConnection connection;
+    private JsonSwingJvmStats latest = new JsonSwingJvmStats();
     private Date disconnectedSince;
     private final Date startedAt = new Date();
     private Date endedAt = new Date();
@@ -57,11 +59,13 @@ public class SwingInstance implements WebSessionListener {
     }
 
     public void sendToWeb(Serializable o) {
+        String serialized = ServerUtil.encode(o);
         if (resource != null) {
-            resource.getBroadcaster().broadcast(o, resource);
+            StatUtils.logOutboundData(this, serialized);
+            resource.getBroadcaster().broadcast(serialized, resource);
         }
         if (mirroredResource != null) {
-            mirroredResource.getBroadcaster().broadcast(o, mirroredResource);
+            mirroredResource.getBroadcaster().broadcast(serialized, mirroredResource);
         }
     }
 
@@ -70,16 +74,16 @@ public class SwingInstance implements WebSessionListener {
             if (h instanceof String) {
                 if (((String) h).startsWith(Constants.PAINT_ACK_PREFIX) && ((resource != null && r.uuid().equals(resource.uuid())) || (resource == null && mirroredResource != null && r.uuid().equals(mirroredResource.uuid())))) {
                     connection.send(h);
-                }else if( ((String) h).startsWith(Constants.UNLOAD_PREFIX)){
+                } else if (((String) h).startsWith(Constants.UNLOAD_PREFIX)) {
                     SwingInstanceManager.getInstance().notifySessionDisconnected(r.uuid());
-                }else{
+                } else {
                     connection.send(h);
                 }
             } else {
                 connection.send(h);
             }
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -131,8 +135,12 @@ public class SwingInstance implements WebSessionListener {
         return endedAt;
     }
 
+    public JsonSwingJvmStats collectStats() {
+        return latest = StatUtils.getSwingInstanceStats(this, connection.getJmxConnection());
+    }
+
     public JsonSwingJvmStats getStats() {
-        return connection.getCurrentStatus();
+        return latest;
     }
 
 }

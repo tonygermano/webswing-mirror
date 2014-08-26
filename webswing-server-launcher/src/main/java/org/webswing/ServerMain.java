@@ -1,11 +1,14 @@
 package org.webswing;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.net.URI;
 
+import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.webswing.util.Logger;
 
 public class ServerMain {
 
@@ -18,7 +21,7 @@ public class ServerMain {
             if(configFile.exists()){
                 System.setProperty(Constants.CONFIG_FILE_PATH, configFile.toURI().toString());
             }else{
-                System.err.print("Webswing configuration file "+config.getConfigFile()+" not found. Using default location.");
+                Logger.error("Webswing configuration file "+config.getConfigFile()+" not found. Using default location.");
             }
         }
         if(config.getUsersFile()!=null){
@@ -26,12 +29,19 @@ public class ServerMain {
             if(usersFile.exists()){
                 System.setProperty(Constants.USER_FILE_PATH, usersFile.toURI().toString());
             }else{
-                System.err.print("Webswing users property file "+config.getUsersFile()+" not found. Using default location.");
+                Logger.error("Webswing users property file "+config.getUsersFile()+" not found. Using default location.");
             }
         }
         
         InetSocketAddress address = new InetSocketAddress(config.getHost(), Integer.parseInt(config.getPort()));
         Server server = new Server(address);
+        //enable jmx
+        MBeanContainer mbcontainer= new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
+        server.getContainer().addEventListener(mbcontainer);
+        server.addBean(mbcontainer);
+        
+        //mbcontainer.addBean(Log.getLog());
+        
         WebAppContext webapp = new WebAppContext();
         webapp.setContextPath("/");
         webapp.setWar(System.getProperty(Constants.WAR_FILE_LOCATION));

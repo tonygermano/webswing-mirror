@@ -1,6 +1,7 @@
 package org.webswing.server;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.net.URI;
@@ -23,6 +24,10 @@ import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import javax.management.MBeanServerConnection;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.tools.ant.BuildException;
@@ -33,7 +38,6 @@ import org.apache.tools.ant.types.Environment.Variable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.model.admin.s2c.JsonSwingJvmStats;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.model.s2c.JsonLinkAction;
@@ -61,7 +65,7 @@ public class SwingJvmConnection implements MessageListener {
     private WebSessionListener webListener;
     private Future<?> app;
     private String clientId;
-    private JsonSwingJvmStats currentStatus;
+    private JMXConnector jmxConnection;
 
     private ExecutorService swingAppExecutor = Executors.newSingleThreadExecutor();
 
@@ -72,7 +76,7 @@ public class SwingJvmConnection implements MessageListener {
             initialize();
             app = start(appConfig, handshake.desktopWidth, handshake.desktopHeight);
         } catch (JMSException e) {
-            e.printStackTrace();
+            log.error("SwingJvmConnection:init", e);
         }
     }
 
@@ -104,12 +108,12 @@ public class SwingJvmConnection implements MessageListener {
                     session.close();
                     connection.close();
                 } catch (JMSException e) {
-                    e.printStackTrace();
+                    log.error("SwingJvmConnection:initialize1", e);
                 }
                 try {
                     SwingJvmConnection.this.initialize();
                 } catch (JMSException e) {
-                    e.printStackTrace();
+                    log.error("SwingJvmConnection:initialize2", e);
                 }
             }
         });
@@ -123,18 +127,13 @@ public class SwingJvmConnection implements MessageListener {
                 producer.send(session.createObjectMessage(o));
             }
         } catch (JMSException e) {
-            e.printStackTrace();
+            log.error("SwingJvmConnection:send", e);
         }
     }
 
     public void onMessage(Message m) {
         try {
             if (m instanceof ObjectMessage) {
-                if (((ObjectMessage) m).getObject() instanceof JsonSwingJvmStats) {
-                    currentStatus = (JsonSwingJvmStats) ((ObjectMessage) m).getObject();
-                    SwingInstanceManager.getInstance().notifySwingChangeChange();
-                    return;
-                }
                 if (((ObjectMessage) m).getObject() instanceof PrinterJobResult) {
                     PrinterJobResult pj = (PrinterJobResult) ((ObjectMessage) m).getObject();
                     FileServlet.registerFile(pj.getPdf(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser());
@@ -158,9 +157,13 @@ public class SwingJvmConnection implements MessageListener {
                 if (text.equals(Constants.SWING_SHUTDOWN_NOTIFICATION)) {
                     // close(true); - handled by ant thread
                 }
+                if (text.startsWith(Constants.SWING_PID_NOTIFICATION) && this.jmxConnection == null) {
+                    this.jmxConnection = getLocalMBeanServerConnectionStatic(text.substring(Constants.SWING_PID_NOTIFICATION.length()));
+                }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("SwingJvmConnection:onMessage", e);
+
         }
 
     }
@@ -171,8 +174,12 @@ public class SwingJvmConnection implements MessageListener {
             producer.close();
             session.close();
             connection.close();
-        } catch (JMSException e) {
-            e.printStackTrace();
+            if(jmxConnection!=null){
+                jmxConnection.close();
+                jmxConnection=null;
+            }
+        } catch (Exception e) {
+            log.error("SwingJvmConnection:close", e);
         }
         if (withShutdownEvent) {
             webListener.sendToWeb(Constants.SWING_SHUTDOWN_NOTIFICATION);
@@ -218,24 +225,24 @@ public class SwingJvmConnection implements MessageListener {
                         String webToolkitClass;
                         if (System.getProperty("java.version").startsWith("1.6")) {
                             webSwingToolkitJarPathSpecific = "\"" + URLDecoder.decode(WebToolkit6.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
-                            webToolkitClass=WebToolkit6.class.getCanonicalName();
+                            webToolkitClass = WebToolkit6.class.getCanonicalName();
                         } else if (System.getProperty("java.version").startsWith("1.7")) {
                             webSwingToolkitJarPathSpecific = "\"" + URLDecoder.decode(WebToolkit7.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
-                            webToolkitClass=WebToolkit7.class.getCanonicalName();
+                            webToolkitClass = WebToolkit7.class.getCanonicalName();
                         } else {
                             log.error("Java version " + System.getProperty("java.version") + " not supported in this version. Check www.webswing.org for supported versions.");
                             throw new RuntimeException("Java version not supported");
                         }
                         String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPathSpecific + File.pathSeparatorChar + webSwingToolkitJarPath;
-                        
-                        if(!System.getProperty("os.name", "").startsWith("Windows")){
+
+                        if (!System.getProperty("os.name", "").startsWith("Windows")) {
                             //filesystem isolation support on non windows systems:
-                            bootCp +=  File.pathSeparatorChar + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator))+File.separator+"rt-win-shell-1.6.0_45.jar\"";
+                            bootCp += File.pathSeparatorChar + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator)) + File.separator + "rt-win-shell-1.6.0_45.jar\"";
                         }
-                        log.info("Setting bootclasspath to: "+bootCp);
+                        log.info("Setting bootclasspath to: " + bootCp);
                         String debug = appConfig.isDebug() ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
                         String aaFonts = appConfig.isAntiAliasText() ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
-                        javaTask.setJvmargs(bootCp + debug + aaFonts + " -noverify " + appConfig.getVmArgs());
+                        javaTask.setJvmargs(bootCp + debug + aaFonts + " -noverify -Dcom.sun.management.jmxremote " + appConfig.getVmArgs());
 
                         Variable clientIdVar = new Variable();
                         clientIdVar.setKey(Constants.SWING_START_SYS_PROP_CLIENT_ID);
@@ -256,12 +263,11 @@ public class SwingJvmConnection implements MessageListener {
                         mainClass.setKey(Constants.SWING_START_SYS_PROP_MAIN_CLASS);
                         mainClass.setValue(appConfig.getMainClass());
                         javaTask.addSysproperty(mainClass);
-                        
+
                         Variable isolatedFs = new Variable();
                         isolatedFs.setKey(Constants.SWING_START_SYS_PROP_ISOLATED_FS);
-                        isolatedFs.setValue(appConfig.isIsolatedFs()+"");
+                        isolatedFs.setValue(appConfig.isIsolatedFs() + "");
                         javaTask.addSysproperty(isolatedFs);
-
 
                         Variable inactivityTimeout = new Variable();
                         inactivityTimeout.setKey(Constants.SWING_SESSION_TIMEOUT_SEC);
@@ -320,8 +326,25 @@ public class SwingJvmConnection implements MessageListener {
         return clientId;
     }
 
-    public JsonSwingJvmStats getCurrentStatus() {
-        return currentStatus;
+    @SuppressWarnings("restriction")
+    private JMXConnector getLocalMBeanServerConnectionStatic(String pid) {
+        try {
+            String address = sun.management.ConnectorAddressLink.importFrom(Integer.parseInt(pid));
+            JMXServiceURL jmxUrl = new JMXServiceURL(address);
+            return JMXConnectorFactory.connect(jmxUrl);
+        } catch (Exception e) {
+            log.error("Failed to connect to JMX of swing instance with pid " + pid + ".", e);
+        }
+        return null;
+    }
+
+    public MBeanServerConnection getJmxConnection() {
+        try {
+            return jmxConnection.getMBeanServerConnection();
+        } catch (IOException e) {
+            log.error("Failed to connect to JMX of swing instance ", e);
+        }
+        return null;
     }
 
     public interface WebSessionListener {

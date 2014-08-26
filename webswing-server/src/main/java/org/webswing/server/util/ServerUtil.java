@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
@@ -28,10 +29,15 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
+import org.webswing.model.admin.c2s.JsonApplyConfiguration;
 import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
 import org.webswing.model.admin.s2c.JsonMessage;
 import org.webswing.model.admin.s2c.JsonMessage.Type;
 import org.webswing.model.admin.s2c.JsonSwingSession;
+import org.webswing.model.c2s.JsonConnectionHandshake;
+import org.webswing.model.c2s.JsonEventKeyboard;
+import org.webswing.model.c2s.JsonEventMouse;
+import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.s2c.JsonApplication;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
@@ -43,6 +49,43 @@ public class ServerUtil {
     private static final String DEFAULT = "default";
     private static final Logger log = LoggerFactory.getLogger(ServerUtil.class);
     private static final Map<String, String> iconMap = new HashMap<String, String>();
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static String encode(Serializable m) {
+        try {
+            if (m instanceof String) {
+                return (String) m;
+            }
+            return mapper.writeValueAsString(m);
+        } catch (IOException e) {
+            log.error("Encoding object failed: " + m, e);
+            return null;
+        }
+    }
+
+    public static Object decode(String s) {
+        try {
+            return mapper.readValue(s, JsonEventMouse.class);
+        } catch (IOException e) {
+            try {
+                return mapper.readValue(s, JsonEventKeyboard.class);
+            } catch (IOException e1) {
+                try {
+                    return mapper.readValue(s, JsonConnectionHandshake.class);
+                } catch (IOException e2) {
+                    try {
+                        return mapper.readValue(s, JsonEventPaste.class);
+                    } catch (IOException e3) {
+                        try {
+                            return mapper.readValue(s, JsonApplyConfiguration.class);
+                        } catch (IOException e4) {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     public static List<JsonApplication> createApplicationJsonInfo(AtmosphereResource r, Map<String, SwingApplicationDescriptor> applications) {
         List<JsonApplication> apps = new ArrayList<JsonApplication>();
@@ -70,7 +113,7 @@ public class ServerUtil {
                 }
                 apps.add(app);
             }
-            if(isUserinRole(r, Constants.ADMIN_ROLE)){
+            if (isUserinRole(r, Constants.ADMIN_ROLE)) {
                 JsonApplication adminConsole = new JsonApplication();
                 adminConsole.name = Constants.ADMIN_CONSOLE_APP_NAME;
                 apps.add(adminConsole);
@@ -166,8 +209,8 @@ public class ServerUtil {
         }
         result.setStartedAt(si.getStartedAt());
         result.setUser(si.getUser());
-        result.setState(si.getStats());
         result.setEndedAt(si.getEndedAt());
+        result.setState(si.getStats());
         return result;
     }
 
@@ -201,22 +244,22 @@ public class ServerUtil {
         return true;
     }
 
-    public static JsonAdminConsoleFrame composeAdminErrorReply(Exception e) {
+    public static String composeAdminErrorReply(Exception e) {
         return createJsonMessageFrame(Type.danger, e.getMessage());
     }
 
-    public static JsonAdminConsoleFrame composeAdminSuccessReply(String s) {
+    public static String composeAdminSuccessReply(String s) {
         return createJsonMessageFrame(Type.success, s);
     }
 
-    private static JsonAdminConsoleFrame createJsonMessageFrame(Type t, String text) {
+    private static String createJsonMessageFrame(Type t, String text) {
         JsonAdminConsoleFrame response = new JsonAdminConsoleFrame();
         JsonMessage message = new JsonMessage();
         message.setType(t);
         message.setText(text);
         message.setTime(new Date());
         response.setMessage(message);
-        return response;
+        return encode(response);
     }
 
 }

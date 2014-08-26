@@ -36,7 +36,7 @@ public class JmsService implements ServletContextListener {
         // BrokerService broker= BrokerFactory.createBroker("xbean:mq.xml");
 
         BrokerService broker = new BrokerService();
-        broker.setUseJmx(false);
+        broker.setUseJmx(true);
         broker.setPersistent(false);
 
         PolicyMap policyMap = new PolicyMap();

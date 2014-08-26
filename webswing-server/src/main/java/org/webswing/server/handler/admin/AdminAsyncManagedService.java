@@ -28,7 +28,6 @@ import org.webswing.model.admin.c2s.JsonApplyConfiguration;
 import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstanceManager;
-import org.webswing.server.coder.SwingJsonCoder;
 import org.webswing.server.handler.SwingAsyncManagedService;
 import org.webswing.server.util.ServerUtil;
 
@@ -44,12 +43,12 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
         SwingInstanceManager.getInstance().setChangeListener(this);
     }
 
-    @Ready(value = DELIVER_TO.RESOURCE, encoders = { SwingJsonCoder.class })
+    @Ready(value = DELIVER_TO.RESOURCE)
     public Serializable onReady(final AtmosphereResource r) {
         Subject sub = SecurityUtils.getSubject();
         if (sub.hasRole(Constants.ADMIN_ROLE)) {
             resourceMap.put(r.uuid(), r);
-            JsonAdminConsoleFrame result = createAdminConsoleUpdate(true, true);
+            String result = createAdminConsoleUpdate(true, true);
             return result;
         } else {
             log.warn("Unauthorized connection atempt from " + sub.getPrincipal());
@@ -70,24 +69,25 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
         }
     }
 
-    @Message(encoders = { SwingJsonCoder.class }, decoders = { SwingJsonCoder.class })
+    @Message
     public Serializable onMessage(AtmosphereResource r, Object message) {
         try {
-            Serializable result = SwingAsyncManagedService.processWebswingMessage(r, message);
+            Serializable result = SwingAsyncManagedService.processWebswingMessage(r, message, false);
             if (result != null) {
                 return result;
-            } else if (message instanceof JsonAdminConsoleFrame) {
-                return (JsonAdminConsoleFrame) message;
-            } else if (message instanceof JsonApplyConfiguration) {
-                JsonApplyConfiguration jac = (JsonApplyConfiguration) message;
-                if (jac.getType().equals(JsonApplyConfiguration.Type.user)) {
-                    ServerUtil.validateUserFile(jac.getConfigContent());
-                    ConfigurationManager.getInstance().applyUserProperties(jac.getConfigContent());
-                    return ServerUtil.composeAdminSuccessReply("User configuration saved successfully.");
-                } else if (jac.getType().equals(JsonApplyConfiguration.Type.config)) {
-                    ServerUtil.validateConfigFile(jac.getConfigContent());
-                    ConfigurationManager.getInstance().applyApplicationConfiguration(jac.getConfigContent());
-                    return ServerUtil.composeAdminSuccessReply("Server configuration saved successfully.");
+            } else if (message instanceof String) {
+                Object jsonMessage = ServerUtil.decode((String) message);
+                if (jsonMessage!=null && jsonMessage instanceof JsonApplyConfiguration) {
+                    JsonApplyConfiguration jac = (JsonApplyConfiguration) jsonMessage;
+                    if (jac.getType().equals(JsonApplyConfiguration.Type.user)) {
+                        ServerUtil.validateUserFile(jac.getConfigContent());
+                        ConfigurationManager.getInstance().applyUserProperties(jac.getConfigContent());
+                        return ServerUtil.composeAdminSuccessReply("User configuration saved successfully.");
+                    } else if (jac.getType().equals(JsonApplyConfiguration.Type.config)) {
+                        ServerUtil.validateConfigFile(jac.getConfigContent());
+                        ConfigurationManager.getInstance().applyApplicationConfiguration(jac.getConfigContent());
+                        return ServerUtil.composeAdminSuccessReply("Server configuration saved successfully.");
+                    }
                 }
             }
         } catch (Exception e) {
@@ -114,6 +114,14 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
     }
 
     @Override
+    public void swingInstancesChangedStats() {
+        Broadcaster bc = getBroadcaster();
+        if (bc != null) {
+            bc.broadcast(createAdminConsoleUpdate(true, false));
+        }
+    }
+
+    @Override
     public void notifyChange() {
         Broadcaster bc = getBroadcaster();
         if (bc != null) {
@@ -121,7 +129,7 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
         }
     }
 
-    private JsonAdminConsoleFrame createAdminConsoleUpdate(boolean swingInstances, boolean configuration) {
+    private String createAdminConsoleUpdate(boolean swingInstances, boolean configuration) {
         JsonAdminConsoleFrame message;
         if (swingInstances) {
             message = SwingInstanceManager.getInstance().extractStatus();
@@ -135,7 +143,7 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
             message.setUserConfig(ConfigurationManager.getInstance().loadUserProperties());
             message.setServerProperties(ConfigurationManager.getInstance().getServerProperties());
         }
-        return message;
+        return ServerUtil.encode(message);
     }
-    
+
 }

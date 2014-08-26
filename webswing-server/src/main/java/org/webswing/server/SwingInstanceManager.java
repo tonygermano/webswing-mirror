@@ -16,6 +16,7 @@ import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
 import org.webswing.model.admin.s2c.JsonSwingSession;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.server.SwingApplicationDescriptor;
+import org.webswing.server.stats.PerformanceStatsMonitor;
 import org.webswing.server.util.ServerUtil;
 
 public class SwingInstanceManager {
@@ -28,17 +29,15 @@ public class SwingInstanceManager {
     private SwingInstanceChangeListener changeListener;
 
     private SwingInstanceManager() {
+        new PerformanceStatsMonitor();
     }
 
     public static SwingInstanceManager getInstance() {
         return instance;
     }
 
-    private synchronized Set<SwingInstance> getSwingInstanceSet() {
-        Set<SwingInstance> set = new HashSet<SwingInstance>();
-        for (SwingInstance si : swingInstances.values()) {
-            set.add(si);
-        }
+    public synchronized Set<SwingInstance> getSwingInstanceSet() {
+        Set<SwingInstance> set = new HashSet<SwingInstance>(swingInstances.values());
         return set;
     }
 
@@ -53,7 +52,9 @@ public class SwingInstanceManager {
                 if (app != null && !h.mirrored) {
                     if (!reachedMaxConnections(app)) {
                         swingInstance = new SwingInstance(h, app, resource);
-                        swingInstances.put(h.clientId, swingInstance);
+                        synchronized (this) {
+                            swingInstances.put(h.clientId, swingInstance);
+                        }
                         notifySwingChangeChange();
                     } else {
                         resource.getBroadcaster().broadcast(Constants.TOO_MANY_CLIENTS_NOTIFICATION, resource);
@@ -138,6 +139,12 @@ public class SwingInstanceManager {
             changeListener.swingInstancesChanged();
         }
     }
+    
+    public void notifySwingChangeStats() {
+        if (changeListener != null) {
+            changeListener.swingInstancesChangedStats();
+        }
+    }
 
     public void setChangeListener(SwingInstanceChangeListener changeListener) {
         this.changeListener = changeListener;
@@ -146,6 +153,8 @@ public class SwingInstanceManager {
     public interface SwingInstanceChangeListener {
 
         void swingInstancesChanged();
+
+        void swingInstancesChangedStats();
     }
 
     public boolean sendMessageToSwing(AtmosphereResource r, String clientId, Serializable o) {
@@ -155,6 +164,10 @@ public class SwingInstanceManager {
         } else {
             return false;
         }
+    }
+    
+    public SwingInstance findInstance(String clientId){
+        return swingInstances.get(clientId);
     }
 
 }

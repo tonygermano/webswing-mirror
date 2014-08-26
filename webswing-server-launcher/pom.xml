@@ -25,6 +25,11 @@
 			<version>8.1.14.v20131031</version>
 		</dependency>
 		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-jmx</artifactId>
+			<version>8.1.14.v20131031</version>
+		</dependency>
+		<dependency>
 			<groupId>org.webswing</groupId>
 			<artifactId>webswing-app-toolkit</artifactId>
 			<version>${project.version}</version>

@@ -30,14 +30,19 @@ import org.webswing.toolkit.WebToolkit;
 
 public class Main {
 
+    @SuppressWarnings("restriction")
     public static void main(String[] args) throws Exception {
         boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
+        
         ProtectionDomain domain = Main.class.getProtectionDomain();
         URL location = domain.getCodeSource().getLocation();
         System.setProperty(Constants.WAR_FILE_LOCATION, location.toExternalForm());
 
         List<URL> urls = new ArrayList<URL>();
         if (client) {
+            //initialize jmx agent
+            sun.management.Agent.startAgent();
+
             populateClasspathFromDir("WEB-INF/swing-lib", urls);
             initializeExtLibServices(urls);
             retainOnlyLauncherUrl(urls);

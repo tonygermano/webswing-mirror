@@ -27,8 +27,8 @@ import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstanceManager;
-import org.webswing.server.coder.SwingJsonCoder;
 import org.webswing.server.util.ServerUtil;
+import org.webswing.server.util.StatUtils;
 
 @ManagedService(path = "/async/swing", interceptors = { AtmosphereResourceLifecycleInterceptor.class, ManagedServiceInterceptor.class, TrackMessageSizeInterceptor.class, HeartbeatInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class })
 public class SwingAsyncManagedService {
@@ -37,13 +37,13 @@ public class SwingAsyncManagedService {
 
     private Map<String, AtmosphereResource> resourceMap = new HashMap<String, AtmosphereResource>();
 
-    @Ready(value = DELIVER_TO.RESOURCE, encoders = { SwingJsonCoder.class })
+    @Ready(value = DELIVER_TO.RESOURCE)
     public Serializable onReady(final AtmosphereResource r) {
         resourceMap.put(r.uuid(), r);
         JsonAppFrame appInfo = new JsonAppFrame();
         appInfo.user = ServerUtil.getUserName(r);
         appInfo.applications = ServerUtil.createApplicationJsonInfo(r, ConfigurationManager.getInstance().getApplications());
-        return appInfo;
+        return ServerUtil.encode(appInfo);
     }
 
     @Disconnect
@@ -52,55 +52,61 @@ public class SwingAsyncManagedService {
         SwingInstanceManager.getInstance().notifySessionDisconnected(event.getResource().uuid());
     }
 
-    @Message(encoders = { SwingJsonCoder.class }, decoders = { SwingJsonCoder.class })
+    @Message
     public Serializable onMessage(AtmosphereResource r, Object message) {
         try {
-            return processWebswingMessage(r, message);
+            return processWebswingMessage(r, message, true);
         } catch (Exception e) {
             log.error("Exception while processing websocket message.", e);
         }
         return null;
     }
 
-    public static Serializable processWebswingMessage(AtmosphereResource r, Object message) {
-        if (message instanceof JsonConnectionHandshake) {
-            JsonConnectionHandshake h = (JsonConnectionHandshake) message;
-            SwingInstanceManager.getInstance().connectSwingInstance(r, h);
-        } else if (message instanceof JsonEventKeyboard) {
-            JsonEventKeyboard k = (JsonEventKeyboard) message;
-            send(r, k.clientId, k);
-        } else if (message instanceof JsonEventMouse) {
-            JsonEventMouse m = (JsonEventMouse) message;
-            send(r, m.clientId, m);
-        } else if (message instanceof JsonEventPaste) {
-            JsonEventPaste p = (JsonEventPaste) message;
-            send(r, p.clientId, p);
-        } else if (message instanceof String) {
+    public static Serializable processWebswingMessage(AtmosphereResource r, Object message, boolean logStats) {
+        if (message instanceof String) {
             String sm = (String) message;
-            if (sm.startsWith(Constants.PAINT_ACK_PREFIX)) {
-                send(r, sm.substring(Constants.PAINT_ACK_PREFIX.length()), sm);
+            Object jsonMessage = ServerUtil.decode((String) message);
+            if (jsonMessage != null) {
+                if (jsonMessage instanceof JsonConnectionHandshake) {
+                    JsonConnectionHandshake h = (JsonConnectionHandshake) jsonMessage;
+                    SwingInstanceManager.getInstance().connectSwingInstance(r, h);
+                } else if (jsonMessage instanceof JsonEventKeyboard) {
+                    JsonEventKeyboard k = (JsonEventKeyboard) jsonMessage;
+                    send(r, k.clientId, k, sm, logStats);
+                } else if (jsonMessage instanceof JsonEventMouse) {
+                    JsonEventMouse m = (JsonEventMouse) jsonMessage;
+                    send(r, m.clientId, m, sm, logStats);
+                } else if (jsonMessage instanceof JsonEventPaste) {
+                    JsonEventPaste p = (JsonEventPaste) jsonMessage;
+                    send(r, p.clientId, p, sm, logStats);
+                } else {
+                    return null;
+                }
+            } else if (sm.startsWith(Constants.PAINT_ACK_PREFIX)) {
+                send(r, sm.substring(Constants.PAINT_ACK_PREFIX.length()), sm, sm, logStats);
             } else if (sm.startsWith(Constants.UNLOAD_PREFIX)) {
-                send(r, sm.substring(Constants.UNLOAD_PREFIX.length()), sm);
+                send(r, sm.substring(Constants.UNLOAD_PREFIX.length()), sm, sm, logStats);
             } else if (sm.startsWith(Constants.HEARTBEAT_MSG_PREFIX)) {
-                send(r, sm.substring(Constants.HEARTBEAT_MSG_PREFIX.length()), sm);
+                send(r, sm.substring(Constants.HEARTBEAT_MSG_PREFIX.length()), sm, sm, logStats);
             } else if (sm.startsWith(Constants.REPAINT_REQUEST_PREFIX)) {
-                send(r, sm.substring(Constants.REPAINT_REQUEST_PREFIX.length()), sm);
+                send(r, sm.substring(Constants.REPAINT_REQUEST_PREFIX.length()), sm, sm, logStats);
             } else if (sm.startsWith(Constants.SWING_KILL_SIGNAL)) {
-                send(r, sm.substring(Constants.SWING_KILL_SIGNAL.length()), sm);
+                send(r, sm.substring(Constants.SWING_KILL_SIGNAL.length()), sm, sm, logStats);
             } else if (sm.startsWith(Constants.DELETE_FILE_PREFIX)) {
-                send(r, sm.substring(Constants.DELETE_FILE_PREFIX.length()), sm);
+                send(r, sm.substring(Constants.DELETE_FILE_PREFIX.length()), sm, sm, logStats);
             } else if (sm.startsWith(Constants.DOWNLOAD_FILE_PREFIX)) {
-                send(r, sm.substring(Constants.DOWNLOAD_FILE_PREFIX.length()), sm);
+                send(r, sm.substring(Constants.DOWNLOAD_FILE_PREFIX.length()), sm, sm, logStats);
             } else {
                 return sm;
             }
-        } else if (message instanceof JsonAppFrame) {
-            return (JsonAppFrame) message;
         }
         return null;
     }
 
-    private static void send(AtmosphereResource r, String clientId, Serializable o) {
+    private static void send(AtmosphereResource r, String clientId, Serializable o, String message, boolean logStat) {
+        if (logStat) {
+            StatUtils.logInboundData(SwingInstanceManager.getInstance().findInstance(clientId), message.getBytes().length);
+        }
         SwingInstanceManager.getInstance().sendMessageToSwing(r, clientId, o);
     }
 

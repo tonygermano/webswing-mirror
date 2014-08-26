@@ -35,7 +35,7 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
     private Connection connection;
     private Session session;
     private MessageProducer producer;
-    private long lastMessageTimestamp=System.currentTimeMillis();
+    private long lastMessageTimestamp = System.currentTimeMillis();
 
     private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -48,17 +48,17 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
 
     public ServerConnectionService() {
         initialize();
-        Runnable watchdog=new Runnable() {
-            
+        Runnable watchdog = new Runnable() {
+
             @Override
             public void run() {
-                long diff=System.currentTimeMillis()-lastMessageTimestamp;
-                int timeout=Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC,"300"))*1000;
-                if(diff/1000>10){
-                    Logger.info("Inactive for " +diff/1000+ " seconds.");
+                long diff = System.currentTimeMillis() - lastMessageTimestamp;
+                int timeout = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) * 1000;
+                if (diff / 1000 > 10) {
+                    Logger.info("Inactive for " + diff / 1000 + " seconds.");
                 }
-                if(diff>timeout){
-                    Logger.info("Exiting swing application due to inactivity for "+diff/1000+ " seconds.");
+                if (diff > timeout) {
+                    Logger.info("Exiting swing application due to inactivity for " + diff / 1000 + " seconds.");
                     System.exit(1);
                 }
             }
@@ -91,8 +91,9 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
                     ServerConnectionService.this.initialize();
                 }
             });
+            sendPidNotification();
         } catch (JMSException e) {
-            Logger.error("Exiting swing application because could not connect to JMS:" +e.getMessage(),e);
+            Logger.error("Exiting swing application because could not connect to JMS:" + e.getMessage(), e);
             System.exit(1);
         }
     }
@@ -102,6 +103,22 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
             producer.send(session.createTextMessage(Constants.SWING_SHUTDOWN_NOTIFICATION));
         } catch (JMSException e) {
             Logger.error("ServerConnectionService.sendShutdownNotification", e);
+        }
+    }
+
+    @SuppressWarnings("restriction")
+    public void sendPidNotification() {
+        try {
+            java.lang.management.RuntimeMXBean runtime = java.lang.management.ManagementFactory.getRuntimeMXBean();
+            java.lang.reflect.Field jvm = runtime.getClass().getDeclaredField("jvm");
+            jvm.setAccessible(true);
+            sun.management.VMManagement mgmt = (sun.management.VMManagement) jvm.get(runtime);
+            java.lang.reflect.Method pid_method = mgmt.getClass().getDeclaredMethod("getProcessId");
+            pid_method.setAccessible(true);
+            int pid = (Integer) pid_method.invoke(mgmt);
+            producer.send(session.createTextMessage(Constants.SWING_PID_NOTIFICATION + pid));
+        } catch (Exception e) {
+            Logger.error("ServerConnectionService.sendPidNotification", e);
         }
     }
 
@@ -117,7 +134,7 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
 
     public void onMessage(Message msg) {
         try {
-            lastMessageTimestamp=System.currentTimeMillis();
+            lastMessageTimestamp = System.currentTimeMillis();
             if (msg instanceof ObjectMessage) {
                 ObjectMessage omsg = (ObjectMessage) msg;
                 if (omsg.getObject() instanceof JsonEvent) {
