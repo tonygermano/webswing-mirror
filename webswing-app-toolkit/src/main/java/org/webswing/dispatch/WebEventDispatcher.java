@@ -97,7 +97,13 @@ public class WebEventDispatcher {
         Logger.debug("WebEventDispatcher.dispatchMessage", message);
         if (message.startsWith(Constants.SWING_KILL_SIGNAL)) {
             Logger.info("Received kill signal. Swing application shutting down.");
-            System.exit(0);
+            SwingUtilities.invokeLater(new Runnable() {
+				
+				@Override
+				public void run() {
+					System.exit(0);	
+				}
+			});
         }
         if (message.startsWith(Constants.PAINT_ACK_PREFIX)) {
             Util.getWebToolkit().getPaintDispatcher().clientReadyToReceive();

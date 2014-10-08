@@ -175,11 +175,12 @@ public class SwingJvmConnection implements MessageListener {
             session.close();
             connection.close();
             if(jmxConnection!=null){
-                jmxConnection.close();
-                jmxConnection=null;
+            	JMXConnector thisjmxConnection = jmxConnection;
+            	jmxConnection=null;
+            	thisjmxConnection.close();
             }
         } catch (Exception e) {
-            log.error("SwingJvmConnection:close", e);
+        	log.debug("SwingJvmConnection:close", e);
         }
         if (withShutdownEvent) {
             webListener.sendToWeb(Constants.SWING_SHUTDOWN_NOTIFICATION);
