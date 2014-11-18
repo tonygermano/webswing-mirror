@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import javax.servlet.http.HttpServletRequest;
 
 import main.Main;
 
@@ -42,7 +43,9 @@ import org.webswing.model.s2c.JsonApplication;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
 import org.webswing.server.SwingInstance;
+import org.webswing.server.handler.ApplicationSelectorServlet;
 import org.webswing.server.handler.FileServlet;
+import org.webswing.server.handler.LoginServlet;
 
 public class ServerUtil {
 
@@ -87,7 +90,7 @@ public class ServerUtil {
         }
     }
 
-    public static List<JsonApplication> createApplicationJsonInfo(AtmosphereResource r, Map<String, SwingApplicationDescriptor> applications) {
+    public static List<JsonApplication> createApplicationJsonInfo(AtmosphereResource r, Map<String, SwingApplicationDescriptor> applications, boolean includeAdminApp) {
         List<JsonApplication> apps = new ArrayList<JsonApplication>();
         if (applications.size() == 0) {
             return null;
@@ -113,7 +116,7 @@ public class ServerUtil {
                 }
                 apps.add(app);
             }
-            if (isUserinRole(r, Constants.ADMIN_ROLE)) {
+            if (includeAdminApp) {
                 JsonApplication adminConsole = new JsonApplication();
                 adminConsole.name = Constants.ADMIN_CONSOLE_APP_NAME;
                 apps.add(adminConsole);
@@ -123,6 +126,9 @@ public class ServerUtil {
     }
 
     public static boolean isUserAuthorizedForApplication(AtmosphereResource r, SwingApplicationDescriptor app) {
+        if ((app.isAuthentication() || app.isAuthorization()) && isUserAnonymous(r)) {
+            return false;
+        }
         if (app.isAuthorization()) {
             if (isUserinRole(r, app.getName()) || isUserinRole(r, Constants.ADMIN_ROLE)) {
                 return true;
@@ -230,6 +236,13 @@ public class ServerUtil {
         return false;
     }
 
+    public static boolean isUserAnonymous(AtmosphereResource resource) {
+        if (LoginServlet.anonymUserName.equals(getUserName(resource))) {
+            return true;
+        }
+        return false;
+    }
+
     public static boolean validateConfigFile(byte[] content) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         mapper.readValue(content, WebswingConfiguration.class);
@@ -260,6 +273,14 @@ public class ServerUtil {
         message.setTime(new Date());
         response.setMessage(message);
         return encode(response);
+    }
+
+    public static String getPreSelectedApplication(HttpServletRequest r, boolean reset) {
+        String application = (String) r.getSession().getAttribute(ApplicationSelectorServlet.SELECTED_APPLICATION);
+        if (reset) {
+            r.getSession().removeAttribute(ApplicationSelectorServlet.SELECTED_APPLICATION);
+        }
+        return application;
     }
 
 }

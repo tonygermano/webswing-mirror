@@ -25,6 +25,7 @@ import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.s2c.JsonAppFrame;
+import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstanceManager;
 import org.webswing.server.util.ServerUtil;
@@ -40,9 +41,20 @@ public class SwingAsyncManagedService {
     @Ready(value = DELIVER_TO.RESOURCE)
     public Serializable onReady(final AtmosphereResource r) {
         resourceMap.put(r.uuid(), r);
+        String preSelectedApplicationName = ServerUtil.getPreSelectedApplication(r.getRequest(), true);
+        boolean includeAdminApp= ServerUtil.isUserinRole(r, Constants.ADMIN_ROLE);
+        Map<String, SwingApplicationDescriptor> applicationsMap = ConfigurationManager.getInstance().getApplications();
+        if (preSelectedApplicationName != null) {
+            includeAdminApp=false;
+            SwingApplicationDescriptor preSelectedApp = applicationsMap.get(preSelectedApplicationName);
+            applicationsMap.clear();
+            if (preSelectedApp != null) {
+                applicationsMap.put(preSelectedApplicationName, preSelectedApp);
+            }
+        }
         JsonAppFrame appInfo = new JsonAppFrame();
         appInfo.user = ServerUtil.getUserName(r);
-        appInfo.applications = ServerUtil.createApplicationJsonInfo(r, ConfigurationManager.getInstance().getApplications());
+        appInfo.applications = ServerUtil.createApplicationJsonInfo(r, applicationsMap,includeAdminApp);
         return ServerUtil.encode(appInfo);
     }
 

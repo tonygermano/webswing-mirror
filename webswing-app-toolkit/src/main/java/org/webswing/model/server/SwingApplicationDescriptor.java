@@ -5,9 +5,6 @@ import java.util.List;
 
 public class SwingApplicationDescriptor implements Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3708498208353403978L;
 
     private String name;
@@ -23,6 +20,7 @@ public class SwingApplicationDescriptor implements Serializable {
     private boolean authorization = false;
     private boolean isolatedFs = false;
     private boolean debug = false;
+    private boolean authentication=true;
 
     public String getName() {
         return name;
@@ -139,6 +137,14 @@ public class SwingApplicationDescriptor implements Serializable {
     
     public void setIsolatedFs(boolean isolatedFs) {
         this.isolatedFs = isolatedFs;
+    }
+
+    public boolean isAuthentication() {
+        return authentication;
+    }
+
+    public void setAuthentication(boolean authentication) {
+        this.authentication = authentication;
     }
     
     

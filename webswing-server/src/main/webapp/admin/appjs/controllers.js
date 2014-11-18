@@ -245,6 +245,7 @@ angular.module('ws-console.controllers', [])
 				'swingSessionTimeout': 300,
 				'antiAliasText': true,
 				'authorization': false,
+				'authentication': true,
 				'isolatedFs' : true
 			});
 		}

@@ -27,6 +27,11 @@
 		<async-supported>true</async-supported>
 	</servlet>
 	<servlet>
+		<description>ApplicationSelectorServlet</description>
+		<servlet-name>ApplicationSelectorServlet</servlet-name>
+		<servlet-class>org.webswing.server.handler.ApplicationSelectorServlet</servlet-class>
+	</servlet>
+	<servlet>
 		<description>FileServlet</description>
 		<servlet-name>FileServlet</servlet-name>
 		<servlet-class>org.webswing.server.handler.FileServlet</servlet-class>
@@ -47,6 +52,10 @@
 		<servlet-name>LoginServlet</servlet-name>
 		<servlet-class>org.webswing.server.handler.LoginServlet</servlet-class>
 	</servlet>
+	<servlet-mapping>
+		<servlet-name>ApplicationSelectorServlet</servlet-name>
+		<url-pattern>/app/*</url-pattern>
+	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>AtmosphereServlet</servlet-name>
 		<url-pattern>/async/*</url-pattern>

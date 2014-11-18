@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.ConfigurationManager.ConfigurationChangeListener;
+import org.webswing.server.handler.LoginServlet;
 
 public class WebSwingPropertiesRealm extends PropertiesRealm implements ConfigurationChangeListener {
     private static final Logger log = LoggerFactory.getLogger(WebSwingPropertiesRealm.class);
@@ -22,6 +23,9 @@ public class WebSwingPropertiesRealm extends PropertiesRealm implements Configur
         }else{
             log.error("Users configuration file "+ServerUtil.getUserPropsFileName()+" does not exist.");
         }
+        
+        //create anonym acount
+        addAccount(LoginServlet.anonymUserName,LoginServlet.anonymSecretPassword);
     }
 
     @Override

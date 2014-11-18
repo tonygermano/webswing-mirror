@@ -35,18 +35,22 @@ var webswing = function() {
 		},
 		onApplicationSelection : function(apps) {
 			$('#userName').append(ws.getUser());
-			for ( var i in apps) {
-				var app = apps[i];
-				if (app.name == 'adminConsoleApplicationName') {
-					$('#applicationsList').append('<div class="col-sm-6 col-md-4"><div class="thumbnail" onclick="window.location.href = \'/admin\';"><img src="/admin/img/admin.png" class="img-thumbnail"/><div class="caption">Admin console</div></div></div>');
-				} else {
-					$('#applicationsList').append('<div class="col-sm-6 col-md-4"><div class="thumbnail" onclick="webswing.startApplication(\'' + app.name + '\')"><img src="data:image/png;base64,' + app.base64Icon + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>');
-				}
-			}
 			if (apps.length == 0) {
-				$('#applicationsList').append('Sorry, there is no application available for you.')
+				$('#applicationsList').append('Sorry, there is no application available for you.');
+				showDialog(applicationSelectorDialog);
+			} else if (apps.length == 1) {
+				webswing.startApplication(apps[0].name);
+			} else {
+				for ( var i in apps) {
+					var app = apps[i];
+					if (app.name == 'adminConsoleApplicationName') {
+						$('#applicationsList').append('<div class="col-sm-6 col-md-4"><div class="thumbnail" onclick="window.location.href = \'/admin\';"><img src="/admin/img/admin.png" class="img-thumbnail"/><div class="caption">Admin console</div></div></div>');
+					} else {
+						$('#applicationsList').append('<div class="col-sm-6 col-md-4"><div class="thumbnail" onclick="webswing.startApplication(\'' + app.name + '\')"><img src="data:image/png;base64,' + app.base64Icon + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>');
+					}
+				}
+				showDialog(applicationSelectorDialog);
 			}
-			showDialog(applicationSelectorDialog);
 		},
 		onBeforePaint : function() {
 			showDialog(null);
@@ -96,7 +100,7 @@ var webswing = function() {
 		var errorMsg = $('#loginErrorMsg');
 		$.ajax({
 			type : 'POST',
-			url : '/login',
+			url : '/login?mode=swing',
 			data : $("#loginForm").serialize(),
 			success : function(data) {
 				errorMsg.html('')
