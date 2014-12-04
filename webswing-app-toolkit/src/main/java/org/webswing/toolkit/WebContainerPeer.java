@@ -8,7 +8,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JWindow;
 
-import org.webswing.util.Util;
+import org.webswing.util.Services;
 
 public class WebContainerPeer extends WebComponentPeer implements ContainerPeer {
 
@@ -22,7 +22,7 @@ public class WebContainerPeer extends WebComponentPeer implements ContainerPeer 
         } else if (target != null && ((target instanceof JFrame && ((JFrame) target).isUndecorated()) || (target instanceof JDialog && ((JDialog) target).isUndecorated()))) {
             return new Insets(0, 0, 0, 0);
         } else {
-            return Util.getWebToolkit().getImageService().getWindowDecorationTheme().getInsets();
+            return Services.getImageService().getWindowDecorationTheme().getInsets();
         }
     }
 

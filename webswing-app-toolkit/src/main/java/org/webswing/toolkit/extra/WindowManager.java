@@ -18,6 +18,7 @@ import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.s2c.JsonCursorChange;
 import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
+import org.webswing.util.Services;
 import org.webswing.util.Util;
 
 public class WindowManager {
@@ -64,8 +65,8 @@ public class WindowManager {
 
     public void removeWindow(Window target) {
         synchronized (WebPaintDispatcher.webPaintLock) {
-            if(target==activeWindow){
-                activeWindow=null;
+            if (target == activeWindow) {
+                activeWindow = null;
             }
             zorder.removeWindow(target);
         }
@@ -111,7 +112,7 @@ public class WindowManager {
             FocusEvent gainedFocusEvent = new FocusEvent(newFocusOwner, FocusEvent.FOCUS_GAINED, false);
             WebEventDispatcher.dispatchEventInSwing(w, gainedFocusEvent);
         }
-        if (SwingUtilities.isRectangleContainingRectangle(new Rectangle(0,0,w.getWidth(),w.getHeight()), new Rectangle(x, y, 0, 0))) {
+        if (SwingUtilities.isRectangleContainingRectangle(new Rectangle(0, 0, w.getWidth(), w.getHeight()), new Rectangle(x, y, 0, 0))) {
             bringToFront(w);
         } else {
             bringToFront(null);
@@ -135,7 +136,7 @@ public class WindowManager {
     }
 
     public void handleWindowDecorationEvent(Window w, MouseEvent e) {
-        WindowActionType wat = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(w, new Point(e.getX(), e.getY()));
+        WindowActionType wat = Services.getImageService().getWindowDecorationTheme().getAction(w, new Point(e.getX(), e.getY()));
         eventhandler.handle(wat, e);
     }
 

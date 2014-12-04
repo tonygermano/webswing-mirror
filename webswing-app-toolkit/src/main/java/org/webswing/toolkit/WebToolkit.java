@@ -76,35 +76,28 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.webswing.Constants;
-import org.webswing.common.ImageServiceIfc;
-import org.webswing.common.ServerConnectionIfc;
-import org.webswing.common.SwingClassLoaderFactoryIfc;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.util.Logger;
 import org.webswing.util.Util;
 
 import sun.awt.SunToolkit;
-import sun.print.PrintJob2D;
 import sun.awt.image.SurfaceManager;
 import sun.java2d.SurfaceData;
+import sun.print.PrintJob2D;
 
 @SuppressWarnings("restriction")
 public abstract class WebToolkit extends SunToolkit {
 
     public static final String BACKGROUND_WINDOW_ID = "BG";
-    private ServerConnectionIfc serverConnection;
-    private ImageServiceIfc imageService;
-    private SwingClassLoaderFactoryIfc webswingClassLoaderFactory;
 
     private WebEventDispatcher eventDispatcher = new WebEventDispatcher();
-    private WebPaintDispatcher paintDispatcher;
+    private WebPaintDispatcher paintDispatcher = new WebPaintDispatcher();
 
-    private WindowManager windowManager;
+    private WindowManager windowManager = WindowManager.getInstance();
 
     public void init() {
-        paintDispatcher = new WebPaintDispatcher(serverConnection, imageService);
-        windowManager = WindowManager.getInstance();
         try {
             if (!System.getProperty("os.name", "").startsWith("Windows")) {
                 Class<?> c = ClassLoader.getSystemClassLoader().loadClass("sun.awt.X11GraphicsEnvironment");
@@ -113,7 +106,7 @@ public abstract class WebToolkit extends SunToolkit {
                 initDisplayMethod.invoke(null, false);
             }
         } catch (Exception e) {
-            //do nothing
+            Logger.error("Failed to init X11 display: ", e.getMessage());
         }
     }
 
@@ -140,26 +133,6 @@ public abstract class WebToolkit extends SunToolkit {
 
     public WebPaintDispatcher getPaintDispatcher() {
         return paintDispatcher;
-    }
-
-    public void setServerConnection(ServerConnectionIfc serverConnection) {
-        this.serverConnection = serverConnection;
-    }
-
-    public void setImageService(ImageServiceIfc imageService) {
-        this.imageService = imageService;
-    }
-
-    public ImageServiceIfc getImageService() {
-        return imageService;
-    }
-
-    public SwingClassLoaderFactoryIfc getWebswingClassLoaderFactory() {
-        return webswingClassLoaderFactory;
-    }
-
-    public void setWebswingClassLoaderFactory(SwingClassLoaderFactoryIfc webswingClassLoader) {
-        this.webswingClassLoaderFactory = webswingClassLoader;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -489,37 +462,37 @@ public abstract class WebToolkit extends SunToolkit {
 
     //update system colors to win7 default theme (light)
     protected void loadSystemColors(int[] systemColors) throws HeadlessException {
-        if(systemColors!=null && systemColors.length==26){
-            systemColors[0]=0xff000000;
-            systemColors[1]=0xff99b4d1;
-            systemColors[2]=0xff000000;
-            systemColors[3]=0xffb4b4b4;
-            systemColors[4]=0xffbfcddb;
-            systemColors[5]=0xff434e54;
-            systemColors[6]=0xfff4f7fc;
-            systemColors[7]=0xffffffff;
-            systemColors[8]=0xff646464;
-            systemColors[9]=0xff000000;
-            systemColors[10]=0xfff0f0f0;
-            systemColors[11]=0xff000000;
-            systemColors[12]=0xffffffff;
-            systemColors[13]=0xff000000;
-            systemColors[14]=0xff3399ff;
-            systemColors[15]=0xffffffff;
-            systemColors[16]=0xff6d6d6d;
-            systemColors[17]=0xfff0f0f0;
-            systemColors[18]=0xff000000;
-            systemColors[19]=0xffe3e3e3;
-            systemColors[20]=0xffffffff;
-            systemColors[21]=0xffa0a0a0;
-            systemColors[22]=0xff696969;
-            systemColors[23]=0xffc8c8c8;
-            systemColors[24]=0xffffffe1;
-            systemColors[25]=0xff000000;
+        if (systemColors != null && systemColors.length == 26) {
+            systemColors[0] = 0xff000000;
+            systemColors[1] = 0xff99b4d1;
+            systemColors[2] = 0xff000000;
+            systemColors[3] = 0xffb4b4b4;
+            systemColors[4] = 0xffbfcddb;
+            systemColors[5] = 0xff434e54;
+            systemColors[6] = 0xfff4f7fc;
+            systemColors[7] = 0xffffffff;
+            systemColors[8] = 0xff646464;
+            systemColors[9] = 0xff000000;
+            systemColors[10] = 0xfff0f0f0;
+            systemColors[11] = 0xff000000;
+            systemColors[12] = 0xffffffff;
+            systemColors[13] = 0xff000000;
+            systemColors[14] = 0xff3399ff;
+            systemColors[15] = 0xffffffff;
+            systemColors[16] = 0xff6d6d6d;
+            systemColors[17] = 0xfff0f0f0;
+            systemColors[18] = 0xff000000;
+            systemColors[19] = 0xffe3e3e3;
+            systemColors[20] = 0xffffffff;
+            systemColors[21] = 0xffa0a0a0;
+            systemColors[22] = 0xff696969;
+            systemColors[23] = 0xffc8c8c8;
+            systemColors[24] = 0xffffffe1;
+            systemColors[25] = 0xff000000;
         }
     }
-    
+
     abstract public boolean webConpoenentPeerUpdateGraphicsData();
-    
+
     abstract public SurfaceData webComponentPeerReplaceSurfaceData(SurfaceManager mgr);
 }

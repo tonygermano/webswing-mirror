@@ -34,6 +34,7 @@ import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Logger;
+import org.webswing.util.Services;
 import org.webswing.util.Util;
 
 public class WebEventDispatcher {
@@ -78,11 +79,10 @@ public class WebEventDispatcher {
                         String validfilename = Util.resolveFilename(currentDir, upload.fileName);
                         if (currentDir.canWrite() && tempFile.exists()) {
                             try {
-                                Util.getWebToolkit().getImageService().moveFile(tempFile, new File(currentDir, validfilename));
+                                Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
                                 dialog.rescanCurrentDirectory();
                             } catch (IOException e) {
-                                System.err.println("Error while moving uploaded file to target folder.");
-                                e.printStackTrace();
+                                Logger.error("Error while moving uploaded file to target folder: ", e);
                             }
                         }
                         break;
@@ -98,12 +98,12 @@ public class WebEventDispatcher {
         if (message.startsWith(Constants.SWING_KILL_SIGNAL)) {
             Logger.info("Received kill signal. Swing application shutting down.");
             SwingUtilities.invokeLater(new Runnable() {
-				
-				@Override
-				public void run() {
-					System.exit(0);	
-				}
-			});
+
+                @Override
+                public void run() {
+                    System.exit(0);
+                }
+            });
         }
         if (message.startsWith(Constants.PAINT_ACK_PREFIX)) {
             Util.getWebToolkit().getPaintDispatcher().clientReadyToReceive();
@@ -163,7 +163,7 @@ public class WebEventDispatcher {
             w = WindowManager.getInstance().getLockedToWindow();
         } else {
             w = WindowManager.getInstance().getVisibleWindowOnPosition(event.x, event.y);
-            if (lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED||lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.type == Type.mousemove && event.button == 1) || (event.type == Type.mouseup))) {
+            if (lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.type == Type.mousemove && event.button == 1) || (event.type == Type.mouseup))) {
                 w = (Window) lastMouseEvent.getSource();
             }
         }
@@ -198,17 +198,17 @@ public class WebEventDispatcher {
                     id = MouseEvent.MOUSE_RELEASED;
                     boolean popupTrigger = (buttons == 3) ? true : false;
                     clickcount = computeClickCount(x, y, buttons, false);
-                    modifiers = modifiers & (((1 << 6) - 1) | (~((1 << 14) - 1)) | MouseEvent.CTRL_DOWN_MASK | MouseEvent.ALT_DOWN_MASK | MouseEvent.SHIFT_DOWN_MASK| MouseEvent.META_DOWN_MASK);
+                    modifiers = modifiers & (((1 << 6) - 1) | (~((1 << 14) - 1)) | MouseEvent.CTRL_DOWN_MASK | MouseEvent.ALT_DOWN_MASK | MouseEvent.SHIFT_DOWN_MASK | MouseEvent.META_DOWN_MASK);
                     e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
                     dispatchEventInSwing(w, e);
-                    if (lastMousePressEvent != null &&  lastMousePressEvent.getX() == x && lastMousePressEvent.getY() == y) {
+                    if (lastMousePressEvent != null && lastMousePressEvent.getX() == x && lastMousePressEvent.getY() == y) {
                         e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
                         dispatchEventInSwing(w, e);
                         lastMouseEvent = e;
-                        lastMousePressEvent=e;
+                        lastMousePressEvent = e;
                     } else {
                         lastMouseEvent = e;
-                        lastMousePressEvent=e;
+                        lastMousePressEvent = e;
                     }
                     break;
                 case mousedown:
@@ -216,7 +216,7 @@ public class WebEventDispatcher {
                     clickcount = computeClickCount(x, y, buttons, true);
                     e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, false, buttons);
                     dispatchEventInSwing(w, e);
-                    lastMousePressEvent=e;
+                    lastMousePressEvent = e;
                     lastMouseEvent = e;
                     break;
                 case mousewheel:

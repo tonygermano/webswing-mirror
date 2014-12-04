@@ -22,8 +22,6 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
-import org.webswing.common.ImageServiceIfc;
-import org.webswing.common.ServerConnectionIfc;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.model.s2c.JsonCopyEvent;
 import org.webswing.model.s2c.JsonCursorChange;
@@ -37,12 +35,12 @@ import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Logger;
+import org.webswing.util.Services;
 import org.webswing.util.Util;
 
 public class WebPaintDispatcher {
 
     public static final Object webPaintLock = new Object();
-    private ServerConnectionIfc serverConnection;
 
     private volatile Map<String, Set<Rectangle>> areasToUpdate = new HashMap<String, Set<Rectangle>>();
     private volatile JsonWindowMoveAction moveAction;
@@ -52,8 +50,7 @@ public class WebPaintDispatcher {
 
     private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1);
 
-    public WebPaintDispatcher(final ServerConnectionIfc serverConnection, final ImageServiceIfc imageService) {
-        this.serverConnection = serverConnection;
+    public WebPaintDispatcher() {
         Runnable sendUpdate = new Runnable() {
 
             public void run() {
@@ -90,9 +87,9 @@ public class WebPaintDispatcher {
                     }
                     Logger.trace("contentSender:paintJson", json);
                     Logger.trace("contentSender:pngEncodingStart", json.hashCode());
-                    Util.encodeWindowImages(windowImages, json, imageService);
+                    Util.encodeWindowImages(windowImages, json);
                     Logger.trace("contentSender:pngEncodingDone", json.hashCode());
-                    serverConnection.sendJsonObject(json);
+                    Services.getConnectionService().sendJsonObject(json);
                 } catch (Exception e) {
                     Logger.error("contentSender:error", e);
                 }
@@ -110,12 +107,12 @@ public class WebPaintDispatcher {
 
     public void notifyShutdown() {
         Logger.info("WebPaintDispatcher:notifyShutdown");
-        serverConnection.sendShutdownNotification();
+        Services.getConnectionService().sendShutdownNotification();
     }
 
     public void sendJsonObject(Serializable object) {
         Logger.info("WebPaintDispatcher:sendJsonObject", object);
-        serverConnection.sendJsonObject(object);
+        Services.getConnectionService().sendJsonObject(object);
     }
 
     public void notifyWindowAreaRepainted(String guid, Rectangle repaintedArea) {
@@ -191,7 +188,7 @@ public class WebPaintDispatcher {
         JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.url, uri.toString());
         f.setLinkAction(linkAction);
         Logger.info("WebPaintDispatcher:notifyOpenLinkAction", uri);
-        serverConnection.sendJsonObject(f);
+        Services.getConnectionService().sendJsonObject(f);
     }
 
     @SuppressWarnings("restriction")
@@ -317,7 +314,7 @@ public class WebPaintDispatcher {
             f.cursorChange = cursorChange;
             WindowManager.getInstance().setCurrentCursor(webcursorName);
             Logger.debug("WebPaintDispatcher:notifyCursorUpdate", f);
-            serverConnection.sendJsonObject(f);
+            Services.getConnectionService().sendJsonObject(f);
         }
     }
 
@@ -327,7 +324,7 @@ public class WebPaintDispatcher {
         copyEvent = new JsonCopyEvent(content);
         f.copyEvent = copyEvent;
         Logger.debug("WebPaintDispatcher:notifyCopyEvent", f);
-        serverConnection.sendJsonObject(f);
+        Services.getConnectionService().sendJsonObject(f);
     }
 
     public void notifyFileDialogActive(WebWindowPeer webWindowPeer) {
@@ -337,7 +334,7 @@ public class WebPaintDispatcher {
         f.fileDialogEvent = fdEvent;
         Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
         fileChooserDialog = Util.discoverFileChooser(webWindowPeer);
-        serverConnection.sendJsonObject(f);
+        Services.getConnectionService().sendJsonObject(f);
     }
 
     public void notifyFileDialogHidden(WebWindowPeer webWindowPeer) {
@@ -347,7 +344,7 @@ public class WebPaintDispatcher {
         f.fileDialogEvent = fdEvent;
         Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
         fileChooserDialog = null;
-        serverConnection.sendJsonObject(f);
+        Services.getConnectionService().sendJsonObject(f);
     }
 
     public JFileChooser getFileChooserDialog() {
@@ -357,7 +354,7 @@ public class WebPaintDispatcher {
     public void notifyDownloadSelectedFile() {
         if (fileChooserDialog != null) {
             File file = fileChooserDialog.getSelectedFile();
-            if (file!=null && file.exists() && !file.isDirectory() && file.canRead()) {
+            if (file != null && file.exists() && !file.isDirectory() && file.canRead()) {
                 OpenFileResult f = new OpenFileResult();
                 f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
                 f.setF(file);

@@ -35,7 +35,6 @@ import javax.swing.JFileChooser;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
-import org.webswing.common.ImageServiceIfc;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventKeyboard.Type;
 import org.webswing.model.c2s.JsonEventMouse;
@@ -184,14 +183,14 @@ public class Util {
         return windowImages;
     }
 
-    public static void encodeWindowImages(Map<String, Map<Integer, BufferedImage>> windowImages, JsonAppFrame json, ImageServiceIfc imageService) {
+    public static void encodeWindowImages(Map<String, Map<Integer, BufferedImage>> windowImages, JsonAppFrame json) {
         for (JsonWindow window : json.getWindows()) {
             if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
                 Map<Integer, BufferedImage> imageMap = windowImages.get(window.getId());
                 for (int i = 0; i < window.getContent().length; i++) {
                     JsonWindowPartialContent c = window.getContent()[i];
                     if (imageMap.containsKey(i)) {
-                        String base64Content = imageService.encodeImage(imageMap.get(i));
+                        String base64Content = Services.getImageService().encodeImage(imageMap.get(i));
                         c.setBase64Content(base64Content);
                     }
                 }
@@ -439,10 +438,10 @@ public class Util {
             int i = fileName.lastIndexOf('.');
             String base = i > 0 ? fileName.substring(0, i) : fileName;
             String ext = i > 0 ? fileName.substring(i) : null;
-            int next=1;
-            while(true){
-                String nextFN= base+" "+next+ext;
-                if(!existsFilename(currentDir,nextFN)){
+            int next = 1;
+            while (true) {
+                String nextFN = base + " " + next + ext;
+                if (!existsFilename(currentDir, nextFN)) {
                     return nextFN;
                 }
                 next++;

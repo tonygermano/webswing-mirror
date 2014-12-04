@@ -5,7 +5,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Window;
 
-public interface WindowDecoratorThemeIfc {
+public interface WindowDecoratorTheme {
 
     
     public static final String DECORATION_THEME_IMPL_PROP = "org.webswing.window.theme.impl";

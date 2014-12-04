@@ -40,6 +40,7 @@ import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.ge.WebGraphicsConfig;
 import org.webswing.util.Logger;
+import org.webswing.util.Services;
 import org.webswing.util.Util;
 
 import sun.awt.AWTAccessor;
@@ -82,7 +83,7 @@ public class WebComponentPeer implements ComponentPeer {
             if ((target instanceof JFrame && ((JFrame) target).isUndecorated()) || (target instanceof JDialog && ((JDialog) target).isUndecorated())) {
                 //window decoration is not painted
             } else {
-                windowDecorationImage = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getWindowDecoration(target, image.getWidth(), image.getHeight());
+                windowDecorationImage = Services.getImageService().getWindowDecorationTheme().getWindowDecoration(target, image.getWidth(), image.getHeight());
             }
         }
     }
@@ -321,7 +322,7 @@ public class WebComponentPeer implements ComponentPeer {
                 Window window = (Window) target;
                 boolean b = Util.isWindowDecorationPosition(window, location);
                 if (b) {
-                    WindowActionType wat = Util.getWebToolkit().getImageService().getWindowDecorationTheme().getAction(window, new Point(location.x - window.getX(), location.y - window.getY()));
+                    WindowActionType wat = Services.getImageService().getWindowDecorationTheme().getAction(window, new Point(location.x - window.getX(), location.y - window.getY()));
                     Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(mapActionToCursor(wat));
                 } else {
                     Component component = SwingUtilities.getDeepestComponentAt(window, location.x - window.getX(), location.y - window.getY());

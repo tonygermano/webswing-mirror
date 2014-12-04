@@ -1,8 +1,8 @@
-package org.webswing.common;
+package org.webswing.ext.services;
 
 import java.io.Serializable;
 
-public interface ServerConnectionIfc  {
+public interface ServerConnectionService  {
 
     void sendJsonObject(Serializable jsonPaintRequest);
 

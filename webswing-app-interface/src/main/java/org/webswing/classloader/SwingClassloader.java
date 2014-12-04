@@ -31,7 +31,7 @@ import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.ClassLoaderRepository;
-import org.webswing.util.CLUtil;
+import org.webswing.util.ClassLoaderUtil;
 
 import sun.security.util.SecurityConstants;
 
@@ -210,7 +210,7 @@ public class SwingClassloader extends ClassLoader {
     protected JavaClass modifyClass(JavaClass clazz) {
 
         //do not modify classes placed in this list
-        if (CLUtil.isInPackage(clazz.getPackageName(), new String[] { "org.webswing.containers" })) {
+        if (ClassLoaderUtil.isInPackage(clazz.getPackageName(), new String[] { "org.webswing.containers" })) {
             return clazz;
         }
 
@@ -265,7 +265,7 @@ public class SwingClassloader extends ClassLoader {
                 if (m == null) {
                     mg = new MethodGen(Constants.ACC_PUBLIC, // access flags
                             returnType, // return type
-                            signatureTypes, CLUtil.createArgNames(signatureTypes.length),// arg types
+                            signatureTypes, ClassLoaderUtil.createArgNames(signatureTypes.length),// arg types
                             methodName, cg.getClassName(), // method, class
                             il, cp);
                 } else {
@@ -318,7 +318,7 @@ public class SwingClassloader extends ClassLoader {
                         if (instruction instanceof CPInstruction) {
                             CPInstruction i = (CPInstruction) instruction;
                             if (indexReplacementMap.containsKey(i.getIndex())) {
-                                InstructionHandle handle = CLUtil.findInstructionHandle(il, i);
+                                InstructionHandle handle = ClassLoaderUtil.findInstructionHandle(il, i);
                                 INVOKESTATIC replacedInstruction = new INVOKESTATIC(indexReplacementMap.get(i.getIndex()));
                                 handle.setInstruction(replacedInstruction);
                                 dirtyFlag = true;
@@ -375,7 +375,7 @@ public class SwingClassloader extends ClassLoader {
                                 }
                                 String myProxyClassName = classReplacementMapping.get(referencedClassName);
                                 int myProxyConstantClassPosition = cp.lookupClass(myProxyClassName);
-                                InstructionHandle handle = CLUtil.findInstructionHandle(il, i);
+                                InstructionHandle handle = ClassLoaderUtil.findInstructionHandle(il, i);
                                 i.setIndex(myProxyConstantClassPosition);
                                 handle.setInstruction(i);
                                 dirtyFlag = true;

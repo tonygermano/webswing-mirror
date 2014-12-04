@@ -1,4 +1,4 @@
-package org.webswing.ext.services;
+package org.webswing.services.impl;
 
 import java.io.Serializable;
 import java.util.concurrent.Executors;
@@ -18,7 +18,7 @@ import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.webswing.Constants;
-import org.webswing.common.ServerConnectionIfc;
+import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.model.c2s.JsonEvent;
 import org.webswing.util.Logger;
 import org.webswing.util.Util;
@@ -27,9 +27,9 @@ import org.webswing.util.Util;
  * @author Viktor_Meszaros
  * This class is needed to achieve classpath isolation for swing application, all functionality dependent on external libs is implemented here.
  */
-public class ServerConnectionService implements MessageListener, ServerConnectionIfc {
+public class ServerConnectionServiceImpl implements MessageListener, ServerConnectionService {
 
-    private static ServerConnectionService impl;
+    private static ServerConnectionServiceImpl impl;
     private static ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Constants.JMS_URL);
 
     private Connection connection;
@@ -39,14 +39,14 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
 
     private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor();
 
-    public static ServerConnectionIfc getInstance() {
+    public static ServerConnectionServiceImpl getInstance() {
         if (impl == null) {
-            impl = new ServerConnectionService();
+            impl = new ServerConnectionServiceImpl();
         }
         return impl;
     }
 
-    public ServerConnectionService() {
+    public ServerConnectionServiceImpl() {
         initialize();
         Runnable watchdog = new Runnable() {
 
@@ -88,7 +88,7 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
                     } catch (JMSException e) {
                         //do nothing, will try to reinitialize.
                     }
-                    ServerConnectionService.this.initialize();
+                    ServerConnectionServiceImpl.this.initialize();
                 }
             });
             sendPidNotification();
@@ -98,6 +98,7 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
         }
     }
 
+    @Override
     public void sendShutdownNotification() {
         try {
             producer.send(session.createTextMessage(Constants.SWING_SHUTDOWN_NOTIFICATION));
@@ -122,6 +123,7 @@ public class ServerConnectionService implements MessageListener, ServerConnectio
         }
     }
 
+    @Override
     public void sendJsonObject(Serializable o) {
         try {
             synchronized (this) {

@@ -18,11 +18,11 @@ import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.WindowActionType;
-import org.webswing.common.WindowDecoratorThemeIfc;
+import org.webswing.common.WindowDecoratorTheme;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Logger;
 
-public class DefaultWindowDecoratorTheme implements WindowDecoratorThemeIfc {
+public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 
     Insets insets = new Insets(25, 5, 5, 5);
     Color basicColor = new Color(120, 200, 120);

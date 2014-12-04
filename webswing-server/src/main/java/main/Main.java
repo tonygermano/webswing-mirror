@@ -23,9 +23,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.webswing.Constants;
-import org.webswing.common.ImageServiceIfc;
-import org.webswing.common.ServerConnectionIfc;
-import org.webswing.common.SwingClassLoaderFactoryIfc;
 import org.webswing.toolkit.WebToolkit;
 
 public class Main {
@@ -33,7 +30,7 @@ public class Main {
     @SuppressWarnings("restriction")
     public static void main(String[] args) throws Exception {
         boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
-        
+
         ProtectionDomain domain = Main.class.getProtectionDomain();
         URL location = domain.getCodeSource().getLocation();
         System.setProperty(Constants.WAR_FILE_LOCATION, location.toExternalForm());
@@ -81,16 +78,9 @@ public class Main {
 
     private static void initializeExtLibServices(List<URL> urls) throws Exception {
         ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[0]), null);
-        Class<?> serverConnectionServiceclazz = extLibClassLoader.loadClass("org.webswing.ext.services.ServerConnectionService");
-        Method getInstanceOfServerConnectionServiceMethod = serverConnectionServiceclazz.getMethod("getInstance");
-        ServerConnectionIfc connService = (ServerConnectionIfc) getInstanceOfServerConnectionServiceMethod.invoke(null);
-        Class<?> imageServiceclazz = extLibClassLoader.loadClass("org.webswing.ext.services.ImageService");
-        Method getInstanceOfImageServiceMethod = imageServiceclazz.getMethod("getInstance");
-        ImageServiceIfc imgService = (ImageServiceIfc) getInstanceOfImageServiceMethod.invoke(null);
-        Class<?> swingClassloaderFactoryClass = extLibClassLoader.loadClass("org.webswing.classloader.SwingClassLoaderFactory");
-        ((WebToolkit) Toolkit.getDefaultToolkit()).setServerConnection(connService);
-        ((WebToolkit) Toolkit.getDefaultToolkit()).setImageService(imgService);
-        ((WebToolkit) Toolkit.getDefaultToolkit()).setWebswingClassLoaderFactory((SwingClassLoaderFactoryIfc) swingClassloaderFactoryClass.newInstance());
+        Class<?> classLoaderUtilclass = extLibClassLoader.loadClass("org.webswing.util.ClassLoaderUtil");
+        Method initializeServicesMethod = classLoaderUtilclass.getMethod("initializeServices");
+        initializeServicesMethod.invoke(null);
         ((WebToolkit) Toolkit.getDefaultToolkit()).init();
     }
 
@@ -176,13 +166,13 @@ public class Main {
 
     private static void initTempDirPath(String[] args) {
         if (args != null) {
-            for (int i = 0; i < args.length-1; i++) {
-                if("-t".equals(args[i]) || "-temp".equals(args[i])){
-                    System.setProperty(Constants.TEMP_DIR_PATH_BASE,args[i+1]);
+            for (int i = 0; i < args.length - 1; i++) {
+                if ("-t".equals(args[i]) || "-temp".equals(args[i])) {
+                    System.setProperty(Constants.TEMP_DIR_PATH_BASE, args[i + 1]);
                     return;
                 }
             }
         }
-        System.setProperty(Constants.TEMP_DIR_PATH_BASE,"tmp");
+        System.setProperty(Constants.TEMP_DIR_PATH_BASE, "tmp");
     }
 }

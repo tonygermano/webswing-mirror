@@ -16,6 +16,7 @@ import javax.print.PrintService;
 
 import org.webswing.Constants;
 import org.webswing.model.s2c.PrinterJobResult;
+import org.webswing.util.Services;
 import org.webswing.util.Util;
 
 public class WebPrinterJob extends PrinterJob {
@@ -66,7 +67,7 @@ public class WebPrinterJob extends PrinterJob {
     @Override
     public void print() throws PrinterException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Graphics2D resultPdf = Util.getWebToolkit().getImageService().createPDFGraphics(out, new Dimension(1, 1));
+        Graphics2D resultPdf = Services.getPdfService().createPDFGraphics(out, new Dimension(1, 1));
         if (printable != null) {
             int i = 0;
             boolean tryNext = true;
@@ -84,7 +85,7 @@ public class WebPrinterJob extends PrinterJob {
                 paintPfd(resultPdf, this.pageable.getPageFormat(i), this.pageable.getPrintable(i), i);
             }
         }
-        Util.getWebToolkit().getImageService().closePDFGraphics(resultPdf);
+        Services.getPdfService().closePDFGraphics(resultPdf);
         PrinterJobResult printResult = new PrinterJobResult();
         printResult.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
         printResult.setId(UUID.randomUUID().toString());
@@ -101,11 +102,11 @@ public class WebPrinterJob extends PrinterJob {
         int width = (int) pageFormat2.getPaper().getWidth();
         int height = (int) pageFormat2.getPaper().getHeight();
         if (printable2 != null) {
-            Util.getWebToolkit().getImageService().startPagePDFGraphics(resultPdf, new Dimension(width, height));
+            Services.getPdfService().startPagePDFGraphics(resultPdf, new Dimension(width, height));
             double[] m = pageFormat2.getMatrix();
             resultPdf.setTransform(new AffineTransform(m[0], m[1], m[2], m[3], m[4], m[5]));
             int result = printable2.print(resultPdf, pageFormat2, i);
-            Util.getWebToolkit().getImageService().endPagePDFGraphics(resultPdf);
+            Services.getPdfService().endPagePDFGraphics(resultPdf);
             return result;
         }
         return Printable.NO_SUCH_PAGE;
