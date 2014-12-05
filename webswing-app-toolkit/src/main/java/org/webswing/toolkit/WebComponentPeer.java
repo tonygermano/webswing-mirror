@@ -279,7 +279,7 @@ public class WebComponentPeer implements ComponentPeer {
             if (localFont == null) {
                 localFont = defaultFont;
             }
-            return new GraphicsWrapper(new SunGraphics2D(localSurfaceData, (Color) localObject2, (Color) localObject1, localFont), this, true);
+            return new GraphicsWrapper(new SunGraphics2D(localSurfaceData, (Color) localObject2, (Color) localObject1, localFont), this);
         }
         return null;
     }
