@@ -9,10 +9,8 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
-
-import org.webswing.toolkit.WebToolkit;
 import org.webswing.util.Logger;
+import org.webswing.util.Services;
 import org.webswing.util.Util;
 
 public class SwingMain {
@@ -45,7 +43,7 @@ public class SwingMain {
                 }
             }
             swingLibClassloader = new URLClassLoader(swingurls.toArray(new URL[0]), SwingMain.class.getClassLoader());
-            ClassLoader swingClassloader = ((WebToolkit) Toolkit.getDefaultToolkit()).getWebswingClassLoaderFactory().createSwingClassLoader(swingLibClassloader);
+            ClassLoader swingClassloader = Services.getClassloaderService().createSwingClassLoader(swingLibClassloader);
             Class<?> clazz = swingClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
             Class<?> mainArgType[] = { (new String[0]).getClass() };
             String progArgs[] = args;
@@ -58,8 +56,7 @@ public class SwingMain {
                 cl.setAccessible(true);
                 cl.set(q, Thread.currentThread().getContextClassLoader());
             } catch (Exception e) {
-                System.err.println("Error in SwingMain: EventQueue thread - setting context classloader failed." + e.getMessage());
-                e.printStackTrace();
+                Logger.error("Error in SwingMain: EventQueue thread - setting context classloader failed.", e);
             }
             Object argsArray[] = { progArgs };
             main.invoke(null, argsArray);

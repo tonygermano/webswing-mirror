@@ -1,13 +1,10 @@
 package org.webswing.toolkit.ge;
 
-import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.GraphicsDevice;
 import java.awt.Image;
-import java.awt.ImageCapabilities;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.awt.image.VolatileImage;
 import java.awt.image.WritableRaster;
 
 import sun.awt.image.BufferedImageGraphicsConfig;
@@ -40,8 +37,8 @@ public class WebGraphicsConfig extends BufferedImageGraphicsConfig {
         return new OffScreenImage(target, localColorModel, localWritableRaster, localColorModel.isAlphaPremultiplied());
     }
 
-    @Override
-    public VolatileImage createCompatibleVolatileImage(int paramInt1, int paramInt2, ImageCapabilities paramImageCapabilities, int paramInt3) throws AWTException {
-    }
+    //    @Override
+    //    public VolatileImage createCompatibleVolatileImage(int paramInt1, int paramInt2, ImageCapabilities paramImageCapabilities, int paramInt3) throws AWTException {
+    //    }
 
 }
