@@ -10,7 +10,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 
@@ -42,7 +41,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
             min = ImageIO.read(getClass().getClassLoader().getResource("img/min2.png"));
             max = ImageIO.read(getClass().getClassLoader().getResource("img/max2.png"));
         } catch (IOException e) {
-            Logger.error("DefaultWindowDecoratorTheme:init",e);
+            Logger.error("DefaultWindowDecoratorTheme:init", e);
         }
     }
 
@@ -50,11 +49,9 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
         return (Insets) insets.clone();
     }
 
-    public Image getWindowDecoration(Object window, int w, int h) {
-        boolean activeWindow=WindowManager.getInstance().getActiveWindow()==window;
-        
-        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
-        Graphics g = image.getGraphics();
+    public void paintWindowDecoration(Graphics g, Object window, int w, int h) {
+        boolean activeWindow = WindowManager.getInstance().getActiveWindow() == window;
+
         g.setColor(new Color(0, 0, 0, 0));
         g.fillRect(0, 0, w, h);
         g.setColor(basicColor);
@@ -64,7 +61,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
         g.fillRect(0, h - insets.bottom, w, insets.bottom);
         g.setColor(basicBorder);
         g.drawRect(0, 0, w - 1, h - 1);
-        if(activeWindow){
+        if (activeWindow) {
             g.drawRect(1, 1, w - 3, h - 3);
         }
         g.setColor(basicText);
@@ -76,8 +73,8 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
             offsetx += 21;
         }
         if (getTitle(window) != null) {
-            if(activeWindow){
-                g.setFont(g.getFont().deriveFont(g.getFont().getStyle()|Font.BOLD));
+            if (activeWindow) {
+                g.setFont(g.getFont().deriveFont(g.getFont().getStyle() | Font.BOLD));
             }
             g.drawString(getTitle(window), offsetx, offsety);
         }
@@ -97,8 +94,6 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
         buttonOffsetx += (buttonWidth + buttonMargin);
         g.fillRect(buttonOffsetx, 1, buttonWidth, insets.top - 2);
         g.drawImage(this.x, buttonOffsetx + (buttonWidth / 4), buttonOffsetY, buttonWidth / 2, buttonWidth / 2, null);
-        g.dispose();
-        return image;
     }
 
     private static String getTitle(Object o) {
@@ -124,7 +119,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
     }
 
     public WindowActionType getAction(Window w, Point e) {
-        Rectangle eventPoint = new Rectangle((int)e.getX(), (int)e.getY(), 0, 0);
+        Rectangle eventPoint = new Rectangle((int) e.getX(), (int) e.getY(), 0, 0);
         Insets i = w.getInsets();
         int buttonsoffsetx = w.getWidth() - i.right - headerMargin - (3 * (buttonWidth + buttonMargin));
         int buttonsWidth = 3 * (buttonWidth + buttonMargin);

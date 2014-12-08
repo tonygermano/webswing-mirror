@@ -13,6 +13,7 @@ import org.webswing.ext.services.ImageService;
 import org.webswing.ext.services.PdfService;
 import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.ext.services.SwingClassLoaderFactoryService;
+import org.webswing.services.impl.DirectDrawServiceImpl;
 import org.webswing.services.impl.ImageServiceImpl;
 import org.webswing.services.impl.PdfServiceImpl;
 import org.webswing.services.impl.ServerConnectionServiceImpl;
@@ -27,7 +28,8 @@ public class ClassLoaderUtil {
         PdfService pdfService = PdfServiceImpl.getInstance();
         ServerConnectionService serverService = ServerConnectionServiceImpl.getInstance();
         SwingClassLoaderFactoryService classloaderService = SwingClassLoaderFactory.getInstance();
-        Services.initialize(imageService, pdfService, serverService, classloaderService);
+        DirectDrawServiceImpl directDrawServiceImpl = DirectDrawServiceImpl.getInstance();
+        Services.initialize(imageService, pdfService, serverService, classloaderService, directDrawServiceImpl);
     }
 
     public static List<Method> getAllConstructors(JavaClass clazz) {

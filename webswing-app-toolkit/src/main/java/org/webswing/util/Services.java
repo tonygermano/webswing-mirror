@@ -1,5 +1,6 @@
 package org.webswing.util;
 
+import org.webswing.ext.services.DirectDrawService;
 import org.webswing.ext.services.ImageService;
 import org.webswing.ext.services.PdfService;
 import org.webswing.ext.services.ServerConnectionService;
@@ -11,12 +12,14 @@ public class Services {
     private static PdfService pdfService;
     private static ServerConnectionService serverService;
     private static SwingClassLoaderFactoryService classloaderService;
+    private static DirectDrawService directDrawService;
 
-    protected static void initialize(ImageService imageServiceImpl, PdfService pdfServiceImpl, ServerConnectionService serverServiceImpl, SwingClassLoaderFactoryService classloaderServiceImpl) {
+    public static void initialize(ImageService imageServiceImpl, PdfService pdfServiceImpl, ServerConnectionService serverServiceImpl, SwingClassLoaderFactoryService classloaderServiceImpl, DirectDrawService directDrawServiceImpl) {
         imageService = imageServiceImpl;
         pdfService = pdfServiceImpl;
         serverService = serverServiceImpl;
         classloaderService = classloaderServiceImpl;
+        directDrawService = directDrawServiceImpl;
     }
 
     public static ImageService getImageService() {
@@ -49,6 +52,14 @@ public class Services {
             System.exit(1);
         }
         return classloaderService;
+    }
+
+    public static DirectDrawService getDirectDrawService() {
+        if (directDrawService == null) {
+            Logger.fatal("DirectDraw service has not been initialize. Exiting...");
+            System.exit(1);
+        }
+        return directDrawService;
     }
 
 }

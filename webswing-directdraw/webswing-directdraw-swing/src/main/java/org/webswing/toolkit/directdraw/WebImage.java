@@ -23,6 +23,7 @@ public class WebImage extends Image {
     private int lastGraphicsId = 0;
     WebGraphics lastUsedG = null;
     private List<DrawInstruction> instructions = new ArrayList<DrawInstruction>();
+    private List<DrawInstruction> newInstructions = new ArrayList<DrawInstruction>();
 
     public WebImage(int w, int h) {
         this.size = new Dimension(w, h);
@@ -61,16 +62,31 @@ public class WebImage extends Image {
         if (g != null && g.isDisposed()) {
             throw new RuntimeException("Drawing to disposed graphics.");
         }
-        if (lastUsedG != g && g != null) {
-            instructions.add(DrawInstruction.switchGraphics(g));
-            lastUsedG = g;
+        synchronized (this) {
+            if (lastUsedG != g && g != null) {
+                newInstructions.add(DrawInstruction.switchGraphics(g));
+                lastUsedG = g;
+            }
+            newInstructions.add(in);
         }
-        instructions.add(in);
     }
 
     public Message toMessage(DirectDraw dd) {
+        return toMessage(dd, true);
+    }
+
+    public Message toMessage(DirectDraw dd, boolean resetOld) {
         DrawConstantPool constantPool = dd.getConstantPool();
         WebImageProto.Builder webImageBuilder = WebImageProto.newBuilder();
+        synchronized (this) {
+            if (resetOld) {
+                instructions = newInstructions;
+                newInstructions = new ArrayList<DrawInstruction>();
+            } else {
+                instructions.addAll(newInstructions);
+                newInstructions.clear();
+            }
+        }
         for (DrawInstruction ins : instructions) {
             DrawConstant<?>[] constants = ins.getArgs();
             for (DrawConstant<?> cons : constants) {

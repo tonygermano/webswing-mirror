@@ -78,7 +78,11 @@ public class WebPaintDispatcher {
                         }
                         windowNonVisibleAreas = WindowManager.getInstance().extractNonVisibleAreas();
                         json = Util.fillJsonWithWindowsData(currentAreasToUpdate, windowNonVisibleAreas);
-                        windowImages = Util.extractWindowImages(json);
+                        if (Util.isDD()) {
+                            Util.fillDirectDrawWindowImages(json);
+                        } else {
+                            windowImages = Util.extractWindowImages(json);
+                        }
                         if (moveAction != null) {
                             json.moveAction = moveAction;
                             moveAction = null;
@@ -86,9 +90,11 @@ public class WebPaintDispatcher {
                         clientReadyToReceive = false;
                     }
                     Logger.trace("contentSender:paintJson", json);
-                    Logger.trace("contentSender:pngEncodingStart", json.hashCode());
-                    Util.encodeWindowImages(windowImages, json);
-                    Logger.trace("contentSender:pngEncodingDone", json.hashCode());
+                    if (!Util.isDD()) {
+                        Logger.trace("contentSender:pngEncodingStart", json.hashCode());
+                        Util.encodeWindowImages(windowImages, json);
+                        Logger.trace("contentSender:pngEncodingDone", json.hashCode());
+                    }
                     Services.getConnectionService().sendJsonObject(json);
                 } catch (Exception e) {
                     Logger.error("contentSender:error", e);

@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Point;
@@ -65,7 +66,7 @@ public class WebComponentPeer implements ComponentPeer {
         return guid;
     }
 
-    public BufferedImage extractSafeImage(Rectangle sub) {
+    public BufferedImage extractBufferedImage(Rectangle sub) {
         BufferedImage safeImage = new BufferedImage(sub.width, sub.height, BufferedImage.TYPE_4BYTE_ABGR);
         Graphics g = safeImage.getGraphics();
         g.drawImage(image, 0, 0, sub.width, sub.height, sub.x, sub.y, sub.x + sub.width, sub.y + sub.height, null);
@@ -74,8 +75,9 @@ public class WebComponentPeer implements ComponentPeer {
         return safeImage;
     }
 
-    public Image getWindowDecorationImage() {
-        return windowDecorationImage;
+    public String extractWebImage() {
+        String webImageBytes = Services.getDirectDrawService().buildWebImage(webImage);
+        return webImageBytes;
     }
 
     public void updateWindowDecorationImage() {
@@ -83,7 +85,19 @@ public class WebComponentPeer implements ComponentPeer {
             if ((target instanceof JFrame && ((JFrame) target).isUndecorated()) || (target instanceof JDialog && ((JDialog) target).isUndecorated())) {
                 //window decoration is not painted
             } else {
-                windowDecorationImage = Services.getImageService().getWindowDecorationTheme().getWindowDecoration(target, image.getWidth(), image.getHeight());
+                int w, h;
+                if (Util.isDD()) {
+                    w = webImage.getWidth(null);
+                    h = webImage.getHeight(null);
+                    windowDecorationImage = Services.getDirectDrawService().createImage(w, h);
+                } else {
+                    w = image.getWidth();
+                    h = image.getHeight();
+                    windowDecorationImage = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
+                }
+                Graphics g = windowDecorationImage.getGraphics();
+                Services.getImageService().getWindowDecorationTheme().paintWindowDecoration(g, target, w, h);
+                g.dispose();
             }
         }
     }
@@ -103,8 +117,9 @@ public class WebComponentPeer implements ComponentPeer {
     private SurfaceData surfaceData;
     private OffScreenImage image;
     private Image windowDecorationImage;
-    private Object background;
-    private Object foreground;
+    Image webImage; //directdraw
+    private Color background;
+    private Color foreground;
     private Font font;
 
     public static WebComponentPeer getPeerForTarget(Object paramObject) {
@@ -203,14 +218,19 @@ public class WebComponentPeer implements ComponentPeer {
         SurfaceData localSurfaceData = null;
         synchronized (((Component) this.target).getTreeLock()) {
             synchronized (this) {
-                WebGraphicsConfig localWebGraphicsConfig = (WebGraphicsConfig) getGraphicsConfiguration();
-                this.image = (OffScreenImage) localWebGraphicsConfig.createAcceleratedImage((Component) this.target, w, h);
-                localSurfaceData = this.surfaceData;
-                this.surfaceData = Util.getWebToolkit().webComponentPeerReplaceSurfaceData(SurfaceManager.getManager(this.image));// java6 vs java7 difference
-                updateWindowDecorationImage();
-                if (localSurfaceData != null) {
-                    localSurfaceData.invalidate();
+                if (Util.isDD()) {
+                    this.webImage = Services.getDirectDrawService().createImage(w, h);
+                } else {
+                    WebGraphicsConfig localWebGraphicsConfig = (WebGraphicsConfig) getGraphicsConfiguration();
+                    this.image = (OffScreenImage) localWebGraphicsConfig.createAcceleratedImage((Component) this.target, w, h);
+                    localSurfaceData = this.surfaceData;
+                    this.surfaceData = Util.getWebToolkit().webComponentPeerReplaceSurfaceData(SurfaceManager.getManager(this.image));// java6 vs java7 difference
+
+                    if (localSurfaceData != null) {
+                        localSurfaceData.invalidate();
+                    }
                 }
+                updateWindowDecorationImage();
                 repaintPeerTarget();
             }
         }
@@ -265,23 +285,35 @@ public class WebComponentPeer implements ComponentPeer {
     }
 
     public Graphics getGraphics() {
-        SurfaceData localSurfaceData = this.surfaceData;
-        if (localSurfaceData != null) {
-            Object localObject1 = this.background;
-            if (localObject1 == null) {
-                localObject1 = SystemColor.window;
-            }
-            Object localObject2 = this.foreground;
-            if (localObject2 == null) {
-                localObject2 = SystemColor.windowText;
-            }
-            Font localFont = this.font;
-            if (localFont == null) {
-                localFont = defaultFont;
-            }
-            return new GraphicsWrapper(new SunGraphics2D(localSurfaceData, (Color) localObject2, (Color) localObject1, localFont), this);
+        Color background = this.background;
+        if (background == null) {
+            background = SystemColor.window;
         }
-        return null;
+        Color foreground = this.foreground;
+        if (foreground == null) {
+            foreground = SystemColor.windowText;
+        }
+        Font font = this.font;
+        if (font == null) {
+            font = defaultFont;
+        }
+
+        Graphics2D result = null;
+        if (Util.isDD()) {
+            Image wi = this.webImage;
+            if (wi != null) {
+                result = new GraphicsWrapper((Graphics2D) wi.getGraphics(), this);
+                result.setBackground(background);
+                result.setColor(foreground);
+                result.setFont(font);
+            }
+        } else {
+            SurfaceData surface = this.surfaceData;
+            if (surface != null) {
+                result = new GraphicsWrapper(new SunGraphics2D(surface, foreground, background, font), this);
+            }
+        }
+        return result;
     }
 
     public FontMetrics getFontMetrics(Font paramFont) {
@@ -291,10 +323,14 @@ public class WebComponentPeer implements ComponentPeer {
     public void dispose() {
         synchronized (WebPaintDispatcher.webPaintLock) {
             Util.getWebToolkit().getPaintDispatcher().notifyWindowClosed(getGuid());
-            SurfaceData localSurfaceData = this.surfaceData;
-            this.surfaceData = null;
-            if (localSurfaceData != null) {
-                localSurfaceData.invalidate();
+            if (Util.isDD()) {
+                this.webImage = null;
+            } else {
+                SurfaceData localSurfaceData = this.surfaceData;
+                this.surfaceData = null;
+                if (localSurfaceData != null) {
+                    localSurfaceData.invalidate();
+                }
             }
             WebToolkit.targetDisposedPeer(this.target, this);
         }

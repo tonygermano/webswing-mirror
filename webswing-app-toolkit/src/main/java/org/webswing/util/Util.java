@@ -35,6 +35,7 @@ import javax.swing.JFileChooser;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
+import org.webswing.Constants;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventKeyboard.Type;
 import org.webswing.model.c2s.JsonEventMouse;
@@ -175,12 +176,21 @@ public class Util {
                 Map<Integer, BufferedImage> imageMap = new HashMap<Integer, BufferedImage>();
                 for (int i = 0; i < window.getContent().length; i++) {
                     JsonWindowPartialContent wpc = window.getContent()[i];
-                    imageMap.put(i, w.extractSafeImage(new Rectangle(wpc.getPositionX(), wpc.getPositionY(), wpc.getWidth(), wpc.getHeight())));
+                    imageMap.put(i, w.extractBufferedImage(new Rectangle(wpc.getPositionX(), wpc.getPositionY(), wpc.getWidth(), wpc.getHeight())));
                 }
                 windowImages.put(window.getId(), imageMap);
             }
         }
         return windowImages;
+    }
+
+    public static void fillDirectDrawWindowImages(JsonAppFrame json) {
+        for (JsonWindow window : json.getWindows()) {
+            WebWindowPeer w = findWindowPeerById(window.getId());
+            if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
+                window.setDirectDrawB64(w.extractWebImage());
+            }
+        }
     }
 
     public static void encodeWindowImages(Map<String, Map<Integer, BufferedImage>> windowImages, JsonAppFrame json) {
@@ -458,6 +468,10 @@ public class Util {
             }
         }
         return false;
+    }
+
+    public static boolean isDD() {
+        return Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, "false"));
     }
 
 }

@@ -135,6 +135,7 @@
 						WEB-INF/lib/slf4j-simple-*.jar,
 						WEB-INF/lib/freehep-*.jar,
 						WEB-INF/lib/webswing-directdraw-swing-*.jar,
+						WEB-INF/lib/protobuf-java-*.jar,
 					</packagingExcludes>
 					<archive>
 						<manifest>
@@ -182,7 +183,7 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/swing-lib</outputDirectory>
 							<includeArtifactIds>
-								webswing-app-interface,webswing-app-launcher,webswing-directdraw-swing,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,commons-io,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging,freehep-graphicsio-pdf,freehep-graphics2d,freehep-graphicsbase,freehep-graphicsio,freehep-io
+								webswing-app-interface,webswing-app-launcher,webswing-directdraw-swing,protobuf-java,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,commons-io,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging,freehep-graphicsio-pdf,freehep-graphics2d,freehep-graphicsbase,freehep-graphicsio,freehep-io
 							</includeArtifactIds>
 						</configuration>
 					</execution>

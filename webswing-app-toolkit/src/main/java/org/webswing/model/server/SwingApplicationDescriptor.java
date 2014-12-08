@@ -20,7 +20,8 @@ public class SwingApplicationDescriptor implements Serializable {
     private boolean authorization = false;
     private boolean isolatedFs = false;
     private boolean debug = false;
-    private boolean authentication=true;
+    private boolean authentication = true;
+    private boolean directdraw = true;
 
     public String getName() {
         return name;
@@ -129,12 +130,10 @@ public class SwingApplicationDescriptor implements Serializable {
         this.debug = debug;
     }
 
-    
     public boolean isIsolatedFs() {
         return isolatedFs;
     }
 
-    
     public void setIsolatedFs(boolean isolatedFs) {
         this.isolatedFs = isolatedFs;
     }
@@ -146,7 +145,13 @@ public class SwingApplicationDescriptor implements Serializable {
     public void setAuthentication(boolean authentication) {
         this.authentication = authentication;
     }
-    
-    
+
+    public boolean isDirectdraw() {
+        return directdraw;
+    }
+
+    public void setDirectdraw(boolean directdraw) {
+        this.directdraw = directdraw;
+    }
 
 }

@@ -174,13 +174,13 @@ public class SwingJvmConnection implements MessageListener {
             producer.close();
             session.close();
             connection.close();
-            if(jmxConnection!=null){
-            	JMXConnector thisjmxConnection = jmxConnection;
-            	jmxConnection=null;
-            	thisjmxConnection.close();
+            if (jmxConnection != null) {
+                JMXConnector thisjmxConnection = jmxConnection;
+                jmxConnection = null;
+                thisjmxConnection.close();
             }
         } catch (Exception e) {
-        	log.debug("SwingJvmConnection:close", e);
+            log.debug("SwingJvmConnection:close", e);
         }
         if (withShutdownEvent) {
             webListener.sendToWeb(Constants.SWING_SHUTDOWN_NOTIFICATION);
@@ -269,6 +269,11 @@ public class SwingJvmConnection implements MessageListener {
                         isolatedFs.setKey(Constants.SWING_START_SYS_PROP_ISOLATED_FS);
                         isolatedFs.setValue(appConfig.isIsolatedFs() + "");
                         javaTask.addSysproperty(isolatedFs);
+
+                        Variable directDrawEnabled = new Variable();
+                        directDrawEnabled.setKey(Constants.SWING_START_SYS_PROP_DIRECTDRAW);
+                        directDrawEnabled.setValue(appConfig.isDirectdraw() + "");
+                        javaTask.addSysproperty(directDrawEnabled);
 
                         Variable inactivityTimeout = new Variable();
                         inactivityTimeout.setKey(Constants.SWING_SESSION_TIMEOUT_SEC);
