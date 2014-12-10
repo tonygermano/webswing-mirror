@@ -36,6 +36,13 @@ function WebswingBase(c) {
 	var canPaint = false;
 	var mirrorMode = config.mirrorMode;
 
+	var proto = dcodeIO.ProtoBuf.loadProtoFile("directdraw.proto");
+	var ddCanvas = document.createElement("canvas");
+	var directDraw = new WebswingDirectDraw({
+		canvas : ddCanvas,
+		proto : proto
+	});
+
 	var timer1 = setInterval(mouseMoveEventFilter, 100);
 	var timer2 = setInterval(heartbeat, 10000);
 
@@ -181,16 +188,40 @@ function WebswingBase(c) {
 			}
 		}
 		// regular windows (background removed)
-		for ( var i in data.windows) {
-			var win = data.windows[i];
-			for ( var x in win.content) {
-				var winContent = win.content[x];
-				if (winContent != null) {
-					draw(win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.base64Content, context);
+		var drawPromisesArray = data.windows.map(function(win) {
+			return new Promise(function(resolve, reject) {
+				if (win.directDrawB64 != null) {
+					ddCanvas.width = win.width;
+					ddCanvas.height = win.height;
+					directDraw.draw64(win.directDrawB64).then(function() {
+						for ( var x in win.content) {
+							var winContent = win.content[x];
+							if (winContent != null) {
+								context.drawImage(ddCanvas, winContent.positionX, winContent.positionY, winContent.width, winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height);
+							}
+						}
+						resolve();
+					});
+				} else {
+					for ( var x in win.content) {
+						var winContent = win.content[x];
+						if (winContent != null) {
+							var imageObj;
+							imageObj = new Image();
+							imageObj.onload = function() {
+								context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
+								imageObj.onload = null;
+								imageObj.src = '';
+							};
+							imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
+						}
+					}
 				}
-			}
-		}
-		ack();
+			});
+		});
+		Promise.all(drawPromisesArray).then(function() {
+			ack();
+		})
 	}
 
 	function adjustCanvasSize(width, height) {
@@ -198,17 +229,6 @@ function WebswingBase(c) {
 			canvas.width = width;
 			canvas.height = height;
 		}
-	}
-
-	function draw(x, y, b64image, context) {
-		var imageObj;
-		imageObj = new Image();
-		imageObj.onload = function() {
-			context.drawImage(imageObj, x, y);
-			imageObj.onload = null;
-			imageObj.src = '';
-		};
-		imageObj.src = 'data:image/png;base64,' + b64image;
 	}
 
 	function clear(x, y, w, h, context) {
@@ -281,7 +301,7 @@ function WebswingBase(c) {
 			// 226
 			// FF (163, 171, 173, ) -> en layout ]\/ keys
 			var kc = event.keyCode;
-			if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226) || (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111) )) {
+			if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226) || (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
 				event.preventDefault();
 				event.stopPropagation();
 			}
@@ -296,9 +316,9 @@ function WebswingBase(c) {
 				sendInput(pasteEvent);
 			} else {
 				// default action prevented
-                if (keyevt.ctrl && !keyevt.alt && !keyevt.altgr) {
-                    event.preventDefault();
-                }
+				if (keyevt.ctrl && !keyevt.alt && !keyevt.altgr) {
+					event.preventDefault();
+				}
 				sendInput(keyevt);
 			}
 			return false;

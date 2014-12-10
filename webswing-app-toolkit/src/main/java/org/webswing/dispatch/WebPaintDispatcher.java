@@ -80,6 +80,9 @@ public class WebPaintDispatcher {
                         json = Util.fillJsonWithWindowsData(currentAreasToUpdate, windowNonVisibleAreas);
                         if (Util.isDD()) {
                             Util.fillDirectDrawWindowImages(json);
+                            if (json.windows.size() < 1) {
+                                return;
+                            }
                         } else {
                             windowImages = Util.extractWindowImages(json);
                         }

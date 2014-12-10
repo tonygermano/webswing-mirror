@@ -11,7 +11,7 @@ function WebswingDirectDraw(c) {
 		},
 		canvas : c.canvas,
 		proto : c.proto,
-		constantPool : c.constantPool!=null?c.constantPool:[]
+		constantPool : c.constantPool != null ? c.constantPool : []
 	};
 
 	var WebImageProto = c.proto.build("org.webswing.directdraw.proto.WebImageProto");
@@ -30,31 +30,61 @@ function WebswingDirectDraw(c) {
 
 	function draw64(data) {
 		var image = WebImageProto.decode64(data);
-		drawWebImage(image);
+		return drawWebImage(image);
 	}
 
 	function drawBin(data) {
 		var image = WebImageProto.decode(data);
-		drawWebImage(image);
+		return drawWebImage(image);
 	}
 
 	function drawWebImage(image) {
-		image.constants.forEach(function(constant, index) {
-			constantPoolCache[constant.id] = constant;
-		});
-		prepareImages(image, function(preloadedImages) {
-			ctx = config.canvas.getContext("2d");
-			config.canvas.width = config.canvas.width;
-			if (image.instructions != null) {
-				image.instructions.forEach(interpretInstruction, preloadedImages);
+		return new Promise(function(resolve, reject) {
+			try {
+				var imagesToPrepare = [];
+				populateConstantsPool(image, imagesToPrepare);
+
+				prepareImages(imagesToPrepare).then(function(preloadedImages) {
+					ctx = config.canvas.getContext("2d");
+					config.canvas.width = config.canvas.width;
+					if (image.instructions != null) {
+						image.instructions.forEach(function(instruction) {
+							interpretInstruction(ctx, instruction,preloadedImages);
+						});
+					}
+					cleanupImages(preloadedImages);
+					cleanupCanvas(ctx);
+					resolve(config.canvas);
+				}, function(error) {
+					config.onErrorMessage(error);
+				});
+			} catch (e) {
+				config.onErrorMessage(error);
+				reject(e);
 			}
-			cleanupImages(preloadedImages);
-			cleanupCanvas(ctx);
 		});
 	}
 
-	function interpretInstruction(instruction, index, array) {
-		var preloadedImages = this;
+	function populateConstantsPool(image, imagesToPrepare) {
+		image.constants.forEach(function(constant, index) {
+			constantPoolCache[constant.id] = constant;
+		});
+		if (image.instructions != null) {
+			image.instructions.forEach(function(instruction, index) {
+				if (instruction.inst == InstructionProto.DRAW_IMAGE || instruction.inst == InstructionProto.SET_PAINT) {
+					if (constantPoolCache[instruction.args[0]].image != null) {
+						imagesToPrepare.push(constantPoolCache[instruction.args[0]].image);
+					}
+				}
+				if (instruction.inst == InstructionProto.DRAW_WEBIMAGE) {
+					instruction.webImage=WebImageProto.decode(instruction.webImage);
+					populateConstantsPool(instruction.webImage, imagesToPrepare);
+				}
+			});
+		}
+	}
+
+	function interpretInstruction(ctx, instruction,preloadedImages) {
 		var instCode = instruction.inst;
 		var args = resolveArgs(instruction.args, constantPoolCache);
 		switch (instCode) {
@@ -77,10 +107,10 @@ function WebswingDirectDraw(c) {
 			iprtDrawImage(ctx, args, preloadedImages);
 			break;
 		case InstructionProto.DRAW_WEBIMAGE:
-			iprtDrawWebImage(ctx, args, instruction.webImage);
+			iprtDrawWebImage(ctx, args, instruction.webImage, preloadedImages);
 			break;
 		case InstructionProto.DRAW_STRING:
-			iprtDrawString(ctx, args, preloadedImages);
+			iprtDrawString(ctx, args);
 			break;
 		case InstructionProto.COPY_AREA:
 			iprtCopyArea(ctx, args);
@@ -202,7 +232,7 @@ function WebswingDirectDraw(c) {
 		ctx.restore();
 	}
 
-	function iprtDrawWebImage(ctx, args, image){
+	function iprtDrawWebImage(ctx, args, image, preloadedImages) {
 		var transform, bg, crop, clip;
 
 		if (args[0].transform != null) {
@@ -221,13 +251,21 @@ function WebswingDirectDraw(c) {
 		var imageCanvas = document.createElement("canvas");
 		imageCanvas.width = crop.w;
 		imageCanvas.height = crop.h;
-		imageCanvas.getContext("2d").translate(crop.x, crop.y);
-		WebswingDirectDraw({
-			canvas : imageCanvas,
-			proto : config.proto,
-			constantPool : config.constantPool
-		}).drawBin(image);
-
+		var icCtx = imageCanvas.getContext("2d");
+		icCtx.translate(crop.x, crop.y);
+		
+		var originalGraphicsStates = graphicsStates;
+		var originalCurrentStateId=currentStateId;
+		graphicsStates = {};
+		currentStateId = null;
+		if (image.instructions != null) {
+			image.instructions.forEach(function(instruction) {
+				interpretInstruction(icCtx, instruction);
+			}, preloadedImages);
+		}
+		graphicsStates = originalGraphicsStates;
+		currentStateId = currentStateId;
+		
 		ctx.save();
 		if (path(ctx, clip)) {
 			ctx.clip();
@@ -240,7 +278,7 @@ function WebswingDirectDraw(c) {
 
 	}
 
-	function iprtDrawString(ctx, args, preloadedImages) {
+	function iprtDrawString(ctx, args) {
 		var string, font, transform, clip;
 		string = args[0].string;
 		font = args[1].font;
@@ -655,31 +693,29 @@ function WebswingDirectDraw(c) {
 		return 'rgba(' + ((rgba >>> 24) & mask) + ',' + ((rgba >>> 16) & mask) + ',' + ((rgba) >>> 8 & mask) + ',' + (rgba & mask) + ')';
 	}
 
-	function prepareImages(image, callback) {
-		var imageConstants = [];
-		var preloadedImages = {};
-		var loaded = 0;
-		image.instructions.forEach(function(instruction, index, array) {
-			for ( var i = 0; i < instruction.args.length; i++) {
-				if (constantPoolCache[instruction.args[i]].image != null) {
-					imageConstants.push(constantPoolCache[instruction.args[i]].image);
+	function prepareImages(imageConstants) {
+		return new Promise(function(resolve, reject) {
+			try {
+				var preloadedImages = {};
+				if (imageConstants.length > 0) {
+					var loadPromisesArray = imageConstants.map(function(constant) {
+						return new Promise(function(resolve, reject) {
+							preloadedImages[constant.hash] = new Image();
+							preloadedImages[constant.hash].onload = function() {
+								resolve(preloadedImages);
+							};
+							preloadedImages[constant.hash].src = getImageData(constant);
+						});
+					});
+					Promise.all(loadPromisesArray).then(resolve(preloadedImages));
+				} else {
+					resolve(preloadedImages);
 				}
+			} catch (e) {
+				config.onErrorMessage(error);
+				reject(e);
 			}
 		});
-		if (imageConstants.length > 0) {
-			for ( var j = 0; j < imageConstants.length; j++) {
-				preloadedImages[imageConstants[j].hash] = new Image();
-				preloadedImages[imageConstants[j].hash].onload = function() {
-					loaded += 1;
-					if (loaded >= imageConstants.length) {
-						callback(preloadedImages);
-					}
-				};
-				preloadedImages[imageConstants[j].hash].src = getImageData(imageConstants[j]);
-			}
-		} else {
-			callback(preloadedImages);
-		}
 	}
 
 	function cleanupImages(preloadedImages) {
@@ -721,10 +757,10 @@ function WebswingDirectDraw(c) {
 
 	return {
 		draw64 : function(data) {
-			draw64(data);
+			return draw64(data);
 		},
 		drawBin : function(data) {
-			drawBin(data);
+			return drawBin(data);
 		}
 	};
 };

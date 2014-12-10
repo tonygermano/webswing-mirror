@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -185,10 +186,16 @@ public class Util {
     }
 
     public static void fillDirectDrawWindowImages(JsonAppFrame json) {
-        for (JsonWindow window : json.getWindows()) {
+        for (Iterator<JsonWindow> i = json.getWindows().iterator(); i.hasNext();) {
+            JsonWindow window = i.next();
             WebWindowPeer w = findWindowPeerById(window.getId());
             if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
-                window.setDirectDrawB64(w.extractWebImage());
+                String webimageString = w.extractWebImage();
+                if (webimageString == null || webimageString.length() == 0) {
+                    i.remove();
+                } else {
+                    window.setDirectDrawB64(webimageString);
+                }
             }
         }
     }
