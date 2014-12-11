@@ -4,15 +4,12 @@ import java.awt.geom.PathIterator;
 import java.util.Arrays;
 
 import org.webswing.directdraw.proto.Directdraw.PathProto;
-import org.webswing.directdraw.proto.Directdraw.PathProto.Builder;
 import org.webswing.directdraw.proto.Directdraw.PathProto.SegmentTypeProto;
 
-public class PathConst extends DrawConstant<PathProto.Builder> {
-
-    private PathProto.Builder model;
+public class PathConst extends DrawConstant {
 
     public PathConst(PathIterator pi) {
-        this.model = PathProto.newBuilder();
+    	 PathProto.Builder  model = PathProto.newBuilder();
         if (pi != null) {
             model.setWindingOdd(pi.getWindingRule() == PathIterator.WIND_EVEN_ODD ? true : false);
             double[] points = new double[6];
@@ -26,11 +23,7 @@ public class PathConst extends DrawConstant<PathProto.Builder> {
                 pi.next();
             }
         }
-    }
-
-    @Override
-    protected Builder getProtoBuilder() {
-        return model;
+        this.message=model.build();
     }
 
     @Override

@@ -17,7 +17,7 @@ import org.webswing.directdraw.proto.Directdraw.ImageProto;
 
 import com.google.protobuf.ByteString;
 
-public class ImageConst extends DrawConstant<ImageProto.Builder> {
+public class ImageConst extends DrawConstant {
 
     private static MessageDigest x;
     static {
@@ -28,14 +28,12 @@ public class ImageConst extends DrawConstant<ImageProto.Builder> {
         }
     }
 
-    private ImageProto.Builder model;
     private RenderedImage img;
     private byte[] hash;
 
     public ImageConst(BufferedImage img) {
-        model = ImageProto.newBuilder();
         byte[] raw = null;
-        Object buffer = img.getData().getDataBuffer();
+        Object buffer = img.getRaster().getDataBuffer();
         if (buffer instanceof DataBufferByte) {
             raw = ((DataBufferByte) buffer).getData();
         } else if (buffer instanceof DataBufferInt) {
@@ -50,17 +48,13 @@ public class ImageConst extends DrawConstant<ImageProto.Builder> {
     }
 
     @Override
-    protected ImageProto.Builder getProtoBuilder() {
-        return model;
-    }
-
-    @Override
     public String getFieldName() {
         return "image";
     }
 
     @Override
-    public Object toMessage(DirectDraw dd) {
+    public Object getMessage(DirectDraw dd) {
+    	ImageProto.Builder model = ImageProto.newBuilder();
         byte[] pngImage = dd.getServices().getPngImage(img);
         try {
             model.setData(ByteString.readFrom(new ByteArrayInputStream(pngImage)));
@@ -68,7 +62,9 @@ public class ImageConst extends DrawConstant<ImageProto.Builder> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return super.toMessage(dd);
+        this.img=null;
+        this.message=model.build();
+        return super.getMessage(dd);
     }
 
     @Override

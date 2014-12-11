@@ -3,8 +3,8 @@ package org.webswing.services.impl;
 import java.awt.Image;
 
 import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.toolkit.WebImage;
 import org.webswing.ext.services.DirectDrawService;
-import org.webswing.toolkit.directdraw.WebImage;
 
 import com.google.protobuf.Message;
 
@@ -25,7 +25,7 @@ public class DirectDrawServiceImpl implements DirectDrawService {
 
     @Override
     public Image createImage(int width, int height) {
-        return new WebImage(width, height);
+        return dd.createImage(width, height);
     }
 
     @Override

@@ -1,8 +1,10 @@
 package org.webswing.toolkit;
 
 import java.awt.Image;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import sun.awt.datatransfer.DataTransferer;
 import sun.awt.datatransfer.ToolkitThreadBlockedHandler;
@@ -72,4 +74,8 @@ public class WebDataTransfer extends DataTransferer {
     public ToolkitThreadBlockedHandler getToolkitThreadBlockedHandler() {
         return handler;
     }
+
+	protected ByteArrayOutputStream convertFileListToBytes(ArrayList<String> arg0) throws IOException {
+		return null;
+	}
 }

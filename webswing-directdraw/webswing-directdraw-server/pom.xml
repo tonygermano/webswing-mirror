@@ -47,6 +47,11 @@
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<packagingExcludes>WEB-INF/lib/*.jar,WEB-INF/classes/**</packagingExcludes>
+					<webResources>
+						<resource>
+							<directory>../src/proto</directory>
+						</resource>
+					</webResources>
 				</configuration>
 			</plugin>
 			<plugin>

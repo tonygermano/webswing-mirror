@@ -1,8 +1,7 @@
 package org.webswing.directdraw.model;
 
-import org.webswing.directdraw.proto.Directdraw.StrokeProto;
+import org.webswing.directdraw.DirectDraw;
 
-@SuppressWarnings("rawtypes")
 public class StringConst extends DrawConstant {
 
     private String string;
@@ -11,14 +10,9 @@ public class StringConst extends DrawConstant {
         this.string = s;
     }
 
-    public Object toMessage(org.webswing.directdraw.DirectDraw dd) {
+    public Object getMessage(DirectDraw dd) {
         return string;
     };
-
-    @Override
-    protected StrokeProto.Builder getProtoBuilder() {
-        return null;
-    }
 
     @Override
     public String getFieldName() {

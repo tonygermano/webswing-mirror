@@ -28,8 +28,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.webswing.toolkit.directdraw.WebGraphics;
-import org.webswing.toolkit.directdraw.WebImage;
+import org.webswing.directdraw.toolkit.WebGraphics;
+import org.webswing.directdraw.toolkit.WebImage;
 
 public class Tests {
 
@@ -302,7 +302,7 @@ public class Tests {
     }
 
     public static void t12ImageDrawImageTest(Graphics2D g) {
-        Image i = getImage(g instanceof WebGraphics);
+        Image i = DrawServlet.getImage(g instanceof WebGraphics);
         Graphics2D gx = (Graphics2D) i.getGraphics();
         t02FillRectTest(gx);
         gx.dispose();
@@ -327,10 +327,6 @@ public class Tests {
         frame.pack();
         frame.setSize(1280, 700);
         frame.setVisible(true);
-    }
-
-    private static Image getImage(boolean web) {
-        return web ? new WebImage(500, 100) : new BufferedImage(500, 100, BufferedImage.TYPE_INT_ARGB);
     }
 
     public static JPanel getPanel(final String name) {

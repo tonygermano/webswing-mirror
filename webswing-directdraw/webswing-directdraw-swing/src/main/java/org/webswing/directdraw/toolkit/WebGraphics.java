@@ -1,4 +1,4 @@
-package org.webswing.toolkit.directdraw;
+package org.webswing.directdraw.toolkit;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

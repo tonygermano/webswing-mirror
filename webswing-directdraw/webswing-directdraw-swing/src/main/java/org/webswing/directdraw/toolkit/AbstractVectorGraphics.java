@@ -1,6 +1,6 @@
 // Copyright 2000-2007, FreeHEP
 // Modification to original: merged with AbstractVectorGraphicsIO 
-package org.webswing.toolkit.directdraw;
+package org.webswing.directdraw.toolkit;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;

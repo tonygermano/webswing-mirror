@@ -3,13 +3,14 @@ package org.webswing.directdraw.proto;
 message WebImageProto {
 	repeated DrawInstructionProto instructions = 1;
 	repeated DrawConstantProto constants = 2;
+	repeated DrawConstantProto imageConstants = 3;
 }
 
 message DrawInstructionProto {
 	required InstructionProto inst = 1;
 	repeated uint32 args = 2;
 	optional bytes webImage = 3;
-	
+
 	enum InstructionProto {
 		DRAW = 0;
 		FILL = 1;
@@ -22,7 +23,7 @@ message DrawInstructionProto {
 		GRAPHICS_CREATE = 8;
 		TRANSFORM = 9;
 		SET_PAINT = 10;
-		SET_FONT = 11;		
+		SET_FONT = 11;
 		SET_STROKE = 12;
 	}
 }
@@ -94,7 +95,7 @@ message ArcProto{
 	optional sint32 start = 5;
 	optional sint32 extent = 6;
 	optional ArcTypeProto type = 7;
-	
+
 	enum ArcTypeProto {
 		OPEN = 0;
 		CHORD =1;
@@ -106,7 +107,7 @@ message PathProto {
 	required bool windingOdd = 1;
 	repeated SegmentTypeProto type = 2;
 	repeated sint32 points = 3;
-	
+
 	enum SegmentTypeProto {
 		MOVE = 0;
 		LINE = 1;
@@ -121,7 +122,7 @@ message FontProto {
 	optional StyleProto style = 2;
 	optional uint32 size = 3;
 	optional uint32 weight = 4;
-	
+
 	enum StyleProto{
 		NORMAL = 0;
 		OBLIQUE = 1;
@@ -136,13 +137,13 @@ message StrokeProto {
 	optional StrokeCapProto cap = 4;
 	repeated uint32 dashX10 = 5;
 	optional uint32 dashOffset = 6;
-	
+
 	enum StrokeJoinProto {
 		JOIN_MITER = 0;
 		JOIN_ROUND = 1;
 		JOIN_BEVEL = 2;
 	}
-	
+
 	enum StrokeCapProto {
 		CAP_BUTT = 0;
 		CAP_ROUND = 1;
@@ -155,7 +156,7 @@ message LinearGradientProto {
 	required sint32 yStart = 2;
 	required sint32 xEnd = 3;
 	required sint32 yEnd = 4;
-	repeated fixed32 colors = 5;	
+	repeated fixed32 colors = 5;
 	repeated float fractions = 6;
 	required CyclicMethodProto repeat = 7;
 }

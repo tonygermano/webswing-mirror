@@ -2,19 +2,16 @@ package org.webswing.directdraw.model;
 
 import org.webswing.directdraw.DirectDraw;
 
-import com.google.protobuf.AbstractMessage.Builder;
-
-public abstract class DrawConstant<T extends Builder<?>> {
+public abstract class DrawConstant {
 
     public static final NullConst nullConst = new NullConst();
 
     private int address = -1;
+    protected Object message;
 
-    public Object toMessage(DirectDraw dd) {
-        return getProtoBuilder().build();
+    public Object getMessage(DirectDraw dd) {
+        return message;
     }
-
-    protected abstract T getProtoBuilder();
 
     public int getAddress() {
         return address;
@@ -28,7 +25,7 @@ public abstract class DrawConstant<T extends Builder<?>> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + getProtoBuilder().build().hashCode();
+        result = prime * result + message.hashCode();
         return result;
     }
 
@@ -40,21 +37,15 @@ public abstract class DrawConstant<T extends Builder<?>> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        DrawConstant<?> other = (DrawConstant<?>) obj;
-        if (!getProtoBuilder().build().equals(other.getProtoBuilder().build()))
+        DrawConstant other = (DrawConstant) obj;
+        if (!message.equals(other.message))
             return false;
         return true;
     }
 
     abstract public String getFieldName();
 
-    @SuppressWarnings({ "rawtypes" })
     private static class NullConst extends DrawConstant {
-
-        @Override
-        protected Builder getProtoBuilder() {
-            return null;
-        }
 
         @Override
         public String getFieldName() {
@@ -72,17 +63,12 @@ public abstract class DrawConstant<T extends Builder<?>> {
         }
     }
 
-    @SuppressWarnings({ "rawtypes" })
     public static class Integer extends DrawConstant {
 
         public Integer(int integer) {
             setAddress(integer);
         }
 
-        @Override
-        protected Builder getProtoBuilder() {
-            return null;
-        }
 
         @Override
         public String getFieldName() {
