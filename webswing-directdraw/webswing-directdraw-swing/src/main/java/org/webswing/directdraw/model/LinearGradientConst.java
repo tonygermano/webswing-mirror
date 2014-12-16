@@ -4,12 +4,14 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.LinearGradientPaint;
 
+import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.proto.Directdraw.CyclicMethodProto;
 import org.webswing.directdraw.proto.Directdraw.LinearGradientProto;
 
 public class LinearGradientConst extends DrawConstant {
 
-	public LinearGradientConst(LinearGradientPaint lgp) {
+	public LinearGradientConst(DirectDraw context,LinearGradientPaint lgp) {
+    	super(context);
 		LinearGradientProto.Builder model = LinearGradientProto.newBuilder();
 		model.setXStart((int) lgp.getStartPoint().getX());
 		model.setYStart((int) lgp.getStartPoint().getY());
@@ -25,7 +27,8 @@ public class LinearGradientConst extends DrawConstant {
 		this.message = model.build();
 	}
 
-	public LinearGradientConst(GradientPaint p) {
+	public LinearGradientConst(DirectDraw context,GradientPaint p) {
+    	super(context);
 		LinearGradientProto.Builder model = LinearGradientProto.newBuilder();
 		model.setXStart((int) p.getPoint1().getX());
 		model.setYStart((int) p.getPoint1().getY());

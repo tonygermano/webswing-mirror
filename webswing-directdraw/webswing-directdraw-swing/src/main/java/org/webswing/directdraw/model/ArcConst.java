@@ -2,12 +2,14 @@ package org.webswing.directdraw.model;
 
 import java.awt.geom.Arc2D;
 
+import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.proto.Directdraw.ArcProto;
 import org.webswing.directdraw.proto.Directdraw.ArcProto.ArcTypeProto;
 
 public class ArcConst extends DrawConstant{
 
-    public ArcConst(Arc2D r) {
+    public ArcConst(DirectDraw context,Arc2D r) {
+    	super(context);
     	ArcProto.Builder model = ArcProto.newBuilder();
         model.setX((int) r.getX());
         model.setY((int) r.getY());

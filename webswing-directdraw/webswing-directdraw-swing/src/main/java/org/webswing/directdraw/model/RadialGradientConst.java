@@ -3,12 +3,14 @@ package org.webswing.directdraw.model;
 import java.awt.Color;
 import java.awt.RadialGradientPaint;
 
+import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.proto.Directdraw.CyclicMethodProto;
 import org.webswing.directdraw.proto.Directdraw.RadialGradientProto;
 
 public class RadialGradientConst extends DrawConstant {
 
-	public RadialGradientConst(RadialGradientPaint rgp) {
+	public RadialGradientConst(DirectDraw context,RadialGradientPaint rgp) {
+    	super(context);
 		RadialGradientProto.Builder model = RadialGradientProto.newBuilder();
 		model.setXCenter((int) rgp.getCenterPoint().getX());
 		model.setYCenter((int) rgp.getCenterPoint().getY());

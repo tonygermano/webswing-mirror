@@ -3,7 +3,7 @@ package org.webswing.directdraw.proto;
 message WebImageProto {
 	repeated DrawInstructionProto instructions = 1;
 	repeated DrawConstantProto constants = 2;
-	repeated DrawConstantProto imageConstants = 3;
+	optional ImageProto image = 3;
 }
 
 message DrawInstructionProto {
@@ -51,7 +51,7 @@ message ColorProto {
 }
 
 message ImageProto {
-	required string hash = 1;
+	required uint32 hash = 1;
 	required bytes data = 2;
 }
 

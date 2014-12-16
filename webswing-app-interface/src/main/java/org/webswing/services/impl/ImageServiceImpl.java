@@ -43,8 +43,8 @@ public class ImageServiceImpl implements ImageService {
         }
     }
 
-    public String encodeImage(BufferedImage window) {
-        return Base64.encodeBase64String(getPngImage(window));
+    public String encodeData(byte[] window) {
+        return Base64.encodeBase64String(window);
     }
 
     public byte[] getPngImage(BufferedImage imageContent) {

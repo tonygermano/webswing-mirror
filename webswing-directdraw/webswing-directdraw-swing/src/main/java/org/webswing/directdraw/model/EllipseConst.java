@@ -2,12 +2,14 @@ package org.webswing.directdraw.model;
 
 import java.awt.geom.Ellipse2D;
 
+import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.proto.Directdraw.EllipseProto;
 
 public class EllipseConst extends DrawConstant {
 
 
-    public EllipseConst(Ellipse2D r) {
+    public EllipseConst(DirectDraw context,Ellipse2D r) {
+    	super(context);
     	EllipseProto.Builder model = EllipseProto.newBuilder();
         model.setX((int) r.getX());
         model.setY((int) r.getY());

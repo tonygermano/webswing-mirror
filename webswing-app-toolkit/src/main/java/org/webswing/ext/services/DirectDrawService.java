@@ -6,7 +6,9 @@ public interface DirectDrawService {
 
     Image createImage(int width, int height);
 
-    String buildWebImage(Image webImage);
+    Image extractWebImage(Image webImage);
+
+    byte[] buildWebImage(Image webImage);
 
     void resetCache();
 }

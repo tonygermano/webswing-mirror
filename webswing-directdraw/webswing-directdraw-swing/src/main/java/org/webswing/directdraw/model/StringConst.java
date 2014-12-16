@@ -6,11 +6,12 @@ public class StringConst extends DrawConstant {
 
     private String string;
 
-    public StringConst(String s) {
+    public StringConst(DirectDraw context,String s) {
+    	super(context);
         this.string = s;
     }
 
-    public Object getMessage(DirectDraw dd) {
+    public Object extractMessage(DirectDraw dd) {
         return string;
     };
 

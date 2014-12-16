@@ -3,12 +3,14 @@ package org.webswing.directdraw.model;
 import java.awt.Font;
 import java.awt.geom.AffineTransform;
 
+import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.proto.Directdraw.TransformProto;
 
 public class TransformConst extends DrawConstant {
 
 
-	public TransformConst(AffineTransform t) {
+	public TransformConst(DirectDraw context,AffineTransform t) {
+    	super(context);
 		TransformProto.Builder model = TransformProto.newBuilder();
 		double[] matrix = new double[6];
 		t.getMatrix(matrix);
@@ -33,7 +35,8 @@ public class TransformConst extends DrawConstant {
 		this.message= model.build();
 	}
 
-	public TransformConst(Font font, double x, double y) {
+	public TransformConst(DirectDraw context,Font font, double x, double y) {
+    	super(context);
 		TransformProto.Builder model = TransformProto.newBuilder();
 		AffineTransform t = font.getTransform();
 		double[] matrix = new double[6];

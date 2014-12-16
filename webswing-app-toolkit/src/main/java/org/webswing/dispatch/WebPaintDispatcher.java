@@ -2,6 +2,7 @@ package org.webswing.dispatch;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
@@ -56,7 +57,8 @@ public class WebPaintDispatcher {
             public void run() {
                 try {
                     JsonAppFrame json;
-                    Map<String, Map<Integer, BufferedImage>> windowImages;
+                    Map<String, Map<Integer, BufferedImage>> windowImages = null;
+                    Map<String, Image> windowWebImages = null;
                     Map<String, List<Rectangle>> windowNonVisibleAreas;
                     Map<String, Set<Rectangle>> currentAreasToUpdate = null;
                     synchronized (webPaintLock) {
@@ -70,7 +72,6 @@ public class WebPaintDispatcher {
                             }
                             return;
                         }
-                        windowImages = new HashMap<String, Map<Integer, BufferedImage>>();
                         currentAreasToUpdate = areasToUpdate;
                         areasToUpdate = Util.postponeNonShowingAreas(currentAreasToUpdate);
                         if (currentAreasToUpdate.size() == 0 && moveAction == null) {
@@ -79,12 +80,11 @@ public class WebPaintDispatcher {
                         windowNonVisibleAreas = WindowManager.getInstance().extractNonVisibleAreas();
                         json = Util.fillJsonWithWindowsData(currentAreasToUpdate, windowNonVisibleAreas);
                         if (Util.isDD()) {
-                            Util.fillDirectDrawWindowImages(json);
-                            if (json.windows.size() < 1) {
-                                return;
-                            }
+                        	windowWebImages = new HashMap<String, Image>();
+                        	windowWebImages =Util.extractWindowWebImages(json,windowWebImages);
                         } else {
-                            windowImages = Util.extractWindowImages(json);
+                        	windowImages = new HashMap<String, Map<Integer, BufferedImage>>();
+                            windowImages = Util.extractWindowImages(json,windowImages);
                         }
                         if (moveAction != null) {
                             json.moveAction = moveAction;
@@ -93,8 +93,12 @@ public class WebPaintDispatcher {
                         clientReadyToReceive = false;
                     }
                     Logger.trace("contentSender:paintJson", json);
-                    if (!Util.isDD()) {
-                        Logger.trace("contentSender:pngEncodingStart", json.hashCode());
+                    if (Util.isDD()) {
+                        Logger.trace("contentSender:pngWebImageEncodingStart", json.hashCode());
+                        Util.encodeWindowWebImages(windowWebImages, json);
+                        Logger.trace("contentSender:pngWebImageEncodingDone", json.hashCode());
+                    }else{
+                    	Logger.trace("contentSender:pngEncodingStart", json.hashCode());
                         Util.encodeWindowImages(windowImages, json);
                         Logger.trace("contentSender:pngEncodingDone", json.hashCode());
                     }

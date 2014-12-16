@@ -15,85 +15,85 @@ import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 
-import org.webswing.directdraw.model.DrawInstruction;
-import org.webswing.directdraw.util.DirectDrawUtils;
-
 public class WebGraphics extends AbstractVectorGraphics {
 
     WebImage thisImage;
+    private DrawInstructionFactory dif;
     private boolean disposed = false;
     private int id;
 
     public WebGraphics(WebImage webImage) {
         super(new Dimension(webImage.getWidth(null), webImage.getHeight(null)));
         this.thisImage = webImage;
+        this.dif= thisImage.getContext().getInstructionFactory();
         this.id = this.thisImage.getNextGraphicsId();
-        this.thisImage.addInstruction(null, DrawInstruction.createGraphics(this, null));
+        this.thisImage.addInstruction(null, dif.createGraphics(this, null));
     }
 
     public WebGraphics(WebGraphics g) {
         super(g);
         this.thisImage = g.thisImage;
+        this.dif= thisImage.getContext().getInstructionFactory();
         this.id = this.thisImage.getNextGraphicsId();
-        this.thisImage.addInstruction(null, DrawInstruction.createGraphics(this, g));
+        this.thisImage.addInstruction(null, dif.createGraphics(this, g));
     }
 
     @Override
     public void draw(Shape s) {
         if (getStroke() instanceof BasicStroke) {
-            thisImage.addInstruction(this, DrawInstruction.draw(s, getClip()));
+            thisImage.addInstruction(this, dif.draw(s, getClip()));
         } else {
-            thisImage.addInstruction(this, DrawInstruction.fill(getStroke().createStrokedShape(s), getClip()));
+            thisImage.addInstruction(this, dif.fill(getStroke().createStrokedShape(s), getClip()));
         }
     }
 
     @Override
     public void fill(Shape s) {
-        thisImage.addInstruction(this, DrawInstruction.fill(s, getClip()));
+        thisImage.addInstruction(this, dif.fill(s, getClip()));
     }
 
     @Override
     protected void writeImage(RenderedImage image, AffineTransform xform) throws IOException {
-        thisImage.addInstruction(this, DrawInstruction.drawImage(DirectDrawUtils.createBufferedImage(image), xform, null, null, getClip()));
+    	thisImage.addImage(this, image, xform);
     }
 
     @Override
     protected void writeImage(Image image, ImageObserver observer, AffineTransform xform, Rectangle2D.Float crop, Color bkg) throws IOException {
         if (image instanceof WebImage) {
             crop = crop != null ? crop : new Rectangle2D.Float(0, 0, image.getWidth(observer), image.getHeight(observer));
-            thisImage.addInstruction(this, DrawInstruction.drawImage((WebImage) image, xform, crop, bkg, getClip()));
+            thisImage.addInstruction(this, dif.drawImage((WebImage) image, xform, crop, bkg, getClip()));
         } else {
-            thisImage.addInstruction(this, DrawInstruction.drawImage(DirectDrawUtils.createBufferedImage(image, observer, bkg), xform, crop, bkg, getClip()));
+            thisImage.addImage(this, image, observer, xform, crop, bkg);
         }
     }
 
     @Override
     protected void writeString(String string, double x, double y) throws IOException {
-        thisImage.addInstruction(this, DrawInstruction.drawString(string, x, y, getFont(), getClip()));
+        thisImage.addInstruction(this, dif.drawString(string, x, y, getFont(), getClip()));
     }
 
     @Override
     protected void writeTransform(AffineTransform transform) throws IOException {
-        thisImage.addInstruction(this, DrawInstruction.transform(transform));
+        thisImage.addInstruction(this, dif.transform(transform));
 
     }
 
     @Override
     protected void writePaint(Paint paint) throws IOException {
-        thisImage.addInstruction(this, DrawInstruction.setPaint(paint));
+        thisImage.addInstruction(this, dif.setPaint(paint));
 
     }
 
     @Override
     public void writeStroke(Stroke stroke) throws IOException {
         if (stroke instanceof BasicStroke) {
-            thisImage.addInstruction(this, DrawInstruction.setStroke((BasicStroke) stroke));
+            thisImage.addInstruction(this, dif.setStroke((BasicStroke) stroke));
         }
     }
 
     @Override
     public void copyArea(int x, int y, int width, int height, int dx, int dy) {
-        thisImage.addInstruction(this, DrawInstruction.copyArea(x, y, width, height, dx, dy, getClip()));
+        thisImage.addInstruction(this, dif.copyArea(x, y, width, height, dx, dy, getClip()));
     }
 
     @Override
@@ -125,7 +125,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 
     @Override
     public void dispose() {
-        thisImage.addInstruction(this, DrawInstruction.disposeGraphics(this));
+        thisImage.addInstruction(this, dif.disposeGraphics(this));
         disposed = true;
     }
 

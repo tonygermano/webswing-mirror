@@ -75,9 +75,9 @@ public class WebComponentPeer implements ComponentPeer {
         return safeImage;
     }
 
-    public String extractWebImage() {
-        String webImageBytes = Services.getDirectDrawService().buildWebImage(webImage);
-        return webImageBytes;
+    public Image extractWebImage() {
+    	Image result = Services.getDirectDrawService().extractWebImage(webImage);
+        return result;
     }
 
     public void updateWindowDecorationImage() {

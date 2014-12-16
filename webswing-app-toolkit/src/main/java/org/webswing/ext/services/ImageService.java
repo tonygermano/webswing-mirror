@@ -8,7 +8,7 @@ import org.webswing.common.WindowDecoratorTheme;
 
 public interface ImageService {
 
-    String encodeImage(BufferedImage window);
+    public String encodeData(byte[] data);
 
     byte[] getPngImage(BufferedImage image);
 

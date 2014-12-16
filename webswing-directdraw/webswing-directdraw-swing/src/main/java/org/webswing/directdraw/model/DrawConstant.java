@@ -2,78 +2,109 @@ package org.webswing.directdraw.model;
 
 import org.webswing.directdraw.DirectDraw;
 
+import com.google.protobuf.Message;
+
 public abstract class DrawConstant {
 
-    public static final NullConst nullConst = new NullConst();
+	public static final NullConst nullConst = new NullConst();
 
-    private int address = -1;
-    protected Object message;
+	private DirectDraw context;
 
-    public Object getMessage(DirectDraw dd) {
-        return message;
-    }
+	private int address = -1;
+	private Long hash = null;
+	protected Object message;
 
-    public int getAddress() {
-        return address;
-    }
+	public DrawConstant(DirectDraw context) {
+		this.context = context;
+	}
 
-    public void setAddress(int address) {
-        this.address = address;
-    }
+	public Object extractMessage(DirectDraw dd) {
+		Object result = message;
+		message = null;
+		return result;
+	}
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + message.hashCode();
-        return result;
-    }
+	public int getAddress() {
+		return address;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        DrawConstant other = (DrawConstant) obj;
-        if (!message.equals(other.message))
-            return false;
-        return true;
-    }
+	public void setAddress(int address) {
+		this.address = address;
+	}
 
-    abstract public String getFieldName();
+	public DirectDraw getContext() {
+		return context;
+	}
 
-    private static class NullConst extends DrawConstant {
+	public void setContext(DirectDraw context) {
+		this.context = context;
+	}
 
-        @Override
-        public String getFieldName() {
-            return null;
-        }
+	protected long getHash() {
+		if (hash == null && message != null) {
+			if (message instanceof Message) {
+				hash = context.getServices().getSignature(((Message) message).toByteArray());
+			} else if (message instanceof String) {
+				hash = context.getServices().getSignature(((String) message).getBytes());
+			}
+		}
+		return hash;
+	}
 
-        @Override
-        public int hashCode() {
-            return this.getClass().hashCode();
-        }
+	@Override
+	public int hashCode() {
+		return (int) getHash();
+	}
 
-        @Override
-        public boolean equals(Object obj) {
-            return obj == this;
-        }
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DrawConstant other = (DrawConstant) obj;
+		if (getHash() != other.getHash())
+			return false;
+		return true;
+	}
 
-    public static class Integer extends DrawConstant {
+	abstract public String getFieldName();
 
-        public Integer(int integer) {
-            setAddress(integer);
-        }
+	private static class NullConst extends DrawConstant {
 
+		public NullConst() {
+			super(null);
+		}
 
-        @Override
-        public String getFieldName() {
-            return null;
-        }
+		@Override
+		public String getFieldName() {
+			return null;
+		}
 
-    }
+		@Override
+		public int hashCode() {
+			return this.getClass().hashCode();
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			return obj == this;
+		}
+	}
+
+	public static class Integer extends DrawConstant {
+
+		public Integer(int integer) {
+			super(null);
+			setAddress(integer);
+		}
+
+		@Override
+		public String getFieldName() {
+			return null;
+		}
+
+	}
 }
