@@ -71,14 +71,15 @@ function WebswingDirectDraw(c) {
 		image.constants.forEach(function(constant, index) {
 			constantPoolCache[constant.id] = constant;
 		});
-		image.imageConstants.forEach(function(constant, index) {
-			imagePoolCache[constant.id] = constant;
-		});
+		if(image.image!=null){
+			imagePoolCache[image.image.hash] = image.image;
+		}
 		if (image.instructions != null) {
 			image.instructions.forEach(function(instruction, index) {
 				if (instruction.inst == InstructionProto.DRAW_IMAGE) {
-					if (imagePoolCache[instruction.args[0]].image != null) {
-						imagesToPrepare.push(imagePoolCache[instruction.args[0]].image);
+					if (imagePoolCache[instruction.args[1]] != null) {
+						imagesToPrepare.push(imagePoolCache[instruction.args[1]]);
+						imagesToPrepare=imagesToPrepare.filter(function(v,i) { return imagesToPrepare.indexOf(v) == i; });
 					}
 				}
 				if (instruction.inst == InstructionProto.SET_PAINT) {
@@ -114,7 +115,7 @@ function WebswingDirectDraw(c) {
 			iprtFill(ctx, args);
 			break;
 		case InstructionProto.DRAW_IMAGE:
-			iprtDrawImage(ctx, args, imagePoolCache[instruction.args[0]], preloadedImages);
+			iprtDrawImage(ctx, args, imagePoolCache[instruction.args[1]], preloadedImages);
 			break;
 		case InstructionProto.DRAW_WEBIMAGE:
 			iprtDrawWebImage(ctx, args, instruction.webImage, preloadedImages);
@@ -210,35 +211,22 @@ function WebswingDirectDraw(c) {
 	}
 
 	function iprtDrawImage(ctx, args, imageConst, preloadedImages) {
-		var image, hash, transform, bg, crop, clip;
-		if (imageConst.image != null) {
-			hash = imageConst.image.hash;
+		var clip,hash,image,offsetX,offsetY;
+		if (imageConst != null) {
+			hash = imageConst.hash;
+			offsetX = imageConst.offsetX;
+			offsetY = imageConst.offsetY;
 			image = preloadedImages[hash];
 		}
-		if (args[1].transform != null) {
-			transform = args[1];
-		}
-		if (args[2].rectangle != null) {
-			crop = args[2].rectangle;
-		}
-		if (args[3].color != null) {
-			bg = args[3].color;
-		}
-		if (args[4] != null) {
-			clip = args[4];
+		if (args[0] != null) {
+			clip = args[0];
 		}
 		ctx.save();
+		ctx.translate(-offsetX,-offsetY);
 		if (path(ctx, clip)) {
 			ctx.clip();
 		}
-		if (transform != null) {
-			iprtTransform(ctx, [ transform ]);
-		}
-		if (crop != null) {
-			ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
-		} else {
-			ctx.drawImage(image, 0, 0, image.width, image.height);
-		}
+		ctx.drawImage(image, 0, 0, image.width, image.height);
 		ctx.restore();
 	}
 

@@ -21,7 +21,7 @@ public class SwingApplicationDescriptor implements Serializable {
     private boolean isolatedFs = false;
     private boolean debug = false;
     private boolean authentication = true;
-    private boolean directdraw = true;
+    private boolean directdraw = false;
 
     public String getName() {
         return name;

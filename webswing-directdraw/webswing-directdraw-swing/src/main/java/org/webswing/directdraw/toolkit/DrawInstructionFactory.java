@@ -92,7 +92,7 @@ public class DrawInstructionFactory {
 			return new DrawInstruction(InstructionProto.SET_PAINT, new RadialGradientConst(ctx, (RadialGradientPaint) p));
 		} else if (p instanceof TexturePaint) {
 			TexturePaint t = (TexturePaint) p;
-			return new DrawInstruction(InstructionProto.SET_PAINT, new ImageConst(ctx, t.getImage()), new RectangleConst(ctx, t.getAnchorRect()));
+			return new DrawInstruction(InstructionProto.SET_PAINT, new ImageConst(ctx, t.getImage(),null), new RectangleConst(ctx, t.getAnchorRect()));
 		}
 		return new DrawInstruction(InstructionProto.SET_PAINT);
 	}

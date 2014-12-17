@@ -51,8 +51,10 @@ message ColorProto {
 }
 
 message ImageProto {
-	required uint32 hash = 1;
+	required sint32 hash = 1;
 	required bytes data = 2;
+	optional uint32 offsetX = 3;
+	optional uint32 offsetY = 4;
 }
 
 message TransformProto {

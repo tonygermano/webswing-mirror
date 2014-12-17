@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Shape;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -84,10 +83,5 @@ public class DirectDrawUtils {
         img.copyData(raster);
         return result;
     }
-
-	public static long computeHash(Shape shape, BufferedImage imageHolder) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 }

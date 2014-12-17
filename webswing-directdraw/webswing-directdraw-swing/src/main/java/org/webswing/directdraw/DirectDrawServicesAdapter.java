@@ -33,4 +33,8 @@ public class DirectDrawServicesAdapter {
     public String encodeBytes(byte[] bytes) {
         return Base64.encodeBase64String(bytes);
     }
+
+	public long computeHash(BufferedImage subImage) {
+		return subImage.hashCode();
+	}
 }
