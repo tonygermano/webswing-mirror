@@ -101,12 +101,15 @@ public class WebImage extends Image {
 		}
 		ihg.setBackground(bkg);
 		if (crop != null) {
-			ihg.drawImage(i, 0, 0, i.getWidth(o), i.getHeight(o), (int) crop.x, (int) crop.y, (int) (crop.x + crop.width), (int) (crop.y + crop.height), o);
+			ihg.drawImage(i, 0, 0, (int) crop.width, (int) crop.height, (int) crop.x, (int) crop.y, (int) (crop.x + crop.width), (int) (crop.y + crop.height), o);
+			ihg.clip(new Rectangle((int) crop.width, (int) crop.height));
 		} else {
 			ihg.drawImage(i, 0, 0, o);
+			ihg.clip(new Rectangle(i.getWidth(o), i.getHeight(o)));
 		}
-		ihg.clip(new Rectangle(i.getWidth(o), i.getHeight(o)));
-		addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), ihg.getTransform()), new DrawConstant.Integer(0)));
+		ihg.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
+		ihg.clip(new Rectangle(getImageHolder().getWidth(), getImageHolder().getHeight()));
+		addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), null), new DrawConstant.Integer(0)));
 		ihg.dispose();
 	}
 
@@ -119,7 +122,9 @@ public class WebImage extends Image {
 		}
 		ihg.drawRenderedImage(i, null);
 		ihg.clip(new Rectangle(i.getWidth(), i.getHeight()));
-		addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), ihg.getTransform()), new DrawConstant.Integer(0)));
+		ihg.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
+		ihg.clip(new Rectangle(getImageHolder().getWidth(), getImageHolder().getHeight()));
+		addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), null), new DrawConstant.Integer(0)));
 		ihg.dispose();
 	}
 
@@ -179,8 +184,8 @@ public class WebImage extends Image {
 			DrawConstant[] constants = ins.getArgs();
 			// compute image hash and link containing image
 			if (ins.getInstruction() == InstructionProto.DRAW_IMAGE) {
-				Rectangle bounds = ((PathConst) constants[0]).getShape().getBounds();
-				BufferedImage subImage = imageHolder.getSubimage(bounds.x,bounds.y,bounds.width,bounds.height);
+				Rectangle2D bounds = ((PathConst) constants[0]).getShape().getBounds().createIntersection(new Rectangle(imageHolder.getWidth(), imageHolder.getHeight()));
+				BufferedImage subImage = imageHolder.getSubimage((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight());
 				long imageHash = context.getServices().computeHash(subImage);
 				if (imagePool.isInCache(imageHash)) {
 					ImageConst imageRef = imagePool.getImageConst(imageHash);
@@ -194,9 +199,9 @@ public class WebImage extends Image {
 		}
 		// include current imageHolder to message if necessary
 		if (currentFrameImageHashes.size() > 0) {
-			ImageConst imageConst = new ImageConst(context, imageHolder, imageCrop.createIntersection(new Rectangle(imageHolder.getWidth(),imageHolder.getHeight())));
+			ImageConst imageConst = new ImageConst(context, imageHolder, imageCrop.createIntersection(new Rectangle(imageHolder.getWidth(), imageHolder.getHeight())));
 			imageConst = imagePool.putImage(currentFrameImageHashes, imageConst);
-			for(DrawInstruction ins:instructionsToUpdate){
+			for (DrawInstruction ins : instructionsToUpdate) {
 				((DrawConstant.Integer) ins.getArgs()[1]).setAddress(imageConst.getAddress());
 			}
 			webImageBuilder.setImage((ImageProto) imageConst.extractMessage(dd));

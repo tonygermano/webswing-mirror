@@ -46,15 +46,14 @@ function WebswingDirectDraw(c) {
 				var imagesToPrepare = [];
 				populateConstantsPool(image, imagesToPrepare);
 
-				prepareImages(imagesToPrepare).then(function(preloadedImages) {
+				prepareImages(imagesToPrepare).then(function(preloadedImageConstants) {
 					ctx = config.canvas.getContext("2d");
 					config.canvas.width = config.canvas.width;
 					if (image.instructions != null) {
 						image.instructions.forEach(function(instruction) {
-							interpretInstruction(ctx, instruction, preloadedImages);
+							interpretInstruction(ctx, instruction);
 						});
 					}
-					cleanupImages(preloadedImages);
 					cleanupCanvas(ctx);
 					resolve(config.canvas);
 				}, function(error) {
@@ -70,23 +69,16 @@ function WebswingDirectDraw(c) {
 	function populateConstantsPool(image, imagesToPrepare) {
 		image.constants.forEach(function(constant, index) {
 			constantPoolCache[constant.id] = constant;
+			if (constant.image != null) {
+				imagesToPrepare.push(constant.image);
+			}
 		});
-		if(image.image!=null){
+		if (image.image != null) {
 			imagePoolCache[image.image.hash] = image.image;
+			imagesToPrepare.push(image.image);
 		}
 		if (image.instructions != null) {
 			image.instructions.forEach(function(instruction, index) {
-				if (instruction.inst == InstructionProto.DRAW_IMAGE) {
-					if (imagePoolCache[instruction.args[1]] != null) {
-						imagesToPrepare.push(imagePoolCache[instruction.args[1]]);
-						imagesToPrepare=imagesToPrepare.filter(function(v,i) { return imagesToPrepare.indexOf(v) == i; });
-					}
-				}
-				if (instruction.inst == InstructionProto.SET_PAINT) {
-					if (constantPoolCache[instruction.args[0]].image != null) {
-						imagesToPrepare.push(constantPoolCache[instruction.args[0]].image);
-					}
-				}
 				if (instruction.inst == InstructionProto.DRAW_WEBIMAGE) {
 					instruction.webImage = WebImageProto.decode(instruction.webImage);
 					populateConstantsPool(instruction.webImage, imagesToPrepare);
@@ -103,7 +95,7 @@ function WebswingDirectDraw(c) {
 			iprtGraphicsCreate(ctx, instruction.args[0], instruction.args[1]);
 			break;
 		case InstructionProto.GRAPHICS_SWITCH:
-			iprtGraphicsSwitch(ctx, instruction.args[0], preloadedImages);
+			iprtGraphicsSwitch(ctx, instruction.args[0]);
 			break;
 		case InstructionProto.GRAPHICS_DISPOSE:
 			delete graphicsStates[instruction.args[0]];
@@ -115,10 +107,10 @@ function WebswingDirectDraw(c) {
 			iprtFill(ctx, args);
 			break;
 		case InstructionProto.DRAW_IMAGE:
-			iprtDrawImage(ctx, args, imagePoolCache[instruction.args[1]], preloadedImages);
+			iprtDrawImage(ctx, args, imagePoolCache[instruction.args[1]]);
 			break;
 		case InstructionProto.DRAW_WEBIMAGE:
-			iprtDrawWebImage(ctx, args, instruction.webImage, preloadedImages);
+			iprtDrawWebImage(ctx, args, instruction.webImage);
 			break;
 		case InstructionProto.DRAW_STRING:
 			iprtDrawString(ctx, args);
@@ -131,7 +123,7 @@ function WebswingDirectDraw(c) {
 			graphicsStates[currentStateId].strokeArgs = args;
 			break;
 		case InstructionProto.SET_PAINT:
-			iprtSetPaint(ctx, args, preloadedImages);
+			iprtSetPaint(ctx, args);
 			graphicsStates[currentStateId].paintArgs = args;
 			break;
 		case InstructionProto.TRANSFORM:
@@ -143,13 +135,13 @@ function WebswingDirectDraw(c) {
 		}
 	}
 
-	function iprtGraphicsSwitch(ctx, id, preloadedImages) {
+	function iprtGraphicsSwitch(ctx, id) {
 		if (graphicsStates[id] != null) {
 			if (graphicsStates[id].strokeArgs != null) {
 				iprtSetStroke(ctx, graphicsStates[id].strokeArgs);
 			}
 			if (graphicsStates[id].paintArgs != null) {
-				iprtSetPaint(ctx, graphicsStates[id].paintArgs, preloadedImages);
+				iprtSetPaint(ctx, graphicsStates[id].paintArgs);
 			}
 			if (graphicsStates[id].transformArgs != null) {
 				var m = graphicsStates[id].transformArgs;
@@ -210,19 +202,19 @@ function WebswingDirectDraw(c) {
 		ctx.restore();
 	}
 
-	function iprtDrawImage(ctx, args, imageConst, preloadedImages) {
-		var clip,hash,image,offsetX,offsetY;
+	function iprtDrawImage(ctx, args, imageConst) {
+		var clip, image, offsetX, offsetY;
 		if (imageConst != null) {
-			hash = imageConst.hash;
 			offsetX = imageConst.offsetX;
 			offsetY = imageConst.offsetY;
-			image = preloadedImages[hash];
+			image = imageConst.data;
 		}
 		if (args[0] != null) {
 			clip = args[0];
 		}
 		ctx.save();
-		ctx.translate(-offsetX,-offsetY);
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.translate(-offsetX, -offsetY);
 		if (path(ctx, clip)) {
 			ctx.clip();
 		}
@@ -230,7 +222,7 @@ function WebswingDirectDraw(c) {
 		ctx.restore();
 	}
 
-	function iprtDrawWebImage(ctx, args, image, preloadedImages) {
+	function iprtDrawWebImage(ctx, args, image) {
 		var transform, bg, crop, clip;
 
 		if (args[0].transform != null) {
@@ -259,10 +251,9 @@ function WebswingDirectDraw(c) {
 		if (image.instructions != null) {
 			image.instructions.forEach(function(instruction) {
 				interpretInstruction(icCtx, instruction);
-			}, preloadedImages);
+			});
 		}
 		graphicsStates = originalGraphicsStates;
-		currentStateId = currentStateId;
 
 		ctx.save();
 		if (path(ctx, clip)) {
@@ -373,7 +364,7 @@ function WebswingDirectDraw(c) {
 		}
 	}
 
-	function iprtSetPaint(ctx, args, preloadedImages) {
+	function iprtSetPaint(ctx, args) {
 		var constant = args[0];
 		if (constant.color != null) {
 			var color = parseColor(constant.color.rgba);
@@ -382,7 +373,7 @@ function WebswingDirectDraw(c) {
 		}
 		if (constant.image != null) {
 			var anchor = args[1].rectangle;
-			var preloadedImage = preloadedImages[constant.image.hash];
+			var preloadedImage = constant.image.data;
 			var ptrn;
 			if (anchor.x == 0 && anchor.y == 0 && anchor.w == preloadedImage.width && anchor == preloadedImage.height) {
 				ptrn = ctx.createPattern(preloadedImage, 'repeat');
@@ -700,36 +691,30 @@ function WebswingDirectDraw(c) {
 	function prepareImages(imageConstants) {
 		return new Promise(function(resolve, reject) {
 			try {
-				var preloadedImages = {};
+				var preloadedImageConstants = [];
 				if (imageConstants.length > 0) {
 					var loadPromisesArray = imageConstants.map(function(constant) {
 						return new Promise(function(resolve, reject) {
-							preloadedImages[constant.hash] = new Image();
-							preloadedImages[constant.hash].onload = function() {
-								resolve(preloadedImages);
+							var img = new Image();
+							img.onload = function() {
+								constant.data = img;
+								preloadedImageConstants.push(img);
+								resolve();
 							};
-							preloadedImages[constant.hash].src = getImageData(constant);
+							img.src = getImageData(constant);
 						});
 					});
-					Promise.all(loadPromisesArray).then(resolve(preloadedImages));
+					Promise.all(loadPromisesArray).then(function(preloadedImageConstants) {
+						resolve(preloadedImageConstants);
+					});
 				} else {
-					resolve(preloadedImages);
+					resolve(preloadedImageConstants);
 				}
 			} catch (e) {
 				config.onErrorMessage(error);
 				reject(e);
 			}
 		});
-	}
-
-	function cleanupImages(preloadedImages) {
-		for ( var hash in preloadedImages) {
-			if (preloadedImages.hasOwnProperty(hash)) {
-				preloadedImages[hash].src = '';
-				preloadedImages[hash].onload = null;
-				delete preloadedImages[hash];
-			}
-		}
 	}
 
 	function cleanupCanvas() {

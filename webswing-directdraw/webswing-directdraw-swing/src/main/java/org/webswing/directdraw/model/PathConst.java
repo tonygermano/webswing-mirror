@@ -32,9 +32,9 @@ public class PathConst extends DrawConstant {
 		this.message = model.build();
 	}
 
-	public PathConst(DirectDraw context, Shape s,AffineTransform t) {
-		this(context,s.getPathIterator(t));
-		this.shape=s;
+	public PathConst(DirectDraw context, Shape s, AffineTransform t) {
+		this(context, s.getPathIterator(t));
+		this.shape = t != null ? t.createTransformedShape(s) : s;
 	}
 
 	public Shape getShape() {
@@ -43,7 +43,7 @@ public class PathConst extends DrawConstant {
 
 	@Override
 	public Object extractMessage(DirectDraw dd) {
-		shape=null;
+		shape = null;
 		return super.extractMessage(dd);
 	}
 
