@@ -2,11 +2,9 @@ package org.webswing.directdraw;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.awt.image.ImageConsumer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -42,7 +40,7 @@ public class DirectDrawServicesAdapter {
 		ImageConsumerAdapter ic = new ImageConsumerAdapter() {
 			@Override
 			public void setPixels(int x, int y, int w, int h, ColorModel model, int[] pixels, int off, int scansize) {
-				hash=hash*Arrays.hashCode(pixels);
+				hash=hash * 31 + (Arrays.hashCode(pixels));
 			}
 		};
 		subImage.getSource().startProduction(ic);

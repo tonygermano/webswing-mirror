@@ -23,9 +23,17 @@ $.ajax({
 					proto : proto
 				});
 				var json = $.parseJSON(d);
-				dd.draw64(json.protoImg);
-				drawImage(canvas, json.originalImg);
 				addInfo(json, index, document.getElementById(method + "label"));
+				var sequence = Promise.resolve();
+				json.protoImg.forEach(function(img, index) {
+					sequence = sequence.then(function(resolved) {
+						console.log("dd.draw" + index);
+						return dd.draw64(img)
+					});
+				});
+				json.originalImg.forEach(function(img) {
+					drawImage(canvas, img)
+				});
 			});
 		}
 	});
@@ -37,15 +45,19 @@ function addInfo(json, index, element) {
 }
 
 function drawImage(canvas, b64image) {
-	var imageObj;
-	imageObj = new Image();
-	imageObj.onload = function() {
-		var context = canvas.getContext("2d");
-		context.drawImage(imageObj, 500, 0);
-		imageObj.onload = null;
-		imageObj.src = '';
-	};
-	imageObj.src = 'data:image/png;base64,' + b64image;
+	return new Promise(function(resolve, reject) {
+		var imageObj;
+		imageObj = new Image();
+		imageObj.onload = function() {
+			var context = canvas.getContext("2d");
+			context.drawImage(imageObj, 500, 0);
+			imageObj.onload = null;
+			imageObj.src = '';
+			resolve();
+		};
+		imageObj.src = 'data:image/png;base64,' + b64image;
+	});
+
 }
 
 function getUrlParameter(sParam) {

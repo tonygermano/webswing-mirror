@@ -214,10 +214,10 @@ function WebswingDirectDraw(c) {
 		}
 		ctx.save();
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
-		ctx.translate(-offsetX, -offsetY);
 		if (path(ctx, clip)) {
 			ctx.clip();
 		}
+		ctx.translate(offsetX, offsetY);
 		ctx.drawImage(image, 0, 0, image.width, image.height);
 		ctx.restore();
 	}

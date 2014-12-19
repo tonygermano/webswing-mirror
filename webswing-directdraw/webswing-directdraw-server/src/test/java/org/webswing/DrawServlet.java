@@ -27,16 +27,14 @@ import org.webswing.directdraw.toolkit.WebImage;
 public class DrawServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 2084660222487051245L;
-	private static Image wimage;
-	private static Image image = getImage(false);
 
-	public static DirectDraw dd= new DirectDraw();
+	public static DirectDraw dd = new DirectDraw();
 
 	protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html");
 		response.setStatus(HttpServletResponse.SC_OK);
 
-		if(request.getPathInfo()!=null&& request.getPathInfo().contains("tests")){
+		if (request.getPathInfo() != null && request.getPathInfo().contains("tests")) {
 			String encoded = encode(getTestMethods());
 			response.getWriter().print(encoded);
 			return;
@@ -45,49 +43,49 @@ public class DrawServlet extends HttpServlet {
 		String testmethod = request.getParameter("test");
 		boolean resetCache = request.getParameter("reset") != null;
 
-		if(resetCache){
+		if (resetCache) {
 			dd.resetConstantCache();
 		}
 
-		Image wimage = getImage(true);
-		Image image = getImage(false);
-		JsonMsg json= new JsonMsg();
-		draw(wimage, image,testmethod,json);
+		JsonMsg json = new JsonMsg();
+		draw(testmethod, json);
 
-		long start=System.currentTimeMillis();
-		ByteArrayOutputStream baos=new ByteArrayOutputStream();
-		((WebImage) wimage).toMessage(dd).writeTo(baos);
-		json.protoImg = encodeBytes(baos.toByteArray());
-		json.protoRenderTime+=(System.currentTimeMillis()-start);
-
-		start=System.currentTimeMillis();
-		json.originalImg = encodeImage((BufferedImage) image);
-		json.originalRenderTime+=(System.currentTimeMillis()-start);
-
-//		FileUtils.writeByteArrayToFile(new File("target/tmp/"+tstmp+".wi"), baos.toByteArray());
-		json.protoRenderSize=baos.size();
-//		FileUtils.writeByteArrayToFile(new File("target/tmp/"+tstmp+".png"), getPngImage((BufferedImage) image));
-		json.originalRenderSize=getPngImage((BufferedImage) image).length;
 		String encoded = encode(json);
 		response.getWriter().print(encoded);
 	}
 
-	private void draw(Image i, Image wi, String testmethod,JsonMsg json) {
-		Graphics g = i.getGraphics();
-		Graphics g2 = wi.getGraphics();
+	private void draw(String testmethod, JsonMsg json) {
 		try {
-			Method m = Tests.class.getDeclaredMethod(testmethod, Graphics2D.class);
-			long start=System.currentTimeMillis();
-			m.invoke(null, g);
-			json.originalRenderTime+= (System.currentTimeMillis()-start);
-			start=System.currentTimeMillis();
-			m.invoke(null, g2);
-			json.protoRenderTime+=(System.currentTimeMillis()-start);
+			boolean success = true;
+			Method m = Tests.class.getDeclaredMethod(testmethod, Graphics2D.class, Integer.class);
+			for (int j = 0; success; j++) {
+				// image
+				Image i = getImage(false);
+				Graphics g = i.getGraphics();
+				long start = System.currentTimeMillis();
+				success = (Boolean) m.invoke(null, g, j);
+				if (success) {
+					json.originalImg.add(encodeImage((BufferedImage) i));
+					json.originalRenderTime += (System.currentTimeMillis() - start);
+					json.originalRenderSize += getPngImage((BufferedImage) i).length;
+					g.dispose();
+
+					// webimage
+					Image wi = getImage(true);
+					Graphics g2 = wi.getGraphics();
+					start = System.currentTimeMillis();
+					m.invoke(null, g2, j);
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					((WebImage) wi).toMessage(dd).writeTo(baos);
+					json.protoImg.add(encodeBytes(baos.toByteArray()));
+					json.protoRenderTime += (System.currentTimeMillis() - start);
+					json.protoRenderSize += baos.size();
+					g2.dispose();
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		g.dispose();
-		g2.dispose();
 	}
 
 	public static Image getImage(boolean web) {
@@ -118,11 +116,11 @@ public class DrawServlet extends HttpServlet {
 		return null;
 	}
 
-	public static String[] getTestMethods(){
-		List<String> result=new ArrayList<String>();
-		for(Method m:Tests.class.getDeclaredMethods()){
-			if(m.getName().endsWith("Test"))
-			result.add(m.getName());
+	public static String[] getTestMethods() {
+		List<String> result = new ArrayList<String>();
+		for (Method m : Tests.class.getDeclaredMethods()) {
+			if (m.getName().endsWith("Test"))
+				result.add(m.getName());
 		}
 		Collections.sort(result);
 		return result.toArray(new String[result.size()]);

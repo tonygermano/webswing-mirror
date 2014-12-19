@@ -159,7 +159,7 @@ function WebswingBase(c) {
 			}
 		}
 		if (data.moveAction != null) {
-			copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height, context);
+			copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height,context);
 		}
 		if (data.cursorChange != null && config.hasControl) {
 			canvas.style.cursor = data.cursorChange.cursor;
@@ -188,40 +188,45 @@ function WebswingBase(c) {
 			}
 		}
 		// regular windows (background removed)
-		var drawPromisesArray = data.windows.map(function(win) {
-			return new Promise(function(resolve, reject) {
-				if (win.directDrawB64 != null) {
-					ddCanvas.width = win.width;
-					ddCanvas.height = win.height;
-					directDraw.draw64(win.directDrawB64).then(function() {
+		if (data.windows != null) {
+			var drawPromisesArray = data.windows.map(function(win) {
+				return new Promise(function(resolve, reject) {
+					if (win.directDrawB64 != null) {
+						ddCanvas.width = win.width;
+						ddCanvas.height = win.height;
+						directDraw.draw64(win.directDrawB64).then(
+								function() {
+									for ( var x in win.content) {
+										var winContent = win.content[x];
+										if (winContent != null) {
+											context.drawImage(ddCanvas, winContent.positionX, winContent.positionY, winContent.width,
+													winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY,
+													winContent.width, winContent.height);
+										}
+									}
+									resolve();
+								});
+					} else {
 						for ( var x in win.content) {
 							var winContent = win.content[x];
 							if (winContent != null) {
-								context.drawImage(ddCanvas, winContent.positionX, winContent.positionY, winContent.width, winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height);
+								var imageObj;
+								imageObj = new Image();
+								imageObj.onload = function() {
+									context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
+									imageObj.onload = null;
+									imageObj.src = '';
+								};
+								imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
 							}
 						}
-						resolve();
-					});
-				} else {
-					for ( var x in win.content) {
-						var winContent = win.content[x];
-						if (winContent != null) {
-							var imageObj;
-							imageObj = new Image();
-							imageObj.onload = function() {
-								context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
-								imageObj.onload = null;
-								imageObj.src = '';
-							};
-							imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
-						}
 					}
-				}
+				});
 			});
-		});
-		Promise.all(drawPromisesArray).then(function() {
-			ack();
-		})
+			Promise.all(drawPromisesArray).then(function() {
+				ack();
+			})
+		}
 	}
 
 	function adjustCanvasSize(width, height) {
@@ -301,7 +306,8 @@ function WebswingBase(c) {
 			// 226
 			// FF (163, 171, 173, ) -> en layout ]\/ keys
 			var kc = event.keyCode;
-			if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226) || (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
+			if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226)
+					|| (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
 				event.preventDefault();
 				event.stopPropagation();
 			}

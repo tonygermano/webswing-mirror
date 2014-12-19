@@ -136,15 +136,11 @@ public class WebImage extends Image {
 	}
 
 	public WebImage extractReadOnlyWebImage() {
-		WebImage result = new WebImage(context, size.width, size.height) {
+		final WebImage thisWi=this;
+		WebImage result = new WebImage(context, size.width, size.height){
 			@Override
-			public void addInstruction(WebGraphics g, DrawInstruction in) {
-				throw new UnsupportedOperationException("This image is read-only");
-			}
-
-			@Override
-			public Graphics getGraphics() {
-				throw new UnsupportedOperationException("This image is read-only");
+			protected int getNextGraphicsId() {
+				return thisWi.getNextGraphicsId();
 			}
 		};
 		synchronized (this) {
@@ -167,7 +163,7 @@ public class WebImage extends Image {
 		ImageConstantPool imagePool = dd.getImagePool();
 		Set<Long> currentFrameImageHashes = new HashSet<Long>();
 		List<DrawInstruction> instructionsToUpdate = new ArrayList<DrawInstruction>();
-		Rectangle2D imageCrop = new Rectangle();
+		Rectangle2D imageCrop = null;
 
 		WebImageProto.Builder webImageBuilder = WebImageProto.newBuilder();
 		synchronized (this) {
@@ -191,7 +187,7 @@ public class WebImage extends Image {
 					ImageConst imageRef = imagePool.getImageConst(imageHash);
 					((DrawConstant.Integer) constants[1]).setAddress(imageRef.getAddress());
 				} else {
-					imageCrop = (((PathConst) constants[0]).getShape().getBounds2D().createUnion(imageCrop));
+					imageCrop = imageCrop==null?((PathConst) constants[0]).getShape().getBounds2D():((PathConst) constants[0]).getShape().getBounds2D().createUnion(imageCrop);
 					currentFrameImageHashes.add(imageHash);
 					instructionsToUpdate.add(ins);
 				}
