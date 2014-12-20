@@ -299,16 +299,16 @@ public class Tests {
         Color c = Color.ORANGE;
         g.setColor(c);
         g.fill(new Arc2D.Double(new Rectangle2D.Double(0, 0, 48, 30), 15, 250, 0));
-
+        
         g.copyArea(0, 0, 50, 50, 0, 50);
 
         g.clipRect(50, 0, 25, 25);
-
         g.copyArea(0, 0, 50, 50, 50, 0);
 
         g.setClip(0, 0, 500, 100);
 
-        g.copyArea(0, 0, 50, 50, 100, 0);
+        g.translate(25,25);
+        g.copyArea(-25, -25, 50, 50, 100, 0);
         return true;
     }
 
@@ -347,7 +347,7 @@ public class Tests {
         return true;
     }
 
-    public static boolean t12ImageDrawImageTest(Graphics2D g,Integer repeat) {
+    public static boolean t12DrawWebImageTest(Graphics2D g,Integer repeat) {
     	if(repeat!=0){
     		return false;
     	}
@@ -383,6 +383,23 @@ public class Tests {
         return true;
     }
     
+    public static boolean t14ImageCacheTest(Graphics2D g, Integer repeat) throws IOException{
+    	if(repeat>1){
+    		return false;
+    	}
+        BufferedImage image = ImageIO.read(new File(Tests.class.getClassLoader().getResource("ws.png").getFile()));
+
+        switch(repeat){
+    	case 0:
+    		g.drawImage(image,0,0,null);
+    		break;
+    	case 1:
+    		g.drawImage(image, 200, 0, null);
+    		break;
+    	}
+        return true;
+    }
+    
     public static void main(String[] args) {
         JFrame frame = new JFrame("tests");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -404,7 +421,7 @@ public class Tests {
 
             public void paint(java.awt.Graphics g) {
                 try {
-                    Tests.class.getDeclaredMethod(name, Graphics2D.class).invoke(null, g);
+                    Tests.class.getDeclaredMethod(name, Graphics2D.class,Integer.class).invoke(null, g,0);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

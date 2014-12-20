@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -13,15 +14,15 @@ import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.RenderedImage;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.DrawConstant;
 import org.webswing.directdraw.model.DrawInstruction;
 import org.webswing.directdraw.model.ImageConst;
 import org.webswing.directdraw.model.PathConst;
+import org.webswing.directdraw.model.PointsConst;
 import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
 import org.webswing.directdraw.proto.Directdraw.ImageProto;
@@ -136,8 +137,8 @@ public class WebImage extends Image {
 	}
 
 	public WebImage extractReadOnlyWebImage() {
-		final WebImage thisWi=this;
-		WebImage result = new WebImage(context, size.width, size.height){
+		final WebImage thisWi = this;
+		WebImage result = new WebImage(context, size.width, size.height) {
 			@Override
 			protected int getNextGraphicsId() {
 				return thisWi.getNextGraphicsId();
@@ -161,7 +162,7 @@ public class WebImage extends Image {
 	public Message toMessage(DirectDraw dd, boolean resetOld) {
 		DrawConstantPool constantPool = dd.getConstantPool();
 		ImageConstantPool imagePool = dd.getImagePool();
-		Set<Long> currentFrameImageHashes = new HashSet<Long>();
+		HashMap<Long, Point> currentFrameImageHashes = new HashMap<Long, Point>();
 		List<DrawInstruction> instructionsToUpdate = new ArrayList<DrawInstruction>();
 		Rectangle2D imageCrop = null;
 
@@ -185,20 +186,21 @@ public class WebImage extends Image {
 				long imageHash = context.getServices().computeHash(subImage);
 				if (imagePool.isInCache(imageHash)) {
 					ImageConst imageRef = imagePool.getImageConst(imageHash);
-					((DrawConstant.Integer) constants[1]).setAddress(imageRef.getAddress());
+					Point startPoint = imageRef.getSubImageHashMap().get(imageHash);
+					constants[1] = new PointsConst(dd, imageRef.getAddress(), (int) (startPoint.x - bounds.getX()), (int) (startPoint.y - bounds.getY()));
 				} else {
-					imageCrop = imageCrop==null?((PathConst) constants[0]).getShape().getBounds2D():((PathConst) constants[0]).getShape().getBounds2D().createUnion(imageCrop);
-					currentFrameImageHashes.add(imageHash);
+					imageCrop = imageCrop == null ? bounds : bounds.createUnion(imageCrop);
+					currentFrameImageHashes.put(imageHash, new Point((int) bounds.getX(), (int) bounds.getY()));
 					instructionsToUpdate.add(ins);
 				}
 			}
 		}
 		// include current imageHolder to message if necessary
 		if (currentFrameImageHashes.size() > 0) {
-			ImageConst imageConst = new ImageConst(context, imageHolder, imageCrop.createIntersection(new Rectangle(imageHolder.getWidth(), imageHolder.getHeight())));
-			imageConst = imagePool.putImage(currentFrameImageHashes, imageConst);
+			ImageConst imageConst = new ImageConst(context, imageHolder, imageCrop, currentFrameImageHashes);
+			imageConst = imagePool.putImage(imageConst);
 			for (DrawInstruction ins : instructionsToUpdate) {
-				((DrawConstant.Integer) ins.getArgs()[1]).setAddress(imageConst.getAddress());
+				ins.getArgs()[1] = new PointsConst(dd, imageConst.getAddress(), 0, 0);
 			}
 			webImageBuilder.setImage((ImageProto) imageConst.extractMessage(dd));
 		}

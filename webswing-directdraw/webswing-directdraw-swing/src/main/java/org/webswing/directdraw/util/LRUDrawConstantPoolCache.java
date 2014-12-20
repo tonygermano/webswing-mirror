@@ -70,6 +70,7 @@ public class LRUDrawConstantPoolCache {
             } else {
                 int evictedAddress = end.getAddress();
                 map.remove(end.getVal());
+                onElementRemoved(end.val);
                 end = end.pre;
                 if (end != null) {
                     end.next = null;
@@ -82,7 +83,11 @@ public class LRUDrawConstantPoolCache {
         }
     }
 
-    private class DoubleLinkedListNode {
+    public void onElementRemoved(DrawConstant val) {
+		
+	}
+
+	private class DoubleLinkedListNode {
 
         DrawConstant val;
         DoubleLinkedListNode pre;

@@ -1,10 +1,12 @@
 package org.webswing.directdraw.model;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Map;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.proto.Directdraw.ImageProto;
@@ -15,9 +17,12 @@ public class ImageConst extends DrawConstant {
 
 	private ImageProto.Builder model = ImageProto.newBuilder();
 	private long hash = System.identityHashCode(this);
+	//map of subImage hash and its start position 
+	private Map<Long,Point> subImageHashMap;
 
-	public ImageConst(DirectDraw context, BufferedImage img, Rectangle2D crop) {
+	public ImageConst(DirectDraw context, BufferedImage img, Rectangle2D crop, Map<Long,Point> subImageHashMap) {
 		super(context);
+		this.subImageHashMap=subImageHashMap;
 		if (crop != null) {
 			model.setOffsetX((int) crop.getX());
 			model.setOffsetY((int) crop.getY());
@@ -29,6 +34,10 @@ public class ImageConst extends DrawConstant {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Map<Long, Point> getSubImageHashMap() {
+		return subImageHashMap;
 	}
 
 	@Override

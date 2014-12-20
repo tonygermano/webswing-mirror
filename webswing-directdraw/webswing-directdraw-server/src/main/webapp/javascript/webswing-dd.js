@@ -48,13 +48,13 @@ function WebswingDirectDraw(c) {
 
 				prepareImages(imagesToPrepare).then(function(preloadedImageConstants) {
 					ctx = config.canvas.getContext("2d");
-					config.canvas.width = config.canvas.width;
+					ctx.save();
 					if (image.instructions != null) {
 						image.instructions.forEach(function(instruction) {
 							interpretInstruction(ctx, instruction);
 						});
 					}
-					cleanupCanvas(ctx);
+					ctx.restore();
 					resolve(config.canvas);
 				}, function(error) {
 					config.onErrorMessage(error);
@@ -107,7 +107,7 @@ function WebswingDirectDraw(c) {
 			iprtFill(ctx, args);
 			break;
 		case InstructionProto.DRAW_IMAGE:
-			iprtDrawImage(ctx, args, imagePoolCache[instruction.args[1]]);
+			iprtDrawImage(ctx, args);
 			break;
 		case InstructionProto.DRAW_WEBIMAGE:
 			iprtDrawWebImage(ctx, args, instruction.webImage);
@@ -202,22 +202,24 @@ function WebswingDirectDraw(c) {
 		ctx.restore();
 	}
 
-	function iprtDrawImage(ctx, args, imageConst) {
-		var clip, image, offsetX, offsetY;
-		if (imageConst != null) {
-			offsetX = imageConst.offsetX;
-			offsetY = imageConst.offsetY;
-			image = imageConst.data;
+	function iprtDrawImage(ctx, args) {
+		var clip, image, offsetX, offsetY,p;
+		if (args[1] != null) {
+			p=args[1].points.points;
+			offsetX = imagePoolCache[p[0]].offsetX;
+			offsetY = imagePoolCache[p[0]].offsetY;
+			image = imagePoolCache[p[0]].data;
 		}
 		if (args[0] != null) {
 			clip = args[0];
 		}
+
 		ctx.save();
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		if (path(ctx, clip)) {
 			ctx.clip();
 		}
-		ctx.translate(offsetX, offsetY);
+		ctx.translate(offsetX-p[1], offsetY-p[2]);
 		ctx.drawImage(image, 0, 0, image.width, image.height);
 		ctx.restore();
 	}
@@ -304,14 +306,12 @@ function WebswingDirectDraw(c) {
 		if (path(ctx, clip)) {
 			ctx.clip();
 		}
-		var tmpCanvas = document.createElement("canvas");
-		tmpCanvas.width = p[2];
-		tmpCanvas.height = p[3];
-		var copiedArea = ctx.getImageData(p[0], p[1], p[2], p[3]);
-		tmpCanvas.getContext("2d").putImageData(copiedArea, 0, 0);
-		ctx.drawImage(tmpCanvas, p[4], p[5]);
+		ctx.beginPath();
+		ctx.rect(p[0], p[1], p[2], p[3]);
+		ctx.clip();
+		ctx.setTransform(1,0,0,1,0,0);
+		ctx.drawImage(config.canvas, p[4],p[5]);
 		ctx.restore();
-
 	}
 
 	function iprtTransform(ctx, args) {
@@ -459,7 +459,7 @@ function WebswingDirectDraw(c) {
 			// in case of cyclic gradient calculate repeat counts
 			var repeatcount = 1;
 			if (rg.repeat != null && rg.repeat != CyclicMethodProto.NO_CYCLE) {
-				var gradientsize, repeatcount;
+				var gradientsize;
 				if (fX == rg.xCenter && fY == rg.yCenter) {
 					gradientsize = rg.radius;
 				} else {
@@ -715,10 +715,6 @@ function WebswingDirectDraw(c) {
 				reject(e);
 			}
 		});
-	}
-
-	function cleanupCanvas() {
-		ctx.setTransform(1, 0, 0, 1, 0, 0);
 	}
 
 	function resolveArgs(args, cache) {

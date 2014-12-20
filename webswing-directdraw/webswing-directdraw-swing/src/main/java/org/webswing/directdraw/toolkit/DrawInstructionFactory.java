@@ -61,8 +61,8 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(InstructionProto.DRAW_STRING, new StringConst(ctx, s), new FontConst(ctx, font), new TransformConst(ctx, font, x, y), toPathConst(clip));
 	}
 
-	public DrawInstruction copyArea(int x, int y, int width, int height, int dx, int dy, Shape clip) {
-		return new DrawInstruction(InstructionProto.COPY_AREA, new PointsConst(ctx, x, y, width, height, dx, dy), toPathConst(clip));
+	public DrawInstruction copyArea(int destX, int destY, int width, int height, int absDx, int absDy, Shape clip) {
+		return new DrawInstruction(InstructionProto.COPY_AREA, new PointsConst(ctx, destX, destY, width, height, absDx, absDy), toPathConst(clip));
 	}
 
 	public DrawInstruction createGraphics(WebGraphics g, WebGraphics parent) {
@@ -92,7 +92,7 @@ public class DrawInstructionFactory {
 			return new DrawInstruction(InstructionProto.SET_PAINT, new RadialGradientConst(ctx, (RadialGradientPaint) p));
 		} else if (p instanceof TexturePaint) {
 			TexturePaint t = (TexturePaint) p;
-			return new DrawInstruction(InstructionProto.SET_PAINT, new ImageConst(ctx, t.getImage(),null), new RectangleConst(ctx, t.getAnchorRect()));
+			return new DrawInstruction(InstructionProto.SET_PAINT, new ImageConst(ctx, t.getImage(),null,null), new RectangleConst(ctx, t.getAnchorRect()));
 		}
 		return new DrawInstruction(InstructionProto.SET_PAINT);
 	}
