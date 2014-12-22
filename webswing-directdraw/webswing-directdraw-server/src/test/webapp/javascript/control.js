@@ -1,4 +1,3 @@
-var proto = dcodeIO.ProtoBuf.loadProtoFile("directdraw.proto");
 $.ajax({
 	url : "/draw/tests",
 }).done(function(d) {
@@ -11,24 +10,24 @@ $.ajax({
 			document.body.innerHTML += '<div id="' + method + 'label"></div><canvas id="' + method + '" width="1000" height="100"></canvas>';
 		}
 	});
-
+	var dd = new WebswingDirectDraw();
 	data.forEach(function(method, index, array) {
 		if (selected == null || (selected != null && index == selected)) {
 			$.ajax({
 				url : "/draw?reset&test=" + method,
 			}).done(function(d) {
 				var canvas = document.getElementById(method);
-				var dd = new WebswingDirectDraw({
-					canvas : canvas,
-					proto : proto
-				});
+				var ctx= canvas.getContext("2d");
 				var json = $.parseJSON(d);
 				addInfo(json, index, document.getElementById(method + "label"));
 				var sequence = Promise.resolve();
 				json.protoImg.forEach(function(img, index) {
 					sequence = sequence.then(function(resolved) {
-						console.log("dd.draw" + index);
-						return dd.draw64(img)
+						return dd.draw64(img);
+					}).then(function(resultCanvas){
+						ctx.drawImage(resultCanvas,0,0);
+					},function(error){
+						console.log(error);
 					});
 				});
 				json.originalImg.forEach(function(img) {

@@ -30,7 +30,6 @@ public class WebGraphics extends AbstractVectorGraphics {
 		this.thisImage = webImage;
 		this.dif = thisImage.getContext().getInstructionFactory();
 		this.id = this.thisImage.getNextGraphicsId();
-		this.thisImage.addInstruction(null, dif.createGraphics(this, null));
 	}
 
 	public WebGraphics(WebGraphics g) {
@@ -38,7 +37,6 @@ public class WebGraphics extends AbstractVectorGraphics {
 		this.thisImage = g.thisImage;
 		this.dif = thisImage.getContext().getInstructionFactory();
 		this.id = this.thisImage.getNextGraphicsId();
-		this.thisImage.addInstruction(null, dif.createGraphics(this, g));
 	}
 
 	@Override
@@ -96,8 +94,10 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	public void copyArea(int x, int y, int width, int height, int dx, int dy) {
-		Point2D absD = getTransform().transform(new Point(x+dx, y+dy), null);
-		thisImage.addInstruction(this, dif.copyArea(x + dx, y + dy, width, height, (int) absD.getX(), (int) absD.getY(), getClip()));
+		Point2D abs = getTransform().transform(new Point(x, y), null);
+		int absx = (int)abs.getX();
+		int absy=(int)abs.getY();
+		thisImage.addInstruction(this, dif.copyArea(absx + dx, absy + dy, width, height, dx, dy, getClip()));
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	public void dispose() {
-		thisImage.addInstruction(this, dif.disposeGraphics(this));
+		//thisImage.addInstruction(this, dif.disposeGraphics(this));
 		disposed = true;
 	}
 

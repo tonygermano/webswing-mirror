@@ -15,7 +15,9 @@ import java.awt.image.ImageProducer;
 import java.awt.image.RenderedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.DrawConstant;
@@ -39,6 +41,7 @@ public class WebImage extends Image {
 	private BufferedImage imageHolder;
 	private volatile int lastGraphicsId = 0;
 	private WebGraphics lastUsedG = null;
+	private Set<WebGraphics> usedGs = new HashSet<WebGraphics>();
 	private List<DrawInstruction> instructions = new ArrayList<DrawInstruction>();
 	private List<DrawInstruction> newInstructions = new ArrayList<DrawInstruction>();
 
@@ -84,10 +87,21 @@ public class WebImage extends Image {
 		if (g != null && g.isDisposed()) {
 			throw new RuntimeException("Drawing to disposed graphics.");
 		}
+		DrawInstructionFactory factory = context.getInstructionFactory();
 		synchronized (this) {
-			if (lastUsedG != g && g != null) {
-				newInstructions.add(context.getInstructionFactory().switchGraphics(g));
-				lastUsedG = g;
+			if (lastUsedG != g) {
+				if (!usedGs.contains(g)) {
+					newInstructions.add(factory.createGraphics(g));
+					usedGs.add(g);
+					lastUsedG = g;
+					if(in.getInstruction().equals(InstructionProto.TRANSFORM)){
+						//skip adding the instruction- transform is already included in create graphics inst.
+						return;
+					}
+				}else{
+					newInstructions.add(factory.switchGraphics(g));
+					lastUsedG = g;
+				}
 			}
 			newInstructions.add(in);
 		}
@@ -141,11 +155,10 @@ public class WebImage extends Image {
 	}
 
 	public WebImage extractReadOnlyWebImage() {
-		final WebImage thisWi = this;
-		WebImage result = new WebImage(context, size.width, size.height) {
+		WebImage result = new WebImage(context, size.width, size.height){
 			@Override
-			protected int getNextGraphicsId() {
-				return thisWi.getNextGraphicsId();
+			public void addInstruction(WebGraphics g, DrawInstruction in) {
+				throw new UnsupportedOperationException("This is read only instance of webimage.");
 			}
 		};
 		synchronized (this) {
@@ -155,6 +168,8 @@ public class WebImage extends Image {
 				result.getImageHolder().getGraphics().drawImage(imageHolder, 0, 0, null);
 			}
 			newInstructions = new ArrayList<DrawInstruction>();
+			lastUsedG = null;
+			usedGs.clear();
 		}
 		return result;
 	}
@@ -231,6 +246,8 @@ public class WebImage extends Image {
 			}
 			webImageBuilder.addInstructions(ins.toMessage(dd));
 		}
+		webImageBuilder.setWidth(size.width);
+		webImageBuilder.setHeight(size.height);
 		return webImageBuilder.build();
 	}
 }

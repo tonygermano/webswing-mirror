@@ -42,11 +42,10 @@ public class DirectDraw {
 		return services;
 	}
 
-
 	public WebImage createImage(int w, int h) {
 		return new WebImage(this, w, h);
 	}
-
+	
 	public DrawInstructionFactory getInstructionFactory() {
 		return instructionFactory;
 	}

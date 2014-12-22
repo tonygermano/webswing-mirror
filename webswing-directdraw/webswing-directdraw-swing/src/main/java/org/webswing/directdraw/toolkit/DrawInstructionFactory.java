@@ -33,6 +33,7 @@ import org.webswing.directdraw.model.StringConst;
 import org.webswing.directdraw.model.StrokeConst;
 import org.webswing.directdraw.model.TransformConst;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
+import org.webswing.directdraw.util.DirectDrawUtils;
 
 public class DrawInstructionFactory {
 
@@ -65,8 +66,14 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(InstructionProto.COPY_AREA, new PointsConst(ctx, destX, destY, width, height, absDx, absDy), toPathConst(clip));
 	}
 
-	public DrawInstruction createGraphics(WebGraphics g, WebGraphics parent) {
-		return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, new DrawConstant.Integer(g.getId()), parent != null ? new DrawConstant.Integer(parent.getId()) : null);
+	public DrawInstruction createGraphics(WebGraphics g) {
+		DrawConstant gid = new DrawConstant.Integer(g.getId());
+		DrawConstant transformConst = g.getTransform() != null ? new TransformConst(ctx, g.getTransform()) : DrawConstant.nullConst;
+		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
+		DrawInstruction paintinst = setPaint(g.getPaint());
+		DrawConstant[] paintConsts = DirectDrawUtils.concat(new DrawConstant[] { gid, transformConst, strokeConst }, paintinst.getArgs());
+
+		return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, paintConsts);
 	}
 
 	public DrawInstruction disposeGraphics(WebGraphics g) {
@@ -92,7 +99,7 @@ public class DrawInstructionFactory {
 			return new DrawInstruction(InstructionProto.SET_PAINT, new RadialGradientConst(ctx, (RadialGradientPaint) p));
 		} else if (p instanceof TexturePaint) {
 			TexturePaint t = (TexturePaint) p;
-			return new DrawInstruction(InstructionProto.SET_PAINT, new ImageConst(ctx, t.getImage(),null,null), new RectangleConst(ctx, t.getAnchorRect()));
+			return new DrawInstruction(InstructionProto.SET_PAINT, new ImageConst(ctx, t.getImage(), null, null), new RectangleConst(ctx, t.getAnchorRect()));
 		}
 		return new DrawInstruction(InstructionProto.SET_PAINT);
 	}

@@ -314,7 +314,7 @@ public class Tests {
 		Graphics2D gx = (Graphics2D) i.getGraphics();
 		gx.setColor(Color.blue);
 		gx.fill(new Arc2D.Double(new Rectangle2D.Double(0, 0, 48, 30), 15, 250, 0));
-		gx.copyArea(0, 0, 50, 50, 0, 50);
+		gx.copyArea(10, 10, 50, 50, 0, 50);
 		gx.dispose();
 		g.translate(150, -25);
 		g.drawImage(i, 0, 0, null);

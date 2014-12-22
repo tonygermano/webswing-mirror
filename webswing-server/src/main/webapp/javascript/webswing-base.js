@@ -22,7 +22,7 @@ function WebswingBase(c) {
 		clientId : c.clientId || '',
 		hasControl : c.hasControl || false,
 		mirrorMode : c.mirrorMode || false
-	}
+	};
 
 	var clientId = config.clientId;
 	var appName = null;
@@ -36,12 +36,8 @@ function WebswingBase(c) {
 	var canPaint = false;
 	var mirrorMode = config.mirrorMode;
 
-	var proto = dcodeIO.ProtoBuf.loadProtoFile("directdraw.proto");
-	var ddCanvas = document.createElement("canvas");
-	var directDraw = new WebswingDirectDraw({
-		canvas : ddCanvas,
-		proto : proto
-	});
+	var windowImageHolders = {};
+	var directDraw = new WebswingDirectDraw();
 
 	var timer1 = setInterval(mouseMoveEventFilter, 100);
 	var timer2 = setInterval(heartbeat, 10000);
@@ -193,14 +189,13 @@ function WebswingBase(c) {
 				if (win.directDrawB64 != null) {
 					// directdraw
 					return sequence.then(function(resolved) {
-						ddCanvas.width = win.width;
-						ddCanvas.height = win.height;
-						return directDraw.draw64(win.directDrawB64);
-					}).then(function() {
+						return directDraw.draw64(win.directDrawB64,windowImageHolders[win.id]);
+					}).then(function(resultImage) {
+						windowImageHolders[win.id] = resultImage;
 						for ( var x in win.content) {
 							var winContent = win.content[x];
 							if (winContent != null) {
-								context.drawImage(ddCanvas, winContent.positionX, winContent.positionY, winContent.width, winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height);
+								context.drawImage(resultImage, winContent.positionX, winContent.positionY, winContent.width, winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height);
 							}
 						}
 					});

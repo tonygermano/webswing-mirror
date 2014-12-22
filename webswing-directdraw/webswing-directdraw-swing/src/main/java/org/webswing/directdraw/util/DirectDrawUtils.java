@@ -13,6 +13,8 @@ import java.awt.image.WritableRaster;
 import java.util.Hashtable;
 import java.util.Properties;
 
+import org.webswing.directdraw.model.DrawConstant;
+
 public class DirectDrawUtils {
 
     public static final Properties windowsFonts = new Properties();
@@ -83,5 +85,14 @@ public class DirectDrawUtils {
         img.copyData(raster);
         return result;
     }
+    
+    public static DrawConstant[] concat(DrawConstant[] a, DrawConstant[] b) {
+    	   int aLen = a.length;
+    	   int bLen = b.length;
+    	   DrawConstant[] c= new DrawConstant[aLen+bLen];
+    	   System.arraycopy(a, 0, c, 0, aLen);
+    	   System.arraycopy(b, 0, c, aLen, bLen);
+    	   return c;
+    	}
 
 }

@@ -1,67 +1,73 @@
 function WebswingDirectDraw(c) {
 	"use strict";
-
-	if (c.canvas == null) {
-		return null;
-	}
-
+	c = c || {};
 	var config = {
 		onErrorMessage : c.onErrorMessage || function(message) {
 			console.log(message);
-		},
-		canvas : c.canvas,
-		proto : c.proto,
-		constantPool : c.constantPool != null ? c.constantPool : [],
-		imagePool : c.imagePool != null ? c.imagePool : []
+		}
 	};
-
-	var WebImageProto = c.proto.build("org.webswing.directdraw.proto.WebImageProto");
-	var InstructionProto = c.proto.build("org.webswing.directdraw.proto.DrawInstructionProto.InstructionProto");
-	var SegmentTypeProto = c.proto.build("org.webswing.directdraw.proto.PathProto.SegmentTypeProto");
-	var ArcTypeProto = c.proto.build("org.webswing.directdraw.proto.ArcProto.ArcTypeProto");
-	var CyclicMethodProto = c.proto.build("org.webswing.directdraw.proto.CyclicMethodProto");
-	var StrokeJoinProto = c.proto.build("org.webswing.directdraw.proto.StrokeProto.StrokeJoinProto");
-	var StrokeCapProto = c.proto.build("org.webswing.directdraw.proto.StrokeProto.StrokeCapProto");
-	var StyleProto = c.proto.build("org.webswing.directdraw.proto.FontProto.StyleProto");
+	var proto = dcodeIO.ProtoBuf.loadProtoFile("directdraw.proto");
+	var WebImageProto = proto.build("org.webswing.directdraw.proto.WebImageProto");
+	var InstructionProto = proto.build("org.webswing.directdraw.proto.DrawInstructionProto.InstructionProto");
+	var SegmentTypeProto = proto.build("org.webswing.directdraw.proto.PathProto.SegmentTypeProto");
+	var ArcTypeProto = proto.build("org.webswing.directdraw.proto.ArcProto.ArcTypeProto");
+	var CyclicMethodProto = proto.build("org.webswing.directdraw.proto.CyclicMethodProto");
+	var StrokeJoinProto = proto.build("org.webswing.directdraw.proto.StrokeProto.StrokeJoinProto");
+	var StrokeCapProto = proto.build("org.webswing.directdraw.proto.StrokeProto.StrokeCapProto");
+	var StyleProto = proto.build("org.webswing.directdraw.proto.FontProto.StyleProto");
 	var MAX_GRADIENT_CYCLE_REPEAT_COUNT = 30;
-	var ctx;
-	var constantPoolCache = config.constantPool;
-	var imagePoolCache = config.imagePool;
-	var graphicsStates = {};
-	var currentStateId = null;
+	var constantPoolCache = {};
+	var imagePoolCache = {};
 
-	function draw64(data) {
+	function draw64(data, targetCanvas) {
 		var image = WebImageProto.decode64(data);
-		return drawWebImage(image);
+		return drawWebImage(image, targetCanvas);
 	}
 
-	function drawBin(data) {
+	function drawBin(data, targetCanvas) {
 		var image = WebImageProto.decode(data);
-		return drawWebImage(image);
+		return drawWebImage(image, targetCanvas);
 	}
 
-	function drawWebImage(image) {
+	function drawWebImage(image, targetCanvas) {
 		return new Promise(function(resolve, reject) {
 			try {
+				var newCanvas;
+				if (targetCanvas != null) {
+					newCanvas = targetCanvas;
+				} else {
+					newCanvas = document.createElement("canvas");
+				}
+				if (newCanvas.width != image.width || newCanvas.height != image.height) {
+					newCanvas.width = image.width;
+					newCanvas.height = image.height;
+				}
+
+				var imageContext = {
+					canvas : newCanvas,
+					graphicsStates : {},
+					currentStateId : null
+				};
+
 				var imagesToPrepare;
 				imagesToPrepare = [];
 				populateConstantsPool(image, imagesToPrepare);
 
 				prepareImages(imagesToPrepare).then(function(preloadedImageConstants) {
-					ctx = config.canvas.getContext("2d");
+					var ctx = imageContext.canvas.getContext("2d");
 					ctx.save();
 					if (image.instructions != null) {
 						image.instructions.forEach(function(instruction) {
-							interpretInstruction(ctx, instruction, config.canvas);
+							interpretInstruction(ctx, instruction, imageContext);
 						});
 					}
 					ctx.restore();
-					resolve(config.canvas);
+					resolve(imageContext.canvas);
 				}, function(error) {
 					config.onErrorMessage(error);
 				});
 			} catch (e) {
-				config.onErrorMessage(error);
+				config.onErrorMessage(e);
 				reject(e);
 			}
 		});
@@ -88,18 +94,18 @@ function WebswingDirectDraw(c) {
 		}
 	}
 
-	function interpretInstruction(ctx, instruction, imageCanvas) {
+	function interpretInstruction(ctx, instruction, imageContext) {
 		var instCode = instruction.inst;
 		var args = resolveArgs(instruction.args, constantPoolCache);
 		switch (instCode) {
 		case InstructionProto.GRAPHICS_CREATE:
-			iprtGraphicsCreate(ctx, instruction.args[0], instruction.args[1]);
+			iprtGraphicsCreate(ctx, instruction.args[0], args, imageContext);
 			break;
 		case InstructionProto.GRAPHICS_SWITCH:
-			iprtGraphicsSwitch(ctx, instruction.args[0]);
+			iprtGraphicsSwitch(ctx, instruction.args[0], imageContext);
 			break;
 		case InstructionProto.GRAPHICS_DISPOSE:
-			delete graphicsStates[instruction.args[0]];
+			delete imageContext.graphicsStates[instruction.args[0]];
 			break;
 		case InstructionProto.DRAW:
 			iprtDraw(ctx, args);
@@ -111,32 +117,34 @@ function WebswingDirectDraw(c) {
 			iprtDrawImage(ctx, args);
 			break;
 		case InstructionProto.DRAW_WEBIMAGE:
-			iprtDrawWebImage(ctx, args, instruction.webImage);
+			iprtDrawWebImage(ctx, args, instruction.webImage, imageContext);
 			break;
 		case InstructionProto.DRAW_STRING:
 			iprtDrawString(ctx, args);
 			break;
 		case InstructionProto.COPY_AREA:
-			iprtCopyArea(ctx, args, imageCanvas);
+			iprtCopyArea(ctx, args, imageContext);
 			break;
 		case InstructionProto.SET_STROKE:
 			iprtSetStroke(ctx, args);
-			graphicsStates[currentStateId].strokeArgs = args;
+			imageContext.graphicsStates[imageContext.currentStateId].strokeArgs = args;
 			break;
 		case InstructionProto.SET_PAINT:
-			iprtSetPaint(ctx, args);
-			graphicsStates[currentStateId].paintArgs = args;
+			iprtSetPaint(ctx, args, imageContext);
+			imageContext.graphicsStates[imageContext.currentStateId].paintArgs = args;
 			break;
 		case InstructionProto.TRANSFORM:
 			var tx = iprtTransform(ctx, args);
-			graphicsStates[currentStateId].transformArgs = concatTransform(graphicsStates[currentStateId].transformArgs, tx);
+			imageContext.graphicsStates[imageContext.currentStateId].transformArgs = concatTransform(
+					imageContext.graphicsStates[imageContext.currentStateId].transformArgs, tx);
 			break;
 		default:
 			console.log("instCode:" + instCode + " not recognized");
 		}
 	}
 
-	function iprtGraphicsSwitch(ctx, id) {
+	function iprtGraphicsSwitch(ctx, id, imageContext) {
+		var graphicsStates = imageContext.graphicsStates;
 		if (graphicsStates[id] != null) {
 			if (graphicsStates[id].strokeArgs != null) {
 				iprtSetStroke(ctx, graphicsStates[id].strokeArgs);
@@ -151,32 +159,23 @@ function WebswingDirectDraw(c) {
 		} else {
 			console.log("Graphics with id " + id + " not initialized!");
 		}
-		currentStateId = id;
+		imageContext.currentStateId = id;
 	}
 
-	function iprtGraphicsCreate(ctx, thisId, parentId) {
+	function iprtGraphicsCreate(ctx, thisId, args, imageContext) {
+		var graphicsStates = imageContext.graphicsStates;
 		if (graphicsStates[thisId] == null) {
 			graphicsStates[thisId] = {};
-			if (parentId == null) {
-				graphicsStates[thisId].strokeArgs = [ {
-					stroke : {
-						widthX10 : 10,
-						miterLimitX10 : 100,
-						cap : StrokeCapProto.CAP_SQUARE,
-						join : StrokeJoinProto.JOIN_MITER
-					}
-				} ];
-				graphicsStates[thisId].paintArgs = [ {
-					color : {
-						rgba : 0x000000FF
-					}
-				} ];
-				graphicsStates[thisId].transformArgs = [ 1, 0, 0, 1, 0, 0 ];
-			} else {
-				graphicsStates[thisId].strokeArgs = graphicsStates[parentId].strokeArgs;
-				graphicsStates[thisId].paintArgs = graphicsStates[parentId].paintArgs;
-				graphicsStates[thisId].transformArgs = graphicsStates[parentId].transformArgs;
-			}
+			imageContext.currentStateId = thisId;
+			args.shift();
+			var tx = iprtTransform(ctx, args, true);
+			imageContext.graphicsStates[thisId].transformArgs = tx;
+			args.shift();
+			iprtSetStroke(ctx, args);
+			imageContext.graphicsStates[thisId].strokeArgs = args.slice(0, 1);
+			args.shift();
+			iprtSetPaint(ctx, args, imageContext);
+			imageContext.graphicsStates[thisId].paintArgs = args;
 		} else {
 			console.log("Graphics with id " + thisId + " already exist!");
 		}
@@ -225,7 +224,7 @@ function WebswingDirectDraw(c) {
 		ctx.restore();
 	}
 
-	function iprtDrawWebImage(ctx, args, image) {
+	function iprtDrawWebImage(ctx, args, image, imageContext) {
 		var transform = null, crop = null, clip = null;
 
 		if (args[0].transform != null) {
@@ -241,20 +240,19 @@ function WebswingDirectDraw(c) {
 		var imageCanvas = document.createElement("canvas");
 		imageCanvas.width = crop.w;
 		imageCanvas.height = crop.h;
+		var newContext = {
+			canvas : imageCanvas,
+			graphicsStates : {},
+			currentStateId : null
+		};
 		var icCtx = imageCanvas.getContext("2d");
 		icCtx.translate(crop.x, crop.y);
 
-		var originalGraphicsStates = graphicsStates;
-		var originalCurrentStateId = currentStateId;
-		graphicsStates = {};
-		currentStateId = null;
 		if (image.instructions != null) {
 			image.instructions.forEach(function(instruction) {
-				interpretInstruction(icCtx, instruction, imageCanvas);
+				interpretInstruction(icCtx, instruction, newContext);
 			});
 		}
-		graphicsStates = originalGraphicsStates;
-		currentStateId = originalCurrentStateId;
 		ctx.save();
 		if (path(ctx, clip)) {
 			ctx.clip();
@@ -262,7 +260,7 @@ function WebswingDirectDraw(c) {
 		if (transform != null) {
 			iprtTransform(ctx, [ transform ]);
 		}
-		ctx.drawImage(imageCanvas, 0, 0, imageCanvas.width, imageCanvas.height);
+		ctx.drawImage(newContext.canvas, 0, 0, newContext.canvas.width, newContext.canvas.height);
 		ctx.restore();
 
 	}
@@ -296,7 +294,7 @@ function WebswingDirectDraw(c) {
 		ctx.restore();
 	}
 
-	function iprtCopyArea(ctx, args,imageCanvas) {
+	function iprtCopyArea(ctx, args, imageContext) {
 		var p = args[0].points.points;
 		var clip = args[1];
 		ctx.save();
@@ -305,14 +303,15 @@ function WebswingDirectDraw(c) {
 			ctx.clip();
 		}
 		ctx.beginPath();
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.rect(p[0], p[1], p[2], p[3]);
 		ctx.clip();
-		ctx.setTransform(1, 0, 0, 1, 0, 0);
-		ctx.drawImage(imageCanvas, p[4], p[5]);
+		ctx.translate( p[4], p[5]);
+		ctx.drawImage(imageContext.canvas, 0,0);
 		ctx.restore();
 	}
 
-	function iprtTransform(ctx, args) {
+	function iprtTransform(ctx, args, reset) {
 		var t = args[0].transform;
 		var a, b, c, d, e, f;
 		a = t.m00 != null ? t.m00 : 1;
@@ -322,7 +321,11 @@ function WebswingDirectDraw(c) {
 		e = t.m02X2 != null ? t.m02X2 / 2 : 0;
 		f = t.m12X2 != null ? t.m12X2 / 2 : 0;
 		var m = [ a, b, c, d, e, f ];
-		ctx.transform(a, b, c, d, e, f);
+		if (reset) {
+			ctx.setTransform(a, b, c, d, e, f);
+		} else {
+			ctx.transform(a, b, c, d, e, f);
+		}
 		return m;
 	}
 
@@ -362,7 +365,7 @@ function WebswingDirectDraw(c) {
 		}
 	}
 
-	function iprtSetPaint(ctx, args) {
+	function iprtSetPaint(ctx, args, imageContext) {
 		var constant = args[0];
 		if (constant.color != null) {
 			var color = parseColor(constant.color.rgba);
@@ -401,9 +404,9 @@ function WebswingDirectDraw(c) {
 			var increaseCount = 0, decreaseCount = 0;
 			var bCanvasMin, bCanvasMax, bStartPoint, bIncrement;
 			if (g.repeat != null && g.repeat != CyclicMethodProto.NO_CYCLE) {
-				var c = config.canvas;
+				var c = imageContext.canvas;
 				if ((g.yStart - g.yEnd) != 0) {
-					a = -(g.xStart - g.xEnd) / (g.yStart - g.yEnd);
+					var a = -(g.xStart - g.xEnd) / (g.yStart - g.yEnd);
 					bCanvasMin = Math.min(0, -a * c.width, c.height, c.height - a * c.width);
 					bCanvasMax = Math.max(0, -a * c.width, c.height, c.height - a * c.width);
 					bStartPoint = (g.yStart - a * g.xStart);
@@ -465,7 +468,7 @@ function WebswingDirectDraw(c) {
 					var distanceFromCenterToFocus = Math.sqrt(Math.pow(rg.xFocus - rg.xCenter, 2) + Math.pow(rg.yFocus - rg.yCenter, 2));
 					gradientsize = Math.min(distanceFromCenterToFocus, rg.radius - distanceFromCenterToFocus);
 				}
-				repeatcount = Math.ceil(Math.sqrt(Math.pow(config.canvas.height, 2) + Math.pow(config.canvas.width, 2)) / gradientsize);
+				repeatcount = Math.ceil(Math.sqrt(Math.pow(imageContext.canvas.height, 2) + Math.pow(imageContext.canvas.width, 2)) / gradientsize);
 				repeatcount = Math.min(MAX_GRADIENT_CYCLE_REPEAT_COUNT, repeatcount);
 			}
 
@@ -741,11 +744,11 @@ function WebswingDirectDraw(c) {
 	}
 
 	return {
-		draw64 : function(data) {
-			return draw64(data);
+		draw64 : function(data, targetCanvas) {
+			return draw64(data, targetCanvas);
 		},
-		drawBin : function(data) {
-			return drawBin(data);
+		drawBin : function(data, targetCanvas) {
+			return drawBin(data, targetCanvas);
 		}
 	};
 };
