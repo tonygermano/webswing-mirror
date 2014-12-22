@@ -91,6 +91,7 @@ public class SwingClassloader extends ClassLoader {
         methodReplacementBuilder.put("java.lang.ClassLoader getSystemResource (Ljava/lang/String;)Ljava/net/URL;", "org.webswing.special.RedirectedMethods getSystemResource (Ljava/lang/String;)Ljava/net/URL;");
         methodReplacementBuilder.put("java.lang.ClassLoader getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;", "org.webswing.special.RedirectedMethods getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;");
         methodReplacementBuilder.put("java.lang.ClassLoader getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;", "org.webswing.special.RedirectedMethods getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;");
+        methodReplacementBuilder.put("javax.swing.RepaintManager setCurrentManager (Ljavax/swing/RepaintManager;)V", "org.webswing.special.RedirectedMethods setCurrentManager (Ljavax/swing/RepaintManager;)V");
         methodReplacementBuilder.put("java.lang.System setErr (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy ()V");
         methodReplacementBuilder.put("java.lang.System setOut (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy2 ()V");
         methodReplacementBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
@@ -210,7 +211,7 @@ public class SwingClassloader extends ClassLoader {
     protected JavaClass modifyClass(JavaClass clazz) {
 
         //do not modify classes placed in this list
-        if (ClassLoaderUtil.isInPackage(clazz.getPackageName(), new String[] { "org.webswing.containers" })) {
+        if (ClassLoaderUtil.isInPackage(clazz.getPackageName(), new String[] { "org.webswing" })) {
             return clazz;
         }
 
@@ -230,7 +231,7 @@ public class SwingClassloader extends ClassLoader {
             //+++++++++ Intercept paint method if current class is subclass of JComponent +++++++
             //interceptPaintMethod(clazz, cg, cp, f);
 
-            //+++++++++ Reroute (static) methods that require special handling +++++++++++++ 
+            //+++++++++ Reroute (static) methods that require special handling +++++++++++++
             rerouteMehods(clazz, cg, cp, f);
 
             //+++++++++ Override methods that needs to be modified +++++++++++++
@@ -342,7 +343,7 @@ public class SwingClassloader extends ClassLoader {
 
     @SuppressWarnings("unused")
     private void rerouteSwingClasses(JavaClass clazz, ClassGen cg, ConstantPoolGen cp) {
-        //Reroute all swing components to our own proxy component 
+        //Reroute all swing components to our own proxy component
         //1.add class constant to constant pool
         for (String jComponentName : classReplacementMapping.keySet()) {
             int jComponentClassConstantPosition = cp.lookupClass(jComponentName);
@@ -370,7 +371,7 @@ public class SwingClassloader extends ClassLoader {
                             String referencedClassName = ((String) classConstant.getConstantValue(cp.getConstantPool())).replace("/", ".");
                             if (classReplacementMapping.containsKey(referencedClassName)) {
                                 if (i instanceof INSTANCEOF || i instanceof CHECKCAST) {
-                                    //dont change; 
+                                    //dont change;
                                     continue;
                                 }
                                 String myProxyClassName = classReplacementMapping.get(referencedClassName);

@@ -37,7 +37,7 @@ public class WebImage extends Image {
 	private DirectDraw context;
 	private Dimension size;
 	private BufferedImage imageHolder;
-	private int lastGraphicsId = 0;
+	private volatile int lastGraphicsId = 0;
 	private WebGraphics lastUsedG = null;
 	private List<DrawInstruction> instructions = new ArrayList<DrawInstruction>();
 	private List<DrawInstruction> newInstructions = new ArrayList<DrawInstruction>();
@@ -67,7 +67,7 @@ public class WebImage extends Image {
 		return new WebGraphics(this);
 	}
 
-	protected int getNextGraphicsId() {
+	protected synchronized int getNextGraphicsId() {
 		return lastGraphicsId++;
 	}
 
@@ -110,7 +110,9 @@ public class WebImage extends Image {
 		}
 		ihg.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
 		ihg.clip(new Rectangle(getImageHolder().getWidth(), getImageHolder().getHeight()));
-		addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), null), new DrawConstant.Integer(0)));
+		if (ihg.getClip().getBounds().width > 0 && ihg.getClip().getBounds().height > 0) {
+			addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), null), new DrawConstant.Integer(0)));
+		}
 		ihg.dispose();
 	}
 
@@ -125,7 +127,9 @@ public class WebImage extends Image {
 		ihg.clip(new Rectangle(i.getWidth(), i.getHeight()));
 		ihg.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
 		ihg.clip(new Rectangle(getImageHolder().getWidth(), getImageHolder().getHeight()));
-		addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), null), new DrawConstant.Integer(0)));
+		if (ihg.getClip().getBounds().width > 0 && ihg.getClip().getBounds().height > 0) {
+			addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), null), new DrawConstant.Integer(0)));
+		}
 		ihg.dispose();
 	}
 

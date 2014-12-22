@@ -193,16 +193,13 @@ function WebswingBase(c) {
 				if (win.directDrawB64 != null) {
 					// directdraw
 					return sequence.then(function(resolved) {
-						console.log("directdraw-draw");
 						ddCanvas.width = win.width;
 						ddCanvas.height = win.height;
-
 						return directDraw.draw64(win.directDrawB64);
 					}).then(function() {
 						for ( var x in win.content) {
 							var winContent = win.content[x];
 							if (winContent != null) {
-								console.log("directdraw-copy");
 								context.drawImage(ddCanvas, winContent.positionX, winContent.positionY, winContent.width, winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height);
 							}
 						}
@@ -226,7 +223,6 @@ function WebswingBase(c) {
 				}
 			}, Promise.resolve()).then(function() {
 				ack();
-				console.log("ack");
 			});
 		}
 	}

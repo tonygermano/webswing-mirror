@@ -75,9 +75,12 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.swing.RepaintManager;
+
 import org.webswing.Constants;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Logger;
 import org.webswing.util.Util;
@@ -98,6 +101,8 @@ public abstract class WebToolkit extends SunToolkit {
     private WindowManager windowManager = WindowManager.getInstance();
 
     public void init() {
+    	RepaintManager.setCurrentManager(new WebRepaintManager(RepaintManager.currentManager(null)));
+
         try {
             if (!System.getProperty("os.name", "").startsWith("Windows")) {
                 Class<?> c = ClassLoader.getSystemClassLoader().loadClass("sun.awt.X11GraphicsEnvironment");

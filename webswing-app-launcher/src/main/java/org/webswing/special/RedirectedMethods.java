@@ -6,7 +6,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 
+import javax.swing.RepaintManager;
+
 import org.webswing.SwingMain;
+import org.webswing.toolkit.extra.WebRepaintManager;
 
 public class RedirectedMethods {
 
@@ -42,7 +45,16 @@ public class RedirectedMethods {
     public static Enumeration<URL> getSystemResources(String name) throws IOException {
         return SwingMain.swingLibClassloader.getResources(name);
     }
-    
+
+    public static void setCurrentManager(RepaintManager manager){
+    	RepaintManager rm=RepaintManager.currentManager(null);
+    	if(rm instanceof WebRepaintManager){
+    		((WebRepaintManager) rm).setDelegate(manager);
+    	}else{
+    		RepaintManager.setCurrentManager(new WebRepaintManager(manager));
+    	}
+    }
+
     @SuppressWarnings("restriction")
     public static File[] listRoots(){
         return (File[]) sun.awt.shell.ShellFolder.get("roots");

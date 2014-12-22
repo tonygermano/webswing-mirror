@@ -20,6 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFileChooser;
+import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
@@ -34,6 +35,7 @@ import org.webswing.model.s2c.JsonWindowMoveAction;
 import org.webswing.model.s2c.OpenFileResult;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
+import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.util.Logger;
 import org.webswing.util.Services;
@@ -63,6 +65,7 @@ public class WebPaintDispatcher {
                     Map<String, Set<Rectangle>> currentAreasToUpdate = null;
                     synchronized (webPaintLock) {
                         if (clientReadyToReceive) {
+                        	((WebRepaintManager)RepaintManager.currentManager(null)).process();
                             lastReadyStateTime = System.currentTimeMillis();
                         }
                         if ((areasToUpdate.size() == 0 && moveAction == null) || !clientReadyToReceive) {

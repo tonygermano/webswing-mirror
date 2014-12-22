@@ -28,7 +28,7 @@ function WebswingDirectDraw(c) {
 	var constantPoolCache = config.constantPool;
 	var imagePoolCache = config.imagePool;
 	var graphicsStates = {};
-	var currentStateId;
+	var currentStateId = null;
 
 	function draw64(data) {
 		var image = WebImageProto.decode64(data);
@@ -43,7 +43,8 @@ function WebswingDirectDraw(c) {
 	function drawWebImage(image) {
 		return new Promise(function(resolve, reject) {
 			try {
-				var imagesToPrepare = [];
+				var imagesToPrepare;
+				imagesToPrepare = [];
 				populateConstantsPool(image, imagesToPrepare);
 
 				prepareImages(imagesToPrepare).then(function(preloadedImageConstants) {
@@ -51,7 +52,7 @@ function WebswingDirectDraw(c) {
 					ctx.save();
 					if (image.instructions != null) {
 						image.instructions.forEach(function(instruction) {
-							interpretInstruction(ctx, instruction);
+							interpretInstruction(ctx, instruction, config.canvas);
 						});
 					}
 					ctx.restore();
@@ -87,7 +88,7 @@ function WebswingDirectDraw(c) {
 		}
 	}
 
-	function interpretInstruction(ctx, instruction, preloadedImages) {
+	function interpretInstruction(ctx, instruction, imageCanvas) {
 		var instCode = instruction.inst;
 		var args = resolveArgs(instruction.args, constantPoolCache);
 		switch (instCode) {
@@ -116,7 +117,7 @@ function WebswingDirectDraw(c) {
 			iprtDrawString(ctx, args);
 			break;
 		case InstructionProto.COPY_AREA:
-			iprtCopyArea(ctx, args);
+			iprtCopyArea(ctx, args, imageCanvas);
 			break;
 		case InstructionProto.SET_STROKE:
 			iprtSetStroke(ctx, args);
@@ -203,9 +204,9 @@ function WebswingDirectDraw(c) {
 	}
 
 	function iprtDrawImage(ctx, args) {
-		var clip, image, offsetX, offsetY,p;
+		var clip = null, image = null, offsetX = 0, offsetY = 0, p = null;
 		if (args[1] != null) {
-			p=args[1].points.points;
+			p = args[1].points.points;
 			offsetX = imagePoolCache[p[0]].offsetX;
 			offsetY = imagePoolCache[p[0]].offsetY;
 			image = imagePoolCache[p[0]].data;
@@ -219,22 +220,19 @@ function WebswingDirectDraw(c) {
 		if (path(ctx, clip)) {
 			ctx.clip();
 		}
-		ctx.translate(offsetX-p[1], offsetY-p[2]);
+		ctx.translate(offsetX - p[1], offsetY - p[2]);
 		ctx.drawImage(image, 0, 0, image.width, image.height);
 		ctx.restore();
 	}
 
 	function iprtDrawWebImage(ctx, args, image) {
-		var transform, bg, crop, clip;
+		var transform = null, crop = null, clip = null;
 
 		if (args[0].transform != null) {
 			transform = args[0];
 		}
 		if (args[1].rectangle != null) {
 			crop = args[1].rectangle;
-		}
-		if (args[2].color != null) {
-			bg = args[2].color;
 		}
 		if (args[3] != null) {
 			clip = args[3];
@@ -252,11 +250,11 @@ function WebswingDirectDraw(c) {
 		currentStateId = null;
 		if (image.instructions != null) {
 			image.instructions.forEach(function(instruction) {
-				interpretInstruction(icCtx, instruction);
+				interpretInstruction(icCtx, instruction, imageCanvas);
 			});
 		}
 		graphicsStates = originalGraphicsStates;
-
+		currentStateId = originalCurrentStateId;
 		ctx.save();
 		if (path(ctx, clip)) {
 			ctx.clip();
@@ -280,7 +278,7 @@ function WebswingDirectDraw(c) {
 			ctx.clip();
 		}
 		iprtTransform(ctx, [ transform ]);
-		var style;
+		var style = '';
 		switch (font.style) {
 		case StyleProto.NORMAL:
 			style = '';
@@ -298,7 +296,7 @@ function WebswingDirectDraw(c) {
 		ctx.restore();
 	}
 
-	function iprtCopyArea(ctx, args) {
+	function iprtCopyArea(ctx, args,imageCanvas) {
 		var p = args[0].points.points;
 		var clip = args[1];
 		ctx.save();
@@ -309,8 +307,8 @@ function WebswingDirectDraw(c) {
 		ctx.beginPath();
 		ctx.rect(p[0], p[1], p[2], p[3]);
 		ctx.clip();
-		ctx.setTransform(1,0,0,1,0,0);
-		ctx.drawImage(config.canvas, p[4],p[5]);
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.drawImage(imageCanvas, p[4], p[5]);
 		ctx.restore();
 	}
 
@@ -401,26 +399,27 @@ function WebswingDirectDraw(c) {
 			var xIncrement = g.xEnd - g.xStart;
 			var yIncrement = g.yEnd - g.yStart;
 			var increaseCount = 0, decreaseCount = 0;
+			var bCanvasMin, bCanvasMax, bStartPoint, bIncrement;
 			if (g.repeat != null && g.repeat != CyclicMethodProto.NO_CYCLE) {
 				var c = config.canvas;
 				if ((g.yStart - g.yEnd) != 0) {
-					var a = -(g.xStart - g.xEnd) / (g.yStart - g.yEnd);
-					var bCanvasMin = Math.min(0, -a * c.width, c.height, c.height - a * c.width);
-					var bCanvasMax = Math.max(0, -a * c.width, c.height, c.height - a * c.width);
-					var bStartPoint = (g.yStart - a * g.xStart);
-					var bIncrement = (g.yEnd - a * g.xEnd) - bStartPoint;
+					a = -(g.xStart - g.xEnd) / (g.yStart - g.yEnd);
+					bCanvasMin = Math.min(0, -a * c.width, c.height, c.height - a * c.width);
+					bCanvasMax = Math.max(0, -a * c.width, c.height, c.height - a * c.width);
+					bStartPoint = (g.yStart - a * g.xStart);
+					bIncrement = (g.yEnd - a * g.xEnd) - bStartPoint;
 				} else {
-					var bCanvasMin = 0;
-					var bCanvasMax = c.width;
-					var bStartPoint = g.xStart;
-					var bIncrement = xIncrement;
+					bCanvasMin = 0;
+					bCanvasMax = c.width;
+					bStartPoint = g.xStart;
+					bIncrement = xIncrement;
 				}
 				// repeat by increasing
 				var maxCount = (bCanvasMax + (bStartPoint % bIncrement) - (bCanvasMax % bIncrement) - bStartPoint) / bIncrement;
 				// repeat decreasing
 				var minCount = -(bCanvasMin + (bStartPoint % bIncrement) - (bCanvasMin % bIncrement) - bStartPoint) / bIncrement + 1;
-				var increaseCount = (maxCount > 0 ? maxCount : 0) + (minCount < 0 ? -minCount : 0);
-				var decreaseCount = (minCount > 0 ? minCount : 0) + (maxCount < 0 ? -maxCount : 0);
+				increaseCount = (maxCount > 0 ? maxCount : 0) + (minCount < 0 ? -minCount : 0);
+				decreaseCount = (minCount > 0 ? minCount : 0) + (maxCount < 0 ? -maxCount : 0);
 				repeatcount = increaseCount + 1 + decreaseCount;
 			}
 			var gradient = ctx.createLinearGradient(g.xStart - xIncrement * decreaseCount, g.yStart - yIncrement * decreaseCount, g.xEnd + xIncrement
@@ -691,7 +690,8 @@ function WebswingDirectDraw(c) {
 	function prepareImages(imageConstants) {
 		return new Promise(function(resolve, reject) {
 			try {
-				var preloadedImageConstants = [];
+				var preloadedImageConstants;
+				preloadedImageConstants = [];
 				if (imageConstants.length > 0) {
 					var loadPromisesArray = imageConstants.map(function(constant) {
 						return new Promise(function(resolve, reject) {
