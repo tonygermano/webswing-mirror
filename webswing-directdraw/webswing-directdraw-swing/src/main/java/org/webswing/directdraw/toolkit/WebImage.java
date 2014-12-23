@@ -29,6 +29,7 @@ import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
 import org.webswing.directdraw.proto.Directdraw.ImageProto;
 import org.webswing.directdraw.proto.Directdraw.WebImageProto;
+import org.webswing.directdraw.util.DirectDrawUtils;
 import org.webswing.directdraw.util.DrawConstantPool;
 import org.webswing.directdraw.util.ImageConstantPool;
 
@@ -94,11 +95,12 @@ public class WebImage extends Image {
 					newInstructions.add(factory.createGraphics(g));
 					usedGs.add(g);
 					lastUsedG = g;
-					if(in.getInstruction().equals(InstructionProto.TRANSFORM)){
-						//skip adding the instruction- transform is already included in create graphics inst.
+					if (in.getInstruction().equals(InstructionProto.TRANSFORM)) {
+						// skip adding the instruction- transform is already
+						// included in create graphics inst.
 						return;
 					}
-				}else{
+				} else {
 					newInstructions.add(factory.switchGraphics(g));
 					lastUsedG = g;
 				}
@@ -155,14 +157,13 @@ public class WebImage extends Image {
 	}
 
 	public WebImage extractReadOnlyWebImage() {
-		WebImage result = new WebImage(context, size.width, size.height){
+		WebImage result = new WebImage(context, size.width, size.height) {
 			@Override
 			public void addInstruction(WebGraphics g, DrawInstruction in) {
 				throw new UnsupportedOperationException("This is read only instance of webimage.");
 			}
 		};
 		synchronized (this) {
-			System.out.println(newInstructions);
 			result.newInstructions = newInstructions;
 			if (imageHolder != null) {
 				result.getImageHolder().getGraphics().drawImage(imageHolder, 0, 0, null);
@@ -175,10 +176,6 @@ public class WebImage extends Image {
 	}
 
 	public Message toMessage(DirectDraw dd) {
-		return toMessage(dd, true);
-	}
-
-	public Message toMessage(DirectDraw dd, boolean resetOld) {
 		DrawConstantPool constantPool = dd.getConstantPool();
 		ImageConstantPool imagePool = dd.getImagePool();
 		HashMap<Long, Point> currentFrameImageHashes = new HashMap<Long, Point>();
@@ -187,14 +184,13 @@ public class WebImage extends Image {
 
 		WebImageProto.Builder webImageBuilder = WebImageProto.newBuilder();
 		synchronized (this) {
-			if (resetOld) {
-				instructions = newInstructions;
-				newInstructions = new ArrayList<DrawInstruction>();
-			} else {
-				instructions.addAll(newInstructions);
-				newInstructions.clear();
-			}
+			instructions = newInstructions;
+			newInstructions = new ArrayList<DrawInstruction>();
 		}
+
+		DirectDrawUtils.optimizeInstructions(dd, instructions);
+		System.out.println(instructions);
+
 		// preprocess draw_image instructions
 		for (DrawInstruction ins : instructions) {
 			DrawConstant[] constants = ins.getArgs();

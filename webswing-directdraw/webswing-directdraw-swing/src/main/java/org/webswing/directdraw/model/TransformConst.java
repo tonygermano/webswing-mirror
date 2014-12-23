@@ -8,9 +8,8 @@ import org.webswing.directdraw.proto.Directdraw.TransformProto;
 
 public class TransformConst extends DrawConstant {
 
-
-	public TransformConst(DirectDraw context,AffineTransform t) {
-    	super(context);
+	public TransformConst(DirectDraw context, AffineTransform t) {
+		super(context);
 		TransformProto.Builder model = TransformProto.newBuilder();
 		double[] matrix = new double[6];
 		t.getMatrix(matrix);
@@ -32,11 +31,11 @@ public class TransformConst extends DrawConstant {
 		if (matrix[5] != 0) {
 			model.setM12X2((int) Math.round(matrix[5] * 2));
 		}
-		this.message= model.build();
+		this.message = model.build();
 	}
 
-	public TransformConst(DirectDraw context,Font font, double x, double y) {
-    	super(context);
+	public TransformConst(DirectDraw context, Font font, double x, double y) {
+		super(context);
 		TransformProto.Builder model = TransformProto.newBuilder();
 		AffineTransform t = font.getTransform();
 		double[] matrix = new double[6];
@@ -59,7 +58,7 @@ public class TransformConst extends DrawConstant {
 		if (y != 0) {
 			model.setM12X2((int) Math.round(y * 2));
 		}
-		this.message= model.build();
+		this.message = model.build();
 	}
 
 	@Override
@@ -67,4 +66,8 @@ public class TransformConst extends DrawConstant {
 		return "transform";
 	}
 
+	public AffineTransform getAffineTransform() {
+		TransformProto m = (TransformProto) this.message;
+		return new AffineTransform(m.hasM00() ? m.getM00() : 1, m.hasM01() ? m.getM01() : 0, m.hasM10() ? m.getM10() : 0, m.hasM11() ? m.getM11() : 1, m.hasM02X2() ? (m.getM02X2() / 2) : 0, m.hasM12X2() ? (m.getM12X2() / 2) : 0);
+	}
 }
