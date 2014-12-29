@@ -11,4 +11,6 @@ public interface DirectDrawService {
     byte[] buildWebImage(Image webImage);
 
     void resetCache();
+
+	boolean isDirty(Image windowDecorationImage);
 }

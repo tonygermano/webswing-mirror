@@ -55,7 +55,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected void writeImage(RenderedImage image, AffineTransform xform) throws IOException {
-		thisImage.addImage(this, image, xform);
+		thisImage.addImage(this, image, null, xform, null);
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 			crop = crop != null ? crop : new Rectangle2D.Float(0, 0, image.getWidth(observer), image.getHeight(observer));
 			thisImage.addInstruction(this, dif.drawImage((WebImage) image, xform, crop, bkg, getClip()));
 		} else {
-			thisImage.addImage(this, image, observer, xform, crop, bkg);
+			thisImage.addImage(this, image, observer, xform, crop);
 		}
 	}
 
@@ -95,8 +95,8 @@ public class WebGraphics extends AbstractVectorGraphics {
 	@Override
 	public void copyArea(int x, int y, int width, int height, int dx, int dy) {
 		Point2D abs = getTransform().transform(new Point(x, y), null);
-		int absx = (int)abs.getX();
-		int absy=(int)abs.getY();
+		int absx = (int) abs.getX();
+		int absy = (int) abs.getY();
 		thisImage.addInstruction(this, dif.copyArea(absx + dx, absy + dy, width, height, dx, dy, getClip()));
 	}
 
@@ -128,7 +128,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	public void dispose() {
-		//thisImage.addInstruction(this, dif.disposeGraphics(this));
+		// thisImage.addInstruction(this, dif.disposeGraphics(this));
 		disposed = true;
 	}
 

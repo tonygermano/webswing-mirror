@@ -6,7 +6,7 @@ function WebswingDirectDraw(c) {
 			console.log(message);
 		}
 	};
-	var proto = dcodeIO.ProtoBuf.loadProtoFile("directdraw.proto");
+	var proto = dcodeIO.ProtoBuf.loadProtoFile("/directdraw.proto");
 	var WebImageProto = proto.build("org.webswing.directdraw.proto.WebImageProto");
 	var InstructionProto = proto.build("org.webswing.directdraw.proto.DrawInstructionProto.InstructionProto");
 	var SegmentTypeProto = proto.build("org.webswing.directdraw.proto.PathProto.SegmentTypeProto");
@@ -54,15 +54,20 @@ function WebswingDirectDraw(c) {
 				populateConstantsPool(image, imagesToPrepare);
 
 				prepareImages(imagesToPrepare).then(function(preloadedImageConstants) {
-					var ctx = imageContext.canvas.getContext("2d");
-					ctx.save();
-					if (image.instructions != null) {
-						image.instructions.forEach(function(instruction) {
-							interpretInstruction(ctx, instruction, imageContext);
-						});
+					try{
+						var ctx = imageContext.canvas.getContext("2d");
+						ctx.save();
+						if (image.instructions != null) {
+							image.instructions.forEach(function(instruction) {
+								interpretInstruction(ctx, instruction, imageContext);
+							});
+						}
+						ctx.restore();
+						resolve(imageContext.canvas);
+					}catch(e){
+						reject(e);
+						config.onErrorMessage(e);
 					}
-					ctx.restore();
-					resolve(imageContext.canvas);
 				}, function(error) {
 					config.onErrorMessage(error);
 				});

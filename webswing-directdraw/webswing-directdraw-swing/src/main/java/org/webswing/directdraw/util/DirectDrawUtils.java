@@ -107,6 +107,7 @@ public class DirectDrawUtils {
 
 		// step 1. group consequent transformations
 		AffineTransform merged = null;
+		DrawInstruction graphicsCreate = null;
 		List<DrawInstruction> newInstructions = new ArrayList<DrawInstruction>();
 		for (Iterator<DrawInstruction> i = instructions.iterator(); i.hasNext();) {
 			DrawInstruction current = i.next();
@@ -117,11 +118,26 @@ public class DirectDrawUtils {
 					AffineTransform currtc = ((TransformConst) current.getArgs()[0]).getAffineTransform();
 					merged.concatenate(currtc);
 				}
+			} else if (current.getInstruction().equals(InstructionProto.GRAPHICS_CREATE)) {
+				if (graphicsCreate != null) {
+					graphicsCreate.getArgs()[1] = new TransformConst(ctx, merged);
+					newInstructions.add(graphicsCreate);
+				}
+				graphicsCreate = current;
+				merged = ((TransformConst) current.getArgs()[1]).getAffineTransform();
 			} else {
 				if (merged != null) {
-					newInstructions.add(ctx.getInstructionFactory().transform(merged));
+					if (graphicsCreate != null) {
+						graphicsCreate.getArgs()[1] = new TransformConst(ctx, merged);
+						newInstructions.add(graphicsCreate);
+					} else {
+						if (!merged.isIdentity()) {
+							newInstructions.add(ctx.getInstructionFactory().transform(merged));
+						}
+					}
 				}
 				merged = null;
+				graphicsCreate = null;
 				newInstructions.add(current);
 			}
 		}

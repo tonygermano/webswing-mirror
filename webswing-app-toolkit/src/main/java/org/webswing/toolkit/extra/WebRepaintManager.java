@@ -61,6 +61,18 @@ public class WebRepaintManager extends RepaintManager {
 	}
 
 	@Override
+	public Rectangle getDirtyRegion(JComponent aComponent) {
+		Rectangle r;
+		synchronized (delegate) {
+			r = dirty.get(aComponent);
+		}
+		if (r == null)
+			return new Rectangle(0, 0, 0, 0);
+		else
+			return new Rectangle(r);
+	}
+
+	@Override
 	public void markCompletelyClean(JComponent component) {
 		synchronized (delegate) {
 			dirty.remove(component);

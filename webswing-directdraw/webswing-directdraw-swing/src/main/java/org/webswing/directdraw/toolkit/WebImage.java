@@ -1,6 +1,5 @@
 package org.webswing.directdraw.toolkit;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -18,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.DrawConstant;
@@ -37,6 +37,7 @@ import com.google.protobuf.Message;
 
 public class WebImage extends Image {
 
+	private String id = UUID.randomUUID().toString();
 	private DirectDraw context;
 	private Dimension size;
 	private BufferedImage imageHolder;
@@ -84,6 +85,16 @@ public class WebImage extends Image {
 		return null;
 	}
 
+	public boolean isDirty() {
+		synchronized (this) {
+			if (newInstructions.size() == 0) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
+
 	public void addInstruction(WebGraphics g, DrawInstruction in) {
 		if (g != null && g.isDisposed()) {
 			throw new RuntimeException("Drawing to disposed graphics.");
@@ -109,38 +120,27 @@ public class WebImage extends Image {
 		}
 	}
 
-	public void addImage(WebGraphics g, Image i, ImageObserver o, AffineTransform xform, Rectangle2D.Float crop, Color bkg) {
+	public void addImage(WebGraphics g, Object image, ImageObserver o, AffineTransform xform, Rectangle2D.Float crop) {
 		Graphics2D ihg = (Graphics2D) getImageHolder().getGraphics();
 		ihg.setTransform(g.getTransform());
 		ihg.setClip(g.getClip());
 		if (xform != null) {
 			ihg.transform(xform);
 		}
-		ihg.setBackground(bkg);
-		if (crop != null) {
-			ihg.drawImage(i, 0, 0, (int) crop.width, (int) crop.height, (int) crop.x, (int) crop.y, (int) (crop.x + crop.width), (int) (crop.y + crop.height), o);
-			ihg.clip(new Rectangle((int) crop.width, (int) crop.height));
-		} else {
-			ihg.drawImage(i, 0, 0, o);
-			ihg.clip(new Rectangle(i.getWidth(o), i.getHeight(o)));
+		if (image instanceof Image) {
+			Image i = (Image) image;
+			if (crop != null) {
+				ihg.drawImage(i, 0, 0, (int) crop.width, (int) crop.height, (int) crop.x, (int) crop.y, (int) (crop.x + crop.width), (int) (crop.y + crop.height), o);
+				ihg.clip(new Rectangle((int) crop.width, (int) crop.height));
+			} else {
+				ihg.drawImage(i, 0, 0, o);
+				ihg.clip(new Rectangle(i.getWidth(o), i.getHeight(o)));
+			}
+		} else if (image instanceof RenderedImage) {
+			RenderedImage i = (RenderedImage) image;
+			ihg.drawRenderedImage(i, null);
+			ihg.clip(new Rectangle(i.getWidth(), i.getHeight()));
 		}
-		ihg.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
-		ihg.clip(new Rectangle(getImageHolder().getWidth(), getImageHolder().getHeight()));
-		if (ihg.getClip().getBounds().width > 0 && ihg.getClip().getBounds().height > 0) {
-			addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), null), new DrawConstant.Integer(0)));
-		}
-		ihg.dispose();
-	}
-
-	public void addImage(WebGraphics g, RenderedImage i, AffineTransform xform) {
-		Graphics2D ihg = (Graphics2D) getImageHolder().getGraphics();
-		ihg.setTransform(g.getTransform());
-		ihg.setClip(g.getClip());
-		if (xform != null) {
-			ihg.transform(xform);
-		}
-		ihg.drawRenderedImage(i, null);
-		ihg.clip(new Rectangle(i.getWidth(), i.getHeight()));
 		ihg.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
 		ihg.clip(new Rectangle(getImageHolder().getWidth(), getImageHolder().getHeight()));
 		if (ihg.getClip().getBounds().width > 0 && ihg.getClip().getBounds().height > 0) {
@@ -162,12 +162,13 @@ public class WebImage extends Image {
 			public void addInstruction(WebGraphics g, DrawInstruction in) {
 				throw new UnsupportedOperationException("This is read only instance of webimage.");
 			}
+
 		};
 		synchronized (this) {
+			result.id = id;
 			result.newInstructions = newInstructions;
-			if (imageHolder != null) {
-				result.getImageHolder().getGraphics().drawImage(imageHolder, 0, 0, null);
-			}
+			result.imageHolder = imageHolder;
+			imageHolder = null;
 			newInstructions = new ArrayList<DrawInstruction>();
 			lastUsedG = null;
 			usedGs.clear();
@@ -244,6 +245,9 @@ public class WebImage extends Image {
 		}
 		webImageBuilder.setWidth(size.width);
 		webImageBuilder.setHeight(size.height);
-		return webImageBuilder.build();
+		WebImageProto result = webImageBuilder.build();
+		dd.getServices().saveFrame(this.id, result);
+		return result;
 	}
+
 }

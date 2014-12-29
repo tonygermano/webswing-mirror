@@ -76,7 +76,7 @@ public class WebComponentPeer implements ComponentPeer {
 	}
 
 	public Image extractWebImage() {
-		if (windowDecorationImage != null) {
+		if (windowDecorationImage != null && Services.getDirectDrawService().isDirty(windowDecorationImage)) {
 			Graphics g = webImage.getGraphics();
 			g.drawImage(windowDecorationImage, 0, 0, null);
 			g.dispose();

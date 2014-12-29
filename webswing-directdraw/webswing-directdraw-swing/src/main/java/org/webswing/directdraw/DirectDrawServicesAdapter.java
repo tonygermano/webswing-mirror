@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
+import org.webswing.directdraw.proto.Directdraw.WebImageProto;
 import org.webswing.directdraw.util.ImageConsumerAdapter;
 
 public class DirectDrawServicesAdapter {
@@ -45,6 +46,9 @@ public class DirectDrawServicesAdapter {
 		};
 		subImage.getSource().startProduction(ic);
 		return ic.getHash();
-
+	}
+	
+	public void saveFrame(String imageId, WebImageProto frame){
+		
 	}
 }
