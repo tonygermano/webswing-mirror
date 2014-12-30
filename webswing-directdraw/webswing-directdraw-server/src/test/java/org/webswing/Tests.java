@@ -27,6 +27,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.webswing.directdraw.toolkit.WebGraphics;
 
@@ -409,17 +410,32 @@ public class Tests {
 		return true;
 	}
 
+	public static boolean t15MultipleCopyAreaTestTest(Graphics2D g, Integer repeat) throws IOException {
+		if (repeat > 0) {
+			return false;
+		}
+		BufferedImage image = ImageIO.read(new File(Tests.class.getClassLoader().getResource("ws.png").getFile()));
+		g.drawImage(image, 0, 0, null);
+		g.copyArea(0, 0, 120, 100, 130, 0);
+		g.drawImage(image, 0, 30, null);
+		g.copyArea(0, 0, 120, 100, 260, 0);
+		g.drawImage(image, 0, 60, null);
+		g.copyArea(0, 0, 120, 100, 390, 0);
+		return true;
+	}
+
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("tests");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel content = new JPanel();
 		content.setLayout(new FlowLayout(FlowLayout.LEFT));
-		frame.getContentPane().add(content);
 		for (String m : DrawServlet.getTestMethods()) {
 			JPanel panel = getPanel(m);
 			panel.setPreferredSize(new Dimension(500, 100));
 			content.add(panel);
 		}
+		content.setPreferredSize(new Dimension(1000,2000));
+		frame.getContentPane().add(new JScrollPane(content));
 		frame.pack();
 		frame.setSize(1280, 700);
 		frame.setVisible(true);

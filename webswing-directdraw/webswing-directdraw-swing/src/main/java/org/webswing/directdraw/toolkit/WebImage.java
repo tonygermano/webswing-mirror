@@ -12,6 +12,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.RenderedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,11 +35,13 @@ import org.webswing.directdraw.util.DirectDrawUtils;
 import org.webswing.directdraw.util.DrawConstantPool;
 import org.webswing.directdraw.util.ImageConstantPool;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 
 public class WebImage extends Image {
 
 	private String id = UUID.randomUUID().toString();
+	private List<byte[]> chunks = new ArrayList<byte[]>();
 	private DirectDraw context;
 	private Dimension size;
 	private BufferedImage imageHolder;
@@ -98,6 +102,13 @@ public class WebImage extends Image {
 	public void addInstruction(WebGraphics g, DrawInstruction in) {
 		if (g != null && g.isDisposed()) {
 			throw new RuntimeException("Drawing to disposed graphics.");
+		}
+		if(in.getInstruction().equals(InstructionProto.COPY_AREA) && newInstructions.size()>0){
+			// copy area instruction must be isolated and always as a first instruction
+			WebImage newChunk=extractReadOnlyWebImage();
+			chunks= newChunk.chunks;
+			newChunk.chunks=null;
+			chunks.add(newChunk.toMessage(context).toByteArray());
 		}
 		DrawInstructionFactory factory = context.getInstructionFactory();
 		synchronized (this) {
@@ -168,8 +179,10 @@ public class WebImage extends Image {
 			result.id = id;
 			result.newInstructions = newInstructions;
 			result.imageHolder = imageHolder;
+			result.chunks = chunks;
 			imageHolder = null;
 			newInstructions = new ArrayList<DrawInstruction>();
+			chunks = new ArrayList<byte[]>();
 			lastUsedG = null;
 			usedGs.clear();
 		}
@@ -245,6 +258,15 @@ public class WebImage extends Image {
 		}
 		webImageBuilder.setWidth(size.width);
 		webImageBuilder.setHeight(size.height);
+		if (chunks != null && chunks.size() > 0) {
+			for (byte[] chunk : chunks) {
+				try {
+					webImageBuilder.addChunks(ByteString.readFrom(new ByteArrayInputStream(chunk)));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		WebImageProto result = webImageBuilder.build();
 		dd.getServices().saveFrame(this.id, result);
 		return result;

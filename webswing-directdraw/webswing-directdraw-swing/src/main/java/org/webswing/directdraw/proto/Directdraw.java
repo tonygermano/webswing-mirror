@@ -102,6 +102,20 @@ public final class Directdraw {
   public interface WebImageProtoOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
+    // repeated bytes chunks = 1;
+    /**
+     * <code>repeated bytes chunks = 1;</code>
+     */
+    java.util.List<com.google.protobuf.ByteString> getChunksList();
+    /**
+     * <code>repeated bytes chunks = 1;</code>
+     */
+    int getChunksCount();
+    /**
+     * <code>repeated bytes chunks = 1;</code>
+     */
+    com.google.protobuf.ByteString getChunks(int index);
+
     // required uint32 width = 2;
     /**
      * <code>required uint32 width = 2;</code>
@@ -237,6 +251,14 @@ public final class Directdraw {
               }
               break;
             }
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                chunks_ = new java.util.ArrayList<com.google.protobuf.ByteString>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              chunks_.add(input.readBytes());
+              break;
+            }
             case 16: {
               bitField0_ |= 0x00000001;
               width_ = input.readUInt32();
@@ -248,17 +270,17 @@ public final class Directdraw {
               break;
             }
             case 34: {
-              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
                 instructions_ = new java.util.ArrayList<org.webswing.directdraw.proto.Directdraw.DrawInstructionProto>();
-                mutable_bitField0_ |= 0x00000004;
+                mutable_bitField0_ |= 0x00000008;
               }
               instructions_.add(input.readMessage(org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.PARSER, extensionRegistry));
               break;
             }
             case 42: {
-              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
                 constants_ = new java.util.ArrayList<org.webswing.directdraw.proto.Directdraw.DrawConstantProto>();
-                mutable_bitField0_ |= 0x00000008;
+                mutable_bitField0_ |= 0x00000010;
               }
               constants_.add(input.readMessage(org.webswing.directdraw.proto.Directdraw.DrawConstantProto.PARSER, extensionRegistry));
               break;
@@ -284,10 +306,13 @@ public final class Directdraw {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
-          instructions_ = java.util.Collections.unmodifiableList(instructions_);
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          chunks_ = java.util.Collections.unmodifiableList(chunks_);
         }
         if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+          instructions_ = java.util.Collections.unmodifiableList(instructions_);
+        }
+        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
           constants_ = java.util.Collections.unmodifiableList(constants_);
         }
         this.unknownFields = unknownFields.build();
@@ -322,6 +347,29 @@ public final class Directdraw {
     }
 
     private int bitField0_;
+    // repeated bytes chunks = 1;
+    public static final int CHUNKS_FIELD_NUMBER = 1;
+    private java.util.List<com.google.protobuf.ByteString> chunks_;
+    /**
+     * <code>repeated bytes chunks = 1;</code>
+     */
+    public java.util.List<com.google.protobuf.ByteString>
+        getChunksList() {
+      return chunks_;
+    }
+    /**
+     * <code>repeated bytes chunks = 1;</code>
+     */
+    public int getChunksCount() {
+      return chunks_.size();
+    }
+    /**
+     * <code>repeated bytes chunks = 1;</code>
+     */
+    public com.google.protobuf.ByteString getChunks(int index) {
+      return chunks_.get(index);
+    }
+
     // required uint32 width = 2;
     public static final int WIDTH_FIELD_NUMBER = 2;
     private int width_;
@@ -449,6 +497,7 @@ public final class Directdraw {
     }
 
     private void initFields() {
+      chunks_ = java.util.Collections.emptyList();
       width_ = 0;
       height_ = 0;
       instructions_ = java.util.Collections.emptyList();
@@ -493,6 +542,9 @@ public final class Directdraw {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
+      for (int i = 0; i < chunks_.size(); i++) {
+        output.writeBytes(1, chunks_.get(i));
+      }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeUInt32(2, width_);
       }
@@ -517,6 +569,15 @@ public final class Directdraw {
       if (size != -1) return size;
 
       size = 0;
+      {
+        int dataSize = 0;
+        for (int i = 0; i < chunks_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(chunks_.get(i));
+        }
+        size += dataSize;
+        size += 1 * getChunksList().size();
+      }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(2, width_);
@@ -656,19 +717,21 @@ public final class Directdraw {
 
       public Builder clear() {
         super.clear();
-        width_ = 0;
+        chunks_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
-        height_ = 0;
+        width_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
+        height_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
         if (instructionsBuilder_ == null) {
           instructions_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000004);
+          bitField0_ = (bitField0_ & ~0x00000008);
         } else {
           instructionsBuilder_.clear();
         }
         if (constantsBuilder_ == null) {
           constants_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000008);
+          bitField0_ = (bitField0_ & ~0x00000010);
         } else {
           constantsBuilder_.clear();
         }
@@ -677,7 +740,7 @@ public final class Directdraw {
         } else {
           imageBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -706,33 +769,38 @@ public final class Directdraw {
         org.webswing.directdraw.proto.Directdraw.WebImageProto result = new org.webswing.directdraw.proto.Directdraw.WebImageProto(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          chunks_ = java.util.Collections.unmodifiableList(chunks_);
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.chunks_ = chunks_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000001;
         }
         result.width_ = width_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000002;
         }
         result.height_ = height_;
         if (instructionsBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          if (((bitField0_ & 0x00000008) == 0x00000008)) {
             instructions_ = java.util.Collections.unmodifiableList(instructions_);
-            bitField0_ = (bitField0_ & ~0x00000004);
+            bitField0_ = (bitField0_ & ~0x00000008);
           }
           result.instructions_ = instructions_;
         } else {
           result.instructions_ = instructionsBuilder_.build();
         }
         if (constantsBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          if (((bitField0_ & 0x00000010) == 0x00000010)) {
             constants_ = java.util.Collections.unmodifiableList(constants_);
-            bitField0_ = (bitField0_ & ~0x00000008);
+            bitField0_ = (bitField0_ & ~0x00000010);
           }
           result.constants_ = constants_;
         } else {
           result.constants_ = constantsBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000004;
         }
         if (imageBuilder_ == null) {
@@ -756,6 +824,16 @@ public final class Directdraw {
 
       public Builder mergeFrom(org.webswing.directdraw.proto.Directdraw.WebImageProto other) {
         if (other == org.webswing.directdraw.proto.Directdraw.WebImageProto.getDefaultInstance()) return this;
+        if (!other.chunks_.isEmpty()) {
+          if (chunks_.isEmpty()) {
+            chunks_ = other.chunks_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureChunksIsMutable();
+            chunks_.addAll(other.chunks_);
+          }
+          onChanged();
+        }
         if (other.hasWidth()) {
           setWidth(other.getWidth());
         }
@@ -766,7 +844,7 @@ public final class Directdraw {
           if (!other.instructions_.isEmpty()) {
             if (instructions_.isEmpty()) {
               instructions_ = other.instructions_;
-              bitField0_ = (bitField0_ & ~0x00000004);
+              bitField0_ = (bitField0_ & ~0x00000008);
             } else {
               ensureInstructionsIsMutable();
               instructions_.addAll(other.instructions_);
@@ -779,7 +857,7 @@ public final class Directdraw {
               instructionsBuilder_.dispose();
               instructionsBuilder_ = null;
               instructions_ = other.instructions_;
-              bitField0_ = (bitField0_ & ~0x00000004);
+              bitField0_ = (bitField0_ & ~0x00000008);
               instructionsBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getInstructionsFieldBuilder() : null;
@@ -792,7 +870,7 @@ public final class Directdraw {
           if (!other.constants_.isEmpty()) {
             if (constants_.isEmpty()) {
               constants_ = other.constants_;
-              bitField0_ = (bitField0_ & ~0x00000008);
+              bitField0_ = (bitField0_ & ~0x00000010);
             } else {
               ensureConstantsIsMutable();
               constants_.addAll(other.constants_);
@@ -805,7 +883,7 @@ public final class Directdraw {
               constantsBuilder_.dispose();
               constantsBuilder_ = null;
               constants_ = other.constants_;
-              bitField0_ = (bitField0_ & ~0x00000008);
+              bitField0_ = (bitField0_ & ~0x00000010);
               constantsBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getConstantsFieldBuilder() : null;
@@ -870,13 +948,85 @@ public final class Directdraw {
       }
       private int bitField0_;
 
+      // repeated bytes chunks = 1;
+      private java.util.List<com.google.protobuf.ByteString> chunks_ = java.util.Collections.emptyList();
+      private void ensureChunksIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          chunks_ = new java.util.ArrayList<com.google.protobuf.ByteString>(chunks_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+      /**
+       * <code>repeated bytes chunks = 1;</code>
+       */
+      public java.util.List<com.google.protobuf.ByteString>
+          getChunksList() {
+        return java.util.Collections.unmodifiableList(chunks_);
+      }
+      /**
+       * <code>repeated bytes chunks = 1;</code>
+       */
+      public int getChunksCount() {
+        return chunks_.size();
+      }
+      /**
+       * <code>repeated bytes chunks = 1;</code>
+       */
+      public com.google.protobuf.ByteString getChunks(int index) {
+        return chunks_.get(index);
+      }
+      /**
+       * <code>repeated bytes chunks = 1;</code>
+       */
+      public Builder setChunks(
+          int index, com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureChunksIsMutable();
+        chunks_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated bytes chunks = 1;</code>
+       */
+      public Builder addChunks(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureChunksIsMutable();
+        chunks_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated bytes chunks = 1;</code>
+       */
+      public Builder addAllChunks(
+          java.lang.Iterable<? extends com.google.protobuf.ByteString> values) {
+        ensureChunksIsMutable();
+        super.addAll(values, chunks_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated bytes chunks = 1;</code>
+       */
+      public Builder clearChunks() {
+        chunks_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+
       // required uint32 width = 2;
       private int width_ ;
       /**
        * <code>required uint32 width = 2;</code>
        */
       public boolean hasWidth() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
+        return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
        * <code>required uint32 width = 2;</code>
@@ -888,7 +1038,7 @@ public final class Directdraw {
        * <code>required uint32 width = 2;</code>
        */
       public Builder setWidth(int value) {
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         width_ = value;
         onChanged();
         return this;
@@ -897,7 +1047,7 @@ public final class Directdraw {
        * <code>required uint32 width = 2;</code>
        */
       public Builder clearWidth() {
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000002);
         width_ = 0;
         onChanged();
         return this;
@@ -909,7 +1059,7 @@ public final class Directdraw {
        * <code>required uint32 height = 3;</code>
        */
       public boolean hasHeight() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
        * <code>required uint32 height = 3;</code>
@@ -921,7 +1071,7 @@ public final class Directdraw {
        * <code>required uint32 height = 3;</code>
        */
       public Builder setHeight(int value) {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         height_ = value;
         onChanged();
         return this;
@@ -930,7 +1080,7 @@ public final class Directdraw {
        * <code>required uint32 height = 3;</code>
        */
       public Builder clearHeight() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         height_ = 0;
         onChanged();
         return this;
@@ -940,9 +1090,9 @@ public final class Directdraw {
       private java.util.List<org.webswing.directdraw.proto.Directdraw.DrawInstructionProto> instructions_ =
         java.util.Collections.emptyList();
       private void ensureInstructionsIsMutable() {
-        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
           instructions_ = new java.util.ArrayList<org.webswing.directdraw.proto.Directdraw.DrawInstructionProto>(instructions_);
-          bitField0_ |= 0x00000004;
+          bitField0_ |= 0x00000008;
          }
       }
 
@@ -1091,7 +1241,7 @@ public final class Directdraw {
       public Builder clearInstructions() {
         if (instructionsBuilder_ == null) {
           instructions_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000004);
+          bitField0_ = (bitField0_ & ~0x00000008);
           onChanged();
         } else {
           instructionsBuilder_.clear();
@@ -1168,7 +1318,7 @@ public final class Directdraw {
           instructionsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               org.webswing.directdraw.proto.Directdraw.DrawInstructionProto, org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.Builder, org.webswing.directdraw.proto.Directdraw.DrawInstructionProtoOrBuilder>(
                   instructions_,
-                  ((bitField0_ & 0x00000004) == 0x00000004),
+                  ((bitField0_ & 0x00000008) == 0x00000008),
                   getParentForChildren(),
                   isClean());
           instructions_ = null;
@@ -1180,9 +1330,9 @@ public final class Directdraw {
       private java.util.List<org.webswing.directdraw.proto.Directdraw.DrawConstantProto> constants_ =
         java.util.Collections.emptyList();
       private void ensureConstantsIsMutable() {
-        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
           constants_ = new java.util.ArrayList<org.webswing.directdraw.proto.Directdraw.DrawConstantProto>(constants_);
-          bitField0_ |= 0x00000008;
+          bitField0_ |= 0x00000010;
          }
       }
 
@@ -1331,7 +1481,7 @@ public final class Directdraw {
       public Builder clearConstants() {
         if (constantsBuilder_ == null) {
           constants_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000008);
+          bitField0_ = (bitField0_ & ~0x00000010);
           onChanged();
         } else {
           constantsBuilder_.clear();
@@ -1408,7 +1558,7 @@ public final class Directdraw {
           constantsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               org.webswing.directdraw.proto.Directdraw.DrawConstantProto, org.webswing.directdraw.proto.Directdraw.DrawConstantProto.Builder, org.webswing.directdraw.proto.Directdraw.DrawConstantProtoOrBuilder>(
                   constants_,
-                  ((bitField0_ & 0x00000008) == 0x00000008),
+                  ((bitField0_ & 0x00000010) == 0x00000010),
                   getParentForChildren(),
                   isClean());
           constants_ = null;
@@ -1424,7 +1574,7 @@ public final class Directdraw {
        * <code>optional .org.webswing.directdraw.proto.ImageProto image = 6;</code>
        */
       public boolean hasImage() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
        * <code>optional .org.webswing.directdraw.proto.ImageProto image = 6;</code>
@@ -1449,7 +1599,7 @@ public final class Directdraw {
         } else {
           imageBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
@@ -1463,7 +1613,7 @@ public final class Directdraw {
         } else {
           imageBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
@@ -1471,7 +1621,7 @@ public final class Directdraw {
        */
       public Builder mergeImage(org.webswing.directdraw.proto.Directdraw.ImageProto value) {
         if (imageBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010) &&
+          if (((bitField0_ & 0x00000020) == 0x00000020) &&
               image_ != org.webswing.directdraw.proto.Directdraw.ImageProto.getDefaultInstance()) {
             image_ =
               org.webswing.directdraw.proto.Directdraw.ImageProto.newBuilder(image_).mergeFrom(value).buildPartial();
@@ -1482,7 +1632,7 @@ public final class Directdraw {
         } else {
           imageBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
@@ -1495,14 +1645,14 @@ public final class Directdraw {
         } else {
           imageBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
       /**
        * <code>optional .org.webswing.directdraw.proto.ImageProto image = 6;</code>
        */
       public org.webswing.directdraw.proto.Directdraw.ImageProto.Builder getImageBuilder() {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         onChanged();
         return getImageFieldBuilder().getBuilder();
       }
@@ -16172,90 +16322,91 @@ public final class Directdraw {
   static {
     java.lang.String[] descriptorData = {
       "\n\020directdraw.proto\022\035org.webswing.directd" +
-      "raw.proto\"\370\001\n\rWebImageProto\022\r\n\005width\030\002 \002" +
-      "(\r\022\016\n\006height\030\003 \002(\r\022I\n\014instructions\030\004 \003(\013" +
-      "23.org.webswing.directdraw.proto.DrawIns" +
-      "tructionProto\022C\n\tconstants\030\005 \003(\01320.org.w" +
-      "ebswing.directdraw.proto.DrawConstantPro" +
-      "to\0228\n\005image\030\006 \001(\0132).org.webswing.directd" +
-      "raw.proto.ImageProto\"\362\002\n\024DrawInstruction" +
-      "Proto\022R\n\004inst\030\001 \002(\0162D.org.webswing.direc" +
-      "tdraw.proto.DrawInstructionProto.Instruc",
-      "tionProto\022\014\n\004args\030\002 \003(\r\022\020\n\010webImage\030\003 \001(" +
-      "\014\"\345\001\n\020InstructionProto\022\010\n\004DRAW\020\000\022\010\n\004FILL" +
-      "\020\001\022\016\n\nDRAW_IMAGE\020\002\022\021\n\rDRAW_WEBIMAGE\020\003\022\017\n" +
-      "\013DRAW_STRING\020\004\022\r\n\tCOPY_AREA\020\005\022\024\n\020GRAPHIC" +
-      "S_DISPOSE\020\006\022\023\n\017GRAPHICS_SWITCH\020\007\022\023\n\017GRAP" +
-      "HICS_CREATE\020\010\022\r\n\tTRANSFORM\020\t\022\r\n\tSET_PAIN" +
-      "T\020\n\022\014\n\010SET_FONT\020\013\022\016\n\nSET_STROKE\020\014\"\337\006\n\021Dr" +
-      "awConstantProto\022\n\n\002id\030\001 \002(\r\0228\n\005color\030\002 \001" +
-      "(\0132).org.webswing.directdraw.proto.Color" +
-      "Proto\0228\n\005image\030\003 \001(\0132).org.webswing.dire",
-      "ctdraw.proto.ImageProto\022@\n\ttransform\030\004 \001" +
-      "(\0132-.org.webswing.directdraw.proto.Trans" +
-      "formProto\022\016\n\006string\030\005 \001(\t\0226\n\004path\030\006 \001(\0132" +
-      "(.org.webswing.directdraw.proto.PathProt" +
-      "o\0226\n\004font\030\007 \001(\0132(.org.webswing.directdra" +
-      "w.proto.FontProto\022F\n\nlinearGrad\030\010 \001(\01322." +
-      "org.webswing.directdraw.proto.LinearGrad" +
-      "ientProto\022F\n\nradialGrad\030\t \001(\01322.org.webs" +
-      "wing.directdraw.proto.RadialGradientProt" +
-      "o\022:\n\006points\030\n \001(\0132*.org.webswing.directd",
-      "raw.proto.PointsProto\022@\n\trectangle\030\013 \001(\013" +
-      "2-.org.webswing.directdraw.proto.Rectang" +
-      "leProto\022<\n\007ellipse\030\014 \001(\0132+.org.webswing." +
-      "directdraw.proto.EllipseProto\022J\n\016roundRe" +
-      "ctangle\030\r \001(\01322.org.webswing.directdraw." +
-      "proto.RoundRectangleProto\0224\n\003arc\030\016 \001(\0132\'" +
-      ".org.webswing.directdraw.proto.ArcProto\022" +
-      ":\n\006stroke\030\017 \001(\0132*.org.webswing.directdra" +
-      "w.proto.StrokeProto\"\032\n\nColorProto\022\014\n\004rgb" +
-      "a\030\001 \002(\007\"J\n\nImageProto\022\014\n\004hash\030\001 \002(\021\022\014\n\004d",
-      "ata\030\002 \002(\014\022\017\n\007offsetX\030\003 \001(\r\022\017\n\007offsetY\030\004 " +
-      "\001(\r\"b\n\016TransformProto\022\013\n\003m00\030\001 \001(\002\022\013\n\003m1" +
-      "0\030\002 \001(\002\022\013\n\003m01\030\003 \001(\002\022\013\n\003m11\030\004 \001(\002\022\r\n\005m02" +
-      "X2\030\005 \001(\021\022\r\n\005m12X2\030\006 \001(\021\"<\n\016RectangleProt" +
-      "o\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030" +
-      "\004 \002(\021\":\n\014EllipseProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 " +
-      "\002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\"]\n\023RoundRectan" +
-      "gleProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(" +
-      "\021\022\t\n\001h\030\004 \002(\021\022\014\n\004arcW\030\005 \001(\021\022\014\n\004arcH\030\006 \001(\021" +
-      "\"\307\001\n\010ArcProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w",
-      "\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\022\r\n\005start\030\005 \001(\021\022\016\n\006exte" +
-      "nt\030\006 \001(\021\022B\n\004type\030\007 \001(\01624.org.webswing.di" +
-      "rectdraw.proto.ArcProto.ArcTypeProto\",\n\014" +
-      "ArcTypeProto\022\010\n\004OPEN\020\000\022\t\n\005CHORD\020\001\022\007\n\003PIE" +
-      "\020\002\"\300\001\n\tPathProto\022\022\n\nwindingOdd\030\001 \002(\010\022G\n\004" +
-      "type\030\002 \003(\01629.org.webswing.directdraw.pro" +
-      "to.PathProto.SegmentTypeProto\022\016\n\006points\030" +
-      "\003 \003(\021\"F\n\020SegmentTypeProto\022\010\n\004MOVE\020\000\022\010\n\004L" +
-      "INE\020\001\022\010\n\004QUAD\020\002\022\t\n\005CUBIC\020\003\022\t\n\005CLOSE\020\004\"\260\001" +
-      "\n\tFontProto\022\016\n\006family\030\001 \002(\t\022B\n\005style\030\002 \001",
-      "(\01623.org.webswing.directdraw.proto.FontP" +
-      "roto.StyleProto\022\014\n\004size\030\003 \001(\r\022\016\n\006weight\030" +
-      "\004 \001(\r\"1\n\nStyleProto\022\n\n\006NORMAL\020\000\022\013\n\007OBLIQ" +
-      "UE\020\001\022\n\n\006ITALIC\020\002\"\357\002\n\013StrokeProto\022\020\n\010widt" +
-      "hX10\030\001 \002(\r\022\025\n\rmiterLimitX10\030\002 \001(\r\022H\n\004joi" +
-      "n\030\003 \001(\0162:.org.webswing.directdraw.proto." +
-      "StrokeProto.StrokeJoinProto\022F\n\003cap\030\004 \001(\016" +
-      "29.org.webswing.directdraw.proto.StrokeP" +
-      "roto.StrokeCapProto\022\017\n\007dashX10\030\005 \003(\r\022\022\n\n" +
-      "dashOffset\030\006 \001(\r\"A\n\017StrokeJoinProto\022\016\n\nJ",
-      "OIN_MITER\020\000\022\016\n\nJOIN_ROUND\020\001\022\016\n\nJOIN_BEVE" +
-      "L\020\002\"=\n\016StrokeCapProto\022\014\n\010CAP_BUTT\020\000\022\r\n\tC" +
-      "AP_ROUND\020\001\022\016\n\nCAP_SQUARE\020\002\"\266\001\n\023LinearGra" +
-      "dientProto\022\016\n\006xStart\030\001 \002(\021\022\016\n\006yStart\030\002 \002" +
-      "(\021\022\014\n\004xEnd\030\003 \002(\021\022\014\n\004yEnd\030\004 \002(\021\022\016\n\006colors" +
-      "\030\005 \003(\007\022\021\n\tfractions\030\006 \003(\002\022@\n\006repeat\030\007 \002(" +
-      "\01620.org.webswing.directdraw.proto.Cyclic" +
-      "MethodProto\"\314\001\n\023RadialGradientProto\022\017\n\007x" +
-      "Center\030\001 \002(\021\022\017\n\007yCenter\030\002 \002(\021\022\016\n\006xFocus\030" +
-      "\003 \002(\021\022\016\n\006yFocus\030\004 \002(\021\022\016\n\006radius\030\005 \002(\021\022\016\n",
-      "\006colors\030\006 \003(\007\022\021\n\tfractions\030\007 \003(\002\022@\n\006repe" +
-      "at\030\010 \002(\01620.org.webswing.directdraw.proto" +
-      ".CyclicMethodProto\"\035\n\013PointsProto\022\016\n\006poi" +
-      "nts\030\001 \003(\021*:\n\021CyclicMethodProto\022\014\n\010NO_CYC" +
-      "LE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
+      "raw.proto\"\210\002\n\rWebImageProto\022\016\n\006chunks\030\001 " +
+      "\003(\014\022\r\n\005width\030\002 \002(\r\022\016\n\006height\030\003 \002(\r\022I\n\014in" +
+      "structions\030\004 \003(\01323.org.webswing.directdr" +
+      "aw.proto.DrawInstructionProto\022C\n\tconstan" +
+      "ts\030\005 \003(\01320.org.webswing.directdraw.proto" +
+      ".DrawConstantProto\0228\n\005image\030\006 \001(\0132).org." +
+      "webswing.directdraw.proto.ImageProto\"\362\002\n" +
+      "\024DrawInstructionProto\022R\n\004inst\030\001 \002(\0162D.or" +
+      "g.webswing.directdraw.proto.DrawInstruct",
+      "ionProto.InstructionProto\022\014\n\004args\030\002 \003(\r\022" +
+      "\020\n\010webImage\030\003 \001(\014\"\345\001\n\020InstructionProto\022\010" +
+      "\n\004DRAW\020\000\022\010\n\004FILL\020\001\022\016\n\nDRAW_IMAGE\020\002\022\021\n\rDR" +
+      "AW_WEBIMAGE\020\003\022\017\n\013DRAW_STRING\020\004\022\r\n\tCOPY_A" +
+      "REA\020\005\022\024\n\020GRAPHICS_DISPOSE\020\006\022\023\n\017GRAPHICS_" +
+      "SWITCH\020\007\022\023\n\017GRAPHICS_CREATE\020\010\022\r\n\tTRANSFO" +
+      "RM\020\t\022\r\n\tSET_PAINT\020\n\022\014\n\010SET_FONT\020\013\022\016\n\nSET" +
+      "_STROKE\020\014\"\337\006\n\021DrawConstantProto\022\n\n\002id\030\001 " +
+      "\002(\r\0228\n\005color\030\002 \001(\0132).org.webswing.direct" +
+      "draw.proto.ColorProto\0228\n\005image\030\003 \001(\0132).o",
+      "rg.webswing.directdraw.proto.ImageProto\022" +
+      "@\n\ttransform\030\004 \001(\0132-.org.webswing.direct" +
+      "draw.proto.TransformProto\022\016\n\006string\030\005 \001(" +
+      "\t\0226\n\004path\030\006 \001(\0132(.org.webswing.directdra" +
+      "w.proto.PathProto\0226\n\004font\030\007 \001(\0132(.org.we" +
+      "bswing.directdraw.proto.FontProto\022F\n\nlin" +
+      "earGrad\030\010 \001(\01322.org.webswing.directdraw." +
+      "proto.LinearGradientProto\022F\n\nradialGrad\030" +
+      "\t \001(\01322.org.webswing.directdraw.proto.Ra" +
+      "dialGradientProto\022:\n\006points\030\n \001(\0132*.org.",
+      "webswing.directdraw.proto.PointsProto\022@\n" +
+      "\trectangle\030\013 \001(\0132-.org.webswing.directdr" +
+      "aw.proto.RectangleProto\022<\n\007ellipse\030\014 \001(\013" +
+      "2+.org.webswing.directdraw.proto.Ellipse" +
+      "Proto\022J\n\016roundRectangle\030\r \001(\01322.org.webs" +
+      "wing.directdraw.proto.RoundRectangleProt" +
+      "o\0224\n\003arc\030\016 \001(\0132\'.org.webswing.directdraw" +
+      ".proto.ArcProto\022:\n\006stroke\030\017 \001(\0132*.org.we" +
+      "bswing.directdraw.proto.StrokeProto\"\032\n\nC" +
+      "olorProto\022\014\n\004rgba\030\001 \002(\007\"J\n\nImageProto\022\014\n",
+      "\004hash\030\001 \002(\021\022\014\n\004data\030\002 \002(\014\022\017\n\007offsetX\030\003 \001" +
+      "(\r\022\017\n\007offsetY\030\004 \001(\r\"b\n\016TransformProto\022\013\n" +
+      "\003m00\030\001 \001(\002\022\013\n\003m10\030\002 \001(\002\022\013\n\003m01\030\003 \001(\002\022\013\n\003" +
+      "m11\030\004 \001(\002\022\r\n\005m02X2\030\005 \001(\021\022\r\n\005m12X2\030\006 \001(\021\"" +
+      "<\n\016RectangleProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022" +
+      "\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\":\n\014EllipseProto\022\t\n" +
+      "\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(" +
+      "\021\"]\n\023RoundRectangleProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y" +
+      "\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\022\014\n\004arcW\030\005 \001" +
+      "(\021\022\014\n\004arcH\030\006 \001(\021\"\307\001\n\010ArcProto\022\t\n\001x\030\001 \002(\021",
+      "\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\022\r\n\005sta" +
+      "rt\030\005 \001(\021\022\016\n\006extent\030\006 \001(\021\022B\n\004type\030\007 \001(\01624" +
+      ".org.webswing.directdraw.proto.ArcProto." +
+      "ArcTypeProto\",\n\014ArcTypeProto\022\010\n\004OPEN\020\000\022\t" +
+      "\n\005CHORD\020\001\022\007\n\003PIE\020\002\"\300\001\n\tPathProto\022\022\n\nwind" +
+      "ingOdd\030\001 \002(\010\022G\n\004type\030\002 \003(\01629.org.webswin" +
+      "g.directdraw.proto.PathProto.SegmentType" +
+      "Proto\022\016\n\006points\030\003 \003(\021\"F\n\020SegmentTypeProt" +
+      "o\022\010\n\004MOVE\020\000\022\010\n\004LINE\020\001\022\010\n\004QUAD\020\002\022\t\n\005CUBIC" +
+      "\020\003\022\t\n\005CLOSE\020\004\"\260\001\n\tFontProto\022\016\n\006family\030\001 ",
+      "\002(\t\022B\n\005style\030\002 \001(\01623.org.webswing.direct" +
+      "draw.proto.FontProto.StyleProto\022\014\n\004size\030" +
+      "\003 \001(\r\022\016\n\006weight\030\004 \001(\r\"1\n\nStyleProto\022\n\n\006N" +
+      "ORMAL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006ITALIC\020\002\"\357\002\n\013Str" +
+      "okeProto\022\020\n\010widthX10\030\001 \002(\r\022\025\n\rmiterLimit" +
+      "X10\030\002 \001(\r\022H\n\004join\030\003 \001(\0162:.org.webswing.d" +
+      "irectdraw.proto.StrokeProto.StrokeJoinPr" +
+      "oto\022F\n\003cap\030\004 \001(\01629.org.webswing.directdr" +
+      "aw.proto.StrokeProto.StrokeCapProto\022\017\n\007d" +
+      "ashX10\030\005 \003(\r\022\022\n\ndashOffset\030\006 \001(\r\"A\n\017Stro",
+      "keJoinProto\022\016\n\nJOIN_MITER\020\000\022\016\n\nJOIN_ROUN" +
+      "D\020\001\022\016\n\nJOIN_BEVEL\020\002\"=\n\016StrokeCapProto\022\014\n" +
+      "\010CAP_BUTT\020\000\022\r\n\tCAP_ROUND\020\001\022\016\n\nCAP_SQUARE" +
+      "\020\002\"\266\001\n\023LinearGradientProto\022\016\n\006xStart\030\001 \002" +
+      "(\021\022\016\n\006yStart\030\002 \002(\021\022\014\n\004xEnd\030\003 \002(\021\022\014\n\004yEnd" +
+      "\030\004 \002(\021\022\016\n\006colors\030\005 \003(\007\022\021\n\tfractions\030\006 \003(" +
+      "\002\022@\n\006repeat\030\007 \002(\01620.org.webswing.directd" +
+      "raw.proto.CyclicMethodProto\"\314\001\n\023RadialGr" +
+      "adientProto\022\017\n\007xCenter\030\001 \002(\021\022\017\n\007yCenter\030" +
+      "\002 \002(\021\022\016\n\006xFocus\030\003 \002(\021\022\016\n\006yFocus\030\004 \002(\021\022\016\n",
+      "\006radius\030\005 \002(\021\022\016\n\006colors\030\006 \003(\007\022\021\n\tfractio" +
+      "ns\030\007 \003(\002\022@\n\006repeat\030\010 \002(\01620.org.webswing." +
+      "directdraw.proto.CyclicMethodProto\"\035\n\013Po" +
+      "intsProto\022\016\n\006points\030\001 \003(\021*:\n\021CyclicMetho" +
+      "dProto\022\014\n\010NO_CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REP" +
+      "EAT\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -16267,7 +16418,7 @@ public final class Directdraw {
           internal_static_org_webswing_directdraw_proto_WebImageProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_WebImageProto_descriptor,
-              new java.lang.String[] { "Width", "Height", "Instructions", "Constants", "Image", });
+              new java.lang.String[] { "Chunks", "Width", "Height", "Instructions", "Constants", "Image", });
           internal_static_org_webswing_directdraw_proto_DrawInstructionProto_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_org_webswing_directdraw_proto_DrawInstructionProto_fieldAccessorTable = new

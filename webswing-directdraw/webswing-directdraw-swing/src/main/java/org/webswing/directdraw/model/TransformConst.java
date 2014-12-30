@@ -68,6 +68,6 @@ public class TransformConst extends DrawConstant {
 
 	public AffineTransform getAffineTransform() {
 		TransformProto m = (TransformProto) this.message;
-		return new AffineTransform(m.hasM00() ? m.getM00() : 1, m.hasM01() ? m.getM01() : 0, m.hasM10() ? m.getM10() : 0, m.hasM11() ? m.getM11() : 1, m.hasM02X2() ? (m.getM02X2() / 2) : 0, m.hasM12X2() ? (m.getM12X2() / 2) : 0);
+		return new AffineTransform(m.hasM00() ? m.getM00() : 1, m.hasM10() ? m.getM10() : 0, m.hasM01() ? m.getM01() : 0, m.hasM11() ? m.getM11() : 1, m.hasM02X2() ? (m.getM02X2() / 2) : 0, m.hasM12X2() ? (m.getM12X2() / 2) : 0);
 	}
 }
