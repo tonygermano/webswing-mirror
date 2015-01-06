@@ -31,6 +31,7 @@ import org.webswing.model.s2c.JsonFileDialogEvent;
 import org.webswing.model.s2c.JsonFileDialogEvent.FileDialogEventType;
 import org.webswing.model.s2c.JsonLinkAction;
 import org.webswing.model.s2c.JsonLinkAction.JsonLinkActionType;
+import org.webswing.model.s2c.JsonWindow;
 import org.webswing.model.s2c.JsonWindowMoveAction;
 import org.webswing.model.s2c.OpenFileResult;
 import org.webswing.toolkit.WebToolkit;
@@ -176,9 +177,14 @@ public class WebPaintDispatcher {
 
 	public void notifyWindowClosed(String guid) {
 		synchronized (webPaintLock) {
-			Logger.info("WebPaintDispatcher:notifyWindowClosed", guid);
 			areasToUpdate.remove(guid);
 		}
+		JsonAppFrame f = new JsonAppFrame();
+		JsonWindow fdEvent = new JsonWindow();
+		fdEvent.setId(guid);
+		f.closedWindow = fdEvent;
+		Logger.info("WebPaintDispatcher:notifyWindowClosed", guid);
+		Services.getConnectionService().sendJsonObject(f);
 	}
 
 	public void notifyWindowRepaint(Window w) {

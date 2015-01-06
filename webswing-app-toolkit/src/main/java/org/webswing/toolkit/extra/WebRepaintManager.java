@@ -20,7 +20,6 @@ public class WebRepaintManager extends RepaintManager {
 
 	private RepaintManager delegate;
 	private Map<Container, Rectangle> dirty = new HashMap<Container, Rectangle>();
-	private Set<JComponent> invalid = new HashSet<JComponent>();
 
 	public WebRepaintManager(RepaintManager delegate) {
 		if (delegate != null) {
@@ -79,25 +78,8 @@ public class WebRepaintManager extends RepaintManager {
 		}
 	}
 
-	@Override
-	public void addInvalidComponent(JComponent invalidComponent) {
-		synchronized (delegate) {
-			invalid.add(invalidComponent);
-		}
-	}
-
-	@Override
-	public void removeInvalidComponent(JComponent component) {
-		synchronized (delegate) {
-			invalid.remove(component);
-		}
-	}
-
 	public void process() {
 		synchronized (delegate) {
-			for (JComponent i : invalid) {
-				delegate.addInvalidComponent(i);
-			}
 			for (Container c : dirty.keySet()) {
 				Rectangle r = dirty.get(c);
 				if (c instanceof JComponent) {
@@ -108,9 +90,18 @@ public class WebRepaintManager extends RepaintManager {
 					delegate.addDirtyRegion((Applet) c, r.x, r.y, r.width, r.height);
 				}
 			}
-			invalid.clear();
 			dirty.clear();
 		}
+	}
+
+	@Override
+	public void addInvalidComponent(JComponent invalidComponent) {
+		delegate.addInvalidComponent(invalidComponent);
+	}
+
+	@Override
+	public void removeInvalidComponent(JComponent component) {
+		delegate.removeInvalidComponent(component);
 	}
 
 	/**

@@ -166,6 +166,9 @@ function WebswingBase(c) {
 		if (data.fileDialogEvent != null && config.hasControl) {
 			config.onFileDialogAction(data.fileDialogEvent);
 		}
+		if (data.closedWindow != null) {
+			delete windowImageHolders[data.closedWindow];
+		}
 		// firs is always the background
 		for ( var i in data.windows) {
 			var win = data.windows[i];
