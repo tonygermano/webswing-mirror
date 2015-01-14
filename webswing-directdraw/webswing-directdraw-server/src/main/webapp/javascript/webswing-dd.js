@@ -23,6 +23,8 @@ function WebswingDirectDraw(c) {
 		var image = WebImageProto.decode64(data);
 		return drawChunks(image, targetCanvas).then(function(result) {
 			return drawWebImage(image, result);
+		}, function(error) {
+			throw error;
 		});
 	}
 
@@ -30,6 +32,8 @@ function WebswingDirectDraw(c) {
 		var image = WebImageProto.decode(data);
 		return drawChunks(image, targetCanvas).then(function(result) {
 			return drawWebImage(image, result);
+		}, function(error) {
+			throw error;
 		});
 	}
 
@@ -37,10 +41,12 @@ function WebswingDirectDraw(c) {
 		if (image.chunks != null) {
 			return image.chunks.reduce(function(seq, current) {
 				return seq.then(function(result) {
-					return drawBin(current, result);
+					return drawWebImage(current, result);
+				}, function(error) {
+					throw error;
 				});
 			}, Promise.resolve(targetCanvas));
-		}else{
+		} else {
 			return Promise.resolve(targetCanvas);
 		}
 	}
@@ -70,22 +76,21 @@ function WebswingDirectDraw(c) {
 				populateConstantsPool(image, imagesToPrepare);
 
 				prepareImages(imagesToPrepare).then(function(preloadedImageConstants) {
-					try {
-						var ctx = imageContext.canvas.getContext("2d");
-						if (image.instructions != null) {
-							ctx.save();
-							image.instructions.reduce(function(seq,instruction) {
-								return seq.then(function(resolved){
-									return interpretInstruction(ctx, instruction, imageContext);
-								});
-							},Promise.resolve()).then(function(){
-								ctx.restore();
-								resolve(imageContext.canvas);
+					var ctx = imageContext.canvas.getContext("2d");
+					if (image.instructions != null) {
+						ctx.save();
+						image.instructions.reduce(function(seq, instruction) {
+							return seq.then(function(resolved) {
+								return interpretInstruction(ctx, instruction, imageContext);
 							});
-						}
-					} catch (e) {
-						reject(e);
-						config.onErrorMessage(e);
+						}, Promise.resolve()).then(function() {
+							ctx.restore();
+							resolve(imageContext.canvas);
+						}, function(error) {
+							ctx.restore();
+							reject(error);
+							config.onErrorMessage(error);
+						});
 					}
 				}, function(error) {
 					config.onErrorMessage(error);
@@ -151,7 +156,8 @@ function WebswingDirectDraw(c) {
 			break;
 		case InstructionProto.TRANSFORM:
 			var tx = iprtTransform(ctx, args);
-			imageContext.graphicsStates[imageContext.currentStateId].transformArgs = concatTransform(imageContext.graphicsStates[imageContext.currentStateId].transformArgs, tx);
+			imageContext.graphicsStates[imageContext.currentStateId].transformArgs = concatTransform(
+					imageContext.graphicsStates[imageContext.currentStateId].transformArgs, tx);
 			break;
 		default:
 			console.log("instCode:" + instCode + " not recognized");
@@ -252,7 +258,7 @@ function WebswingDirectDraw(c) {
 		if (args[3] != null) {
 			clip = args[3];
 		}
-		return drawBin(imagedata).then(function(imageCanvas){
+		return drawBin(imagedata).then(function(imageCanvas) {
 			ctx.save();
 			if (path(ctx, clip)) {
 				ctx.clip();
@@ -260,7 +266,7 @@ function WebswingDirectDraw(c) {
 			if (transform != null) {
 				iprtTransform(ctx, [ transform ]);
 			}
-			ctx.drawImage(imageCanvas, -crop.x, - crop.y, imageCanvas.width, imageCanvas.height);
+			ctx.drawImage(imageCanvas, -crop.x, -crop.y, imageCanvas.width, imageCanvas.height);
 			ctx.restore();
 		});
 	}
@@ -388,7 +394,8 @@ function WebswingDirectDraw(c) {
 				ptrnContext.fillRect(0, 0, anchor.w, anchor.h);
 				ptrnContext.fillStyle = ptrnContext.createPattern(preloadedImage, 'repeat');
 				ptrnContext.setTransform(anchor.w / preloadedImage.width, 0, 0, anchor.h / preloadedImage.height, ax, ay);
-				ptrnContext.fillRect(-ax * preloadedImage.width / anchor.w, -ay * preloadedImage.height / anchor.h, preloadedImage.width, preloadedImage.height);
+				ptrnContext.fillRect(-ax * preloadedImage.width / anchor.w, -ay * preloadedImage.height / anchor.h, preloadedImage.width,
+						preloadedImage.height);
 				ptrn = ctx.createPattern(ptrnCanvas, 'repeat');
 			}
 			ctx.fillStyle = ptrn;
@@ -424,7 +431,8 @@ function WebswingDirectDraw(c) {
 				decreaseCount = (minCount > 0 ? minCount : 0) + (maxCount < 0 ? -maxCount : 0);
 				repeatcount = increaseCount + 1 + decreaseCount;
 			}
-			var gradient = ctx.createLinearGradient(g.xStart - xIncrement * decreaseCount, g.yStart - yIncrement * decreaseCount, g.xEnd + xIncrement * increaseCount, g.yEnd + yIncrement * increaseCount);
+			var gradient = ctx.createLinearGradient(g.xStart - xIncrement * decreaseCount, g.yStart - yIncrement * decreaseCount, g.xEnd + xIncrement
+					* increaseCount, g.yEnd + yIncrement * increaseCount);
 			for ( var rep = -decreaseCount; rep < repeatcount - decreaseCount; rep++) {
 
 				if (rep % 2 == 0) {
@@ -433,7 +441,8 @@ function WebswingDirectDraw(c) {
 					}
 				} else {
 					for ( var i = g.colors.length - 1; i >= 0; i--) {
-						gradient.addColorStop(Math.abs(1 - (g.fractions[i])) / repeatcount + (rep + decreaseCount) / repeatcount, parseColor(g.colors[i]));
+						gradient.addColorStop(Math.abs(1 - (g.fractions[i])) / repeatcount + (rep + decreaseCount) / repeatcount,
+								parseColor(g.colors[i]));
 					}
 				}
 			}
@@ -449,7 +458,9 @@ function WebswingDirectDraw(c) {
 			directionY = rg.yFocus - rg.yCenter < 0 ? -1 : 1;
 			maxFocusX = rg.xCenter + (directionX * rg.radius * Math.cos(phi));
 			maxFocusY = rg.yCenter + (directionY * rg.radius * Math.sin(phi));
-			var useMaxFocus = Math.sqrt(Math.pow(maxFocusX - rg.xCenter, 2) + Math.pow(maxFocusY - rg.yCenter, 2)) < Math.sqrt(Math.pow(rg.xFocus - rg.xCenter, 2) + Math.pow(rg.yFocus - rg.yCenter, 2));
+			var useMaxFocus = Math.sqrt(Math.pow(maxFocusX - rg.xCenter, 2) + Math.pow(maxFocusY - rg.yCenter, 2)) < Math.sqrt(Math.pow(rg.xFocus
+					- rg.xCenter, 2)
+					+ Math.pow(rg.yFocus - rg.yCenter, 2));
 			fX = useMaxFocus ? (directionX == 1 ? Math.floor(maxFocusX) : Math.ceil(maxFocusX)) : rg.xFocus;
 			fY = useMaxFocus ? (directionY == 1 ? Math.floor(maxFocusY) : Math.ceil(maxFocusY)) : rg.yFocus;
 
@@ -542,7 +553,8 @@ function WebswingDirectDraw(c) {
 					off += 4;
 					break;
 				case SegmentTypeProto.CUBIC:
-					ctx.bezierCurveTo(path.points[off + 0] + bias, path.points[off + 1] + bias, path.points[off + 2], path.points[off + 3], path.points[off + 4], path.points[off + 5]);
+					ctx.bezierCurveTo(path.points[off + 0] + bias, path.points[off + 1] + bias, path.points[off + 2], path.points[off + 3],
+							path.points[off + 4], path.points[off + 5]);
 					off += 6;
 					break;
 				case SegmentTypeProto.CLOSE:

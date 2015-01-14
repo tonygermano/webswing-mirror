@@ -12,8 +12,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.RenderedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,13 +33,10 @@ import org.webswing.directdraw.util.DirectDrawUtils;
 import org.webswing.directdraw.util.DrawConstantPool;
 import org.webswing.directdraw.util.ImageConstantPool;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.Message;
-
 public class WebImage extends Image {
 
 	private String id = UUID.randomUUID().toString();
-	private List<byte[]> chunks = new ArrayList<byte[]>();
+	private List<WebImage> chunks = new ArrayList<WebImage>();
 	private DirectDraw context;
 	private Dimension size;
 	private BufferedImage imageHolder;
@@ -103,12 +98,13 @@ public class WebImage extends Image {
 		if (g != null && g.isDisposed()) {
 			throw new RuntimeException("Drawing to disposed graphics.");
 		}
-		if(in.getInstruction().equals(InstructionProto.COPY_AREA) && newInstructions.size()>0){
-			// copy area instruction must be isolated and always as a first instruction
-			WebImage newChunk=extractReadOnlyWebImage();
-			chunks= newChunk.chunks;
-			newChunk.chunks=null;
-			chunks.add(newChunk.toMessage(context).toByteArray());
+		if (in.getInstruction().equals(InstructionProto.COPY_AREA) && newInstructions.size() > 0) {
+			// copy area instruction must be isolated and always as a first
+			// instruction
+			WebImage newChunk = extractReadOnlyWebImage();
+			chunks = newChunk.chunks;
+			newChunk.chunks = null;
+			chunks.add(newChunk);
 		}
 		DrawInstructionFactory factory = context.getInstructionFactory();
 		synchronized (this) {
@@ -182,14 +178,14 @@ public class WebImage extends Image {
 			result.chunks = chunks;
 			imageHolder = null;
 			newInstructions = new ArrayList<DrawInstruction>();
-			chunks = new ArrayList<byte[]>();
+			chunks = new ArrayList<WebImage>();
 			lastUsedG = null;
 			usedGs.clear();
 		}
 		return result;
 	}
 
-	public Message toMessage(DirectDraw dd) {
+	public WebImageProto toMessage(DirectDraw dd) {
 		DrawConstantPool constantPool = dd.getConstantPool();
 		ImageConstantPool imagePool = dd.getImagePool();
 		HashMap<Long, Point> currentFrameImageHashes = new HashMap<Long, Point>();
@@ -204,6 +200,12 @@ public class WebImage extends Image {
 
 		DirectDrawUtils.optimizeInstructions(dd, instructions);
 		System.out.println(instructions);
+		// first process chunks
+		if (chunks != null && chunks.size() > 0) {
+			for (WebImage chunk : chunks) {
+				webImageBuilder.addChunks(chunk.toMessage(dd));
+			}
+		}
 
 		// preprocess draw_image instructions
 		for (DrawInstruction ins : instructions) {
@@ -258,18 +260,8 @@ public class WebImage extends Image {
 		}
 		webImageBuilder.setWidth(size.width);
 		webImageBuilder.setHeight(size.height);
-		if (chunks != null && chunks.size() > 0) {
-			for (byte[] chunk : chunks) {
-				try {
-					webImageBuilder.addChunks(ByteString.readFrom(new ByteArrayInputStream(chunk)));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
 		WebImageProto result = webImageBuilder.build();
 		dd.getServices().saveFrame(this.id, result);
 		return result;
 	}
-
 }
