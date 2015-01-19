@@ -1,5 +1,6 @@
 package org.webswing;
 
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -18,10 +19,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.RepaintManager;
 
 import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.toolkit.VolatileWebImageWrapper;
 import org.webswing.directdraw.toolkit.WebImage;
 
 public class DrawServlet extends HttpServlet {
@@ -46,7 +49,17 @@ public class DrawServlet extends HttpServlet {
 		if (resetCache) {
 			dd.resetConstantCache();
 		}
+		RepaintManager.setCurrentManager(new RepaintManager() {
+			@Override
+			public Image getVolatileOffscreenBuffer(Component c, int proposedWidth, int proposedHeight) {
+				return new VolatileWebImageWrapper(c.getGraphicsConfiguration().getImageCapabilities(), new WebImage(dd, proposedWidth, proposedHeight));
+			}
 
+			@Override
+			public Image getOffscreenBuffer(Component c, int proposedWidth, int proposedHeight) {
+				return new WebImage(dd, proposedWidth, proposedHeight);
+			}
+		});
 		JsonMsg json = new JsonMsg();
 		draw(testmethod, json);
 

@@ -19,9 +19,7 @@ public abstract class DrawConstant {
 	}
 
 	public Object extractMessage(DirectDraw dd) {
-		Object result = message;
-		message = null;
-		return result;
+		return message;
 	}
 
 	public int getAddress() {
@@ -62,8 +60,6 @@ public abstract class DrawConstant {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
 		DrawConstant other = (DrawConstant) obj;
 		if (getHash() != other.getHash())
 			return false;
@@ -84,14 +80,15 @@ public abstract class DrawConstant {
 		}
 
 		@Override
-		public int hashCode() {
-			return this.getClass().hashCode();
+		protected long getHash() {
+			return 0;
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			return obj == this;
+		public int hashCode() {
+			return 0;
 		}
+
 	}
 
 	public static class Integer extends DrawConstant {
@@ -106,5 +103,39 @@ public abstract class DrawConstant {
 			return null;
 		}
 
+	}
+
+	public static class HashConst extends DrawConstant {
+
+		long hash;
+		DrawConstant parent;
+
+		public HashConst(DrawConstant dc) {
+			super(null);
+			this.hash = dc.getHash();
+			this.parent = dc;
+		}
+
+		@Override
+		protected long getHash() {
+			return hash;
+		}
+
+		@Override
+		public void setAddress(int address) {
+			parent.setAddress(address);
+			parent = null;
+			super.setAddress(address);
+		}
+
+		@Override
+		public String getFieldName() {
+			return null;
+		}
+
+	}
+
+	public static void main(String[] args) {
+		System.out.println(new HashConst(DrawConstant.nullConst).equals(DrawConstant.nullConst));
 	}
 }

@@ -1,5 +1,6 @@
 package org.webswing.directdraw.toolkit;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -18,6 +19,7 @@ import java.awt.geom.RoundRectangle2D;
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.ArcConst;
 import org.webswing.directdraw.model.ColorConst;
+import org.webswing.directdraw.model.CompositeConst;
 import org.webswing.directdraw.model.DrawConstant;
 import org.webswing.directdraw.model.DrawInstruction;
 import org.webswing.directdraw.model.EllipseConst;
@@ -69,9 +71,10 @@ public class DrawInstructionFactory {
 	public DrawInstruction createGraphics(WebGraphics g) {
 		DrawConstant gid = new DrawConstant.Integer(g.getId());
 		DrawConstant transformConst = g.getTransform() != null ? new TransformConst(ctx, g.getTransform()) : DrawConstant.nullConst;
+		DrawConstant compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
 		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
 		DrawInstruction paintinst = setPaint(g.getPaint());
-		DrawConstant[] paintConsts = DirectDrawUtils.concat(new DrawConstant[] { gid, transformConst, strokeConst }, paintinst.getArgs());
+		DrawConstant[] paintConsts = DirectDrawUtils.concat(new DrawConstant[] { gid, transformConst, strokeConst, compositeConst }, paintinst.getArgs());
 
 		return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, paintConsts);
 	}
@@ -127,5 +130,9 @@ public class DrawInstructionFactory {
 		} else {
 			return new PathConst(ctx, s.getPathIterator(null));
 		}
+	}
+
+	public DrawInstruction setComposite(AlphaComposite ac) {
+		return new DrawInstruction(InstructionProto.SET_COMPOSITE, new CompositeConst(ctx, ac));
 	}
 }

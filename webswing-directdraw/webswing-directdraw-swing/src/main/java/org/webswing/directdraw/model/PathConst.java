@@ -43,7 +43,6 @@ public class PathConst extends DrawConstant {
 
 	@Override
 	public Object extractMessage(DirectDraw dd) {
-		shape = null;
 		return super.extractMessage(dd);
 	}
 

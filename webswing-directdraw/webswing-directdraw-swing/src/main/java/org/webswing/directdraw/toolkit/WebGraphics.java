@@ -1,7 +1,9 @@
 package org.webswing.directdraw.toolkit;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
@@ -60,9 +62,12 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected void writeImage(Image image, ImageObserver observer, AffineTransform xform, Rectangle2D.Float crop, Color bkg) throws IOException {
-		if (image instanceof WebImage) {
+		if (image instanceof WebImage || image instanceof VolatileWebImageWrapper) {
 			crop = crop != null ? crop : new Rectangle2D.Float(0, 0, image.getWidth(observer), image.getHeight(observer));
-			thisImage.addInstruction(this, dif.drawImage((WebImage) image, xform, crop, bkg, getClip()));
+			WebImage wi = image instanceof WebImage ? (WebImage) image : ((VolatileWebImageWrapper) image).getWebImage();
+			if (wi.isDirty()) {
+				thisImage.addInstruction(this, dif.drawImage(wi.extractReadOnlyWebImage(false), xform, crop, bkg, getClip()));
+			}
 		} else {
 			thisImage.addImage(this, image, observer, xform, crop);
 		}
@@ -89,6 +94,14 @@ public class WebGraphics extends AbstractVectorGraphics {
 	public void writeStroke(Stroke stroke) throws IOException {
 		if (stroke instanceof BasicStroke) {
 			thisImage.addInstruction(this, dif.setStroke((BasicStroke) stroke));
+		}
+	}
+
+	@Override
+	protected void writeComposite(Composite composite) {
+		if (composite instanceof AlphaComposite) {
+			AlphaComposite ac = (AlphaComposite) composite;
+			thisImage.addInstruction(this, dif.setComposite(ac));
 		}
 	}
 

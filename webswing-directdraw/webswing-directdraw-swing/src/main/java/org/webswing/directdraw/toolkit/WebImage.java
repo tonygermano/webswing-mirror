@@ -101,7 +101,7 @@ public class WebImage extends Image {
 		if (in.getInstruction().equals(InstructionProto.COPY_AREA) && newInstructions.size() > 0) {
 			// copy area instruction must be isolated and always as a first
 			// instruction
-			WebImage newChunk = extractReadOnlyWebImage();
+			WebImage newChunk = extractReadOnlyWebImage(true);
 			chunks = newChunk.chunks;
 			newChunk.chunks = null;
 			chunks.add(newChunk);
@@ -163,7 +163,7 @@ public class WebImage extends Image {
 		return imageHolder;
 	}
 
-	public WebImage extractReadOnlyWebImage() {
+	public WebImage extractReadOnlyWebImage(boolean reset) {
 		WebImage result = new WebImage(context, size.width, size.height) {
 			@Override
 			public void addInstruction(WebGraphics g, DrawInstruction in) {
@@ -173,16 +173,26 @@ public class WebImage extends Image {
 		};
 		synchronized (this) {
 			result.id = id;
-			result.newInstructions = newInstructions;
-			result.imageHolder = imageHolder;
-			result.chunks = chunks;
-			imageHolder = null;
-			newInstructions = new ArrayList<DrawInstruction>();
-			chunks = new ArrayList<WebImage>();
-			lastUsedG = null;
-			usedGs.clear();
+			if (!reset) {
+				result.newInstructions = new ArrayList<DrawInstruction>(newInstructions);
+				result.imageHolder = imageHolder == null ? null : DirectDrawUtils.deepCopy(imageHolder);
+				result.chunks = new ArrayList<WebImage>(chunks);
+			} else {
+				result.newInstructions = newInstructions;
+				result.imageHolder = imageHolder;
+				result.chunks = chunks;
+				reset();
+			}
 		}
 		return result;
+	}
+
+	public void reset() {
+		imageHolder = null;
+		newInstructions = new ArrayList<DrawInstruction>();
+		chunks = new ArrayList<WebImage>();
+		lastUsedG = null;
+		usedGs.clear();
 	}
 
 	public WebImageProto toMessage(DirectDraw dd) {
@@ -199,7 +209,7 @@ public class WebImage extends Image {
 		}
 
 		DirectDrawUtils.optimizeInstructions(dd, instructions);
-		System.out.println(instructions);
+		System.out.println(instructions + (imageHolder == null ? "" : "*"));
 		// first process chunks
 		if (chunks != null && chunks.size() > 0) {
 			for (WebImage chunk : chunks) {
@@ -242,9 +252,9 @@ public class WebImage extends Image {
 				if (!(cons instanceof DrawConstant.Integer)) {
 					// update cache
 					boolean isInCache = constantPool.isInCache(cons);
-					DrawConstant cached = constantPool.getCachedConstant(cons);
 					if (!isInCache) {// this constant was recently inserted to
 										// cache
+						constantPool.getCachedConstant(new DrawConstant.HashConst(cons));
 						DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
 						builder.setId(cons.getAddress());
 						if (cons.getFieldName() != null) {
@@ -252,6 +262,7 @@ public class WebImage extends Image {
 						}
 						webImageBuilder.addConstants(builder.build());
 					} else {
+						DrawConstant cached = constantPool.getCachedConstant(cons);
 						cons.setAddress(cached.getAddress());
 					}
 				}

@@ -1,16 +1,22 @@
 package org.webswing;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Composite;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.Point;
 import java.awt.RadialGradientPaint;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
@@ -25,11 +31,24 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.RepaintManager;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.ChangeListener;
 
+import org.webswing.directdraw.toolkit.VolatileWebImageWrapper;
 import org.webswing.directdraw.toolkit.WebGraphics;
+import org.webswing.directdraw.toolkit.WebImage;
+
+import com.sun.swingset3.demos.slider.SliderDemo;
 
 public class Tests {
 
@@ -284,13 +303,39 @@ public class Tests {
 		if (repeat != 0) {
 			return false;
 		}
-		JPanel p = new JPanel();
-		JButton b = new JButton("test");
-		p.add(b);
-		p.setSize(200, 100);
-		p.layout();
-		b.paint(g);
+		try {
+			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		JFrame jf = new JFrame("");
+		jf.setSize(500, 100);
+		JPanel sd = new JPanel();
+		sd.setPreferredSize(new Dimension(500, 100));
+		JPanel scrP = new JPanel();
+		scrP.add(new JLabel("test"));
+		JScrollPane scroll = new JScrollPane(scrP);
+		scroll.setPreferredSize(new Dimension(400, 80));
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		sd.add(scroll);
+		jf.add(sd);
+		jf.pack();
+		sd.print(g);
+
 		return true;
+	}
+
+	@SuppressWarnings("deprecation")
+	private static void layout(Component sd) {
+		if (sd instanceof JComponent) {
+			for (Component jc : ((Container) sd).getComponents()) {
+				layout(jc);
+			}
+			sd.invalidate();
+			sd.validate();
+			sd.layout();
+		}
 	}
 
 	public static boolean t10CopyAreaTest(Graphics2D g, Integer repeat) {
@@ -368,7 +413,11 @@ public class Tests {
 		g.setClip(new Arc2D.Double(new Rectangle2D.Double(0, 0, 500, 100), 15, 360, 0));
 		g.translate(500, 100);
 		g.rotate(Math.PI);
-		g.drawImage(i, 0, 0, null);
+		g.drawImage(i, 0, 0, 100, 100, 400, 0, 500, 100, null);
+		g.drawImage(i, 100, 0, 200, 100, 300, 0, 400, 100, null);
+		g.drawImage(i, 200, 0, 300, 100, 200, 0, 300, 100, null);
+		g.drawImage(i, 300, 0, 400, 100, 100, 0, 200, 100, null);
+		g.drawImage(i, 400, 0, 500, 100, 0, 0, 100, 100, null);
 		return true;
 	}
 
@@ -424,8 +473,68 @@ public class Tests {
 		return true;
 	}
 
+	public static boolean t16CompositeModesTest(Graphics2D g, Integer repeat) throws IOException {
+		if (repeat > 0) {
+			return false;
+		}
+
+		Image i2 = DrawServlet.getImage(g instanceof WebGraphics);
+		Graphics2D source = (Graphics2D) i2.getGraphics();
+		source.setBackground(new Color(0, 0, 0, 0));
+		source.clearRect(0, 0, i2.getWidth(null), i2.getHeight(null));
+		source.setColor(new Color(255, 0, 0));
+		source.fillRect(0, 0, 25, 25);
+
+		compositetestopp(g, i2, 0, 0, AlphaComposite.Src);
+
+		compositetestopp(g, i2, 50, 0, AlphaComposite.SrcOver);
+
+		compositetestopp(g, i2, 100, 0, AlphaComposite.SrcIn);
+
+		compositetestopp(g, i2, 0, 50, AlphaComposite.SrcOut);
+
+		compositetestopp(g, i2, 50, 50, AlphaComposite.SrcAtop);
+
+		compositetestopp(g, i2, 150, 0, AlphaComposite.Xor);
+
+		compositetestopp(g, i2, 150, 50, AlphaComposite.Clear);
+
+		compositetestopp(g, i2, 200, 0, AlphaComposite.Dst);
+
+		compositetestopp(g, i2, 250, 0, AlphaComposite.DstOver);
+
+		compositetestopp(g, i2, 300, 0, AlphaComposite.DstIn);
+
+		compositetestopp(g, i2, 200, 50, AlphaComposite.DstOut);
+
+		compositetestopp(g, i2, 250, 50, AlphaComposite.DstAtop);
+
+		return true;
+	}
+
+	private static void compositetestopp(Graphics2D g, Image i2, int x, int y, AlphaComposite c) {
+		Image i;
+		Graphics2D dest;
+		g.setClip(x, y, 50, 50);
+		g.setPaint(new LinearGradientPaint(new Point(x, y), new Point(x + 50, y + 50), new float[] { 0, 1 }, new Color[] { Color.yellow, Color.green }));
+		g.fillRect(x, y, 50, 50);
+		i = DrawServlet.getImage(g instanceof WebGraphics);
+		dest = (Graphics2D) i.getGraphics();
+		dest.setBackground(new Color(0, 0, 0, 0));
+		dest.clearRect(0, 0, i2.getWidth(null), i2.getHeight(null));
+		dest.setColor(new Color(0, 0, 255));
+		dest.fillRect(0, 0, 25, 25);
+		dest.setComposite(c);
+		dest.setColor(new Color(255, 0, 0));
+		dest.fillOval(10, 10, 25, 25);
+		g.setColor(Color.black);
+		g.drawString("" + c.getRule(), x + 30, y + 40);
+		g.drawImage(i, x, y, null);
+	}
+
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("tests");
+
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel content = new JPanel();
 		content.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -434,7 +543,7 @@ public class Tests {
 			panel.setPreferredSize(new Dimension(500, 100));
 			content.add(panel);
 		}
-		content.setPreferredSize(new Dimension(1000,2000));
+		content.setPreferredSize(new Dimension(1000, 2000));
 		frame.getContentPane().add(new JScrollPane(content));
 		frame.pack();
 		frame.setSize(1280, 700);

@@ -15,6 +15,7 @@ function WebswingDirectDraw(c) {
 	var StrokeJoinProto = proto.build("org.webswing.directdraw.proto.StrokeProto.StrokeJoinProto");
 	var StrokeCapProto = proto.build("org.webswing.directdraw.proto.StrokeProto.StrokeCapProto");
 	var StyleProto = proto.build("org.webswing.directdraw.proto.FontProto.StyleProto");
+	var CompositeTypeProto = proto.build("org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto");
 	var MAX_GRADIENT_CYCLE_REPEAT_COUNT = 20;
 	var constantPoolCache = {};
 	var imagePoolCache = {};
@@ -154,6 +155,10 @@ function WebswingDirectDraw(c) {
 			iprtSetPaint(ctx, args, imageContext);
 			imageContext.graphicsStates[imageContext.currentStateId].paintArgs = args;
 			break;
+		case InstructionProto.SET_COMPOSITE:
+			iprtSetComposite(ctx, args);
+			imageContext.graphicsStates[imageContext.currentStateId].composite = args;
+			break;
 		case InstructionProto.TRANSFORM:
 			var tx = iprtTransform(ctx, args);
 			imageContext.graphicsStates[imageContext.currentStateId].transformArgs = concatTransform(
@@ -173,6 +178,9 @@ function WebswingDirectDraw(c) {
 			}
 			if (graphicsStates[id].paintArgs != null) {
 				iprtSetPaint(ctx, graphicsStates[id].paintArgs);
+			}
+			if (graphicsStates[id].composite != null) {
+				iprtSetComposite(ctx, graphicsStates[id].composite);
 			}
 			if (graphicsStates[id].transformArgs != null) {
 				var m = graphicsStates[id].transformArgs;
@@ -195,6 +203,9 @@ function WebswingDirectDraw(c) {
 			args.shift();
 			iprtSetStroke(ctx, args);
 			imageContext.graphicsStates[thisId].strokeArgs = args.slice(0, 1);
+			args.shift();
+			iprtSetComposite(ctx, args);
+			imageContext.graphicsStates[thisId].composite = args.slice(0, 1);
 			args.shift();
 			iprtSetPaint(ctx, args, imageContext);
 			imageContext.graphicsStates[thisId].paintArgs = args;
@@ -266,7 +277,7 @@ function WebswingDirectDraw(c) {
 			if (transform != null) {
 				iprtTransform(ctx, [ transform ]);
 			}
-			ctx.drawImage(imageCanvas, -crop.x, -crop.y, imageCanvas.width, imageCanvas.height);
+			ctx.drawImage(imageCanvas, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
 			ctx.restore();
 		});
 	}
@@ -292,6 +303,9 @@ function WebswingDirectDraw(c) {
 			break;
 		case StyleProto.OBLIQUE:
 			style = 'italic';
+			break;
+		case StyleProto.BOLDANDITALIC:
+			style = 'bold italic';
 			break;
 		}
 		ctx.font = style + " " + font.size + "px " + font.family;
@@ -501,6 +515,50 @@ function WebswingDirectDraw(c) {
 			}
 			ctx.fillStyle = grd;
 			ctx.strokeStyle = grd;
+		}
+	}
+
+	function iprtSetComposite(ctx, args) {
+		var composite = args[0].composite;
+		if (composite != null) {
+			if (composite.alpha != null) {
+				ctx.globalAlpha = composite.alpha;
+			}
+			switch (composite.type) {
+			case CompositeTypeProto.CLEAR:
+				ctx.globalCompositeOperation = "destination-out";
+				break;
+			case CompositeTypeProto.SRC:
+				ctx.globalCompositeOperation = "source-over";
+				break;
+			case CompositeTypeProto.DST:
+				ctx.globalCompositeOperation = "destination-in";
+				break;
+			case CompositeTypeProto.SRC_OVER:
+				ctx.globalCompositeOperation = "source-over";
+				break;
+			case CompositeTypeProto.DST_OVER:
+				ctx.globalCompositeOperation = "destination-over";
+				break;
+			case CompositeTypeProto.SRC_IN:
+				ctx.globalCompositeOperation = "source-in";
+				break;
+			case CompositeTypeProto.DST_IN:
+				ctx.globalCompositeOperation = "destination-in";
+				break;
+			case CompositeTypeProto.SRC_OUT:
+				ctx.globalCompositeOperation = "source-out";
+				break;
+			case CompositeTypeProto.DST_OUT:
+				ctx.globalCompositeOperation = "destination-out";
+				break;
+			case CompositeTypeProto.SRC_ATOP:
+				ctx.globalCompositeOperation = "source-atop";
+				break;
+			case CompositeTypeProto.XOR:
+				ctx.globalCompositeOperation = "xor";
+				break;
+			}
 		}
 	}
 

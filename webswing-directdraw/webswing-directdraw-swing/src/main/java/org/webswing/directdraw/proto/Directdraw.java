@@ -2142,6 +2142,10 @@ public final class Directdraw {
        * <code>SET_STROKE = 12;</code>
        */
       SET_STROKE(12, 12),
+      /**
+       * <code>SET_COMPOSITE = 13;</code>
+       */
+      SET_COMPOSITE(13, 13),
       ;
 
       /**
@@ -2196,6 +2200,10 @@ public final class Directdraw {
        * <code>SET_STROKE = 12;</code>
        */
       public static final int SET_STROKE_VALUE = 12;
+      /**
+       * <code>SET_COMPOSITE = 13;</code>
+       */
+      public static final int SET_COMPOSITE_VALUE = 13;
 
 
       public final int getNumber() { return value; }
@@ -2215,6 +2223,7 @@ public final class Directdraw {
           case 10: return SET_PAINT;
           case 11: return SET_FONT;
           case 12: return SET_STROKE;
+          case 13: return SET_COMPOSITE;
           default: return null;
         }
       }
@@ -2962,6 +2971,20 @@ public final class Directdraw {
      * <code>optional .org.webswing.directdraw.proto.StrokeProto stroke = 15;</code>
      */
     org.webswing.directdraw.proto.Directdraw.StrokeProtoOrBuilder getStrokeOrBuilder();
+
+    // optional .org.webswing.directdraw.proto.CompositeProto composite = 16;
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+     */
+    boolean hasComposite();
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+     */
+    org.webswing.directdraw.proto.Directdraw.CompositeProto getComposite();
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+     */
+    org.webswing.directdraw.proto.Directdraw.CompositeProtoOrBuilder getCompositeOrBuilder();
   }
   /**
    * Protobuf type {@code org.webswing.directdraw.proto.DrawConstantProto}
@@ -3191,6 +3214,19 @@ public final class Directdraw {
                 stroke_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00004000;
+              break;
+            }
+            case 130: {
+              org.webswing.directdraw.proto.Directdraw.CompositeProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00008000) == 0x00008000)) {
+                subBuilder = composite_.toBuilder();
+              }
+              composite_ = input.readMessage(org.webswing.directdraw.proto.Directdraw.CompositeProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(composite_);
+                composite_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00008000;
               break;
             }
           }
@@ -3578,6 +3614,28 @@ public final class Directdraw {
       return stroke_;
     }
 
+    // optional .org.webswing.directdraw.proto.CompositeProto composite = 16;
+    public static final int COMPOSITE_FIELD_NUMBER = 16;
+    private org.webswing.directdraw.proto.Directdraw.CompositeProto composite_;
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+     */
+    public boolean hasComposite() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+     */
+    public org.webswing.directdraw.proto.Directdraw.CompositeProto getComposite() {
+      return composite_;
+    }
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+     */
+    public org.webswing.directdraw.proto.Directdraw.CompositeProtoOrBuilder getCompositeOrBuilder() {
+      return composite_;
+    }
+
     private void initFields() {
       id_ = 0;
       color_ = org.webswing.directdraw.proto.Directdraw.ColorProto.getDefaultInstance();
@@ -3594,6 +3652,7 @@ public final class Directdraw {
       roundRectangle_ = org.webswing.directdraw.proto.Directdraw.RoundRectangleProto.getDefaultInstance();
       arc_ = org.webswing.directdraw.proto.Directdraw.ArcProto.getDefaultInstance();
       stroke_ = org.webswing.directdraw.proto.Directdraw.StrokeProto.getDefaultInstance();
+      composite_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3670,6 +3729,12 @@ public final class Directdraw {
           return false;
         }
       }
+      if (hasComposite()) {
+        if (!getComposite().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -3721,6 +3786,9 @@ public final class Directdraw {
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
         output.writeMessage(15, stroke_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeMessage(16, composite_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -3790,6 +3858,10 @@ public final class Directdraw {
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(15, stroke_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(16, composite_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3912,6 +3984,7 @@ public final class Directdraw {
           getRoundRectangleFieldBuilder();
           getArcFieldBuilder();
           getStrokeFieldBuilder();
+          getCompositeFieldBuilder();
         }
       }
       private static Builder create() {
@@ -4002,6 +4075,12 @@ public final class Directdraw {
           strokeBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00004000);
+        if (compositeBuilder_ == null) {
+          composite_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.getDefaultInstance();
+        } else {
+          compositeBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00008000);
         return this;
       }
 
@@ -4142,6 +4221,14 @@ public final class Directdraw {
         } else {
           result.stroke_ = strokeBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+          to_bitField0_ |= 0x00008000;
+        }
+        if (compositeBuilder_ == null) {
+          result.composite_ = composite_;
+        } else {
+          result.composite_ = compositeBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -4204,6 +4291,9 @@ public final class Directdraw {
         }
         if (other.hasStroke()) {
           mergeStroke(other.getStroke());
+        }
+        if (other.hasComposite()) {
+          mergeComposite(other.getComposite());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -4276,6 +4366,12 @@ public final class Directdraw {
         }
         if (hasStroke()) {
           if (!getStroke().isInitialized()) {
+            
+            return false;
+          }
+        }
+        if (hasComposite()) {
+          if (!getComposite().isInitialized()) {
             
             return false;
           }
@@ -5928,6 +6024,123 @@ public final class Directdraw {
           stroke_ = null;
         }
         return strokeBuilder_;
+      }
+
+      // optional .org.webswing.directdraw.proto.CompositeProto composite = 16;
+      private org.webswing.directdraw.proto.Directdraw.CompositeProto composite_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.directdraw.proto.Directdraw.CompositeProto, org.webswing.directdraw.proto.Directdraw.CompositeProto.Builder, org.webswing.directdraw.proto.Directdraw.CompositeProtoOrBuilder> compositeBuilder_;
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+       */
+      public boolean hasComposite() {
+        return ((bitField0_ & 0x00008000) == 0x00008000);
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.CompositeProto getComposite() {
+        if (compositeBuilder_ == null) {
+          return composite_;
+        } else {
+          return compositeBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+       */
+      public Builder setComposite(org.webswing.directdraw.proto.Directdraw.CompositeProto value) {
+        if (compositeBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          composite_ = value;
+          onChanged();
+        } else {
+          compositeBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00008000;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+       */
+      public Builder setComposite(
+          org.webswing.directdraw.proto.Directdraw.CompositeProto.Builder builderForValue) {
+        if (compositeBuilder_ == null) {
+          composite_ = builderForValue.build();
+          onChanged();
+        } else {
+          compositeBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00008000;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+       */
+      public Builder mergeComposite(org.webswing.directdraw.proto.Directdraw.CompositeProto value) {
+        if (compositeBuilder_ == null) {
+          if (((bitField0_ & 0x00008000) == 0x00008000) &&
+              composite_ != org.webswing.directdraw.proto.Directdraw.CompositeProto.getDefaultInstance()) {
+            composite_ =
+              org.webswing.directdraw.proto.Directdraw.CompositeProto.newBuilder(composite_).mergeFrom(value).buildPartial();
+          } else {
+            composite_ = value;
+          }
+          onChanged();
+        } else {
+          compositeBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00008000;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+       */
+      public Builder clearComposite() {
+        if (compositeBuilder_ == null) {
+          composite_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.getDefaultInstance();
+          onChanged();
+        } else {
+          compositeBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00008000);
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.CompositeProto.Builder getCompositeBuilder() {
+        bitField0_ |= 0x00008000;
+        onChanged();
+        return getCompositeFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.CompositeProtoOrBuilder getCompositeOrBuilder() {
+        if (compositeBuilder_ != null) {
+          return compositeBuilder_.getMessageOrBuilder();
+        } else {
+          return composite_;
+        }
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CompositeProto composite = 16;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.directdraw.proto.Directdraw.CompositeProto, org.webswing.directdraw.proto.Directdraw.CompositeProto.Builder, org.webswing.directdraw.proto.Directdraw.CompositeProtoOrBuilder> 
+          getCompositeFieldBuilder() {
+        if (compositeBuilder_ == null) {
+          compositeBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.webswing.directdraw.proto.Directdraw.CompositeProto, org.webswing.directdraw.proto.Directdraw.CompositeProto.Builder, org.webswing.directdraw.proto.Directdraw.CompositeProtoOrBuilder>(
+                  composite_,
+                  getParentForChildren(),
+                  isClean());
+          composite_ = null;
+        }
+        return compositeBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:org.webswing.directdraw.proto.DrawConstantProto)
@@ -12018,6 +12231,10 @@ public final class Directdraw {
        * <code>ITALIC = 2;</code>
        */
       ITALIC(2, 2),
+      /**
+       * <code>BOLDANDITALIC = 3;</code>
+       */
+      BOLDANDITALIC(3, 3),
       ;
 
       /**
@@ -12032,6 +12249,10 @@ public final class Directdraw {
        * <code>ITALIC = 2;</code>
        */
       public static final int ITALIC_VALUE = 2;
+      /**
+       * <code>BOLDANDITALIC = 3;</code>
+       */
+      public static final int BOLDANDITALIC_VALUE = 3;
 
 
       public final int getNumber() { return value; }
@@ -12041,6 +12262,7 @@ public final class Directdraw {
           case 0: return NORMAL;
           case 1: return OBLIQUE;
           case 2: return ITALIC;
+          case 3: return BOLDANDITALIC;
           default: return null;
         }
       }
@@ -16456,6 +16678,672 @@ public final class Directdraw {
     // @@protoc_insertion_point(class_scope:org.webswing.directdraw.proto.PointsProto)
   }
 
+  public interface CompositeProtoOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // required .org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto type = 1;
+    /**
+     * <code>required .org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto type = 1;</code>
+     */
+    boolean hasType();
+    /**
+     * <code>required .org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto type = 1;</code>
+     */
+    org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto getType();
+
+    // optional float alpha = 2;
+    /**
+     * <code>optional float alpha = 2;</code>
+     */
+    boolean hasAlpha();
+    /**
+     * <code>optional float alpha = 2;</code>
+     */
+    float getAlpha();
+  }
+  /**
+   * Protobuf type {@code org.webswing.directdraw.proto.CompositeProto}
+   */
+  public static final class CompositeProto extends
+      com.google.protobuf.GeneratedMessage
+      implements CompositeProtoOrBuilder {
+    // Use CompositeProto.newBuilder() to construct.
+    private CompositeProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private CompositeProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final CompositeProto defaultInstance;
+    public static CompositeProto getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public CompositeProto getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private CompositeProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              int rawValue = input.readEnum();
+              org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto value = org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(1, rawValue);
+              } else {
+                bitField0_ |= 0x00000001;
+                type_ = value;
+              }
+              break;
+            }
+            case 21: {
+              bitField0_ |= 0x00000002;
+              alpha_ = input.readFloat();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_CompositeProto_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_CompositeProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.webswing.directdraw.proto.Directdraw.CompositeProto.class, org.webswing.directdraw.proto.Directdraw.CompositeProto.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<CompositeProto> PARSER =
+        new com.google.protobuf.AbstractParser<CompositeProto>() {
+      public CompositeProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new CompositeProto(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CompositeProto> getParserForType() {
+      return PARSER;
+    }
+
+    /**
+     * Protobuf enum {@code org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto}
+     */
+    public enum CompositeTypeProto
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>CLEAR = 1;</code>
+       */
+      CLEAR(0, 1),
+      /**
+       * <code>SRC = 2;</code>
+       */
+      SRC(1, 2),
+      /**
+       * <code>DST = 9;</code>
+       */
+      DST(2, 9),
+      /**
+       * <code>SRC_OVER = 3;</code>
+       */
+      SRC_OVER(3, 3),
+      /**
+       * <code>DST_OVER = 4;</code>
+       */
+      DST_OVER(4, 4),
+      /**
+       * <code>SRC_IN = 5;</code>
+       */
+      SRC_IN(5, 5),
+      /**
+       * <code>DST_IN = 6;</code>
+       */
+      DST_IN(6, 6),
+      /**
+       * <code>SRC_OUT = 7;</code>
+       */
+      SRC_OUT(7, 7),
+      /**
+       * <code>DST_OUT = 8;</code>
+       */
+      DST_OUT(8, 8),
+      /**
+       * <code>SRC_ATOP = 10;</code>
+       */
+      SRC_ATOP(9, 10),
+      /**
+       * <code>DST_ATOP = 11;</code>
+       */
+      DST_ATOP(10, 11),
+      /**
+       * <code>XOR = 12;</code>
+       */
+      XOR(11, 12),
+      ;
+
+      /**
+       * <code>CLEAR = 1;</code>
+       */
+      public static final int CLEAR_VALUE = 1;
+      /**
+       * <code>SRC = 2;</code>
+       */
+      public static final int SRC_VALUE = 2;
+      /**
+       * <code>DST = 9;</code>
+       */
+      public static final int DST_VALUE = 9;
+      /**
+       * <code>SRC_OVER = 3;</code>
+       */
+      public static final int SRC_OVER_VALUE = 3;
+      /**
+       * <code>DST_OVER = 4;</code>
+       */
+      public static final int DST_OVER_VALUE = 4;
+      /**
+       * <code>SRC_IN = 5;</code>
+       */
+      public static final int SRC_IN_VALUE = 5;
+      /**
+       * <code>DST_IN = 6;</code>
+       */
+      public static final int DST_IN_VALUE = 6;
+      /**
+       * <code>SRC_OUT = 7;</code>
+       */
+      public static final int SRC_OUT_VALUE = 7;
+      /**
+       * <code>DST_OUT = 8;</code>
+       */
+      public static final int DST_OUT_VALUE = 8;
+      /**
+       * <code>SRC_ATOP = 10;</code>
+       */
+      public static final int SRC_ATOP_VALUE = 10;
+      /**
+       * <code>DST_ATOP = 11;</code>
+       */
+      public static final int DST_ATOP_VALUE = 11;
+      /**
+       * <code>XOR = 12;</code>
+       */
+      public static final int XOR_VALUE = 12;
+
+
+      public final int getNumber() { return value; }
+
+      public static CompositeTypeProto valueOf(int value) {
+        switch (value) {
+          case 1: return CLEAR;
+          case 2: return SRC;
+          case 9: return DST;
+          case 3: return SRC_OVER;
+          case 4: return DST_OVER;
+          case 5: return SRC_IN;
+          case 6: return DST_IN;
+          case 7: return SRC_OUT;
+          case 8: return DST_OUT;
+          case 10: return SRC_ATOP;
+          case 11: return DST_ATOP;
+          case 12: return XOR;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<CompositeTypeProto>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<CompositeTypeProto>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<CompositeTypeProto>() {
+              public CompositeTypeProto findValueByNumber(int number) {
+                return CompositeTypeProto.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return org.webswing.directdraw.proto.Directdraw.CompositeProto.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final CompositeTypeProto[] VALUES = values();
+
+      public static CompositeTypeProto valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private CompositeTypeProto(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto)
+    }
+
+    private int bitField0_;
+    // required .org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto type = 1;
+    public static final int TYPE_FIELD_NUMBER = 1;
+    private org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto type_;
+    /**
+     * <code>required .org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto type = 1;</code>
+     */
+    public boolean hasType() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required .org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto type = 1;</code>
+     */
+    public org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto getType() {
+      return type_;
+    }
+
+    // optional float alpha = 2;
+    public static final int ALPHA_FIELD_NUMBER = 2;
+    private float alpha_;
+    /**
+     * <code>optional float alpha = 2;</code>
+     */
+    public boolean hasAlpha() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional float alpha = 2;</code>
+     */
+    public float getAlpha() {
+      return alpha_;
+    }
+
+    private void initFields() {
+      type_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto.CLEAR;
+      alpha_ = 0F;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      if (!hasType()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeEnum(1, type_.getNumber());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeFloat(2, alpha_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(1, type_.getNumber());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(2, alpha_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.webswing.directdraw.proto.Directdraw.CompositeProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CompositeProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CompositeProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CompositeProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CompositeProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CompositeProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CompositeProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CompositeProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CompositeProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CompositeProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.webswing.directdraw.proto.Directdraw.CompositeProto prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.webswing.directdraw.proto.CompositeProto}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.webswing.directdraw.proto.Directdraw.CompositeProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_CompositeProto_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_CompositeProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.webswing.directdraw.proto.Directdraw.CompositeProto.class, org.webswing.directdraw.proto.Directdraw.CompositeProto.Builder.class);
+      }
+
+      // Construct using org.webswing.directdraw.proto.Directdraw.CompositeProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        type_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto.CLEAR;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        alpha_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_CompositeProto_descriptor;
+      }
+
+      public org.webswing.directdraw.proto.Directdraw.CompositeProto getDefaultInstanceForType() {
+        return org.webswing.directdraw.proto.Directdraw.CompositeProto.getDefaultInstance();
+      }
+
+      public org.webswing.directdraw.proto.Directdraw.CompositeProto build() {
+        org.webswing.directdraw.proto.Directdraw.CompositeProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.webswing.directdraw.proto.Directdraw.CompositeProto buildPartial() {
+        org.webswing.directdraw.proto.Directdraw.CompositeProto result = new org.webswing.directdraw.proto.Directdraw.CompositeProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.type_ = type_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.alpha_ = alpha_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.webswing.directdraw.proto.Directdraw.CompositeProto) {
+          return mergeFrom((org.webswing.directdraw.proto.Directdraw.CompositeProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.webswing.directdraw.proto.Directdraw.CompositeProto other) {
+        if (other == org.webswing.directdraw.proto.Directdraw.CompositeProto.getDefaultInstance()) return this;
+        if (other.hasType()) {
+          setType(other.getType());
+        }
+        if (other.hasAlpha()) {
+          setAlpha(other.getAlpha());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasType()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.webswing.directdraw.proto.Directdraw.CompositeProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.webswing.directdraw.proto.Directdraw.CompositeProto) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // required .org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto type = 1;
+      private org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto type_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto.CLEAR;
+      /**
+       * <code>required .org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto type = 1;</code>
+       */
+      public boolean hasType() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>required .org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto type = 1;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto getType() {
+        return type_;
+      }
+      /**
+       * <code>required .org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto type = 1;</code>
+       */
+      public Builder setType(org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000001;
+        type_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required .org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto type = 1;</code>
+       */
+      public Builder clearType() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        type_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto.CLEAR;
+        onChanged();
+        return this;
+      }
+
+      // optional float alpha = 2;
+      private float alpha_ ;
+      /**
+       * <code>optional float alpha = 2;</code>
+       */
+      public boolean hasAlpha() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional float alpha = 2;</code>
+       */
+      public float getAlpha() {
+        return alpha_;
+      }
+      /**
+       * <code>optional float alpha = 2;</code>
+       */
+      public Builder setAlpha(float value) {
+        bitField0_ |= 0x00000002;
+        alpha_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float alpha = 2;</code>
+       */
+      public Builder clearAlpha() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        alpha_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.webswing.directdraw.proto.CompositeProto)
+    }
+
+    static {
+      defaultInstance = new CompositeProto(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:org.webswing.directdraw.proto.CompositeProto)
+  }
+
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_org_webswing_directdraw_proto_WebImageProto_descriptor;
   private static
@@ -16536,6 +17424,11 @@ public final class Directdraw {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_webswing_directdraw_proto_PointsProto_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_webswing_directdraw_proto_CompositeProto_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_webswing_directdraw_proto_CompositeProto_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -16554,84 +17447,93 @@ public final class Directdraw {
       "onstants\030\005 \003(\01320.org.webswing.directdraw" +
       ".proto.DrawConstantProto\0228\n\005image\030\006 \001(\0132" +
       ").org.webswing.directdraw.proto.ImagePro" +
-      "to\"\362\002\n\024DrawInstructionProto\022R\n\004inst\030\001 \002(",
+      "to\"\205\003\n\024DrawInstructionProto\022R\n\004inst\030\001 \002(",
       "\0162D.org.webswing.directdraw.proto.DrawIn" +
       "structionProto.InstructionProto\022\014\n\004args\030" +
-      "\002 \003(\r\022\020\n\010webImage\030\003 \001(\014\"\345\001\n\020InstructionP" +
+      "\002 \003(\r\022\020\n\010webImage\030\003 \001(\014\"\370\001\n\020InstructionP" +
       "roto\022\010\n\004DRAW\020\000\022\010\n\004FILL\020\001\022\016\n\nDRAW_IMAGE\020\002" +
       "\022\021\n\rDRAW_WEBIMAGE\020\003\022\017\n\013DRAW_STRING\020\004\022\r\n\t" +
       "COPY_AREA\020\005\022\024\n\020GRAPHICS_DISPOSE\020\006\022\023\n\017GRA" +
       "PHICS_SWITCH\020\007\022\023\n\017GRAPHICS_CREATE\020\010\022\r\n\tT" +
       "RANSFORM\020\t\022\r\n\tSET_PAINT\020\n\022\014\n\010SET_FONT\020\013\022" +
-      "\016\n\nSET_STROKE\020\014\"\337\006\n\021DrawConstantProto\022\n\n" +
-      "\002id\030\001 \002(\r\0228\n\005color\030\002 \001(\0132).org.webswing.",
-      "directdraw.proto.ColorProto\0228\n\005image\030\003 \001" +
-      "(\0132).org.webswing.directdraw.proto.Image" +
-      "Proto\022@\n\ttransform\030\004 \001(\0132-.org.webswing." +
-      "directdraw.proto.TransformProto\022\016\n\006strin" +
-      "g\030\005 \001(\t\0226\n\004path\030\006 \001(\0132(.org.webswing.dir" +
-      "ectdraw.proto.PathProto\0226\n\004font\030\007 \001(\0132(." +
-      "org.webswing.directdraw.proto.FontProto\022" +
-      "F\n\nlinearGrad\030\010 \001(\01322.org.webswing.direc" +
-      "tdraw.proto.LinearGradientProto\022F\n\nradia" +
-      "lGrad\030\t \001(\01322.org.webswing.directdraw.pr",
-      "oto.RadialGradientProto\022:\n\006points\030\n \001(\0132" +
-      "*.org.webswing.directdraw.proto.PointsPr" +
-      "oto\022@\n\trectangle\030\013 \001(\0132-.org.webswing.di" +
-      "rectdraw.proto.RectangleProto\022<\n\007ellipse" +
-      "\030\014 \001(\0132+.org.webswing.directdraw.proto.E" +
-      "llipseProto\022J\n\016roundRectangle\030\r \001(\01322.or" +
-      "g.webswing.directdraw.proto.RoundRectang" +
-      "leProto\0224\n\003arc\030\016 \001(\0132\'.org.webswing.dire" +
-      "ctdraw.proto.ArcProto\022:\n\006stroke\030\017 \001(\0132*." +
-      "org.webswing.directdraw.proto.StrokeProt",
-      "o\"\032\n\nColorProto\022\014\n\004rgba\030\001 \002(\007\"J\n\nImagePr" +
-      "oto\022\014\n\004hash\030\001 \002(\021\022\014\n\004data\030\002 \002(\014\022\017\n\007offse" +
-      "tX\030\003 \001(\r\022\017\n\007offsetY\030\004 \001(\r\"b\n\016TransformPr" +
-      "oto\022\013\n\003m00\030\001 \001(\002\022\013\n\003m10\030\002 \001(\002\022\013\n\003m01\030\003 \001" +
-      "(\002\022\013\n\003m11\030\004 \001(\002\022\r\n\005m02X2\030\005 \001(\021\022\r\n\005m12X2\030" +
-      "\006 \001(\021\"<\n\016RectangleProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030" +
-      "\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\":\n\014EllipsePr" +
-      "oto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001" +
-      "h\030\004 \002(\021\"]\n\023RoundRectangleProto\022\t\n\001x\030\001 \002(" +
-      "\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\022\014\n\004ar",
-      "cW\030\005 \001(\021\022\014\n\004arcH\030\006 \001(\021\"\307\001\n\010ArcProto\022\t\n\001x" +
+      "\016\n\nSET_STROKE\020\014\022\021\n\rSET_COMPOSITE\020\r\"\241\007\n\021D" +
+      "rawConstantProto\022\n\n\002id\030\001 \002(\r\0228\n\005color\030\002 ",
+      "\001(\0132).org.webswing.directdraw.proto.Colo" +
+      "rProto\0228\n\005image\030\003 \001(\0132).org.webswing.dir" +
+      "ectdraw.proto.ImageProto\022@\n\ttransform\030\004 " +
+      "\001(\0132-.org.webswing.directdraw.proto.Tran" +
+      "sformProto\022\016\n\006string\030\005 \001(\t\0226\n\004path\030\006 \001(\013" +
+      "2(.org.webswing.directdraw.proto.PathPro" +
+      "to\0226\n\004font\030\007 \001(\0132(.org.webswing.directdr" +
+      "aw.proto.FontProto\022F\n\nlinearGrad\030\010 \001(\01322" +
+      ".org.webswing.directdraw.proto.LinearGra" +
+      "dientProto\022F\n\nradialGrad\030\t \001(\01322.org.web",
+      "swing.directdraw.proto.RadialGradientPro" +
+      "to\022:\n\006points\030\n \001(\0132*.org.webswing.direct" +
+      "draw.proto.PointsProto\022@\n\trectangle\030\013 \001(" +
+      "\0132-.org.webswing.directdraw.proto.Rectan" +
+      "gleProto\022<\n\007ellipse\030\014 \001(\0132+.org.webswing" +
+      ".directdraw.proto.EllipseProto\022J\n\016roundR" +
+      "ectangle\030\r \001(\01322.org.webswing.directdraw" +
+      ".proto.RoundRectangleProto\0224\n\003arc\030\016 \001(\0132" +
+      "\'.org.webswing.directdraw.proto.ArcProto" +
+      "\022:\n\006stroke\030\017 \001(\0132*.org.webswing.directdr",
+      "aw.proto.StrokeProto\022@\n\tcomposite\030\020 \001(\0132" +
+      "-.org.webswing.directdraw.proto.Composit" +
+      "eProto\"\032\n\nColorProto\022\014\n\004rgba\030\001 \002(\007\"J\n\nIm" +
+      "ageProto\022\014\n\004hash\030\001 \002(\021\022\014\n\004data\030\002 \002(\014\022\017\n\007" +
+      "offsetX\030\003 \001(\r\022\017\n\007offsetY\030\004 \001(\r\"b\n\016Transf" +
+      "ormProto\022\013\n\003m00\030\001 \001(\002\022\013\n\003m10\030\002 \001(\002\022\013\n\003m0" +
+      "1\030\003 \001(\002\022\013\n\003m11\030\004 \001(\002\022\r\n\005m02X2\030\005 \001(\021\022\r\n\005m" +
+      "12X2\030\006 \001(\021\"<\n\016RectangleProto\022\t\n\001x\030\001 \002(\021\022" +
+      "\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\":\n\014Elli" +
+      "pseProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(",
+      "\021\022\t\n\001h\030\004 \002(\021\"]\n\023RoundRectangleProto\022\t\n\001x" +
       "\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\022" +
-      "\r\n\005start\030\005 \001(\021\022\016\n\006extent\030\006 \001(\021\022B\n\004type\030\007" +
-      " \001(\01624.org.webswing.directdraw.proto.Arc" +
-      "Proto.ArcTypeProto\",\n\014ArcTypeProto\022\010\n\004OP" +
-      "EN\020\000\022\t\n\005CHORD\020\001\022\007\n\003PIE\020\002\"\300\001\n\tPathProto\022\022" +
-      "\n\nwindingOdd\030\001 \002(\010\022G\n\004type\030\002 \003(\01629.org.w" +
-      "ebswing.directdraw.proto.PathProto.Segme" +
-      "ntTypeProto\022\016\n\006points\030\003 \003(\021\"F\n\020SegmentTy" +
-      "peProto\022\010\n\004MOVE\020\000\022\010\n\004LINE\020\001\022\010\n\004QUAD\020\002\022\t\n",
-      "\005CUBIC\020\003\022\t\n\005CLOSE\020\004\"\260\001\n\tFontProto\022\016\n\006fam" +
-      "ily\030\001 \002(\t\022B\n\005style\030\002 \001(\01623.org.webswing." +
-      "directdraw.proto.FontProto.StyleProto\022\014\n" +
-      "\004size\030\003 \001(\r\022\016\n\006weight\030\004 \001(\r\"1\n\nStyleProt" +
-      "o\022\n\n\006NORMAL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006ITALIC\020\002\"\357" +
-      "\002\n\013StrokeProto\022\020\n\010widthX10\030\001 \002(\r\022\025\n\rmite" +
-      "rLimitX10\030\002 \001(\r\022H\n\004join\030\003 \001(\0162:.org.webs" +
-      "wing.directdraw.proto.StrokeProto.Stroke" +
-      "JoinProto\022F\n\003cap\030\004 \001(\01629.org.webswing.di" +
-      "rectdraw.proto.StrokeProto.StrokeCapProt",
-      "o\022\017\n\007dashX10\030\005 \003(\r\022\022\n\ndashOffset\030\006 \001(\r\"A" +
-      "\n\017StrokeJoinProto\022\016\n\nJOIN_MITER\020\000\022\016\n\nJOI" +
-      "N_ROUND\020\001\022\016\n\nJOIN_BEVEL\020\002\"=\n\016StrokeCapPr" +
-      "oto\022\014\n\010CAP_BUTT\020\000\022\r\n\tCAP_ROUND\020\001\022\016\n\nCAP_" +
-      "SQUARE\020\002\"\266\001\n\023LinearGradientProto\022\016\n\006xSta" +
-      "rt\030\001 \002(\021\022\016\n\006yStart\030\002 \002(\021\022\014\n\004xEnd\030\003 \002(\021\022\014" +
-      "\n\004yEnd\030\004 \002(\021\022\016\n\006colors\030\005 \003(\007\022\021\n\tfraction" +
-      "s\030\006 \003(\002\022@\n\006repeat\030\007 \002(\01620.org.webswing.d" +
-      "irectdraw.proto.CyclicMethodProto\"\314\001\n\023Ra" +
-      "dialGradientProto\022\017\n\007xCenter\030\001 \002(\021\022\017\n\007yC",
-      "enter\030\002 \002(\021\022\016\n\006xFocus\030\003 \002(\021\022\016\n\006yFocus\030\004 " +
-      "\002(\021\022\016\n\006radius\030\005 \002(\021\022\016\n\006colors\030\006 \003(\007\022\021\n\tf" +
-      "ractions\030\007 \003(\002\022@\n\006repeat\030\010 \002(\01620.org.web" +
-      "swing.directdraw.proto.CyclicMethodProto" +
-      "\"\035\n\013PointsProto\022\016\n\006points\030\001 \003(\021*:\n\021Cycli" +
-      "cMethodProto\022\014\n\010NO_CYCLE\020\000\022\013\n\007REFLECT\020\001\022" +
-      "\n\n\006REPEAT\020\002"
+      "\014\n\004arcW\030\005 \001(\021\022\014\n\004arcH\030\006 \001(\021\"\307\001\n\010ArcProto" +
+      "\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004" +
+      " \002(\021\022\r\n\005start\030\005 \001(\021\022\016\n\006extent\030\006 \001(\021\022B\n\004t" +
+      "ype\030\007 \001(\01624.org.webswing.directdraw.prot" +
+      "o.ArcProto.ArcTypeProto\",\n\014ArcTypeProto\022" +
+      "\010\n\004OPEN\020\000\022\t\n\005CHORD\020\001\022\007\n\003PIE\020\002\"\300\001\n\tPathPr" +
+      "oto\022\022\n\nwindingOdd\030\001 \002(\010\022G\n\004type\030\002 \003(\01629." +
+      "org.webswing.directdraw.proto.PathProto.",
+      "SegmentTypeProto\022\016\n\006points\030\003 \003(\021\"F\n\020Segm" +
+      "entTypeProto\022\010\n\004MOVE\020\000\022\010\n\004LINE\020\001\022\010\n\004QUAD" +
+      "\020\002\022\t\n\005CUBIC\020\003\022\t\n\005CLOSE\020\004\"\303\001\n\tFontProto\022\016" +
+      "\n\006family\030\001 \002(\t\022B\n\005style\030\002 \001(\01623.org.webs" +
+      "wing.directdraw.proto.FontProto.StylePro" +
+      "to\022\014\n\004size\030\003 \001(\r\022\016\n\006weight\030\004 \001(\r\"D\n\nStyl" +
+      "eProto\022\n\n\006NORMAL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006ITALI" +
+      "C\020\002\022\021\n\rBOLDANDITALIC\020\003\"\357\002\n\013StrokeProto\022\020" +
+      "\n\010widthX10\030\001 \002(\r\022\025\n\rmiterLimitX10\030\002 \001(\r\022" +
+      "H\n\004join\030\003 \001(\0162:.org.webswing.directdraw.",
+      "proto.StrokeProto.StrokeJoinProto\022F\n\003cap" +
+      "\030\004 \001(\01629.org.webswing.directdraw.proto.S" +
+      "trokeProto.StrokeCapProto\022\017\n\007dashX10\030\005 \003" +
+      "(\r\022\022\n\ndashOffset\030\006 \001(\r\"A\n\017StrokeJoinProt" +
+      "o\022\016\n\nJOIN_MITER\020\000\022\016\n\nJOIN_ROUND\020\001\022\016\n\nJOI" +
+      "N_BEVEL\020\002\"=\n\016StrokeCapProto\022\014\n\010CAP_BUTT\020" +
+      "\000\022\r\n\tCAP_ROUND\020\001\022\016\n\nCAP_SQUARE\020\002\"\266\001\n\023Lin" +
+      "earGradientProto\022\016\n\006xStart\030\001 \002(\021\022\016\n\006ySta" +
+      "rt\030\002 \002(\021\022\014\n\004xEnd\030\003 \002(\021\022\014\n\004yEnd\030\004 \002(\021\022\016\n\006" +
+      "colors\030\005 \003(\007\022\021\n\tfractions\030\006 \003(\002\022@\n\006repea",
+      "t\030\007 \002(\01620.org.webswing.directdraw.proto." +
+      "CyclicMethodProto\"\314\001\n\023RadialGradientProt" +
+      "o\022\017\n\007xCenter\030\001 \002(\021\022\017\n\007yCenter\030\002 \002(\021\022\016\n\006x" +
+      "Focus\030\003 \002(\021\022\016\n\006yFocus\030\004 \002(\021\022\016\n\006radius\030\005 " +
+      "\002(\021\022\016\n\006colors\030\006 \003(\007\022\021\n\tfractions\030\007 \003(\002\022@" +
+      "\n\006repeat\030\010 \002(\01620.org.webswing.directdraw" +
+      ".proto.CyclicMethodProto\"\035\n\013PointsProto\022" +
+      "\016\n\006points\030\001 \003(\021\"\226\002\n\016CompositeProto\022N\n\004ty" +
+      "pe\030\001 \002(\0162@.org.webswing.directdraw.proto" +
+      ".CompositeProto.CompositeTypeProto\022\r\n\005al",
+      "pha\030\002 \001(\002\"\244\001\n\022CompositeTypeProto\022\t\n\005CLEA" +
+      "R\020\001\022\007\n\003SRC\020\002\022\007\n\003DST\020\t\022\014\n\010SRC_OVER\020\003\022\014\n\010D" +
+      "ST_OVER\020\004\022\n\n\006SRC_IN\020\005\022\n\n\006DST_IN\020\006\022\013\n\007SRC" +
+      "_OUT\020\007\022\013\n\007DST_OUT\020\010\022\014\n\010SRC_ATOP\020\n\022\014\n\010DST" +
+      "_ATOP\020\013\022\007\n\003XOR\020\014*:\n\021CyclicMethodProto\022\014\n" +
+      "\010NO_CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -16655,7 +17557,7 @@ public final class Directdraw {
           internal_static_org_webswing_directdraw_proto_DrawConstantProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_DrawConstantProto_descriptor,
-              new java.lang.String[] { "Id", "Color", "Image", "Transform", "String", "Path", "Font", "LinearGrad", "RadialGrad", "Points", "Rectangle", "Ellipse", "RoundRectangle", "Arc", "Stroke", });
+              new java.lang.String[] { "Id", "Color", "Image", "Transform", "String", "Path", "Font", "LinearGrad", "RadialGrad", "Points", "Rectangle", "Ellipse", "RoundRectangle", "Arc", "Stroke", "Composite", });
           internal_static_org_webswing_directdraw_proto_ColorProto_descriptor =
             getDescriptor().getMessageTypes().get(3);
           internal_static_org_webswing_directdraw_proto_ColorProto_fieldAccessorTable = new
@@ -16734,6 +17636,12 @@ public final class Directdraw {
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_PointsProto_descriptor,
               new java.lang.String[] { "Points", });
+          internal_static_org_webswing_directdraw_proto_CompositeProto_descriptor =
+            getDescriptor().getMessageTypes().get(16);
+          internal_static_org_webswing_directdraw_proto_CompositeProto_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_org_webswing_directdraw_proto_CompositeProto_descriptor,
+              new java.lang.String[] { "Type", "Alpha", });
           return null;
         }
       };

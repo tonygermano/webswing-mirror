@@ -1,6 +1,9 @@
 package org.webswing.directdraw;
 
+import java.awt.ImageCapabilities;
+
 import org.webswing.directdraw.toolkit.DrawInstructionFactory;
+import org.webswing.directdraw.toolkit.VolatileWebImageWrapper;
 import org.webswing.directdraw.toolkit.WebImage;
 import org.webswing.directdraw.util.DrawConstantPool;
 import org.webswing.directdraw.util.ImageConstantPool;
@@ -14,7 +17,6 @@ public class DirectDraw {
 
 	private DrawConstantPool constantPool;
 	private ImageConstantPool imagePool;
-
 
 	public DirectDraw() {
 		resetConstantCache();
@@ -44,6 +46,10 @@ public class DirectDraw {
 
 	public WebImage createImage(int w, int h) {
 		return new WebImage(this, w, h);
+	}
+
+	public VolatileWebImageWrapper createVolatileImage(int w, int h, ImageCapabilities caps) {
+		return new VolatileWebImageWrapper(caps, createImage(w, h));
 	}
 
 	public DrawInstructionFactory getInstructionFactory() {

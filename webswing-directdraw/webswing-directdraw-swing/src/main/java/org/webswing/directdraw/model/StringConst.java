@@ -4,42 +4,14 @@ import org.webswing.directdraw.DirectDraw;
 
 public class StringConst extends DrawConstant {
 
-    private String string;
-
-    public StringConst(DirectDraw context,String s) {
-    	super(context);
-        this.string = s;
-    }
-
-    public Object extractMessage(DirectDraw dd) {
-        return string;
-    };
-
-    @Override
-    public String getFieldName() {
-        return "string";
-    }
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = prime * ((string == null) ? 0 : string.hashCode());
-		return result;
+	public StringConst(DirectDraw context, String s) {
+		super(context);
+		this.message = s;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (getClass() != obj.getClass())
-			return false;
-		StringConst other = (StringConst) obj;
-		if (string == null) {
-			if (other.string != null)
-				return false;
-		} else if (!string.equals(other.string))
-			return false;
-		return true;
+	public String getFieldName() {
+		return "string";
 	}
 
 }

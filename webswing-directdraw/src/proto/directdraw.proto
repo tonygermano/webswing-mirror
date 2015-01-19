@@ -28,6 +28,7 @@ message DrawInstructionProto {
 		SET_PAINT = 10;
 		SET_FONT = 11;
 		SET_STROKE = 12;
+		SET_COMPOSITE = 13;
 	}
 }
 
@@ -47,6 +48,7 @@ message DrawConstantProto {
 	optional RoundRectangleProto roundRectangle = 13;
 	optional ArcProto arc = 14;
 	optional StrokeProto stroke = 15;
+	optional CompositeProto composite = 16;
 }
 
 message ColorProto {
@@ -132,6 +134,7 @@ message FontProto {
 		NORMAL = 0;
 		OBLIQUE = 1;
 		ITALIC = 2;
+		BOLDANDITALIC = 3;
 	}
 }
 
@@ -185,4 +188,24 @@ enum CyclicMethodProto{
 
 message PointsProto {
 	repeated sint32 points = 1;
+}
+
+message CompositeProto {
+	required CompositeTypeProto type= 1;
+	optional float alpha = 2;
+
+	enum CompositeTypeProto {
+	    CLEAR = 1;
+	    SRC = 2;
+	    DST = 9;
+		SRC_OVER = 3;
+		DST_OVER = 4;
+		SRC_IN = 5;
+		DST_IN = 6;
+		SRC_OUT = 7;
+		DST_OUT = 8;
+		SRC_ATOP = 10;
+		DST_ATOP = 11;
+		XOR = 12;
+	}
 }

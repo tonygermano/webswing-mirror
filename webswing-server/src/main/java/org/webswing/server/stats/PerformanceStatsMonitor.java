@@ -9,28 +9,28 @@ import org.webswing.model.admin.s2c.JsonSwingJvmStats;
 import org.webswing.server.SwingInstance;
 import org.webswing.server.SwingInstanceManager;
 
-
 public class PerformanceStatsMonitor {
-    
 
-    ScheduledExecutorService statsCollector=Executors.newSingleThreadScheduledExecutor();
-    
-    public PerformanceStatsMonitor() {
-        Runnable collect=new Runnable() {
-            
-            @Override
-            public void run() {
-                for(SwingInstance si:SwingInstanceManager.getInstance().getSwingInstanceSet()){
-                    JsonSwingJvmStats stats = si.collectStats();
-                    stats.setSnapshotTime(new Date());
-                    //System.out.println(stats);
-                }
-                SwingInstanceManager.getInstance().notifySwingChangeChange();
-            }
-        };
-        statsCollector.scheduleWithFixedDelay(collect, 5,5, TimeUnit.SECONDS);
-    }
+	ScheduledExecutorService statsCollector = Executors.newSingleThreadScheduledExecutor();
 
-    
+	public PerformanceStatsMonitor() {
+		Runnable collect = new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					for (SwingInstance si : SwingInstanceManager.getInstance().getSwingInstanceSet()) {
+						JsonSwingJvmStats stats = si.collectStats();
+						stats.setSnapshotTime(new Date());
+						System.out.println(stats);
+					}
+					SwingInstanceManager.getInstance().notifySwingChangeChange();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		statsCollector.scheduleWithFixedDelay(collect, 5, 5, TimeUnit.SECONDS);
+	}
 
 }
