@@ -26,6 +26,7 @@ import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.Instruction
 public class DirectDrawUtils {
 
 	public static final Properties windowsFonts = new Properties();
+	public static final Properties webFonts = new Properties();
 	static {
 		// logical fonts
 		windowsFonts.setProperty("Dialog", "Arial");
@@ -33,12 +34,15 @@ public class DirectDrawUtils {
 		windowsFonts.setProperty("Serif", "Times New Roman");
 		windowsFonts.setProperty("SansSerif", "Arial");
 		windowsFonts.setProperty("Monospaced", "Courier New");
+		webFonts.setProperty("Arial", "Dialog");
+		webFonts.setProperty("Courier New", "DialogInput");
+		webFonts.setProperty("Times New Roman", "Serif");
+		webFonts.setProperty("Arial", "SansSerif");
+		webFonts.setProperty("Courier New", "Monospaced");
 	}
 
 	/**
-	 * there is a bug in the jdk 1.6 which makes Font.getAttributes() not work
-	 * correctly. The method does not return all values. What we dow here is
-	 * using the old JDK 1.5 method.
+	 * there is a bug in the jdk 1.6 which makes Font.getAttributes() not work correctly. The method does not return all values. What we dow here is using the old JDK 1.5 method.
 	 * 
 	 * @param font
 	 *            font

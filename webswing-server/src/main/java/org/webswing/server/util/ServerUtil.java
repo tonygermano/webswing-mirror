@@ -46,241 +46,246 @@ import org.webswing.server.SwingInstance;
 import org.webswing.server.handler.ApplicationSelectorServlet;
 import org.webswing.server.handler.FileServlet;
 import org.webswing.server.handler.LoginServlet;
+import org.webswing.server.stats.SessionRecorder;
 
 public class ServerUtil {
 
-    private static final String DEFAULT = "default";
-    private static final Logger log = LoggerFactory.getLogger(ServerUtil.class);
-    private static final Map<String, String> iconMap = new HashMap<String, String>();
-    private static final ObjectMapper mapper = new ObjectMapper();
+	private static final String DEFAULT = "default";
+	private static final Logger log = LoggerFactory.getLogger(ServerUtil.class);
+	private static final Map<String, String> iconMap = new HashMap<String, String>();
+	private static final ObjectMapper mapper = new ObjectMapper();
 
-    public static String encode(Serializable m) {
-        try {
-            if (m instanceof String) {
-                return (String) m;
-            }
-            return mapper.writeValueAsString(m);
-        } catch (IOException e) {
-            log.error("Encoding object failed: " + m, e);
-            return null;
-        }
-    }
+	public static String encode(Serializable m) {
+		try {
+			if (m instanceof String) {
+				return (String) m;
+			}
+			return mapper.writeValueAsString(m);
+		} catch (IOException e) {
+			log.error("Encoding object failed: " + m, e);
+			return null;
+		}
+	}
 
-    public static Object decode(String s) {
-        try {
-            return mapper.readValue(s, JsonEventMouse.class);
-        } catch (IOException e) {
-            try {
-                return mapper.readValue(s, JsonEventKeyboard.class);
-            } catch (IOException e1) {
-                try {
-                    return mapper.readValue(s, JsonConnectionHandshake.class);
-                } catch (IOException e2) {
-                    try {
-                        return mapper.readValue(s, JsonEventPaste.class);
-                    } catch (IOException e3) {
-                        try {
-                            return mapper.readValue(s, JsonApplyConfiguration.class);
-                        } catch (IOException e4) {
-                            return null;
-                        }
-                    }
-                }
-            }
-        }
-    }
+	public static Object decode(String s) {
+		try {
+			return mapper.readValue(s, JsonEventMouse.class);
+		} catch (IOException e) {
+			try {
+				return mapper.readValue(s, JsonEventKeyboard.class);
+			} catch (IOException e1) {
+				try {
+					return mapper.readValue(s, JsonConnectionHandshake.class);
+				} catch (IOException e2) {
+					try {
+						return mapper.readValue(s, JsonEventPaste.class);
+					} catch (IOException e3) {
+						try {
+							return mapper.readValue(s, JsonApplyConfiguration.class);
+						} catch (IOException e4) {
+							return null;
+						}
+					}
+				}
+			}
+		}
+	}
 
-    public static List<JsonApplication> createApplicationJsonInfo(AtmosphereResource r, Map<String, SwingApplicationDescriptor> applications, boolean includeAdminApp) {
-        List<JsonApplication> apps = new ArrayList<JsonApplication>();
-        if (applications.size() == 0) {
-            return null;
-        } else {
-            for (String name : applications.keySet()) {
-                SwingApplicationDescriptor descriptor = applications.get(name);
-                if (!isUserAuthorizedForApplication(r, descriptor)) {
-                    continue;
-                }
-                JsonApplication app = new JsonApplication();
-                app.name = name;
-                if (descriptor.getIcon() == null) {
-                    app.base64Icon = loadImage(null);
-                } else {
-                    if (new File(descriptor.getIcon()).exists()) {
-                        app.base64Icon = loadImage(descriptor.getIcon());
-                    } else if (new File(descriptor.getHomeDir() + File.separator + descriptor.getIcon()).exists()) {
-                        app.base64Icon = loadImage(descriptor.getHomeDir() + File.separator + descriptor.getIcon());
-                    } else {
-                        log.error("Icon loading failed. File " + descriptor.getIcon() + " or " + descriptor.getHomeDir() + File.separator + descriptor.getIcon() + " does not exist.");
-                        app.base64Icon = loadImage(null);
-                    }
-                }
-                apps.add(app);
-            }
-            if (includeAdminApp) {
-                JsonApplication adminConsole = new JsonApplication();
-                adminConsole.name = Constants.ADMIN_CONSOLE_APP_NAME;
-                apps.add(adminConsole);
-            }
-        }
-        return apps;
-    }
+	public static List<JsonApplication> createApplicationJsonInfo(AtmosphereResource r, Map<String, SwingApplicationDescriptor> applications, boolean includeAdminApp) {
+		List<JsonApplication> apps = new ArrayList<JsonApplication>();
+		if (applications.size() == 0) {
+			return null;
+		} else {
+			for (String name : applications.keySet()) {
+				SwingApplicationDescriptor descriptor = applications.get(name);
+				if (!isUserAuthorizedForApplication(r, descriptor)) {
+					continue;
+				}
+				JsonApplication app = new JsonApplication();
+				app.name = name;
+				if (descriptor.getIcon() == null) {
+					app.base64Icon = loadImage(null);
+				} else {
+					if (new File(descriptor.getIcon()).exists()) {
+						app.base64Icon = loadImage(descriptor.getIcon());
+					} else if (new File(descriptor.getHomeDir() + File.separator + descriptor.getIcon()).exists()) {
+						app.base64Icon = loadImage(descriptor.getHomeDir() + File.separator + descriptor.getIcon());
+					} else {
+						log.error("Icon loading failed. File " + descriptor.getIcon() + " or " + descriptor.getHomeDir() + File.separator + descriptor.getIcon() + " does not exist.");
+						app.base64Icon = loadImage(null);
+					}
+				}
+				apps.add(app);
+			}
+			if (includeAdminApp) {
+				JsonApplication adminConsole = new JsonApplication();
+				adminConsole.name = Constants.ADMIN_CONSOLE_APP_NAME;
+				apps.add(adminConsole);
+			}
+		}
+		return apps;
+	}
 
-    public static boolean isUserAuthorizedForApplication(AtmosphereResource r, SwingApplicationDescriptor app) {
-        if ((app.isAuthentication() || app.isAuthorization()) && isUserAnonymous(r)) {
-            return false;
-        }
-        if (app.isAuthorization()) {
-            if (isUserinRole(r, app.getName()) || isUserinRole(r, Constants.ADMIN_ROLE)) {
-                return true;
-            }
-            return false;
-        } else {
-            return true;
-        }
-    }
+	public static boolean isUserAuthorizedForApplication(AtmosphereResource r, SwingApplicationDescriptor app) {
+		if ((app.isAuthentication() || app.isAuthorization()) && isUserAnonymous(r)) {
+			return false;
+		}
+		if (app.isAuthorization()) {
+			if (isUserinRole(r, app.getName()) || isUserinRole(r, Constants.ADMIN_ROLE)) {
+				return true;
+			}
+			return false;
+		} else {
+			return true;
+		}
+	}
 
-    private static String loadImage(String icon) {
-        try {
-            if (icon == null) {
-                if (iconMap.containsKey(DEFAULT)) {
-                    return iconMap.get(DEFAULT);
-                } else {
-                    BufferedImage defaultIcon = ImageIO.read(ServerUtil.class.getClassLoader().getResourceAsStream("images/java.png"));
-                    String b64icon = Base64.encodeBase64String(getPngImage(defaultIcon));
-                    iconMap.put(DEFAULT, b64icon);
-                    return b64icon;
-                }
-            } else {
-                if (iconMap.containsKey(icon)) {
-                    return iconMap.get(icon);
-                } else {
-                    BufferedImage defaultIcon = ImageIO.read(new File(icon));
-                    String b64icon = Base64.encodeBase64String(getPngImage(defaultIcon));
-                    iconMap.put(icon, b64icon);
-                    return b64icon;
-                }
-            }
-        } catch (IOException e) {
-            log.error("Failed to load image " + icon, e);
-            return null;
-        }
-    }
+	private static String loadImage(String icon) {
+		try {
+			if (icon == null) {
+				if (iconMap.containsKey(DEFAULT)) {
+					return iconMap.get(DEFAULT);
+				} else {
+					BufferedImage defaultIcon = ImageIO.read(ServerUtil.class.getClassLoader().getResourceAsStream("images/java.png"));
+					String b64icon = Base64.encodeBase64String(getPngImage(defaultIcon));
+					iconMap.put(DEFAULT, b64icon);
+					return b64icon;
+				}
+			} else {
+				if (iconMap.containsKey(icon)) {
+					return iconMap.get(icon);
+				} else {
+					BufferedImage defaultIcon = ImageIO.read(new File(icon));
+					String b64icon = Base64.encodeBase64String(getPngImage(defaultIcon));
+					iconMap.put(icon, b64icon);
+					return b64icon;
+				}
+			}
+		} catch (IOException e) {
+			log.error("Failed to load image " + icon, e);
+			return null;
+		}
+	}
 
-    private static byte[] getPngImage(BufferedImage imageContent) {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
-            ImageIO.write(imageContent, "png", ios);
-            byte[] result = baos.toByteArray();
-            baos.close();
-            return result;
-        } catch (IOException e) {
-            log.error("Writing image interupted:" + e.getMessage(), e);
-        }
-        return null;
-    }
+	private static byte[] getPngImage(BufferedImage imageContent) {
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
+			ImageIO.write(imageContent, "png", ios);
+			byte[] result = baos.toByteArray();
+			baos.close();
+			return result;
+		} catch (IOException e) {
+			log.error("Writing image interupted:" + e.getMessage(), e);
+		}
+		return null;
+	}
 
-    public static String getUserPropsFileName() {
-        String userFile = System.getProperty(Constants.USER_FILE_PATH);
-        if (userFile == null) {
-            String war = ServerUtil.getWarFileLocation();
-            userFile = war.substring(0, war.lastIndexOf("/") + 1) + Constants.DEFAULT_USER_FILE_NAME;
-            System.setProperty(userFile, Constants.USER_FILE_PATH);
-        }
-        return userFile;
-    }
+	public static String getUserPropsFileName() {
+		String userFile = System.getProperty(Constants.USER_FILE_PATH);
+		if (userFile == null) {
+			String war = ServerUtil.getWarFileLocation();
+			userFile = war.substring(0, war.lastIndexOf("/") + 1) + Constants.DEFAULT_USER_FILE_NAME;
+			System.setProperty(userFile, Constants.USER_FILE_PATH);
+		}
+		return userFile;
+	}
 
-    public static String getWarFileLocation() {
-        String warFile = System.getProperty(Constants.WAR_FILE_LOCATION);
-        if (warFile == null) {
-            ProtectionDomain domain = Main.class.getProtectionDomain();
-            URL location = domain.getCodeSource().getLocation();
-            String locationString = location.toExternalForm();
-            if (locationString.endsWith("/WEB-INF/classes/")) {
-                locationString = locationString.substring(0, locationString.length() - "/WEB-INF/classes/".length());
-            }
-            System.setProperty(Constants.WAR_FILE_LOCATION, locationString);
-            return locationString;
-        }
-        return warFile;
-    }
+	public static String getWarFileLocation() {
+		String warFile = System.getProperty(Constants.WAR_FILE_LOCATION);
+		if (warFile == null) {
+			ProtectionDomain domain = Main.class.getProtectionDomain();
+			URL location = domain.getCodeSource().getLocation();
+			String locationString = location.toExternalForm();
+			if (locationString.endsWith("/WEB-INF/classes/")) {
+				locationString = locationString.substring(0, locationString.length() - "/WEB-INF/classes/".length());
+			}
+			System.setProperty(Constants.WAR_FILE_LOCATION, locationString);
+			return locationString;
+		}
+		return warFile;
+	}
 
-    public static JsonSwingSession composeSwingInstanceStatus(SwingInstance si) {
-        JsonSwingSession result = new JsonSwingSession();
-        result.setId(si.getClientId());
-        result.setApplication(si.getApplicationName());
-        result.setConnected(si.getSessionId() != null);
-        if (!result.getConnected()) {
-            result.setDisconnectedSince(si.getDisconnectedSince());
-        }
-        result.setStartedAt(si.getStartedAt());
-        result.setUser(si.getUser());
-        result.setEndedAt(si.getEndedAt());
-        result.setState(si.getStats());
-        return result;
-    }
+	public static JsonSwingSession composeSwingInstanceStatus(SwingInstance si) {
+		JsonSwingSession result = new JsonSwingSession();
+		result.setId(si.getClientId());
+		result.setApplication(si.getApplicationName());
+		result.setConnected(si.getSessionId() != null);
+		if (!result.getConnected()) {
+			result.setDisconnectedSince(si.getDisconnectedSince());
+		}
+		result.setStartedAt(si.getStartedAt());
+		result.setUser(si.getUser());
+		result.setEndedAt(si.getEndedAt());
+		result.setState(si.getStats());
+		return result;
+	}
 
-    public static String getUserName(AtmosphereResource resource) {
-        Subject sub = (Subject) resource.getRequest().getAttribute(FrameworkConfig.SECURITY_SUBJECT);
-        if (sub != null) {
-            return sub.getPrincipal() + "";
-        }
-        return null;
-    }
+	public static String getUserName(AtmosphereResource resource) {
+		Subject sub = (Subject) resource.getRequest().getAttribute(FrameworkConfig.SECURITY_SUBJECT);
+		if (sub != null) {
+			return sub.getPrincipal() + "";
+		}
+		return null;
+	}
 
-    public static boolean isUserinRole(AtmosphereResource resource, String role) {
-        Subject sub = (Subject) resource.getRequest().getAttribute(FrameworkConfig.SECURITY_SUBJECT);
-        if (sub != null) {
-            return sub.hasRole(role);
-        }
-        return false;
-    }
+	public static boolean isUserinRole(AtmosphereResource resource, String role) {
+		Subject sub = (Subject) resource.getRequest().getAttribute(FrameworkConfig.SECURITY_SUBJECT);
+		if (sub != null) {
+			return sub.hasRole(role);
+		}
+		return false;
+	}
 
-    public static boolean isUserAnonymous(AtmosphereResource resource) {
-        if (LoginServlet.anonymUserName.equals(getUserName(resource))) {
-            return true;
-        }
-        return false;
-    }
+	public static boolean isUserAnonymous(AtmosphereResource resource) {
+		if (LoginServlet.anonymUserName.equals(getUserName(resource))) {
+			return true;
+		}
+		return false;
+	}
 
-    public static boolean validateConfigFile(byte[] content) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.readValue(content, WebswingConfiguration.class);
-        return true;
-    }
+	public static boolean validateConfigFile(byte[] content) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.readValue(content, WebswingConfiguration.class);
+		return true;
+	}
 
-    public static boolean validateUserFile(byte[] content) throws IOException {
-        PropertiesRealm r = new PropertiesRealm();
-        String tmpFileName = FileServlet.registerFile(content, UUID.randomUUID().toString(), 10, TimeUnit.SECONDS, "");
-        r.setResourcePath(tmpFileName);
-        r.init();
-        return true;
-    }
+	public static boolean validateUserFile(byte[] content) throws IOException {
+		PropertiesRealm r = new PropertiesRealm();
+		String tmpFileName = FileServlet.registerFile(content, UUID.randomUUID().toString(), 10, TimeUnit.SECONDS, "");
+		r.setResourcePath(tmpFileName);
+		r.init();
+		return true;
+	}
 
-    public static String composeAdminErrorReply(Exception e) {
-        return createJsonMessageFrame(Type.danger, e.getMessage());
-    }
+	public static String composeAdminErrorReply(Exception e) {
+		return createJsonMessageFrame(Type.danger, e.getMessage());
+	}
 
-    public static String composeAdminSuccessReply(String s) {
-        return createJsonMessageFrame(Type.success, s);
-    }
+	public static String composeAdminSuccessReply(String s) {
+		return createJsonMessageFrame(Type.success, s);
+	}
 
-    private static String createJsonMessageFrame(Type t, String text) {
-        JsonAdminConsoleFrame response = new JsonAdminConsoleFrame();
-        JsonMessage message = new JsonMessage();
-        message.setType(t);
-        message.setText(text);
-        message.setTime(new Date());
-        response.setMessage(message);
-        return encode(response);
-    }
+	private static String createJsonMessageFrame(Type t, String text) {
+		JsonAdminConsoleFrame response = new JsonAdminConsoleFrame();
+		JsonMessage message = new JsonMessage();
+		message.setType(t);
+		message.setText(text);
+		message.setTime(new Date());
+		response.setMessage(message);
+		return encode(response);
+	}
 
-    public static String getPreSelectedApplication(HttpServletRequest r, boolean reset) {
-        String application = (String) r.getSession().getAttribute(ApplicationSelectorServlet.SELECTED_APPLICATION);
-        if (reset) {
-            r.getSession().removeAttribute(ApplicationSelectorServlet.SELECTED_APPLICATION);
-        }
-        return application;
-    }
+	public static String getPreSelectedApplication(HttpServletRequest r, boolean reset) {
+		String application = (String) r.getSession().getAttribute(ApplicationSelectorServlet.SELECTED_APPLICATION);
+		if (reset) {
+			r.getSession().removeAttribute(ApplicationSelectorServlet.SELECTED_APPLICATION);
+		}
+		return application;
+	}
 
+	public static boolean isRecording(HttpServletRequest r) {
+		String recording = (String) r.getAttribute(SessionRecorder.RECORDING_FLAG);
+		return Boolean.parseBoolean(recording);
+	}
 }

@@ -17,4 +17,6 @@ public interface DirectDrawService {
 	boolean isDirty(Image windowDecorationImage);
 
 	VolatileImage createVolatileImage(int width, int height, ImageCapabilities caps, int transparency);
+
+	void resetImage(Image webImage);
 }

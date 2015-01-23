@@ -1,6 +1,8 @@
 package org.webswing.directdraw.model;
 
 import java.awt.Color;
+import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.Point;
 import java.awt.RadialGradientPaint;
 
 import org.webswing.directdraw.DirectDraw;
@@ -9,8 +11,8 @@ import org.webswing.directdraw.proto.Directdraw.RadialGradientProto;
 
 public class RadialGradientConst extends DrawConstant {
 
-	public RadialGradientConst(DirectDraw context,RadialGradientPaint rgp) {
-    	super(context);
+	public RadialGradientConst(DirectDraw context, RadialGradientPaint rgp) {
+		super(context);
 		RadialGradientProto.Builder model = RadialGradientProto.newBuilder();
 		model.setXCenter((int) rgp.getCenterPoint().getX());
 		model.setYCenter((int) rgp.getCenterPoint().getY());
@@ -32,4 +34,20 @@ public class RadialGradientConst extends DrawConstant {
 		return "radialGrad";
 	}
 
+	public RadialGradientPaint getRadialGradientPaint() {
+		RadialGradientProto gp = (RadialGradientProto) message;
+		Point center = new Point(gp.getXCenter(), gp.getYCenter());
+		float radius = gp.getRadius();
+		Point focus = new Point(gp.getXFocus(), gp.getYFocus());
+		Color[] colors = gp.getColorsCount() > 0 ? new Color[gp.getColorsCount()] : null;
+		for (int i = 0; i < gp.getColorsCount(); i++) {
+			colors[i] = ColorConst.getColor(gp.getColors(i));
+		}
+		float[] fractions = gp.getFractionsCount() > 0 ? new float[gp.getFractionsCount()] : null;
+		for (int i = 0; i < gp.getFractionsCount(); i++) {
+			fractions[i] = gp.getFractions(i);
+		}
+		CycleMethod cycleMethod = CycleMethod.valueOf(gp.getRepeat().name());
+		return new RadialGradientPaint(center, radius, focus, fractions, colors, cycleMethod);
+	}
 }

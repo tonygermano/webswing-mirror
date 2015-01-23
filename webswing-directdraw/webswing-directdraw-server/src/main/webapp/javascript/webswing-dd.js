@@ -17,8 +17,8 @@ function WebswingDirectDraw(c) {
 	var StyleProto = proto.build("org.webswing.directdraw.proto.FontProto.StyleProto");
 	var CompositeTypeProto = proto.build("org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto");
 	var MAX_GRADIENT_CYCLE_REPEAT_COUNT = 20;
-	var constantPoolCache = {};
-	var imagePoolCache = {};
+	var constantPoolCache = c.constantPoolCache || {};
+	var imagePoolCache = c.imagePoolCache || {};
 
 	function draw64(data, targetCanvas) {
 		var image = WebImageProto.decode64(data);
@@ -30,7 +30,18 @@ function WebswingDirectDraw(c) {
 	}
 
 	function drawBin(data, targetCanvas) {
+		var offset = data.offset;
 		var image = WebImageProto.decode(data);
+		data.offset = offset;
+		return drawChunks(image, targetCanvas).then(function(result) {
+			return drawWebImage(image, result);
+		}, function(error) {
+			throw error;
+		});
+	}
+
+	function drawProto(data, targetCanvas) {
+		var image = data;
 		return drawChunks(image, targetCanvas).then(function(result) {
 			return drawWebImage(image, result);
 		}, function(error) {
@@ -110,9 +121,11 @@ function WebswingDirectDraw(c) {
 				imagesToPrepare.push(constant.image);
 			}
 		});
-		if (image.image != null) {
-			imagePoolCache[image.image.hash] = image.image;
-			imagesToPrepare.push(image.image);
+		if (image.images != null) {
+			image.images.forEach(function(imgConst) {
+				imagePoolCache[imgConst.id] = imgConst;
+				imagesToPrepare.push(imgConst.image);
+			});
 		}
 	}
 
@@ -218,7 +231,7 @@ function WebswingDirectDraw(c) {
 	function iprtDraw(ctx, args) {
 		ctx.save();
 		if (path(ctx, args[1])) {
-			ctx.clip();
+			ctx.clip(fillRule(args[1]));
 		}
 		path(ctx, args[0], true);
 		ctx.stroke();
@@ -228,20 +241,18 @@ function WebswingDirectDraw(c) {
 	function iprtFill(ctx, args) {
 		ctx.save();
 		if (path(ctx, args[1])) {
-			ctx.clip();
+			ctx.clip(fillRule(args[1]));
 		}
 		path(ctx, args[0]);
-		ctx.fill();
+		ctx.fill(fillRule(args[0]));
 		ctx.restore();
 	}
 
 	function iprtDrawImage(ctx, args) {
-		var clip = null, image = null, offsetX = 0, offsetY = 0, p = null;
+		var clip = null, image = null, p = null;
 		if (args[1] != null) {
 			p = args[1].points.points;
-			offsetX = imagePoolCache[p[0]].offsetX;
-			offsetY = imagePoolCache[p[0]].offsetY;
-			image = imagePoolCache[p[0]].data;
+			image = imagePoolCache[p[0]].image.data;
 		}
 		if (args[0] != null) {
 			clip = args[0];
@@ -250,9 +261,9 @@ function WebswingDirectDraw(c) {
 		ctx.save();
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		if (path(ctx, clip)) {
-			ctx.clip();
+			ctx.clip(fillRule(clip));
 		}
-		ctx.translate(offsetX - p[1], offsetY - p[2]);
+		ctx.translate(p[1], p[2]);
 		ctx.drawImage(image, 0, 0, image.width, image.height);
 		ctx.restore();
 	}
@@ -272,7 +283,7 @@ function WebswingDirectDraw(c) {
 		return drawBin(imagedata).then(function(imageCanvas) {
 			ctx.save();
 			if (path(ctx, clip)) {
-				ctx.clip();
+				ctx.clip(fillRule(clip));
 			}
 			if (transform != null) {
 				iprtTransform(ctx, [ transform ]);
@@ -290,7 +301,7 @@ function WebswingDirectDraw(c) {
 		clip = args[3];
 		ctx.save();
 		if (path(ctx, clip)) {
-			ctx.clip();
+			ctx.clip(fillRule(clip));
 		}
 		iprtTransform(ctx, [ transform ]);
 		var style = '';
@@ -320,7 +331,7 @@ function WebswingDirectDraw(c) {
 		ctx.save();
 
 		if (path(ctx, clip)) {
-			ctx.clip();
+			ctx.clip(fillRule(clip));
 		}
 		ctx.beginPath();
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -751,7 +762,7 @@ function WebswingDirectDraw(c) {
 
 	function parseColor(rgba) {
 		var mask = 0x000000FF;
-		return 'rgba(' + ((rgba >>> 24) & mask) + ',' + ((rgba >>> 16) & mask) + ',' + ((rgba) >>> 8 & mask) + ',' + (rgba & mask) + ')';
+		return 'rgba(' + ((rgba >>> 24) & mask) + ',' + ((rgba >>> 16) & mask) + ',' + ((rgba) >>> 8 & mask) + ',' + ((rgba & mask) / 255) + ')';
 	}
 
 	function prepareImages(imageConstants) {
@@ -784,6 +795,13 @@ function WebswingDirectDraw(c) {
 		});
 	}
 
+	function fillRule(constant) {
+		if (constant.path != null) {
+			return constant.path.windingOdd ? 'evenodd' : 'nonzero';
+		}
+		return 'nonzero';
+	}
+
 	function resolveArgs(args, cache) {
 		var result = [];
 		for ( var i = 0; i < args.length; i++) {
@@ -813,6 +831,15 @@ function WebswingDirectDraw(c) {
 		},
 		drawBin : function(data, targetCanvas) {
 			return drawBin(data, targetCanvas);
+		},
+		drawProto : function(data, targetCanvas) {
+			return drawProto(data, targetCanvas);
+		},
+		getConstantPoolCache : function() {
+			return constantPoolCache;
+		},
+		getImagePoolCache : function() {
+			return imagePoolCache;
 		}
 	};
 };

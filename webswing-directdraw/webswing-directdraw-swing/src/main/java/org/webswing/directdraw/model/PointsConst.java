@@ -5,8 +5,8 @@ import org.webswing.directdraw.proto.Directdraw.PointsProto;
 
 public class PointsConst extends DrawConstant {
 
-	public PointsConst(DirectDraw context,int... points) {
-    	super(context);
+	public PointsConst(DirectDraw context, int... points) {
+		super(context);
 		PointsProto.Builder model = PointsProto.newBuilder();
 		if (points != null) {
 			for (int i = 0; i < points.length; i++) {
@@ -21,4 +21,7 @@ public class PointsConst extends DrawConstant {
 		return "points";
 	}
 
+	public java.lang.Integer[] getIntArray() {
+		return ((PointsProto) message).getPointsList().toArray(new java.lang.Integer[((PointsProto) message).getPointsCount()]);
+	}
 }

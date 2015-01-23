@@ -41,14 +41,11 @@ public class DirectDrawServicesAdapter {
 		ImageConsumerAdapter ic = new ImageConsumerAdapter() {
 			@Override
 			public void setPixels(int x, int y, int w, int h, ColorModel model, int[] pixels, int off, int scansize) {
-				hash=hash * 31 + (Arrays.hashCode(pixels));
+				hash = hash * 31 + (Arrays.hashCode(pixels));
 			}
 		};
 		subImage.getSource().startProduction(ic);
 		return ic.getHash();
 	}
-	
-	public void saveFrame(String imageId, WebImageProto frame){
-		
-	}
+
 }

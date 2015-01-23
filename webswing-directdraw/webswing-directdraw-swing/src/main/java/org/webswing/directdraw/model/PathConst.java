@@ -2,8 +2,11 @@ package org.webswing.directdraw.model;
 
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
+import java.awt.geom.Path2D.Float;
 import java.awt.geom.PathIterator;
 import java.util.Arrays;
+import java.util.List;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.proto.Directdraw.PathProto;
@@ -42,13 +45,37 @@ public class PathConst extends DrawConstant {
 	}
 
 	@Override
-	public Object extractMessage(DirectDraw dd) {
-		return super.extractMessage(dd);
-	}
-
-	@Override
 	public String getFieldName() {
 		return "path";
 	}
 
+	public Path2D.Float getPath(boolean biased) {
+		PathProto p = (PathProto) message;
+		float bias = biased ? 0.5f : 0;
+		Float path = new Path2D.Float(p.getWindingOdd() ? PathIterator.WIND_EVEN_ODD : PathIterator.WIND_NON_ZERO);
+		List<java.lang.Integer> pts = p.getPointsList();
+		int offset = 0;
+		for (SegmentTypeProto type : p.getTypeList()) {
+			int pointCount = type == SegmentTypeProto.CLOSE ? 0 : type == SegmentTypeProto.MOVE || type == SegmentTypeProto.LINE ? 2 : type == SegmentTypeProto.QUAD ? 4 : type == SegmentTypeProto.CUBIC ? 6 : 0;
+			switch (type) {
+			case MOVE:
+				path.moveTo(pts.get(offset) + bias, pts.get(offset + 1) + bias);
+				break;
+			case LINE:
+				path.lineTo(pts.get(offset) + bias, pts.get(offset + 1) + bias);
+				break;
+			case QUAD:
+				path.quadTo(pts.get(offset) + bias, pts.get(offset + 1) + bias, pts.get(offset + 2), pts.get(offset + 3));
+				break;
+			case CUBIC:
+				path.curveTo(pts.get(offset) + bias, pts.get(offset + 1) + bias, pts.get(offset + 2), pts.get(offset + 3), pts.get(offset + 4), pts.get(offset + 5));
+				break;
+			case CLOSE:
+				path.closePath();
+				break;
+			}
+			offset += pointCount;
+		}
+		return path;
+	}
 }

@@ -7,19 +7,74 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.VolatileImage;
 
+import sun.awt.image.SurfaceManager;
+import sun.java2d.SurfaceData;
+
 public class VolatileWebImageWrapper extends VolatileImage {
 
 	private WebImage webImage;
 	private ImageCapabilities caps;
 
+	@SuppressWarnings("restriction")
 	public VolatileWebImageWrapper(ImageCapabilities caps, WebImage webImage) {
 		this.webImage = webImage;
 		this.caps = caps;
+		SurfaceManager.setManager(this, new SurfaceManager() {
+
+			@SuppressWarnings("unused")
+			// java 1.6
+			public SurfaceData getSourceSurfaceData(sun.java2d.SurfaceData s, sun.java2d.loops.CompositeType c, java.awt.Color color, boolean b) {
+				BufferedImage snapshot = VolatileWebImageWrapper.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("getSourceSurfaceData", sun.java2d.SurfaceData.class, sun.java2d.loops.CompositeType.class, java.awt.Color.class, Boolean.TYPE).invoke(m, s, c, color, b);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			@SuppressWarnings("unused")
+			// java 1.6
+			public SurfaceData getDestSurfaceData() {
+				BufferedImage snapshot = VolatileWebImageWrapper.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("getDestSurfaceData").invoke(m);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			public SurfaceData getPrimarySurfaceData() {// java 1.7
+				BufferedImage snapshot = VolatileWebImageWrapper.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("getPrimarySurfaceData").invoke(m);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			public SurfaceData restoreContents() {// java 1.7
+				BufferedImage snapshot = VolatileWebImageWrapper.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("restoreContents").invoke(m);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+		});
 	}
 
 	@Override
 	public BufferedImage getSnapshot() {
-		return null;
+		return this.webImage.getSnapshot();
 	}
 
 	@Override

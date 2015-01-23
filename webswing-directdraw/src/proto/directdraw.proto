@@ -6,7 +6,7 @@ message WebImageProto {
 	required uint32 height = 3;
 	repeated DrawInstructionProto instructions = 4;
 	repeated DrawConstantProto constants = 5;
-	optional ImageProto image = 6;
+	repeated DrawConstantProto images = 6;
 }
 
 message DrawInstructionProto {
@@ -56,10 +56,7 @@ message ColorProto {
 }
 
 message ImageProto {
-	required sint32 hash = 1;
-	required bytes data = 2;
-	optional uint32 offsetX = 3;
-	optional uint32 offsetY = 4;
+	required bytes data = 1;
 }
 
 message TransformProto {

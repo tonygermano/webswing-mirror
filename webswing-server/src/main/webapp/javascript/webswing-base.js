@@ -36,8 +36,8 @@ function WebswingBase(c) {
 	var canPaint = false;
 	var mirrorMode = config.mirrorMode;
 
-	var windowImageHolders = {};
-	var directDraw = new WebswingDirectDraw();
+	var windowImageHolders = c.windowImageHolders || {};
+	var directDraw = new WebswingDirectDraw(c.directDrawConfig || {});
 
 	var timer1 = setInterval(mouseMoveEventFilter, 100);
 	var timer2 = setInterval(heartbeat, 10000);
@@ -111,7 +111,9 @@ function WebswingBase(c) {
 	function dispose() {
 		clearInterval(timer1);
 		clearInterval(timer2);
-		canvas.parentNode.replaceChild(canvas.cloneNode(true), canvas);
+		if(canvas.parentNode!=null){
+			canvas.parentNode.replaceChild(canvas.cloneNode(true), canvas);
+		}
 		unload();
 		c = {};
 	}
@@ -469,6 +471,12 @@ function WebswingBase(c) {
 		},
 		dispose : function() {
 			dispose();
+		},
+		getWindowImageHolders : function(){
+			return windowImageHolders;
+		},
+		getDirectDraw :function(){
+			return directDraw;
 		}
 	};
 }

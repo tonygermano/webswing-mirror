@@ -116,6 +116,11 @@ public abstract class DrawConstant {
 			this.parent = dc;
 		}
 
+		public HashConst(long hash) {
+			super(null);
+			this.hash = hash;
+		}
+
 		@Override
 		protected long getHash() {
 			return hash;
@@ -135,7 +140,4 @@ public abstract class DrawConstant {
 
 	}
 
-	public static void main(String[] args) {
-		System.out.println(new HashConst(DrawConstant.nullConst).equals(DrawConstant.nullConst));
-	}
 }

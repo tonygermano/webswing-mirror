@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -13,7 +12,6 @@ import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.RenderedImage;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,17 +19,20 @@ import java.util.UUID;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.DrawConstant;
+import org.webswing.directdraw.model.DrawConstant.HashConst;
 import org.webswing.directdraw.model.DrawInstruction;
 import org.webswing.directdraw.model.ImageConst;
 import org.webswing.directdraw.model.PathConst;
 import org.webswing.directdraw.model.PointsConst;
 import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
-import org.webswing.directdraw.proto.Directdraw.ImageProto;
 import org.webswing.directdraw.proto.Directdraw.WebImageProto;
 import org.webswing.directdraw.util.DirectDrawUtils;
 import org.webswing.directdraw.util.DrawConstantPool;
-import org.webswing.directdraw.util.ImageConstantPool;
+import org.webswing.directdraw.util.RenderUtil;
+
+import sun.awt.image.SurfaceManager;
+import sun.java2d.SurfaceData;
 
 public class WebImage extends Image {
 
@@ -46,9 +47,61 @@ public class WebImage extends Image {
 	private List<DrawInstruction> instructions = new ArrayList<DrawInstruction>();
 	private List<DrawInstruction> newInstructions = new ArrayList<DrawInstruction>();
 
+	@SuppressWarnings("restriction")
 	public WebImage(DirectDraw dd, int w, int h) {
 		this.context = dd;
 		this.size = new Dimension(w, h);
+		SurfaceManager.setManager(this, new SurfaceManager() {
+
+			@SuppressWarnings("unused")
+			// java 1.6
+			public SurfaceData getSourceSurfaceData(sun.java2d.SurfaceData s, sun.java2d.loops.CompositeType c, java.awt.Color color, boolean b) {
+				BufferedImage snapshot = WebImage.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("getSourceSurfaceData", sun.java2d.SurfaceData.class, sun.java2d.loops.CompositeType.class, java.awt.Color.class, Boolean.TYPE).invoke(m, s, c, color, b);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			@SuppressWarnings("unused")
+			// java 1.6
+			public SurfaceData getDestSurfaceData() {
+				BufferedImage snapshot = WebImage.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("getDestSurfaceData").invoke(m);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			public SurfaceData getPrimarySurfaceData() {// java 1.7
+				BufferedImage snapshot = WebImage.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("getPrimarySurfaceData").invoke(m);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			public SurfaceData restoreContents() {// java 1.7
+				BufferedImage snapshot = WebImage.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("restoreContents").invoke(m);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+		});
 	}
 
 	@Override
@@ -63,7 +116,7 @@ public class WebImage extends Image {
 
 	@Override
 	public ImageProducer getSource() {
-		return null;
+		return getSnapshot().getSource();
 	}
 
 	@Override
@@ -197,10 +250,7 @@ public class WebImage extends Image {
 
 	public WebImageProto toMessage(DirectDraw dd) {
 		DrawConstantPool constantPool = dd.getConstantPool();
-		ImageConstantPool imagePool = dd.getImagePool();
-		HashMap<Long, Point> currentFrameImageHashes = new HashMap<Long, Point>();
-		List<DrawInstruction> instructionsToUpdate = new ArrayList<DrawInstruction>();
-		Rectangle2D imageCrop = null;
+		DrawConstantPool imagePool = dd.getImagePool();
 
 		WebImageProto.Builder webImageBuilder = WebImageProto.newBuilder();
 		synchronized (this) {
@@ -209,7 +259,7 @@ public class WebImage extends Image {
 		}
 
 		DirectDrawUtils.optimizeInstructions(dd, instructions);
-		System.out.println(instructions + (imageHolder == null ? "" : "*"));
+		// System.out.println(instructions + (imageHolder == null ? "" : "*"));
 		// first process chunks
 		if (chunks != null && chunks.size() > 0) {
 			for (WebImage chunk : chunks) {
@@ -224,26 +274,23 @@ public class WebImage extends Image {
 			if (ins.getInstruction() == InstructionProto.DRAW_IMAGE) {
 				Rectangle2D bounds = ((PathConst) constants[0]).getShape().getBounds().createIntersection(new Rectangle(imageHolder.getWidth(), imageHolder.getHeight()));
 				BufferedImage subImage = imageHolder.getSubimage((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight());
-				long imageHash = context.getServices().computeHash(subImage);
-				if (imagePool.isInCache(imageHash)) {
-					ImageConst imageRef = imagePool.getImageConst(imageHash);
-					Point startPoint = imageRef.getSubImageHashMap().get(imageHash);
-					constants[1] = new PointsConst(dd, imageRef.getAddress(), (int) (startPoint.x - bounds.getX()), (int) (startPoint.y - bounds.getY()));
+				long hash = context.getServices().computeHash(subImage);
+				HashConst imageHashConst = new DrawConstant.HashConst(hash);
+				if (!imagePool.isInCache(imageHashConst)) {
+					ImageConst imageConst = new ImageConst(context, subImage, hash);
+					imagePool.getCachedConstant(new DrawConstant.HashConst(imageConst));
+					DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
+					builder.setId(imageConst.getAddress());
+					if (imageConst.getFieldName() != null) {
+						builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(imageConst.getFieldName()), imageConst.extractMessage(dd));
+					}
+					webImageBuilder.addImages(builder.build());
+					constants[1] = new PointsConst(context, imageConst.getAddress(), (int) bounds.getX(), (int) bounds.getY());
 				} else {
-					imageCrop = imageCrop == null ? bounds : bounds.createUnion(imageCrop);
-					currentFrameImageHashes.put(imageHash, new Point((int) bounds.getX(), (int) bounds.getY()));
-					instructionsToUpdate.add(ins);
+					DrawConstant imageRef = imagePool.getCachedConstant(imageHashConst);
+					constants[1] = new PointsConst(context, imageRef.getAddress(), (int) bounds.getX(), (int) bounds.getY());
 				}
 			}
-		}
-		// include current imageHolder to message if necessary
-		if (currentFrameImageHashes.size() > 0) {
-			ImageConst imageConst = new ImageConst(context, imageHolder, imageCrop, currentFrameImageHashes);
-			imageConst = imagePool.putImage(imageConst);
-			for (DrawInstruction ins : instructionsToUpdate) {
-				ins.getArgs()[1] = new PointsConst(dd, imageConst.getAddress(), 0, 0);
-			}
-			webImageBuilder.setImage((ImageProto) imageConst.extractMessage(dd));
 		}
 		// build proto message
 		for (DrawInstruction ins : instructions) {
@@ -251,9 +298,7 @@ public class WebImage extends Image {
 			for (DrawConstant cons : constants) {
 				if (!(cons instanceof DrawConstant.Integer)) {
 					// update cache
-					boolean isInCache = constantPool.isInCache(cons);
-					if (!isInCache) {// this constant was recently inserted to
-										// cache
+					if (!constantPool.isInCache(cons)) {
 						constantPool.getCachedConstant(new DrawConstant.HashConst(cons));
 						DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
 						builder.setId(cons.getAddress());
@@ -272,7 +317,14 @@ public class WebImage extends Image {
 		webImageBuilder.setWidth(size.width);
 		webImageBuilder.setHeight(size.height);
 		WebImageProto result = webImageBuilder.build();
-		dd.getServices().saveFrame(this.id, result);
 		return result;
+	}
+
+	public BufferedImage getSnapshot() {
+		return RenderUtil.render(this, imageHolder, chunks, newInstructions, size);
+	}
+
+	public BufferedImage getSnapshot(BufferedImage result) {
+		return RenderUtil.render(result, this, imageHolder, chunks, newInstructions, size);
 	}
 }

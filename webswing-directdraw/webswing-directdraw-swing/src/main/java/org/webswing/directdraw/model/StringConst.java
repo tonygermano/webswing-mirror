@@ -14,4 +14,7 @@ public class StringConst extends DrawConstant {
 		return "string";
 	}
 
+	public String getString() {
+		return (String) message;
+	}
 }

@@ -65,6 +65,7 @@ public class DrawServlet extends HttpServlet {
 
 		String encoded = encode(json);
 		response.getWriter().print(encoded);
+		System.out.println(testmethod);
 	}
 
 	private void draw(String testmethod, JsonMsg json) {

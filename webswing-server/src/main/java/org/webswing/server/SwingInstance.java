@@ -9,6 +9,7 @@ import org.webswing.model.admin.s2c.JsonSwingJvmStats;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.SwingJvmConnection.WebSessionListener;
+import org.webswing.server.stats.SessionRecorder;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.server.util.StatUtils;
 
@@ -21,11 +22,13 @@ public class SwingInstance implements WebSessionListener {
 	private SwingJvmConnection connection;
 	private JsonSwingJvmStats latest = new JsonSwingJvmStats();
 	private Date disconnectedSince;
+	private SessionRecorder sessionRecorder;
 	private final Date startedAt = new Date();
 	private Date endedAt = new Date();
 
 	public SwingInstance(JsonConnectionHandshake h, SwingApplicationDescriptor app, AtmosphereResource resource) {
 		this.application = app;
+		this.sessionRecorder = ServerUtil.isRecording(resource.getRequest()) ? new SessionRecorder(this) : null;
 		this.user = ServerUtil.getUserName(resource);
 		registerPrimaryWebSession(resource);
 		this.connection = new SwingJvmConnection(h, app, this);
@@ -60,6 +63,9 @@ public class SwingInstance implements WebSessionListener {
 
 	public void sendToWeb(Serializable o) {
 		String serialized = ServerUtil.encode(o);
+		if (sessionRecorder != null) {
+			sessionRecorder.saveFrame(serialized);
+		}
 		if (resource != null) {
 			StatUtils.logOutboundData(this, serialized);
 			resource.getBroadcaster().broadcast(serialized, resource);
@@ -91,6 +97,9 @@ public class SwingInstance implements WebSessionListener {
 	public void notifyClose() {
 		endedAt = new Date();
 		SwingInstanceManager.getInstance().notifySwingClose(this);
+		if (sessionRecorder != null) {
+			sessionRecorder.close();
+		}
 	}
 
 	public String getClientId() {

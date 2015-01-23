@@ -74,6 +74,9 @@ public class WebPaintDispatcher {
 						if ((areasToUpdate.size() == 0 && moveAction == null) || !clientReadyToReceive) {
 							if (!clientReadyToReceive && (System.currentTimeMillis() - lastReadyStateTime) > 2000) {
 								Logger.info("contentSender.readyToReceive re-enabled after timeout");
+								if (Util.isDD()) {
+									Services.getDirectDrawService().resetCache();
+								}
 								clientReadyToReceive = true;
 							}
 							return;

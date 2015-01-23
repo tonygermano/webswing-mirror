@@ -2,20 +2,14 @@ package org.webswing.services.impl.ddutil;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import net.jpountz.xxhash.StreamingXXHash64;
 import net.jpountz.xxhash.XXHashFactory;
 
-import org.webswing.Constants;
 import org.webswing.directdraw.DirectDrawServicesAdapter;
-import org.webswing.directdraw.proto.Directdraw.WebImageProto;
 import org.webswing.directdraw.util.ImageConsumerAdapter;
 import org.webswing.services.impl.ImageServiceImpl;
 
@@ -51,27 +45,4 @@ public class FastDirectDrawServicesAdapter extends DirectDrawServicesAdapter {
 		return shash.getValue();
 	}
 
-	@Override
-	public void saveFrame(String imageId, WebImageProto frame) {
-		if (out == null) {
-			URI file = URI.create(System.getProperty(Constants.TEMP_DIR_PATH) + "/" + System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-			try {
-				out = new FileOutputStream(new File(file));
-				System.out.println("Recording to " + file.toString());
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-		if (out != null) {
-			byte[] bytes = frame.toByteArray();
-			byte[] length = ByteBuffer.allocate(4).putInt(bytes.length).array();
-			try {
-				out.write(length);
-				out.write(bytes);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
 }

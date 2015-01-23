@@ -80,6 +80,7 @@ public class WebComponentPeer implements ComponentPeer {
 			Graphics g = webImage.getGraphics();
 			g.drawImage(windowDecorationImage, 0, 0, null);
 			g.dispose();
+			Services.getDirectDrawService().resetImage(windowDecorationImage);
 		}
 		return Services.getDirectDrawService().extractWebImage(webImage);
 	}

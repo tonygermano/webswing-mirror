@@ -72,4 +72,12 @@ public class DirectDrawServiceImpl implements DirectDrawService {
 		return dd.createVolatileImage(width, height, caps);
 	}
 
+	@Override
+	public void resetImage(Image webImage) {
+		if (webImage instanceof WebImage) {
+			((WebImage) webImage).reset();
+		} else if (webImage instanceof VolatileWebImageWrapper) {
+			((VolatileWebImageWrapper) webImage).getWebImage().reset();
+		}
+	}
 }

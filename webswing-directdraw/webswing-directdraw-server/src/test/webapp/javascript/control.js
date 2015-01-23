@@ -11,36 +11,51 @@ $.ajax({
 		}
 	});
 	var dd = new WebswingDirectDraw();
-	data.forEach(function(method, index, array) {
-		if (selected == null || (selected != null && index == selected)) {
-			$.ajax({
-				url : "/draw?reset&test=" + method,
-			}).done(function(d) {
-				var canvas = document.getElementById(method);
-				var ctx= canvas.getContext("2d");
-				var json = $.parseJSON(d);
-				addInfo(json, index, document.getElementById(method + "label"));
-				var sequence = Promise.resolve();
-				json.protoImg.forEach(function(img, index) {
-					sequence = sequence.then(function(resolved) {
-						return dd.draw64(img);
-					}).then(function(resultCanvas){
-						ctx.drawImage(resultCanvas,0,0);
-					},function(error){
-						console.log(error);
+	var sequence = Promise.resolve();
+	data.forEach(function(method, index) {
+		sequence = sequence.then(function(resolved) {
+			return executeMethod(method,index);
+		});
+	});
+
+	function executeMethod(method, index) {
+		return new Promise(function(resolve, reject) {
+			if (selected == null || (selected != null && index == selected)) {
+				$.ajax({
+					url : "/draw?reset&test=" + method,
+				}).done(function(d) {
+					var canvas = document.getElementById(method);
+					var ctx = canvas.getContext("2d");
+					var json = $.parseJSON(d);
+					addInfo(json, index, document.getElementById(method + "label"));
+					var sequence = Promise.resolve();
+					json.protoImg.forEach(function(img, index) {
+						sequence = sequence.then(function(resolved) {
+							console.log('started ' + method);
+							return dd.draw64(img);
+						}).then(function(resultCanvas) {
+							console.log('finished ' + method);
+							ctx.drawImage(resultCanvas, 0, 0);
+						}, function(error) {
+							console.log(error);
+						});
+					});
+					sequence.then(function() {
+						resolve();
+					});
+					json.originalImg.forEach(function(img) {
+						drawImage(canvas, img);
 					});
 				});
-				json.originalImg.forEach(function(img) {
-					drawImage(canvas, img)
-				});
-			});
-		}
-	});
+			}
+		});
+	}
 
 });
 
 function addInfo(json, index, element) {
-	element.innerHTML = index + ". " + ((json.protoRenderSize / json.originalRenderSize) * 100).toPrecision(4) + "% in size, " + ((json.protoRenderTime / json.originalRenderTime) * 100).toPrecision(4) + "% in time";
+	element.innerHTML = index + ". " + ((json.protoRenderSize / json.originalRenderSize) * 100).toPrecision(4) + "% in size, "
+			+ ((json.protoRenderTime / json.originalRenderTime) * 100).toPrecision(4) + "% in time";
 }
 
 function drawImage(canvas, b64image) {

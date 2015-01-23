@@ -9,8 +9,8 @@ import org.webswing.directdraw.util.DirectDrawUtils;
 
 public class FontConst extends DrawConstant {
 
-	public FontConst(DirectDraw context,Font f) {
-    	super(context);
+	public FontConst(DirectDraw context, Font f) {
+		super(context);
 		FontProto.Builder model = FontProto.newBuilder();
 		model.setFamily(DirectDrawUtils.windowsFonts.getProperty(f.getFamily(), f.getFamily()));
 		model.setSize(f.getSize());
@@ -21,5 +21,13 @@ public class FontConst extends DrawConstant {
 	@Override
 	public String getFieldName() {
 		return "font";
+	}
+
+	public Font getFont() {
+		FontProto f = (FontProto) message;
+		String name = DirectDrawUtils.webFonts.getProperty(f.getFamily(), f.getFamily());
+		int style = f.getStyle().getNumber();
+		int size = f.getSize();
+		return new Font(name, style, size);
 	}
 }

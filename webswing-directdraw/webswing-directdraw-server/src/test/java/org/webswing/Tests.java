@@ -4,7 +4,6 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Composite;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -30,25 +29,20 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.JButton;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.RepaintManager;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.JSlider;
+import javax.swing.JToolTip;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.ChangeListener;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.metal.MetalToolTipUI;
 
-import org.webswing.directdraw.toolkit.VolatileWebImageWrapper;
 import org.webswing.directdraw.toolkit.WebGraphics;
-import org.webswing.directdraw.toolkit.WebImage;
-
-import com.sun.swingset3.demos.slider.SliderDemo;
 
 public class Tests {
 
@@ -303,26 +297,13 @@ public class Tests {
 		if (repeat != 0) {
 			return false;
 		}
-		try {
-			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		JFrame jf = new JFrame("");
-		jf.setSize(500, 100);
-		JPanel sd = new JPanel();
-		sd.setPreferredSize(new Dimension(500, 100));
 		JPanel scrP = new JPanel();
 		scrP.add(new JLabel("test"));
 		JScrollPane scroll = new JScrollPane(scrP);
 		scroll.setPreferredSize(new Dimension(400, 80));
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		sd.add(scroll);
-		jf.add(sd);
-		jf.pack();
-		sd.print(g);
-
+		printJComponentHelper("javax.swing.plaf.nimbus.NimbusLookAndFeel", g, scroll);
 		return true;
 	}
 
@@ -418,6 +399,8 @@ public class Tests {
 		g.drawImage(i, 200, 0, 300, 100, 200, 0, 300, 100, null);
 		g.drawImage(i, 300, 0, 400, 100, 100, 0, 200, 100, null);
 		g.drawImage(i, 400, 0, 500, 100, 0, 0, 100, 100, null);
+		g.setColor(new Color(100, 100, 100, 100));
+		g.fillRect(0, 0, 500, 100);
 		return true;
 	}
 
@@ -512,6 +495,15 @@ public class Tests {
 		return true;
 	}
 
+	public static boolean t17MetalTooltipTest(Graphics2D g, Integer repeat) throws IOException {
+		if (repeat > 0) {
+			return false;
+		}
+		SliderDemo sd = new SliderDemo();
+		printJComponentHelper(null, g, sd);
+		return true;
+	}
+
 	private static void compositetestopp(Graphics2D g, Image i2, int x, int y, AlphaComposite c) {
 		Image i;
 		Graphics2D dest;
@@ -532,6 +524,22 @@ public class Tests {
 		g.drawImage(i, x, y, null);
 	}
 
+	private static void printJComponentHelper(String laf, Graphics2D g, JComponent c) {
+		try {
+			UIManager.setLookAndFeel(laf == null ? "javax.swing.plaf.metal.MetalLookAndFeel" : laf);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		JFrame jf = new JFrame("");
+		jf.setSize(500, 100);
+		JPanel sd = new JPanel();
+		sd.setPreferredSize(new Dimension(500, 100));
+		sd.add(c);
+		jf.add(sd);
+		jf.pack();
+		sd.print(g);
+	}
+
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("tests");
 
@@ -539,9 +547,10 @@ public class Tests {
 		JPanel content = new JPanel();
 		content.setLayout(new FlowLayout(FlowLayout.LEFT));
 		for (String m : DrawServlet.getTestMethods()) {
-			JPanel panel = getPanel(m);
-			panel.setPreferredSize(new Dimension(500, 100));
-			content.add(panel);
+			Image image = getImage(m, true);
+			content.add(new JLabel(new ImageIcon(image)));
+			image = getImage(m, false);
+			content.add(new JLabel(new ImageIcon(image)));
 		}
 		content.setPreferredSize(new Dimension(1000, 2000));
 		frame.getContentPane().add(new JScrollPane(content));
@@ -550,17 +559,15 @@ public class Tests {
 		frame.setVisible(true);
 	}
 
-	public static JPanel getPanel(final String name) {
-		JPanel panel = new JPanel() {
-
-			public void paint(java.awt.Graphics g) {
-				try {
-					Tests.class.getDeclaredMethod(name, Graphics2D.class, Integer.class).invoke(null, g, 0);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			};
-		};
-		return panel;
+	public static Image getImage(String name, boolean webimage) {
+		Image i = DrawServlet.getImage(webimage);
+		Graphics2D g = (Graphics2D) i.getGraphics();
+		try {
+			Tests.class.getDeclaredMethod(name, Graphics2D.class, Integer.class).invoke(null, g, 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		g.dispose();
+		return i;
 	}
 }
