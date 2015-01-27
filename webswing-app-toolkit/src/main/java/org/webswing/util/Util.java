@@ -249,12 +249,14 @@ public class Util {
 				List<Rectangle> toPaint = joinRectangles(getGrid(new ArrayList<Rectangle>(currentAreasToUpdate.get(windowId)), windowNonVisibleAreas.get(windowId)));
 				List<JsonWindowPartialContent> partialContentList = new ArrayList<JsonWindowPartialContent>();
 				for (Rectangle r : toPaint) {
-					JsonWindowPartialContent content = new JsonWindowPartialContent();
-					content.setPositionX(r.x);
-					content.setPositionY(r.y);
-					content.setWidth(r.width);
-					content.setHeight(r.height);
-					partialContentList.add(content);
+					if (r.x < window.getWidth() && r.y < window.getHeight()) {
+						JsonWindowPartialContent content = new JsonWindowPartialContent();
+						content.setPositionX(r.x);
+						content.setPositionY(r.y);
+						content.setWidth(Math.min(r.width, window.getWidth() - r.x));
+						content.setHeight(Math.min(r.height, window.getHeight() - r.y));
+						partialContentList.add(content);
+					}
 				}
 				window.setContent(partialContentList.toArray(new JsonWindowPartialContent[partialContentList.size()]));
 			}

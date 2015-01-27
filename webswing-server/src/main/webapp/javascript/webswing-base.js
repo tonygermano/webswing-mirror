@@ -121,6 +121,7 @@ function WebswingBase(c) {
 	function processTxtMessage(message) {
 		if (message == "shutDownNotification") {
 			config.onErrorMessage('Application stopped...');
+			dispose();
 		} else if (message == "applicationAlreadyRunning") {
 			config.onErrorMessage('Application is already running in other browser window...');
 		} else if (message == "tooManyClientsNotification") {
@@ -207,18 +208,22 @@ function WebswingBase(c) {
 				} else {
 					// imagedraw
 					return sequence.then(function(resolved) {
-						for ( var x in win.content) {
-							var winContent = win.content[x];
-							if (winContent != null) {
-								var imageObj = new Image();
-								imageObj.onload = function() {
-									context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
-									imageObj.onload = null;
-									imageObj.src = '';
-								};
-								imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
-							}
-						}
+						return win.content.reduce(function(internalSeq, winContent) {
+							return internalSeq.then(function(done){
+								return new Promise(function(resolved,rejected){
+									if (winContent != null) {
+										var imageObj = new Image();
+										imageObj.onload = function() {
+											context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
+											imageObj.onload = null;
+											imageObj.src = '';
+											resolved();
+										};
+										imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
+									}
+								});
+							});
+						},Promise.resolve());
 					});
 				}
 			}, Promise.resolve()).then(function() {

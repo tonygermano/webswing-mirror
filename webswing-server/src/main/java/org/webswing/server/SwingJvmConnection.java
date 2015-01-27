@@ -68,6 +68,7 @@ public class SwingJvmConnection implements MessageListener {
 	private JMXConnector jmxConnection;
 
 	private ExecutorService swingAppExecutor = Executors.newSingleThreadExecutor();
+	private boolean jmsOpen = false;
 
 	public SwingJvmConnection(JsonConnectionHandshake handshake, SwingApplicationDescriptor appConfig, WebSessionListener webListener) {
 		this.webListener = webListener;
@@ -89,45 +90,54 @@ public class SwingJvmConnection implements MessageListener {
 	}
 
 	private void initialize() throws JMSException {
-		connection = connectionFactory.createConnection();
-		connection.start();
-		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		Queue producerQueue = session.createQueue(clientId + Constants.SERVER2SWING);
-		Queue consumerQueue = session.createQueue(clientId + Constants.SWING2SERVER);
-		consumer = session.createConsumer(consumerQueue);
-		consumer.setMessageListener(this);
-		producer = session.createProducer(producerQueue);
-		connection.setExceptionListener(new ExceptionListener() {
+		synchronized (this) {
+			connection = connectionFactory.createConnection();
+			connection.start();
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			Queue producerQueue = session.createQueue(clientId + Constants.SERVER2SWING);
+			Queue consumerQueue = session.createQueue(clientId + Constants.SWING2SERVER);
+			consumer = session.createConsumer(consumerQueue);
+			consumer.setMessageListener(this);
+			producer = session.createProducer(producerQueue);
+			jmsOpen = true;
+			connection.setExceptionListener(new ExceptionListener() {
 
-			@Override
-			public void onException(JMSException paramJMSException) {
-				log.warn("JMS encountered an exception: " + paramJMSException.getMessage());
-				try {
-					consumer.close();
-					producer.close();
-					session.close();
-					connection.close();
-				} catch (JMSException e) {
-					log.error("SwingJvmConnection:initialize1", e);
+				@Override
+				public void onException(JMSException paramJMSException) {
+					log.warn("JMS encountered an exception: " + paramJMSException.getMessage());
+					try {
+						synchronized (SwingJvmConnection.this) {
+							consumer.close();
+							producer.close();
+							session.close();
+							connection.close();
+							jmsOpen = false;
+						}
+					} catch (JMSException e) {
+						log.error("SwingJvmConnection:initialize1", e);
+					}
+					try {
+						SwingJvmConnection.this.initialize();
+					} catch (JMSException e) {
+						log.error("SwingJvmConnection:initialize2", e);
+
+					}
 				}
-				try {
-					SwingJvmConnection.this.initialize();
-				} catch (JMSException e) {
-					log.error("SwingJvmConnection:initialize2", e);
-				}
-			}
-		});
+			});
+		}
 	}
 
-	public void send(Serializable o) {
-		try {
-			if (o instanceof String) {
-				producer.send(session.createTextMessage((String) o));
-			} else {
-				producer.send(session.createObjectMessage(o));
+	public synchronized void send(Serializable o) {
+		if (jmsOpen) {
+			try {
+				if (o instanceof String) {
+					producer.send(session.createTextMessage((String) o));
+				} else {
+					producer.send(session.createObjectMessage(o));
+				}
+			} catch (JMSException e) {
+				log.debug("SwingJvmConnection:send", e);
 			}
-		} catch (JMSException e) {
-			log.error("SwingJvmConnection:send", e);
 		}
 	}
 
@@ -154,9 +164,6 @@ public class SwingJvmConnection implements MessageListener {
 				webListener.sendToWeb(((ObjectMessage) m).getObject());
 			} else if (m instanceof TextMessage) {
 				String text = ((TextMessage) m).getText();
-				if (text.equals(Constants.SWING_SHUTDOWN_NOTIFICATION)) {
-					// close(true); - handled by ant thread
-				}
 				if (text.startsWith(Constants.SWING_PID_NOTIFICATION) && this.jmxConnection == null) {
 					this.jmxConnection = getLocalMBeanServerConnectionStatic(text.substring(Constants.SWING_PID_NOTIFICATION.length()));
 				}
@@ -169,11 +176,17 @@ public class SwingJvmConnection implements MessageListener {
 	}
 
 	public void close(boolean withShutdownEvent) {
+		if (withShutdownEvent) {
+			webListener.sendToWeb(Constants.SWING_SHUTDOWN_NOTIFICATION);
+		}
 		try {
-			consumer.close();
-			producer.close();
-			session.close();
-			connection.close();
+			synchronized (this) {
+				consumer.close();
+				producer.close();
+				session.close();
+				connection.close();
+				jmsOpen = false;
+			}
 			if (jmxConnection != null) {
 				JMXConnector thisjmxConnection = jmxConnection;
 				jmxConnection = null;
@@ -181,9 +194,6 @@ public class SwingJvmConnection implements MessageListener {
 			}
 		} catch (Exception e) {
 			log.debug("SwingJvmConnection:close", e);
-		}
-		if (withShutdownEvent) {
-			webListener.sendToWeb(Constants.SWING_SHUTDOWN_NOTIFICATION);
 		}
 		webListener.notifyClose();
 	}
