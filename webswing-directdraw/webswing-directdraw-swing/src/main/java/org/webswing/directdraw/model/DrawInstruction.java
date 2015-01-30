@@ -40,6 +40,10 @@ public class DrawInstruction {
 		return args;
 	}
 
+	public void setArgs(DrawConstant[] args) {
+		this.args = args;
+	}
+
 	public WebImage getImage() {
 		return image;
 	}
@@ -64,6 +68,5 @@ public class DrawInstruction {
 	public String toString() {
 		return instruction.name();
 	}
-
 
 }

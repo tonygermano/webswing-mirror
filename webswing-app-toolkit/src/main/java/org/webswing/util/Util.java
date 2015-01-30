@@ -501,4 +501,17 @@ public class Util {
 		return Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, "false"));
 	}
 
+	public static void repaintAllWindow() {
+		for (Window w : Window.getWindows()) {
+			if (w.isShowing()) {
+				Object peer = WebToolkit.targetToPeer(w);
+				if (peer != null && peer instanceof WebWindowPeer) {
+					((WebWindowPeer) peer).updateWindowDecorationImage();
+					RepaintManager.currentManager(null).addDirtyRegion(w, 0, 0, w.getWidth(), w.getHeight());
+				}
+			}
+		}
+
+	}
+
 }

@@ -747,7 +747,15 @@ function WebswingDirectDraw(c) {
 	}
 
 	function getImageData(image) {
-		return 'data:image/png;base64,' + image.data.toBase64();
+		var binary = '';
+		var bytes = new Uint8Array(image.data.buffer,image.data.offset,image.data.limit-image.data.offset);
+
+		for ( var i = 0, l = bytes.byteLength; i < l; i++) {
+			binary += String.fromCharCode(bytes[i]);
+		}
+
+		return "data:image/png;base64," + window.btoa(binary);
+		// return 'data:image/png;base64,' + image.data.toBase64();
 	}
 
 	function getRRCoords(pts, rr) {

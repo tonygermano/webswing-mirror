@@ -47,6 +47,8 @@ $.ajax({
 						drawImage(canvas, img);
 					});
 				});
+			}else{
+				resolve();
 			}
 		});
 	}
