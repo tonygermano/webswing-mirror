@@ -34,116 +34,118 @@ import org.webswing.server.util.ServerUtil;
 @ManagedService(path = "/async/admin", interceptors = { AtmosphereResourceLifecycleInterceptor.class, ManagedServiceInterceptor.class, TrackMessageSizeInterceptor.class, HeartbeatInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class })
 public class AdminAsyncManagedService implements ConfigurationManager.ConfigurationChangeListener, SwingInstanceManager.SwingInstanceChangeListener {
 
-    private static final Logger log = LoggerFactory.getLogger(AdminAsyncManagedService.class);
+	private static final Logger log = LoggerFactory.getLogger(AdminAsyncManagedService.class);
 
-    private Map<String, AtmosphereResource> resourceMap = new HashMap<String, AtmosphereResource>();
+	public static final Object BROADCAST_LOCK = new Object();
 
-    public AdminAsyncManagedService() {
-        ConfigurationManager.getInstance().registerListener(this);
-        SwingInstanceManager.getInstance().setChangeListener(this);
-    }
+	private Map<String, AtmosphereResource> resourceMap = new HashMap<String, AtmosphereResource>();
 
-    @Ready(value = DELIVER_TO.RESOURCE)
-    public Serializable onReady(final AtmosphereResource r) {
-        Subject sub = SecurityUtils.getSubject();
-        if (sub.hasRole(Constants.ADMIN_ROLE)) {
-            resourceMap.put(r.uuid(), r);
-            String result = createAdminConsoleUpdate(true, true);
-            return result;
-        } else {
-            log.warn("Unauthorized connection atempt from " + sub.getPrincipal());
-            try {
-                r.close();
-            } catch (IOException e) {
-                // do nothing
-            }
-        }
-        return null;
-    }
+	public AdminAsyncManagedService() {
+		ConfigurationManager.getInstance().registerListener(this);
+		SwingInstanceManager.getInstance().setChangeListener(this);
+	}
 
-    @Disconnect
-    public void onDisconnect(AtmosphereResourceEvent event) {
-        if (resourceMap.containsKey(event.getResource().uuid())) {
-            resourceMap.remove(event.getResource().uuid());
-            SwingInstanceManager.getInstance().notifySessionDisconnected(event.getResource().uuid());
-        }
-    }
+	@Ready(value = DELIVER_TO.RESOURCE)
+	public Serializable onReady(final AtmosphereResource r) {
+		Subject sub = SecurityUtils.getSubject();
+		if (sub.hasRole(Constants.ADMIN_ROLE)) {
+			resourceMap.put(r.uuid(), r);
+			String result = createAdminConsoleUpdate(true, true);
+			return result;
+		} else {
+			log.warn("Unauthorized connection atempt from " + sub.getPrincipal());
+			try {
+				r.close();
+			} catch (IOException e) {
+				// do nothing
+			}
+		}
+		return null;
+	}
 
-    @Message
-    public Serializable onMessage(AtmosphereResource r, Object message) {
-        try {
-            Serializable result = SwingAsyncManagedService.processWebswingMessage(r, message, false);
-            if (result != null) {
-                return result;
-            } else if (message instanceof String) {
-                Object jsonMessage = ServerUtil.decode((String) message);
-                if (jsonMessage!=null && jsonMessage instanceof JsonApplyConfiguration) {
-                    JsonApplyConfiguration jac = (JsonApplyConfiguration) jsonMessage;
-                    if (jac.getType().equals(JsonApplyConfiguration.Type.user)) {
-                        ServerUtil.validateUserFile(jac.getConfigContent());
-                        ConfigurationManager.getInstance().applyUserProperties(jac.getConfigContent());
-                        return ServerUtil.composeAdminSuccessReply("User configuration saved successfully.");
-                    } else if (jac.getType().equals(JsonApplyConfiguration.Type.config)) {
-                        ServerUtil.validateConfigFile(jac.getConfigContent());
-                        ConfigurationManager.getInstance().applyApplicationConfiguration(jac.getConfigContent());
-                        return ServerUtil.composeAdminSuccessReply("Server configuration saved successfully.");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.error("Exception while processing websocket message.", e);
-            return ServerUtil.composeAdminErrorReply(e);
-        }
-        return null;
-    }
+	@Disconnect
+	public void onDisconnect(AtmosphereResourceEvent event) {
+		if (resourceMap.containsKey(event.getResource().uuid())) {
+			resourceMap.remove(event.getResource().uuid());
+			SwingInstanceManager.getInstance().notifySessionDisconnected(event.getResource().uuid());
+		}
+	}
 
-    private Broadcaster getBroadcaster() {
-        if (resourceMap.keySet().size() > 0) {
-            return resourceMap.get(resourceMap.keySet().iterator().next()).getBroadcaster();
-        } else {
-            return null;
-        }
-    }
+	@Message
+	public Serializable onMessage(AtmosphereResource r, Object message) {
+		try {
+			Serializable result = SwingAsyncManagedService.processWebswingMessage(r, message, false);
+			if (result != null) {
+				return result;
+			} else if (message instanceof String) {
+				Object jsonMessage = ServerUtil.decode((String) message);
+				if (jsonMessage != null && jsonMessage instanceof JsonApplyConfiguration) {
+					JsonApplyConfiguration jac = (JsonApplyConfiguration) jsonMessage;
+					if (jac.getType().equals(JsonApplyConfiguration.Type.user)) {
+						ServerUtil.validateUserFile(jac.getConfigContent());
+						ConfigurationManager.getInstance().applyUserProperties(jac.getConfigContent());
+						return ServerUtil.composeAdminSuccessReply("User configuration saved successfully.");
+					} else if (jac.getType().equals(JsonApplyConfiguration.Type.config)) {
+						ServerUtil.validateConfigFile(jac.getConfigContent());
+						ConfigurationManager.getInstance().applyApplicationConfiguration(jac.getConfigContent());
+						return ServerUtil.composeAdminSuccessReply("Server configuration saved successfully.");
+					}
+				}
+			}
+		} catch (Exception e) {
+			log.error("Exception while processing websocket message.", e);
+			return ServerUtil.composeAdminErrorReply(e);
+		}
+		return null;
+	}
 
-    @Override
-    public void swingInstancesChanged() {
-        Broadcaster bc = getBroadcaster();
-        if (bc != null) {
-            bc.broadcast(createAdminConsoleUpdate(true, false));
-        }
-    }
+	private Broadcaster getBroadcaster() {
+		if (resourceMap.keySet().size() > 0) {
+			return resourceMap.get(resourceMap.keySet().iterator().next()).getBroadcaster();
+		} else {
+			return null;
+		}
+	}
 
-    @Override
-    public void swingInstancesChangedStats() {
-        Broadcaster bc = getBroadcaster();
-        if (bc != null) {
-            bc.broadcast(createAdminConsoleUpdate(true, false));
-        }
-    }
+	@Override
+	public void swingInstancesChanged() {
+		broadcast(createAdminConsoleUpdate(true, false));
+	}
 
-    @Override
-    public void notifyChange() {
-        Broadcaster bc = getBroadcaster();
-        if (bc != null) {
-            bc.broadcast(createAdminConsoleUpdate(false, true));
-        }
-    }
+	@Override
+	public void swingInstancesChangedStats() {
+		broadcast(createAdminConsoleUpdate(true, false));
+	}
 
-    private String createAdminConsoleUpdate(boolean swingInstances, boolean configuration) {
-        JsonAdminConsoleFrame message;
-        if (swingInstances) {
-            message = SwingInstanceManager.getInstance().extractStatus();
-        } else {
-            message = new JsonAdminConsoleFrame();
-        }
-        if (configuration) {
-            message.setConfiguration(ConfigurationManager.getInstance().loadApplicationConfiguration());
-            message.setConfigurationBackup(ConfigurationManager.getInstance().loadApplicationConfigurationBackup());
-            message.setLiveConfiguration(ConfigurationManager.getInstance().getLiveConfiguration());
-            message.setUserConfig(ConfigurationManager.getInstance().loadUserProperties());
-            message.setServerProperties(ConfigurationManager.getInstance().getServerProperties());
-        }
-        return ServerUtil.encode(message);
-    }
+	@Override
+	public void notifyChange() {
+		broadcast(createAdminConsoleUpdate(false, true));
+	}
+
+	public void broadcast(String msg) {
+		Broadcaster bc = getBroadcaster();
+		if (bc != null) {
+			synchronized (BROADCAST_LOCK) {
+				bc.broadcast(msg);
+			}
+		}
+	}
+
+	private String createAdminConsoleUpdate(boolean swingInstances, boolean configuration) {
+		JsonAdminConsoleFrame message;
+		if (swingInstances) {
+			message = SwingInstanceManager.getInstance().extractStatus();
+		} else {
+			message = new JsonAdminConsoleFrame();
+		}
+		if (configuration) {
+			message.setConfiguration(ConfigurationManager.getInstance().loadApplicationConfiguration());
+			message.setConfigurationBackup(ConfigurationManager.getInstance().loadApplicationConfigurationBackup());
+			message.setLiveConfiguration(ConfigurationManager.getInstance().getLiveConfiguration());
+			message.setUserConfig(ConfigurationManager.getInstance().loadUserProperties());
+			message.setServerProperties(ConfigurationManager.getInstance().getServerProperties());
+		}
+		return ServerUtil.encode(message);
+	}
 
 }

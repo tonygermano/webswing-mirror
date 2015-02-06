@@ -9,6 +9,7 @@ import org.webswing.model.admin.s2c.JsonSwingJvmStats;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.SwingJvmConnection.WebSessionListener;
+import org.webswing.server.handler.admin.AdminAsyncManagedService;
 import org.webswing.server.stats.SessionRecorder;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.server.util.StatUtils;
@@ -68,10 +69,16 @@ public class SwingInstance implements WebSessionListener {
 		}
 		if (resource != null) {
 			StatUtils.logOutboundData(this, serialized);
-			resource.getBroadcaster().broadcast(serialized, resource);
+			synchronized (resource) {
+				resource.getBroadcaster().broadcast(serialized, resource);
+			}
 		}
 		if (mirroredResource != null) {
-			mirroredResource.getBroadcaster().broadcast(serialized, mirroredResource);
+			synchronized (AdminAsyncManagedService.BROADCAST_LOCK) {
+				synchronized (mirroredResource) {
+					mirroredResource.getBroadcaster().broadcast(serialized, mirroredResource);
+				}
+			}
 		}
 	}
 

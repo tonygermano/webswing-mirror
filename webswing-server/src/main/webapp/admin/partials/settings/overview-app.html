@@ -22,10 +22,26 @@
 		</div>
 	</div>
 	<div class="form-group">
+		<label  class="col-sm-4 control-label">Requires authentication</label>
+		<div class="col-sm-8">
+			<div class="checkbox">
+				<input type="checkbox" ng-model="currentViewApp().authentication" onclick="return false">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
 		<label  class="col-sm-4 control-label">Requires authorization</label>
 		<div class="col-sm-8">
 			<div class="checkbox">
 				<input type="checkbox" ng-model="currentViewApp().authorization" onclick="return false">
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label  class="col-sm-4 control-label">DirectDraw</label>
+		<div class="col-sm-8">
+			<div class="checkbox">
+				<input type="checkbox" ng-model="currentViewApp().directdraw" onclick="return false">
 			</div>
 		</div>
 	</div>
