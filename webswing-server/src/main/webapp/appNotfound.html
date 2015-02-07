@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Webswing</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="css/bootstrap.css" />
+        <link rel="stylesheet" href="css/webswing.css" />
+
+    </head>
+    <body>
+        <div id="m" class="modal in" style="display: block;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p id="app"></p>         
+                        <a href="/">Back to home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script src="javascript/jquery.js" type="text/javascript" charset="utf-8"></script>
+        <script src="javascript/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+        <script>
+            $.urlParam = function (name) {
+                var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+                if (results === null) {
+                    return null;
+                }
+                else {
+                    return results[1] || 0;
+                }
+            };
+
+            $( document ).ready(function() {
+                $('#m').modal('show');
+                var app=$.urlParam('app');
+                if(app=='UNSPECIFIED'){
+                	$("#app").text('Please specify the application name. (ie. /app/MyAppName)' );
+                }else{
+                	$("#app").text('The requested application "' + $.urlParam('app') +'" does not exist!' );
+                }
+            });
+            
+        </script>
+    </body>
+</html>

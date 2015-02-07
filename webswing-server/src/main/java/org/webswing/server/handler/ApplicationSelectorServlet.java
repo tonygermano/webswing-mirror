@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.webswing.model.server.SwingApplicationDescriptor;
+import org.webswing.server.ConfigurationManager;
 import org.webswing.server.stats.SessionRecorder;
 
 public class ApplicationSelectorServlet extends HttpServlet {
@@ -21,16 +23,22 @@ public class ApplicationSelectorServlet extends HttpServlet {
 		String appName = req.getPathInfo();
 		if (appName != null && appName.length() > 0) {
 			appName = appName.startsWith("/") ? appName.substring(1) : appName;
-			req.getSession().setAttribute(SELECTED_APPLICATION, appName);
-		}
+			SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(appName);
+			if (app != null) {
+				req.getSession().setAttribute(SELECTED_APPLICATION, appName);
+				if (req.getParameter(APPLICATION_CUSTOM_ARGS_PARAM) != null) {
+					req.getSession().setAttribute(APPLICATION_CUSTOM_ARGS, req.getParameter(APPLICATION_CUSTOM_ARGS_PARAM));
+				}
 
-		if (req.getParameter(APPLICATION_CUSTOM_ARGS_PARAM) != null) {
-			req.getSession().setAttribute(APPLICATION_CUSTOM_ARGS, req.getParameter(APPLICATION_CUSTOM_ARGS_PARAM));
+				if (req.getParameter(SessionRecorder.RECORDING_FLAG) != null) {
+					req.getSession().setAttribute(SessionRecorder.RECORDING_FLAG, req.getParameter(SessionRecorder.RECORDING_FLAG));
+				}
+				resp.sendRedirect("/");
+			} else {
+				resp.sendRedirect("/appNotfound.html?app=" + appName);
+			}
+		} else {
+			resp.sendRedirect("/appNotfound.html?app=UNSPECIFIED");
 		}
-
-		if (req.getParameter(SessionRecorder.RECORDING_FLAG) != null) {
-			req.getSession().setAttribute(SessionRecorder.RECORDING_FLAG, req.getParameter(SessionRecorder.RECORDING_FLAG));
-		}
-		resp.sendRedirect("/");
 	}
 }
