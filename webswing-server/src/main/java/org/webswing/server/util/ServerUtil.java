@@ -288,4 +288,9 @@ public class ServerUtil {
 		String recording = (String) r.getAttribute(SessionRecorder.RECORDING_FLAG);
 		return Boolean.parseBoolean(recording);
 	}
+
+	public static String getCustomArgs(HttpServletRequest r) {
+		String args = (String) r.getAttribute(ApplicationSelectorServlet.APPLICATION_CUSTOM_ARGS);
+		return args != null ? args : "";
+	}
 }

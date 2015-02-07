@@ -42,6 +42,7 @@ public class SwingAsyncManagedService {
 	@Ready(value = DELIVER_TO.RESOURCE)
 	public Serializable onReady(final AtmosphereResource r) {
 		resourceMap.put(r.uuid(), r);
+		r.getRequest().setAttribute(ApplicationSelectorServlet.APPLICATION_CUSTOM_ARGS, r.getRequest().getSession().getAttribute(ApplicationSelectorServlet.APPLICATION_CUSTOM_ARGS));
 		r.getRequest().setAttribute(SessionRecorder.RECORDING_FLAG, r.getRequest().getSession().getAttribute(SessionRecorder.RECORDING_FLAG));
 		String preSelectedApplicationName = ServerUtil.getPreSelectedApplication(r.getRequest(), true);
 		boolean includeAdminApp = ServerUtil.isUserinRole(r, Constants.ADMIN_ROLE);

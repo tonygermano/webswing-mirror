@@ -69,10 +69,12 @@ public class SwingJvmConnection implements MessageListener {
 
 	private ExecutorService swingAppExecutor = Executors.newSingleThreadExecutor();
 	private boolean jmsOpen = false;
+	private String customArgs = "";
 
-	public SwingJvmConnection(JsonConnectionHandshake handshake, SwingApplicationDescriptor appConfig, WebSessionListener webListener) {
+	public SwingJvmConnection(JsonConnectionHandshake handshake, SwingApplicationDescriptor appConfig, WebSessionListener webListener, String customArgs) {
 		this.webListener = webListener;
 		this.clientId = handshake.clientId;
+		this.customArgs = customArgs;
 		try {
 			initialize();
 			app = start(appConfig, handshake.desktopWidth, handshake.desktopHeight);
@@ -230,7 +232,7 @@ public class SwingJvmConnection implements MessageListener {
 						javaTask.setFork(true);
 						javaTask.setFailonerror(true);
 						javaTask.setJar(new File(URI.create(ServerUtil.getWarFileLocation())));
-						javaTask.setArgs(appConfig.getArgs());
+						javaTask.setArgs(appConfig.getArgs() + " " + customArgs);
 						String webSwingToolkitJarPath = "\"" + URLDecoder.decode(WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
 						String webSwingToolkitJarPathSpecific;
 						String webToolkitClass;
