@@ -1,2 +1,2 @@
 cd %~dp0
-java -jar webswing-server.war
+java -jar webswing-server.war -j jetty.properties

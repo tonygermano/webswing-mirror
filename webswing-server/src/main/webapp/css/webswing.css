@@ -54,3 +54,7 @@ canvas {
 	opacity: 0;
 	filter: alpha(opacity =   0);
 }
+
+.thumbnail  {
+    max-width: 155px;
+}

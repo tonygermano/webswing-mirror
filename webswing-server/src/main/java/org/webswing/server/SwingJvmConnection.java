@@ -257,70 +257,21 @@ public class SwingJvmConnection implements MessageListener {
 						String aaFonts = appConfig.isAntiAliasText() ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
 						javaTask.setJvmargs(bootCp + debug + aaFonts + " -noverify -Dcom.sun.management.jmxremote " + appConfig.getVmArgs());
 
-						Variable clientIdVar = new Variable();
-						clientIdVar.setKey(Constants.SWING_START_SYS_PROP_CLIENT_ID);
-						clientIdVar.setValue(clientId);
-						javaTask.addSysproperty(clientIdVar);
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_CLIENT_ID, clientId);
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_CLASS_PATH, appConfig.generateClassPathString());
+						addSysProperty(javaTask, Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 
-						Variable classpathVar = new Variable();
-						classpathVar.setKey(Constants.SWING_START_SYS_PROP_CLASS_PATH);
-						classpathVar.setValue(appConfig.generateClassPathString());
-						javaTask.addSysproperty(classpathVar);
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_MAIN_CLASS, appConfig.getMainClass());
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs() + "");
 
-						Variable tempDirVar = new Variable();
-						tempDirVar.setKey(Constants.TEMP_DIR_PATH);
-						tempDirVar.setValue(System.getProperty(Constants.TEMP_DIR_PATH));
-						javaTask.addSysproperty(tempDirVar);
-
-						Variable mainClass = new Variable();
-						mainClass.setKey(Constants.SWING_START_SYS_PROP_MAIN_CLASS);
-						mainClass.setValue(appConfig.getMainClass());
-						javaTask.addSysproperty(mainClass);
-
-						Variable isolatedFs = new Variable();
-						isolatedFs.setKey(Constants.SWING_START_SYS_PROP_ISOLATED_FS);
-						isolatedFs.setValue(appConfig.isIsolatedFs() + "");
-						javaTask.addSysproperty(isolatedFs);
-
-						Variable directDrawEnabled = new Variable();
-						directDrawEnabled.setKey(Constants.SWING_START_SYS_PROP_DIRECTDRAW);
-						directDrawEnabled.setValue(appConfig.isDirectdraw() + "");
-						javaTask.addSysproperty(directDrawEnabled);
-
-						Variable inactivityTimeout = new Variable();
-						inactivityTimeout.setKey(Constants.SWING_SESSION_TIMEOUT_SEC);
-						inactivityTimeout.setValue(appConfig.getSwingSessionTimeout() + "");
-						javaTask.addSysproperty(inactivityTimeout);
-
-						Variable toolkitImplClass = new Variable();
-						toolkitImplClass.setKey("awt.toolkit");
-						toolkitImplClass.setValue(webToolkitClass);
-						javaTask.addSysproperty(toolkitImplClass);
-
-						Variable headless = new Variable();
-						headless.setKey("java.awt.headless");
-						headless.setValue("false");
-						javaTask.addSysproperty(headless);
-
-						Variable graphicsConfigImplClass = new Variable();
-						graphicsConfigImplClass.setKey("java.awt.graphicsenv");
-						graphicsConfigImplClass.setValue("org.webswing.toolkit.ge.WebGraphicsEnvironment");
-						javaTask.addSysproperty(graphicsConfigImplClass);
-
-						Variable printerJobImplClass = new Variable();
-						printerJobImplClass.setKey("java.awt.printerjob");
-						printerJobImplClass.setValue("org.webswing.toolkit.WebPrinterJob");
-						javaTask.addSysproperty(printerJobImplClass);
-
-						Variable screenWidthVar = new Variable();
-						screenWidthVar.setKey(Constants.SWING_SCREEN_WIDTH);
-						screenWidthVar.setValue(((screenWidth == null || screenWidth < Constants.SWING_SCREEN_WIDTH_MIN) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth) + "");
-						javaTask.addSysproperty(screenWidthVar);
-
-						Variable screenHeigthVar = new Variable();
-						screenHeigthVar.setKey(Constants.SWING_SCREEN_HEIGHT);
-						screenHeigthVar.setValue(((screenHeight == null || screenHeight < Constants.SWING_SCREEN_HEIGHT_MIN) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight) + "");
-						javaTask.addSysproperty(screenHeigthVar);
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw() + "");
+						addSysProperty(javaTask, Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout() + "");
+						addSysProperty(javaTask, "awt.toolkit", webToolkitClass);
+						addSysProperty(javaTask, "java.awt.headless", "false");
+						addSysProperty(javaTask, "java.awt.graphicsenv", "org.webswing.toolkit.ge.WebGraphicsEnvironment");
+						addSysProperty(javaTask, "java.awt.printerjob", "org.webswing.toolkit.WebPrinterJob");
+						addSysProperty(javaTask, Constants.SWING_SCREEN_WIDTH, ((screenWidth == null || screenWidth < Constants.SWING_SCREEN_WIDTH_MIN) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth) + "");
+						addSysProperty(javaTask, Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null || screenHeight < Constants.SWING_SCREEN_HEIGHT_MIN) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight) + "");
 
 						javaTask.init();
 						javaTask.executeJava();
@@ -338,6 +289,13 @@ public class SwingJvmConnection implements MessageListener {
 			}
 		});
 		return future;
+	}
+
+	private void addSysProperty(Java javaTask, String key, String value) {
+		Variable v = new Variable();
+		v.setKey(key);
+		v.setValue(value);
+		javaTask.addSysproperty(v);
 	}
 
 	public String getClientId() {

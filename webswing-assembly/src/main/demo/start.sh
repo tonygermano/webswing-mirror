@@ -7,5 +7,5 @@ if [[ -z $DISPLAY ]]; then
   export XAUTHORITY=~/.Xauthority
   export DISPLAY=':99'
 fi
-java -jar webswing-server.war
+java -jar webswing-server.war -j jetty.properties
 

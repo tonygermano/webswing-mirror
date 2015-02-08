@@ -29,7 +29,6 @@ public class SwingMain {
 					swingurls.add(file.toURI().toURL());
 				} else {
 					Logger.error("SwingMain:main ERROR: Required classpath file '" + f + "' does not exist!");
-					System.exit(1);
 				}
 			}
 			swingLibClassloader = new URLClassLoader(swingurls.toArray(new URL[0]), SwingMain.class.getClassLoader());

@@ -128,7 +128,7 @@
 
 		function processTxtMessage(message) {
 			if (message == "shutDownNotification") {
-				config.onErrorMessage('Application stopped...');
+	            config.onErrorMessage('Application stopped... <br\> <a href="javascript:webswing.continueSession(false);">Start new session.</a> <br\><a href="/logout">Logout.</a>');
 				dispose();
 			} else if (message == "applicationAlreadyRunning") {
 				config.onErrorMessage('Application is already running in other browser window...');

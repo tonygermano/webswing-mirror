@@ -68,27 +68,19 @@ public class ServerUtil {
 	}
 
 	public static Object decode(String s) {
-		try {
-			return mapper.readValue(s, JsonEventMouse.class);
-		} catch (IOException e) {
-			try {
-				return mapper.readValue(s, JsonEventKeyboard.class);
-			} catch (IOException e1) {
+		Object o = null;
+		if (!s.startsWith(Constants.PAINT_ACK_PREFIX)) {
+			Class<?> a[] = { JsonEventMouse.class, JsonEventKeyboard.class, JsonConnectionHandshake.class, JsonEventPaste.class, JsonApplyConfiguration.class };
+			for (Class<?> c : a) {
 				try {
-					return mapper.readValue(s, JsonConnectionHandshake.class);
-				} catch (IOException e2) {
-					try {
-						return mapper.readValue(s, JsonEventPaste.class);
-					} catch (IOException e3) {
-						try {
-							return mapper.readValue(s, JsonApplyConfiguration.class);
-						} catch (IOException e4) {
-							return null;
-						}
-					}
+					o = mapper.readValue(s, c);
+					break;
+				} catch (IOException e) {
+					// do nothing
 				}
 			}
 		}
+		return o;
 	}
 
 	public static List<JsonApplication> createApplicationJsonInfo(AtmosphereResource r, Map<String, SwingApplicationDescriptor> applications, boolean includeAdminApp) {
