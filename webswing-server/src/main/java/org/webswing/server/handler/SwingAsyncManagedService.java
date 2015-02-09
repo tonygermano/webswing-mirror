@@ -6,11 +6,12 @@ import java.util.Map;
 
 import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.config.managed.ManagedServiceInterceptor;
+import org.atmosphere.config.service.DeliverTo;
 import org.atmosphere.config.service.Disconnect;
 import org.atmosphere.config.service.ManagedService;
 import org.atmosphere.config.service.Message;
 import org.atmosphere.config.service.Ready;
-import org.atmosphere.config.service.Ready.DELIVER_TO;
+import org.atmosphere.config.service.DeliverTo.DELIVER_TO;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
@@ -39,7 +40,8 @@ public class SwingAsyncManagedService {
 
 	private Map<String, AtmosphereResource> resourceMap = new HashMap<String, AtmosphereResource>();
 
-	@Ready(value = DELIVER_TO.RESOURCE)
+	@Ready
+	@DeliverTo(DELIVER_TO.RESOURCE)
 	public Serializable onReady(final AtmosphereResource r) {
 		resourceMap.put(r.uuid(), r);
 		r.getRequest().setAttribute(ApplicationSelectorServlet.APPLICATION_CUSTOM_ARGS, r.getRequest().getSession().getAttribute(ApplicationSelectorServlet.APPLICATION_CUSTOM_ARGS));
