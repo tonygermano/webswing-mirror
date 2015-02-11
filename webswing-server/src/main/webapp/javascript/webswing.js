@@ -58,6 +58,11 @@ define(
 						showDialog(applicationSelectorDialog);
 					}
 				},
+				onApplicationShutdown : function() {
+					showDialog(messageDialog, 'Application stopped... <br\> <button class="btn btn-primary" onclick="webswing.continueSession(false)">Start new session.</button>'+
+							'<span> </span><button class="btn btn-default" onclick="window.location.href = \'/logout\'">Logout.</button>');
+					atmosphere.unsubscribe();
+				},
 				onBeforePaint : function() {
 					showDialog(null);
 				},
@@ -306,6 +311,9 @@ define(
 				},
 				fileDialogDelete : function() {
 					ws.requestDeleteFile();
+				},
+				setDirectDrawSupported : function(supported){
+					ws.setDirectDrawSupported(supported);
 				}
 			};
 		});

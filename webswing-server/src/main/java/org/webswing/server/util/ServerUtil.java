@@ -285,4 +285,12 @@ public class ServerUtil {
 		String args = (String) r.getAttribute(ApplicationSelectorServlet.APPLICATION_CUSTOM_ARGS);
 		return args != null ? args : "";
 	}
+
+	public static void broadcastMessage(AtmosphereResource r, Serializable o) {
+		for (AtmosphereResource resource : r.getBroadcaster().getAtmosphereResources()) {
+			if (resource.uuid().equals(r.uuid())) {
+				resource.getBroadcaster().broadcast(o, resource);
+			}
+		}
+	}
 }

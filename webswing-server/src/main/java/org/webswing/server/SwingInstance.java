@@ -70,22 +70,14 @@ public class SwingInstance implements WebSessionListener {
 		if (resource != null) {
 			StatUtils.logOutboundData(this, serialized);
 			synchronized (resource) {
-				broadcastMessage(resource, serialized);
+				ServerUtil.broadcastMessage(resource, serialized);
 			}
 		}
 		if (mirroredResource != null) {
 			synchronized (AdminAsyncManagedService.BROADCAST_LOCK) {
 				synchronized (mirroredResource) {
-					broadcastMessage(mirroredResource, serialized);
+					ServerUtil.broadcastMessage(mirroredResource, serialized);
 				}
-			}
-		}
-	}
-
-	private void broadcastMessage(AtmosphereResource r, Serializable o) {
-		for (AtmosphereResource resource : r.getBroadcaster().getAtmosphereResources()) {
-			if (resource.uuid().equals(r.uuid())) {
-				resource.getBroadcaster().broadcast(o, resource);
 			}
 		}
 	}

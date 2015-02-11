@@ -38,12 +38,14 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
+import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventKeyboard.Type;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.model.s2c.JsonWindow;
 import org.webswing.model.s2c.JsonWindowPartialContent;
+import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 
@@ -498,20 +500,23 @@ public class Util {
 	}
 
 	public static boolean isDD() {
-		return Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, "false"));
+		boolean startDD = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, "false"));
+		boolean supportedDD = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, "true"));
+		return startDD && supportedDD;
 	}
 
 	public static void repaintAllWindow() {
-		for (Window w : Window.getWindows()) {
-			if (w.isShowing()) {
-				Object peer = WebToolkit.targetToPeer(w);
-				if (peer != null && peer instanceof WebWindowPeer) {
-					((WebWindowPeer) peer).updateWindowDecorationImage();
-					RepaintManager.currentManager(null).addDirtyRegion(w, 0, 0, w.getWidth(), w.getHeight());
+		synchronized (WebPaintDispatcher.webPaintLock) {
+			for (Window w : Window.getWindows()) {
+				if (w.isShowing()) {
+					final Object peer = WebToolkit.targetToPeer(w);
+					if (peer != null && peer instanceof WebWindowPeer) {
+						((WebWindowPeer) peer).updateWindowDecorationImage();
+						RepaintManager.currentManager(null).addDirtyRegion(w, 0, 0, w.getWidth(), w.getHeight());
+					}
 				}
 			}
 		}
-
 	}
 
 }

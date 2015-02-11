@@ -17,6 +17,8 @@
 			},
 			onApplicationSelection : c.onApplicationSelection || function() {
 			},
+			onApplicationShutdown : c.onApplicationShutdown || function(){
+			},
 			onBeforePaint : c.onBeforePaint || function() {
 			},
 			onLinkOpenAction : c.onLinkOpenAction || function() {
@@ -42,6 +44,7 @@
 		var mouseDown = 0;
 		var user = null;
 		var canPaint = false;
+		var directDrawSupported = true;
 		var mirrorMode = config.mirrorMode;
 
 		var windowImageHolders = c.windowImageHolders || {};
@@ -128,7 +131,7 @@
 
 		function processTxtMessage(message) {
 			if (message == "shutDownNotification") {
-	            config.onErrorMessage('Application stopped... <br\> <a href="javascript:webswing.continueSession(false);">Start new session.</a> <br\><a href="/logout">Logout.</a>');
+	            config.onApplicationShutdown();
 				dispose();
 			} else if (message == "applicationAlreadyRunning") {
 				config.onErrorMessage('Application is already running in other browser window...');
@@ -429,7 +432,8 @@
 				sessionId : uuid,
 				desktopWidth : canvas.width,
 				desktopHeight : canvas.height,
-				mirrored : mirrorMode
+				mirrored : mirrorMode,
+				directDrawSupported : directDrawSupported
 			};
 			return handshake;
 		}
@@ -492,6 +496,9 @@
 			},
 			dispose : function() {
 				dispose();
+			},
+			setDirectDrawSupported : function(supported){
+				directDrawSupported=supported;
 			},
 			getWindowImageHolders : function() {
 				return windowImageHolders;

@@ -1,5 +1,7 @@
 (function(root) {
 
+	var directdrawBrowserSupport=true;
+
 	require.config({
 		baseUrl : 'javascript',
 		shim : {
@@ -15,14 +17,11 @@
 		window.location = '/notSupportedBrowser.html';
 	}
 
-	function startWebswing() {
-		require([ 'webswing' ], function(ws) {
-			root.webswing = ws;
-		});
-	}
-
 	function polyfill(doneCallback) {
 		if (!isPromisesSupported() || !isArrayBufferSupported()) {
+			if(!isArrayBufferSupported()){
+				directdrawBrowserSupport=false;
+			}
 			require([ 'es6promise', 'typedarray' ], function(es6promise) {
 				es6promise.polyfill();
 				doneCallback();
@@ -30,6 +29,13 @@
 		} else {
 			doneCallback();
 		}
+	}
+
+	function startWebswing() {
+		require([ 'webswing' ], function(ws) {
+			ws.setDirectDrawSupported(directdrawBrowserSupport);
+			root.webswing = ws;
+		});
 	}
 
 	function isCanvasSupported() {

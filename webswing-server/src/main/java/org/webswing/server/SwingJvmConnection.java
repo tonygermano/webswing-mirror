@@ -77,7 +77,7 @@ public class SwingJvmConnection implements MessageListener {
 		this.customArgs = customArgs;
 		try {
 			initialize();
-			app = start(appConfig, handshake.desktopWidth, handshake.desktopHeight);
+			app = start(appConfig, handshake);
 		} catch (JMSException e) {
 			log.error("SwingJvmConnection:init", e);
 		}
@@ -200,7 +200,9 @@ public class SwingJvmConnection implements MessageListener {
 		webListener.notifyClose();
 	}
 
-	public Future<?> start(final SwingApplicationDescriptor appConfig, final Integer screenWidth, final Integer screenHeight) {
+	public Future<?> start(final SwingApplicationDescriptor appConfig, final JsonConnectionHandshake handshake) {
+		final Integer screenWidth = handshake.desktopWidth;
+		final Integer screenHeight = handshake.desktopHeight;
 		Future<?> future = swingAppExecutor.submit(new Callable<Object>() {
 
 			public Object call() throws Exception {
@@ -265,6 +267,7 @@ public class SwingJvmConnection implements MessageListener {
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs() + "");
 
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw() + "");
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.directDrawSupported + "");
 						addSysProperty(javaTask, Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout() + "");
 						addSysProperty(javaTask, "awt.toolkit", webToolkitClass);
 						addSysProperty(javaTask, "java.awt.headless", "false");
