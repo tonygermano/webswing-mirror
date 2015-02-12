@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.webswing.util.Logger;
@@ -22,7 +23,8 @@ public class SwingMain {
 			// create classloader with swinglib classpath
 			List<URL> swingurls = new ArrayList<URL>();
 			String classpath = System.getProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH);
-			String[] cp = classpath.split(";");
+			String[] cp = scanForFiles(classpath.split(";"), ".");
+			Logger.debug("Swing classpath: " + Arrays.asList(cp));
 			for (String f : cp) {
 				File file = new File(f);
 				if (file.exists()) {
@@ -53,6 +55,55 @@ public class SwingMain {
 			Logger.fatal("SwingMain:main", e);
 			System.exit(1);
 		}
+	}
+
+	public static String[] scanForFiles(String[] patternPaths, String base) {
+		base = base.replaceAll("\\\\", "/");
+		List<String> result = new ArrayList<String>();
+		for (String pattern : patternPaths) {
+			if (pattern.contains("?") || pattern.contains("*")) {
+				pattern = pattern.replaceAll("\\\\", "/");
+				String[] pathSegs = pattern.split("/");
+				boolean absolute = pathSegs[0].length() == 0 || pathSegs[0].contains(":") ? true : false;
+				String currentBase = absolute ? "/" : base + "/";
+				scanForPatternFiles(pathSegs, currentBase, result);
+			} else {
+				result.add(pattern);
+			}
+		}
+		return result.toArray(new String[result.size()]);
+	}
+
+	private static void scanForPatternFiles(String[] pathSegs, String currentBase, List<String> result) {
+		String pathSeg = pathSegs[0];
+		if (pathSegs.length > 1) {
+			if (pathSeg.contains("?") || pathSeg.contains("*")) {
+				File currentBaseFolder = new File(currentBase);
+				if (currentBaseFolder.exists() && currentBaseFolder.isDirectory()) {
+					for (String name : currentBaseFolder.list()) {
+						if (matches(pathSeg, name)) {
+							scanForPatternFiles(Arrays.copyOfRange(pathSegs, 1, pathSegs.length), currentBase + name + "/", result);
+						}
+					}
+				}
+			} else {
+				currentBase += pathSeg + "/";
+				scanForPatternFiles(Arrays.copyOfRange(pathSegs, 1, pathSegs.length), currentBase, result);
+			}
+		} else {
+			File currentBaseFolder = new File(currentBase);
+			if (currentBaseFolder.exists() && currentBaseFolder.isDirectory()) {
+				for (String name : currentBaseFolder.list()) {
+					if (matches(pathSeg, name)) {
+						result.add(currentBase + name);
+					}
+				}
+			}
+		}
+	}
+
+	private static boolean matches(String pathSeg, String name) {
+		return name.matches("^" + pathSeg.replaceAll("\\.", "\\\\.").replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]").replaceAll("\\?", ".").replaceAll("\\*", ".*") + "$");
 	}
 
 }
