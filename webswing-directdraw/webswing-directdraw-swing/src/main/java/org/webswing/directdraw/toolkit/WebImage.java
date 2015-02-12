@@ -1,10 +1,14 @@
 package org.webswing.directdraw.toolkit;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -207,6 +211,24 @@ public class WebImage extends Image {
 			addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), null), new DrawConstant.Integer(0)));
 		}
 		ihg.dispose();
+	}
+
+	public void addFillInstruction(WebGraphics g, Shape fillShape) {
+		if (imageHolder != null) {
+			Graphics2D ihg = (Graphics2D) getImageHolder().getGraphics();
+			ihg.setTransform(g.getTransform());
+			ihg.setClip(g.getClip());
+			if (g.getPaint().getTransparency() == Transparency.OPAQUE) {
+				ihg.setComposite(AlphaComposite.Src);
+				ihg.setPaint(new Color(0, 0, 0, 0));
+				ihg.fill(fillShape);
+			} else {
+				ihg.setPaint(g.getPaint());
+				ihg.fill(fillShape);
+			}
+			ihg.dispose();
+		}
+		addInstruction(g, context.getInstructionFactory().fill(fillShape, g.getClip()));
 	}
 
 	private BufferedImage getImageHolder() {

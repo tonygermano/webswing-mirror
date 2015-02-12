@@ -46,13 +46,13 @@ public class WebGraphics extends AbstractVectorGraphics {
 		if (getStroke() instanceof BasicStroke) {
 			thisImage.addInstruction(this, dif.draw(s, getClip()));
 		} else {
-			thisImage.addInstruction(this, dif.fill(getStroke().createStrokedShape(s), getClip()));
+			fill(getStroke().createStrokedShape(s));
 		}
 	}
 
 	@Override
 	public void fill(Shape s) {
-		thisImage.addInstruction(this, dif.fill(s, getClip()));
+		thisImage.addFillInstruction(this, s);
 	}
 
 	@Override

@@ -17,6 +17,7 @@ import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Point;
 import java.awt.RadialGradientPaint;
+import java.awt.Rectangle;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
@@ -501,6 +502,23 @@ public class Tests {
 		}
 		SliderDemo sd = new SliderDemo();
 		printJComponentHelper(null, g, sd);
+		return true;
+	}
+
+	public static boolean t18OverlayedImagesWithTransparencyTest(Graphics2D g, Integer repeat) throws IOException {
+		if (repeat > 0) {
+			return false;
+		}
+		BufferedImage image = ImageIO.read(new File(Tests.class.getClassLoader().getResource("java.png").getFile()));
+		g.drawImage(image, 0, 0, 100, 100, null);
+		g.setColor(Color.yellow);
+		g.fill(new Rectangle(50, 0, 100, 100));
+		g.drawImage(image, 50, 0, 100, 100, null);
+
+		g.drawImage(image, 200, 0, 100, 100, null);
+		g.setColor(new Color(255, 255, 0, 200));
+		g.fill(new Rectangle(250, 0, 100, 100));
+		g.drawImage(image, 250, 0, 100, 100, null);
 		return true;
 	}
 
