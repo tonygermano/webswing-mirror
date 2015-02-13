@@ -90,7 +90,7 @@ public class DrawServlet extends HttpServlet {
 					start = System.currentTimeMillis();
 					m.invoke(null, g2, j);
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					((WebImage) wi).toMessage(dd).writeTo(baos);
+					((WebImage) wi).extractReadOnlyWebImage(true).toMessage(dd).writeTo(baos);
 					json.protoImg.add(encodeBytes(baos.toByteArray()));
 					json.protoRenderTime += (System.currentTimeMillis() - start);
 					json.protoRenderSize += baos.size();

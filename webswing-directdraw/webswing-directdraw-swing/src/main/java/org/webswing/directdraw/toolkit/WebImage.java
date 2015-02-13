@@ -16,8 +16,10 @@ import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.RenderedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,6 +47,7 @@ public class WebImage extends Image {
 	private DirectDraw context;
 	private Dimension size;
 	private BufferedImage imageHolder;
+	Map<DrawInstruction, BufferedImage> partialImageMap;
 	private volatile int lastGraphicsId = 0;
 	private WebGraphics lastUsedG = null;
 	private Set<WebGraphics> usedGs = new HashSet<WebGraphics>();
@@ -240,42 +243,59 @@ public class WebImage extends Image {
 
 	public WebImage extractReadOnlyWebImage(boolean reset) {
 		WebImage result = new WebImage(context, size.width, size.height) {
+
 			@Override
 			public void addInstruction(WebGraphics g, DrawInstruction in) {
 				throw new UnsupportedOperationException("This is read only instance of webimage.");
 			}
 
+			public WebImageProto toMessage(DirectDraw dd) {
+				return toMessageInternal(dd);
+			}
+
 		};
 		synchronized (this) {
 			result.id = id;
-			if (!reset) {
-				result.newInstructions = new ArrayList<DrawInstruction>(newInstructions);
-				result.imageHolder = imageHolder == null ? null : DirectDrawUtils.deepCopy(imageHolder);
-				result.chunks = new ArrayList<WebImage>(chunks);
-			} else {
-				result.newInstructions = newInstructions;
-				result.imageHolder = imageHolder;
-				result.chunks = chunks;
+			result.newInstructions = newInstructions;
+			result.chunks = chunks;
+			// extract the areas where images were painted. For saving some
+			// memory by not keeping the full window image
+			// but just the relevant areas
+			result.preprocessDrawImageInstructions(imageHolder);
+			if (reset) {
 				reset();
 			}
 		}
 		return result;
 	}
 
-	public void reset() {
-		imageHolder = null;
-		newInstructions = new ArrayList<DrawInstruction>();
-		chunks = new ArrayList<WebImage>();
-		lastUsedG = null;
-		usedGs.clear();
+	protected void preprocessDrawImageInstructions(BufferedImage imageHolder) {
+		if (imageHolder != null) {
+			partialImageMap = new HashMap<DrawInstruction, BufferedImage>();
+			// find drawImage instructions and save subImages to subImageMap
+			// (these are later encoded to proto message)
+			for (DrawInstruction ins : newInstructions) {
+				DrawConstant[] constants = ins.getArgs();
+				if (ins.getInstruction() == InstructionProto.DRAW_IMAGE) {
+					Rectangle2D bounds = ((PathConst) constants[0]).getShape().getBounds().createIntersection(new Rectangle(imageHolder.getWidth(), imageHolder.getHeight()));
+					BufferedImage subImage = new BufferedImage((int) bounds.getWidth(), (int) bounds.getHeight(), BufferedImage.TYPE_INT_ARGB);
+					Graphics sig = subImage.getGraphics();
+					sig.drawImage(imageHolder.getSubimage((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight()), 0, 0, null);
+					sig.dispose();
+					partialImageMap.put(ins, subImage);
+					constants[1] = new PointsConst(context, 0, (int) bounds.getX(), (int) bounds.getY());
+				}
+			}
+		}
 	}
 
-	public WebImageProto toMessage(DirectDraw dd) {
+	protected WebImageProto toMessageInternal(DirectDraw dd) {
 		DrawConstantPool constantPool = dd.getConstantPool();
 		DrawConstantPool imagePool = dd.getImagePool();
 
 		WebImageProto.Builder webImageBuilder = WebImageProto.newBuilder();
-		synchronized (this) {
+		synchronized (this) { // TODO: remove this and keep only instructions
+			// field
 			instructions = newInstructions;
 			newInstructions = new ArrayList<DrawInstruction>();
 		}
@@ -290,14 +310,14 @@ public class WebImage extends Image {
 		}
 
 		// preprocess draw_image instructions
-		for (DrawInstruction ins : instructions) {
-			DrawConstant[] constants = ins.getArgs();
-			// compute image hash and link containing image
-			if (ins.getInstruction() == InstructionProto.DRAW_IMAGE) {
-				Rectangle2D bounds = ((PathConst) constants[0]).getShape().getBounds().createIntersection(new Rectangle(imageHolder.getWidth(), imageHolder.getHeight()));
-				BufferedImage subImage = imageHolder.getSubimage((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight());
+		if (partialImageMap != null) {
+			for (DrawInstruction ins : partialImageMap.keySet()) {
+				DrawConstant[] constants = ins.getArgs();
+				// compute image hash and link containing image
+				BufferedImage subImage = partialImageMap.get(ins);
 				long hash = context.getServices().computeHash(subImage);
 				HashConst imageHashConst = new DrawConstant.HashConst(hash);
+				Integer[] points = ((PointsConst) constants[1]).getIntArray();
 				if (!imagePool.isInCache(imageHashConst)) {
 					ImageConst imageConst = new ImageConst(context, subImage, hash);
 					imagePool.getCachedConstant(new DrawConstant.HashConst(imageConst));
@@ -307,10 +327,10 @@ public class WebImage extends Image {
 						builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(imageConst.getFieldName()), imageConst.extractMessage(dd));
 					}
 					webImageBuilder.addImages(builder.build());
-					constants[1] = new PointsConst(context, imageConst.getAddress(), (int) bounds.getX(), (int) bounds.getY());
+					constants[1] = new PointsConst(context, imageConst.getAddress(), points[1], points[2]);
 				} else {
 					DrawConstant imageRef = imagePool.getCachedConstant(imageHashConst);
-					constants[1] = new PointsConst(context, imageRef.getAddress(), (int) bounds.getX(), (int) bounds.getY());
+					constants[1] = new PointsConst(context, imageRef.getAddress(), points[1], points[2]);
 				}
 			}
 		}
@@ -342,11 +362,25 @@ public class WebImage extends Image {
 		return result;
 	}
 
+	public void reset() {
+		imageHolder = null;
+		newInstructions = new ArrayList<DrawInstruction>();
+		chunks = new ArrayList<WebImage>();
+		lastUsedG = null;
+		usedGs.clear();
+	}
+
+	public WebImageProto toMessage(DirectDraw dd) {
+		// toMessageInternal is executed from anonymous subclass' overriden
+		// method created in 'extractReadOnlyWebImage' method
+		throw new IllegalStateException("Only read-only image can be encoded to proto message. Invoke extractReadOnlyWebImage method first to create read-only webimage.");
+	}
+
 	public BufferedImage getSnapshot() {
-		return RenderUtil.render(this, imageHolder, chunks, newInstructions, size);
+		return RenderUtil.render(this, imageHolder, partialImageMap, chunks, newInstructions, size);
 	}
 
 	public BufferedImage getSnapshot(BufferedImage result) {
-		return RenderUtil.render(result, this, imageHolder, chunks, newInstructions, size);
+		return RenderUtil.render(result, this, imageHolder, partialImageMap, chunks, newInstructions, size);
 	}
 }

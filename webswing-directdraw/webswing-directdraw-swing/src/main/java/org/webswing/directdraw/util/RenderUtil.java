@@ -32,7 +32,7 @@ import org.webswing.directdraw.toolkit.WebImage;
 
 public class RenderUtil {
 
-	public static BufferedImage render(WebImage webImage, BufferedImage imageHolder, List<WebImage> chunks, List<DrawInstruction> newInstructions, Dimension size) {
+	public static BufferedImage render(WebImage webImage, BufferedImage imageHolder, Map<DrawInstruction, BufferedImage> partialImageMap, List<WebImage> chunks, List<DrawInstruction> newInstructions, Dimension size) {
 		BufferedImage result = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) result.getGraphics();
 		if (chunks != null) {
@@ -40,12 +40,12 @@ public class RenderUtil {
 				chunk.getSnapshot(result);
 			}
 		}
-		render(result, webImage, imageHolder, chunks, newInstructions, size);
+		render(result, webImage, imageHolder, partialImageMap, chunks, newInstructions, size);
 		g.dispose();
 		return result;
 	}
 
-	public static BufferedImage render(BufferedImage result, WebImage webImage, BufferedImage imageHolder, List<WebImage> chunks, List<DrawInstruction> newInstructions, Dimension size) {
+	public static BufferedImage render(BufferedImage result, WebImage webImage, BufferedImage imageHolder, Map<DrawInstruction, BufferedImage> partialImageMap, List<WebImage> chunks, List<DrawInstruction> newInstructions, Dimension size) {
 		Map<Integer, Graphics2D> gmap = new HashMap<Integer, Graphics2D>();
 		Graphics2D currentg = null;
 		for (DrawInstruction di : newInstructions) {
@@ -71,7 +71,7 @@ public class RenderUtil {
 				iprtDrawWebImage(currentg, di);
 				break;
 			case DRAW_IMAGE:
-				iprtDrawImage(currentg, di, imageHolder);
+				iprtDrawImage(currentg, di, imageHolder, partialImageMap);
 				break;
 			case COPY_AREA:
 				iprtCopyArea(currentg, di, result);
@@ -100,12 +100,17 @@ public class RenderUtil {
 		return result;
 	}
 
-	private static void iprtDrawImage(Graphics2D g, DrawInstruction di, BufferedImage imageHolder) {
-		Shape clip = getShape(getConst(3, di, DrawConstant.class), false);
-		g.setClip(clip);
+	private static void iprtDrawImage(Graphics2D g, DrawInstruction di, BufferedImage imageHolder, Map<DrawInstruction, BufferedImage> partialImageMap) {
+		Shape clip = getShape(getConst(0, di, DrawConstant.class), false);
 		AffineTransform original = g.getTransform();
 		g.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
-		g.drawImage(imageHolder, 0, 0, null);
+		g.setClip(clip);
+		if (imageHolder != null) {
+			g.drawImage(imageHolder, 0, 0, null);
+		} else if (partialImageMap != null && partialImageMap.containsKey(di)) {
+			Integer[] points = getConst(1, di, PointsConst.class).getIntArray();
+			g.drawImage(partialImageMap.get(di), points[1], points[2], null);
+		}
 		g.setTransform(original);
 
 	}
