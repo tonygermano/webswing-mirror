@@ -25,7 +25,7 @@ public class SwingInstance implements WebSessionListener {
 	private Date disconnectedSince;
 	private SessionRecorder sessionRecorder;
 	private final Date startedAt = new Date();
-	private Date endedAt = new Date();
+	private Date endedAt = null;
 
 	public SwingInstance(JsonConnectionHandshake h, SwingApplicationDescriptor app, AtmosphereResource resource) {
 		this.application = app;

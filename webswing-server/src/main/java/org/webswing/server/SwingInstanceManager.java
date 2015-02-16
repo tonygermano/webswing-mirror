@@ -1,12 +1,16 @@
 package org.webswing.server;
 
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
@@ -17,6 +21,7 @@ import org.webswing.model.admin.s2c.JsonSwingSession;
 import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.stats.PerformanceStatsMonitor;
+import org.webswing.server.stats.jmx.WebswingMonitoringMXBeanImpl;
 import org.webswing.server.util.ServerUtil;
 
 public class SwingInstanceManager {
@@ -30,6 +35,13 @@ public class SwingInstanceManager {
 
 	private SwingInstanceManager() {
 		new PerformanceStatsMonitor();
+		MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
+		try {
+			ObjectName mxbeanName = new ObjectName("org.webswing:type=WebswingMonitoring");
+			platformMBeanServer.registerMBean(new WebswingMonitoringMXBeanImpl(), mxbeanName);
+		} catch (Exception e) {
+			log.error("Failed to register webswing monitoring jmx mbean", e);
+		}
 	}
 
 	public static SwingInstanceManager getInstance() {
