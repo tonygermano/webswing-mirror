@@ -58,3 +58,31 @@ canvas {
 .thumbnail  {
     max-width: 155px;
 }
+
+.upload-drop {
+    border-style: dashed;
+    border-color: #ccc;
+    height: 200px;
+    overflow:auto;
+    margin-bottom: 5px;
+}
+ 
+.upload-drop p {
+    margin: 0 0 2px;
+    padding-left: 10px;
+}
+
+.upload-dropH1 {
+     text-align: center;
+}
+
+.progress{ 
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+#fileDownloadBtn, #fileUploadBtn, #fileDeleteBtn {
+    display: none;
+}
+
+ 

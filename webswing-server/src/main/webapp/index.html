@@ -101,31 +101,44 @@
 			</div>
 		</div>
 	</div>
-	<div id="fileDialogTransferBar" class="fileDialogBar">
-		<div class="fileDialogBarButton">
-			<button class="btn btn-success btn-primary" onclick="webswing.fileDialogDownload();">Download selected</button>
-		</div>
-		<div class="fileDialogBarButton">
-			<form  id="fileupload" data-url="upload">
-		    	<input id="fileDialogTransferBarClientId" name="clinetId" type="hidden" />
-				<div class="fileUpload btn btn-success btn-primary">
-				    <span>Upload files</span>
-					<input type="file" name="files[]" class="upload" multiple/>
-				</div>
-			</form>
-		</div>
-		<div class="fileDialogBarButton">
-			<!-- Single button -->
-			<div class="btn-group dropup">
-			  <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-			    Delete selected <span class="caret"></span>
-			  </button>
-			  <ul class="dropdown-menu " role="menu">
-			    <li><span> Are you sure?</span></li>
-			    <li><a href="javascript:webswing.fileDialogDelete();">Yes</a></li>
-			  </ul>
-			</div>
-		</div>
-	</div>
+        <div id="fileDialogTransferBar" class="fileDialogBar">
+            <div class="upload-drop">
+                <p class="upload-dropH1">Drag and drop files here </p>
+                <span id="files"></span>
+            </div>
+            <div id="fileDownloadBtn" class="fileDialogBarButton">
+                <button class="btn btn-success btn-primary" onclick="webswing.fileDialogDownload();">Download selected</button>
+            </div>
+            <div id="fileUploadBtn" class="fileDialogBarButton">
+                <form  id="fileupload" data-url="upload">
+                    <input id="fileDialogTransferBarClientId" name="clinetId" type="hidden" />
+                    <div class="fileUpload btn btn-success btn-primary">
+                        <span>Upload files</span>
+                        <input id="fileInput" type="file" name="files[]" class="upload" multiple/>
+                    </div>
+                </form>
+            </div>
+            <div id="fileDeleteBtn" class="fileDialogBarButton">
+                <!-- Single button -->
+                <div class="btn-group dropup">
+                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                        Delete selected <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu " role="menu">
+                        <li><span> Are you sure?</span></li>
+                        <li><a href="javascript:webswing.fileDialogDelete();">Yes</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="cancelBtn" class="btn btn-danger">
+                <i class="glyphicon glyphicon-ban-circle"></i>
+                Cancel
+            </div>     
+            <br /><br />
+            <div id="progress" class="progress">
+                <div class="progress-bar progress-bar-success"></div>
+            </div>
+        </div>
+
 </body>
 </html>

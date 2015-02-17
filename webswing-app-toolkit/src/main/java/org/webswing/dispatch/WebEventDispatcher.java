@@ -3,7 +3,6 @@ package org.webswing.dispatch;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -17,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
@@ -30,6 +30,7 @@ import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventMouse.Type;
 import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.c2s.JsonEventUpload;
+import org.webswing.model.c2s.JsonEventUploaded;
 import org.webswing.toolkit.WebClipboard;
 import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.extra.DndEventHandler;
@@ -44,6 +45,7 @@ public class WebEventDispatcher {
 	private MouseEvent lastMousePressEvent;
 	private Point lastMousePosition = new Point();
 	private static final DndEventHandler dndHandler = new DndEventHandler();
+	private HashMap<String, String> uploadMap = new HashMap<String, String>();
 
 	private ClipboardOwner owner = new ClipboardOwner() {
 
@@ -69,6 +71,9 @@ public class WebEventDispatcher {
 			JsonEventPaste paste = (JsonEventPaste) event;
 			handlePasteEvent(paste.content);
 		}
+		if (event instanceof JsonEventUploaded) {
+			handleUploadedEvent((JsonEventUploaded) event);
+		}
 		if (event instanceof JsonEventUpload) {
 			JsonEventUpload upload = (JsonEventUpload) event;
 			JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
@@ -82,6 +87,7 @@ public class WebEventDispatcher {
 						try {
 							Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
 							dialog.rescanCurrentDirectory();
+							uploadMap.put(upload.fileName, validfilename);
 						} catch (IOException e) {
 							Logger.error("Error while moving uploaded file to target folder: ", e);
 						}
@@ -295,4 +301,28 @@ public class WebEventDispatcher {
 			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
 		}
 	}
+
+	private void handleUploadedEvent(JsonEventUploaded e) {
+		JFileChooser fc = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
+		JsonEventUploaded event = (JsonEventUploaded) e;
+		if (fc != null) {
+			if (event.files.size() > 0) {
+				if (fc.isMultiSelectionEnabled()) {
+					File arr[] = new File[event.files.size()];
+					for (int i = 0; i < event.files.size(); i++) {
+						arr[i] = new File(fc.getCurrentDirectory(), uploadMap.get(event.files.get(i)));
+					}
+					fc.setSelectedFiles(arr);
+				} else {
+					File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.files.get(0)));
+					fc.setSelectedFile(f);
+				}
+				fc.approveSelection();
+			} else {
+				fc.cancelSelection();
+			}
+		}
+		uploadMap.clear();
+	}
+
 }

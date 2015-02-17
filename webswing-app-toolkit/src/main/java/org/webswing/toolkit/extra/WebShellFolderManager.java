@@ -20,7 +20,10 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
     private File root;
 
     public WebShellFolderManager() {
-        root = new IsolatedRootFile(System.getProperty("user.dir"));
+        root = new IsolatedRootFile(System.getProperty("user.dir") + "/upload");
+        if(!root.getAbsoluteFile().exists()) {
+    		root.mkdirs();
+    	}
         System.setProperty("user.home", root.getAbsolutePath());
         if (System.getProperty("os.name", "").startsWith("Windows")) {
             windows = true;

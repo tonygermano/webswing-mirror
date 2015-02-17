@@ -25,6 +25,7 @@ import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventPaste;
+import org.webswing.model.c2s.JsonEventUploaded;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.ConfigurationManager;
@@ -95,6 +96,9 @@ public class SwingAsyncManagedService {
 					send(r, m.clientId, m, sm, logStats);
 				} else if (jsonMessage instanceof JsonEventPaste) {
 					JsonEventPaste p = (JsonEventPaste) jsonMessage;
+					send(r, p.clientId, p, sm, logStats);
+				} else if (jsonMessage instanceof JsonEventUploaded) {
+					JsonEventUploaded p = (JsonEventUploaded) jsonMessage;
 					send(r, p.clientId, p, sm, logStats);
 				} else {
 					return null;

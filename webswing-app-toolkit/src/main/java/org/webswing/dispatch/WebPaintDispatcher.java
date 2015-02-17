@@ -362,6 +362,8 @@ public class WebPaintDispatcher {
 		f.fileDialogEvent = fdEvent;
 		Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
 		fileChooserDialog = Util.discoverFileChooser(webWindowPeer);
+		fdEvent.addFilter(fileChooserDialog.getChoosableFileFilters());
+		fdEvent.isMultiSelection = fileChooserDialog.isMultiSelectionEnabled();
 		Services.getConnectionService().sendJsonObject(f);
 	}
 

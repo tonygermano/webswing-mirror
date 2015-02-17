@@ -36,6 +36,7 @@ public class UploadServlet extends HttpServlet {
             FileOutputStream output = new FileOutputStream(f);
             IOUtils.copy(filecontent, output);
             output.close();
+            filecontent.close();
             JsonEventUpload msg=new JsonEventUpload();
             msg.type=UploadType.Upload;
             msg.fileName=filename;
@@ -43,6 +44,8 @@ public class UploadServlet extends HttpServlet {
             boolean sent = SwingInstanceManager.getInstance().sendMessageToSwing(null, clientId,msg);
             if(!sent){
                 f.delete();
+            } else { 
+                resp.getWriter().write("{\"files\":[{\"name\":\""+filename+"\"}]}"); //TODO size
             }
         }
     }

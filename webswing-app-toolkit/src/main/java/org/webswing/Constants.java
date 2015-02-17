@@ -29,6 +29,10 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_ISOLATED_FS = "webswing.isolatedFs";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW = "webswing.directdraw";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED = "webswing.directdraw.supported";
+    public static final String SWING_START_SYS_PROP_ALLOW_DOWNLOAD = "webswing.allowDownload";
+    public static final String SWING_START_SYS_PROP_ALLOW_UPLOAD = "webswing.allowUpload";
+    public static final String SWING_START_SYS_PROP_ALLOW_DELETE = "webswing.allowDelete";
+
 
 	// JMS queue names
 	public static final String SWING2SERVER = "Swing2Server";

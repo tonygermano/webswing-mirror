@@ -75,15 +75,21 @@ define(
 				onFileDownloadAction : function(url) {
 					downloadURL('/file?id=' + url);
 				},
-				onFileDialogAction : function(data) {
-					fileDialogTransferBarClientId.val(ws.getClientId());
-					if (data.eventType == 'Open') {
-						fileDialogTransferBar.show("fast");
-					}
-					if (data.eventType == 'Close') {
-						fileDialogTransferBar.hide("fast");
-					}
-				},
+		        onFileDialogAction: function (data) {
+		            fileDialogTransferBarClientId.val(ws.getClientId());
+		            if (data.eventType === 'Open') {
+		                showOrHide("#fileDownloadBtn", data.allowDownload);
+		                showOrHide("#fileUploadBtn", data.allowUpload);
+		                showOrHide("#fileDeleteBtn", data.allowDelete);
+		                $("#files").text('');
+		                $('#progress .progress-bar').css('width', '0%');
+		                $("#fileInput").prop("multiple", data.isMultiSelection);
+		                $("#fileInput").attr("accept", data.filter);
+		                fileDialogTransferBar.show("fast");
+		            } else if (data.eventType === 'Close') {
+		                fileDialogTransferBar.hide(2000);
+		            }
+		        },
 				clientId : setupClientID(),
 				hasControl : true,
 				mirrorMode : false
@@ -98,14 +104,41 @@ define(
 				}
 			});
 
-			$('#fileupload').fileupload({
-				dataType : 'json',
-				done : function(e, data) {
-					$.each(data.result.files, function(index, file) {
-						$('<p/>').text(file.name).appendTo(document.body);
-					});
-				}
-			});
+		    var jqXHR_fileupload = new Array();
+		    $('#fileupload').fileupload({
+		        dataType: 'json',
+		        done: function (e, data) {
+		            $.each(data.result.files, function (index, file) {
+		                $("#files").append('<p>' + file.name);
+		            });
+		        },
+		        progressall: function (e, data) {
+		            var progress = parseInt(data.loaded / data.total * 100, 10);
+		            $('#progress .progress-bar').css('width', progress + '%');
+		            if(progress === 100) {
+		                var files = new Array();
+		                $("#files span").each(function (index) {
+		                    files.push($(this).text());
+		                });
+		                setTimeout(function(){
+		                    config.send({clientId: ws.getClientId(), files: files});
+		                }, 1000);
+		                jqXHR_fileupload = new Array();
+		            }
+		        }
+		    }).on('fileuploadadd', function (e, data) {
+		        $.each(data.files, function (index, file) {
+		            $("#files").append('<span style="display:none">' + file.name);
+		        });
+		        jqXHR_fileupload.push(data);
+		    });
+
+		    $("#cancelBtn").click(function () {
+		        config.send({clientId: ws.getClientId(), files: new Array()});
+		        for (var i = 0; i < jqXHR_fileupload.length; i++) {
+		            jqXHR_fileupload[i].abort();
+		        }
+		    });
 
 			function login() {
 				var errorMsg = $('#loginErrorMsg');
@@ -281,6 +314,14 @@ define(
 			function height() {
 				return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || 0;
 			}
+
+		    function showOrHide(id, bool) {
+		        if (bool) {
+		            $(id).show();
+		        } else {
+		            $(id).hide();
+		        }
+		    }
 
 			return {
 				continueSession : function(toContinue) {

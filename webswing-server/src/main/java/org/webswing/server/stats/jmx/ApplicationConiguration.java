@@ -70,4 +70,16 @@ public class ApplicationConiguration {
 	public boolean isDirectdraw() {
 		return sad.isDirectdraw();
 	}
+
+	public boolean isAllowDelete() {
+		return sad.isAllowDelete();
+	}
+
+	public boolean isAllowDownload() {
+		return sad.isAllowDownload();
+	}
+
+	public boolean isAllowUpload() {
+		return sad.isAllowUpload();
+	}
 }
