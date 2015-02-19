@@ -101,44 +101,67 @@
 			</div>
 		</div>
 	</div>
-        <div id="fileDialogTransferBar" class="fileDialogBar">
-            <div class="upload-drop">
-                <p class="upload-dropH1">Drag and drop files here </p>
-                <span id="files"></span>
-            </div>
-            <div id="fileDownloadBtn" class="fileDialogBarButton">
-                <button class="btn btn-success btn-primary" onclick="webswing.fileDialogDownload();">Download selected</button>
-            </div>
-            <div id="fileUploadBtn" class="fileDialogBarButton">
-                <form  id="fileupload" data-url="upload">
-                    <input id="fileDialogTransferBarClientId" name="clinetId" type="hidden" />
-                    <div class="fileUpload btn btn-success btn-primary">
-                        <span>Upload files</span>
-                        <input id="fileInput" type="file" name="files[]" class="upload" multiple/>
-                    </div>
-                </form>
-            </div>
-            <div id="fileDeleteBtn" class="fileDialogBarButton">
-                <!-- Single button -->
-                <div class="btn-group dropup">
-                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                        Delete selected <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu " role="menu">
-                        <li><span> Are you sure?</span></li>
-                        <li><a href="javascript:webswing.fileDialogDelete();">Yes</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div id="cancelBtn" class="btn btn-danger">
-                <i class="glyphicon glyphicon-ban-circle"></i>
-                Cancel
-            </div>     
-            <br /><br />
-            <div id="progress" class="progress">
-                <div class="progress-bar progress-bar-success"></div>
-            </div>
-        </div>
-
+  
+	<div id="fileDialogTransferBar" class="fileDialogBar">
+		<div class="container-fluid">
+			<div class="row fileDialogButtonRow">
+				<div id="fileDropArea">
+					<p class="upload-dropH1">Drag and drop files here </p>
+					<span id="files"></span>
+				</div>
+			</div>
+			<div class="row fileDialogButtonRow">
+				<div class="col-md-4"  id="fileDownloadBtn">
+					<button class="btn btn-success btn-sm btn-block" onclick="webswing.fileDialogDownload();">Download
+						selected</button>
+				</div>
+				<div class="col-md-4"  id="fileUploadBtn">
+					<form id="fileupload" data-url="upload">
+						<input id="fileDialogTransferBarClientId" name="clinetId" type="hidden">
+						<div class="fileUpload btn btn-success btn-sm btn-block">
+							<span>Upload files</span>
+							<input accept="" id="fileInput" name="files[]" class="upload"
+								type="file">
+						</div>
+					</form>
+				</div>
+				<div class="col-md-4"  id="fileDeleteBtn">
+					<!-- Single button -->
+					<div class="btn btn-success btn-sm btn-block dropup" >
+						<div class=" dropdown-toggle " type="button" data-toggle="dropdown">
+							Delete selected
+							<span class="caret"></span>
+						</div>
+						<ul class="dropdown-menu " role="menu">
+							<li>
+								<span style="color: gray;"> Are you sure?</span>
+							</li>
+							<li>
+								<a href="javascript:webswing.fileDialogDelete();">Yes</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div id="fileDialogTransferProgressBar" class="row fileDialogButtonRow">
+				<div style="padding-right: 0px;" class="col-md-8">
+					<div id="progress" class="progress">
+						<div style="width: 0%;" class="progress-bar progress-bar-success">
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div id="cancelBtn" class="btn btn-danger btn-xs btn-block">
+						<span class="glyphicon glyphicon-ban-circle"> Cancel</span>
+					</div>
+				</div>
+			</div>
+			<div id="fileDialogErrorMessage" class="row fileDialogButtonRow">
+				<div class="col-md-12">
+					<div id="fileDialogErrorMessageContent" class="alert alert-danger"></div>
+				</div>
+			</div>
+		</div>
+	</div>  
 </body>
 </html>

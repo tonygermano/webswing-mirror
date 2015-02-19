@@ -86,7 +86,6 @@ public class WebEventDispatcher {
 					if (currentDir.canWrite() && tempFile.exists()) {
 						try {
 							Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
-							dialog.rescanCurrentDirectory();
 							uploadMap.put(upload.fileName, validfilename);
 						} catch (IOException e) {
 							Logger.error("Error while moving uploaded file to target folder: ", e);
@@ -306,6 +305,7 @@ public class WebEventDispatcher {
 		JFileChooser fc = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
 		JsonEventUploaded event = (JsonEventUploaded) e;
 		if (fc != null) {
+			fc.rescanCurrentDirectory();
 			if (event.files.size() > 0) {
 				if (fc.isMultiSelectionEnabled()) {
 					File arr[] = new File[event.files.size()];
@@ -317,7 +317,7 @@ public class WebEventDispatcher {
 					File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.files.get(0)));
 					fc.setSelectedFile(f);
 				}
-				fc.approveSelection();
+				// fc.approveSelection();
 			} else {
 				fc.cancelSelection();
 			}

@@ -183,7 +183,7 @@ public class Main {
 					tempDir.mkdir();
 				} else {
 					for (File f : tempDir.listFiles()) {
-						if (!f.delete()) {
+						if (!delete(f)) {
 							throw new IllegalStateException("Not possible to clean the temp folder. Make sure no other instance of webswing is running or use '-d true' option to create a new temp folder.");
 						}
 					}
@@ -195,6 +195,17 @@ public class Main {
 		} else {
 			return new File(URI.create(System.getProperty(Constants.TEMP_DIR_PATH)));
 		}
+	}
+
+	private static boolean delete(File f) {
+		if(f.isDirectory()){
+			for (File fx : f.listFiles()) {
+				if(!delete(fx)){
+					return false;
+				}
+			}
+		}
+		return f.delete(); 
 	}
 
 	private static void initTempDirPath(String[] args) {

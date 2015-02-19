@@ -1,6 +1,6 @@
 define(
-		[ 'jquery', 'webswing-base', 'atmosphere', 'bootstrap', 'jquery.iframe-transport','jquery.fileupload'],
-		function( $, webswingBase, atmosphere) {
+		[ 'jquery', 'webswing-base', 'atmosphere', 'bootstrap', 'jquery.iframe-transport', 'jquery.fileupload' ],
+		function($, webswingBase, atmosphere) {
 			"use strict";
 			var loginDialog = $('#loginDialog');
 			var initializingDialog = $('#initializingDialog');
@@ -11,15 +11,14 @@ define(
 			var disconnectedDialog = $('#disconnectedDialog');
 			var messageDialog = $('#messageDialog');
 			var messageDialogText = $('#messageDialogText');
-			var fileDialogTransferBar = $('#fileDialogTransferBar');
-			var fileDialogTransferBarClientId = $('#fileDialogTransferBarClientId');
+			var fileUpload = FileUploaderFactory();
 			var canvas = null;
 			var socket = null;
 			var config = {
 				send : function(message) {
 					if (socket != null && socket.request.isOpen) {
 						if (typeof message == "string") {
-							socket.push(message)
+							socket.push(message);
 						}
 						if (typeof message === "object") {
 							socket.push(atmosphere.util.stringifyJSON(message));
@@ -59,8 +58,9 @@ define(
 					}
 				},
 				onApplicationShutdown : function() {
-					showDialog(messageDialog, 'Application stopped... <br\> <button class="btn btn-primary" onclick="webswing.continueSession(false)">Start new session.</button>'+
-							'<span> </span><button class="btn btn-default" onclick="window.location.href = \'/logout\'">Logout.</button>');
+					showDialog(messageDialog,
+							'Application stopped... <br\> <button class="btn btn-primary" onclick="webswing.continueSession(false)">Start new session.</button>'
+									+ '<span> </span><button class="btn btn-default" onclick="window.location.href = \'/logout\'">Logout.</button>');
 					atmosphere.unsubscribe();
 				},
 				onBeforePaint : function() {
@@ -75,21 +75,13 @@ define(
 				onFileDownloadAction : function(url) {
 					downloadURL('/file?id=' + url);
 				},
-		        onFileDialogAction: function (data) {
-		            fileDialogTransferBarClientId.val(ws.getClientId());
-		            if (data.eventType === 'Open') {
-		                showOrHide("#fileDownloadBtn", data.allowDownload);
-		                showOrHide("#fileUploadBtn", data.allowUpload);
-		                showOrHide("#fileDeleteBtn", data.allowDelete);
-		                $("#files").text('');
-		                $('#progress .progress-bar').css('width', '0%');
-		                $("#fileInput").prop("multiple", data.isMultiSelection);
-		                $("#fileInput").attr("accept", data.filter);
-		                fileDialogTransferBar.show("fast");
-		            } else if (data.eventType === 'Close') {
-		                fileDialogTransferBar.hide(2000);
-		            }
-		        },
+				onFileDialogAction : function(data) {
+					if (data.eventType === 'Open') {
+						fileUpload.open(data, ws.getClientId());
+					} else if (data.eventType === 'Close') {
+						fileUpload.close();
+					}
+				},
 				clientId : setupClientID(),
 				hasControl : true,
 				mirrorMode : false
@@ -104,41 +96,113 @@ define(
 				}
 			});
 
-		    var jqXHR_fileupload = new Array();
-		    $('#fileupload').fileupload({
-		        dataType: 'json',
-		        done: function (e, data) {
-		            $.each(data.result.files, function (index, file) {
-		                $("#files").append('<p>' + file.name);
-		            });
-		        },
-		        progressall: function (e, data) {
-		            var progress = parseInt(data.loaded / data.total * 100, 10);
-		            $('#progress .progress-bar').css('width', progress + '%');
-		            if(progress === 100) {
-		                var files = new Array();
-		                $("#files span").each(function (index) {
-		                    files.push($(this).text());
-		                });
-		                setTimeout(function(){
-		                    config.send({clientId: ws.getClientId(), files: files});
-		                }, 1000);
-		                jqXHR_fileupload = new Array();
-		            }
-		        }
-		    }).on('fileuploadadd', function (e, data) {
-		        $.each(data.files, function (index, file) {
-		            $("#files").append('<span style="display:none">' + file.name);
-		        });
-		        jqXHR_fileupload.push(data);
-		    });
+			function FileUploaderFactory() {
+				var fileDialogTransferBar = $('#fileDialogTransferBar');
+				var fileDialogTransferBarClientId = $('#fileDialogTransferBarClientId');
+				var fileDialogErrorMessage = $('#fileDialogErrorMessage');
+				var fileDialogErrorMessageContent = $('#fileDialogErrorMessageContent');
+				var jqXHR_fileupload = [];
+				var doneFileList = [];
+				var timeout;
+				var errorTimeout;
+				$(document).bind('drop', function(e) {
+					e.preventDefault();
+				});
+				$(document).bind('dragover', function(e) {
+					var dropZone = $("#fileDropArea");
+					if (!timeout) {
+						dropZone.addClass('in');
+					} else {
+						clearTimeout(timeout);
+					}
 
-		    $("#cancelBtn").click(function () {
-		        config.send({clientId: ws.getClientId(), files: new Array()});
-		        for (var i = 0; i < jqXHR_fileupload.length; i++) {
-		            jqXHR_fileupload[i].abort();
-		        }
-		    });
+					timeout = setTimeout(function() {
+						timeout = null;
+						dropZone.removeClass('in');
+					}, 100);
+				});
+
+				var jqUpload = $('#fileupload').fileupload({
+					dataType : 'json',
+					dropZone : $('#fileDropArea')
+				});
+
+				jqUpload.on('fileuploadadd', function(e, data) {
+					data.files.forEach(function(file) {
+						doneFileList.push(file.name);
+					});
+					jqXHR_fileupload.push(data);
+					$("#fileDialogTransferProgressBar").show("fast");
+				});
+
+				jqUpload.bind('fileuploadfail', function(e, data) {
+					if (!errorTimeout) {
+						fileDialogErrorMessageContent.append('<p>'+data.jqXHR.responseText+'</p>');
+						fileDialogErrorMessage.show("fast");
+					} else {
+						fileDialogErrorMessageContent.append('<p>'+data.jqXHR.responseText+'</p>');
+						clearTimeout(timeout);
+					}
+					errorTimeout = setTimeout(function() {
+						errorTimeout = null;
+						fileDialogErrorMessageContent.html("");
+						fileDialogErrorMessage.hide("fast");
+					}, 5000);
+				});
+
+				jqUpload.bind("fileuploadprogressall", function(e, data) {
+					var progress = parseInt(data.loaded / data.total * 100, 10);
+					$('#progress .progress-bar').css('width', progress + '%');
+					if (progress === 100) {
+						setTimeout(function() {
+							config.send({
+								clientId : ws.getClientId(),
+								files : doneFileList
+							});
+							doneFileList = [];
+						}, 1000);
+						$("#fileDialogTransferProgressBar").hide("fast");
+						$('#progress .progress-bar').css('width', '0%');
+						jqXHR_fileupload = [];
+					}
+				});
+
+				$("#cancelBtn").click(function() {
+					config.send({
+						clientId : ws.getClientId(),
+						files : []
+					});
+					jqXHR_fileupload.forEach(function(el) {
+						el.abort();
+					});
+					$("#fileDialogTransferProgressBar").hide("fast");
+					$('#progress .progress-bar').css('width', '0%');
+				});
+
+				function showOrHide(id, bool) {
+					if (bool) {
+						$(id).show();
+					} else {
+						$(id).hide();
+					}
+				}
+				return {
+					open : function(data, clientId) {
+						fileDialogTransferBarClientId.val(clientId);
+						showOrHide("#fileDownloadBtn", data.allowDownload);
+						showOrHide("#fileUploadBtn", data.allowUpload);
+						showOrHide("#fileDropArea", data.allowUpload);
+						showOrHide("#fileDeleteBtn", data.allowDelete);
+						$('#progress .progress-bar').css('width', '0%');
+						$("#fileInput").prop("multiple", data.isMultiSelection);
+						$("#fileInput").attr("accept", data.filter);
+						fileDialogTransferBar.show("fast");
+					},
+					close : function() {
+						fileDialogTransferBar.hide("fast");
+					}
+				};
+			}
 
 			function login() {
 				var errorMsg = $('#loginErrorMsg');
@@ -147,7 +211,7 @@ define(
 					url : '/login?mode=swing',
 					data : $("#loginForm").serialize(),
 					success : function(data) {
-						errorMsg.html('')
+						errorMsg.html('');
 						start();
 					},
 					error : function(data) {
@@ -315,14 +379,6 @@ define(
 				return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || 0;
 			}
 
-		    function showOrHide(id, bool) {
-		        if (bool) {
-		            $(id).show();
-		        } else {
-		            $(id).hide();
-		        }
-		    }
-
 			return {
 				continueSession : function(toContinue) {
 					if (toContinue) {
@@ -353,7 +409,7 @@ define(
 				fileDialogDelete : function() {
 					ws.requestDeleteFile();
 				},
-				setDirectDrawSupported : function(supported){
+				setDirectDrawSupported : function(supported) {
 					ws.setDirectDrawSupported(supported);
 				}
 			};

@@ -30,12 +30,8 @@ canvas {
 	border-color: #ddd;
 }
 
-.fileDialogBarButton {
-	margin-right: 10px;
-	margin-left: 10px;
-	margin-top: 0px;
-	margin-bottom: 0px;
-	float: left;
+.fileDialogButtonRow {
+	padding-bottom: 10px;
 }
 
 .fileUpload {
@@ -59,30 +55,29 @@ canvas {
     max-width: 155px;
 }
 
-.upload-drop {
+#fileDropArea {
     border-style: dashed;
     border-color: #ccc;
-    height: 200px;
+    height: 30px;
     overflow:auto;
     margin-bottom: 5px;
 }
- 
-.upload-drop p {
+#fileDropArea.in {
+    height: 200px;
+}
+
+#fileDropArea p {
     margin: 0 0 2px;
     padding-left: 10px;
+    text-align: center;
 }
 
-.upload-dropH1 {
-     text-align: center;
+.progress{
+    margin-bottom: 0px;
 }
 
-.progress{ 
-    margin-right: 10px;
-    margin-left: 10px;
-}
-
-#fileDownloadBtn, #fileUploadBtn, #fileDeleteBtn {
+#fileDownloadBtn, #fileUploadBtn, #fileDeleteBtn, #fileDropArea, #fileDialogTransferProgressBar, #fileDialogErrorMessage {
     display: none;
 }
 
- 
+

@@ -39,6 +39,7 @@ import org.webswing.model.c2s.JsonConnectionHandshake;
 import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventPaste;
+import org.webswing.model.c2s.JsonEventUploaded;
 import org.webswing.model.s2c.JsonApplication;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
@@ -70,7 +71,7 @@ public class ServerUtil {
 	public static Object decode(String s) {
 		Object o = null;
 		if (!s.startsWith(Constants.PAINT_ACK_PREFIX)) {
-			Class<?> a[] = { JsonEventMouse.class, JsonEventKeyboard.class, JsonConnectionHandshake.class, JsonEventPaste.class, JsonApplyConfiguration.class };
+			Class<?> a[] = { JsonEventMouse.class, JsonEventKeyboard.class, JsonEventUploaded.class, JsonConnectionHandshake.class, JsonEventPaste.class, JsonApplyConfiguration.class };
 			for (Class<?> c : a) {
 				try {
 					o = mapper.readValue(s, c);
