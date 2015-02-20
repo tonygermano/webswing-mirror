@@ -99,7 +99,6 @@ public class WebEventDispatcher {
 		}
 	}
 
-	@SuppressWarnings("restriction")
 	public void dispatchMessage(String message) {
 		Logger.debug("WebEventDispatcher.dispatchMessage", message);
 		if (message.startsWith(Constants.SWING_KILL_SIGNAL)) {
