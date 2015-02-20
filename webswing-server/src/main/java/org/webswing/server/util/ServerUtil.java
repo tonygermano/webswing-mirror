@@ -27,6 +27,7 @@ import org.apache.shiro.subject.Subject;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.FrameworkConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -40,6 +41,7 @@ import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.c2s.JsonEventUploaded;
+import org.webswing.model.c2s.JsonInputEvent;
 import org.webswing.model.s2c.JsonApplication;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
@@ -71,8 +73,12 @@ public class ServerUtil {
 	public static Object decode(String s) {
 		Object o = null;
 		if (!s.startsWith(Constants.PAINT_ACK_PREFIX)) {
-			Class<?> a[] = { JsonEventMouse.class, JsonEventKeyboard.class, JsonEventUploaded.class, JsonConnectionHandshake.class, JsonEventPaste.class, JsonApplyConfiguration.class };
-			for (Class<?> c : a) {
+			List<TypeReference<?>> types = new ArrayList<TypeReference<?>>();
+			types.add(new TypeReference<List<JsonInputEvent>>() {});
+			types.add(new TypeReference<JsonEventUploaded>() {});
+			types.add(new TypeReference<JsonEventPaste>() {});
+			types.add(new TypeReference<JsonApplyConfiguration>() {});
+			for (TypeReference<?> c : types) {
 				try {
 					o = mapper.readValue(s, c);
 					break;

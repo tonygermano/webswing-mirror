@@ -2,6 +2,7 @@ package org.webswing.server.handler;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.atmosphere.client.TrackMessageSizeInterceptor;
@@ -26,6 +27,7 @@ import org.webswing.model.c2s.JsonEventKeyboard;
 import org.webswing.model.c2s.JsonEventMouse;
 import org.webswing.model.c2s.JsonEventPaste;
 import org.webswing.model.c2s.JsonEventUploaded;
+import org.webswing.model.c2s.JsonInputEvent;
 import org.webswing.model.s2c.JsonAppFrame;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.ConfigurationManager;
@@ -80,20 +82,23 @@ public class SwingAsyncManagedService {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Serializable processWebswingMessage(AtmosphereResource r, Object message, boolean logStats) {
 		if (message instanceof String) {
 			String sm = (String) message;
 			Object jsonMessage = ServerUtil.decode((String) message);
 			if (jsonMessage != null) {
-				if (jsonMessage instanceof JsonConnectionHandshake) {
-					JsonConnectionHandshake h = (JsonConnectionHandshake) jsonMessage;
-					SwingInstanceManager.getInstance().connectSwingInstance(r, h);
-				} else if (jsonMessage instanceof JsonEventKeyboard) {
-					JsonEventKeyboard k = (JsonEventKeyboard) jsonMessage;
-					send(r, k.clientId, k, sm, logStats);
-				} else if (jsonMessage instanceof JsonEventMouse) {
-					JsonEventMouse m = (JsonEventMouse) jsonMessage;
-					send(r, m.clientId, m, sm, logStats);
+				if (jsonMessage instanceof List) {
+					List<JsonInputEvent> evts = (List<JsonInputEvent>) jsonMessage;
+					for (JsonInputEvent evt : evts) {
+						if (evt.handshake != null) {
+							SwingInstanceManager.getInstance().connectSwingInstance(r, evt.handshake);
+						} else if (evt.key != null) {
+							send(r, evt.key.clientId, evt.key, sm, logStats);
+						} else if (evt.mouse != null) {
+							send(r, evt.mouse.clientId, evt.mouse, sm, logStats);
+						}
+					}
 				} else if (jsonMessage instanceof JsonEventPaste) {
 					JsonEventPaste p = (JsonEventPaste) jsonMessage;
 					send(r, p.clientId, p, sm, logStats);

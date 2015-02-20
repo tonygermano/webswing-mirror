@@ -17,7 +17,7 @@
 			},
 			onApplicationSelection : c.onApplicationSelection || function() {
 			},
-			onApplicationShutdown : c.onApplicationShutdown || function(){
+			onApplicationShutdown : c.onApplicationShutdown || function() {
 			},
 			onBeforePaint : c.onBeforePaint || function() {
 			},
@@ -50,35 +50,47 @@
 		var windowImageHolders = c.windowImageHolders || {};
 		var directDraw = new WebswingDirectDraw(c.directDrawConfig || {});
 
-		var timer1 = setInterval(mouseMoveEventFilter, 100);
+		var timer1 = setInterval(sendInput, 100);
 		var timer2 = setInterval(heartbeat, 10000);
+
+		var inputEvtQueue=[];
 
 		function send(message) {
 			config.send(message);
 		}
 
-		function sendInput(message) {
+		function sendInput() {
 			if (config.hasControl) {
-				send(message);
+				enqueueInputEvent();
+				if(inputEvtQueue.length>0){
+					send(inputEvtQueue);
+					inputEvtQueue=[];
+				}
 			}
 		}
+
 
 		function heartbeat() {
 			send('hb' + clientId);
 		}
 
-		function mouseMoveEventFilter() {
-			if (latestMouseMoveEvent != null && config.hasControl) {
-				send(latestMouseMoveEvent);
+		function enqueueInputEvent(message) {
+			if (latestMouseMoveEvent != null) {
+				inputEvtQueue.push(latestMouseMoveEvent);
 				latestMouseMoveEvent = null;
 			}
-			if (latestMouseWheelEvent != null && config.hasControl) {
-				send(latestMouseWheelEvent);
+			if (latestMouseWheelEvent != null ) {
+				inputEvtQueue.push(latestMouseWheelEvent);
 				latestMouseWheelEvent = null;
 			}
-			if (latestWindowResizeEvent != null && config.hasControl) {
-				send(latestWindowResizeEvent);
+			if (latestWindowResizeEvent != null ) {
+				inputEvtQueue.push(latestWindowResizeEvent);
 				latestWindowResizeEvent = null;
+			}
+			if(message!=null ){
+				if(JSON.stringify(inputEvtQueue[inputEvtQueue.length-1]) !== JSON.stringify(message) ){
+					inputEvtQueue.push(message);
+				}
 			}
 		}
 
@@ -112,7 +124,7 @@
 		}
 
 		function handshake() {
-			send(getHandShake());
+			send([getHandShake()]);
 		}
 
 		function resizedWindow() {
@@ -131,7 +143,7 @@
 
 		function processTxtMessage(message) {
 			if (message == "shutDownNotification") {
-	            config.onApplicationShutdown();
+				config.onApplicationShutdown();
 				dispose();
 			} else if (message == "applicationAlreadyRunning") {
 				config.onErrorMessage('Application is already running in other browser window...');
@@ -169,8 +181,7 @@
 				}
 			}
 			if (data.moveAction != null) {
-				copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height,
-						context);
+				copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height, context);
 			}
 			if (data.cursorChange != null && config.hasControl) {
 				canvas.style.cursor = data.cursorChange.cursor;
@@ -203,48 +214,42 @@
 			}
 			// regular windows (background removed)
 			if (data.windows != null) {
-				data.windows.reduce(
-						function(sequence, win) {
-							if (win.directDrawB64 != null) {
-								// directdraw
-								return sequence.then(function(resolved) {
-									return directDraw.draw64(win.directDrawB64, windowImageHolders[win.id]);
-								}).then(
-										function(resultImage) {
-											windowImageHolders[win.id] = resultImage;
-											for ( var x in win.content) {
-												var winContent = win.content[x];
-												if (winContent != null) {
-													context.drawImage(resultImage, winContent.positionX, winContent.positionY, winContent.width,
-															winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY,
-															winContent.width, winContent.height);
-												}
-											}
-										});
-							} else {
-								// imagedraw
-								return sequence.then(function(resolved) {
-									return win.content.reduce(function(internalSeq, winContent) {
-										return internalSeq.then(function(done) {
-											return new Promise(
-													function(resolved, rejected) {
-														if (winContent != null) {
-															var imageObj = new Image();
-															imageObj.onload = function() {
-																context.drawImage(imageObj, win.posX + winContent.positionX, win.posY
-																		+ winContent.positionY);
-																imageObj.onload = null;
-																imageObj.src = '';
-																resolved();
-															};
-															imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
-														}
-													});
-										});
-									}, Promise.resolve());
-								});
+				data.windows.reduce(function(sequence, win) {
+					if (win.directDrawB64 != null) {
+						// directdraw
+						return sequence.then(function(resolved) {
+							return directDraw.draw64(win.directDrawB64, windowImageHolders[win.id]);
+						}).then(function(resultImage) {
+							windowImageHolders[win.id] = resultImage;
+							for ( var x in win.content) {
+								var winContent = win.content[x];
+								if (winContent != null) {
+									context.drawImage(resultImage, winContent.positionX, winContent.positionY, winContent.width, winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height);
+								}
 							}
-						}, Promise.resolve()).then(function() {
+						});
+					} else {
+						// imagedraw
+						return sequence.then(function(resolved) {
+							return win.content.reduce(function(internalSeq, winContent) {
+								return internalSeq.then(function(done) {
+									return new Promise(function(resolved, rejected) {
+										if (winContent != null) {
+											var imageObj = new Image();
+											imageObj.onload = function() {
+												context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
+												imageObj.onload = null;
+												imageObj.src = '';
+												resolved();
+											};
+											imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
+										}
+									});
+								});
+							}, Promise.resolve());
+						});
+					}
+				}, Promise.resolve()).then(function() {
 					ack();
 				});
 			}
@@ -270,27 +275,27 @@
 			bindEvent(canvas, 'mousedown', function(evt) {
 				var mousePos = getMousePos(canvas, evt, 'mousedown');
 				latestMouseMoveEvent = null;
-				sendInput(mousePos);
+				enqueueInputEvent(mousePos);
 				canvas.focus();
 				return false;
 			}, false);
 			bindEvent(canvas, 'dblclick', function(evt) {
 				var mousePos = getMousePos(canvas, evt, 'dblclick');
 				latestMouseMoveEvent = null;
-				sendInput(mousePos);
+				enqueueInputEvent(mousePos);
 				canvas.focus();
 				return false;
 			}, false);
 			bindEvent(canvas, 'mousemove', function(evt) {
 				var mousePos = getMousePos(canvas, evt, 'mousemove');
-				mousePos.button = mouseDown;
+				mousePos.mouse.button = mouseDown;
 				latestMouseMoveEvent = mousePos;
 				return false;
 			}, false);
 			bindEvent(canvas, 'mouseup', function(evt) {
 				var mousePos = getMousePos(canvas, evt, 'mouseup');
 				latestMouseMoveEvent = null;
-				sendInput(mousePos);
+				enqueueInputEvent(mousePos);
 				return false;
 			}, false);
 			// IE9, Chrome, Safari, Opera
@@ -298,7 +303,7 @@
 				var mousePos = getMousePos(canvas, evt, 'mousewheel');
 				latestMouseMoveEvent = null;
 				if (latestMouseWheelEvent != null) {
-					mousePos.wheelDelta += latestMouseWheelEvent.wheelDelta;
+					mousePos.mouse.wheelDelta += latestMouseWheelEvent.mouse.wheelDelta;
 				}
 				latestMouseWheelEvent = mousePos;
 				return false;
@@ -308,7 +313,7 @@
 				var mousePos = getMousePos(canvas, evt, 'mousewheel');
 				latestMouseMoveEvent = null;
 				if (latestMouseWheelEvent != null) {
-					mousePos.wheelDelta += latestMouseWheelEvent.wheelDelta;
+					mousePos.mouse.wheelDelta += latestMouseWheelEvent.mouse.wheelDelta;
 				}
 				latestMouseWheelEvent = mousePos;
 				return false;
@@ -327,26 +332,27 @@
 				// 226
 				// FF (163, 171, 173, ) -> en layout ]\/ keys
 				var kc = event.keyCode;
-				if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226)
-						|| (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
+				if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226) || (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
 					event.preventDefault();
 					event.stopPropagation();
 				}
 				var keyevt = getKBKey('keydown', canvas, event);
 				// hanle paste event
-				if (keyevt.ctrl && keyevt.character == 86) { // ctrl+v
+				if (keyevt.key.ctrl && keyevt.key.character == 86) { // ctrl+v
 					var text = prompt('Press ctrl+v and enter..');
 					var pasteEvent = {
 						content : text,
 						clientId : clientId
 					};
-					sendInput(pasteEvent);
+					if(config.hasControl){
+						send(pasteEvent);
+					}
 				} else {
 					// default action prevented
-					if (keyevt.ctrl && !keyevt.alt && !keyevt.altgr) {
+					if (keyevt.key.ctrl && !keyevt.key.alt && !keyevt.key.altgr) {
 						event.preventDefault();
 					}
-					sendInput(keyevt);
+					enqueueInputEvent(keyevt);
 				}
 				return false;
 			}, false);
@@ -354,14 +360,14 @@
 				event.preventDefault();
 				event.stopPropagation();
 				var keyevt = getKBKey('keypress', canvas, event);
-				sendInput(keyevt);
+				enqueueInputEvent(keyevt);
 				return false;
 			}, false);
 			bindEvent(canvas, 'keyup', function(event) {
 				event.preventDefault();
 				event.stopPropagation();
 				var keyevt = getKBKey('keyup', canvas, event);
-				sendInput(keyevt);
+				enqueueInputEvent(keyevt);
 				return false;
 			}, false);
 			bindEvent(document, 'mousedown', function(evt) {
@@ -390,16 +396,18 @@
 				delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 			}
 			return {
-				clientId : clientId,
-				x : mouseX,
-				y : mouseY,
-				type : type,
-				wheelDelta : delta,
-				button : evt.which,
-				ctrl : evt.ctrlKey,
-				alt : evt.altKey,
-				shift : evt.shiftKey,
-				meta : evt.metaKey
+				mouse : {
+					clientId : clientId,
+					x : mouseX,
+					y : mouseY,
+					type : type,
+					wheelDelta : delta,
+					button : evt.which,
+					ctrl : evt.ctrlKey,
+					alt : evt.altKey,
+					shift : evt.shiftKey,
+					meta : evt.metaKey
+				}
 			};
 		}
 
@@ -413,27 +421,31 @@
 				kk = char;
 			}
 			return {
-				clientId : clientId,
-				type : type,
-				character : char,
-				keycode : kk,
-				alt : evt.altKey,
-				ctrl : evt.ctrlKey,
-				shift : evt.shiftKey,
-				meta : evt.metaKey,
-				altgr : evt.altGraphKey
+				key : {
+					clientId : clientId,
+					type : type,
+					character : char,
+					keycode : kk,
+					alt : evt.altKey,
+					ctrl : evt.ctrlKey,
+					shift : evt.shiftKey,
+					meta : evt.metaKey,
+					altgr : evt.altGraphKey
+				}
 			};
 		}
 
 		function getHandShake() {
 			var handshake = {
-				applicationName : appName,
-				clientId : clientId,
-				sessionId : uuid,
-				desktopWidth : canvas.width,
-				desktopHeight : canvas.height,
-				mirrored : mirrorMode,
-				directDrawSupported : directDrawSupported
+				handshake : {
+					applicationName : appName,
+					clientId : clientId,
+					sessionId : uuid,
+					desktopWidth : canvas.width,
+					desktopHeight : canvas.height,
+					mirrored : mirrorMode,
+					directDrawSupported : directDrawSupported
+				}
 			};
 			return handshake;
 		}
@@ -497,8 +509,8 @@
 			dispose : function() {
 				dispose();
 			},
-			setDirectDrawSupported : function(supported){
-				directDrawSupported=supported;
+			setDirectDrawSupported : function(supported) {
+				directDrawSupported = supported;
 			},
 			getWindowImageHolders : function() {
 				return windowImageHolders;
@@ -507,5 +519,5 @@
 				return directDraw;
 			}
 		};
-	}
+	};
 }));

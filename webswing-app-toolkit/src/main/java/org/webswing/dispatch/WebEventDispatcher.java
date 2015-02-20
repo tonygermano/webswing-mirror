@@ -152,8 +152,7 @@ public class WebEventDispatcher {
 
 				// filter out ctrl+c for copy
 				if (event.type == JsonEventKeyboard.Type.keydown && event.character == 67 && event.ctrl == true && event.alt == false && event.altgr == false && event.meta == false && event.shift == false) {
-					Transferable copied = Util.getWebToolkit().getSystemSelection().getContents(DataFlavor.stringFlavor);
-					Util.getWebToolkit().getSystemClipboard().setContents(copied, owner);
+					// on copy event - do nothing, default behavior calls setContents on WebClipboard, which notifies the browser
 				}
 				if (event.type == JsonEventKeyboard.Type.keydown && event.character == 86 && event.ctrl == true && event.alt == false && event.altgr == false && event.meta == false && event.shift == false) {
 					// on paste event -do nothing
