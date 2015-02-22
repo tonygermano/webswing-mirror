@@ -326,7 +326,7 @@ public class SwingJvmConnection implements MessageListener {
 				return jmxConnection.getMBeanServerConnection();
 			}
 		} catch (IOException e) {
-			log.error("Failed to connect to JMX of swing instance ", e);
+			log.debug("Failed to connect to JMX of swing instance ", e);
 		}
 		return null;
 	}

@@ -65,7 +65,7 @@ public class SwingMain {
 				pattern = pattern.replaceAll("\\\\", "/");
 				String[] pathSegs = pattern.split("/");
 				boolean absolute = pathSegs[0].length() == 0 || pathSegs[0].contains(":") ? true : false;
-				String currentBase = absolute ? "/" : base + "/";
+				String currentBase = absolute ? "/" : "";
 				scanForPatternFiles(pathSegs, currentBase, result);
 			} else {
 				result.add(pattern);
@@ -78,7 +78,7 @@ public class SwingMain {
 		String pathSeg = pathSegs[0];
 		if (pathSegs.length > 1) {
 			if (pathSeg.contains("?") || pathSeg.contains("*")) {
-				File currentBaseFolder = new File(currentBase);
+				File currentBaseFolder = new File(currentBase.isEmpty() ? "." : currentBase);
 				if (currentBaseFolder.exists() && currentBaseFolder.isDirectory()) {
 					for (String name : currentBaseFolder.list()) {
 						if (matches(pathSeg, name)) {
@@ -91,7 +91,7 @@ public class SwingMain {
 				scanForPatternFiles(Arrays.copyOfRange(pathSegs, 1, pathSegs.length), currentBase, result);
 			}
 		} else {
-			File currentBaseFolder = new File(currentBase);
+			File currentBaseFolder = new File(currentBase.isEmpty() ? "." : currentBase);
 			if (currentBaseFolder.exists() && currentBaseFolder.isDirectory()) {
 				for (String name : currentBaseFolder.list()) {
 					if (matches(pathSeg, name)) {

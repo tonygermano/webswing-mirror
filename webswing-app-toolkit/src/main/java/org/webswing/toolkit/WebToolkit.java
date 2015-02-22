@@ -466,6 +466,10 @@ public abstract class WebToolkit extends SunToolkit {
 		return config;
 	}
 
+	public boolean areExtraMouseButtonsEnabled() throws HeadlessException {
+		return true;
+	}
+
 	// update system colors to win7 default theme (light)
 	protected void loadSystemColors(int[] systemColors) throws HeadlessException {
 		if (systemColors != null && systemColors.length == 26) {

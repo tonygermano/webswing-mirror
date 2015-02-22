@@ -26,7 +26,7 @@ public class StatUtils {
 				stats.setHeapSize(Double.valueOf((Long) cd.get("max")) / MB);
 				stats.setHeapSizeUsed(Double.valueOf((Long) cd.get("used")) / MB);
 			} catch (Exception e) {
-				Logger.error("Failed to read memory consumption stats.", e);
+				Logger.debug("Failed to read memory consumption stats.");
 			}
 		}
 	}
