@@ -39,13 +39,12 @@ import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
 import org.webswing.dispatch.WebPaintDispatcher;
-import org.webswing.model.c2s.JsonEventKeyboard;
-import org.webswing.model.c2s.JsonEventKeyboard.Type;
-import org.webswing.model.c2s.JsonEventMouse;
-import org.webswing.model.s2c.JsonAppFrame;
-import org.webswing.model.s2c.JsonWindow;
-import org.webswing.model.s2c.JsonWindowPartialContent;
-import org.webswing.toolkit.WebComponentPeer;
+import org.webswing.model.c2s.KeyboardEventMsgIn;
+import org.webswing.model.c2s.KeyboardEventMsgIn.Type;
+import org.webswing.model.c2s.MouseEventMsgIn;
+import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.model.s2c.WindowMsg;
+import org.webswing.model.s2c.WindowPartialContentMsg;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 
@@ -65,7 +64,7 @@ public class Util {
 		return 0;
 	}
 
-	public static int getMouseModifiersAWTFlag(JsonEventMouse evt) {
+	public static int getMouseModifiersAWTFlag(MouseEventMsgIn evt) {
 		int result = 0;
 		switch (evt.button) {
 		case 1:
@@ -105,7 +104,7 @@ public class Util {
 		}
 	}
 
-	public static int getKeyModifiersAWTFlag(JsonEventKeyboard event) {
+	public static int getKeyModifiersAWTFlag(KeyboardEventMsgIn event) {
 		int modifiers = 0;
 		if (event.alt) {
 			modifiers = modifiers | KeyEvent.ALT_MASK;
@@ -170,8 +169,8 @@ public class Util {
 		return null;
 	}
 
-	public static Map<String, Map<Integer, BufferedImage>> extractWindowImages(JsonAppFrame json, Map<String, Map<Integer, BufferedImage>> windowImages) {
-		for (JsonWindow window : json.getWindows()) {
+	public static Map<String, Map<Integer, BufferedImage>> extractWindowImages(AppFrameMsgOut json, Map<String, Map<Integer, BufferedImage>> windowImages) {
+		for (WindowMsg window : json.getWindows()) {
 			WebWindowPeer w = findWindowPeerById(window.getId());
 			if (window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
 				windowImages.put(window.getId(), new HashMap<Integer, BufferedImage>());// background
@@ -183,7 +182,7 @@ public class Util {
 			} else {
 				Map<Integer, BufferedImage> imageMap = new HashMap<Integer, BufferedImage>();
 				for (int i = 0; i < window.getContent().length; i++) {
-					JsonWindowPartialContent wpc = window.getContent()[i];
+					WindowPartialContentMsg wpc = window.getContent()[i];
 					imageMap.put(i, w.extractBufferedImage(new Rectangle(wpc.getPositionX(), wpc.getPositionY(), wpc.getWidth(), wpc.getHeight())));
 				}
 				windowImages.put(window.getId(), imageMap);
@@ -192,9 +191,9 @@ public class Util {
 		return windowImages;
 	}
 
-	public static Map<String, Image> extractWindowWebImages(JsonAppFrame json, Map<String, Image> webImages) {
-		for (Iterator<JsonWindow> i = json.getWindows().iterator(); i.hasNext();) {
-			JsonWindow window = i.next();
+	public static Map<String, Image> extractWindowWebImages(AppFrameMsgOut json, Map<String, Image> webImages) {
+		for (Iterator<WindowMsg> i = json.getWindows().iterator(); i.hasNext();) {
+			WindowMsg window = i.next();
 			WebWindowPeer w = findWindowPeerById(window.getId());
 			if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
 				Image webimageString = w.extractWebImage();
@@ -204,38 +203,36 @@ public class Util {
 		return webImages;
 	}
 
-	public static void encodeWindowImages(Map<String, Map<Integer, BufferedImage>> windowImages, JsonAppFrame json) {
-		for (JsonWindow window : json.getWindows()) {
+	public static void encodeWindowImages(Map<String, Map<Integer, BufferedImage>> windowImages, AppFrameMsgOut json) {
+		for (WindowMsg window : json.getWindows()) {
 			if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
 				Map<Integer, BufferedImage> imageMap = windowImages.get(window.getId());
 				for (int i = 0; i < window.getContent().length; i++) {
-					JsonWindowPartialContent c = window.getContent()[i];
+					WindowPartialContentMsg c = window.getContent()[i];
 					if (imageMap.containsKey(i)) {
-						String base64Content = Services.getImageService().encodeData(Services.getImageService().getPngImage(imageMap.get(i)));
-						c.setBase64Content(base64Content);
+						c.setBase64Content(Services.getImageService().getPngImage(imageMap.get(i)));
 					}
 				}
 			}
 		}
 	}
 
-	public static void encodeWindowWebImages(Map<String, Image> windowWebImages, JsonAppFrame json) {
-		for (JsonWindow window : json.getWindows()) {
+	public static void encodeWindowWebImages(Map<String, Image> windowWebImages, AppFrameMsgOut json) {
+		for (WindowMsg window : json.getWindows()) {
 			if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
 				Image wi = windowWebImages.get(window.getId());
-				String base64Content = Services.getImageService().encodeData(Services.getDirectDrawService().buildWebImage(wi));
-				window.setDirectDrawB64(base64Content);
+				window.setDirectDraw(Services.getDirectDrawService().buildWebImage(wi));
 			}
 		}
 	}
 
 	@SuppressWarnings("restriction")
-	public static JsonAppFrame fillJsonWithWindowsData(Map<String, Set<Rectangle>> currentAreasToUpdate, Map<String, List<Rectangle>> windowNonVisibleAreas) {
-		JsonAppFrame json = new JsonAppFrame();
+	public static AppFrameMsgOut fillJsonWithWindowsData(Map<String, Set<Rectangle>> currentAreasToUpdate, Map<String, List<Rectangle>> windowNonVisibleAreas) {
+		AppFrameMsgOut json = new AppFrameMsgOut();
 		for (String windowId : currentAreasToUpdate.keySet()) {
 			WebWindowPeer ww = Util.findWindowPeerById(windowId);
 			if (ww != null || windowId.equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
-				JsonWindow window = json.getOrCreateWindowById(windowId);
+				WindowMsg window = json.getOrCreateWindowById(windowId);
 				if (windowId.equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
 					window.setPosX(0);
 					window.setPosY(0);
@@ -249,10 +246,10 @@ public class Util {
 					window.setHeight(ww.getBounds().height);
 				}
 				List<Rectangle> toPaint = joinRectangles(getGrid(new ArrayList<Rectangle>(currentAreasToUpdate.get(windowId)), windowNonVisibleAreas.get(windowId)));
-				List<JsonWindowPartialContent> partialContentList = new ArrayList<JsonWindowPartialContent>();
+				List<WindowPartialContentMsg> partialContentList = new ArrayList<WindowPartialContentMsg>();
 				for (Rectangle r : toPaint) {
 					if (r.x < window.getWidth() && r.y < window.getHeight()) {
-						JsonWindowPartialContent content = new JsonWindowPartialContent();
+						WindowPartialContentMsg content = new WindowPartialContentMsg();
 						content.setPositionX(r.x);
 						content.setPositionY(r.y);
 						content.setWidth(Math.min(r.width, window.getWidth() - r.x));
@@ -260,7 +257,7 @@ public class Util {
 						partialContentList.add(content);
 					}
 				}
-				window.setContent(partialContentList.toArray(new JsonWindowPartialContent[partialContentList.size()]));
+				window.setContent(partialContentList.toArray(new WindowPartialContentMsg[partialContentList.size()]));
 			}
 		}
 		return json;

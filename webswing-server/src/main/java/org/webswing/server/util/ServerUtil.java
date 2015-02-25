@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URL;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
@@ -31,24 +30,23 @@ import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.model.admin.c2s.JsonApplyConfiguration;
-import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
-import org.webswing.model.admin.s2c.JsonMessage;
-import org.webswing.model.admin.s2c.JsonMessage.Type;
-import org.webswing.model.admin.s2c.JsonSwingSession;
-import org.webswing.model.c2s.JsonConnectionHandshake;
-import org.webswing.model.c2s.JsonEventKeyboard;
-import org.webswing.model.c2s.JsonEventMouse;
-import org.webswing.model.c2s.JsonEventPaste;
-import org.webswing.model.c2s.JsonEventUploaded;
-import org.webswing.model.c2s.JsonInputEvent;
-import org.webswing.model.s2c.JsonApplication;
+import org.webswing.model.MsgOut;
+import org.webswing.model.admin.c2s.ApplyConfigurationMsgIn;
+import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
+import org.webswing.model.admin.s2c.MessageMsg;
+import org.webswing.model.admin.s2c.MessageMsg.Type;
+import org.webswing.model.admin.s2c.SwingSessionMsg;
+import org.webswing.model.c2s.InputEventMsgIn;
+import org.webswing.model.c2s.PasteEventMsgIn;
+import org.webswing.model.c2s.UploadedEventMsgIn;
+import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
 import org.webswing.server.SwingInstance;
 import org.webswing.server.handler.ApplicationSelectorServlet;
 import org.webswing.server.handler.FileServlet;
 import org.webswing.server.handler.LoginServlet;
+import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.stats.SessionRecorder;
 
 public class ServerUtil {
@@ -58,11 +56,8 @@ public class ServerUtil {
 	private static final Map<String, String> iconMap = new HashMap<String, String>();
 	private static final ObjectMapper mapper = new ObjectMapper();
 
-	public static String encode(Serializable m) {
+	public static String encode2Json(MsgOut m) {
 		try {
-			if (m instanceof String) {
-				return (String) m;
-			}
 			return mapper.writeValueAsString(m);
 		} catch (IOException e) {
 			log.error("Encoding object failed: " + m, e);
@@ -70,28 +65,34 @@ public class ServerUtil {
 		}
 	}
 
+	public static byte[] encode2Proto(MsgOut m) {
+		return null;
+	}
+
 	public static Object decode(String s) {
 		Object o = null;
-		if (!s.startsWith(Constants.PAINT_ACK_PREFIX)) {
-			List<TypeReference<?>> types = new ArrayList<TypeReference<?>>();
-			types.add(new TypeReference<List<JsonInputEvent>>() {});
-			types.add(new TypeReference<JsonEventUploaded>() {});
-			types.add(new TypeReference<JsonEventPaste>() {});
-			types.add(new TypeReference<JsonApplyConfiguration>() {});
-			for (TypeReference<?> c : types) {
-				try {
-					o = mapper.readValue(s, c);
-					break;
-				} catch (IOException e) {
-					// do nothing
-				}
+		List<TypeReference<?>> types = new ArrayList<TypeReference<?>>();
+		types.add(new TypeReference<List<InputEventMsgIn>>() {
+		});
+		types.add(new TypeReference<UploadedEventMsgIn>() {
+		});
+		types.add(new TypeReference<PasteEventMsgIn>() {
+		});
+		types.add(new TypeReference<ApplyConfigurationMsgIn>() {
+		});
+		for (TypeReference<?> c : types) {
+			try {
+				o = mapper.readValue(s, c);
+				break;
+			} catch (IOException e) {
+				// do nothing
 			}
 		}
 		return o;
 	}
 
-	public static List<JsonApplication> createApplicationJsonInfo(AtmosphereResource r, Map<String, SwingApplicationDescriptor> applications, boolean includeAdminApp) {
-		List<JsonApplication> apps = new ArrayList<JsonApplication>();
+	public static List<ApplicationInfoMsg> createApplicationJsonInfo(AtmosphereResource r, Map<String, SwingApplicationDescriptor> applications, boolean includeAdminApp) {
+		List<ApplicationInfoMsg> apps = new ArrayList<ApplicationInfoMsg>();
 		if (applications.size() == 0) {
 			return null;
 		} else {
@@ -100,7 +101,7 @@ public class ServerUtil {
 				if (!isUserAuthorizedForApplication(r, descriptor)) {
 					continue;
 				}
-				JsonApplication app = new JsonApplication();
+				ApplicationInfoMsg app = new ApplicationInfoMsg();
 				app.name = name;
 				if (descriptor.getIcon() == null) {
 					app.base64Icon = loadImage(null);
@@ -117,7 +118,7 @@ public class ServerUtil {
 				apps.add(app);
 			}
 			if (includeAdminApp) {
-				JsonApplication adminConsole = new JsonApplication();
+				ApplicationInfoMsg adminConsole = new ApplicationInfoMsg();
 				adminConsole.name = Constants.ADMIN_CONSOLE_APP_NAME;
 				apps.add(adminConsole);
 			}
@@ -205,8 +206,8 @@ public class ServerUtil {
 		return warFile;
 	}
 
-	public static JsonSwingSession composeSwingInstanceStatus(SwingInstance si) {
-		JsonSwingSession result = new JsonSwingSession();
+	public static SwingSessionMsg composeSwingInstanceStatus(SwingInstance si) {
+		SwingSessionMsg result = new SwingSessionMsg();
 		result.setId(si.getClientId());
 		result.setApplication(si.getApplicationName());
 		result.setConnected(si.getSessionId() != null);
@@ -266,13 +267,13 @@ public class ServerUtil {
 	}
 
 	private static String createJsonMessageFrame(Type t, String text) {
-		JsonAdminConsoleFrame response = new JsonAdminConsoleFrame();
-		JsonMessage message = new JsonMessage();
+		AdminConsoleFrameMsgOut response = new AdminConsoleFrameMsgOut();
+		MessageMsg message = new MessageMsg();
 		message.setType(t);
 		message.setText(text);
 		message.setTime(new Date());
 		response.setMessage(message);
-		return encode(response);
+		return encode2Json(response);
 	}
 
 	public static String getPreSelectedApplication(HttpServletRequest r, boolean reset) {
@@ -293,11 +294,15 @@ public class ServerUtil {
 		return args != null ? args : "";
 	}
 
-	public static void broadcastMessage(AtmosphereResource r, Serializable o) {
+	public static void broadcastMessage(AtmosphereResource r, EncodedMessage o) {
 		for (AtmosphereResource resource : r.getBroadcaster().getAtmosphereResources()) {
 			if (resource.uuid().equals(r.uuid())) {
-				resource.getBroadcaster().broadcast(o, resource);
+				resource.getBroadcaster().broadcast(resource.forceBinaryWrite() ? o.getProtoMessage() : o.getJsonMessage(), resource);
 			}
 		}
+	}
+
+	public static void broadcastMessage(AtmosphereResource r, MsgOut o) {
+		broadcastMessage(r, new EncodedMessage(o));
 	}
 }

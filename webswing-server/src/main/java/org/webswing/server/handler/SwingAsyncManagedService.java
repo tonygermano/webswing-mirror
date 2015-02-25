@@ -22,16 +22,18 @@ import org.atmosphere.interceptor.SuspendTrackerInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.model.c2s.JsonConnectionHandshake;
-import org.webswing.model.c2s.JsonEventKeyboard;
-import org.webswing.model.c2s.JsonEventMouse;
-import org.webswing.model.c2s.JsonEventPaste;
-import org.webswing.model.c2s.JsonEventUploaded;
-import org.webswing.model.c2s.JsonInputEvent;
-import org.webswing.model.s2c.JsonAppFrame;
+import org.webswing.model.MsgIn;
+import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.c2s.KeyboardEventMsgIn;
+import org.webswing.model.c2s.MouseEventMsgIn;
+import org.webswing.model.c2s.PasteEventMsgIn;
+import org.webswing.model.c2s.UploadedEventMsgIn;
+import org.webswing.model.c2s.InputEventMsgIn;
+import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstanceManager;
+import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.stats.SessionRecorder;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.server.util.StatUtils;
@@ -45,7 +47,7 @@ public class SwingAsyncManagedService {
 
 	@Ready
 	@DeliverTo(DELIVER_TO.RESOURCE)
-	public Serializable onReady(final AtmosphereResource r) {
+	public void onReady(final AtmosphereResource r) {
 		resourceMap.put(r.uuid(), r);
 		r.getRequest().setAttribute(ApplicationSelectorServlet.APPLICATION_CUSTOM_ARGS, r.getRequest().getSession().getAttribute(ApplicationSelectorServlet.APPLICATION_CUSTOM_ARGS));
 		r.getRequest().setAttribute(SessionRecorder.RECORDING_FLAG, r.getRequest().getSession().getAttribute(SessionRecorder.RECORDING_FLAG));
@@ -60,10 +62,10 @@ public class SwingAsyncManagedService {
 				applicationsMap.put(preSelectedApplicationName, preSelectedApp);
 			}
 		}
-		JsonAppFrame appInfo = new JsonAppFrame();
+		AppFrameMsgOut appInfo = new AppFrameMsgOut();
 		appInfo.user = ServerUtil.getUserName(r);
 		appInfo.applications = ServerUtil.createApplicationJsonInfo(r, applicationsMap, includeAdminApp);
-		return ServerUtil.encode(appInfo);
+		ServerUtil.broadcastMessage(r, new EncodedMessage(appInfo));
 	}
 
 	@Disconnect
@@ -89,39 +91,27 @@ public class SwingAsyncManagedService {
 			Object jsonMessage = ServerUtil.decode((String) message);
 			if (jsonMessage != null) {
 				if (jsonMessage instanceof List) {
-					List<JsonInputEvent> evts = (List<JsonInputEvent>) jsonMessage;
-					for (JsonInputEvent evt : evts) {
+					List<InputEventMsgIn> evts = (List<InputEventMsgIn>) jsonMessage;
+					for (InputEventMsgIn evt : evts) {
 						if (evt.handshake != null) {
 							SwingInstanceManager.getInstance().connectSwingInstance(r, evt.handshake);
 						} else if (evt.key != null) {
 							send(r, evt.key.clientId, evt.key, sm, logStats);
 						} else if (evt.mouse != null) {
 							send(r, evt.mouse.clientId, evt.mouse, sm, logStats);
+						} else if (evt.event != null) {
+							send(r, evt.event.clientId, evt.event, sm, logStats);
 						}
 					}
-				} else if (jsonMessage instanceof JsonEventPaste) {
-					JsonEventPaste p = (JsonEventPaste) jsonMessage;
+				} else if (jsonMessage instanceof PasteEventMsgIn) {
+					PasteEventMsgIn p = (PasteEventMsgIn) jsonMessage;
 					send(r, p.clientId, p, sm, logStats);
-				} else if (jsonMessage instanceof JsonEventUploaded) {
-					JsonEventUploaded p = (JsonEventUploaded) jsonMessage;
+				} else if (jsonMessage instanceof UploadedEventMsgIn) {
+					UploadedEventMsgIn p = (UploadedEventMsgIn) jsonMessage;
 					send(r, p.clientId, p, sm, logStats);
 				} else {
 					return null;
 				}
-			} else if (sm.startsWith(Constants.PAINT_ACK_PREFIX)) {
-				send(r, sm.substring(Constants.PAINT_ACK_PREFIX.length()), sm, sm, logStats);
-			} else if (sm.startsWith(Constants.UNLOAD_PREFIX)) {
-				send(r, sm.substring(Constants.UNLOAD_PREFIX.length()), sm, sm, logStats);
-			} else if (sm.startsWith(Constants.HEARTBEAT_MSG_PREFIX)) {
-				send(r, sm.substring(Constants.HEARTBEAT_MSG_PREFIX.length()), sm, sm, logStats);
-			} else if (sm.startsWith(Constants.REPAINT_REQUEST_PREFIX)) {
-				send(r, sm.substring(Constants.REPAINT_REQUEST_PREFIX.length()), sm, sm, logStats);
-			} else if (sm.startsWith(Constants.SWING_KILL_SIGNAL)) {
-				send(r, sm.substring(Constants.SWING_KILL_SIGNAL.length()), sm, sm, logStats);
-			} else if (sm.startsWith(Constants.DELETE_FILE_PREFIX)) {
-				send(r, sm.substring(Constants.DELETE_FILE_PREFIX.length()), sm, sm, logStats);
-			} else if (sm.startsWith(Constants.DOWNLOAD_FILE_PREFIX)) {
-				send(r, sm.substring(Constants.DOWNLOAD_FILE_PREFIX.length()), sm, sm, logStats);
 			} else {
 				return sm;
 			}
@@ -129,7 +119,7 @@ public class SwingAsyncManagedService {
 		return null;
 	}
 
-	private static void send(AtmosphereResource r, String clientId, Serializable o, String message, boolean logStat) {
+	private static void send(AtmosphereResource r, String clientId, MsgIn o, String message, boolean logStat) {
 		if (logStat) {
 			StatUtils.logInboundData(SwingInstanceManager.getInstance().findInstance(clientId), message.getBytes().length);
 		}

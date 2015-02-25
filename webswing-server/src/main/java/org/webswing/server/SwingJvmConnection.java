@@ -38,12 +38,15 @@ import org.apache.tools.ant.types.Environment.Variable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.model.c2s.JsonConnectionHandshake;
-import org.webswing.model.s2c.JsonAppFrame;
-import org.webswing.model.s2c.JsonLinkAction;
-import org.webswing.model.s2c.JsonLinkAction.JsonLinkActionType;
-import org.webswing.model.s2c.OpenFileResult;
-import org.webswing.model.s2c.PrinterJobResult;
+import org.webswing.model.MsgInternal;
+import org.webswing.model.MsgOut;
+import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.model.s2c.LinkActionMsg;
+import org.webswing.model.s2c.SimpleEventMsgOut;
+import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
+import org.webswing.model.s2c.OpenFileResultMsgInternal;
+import org.webswing.model.s2c.PrinterJobResultMsgInternal;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.handler.FileServlet;
 import org.webswing.server.util.Los;
@@ -71,7 +74,7 @@ public class SwingJvmConnection implements MessageListener {
 	private boolean jmsOpen = false;
 	private String customArgs = "";
 
-	public SwingJvmConnection(JsonConnectionHandshake handshake, SwingApplicationDescriptor appConfig, WebSessionListener webListener, String customArgs) {
+	public SwingJvmConnection(ConnectionHandshakeMsgIn handshake, SwingApplicationDescriptor appConfig, WebSessionListener webListener, String customArgs) {
 		this.webListener = webListener;
 		this.clientId = handshake.clientId;
 		this.customArgs = customArgs;
@@ -146,24 +149,27 @@ public class SwingJvmConnection implements MessageListener {
 	public void onMessage(Message m) {
 		try {
 			if (m instanceof ObjectMessage) {
-				if (((ObjectMessage) m).getObject() instanceof PrinterJobResult) {
-					PrinterJobResult pj = (PrinterJobResult) ((ObjectMessage) m).getObject();
-					FileServlet.registerFile(pj.getPdf(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser());
-					JsonAppFrame f = new JsonAppFrame();
-					JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.print, pj.getId());
-					f.setLinkAction(linkAction);
-					webListener.sendToWeb(f);
+				Serializable o = ((ObjectMessage) m).getObject();
+				if (o instanceof MsgInternal) {
+					if (o instanceof PrinterJobResultMsgInternal) {
+						PrinterJobResultMsgInternal pj = (PrinterJobResultMsgInternal) o;
+						FileServlet.registerFile(pj.getPdf(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser());
+						AppFrameMsgOut f = new AppFrameMsgOut();
+						LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.print, pj.getId());
+						f.setLinkAction(linkAction);
+						webListener.sendToWeb(f);
+					} else if (o instanceof OpenFileResultMsgInternal) {
+						OpenFileResultMsgInternal fr = (OpenFileResultMsgInternal) o;
+						String id = UUID.randomUUID().toString();
+						FileServlet.registerFile(fr.getF(), id, 30, TimeUnit.MINUTES, webListener.getUser());
+						AppFrameMsgOut f = new AppFrameMsgOut();
+						LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.file, id);
+						f.setLinkAction(linkAction);
+						webListener.sendToWeb(f);
+					}
+				} else if (o instanceof MsgOut) {
+					webListener.sendToWeb((MsgOut) o);
 				}
-				if (((ObjectMessage) m).getObject() instanceof OpenFileResult) {
-					OpenFileResult fr = (OpenFileResult) ((ObjectMessage) m).getObject();
-					String id = UUID.randomUUID().toString();
-					FileServlet.registerFile(fr.getF(), id, 30, TimeUnit.MINUTES, webListener.getUser());
-					JsonAppFrame f = new JsonAppFrame();
-					JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.file, id);
-					f.setLinkAction(linkAction);
-					webListener.sendToWeb(f);
-				}
-				webListener.sendToWeb(((ObjectMessage) m).getObject());
 			} else if (m instanceof TextMessage) {
 				String text = ((TextMessage) m).getText();
 				if (text.startsWith(Constants.SWING_PID_NOTIFICATION) && this.jmxConnection == null) {
@@ -179,7 +185,7 @@ public class SwingJvmConnection implements MessageListener {
 
 	public void close(boolean withShutdownEvent) {
 		if (withShutdownEvent) {
-			webListener.sendToWeb(Constants.SWING_SHUTDOWN_NOTIFICATION);
+			webListener.sendToWeb(SimpleEventMsgOut.shutDownNotification.buildMsgOut());
 		}
 		try {
 			synchronized (this) {
@@ -200,7 +206,7 @@ public class SwingJvmConnection implements MessageListener {
 		webListener.notifyClose();
 	}
 
-	public Future<?> start(final SwingApplicationDescriptor appConfig, final JsonConnectionHandshake handshake) {
+	public Future<?> start(final SwingApplicationDescriptor appConfig, final ConnectionHandshakeMsgIn handshake) {
 		final Integer screenWidth = handshake.desktopWidth;
 		final Integer screenHeight = handshake.desktopHeight;
 		Future<?> future = swingAppExecutor.submit(new Callable<Object>() {
@@ -335,7 +341,7 @@ public class SwingJvmConnection implements MessageListener {
 
 		String getUser();
 
-		void sendToWeb(Serializable o);
+		void sendToWeb(MsgOut o);
 
 		void notifyClose();
 	}

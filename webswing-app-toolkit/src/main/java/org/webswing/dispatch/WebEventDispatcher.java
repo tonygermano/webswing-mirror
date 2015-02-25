@@ -7,9 +7,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -22,15 +19,15 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
-import org.webswing.Constants;
-import org.webswing.model.c2s.JsonConnectionHandshake;
-import org.webswing.model.c2s.JsonEvent;
-import org.webswing.model.c2s.JsonEventKeyboard;
-import org.webswing.model.c2s.JsonEventMouse;
-import org.webswing.model.c2s.JsonEventMouse.Type;
-import org.webswing.model.c2s.JsonEventPaste;
-import org.webswing.model.c2s.JsonEventUpload;
-import org.webswing.model.c2s.JsonEventUploaded;
+import org.webswing.model.MsgIn;
+import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.c2s.KeyboardEventMsgIn;
+import org.webswing.model.c2s.MouseEventMsgIn;
+import org.webswing.model.c2s.MouseEventMsgIn.Type;
+import org.webswing.model.c2s.PasteEventMsgIn;
+import org.webswing.model.c2s.SimpleEventMsgIn;
+import org.webswing.model.c2s.UploadEventMsgIn;
+import org.webswing.model.c2s.UploadedEventMsgIn;
 import org.webswing.toolkit.WebClipboard;
 import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.extra.DndEventHandler;
@@ -47,35 +44,32 @@ public class WebEventDispatcher {
 	private static final DndEventHandler dndHandler = new DndEventHandler();
 	private HashMap<String, String> uploadMap = new HashMap<String, String>();
 
-	private ClipboardOwner owner = new ClipboardOwner() {
-
-		@Override
-		public void lostOwnership(Clipboard clipboard, Transferable contents) {
-		}
-	};
-
-	public void dispatchEvent(JsonEvent event) {
+	public void dispatchEvent(MsgIn event) {
 		Logger.debug("WebEventDispatcher.dispatchEvent:", event);
 
-		if (event instanceof JsonEventMouse) {
-			dispatchMouseEvent((JsonEventMouse) event);
+		if (event instanceof MouseEventMsgIn) {
+			dispatchMouseEvent((MouseEventMsgIn) event);
 		}
-		if (event instanceof JsonEventKeyboard) {
-			dispatchKeyboardEvent((JsonEventKeyboard) event);
+		if (event instanceof KeyboardEventMsgIn) {
+			dispatchKeyboardEvent((KeyboardEventMsgIn) event);
 		}
-		if (event instanceof JsonConnectionHandshake) {
-			JsonConnectionHandshake handshake = (JsonConnectionHandshake) event;
+		if (event instanceof ConnectionHandshakeMsgIn) {
+			ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
 			Util.getWebToolkit().initSize(handshake.desktopWidth, handshake.desktopHeight);
 		}
-		if (event instanceof JsonEventPaste) {
-			JsonEventPaste paste = (JsonEventPaste) event;
+		if (event instanceof SimpleEventMsgIn) {
+			SimpleEventMsgIn msg = (SimpleEventMsgIn) event;
+			dispatchMessage(msg);
+		}
+		if (event instanceof PasteEventMsgIn) {
+			PasteEventMsgIn paste = (PasteEventMsgIn) event;
 			handlePasteEvent(paste.content);
 		}
-		if (event instanceof JsonEventUploaded) {
-			handleUploadedEvent((JsonEventUploaded) event);
+		if (event instanceof UploadedEventMsgIn) {
+			handleUploadedEvent((UploadedEventMsgIn) event);
 		}
-		if (event instanceof JsonEventUpload) {
-			JsonEventUpload upload = (JsonEventUpload) event;
+		if (event instanceof UploadEventMsgIn) {
+			UploadEventMsgIn upload = (UploadEventMsgIn) event;
 			JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
 			if (dialog != null) {
 				switch (upload.type) {
@@ -99,38 +93,41 @@ public class WebEventDispatcher {
 		}
 	}
 
-	public void dispatchMessage(String message) {
+	private void dispatchMessage(SimpleEventMsgIn message) {
 		Logger.debug("WebEventDispatcher.dispatchMessage", message);
-		if (message.startsWith(Constants.SWING_KILL_SIGNAL)) {
+		switch (message.type) {
+		case killSwing:
 			Logger.info("Received kill signal. Swing application shutting down.");
 			SwingUtilities.invokeLater(new Runnable() {
-
 				@Override
 				public void run() {
 					System.exit(0);
 				}
 			});
-		}
-		if (message.startsWith(Constants.PAINT_ACK_PREFIX)) {
+			break;
+		case deleteFile:
+			Util.getWebToolkit().getPaintDispatcher().notifyDeleteSelectedFile();
+			break;
+		case downloadFile:
+			Util.getWebToolkit().getPaintDispatcher().notifyDownloadSelectedFile();
+			break;
+		case paintAck:
 			Util.getWebToolkit().getPaintDispatcher().clientReadyToReceive();
-		}
-		if (message.startsWith(Constants.REPAINT_REQUEST_PREFIX)) {
+			break;
+		case repaint:
 			if (Util.isDD()) {
 				Services.getDirectDrawService().resetCache();
 				Util.repaintAllWindow();
 			} else {
 				Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaintAll();
 			}
-		}
-		if (message.startsWith(Constants.DOWNLOAD_FILE_PREFIX)) {
-			Util.getWebToolkit().getPaintDispatcher().notifyDownloadSelectedFile();
-		}
-		if (message.startsWith(Constants.DELETE_FILE_PREFIX)) {
-			Util.getWebToolkit().getPaintDispatcher().notifyDeleteSelectedFile();
+			break;
+		case hb:
+		case unload:
 		}
 	}
 
-	private void dispatchKeyboardEvent(JsonEventKeyboard event) {
+	private void dispatchKeyboardEvent(KeyboardEventMsgIn event) {
 		Window w = (Window) WindowManager.getInstance().getActiveWindow();
 		if (w != null) {
 			long when = System.currentTimeMillis();
@@ -151,23 +148,23 @@ public class WebEventDispatcher {
 				AWTEvent e = new KeyEvent(src, type, when, modifiers, event.keycode, (char) event.character, KeyEvent.KEY_LOCATION_STANDARD);
 
 				// filter out ctrl+c for copy
-				if (event.type == JsonEventKeyboard.Type.keydown && event.character == 67 && event.ctrl == true && event.alt == false && event.altgr == false && event.meta == false && event.shift == false) {
+				if (event.type == KeyboardEventMsgIn.Type.keydown && event.character == 67 && event.ctrl == true && event.alt == false && event.altgr == false && event.meta == false && event.shift == false) {
 					// on copy event - do nothing, default behavior calls setContents on WebClipboard, which notifies the browser
 				}
-				if (event.type == JsonEventKeyboard.Type.keydown && event.character == 86 && event.ctrl == true && event.alt == false && event.altgr == false && event.meta == false && event.shift == false) {
+				if (event.type == KeyboardEventMsgIn.Type.keydown && event.character == 86 && event.ctrl == true && event.alt == false && event.altgr == false && event.meta == false && event.shift == false) {
 					// on paste event -do nothing
 				} else {
 					dispatchEventInSwing(w, e);
-					if (event.keycode == 32 && event.type == JsonEventKeyboard.Type.keydown) {// space keycode handle press
-						event.type = JsonEventKeyboard.Type.keypress;
-						dispatchEvent(event);
+					if (event.keycode == 32 && event.type == KeyboardEventMsgIn.Type.keydown) {// space keycode handle press
+						event.type = KeyboardEventMsgIn.Type.keypress;
+						dispatchKeyboardEvent(event);
 					}
 				}
 			}
 		}
 	}
 
-	private void dispatchMouseEvent(JsonEventMouse event) {
+	private void dispatchMouseEvent(MouseEventMsgIn event) {
 		Window w = null;
 		if (WindowManager.getInstance().isLockedToWindowDecorationHandler()) {
 			w = WindowManager.getInstance().getLockedToWindow();
@@ -299,9 +296,9 @@ public class WebEventDispatcher {
 		}
 	}
 
-	private void handleUploadedEvent(JsonEventUploaded e) {
+	private void handleUploadedEvent(UploadedEventMsgIn e) {
 		JFileChooser fc = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
-		JsonEventUploaded event = (JsonEventUploaded) e;
+		UploadedEventMsgIn event = (UploadedEventMsgIn) e;
 		if (fc != null) {
 			fc.rescanCurrentDirectory();
 			if (event.files.size() > 0) {

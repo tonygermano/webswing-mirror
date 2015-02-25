@@ -168,9 +168,6 @@ angular.module('ws-console.controllers', [])
 					$scope.$parent.appDataProcessor = function(data) {
 						$scope.ws.processJsonMessage(data);
 					};
-					$scope.$parent.appMsgProcessor = function(data) {
-						$scope.ws.processTxtMessage(data);
-					};
 					$scope.ws.setCanvas($('#canvas')[0]);
 					$scope.ws.canPaint(true);
 					$scope.ws.setApplication(session.application);

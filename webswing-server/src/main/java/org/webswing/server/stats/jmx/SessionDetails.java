@@ -2,12 +2,12 @@ package org.webswing.server.stats.jmx;
 
 import java.util.Date;
 
-import org.webswing.model.admin.s2c.JsonSwingSession;
+import org.webswing.model.admin.s2c.SwingSessionMsg;
 
 public class SessionDetails {
-	JsonSwingSession sessionInfo;
+	SwingSessionMsg sessionInfo;
 
-	public SessionDetails(JsonSwingSession sessionInfo) {
+	public SessionDetails(SwingSessionMsg sessionInfo) {
 		this.sessionInfo = sessionInfo;
 	}
 

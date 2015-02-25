@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.webswing.Constants;
-import org.webswing.model.s2c.OpenFileResult;
+import org.webswing.model.s2c.OpenFileResultMsgInternal;
 import org.webswing.util.Logger;
 import org.webswing.util.Util;
 
@@ -52,7 +52,7 @@ public class WebDesktopPeer implements DesktopPeer {
     }
 
     private void sendFile(File file) {
-        OpenFileResult f= new OpenFileResult();
+        OpenFileResultMsgInternal f= new OpenFileResultMsgInternal();
         f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
         f.setF(file);
         Util.getWebToolkit().getPaintDispatcher().sendJsonObject(f);

@@ -1,15 +1,17 @@
 package org.webswing.server;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import org.atmosphere.cpr.AtmosphereResource;
-import org.webswing.Constants;
-import org.webswing.model.admin.s2c.JsonSwingJvmStats;
-import org.webswing.model.c2s.JsonConnectionHandshake;
+import org.webswing.model.MsgIn;
+import org.webswing.model.MsgOut;
+import org.webswing.model.admin.s2c.SwingJvmStatsMsg;
+import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.SwingJvmConnection.WebSessionListener;
 import org.webswing.server.handler.admin.AdminAsyncManagedService;
+import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.stats.SessionRecorder;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.server.util.StatUtils;
@@ -21,13 +23,13 @@ public class SwingInstance implements WebSessionListener {
 	private AtmosphereResource mirroredResource;
 	private SwingApplicationDescriptor application;
 	private SwingJvmConnection connection;
-	private JsonSwingJvmStats latest = new JsonSwingJvmStats();
+	private SwingJvmStatsMsg latest = new SwingJvmStatsMsg();
 	private Date disconnectedSince;
 	private SessionRecorder sessionRecorder;
 	private final Date startedAt = new Date();
 	private Date endedAt = null;
 
-	public SwingInstance(JsonConnectionHandshake h, SwingApplicationDescriptor app, AtmosphereResource resource) {
+	public SwingInstance(ConnectionHandshakeMsgIn h, SwingApplicationDescriptor app, AtmosphereResource resource) {
 		this.application = app;
 		this.sessionRecorder = ServerUtil.isRecording(resource.getRequest()) ? new SessionRecorder(this) : null;
 		this.user = ServerUtil.getUserName(resource);
@@ -62,15 +64,16 @@ public class SwingInstance implements WebSessionListener {
 		}
 	}
 
-	public void sendToWeb(Serializable o) {
-		String serialized = ServerUtil.encode(o);
+	public void sendToWeb(MsgOut o) {
+		EncodedMessage serialized = new EncodedMessage(o);
 		if (sessionRecorder != null) {
-			sessionRecorder.saveFrame(serialized);
+			sessionRecorder.saveFrame(serialized.getProtoMessage());
 		}
 		if (resource != null) {
-			StatUtils.logOutboundData(this, serialized);
 			synchronized (resource) {
 				ServerUtil.broadcastMessage(resource, serialized);
+				int length = resource.forceBinaryWrite() ? serialized.getProtoMessage().length : serialized.getJsonMessage().getBytes().length;
+				StatUtils.logOutboundData(this, length);
 			}
 		}
 		if (mirroredResource != null) {
@@ -82,12 +85,13 @@ public class SwingInstance implements WebSessionListener {
 		}
 	}
 
-	public boolean sendToSwing(AtmosphereResource r, Serializable h) {
+	public boolean sendToSwing(AtmosphereResource r, MsgIn h) {
 		if (connection.isRunning()) {
-			if (h instanceof String) {
-				if (((String) h).startsWith(Constants.PAINT_ACK_PREFIX) && ((resource != null && r.uuid().equals(resource.uuid())) || (resource == null && mirroredResource != null && r.uuid().equals(mirroredResource.uuid())))) {
+			if (h instanceof SimpleEventMsgIn) {
+				SimpleEventMsgIn m = (SimpleEventMsgIn) h;
+				if (m.type.equals(SimpleEventMsgIn.Type.paintAck) && ((resource != null && r.uuid().equals(resource.uuid())) || (resource == null && mirroredResource != null && r.uuid().equals(mirroredResource.uuid())))) {
 					connection.send(h);
-				} else if (((String) h).startsWith(Constants.UNLOAD_PREFIX)) {
+				} else if (m.type.equals(SimpleEventMsgIn.Type.unload)) {
 					SwingInstanceManager.getInstance().notifySessionDisconnected(r.uuid());
 				} else {
 					connection.send(h);
@@ -151,11 +155,11 @@ public class SwingInstance implements WebSessionListener {
 		return endedAt;
 	}
 
-	public JsonSwingJvmStats collectStats() {
+	public SwingJvmStatsMsg collectStats() {
 		return latest = StatUtils.getSwingInstanceStats(this, connection != null ? connection.getJmxConnection() : null);
 	}
 
-	public JsonSwingJvmStats getStats() {
+	public SwingJvmStatsMsg getStats() {
 		return latest;
 	}
 

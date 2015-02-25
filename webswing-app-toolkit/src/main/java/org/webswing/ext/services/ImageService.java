@@ -8,11 +8,9 @@ import org.webswing.common.WindowDecoratorTheme;
 
 public interface ImageService {
 
-    public String encodeData(byte[] data);
+	byte[] getPngImage(BufferedImage image);
 
-    byte[] getPngImage(BufferedImage image);
+	WindowDecoratorTheme getWindowDecorationTheme();
 
-    WindowDecoratorTheme getWindowDecorationTheme();
-
-    void moveFile(File srcFile, File destFile) throws IOException;
+	void moveFile(File srcFile, File destFile) throws IOException;
 }

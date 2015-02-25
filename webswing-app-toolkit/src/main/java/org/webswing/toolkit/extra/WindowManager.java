@@ -15,7 +15,7 @@ import javax.swing.SwingUtilities;
 import org.webswing.common.WindowActionType;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
-import org.webswing.model.s2c.JsonCursorChange;
+import org.webswing.model.s2c.CursorChangeEventMsg;
 import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.util.Services;
@@ -27,7 +27,7 @@ public class WindowManager {
 	private WindowHierarchyTree zorder = new WindowHierarchyTree();
 	private Window activeWindow = null;
 	private WindowEventHandler eventhandler = new WindowEventHandler();
-	private String currentCursor = JsonCursorChange.DEFAULT_CURSOR;
+	private String currentCursor = CursorChangeEventMsg.DEFAULT_CURSOR;
 
 	private WindowManager() {
 	}

@@ -7,7 +7,7 @@ import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
-import org.webswing.model.s2c.JsonCursorChange;
+import org.webswing.model.s2c.CursorChangeEventMsg;
 import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.WebDropTargetContextPeer;
 
@@ -21,7 +21,7 @@ public class DndEventHandler {
     private int lastDropTargetAction = 0;
     private boolean dropped;
     private boolean finished;
-    private static String cursorName = JsonCursorChange.MOVE_CURSOR;
+    private static String cursorName = CursorChangeEventMsg.MOVE_CURSOR;
 
     public void processMouseEvent(Window w, AWTEvent e) {
         if (e instanceof MouseEvent) {
@@ -77,7 +77,7 @@ public class DndEventHandler {
         }
         sourceActions = 0;
         lastDropTargetAction = 0;
-        cursorName = JsonCursorChange.MOVE_CURSOR;
+        cursorName = CursorChangeEventMsg.MOVE_CURSOR;
     }
 
     public static String getCurrentDropTargetCursorName() {

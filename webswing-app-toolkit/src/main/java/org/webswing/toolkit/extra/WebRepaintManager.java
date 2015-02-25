@@ -8,9 +8,7 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.RepaintManager;

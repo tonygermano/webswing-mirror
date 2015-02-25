@@ -15,7 +15,7 @@ import java.util.UUID;
 import javax.print.PrintService;
 
 import org.webswing.Constants;
-import org.webswing.model.s2c.PrinterJobResult;
+import org.webswing.model.s2c.PrinterJobResultMsgInternal;
 import org.webswing.util.Services;
 import org.webswing.util.Util;
 
@@ -86,7 +86,7 @@ public class WebPrinterJob extends PrinterJob {
             }
         }
         Services.getPdfService().closePDFGraphics(resultPdf);
-        PrinterJobResult printResult = new PrinterJobResult();
+        PrinterJobResultMsgInternal printResult = new PrinterJobResultMsgInternal();
         printResult.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
         printResult.setId(UUID.randomUUID().toString());
         printResult.setPdf(out.toByteArray());

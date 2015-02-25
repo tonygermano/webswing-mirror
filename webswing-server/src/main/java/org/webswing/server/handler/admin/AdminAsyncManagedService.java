@@ -9,11 +9,12 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.config.managed.ManagedServiceInterceptor;
+import org.atmosphere.config.service.DeliverTo;
+import org.atmosphere.config.service.DeliverTo.DELIVER_TO;
 import org.atmosphere.config.service.Disconnect;
 import org.atmosphere.config.service.ManagedService;
 import org.atmosphere.config.service.Message;
 import org.atmosphere.config.service.Ready;
-import org.atmosphere.config.service.Ready.DELIVER_TO;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.atmosphere.cpr.Broadcaster;
@@ -24,11 +25,12 @@ import org.atmosphere.interceptor.SuspendTrackerInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.model.admin.c2s.JsonApplyConfiguration;
-import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
+import org.webswing.model.admin.c2s.ApplyConfigurationMsgIn;
+import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstanceManager;
 import org.webswing.server.handler.SwingAsyncManagedService;
+import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.util.ServerUtil;
 
 @ManagedService(path = "/async/admin", interceptors = { AtmosphereResourceLifecycleInterceptor.class, ManagedServiceInterceptor.class, TrackMessageSizeInterceptor.class, HeartbeatInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class })
@@ -45,13 +47,13 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
 		SwingInstanceManager.getInstance().setChangeListener(this);
 	}
 
-	@Ready(value = DELIVER_TO.RESOURCE)
-	public Serializable onReady(final AtmosphereResource r) {
+	@Ready
+	@DeliverTo(DELIVER_TO.RESOURCE)
+	public void onReady(final AtmosphereResource r) {
 		Subject sub = SecurityUtils.getSubject();
 		if (sub.hasRole(Constants.ADMIN_ROLE)) {
 			resourceMap.put(r.uuid(), r);
-			String result = createAdminConsoleUpdate(true, true);
-			return result;
+			broadcast(createAdminConsoleUpdate(true, true));
 		} else {
 			log.warn("Unauthorized connection atempt from " + sub.getPrincipal());
 			try {
@@ -60,7 +62,6 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
 				// do nothing
 			}
 		}
-		return null;
 	}
 
 	@Disconnect
@@ -79,13 +80,13 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
 				return result;
 			} else if (message instanceof String) {
 				Object jsonMessage = ServerUtil.decode((String) message);
-				if (jsonMessage != null && jsonMessage instanceof JsonApplyConfiguration) {
-					JsonApplyConfiguration jac = (JsonApplyConfiguration) jsonMessage;
-					if (jac.getType().equals(JsonApplyConfiguration.Type.user)) {
+				if (jsonMessage != null && jsonMessage instanceof ApplyConfigurationMsgIn) {
+					ApplyConfigurationMsgIn jac = (ApplyConfigurationMsgIn) jsonMessage;
+					if (jac.getType().equals(ApplyConfigurationMsgIn.Type.user)) {
 						ServerUtil.validateUserFile(jac.getConfigContent());
 						ConfigurationManager.getInstance().applyUserProperties(jac.getConfigContent());
 						return ServerUtil.composeAdminSuccessReply("User configuration saved successfully.");
-					} else if (jac.getType().equals(JsonApplyConfiguration.Type.config)) {
+					} else if (jac.getType().equals(ApplyConfigurationMsgIn.Type.config)) {
 						ServerUtil.validateConfigFile(jac.getConfigContent());
 						ConfigurationManager.getInstance().applyApplicationConfiguration(jac.getConfigContent());
 						return ServerUtil.composeAdminSuccessReply("Server configuration saved successfully.");
@@ -122,21 +123,23 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
 		broadcast(createAdminConsoleUpdate(false, true));
 	}
 
-	public void broadcast(String msg) {
+	public void broadcast(AdminConsoleFrameMsgOut msg) {
 		Broadcaster bc = getBroadcaster();
 		if (bc != null) {
 			synchronized (BROADCAST_LOCK) {
-				bc.broadcast(msg);
+				for (AtmosphereResource r : bc.getAtmosphereResources()) {
+					ServerUtil.broadcastMessage(r, new EncodedMessage(msg));
+				}
 			}
 		}
 	}
 
-	private String createAdminConsoleUpdate(boolean swingInstances, boolean configuration) {
-		JsonAdminConsoleFrame message;
+	private AdminConsoleFrameMsgOut createAdminConsoleUpdate(boolean swingInstances, boolean configuration) {
+		AdminConsoleFrameMsgOut message;
 		if (swingInstances) {
 			message = SwingInstanceManager.getInstance().extractStatus();
 		} else {
-			message = new JsonAdminConsoleFrame();
+			message = new AdminConsoleFrameMsgOut();
 		}
 		if (configuration) {
 			message.setConfiguration(ConfigurationManager.getInstance().loadApplicationConfiguration());
@@ -145,7 +148,7 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
 			message.setUserConfig(ConfigurationManager.getInstance().loadUserProperties());
 			message.setServerProperties(ConfigurationManager.getInstance().getServerProperties());
 		}
-		return ServerUtil.encode(message);
+		return message;
 	}
 
 }

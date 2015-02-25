@@ -53,7 +53,7 @@
 		var timer1 = setInterval(sendInput, 100);
 		var timer2 = setInterval(heartbeat, 10000);
 
-		var inputEvtQueue=[];
+		var inputEvtQueue = [];
 
 		function send(message) {
 			config.send(message);
@@ -62,16 +62,16 @@
 		function sendInput() {
 			if (config.hasControl) {
 				enqueueInputEvent();
-				if(inputEvtQueue.length>0){
+				if (inputEvtQueue.length > 0) {
 					send(inputEvtQueue);
-					inputEvtQueue=[];
+					inputEvtQueue = [];
 				}
 			}
 		}
 
 
-		function heartbeat() {
-			send('hb' + clientId);
+		function enqueueMessageEvent(message){
+			inputEvtQueue.push(getMessageEvent(message));
 		}
 
 		function enqueueInputEvent(message) {
@@ -79,16 +79,16 @@
 				inputEvtQueue.push(latestMouseMoveEvent);
 				latestMouseMoveEvent = null;
 			}
-			if (latestMouseWheelEvent != null ) {
+			if (latestMouseWheelEvent != null) {
 				inputEvtQueue.push(latestMouseWheelEvent);
 				latestMouseWheelEvent = null;
 			}
-			if (latestWindowResizeEvent != null ) {
+			if (latestWindowResizeEvent != null) {
 				inputEvtQueue.push(latestWindowResizeEvent);
 				latestWindowResizeEvent = null;
 			}
-			if(message!=null ){
-				if(JSON.stringify(inputEvtQueue[inputEvtQueue.length-1]) !== JSON.stringify(message) ){
+			if (message != null) {
+				if (JSON.stringify(inputEvtQueue[inputEvtQueue.length - 1]) !== JSON.stringify(message)) {
 					inputEvtQueue.push(message);
 				}
 			}
@@ -99,32 +99,36 @@
 			registerEventListeners(c);
 		}
 
+		function heartbeat() {
+			enqueueMessageEvent('hb');
+		}
+
 		function repaint() {
-			send('repaint' + clientId);
+			enqueueMessageEvent('repaint');
 		}
 
 		function ack() {
-			send('paintAck' + clientId);
+			enqueueMessageEvent('paintAck');
 		}
 
 		function kill() {
-			send('killSwing' + clientId);
+			send(getMessageEvent('killSwing'));
 		}
 
 		function unload() {
-			send('unload' + clientId);
+			send(getMessageEvent('unload'));
 		}
 
 		function requestDownloadFile() {
-			send('downloadFile' + clientId);
+			enqueueMessageEvent('downloadFile');
 		}
 
 		function requestDeleteFile() {
-			send('deleteFile' + clientId);
+			enqueueMessageEvent('deleteFile');
 		}
 
 		function handshake() {
-			send([getHandShake()]);
+			send([ getHandShake() ]);
 		}
 
 		function resizedWindow() {
@@ -141,26 +145,24 @@
 			c = {};
 		}
 
-		function processTxtMessage(message) {
-			if (message == "shutDownNotification") {
-				config.onApplicationShutdown();
-				dispose();
-			} else if (message == "applicationAlreadyRunning") {
-				config.onErrorMessage('Application is already running in other browser window...');
-			} else if (message == "tooManyClientsNotification") {
-				config.onErrorMessage('Too many connections. Please try again later...');
-			} else if (message == "continueOldSession") {
-				config.onContinueOldSession();
-			}
-			return;
-		}
-
 		function processJsonMessage(data) {
 			if (data.user != null) {
 				user = data.user;
 			}
 			if (data.applications != null) {
 				config.onApplicationSelection(data.applications);
+			}
+			if(data.event!=null){
+				if (data.event == "shutDownNotification") {
+					config.onApplicationShutdown();
+					dispose();
+				} else if (data.event == "applicationAlreadyRunning") {
+					config.onErrorMessage('Application is already running in other browser window...');
+				} else if (data.event == "tooManyClientsNotification") {
+					config.onErrorMessage('Too many connections. Please try again later...');
+				} else if (data.event == "continueOldSession") {
+					config.onContinueOldSession();
+				}
 			}
 			if (canPaint) {
 				processRequest(data);
@@ -181,7 +183,8 @@
 				}
 			}
 			if (data.moveAction != null) {
-				copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height, context);
+				copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height,
+						context);
 			}
 			if (data.cursorChange != null && config.hasControl) {
 				canvas.style.cursor = data.cursorChange.cursor;
@@ -214,42 +217,48 @@
 			}
 			// regular windows (background removed)
 			if (data.windows != null) {
-				data.windows.reduce(function(sequence, win) {
-					if (win.directDrawB64 != null) {
-						// directdraw
-						return sequence.then(function(resolved) {
-							return directDraw.draw64(win.directDrawB64, windowImageHolders[win.id]);
-						}).then(function(resultImage) {
-							windowImageHolders[win.id] = resultImage;
-							for ( var x in win.content) {
-								var winContent = win.content[x];
-								if (winContent != null) {
-									context.drawImage(resultImage, winContent.positionX, winContent.positionY, winContent.width, winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height);
-								}
-							}
-						});
-					} else {
-						// imagedraw
-						return sequence.then(function(resolved) {
-							return win.content.reduce(function(internalSeq, winContent) {
-								return internalSeq.then(function(done) {
-									return new Promise(function(resolved, rejected) {
-										if (winContent != null) {
-											var imageObj = new Image();
-											imageObj.onload = function() {
-												context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
-												imageObj.onload = null;
-												imageObj.src = '';
-												resolved();
-											};
-											imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
-										}
-									});
+				data.windows.reduce(
+						function(sequence, win) {
+							if (win.directDraw != null) {
+								// directdraw
+								return sequence.then(function(resolved) {
+									return directDraw.drawBin(win.directDraw, windowImageHolders[win.id]);
+								}).then(
+										function(resultImage) {
+											windowImageHolders[win.id] = resultImage;
+											for ( var x in win.content) {
+												var winContent = win.content[x];
+												if (winContent != null) {
+													context.drawImage(resultImage, winContent.positionX, winContent.positionY, winContent.width,
+															winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY,
+															winContent.width, winContent.height);
+												}
+											}
+										});
+							} else {
+								// imagedraw
+								return sequence.then(function(resolved) {
+									return win.content.reduce(function(internalSeq, winContent) {
+										return internalSeq.then(function(done) {
+											return new Promise(
+													function(resolved, rejected) {
+														if (winContent != null) {
+															var imageObj = new Image();
+															imageObj.onload = function() {
+																context.drawImage(imageObj, win.posX + winContent.positionX, win.posY
+																		+ winContent.positionY);
+																imageObj.onload = null;
+																imageObj.src = '';
+																resolved();
+															};
+															imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
+														}
+													});
+										});
+									}, Promise.resolve());
 								});
-							}, Promise.resolve());
-						});
-					}
-				}, Promise.resolve()).then(function() {
+							}
+						}, Promise.resolve()).then(function() {
 					ack();
 				});
 			}
@@ -332,7 +341,8 @@
 				// 226
 				// FF (163, 171, 173, ) -> en layout ]\/ keys
 				var kc = event.keyCode;
-				if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226) || (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
+				if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226)
+						|| (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
 					event.preventDefault();
 					event.stopPropagation();
 				}
@@ -344,7 +354,7 @@
 						content : text,
 						clientId : clientId
 					};
-					if(config.hasControl){
+					if (config.hasControl) {
 						send(pasteEvent);
 					}
 				} else {
@@ -450,6 +460,15 @@
 			return handshake;
 		}
 
+		function getMessageEvent(message){
+			return {
+				event : {
+					type : message,
+					clientId : clientId
+				}
+			}
+		}
+
 		function bindEvent(el, eventName, eventHandler) {
 			el.addEventListener(eventName, eventHandler, false);
 		}
@@ -499,9 +518,6 @@
 			},
 			canControl : function(bool) {
 				config.hasControl = bool;
-			},
-			processTxtMessage : function(message) {
-				processTxtMessage(message);
 			},
 			processJsonMessage : function(data) {
 				processJsonMessage(data);

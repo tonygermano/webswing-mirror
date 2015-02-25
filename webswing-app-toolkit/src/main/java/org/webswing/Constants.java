@@ -2,25 +2,11 @@ package org.webswing;
 
 public interface Constants {
 
-	// JMS messages from web
-	public static final String PAINT_ACK_PREFIX = "paintAck";
-	public static final String UNLOAD_PREFIX = "unload";
-	public static final String HEARTBEAT_MSG_PREFIX = "hb";
-	public static final String REPAINT_REQUEST_PREFIX = "repaint";
-	public static final String DELETE_FILE_PREFIX = "deleteFile";
-	public static final String DOWNLOAD_FILE_PREFIX = "downloadFile";
-
 	// Web related constants
 	public static final String CLIENT_ID_COOKIE = "webswingID";
 
-	// JMS messages to web
-	public static final String APPLICATION_ALREADY_RUNNING = "applicationAlreadyRunning";
-	public static final String SWING_SHUTDOWN_NOTIFICATION = "shutDownNotification";
-	public static final String TOO_MANY_CLIENTS_NOTIFICATION = "tooManyClientsNotification";
-	public static final String SWING_KILL_SIGNAL = "killSwing";
+	// JMS messages internal
 	public static final String SWING_PID_NOTIFICATION = "swingPID";
-	public static final String CONTINUE_OLD_SESSION_QUESTION = "continueOldSession";
-	public static final String CONFIGURATION_ERROR = "configurationError";
 
 	// swing startup properties
 	public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
@@ -29,10 +15,9 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_ISOLATED_FS = "webswing.isolatedFs";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW = "webswing.directdraw";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED = "webswing.directdraw.supported";
-    public static final String SWING_START_SYS_PROP_ALLOW_DOWNLOAD = "webswing.allowDownload";
-    public static final String SWING_START_SYS_PROP_ALLOW_UPLOAD = "webswing.allowUpload";
-    public static final String SWING_START_SYS_PROP_ALLOW_DELETE = "webswing.allowDelete";
-
+	public static final String SWING_START_SYS_PROP_ALLOW_DOWNLOAD = "webswing.allowDownload";
+	public static final String SWING_START_SYS_PROP_ALLOW_UPLOAD = "webswing.allowUpload";
+	public static final String SWING_START_SYS_PROP_ALLOW_DELETE = "webswing.allowDelete";
 
 	// JMS queue names
 	public static final String SWING2SERVER = "Swing2Server";

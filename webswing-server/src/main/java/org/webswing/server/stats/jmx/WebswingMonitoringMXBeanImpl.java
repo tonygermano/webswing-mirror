@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
-import org.webswing.model.admin.s2c.JsonSwingSession;
+import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
+import org.webswing.model.admin.s2c.SwingSessionMsg;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstanceManager;
@@ -13,7 +13,7 @@ import org.webswing.server.SwingInstanceManager;
 public class WebswingMonitoringMXBeanImpl implements WebswingMonitoringMXBean {
 
 	long lastsessionUpdate = -1;
-	JsonAdminConsoleFrame sessionInfo;
+	AdminConsoleFrameMsgOut sessionInfo;
 	long lastconfigUpdate = -1;
 	Map<String, SwingApplicationDescriptor> configInfo;
 
@@ -33,7 +33,7 @@ public class WebswingMonitoringMXBeanImpl implements WebswingMonitoringMXBean {
 	public List<SessionDetails> getSessionsDetails() {
 		updateSessionInfo();
 		List<SessionDetails> result = new ArrayList<SessionDetails>();
-		for (JsonSwingSession ss : sessionInfo.getSessions()) {
+		for (SwingSessionMsg ss : sessionInfo.getSessions()) {
 			result.add(new SessionDetails(ss));
 		}
 		return result;

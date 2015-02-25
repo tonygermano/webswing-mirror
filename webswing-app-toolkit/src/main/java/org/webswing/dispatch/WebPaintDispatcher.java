@@ -24,16 +24,16 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
-import org.webswing.model.s2c.JsonAppFrame;
-import org.webswing.model.s2c.JsonCopyEvent;
-import org.webswing.model.s2c.JsonCursorChange;
-import org.webswing.model.s2c.JsonFileDialogEvent;
-import org.webswing.model.s2c.JsonFileDialogEvent.FileDialogEventType;
-import org.webswing.model.s2c.JsonLinkAction;
-import org.webswing.model.s2c.JsonLinkAction.JsonLinkActionType;
-import org.webswing.model.s2c.JsonWindow;
-import org.webswing.model.s2c.JsonWindowMoveAction;
-import org.webswing.model.s2c.OpenFileResult;
+import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.model.s2c.CopyEventMsg;
+import org.webswing.model.s2c.CursorChangeEventMsg;
+import org.webswing.model.s2c.FileDialogEventMsg;
+import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
+import org.webswing.model.s2c.LinkActionMsg;
+import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
+import org.webswing.model.s2c.WindowMsg;
+import org.webswing.model.s2c.WindowMoveActionMsg;
+import org.webswing.model.s2c.OpenFileResultMsgInternal;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.extra.WebRepaintManager;
@@ -47,7 +47,7 @@ public class WebPaintDispatcher {
 	public static final Object webPaintLock = new Object();
 
 	private volatile Map<String, Set<Rectangle>> areasToUpdate = new HashMap<String, Set<Rectangle>>();
-	private volatile JsonWindowMoveAction moveAction;
+	private volatile WindowMoveActionMsg moveAction;
 	private volatile boolean clientReadyToReceive = true;
 	private long lastReadyStateTime;
 	private JFileChooser fileChooserDialog;
@@ -59,7 +59,7 @@ public class WebPaintDispatcher {
 
 			public void run() {
 				try {
-					JsonAppFrame json;
+					AppFrameMsgOut json;
 					Map<String, Map<Integer, BufferedImage>> windowImages = null;
 					Map<String, Image> windowWebImages = null;
 					Map<String, List<Rectangle>> windowNonVisibleAreas;
@@ -182,8 +182,8 @@ public class WebPaintDispatcher {
 		synchronized (webPaintLock) {
 			areasToUpdate.remove(guid);
 		}
-		JsonAppFrame f = new JsonAppFrame();
-		JsonWindow fdEvent = new JsonWindow();
+		AppFrameMsgOut f = new AppFrameMsgOut();
+		WindowMsg fdEvent = new WindowMsg();
 		fdEvent.setId(guid);
 		f.closedWindow = fdEvent;
 		Logger.info("WebPaintDispatcher:notifyWindowClosed", guid);
@@ -211,8 +211,8 @@ public class WebPaintDispatcher {
 	}
 
 	public void notifyOpenLinkAction(URI uri) {
-		JsonAppFrame f = new JsonAppFrame();
-		JsonLinkAction linkAction = new JsonLinkAction(JsonLinkActionType.url, uri.toString());
+		AppFrameMsgOut f = new AppFrameMsgOut();
+		LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.url, uri.toString());
 		f.setLinkAction(linkAction);
 		Logger.info("WebPaintDispatcher:notifyOpenLinkAction", uri);
 		Services.getConnectionService().sendJsonObject(f);
@@ -254,7 +254,7 @@ public class WebPaintDispatcher {
 	public void notifyWindowMoved(Window w, Rectangle from, Rectangle to) {
 		synchronized (webPaintLock) {
 			if (moveAction == null) {
-				moveAction = new JsonWindowMoveAction(from.x, from.y, to.x, to.y, from.width, from.height);
+				moveAction = new WindowMoveActionMsg(from.x, from.y, to.x, to.y, from.width, from.height);
 				notifyRepaintOffScreenAreas(w, moveAction);
 			} else if (moveAction.dx == from.x && moveAction.dy == from.y && moveAction.width == from.width && moveAction.height == from.height) {
 				moveAction.dx = to.x;
@@ -267,7 +267,7 @@ public class WebPaintDispatcher {
 	}
 
 	@SuppressWarnings("restriction")
-	private void notifyRepaintOffScreenAreas(Window w, JsonWindowMoveAction m) {
+	private void notifyRepaintOffScreenAreas(Window w, WindowMoveActionMsg m) {
 		Rectangle screen = new Rectangle(Util.getWebToolkit().getScreenSize());
 		Rectangle before = new Rectangle(m.sx, m.sy, m.width, m.height);
 		Rectangle after = new Rectangle(m.dx, m.dy, m.width, m.height);
@@ -297,48 +297,48 @@ public class WebPaintDispatcher {
 		if (overridenCursorName == null) {
 			switch (cursor.getType()) {
 			case Cursor.DEFAULT_CURSOR:
-				webcursorName = JsonCursorChange.DEFAULT_CURSOR;
+				webcursorName = CursorChangeEventMsg.DEFAULT_CURSOR;
 				break;
 			case Cursor.HAND_CURSOR:
-				webcursorName = JsonCursorChange.HAND_CURSOR;
+				webcursorName = CursorChangeEventMsg.HAND_CURSOR;
 				break;
 			case Cursor.CROSSHAIR_CURSOR:
-				webcursorName = JsonCursorChange.CROSSHAIR_CURSOR;
+				webcursorName = CursorChangeEventMsg.CROSSHAIR_CURSOR;
 				break;
 			case Cursor.MOVE_CURSOR:
-				webcursorName = JsonCursorChange.MOVE_CURSOR;
+				webcursorName = CursorChangeEventMsg.MOVE_CURSOR;
 				break;
 			case Cursor.TEXT_CURSOR:
-				webcursorName = JsonCursorChange.TEXT_CURSOR;
+				webcursorName = CursorChangeEventMsg.TEXT_CURSOR;
 				break;
 			case Cursor.WAIT_CURSOR:
-				webcursorName = JsonCursorChange.WAIT_CURSOR;
+				webcursorName = CursorChangeEventMsg.WAIT_CURSOR;
 				break;
 			case Cursor.E_RESIZE_CURSOR:
 			case Cursor.W_RESIZE_CURSOR:
-				webcursorName = JsonCursorChange.EW_RESIZE_CURSOR;
+				webcursorName = CursorChangeEventMsg.EW_RESIZE_CURSOR;
 				break;
 			case Cursor.N_RESIZE_CURSOR:
 			case Cursor.S_RESIZE_CURSOR:
-				webcursorName = JsonCursorChange.NS_RESIZE_CURSOR;
+				webcursorName = CursorChangeEventMsg.NS_RESIZE_CURSOR;
 				break;
 			case Cursor.NW_RESIZE_CURSOR:
 			case Cursor.SE_RESIZE_CURSOR:
-				webcursorName = JsonCursorChange.BACKSLASH_RESIZE_CURSOR;
+				webcursorName = CursorChangeEventMsg.BACKSLASH_RESIZE_CURSOR;
 				break;
 			case Cursor.NE_RESIZE_CURSOR:
 			case Cursor.SW_RESIZE_CURSOR:
-				webcursorName = JsonCursorChange.SLASH_RESIZE_CURSOR;
+				webcursorName = CursorChangeEventMsg.SLASH_RESIZE_CURSOR;
 				break;
 			default:
-				webcursorName = JsonCursorChange.DEFAULT_CURSOR;
+				webcursorName = CursorChangeEventMsg.DEFAULT_CURSOR;
 			}
 		} else {
 			webcursorName = overridenCursorName;
 		}
 		if (!WindowManager.getInstance().getCurrentCursor().equals(webcursorName)) {
-			JsonAppFrame f = new JsonAppFrame();
-			JsonCursorChange cursorChange = new JsonCursorChange(webcursorName);
+			AppFrameMsgOut f = new AppFrameMsgOut();
+			CursorChangeEventMsg cursorChange = new CursorChangeEventMsg(webcursorName);
 			f.cursorChange = cursorChange;
 			WindowManager.getInstance().setCurrentCursor(webcursorName);
 			Logger.debug("WebPaintDispatcher:notifyCursorUpdate", f);
@@ -347,17 +347,17 @@ public class WebPaintDispatcher {
 	}
 
 	public void notifyCopyEvent(String content) {
-		JsonAppFrame f = new JsonAppFrame();
-		JsonCopyEvent copyEvent;
-		copyEvent = new JsonCopyEvent(content);
+		AppFrameMsgOut f = new AppFrameMsgOut();
+		CopyEventMsg copyEvent;
+		copyEvent = new CopyEventMsg(content);
 		f.copyEvent = copyEvent;
 		Logger.debug("WebPaintDispatcher:notifyCopyEvent", f);
 		Services.getConnectionService().sendJsonObject(f);
 	}
 
 	public void notifyFileDialogActive(WebWindowPeer webWindowPeer) {
-		JsonAppFrame f = new JsonAppFrame();
-		JsonFileDialogEvent fdEvent = new JsonFileDialogEvent();
+		AppFrameMsgOut f = new AppFrameMsgOut();
+		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
 		fdEvent.eventType = FileDialogEventType.Open;
 		f.fileDialogEvent = fdEvent;
 		Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
@@ -368,8 +368,8 @@ public class WebPaintDispatcher {
 	}
 
 	public void notifyFileDialogHidden(WebWindowPeer webWindowPeer) {
-		JsonAppFrame f = new JsonAppFrame();
-		JsonFileDialogEvent fdEvent = new JsonFileDialogEvent();
+		AppFrameMsgOut f = new AppFrameMsgOut();
+		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
 		fdEvent.eventType = FileDialogEventType.Close;
 		f.fileDialogEvent = fdEvent;
 		Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
@@ -385,7 +385,7 @@ public class WebPaintDispatcher {
 		if (fileChooserDialog != null) {
 			File file = fileChooserDialog.getSelectedFile();
 			if (file != null && file.exists() && !file.isDirectory() && file.canRead()) {
-				OpenFileResult f = new OpenFileResult();
+				OpenFileResultMsgInternal f = new OpenFileResultMsgInternal();
 				f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
 				f.setF(file);
 				Util.getWebToolkit().getPaintDispatcher().sendJsonObject(f);

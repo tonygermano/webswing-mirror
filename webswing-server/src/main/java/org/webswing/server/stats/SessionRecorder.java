@@ -20,7 +20,7 @@ public class SessionRecorder {
 		this.swingInstance = swingInstance;
 	}
 
-	public void saveFrame(String serialized) {
+	public void saveFrame(byte[] serialized) {
 		if (out == null) {
 			URI file = URI.create(System.getProperty(Constants.TEMP_DIR_PATH) + "/" + swingInstance.getClientId() + ".wss");
 			try {
@@ -31,11 +31,10 @@ public class SessionRecorder {
 			}
 		}
 		if (out != null) {
-			byte[] bytes = serialized.getBytes();
-			byte[] length = ByteBuffer.allocate(4).putInt(bytes.length).array();
+			byte[] length = ByteBuffer.allocate(4).putInt(serialized.length).array();
 			try {
 				out.write(length);
-				out.write(bytes);
+				out.write(serialized);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

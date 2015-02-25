@@ -1,21 +1,27 @@
 package org.webswing.model.s2c;
 
-import java.io.Serializable;
-
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.webswing.Constants;
+import org.webswing.model.Msg;
 
-public class JsonFileDialogEvent implements Serializable {
+public class FileDialogEventMsg implements Msg {
 
-	private static final long serialVersionUID = -6782940433721602460L;
+	private static final long serialVersionUID = -7470385173647106699L;
 
 	public enum FileDialogEventType {
 		Open, Close;
 	}
 
-	public JsonFileDialogEvent() {
+	public FileDialogEventType eventType;
+	public boolean allowDownload;
+	public boolean allowUpload;
+	public boolean allowDelete;
+	public String filter = "";
+	public boolean isMultiSelection;
+
+	public FileDialogEventMsg() {
 		allowDownload = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD));
 		allowUpload = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD));
 		allowDelete = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE));
@@ -37,12 +43,5 @@ public class JsonFileDialogEvent implements Serializable {
 		if (filter.length() > 2)
 			filter = filter.substring(0, filter.length() - 2);
 	}
-
-	public FileDialogEventType eventType;
-	public boolean allowDownload;
-	public boolean allowUpload;
-	public boolean allowDelete;
-	public String filter = "";
-	public boolean isMultiSelection;
 
 }

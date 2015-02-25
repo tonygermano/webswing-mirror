@@ -1,6 +1,8 @@
 package org.webswing.model.c2s;
 
-public class JsonEventUpload implements JsonEvent {
+import org.webswing.model.MsgIn;
+
+public class UploadEventMsgIn implements MsgIn {
 
     private static final long serialVersionUID = -7188733550212761231L;
 

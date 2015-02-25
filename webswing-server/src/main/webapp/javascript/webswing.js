@@ -96,6 +96,65 @@ define(
 				}
 			});
 
+			function start() {
+				createCanvas();
+				showDialog(initializingDialog);
+				connect();
+				$(window).bind("beforeunload", function() {
+					ws.dispose();
+				});
+			}
+
+			function connect() {
+				var request = {
+					url : document.location.toString() + 'async/swing',
+					contentType : "application/json",
+					logLevel : 'debug',
+					transport : 'websocket',
+					trackMessageLength : true,
+					reconnectInterval : 5000,
+					fallbackTransport : 'long-polling'
+				};
+
+				request.onOpen = function(response) {
+					ws.setUuid(response.request.uuid);
+				};
+
+				request.onReopen = function(response) {
+					showDialog(null);
+				};
+
+				request.onMessage = function(response) {
+					var message = response.responseBody;
+					try {
+						var data = atmosphere.util.parseJSON(message);
+						ws.processJsonMessage(data);
+					} catch (e) {
+						//ws.processTxtMessage(response.responseBody);
+						return;
+					}
+				};
+
+				request.onClose = function(response) {
+					// need to wait until animated transition finish
+					setTimeout(function() {
+						if (!messageDialog.hasClass('in')) {
+							showDialog(disconnectedDialog);
+						}
+					}, 1000);
+				};
+
+				request.onError = function(response) {
+					// TODO:handle
+				};
+
+				request.onReconnect = function(request, response) {
+					showDialog(initializingDialog);
+				};
+
+				socket = atmosphere.subscribe(request);
+			}
+
 			function FileUploaderFactory() {
 				var fileDialogTransferBar = $('#fileDialogTransferBar');
 				var fileDialogTransferBarClientId = $('#fileDialogTransferBarClientId');
@@ -137,10 +196,10 @@ define(
 
 				jqUpload.bind('fileuploadfail', function(e, data) {
 					if (!errorTimeout) {
-						fileDialogErrorMessageContent.append('<p>'+data.jqXHR.responseText+'</p>');
+						fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
 						fileDialogErrorMessage.show("fast");
 					} else {
-						fileDialogErrorMessageContent.append('<p>'+data.jqXHR.responseText+'</p>');
+						fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
 						clearTimeout(timeout);
 					}
 					errorTimeout = setTimeout(function() {
@@ -222,65 +281,6 @@ define(
 						}
 					}
 				});
-			}
-
-			function start() {
-				createCanvas();
-				showDialog(initializingDialog);
-				connect();
-				$(window).bind("beforeunload", function() {
-					ws.dispose();
-				});
-			}
-
-			function connect() {
-				var request = {
-					url : document.location.toString() + 'async/swing',
-					contentType : "application/json",
-					logLevel : 'debug',
-					transport : 'websocket',
-					trackMessageLength : true,
-					reconnectInterval : 5000,
-					fallbackTransport : 'long-polling'
-				};
-
-				request.onOpen = function(response) {
-					ws.setUuid(response.request.uuid);
-				};
-
-				request.onReopen = function(response) {
-					showDialog(null);
-				};
-
-				request.onMessage = function(response) {
-					var message = response.responseBody;
-					try {
-						var data = atmosphere.util.parseJSON(message);
-						ws.processJsonMessage(data);
-					} catch (e) {
-						ws.processTxtMessage(response.responseBody);
-						return;
-					}
-				};
-
-				request.onClose = function(response) {
-					// need to wait until animated transition finish
-					setTimeout(function() {
-						if (!messageDialog.hasClass('in')) {
-							showDialog(disconnectedDialog);
-						}
-					}, 1000);
-				};
-
-				request.onError = function(response) {
-					// TODO:handle
-				};
-
-				request.onReconnect = function(request, response) {
-					showDialog(initializingDialog);
-				};
-
-				socket = atmosphere.subscribe(request);
 			}
 
 			function setupClientID() {

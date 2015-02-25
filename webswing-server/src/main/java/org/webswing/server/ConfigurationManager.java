@@ -15,7 +15,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.model.admin.s2c.JsonServerProperties;
+import org.webswing.model.admin.s2c.ServerPropertiesMsg;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
 import org.webswing.model.server.WebswingConfigurationBackup;
@@ -41,8 +41,8 @@ public class ConfigurationManager {
         return liveConfiguration;
     }
 
-    public JsonServerProperties getServerProperties() {
-        JsonServerProperties result = new JsonServerProperties();
+    public ServerPropertiesMsg getServerProperties() {
+        ServerPropertiesMsg result = new ServerPropertiesMsg();
         result.setTempFolder(System.getProperty(Constants.TEMP_DIR_PATH));
         result.setJmsServerUrl(Constants.JMS_URL);
         result.setConfigFile(getConfigFile().toURI().toString());

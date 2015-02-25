@@ -1,6 +1,5 @@
 package org.webswing.server;
 
-import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,10 +14,11 @@ import javax.management.ObjectName;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.Constants;
-import org.webswing.model.admin.s2c.JsonAdminConsoleFrame;
-import org.webswing.model.admin.s2c.JsonSwingSession;
-import org.webswing.model.c2s.JsonConnectionHandshake;
+import org.webswing.model.MsgIn;
+import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
+import org.webswing.model.admin.s2c.SwingSessionMsg;
+import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.stats.PerformanceStatsMonitor;
 import org.webswing.server.stats.jmx.WebswingMonitoringMXBeanImpl;
@@ -29,7 +29,7 @@ public class SwingInstanceManager {
 	private static SwingInstanceManager instance = new SwingInstanceManager();
 	private static final Logger log = LoggerFactory.getLogger(SwingInstanceManager.class);
 
-	private List<JsonSwingSession> closedInstances = new ArrayList<JsonSwingSession>();
+	private List<SwingSessionMsg> closedInstances = new ArrayList<SwingSessionMsg>();
 	private Map<String, SwingInstance> swingInstances = new ConcurrentHashMap<String, SwingInstance>();
 	private SwingInstanceChangeListener changeListener;
 
@@ -53,7 +53,7 @@ public class SwingInstanceManager {
 		return set;
 	}
 
-	public void connectSwingInstance(AtmosphereResource resource, JsonConnectionHandshake h) {
+	public void connectSwingInstance(AtmosphereResource resource, ConnectionHandshakeMsgIn h) {
 		SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(h.applicationName);
 		if (app == null) {
 			throw new RuntimeException("Application " + h.applicationName + " is not configured.");
@@ -69,17 +69,17 @@ public class SwingInstanceManager {
 						}
 						notifySwingChangeChange();
 					} else {
-						ServerUtil.broadcastMessage(resource, Constants.TOO_MANY_CLIENTS_NOTIFICATION);
+						ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
 					}
 				} else {
-					ServerUtil.broadcastMessage(resource, Constants.CONFIGURATION_ERROR);
+					ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.configurationError.buildMsgOut());
 				}
 			} else {
 				if (h.mirrored) {// connect as mirror viewer
 					notifySessionDisconnected(resource.uuid());// disconnect possible running mirror sessions
 					boolean result = swingInstance.registerMirroredWebSession(resource);
 					if (!result) {
-						ServerUtil.broadcastMessage(resource, Constants.APPLICATION_ALREADY_RUNNING);
+						ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.applicationAlreadyRunning.buildMsgOut());
 					}
 				} else {// continue old session?
 					if (h.sessionId != null && h.sessionId.equals(swingInstance.getSessionId())) {
@@ -87,10 +87,10 @@ public class SwingInstanceManager {
 					} else {
 						boolean result = swingInstance.registerPrimaryWebSession(resource);
 						if (result) {
-							ServerUtil.broadcastMessage(resource, Constants.CONTINUE_OLD_SESSION_QUESTION);
+							ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.continueOldSession.buildMsgOut());
 							notifySwingChangeChange();
 						} else {
-							ServerUtil.broadcastMessage(resource, Constants.APPLICATION_ALREADY_RUNNING);
+							ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.applicationAlreadyRunning.buildMsgOut());
 						}
 					}
 				}
@@ -126,8 +126,8 @@ public class SwingInstanceManager {
 		notifySwingChangeChange();
 	}
 
-	public synchronized JsonAdminConsoleFrame extractStatus() {
-		JsonAdminConsoleFrame result = new JsonAdminConsoleFrame();
+	public synchronized AdminConsoleFrameMsgOut extractStatus() {
+		AdminConsoleFrameMsgOut result = new AdminConsoleFrameMsgOut();
 		for (SwingInstance si : getSwingInstanceSet()) {
 			result.getSessions().add(ServerUtil.composeSwingInstanceStatus(si));
 		}
@@ -169,7 +169,7 @@ public class SwingInstanceManager {
 		void swingInstancesChangedStats();
 	}
 
-	public boolean sendMessageToSwing(AtmosphereResource r, String clientId, Serializable o) {
+	public boolean sendMessageToSwing(AtmosphereResource r, String clientId, MsgIn o) {
 		SwingInstance client = swingInstances.get(clientId);
 		if (client != null) {
 			return client.sendToSwing(r, o);

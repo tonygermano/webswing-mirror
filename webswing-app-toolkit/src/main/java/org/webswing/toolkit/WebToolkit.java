@@ -76,7 +76,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
 import org.webswing.dispatch.WebEventDispatcher;

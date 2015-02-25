@@ -16,10 +16,9 @@ import javax.servlet.http.Part;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.webswing.Constants;
-import org.webswing.model.c2s.JsonEventUpload;
-import org.webswing.model.c2s.JsonEventUpload.UploadType;
+import org.webswing.model.c2s.UploadEventMsgIn;
+import org.webswing.model.c2s.UploadEventMsgIn.UploadType;
 import org.webswing.server.SwingInstanceManager;
-import org.webswing.util.Util;
 
 public class UploadServlet extends HttpServlet {
 
@@ -40,7 +39,7 @@ public class UploadServlet extends HttpServlet {
 				IOUtils.copy(filecontent, output);
 				output.close();
 				filecontent.close();
-				JsonEventUpload msg = new JsonEventUpload();
+				UploadEventMsgIn msg = new UploadEventMsgIn();
 				msg.type = UploadType.Upload;
 				msg.fileName = filename;
 				msg.tempFileLocation = f.getAbsolutePath();
