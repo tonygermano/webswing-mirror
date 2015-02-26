@@ -88,6 +88,11 @@
 			<artifactId>shiro-web</artifactId>
 			<version>1.2.3</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>2.5.0</version>
+		</dependency>
 		<!-- TO BE EXCLUDED FROM WEB-INF/lib -->
 
 		<dependency>
@@ -115,7 +120,30 @@
 	<build>
 		<finalName>webswing-server</finalName>
 		<plugins>
-
+			<plugin>
+				<groupId>com.github.os72</groupId>
+				<artifactId>protoc-jar-maven-plugin</artifactId>
+				<version>2.5.0.1</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<addSources>main</addSources>
+							<outputDirectory>src/main/java</outputDirectory>
+							<cleanOutputFolder>false</cleanOutputFolder>
+							<includeDirectories>
+								<include>src/main/webapp</include>
+							</includeDirectories>
+							<inputDirectories>
+								<include>src/main/webapp</include>
+							</inputDirectories>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
@@ -258,8 +286,7 @@
 									<fileset
 										dir="${project.build.directory}/${project.build.finalName}/WEB-INF/classes/"
 										includes="main/*.class" />
-									<fileset
-										dir="${project.build.directory}/require-build/"
+									<fileset dir="${project.build.directory}/require-build/"
 										includes="javascript/*.js" />
 								</war>
 							</target>

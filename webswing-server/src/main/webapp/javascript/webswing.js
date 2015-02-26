@@ -1,5 +1,5 @@
 define(
-		[ 'jquery', 'webswing-base', 'atmosphere', 'bootstrap', 'jquery.iframe-transport', 'jquery.fileupload' ],
+		[ 'jquery', 'webswing-base', 'atmosphere', 'ProtoBuf', 'bootstrap', 'jquery.iframe-transport', 'jquery.fileupload' ],
 		function($, webswingBase, atmosphere) {
 			"use strict";
 			var loginDialog = $('#loginDialog');

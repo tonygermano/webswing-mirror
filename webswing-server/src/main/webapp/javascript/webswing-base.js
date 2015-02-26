@@ -175,11 +175,11 @@
 			context = canvas.getContext("2d");
 			if (data.linkAction != null) {
 				if (data.linkAction.action == 'url') {
-					config.onLinkOpenAction(data.linkAction.url);
+					config.onLinkOpenAction(data.linkAction.src);
 				} else if (data.linkAction.action == 'print') {
-					config.onPrintAction(data.linkAction.url);
+					config.onPrintAction(data.linkAction.src);
 				} else if (data.linkAction.action == 'file') {
-					config.onFileDownloadAction(data.linkAction.url);
+					config.onFileDownloadAction(data.linkAction.src);
 				}
 			}
 			if (data.moveAction != null) {

@@ -1,0 +1,90 @@
+package org.webswing.server.model.proto;
+
+/* ===================SERVER -> BROWSER====================*/
+
+message AppFrameMsgOutProto{
+	optional ApplicationInfoMsgProto applications = 1;
+	optional LinkActionMsgProto linkAction = 2;
+	optional WindowMoveActionMsgProto moveAction = 3;
+	optional CursorChangeEventMsgProto cursorChange = 4;
+	optional CopyEventMsgProto copyEvent = 5;
+	optional FileDialogEventMsgProto fileDialogEvent = 6;
+	repeated WindowMsgProto windows = 7;
+	optional WindowMsgProto closedWindow = 8;
+	optional SimpleEventMsgOutProto event = 9;
+	optional string user = 10;
+}
+
+message ApplicationInfoMsgProto{
+	required string name = 1;
+	optional string base64Icon = 2;
+}
+
+message LinkActionMsgProto{
+	required LinkActionTypeProto action = 1;
+	required string src = 2;
+
+	enum LinkActionTypeProto{
+		file = 0;
+		url = 1;
+		print = 2;
+	}
+}
+
+message WindowMoveActionMsgProto{
+	optional sint32 sx = 1;
+	optional sint32 sy = 2;
+	optional sint32 dx = 3;
+	optional sint32 dy = 4;
+	optional uint32 width = 5;
+	optional uint32 height = 6;
+}
+
+message CursorChangeEventMsgProto{
+	required string cursor = 1;
+}
+
+message CopyEventMsgProto{
+	optional string content = 1;
+}
+
+message FileDialogEventMsgProto{
+	required FileDialogEventTypeProto eventType = 1;
+	optional bool allowDownload = 2;
+	optional bool allowUpload = 3;
+	optional bool allowDelete = 4;
+	optional string filter = 5;
+	optional bool isMultiSelection = 6;
+
+	enum FileDialogEventTypeProto {
+		Open = 0;
+		Close = 1;
+	}
+}
+
+message WindowMsgProto{
+	required string id = 1;
+	repeated WindowPartialContentMsgProto content = 2;
+	optional bytes directDraw = 3;
+	optional string title = 4;
+	optional sint32 posX = 5;
+	optional sint32 posY = 6;
+	optional uint32 width = 7;
+	optional uint32 height = 8;
+}
+
+message WindowPartialContentMsgProto{
+	optional sint32 positionX = 1;
+	optional sint32 positionY = 2;
+	optional uint32 width = 3;
+	optional uint32 height = 4;
+	optional bytes base64Content = 5;
+}
+
+enum SimpleEventMsgOutProto{
+	applicationAlreadyRunning = 0;
+	shutDownNotification = 1;
+	tooManyClientsNotification = 2;
+	continueOldSession = 3;
+	configurationError = 4;
+}

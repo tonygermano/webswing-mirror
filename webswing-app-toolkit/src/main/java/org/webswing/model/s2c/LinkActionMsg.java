@@ -11,12 +11,12 @@ public class LinkActionMsg implements Msg {
 	}
 
 	public LinkActionType action;
-	public String url;
+	public String src;
 
 	public LinkActionMsg(LinkActionType action, String url) {
 		super();
 		this.action = action;
-		this.url = url;
+		this.src = url;
 	}
 
 }
