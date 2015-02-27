@@ -89,9 +89,9 @@ public class SwingInstance implements WebSessionListener {
 		if (connection.isRunning()) {
 			if (h instanceof SimpleEventMsgIn) {
 				SimpleEventMsgIn m = (SimpleEventMsgIn) h;
-				if (m.type.equals(SimpleEventMsgIn.Type.paintAck) && ((resource != null && r.uuid().equals(resource.uuid())) || (resource == null && mirroredResource != null && r.uuid().equals(mirroredResource.uuid())))) {
+				if (m.getType().equals(SimpleEventMsgIn.SimpleEventType.paintAck) && ((resource != null && r.uuid().equals(resource.uuid())) || (resource == null && mirroredResource != null && r.uuid().equals(mirroredResource.uuid())))) {
 					connection.send(h);
-				} else if (m.type.equals(SimpleEventMsgIn.Type.unload)) {
+				} else if (m.getType().equals(SimpleEventMsgIn.SimpleEventType.unload)) {
 					SwingInstanceManager.getInstance().notifySessionDisconnected(r.uuid());
 				} else {
 					connection.send(h);

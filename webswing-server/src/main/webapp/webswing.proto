@@ -3,7 +3,7 @@ package org.webswing.server.model.proto;
 /* ===================SERVER -> BROWSER====================*/
 
 message AppFrameMsgOutProto{
-	optional ApplicationInfoMsgProto applications = 1;
+	repeated ApplicationInfoMsgProto applications = 1;
 	optional LinkActionMsgProto linkAction = 2;
 	optional WindowMoveActionMsgProto moveAction = 3;
 	optional CursorChangeEventMsgProto cursorChange = 4;
@@ -88,3 +88,101 @@ enum SimpleEventMsgOutProto{
 	continueOldSession = 3;
 	configurationError = 4;
 }
+
+
+/* ===================BROWSER -> SERVER====================*/
+
+message ConnectionHandshakeMsgInProto{
+	optional string clientId = 1;
+	optional string sessionId = 2;
+	optional uint32 desktopWidth = 3;
+	optional uint32 desktopHeight = 4;
+	optional string applicationName = 5;
+	optional bool mirrored = 6;
+	optional bool directDrawSupported = 7;
+}
+
+message InputEventMsgInProto{
+	optional ConnectionHandshakeMsgInProto handshake = 1;
+	optional KeyboardEventMsgInProto key = 2;
+	optional MouseEventMsgInProto mouse = 3;
+	optional SimpleEventMsgInProto event = 4;
+}
+
+message KeyboardEventMsgInProto{
+	optional string clientId = 1;
+	optional KeyEventTypeProto type = 2;
+	optional sint32 character = 3;
+	optional sint32 keycode = 4; 
+	optional bool alt = 5;
+	optional bool ctrl = 6;
+	optional bool shift = 7;
+	optional bool meta = 8;
+	optional bool altgr = 9;
+	
+	enum KeyEventTypeProto {
+		keypress = 0;
+		keydown = 1;
+		keyup = 2;
+	}
+}
+
+message MouseEventMsgInProto{
+	optional string clientId = 1;
+	optional sint32 x = 2;
+	optional sint32 y = 3;
+	optional MouseEventTypeProto type = 4;
+	optional sint32 wheelDelta = 5;
+	optional sint32 button = 6;
+	optional bool ctrl = 7;
+	optional bool alt = 8;
+	optional bool shift = 9;
+	optional bool meta = 10;
+	
+	enum MouseEventTypeProto {
+		mousemove = 0;
+		mousedown = 1;
+		mouseup = 2;
+		mousewheel = 3;
+		dblclick = 4;
+	}
+}
+
+message PasteEventMsgInProto{
+	optional string clientId = 1;
+	optional string content = 2;
+}
+
+message SimpleEventMsgInProto{
+	optional SimpleEventTypeProto type = 1;
+	optional string clientId = 2;
+	
+	enum SimpleEventTypeProto {
+		unload = 0;
+		killSwing = 1;
+		paintAck = 2;
+		repaint = 3;
+		downloadFile = 4;
+		deleteFile = 5;
+		hb = 6;
+	}
+}
+
+message UploadedEventMsgInProto{
+	repeated string files = 1;
+	optional string clientId = 2;
+}
+
+message UploadEventMsgInProto{
+    optional UploadTypeProto type = 1;
+    optional string fileName = 2;
+    optional string tempFileLocation = 3;
+    
+    enum UploadTypeProto {
+        Download = 0;
+        Upload = 1;
+        Delete = 2;
+    }
+}
+
+

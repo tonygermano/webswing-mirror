@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.webswing.Constants;
-import org.webswing.model.s2c.OpenFileResultMsgInternal;
+import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.util.Logger;
 import org.webswing.util.Util;
 

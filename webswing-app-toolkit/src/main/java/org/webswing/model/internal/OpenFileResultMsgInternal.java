@@ -1,4 +1,4 @@
-package org.webswing.model.s2c;
+package org.webswing.model.internal;
 
 import java.io.File;
 

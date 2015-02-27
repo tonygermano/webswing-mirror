@@ -7,7 +7,7 @@ public enum SimpleEventMsgOut implements Msg {
 
 	public AppFrameMsgOut buildMsgOut() {
 		AppFrameMsgOut result = new AppFrameMsgOut();
-		result.event = this;
+		result.setEvent(this);
 		return result;
 	}
 }

@@ -5,12 +5,12 @@ import org.webswing.model.Msg;
 public class WindowMoveActionMsg implements Msg {
 
 	private static final long serialVersionUID = -8935899924614304993L;
-	public int sx;
-	public int sy;
-	public int dx;
-	public int dy;
-	public int width;
-	public int height;
+	private int sx;
+	private int sy;
+	private int dx;
+	private int dy;
+	private int width;
+	private int height;
 
 	public WindowMoveActionMsg(int sx, int sy, int dx, int dy, int width, int height) {
 		super();
@@ -19,6 +19,54 @@ public class WindowMoveActionMsg implements Msg {
 		this.dx = dx;
 		this.dy = dy;
 		this.width = width;
+		this.height = height;
+	}
+
+	public int getSx() {
+		return sx;
+	}
+
+	public void setSx(int sx) {
+		this.sx = sx;
+	}
+
+	public int getSy() {
+		return sy;
+	}
+
+	public void setSy(int sy) {
+		this.sy = sy;
+	}
+
+	public int getDx() {
+		return dx;
+	}
+
+	public void setDx(int dx) {
+		this.dx = dx;
+	}
+
+	public int getDy() {
+		return dy;
+	}
+
+	public void setDy(int dy) {
+		this.dy = dy;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
 		this.height = height;
 	}
 

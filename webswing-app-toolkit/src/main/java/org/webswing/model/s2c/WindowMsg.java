@@ -1,18 +1,20 @@
 package org.webswing.model.s2c;
 
+import java.util.List;
+
 import org.webswing.model.Msg;
 
 public class WindowMsg implements Msg {
 
 	private static final long serialVersionUID = -523823816533325842L;
-	String id;
-	WindowPartialContentMsg[] content;
-	byte[] directDraw;
-	String title;
-	Integer posX;
-	Integer posY;
-	Integer width;
-	Integer height;
+	private String id;
+	private List<WindowPartialContentMsg> content;
+	private byte[] directDraw;
+	private String title;
+	private Integer posX;
+	private Integer posY;
+	private Integer width;
+	private Integer height;
 
 	public String getId() {
 		return id;
@@ -22,12 +24,20 @@ public class WindowMsg implements Msg {
 		this.id = id;
 	}
 
-	public WindowPartialContentMsg[] getContent() {
+	public List<WindowPartialContentMsg> getContent() {
 		return content;
 	}
 
-	public void setContent(WindowPartialContentMsg[] content) {
+	public void setContent(List<WindowPartialContentMsg> content) {
 		this.content = content;
+	}
+
+	public byte[] getDirectDraw() {
+		return directDraw;
+	}
+
+	public void setDirectDraw(byte[] directDraw) {
+		this.directDraw = directDraw;
 	}
 
 	public String getTitle() {
@@ -68,14 +78,6 @@ public class WindowMsg implements Msg {
 
 	public void setHeight(Integer height) {
 		this.height = height;
-	}
-
-	public byte[] getDirectDraw() {
-		return directDraw;
-	}
-
-	public void setDirectDraw(byte[] directDraw) {
-		this.directDraw = directDraw;
 	}
 
 }

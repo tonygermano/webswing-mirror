@@ -40,7 +40,7 @@ import javax.swing.SwingUtilities;
 import org.webswing.Constants;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.c2s.KeyboardEventMsgIn;
-import org.webswing.model.c2s.KeyboardEventMsgIn.Type;
+import org.webswing.model.c2s.KeyboardEventMsgIn.KeyEventType;
 import org.webswing.model.c2s.MouseEventMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.WindowMsg;
@@ -66,7 +66,7 @@ public class Util {
 
 	public static int getMouseModifiersAWTFlag(MouseEventMsgIn evt) {
 		int result = 0;
-		switch (evt.button) {
+		switch (evt.getButton()) {
 		case 1:
 			result = MouseEvent.BUTTON1_DOWN_MASK;
 			break;
@@ -77,16 +77,16 @@ public class Util {
 			result = MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK;
 			break;
 		}
-		if (evt.ctrl) {
+		if (evt.isCtrl()) {
 			result = result | MouseEvent.CTRL_DOWN_MASK;
 		}
-		if (evt.alt) {
+		if (evt.isAlt()) {
 			result = result | MouseEvent.ALT_DOWN_MASK;
 		}
-		if (evt.shift) {
+		if (evt.isShift()) {
 			result = result | MouseEvent.SHIFT_DOWN_MASK;
 		}
-		if (evt.meta) {
+		if (evt.isMeta()) {
 			result = result | MouseEvent.META_DOWN_MASK;
 		}
 		return result;
@@ -106,25 +106,25 @@ public class Util {
 
 	public static int getKeyModifiersAWTFlag(KeyboardEventMsgIn event) {
 		int modifiers = 0;
-		if (event.alt) {
+		if (event.isAlt()) {
 			modifiers = modifiers | KeyEvent.ALT_MASK;
 		}
-		if (event.ctrl) {
+		if (event.isCtrl()) {
 			modifiers = modifiers | KeyEvent.CTRL_MASK;
 		}
-		if (event.shift) {
+		if (event.isShift()) {
 			modifiers = modifiers | KeyEvent.SHIFT_MASK;
 		}
-		if (event.altgr) {
+		if (event.isAltgr()) {
 			modifiers = modifiers | KeyEvent.ALT_GRAPH_MASK;
 		}
-		if (event.meta) {
+		if (event.isMeta()) {
 			modifiers = modifiers | KeyEvent.META_MASK;
 		}
 		return modifiers;
 	}
 
-	public static int getKeyType(Type type) {
+	public static int getKeyType(KeyEventType type) {
 		switch (type) {
 		case keydown:
 			return KeyEvent.KEY_PRESSED;
@@ -181,8 +181,8 @@ public class Util {
 																						// client
 			} else {
 				Map<Integer, BufferedImage> imageMap = new HashMap<Integer, BufferedImage>();
-				for (int i = 0; i < window.getContent().length; i++) {
-					WindowPartialContentMsg wpc = window.getContent()[i];
+				for (int i = 0; i < window.getContent().size(); i++) {
+					WindowPartialContentMsg wpc = window.getContent().get(i);
 					imageMap.put(i, w.extractBufferedImage(new Rectangle(wpc.getPositionX(), wpc.getPositionY(), wpc.getWidth(), wpc.getHeight())));
 				}
 				windowImages.put(window.getId(), imageMap);
@@ -207,8 +207,8 @@ public class Util {
 		for (WindowMsg window : json.getWindows()) {
 			if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
 				Map<Integer, BufferedImage> imageMap = windowImages.get(window.getId());
-				for (int i = 0; i < window.getContent().length; i++) {
-					WindowPartialContentMsg c = window.getContent()[i];
+				for (int i = 0; i < window.getContent().size(); i++) {
+					WindowPartialContentMsg c = window.getContent().get(i);
 					if (imageMap.containsKey(i)) {
 						c.setBase64Content(Services.getImageService().getPngImage(imageMap.get(i)));
 					}
@@ -257,7 +257,7 @@ public class Util {
 						partialContentList.add(content);
 					}
 				}
-				window.setContent(partialContentList.toArray(new WindowPartialContentMsg[partialContentList.size()]));
+				window.setContent(partialContentList);
 			}
 		}
 		return json;

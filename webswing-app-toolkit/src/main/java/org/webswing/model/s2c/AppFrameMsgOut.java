@@ -9,33 +9,16 @@ public class AppFrameMsgOut implements MsgOut {
 
 	private static final long serialVersionUID = 6019708608380425820L;
 
-	private String type = "app";
-	public List<ApplicationInfoMsg> applications;
-	public LinkActionMsg linkAction;
-	public WindowMoveActionMsg moveAction;
-	public CursorChangeEventMsg cursorChange;
-	public String user;
-	public CopyEventMsg copyEvent;
-	public FileDialogEventMsg fileDialogEvent;
-	public List<WindowMsg> windows;
-	public WindowMsg closedWindow;
-	public SimpleEventMsgOut event;
-
-	public LinkActionMsg getLinkAction() {
-		return linkAction;
-	}
-
-	public void setLinkAction(LinkActionMsg linkAction) {
-		this.linkAction = linkAction;
-	}
-
-	public List<WindowMsg> getWindows() {
-		return windows;
-	}
-
-	public void setWindows(List<WindowMsg> windows) {
-		this.windows = windows;
-	}
+	private List<ApplicationInfoMsg> applications;
+	private LinkActionMsg linkAction;
+	private WindowMoveActionMsg moveAction;
+	private CursorChangeEventMsg cursorChange;
+	private String user;
+	private CopyEventMsg copyEvent;
+	private FileDialogEventMsg fileDialogEvent;
+	private List<WindowMsg> windows;
+	private WindowMsg closedWindow;
+	private SimpleEventMsgOut event;
 
 	public WindowMsg getOrCreateWindowById(String guid) {
 		if (windows != null) {
@@ -53,8 +36,84 @@ public class AppFrameMsgOut implements MsgOut {
 		return window;
 	}
 
-	public String getType() {
-		return type;
+	public List<ApplicationInfoMsg> getApplications() {
+		return applications;
+	}
+
+	public void setApplications(List<ApplicationInfoMsg> applications) {
+		this.applications = applications;
+	}
+
+	public LinkActionMsg getLinkAction() {
+		return linkAction;
+	}
+
+	public void setLinkAction(LinkActionMsg linkAction) {
+		this.linkAction = linkAction;
+	}
+
+	public WindowMoveActionMsg getMoveAction() {
+		return moveAction;
+	}
+
+	public void setMoveAction(WindowMoveActionMsg moveAction) {
+		this.moveAction = moveAction;
+	}
+
+	public CursorChangeEventMsg getCursorChange() {
+		return cursorChange;
+	}
+
+	public void setCursorChange(CursorChangeEventMsg cursorChange) {
+		this.cursorChange = cursorChange;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public CopyEventMsg getCopyEvent() {
+		return copyEvent;
+	}
+
+	public void setCopyEvent(CopyEventMsg copyEvent) {
+		this.copyEvent = copyEvent;
+	}
+
+	public FileDialogEventMsg getFileDialogEvent() {
+		return fileDialogEvent;
+	}
+
+	public void setFileDialogEvent(FileDialogEventMsg fileDialogEvent) {
+		this.fileDialogEvent = fileDialogEvent;
+	}
+
+	public List<WindowMsg> getWindows() {
+		return windows;
+	}
+
+	public void setWindows(List<WindowMsg> windows) {
+		this.windows = windows;
+	}
+
+	public WindowMsg getClosedWindow() {
+		return closedWindow;
+	}
+
+	public void setClosedWindow(WindowMsg closedWindow) {
+		this.closedWindow = closedWindow;
+	}
+
+	public SimpleEventMsgOut getEvent() {
+		return event;
+	}
+
+	public void setEvent(SimpleEventMsgOut event) {
+		this.event = event;
 	}
 
 }

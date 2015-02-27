@@ -41,12 +41,12 @@ import org.webswing.Constants;
 import org.webswing.model.MsgInternal;
 import org.webswing.model.MsgOut;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.internal.OpenFileResultMsgInternal;
+import org.webswing.model.internal.PrinterJobResultMsgInternal;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.LinkActionMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
-import org.webswing.model.s2c.OpenFileResultMsgInternal;
-import org.webswing.model.s2c.PrinterJobResultMsgInternal;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.handler.FileServlet;
 import org.webswing.server.util.Los;
@@ -76,7 +76,7 @@ public class SwingJvmConnection implements MessageListener {
 
 	public SwingJvmConnection(ConnectionHandshakeMsgIn handshake, SwingApplicationDescriptor appConfig, WebSessionListener webListener, String customArgs) {
 		this.webListener = webListener;
-		this.clientId = handshake.clientId;
+		this.clientId = handshake.getClientId();
 		this.customArgs = customArgs;
 		try {
 			initialize();
@@ -207,8 +207,8 @@ public class SwingJvmConnection implements MessageListener {
 	}
 
 	public Future<?> start(final SwingApplicationDescriptor appConfig, final ConnectionHandshakeMsgIn handshake) {
-		final Integer screenWidth = handshake.desktopWidth;
-		final Integer screenHeight = handshake.desktopHeight;
+		final Integer screenWidth = handshake.getDesktopWidth();
+		final Integer screenHeight = handshake.getDesktopHeight();
 		Future<?> future = swingAppExecutor.submit(new Callable<Object>() {
 
 			public Object call() throws Exception {
@@ -276,7 +276,7 @@ public class SwingJvmConnection implements MessageListener {
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_DELETE, appConfig.isAllowDelete() + "");
 
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw() + "");
-						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.directDrawSupported + "");
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported() + "");
 						addSysProperty(javaTask, Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout() + "");
 						addSysProperty(javaTask, "awt.toolkit", webToolkitClass);
 						addSysProperty(javaTask, "java.awt.headless", "false");

@@ -23,7 +23,7 @@ import org.webswing.model.MsgIn;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.KeyboardEventMsgIn;
 import org.webswing.model.c2s.MouseEventMsgIn;
-import org.webswing.model.c2s.MouseEventMsgIn.Type;
+import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
 import org.webswing.model.c2s.PasteEventMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.c2s.UploadEventMsgIn;
@@ -55,7 +55,7 @@ public class WebEventDispatcher {
 		}
 		if (event instanceof ConnectionHandshakeMsgIn) {
 			ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
-			Util.getWebToolkit().initSize(handshake.desktopWidth, handshake.desktopHeight);
+			Util.getWebToolkit().initSize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
 		}
 		if (event instanceof SimpleEventMsgIn) {
 			SimpleEventMsgIn msg = (SimpleEventMsgIn) event;
@@ -63,7 +63,7 @@ public class WebEventDispatcher {
 		}
 		if (event instanceof PasteEventMsgIn) {
 			PasteEventMsgIn paste = (PasteEventMsgIn) event;
-			handlePasteEvent(paste.content);
+			handlePasteEvent(paste.getContent());
 		}
 		if (event instanceof UploadedEventMsgIn) {
 			handleUploadedEvent((UploadedEventMsgIn) event);
@@ -72,15 +72,15 @@ public class WebEventDispatcher {
 			UploadEventMsgIn upload = (UploadEventMsgIn) event;
 			JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
 			if (dialog != null) {
-				switch (upload.type) {
+				switch (upload.getType()) {
 				case Upload:
 					File currentDir = dialog.getCurrentDirectory();
-					File tempFile = new File(upload.tempFileLocation);
-					String validfilename = Util.resolveFilename(currentDir, upload.fileName);
+					File tempFile = new File(upload.getTempFileLocation());
+					String validfilename = Util.resolveFilename(currentDir, upload.getFileName());
 					if (currentDir.canWrite() && tempFile.exists()) {
 						try {
 							Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
-							uploadMap.put(upload.fileName, validfilename);
+							uploadMap.put(upload.getFileName(), validfilename);
 						} catch (IOException e) {
 							Logger.error("Error while moving uploaded file to target folder: ", e);
 						}
@@ -95,7 +95,7 @@ public class WebEventDispatcher {
 
 	private void dispatchMessage(SimpleEventMsgIn message) {
 		Logger.debug("WebEventDispatcher.dispatchMessage", message);
-		switch (message.type) {
+		switch (message.getType()) {
 		case killSwing:
 			Logger.info("Received kill signal. Swing application shutting down.");
 			SwingUtilities.invokeLater(new Runnable() {
@@ -132,31 +132,31 @@ public class WebEventDispatcher {
 		if (w != null) {
 			long when = System.currentTimeMillis();
 			int modifiers = Util.getKeyModifiersAWTFlag(event);
-			int type = Util.getKeyType(event.type);
+			int type = Util.getKeyType(event.getType());
 			Component src = w.getFocusOwner() == null ? w : w.getFocusOwner();
 			if (type == KeyEvent.KEY_TYPED) {
-				AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, 0, 0, (char) event.character);
+				AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, 0, 0, (char) event.getCharacter());
 				dispatchEventInSwing(w, e);
 			} else {
-				if (event.keycode == 13) {// enter keycode
-					event.keycode = 10;
-					event.character = 10;
-				} else if (event.keycode == 46) {// delete keycode
-					event.keycode = 127;
-					event.character = 127;
+				if (event.getKeycode() == 13) {// enter keycode
+					event.setKeycode(10);
+					event.setCharacter(10);
+				} else if (event.getKeycode() == 46) {// delete keycode
+					event.setKeycode(127);
+					event.setCharacter(127);
 				}
-				AWTEvent e = new KeyEvent(src, type, when, modifiers, event.keycode, (char) event.character, KeyEvent.KEY_LOCATION_STANDARD);
+				AWTEvent e = new KeyEvent(src, type, when, modifiers, event.getKeycode(), (char) event.getCharacter(), KeyEvent.KEY_LOCATION_STANDARD);
 
 				// filter out ctrl+c for copy
-				if (event.type == KeyboardEventMsgIn.Type.keydown && event.character == 67 && event.ctrl == true && event.alt == false && event.altgr == false && event.meta == false && event.shift == false) {
+				if (event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && event.getCharacter() == 67 && event.isCtrl() == true && event.isAlt() == false && event.isAltgr() == false && event.isMeta() == false && event.isShift() == false) {
 					// on copy event - do nothing, default behavior calls setContents on WebClipboard, which notifies the browser
 				}
-				if (event.type == KeyboardEventMsgIn.Type.keydown && event.character == 86 && event.ctrl == true && event.alt == false && event.altgr == false && event.meta == false && event.shift == false) {
+				if (event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && event.getCharacter() == 86 && event.isCtrl() == true && event.isAlt() == false && event.isAltgr() == false && event.isMeta() == false && event.isShift() == false) {
 					// on paste event -do nothing
 				} else {
 					dispatchEventInSwing(w, e);
-					if (event.keycode == 32 && event.type == KeyboardEventMsgIn.Type.keydown) {// space keycode handle press
-						event.type = KeyboardEventMsgIn.Type.keypress;
+					if (event.getKeycode() == 32 && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown) {// space keycode handle press
+						event.setType(KeyboardEventMsgIn.KeyEventType.keypress);
 						dispatchKeyboardEvent(event);
 					}
 				}
@@ -169,8 +169,8 @@ public class WebEventDispatcher {
 		if (WindowManager.getInstance().isLockedToWindowDecorationHandler()) {
 			w = WindowManager.getInstance().getLockedToWindow();
 		} else {
-			w = WindowManager.getInstance().getVisibleWindowOnPosition(event.x, event.y);
-			if (lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.type == Type.mousemove && event.button == 1) || (event.type == Type.mouseup))) {
+			w = WindowManager.getInstance().getVisibleWindowOnPosition(event.getX(), event.getY());
+			if (lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButton() == 1) || (event.getType() == MouseEventType.mouseup))) {
 				w = (Window) lastMouseEvent.getSource();
 			}
 		}
@@ -182,22 +182,22 @@ public class WebEventDispatcher {
 		}
 		if (w != null) {
 			MouseEvent e = null;
-			int x = event.x - w.getX();
-			int y = event.y - w.getY();
-			lastMousePosition.x = event.x;
-			lastMousePosition.y = event.y;
+			int x = event.getX() - w.getX();
+			int y = event.getY() - w.getY();
+			lastMousePosition.x = event.getX();
+			lastMousePosition.y = event.getY();
 			long when = System.currentTimeMillis();
 			int modifiers = Util.getMouseModifiersAWTFlag(event);
 			int id = 0;
 			int clickcount = 0;
-			int buttons = Util.getMouseButtonsAWTFlag(event.button);
-			if (buttons != 0 && event.type == Type.mousedown) {
+			int buttons = Util.getMouseButtonsAWTFlag(event.getButton());
+			if (buttons != 0 && event.getType() == MouseEventType.mousedown) {
 				WindowManager.getInstance().activateWindow(w, x, y);
 			}
-			switch (event.type) {
+			switch (event.getType()) {
 			case mousemove:
-				id = event.button == 1 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
-				e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, false, buttons);
+				id = event.getButton() == 1 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
+				e = new MouseEvent(w, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
 				lastMouseEvent = e;
 				dispatchEventInSwing(w, e);
 				break;
@@ -206,10 +206,10 @@ public class WebEventDispatcher {
 				boolean popupTrigger = (buttons == 3) ? true : false;
 				clickcount = computeClickCount(x, y, buttons, false);
 				modifiers = modifiers & (((1 << 6) - 1) | (~((1 << 14) - 1)) | MouseEvent.CTRL_DOWN_MASK | MouseEvent.ALT_DOWN_MASK | MouseEvent.SHIFT_DOWN_MASK | MouseEvent.META_DOWN_MASK);
-				e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
+				e = new MouseEvent(w, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
 				dispatchEventInSwing(w, e);
 				if (lastMousePressEvent != null && lastMousePressEvent.getX() == x && lastMousePressEvent.getY() == y) {
-					e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.x, event.y, clickcount, popupTrigger, buttons);
+					e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
 					dispatchEventInSwing(w, e);
 					lastMouseEvent = e;
 					lastMousePressEvent = e;
@@ -221,7 +221,7 @@ public class WebEventDispatcher {
 			case mousedown:
 				id = MouseEvent.MOUSE_PRESSED;
 				clickcount = computeClickCount(x, y, buttons, true);
-				e = new MouseEvent(w, id, when, modifiers, x, y, event.x, event.y, clickcount, false, buttons);
+				e = new MouseEvent(w, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
 				dispatchEventInSwing(w, e);
 				lastMousePressEvent = e;
 				lastMouseEvent = e;
@@ -230,7 +230,7 @@ public class WebEventDispatcher {
 				id = MouseEvent.MOUSE_WHEEL;
 				buttons = 0;
 				modifiers = 0;
-				e = new MouseWheelEvent(w, id, when, modifiers, x, y, clickcount, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 3, event.wheelDelta);
+				e = new MouseWheelEvent(w, id, when, modifiers, x, y, clickcount, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 3, event.getWheelDelta());
 				dispatchEventInSwing(w, e);
 				break;
 			case dblclick:
@@ -301,15 +301,15 @@ public class WebEventDispatcher {
 		UploadedEventMsgIn event = (UploadedEventMsgIn) e;
 		if (fc != null) {
 			fc.rescanCurrentDirectory();
-			if (event.files.size() > 0) {
+			if (event.getFiles().size() > 0) {
 				if (fc.isMultiSelectionEnabled()) {
-					File arr[] = new File[event.files.size()];
-					for (int i = 0; i < event.files.size(); i++) {
-						arr[i] = new File(fc.getCurrentDirectory(), uploadMap.get(event.files.get(i)));
+					File arr[] = new File[event.getFiles().size()];
+					for (int i = 0; i < event.getFiles().size(); i++) {
+						arr[i] = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i)));
 					}
 					fc.setSelectedFiles(arr);
 				} else {
-					File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.files.get(0)));
+					File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
 					fc.setSelectedFile(f);
 				}
 				// fc.approveSelection();

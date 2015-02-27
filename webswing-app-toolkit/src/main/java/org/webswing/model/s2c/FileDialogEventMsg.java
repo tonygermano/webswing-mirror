@@ -14,12 +14,12 @@ public class FileDialogEventMsg implements Msg {
 		Open, Close;
 	}
 
-	public FileDialogEventType eventType;
-	public boolean allowDownload;
-	public boolean allowUpload;
-	public boolean allowDelete;
-	public String filter = "";
-	public boolean isMultiSelection;
+	private FileDialogEventType eventType;
+	private boolean allowDownload;
+	private boolean allowUpload;
+	private boolean allowDelete;
+	private String filter = "";
+	private boolean isMultiSelection;
 
 	public FileDialogEventMsg() {
 		allowDownload = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD));
@@ -44,4 +44,51 @@ public class FileDialogEventMsg implements Msg {
 			filter = filter.substring(0, filter.length() - 2);
 	}
 
+	public FileDialogEventType getEventType() {
+		return eventType;
+	}
+
+	public void setEventType(FileDialogEventType eventType) {
+		this.eventType = eventType;
+	}
+
+	public boolean isAllowDownload() {
+		return allowDownload;
+	}
+
+	public void setAllowDownload(boolean allowDownload) {
+		this.allowDownload = allowDownload;
+	}
+
+	public boolean isAllowUpload() {
+		return allowUpload;
+	}
+
+	public void setAllowUpload(boolean allowUpload) {
+		this.allowUpload = allowUpload;
+	}
+
+	public boolean isAllowDelete() {
+		return allowDelete;
+	}
+
+	public void setAllowDelete(boolean allowDelete) {
+		this.allowDelete = allowDelete;
+	}
+
+	public String getFilter() {
+		return filter;
+	}
+
+	public void setFilter(String filter) {
+		this.filter = filter;
+	}
+
+	public boolean isMultiSelection() {
+		return isMultiSelection;
+	}
+
+	public void setMultiSelection(boolean isMultiSelection) {
+		this.isMultiSelection = isMultiSelection;
+	}
 }

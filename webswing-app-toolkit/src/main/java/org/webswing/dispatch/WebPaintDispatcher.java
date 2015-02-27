@@ -24,6 +24,7 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
+import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.CopyEventMsg;
 import org.webswing.model.s2c.CursorChangeEventMsg;
@@ -33,7 +34,6 @@ import org.webswing.model.s2c.LinkActionMsg;
 import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
 import org.webswing.model.s2c.WindowMsg;
 import org.webswing.model.s2c.WindowMoveActionMsg;
-import org.webswing.model.s2c.OpenFileResultMsgInternal;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.extra.WebRepaintManager;
@@ -96,7 +96,7 @@ public class WebPaintDispatcher {
 							windowImages = Util.extractWindowImages(json, windowImages);
 						}
 						if (moveAction != null) {
-							json.moveAction = moveAction;
+							json.setMoveAction(moveAction);
 							moveAction = null;
 						}
 						clientReadyToReceive = false;
@@ -185,7 +185,7 @@ public class WebPaintDispatcher {
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		WindowMsg fdEvent = new WindowMsg();
 		fdEvent.setId(guid);
-		f.closedWindow = fdEvent;
+		f.setClosedWindow(fdEvent);
 		Logger.info("WebPaintDispatcher:notifyWindowClosed", guid);
 		Services.getConnectionService().sendJsonObject(f);
 	}
@@ -256,9 +256,9 @@ public class WebPaintDispatcher {
 			if (moveAction == null) {
 				moveAction = new WindowMoveActionMsg(from.x, from.y, to.x, to.y, from.width, from.height);
 				notifyRepaintOffScreenAreas(w, moveAction);
-			} else if (moveAction.dx == from.x && moveAction.dy == from.y && moveAction.width == from.width && moveAction.height == from.height) {
-				moveAction.dx = to.x;
-				moveAction.dy = to.y;
+			} else if (moveAction.getDx() == from.x && moveAction.getDy() == from.y && moveAction.getWidth() == from.width && moveAction.getHeight() == from.height) {
+				moveAction.setDx(to.x);
+				moveAction.setDy(to.y);
 				notifyRepaintOffScreenAreas(w, moveAction);
 			} else {
 				notifyWindowRepaint(w);
@@ -269,10 +269,10 @@ public class WebPaintDispatcher {
 	@SuppressWarnings("restriction")
 	private void notifyRepaintOffScreenAreas(Window w, WindowMoveActionMsg m) {
 		Rectangle screen = new Rectangle(Util.getWebToolkit().getScreenSize());
-		Rectangle before = new Rectangle(m.sx, m.sy, m.width, m.height);
-		Rectangle after = new Rectangle(m.dx, m.dy, m.width, m.height);
-		int xdiff = m.sx - m.dx;
-		int ydiff = m.sy - m.dy;
+		Rectangle before = new Rectangle(m.getSx(), m.getSy(), m.getWidth(), m.getHeight());
+		Rectangle after = new Rectangle(m.getDx(), m.getDy(), m.getWidth(), m.getHeight());
+		int xdiff = m.getSx() - m.getDx();
+		int ydiff = m.getSy() - m.getDy();
 		Rectangle[] invisibleBefore = SwingUtilities.computeDifference(before, screen);
 		if (invisibleBefore.length != 0) {
 			for (Rectangle r : invisibleBefore) {
@@ -339,7 +339,7 @@ public class WebPaintDispatcher {
 		if (!WindowManager.getInstance().getCurrentCursor().equals(webcursorName)) {
 			AppFrameMsgOut f = new AppFrameMsgOut();
 			CursorChangeEventMsg cursorChange = new CursorChangeEventMsg(webcursorName);
-			f.cursorChange = cursorChange;
+			f.setCursorChange(cursorChange);
 			WindowManager.getInstance().setCurrentCursor(webcursorName);
 			Logger.debug("WebPaintDispatcher:notifyCursorUpdate", f);
 			Services.getConnectionService().sendJsonObject(f);
@@ -350,7 +350,7 @@ public class WebPaintDispatcher {
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		CopyEventMsg copyEvent;
 		copyEvent = new CopyEventMsg(content);
-		f.copyEvent = copyEvent;
+		f.setCopyEvent(copyEvent);
 		Logger.debug("WebPaintDispatcher:notifyCopyEvent", f);
 		Services.getConnectionService().sendJsonObject(f);
 	}
@@ -358,20 +358,20 @@ public class WebPaintDispatcher {
 	public void notifyFileDialogActive(WebWindowPeer webWindowPeer) {
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
-		fdEvent.eventType = FileDialogEventType.Open;
-		f.fileDialogEvent = fdEvent;
+		fdEvent.setEventType(FileDialogEventType.Open);
+		f.setFileDialogEvent(fdEvent);
 		Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
 		fileChooserDialog = Util.discoverFileChooser(webWindowPeer);
 		fdEvent.addFilter(fileChooserDialog.getChoosableFileFilters());
-		fdEvent.isMultiSelection = fileChooserDialog.isMultiSelectionEnabled();
+		fdEvent.setMultiSelection(fileChooserDialog.isMultiSelectionEnabled());
 		Services.getConnectionService().sendJsonObject(f);
 	}
 
 	public void notifyFileDialogHidden(WebWindowPeer webWindowPeer) {
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
-		fdEvent.eventType = FileDialogEventType.Close;
-		f.fileDialogEvent = fdEvent;
+		fdEvent.setEventType(FileDialogEventType.Close);
+		f.setFileDialogEvent(fdEvent);
 		Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
 		fileChooserDialog = null;
 		Services.getConnectionService().sendJsonObject(f);

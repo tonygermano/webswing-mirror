@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import main.Main;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.shiro.realm.text.PropertiesRealm;
 import org.apache.shiro.subject.Subject;
 import org.atmosphere.cpr.AtmosphereResource;
@@ -53,20 +52,26 @@ public class ServerUtil {
 
 	private static final String DEFAULT = "default";
 	private static final Logger log = LoggerFactory.getLogger(ServerUtil.class);
-	private static final Map<String, String> iconMap = new HashMap<String, String>();
+	private static final Map<String, byte[]> iconMap = new HashMap<String, byte[]>();
 	private static final ObjectMapper mapper = new ObjectMapper();
+	private static final ProtoMapper protoMapper = new ProtoMapper();
 
 	public static String encode2Json(MsgOut m) {
 		try {
 			return mapper.writeValueAsString(m);
 		} catch (IOException e) {
-			log.error("Encoding object failed: " + m, e);
+			log.error("Json encoding object failed: " + m, e);
 			return null;
 		}
 	}
 
 	public static byte[] encode2Proto(MsgOut m) {
-		return null;
+		try {
+			return protoMapper.encodeProto(m);
+		} catch (IOException e) {
+			log.error("Proto encoding object failed: " + m, e);
+			return null;
+		}
 	}
 
 	public static Object decode(String s) {
@@ -102,24 +107,24 @@ public class ServerUtil {
 					continue;
 				}
 				ApplicationInfoMsg app = new ApplicationInfoMsg();
-				app.name = name;
+				app.setName(name);
 				if (descriptor.getIcon() == null) {
-					app.base64Icon = loadImage(null);
+					app.setBase64Icon(loadImage(null));
 				} else {
 					if (new File(descriptor.getIcon()).exists()) {
-						app.base64Icon = loadImage(descriptor.getIcon());
+						app.setBase64Icon(loadImage(descriptor.getIcon()));
 					} else if (new File(descriptor.getHomeDir() + File.separator + descriptor.getIcon()).exists()) {
-						app.base64Icon = loadImage(descriptor.getHomeDir() + File.separator + descriptor.getIcon());
+						app.setBase64Icon(loadImage(descriptor.getHomeDir() + File.separator + descriptor.getIcon()));
 					} else {
 						log.error("Icon loading failed. File " + descriptor.getIcon() + " or " + descriptor.getHomeDir() + File.separator + descriptor.getIcon() + " does not exist.");
-						app.base64Icon = loadImage(null);
+						app.setBase64Icon(loadImage(null));
 					}
 				}
 				apps.add(app);
 			}
 			if (includeAdminApp) {
 				ApplicationInfoMsg adminConsole = new ApplicationInfoMsg();
-				adminConsole.name = Constants.ADMIN_CONSOLE_APP_NAME;
+				adminConsole.setName(Constants.ADMIN_CONSOLE_APP_NAME);
 				apps.add(adminConsole);
 			}
 		}
@@ -140,14 +145,14 @@ public class ServerUtil {
 		}
 	}
 
-	private static String loadImage(String icon) {
+	private static byte[] loadImage(String icon) {
 		try {
 			if (icon == null) {
 				if (iconMap.containsKey(DEFAULT)) {
 					return iconMap.get(DEFAULT);
 				} else {
 					BufferedImage defaultIcon = ImageIO.read(ServerUtil.class.getClassLoader().getResourceAsStream("images/java.png"));
-					String b64icon = Base64.encodeBase64String(getPngImage(defaultIcon));
+					byte[] b64icon = getPngImage(defaultIcon);
 					iconMap.put(DEFAULT, b64icon);
 					return b64icon;
 				}
@@ -156,7 +161,7 @@ public class ServerUtil {
 					return iconMap.get(icon);
 				} else {
 					BufferedImage defaultIcon = ImageIO.read(new File(icon));
-					String b64icon = Base64.encodeBase64String(getPngImage(defaultIcon));
+					byte[] b64icon = getPngImage(defaultIcon);
 					iconMap.put(icon, b64icon);
 					return b64icon;
 				}

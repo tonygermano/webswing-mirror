@@ -15,7 +15,7 @@ import java.util.UUID;
 import javax.print.PrintService;
 
 import org.webswing.Constants;
-import org.webswing.model.s2c.PrinterJobResultMsgInternal;
+import org.webswing.model.internal.PrinterJobResultMsgInternal;
 import org.webswing.util.Services;
 import org.webswing.util.Util;
 

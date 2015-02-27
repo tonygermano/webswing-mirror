@@ -15,10 +15,18 @@ public class CursorChangeEventMsg implements Msg {
 	public static final String SLASH_RESIZE_CURSOR = "ne-resize";
 	public static final String BACKSLASH_RESIZE_CURSOR = "se-resize";
 	public static final String NOT_ALLOWED_CURSOR = "not-allowed";
-	public String cursor;
+	private String cursor;
 
 	public CursorChangeEventMsg(String cursor) {
 		super();
+		this.cursor = cursor;
+	}
+
+	public String getCursor() {
+		return cursor;
+	}
+
+	public void setCursor(String cursor) {
 		this.cursor = cursor;
 	}
 

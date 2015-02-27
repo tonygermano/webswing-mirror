@@ -4,6 +4,23 @@ import org.webswing.model.Msg;
 
 public class ApplicationInfoMsg implements Msg {
 	private static final long serialVersionUID = -7176092462203716782L;
-	public String name;
-	public String base64Icon;
+	private String name;
+	private byte[] base64Icon;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public byte[] getBase64Icon() {
+		return base64Icon;
+	}
+
+	public void setBase64Icon(byte[] base64Icon) {
+		this.base64Icon = base64Icon;
+	}
+
 }

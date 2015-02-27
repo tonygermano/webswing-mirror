@@ -10,13 +10,29 @@ public class LinkActionMsg implements Msg {
 		file, url, print;
 	}
 
-	public LinkActionType action;
-	public String src;
+	private LinkActionType action;
+	private String src;
 
 	public LinkActionMsg(LinkActionType action, String url) {
 		super();
 		this.action = action;
 		this.src = url;
+	}
+
+	public LinkActionType getAction() {
+		return action;
+	}
+
+	public void setAction(LinkActionType action) {
+		this.action = action;
+	}
+
+	public String getSrc() {
+		return src;
+	}
+
+	public void setSrc(String src) {
+		this.src = src;
 	}
 
 }

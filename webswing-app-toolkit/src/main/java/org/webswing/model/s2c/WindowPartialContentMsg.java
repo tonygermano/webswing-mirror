@@ -5,11 +5,11 @@ import org.webswing.model.Msg;
 public class WindowPartialContentMsg implements Msg {
 
 	private static final long serialVersionUID = 5963096092200874758L;
-	Integer positionX;
-	Integer positionY;
-	Integer width;
-	Integer height;
-	byte[] base64Content;
+	private Integer positionX;
+	private Integer positionY;
+	private Integer width;
+	private Integer height;
+	private byte[] base64Content;
 
 	public Integer getPositionX() {
 		return positionX;
@@ -27,14 +27,6 @@ public class WindowPartialContentMsg implements Msg {
 		this.positionY = positionY;
 	}
 
-	public byte[] getBase64Content() {
-		return base64Content;
-	}
-
-	public void setBase64Content(byte[] base64Content) {
-		this.base64Content = base64Content;
-	}
-
 	public Integer getWidth() {
 		return width;
 	}
@@ -49,6 +41,14 @@ public class WindowPartialContentMsg implements Msg {
 
 	public void setHeight(Integer height) {
 		this.height = height;
+	}
+
+	public byte[] getBase64Content() {
+		return base64Content;
+	}
+
+	public void setBase64Content(byte[] base64Content) {
+		this.base64Content = base64Content;
 	}
 
 }

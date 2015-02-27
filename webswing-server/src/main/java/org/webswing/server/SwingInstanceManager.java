@@ -54,18 +54,18 @@ public class SwingInstanceManager {
 	}
 
 	public void connectSwingInstance(AtmosphereResource resource, ConnectionHandshakeMsgIn h) {
-		SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(h.applicationName);
+		SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(h.getApplicationName());
 		if (app == null) {
-			throw new RuntimeException("Application " + h.applicationName + " is not configured.");
+			throw new RuntimeException("Application " + h.getApplicationName() + " is not configured.");
 		}
 		if (ServerUtil.isUserAuthorizedForApplication(resource, app)) {
-			SwingInstance swingInstance = swingInstances.get(h.clientId);
+			SwingInstance swingInstance = swingInstances.get(h.getClientId());
 			if (swingInstance == null) {// start new swing app
-				if (app != null && !h.mirrored) {
+				if (app != null && !h.isMirrored()) {
 					if (!reachedMaxConnections(app)) {
 						swingInstance = new SwingInstance(h, app, resource);
 						synchronized (this) {
-							swingInstances.put(h.clientId, swingInstance);
+							swingInstances.put(h.getClientId(), swingInstance);
 						}
 						notifySwingChangeChange();
 					} else {
@@ -75,14 +75,14 @@ public class SwingInstanceManager {
 					ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.configurationError.buildMsgOut());
 				}
 			} else {
-				if (h.mirrored) {// connect as mirror viewer
+				if (h.isMirrored()) {// connect as mirror viewer
 					notifySessionDisconnected(resource.uuid());// disconnect possible running mirror sessions
 					boolean result = swingInstance.registerMirroredWebSession(resource);
 					if (!result) {
 						ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.applicationAlreadyRunning.buildMsgOut());
 					}
 				} else {// continue old session?
-					if (h.sessionId != null && h.sessionId.equals(swingInstance.getSessionId())) {
+					if (h.getSessionId() != null && h.getSessionId().equals(swingInstance.getSessionId())) {
 						swingInstance.sendToSwing(resource, h);
 					} else {
 						boolean result = swingInstance.registerPrimaryWebSession(resource);
