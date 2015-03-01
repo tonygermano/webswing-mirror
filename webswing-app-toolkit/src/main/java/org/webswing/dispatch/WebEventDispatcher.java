@@ -72,22 +72,16 @@ public class WebEventDispatcher {
 			UploadEventMsgIn upload = (UploadEventMsgIn) event;
 			JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
 			if (dialog != null) {
-				switch (upload.getType()) {
-				case Upload:
-					File currentDir = dialog.getCurrentDirectory();
-					File tempFile = new File(upload.getTempFileLocation());
-					String validfilename = Util.resolveFilename(currentDir, upload.getFileName());
-					if (currentDir.canWrite() && tempFile.exists()) {
-						try {
-							Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
-							uploadMap.put(upload.getFileName(), validfilename);
-						} catch (IOException e) {
-							Logger.error("Error while moving uploaded file to target folder: ", e);
-						}
+				File currentDir = dialog.getCurrentDirectory();
+				File tempFile = new File(upload.getTempFileLocation());
+				String validfilename = Util.resolveFilename(currentDir, upload.getFileName());
+				if (currentDir.canWrite() && tempFile.exists()) {
+					try {
+						Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
+						uploadMap.put(upload.getFileName(), validfilename);
+					} catch (IOException e) {
+						Logger.error("Error while moving uploaded file to target folder: ", e);
 					}
-					break;
-				default:
-					break;
 				}
 			}
 		}
@@ -149,13 +143,17 @@ public class WebEventDispatcher {
 
 				// filter out ctrl+c for copy
 				if (event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && event.getCharacter() == 67 && event.isCtrl() == true && event.isAlt() == false && event.isAltgr() == false && event.isMeta() == false && event.isShift() == false) {
-					// on copy event - do nothing, default behavior calls setContents on WebClipboard, which notifies the browser
+					// on copy event - do nothing, default behavior calls
+					// setContents on WebClipboard, which notifies the browser
 				}
 				if (event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && event.getCharacter() == 86 && event.isCtrl() == true && event.isAlt() == false && event.isAltgr() == false && event.isMeta() == false && event.isShift() == false) {
 					// on paste event -do nothing
 				} else {
 					dispatchEventInSwing(w, e);
-					if (event.getKeycode() == 32 && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown) {// space keycode handle press
+					if (event.getKeycode() == 32 && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown) {// space
+																													// keycode
+																													// handle
+																													// press
 						event.setType(KeyboardEventMsgIn.KeyEventType.keypress);
 						dispatchKeyboardEvent(event);
 					}
@@ -234,7 +232,8 @@ public class WebEventDispatcher {
 				dispatchEventInSwing(w, e);
 				break;
 			case dblclick:
-				// e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.x, event.y, 2, false, buttons);
+				// e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when,
+				// modifiers, x, y, event.x, event.y, 2, false, buttons);
 				// dispatchEventInSwing(w, e);
 				// break;
 			default:

@@ -1,6 +1,6 @@
 (function(root) {
 
-	var directdrawBrowserSupport=true;
+	var typedArraysSupported=true;
 
 	require.config({
 		baseUrl : 'javascript',
@@ -20,7 +20,7 @@
 	function polyfill(doneCallback) {
 		if (!isPromisesSupported() || !isArrayBufferSupported()) {
 			if(!isArrayBufferSupported()){
-				directdrawBrowserSupport=false;
+				typedArraysSupported=false;
 			}
 			require([ 'es6promise', 'typedarray' ], function(es6promise) {
 				es6promise.polyfill();
@@ -33,7 +33,7 @@
 
 	function startWebswing() {
 		require([ 'webswing' ], function(ws) {
-			ws.setDirectDrawSupported(directdrawBrowserSupport);
+			ws.setTypedArraysSupported(typedArraysSupported);
 			root.webswing = ws;
 		});
 	}

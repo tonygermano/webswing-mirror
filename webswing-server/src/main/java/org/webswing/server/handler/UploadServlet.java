@@ -17,7 +17,6 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.webswing.Constants;
 import org.webswing.model.c2s.UploadEventMsgIn;
-import org.webswing.model.c2s.UploadEventMsgIn.UploadType;
 import org.webswing.server.SwingInstanceManager;
 
 public class UploadServlet extends HttpServlet {
@@ -40,9 +39,8 @@ public class UploadServlet extends HttpServlet {
 				output.close();
 				filecontent.close();
 				UploadEventMsgIn msg = new UploadEventMsgIn();
-				msg.type = UploadType.Upload;
-				msg.fileName = filename;
-				msg.tempFileLocation = f.getAbsolutePath();
+				msg.setFileName(filename);
+				msg.setTempFileLocation(f.getAbsolutePath());
 				boolean sent = SwingInstanceManager.getInstance().sendMessageToSwing(null, clientId, msg);
 				if (!sent) {
 					f.delete();

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.MsgIn;
 import org.webswing.model.c2s.InputEventMsgIn;
+import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.c2s.PasteEventMsgIn;
 import org.webswing.model.c2s.UploadedEventMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
@@ -60,8 +61,8 @@ public class SwingAsyncManagedService {
 			}
 		}
 		AppFrameMsgOut appInfo = new AppFrameMsgOut();
-		appInfo.user = ServerUtil.getUserName(r);
-		appInfo.applications = ServerUtil.createApplicationJsonInfo(r, applicationsMap, includeAdminApp);
+		appInfo.setUser(ServerUtil.getUserName(r));
+		appInfo.setApplications(ServerUtil.createApplicationJsonInfo(r, applicationsMap, includeAdminApp));
 		ServerUtil.broadcastMessage(r, new EncodedMessage(appInfo));
 	}
 
@@ -81,31 +82,31 @@ public class SwingAsyncManagedService {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Serializable processWebswingMessage(AtmosphereResource r, Object message, boolean logStats) {
 		if (message instanceof String) {
 			String sm = (String) message;
 			Object jsonMessage = ServerUtil.decode((String) message);
-			if (jsonMessage != null) {
-				if (jsonMessage instanceof List) {
-					List<InputEventMsgIn> evts = (List<InputEventMsgIn>) jsonMessage;
+			if (jsonMessage != null && jsonMessage instanceof InputEventsFrameMsgIn) {
+				InputEventsFrameMsgIn frame = (InputEventsFrameMsgIn) jsonMessage;
+				if (frame.getEvents() != null && frame.getEvents().size() > 0) {
+					List<InputEventMsgIn> evts = frame.getEvents();
 					for (InputEventMsgIn evt : evts) {
-						if (evt.handshake != null) {
-							SwingInstanceManager.getInstance().connectSwingInstance(r, evt.handshake);
-						} else if (evt.key != null) {
-							send(r, evt.key.clientId, evt.key, sm, logStats);
-						} else if (evt.mouse != null) {
-							send(r, evt.mouse.clientId, evt.mouse, sm, logStats);
-						} else if (evt.event != null) {
-							send(r, evt.event.clientId, evt.event, sm, logStats);
+						if (evt.getHandshake() != null) {
+							SwingInstanceManager.getInstance().connectSwingInstance(r, evt.getHandshake());
+						} else if (evt.getKey() != null) {
+							send(r, evt.getKey().getClientId(), evt.getKey(), sm, logStats);
+						} else if (evt.getMouse() != null) {
+							send(r, evt.getMouse().getClientId(), evt.getMouse(), sm, logStats);
+						} else if (evt.getEvent() != null) {
+							send(r, evt.getEvent().getClientId(), evt.getEvent(), sm, logStats);
 						}
 					}
-				} else if (jsonMessage instanceof PasteEventMsgIn) {
-					PasteEventMsgIn p = (PasteEventMsgIn) jsonMessage;
-					send(r, p.clientId, p, sm, logStats);
-				} else if (jsonMessage instanceof UploadedEventMsgIn) {
-					UploadedEventMsgIn p = (UploadedEventMsgIn) jsonMessage;
-					send(r, p.clientId, p, sm, logStats);
+				} else if (frame.getPaste() != null) {
+					PasteEventMsgIn p = frame.getPaste();
+					send(r, p.getClientId(), p, sm, logStats);
+				} else if (frame.getUploaded() != null) {
+					UploadedEventMsgIn p = frame.getUploaded();
+					send(r, p.getClientId(), p, sm, logStats);
 				} else {
 					return null;
 				}

@@ -25,19 +25,15 @@ import org.apache.shiro.subject.Subject;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.FrameworkConfig;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.MsgOut;
-import org.webswing.model.admin.c2s.ApplyConfigurationMsgIn;
 import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
 import org.webswing.model.admin.s2c.MessageMsg;
 import org.webswing.model.admin.s2c.MessageMsg.Type;
 import org.webswing.model.admin.s2c.SwingSessionMsg;
-import org.webswing.model.c2s.InputEventMsgIn;
-import org.webswing.model.c2s.PasteEventMsgIn;
-import org.webswing.model.c2s.UploadedEventMsgIn;
+import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
@@ -76,16 +72,8 @@ public class ServerUtil {
 
 	public static Object decode(String s) {
 		Object o = null;
-		List<TypeReference<?>> types = new ArrayList<TypeReference<?>>();
-		types.add(new TypeReference<List<InputEventMsgIn>>() {
-		});
-		types.add(new TypeReference<UploadedEventMsgIn>() {
-		});
-		types.add(new TypeReference<PasteEventMsgIn>() {
-		});
-		types.add(new TypeReference<ApplyConfigurationMsgIn>() {
-		});
-		for (TypeReference<?> c : types) {
+		Class<?>[] classes = new Class<?>[]{InputEventsFrameMsgIn.class};
+		for (Class<?> c : classes) {
 			try {
 				o = mapper.readValue(s, c);
 				break;

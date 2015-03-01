@@ -17,7 +17,7 @@ message AppFrameMsgOutProto{
 
 message ApplicationInfoMsgProto{
 	required string name = 1;
-	optional string base64Icon = 2;
+	optional bytes base64Icon = 2;
 }
 
 message LinkActionMsgProto{
@@ -91,6 +91,19 @@ enum SimpleEventMsgOutProto{
 
 
 /* ===================BROWSER -> SERVER====================*/
+message InputEventsFrameMsgInProto{
+	repeated InputEventMsgInProto events = 1;
+	optional PasteEventMsgInProto paste = 2;
+	optional UploadEventMsgInProto upload = 3;
+	optional UploadedEventMsgInProto uploaded = 4;
+}
+
+message InputEventMsgInProto{
+	optional ConnectionHandshakeMsgInProto handshake = 1;
+	optional KeyboardEventMsgInProto key = 2;
+	optional MouseEventMsgInProto mouse = 3;
+	optional SimpleEventMsgInProto event = 4;
+}
 
 message ConnectionHandshakeMsgInProto{
 	optional string clientId = 1;
@@ -100,13 +113,6 @@ message ConnectionHandshakeMsgInProto{
 	optional string applicationName = 5;
 	optional bool mirrored = 6;
 	optional bool directDrawSupported = 7;
-}
-
-message InputEventMsgInProto{
-	optional ConnectionHandshakeMsgInProto handshake = 1;
-	optional KeyboardEventMsgInProto key = 2;
-	optional MouseEventMsgInProto mouse = 3;
-	optional SimpleEventMsgInProto event = 4;
 }
 
 message KeyboardEventMsgInProto{
@@ -174,15 +180,8 @@ message UploadedEventMsgInProto{
 }
 
 message UploadEventMsgInProto{
-    optional UploadTypeProto type = 1;
     optional string fileName = 2;
     optional string tempFileLocation = 3;
-    
-    enum UploadTypeProto {
-        Download = 0;
-        Upload = 1;
-        Delete = 2;
-    }
 }
 
 

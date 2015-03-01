@@ -63,14 +63,15 @@
 			if (config.hasControl) {
 				enqueueInputEvent();
 				if (inputEvtQueue.length > 0) {
-					send(inputEvtQueue);
+					send({
+						events : inputEvtQueue
+					});
 					inputEvtQueue = [];
 				}
 			}
 		}
 
-
-		function enqueueMessageEvent(message){
+		function enqueueMessageEvent(message) {
 			inputEvtQueue.push(getMessageEvent(message));
 		}
 
@@ -112,11 +113,11 @@
 		}
 
 		function kill() {
-			send(getMessageEvent('killSwing'));
+			enqueueMessageEvent('killSwing');
 		}
 
 		function unload() {
-			send(getMessageEvent('unload'));
+			enqueueMessageEvent('unload');
 		}
 
 		function requestDownloadFile() {
@@ -128,7 +129,16 @@
 		}
 
 		function handshake() {
-			send([ getHandShake() ]);
+			inputEvtQueue.push(getHandShake());
+		}
+
+		function filesUploaded(files) {
+			send({
+				uploaded : {
+					clientId : clientId,
+					files : files
+				}
+			});
 		}
 
 		function resizedWindow() {
@@ -152,7 +162,7 @@
 			if (data.applications != null) {
 				config.onApplicationSelection(data.applications);
 			}
-			if(data.event!=null){
+			if (data.event != null) {
 				if (data.event == "shutDownNotification") {
 					config.onApplicationShutdown();
 					dispose();
@@ -183,8 +193,7 @@
 				}
 			}
 			if (data.moveAction != null) {
-				copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height,
-						context);
+				copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height, context);
 			}
 			if (data.cursorChange != null && config.hasControl) {
 				canvas.style.cursor = data.cursorChange.cursor;
@@ -217,48 +226,42 @@
 			}
 			// regular windows (background removed)
 			if (data.windows != null) {
-				data.windows.reduce(
-						function(sequence, win) {
-							if (win.directDraw != null) {
-								// directdraw
-								return sequence.then(function(resolved) {
-									return directDraw.drawBin(win.directDraw, windowImageHolders[win.id]);
-								}).then(
-										function(resultImage) {
-											windowImageHolders[win.id] = resultImage;
-											for ( var x in win.content) {
-												var winContent = win.content[x];
-												if (winContent != null) {
-													context.drawImage(resultImage, winContent.positionX, winContent.positionY, winContent.width,
-															winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY,
-															winContent.width, winContent.height);
-												}
-											}
-										});
-							} else {
-								// imagedraw
-								return sequence.then(function(resolved) {
-									return win.content.reduce(function(internalSeq, winContent) {
-										return internalSeq.then(function(done) {
-											return new Promise(
-													function(resolved, rejected) {
-														if (winContent != null) {
-															var imageObj = new Image();
-															imageObj.onload = function() {
-																context.drawImage(imageObj, win.posX + winContent.positionX, win.posY
-																		+ winContent.positionY);
-																imageObj.onload = null;
-																imageObj.src = '';
-																resolved();
-															};
-															imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
-														}
-													});
-										});
-									}, Promise.resolve());
-								});
+				data.windows.reduce(function(sequence, win) {
+					if (win.directDraw != null) {
+						// directdraw
+						return sequence.then(function(resolved) {
+							return directDraw.drawBin(win.directDraw, windowImageHolders[win.id]);
+						}).then(function(resultImage) {
+							windowImageHolders[win.id] = resultImage;
+							for ( var x in win.content) {
+								var winContent = win.content[x];
+								if (winContent != null) {
+									context.drawImage(resultImage, winContent.positionX, winContent.positionY, winContent.width, winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height);
+								}
 							}
-						}, Promise.resolve()).then(function() {
+						});
+					} else {
+						// imagedraw
+						return sequence.then(function(resolved) {
+							return win.content.reduce(function(internalSeq, winContent) {
+								return internalSeq.then(function(done) {
+									return new Promise(function(resolved, rejected) {
+										if (winContent != null) {
+											var imageObj = new Image();
+											imageObj.onload = function() {
+												context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
+												imageObj.onload = null;
+												imageObj.src = '';
+												resolved();
+											};
+											imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
+										}
+									});
+								});
+							}, Promise.resolve());
+						});
+					}
+				}, Promise.resolve()).then(function() {
 					ack();
 				});
 			}
@@ -341,8 +344,7 @@
 				// 226
 				// FF (163, 171, 173, ) -> en layout ]\/ keys
 				var kc = event.keyCode;
-				if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226)
-						|| (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
+				if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226) || (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
 					event.preventDefault();
 					event.stopPropagation();
 				}
@@ -355,7 +357,9 @@
 						clientId : clientId
 					};
 					if (config.hasControl) {
-						send(pasteEvent);
+						send({
+							paste : pasteEvent
+						});
 					}
 				} else {
 					// default action prevented
@@ -460,7 +464,7 @@
 			return handshake;
 		}
 
-		function getMessageEvent(message){
+		function getMessageEvent(message) {
 			return {
 				event : {
 					type : message,
@@ -485,6 +489,9 @@
 			},
 			handshake : function() {
 				handshake();
+			},
+			filesUploaded : function(files) {
+				filesUploaded(files);
 			},
 			requestDownloadFile : function() {
 				requestDownloadFile();

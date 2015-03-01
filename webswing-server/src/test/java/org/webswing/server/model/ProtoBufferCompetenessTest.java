@@ -13,7 +13,6 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +22,21 @@ import java.util.jar.JarFile;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.webswing.model.c2s.InputEventMsgIn;
+import org.webswing.model.c2s.InputEventsFrameMsgIn;
+import org.webswing.model.c2s.SimpleEventMsgIn;
+import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.model.s2c.ApplicationInfoMsg;
+import org.webswing.model.s2c.SimpleEventMsgOut;
+import org.webswing.model.s2c.WindowMsg;
+import org.webswing.model.s2c.WindowPartialContentMsg;
+import org.webswing.server.model.proto.Webswing.AppFrameMsgOutProto;
+import org.webswing.server.model.proto.Webswing.ApplicationInfoMsgProto;
+import org.webswing.server.model.proto.Webswing.InputEventMsgInProto;
+import org.webswing.server.model.proto.Webswing.InputEventsFrameMsgInProto;
+import org.webswing.server.model.proto.Webswing.MouseEventMsgInProto;
+import org.webswing.server.model.proto.Webswing.SimpleEventMsgInProto;
+import org.webswing.server.model.proto.Webswing.SimpleEventMsgInProto.SimpleEventTypeProto;
 import org.webswing.server.util.ProtoMapper;
 
 import sun.net.www.protocol.file.FileURLConnection;
@@ -95,7 +109,7 @@ public class ProtoBufferCompetenessTest {
 					String fieldName = field.getName();
 					FieldDescriptor protoField = b.getDescriptorForType().findFieldByName(fieldName);
 					assertTrue("Field " + fieldName + " not found in " + protoClass, protoField != null);
-					if (Collection.class.isAssignableFrom(field.getType())) {
+					if (List.class == field.getType()) {
 						assertTrue("List field '" + fieldName + "' is not repeated in " + classProtoMap.get(c), protoField.isRepeated());
 					} else {
 						assertTrue("List field '" + fieldName + "' is repeated in " + classProtoMap.get(c), !protoField.isRepeated());
@@ -110,11 +124,137 @@ public class ProtoBufferCompetenessTest {
 							assertTrue("Type of field '" + fieldName + "' in " + classProtoMap.get(c) + " is bytess", byte[].class.isAssignableFrom(field.getType()));
 						} else if (protoField.getJavaType().equals(JavaType.INT)) {
 							assertTrue("Type of field '" + fieldName + "' in " + classProtoMap.get(c) + " is integer", Integer.class == field.getType() || Integer.TYPE == field.getType());
+						} else if (protoField.getJavaType().equals(JavaType.STRING)) {
+							assertTrue("Type of field '" + fieldName + "' in " + classProtoMap.get(c) + " is string", String.class == field.getType());
 						}
 					}
 				}
 			}
 		}
+	}
+
+	@Test
+	public void testEncoding1() throws IOException {
+		AppFrameMsgOut m = new AppFrameMsgOut();
+		ApplicationInfoMsg a1 = new ApplicationInfoMsg();
+		a1.setBase64Icon(new byte[] { 1, 2, 3, 4 });
+		a1.setName("a1");
+		ApplicationInfoMsg a2 = new ApplicationInfoMsg();
+		a2.setBase64Icon(new byte[] { 4, 3, 2, 1 });
+		a2.setName("a2");
+		m.setApplications(Arrays.asList(a1, a2));
+
+		ProtoMapper pm = new ProtoMapper();
+
+		byte[] encoded = pm.encodeProto(m);
+		AppFrameMsgOutProto decoded = AppFrameMsgOutProto.parseFrom(encoded);
+		ApplicationInfoMsgProto da1 = decoded.getApplications(0);
+		assertTrue("name not equals", da1.getName().equals("a1"));
+		assertTrue("data not equals", Arrays.equals(da1.getBase64Icon().toByteArray(), new byte[] { 1, 2, 3, 4 }));
+		ApplicationInfoMsgProto da2 = decoded.getApplications(1);
+		assertTrue("name not equals", da2.getName().equals("a2"));
+		assertTrue("data not equals", Arrays.equals(da2.getBase64Icon().toByteArray(), new byte[] { 4, 3, 2, 1 }));
+	}
+
+	@Test
+	public void testEncoding2() throws IOException {
+		AppFrameMsgOut m = SimpleEventMsgOut.continueOldSession.buildMsgOut();
+
+		ProtoMapper pm = new ProtoMapper();
+
+		byte[] encoded = pm.encodeProto(m);
+		AppFrameMsgOutProto decoded = AppFrameMsgOutProto.parseFrom(encoded);
+		assertTrue(decoded.getEvent().name().equals(SimpleEventMsgOut.continueOldSession.name()));
+	}
+
+	@Test
+	public void testEncoding3() throws IOException {
+		AppFrameMsgOut m = new AppFrameMsgOut();
+		WindowMsg w1 = new WindowMsg();
+		WindowPartialContentMsg content = new WindowPartialContentMsg();
+		content.setPositionX(1);
+		content.setPositionY(2);
+		content.setWidth(3);
+		content.setHeight(4);
+		content.setBase64Content(new byte[] { 3, 2, 1 });
+		w1.setContent(Arrays.asList(content));
+		w1.setDirectDraw(new byte[] { 1, 2, 3 });
+		w1.setPosX(1);
+		w1.setPosY(2);
+		w1.setTitle("title");
+		w1.setId("id");
+		m.setWindows(Arrays.asList(w1));
+		ProtoMapper pm = new ProtoMapper();
+		byte[] encoded = pm.encodeProto(m);
+		AppFrameMsgOutProto decoded = AppFrameMsgOutProto.parseFrom(encoded);
+
+		assertTrue(decoded.getWindows(0).getContent(0).getPositionX() == 1);
+		assertTrue(Arrays.equals(decoded.getWindows(0).getContent(0).getBase64Content().toByteArray(), new byte[] { 3, 2, 1 }));
+		assertTrue(decoded.getWindows(0).getTitle().equals("title"));
+		assertTrue(decoded.getWindows(0).getPosX() == 1);
+
+	}
+
+	@Test
+	public void testDecoding() throws IOException {
+		org.webswing.server.model.proto.Webswing.InputEventMsgInProto.Builder b = InputEventMsgInProto.newBuilder();
+
+		org.webswing.server.model.proto.Webswing.SimpleEventMsgInProto.Builder seb = SimpleEventMsgInProto.newBuilder();
+		seb.setClientId("client");
+		seb.setType(SimpleEventTypeProto.killSwing);
+		b.setEvent(seb.build());
+		ProtoMapper pm = new ProtoMapper();
+		InputEventMsgIn ie = pm.decodeProto(b.build().toByteArray(), InputEventMsgIn.class);
+		assertTrue(ie.getEvent().getClientId().equals("client"));
+		assertTrue(ie.getEvent().getType().equals(SimpleEventMsgIn.SimpleEventType.killSwing));
+	}
+
+	@Test
+	public void testDecoding2() throws IOException {
+		org.webswing.server.model.proto.Webswing.InputEventMsgInProto.Builder b = InputEventMsgInProto.newBuilder();
+
+		org.webswing.server.model.proto.Webswing.MouseEventMsgInProto.Builder meb = MouseEventMsgInProto.newBuilder();
+		meb.setAlt(true);
+		meb.setCtrl(false);
+		meb.setX(1);
+		meb.setY(2);
+		b.setMouse(meb.build());
+		ProtoMapper pm = new ProtoMapper();
+		InputEventMsgIn ie = pm.decodeProto(b.build().toByteArray(), InputEventMsgIn.class);
+		assertTrue(ie.getMouse().isAlt());
+		assertTrue(!ie.getMouse().isCtrl());
+		assertTrue(ie.getMouse().getX() == 1);
+		assertTrue(ie.getMouse().getY() == 2);
+	}
+
+	@Test
+	public void testDecoding3() throws IOException {
+		org.webswing.server.model.proto.Webswing.InputEventsFrameMsgInProto.Builder b = InputEventsFrameMsgInProto.newBuilder();
+		
+		org.webswing.server.model.proto.Webswing.InputEventMsgInProto.Builder ieb2 = InputEventMsgInProto.newBuilder();
+		org.webswing.server.model.proto.Webswing.SimpleEventMsgInProto.Builder seb = SimpleEventMsgInProto.newBuilder();
+		seb.setClientId("client");
+		seb.setType(SimpleEventTypeProto.killSwing);
+		ieb2.setEvent(seb.build());
+		
+		org.webswing.server.model.proto.Webswing.InputEventMsgInProto.Builder ieb = InputEventMsgInProto.newBuilder();
+		org.webswing.server.model.proto.Webswing.MouseEventMsgInProto.Builder meb = MouseEventMsgInProto.newBuilder();
+		meb.setAlt(true);
+		meb.setCtrl(false);
+		meb.setX(1);
+		meb.setY(2);
+		ieb.setMouse(meb.build());
+		
+		b.addEvents(ieb);
+		b.addEvents(ieb2);
+		ProtoMapper pm = new ProtoMapper();
+		InputEventsFrameMsgIn ie = pm.decodeProto(b.build().toByteArray(), InputEventsFrameMsgIn.class);
+		assertTrue(ie.getEvents().get(0).getMouse().isAlt());
+		assertTrue(!ie.getEvents().get(0).getMouse().isCtrl());
+		assertTrue(ie.getEvents().get(0).getMouse().getX() == 1);
+		assertTrue(ie.getEvents().get(0).getMouse().getY() == 2);
+		assertTrue(ie.getEvents().get(1).getEvent().getClientId().equals("client"));
+		assertTrue(ie.getEvents().get(1).getEvent().getType().equals(SimpleEventMsgIn.SimpleEventType.killSwing));
 	}
 
 	/**
@@ -123,7 +263,8 @@ public class ProtoBufferCompetenessTest {
 	 * @param directory
 	 *            The directory to start with
 	 * @param pckgname
-	 *            The package name to search for. Will be needed for getting the Class object.
+	 *            The package name to search for. Will be needed for getting the
+	 *            Class object.
 	 * @param classes
 	 *            if a file isn't loaded but still is in the directory
 	 * @throws ClassNotFoundException
@@ -157,7 +298,8 @@ public class ProtoBufferCompetenessTest {
 	 * @param pckgname
 	 *            the package name to search for
 	 * @param classes
-	 *            the current ArrayList of all classes. This method will simply add new classes.
+	 *            the current ArrayList of all classes. This method will simply
+	 *            add new classes.
 	 * @throws ClassNotFoundException
 	 *             if a file isn't loaded but still is in the jar file
 	 * @throws IOException
@@ -182,7 +324,8 @@ public class ProtoBufferCompetenessTest {
 	}
 
 	/**
-	 * Attempts to list all the classes in the specified package as determined by the context class loader
+	 * Attempts to list all the classes in the specified package as determined
+	 * by the context class loader
 	 * 
 	 * @param pckgname
 	 *            the package name to search

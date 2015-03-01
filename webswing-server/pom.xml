@@ -173,7 +173,6 @@
 						WEB-INF/lib/slf4j-simple-*.jar,
 						WEB-INF/lib/freehep-*.jar,
 						WEB-INF/lib/webswing-directdraw-swing-*.jar,
-						WEB-INF/lib/protobuf-java-*.jar,
 						WEB-INF/lib/lz4-*.jar
 					</packagingExcludes>
 					<archive>
