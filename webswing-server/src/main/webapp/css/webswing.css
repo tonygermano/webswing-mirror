@@ -13,6 +13,12 @@ html,body {
 canvas {
 	display: block;
 } /* To remove the scrollbars */
+
+
+.thumbnail  {
+    max-width: 155px;
+}
+
 .fileDialogBar {
 	display: none;
 	position: fixed;
@@ -51,22 +57,18 @@ canvas {
 	filter: alpha(opacity =   0);
 }
 
-.thumbnail  {
-    max-width: 155px;
-}
-
-#fileDropArea {
+div[data-id="fileDropArea"] {
     border-style: dashed;
     border-color: #ccc;
     height: 30px;
     overflow:auto;
     margin-bottom: 5px;
 }
-#fileDropArea.in {
+div[data-id="fileDropArea"].in {
     height: 200px;
 }
 
-#fileDropArea p {
+div[data-id="fileDropArea"] p {
     margin: 0 0 2px;
     padding-left: 10px;
     text-align: center;
@@ -76,8 +78,7 @@ canvas {
     margin-bottom: 0px;
 }
 
-#fileDownloadBtn, #fileUploadBtn, #fileDeleteBtn, #fileDropArea, #fileDialogTransferProgressBar, #fileDialogErrorMessage {
+.ws-hidden{
     display: none;
 }
-
 

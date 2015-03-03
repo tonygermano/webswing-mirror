@@ -1,0 +1,60 @@
+<div data-id="uploadBar" class="fileDialogBar">
+	<div class="container-fluid">
+		<div class="row fileDialogButtonRow">
+			<div data-id="fileDropArea" class="ws-hidden">
+				<p class="upload-dropH1">Drag and drop files here </p>
+			</div>
+		</div>
+		<div class="row fileDialogButtonRow">
+			<div class="col-xs-4"  data-id="fileDownloadBtn" class="ws-hidden">
+				<button class="btn btn-success btn-sm btn-block" data-id="downloadSelectedButton">Download
+					selected</button>
+			</div>
+			<div class="col-xs-4"  data-id="fileUploadBtn" class="ws-hidden">
+				<form data-id="fileupload" data-url="upload">
+					<input data-id="fileDialogTransferBarClientId" name="clinetId" type="hidden">
+					<div class="fileUpload btn btn-success btn-sm btn-block">
+						<span>Upload files</span>
+						<input accept="" data-id="fileInput" name="files[]" class="upload"
+							type="file">
+					</div>
+				</form>
+			</div>
+			<div class="col-xs-4"  data-id="fileDeleteBtn" class="ws-hidden">
+				<!-- Single button -->
+				<div class="btn btn-success btn-sm btn-block dropup" >
+					<div class=" dropdown-toggle " type="button" data-toggle="dropdown">
+						Delete selected
+						<span class="caret"></span>
+					</div>
+					<ul class="dropdown-menu " role="menu">
+						<li>
+							<span style="color: gray;"> Are you sure?</span>
+						</li>
+						<li>
+							<a data-id="deleteSelectedButton" href="javascript:;">Yes</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div data-id="fileDialogTransferProgressBar" class="row fileDialogButtonRow" class="ws-hidden">
+			<div style="padding-right: 0px;" class="col-xs-8">
+				<div data-id="progress" class="progress">
+					<div style="width: 0%;" class="progress-bar progress-bar-success">
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-4">
+				<div data-id="cancelBtn" class="btn btn-danger btn-xs btn-block">
+					<span class="glyphicon glyphicon-ban-circle"> Cancel</span>
+				</div>
+			</div>
+		</div>
+		<div data-id="fileDialogErrorMessage" class="row fileDialogButtonRow ws-hidden" >
+			<div class="col-md-12">
+				<div data-id="fileDialogErrorMessageContent" class="alert alert-danger"></div>
+			</div>
+		</div>
+	</div>
+</div>
