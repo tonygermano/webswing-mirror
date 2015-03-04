@@ -286,7 +286,7 @@
 										dir="${project.build.directory}/${project.build.finalName}/WEB-INF/classes/"
 										includes="main/*.class" />
 									<fileset dir="${project.build.directory}/require-build/"
-										includes="javascript/*.js" />
+										includes="javascript/**" />
 								</war>
 							</target>
 						</configuration>

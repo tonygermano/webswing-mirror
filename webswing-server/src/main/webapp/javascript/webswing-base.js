@@ -173,6 +173,7 @@
 				} else if (data.event == "continueOldSession") {
 					config.onContinueOldSession();
 				}
+				return;
 			}
 			if (canPaint) {
 				processRequest(data);
@@ -470,7 +471,7 @@
 					type : message,
 					clientId : clientId
 				}
-			}
+			};
 		}
 
 		function bindEvent(el, eventName, eventHandler) {

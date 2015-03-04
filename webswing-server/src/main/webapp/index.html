@@ -9,39 +9,5 @@
 	<script data-main="javascript/main.js" src="javascript/require.js"></script>
 </head>
 <body id="body">
-	<div id="loginDialog" class="modal" data-backdrop="static">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-body">
-			      <form id="loginForm" class="form-signin" accept-charset="UTF-8" role="form">
-			        <h2 class="form-signin-heading">Please sign in</h2>
-	        		<div class="form-group">
-			        	<input type="text" class="form-control" placeholder="User name" name="username" required autofocus>
-					</div>
-	        		<div class="form-group">
-				        <input id="passwordInput" type="password" class="form-control" placeholder="Password" name="password" required>
-					</div>
-					<div id="loginErrorMsg"></div>
-			      </form>
-		          <button class="btn btn-lg btn-primary" onclick="webswing.login()">Sign in</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div id="applicationSelectorDialog" class="modal" tabindex="-1"
-		data-backdrop="static">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<span class="pull-right"><a href="/logout">Logout</a></span>
-					<h4 class="modal-title" id="myModalLabel">Hello <span id="userName"></span>. Select your application:</h4>
-				</div>
-				<div class="modal-body">
-					<div class="row" id="applicationsList"></div>
-				</div>
-			</div>
-		</div>
-	</div>
 </body>
 </html>

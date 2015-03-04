@@ -1,4 +1,4 @@
-define([ 'jquery', 'text!../templates/upload.html', 'bootstrap', 'jquery.iframe-transport', 'jquery.fileupload' ], function($, html) {
+define([ 'jquery', 'text!templates/upload.html', 'bootstrap', 'jquery.iframe-transport', 'jquery.fileupload' ], function($, html) {
 	"use strict";
 
 	var jqXHR_fileupload = [];
@@ -126,7 +126,7 @@ define([ 'jquery', 'text!../templates/upload.html', 'bootstrap', 'jquery.iframe-
 		init : function(wsApi) {
 			api = wsApi;
 			setup(api);
-			return {
+			wsApi.upload= {
 				open : function(data, clientId) {
 					fileDialogTransferBarClientId.val(clientId);
 					showOrHide(downloadBtn, data.allowDownload);
@@ -136,7 +136,7 @@ define([ 'jquery', 'text!../templates/upload.html', 'bootstrap', 'jquery.iframe-
 					fileInput.prop("multiple", data.isMultiSelection);
 					fileInput.attr("accept", data.filter);
 					setProgressBarVisible(false);
-					uploadBar.show("fast")
+					uploadBar.show("fast");
 				},
 				close : function() {
 					uploadBar.hide("fast");
