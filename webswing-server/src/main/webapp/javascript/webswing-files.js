@@ -122,6 +122,26 @@ define([ 'jquery', 'text!templates/upload.html', 'bootstrap', 'jquery.iframe-tra
 		}
 	}
 
+	function download(url) {
+		var hiddenIFrameID = 'hiddenDownloader';
+		var iframe = api.rootElement.find('iframe[data-id="'+hiddenIFrameID+'"');
+		if (iframe.length === 0) {
+			iframe = $(document.createElement('iframe'));
+			iframe.data('id',hiddenIFrameID);
+			iframe.hide();
+			api.rootElement.append(iframe);
+		}
+		iframe.src = url;
+	}
+	
+	function link(url){
+		window.open(url, '_blank');
+	}
+
+	function print(url){
+		window.open('/print/viewer.html?file=' + url, '_blank');
+	}
+	
 	return {
 		init : function(wsApi) {
 			api = wsApi;
@@ -140,7 +160,10 @@ define([ 'jquery', 'text!templates/upload.html', 'bootstrap', 'jquery.iframe-tra
 				},
 				close : function() {
 					uploadBar.hide("fast");
-				}
+				},
+				download:download,
+				link:link,
+				print:print
 			};
 		}
 	};

@@ -141,10 +141,6 @@
 			});
 		}
 
-		function resizedWindow() {
-			latestWindowResizeEvent = getHandShake();
-		}
-
 		function dispose() {
 			clearInterval(timer1);
 			clearInterval(timer2);
@@ -479,38 +475,21 @@
 		}
 
 		return {
-			repaint : function() {
-				repaint();
-			},
-			ack : function() {
-				ack();
-			},
-			kill : function() {
-				kill();
-			},
-			handshake : function() {
-				handshake();
-			},
-			filesUploaded : function(files) {
-				filesUploaded(files);
-			},
-			requestDownloadFile : function() {
-				requestDownloadFile();
-			},
-			requestDeleteFile : function() {
-				requestDeleteFile();
-			},
+			repaint : repaint,
+			ack : ack,
+			kill : kill,
+			handshake : handshake,
+			filesUploaded : filesUploaded,
+			requestDownloadFile : requestDownloadFile,
+			requestDeleteFile : requestDeleteFile,
+			setCanvas : setCanvas,
+			processJsonMessage : processJsonMessage,
+			dispose : dispose,
 			setUuid : function(param) {
 				uuid = param;
 			},
 			getUser : function() {
 				return user;
-			},
-			resizedWindow : function() {
-				resizedWindow();
-			},
-			setCanvas : function(c) {
-				setCanvas(c);
 			},
 			setApplication : function(app) {
 				appName = app;
@@ -526,12 +505,6 @@
 			},
 			canControl : function(bool) {
 				config.hasControl = bool;
-			},
-			processJsonMessage : function(data) {
-				processJsonMessage(data);
-			},
-			dispose : function() {
-				dispose();
 			},
 			setDirectDrawSupported : function(supported) {
 				directDrawSupported = supported;

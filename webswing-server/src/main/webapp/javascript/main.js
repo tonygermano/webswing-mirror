@@ -33,8 +33,7 @@
 
 	function startWebswing() {
 		require([ 'webswing' ], function(ws) {
-			//ws.setTypedArraysSupported(typedArraysSupported);
-			//root.webswing = ws;
+			ws.setTypedArraysSupported(typedArraysSupported);
 		});
 	}
 

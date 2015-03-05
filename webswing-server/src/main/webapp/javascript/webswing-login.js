@@ -20,7 +20,7 @@ define([ 'jquery', 'text!templates/login.html', 'bootstrap' ], function($, html)
 		}
 	};
 
-	function login() {
+	function login(successCallback) {
 		$.ajax({
 			type : 'POST',
 			url : '/login?mode=swing',
@@ -30,7 +30,7 @@ define([ 'jquery', 'text!templates/login.html', 'bootstrap' ], function($, html)
 					var errorMsg = api.dialog.dialog.find('*[data-id="loginErrorMsg"]');
 					errorMsg.html('');
 				}
-				api.start();
+				successCallback();
 			},
 			error : function(data) {
 				if (!loginDialogVisible()) {
