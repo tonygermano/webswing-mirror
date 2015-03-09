@@ -4,7 +4,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'bootstrap' ], function($, html
 	var api;
 	var currentContent;
 	var dialog, content,header;
-	var configuration = configuration = {
+	var configuration = {
 		initializingDialog : {
 			content : '<p>Initializing...</p>'
 		},
@@ -16,6 +16,15 @@ define([ 'jquery', 'text!templates/dialog.html', 'bootstrap' ], function($, html
 		},
 		disconnectedDialog : {
 			content : '<p>Disconnected...</p>'
+		},
+		connectionErrorDialog : {
+			content : '<p>Connection error...</p>'
+		},
+		tooManyClientsNotification : {
+			content : '<p>Too many connections. Please try again later...</p>'
+		},
+		applicationAlreadyRunning : {
+			content : '<p>Application is already running in other browser window...</p>'
 		},
 		stoppedDialog : {
 			content : '<p>Application stopped... </p> <button data-id="newsession" class="btn btn-primary">Start new session.</button> <span> </span><button data-id="logout" class="btn btn-default">Logout.</button>',
@@ -32,10 +41,10 @@ define([ 'jquery', 'text!templates/dialog.html', 'bootstrap' ], function($, html
 			content : '<p>Continue old session?</p><button data-id="continue" class="btn btn-primary">Yes,	continue.</button><span> </span><button data-id="newsession" class="btn btn-default" >No, start new session.</button>',
 			events : {
 				continue_click : function() {
-					api.newSession();
+					api.base.continueSession();
 				},
 				newsession_click : function() {
-					api.continueSession();
+					api.newSession();
 				}
 			}
 		}
@@ -49,6 +58,9 @@ define([ 'jquery', 'text!templates/dialog.html', 'bootstrap' ], function($, html
 	}
 
 	function show(msg) {
+		if(dialog==null){
+			setup(api);
+		}
 		currentContent = msg;
 		if(msg.header!=null){
 			header.show();
@@ -78,12 +90,10 @@ define([ 'jquery', 'text!templates/dialog.html', 'bootstrap' ], function($, html
 	return {
 		init : function(wsApi) {
 			api = wsApi;
-			setup(api);
 			wsApi.dialog = {
 				show : show,
 				hide : hide,
 				current : current,
-				dialog : dialog,
 				content : configuration
 			};
 		}

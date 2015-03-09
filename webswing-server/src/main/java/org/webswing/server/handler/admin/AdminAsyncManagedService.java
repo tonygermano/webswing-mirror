@@ -79,7 +79,7 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
 			if (result != null) {
 				return result;
 			} else if (message instanceof String) {
-				Object jsonMessage = ServerUtil.decode((String) message);
+				Object jsonMessage = ServerUtil.decodeJson((String) message);
 				if (jsonMessage != null && jsonMessage instanceof ApplyConfigurationMsgIn) {
 					ApplyConfigurationMsgIn jac = (ApplyConfigurationMsgIn) jsonMessage;
 					if (jac.getType().equals(ApplyConfigurationMsgIn.Type.user)) {

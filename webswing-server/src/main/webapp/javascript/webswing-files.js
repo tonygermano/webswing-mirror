@@ -10,6 +10,25 @@ define([ 'jquery', 'text!templates/upload.html', 'bootstrap', 'jquery.iframe-tra
 	var fileDialogErrorMessageContent, deleteSelectedButton, downloadSelectedButton;
 	var dropZone, fileUpload, uploadProgressBar, uploadProgress, cancelBtn, downloadBtn, uploadBtn, deleteBtn, fileInput;
 
+	function open(data, clientId) {
+		if (uploadBar == null) {
+			setup(api);
+		}
+		fileDialogTransferBarClientId.val(clientId);
+		showOrHide(downloadBtn, data.allowDownload);
+		showOrHide(uploadBtn, data.allowUpload);
+		showOrHide(dropZone, data.allowUpload);
+		showOrHide(deleteBtn, data.allowDelete);
+		fileInput.prop("multiple", data.isMultiSelection);
+		fileInput.attr("accept", data.filter);
+		setProgressBarVisible(false);
+		uploadBar.show("fast");
+	}
+
+	function close() {
+		uploadBar.hide("fast");
+	}
+
 	function setup(api) {
 		api.rootElement.append(html);
 
@@ -30,11 +49,11 @@ define([ 'jquery', 'text!templates/upload.html', 'bootstrap', 'jquery.iframe-tra
 		fileInput = uploadBar.find('input[data-id="fileInput"]');
 
 		deleteSelectedButton.bind('click', function(e) {
-			api.ws.requestDeleteFile();
+			sendMessageEvent('deleteFile');
 		});
 
 		downloadSelectedButton.bind('click', function(e) {
-			api.ws.requestDownloadFile();
+			sendMessageEvent('downloadFile');
 		});
 
 		api.rootElement.bind('drop', function(e) {
@@ -87,7 +106,7 @@ define([ 'jquery', 'text!templates/upload.html', 'bootstrap', 'jquery.iframe-tra
 			uploadProgress.css('width', progress + '%');
 			if (progress === 100) {
 				setTimeout(function() {
-					api.ws.filesUploaded(doneFileList);
+					filesUploaded(doneFileList);
 					doneFileList = [];
 				}, 1000);
 				setProgressBarVisible(false);
@@ -96,7 +115,7 @@ define([ 'jquery', 'text!templates/upload.html', 'bootstrap', 'jquery.iframe-tra
 		});
 
 		cancelBtn.click(function() {
-			api.ws.filesUploaded([]);
+			filesUploaded([]);
 			jqXHR_fileupload.forEach(function(el) {
 				el.abort();
 			});
@@ -122,48 +141,55 @@ define([ 'jquery', 'text!templates/upload.html', 'bootstrap', 'jquery.iframe-tra
 		}
 	}
 
+	function filesUploaded(files) {
+		api.socket.send({
+			uploaded : {
+				clientId : api.context.clientId,
+				files : files
+			}
+		});
+	}
+
+	function sendMessageEvent(message) {
+		api.socket.send({
+			events : [ {
+				event : {
+					type : message,
+					clientId : api.context.clientId
+				}
+			} ]
+		});
+	}
+
 	function download(url) {
 		var hiddenIFrameID = 'hiddenDownloader';
-		var iframe = api.rootElement.find('iframe[data-id="'+hiddenIFrameID+'"');
+		var iframe = api.rootElement.find('iframe[data-id="' + hiddenIFrameID + '"]');
 		if (iframe.length === 0) {
 			iframe = $(document.createElement('iframe'));
-			iframe.data('id',hiddenIFrameID);
+			iframe.data('id', hiddenIFrameID);
 			iframe.hide();
 			api.rootElement.append(iframe);
 		}
 		iframe.src = url;
 	}
-	
-	function link(url){
+
+	function link(url) {
 		window.open(url, '_blank');
 	}
 
-	function print(url){
+	function print(url) {
 		window.open('/print/viewer.html?file=' + url, '_blank');
 	}
-	
+
 	return {
 		init : function(wsApi) {
 			api = wsApi;
-			setup(api);
-			wsApi.upload= {
-				open : function(data, clientId) {
-					fileDialogTransferBarClientId.val(clientId);
-					showOrHide(downloadBtn, data.allowDownload);
-					showOrHide(uploadBtn, data.allowUpload);
-					showOrHide(dropZone, data.allowUpload);
-					showOrHide(deleteBtn, data.allowDelete);
-					fileInput.prop("multiple", data.isMultiSelection);
-					fileInput.attr("accept", data.filter);
-					setProgressBarVisible(false);
-					uploadBar.show("fast");
-				},
-				close : function() {
-					uploadBar.hide("fast");
-				},
-				download:download,
-				link:link,
-				print:print
+			wsApi.files = {
+				open : open,
+				close : close,
+				download : download,
+				link : link,
+				print : print
 			};
 		}
 	};

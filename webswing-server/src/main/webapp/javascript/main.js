@@ -32,9 +32,7 @@
 	}
 
 	function startWebswing() {
-		require([ 'webswing' ], function(ws) {
-			ws.setTypedArraysSupported(typedArraysSupported);
-		});
+		require([ 'webswing' ]);
 	}
 
 	function isCanvasSupported() {

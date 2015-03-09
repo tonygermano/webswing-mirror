@@ -33,7 +33,7 @@ public class ProtoMapper {
 		return result.toByteArray();
 	}
 
-	public <T extends MsgIn> T decodeProto(byte[] bytes, Class<T> msgInClass) throws IOException {
+	public <T> T decodeProto(byte[] bytes, Class<T> msgInClass) throws IOException {
 		T result = decodeMessage(bytes, msgInClass);
 		return result;
 	}
@@ -62,12 +62,12 @@ public class ProtoMapper {
 			for (FieldDescriptor fd : valueMap.keySet()) {
 				Field field = c.getDeclaredField(fd.getName());
 				field.setAccessible(true);
-				if(fd.isRepeated()){
-					if(field.getType()==List.class && field.getGenericType()instanceof ParameterizedType){
+				if (fd.isRepeated()) {
+					if (field.getType() == List.class && field.getGenericType() instanceof ParameterizedType) {
 						List<Object> decodedList = new ArrayList<Object>();
 						ParameterizedType type = (ParameterizedType) field.getGenericType();
-						Class<?> param=(Class<?>) type.getActualTypeArguments()[0];
-						for(Object o: (List)valueMap.get(fd)){
+						Class<?> param = (Class<?>) type.getActualTypeArguments()[0];
+						for (Object o : (List) valueMap.get(fd)) {
 							if (fd.getJavaType().equals(JavaType.MESSAGE)) {
 								decodedList.add(decodeMessage((Message) o, param));
 							} else if (fd.getJavaType().equals(JavaType.ENUM)) {
@@ -81,10 +81,10 @@ public class ProtoMapper {
 							}
 						}
 						field.set(result, decodedList);
-					}else{
-						throw new IOException("Field '"+fd.getName()+"' of "+c+" has to be List with generics type!");
+					} else {
+						throw new IOException("Field '" + fd.getName() + "' of " + c + " has to be List with generics type!");
 					}
-				}else{
+				} else {
 					if (fd.getJavaType().equals(JavaType.MESSAGE)) {
 						Object o = decodeMessage((Message) valueMap.get(fd), field.getType());
 						field.set(result, o);

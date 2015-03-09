@@ -70,12 +70,26 @@ public class ServerUtil {
 		}
 	}
 
-	public static Object decode(String s) {
+	public static Object decodeJson(String s) {
 		Object o = null;
-		Class<?>[] classes = new Class<?>[]{InputEventsFrameMsgIn.class};
+		Class<?>[] classes = new Class<?>[] { InputEventsFrameMsgIn.class };
 		for (Class<?> c : classes) {
 			try {
 				o = mapper.readValue(s, c);
+				break;
+			} catch (IOException e) {
+				// do nothing
+			}
+		}
+		return o;
+	}
+
+	public static Object decodeProto(byte[] message) {
+		Object o = null;
+		Class<?>[] classes = new Class<?>[] { InputEventsFrameMsgIn.class };
+		for (Class<?> c : classes) {
+			try {
+				o = protoMapper.decodeProto(message, c);
 				break;
 			} catch (IOException e) {
 				// do nothing
@@ -298,4 +312,5 @@ public class ServerUtil {
 	public static void broadcastMessage(AtmosphereResource r, MsgOut o) {
 		broadcastMessage(r, new EncodedMessage(o));
 	}
+
 }

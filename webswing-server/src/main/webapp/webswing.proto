@@ -12,7 +12,6 @@ message AppFrameMsgOutProto{
 	repeated WindowMsgProto windows = 7;
 	optional WindowMsgProto closedWindow = 8;
 	optional SimpleEventMsgOutProto event = 9;
-	optional string user = 10;
 }
 
 message ApplicationInfoMsgProto{
@@ -119,13 +118,13 @@ message KeyboardEventMsgInProto{
 	optional string clientId = 1;
 	optional KeyEventTypeProto type = 2;
 	optional sint32 character = 3;
-	optional sint32 keycode = 4; 
+	optional sint32 keycode = 4;
 	optional bool alt = 5;
 	optional bool ctrl = 6;
 	optional bool shift = 7;
 	optional bool meta = 8;
 	optional bool altgr = 9;
-	
+
 	enum KeyEventTypeProto {
 		keypress = 0;
 		keydown = 1;
@@ -144,7 +143,7 @@ message MouseEventMsgInProto{
 	optional bool alt = 8;
 	optional bool shift = 9;
 	optional bool meta = 10;
-	
+
 	enum MouseEventTypeProto {
 		mousemove = 0;
 		mousedown = 1;
@@ -162,7 +161,7 @@ message PasteEventMsgInProto{
 message SimpleEventMsgInProto{
 	optional SimpleEventTypeProto type = 1;
 	optional string clientId = 2;
-	
+
 	enum SimpleEventTypeProto {
 		unload = 0;
 		killSwing = 1;

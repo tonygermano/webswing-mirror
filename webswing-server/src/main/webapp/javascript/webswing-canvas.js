@@ -11,10 +11,10 @@ define([ 'jquery' ], function($) {
 		api.rootElement.append('<canvas data-id="canvas" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
 		canvas = api.rootElement.find('canvas[data-id="canvas"]');
 		resizeCheck = setInterval(function() {
-			if (canvas.width !== width() || canvas.height !== height()) {
-				canvas.width = width();
-				canvas.height = height();
-				api.ws.handshake();
+			if (canvas.width() !== width() || canvas.height() !== height()) {
+				get().width = width();
+				get().height = height();
+				api.base.handshake();
 			}
 		}, 500);
 	}
@@ -26,14 +26,22 @@ define([ 'jquery' ], function($) {
 		if (resizeCheck != null) {
 			clearInterval(resizeCheck);
 		}
+		canvas = null;
 	}
 
 	function width() {
-		return api.rootElement.offsetWidth;
+		return api.rootElement.width();
 	}
 
 	function height() {
-		return api.rootElement.offsetHeight;
+		return api.rootElement.height();
+	}
+
+	function get() {
+		if (canvas == null) {
+			create();
+		}
+		return canvas[0];
 	}
 
 	return {
@@ -42,7 +50,7 @@ define([ 'jquery' ], function($) {
 			wsApi.canvas = {
 				create : create,
 				dispose : dispose,
-				canvas : canvas
+				get : get
 			};
 		}
 	};

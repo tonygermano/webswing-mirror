@@ -36,7 +36,7 @@ import org.webswing.server.stats.SessionRecorder;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.server.util.StatUtils;
 
-@ManagedService(path = "/async/swing", interceptors = { AtmosphereResourceLifecycleInterceptor.class, ManagedServiceInterceptor.class, TrackMessageSizeInterceptor.class, HeartbeatInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class })
+@ManagedService(path = "/async/swing", interceptors = { AtmosphereResourceLifecycleInterceptor.class, ManagedServiceInterceptor.class, HeartbeatInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class })
 public class SwingAsyncManagedService {
 
 	private static final Logger log = LoggerFactory.getLogger(SwingAsyncManagedService.class);
@@ -61,7 +61,6 @@ public class SwingAsyncManagedService {
 			}
 		}
 		AppFrameMsgOut appInfo = new AppFrameMsgOut();
-		appInfo.setUser(ServerUtil.getUserName(r));
 		appInfo.setApplications(ServerUtil.createApplicationJsonInfo(r, applicationsMap, includeAdminApp));
 		ServerUtil.broadcastMessage(r, new EncodedMessage(appInfo));
 	}
@@ -83,43 +82,48 @@ public class SwingAsyncManagedService {
 	}
 
 	public static Serializable processWebswingMessage(AtmosphereResource r, Object message, boolean logStats) {
+		int length = 0;
+		Object decodedMessage = null;
 		if (message instanceof String) {
-			String sm = (String) message;
-			Object jsonMessage = ServerUtil.decode((String) message);
-			if (jsonMessage != null && jsonMessage instanceof InputEventsFrameMsgIn) {
-				InputEventsFrameMsgIn frame = (InputEventsFrameMsgIn) jsonMessage;
-				if (frame.getEvents() != null && frame.getEvents().size() > 0) {
-					List<InputEventMsgIn> evts = frame.getEvents();
-					for (InputEventMsgIn evt : evts) {
-						if (evt.getHandshake() != null) {
-							SwingInstanceManager.getInstance().connectSwingInstance(r, evt.getHandshake());
-						} else if (evt.getKey() != null) {
-							send(r, evt.getKey().getClientId(), evt.getKey(), sm, logStats);
-						} else if (evt.getMouse() != null) {
-							send(r, evt.getMouse().getClientId(), evt.getMouse(), sm, logStats);
-						} else if (evt.getEvent() != null) {
-							send(r, evt.getEvent().getClientId(), evt.getEvent(), sm, logStats);
-						}
+			length = ((String) message).getBytes().length;
+			decodedMessage = ServerUtil.decodeJson((String) message);
+		} else if (message instanceof byte[]) {
+			length = ((byte[]) message).length;
+			decodedMessage = ServerUtil.decodeProto((byte[]) message);
+		}
+		if (decodedMessage != null && decodedMessage instanceof InputEventsFrameMsgIn) {
+			InputEventsFrameMsgIn frame = (InputEventsFrameMsgIn) decodedMessage;
+			if (frame.getEvents() != null && frame.getEvents().size() > 0) {
+				List<InputEventMsgIn> evts = frame.getEvents();
+				for (InputEventMsgIn evt : evts) {
+					if (evt.getHandshake() != null) {
+						SwingInstanceManager.getInstance().connectSwingInstance(r, evt.getHandshake());
+					} else if (evt.getKey() != null) {
+						send(r, evt.getKey().getClientId(), evt.getKey(), length, logStats);
+					} else if (evt.getMouse() != null) {
+						send(r, evt.getMouse().getClientId(), evt.getMouse(), length, logStats);
+					} else if (evt.getEvent() != null) {
+						send(r, evt.getEvent().getClientId(), evt.getEvent(), length, logStats);
 					}
-				} else if (frame.getPaste() != null) {
-					PasteEventMsgIn p = frame.getPaste();
-					send(r, p.getClientId(), p, sm, logStats);
-				} else if (frame.getUploaded() != null) {
-					UploadedEventMsgIn p = frame.getUploaded();
-					send(r, p.getClientId(), p, sm, logStats);
-				} else {
-					return null;
 				}
+			} else if (frame.getPaste() != null) {
+				PasteEventMsgIn p = frame.getPaste();
+				send(r, p.getClientId(), p, length, logStats);
+			} else if (frame.getUploaded() != null) {
+				UploadedEventMsgIn p = frame.getUploaded();
+				send(r, p.getClientId(), p, length, logStats);
 			} else {
-				return sm;
+				return null;
 			}
+		} else {
+			return (Serializable) message;
 		}
 		return null;
 	}
 
-	private static void send(AtmosphereResource r, String clientId, MsgIn o, String message, boolean logStat) {
+	private static void send(AtmosphereResource r, String clientId, MsgIn o, int length, boolean logStat) {
 		if (logStat) {
-			StatUtils.logInboundData(SwingInstanceManager.getInstance().findInstance(clientId), message.getBytes().length);
+			StatUtils.logInboundData(SwingInstanceManager.getInstance().findInstance(clientId), length);
 		}
 		SwingInstanceManager.getInstance().sendMessageToSwing(r, clientId, o);
 	}

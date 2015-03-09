@@ -13,7 +13,6 @@ public class AppFrameMsgOut implements MsgOut {
 	private LinkActionMsg linkAction;
 	private WindowMoveActionMsg moveAction;
 	private CursorChangeEventMsg cursorChange;
-	private String user;
 	private CopyEventMsg copyEvent;
 	private FileDialogEventMsg fileDialogEvent;
 	private List<WindowMsg> windows;
@@ -66,14 +65,6 @@ public class AppFrameMsgOut implements MsgOut {
 
 	public void setCursorChange(CursorChangeEventMsg cursorChange) {
 		this.cursorChange = cursorChange;
-	}
-
-	public String getUser() {
-		return user;
-	}
-
-	public void setUser(String user) {
-		this.user = user;
 	}
 
 	public CopyEventMsg getCopyEvent() {

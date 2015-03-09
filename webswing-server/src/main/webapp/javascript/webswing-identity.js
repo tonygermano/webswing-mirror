@@ -1,24 +1,23 @@
 define([], function() {
 	"use strict";
 	var api;
-	var id;
 	var cookieName = 'webswingID';
 
-	function create() {
-		id = readCookie(cookieName);
+	function get() {
+		var id = readCookie(cookieName);
 		if (id != null) {
-			eraseCookie(cookieName);
+			return id;
 		} else {
 			id = GUID();
+			createCookie(cookieName, id, 1);
+			return id;
 		}
-		createCookie(cookieName, id, 1);
-		return id;
 	}
-	
+
 	function dispose(){
 		eraseCookie(cookieName);
 	}
-	
+
 
 	function GUID() {
 		var S4 = function() {
@@ -61,9 +60,8 @@ define([], function() {
 		init : function(wsApi) {
 			api = wsApi;
 			wsApi.identity = {
-				create : create,
+				get : get,
 				dispose : dispose,
-				identity : id
 			};
 		}
 	};

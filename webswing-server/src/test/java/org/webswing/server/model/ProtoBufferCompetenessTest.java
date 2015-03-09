@@ -230,13 +230,13 @@ public class ProtoBufferCompetenessTest {
 	@Test
 	public void testDecoding3() throws IOException {
 		org.webswing.server.model.proto.Webswing.InputEventsFrameMsgInProto.Builder b = InputEventsFrameMsgInProto.newBuilder();
-		
+
 		org.webswing.server.model.proto.Webswing.InputEventMsgInProto.Builder ieb2 = InputEventMsgInProto.newBuilder();
 		org.webswing.server.model.proto.Webswing.SimpleEventMsgInProto.Builder seb = SimpleEventMsgInProto.newBuilder();
 		seb.setClientId("client");
 		seb.setType(SimpleEventTypeProto.killSwing);
 		ieb2.setEvent(seb.build());
-		
+
 		org.webswing.server.model.proto.Webswing.InputEventMsgInProto.Builder ieb = InputEventMsgInProto.newBuilder();
 		org.webswing.server.model.proto.Webswing.MouseEventMsgInProto.Builder meb = MouseEventMsgInProto.newBuilder();
 		meb.setAlt(true);
@@ -244,7 +244,7 @@ public class ProtoBufferCompetenessTest {
 		meb.setX(1);
 		meb.setY(2);
 		ieb.setMouse(meb.build());
-		
+
 		b.addEvents(ieb);
 		b.addEvents(ieb2);
 		ProtoMapper pm = new ProtoMapper();
@@ -263,8 +263,7 @@ public class ProtoBufferCompetenessTest {
 	 * @param directory
 	 *            The directory to start with
 	 * @param pckgname
-	 *            The package name to search for. Will be needed for getting the
-	 *            Class object.
+	 *            The package name to search for. Will be needed for getting the Class object.
 	 * @param classes
 	 *            if a file isn't loaded but still is in the directory
 	 * @throws ClassNotFoundException
@@ -298,8 +297,7 @@ public class ProtoBufferCompetenessTest {
 	 * @param pckgname
 	 *            the package name to search for
 	 * @param classes
-	 *            the current ArrayList of all classes. This method will simply
-	 *            add new classes.
+	 *            the current ArrayList of all classes. This method will simply add new classes.
 	 * @throws ClassNotFoundException
 	 *             if a file isn't loaded but still is in the jar file
 	 * @throws IOException
@@ -324,8 +322,7 @@ public class ProtoBufferCompetenessTest {
 	}
 
 	/**
-	 * Attempts to list all the classes in the specified package as determined
-	 * by the context class loader
+	 * Attempts to list all the classes in the specified package as determined by the context class loader
 	 * 
 	 * @param pckgname
 	 *            the package name to search
