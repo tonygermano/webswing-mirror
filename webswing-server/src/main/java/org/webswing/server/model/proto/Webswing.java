@@ -12093,16 +12093,6 @@ public final class Webswing {
      * <code>optional bool meta = 8;</code>
      */
     boolean getMeta();
-
-    // optional bool altgr = 9;
-    /**
-     * <code>optional bool altgr = 9;</code>
-     */
-    boolean hasAltgr();
-    /**
-     * <code>optional bool altgr = 9;</code>
-     */
-    boolean getAltgr();
   }
   /**
    * Protobuf type {@code org.webswing.server.model.proto.KeyboardEventMsgInProto}
@@ -12199,11 +12189,6 @@ public final class Webswing {
             case 64: {
               bitField0_ |= 0x00000080;
               meta_ = input.readBool();
-              break;
-            }
-            case 72: {
-              bitField0_ |= 0x00000100;
-              altgr_ = input.readBool();
               break;
             }
           }
@@ -12492,22 +12477,6 @@ public final class Webswing {
       return meta_;
     }
 
-    // optional bool altgr = 9;
-    public static final int ALTGR_FIELD_NUMBER = 9;
-    private boolean altgr_;
-    /**
-     * <code>optional bool altgr = 9;</code>
-     */
-    public boolean hasAltgr() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
-    }
-    /**
-     * <code>optional bool altgr = 9;</code>
-     */
-    public boolean getAltgr() {
-      return altgr_;
-    }
-
     private void initFields() {
       clientId_ = "";
       type_ = org.webswing.server.model.proto.Webswing.KeyboardEventMsgInProto.KeyEventTypeProto.keypress;
@@ -12517,7 +12486,6 @@ public final class Webswing {
       ctrl_ = false;
       shift_ = false;
       meta_ = false;
-      altgr_ = false;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -12554,9 +12522,6 @@ public final class Webswing {
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeBool(8, meta_);
-      }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeBool(9, altgr_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -12598,10 +12563,6 @@ public final class Webswing {
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(8, meta_);
-      }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(9, altgr_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -12735,8 +12696,6 @@ public final class Webswing {
         bitField0_ = (bitField0_ & ~0x00000040);
         meta_ = false;
         bitField0_ = (bitField0_ & ~0x00000080);
-        altgr_ = false;
-        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
 
@@ -12797,10 +12756,6 @@ public final class Webswing {
           to_bitField0_ |= 0x00000080;
         }
         result.meta_ = meta_;
-        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
-          to_bitField0_ |= 0x00000100;
-        }
-        result.altgr_ = altgr_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -12842,9 +12797,6 @@ public final class Webswing {
         }
         if (other.hasMeta()) {
           setMeta(other.getMeta());
-        }
-        if (other.hasAltgr()) {
-          setAltgr(other.getAltgr());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -13177,39 +13129,6 @@ public final class Webswing {
       public Builder clearMeta() {
         bitField0_ = (bitField0_ & ~0x00000080);
         meta_ = false;
-        onChanged();
-        return this;
-      }
-
-      // optional bool altgr = 9;
-      private boolean altgr_ ;
-      /**
-       * <code>optional bool altgr = 9;</code>
-       */
-      public boolean hasAltgr() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
-      }
-      /**
-       * <code>optional bool altgr = 9;</code>
-       */
-      public boolean getAltgr() {
-        return altgr_;
-      }
-      /**
-       * <code>optional bool altgr = 9;</code>
-       */
-      public Builder setAltgr(boolean value) {
-        bitField0_ |= 0x00000100;
-        altgr_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional bool altgr = 9;</code>
-       */
-      public Builder clearAltgr() {
-        bitField0_ = (bitField0_ & ~0x00000100);
-        altgr_ = false;
         onChanged();
         return this;
       }
@@ -17305,38 +17224,38 @@ public final class Webswing {
       "\030\001 \001(\t\022\021\n\tsessionId\030\002 \001(\t\022\024\n\014desktopWidt" +
       "h\030\003 \001(\r\022\025\n\rdesktopHeight\030\004 \001(\r\022\027\n\017applic" +
       "ationName\030\005 \001(\t\022\020\n\010mirrored\030\006 \001(\010\022\033\n\023dir" +
-      "ectDrawSupported\030\007 \001(\010\"\253\002\n\027KeyboardEvent" +
+      "ectDrawSupported\030\007 \001(\010\"\234\002\n\027KeyboardEvent" +
       "MsgInProto\022\020\n\010clientId\030\001 \001(\t\022X\n\004type\030\002 \001" +
       "(\0162J.org.webswing.server.model.proto.Key" +
       "boardEventMsgInProto.KeyEventTypeProto\022\021" +
       "\n\tcharacter\030\003 \001(\021\022\017\n\007keycode\030\004 \001(\021\022\013\n\003al",
       "t\030\005 \001(\010\022\014\n\004ctrl\030\006 \001(\010\022\r\n\005shift\030\007 \001(\010\022\014\n\004" +
-      "meta\030\010 \001(\010\022\r\n\005altgr\030\t \001(\010\"9\n\021KeyEventTyp" +
-      "eProto\022\014\n\010keypress\020\000\022\013\n\007keydown\020\001\022\t\n\005key" +
-      "up\020\002\"\323\002\n\024MouseEventMsgInProto\022\020\n\010clientI" +
-      "d\030\001 \001(\t\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021\022W\n\004type\030\004 " +
-      "\001(\0162I.org.webswing.server.model.proto.Mo" +
-      "useEventMsgInProto.MouseEventTypeProto\022\022" +
-      "\n\nwheelDelta\030\005 \001(\021\022\016\n\006button\030\006 \001(\021\022\014\n\004ct" +
-      "rl\030\007 \001(\010\022\013\n\003alt\030\010 \001(\010\022\r\n\005shift\030\t \001(\010\022\014\n\004" +
-      "meta\030\n \001(\010\"^\n\023MouseEventTypeProto\022\r\n\tmou",
-      "semove\020\000\022\r\n\tmousedown\020\001\022\013\n\007mouseup\020\002\022\016\n\n" +
-      "mousewheel\020\003\022\014\n\010dblclick\020\004\"9\n\024PasteEvent" +
-      "MsgInProto\022\020\n\010clientId\030\001 \001(\t\022\017\n\007content\030" +
-      "\002 \001(\t\"\374\001\n\025SimpleEventMsgInProto\022Y\n\004type\030" +
-      "\001 \001(\0162K.org.webswing.server.model.proto." +
-      "SimpleEventMsgInProto.SimpleEventTypePro" +
-      "to\022\020\n\010clientId\030\002 \001(\t\"v\n\024SimpleEventTypeP" +
-      "roto\022\n\n\006unload\020\000\022\r\n\tkillSwing\020\001\022\014\n\010paint" +
-      "Ack\020\002\022\013\n\007repaint\020\003\022\020\n\014downloadFile\020\004\022\016\n\n" +
-      "deleteFile\020\005\022\006\n\002hb\020\006\":\n\027UploadedEventMsg",
-      "InProto\022\r\n\005files\030\001 \003(\t\022\020\n\010clientId\030\002 \001(\t" +
-      "\"C\n\025UploadEventMsgInProto\022\020\n\010fileName\030\002 " +
-      "\001(\t\022\030\n\020tempFileLocation\030\003 \001(\t*\241\001\n\026Simple" +
-      "EventMsgOutProto\022\035\n\031applicationAlreadyRu" +
-      "nning\020\000\022\030\n\024shutDownNotification\020\001\022\036\n\032too" +
-      "ManyClientsNotification\020\002\022\026\n\022continueOld" +
-      "Session\020\003\022\026\n\022configurationError\020\004"
+      "meta\030\010 \001(\010\"9\n\021KeyEventTypeProto\022\014\n\010keypr" +
+      "ess\020\000\022\013\n\007keydown\020\001\022\t\n\005keyup\020\002\"\323\002\n\024MouseE" +
+      "ventMsgInProto\022\020\n\010clientId\030\001 \001(\t\022\t\n\001x\030\002 " +
+      "\001(\021\022\t\n\001y\030\003 \001(\021\022W\n\004type\030\004 \001(\0162I.org.websw" +
+      "ing.server.model.proto.MouseEventMsgInPr" +
+      "oto.MouseEventTypeProto\022\022\n\nwheelDelta\030\005 " +
+      "\001(\021\022\016\n\006button\030\006 \001(\021\022\014\n\004ctrl\030\007 \001(\010\022\013\n\003alt" +
+      "\030\010 \001(\010\022\r\n\005shift\030\t \001(\010\022\014\n\004meta\030\n \001(\010\"^\n\023M" +
+      "ouseEventTypeProto\022\r\n\tmousemove\020\000\022\r\n\tmou",
+      "sedown\020\001\022\013\n\007mouseup\020\002\022\016\n\nmousewheel\020\003\022\014\n" +
+      "\010dblclick\020\004\"9\n\024PasteEventMsgInProto\022\020\n\010c" +
+      "lientId\030\001 \001(\t\022\017\n\007content\030\002 \001(\t\"\374\001\n\025Simpl" +
+      "eEventMsgInProto\022Y\n\004type\030\001 \001(\0162K.org.web" +
+      "swing.server.model.proto.SimpleEventMsgI" +
+      "nProto.SimpleEventTypeProto\022\020\n\010clientId\030" +
+      "\002 \001(\t\"v\n\024SimpleEventTypeProto\022\n\n\006unload\020" +
+      "\000\022\r\n\tkillSwing\020\001\022\014\n\010paintAck\020\002\022\013\n\007repain" +
+      "t\020\003\022\020\n\014downloadFile\020\004\022\016\n\ndeleteFile\020\005\022\006\n" +
+      "\002hb\020\006\":\n\027UploadedEventMsgInProto\022\r\n\005file",
+      "s\030\001 \003(\t\022\020\n\010clientId\030\002 \001(\t\"C\n\025UploadEvent" +
+      "MsgInProto\022\020\n\010fileName\030\002 \001(\t\022\030\n\020tempFile" +
+      "Location\030\003 \001(\t*\241\001\n\026SimpleEventMsgOutProt" +
+      "o\022\035\n\031applicationAlreadyRunning\020\000\022\030\n\024shut" +
+      "DownNotification\020\001\022\036\n\032tooManyClientsNoti" +
+      "fication\020\002\022\026\n\022continueOldSession\020\003\022\026\n\022co" +
+      "nfigurationError\020\004"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -17420,7 +17339,7 @@ public final class Webswing {
           internal_static_org_webswing_server_model_proto_KeyboardEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_KeyboardEventMsgInProto_descriptor,
-              new java.lang.String[] { "ClientId", "Type", "Character", "Keycode", "Alt", "Ctrl", "Shift", "Meta", "Altgr", });
+              new java.lang.String[] { "ClientId", "Type", "Character", "Keycode", "Alt", "Ctrl", "Shift", "Meta", });
           internal_static_org_webswing_server_model_proto_MouseEventMsgInProto_descriptor =
             getDescriptor().getMessageTypes().get(13);
           internal_static_org_webswing_server_model_proto_MouseEventMsgInProto_fieldAccessorTable = new

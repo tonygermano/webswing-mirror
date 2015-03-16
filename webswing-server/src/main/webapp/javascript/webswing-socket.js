@@ -1,16 +1,16 @@
-define([ 'atmosphere', 'ProtoBuf' ], function(atmosphere, ProtoBuf) {
+define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, ProtoBuf,wsProto) {
 	"use strict";
 	var api;
 	var socket = null;
 	var uuid = null;
 	var binary;
-	var proto = ProtoBuf.loadProtoFile("/webswing.proto");
+	var proto = ProtoBuf.loadProto(wsProto,"webswing.proto");
 	var InputEventsFrameMsgInProto = proto.build("org.webswing.server.model.proto.InputEventsFrameMsgInProto");
 	var AppFrameMsgOutProto = proto.build("org.webswing.server.model.proto.AppFrameMsgOutProto");
 	function connect() {
-		binary = api.typedArraysSupported;
+		binary = api.typedArraysSupported && api.binarySocket;
 		var request = {
-			url : document.location.toString() + 'async/swing',
+			url : api.connectionUrl + 'async/swing',
 			contentType : "application/json",
 			logLevel : 'debug',
 			transport : 'websocket',
@@ -44,6 +44,7 @@ define([ 'atmosphere', 'ProtoBuf' ], function(atmosphere, ProtoBuf) {
 				var data
 				if (binary) {
 					data = AppFrameMsgOutProto.decode(message);
+					explodeEnumNames(data);
 				} else {
 					data = atmosphere.util.parseJSON(message);
 				}
@@ -95,6 +96,31 @@ define([ 'atmosphere', 'ProtoBuf' ], function(atmosphere, ProtoBuf) {
 
 	function getuuid() {
 		return uuid;
+	}
+
+	function explodeEnumNames(data) {
+		if (data != null) {
+			if (Array.isArray(data)) {
+				data.forEach(function(d) {
+					explodeEnumNames(d);
+				})
+			} else {
+				data.$type._fields.forEach(function(field) {
+					if (field.resolvedType != null) {
+						if (field.resolvedType.className === "Enum") {
+							var enm = field.resolvedType.object;
+							for ( var key in enm) {
+								if (enm[key] === data[field.name]) {
+									data[field.name] = key;
+								}
+							}
+						} else if (field.resolvedType.className === "Message") {
+							explodeEnumNames(data[field.name]);
+						}
+					}
+				});
+			}
+		}
 	}
 
 	return {

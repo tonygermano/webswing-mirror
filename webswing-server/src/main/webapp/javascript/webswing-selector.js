@@ -1,5 +1,5 @@
 define(
-		[ 'jquery', 'bootstrap' ],
+		[ 'jquery' ],
 		function($) {
 			"use strict";
 			var api;
@@ -13,26 +13,34 @@ define(
 					},
 					application_click : function() {
 						var appName = $(this).attr('data-name');
-						hide();
 						api.base.startApplication(appName);
 					}
 				};
 				var content;
 				if (apps == null || apps.length == 0) {
 					content = '<p>Sorry, there is no application available for you.</p>';
-				} else if (apps.length == 1 && api.autoStart) {
-					api.base.startApplication(apps[0].name);
-					return;
+				} else if (api.applicationName != null) {
+					apps.forEach(function(app) {
+						if (app.name === api.applicationName) {
+							api.base.startApplication(app.name);
+							return;
+						}
+					});
+					content = '<p>Sorry, application "' + api.applicationName + '" is not available for you.</p>';
+
 				} else {
 					content = '<div class="row">';
 					for ( var i in apps) {
 						var app = apps[i];
 						if (app.name == 'adminConsoleApplicationName') {
-							content += '<div class="col-sm-6 col-md-4"><div class="thumbnail" onclick="window.location.href = \'/admin\';"><img src="/admin/img/admin.png" class="img-thumbnail"/><div class="caption">Admin console</div></div></div>';
+							content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" onclick="window.location.href = \'/admin\';"><img src="/admin/img/admin.png" class="img-thumbnail"/><div class="caption">Admin console</div></div></div>';
 						} else {
-							content += '<div class="col-sm-6 col-md-4"><div class="thumbnail" data-id="application" data-name="' + app.name
-									+ '"><img src="' + getImageString(app.base64Icon) + '" class="img-thumbnail"/><div class="caption">' + app.name
-									+ '</div></div></div>';
+							content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" data-id="application" data-name="'
+									+ app.name
+									+ '"><img src="'
+									+ getImageString(app.base64Icon)
+									+ '" class="img-thumbnail"/><div class="caption">'
+									+ app.name + '</div></div></div>';
 						}
 					}
 					content += '</div>';

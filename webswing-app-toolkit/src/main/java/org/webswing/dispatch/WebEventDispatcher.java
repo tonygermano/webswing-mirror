@@ -19,6 +19,7 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
+import org.webswing.Constants;
 import org.webswing.model.MsgIn;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.KeyboardEventMsgIn;
@@ -296,27 +297,29 @@ public class WebEventDispatcher {
 	}
 
 	private void handleUploadedEvent(UploadedEventMsgIn e) {
-		JFileChooser fc = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
-		UploadedEventMsgIn event = (UploadedEventMsgIn) e;
-		if (fc != null) {
-			fc.rescanCurrentDirectory();
-			if (event.getFiles().size() > 0) {
-				if (fc.isMultiSelectionEnabled()) {
-					File arr[] = new File[event.getFiles().size()];
-					for (int i = 0; i < event.getFiles().size(); i++) {
-						arr[i] = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i)));
+		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD)) {
+			JFileChooser fc = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
+			UploadedEventMsgIn event = (UploadedEventMsgIn) e;
+			if (fc != null) {
+				fc.rescanCurrentDirectory();
+				if (event.getFiles().size() > 0) {
+					if (fc.isMultiSelectionEnabled()) {
+						File arr[] = new File[event.getFiles().size()];
+						for (int i = 0; i < event.getFiles().size(); i++) {
+							arr[i] = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i)));
+						}
+						fc.setSelectedFiles(arr);
+					} else {
+						File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
+						fc.setSelectedFile(f);
 					}
-					fc.setSelectedFiles(arr);
+					// fc.approveSelection();
 				} else {
-					File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
-					fc.setSelectedFile(f);
+					fc.cancelSelection();
 				}
-				// fc.approveSelection();
-			} else {
-				fc.cancelSelection();
 			}
+			uploadMap.clear();
 		}
-		uploadMap.clear();
 	}
 
 }

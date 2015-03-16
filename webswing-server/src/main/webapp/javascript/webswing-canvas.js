@@ -8,7 +8,7 @@ define([ 'jquery' ], function($) {
 		if (canvas != null || resizeCheck != null) {
 			dispose();
 		}
-		api.rootElement.append('<canvas data-id="canvas" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
+		api.rootElement.append('<canvas data-id="canvas" style="display:block" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
 		canvas = api.rootElement.find('canvas[data-id="canvas"]');
 		resizeCheck = setInterval(function() {
 			if (canvas.width() !== width() || canvas.height() !== height()) {

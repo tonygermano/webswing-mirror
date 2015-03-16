@@ -1,46 +1,33 @@
-<div data-id="uploadBar" class="fileDialogBar">
+<div data-id="uploadBar" class="webswing-fileDialogBar">
 	<div class="container-fluid">
-		<div class="row fileDialogButtonRow">
-			<div data-id="fileDropArea" class="ws-hidden">
+		<div class="row webswing-fileDialogButtonRow">
+			<div data-id="fileDropArea" class="webswing-hidden">
 				<p class="upload-dropH1">Drag and drop files here </p>
 			</div>
 		</div>
-		<div class="row fileDialogButtonRow">
-			<div class="col-xs-4"  data-id="fileDownloadBtn" class="ws-hidden">
+		<div class="row webswing-fileDialogButtonRow">
+			<div class="col-xs-4"  data-id="fileDownloadBtn" class="webswing-hidden">
 				<button class="btn btn-success btn-sm btn-block" data-id="downloadSelectedButton">Download
 					selected</button>
 			</div>
-			<div class="col-xs-4"  data-id="fileUploadBtn" class="ws-hidden">
+			<div class="col-xs-4"  data-id="fileUploadBtn" class="webswing-hidden">
 				<form data-id="fileupload" data-url="upload">
 					<input data-id="fileDialogTransferBarClientId" name="clinetId" type="hidden">
-					<div class="fileUpload btn btn-success btn-sm btn-block">
+					<div class="webswing-fileUpload btn btn-success btn-sm btn-block">
 						<span>Upload files</span>
 						<input accept="" data-id="fileInput" name="files[]" class="upload"
 							type="file">
 					</div>
 				</form>
 			</div>
-			<div class="col-xs-4"  data-id="fileDeleteBtn" class="ws-hidden">
+			<div class="col-xs-4"  data-id="fileDeleteBtn" class="webswing-hidden">
 				<!-- Single button -->
-				<div class="btn btn-success btn-sm btn-block dropup" >
-					<div class=" dropdown-toggle " type="button" data-toggle="dropdown">
-						Delete selected
-						<span class="caret"></span>
-					</div>
-					<ul class="dropdown-menu " role="menu">
-						<li>
-							<span style="color: gray;"> Are you sure?</span>
-						</li>
-						<li>
-							<a data-id="deleteSelectedButton" href="javascript:;">Yes</a>
-						</li>
-					</ul>
-				</div>
+				<button class="btn btn-success btn-sm btn-block" data-id="deleteSelectedButton">Delete selected</button>
 			</div>
 		</div>
-		<div data-id="fileDialogTransferProgressBar" class="row fileDialogButtonRow" class="ws-hidden">
+		<div data-id="fileDialogTransferProgressBar" class="row webswing-fileDialogButtonRow" class="webswing-hidden">
 			<div style="padding-right: 0px;" class="col-xs-8">
-				<div data-id="progress" class="progress">
+				<div data-id="progress webswing-progress" class="progress">
 					<div style="width: 0%;" class="progress-bar progress-bar-success">
 					</div>
 				</div>
@@ -51,7 +38,7 @@
 				</div>
 			</div>
 		</div>
-		<div data-id="fileDialogErrorMessage" class="row fileDialogButtonRow ws-hidden" >
+		<div data-id="fileDialogErrorMessage" class="row webswing-fileDialogButtonRow webswing-hidden" >
 			<div class="col-md-12">
 				<div data-id="fileDialogErrorMessageContent" class="alert alert-danger"></div>
 			</div>

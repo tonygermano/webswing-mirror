@@ -123,7 +123,6 @@ message KeyboardEventMsgInProto{
 	optional bool ctrl = 6;
 	optional bool shift = 7;
 	optional bool meta = 8;
-	optional bool altgr = 9;
 
 	enum KeyEventTypeProto {
 		keypress = 0;

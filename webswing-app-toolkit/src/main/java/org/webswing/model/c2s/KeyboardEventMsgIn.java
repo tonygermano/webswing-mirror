@@ -18,7 +18,6 @@ public class KeyboardEventMsgIn implements MsgIn {
 	private boolean ctrl;
 	private boolean shift;
 	private boolean meta;
-	private boolean altgr;
 
 	public String getClientId() {
 		return clientId;
@@ -85,11 +84,7 @@ public class KeyboardEventMsgIn implements MsgIn {
 	}
 
 	public boolean isAltgr() {
-		return altgr;
-	}
-
-	public void setAltgr(boolean altgr) {
-		this.altgr = altgr;
+		return alt && ctrl;
 	}
 
 }

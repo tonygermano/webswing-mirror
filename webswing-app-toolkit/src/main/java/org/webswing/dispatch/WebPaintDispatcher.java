@@ -382,7 +382,7 @@ public class WebPaintDispatcher {
 	}
 
 	public void notifyDownloadSelectedFile() {
-		if (fileChooserDialog != null) {
+		if (fileChooserDialog != null && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD)) {
 			File file = fileChooserDialog.getSelectedFile();
 			if (file != null && file.exists() && !file.isDirectory() && file.canRead()) {
 				OpenFileResultMsgInternal f = new OpenFileResultMsgInternal();
@@ -394,7 +394,7 @@ public class WebPaintDispatcher {
 	}
 
 	public void notifyDeleteSelectedFile() {
-		if (fileChooserDialog != null) {
+		if (fileChooserDialog != null && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_DELETE)) {
 			File[] selected = fileChooserDialog.getSelectedFiles();
 			if ((selected == null || selected.length == 0) && fileChooserDialog.getSelectedFile() != null) {
 				selected = new File[] { fileChooserDialog.getSelectedFile() };

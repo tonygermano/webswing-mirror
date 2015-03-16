@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>org.atmosphere</groupId>
 			<artifactId>atmosphere-runtime</artifactId>
-			<version>2.2.4</version>
+			<version>2.2.6</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-api</artifactId>
@@ -135,10 +135,10 @@
 							<outputDirectory>src/main/java</outputDirectory>
 							<cleanOutputFolder>false</cleanOutputFolder>
 							<includeDirectories>
-								<include>src/main/webapp</include>
+								<include>src/main/webapp/javascript</include>
 							</includeDirectories>
 							<inputDirectories>
-								<include>src/main/webapp</include>
+								<include>src/main/webapp/javascript</include>
 							</inputDirectories>
 						</configuration>
 					</execution>
@@ -348,4 +348,11 @@
 			</build>
 		</profile>
 	</profiles>
+
+	<repositories>
+		<repository>
+			<id>oss.sonatype.org-snapshot</id>
+			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
 </project>

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.config.managed.ManagedServiceInterceptor;
 import org.atmosphere.config.service.DeliverTo;
 import org.atmosphere.config.service.DeliverTo.DELIVER_TO;
@@ -62,7 +61,12 @@ public class SwingAsyncManagedService {
 		}
 		AppFrameMsgOut appInfo = new AppFrameMsgOut();
 		appInfo.setApplications(ServerUtil.createApplicationJsonInfo(r, applicationsMap, includeAdminApp));
-		ServerUtil.broadcastMessage(r, new EncodedMessage(appInfo));
+		EncodedMessage encoded = new EncodedMessage(appInfo);
+		if (r.forceBinaryWrite()) {
+			r.write(encoded.getProtoMessage());
+		} else {
+			r.write(encoded.getJsonMessage());
+		}
 	}
 
 	@Disconnect

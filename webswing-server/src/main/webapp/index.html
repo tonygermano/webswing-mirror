@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Webswing</title>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta charset="utf-8" />
-	<link rel="stylesheet" href="css/bootstrap.css" />
-	<link rel="stylesheet" href="css/webswing.css" />
-	<script data-main="javascript/main.js" src="javascript/require.js"></script>
+<title>Webswing</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta charset="utf-8" />
+<link rel="stylesheet" href="css/bootstrap.css" />
+<link rel="stylesheet" href="css/webswing.css" />
 </head>
-<body id="body">
+<body data-webswing-id="main" data-webswing-options="{exportName:'webswing', autoStart:true, applicationName:null, connectionUrl:null, customization:null}">
+	<script>
+	(function (window, document) {
+	  var loader = function () {
+	    var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+	    script.src =  document.location.toString()+"javascript/webswing-embed.js";
+	    tag.parentNode.insertBefore(script, tag);
+	  };
+	  window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+	})(window, document);
+	</script>
 </body>
 </html>

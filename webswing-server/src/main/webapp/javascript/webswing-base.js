@@ -142,12 +142,13 @@
 	function dispose() {
 		clearInterval(timer1);
 		clearInterval(timer2);
+		sendInput();
 		unload();
 		resetState();
 	}
 
 	function processMessage(data) {
-		if (data.applications != null) {
+		if (data.applications != null && data.applications.length != 0) {
 			api.selector.show(data.applications);
 		}
 		if (data.event != null) {
@@ -254,7 +255,7 @@
 													imageObj.src = '';
 													resolved();
 												};
-												imageObj.src = 'data:image/png;base64,' + winContent.base64Content;
+												imageObj.src = getImageString(winContent.base64Content);
 											}
 										});
 									});
@@ -265,6 +266,18 @@
 				ack();
 			});
 		}
+	}
+
+	function getImageString(data) {
+		if (typeof data === 'object') {
+			var binary = '';
+			var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
+			for ( var i = 0, l = bytes.byteLength; i < l; i++) {
+				binary += String.fromCharCode(bytes[i]);
+			}
+			data = window.btoa(binary);
+		}
+		return 'data:image/png;base64,' + data
 	}
 
 	function adjustCanvasSize(canvas, width, height) {
@@ -444,7 +457,6 @@
 				ctrl : evt.ctrlKey,
 				shift : evt.shiftKey,
 				meta : evt.metaKey,
-				altgr : evt.altGraphKey
 			}
 		};
 	}
