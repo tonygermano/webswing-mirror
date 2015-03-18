@@ -13,21 +13,18 @@ define([ 'es6promise', 'typedarray' ], function(es6promise) {
 	}
 
 	function isArrayBufferSupported() {
-		if ('ArrayBuffer' in window)
+		if ('ArrayBuffer' in window && ArrayBuffer.toString().indexOf("[native code]") !== -1) {
 			return true;
+		}
 		return false;
 	}
 
 	return {
 		init : function(api) {
-			if (!isCanvasSupported()) {
-				api.dialog.show(api.dialog.content.notSupportedBrowser);
-				api.start=function(){};
+			if (isArrayBufferSupported()) {
+				api.typedArraysSupported = true;
 			}
-			if (!isPromisesSupported() || !isArrayBufferSupported()) {
-				if (!isArrayBufferSupported()) {
-					api.typedArraysSupported = false;
-				}
+			if (!isPromisesSupported()) {
 				es6promise.polyfill();
 			}
 		}

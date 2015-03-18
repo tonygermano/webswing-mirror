@@ -1,8 +1,7 @@
-define([ 'jquery', 'text!templates/login.html', 'text!templates/login.css' ], function($, html, css) {
+define([ 'jquery', 'text!templates/login.html' ], function($, html) {
 	"use strict";
 	var api;
 	var user;
-	var started = false;
 	var loginDialog = {
 		content : html,
 		events : {
@@ -23,14 +22,6 @@ define([ 'jquery', 'text!templates/login.html', 'text!templates/login.css' ], fu
 	};
 
 	function login(successCallback) {
-		if (!started) {
-			var style = $("<style></style>", {
-				type : "text/css"
-			});
-			style.text(css);
-			$("head").append(style);
-			started = true;
-		}
 		$.ajax({
 			type : 'POST',
 			url : '/login?mode=swing',

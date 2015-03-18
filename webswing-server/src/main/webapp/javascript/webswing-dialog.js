@@ -1,12 +1,15 @@
 define(
-		[ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 'text!templates/notSupportedBrowser.html' ],
-		function($, html, css, notSupportedBrowser) {
+		[ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 'text!templates/bootstrap.css' ],
+		function($, html, css, cssBootstrap) {
 			"use strict";
 
 			var api;
 			var currentContent;
 			var dialog, content, header;
 			var configuration = {
+				readyDialog : {
+					content : '<p>Webswing ready...</p>'
+				},
 				initializingDialog : {
 					content : '<p>Initializing...</p>'
 				},
@@ -24,9 +27,6 @@ define(
 				},
 				tooManyClientsNotification : {
 					content : '<p>Too many connections. Please try again later...</p>'
-				},
-				notSupportedBrowser : {
-					content : notSupportedBrowser
 				},
 				applicationAlreadyRunning : {
 					content : '<p>Application is already running in other browser window...</p>'
@@ -46,6 +46,7 @@ define(
 					content : '<p>Continue old session?</p><button data-id="continue" class="btn btn-primary">Yes,	continue.</button><span> </span><button data-id="newsession" class="btn btn-default" >No, start new session.</button>',
 					events : {
 						continue_click : function() {
+							api.base.kill();
 							api.base.continueSession();
 						},
 						newsession_click : function() {
@@ -56,12 +57,19 @@ define(
 			};
 
 			function setup(api) {
-				api.rootElement.append(html);
 				var style = $("<style></style>", {
 					type : "text/css"
 				});
 				style.text(css);
-				$("head").append(style);
+				var style0 = $("<style></style>", {
+					type : "text/css"
+				});
+				style0.text(cssBootstrap);
+
+				api.rootElement.append(html);
+				$("head").prepend(style0);
+				$("head").prepend(style);
+
 				backdrop = api.rootElement.find('div[data-id="commonDialogBackDrop"]');
 				dialog = api.rootElement.find('div[data-id="commonDialog"]');
 				content = dialog.find('div[data-id="content"]');
@@ -104,7 +112,7 @@ define(
 			function hide() {
 				currentContent = null;
 				content.html('');
-				dialog.slideUp('fast');
+				dialog.fadeOut('fast');
 				backdrop.fadeOut('fast');
 			}
 

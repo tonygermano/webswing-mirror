@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.webswing.model.MsgIn;
 import org.webswing.model.MsgOut;
 
 import com.google.protobuf.ByteString;

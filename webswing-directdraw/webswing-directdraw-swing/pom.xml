@@ -41,10 +41,10 @@
 							<outputDirectory>src/main/java</outputDirectory>
 							<cleanOutputFolder>false</cleanOutputFolder>
 							<includeDirectories>
-								<include>../src/proto</include>
+								<include>../src/proto/javascript</include>
 							</includeDirectories>
 							<inputDirectories>
-								<include>../src/proto</include>
+								<include>../src/proto/javascript</include>
 							</inputDirectories>
 						</configuration>
 					</execution>

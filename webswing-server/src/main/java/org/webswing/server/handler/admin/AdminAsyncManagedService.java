@@ -29,7 +29,6 @@ import org.webswing.model.admin.c2s.ApplyConfigurationMsgIn;
 import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstanceManager;
-import org.webswing.server.handler.SwingAsyncManagedService;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.util.ServerUtil;
 
@@ -75,10 +74,7 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
 	@Message
 	public Serializable onMessage(AtmosphereResource r, Object message) {
 		try {
-			Serializable result = SwingAsyncManagedService.processWebswingMessage(r, message, false);
-			if (result != null) {
-				return result;
-			} else if (message instanceof String) {
+			if (message instanceof String) {
 				Object jsonMessage = ServerUtil.decodeJson((String) message);
 				if (jsonMessage != null && jsonMessage instanceof ApplyConfigurationMsgIn) {
 					ApplyConfigurationMsgIn jac = (ApplyConfigurationMsgIn) jsonMessage;

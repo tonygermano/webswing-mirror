@@ -1,11 +1,11 @@
 (function(root, factory) {
 	if (typeof define === "function" && define.amd) {
 		// AMD
-		define([ 'ProtoBuf' ], factory);
+		define([ 'ProtoBuf','text!directdraw.proto' ], factory);
 	} else {
 		root.WebswingDirectDraw = factory(dcodeIO.ProtoBuf);
 	}
-}(this, function(ProtoBuf) {
+}(this, function(ProtoBuf, webswingProto) {
 	return function(c) {
 		"use strict";
 		c = c || {};
@@ -14,7 +14,7 @@
 				console.log(message);
 			}
 		};
-		var proto = ProtoBuf.loadProtoFile("/directdraw.proto");
+		var proto = webswingProto!=null? ProtoBuf.loadProto(webswingProto,"directdraw.proto"):ProtoBuf.loadProtoFile("/directdraw.proto");
 		var WebImageProto = proto.build("org.webswing.directdraw.proto.WebImageProto");
 		var InstructionProto = proto.build("org.webswing.directdraw.proto.DrawInstructionProto.InstructionProto");
 		var SegmentTypeProto = proto.build("org.webswing.directdraw.proto.PathProto.SegmentTypeProto");

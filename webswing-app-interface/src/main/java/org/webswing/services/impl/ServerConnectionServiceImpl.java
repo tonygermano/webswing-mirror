@@ -142,7 +142,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					Util.getWebToolkit().getEventDispatcher().dispatchEvent((MsgIn) omsg.getObject());
 				}
 			}
-		} catch (JMSException e) {
+		} catch (Exception e) {
 			Logger.error("ServerConnectionService.onMessage", e);
 		}
 	}

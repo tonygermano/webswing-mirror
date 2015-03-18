@@ -35,17 +35,11 @@
 		api.dialog.show(api.dialog.content.startingDialog);
 	}
 
-	function startMirrorView(clientId) {
+	function startMirrorView() {
 		api.canvas.create();
 		registerEventListeners(api.canvas.get());
 		resetState();
-		api.context = {
-			clientId : clientId,
-			appName : null,
-			hasControl : false,
-			mirrorMode : true,
-			canPaint : true
-		}
+		api.context.canPaint=true;
 		handshake();
 		api.dialog.show(api.dialog.content.startingDialog);
 	}

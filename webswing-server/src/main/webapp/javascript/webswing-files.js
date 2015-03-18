@@ -36,7 +36,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 					type : "text/css"
 				});
 				style.text(css);
-				$("head").append(style);
+				$("head").prepend(style);
 
 				uploadBar = api.rootElement.find('div[data-id="uploadBar"]');
 				fileDialogTransferBarClientId = uploadBar.find('input[data-id="fileDialogTransferBarClientId"]');

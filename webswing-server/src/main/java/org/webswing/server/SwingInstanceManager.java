@@ -58,7 +58,7 @@ public class SwingInstanceManager {
 		if (app == null) {
 			throw new RuntimeException("Application " + h.getApplicationName() + " is not configured.");
 		}
-		if (ServerUtil.isUserAuthorizedForApplication(resource, app)) {
+		if (ServerUtil.isUserAuthorized(resource, app, h)) {
 			SwingInstance swingInstance = swingInstances.get(h.getClientId());
 			if (swingInstance == null) {// start new swing app
 				if (app != null && !h.isMirrored()) {
@@ -96,7 +96,7 @@ public class SwingInstanceManager {
 				}
 			}
 		} else {
-			log.error("Authorization error: User " + ServerUtil.getUserName(resource) + " is not authorized to connect to application " + app.getName());
+			log.error("Authorization error: User " + ServerUtil.getUserName(resource) + " is not authorized to connect to application " + app.getName() + (h.isMirrored() ? " [Mirrored view only available for admin role]" : ""));
 		}
 	}
 

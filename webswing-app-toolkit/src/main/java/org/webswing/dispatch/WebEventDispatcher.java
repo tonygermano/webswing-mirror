@@ -13,7 +13,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
@@ -304,14 +306,18 @@ public class WebEventDispatcher {
 				fc.rescanCurrentDirectory();
 				if (event.getFiles().size() > 0) {
 					if (fc.isMultiSelectionEnabled()) {
-						File arr[] = new File[event.getFiles().size()];
+						List<File> arr = new ArrayList<File>();
 						for (int i = 0; i < event.getFiles().size(); i++) {
-							arr[i] = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i)));
+							if (uploadMap.get(event.getFiles().get(i)) != null) {
+								arr.add(new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i))));
+							}
 						}
-						fc.setSelectedFiles(arr);
+						fc.setSelectedFiles(arr.toArray(new File[arr.size()]));
 					} else {
-						File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
-						fc.setSelectedFile(f);
+						if (uploadMap.get(event.getFiles().get(0)) != null) {
+							File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
+							fc.setSelectedFile(f);
+						}
 					}
 					// fc.approveSelection();
 				} else {
@@ -321,5 +327,4 @@ public class WebEventDispatcher {
 			uploadMap.clear();
 		}
 	}
-
 }

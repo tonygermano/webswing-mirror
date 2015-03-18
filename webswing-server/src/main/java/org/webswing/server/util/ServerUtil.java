@@ -33,6 +33,7 @@ import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
 import org.webswing.model.admin.s2c.MessageMsg;
 import org.webswing.model.admin.s2c.MessageMsg.Type;
 import org.webswing.model.admin.s2c.SwingSessionMsg;
+import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.server.SwingApplicationDescriptor;
@@ -131,6 +132,19 @@ public class ServerUtil {
 			}
 		}
 		return apps;
+	}
+
+	public static boolean isUserAuthorized(AtmosphereResource r, SwingApplicationDescriptor app, ConnectionHandshakeMsgIn h) {
+
+		// mirror view
+		if (h.isMirrored()) {
+			if (isUserinRole(r, Constants.ADMIN_ROLE)) {
+				return true;
+			}
+			return false;
+		}
+		// regular
+		return isUserAuthorizedForApplication(r, app);
 	}
 
 	public static boolean isUserAuthorizedForApplication(AtmosphereResource r, SwingApplicationDescriptor app) {

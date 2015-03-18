@@ -26,8 +26,6 @@ angular.module('ws-console.controllers', [])
 			$scope.location = split[1] == null ? 'dashboard' : split[1];
 			$scope.active = split[2] == null ? 'overview' : split[2];
 			var masterData = $scope.masterData = {};
-			$scope.appDataProcessor = function() {};
-			$scope.appMsgProcessor = function() {};
 			$scope.handleLoginEnter = function(event) {
 				if (event.keyCode == 13) {
 					$scope.login();
@@ -92,11 +90,8 @@ angular.module('ws-console.controllers', [])
 									if (data.message != null) {
 										$scope.addMessage(data.message);
 									}
-								} else if (data.type == 'app') {
-									$scope.appDataProcessor(data);
 								}
 							} catch (e) {
-								$scope.appMsgProcessor(message);
 								return;
 							}
 						},
@@ -116,7 +111,6 @@ angular.module('ws-console.controllers', [])
 
 .controller('Dashboard', ['$scope', '$modal', '$timeout',
 	function($scope, $modal, $timeout) {
-		$scope.controlEnabled = false;
 		$scope.$watch('masterData.sessions | filter:{id:mirrorSession.id}', function(newValue, oldValue) {
 			if (typeof newValue != 'undefined') {
 				if (newValue.length > 0) {
@@ -126,14 +120,13 @@ angular.module('ws-console.controllers', [])
 				}
 			}
 		}, true);
-		$scope.$watch('wsConfig.hasControl', function(newValue, oldValue) {
-			if ($scope.ws != null) {
-				$scope.ws.canControl(newValue);
+		$scope.$watch('mirrorSession.config.control', function(newValue, oldValue) {
+			if (window.webswingmirrorview != null) {
+				window.webswingmirrorview.configure();
 			}
 		});
 		$scope.view = function(session) {
 			$scope.mirrorSession = session;
-			$scope.controlEnabled = false;
 			$scope.mirrorDialog = $modal.open({
 				templateUrl: 'partials/dashboard/mirror-viewer.html',
 				scope: $scope,
@@ -146,42 +139,23 @@ angular.module('ws-console.controllers', [])
 			}
 			$scope.mirrorDialog.opened.then(function() {
 				$timeout(function() {
-					$scope.wsConfig = {
-						send: function(message) {
-							if ($scope.socket != null && $scope.socket.request.isOpen) {
-								if (typeof message == "string") {
-									$scope.socket.push(message)
-								}
-								if (typeof message === "object") {
-									$scope.socket.push(atmosphere.util.stringifyJSON(message));
-								}
-							}
-						},
-						onErrorMessage: function(text) {
-							console.log(text);
-						},
+					$scope.mirrorSession.config = {
 						clientId: session.id,
-						hasControl: false,
+						applicationName: session.application,
+						control: false,
 						mirrorMode: true
 					};
-					$scope.ws = WebswingBase($scope.wsConfig);
-					$scope.$parent.appDataProcessor = function(data) {
-						$scope.ws.processJsonMessage(data);
-					};
-					$scope.ws.setCanvas($('#canvas')[0]);
-					$scope.ws.canPaint(true);
-					$scope.ws.setApplication(session.application);
-					$scope.ws.handshake();
-					$scope.ws.repaint();
+					window.webswingadmin.scan();
+					window.webswingmirrorview.start();
 				}, 1000);
 			});
 			$scope.mirrorDialog.result.then(function() {
-				$scope.ws.dispose();
+				window.webswingmirrorview.disconnect();
 			}, function() {});
 		};
 		$scope.kill = function(session) {
-			if ($scope.mirrorDialog != null && $scope.ws != null) {
-				$scope.ws.kill();
+			if ($scope.mirrorDialog != null) {
+				window.webswingmirrorview.kill();
 			}
 		}
 	}
@@ -191,7 +165,7 @@ angular.module('ws-console.controllers', [])
 .controller('Settings', ['$scope', 'base64Encoder',
 	function($scope, base64Encoder) {
 
-		//edit
+		// edit
 		$scope.editType = 'form';
 		$scope.$watch('config.form', function(newValue, oldValue) {
 			if ($scope.editType == 'form') {
