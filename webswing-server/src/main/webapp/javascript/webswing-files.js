@@ -80,8 +80,12 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				});
 
 				var jqUpload = fileUpload.fileupload({
+					xhrFields : {
+						withCredentials : true
+					},
+					url : api.connectionUrl + 'upload',
 					dataType : 'json',
-					dropZone : dropZone
+					dropZone : dropZone,
 				});
 
 				jqUpload.on('fileuploadadd', function(e, data) {
@@ -168,15 +172,14 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			}
 
 			function download(url) {
-				var hiddenIFrameID = 'hiddenDownloader';
-				var iframe = api.rootElement.find('iframe[data-id="' + hiddenIFrameID + '"]');
-				if (iframe.length === 0) {
-					iframe = $(document.createElement('iframe'));
-					iframe.data('id', hiddenIFrameID);
-					iframe.hide();
-					api.rootElement.append(iframe);
+				var hiddenIFrameID = 'hiddenDownloader', iframe = document.getElementById(hiddenIFrameID);
+				if (iframe === null) {
+					iframe = document.createElement('iframe');
+					iframe.id = hiddenIFrameID;
+					iframe.style.display = 'none';
+					document.body.appendChild(iframe);
 				}
-				iframe.src = url;
+				iframe.src = api.connectionUrl + url;
 			}
 
 			function link(url) {
@@ -184,7 +187,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			}
 
 			function print(url) {
-				window.open('/print/viewer.html?file=' + url, '_blank');
+				window.open(api.connectionUrl + 'print/viewer.html?file=/' + url, '_blank');
 			}
 
 			return {

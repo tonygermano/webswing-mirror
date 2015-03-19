@@ -19,29 +19,11 @@ define(
 				connectingDialog : {
 					content : '<p>Connecting...</p>'
 				},
-				disconnectedDialog : {
-					content : '<p>Disconnected...</p>'
-				},
-				connectionErrorDialog : {
-					content : '<p>Connection error...</p>'
-				},
-				tooManyClientsNotification : {
-					content : '<p>Too many connections. Please try again later...</p>'
-				},
-				applicationAlreadyRunning : {
-					content : '<p>Application is already running in other browser window...</p>'
-				},
-				stoppedDialog : {
-					content : '<p>Application stopped... </p> <button data-id="newsession" class="btn btn-primary">Start new session.</button> <span> </span><button data-id="logout" class="btn btn-default">Logout.</button>',
-					events : {
-						newsession_click : function() {
-							api.newSession();
-						},
-						logout_click : function() {
-							api.login.logout();
-						}
-					}
-				},
+				disconnectedDialog : finalMessageDialog('Disconnected...'),
+				connectionErrorDialog : finalMessageDialog('Connection error...'),
+				tooManyClientsNotification : finalMessageDialog('Too many connections. Please try again later...'),
+				applicationAlreadyRunning : finalMessageDialog('Application is already running in other browser window...'),
+				stoppedDialog : finalMessageDialog('Application stopped...'),
 				continueOldSessionDialog : {
 					content : '<p>Continue old session?</p><button data-id="continue" class="btn btn-primary">Yes,	continue.</button><span> </span><button data-id="newsession" class="btn btn-default" >No, start new session.</button>',
 					events : {
@@ -55,6 +37,22 @@ define(
 					}
 				}
 			};
+
+			function finalMessageDialog(msg) {
+				return {
+					content : '<p>'
+							+ msg
+							+ '</p><button data-id="newsession" class="btn btn-primary">Start new session.</button> <span> </span><button data-id="logout" class="btn btn-default">Logout.</button>',
+					events : {
+						newsession_click : function() {
+							api.newSession();
+						},
+						logout_click : function() {
+							api.login.logout();
+						}
+					}
+				}
+			}
 
 			function setup(api) {
 				var style = $("<style></style>", {

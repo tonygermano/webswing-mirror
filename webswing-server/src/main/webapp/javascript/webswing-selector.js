@@ -33,7 +33,7 @@ define(
 					for ( var i in apps) {
 						var app = apps[i];
 						if (app.name == 'adminConsoleApplicationName') {
-							content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" onclick="window.location.href = \'/admin\';"><img src="/admin/img/admin.png" class="img-thumbnail"/><div class="caption">Admin console</div></div></div>';
+							content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" onclick="window.location.href = \''+api.connectionUrl+'admin\';"><img src="'+api.connectionUrl+'admin/img/admin.png" class="img-thumbnail"/><div class="caption">Admin console</div></div></div>';
 						} else {
 							content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" data-id="application" data-name="'
 									+ app.name

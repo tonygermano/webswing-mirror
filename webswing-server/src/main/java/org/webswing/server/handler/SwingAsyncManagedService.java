@@ -15,6 +15,7 @@ import org.atmosphere.config.service.Ready;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
+import org.atmosphere.interceptor.CorsInterceptor;
 import org.atmosphere.interceptor.HeartbeatInterceptor;
 import org.atmosphere.interceptor.ShiroInterceptor;
 import org.atmosphere.interceptor.SuspendTrackerInterceptor;
@@ -35,7 +36,7 @@ import org.webswing.server.stats.SessionRecorder;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.server.util.StatUtils;
 
-@ManagedService(path = "/async/swing", interceptors = { AtmosphereResourceLifecycleInterceptor.class, ManagedServiceInterceptor.class, HeartbeatInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class })
+@ManagedService(path = "/async/swing", interceptors = { AtmosphereResourceLifecycleInterceptor.class, ManagedServiceInterceptor.class, HeartbeatInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class, CorsInterceptor.class })
 public class SwingAsyncManagedService {
 
 	private static final Logger log = LoggerFactory.getLogger(SwingAsyncManagedService.class);

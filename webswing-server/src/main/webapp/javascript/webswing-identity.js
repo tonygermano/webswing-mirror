@@ -61,7 +61,7 @@ define([], function() {
 			api = wsApi;
 			wsApi.identity = {
 				get : get,
-				dispose : dispose,
+				dispose : dispose
 			};
 		}
 	};

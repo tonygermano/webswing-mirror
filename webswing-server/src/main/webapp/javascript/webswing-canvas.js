@@ -5,7 +5,7 @@ define([ 'jquery' ], function($) {
 	var resizeCheck;
 
 	function create() {
-		if (canvas != null || resizeCheck != null) {
+		if (resizeCheck != null) {
 			dispose();
 		}
 		api.rootElement.append('<canvas data-id="canvas" style="display:block" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
@@ -21,7 +21,7 @@ define([ 'jquery' ], function($) {
 
 	function dispose() {
 		if (canvas != null) {
-			canvas.remove();
+			get().height =0;
 		}
 		if (resizeCheck != null) {
 			clearInterval(resizeCheck);

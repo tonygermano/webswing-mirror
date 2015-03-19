@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.MsgOut;
+import org.webswing.model.admin.c2s.ApplyConfigurationMsgIn;
 import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
 import org.webswing.model.admin.s2c.MessageMsg;
 import org.webswing.model.admin.s2c.MessageMsg.Type;
@@ -73,7 +74,7 @@ public class ServerUtil {
 
 	public static Object decodeJson(String s) {
 		Object o = null;
-		Class<?>[] classes = new Class<?>[] { InputEventsFrameMsgIn.class };
+		Class<?>[] classes = new Class<?>[] { InputEventsFrameMsgIn.class,ApplyConfigurationMsgIn.class };
 		for (Class<?> c : classes) {
 			try {
 				o = mapper.readValue(s, c);

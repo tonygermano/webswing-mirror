@@ -16,7 +16,8 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 			transport : 'websocket',
 			trackMessageLength : true,
 			reconnectInterval : 5000,
-			fallbackTransport : 'long-polling'
+			fallbackTransport : 'long-polling',
+			enableXDR : true
 		};
 
 		if (binary) {

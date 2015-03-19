@@ -1,6 +1,10 @@
-.webswing-fileDialogBar {
+.webswing-fileDialogBarOuter {
 	display: none;
-	position: fixed;
+	position: relative;
+}
+
+.webswing-fileDialogBar {
+	position: absolute;
 	right: 0px;
 	bottom: 0px;
 	padding: 5px;
@@ -13,10 +17,11 @@
 	border-top-left-radius: 10px;
 	background-color: #fff;
 	border-color: #ddd;
+	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 }
 
 .webswing-fileDialogButtonRow {
-	padding-bottom: 10px;
+	margin-right: 0 !important;
 }
 
 .webswing-fileUpload {
@@ -33,7 +38,7 @@
 	font-size: 20px;
 	cursor: pointer;
 	opacity: 0;
-	filter: alpha(opacity =        0);
+	filter: alpha(opacity =            0);
 }
 
 div[data-id="fileDropArea"] {

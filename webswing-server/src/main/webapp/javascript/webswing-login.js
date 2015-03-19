@@ -23,8 +23,9 @@ define([ 'jquery', 'text!templates/login.html' ], function($, html) {
 
 	function login(successCallback) {
 		$.ajax({
+			xhrFields: { withCredentials: true },
 			type : 'POST',
-			url : '/login?mode=swing',
+			url : api.connectionUrl+'login?mode=swing',
 			data : loginDialogVisible() ? api.rootElement.find('form[data-id="loginForm"]').serialize() : '',
 			success : function(data) {
 				if (loginDialogVisible()) {
@@ -51,8 +52,9 @@ define([ 'jquery', 'text!templates/login.html' ], function($, html) {
 
 	function logout() {
 		$.ajax({
+			xhrFields: { withCredentials: true },
 			type : 'GET',
-			url : '/logout',
+			url : api.connectionUrl + 'logout',
 			data : '',
 			success : function(data) {
 				user = null;

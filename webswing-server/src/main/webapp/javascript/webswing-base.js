@@ -173,9 +173,9 @@
 			if (data.linkAction.action == 'url') {
 				api.files.link(data.linkAction.src);
 			} else if (data.linkAction.action == 'print') {
-				api.files.print(encodeURIComponent('/file?id=' + data.linkAction.src));
+				api.files.print(encodeURIComponent('file?id=' + data.linkAction.src));
 			} else if (data.linkAction.action == 'file') {
-				api.files.download('/file?id=' + data.linkAction.src);
+				api.files.download('file?id=' + data.linkAction.src);
 			}
 		}
 		if (data.moveAction != null) {
@@ -450,7 +450,7 @@
 				alt : evt.altKey,
 				ctrl : evt.ctrlKey,
 				shift : evt.shiftKey,
-				meta : evt.metaKey,
+				meta : evt.metaKey
 			}
 		};
 	}
@@ -496,7 +496,7 @@
 				hasControl : false,
 				mirrorMode : false,
 				canPaint : false
-			}
+			};
 			api.base = {
 				startApplication : startApplication,
 				startMirrorView : startMirrorView,
@@ -505,8 +505,8 @@
 				kill : kill,
 				handshake : handshake,
 				processMessage : processMessage,
-				dispose : dispose,
-			}
+				dispose : dispose
+			};
 		}
 	};
 }));

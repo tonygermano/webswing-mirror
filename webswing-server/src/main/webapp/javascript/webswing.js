@@ -20,7 +20,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 				});
 			},
 			newSession : function() {
-				api.disconnect()
+				api.disconnect();
 				api.identity.dispose();
 				api.start();
 			},
@@ -40,6 +40,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 		canvas.init(api);
 		identity.init(api);
 		polyfill.init(api);
+		configure();
 
 		if (options.customization != null && typeof options.customization === 'function') {
 			options.customization(api);
@@ -53,9 +54,12 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 
 		function configure() {
 			var options = readOptions(api.rootElement);
-			api.api.autoStart = options.autoStart != null ? options.autoStart : api.autoStart;
+			api.autoStart = options.autoStart != null ? options.autoStart : api.autoStart;
 			api.applicationName = options.applicationName != null ? options.applicationName : api.applicationName;
 			api.connectionUrl = options.connectionUrl != null ? options.connectionUrl : api.connectionUrl;
+			if(api.connectionUrl.substr(api.connectionUrl.length - 1)!=='/'){
+				api.connectionUrl=api.connectionUrl+'/';
+			}
 			api.context.hasControl = options.control != null ? options.control : api.context.hasControl;
 			api.context.clientId = options.clientId != null ? options.clientId : api.context.clientId;
 			api.context.mirrorMode = options.mirrorMode != null ? options.mirrorMode : api.context.mirrorMode;

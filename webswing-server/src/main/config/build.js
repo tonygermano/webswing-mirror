@@ -5,10 +5,10 @@
 	paths : {
 		requireLib : 'require'
 	},
-	namespace : 'webswing',
+	namespace : 'webswingRequirejs',
 	modules : [ {
 		name : "webswing-embed",
-		include : [ 'requireLib', 'main','jquery-private' ],
+		include : [ 'requireLib', 'main', 'jquery-private', 'text!templates/notSupportedBrowser.html' ],
 		create : true
 	} ]
 })
