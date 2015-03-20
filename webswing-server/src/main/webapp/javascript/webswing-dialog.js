@@ -28,10 +28,10 @@ define(
 					content : '<p>Continue old session?</p><button data-id="continue" class="btn btn-primary">Yes,	continue.</button><span> </span><button data-id="newsession" class="btn btn-default" >No, start new session.</button>',
 					events : {
 						continue_click : function() {
-							api.base.kill();
 							api.base.continueSession();
 						},
 						newsession_click : function() {
+							api.base.kill();
 							api.newSession();
 						}
 					}

@@ -59,10 +59,14 @@ define([ 'jquery', 'text!templates/login.html' ], function($, html) {
 			success : function(data) {
 				user = null;
 				api.dialog.show(loginDialog);
+			},
+			error : function(data) {
+				user = null;
+				api.dialog.show(loginDialog);
 			}
 		});
 	}
-	function user() {
+	function getUser() {
 		return user;
 	}
 
@@ -70,7 +74,7 @@ define([ 'jquery', 'text!templates/login.html' ], function($, html) {
 		init : function(wsApi) {
 			api = wsApi;
 			wsApi.login = {
-				user : user,
+				user : getUser,
 				login : login,
 				logout : logout
 			};

@@ -12,9 +12,7 @@
 	});
 
 	require([ 'webswing' ], function(result) {
-		for ( var exportName in result) {
-			root[exportName] = result[exportName];
-		}
+		
 	}, function(err) {
 		var failedId = err.requireModules && err.requireModules[0];
 		var elements = getAllElementsWithAttribute('data-webswing-id');

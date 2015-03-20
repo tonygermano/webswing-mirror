@@ -1,7 +1,15 @@
-.webswing-dialog-backdrop {
+.webswing-dialog-container {
 	width: 100%;
 	height: 100%;
 	position: relative;
+}
+
+.webswing-dialog-backdrop {
+	position: absolute;
+	bottom: 0px;
+	top: 0px;
+	right: 0px;
+	left: 0px;
 	opacity: 0.5;
 	background-color: #000000;
 }
@@ -11,9 +19,8 @@
 	display: table;
 	width: 100%;
 	height: 100%;
-	position: relative;
+	position: absolute;
 	z-index: 1050;
-	top: -100%;
 }
 
 .webswing-dialog-modal {

@@ -35,8 +35,8 @@
 				<progressbar  animate="false" max="mirrorSession.state.heapSize" value="mirrorSession.state.heapSizeUsed"><span style="color:black; white-space:nowrap;">{{(mirrorSession.state.heapSizeUsed/mirrorSession.state.heapSize*100 |number:1) +'%  '+(mirrorSession.state.heapSizeUsed|number:1)+'MB/'+(mirrorSession.state.heapSize|number:0)+'MB'}}</span></progressbar>
 			</td>
 			<td>
-				<button type="button" class="btn btn-primary" ng-model="mirrorSession.config.control" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
-        			Control: {{ mirrorSession.config.control|bool:'ON ':'OFF' }}
+				<button type="button" class="btn btn-primary" ng-model="config.control" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
+        			Control: {{config.control|bool:'ON ':'OFF' }}
    				</button>
 				<button type="button" class="btn btn-primary" ng-click="kill()">
 					<span class="glyphicon glyphicon-off"></span> Kill swing 
@@ -49,6 +49,6 @@
 		</tr>
 	</table>
 </div>
-<div class="modal-body mirror-view-dialog-body" data-webswing-instance="webswingmirrorview" data-webswing-config="{{mirrorSession.config}}">
+<div class="modal-body mirror-view-dialog-body" data-webswing-instance="webswingmirrorview">
 	
 </div>

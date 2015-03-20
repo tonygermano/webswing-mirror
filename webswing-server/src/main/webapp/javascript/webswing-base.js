@@ -21,7 +21,7 @@
 	var directDraw = new WebswingDirectDraw({});
 
 	function startApplication(name) {
-		api.canvas.create();
+		api.canvas.get();
 		registerEventListeners(api.canvas.get());
 		resetState();
 		api.context = {
@@ -35,12 +35,19 @@
 		api.dialog.show(api.dialog.content.startingDialog);
 	}
 
-	function startMirrorView() {
-		api.canvas.create();
+	function startMirrorView(clientId,appName) {
+		api.canvas.get();
 		registerEventListeners(api.canvas.get());
 		resetState();
-		api.context.canPaint=true;
+		api.context = {
+				clientId : clientId,
+				appName : appName,
+				hasControl : false,
+				mirrorMode : true,
+				canPaint : true
+		};
 		handshake();
+		repaint();
 		api.dialog.show(api.dialog.content.startingDialog);
 	}
 
@@ -74,15 +81,14 @@
 	}
 
 	function sendInput() {
-		if (api.context.hasControl) {
-			enqueueInputEvent();
-			if (inputEvtQueue.length > 0) {
-				api.socket.send({
-					events : inputEvtQueue
-				});
-				inputEvtQueue = [];
-			}
+		enqueueInputEvent();
+		if (inputEvtQueue.length > 0) {
+			api.socket.send({
+				events : inputEvtQueue
+			});
+			inputEvtQueue = [];
 		}
+
 	}
 
 	function enqueueMessageEvent(message) {
@@ -90,21 +96,23 @@
 	}
 
 	function enqueueInputEvent(message) {
-		if (latestMouseMoveEvent != null) {
-			inputEvtQueue.push(latestMouseMoveEvent);
-			latestMouseMoveEvent = null;
-		}
-		if (latestMouseWheelEvent != null) {
-			inputEvtQueue.push(latestMouseWheelEvent);
-			latestMouseWheelEvent = null;
-		}
-		if (latestWindowResizeEvent != null) {
-			inputEvtQueue.push(latestWindowResizeEvent);
-			latestWindowResizeEvent = null;
-		}
-		if (message != null) {
-			if (JSON.stringify(inputEvtQueue[inputEvtQueue.length - 1]) !== JSON.stringify(message)) {
-				inputEvtQueue.push(message);
+		if (api.context.hasControl) {
+			if (latestMouseMoveEvent != null) {
+				inputEvtQueue.push(latestMouseMoveEvent);
+				latestMouseMoveEvent = null;
+			}
+			if (latestMouseWheelEvent != null) {
+				inputEvtQueue.push(latestMouseWheelEvent);
+				latestMouseWheelEvent = null;
+			}
+			if (latestWindowResizeEvent != null) {
+				inputEvtQueue.push(latestWindowResizeEvent);
+				latestWindowResizeEvent = null;
+			}
+			if (message != null) {
+				if (JSON.stringify(inputEvtQueue[inputEvtQueue.length - 1]) !== JSON.stringify(message)) {
+					inputEvtQueue.push(message);
+				}
 			}
 		}
 	}
@@ -276,8 +284,10 @@
 
 	function adjustCanvasSize(canvas, width, height) {
 		if (canvas.width != width || canvas.height != height) {
+			var snapshot=canvas.getContext("2d").getImageData(0,0,canvas.width,canvas.height);
 			canvas.width = width;
 			canvas.height = height;
+			canvas.getContext("2d").putImageData(snapshot,0,0);
 		}
 	}
 

@@ -20,14 +20,21 @@ define(
 				if (apps == null || apps.length == 0) {
 					content = '<p>Sorry, there is no application available for you.</p>';
 				} else if (api.applicationName != null) {
+					var exists=false;
 					apps.forEach(function(app) {
 						if (app.name === api.applicationName) {
-							api.base.startApplication(app.name);
-							return;
+							exists=true;
 						}
 					});
+					if(exists){
+						if(!api.mirror){
+							api.base.startApplication(api.applicationName);
+						}else{
+							api.base.startMirrorView(api.clientId,api.applicationName);
+						}
+						return;
+					}	
 					content = '<p>Sorry, application "' + api.applicationName + '" is not available for you.</p>';
-
 				} else {
 					content = '<div class="row">';
 					for ( var i in apps) {

@@ -5,28 +5,33 @@ define([ 'jquery' ], function($) {
 	var resizeCheck;
 
 	function create() {
-		if (resizeCheck != null) {
-			dispose();
+		if (canvas == null) {
+			api.rootElement
+					.append('<canvas data-id="canvas" style="display:block" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
+			canvas = api.rootElement.find('canvas[data-id="canvas"]');
 		}
-		api.rootElement.append('<canvas data-id="canvas" style="display:block" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
-		canvas = api.rootElement.find('canvas[data-id="canvas"]');
-		resizeCheck = setInterval(function() {
-			if (canvas.width() !== width() || canvas.height() !== height()) {
-				get().width = width();
-				get().height = height();
-				api.base.handshake();
-			}
-		}, 500);
+		if (resizeCheck == null) {
+			resizeCheck = setInterval(function() {
+				if (!api.mirror && (canvas.width() !== width() || canvas.height() !== height())) {
+					var snapshot = get().getContext("2d").getImageData(0, 0, get().width, get().height);
+					get().width = width();
+					get().height = height();
+					get().getContext("2d").putImageData(snapshot, 0, 0);
+					api.base.handshake();
+				}
+			}, 500);
+		}
 	}
 
 	function dispose() {
 		if (canvas != null) {
-			get().height =0;
+			canvas.remove();
+			canvas = null;
 		}
 		if (resizeCheck != null) {
 			clearInterval(resizeCheck);
+			resizeCheck = null;
 		}
-		canvas = null;
 	}
 
 	function width() {
@@ -38,7 +43,7 @@ define([ 'jquery' ], function($) {
 	}
 
 	function get() {
-		if (canvas == null) {
+		if (canvas == null || resizeCheck != null) {
 			create();
 		}
 		return canvas[0];
@@ -48,7 +53,6 @@ define([ 'jquery' ], function($) {
 		init : function(wsApi) {
 			api = wsApi;
 			wsApi.canvas = {
-				create : create,
 				dispose : dispose,
 				get : get
 			};

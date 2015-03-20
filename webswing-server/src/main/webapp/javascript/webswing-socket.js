@@ -42,7 +42,7 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 		request.onMessage = function(response) {
 			var message = response.responseBody;
 			try {
-				var data
+				var data;
 				if (binary) {
 					data = AppFrameMsgOutProto.decode(message);
 					explodeEnumNames(data);

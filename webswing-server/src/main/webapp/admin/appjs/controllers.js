@@ -120,9 +120,9 @@ angular.module('ws-console.controllers', [])
 				}
 			}
 		}, true);
-		$scope.$watch('mirrorSession.config.control', function(newValue, oldValue) {
-			if (window.webswingmirrorview != null) {
-				window.webswingmirrorview.configure();
+		$scope.$watch('config.control', function(newValue, oldValue) {
+			if (window.webswingadmin!=null && window.webswingadmin.webswingmirrorview != null && newValue!=null) {
+				window.webswingadmin.webswingmirrorview.setControl(newValue);
 			}
 		});
 		$scope.view = function(session) {
@@ -138,24 +138,28 @@ angular.module('ws-console.controllers', [])
 				$scope.mirrorDialog.close();
 			}
 			$scope.mirrorDialog.opened.then(function() {
+				$scope.config={
+					autoStart : false,
+					connectionUrl: document.location.toString().substring(0,document.location.toString().lastIndexOf('admin')),
+					clientId: session.id,
+					applicationName: session.application,
+					control: false,
+					mirrorMode: true
+				};
 				$timeout(function() {
-					$scope.mirrorSession.config = {
-						clientId: session.id,
-						applicationName: session.application,
-						control: false,
-						mirrorMode: true
-					};
 					window.webswingadmin.scan();
-					window.webswingmirrorview.start();
+					window.webswingadmin.webswingmirrorview.disconnect();
+					window.webswingadmin.webswingmirrorview.configure($scope.config);
+					window.webswingadmin.webswingmirrorview.start();
 				}, 1000);
 			});
 			$scope.mirrorDialog.result.then(function() {
-				window.webswingmirrorview.disconnect();
+				window.webswingadmin.webswingmirrorview.disconnect();
 			}, function() {});
 		};
 		$scope.kill = function(session) {
 			if ($scope.mirrorDialog != null) {
-				window.webswingmirrorview.kill();
+				window.webswingadmin.webswingmirrorview.kill();
 			}
 		}
 	}

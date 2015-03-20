@@ -35,7 +35,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private Session session;
 	private MessageProducer producer;
 	private long lastMessageTimestamp = System.currentTimeMillis();
-
+	private Runnable watchdog;
 	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor();
 
 	public static ServerConnectionServiceImpl getInstance() {
@@ -46,8 +46,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	}
 
 	public ServerConnectionServiceImpl() {
-		initialize();
-		Runnable watchdog = new Runnable() {
+		watchdog = new Runnable() {
 
 			@Override
 			public void run() {
@@ -62,10 +61,9 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 				}
 			}
 		};
-		exitScheduler.scheduleWithFixedDelay(watchdog, 10, 10, TimeUnit.SECONDS);
 	}
 
-	private void initialize() {
+	public void initialize() {
 		try {
 			String clientId = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID);
 			connection = connectionFactory.createConnection();
@@ -95,6 +93,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			Logger.error("Exiting swing application because could not connect to JMS:" + e.getMessage(), e);
 			System.exit(1);
 		}
+
+		exitScheduler.scheduleWithFixedDelay(watchdog, 10, 10, TimeUnit.SECONDS);
 	}
 
 	@Override

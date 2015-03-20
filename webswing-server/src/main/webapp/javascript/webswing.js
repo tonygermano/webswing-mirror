@@ -5,18 +5,19 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 	function initInstance(rootElement, options) {
 		var api = {
 			rootElement : rootElement,
-			autoStart : true,
+			autoStart : false,
 			applicationName : null,
 			connectionUrl : document.location.toString(),
+			mirror : false,
 			typedArraysSupported : false,
 			binarySocket : false,// not working yet
-			start : function() {
+			start : function(customization) {
+				if(customization!=null){
+					customization(api);
+				}
 				api.login.login(function() {
 					api.dialog.show(api.dialog.content.initializingDialog);
-					api.socket.connect();
-					if(api.context.mirrorMode){
-						api.base.startMirrorView();
-					}
+					api.socket.connect();	
 				});
 			},
 			newSession : function() {
@@ -42,34 +43,40 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 		polyfill.init(api);
 		configure();
 
-		if (options.customization != null && typeof options.customization === 'function') {
-			options.customization(api);
-		}
-
 		if (api.autoStart) {
 			api.start();
 		} else {
 			api.dialog.show(api.dialog.content.readyDialog);
 		}
 
-		function configure() {
-			var options = readOptions(api.rootElement);
-			api.autoStart = options.autoStart != null ? options.autoStart : api.autoStart;
-			api.applicationName = options.applicationName != null ? options.applicationName : api.applicationName;
-			api.connectionUrl = options.connectionUrl != null ? options.connectionUrl : api.connectionUrl;
-			if(api.connectionUrl.substr(api.connectionUrl.length - 1)!=='/'){
-				api.connectionUrl=api.connectionUrl+'/';
+		function configure(options) {
+			options = options!=null?options:readOptions(api.rootElement);
+			if(options!=null){
+				api.autoStart = options.autoStart != null ? options.autoStart : api.autoStart;
+				api.applicationName = options.applicationName != null ? options.applicationName : api.applicationName;
+				api.connectionUrl = options.connectionUrl != null ? options.connectionUrl : api.connectionUrl;
+				if(api.connectionUrl.substr(api.connectionUrl.length - 1)!=='/'){
+					api.connectionUrl=api.connectionUrl+'/';
+				}
+				api.clientId = options.clientId != null ? options.clientId : api.clientId;
+				api.mirror= options.mirrorMode != null ? options.mirrorMode : api.mirror;	
 			}
-			api.context.hasControl = options.control != null ? options.control : api.context.hasControl;
-			api.context.clientId = options.clientId != null ? options.clientId : api.context.clientId;
-			api.context.mirrorMode = options.mirrorMode != null ? options.mirrorMode : api.context.mirrorMode;
 		}
 
+		function setControl(value){
+			if(value){
+				api.context.hasControl=true;
+			}else{
+				api.context.hasControl=false;
+			}
+		}
+		
 		return {
 			start : api.start,
 			disconnect : api.disconnect,
 			configure : configure,
-			kill : api.base.kill
+			kill : api.base.kill,
+			setControl : setControl
 		};
 
 	}
@@ -86,33 +93,35 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 		return options;
 	}
 
-	function scanForInstances() {
+	function scanForInstances(root) {
+		root= root!=null?root:global;
 		var result = {};
 		var instances = $('[data-webswing-instance]');
 		instances.each(function(index, instance) {
 			var id = $(instance).data('webswingInstance');
-			var api = $(instance).data('webswingInstanceApi');
-			if (api == null) {
-				var options = readOptions($(instance));
-				var wsInstance = initInstance($(instance), options);
-				$(instance).data('webswingInstanceApi', wsInstance);
+			var active=$(instance).data('webswingActive');
+			if (!active) {
+				var wsInstance = initInstance($(instance));
+				$(instance).attr('data-webswing-active','true');
 				if (id != null) {
 					result[id] = wsInstance;
 				}
 			}
 		});
-		return result;
-	}
-
-	var result = scanForInstances();
-
-	var global = $('[data-webswing-global-var]')
-	if (global != null && global.length != 0) {
-		var name = global.data('webswingGlobalVar');
-		result[name] = {
-			scan : scanForInstances
+		for ( var exportName in result) {
+			root[exportName] = result[exportName];
 		}
 	}
 
-	return result;
+	var globalName = $('[data-webswing-global-var]');
+	var global={};
+	if (globalName != null && globalName.length != 0) {
+		var name = globalName.data('webswingGlobalVar');
+		global = window[name] = {
+			scan : scanForInstances
+		};
+		scanForInstances(window[name]);
+	}else{
+		scanForInstances(window);
+	}
 });
