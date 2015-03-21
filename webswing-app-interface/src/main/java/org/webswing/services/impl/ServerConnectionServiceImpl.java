@@ -29,7 +29,7 @@ import org.webswing.util.Util;
 public class ServerConnectionServiceImpl implements MessageListener, ServerConnectionService {
 
 	private static ServerConnectionServiceImpl impl;
-	private static ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Constants.JMS_URL);
+	private static ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(System.getProperty(Constants.JMS_URL));
 
 	private Connection connection;
 	private Session session;

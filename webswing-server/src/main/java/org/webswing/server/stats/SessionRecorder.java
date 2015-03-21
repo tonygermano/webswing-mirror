@@ -12,7 +12,6 @@ import org.webswing.server.SwingInstance;
 
 public class SessionRecorder {
 
-	public static final String RECORDING_FLAG = "recording";
 	FileOutputStream out;
 	private SwingInstance swingInstance;
 

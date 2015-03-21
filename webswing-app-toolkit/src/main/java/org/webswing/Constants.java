@@ -22,7 +22,8 @@ public interface Constants {
 	// JMS queue names
 	public static final String SWING2SERVER = "Swing2Server";
 	public static final String SERVER2SWING = "Server2Swing";
-	public static final String JMS_URL = "nio://127.0.0.1:34455";
+	public static final String JMS_URL = "webswing.jmsUrl";
+	public static final String JMS_URL_DEFAULT = "nio://127.0.0.1:34455";
 
 	// server startup constants
 	public static final String WAR_FILE_LOCATION = "webswing.warLocation";
@@ -34,6 +35,7 @@ public interface Constants {
 	public static final String USER_FILE_PATH = "webswing.usersFilePath";
 	public static final String SERVER_HOST = "webswing.host";
 	public static final String SERVER_PORT = "webswing.port";
+	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";;
 	public static final String DEFAULT_USER_FILE_NAME = "user.properties";
 	public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutAfterDisconectSec";
 
@@ -43,7 +45,12 @@ public interface Constants {
 	public static final int SWING_SCREEN_WIDTH_MIN = 300;
 	public static final int SWING_SCREEN_HEIGHT_MIN = 300;
 
+	// http request header names
+	public static final String HTTP_ATTR_RECORDING_FLAG = "webswing-recording";
+	public static final String HTTP_ATTR_ARGS = "webswing-args";
+
 	// admin console constants
 	public static final String ADMIN_ROLE = "admin";
 	public static final String ADMIN_CONSOLE_APP_NAME = "adminConsoleApplicationName";
+
 }

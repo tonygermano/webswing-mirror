@@ -28,11 +28,8 @@ import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.c2s.PasteEventMsgIn;
 import org.webswing.model.c2s.UploadedEventMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
-import org.webswing.model.server.SwingApplicationDescriptor;
-import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstanceManager;
 import org.webswing.server.model.EncodedMessage;
-import org.webswing.server.stats.SessionRecorder;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.server.util.StatUtils;
 
@@ -47,21 +44,9 @@ public class SwingAsyncManagedService {
 	@DeliverTo(DELIVER_TO.RESOURCE)
 	public void onReady(final AtmosphereResource r) {
 		resourceMap.put(r.uuid(), r);
-		r.getRequest().setAttribute(ApplicationSelectorServlet.APPLICATION_CUSTOM_ARGS, r.getRequest().getSession().getAttribute(ApplicationSelectorServlet.APPLICATION_CUSTOM_ARGS));
-		r.getRequest().setAttribute(SessionRecorder.RECORDING_FLAG, r.getRequest().getSession().getAttribute(SessionRecorder.RECORDING_FLAG));
-		String preSelectedApplicationName = ServerUtil.getPreSelectedApplication(r.getRequest(), true);
 		boolean includeAdminApp = ServerUtil.isUserinRole(r, Constants.ADMIN_ROLE);
-		Map<String, SwingApplicationDescriptor> applicationsMap = ConfigurationManager.getInstance().getApplications();
-		if (preSelectedApplicationName != null) {
-			includeAdminApp = false;
-			SwingApplicationDescriptor preSelectedApp = applicationsMap.get(preSelectedApplicationName);
-			applicationsMap.clear();
-			if (preSelectedApp != null) {
-				applicationsMap.put(preSelectedApplicationName, preSelectedApp);
-			}
-		}
 		AppFrameMsgOut appInfo = new AppFrameMsgOut();
-		appInfo.setApplications(ServerUtil.createApplicationJsonInfo(r, applicationsMap, includeAdminApp));
+		appInfo.setApplications(ServerUtil.createApplicationInfoMsg(r, includeAdminApp));
 		EncodedMessage encoded = new EncodedMessage(appInfo);
 		if (r.forceBinaryWrite()) {
 			r.write(encoded.getProtoMessage());

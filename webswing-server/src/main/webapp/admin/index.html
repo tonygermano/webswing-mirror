@@ -30,7 +30,7 @@
           <li><a href="#/settings/overview" ng-click="location='settings';active='overview'">Settings</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="/logout">Logout</a></li>
+          <li><a onclick="javascript:location.href=document.location.toString().substring(0,document.location.toString().lastIndexOf('admin'))+'logout'">Logout</a></li>
           <li>
             <span class="label label-success admin-connection-status" ng-if="connected">Connected</span>
             <span class="label label-danger admin-connection-status" ng-if="!connected">Disconnected</span>
@@ -57,7 +57,7 @@
 	(function (window, document) {
 	  var loader = function () {
 	    var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
-	    script.src =  "/javascript/webswing-embed.js";
+	    script.src =  document.location.toString().substring(0,document.location.toString().lastIndexOf('admin'))+"javascript/webswing-embed.js";
 	    tag.parentNode.insertBefore(script, tag);
 	  };
 	  window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);

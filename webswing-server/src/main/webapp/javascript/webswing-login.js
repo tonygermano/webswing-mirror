@@ -25,7 +25,7 @@ define([ 'jquery', 'text!templates/login.html' ], function($, html) {
 		$.ajax({
 			xhrFields: { withCredentials: true },
 			type : 'POST',
-			url : api.connectionUrl+'login?mode=swing',
+			url : api.connectionUrl+'login' + (api.anonym?'?mode=anonym':''),
 			data : loginDialogVisible() ? api.rootElement.find('form[data-id="loginForm"]').serialize() : '',
 			success : function(data) {
 				if (loginDialogVisible()) {

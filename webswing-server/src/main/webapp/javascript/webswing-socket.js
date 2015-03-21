@@ -17,19 +17,25 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 			trackMessageLength : true,
 			reconnectInterval : 5000,
 			fallbackTransport : 'long-polling',
-			enableXDR : true
+			enableXDR : true,
+			headers : {}
 		};
 
 		if (binary) {
-			request.headers = {
-				'X-Atmosphere-Binary' : true
-			};
+			request.headers['X-Atmosphere-Binary']=true;
 			request.enableProtocol = false;
 			request.trackMessageLength = false;
 			request.contentType = 'application/octet-stream';
 			request.webSocketBinaryType = 'arraybuffer';
-
 		}
+
+		if(api.args!=null){
+			request.headers['webswing-args']=api.args;
+		}
+		if(api.recording!=null){
+			request.headers['webswing-recording']=api.recording;
+		}
+
 
 		request.onOpen = function(response) {
 			uuid = response.request.uuid + '';

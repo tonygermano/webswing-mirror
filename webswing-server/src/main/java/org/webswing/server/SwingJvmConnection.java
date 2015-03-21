@@ -49,6 +49,7 @@ import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.handler.FileServlet;
+import org.webswing.server.handler.JmsService;
 import org.webswing.server.util.Los;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.server.util.SwingAntTimestampedLogger;
@@ -268,6 +269,7 @@ public class SwingJvmConnection implements MessageListener {
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_CLIENT_ID, clientId);
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_CLASS_PATH, appConfig.generateClassPathString());
 						addSysProperty(javaTask, Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
+						addSysProperty(javaTask, Constants.JMS_URL, JmsService.getUrl());
 
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_MAIN_CLASS, appConfig.getMainClass());
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs() + "");

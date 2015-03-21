@@ -187,7 +187,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			}
 
 			function print(url) {
-				window.open(api.connectionUrl + 'print/viewer.html?file=/' + url, '_blank');
+				window.open(api.connectionUrl + 'print/viewer.html?file=' + url, '_blank');
 			}
 
 			return {

@@ -7,14 +7,21 @@
 <link rel="stylesheet" href="css/webswing.css" />
 </head>
 <body>
-	<div class="webswing-element" data-webswing-instance="webswing" data-webswing-options="{autoStart:true, applicationName:null, connectionUrl:null}">
+	<div class="webswing-element" data-webswing-instance="webswing" data-webswing-options="{autoStart:true, applicationName:getParam('app'), args:getParam('args'), anonym:getParam('anonym'), recording:getParam('recording')}">
 	</div>
 
+	<script>
+	var getParam = function (name) {
+		  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+		  var results = new RegExp("[\\?&]"+name+"=([^&#]*)").exec( location.href );
+		  return results == null ? null : decodeURIComponent(results[1]);
+	}
+	</script>
 	<script>
 	(function (window, document) {
 	  var loader = function () {
 	    var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
-	    script.src =  document.location.toString()+"javascript/webswing-embed.js";
+	    script.src =  document.location.origin + document.location.pathname + "javascript/webswing-embed.js";
 	    tag.parentNode.insertBefore(script, tag);
 	  };
 	  window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);

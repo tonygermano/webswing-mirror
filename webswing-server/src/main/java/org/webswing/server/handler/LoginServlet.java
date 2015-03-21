@@ -1,7 +1,6 @@
 package org.webswing.server.handler;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -16,9 +15,6 @@ import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.webswing.model.server.SwingApplicationDescriptor;
-import org.webswing.server.ConfigurationManager;
-import org.webswing.server.util.ServerUtil;
 
 public class LoginServlet extends HttpServlet {
 
@@ -29,14 +25,15 @@ public class LoginServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Subject currentUser = SecurityUtils.getSubject();
 		try {
-			AuthenticationToken token = new UsernamePasswordToken(req.getParameter("username"), req.getParameter("password"));
-			if (accessingAnonymousSwingApp(req)) {
+			AuthenticationToken token;
+			if (!isAnonymousMode(req)) {
+				token = new UsernamePasswordToken(req.getParameter("username"), req.getParameter("password"));
+			} else {
 				// TODO: anonym user is dynamicly created in WebSwingPropertiesRealm constructor. If this is replaced it wont work. Find better solution!
 				token = new UsernamePasswordToken(anonymUserName, anonymSecretPassword);
 			}
 			currentUser.login(token);
 			authorizeAccess(req, resp);
-			// WebUtils.redirectToSavedRequest(req, resp, "index.xhtml");
 		} catch (AuthenticationException e) {
 			if (currentUser.isAuthenticated()) {
 				authorizeAccess(req, resp);
@@ -74,23 +71,9 @@ public class LoginServlet extends HttpServlet {
 		}
 	}
 
-	private boolean accessingAnonymousSwingApp(HttpServletRequest req) {
-		if ("swing".equals(req.getParameter("mode"))) {
-			String app = ServerUtil.getPreSelectedApplication(req, false);
-			Map<String, SwingApplicationDescriptor> applicationsMap = ConfigurationManager.getInstance().getApplications();
-			if (app != null) {
-				SwingApplicationDescriptor swingApplicationDescriptor = applicationsMap.get(app);
-				if (swingApplicationDescriptor != null) {
-					return !swingApplicationDescriptor.isAuthentication() && !swingApplicationDescriptor.isAuthorization();
-				}
-			} else {
-				for (SwingApplicationDescriptor desc : applicationsMap.values()) {
-					if (desc.isAuthentication() || desc.isAuthorization()) {
-						return false;
-					}
-				}
-				return true;
-			}
+	private boolean isAnonymousMode(HttpServletRequest req) {
+		if ("anonym".equals(req.getParameter("mode"))) {
+			return true;
 		}
 		return false;
 	}

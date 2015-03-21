@@ -39,12 +39,11 @@ import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
+import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstance;
-import org.webswing.server.handler.ApplicationSelectorServlet;
 import org.webswing.server.handler.FileServlet;
 import org.webswing.server.handler.LoginServlet;
 import org.webswing.server.model.EncodedMessage;
-import org.webswing.server.stats.SessionRecorder;
 
 public class ServerUtil {
 
@@ -74,7 +73,7 @@ public class ServerUtil {
 
 	public static Object decodeJson(String s) {
 		Object o = null;
-		Class<?>[] classes = new Class<?>[] { InputEventsFrameMsgIn.class,ApplyConfigurationMsgIn.class };
+		Class<?>[] classes = new Class<?>[] { InputEventsFrameMsgIn.class, ApplyConfigurationMsgIn.class };
 		for (Class<?> c : classes) {
 			try {
 				o = mapper.readValue(s, c);
@@ -100,31 +99,31 @@ public class ServerUtil {
 		return o;
 	}
 
-	public static List<ApplicationInfoMsg> createApplicationJsonInfo(AtmosphereResource r, Map<String, SwingApplicationDescriptor> applications, boolean includeAdminApp) {
+	public static List<ApplicationInfoMsg> createApplicationInfoMsg(AtmosphereResource r, boolean includeAdminApp) {
+		Map<String, SwingApplicationDescriptor> applications = ConfigurationManager.getInstance().getApplications();
 		List<ApplicationInfoMsg> apps = new ArrayList<ApplicationInfoMsg>();
 		if (applications.size() == 0) {
 			return null;
 		} else {
 			for (String name : applications.keySet()) {
 				SwingApplicationDescriptor descriptor = applications.get(name);
-				if (!isUserAuthorizedForApplication(r, descriptor)) {
-					continue;
-				}
-				ApplicationInfoMsg app = new ApplicationInfoMsg();
-				app.setName(name);
-				if (descriptor.getIcon() == null) {
-					app.setBase64Icon(loadImage(null));
-				} else {
-					if (new File(descriptor.getIcon()).exists()) {
-						app.setBase64Icon(loadImage(descriptor.getIcon()));
-					} else if (new File(descriptor.getHomeDir() + File.separator + descriptor.getIcon()).exists()) {
-						app.setBase64Icon(loadImage(descriptor.getHomeDir() + File.separator + descriptor.getIcon()));
-					} else {
-						log.error("Icon loading failed. File " + descriptor.getIcon() + " or " + descriptor.getHomeDir() + File.separator + descriptor.getIcon() + " does not exist.");
+				if (isUserAuthorizedForApplication(r, descriptor)) {
+					ApplicationInfoMsg app = new ApplicationInfoMsg();
+					app.setName(name);
+					if (descriptor.getIcon() == null) {
 						app.setBase64Icon(loadImage(null));
+					} else {
+						if (new File(descriptor.getIcon()).exists()) {
+							app.setBase64Icon(loadImage(descriptor.getIcon()));
+						} else if (new File(descriptor.getHomeDir() + File.separator + descriptor.getIcon()).exists()) {
+							app.setBase64Icon(loadImage(descriptor.getHomeDir() + File.separator + descriptor.getIcon()));
+						} else {
+							log.error("Icon loading failed. File " + descriptor.getIcon() + " or " + descriptor.getHomeDir() + File.separator + descriptor.getIcon() + " does not exist.");
+							app.setBase64Icon(loadImage(null));
+						}
 					}
+					apps.add(app);
 				}
-				apps.add(app);
 			}
 			if (includeAdminApp) {
 				ApplicationInfoMsg adminConsole = new ApplicationInfoMsg();
@@ -298,21 +297,13 @@ public class ServerUtil {
 		return encode2Json(response);
 	}
 
-	public static String getPreSelectedApplication(HttpServletRequest r, boolean reset) {
-		String application = (String) r.getSession().getAttribute(ApplicationSelectorServlet.SELECTED_APPLICATION);
-		if (reset) {
-			r.getSession().removeAttribute(ApplicationSelectorServlet.SELECTED_APPLICATION);
-		}
-		return application;
-	}
-
 	public static boolean isRecording(HttpServletRequest r) {
-		String recording = (String) r.getAttribute(SessionRecorder.RECORDING_FLAG);
+		String recording = (String) r.getHeader(Constants.HTTP_ATTR_RECORDING_FLAG);
 		return Boolean.parseBoolean(recording);
 	}
 
 	public static String getCustomArgs(HttpServletRequest r) {
-		String args = (String) r.getAttribute(ApplicationSelectorServlet.APPLICATION_CUSTOM_ARGS);
+		String args = (String) r.getHeader(Constants.HTTP_ATTR_ARGS);
 		return args != null ? args : "";
 	}
 

@@ -20,6 +20,7 @@ public class ServerMain {
 	public static void main(String[] args) throws Exception {
 		Configuration config = ConfigurationImpl.parse(args);
 		System.out.println(config.toString());
+		System.setProperty(Constants.SERVER_EMBEDED_FLAG, "true");
 		System.setProperty(Constants.SERVER_PORT, config.getHttpPort());
 		System.setProperty(Constants.SERVER_HOST, config.getHost());
 		if (config.getConfigFile() != null) {

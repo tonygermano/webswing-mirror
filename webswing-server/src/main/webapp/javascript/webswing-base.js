@@ -35,16 +35,16 @@
 		api.dialog.show(api.dialog.content.startingDialog);
 	}
 
-	function startMirrorView(clientId,appName) {
+	function startMirrorView(clientId, appName) {
 		api.canvas.get();
 		registerEventListeners(api.canvas.get());
 		resetState();
 		api.context = {
-				clientId : clientId,
-				appName : appName,
-				hasControl : false,
-				mirrorMode : true,
-				canPaint : true
+			clientId : clientId,
+			appName : appName,
+			hasControl : false,
+			mirrorMode : true,
+			canPaint : true
 		};
 		handshake();
 		repaint();
@@ -181,7 +181,7 @@
 			if (data.linkAction.action == 'url') {
 				api.files.link(data.linkAction.src);
 			} else if (data.linkAction.action == 'print') {
-				api.files.print(encodeURIComponent('file?id=' + data.linkAction.src));
+				api.files.print(encodeURIComponent(location.pathname + 'file?id=' + data.linkAction.src));
 			} else if (data.linkAction.action == 'file') {
 				api.files.download('file?id=' + data.linkAction.src);
 			}
@@ -284,10 +284,10 @@
 
 	function adjustCanvasSize(canvas, width, height) {
 		if (canvas.width != width || canvas.height != height) {
-			var snapshot=canvas.getContext("2d").getImageData(0,0,canvas.width,canvas.height);
+			var snapshot = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
 			canvas.width = width;
 			canvas.height = height;
-			canvas.getContext("2d").putImageData(snapshot,0,0);
+			canvas.getContext("2d").putImageData(snapshot, 0, 0);
 		}
 	}
 

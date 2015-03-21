@@ -49,12 +49,11 @@ public class AdminAsyncManagedService implements ConfigurationManager.Configurat
 	@Ready
 	@DeliverTo(DELIVER_TO.RESOURCE)
 	public void onReady(final AtmosphereResource r) {
-		Subject sub = SecurityUtils.getSubject();
-		if (sub.hasRole(Constants.ADMIN_ROLE)) {
+		if (ServerUtil.isUserinRole(r, Constants.ADMIN_ROLE)) {
 			resourceMap.put(r.uuid(), r);
 			broadcast(createAdminConsoleUpdate(true, true));
 		} else {
-			log.warn("Unauthorized connection atempt from " + sub.getPrincipal());
+			log.warn("Unauthorized connection atempt from " + ServerUtil.getUserName(r));
 			try {
 				r.close();
 			} catch (IOException e) {

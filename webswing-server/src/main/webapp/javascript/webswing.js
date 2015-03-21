@@ -7,17 +7,20 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 			rootElement : rootElement,
 			autoStart : false,
 			applicationName : null,
-			connectionUrl : document.location.toString(),
+			args : null,
+			anonym : false,
+			connectionUrl : location.origin + location.pathname,
 			mirror : false,
 			typedArraysSupported : false,
 			binarySocket : false,// not working yet
+			recording : false,
 			start : function(customization) {
-				if(customization!=null){
+				if (customization != null) {
 					customization(api);
 				}
 				api.login.login(function() {
 					api.dialog.show(api.dialog.content.initializingDialog);
-					api.socket.connect();	
+					api.socket.connect();
 				});
 			},
 			newSession : function() {
@@ -50,27 +53,30 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 		}
 
 		function configure(options) {
-			options = options!=null?options:readOptions(api.rootElement);
-			if(options!=null){
+			options = options != null ? options : readOptions(api.rootElement);
+			if (options != null) {
 				api.autoStart = options.autoStart != null ? options.autoStart : api.autoStart;
 				api.applicationName = options.applicationName != null ? options.applicationName : api.applicationName;
-				api.connectionUrl = options.connectionUrl != null ? options.connectionUrl : api.connectionUrl;
-				if(api.connectionUrl.substr(api.connectionUrl.length - 1)!=='/'){
-					api.connectionUrl=api.connectionUrl+'/';
-				}
+				api.args = options.args != null ? options.args : api.args;
+				api.anonym = options.anonym ? true : false;
+				api.recording = options.recording ? true : false;
 				api.clientId = options.clientId != null ? options.clientId : api.clientId;
-				api.mirror= options.mirrorMode != null ? options.mirrorMode : api.mirror;	
+				api.mirror = options.mirrorMode != null ? options.mirrorMode : api.mirror;
+				api.connectionUrl = options.connectionUrl != null ? options.connectionUrl : api.connectionUrl;
+				if (api.connectionUrl.substr(api.connectionUrl.length - 1) !== '/') {
+					api.connectionUrl = api.connectionUrl + '/';
+				}
 			}
 		}
 
-		function setControl(value){
-			if(value){
-				api.context.hasControl=true;
-			}else{
-				api.context.hasControl=false;
+		function setControl(value) {
+			if (value) {
+				api.context.hasControl = true;
+			} else {
+				api.context.hasControl = false;
 			}
 		}
-		
+
 		return {
 			start : api.start,
 			disconnect : api.disconnect,
@@ -94,15 +100,15 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 	}
 
 	function scanForInstances(root) {
-		root= root!=null?root:global;
+		root = root != null ? root : global;
 		var result = {};
 		var instances = $('[data-webswing-instance]');
 		instances.each(function(index, instance) {
 			var id = $(instance).data('webswingInstance');
-			var active=$(instance).data('webswingActive');
+			var active = $(instance).data('webswingActive');
 			if (!active) {
 				var wsInstance = initInstance($(instance));
-				$(instance).attr('data-webswing-active','true');
+				$(instance).attr('data-webswing-active', 'true');
 				if (id != null) {
 					result[id] = wsInstance;
 				}
@@ -114,14 +120,14 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 	}
 
 	var globalName = $('[data-webswing-global-var]');
-	var global={};
+	var global = {};
 	if (globalName != null && globalName.length != 0) {
 		var name = globalName.data('webswingGlobalVar');
 		global = window[name] = {
 			scan : scanForInstances
 		};
 		scanForInstances(window[name]);
-	}else{
+	} else {
 		scanForInstances(window);
 	}
 });

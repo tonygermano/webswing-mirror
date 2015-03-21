@@ -56,10 +56,14 @@ public class JmsService implements ServletContextListener {
 		memoryManager.setMemoryUsage(memoryLimit);
 		broker.setSystemUsage(memoryManager);
 		// configure the broker
-		broker.addConnector(Constants.JMS_URL);
+		broker.addConnector(getUrl());
 
 		broker.start();
 		return broker;
 
+	}
+
+	public static String getUrl() {
+		return System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT);
 	}
 }

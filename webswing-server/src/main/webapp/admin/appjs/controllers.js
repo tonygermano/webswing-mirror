@@ -39,7 +39,7 @@ angular.module('ws-console.controllers', [])
 			$scope.login = function() {
 				$http({
 					method: 'POST',
-					url: '/login?role=admin',
+					url: document.location.toString().substring(0,document.location.toString().lastIndexOf('admin'))+'login?role=admin',
 					data: $.param($scope.loginForm),
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -62,7 +62,7 @@ angular.module('ws-console.controllers', [])
 						$scope.loginDialog = null;
 					}
 					$scope.socket = atmosphereService.subscribe({
-						url: '/async/admin',
+						url: document.location.toString().substring(0,document.location.toString().lastIndexOf('admin'))+'async/admin',
 						contentType: "application/json",
 						logLevel: 'debug',
 						transport: 'websocket',
