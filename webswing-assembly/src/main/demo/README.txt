@@ -1,1 +1,27 @@
+Webswing comes with an embeded jetty web server so to start it just 
 execute start.bat(.sh), open browser (IE9+,Chrome,FF) and load http://localhost:8080
+
+
+
+In case you want to deploy in Tomcat 8, add the following properties to your catalina.properties file:
+
+webswing.warLocation=/path/to/tomcat8/webapps/webswing-server.war
+webswing.usersFilePath=/path/to/user.properties
+webswing.configFile=/path/to/webswing.config
+webswing.tempDirBase=/path/to/tempfolder
+
+
+
+To embed webswing into your web page, just add following snippet (for all available options check the online documentation):
+
+<div style="height:500px;" data-webswing-instance="webswing" data-webswing-options="{autoStart:true, anonym:true, args='foo', applicationName:'SwingSet3', connectionUrl:'http://<webswing-host-and-port>'}">
+<script>
+	(function (window, document) {
+	  var loader = function () {
+	    var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+	    script.src =  "http://<webswing-host-and-port>/javascript/webswing-embed.js";
+	    tag.parentNode.insertBefore(script, tag);
+	  };
+	  window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+	})(window, document);
+</script>

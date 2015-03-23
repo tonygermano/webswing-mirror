@@ -20,13 +20,12 @@ public class CorsFilter implements Filter {
 		if (req.getHeader("Origin") != null) {
 			res.addHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
 			res.addHeader("Access-Control-Allow-Credentials", "true");
-			res.addHeader("Access-Control-Expose-Headers", "X-Cache-Date, X-Atmosphere-tracking-id");
+			res.addHeader("Access-Control-Expose-Headers", "X-Cache-Date, X-Atmosphere-tracking-id, X-Requested-With");
 		}
 
 		if ("OPTIONS".equals(req.getMethod())) {
 			res.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-			res.addHeader("Access-Control-Allow-Credentials", "true");
-			res.addHeader("Access-Control-Allow-Headers", " Origin, Content-Type, Content-Range, Content-Disposition, Content-Description, X-Atmosphere-Framework, X-Cache-Date, X-Atmosphere-tracking-id, X-Atmosphere-Transport");
+			res.addHeader("Access-Control-Allow-Headers", "X-Requested-With, Origin, Content-Type, Content-Range, Content-Disposition, Content-Description, X-Atmosphere-Framework, X-Cache-Date, X-Atmosphere-tracking-id, X-Atmosphere-Transport");
 			res.addHeader("Access-Control-Max-Age", "-1");
 		}
 		chain.doFilter(req, res);
