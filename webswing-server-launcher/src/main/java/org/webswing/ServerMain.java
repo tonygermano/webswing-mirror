@@ -40,6 +40,10 @@ public class ServerMain {
 			}
 		}
 
+		if (config.getAllowedCorsOrigins() != null) {
+			System.setProperty(Constants.ALLOWED_CORS_ORIGINS, config.getAllowedCorsOrigins());
+		}
+
 		Server server = new Server();
 		List<Connector> connectors = new ArrayList<Connector>();
 		if (config.isHttp()) {

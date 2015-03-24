@@ -9,7 +9,8 @@ webswing.warLocation=/path/to/tomcat8/webapps/webswing-server.war
 webswing.usersFilePath=/path/to/user.properties
 webswing.configFile=/path/to/webswing.config
 webswing.tempDirBase=/path/to/tempfolder
-
+#if want to embed to page hosted on different domain (set * for all)
+webswing.corsOrigins=http://other.domain1, http://other.domain2
 
 
 To embed webswing into your web page, just add following snippet (for all available options check the online documentation):

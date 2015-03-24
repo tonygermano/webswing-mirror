@@ -119,6 +119,12 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 		}
 	}
 
+	//fix for ie
+	if (!window.location.origin) {
+		window.location.origin = window.location.protocol + "//" + window.location.hostname
+				+ (window.location.port ? ':' + window.location.port : '');
+	}
+
 	var globalName = $('[data-webswing-global-var]');
 	var global = {};
 	if (globalName != null && globalName.length != 0) {

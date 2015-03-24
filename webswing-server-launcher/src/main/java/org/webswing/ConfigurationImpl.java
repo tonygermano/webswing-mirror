@@ -31,6 +31,8 @@ public class ConfigurationImpl extends Configuration {
 	private String configFile;
 	private String usersFile;
 
+	private String allowedCorsOrigins;
+
 	public static Configuration parse(String[] args) {
 		ConfigurationImpl cimpl = (ConfigurationImpl) Configuration.getInstance();
 		// create the command line parser
@@ -53,6 +55,8 @@ public class ConfigurationImpl extends Configuration {
 		options.addOption("c", "config", true, "Configuration file name. (<webswing-server.war path>/webswing.config)");
 		options.addOption("u", "users", true, "Users properties file name. (<webswing-server.war path>/users.properties)");
 		options.addOption("j", "jetty", true, "Jetty startup configuration file. (./jetty.properties)");
+
+		options.addOption("o", "cors", true, "Comma separated list of allowed domains to embeded webswing page in. '*' for allow all. (Default:none)");
 
 		try {
 			// parse the command line arguments
@@ -105,6 +109,10 @@ public class ConfigurationImpl extends Configuration {
 			if (line.getOptionValue('u') != null) {
 				cimpl.setUsersFile(line.getOptionValue('u'));
 			}
+
+			if (line.getOptionValue('o') != null) {
+				cimpl.setAllowedCorsOrigins(line.getOptionValue('o'));
+			}
 			// NOTE: -d and -t are parsed in main.Main
 		} catch (ParseException exp) {
 			Logger.info(exp.getMessage());
@@ -131,6 +139,7 @@ public class ConfigurationImpl extends Configuration {
 		setTruststorePassword(prop.getProperty("org.webswing.server.https.truststore.password"));
 		setKeystore(prop.getProperty("org.webswing.server.https.keystore"));
 		setKeystorePassword(prop.getProperty("org.webswing.server.https.keystore.password"));
+		setAllowedCorsOrigins(prop.getProperty("org.webswing.server.allowedCorsOrigins"));
 	}
 
 	public String getHost() {
@@ -221,10 +230,18 @@ public class ConfigurationImpl extends Configuration {
 		this.usersFile = usersFile;
 	}
 
+	public String getAllowedCorsOrigins() {
+		return allowedCorsOrigins;
+	}
+
+	public void setAllowedCorsOrigins(String allowedCorsOrigins) {
+		this.allowedCorsOrigins = allowedCorsOrigins;
+	}
+
 	@Override
 	public String toString() {
 		return "########################Server Configuration ################################\n" + " host=" + host + "\n http=" + http + "\n httpPort=" + httpPort + "\n https=" + https + "\n httpsPort=" + httpsPort + "\n truststore=" + truststore + "\n truststorePassword=***" + "\n keystore=" + keystore + "\n keystorePassword=***"
-				+ "\n configFile=" + configFile + "\n usersFile=" + usersFile + "\n########################Server Configuration End#############################\n";
+				+ "\n configFile=" + configFile + "\n usersFile=" + usersFile + "\n allowedCorsOrigins=" + allowedCorsOrigins + "\n########################Server Configuration End#############################\n";
 	}
 
 }

@@ -18,6 +18,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_ALLOW_DOWNLOAD = "webswing.allowDownload";
 	public static final String SWING_START_SYS_PROP_ALLOW_UPLOAD = "webswing.allowUpload";
 	public static final String SWING_START_SYS_PROP_ALLOW_DELETE = "webswing.allowDelete";
+	public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutAfterDisconectSec";
 
 	// JMS queue names
 	public static final String SWING2SERVER = "Swing2Server";
@@ -37,7 +38,7 @@ public interface Constants {
 	public static final String SERVER_PORT = "webswing.port";
 	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";;
 	public static final String DEFAULT_USER_FILE_NAME = "user.properties";
-	public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutAfterDisconectSec";
+	public static final String ALLOWED_CORS_ORIGINS = "webswing.corsOrigins";
 
 	// other
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";
@@ -46,8 +47,8 @@ public interface Constants {
 	public static final int SWING_SCREEN_HEIGHT_MIN = 300;
 
 	// http request header names
-	public static final String HTTP_ATTR_RECORDING_FLAG = "webswing-recording";
-	public static final String HTTP_ATTR_ARGS = "webswing-args";
+	public static final String HTTP_ATTR_RECORDING_FLAG = "X-webswing-recording";
+	public static final String HTTP_ATTR_ARGS = "X-webswing-args";
 
 	// admin console constants
 	public static final String ADMIN_ROLE = "admin";
