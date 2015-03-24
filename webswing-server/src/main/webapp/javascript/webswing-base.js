@@ -420,8 +420,8 @@
 		var rect = canvas.getBoundingClientRect();
 		var root = document.documentElement;
 		// return relative mouse position
-		var mouseX = evt.clientX - rect.left - root.scrollTop;
-		var mouseY = evt.clientY - rect.top - root.scrollLeft;
+		var mouseX = evt.clientX - rect.left;
+		var mouseY = evt.clientY - rect.top;
 		var delta = 0;
 		if (type == 'mousewheel') {
 			delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
