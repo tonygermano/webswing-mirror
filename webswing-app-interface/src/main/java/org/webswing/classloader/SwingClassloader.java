@@ -92,8 +92,8 @@ public class SwingClassloader extends ClassLoader {
 		methodReplacementBuilder.put("java.lang.ClassLoader getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;", "org.webswing.special.RedirectedMethods getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;");
 		methodReplacementBuilder.put("java.lang.ClassLoader getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;", "org.webswing.special.RedirectedMethods getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;");
 		methodReplacementBuilder.put("javax.swing.RepaintManager setCurrentManager (Ljavax/swing/RepaintManager;)V", "org.webswing.special.RedirectedMethods setCurrentManager (Ljavax/swing/RepaintManager;)V");
-		methodReplacementBuilder.put("java.lang.System setErr (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy ()V");
-		methodReplacementBuilder.put("java.lang.System setOut (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy2 ()V");
+		methodReplacementBuilder.put("java.lang.System setErr (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods setErr (Ljava/io/PrintStream;)V");
+		methodReplacementBuilder.put("java.lang.System setOut (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods setOut (Ljava/io/PrintStream;)V");
 		methodReplacementBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
 		if (System.getProperty(org.webswing.Constants.SWING_START_SYS_PROP_ISOLATED_FS, "").equalsIgnoreCase("true")) {
 			methodReplacementBuilder.put("java.io.File listRoots ()[Ljava/io/File;", "org.webswing.special.RedirectedMethods listRoots ()[Ljava/io/File;");
@@ -242,7 +242,7 @@ public class SwingClassloader extends ClassLoader {
 
 			// dump
 			// try {
-			// if (cg.getClassName().equals("org.webswing.special.RedirectedJOptionPane"))
+			// if (cg.getClassName().equals("org.netbeans.core.startup.TopLogging"))
 			// cg.getJavaClass().dump(cg.getClassName() + ".class");
 			// } catch (Exception ex) {
 			// ex.printStackTrace();
