@@ -259,7 +259,7 @@ public class SwingJvmConnection implements MessageListener {
 
 						if (!System.getProperty("os.name", "").startsWith("Windows")) {
 							// filesystem isolation support on non windows systems:
-							bootCp += File.pathSeparatorChar + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator)) + File.separator + "rt-win-shell-1.6.0_45.jar\"";
+							bootCp += File.pathSeparatorChar + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator)) + File.separator + "rt-win-shell.jar\"";
 						}
 						log.info("Setting bootclasspath to: " + bootCp);
 						String debug = appConfig.isDebug() ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
