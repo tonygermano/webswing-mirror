@@ -30,10 +30,10 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 		}
 
 		if(api.args!=null){
-			request.headers['webswing-args']=api.args;
+			request.headers['X-webswing-args']=api.args;
 		}
 		if(api.recording!=null){
-			request.headers['webswing-recording']=api.recording;
+			request.headers['X-webswing-recording']=api.recording;
 		}
 
 
