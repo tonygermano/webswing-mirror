@@ -9,9 +9,16 @@ import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
 import org.apache.activemq.usage.MemoryUsage;
 import org.apache.activemq.usage.SystemUsage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 
 public class JmsService implements ServletContextListener {
+
+	private static final Logger log = LoggerFactory.getLogger(JmsService.class);
+
+	private final static long defaultOveralMemLimit = 80 * 1024 * 1024;
+	private final static long defaultDestMemLimit = 5 * 1024 * 1024;
 
 	private BrokerService broker;
 
@@ -19,7 +26,7 @@ public class JmsService implements ServletContextListener {
 		try {
 			broker = startService();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Failed to start JMS service.", e);
 		}
 	}
 
@@ -27,7 +34,7 @@ public class JmsService implements ServletContextListener {
 		try {
 			broker.stop();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Failed to stop JMS service.", e);
 		}
 	}
 
@@ -45,13 +52,14 @@ public class JmsService implements ServletContextListener {
 		pendingMessageLimitStrategy.setLimit(10);
 		defaultEntry.setPendingMessageLimitStrategy(pendingMessageLimitStrategy);
 		defaultEntry.setMemoryLimit(5 * 1024 * 1024);
+		defaultEntry.setMemoryLimit(getDestinationMemoryLimit());
 
 		policyMap.setDefaultEntry(defaultEntry);
 		broker.setDestinationPolicy(policyMap);
 
 		SystemUsage memoryManager = new SystemUsage();
 		MemoryUsage memoryLimit = new MemoryUsage();
-		memoryLimit.setLimit(80 * 1024 * 1024);
+		memoryLimit.setLimit(getOveralMemoryLimit());
 
 		memoryManager.setMemoryUsage(memoryLimit);
 		broker.setSystemUsage(memoryManager);
@@ -61,6 +69,30 @@ public class JmsService implements ServletContextListener {
 		broker.start();
 		return broker;
 
+	}
+
+	private long getOveralMemoryLimit() {
+		long result = defaultOveralMemLimit;
+		if (System.getProperty(Constants.JMS_OVERAL_MEM_LIMIT) != null) {
+			try {
+				result = Long.parseLong(System.getProperty(Constants.JMS_OVERAL_MEM_LIMIT));
+			} catch (NumberFormatException e) {
+				log.error("System property " + Constants.JMS_OVERAL_MEM_LIMIT + " is not valid. Number value is expected (number of bytes).", e);
+			}
+		}
+		return result;
+	}
+
+	private long getDestinationMemoryLimit() {
+		long result = defaultDestMemLimit;
+		if (System.getProperty(Constants.JMS_DEST_MEM_LIMIT) != null) {
+			try {
+				result = Long.parseLong(System.getProperty(Constants.JMS_DEST_MEM_LIMIT));
+			} catch (NumberFormatException e) {
+				log.error("System property " + Constants.JMS_DEST_MEM_LIMIT + " is not valid. Number value is expected (number of bytes).", e);
+			}
+		}
+		return result;
 	}
 
 	public static String getUrl() {

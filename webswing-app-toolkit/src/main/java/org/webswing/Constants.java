@@ -39,6 +39,8 @@ public interface Constants {
 	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";;
 	public static final String DEFAULT_USER_FILE_NAME = "user.properties";
 	public static final String ALLOWED_CORS_ORIGINS = "webswing.corsOrigins";
+	public static final String JMS_OVERAL_MEM_LIMIT = "webswing.jmsOveralMemoryLimit";
+	public static final String JMS_DEST_MEM_LIMIT = "webswing.jmsDestinationMemoryLimit";
 
 	// other
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";

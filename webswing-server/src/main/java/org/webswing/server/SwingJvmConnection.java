@@ -154,7 +154,7 @@ public class SwingJvmConnection implements MessageListener {
 				if (o instanceof MsgInternal) {
 					if (o instanceof PrinterJobResultMsgInternal) {
 						PrinterJobResultMsgInternal pj = (PrinterJobResultMsgInternal) o;
-						FileServlet.registerFile(pj.getPdf(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser());
+						FileServlet.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser());
 						AppFrameMsgOut f = new AppFrameMsgOut();
 						LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.print, pj.getId());
 						f.setLinkAction(linkAction);

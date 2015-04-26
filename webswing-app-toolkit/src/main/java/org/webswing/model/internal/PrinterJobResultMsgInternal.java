@@ -1,20 +1,22 @@
 package org.webswing.model.internal;
 
+import java.io.File;
+
 import org.webswing.model.MsgInternal;
 
 public class PrinterJobResultMsgInternal implements MsgInternal {
 
 	private static final long serialVersionUID = 6352518694214860256L;
-	private byte[] pdf;
+	private File pdfFile;
 	private String id;
 	private String clientId;
 
-	public byte[] getPdf() {
-		return pdf;
+	public File getPdfFile() {
+		return pdfFile;
 	}
 
-	public void setPdf(byte[] pdf) {
-		this.pdf = pdf;
+	public void setPdfFile(File pdfFile) {
+		this.pdfFile = pdfFile;
 	}
 
 	public String getId() {
