@@ -95,9 +95,13 @@ public class SwingClassloader extends ClassLoader {
 		methodReplacementBuilder.put("java.lang.System setErr (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods setErr (Ljava/io/PrintStream;)V");
 		methodReplacementBuilder.put("java.lang.System setOut (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods setOut (Ljava/io/PrintStream;)V");
 		methodReplacementBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
+		// ignore outline drag mode for JDesktopPane
+		methodReplacementBuilder.put("javax.swing.JDesktopPane putClientProperty (Ljava/lang/Object;Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods putClientProperty (Ljavax/swing/JDesktopPane;Ljava/lang/Object;Ljava/lang/Object;)V");
+
 		if (System.getProperty(org.webswing.Constants.SWING_START_SYS_PROP_ISOLATED_FS, "").equalsIgnoreCase("true")) {
 			methodReplacementBuilder.put("java.io.File listRoots ()[Ljava/io/File;", "org.webswing.special.RedirectedMethods listRoots ()[Ljava/io/File;");
 		}
+
 		// methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;");
 		// methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");
 		// methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;");

@@ -7,10 +7,12 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.util.Enumeration;
 
+import javax.swing.JDesktopPane;
 import javax.swing.RepaintManager;
 
 import org.webswing.SwingMain;
 import org.webswing.toolkit.extra.WebRepaintManager;
+import org.webswing.util.Logger;
 
 public class RedirectedMethods {
 
@@ -59,5 +61,13 @@ public class RedirectedMethods {
 	@SuppressWarnings("restriction")
 	public static File[] listRoots() {
 		return (File[]) sun.awt.shell.ShellFolder.get("roots");
+	}
+
+	public static void putClientProperty(JDesktopPane target, Object key, Object value) {
+		if ("JDesktopPane.dragMode".equals(key) && "outline".equals(value)) {
+			Logger.warn("Outline drag mode for JDesktop pane is not supported in Webswing.");
+		} else {
+			target.putClientProperty(key, value);
+		}
 	}
 }
