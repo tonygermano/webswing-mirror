@@ -323,7 +323,8 @@ public class SwingJvmConnection implements MessageListener {
 			JMXServiceURL jmxUrl = new JMXServiceURL(address);
 			return JMXConnectorFactory.connect(jmxUrl);
 		} catch (Exception e) {
-			log.error("Failed to connect to JMX of swing instance with pid " + pid + ".", e);
+			log.warn("Failed to connect to JMX of swing instance with pid " + pid + ". Reason: " + e.getMessage());
+			log.debug("Exception details:", e);
 		}
 		return null;
 	}
@@ -334,7 +335,8 @@ public class SwingJvmConnection implements MessageListener {
 				return jmxConnection.getMBeanServerConnection();
 			}
 		} catch (IOException e) {
-			log.debug("Failed to connect to JMX of swing instance ", e);
+			log.warn("Failed to connect to JMX of swing instance. Reason:" + e.getMessage());
+			log.debug("Exception details:", e);
 		}
 		return null;
 	}
