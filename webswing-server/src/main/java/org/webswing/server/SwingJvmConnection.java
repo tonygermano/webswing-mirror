@@ -45,8 +45,8 @@ import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.model.internal.PrinterJobResultMsgInternal;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.LinkActionMsg;
-import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
+import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.handler.FileServlet;
 import org.webswing.server.handler.JmsService;
@@ -56,6 +56,7 @@ import org.webswing.server.util.SwingAntTimestampedLogger;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebToolkit6;
 import org.webswing.toolkit.WebToolkit7;
+import org.webswing.toolkit.WebToolkit8;
 
 public class SwingJvmConnection implements MessageListener {
 
@@ -251,6 +252,9 @@ public class SwingJvmConnection implements MessageListener {
 						} else if (System.getProperty("java.version").startsWith("1.7")) {
 							webSwingToolkitJarPathSpecific = "\"" + URLDecoder.decode(WebToolkit7.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
 							webToolkitClass = WebToolkit7.class.getCanonicalName();
+						} else if (System.getProperty("java.version").startsWith("1.8")) {
+							webSwingToolkitJarPathSpecific = "\"" + URLDecoder.decode(WebToolkit8.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
+							webToolkitClass = WebToolkit8.class.getCanonicalName();
 						} else {
 							log.error("Java version " + System.getProperty("java.version") + " not supported in this version. Check www.webswing.org for supported versions.");
 							throw new RuntimeException("Java version not supported");

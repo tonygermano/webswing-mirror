@@ -11,6 +11,7 @@
 		<module>webswing-app-toolkit</module>
 		<module>webswing-app-toolkit-java6</module>
 		<module>webswing-app-toolkit-java7</module>
+		<module>webswing-app-toolkit-java8</module>
 		<module>webswing-app-launcher</module>
 		<module>webswing-app-interface</module>
 		<module>webswing-directdraw</module>

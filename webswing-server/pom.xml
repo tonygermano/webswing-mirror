@@ -115,6 +115,11 @@
 			<artifactId>webswing-app-toolkit-java7</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.webswing</groupId>
+			<artifactId>webswing-app-toolkit-java8</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
