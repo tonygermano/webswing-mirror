@@ -154,7 +154,7 @@ public class SwingJvmConnection implements MessageListener {
 				if (o instanceof MsgInternal) {
 					if (o instanceof PrinterJobResultMsgInternal) {
 						PrinterJobResultMsgInternal pj = (PrinterJobResultMsgInternal) o;
-						FileServlet.registerFile(pj.getPdf(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser());
+						FileServlet.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser());
 						AppFrameMsgOut f = new AppFrameMsgOut();
 						LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.print, pj.getId());
 						f.setLinkAction(linkAction);
@@ -259,7 +259,7 @@ public class SwingJvmConnection implements MessageListener {
 
 						if (!System.getProperty("os.name", "").startsWith("Windows")) {
 							// filesystem isolation support on non windows systems:
-							bootCp += File.pathSeparatorChar + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator)) + File.separator + "rt-win-shell-1.6.0_45.jar\"";
+							bootCp += File.pathSeparatorChar + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator)) + File.separator + "rt-win-shell.jar\"";
 						}
 						log.info("Setting bootclasspath to: " + bootCp);
 						String debug = appConfig.isDebug() ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
@@ -323,7 +323,8 @@ public class SwingJvmConnection implements MessageListener {
 			JMXServiceURL jmxUrl = new JMXServiceURL(address);
 			return JMXConnectorFactory.connect(jmxUrl);
 		} catch (Exception e) {
-			log.error("Failed to connect to JMX of swing instance with pid " + pid + ".", e);
+			log.warn("Failed to connect to JMX of swing instance with pid " + pid + ". Reason: " + e.getMessage());
+			log.debug("Exception details:", e);
 		}
 		return null;
 	}
@@ -334,7 +335,8 @@ public class SwingJvmConnection implements MessageListener {
 				return jmxConnection.getMBeanServerConnection();
 			}
 		} catch (IOException e) {
-			log.debug("Failed to connect to JMX of swing instance ", e);
+			log.warn("Failed to connect to JMX of swing instance. Reason:" + e.getMessage());
+			log.debug("Exception details:", e);
 		}
 		return null;
 	}

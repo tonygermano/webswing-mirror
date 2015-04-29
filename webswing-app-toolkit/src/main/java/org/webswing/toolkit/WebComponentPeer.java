@@ -86,7 +86,7 @@ public class WebComponentPeer implements ComponentPeer {
 	}
 
 	public void updateWindowDecorationImage() {
-		if (target != null && !(target instanceof JWindow)) {
+		if (target != null && !(target instanceof JWindow) && isInitialized()) {
 			if ((target instanceof JFrame && ((JFrame) target).isUndecorated()) || (target instanceof JDialog && ((JDialog) target).isUndecorated())) {
 				// window decoration is not painted
 			} else {
@@ -104,6 +104,14 @@ public class WebComponentPeer implements ComponentPeer {
 				Services.getImageService().getWindowDecorationTheme().paintWindowDecoration(g, target, w, h);
 				g.dispose();
 			}
+		}
+	}
+
+	private boolean isInitialized() {
+		if (Util.isDD()) {
+			return webImage != null;
+		} else {
+			return image != null;
 		}
 	}
 

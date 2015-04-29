@@ -92,12 +92,16 @@ public class SwingClassloader extends ClassLoader {
 		methodReplacementBuilder.put("java.lang.ClassLoader getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;", "org.webswing.special.RedirectedMethods getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;");
 		methodReplacementBuilder.put("java.lang.ClassLoader getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;", "org.webswing.special.RedirectedMethods getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;");
 		methodReplacementBuilder.put("javax.swing.RepaintManager setCurrentManager (Ljavax/swing/RepaintManager;)V", "org.webswing.special.RedirectedMethods setCurrentManager (Ljavax/swing/RepaintManager;)V");
-		methodReplacementBuilder.put("java.lang.System setErr (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy ()V");
-		methodReplacementBuilder.put("java.lang.System setOut (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods dummy2 ()V");
+		methodReplacementBuilder.put("java.lang.System setErr (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods setErr (Ljava/io/PrintStream;)V");
+		methodReplacementBuilder.put("java.lang.System setOut (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods setOut (Ljava/io/PrintStream;)V");
 		methodReplacementBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
+		// ignore outline drag mode for JDesktopPane
+		methodReplacementBuilder.put("javax.swing.JDesktopPane putClientProperty (Ljava/lang/Object;Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods putClientProperty (Ljavax/swing/JDesktopPane;Ljava/lang/Object;Ljava/lang/Object;)V");
+
 		if (System.getProperty(org.webswing.Constants.SWING_START_SYS_PROP_ISOLATED_FS, "").equalsIgnoreCase("true")) {
 			methodReplacementBuilder.put("java.io.File listRoots ()[Ljava/io/File;", "org.webswing.special.RedirectedMethods listRoots ()[Ljava/io/File;");
 		}
+
 		// methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;");
 		// methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");
 		// methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/awt/Component;Ljava/lang/Object;)Ljava/lang/String;");
@@ -144,7 +148,7 @@ public class SwingClassloader extends ClassLoader {
 
 	public SwingClassloader(ClassLoader parent) {
 		super(parent);
-		this.ignored_packages = new String[] { "java.", "javax.", "sun.", "org.xml.sax", "org.omg.CORBA", "org.w3c.dom", "org.webswing.model", "org.webswing.toolkit" };
+		this.ignored_packages = new String[] { "java.", "javax.", "sun.", "org.xml.sax", "org.omg.CORBA", "org.w3c.dom", "org.webswing.special", "org.webswing.model", "org.webswing.toolkit" };
 		this.repository = new ClassLoaderRepository(parent);
 	}
 
@@ -242,7 +246,7 @@ public class SwingClassloader extends ClassLoader {
 
 			// dump
 			// try {
-			// if (cg.getClassName().equals("org.webswing.special.RedirectedJOptionPane"))
+			// if (cg.getClassName().equals("org.netbeans.core.startup.TopLogging"))
 			// cg.getJavaClass().dump(cg.getClassName() + ".class");
 			// } catch (Exception ex) {
 			// ex.printStackTrace();
