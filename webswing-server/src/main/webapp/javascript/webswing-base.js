@@ -390,15 +390,19 @@
 		bindEvent(canvas, 'keypress', function(event) {
 			event.preventDefault();
 			event.stopPropagation();
-			var keyevt = getKBKey('keypress', canvas, event);
-			enqueueInputEvent(keyevt);
+			if (!(keyevt.key.ctrl && keyevt.key.character == 86)) { // skip ctrl+v
+				var keyevt = getKBKey('keypress', canvas, event);
+				enqueueInputEvent(keyevt);
+			}
 			return false;
 		}, false);
 		bindEvent(canvas, 'keyup', function(event) {
 			event.preventDefault();
 			event.stopPropagation();
-			var keyevt = getKBKey('keyup', canvas, event);
-			enqueueInputEvent(keyevt);
+			if (!(keyevt.key.ctrl && keyevt.key.character == 86)) { // skip ctrl+v
+				var keyevt = getKBKey('keyup', canvas, event);
+				enqueueInputEvent(keyevt);
+			}
 			return false;
 		}, false);
 		bindEvent(document, 'mousedown', function(evt) {
