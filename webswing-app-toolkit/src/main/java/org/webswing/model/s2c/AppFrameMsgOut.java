@@ -18,6 +18,7 @@ public class AppFrameMsgOut implements MsgOut {
 	private List<WindowMsg> windows;
 	private WindowMsg closedWindow;
 	private SimpleEventMsgOut event;
+	private String sessionId;
 
 	public WindowMsg getOrCreateWindowById(String guid) {
 		if (windows != null) {
@@ -105,6 +106,14 @@ public class AppFrameMsgOut implements MsgOut {
 
 	public void setEvent(SimpleEventMsgOut event) {
 		this.event = event;
+	}
+
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
 	}
 
 }

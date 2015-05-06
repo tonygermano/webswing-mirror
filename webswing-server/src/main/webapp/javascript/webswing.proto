@@ -12,6 +12,7 @@ message AppFrameMsgOutProto{
 	repeated WindowMsgProto windows = 7;
 	optional WindowMsgProto closedWindow = 8;
 	optional SimpleEventMsgOutProto event = 9;
+	optional string sessionId = 10;
 }
 
 message ApplicationInfoMsgProto{

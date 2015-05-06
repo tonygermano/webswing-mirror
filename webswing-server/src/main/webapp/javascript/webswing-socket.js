@@ -12,7 +12,7 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 		var request = {
 			url : api.connectionUrl + 'async/swing',
 			contentType : "application/json",
-			logLevel : 'debug',
+			//logLevel : 'debug',
 			transport : 'websocket',
 			trackMessageLength : true,
 			reconnectInterval : 5000,
@@ -36,24 +36,15 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 			request.headers['X-webswing-recording']=api.recording;
 		}
 
-
-		request.onOpen = function(response) {
-			uuid = response.request.uuid + '';
-		};
-
 		request.onReopen = function(response) {
 			api.dialog.hide();
 		};
 
 		request.onMessage = function(response) {
-			var message = response.responseBody;
-			try {
-				var data;
-				if (binary) {
-					data = AppFrameMsgOutProto.decode(message);
-					explodeEnumNames(data);
-				} else {
-					data = atmosphere.util.parseJSON(message);
+			try{
+				var data=decodeResponse(response);
+				if(data.sessionId!=null){
+					uuid = data.sessionId;
 				}
 				api.base.processMessage(data);
 			} catch (e) {
@@ -77,6 +68,24 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 		};
 
 		socket = atmosphere.subscribe(request);
+	}
+
+	function decodeResponse(response){
+		var message = response.responseBody;
+		try {
+			var data;
+			if (binary) {
+				data = AppFrameMsgOutProto.decode(message);
+				explodeEnumNames(data);
+			} else {
+				data = atmosphere.util.parseJSON(message);
+			}
+				return data;
+		} catch (e) {
+			console.error(e);
+			return;
+		}
+
 	}
 
 	function dispose() {

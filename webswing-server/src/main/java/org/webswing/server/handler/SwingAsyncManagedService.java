@@ -47,6 +47,7 @@ public class SwingAsyncManagedService {
 		boolean includeAdminApp = ServerUtil.isUserinRole(r, Constants.ADMIN_ROLE);
 		AppFrameMsgOut appInfo = new AppFrameMsgOut();
 		appInfo.setApplications(ServerUtil.createApplicationInfoMsg(r, includeAdminApp));
+		appInfo.setSessionId(r.uuid());
 		EncodedMessage encoded = new EncodedMessage(appInfo);
 		if (r.forceBinaryWrite()) {
 			r.write(encoded.getProtoMessage());
