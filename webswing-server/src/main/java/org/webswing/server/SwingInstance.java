@@ -10,7 +10,7 @@ import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.server.SwingJvmConnection.WebSessionListener;
-import org.webswing.server.handler.admin.AdminAsyncManagedService;
+import org.webswing.server.handler.AdminAsyncManagedService;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.stats.SessionRecorder;
 import org.webswing.server.util.ServerUtil;

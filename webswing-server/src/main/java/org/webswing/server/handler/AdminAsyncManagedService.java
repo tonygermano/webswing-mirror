@@ -1,4 +1,4 @@
-package org.webswing.server.handler.admin;
+package org.webswing.server.handler;
 
 import java.io.IOException;
 import java.io.Serializable;

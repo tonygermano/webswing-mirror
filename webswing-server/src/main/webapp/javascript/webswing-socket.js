@@ -1,10 +1,10 @@
-define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, ProtoBuf,wsProto) {
+define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function(atmosphere, ProtoBuf, wsProto) {
 	"use strict";
 	var api;
 	var socket = null;
 	var uuid = null;
 	var binary;
-	var proto = ProtoBuf.loadProto(wsProto,"webswing.proto");
+	var proto = ProtoBuf.loadProto(wsProto, "webswing.proto");
 	var InputEventsFrameMsgInProto = proto.build("org.webswing.server.model.proto.InputEventsFrameMsgInProto");
 	var AppFrameMsgOutProto = proto.build("org.webswing.server.model.proto.AppFrameMsgOutProto");
 	function connect() {
@@ -12,7 +12,7 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 		var request = {
 			url : api.connectionUrl + 'async/swing',
 			contentType : "application/json",
-			//logLevel : 'debug',
+			// logLevel : 'debug',
 			transport : 'websocket',
 			trackMessageLength : true,
 			reconnectInterval : 5000,
@@ -22,18 +22,19 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 		};
 
 		if (binary) {
-			request.headers['X-Atmosphere-Binary']=true;
+			request.url = request.url + '-bin';
+			request.headers['X-Atmosphere-Binary'] = true;
 			request.enableProtocol = false;
 			request.trackMessageLength = false;
 			request.contentType = 'application/octet-stream';
 			request.webSocketBinaryType = 'arraybuffer';
 		}
 
-		if(api.args!=null){
-			request.headers['X-webswing-args']=api.args;
+		if (api.args != null) {
+			request.headers['X-webswing-args'] = api.args;
 		}
-		if(api.recording!=null){
-			request.headers['X-webswing-recording']=api.recording;
+		if (api.recording != null) {
+			request.headers['X-webswing-recording'] = api.recording;
 		}
 
 		request.onReopen = function(response) {
@@ -41,9 +42,9 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 		};
 
 		request.onMessage = function(response) {
-			try{
-				var data=decodeResponse(response);
-				if(data.sessionId!=null){
+			try {
+				var data = decodeResponse(response);
+				if (data.sessionId != null) {
 					uuid = data.sessionId;
 				}
 				api.base.processMessage(data);
@@ -70,7 +71,7 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 		socket = atmosphere.subscribe(request);
 	}
 
-	function decodeResponse(response){
+	function decodeResponse(response) {
 		var message = response.responseBody;
 		try {
 			var data;
@@ -80,7 +81,7 @@ define([ 'atmosphere', 'ProtoBuf','text!webswing.proto' ], function(atmosphere, 
 			} else {
 				data = atmosphere.util.parseJSON(message);
 			}
-				return data;
+			return data;
 		} catch (e) {
 			console.error(e);
 			return;

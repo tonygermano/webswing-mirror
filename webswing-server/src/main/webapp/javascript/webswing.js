@@ -12,7 +12,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 			connectionUrl : location.origin + location.pathname,
 			mirror : false,
 			typedArraysSupported : false,
-			binarySocket : false,// not working yet
+			binarySocket : true,
 			recording : false,
 			start : function(customization) {
 				if (customization != null) {
@@ -55,13 +55,14 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 		function configure(options) {
 			options = options != null ? options : readOptions(api.rootElement);
 			if (options != null) {
-				api.autoStart = options.autoStart != null ? options.autoStart : api.autoStart;
+				api.autoStart = options.autoStart != null ? JSON.parse(options.autoStart) : api.autoStart;
 				api.applicationName = options.applicationName != null ? options.applicationName : api.applicationName;
 				api.args = options.args != null ? options.args : api.args;
-				api.anonym = options.anonym ? true : false;
-				api.recording = options.recording ? true : false;
+				api.anonym = options.anonym != null ? JSON.parse(options.anonym) : api.anonym;
+				api.binarySocket = options.binarySocket != null ? JSON.parse(options.binarySocket) : api.binarySocket;
+				api.recording = options.recording != null ? JSON.parse(options.recording) : api.recording ;
 				api.clientId = options.clientId != null ? options.clientId : api.clientId;
-				api.mirror = options.mirrorMode != null ? options.mirrorMode : api.mirror;
+				api.mirror = options.mirrorMode != null ? JSON.parse(options.mirrorMode) : api.mirror;
 				api.connectionUrl = options.connectionUrl != null ? options.connectionUrl : api.connectionUrl;
 				if (api.connectionUrl.substr(api.connectionUrl.length - 1) !== '/') {
 					api.connectionUrl = api.connectionUrl + '/';
@@ -119,7 +120,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 		}
 	}
 
-	//fix for ie
+	// fix for ie
 	if (!window.location.origin) {
 		window.location.origin = window.location.protocol + "//" + window.location.hostname
 				+ (window.location.port ? ':' + window.location.port : '');
