@@ -391,7 +391,9 @@
 			event.preventDefault();
 			event.stopPropagation();
 			var keyevt = getKBKey('keypress', canvas, event);
-			enqueueInputEvent(keyevt);
+			if (!(keyevt.key.ctrl &&  keyevt.key.character == 118)) { // skip ctrl+v
+				enqueueInputEvent(keyevt);
+			}
 			return false;
 		}, false);
 		bindEvent(canvas, 'keyup', function(event) {
