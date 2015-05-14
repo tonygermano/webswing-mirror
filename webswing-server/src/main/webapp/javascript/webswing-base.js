@@ -390,8 +390,8 @@
 		bindEvent(canvas, 'keypress', function(event) {
 			event.preventDefault();
 			event.stopPropagation();
-			if (!(keyevt.key.ctrl && keyevt.key.character == 86)) { // skip ctrl+v
-				var keyevt = getKBKey('keypress', canvas, event);
+			var keyevt = getKBKey('keypress', canvas, event);
+			if (!(keyevt.key.ctrl &&  keyevt.key.character == 118)) { // skip ctrl+v
 				enqueueInputEvent(keyevt);
 			}
 			return false;
@@ -399,10 +399,8 @@
 		bindEvent(canvas, 'keyup', function(event) {
 			event.preventDefault();
 			event.stopPropagation();
-			if (!(keyevt.key.ctrl && keyevt.key.character == 86)) { // skip ctrl+v
-				var keyevt = getKBKey('keyup', canvas, event);
-				enqueueInputEvent(keyevt);
-			}
+			var keyevt = getKBKey('keyup', canvas, event);
+			enqueueInputEvent(keyevt);
 			return false;
 		}, false);
 		bindEvent(document, 'mousedown', function(evt) {
