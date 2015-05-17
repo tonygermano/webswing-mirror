@@ -19,6 +19,7 @@
 
 	var windowImageHolders = {};
 	var directDraw = new WebswingDirectDraw({});
+	var iePastePromptHack=false;
 
 	function startApplication(name) {
 		api.canvas.get();
@@ -370,6 +371,7 @@
 			// hanle paste event
 			if (keyevt.key.ctrl && keyevt.key.character == 86) { // ctrl+v
 				var text = prompt('Press ctrl+v and enter..');
+				iePastePromptHack=true;setTimeout(function(){iePastePromptHack=false;},10);
 				if (api.context.hasControl) {
 					api.socket.send({
 						paste : {
@@ -391,7 +393,7 @@
 			event.preventDefault();
 			event.stopPropagation();
 			var keyevt = getKBKey('keypress', canvas, event);
-			if (!(keyevt.key.ctrl &&  keyevt.key.character == 118)) { // skip ctrl+v
+			if (!(keyevt.key.ctrl &&  keyevt.key.character == 118) && !(iePastePromptHack &&  keyevt.key.character == 118)) { // skip ctrl+v
 				enqueueInputEvent(keyevt);
 			}
 			return false;
