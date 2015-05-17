@@ -36,6 +36,9 @@ define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function(atmosphere,
 		if (api.recording != null) {
 			request.headers['X-webswing-recording'] = api.recording;
 		}
+		if (api.debugPort != null){
+			request.headers['X-webswing-debugPort'] = api.debugPort;
+		}
 
 		request.onReopen = function(response) {
 			api.dialog.hide();

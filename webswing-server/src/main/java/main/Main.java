@@ -104,16 +104,27 @@ public class Main {
 
 	private static List<URL> getFilesFromPath(URL r) throws IOException {
 		List<URL> urls = new ArrayList<URL>();
-		String[] splitPath = r.getPath().split("\\!/");
-		String jar = splitPath[0];
-		String path = splitPath[1];
-		JarFile jarFile = new JarFile(new File(URI.create(jar)));
-		Enumeration<JarEntry> jarEntries = jarFile.entries();
 		String tempDirPath = getTempDir().getAbsolutePath();
-		while (jarEntries.hasMoreElements()) {
-			JarEntry jarEntry = jarEntries.nextElement();
-			if (!jarEntry.isDirectory() && jarEntry.getName().endsWith(".jar") && jarEntry.getName().startsWith(path)) {
-				urls.add(jarEntryAsFile(jarFile, jarEntry, tempDirPath).toURI().toURL());
+		if (r.getPath().contains("!")) {
+			String[] splitPath = r.getPath().split("\\!/");
+			String jar = splitPath[0];
+			String path = splitPath[1];
+			JarFile jarFile = new JarFile(new File(URI.create(jar)));
+			Enumeration<JarEntry> jarEntries = jarFile.entries();
+			while (jarEntries.hasMoreElements()) {
+				JarEntry jarEntry = jarEntries.nextElement();
+				if (!jarEntry.isDirectory() && jarEntry.getName().endsWith(".jar") && jarEntry.getName().startsWith(path)) {
+					urls.add(jarEntryAsFile(jarFile, jarEntry, tempDirPath).toURI().toURL());
+				}
+			}
+		} else {
+			File dir = new File(r.getPath());
+			if (dir.isDirectory()) {
+				for (File f : dir.listFiles()) {
+					if (f.isFile() && f.getName().endsWith(".jar")) {
+						urls.add(f.toURI().toURL());
+					}
+				}
 			}
 		}
 		return urls;
@@ -197,15 +208,41 @@ public class Main {
 		}
 	}
 
+	public static File getRootDir() {
+		if (System.getProperty(Constants.ROOT_DIR_PATH) == null) {
+			File defaultRoot = new File(System.getProperty("user.dir"));
+			System.setProperty(Constants.ROOT_DIR_PATH, defaultRoot.toURI().toString());
+			return defaultRoot;
+		} else {
+			String pathOrUri = System.getProperty(Constants.ROOT_DIR_PATH);
+			try {
+				File file = new File(URI.create(pathOrUri));
+				if (file.exists()) {
+					return file;
+				} else {
+					throw new IllegalArgumentException("File " + file.getAbsolutePath() + "not found.");
+				}
+			} catch (IllegalArgumentException e) {
+				File absoluteConfigFile = new File(pathOrUri);
+				if (absoluteConfigFile.exists()) {
+					System.setProperty(Constants.ROOT_DIR_PATH, absoluteConfigFile.toURI().toString());
+					return absoluteConfigFile;
+				} else {
+					throw new IllegalArgumentException("File " + absoluteConfigFile.getAbsolutePath() + " not found.");
+				}
+			}
+		}
+	}
+
 	private static boolean delete(File f) {
-		if(f.isDirectory()){
+		if (f.isDirectory()) {
 			for (File fx : f.listFiles()) {
-				if(!delete(fx)){
+				if (!delete(fx)) {
 					return false;
 				}
 			}
 		}
-		return f.delete(); 
+		return f.delete();
 	}
 
 	private static void initTempDirPath(String[] args) {

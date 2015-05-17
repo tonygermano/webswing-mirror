@@ -38,6 +38,11 @@ public class SwingInstanceManager {
 		MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
 		try {
 			ObjectName mxbeanName = new ObjectName("org.webswing:type=WebswingMonitoring");
+			try {
+				platformMBeanServer.unregisterMBean(mxbeanName);
+			} catch (Exception e) {
+				// do nothing
+			}
 			platformMBeanServer.registerMBean(new WebswingMonitoringMXBeanImpl(), mxbeanName);
 		} catch (Exception e) {
 			log.error("Failed to register webswing monitoring jmx mbean", e);

@@ -117,6 +117,8 @@ public class ServerUtil {
 							app.setBase64Icon(loadImage(descriptor.getIcon()));
 						} else if (new File(descriptor.getHomeDir() + File.separator + descriptor.getIcon()).exists()) {
 							app.setBase64Icon(loadImage(descriptor.getHomeDir() + File.separator + descriptor.getIcon()));
+						} else if (new File(Main.getRootDir(), descriptor.getHomeDir() + File.separator + descriptor.getIcon()).exists()) {
+							app.setBase64Icon(loadImage(new File(Main.getRootDir(), descriptor.getHomeDir() + File.separator + descriptor.getIcon()).getAbsolutePath()));
 						} else {
 							log.error("Icon loading failed. File " + descriptor.getIcon() + " or " + descriptor.getHomeDir() + File.separator + descriptor.getIcon() + " does not exist.");
 							app.setBase64Icon(loadImage(null));
@@ -305,6 +307,15 @@ public class ServerUtil {
 	public static String getCustomArgs(HttpServletRequest r) {
 		String args = (String) r.getHeader(Constants.HTTP_ATTR_ARGS);
 		return args != null ? args : "";
+	}
+
+	public static int getDebugPort(HttpServletRequest r) {
+		String recording = (String) r.getHeader(Constants.HTTP_ATTR_DEBUG_PORT);
+		try {
+			return Integer.parseInt(recording);
+		} catch (NumberFormatException e) {
+			return 0;
+		}
 	}
 
 	public static void broadcastMessage(AtmosphereResource r, EncodedMessage o) {

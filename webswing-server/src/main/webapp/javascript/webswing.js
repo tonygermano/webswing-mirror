@@ -14,6 +14,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 			typedArraysSupported : false,
 			binarySocket : true,
 			recording : false,
+			debugPort : null,
 			start : function(customization) {
 				if (customization != null) {
 					customization(api);
@@ -64,6 +65,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 				api.clientId = options.clientId != null ? options.clientId : api.clientId;
 				api.mirror = options.mirrorMode != null ? JSON.parse(options.mirrorMode) : api.mirror;
 				api.connectionUrl = options.connectionUrl != null ? options.connectionUrl : api.connectionUrl;
+				api.debugPort = options.debugPort != null ? options.debugPort : api.debugPort;
 				if (api.connectionUrl.substr(api.connectionUrl.length - 1) !== '/') {
 					api.connectionUrl = api.connectionUrl + '/';
 				}

@@ -5,7 +5,7 @@ define(
 
 			var api;
 			var currentContent;
-			var dialog, content, header;
+			var dialog, content, header,backdrop;
 			var configuration = {
 				readyDialog : {
 					content : '<p>Webswing ready...</p>'

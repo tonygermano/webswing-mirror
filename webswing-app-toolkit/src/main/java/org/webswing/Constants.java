@@ -28,6 +28,7 @@ public interface Constants {
 
 	// server startup constants
 	public static final String WAR_FILE_LOCATION = "webswing.warLocation";
+	public static final String ROOT_DIR_PATH = "webswing.rootDir";
 	public static final String TEMP_DIR_PATH_BASE = "webswing.tempDirBase";
 	public static final String TEMP_DIR_PATH = "webswing.tempDirPath";
 	public static final String CREATE_NEW_TEMP = "webswing.createNewTemp";
@@ -51,6 +52,7 @@ public interface Constants {
 	// http request header names
 	public static final String HTTP_ATTR_RECORDING_FLAG = "X-webswing-recording";
 	public static final String HTTP_ATTR_ARGS = "X-webswing-args";
+	public static final String HTTP_ATTR_DEBUG_PORT = "X-webswing-debugPort";
 
 	// admin console constants
 	public static final String ADMIN_ROLE = "admin";

@@ -29,12 +29,15 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import main.Main;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Environment.Variable;
+import org.apache.tools.ant.types.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -75,11 +78,13 @@ public class SwingJvmConnection implements MessageListener {
 	private ExecutorService swingAppExecutor = Executors.newSingleThreadExecutor();
 	private boolean jmsOpen = false;
 	private String customArgs = "";
+	private int debugPort = 0;
 
-	public SwingJvmConnection(ConnectionHandshakeMsgIn handshake, SwingApplicationDescriptor appConfig, WebSessionListener webListener, String customArgs) {
+	public SwingJvmConnection(ConnectionHandshakeMsgIn handshake, SwingApplicationDescriptor appConfig, WebSessionListener webListener, String customArgs, int debugPort) {
 		this.webListener = webListener;
 		this.clientId = handshake.getClientId();
 		this.customArgs = customArgs;
+		this.debugPort = debugPort;
 		try {
 			initialize();
 			app = start(appConfig, handshake);
@@ -217,11 +222,7 @@ public class SwingJvmConnection implements MessageListener {
 				try {
 					Project project = new Project();
 					// set home directory
-					String dirString = appConfig.getHomeDir();
-					File homeDir = new File(dirString);
-					if (!homeDir.exists()) {
-						homeDir.mkdirs();
-					}
+					File homeDir = getHomeDir(appConfig);
 					project.setBaseDir(homeDir);
 					// setup logging
 					project.init();
@@ -241,7 +242,9 @@ public class SwingJvmConnection implements MessageListener {
 						javaTask.setProject(project);
 						javaTask.setFork(true);
 						javaTask.setFailonerror(true);
-						javaTask.setJar(new File(URI.create(ServerUtil.getWarFileLocation())));
+						javaTask.setClassname("main.Main");
+						Path classPath = javaTask.createClasspath();
+						classPath.setLocation(new File(URI.create(ServerUtil.getWarFileLocation())));
 						javaTask.setArgs(appConfig.getArgs() + " " + customArgs);
 						String webSwingToolkitJarPath = "\"" + URLDecoder.decode(WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
 						String webSwingToolkitJarPathSpecific;
@@ -266,10 +269,9 @@ public class SwingJvmConnection implements MessageListener {
 							bootCp += File.pathSeparatorChar + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator)) + File.separator + "rt-win-shell.jar\"";
 						}
 						log.info("Setting bootclasspath to: " + bootCp);
-						String debug = appConfig.isDebug() ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y " : "";
+						String debug = appConfig.isDebug() && (debugPort != 0) ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=" + debugPort + ",server=y,suspend=y " : "";
 						String aaFonts = appConfig.isAntiAliasText() ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
 						javaTask.setJvmargs(bootCp + debug + aaFonts + " -noverify -Dcom.sun.management.jmxremote " + appConfig.getVmArgs());
-
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_CLIENT_ID, clientId);
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_CLASS_PATH, appConfig.generateClassPathString());
 						addSysProperty(javaTask, Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
@@ -305,8 +307,25 @@ public class SwingJvmConnection implements MessageListener {
 				close(true);
 				return null;
 			}
+
 		});
 		return future;
+	}
+
+	private File getHomeDir(final SwingApplicationDescriptor appConfig) {
+		String dirString = appConfig.getHomeDir();
+		File homeDir;
+		if (dirString.startsWith("/") || dirString.startsWith("\\") || dirString.contains(":/") || dirString.contains(":\\")) {
+			// path is absolute
+			homeDir = new File(dirString);
+		} else {
+			// path is relative
+			homeDir = new File(Main.getRootDir(), dirString);
+		}
+		if (!homeDir.exists()) {
+			homeDir.mkdirs();
+		}
+		return homeDir;
 	}
 
 	private void addSysProperty(Java javaTask, String key, String value) {
