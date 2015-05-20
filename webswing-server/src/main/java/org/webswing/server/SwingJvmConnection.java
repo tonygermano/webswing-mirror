@@ -6,6 +6,8 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +34,7 @@ import javax.management.remote.JMXServiceURL;
 import main.Main;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -216,13 +219,14 @@ public class SwingJvmConnection implements MessageListener {
 	public Future<?> start(final SwingApplicationDescriptor appConfig, final ConnectionHandshakeMsgIn handshake) {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		Future<?> future = swingAppExecutor.submit(new Callable<Object>() {
+		final StrSubstitutor subs = new StrSubstitutor(getConfigSubstitutorMap());
 
+		Future<?> future = swingAppExecutor.submit(new Callable<Object>() {
 			public Object call() throws Exception {
 				try {
 					Project project = new Project();
 					// set home directory
-					File homeDir = getHomeDir(appConfig);
+					File homeDir = getHomeDir(appConfig, subs);
 					project.setBaseDir(homeDir);
 					// setup logging
 					project.init();
@@ -245,7 +249,7 @@ public class SwingJvmConnection implements MessageListener {
 						javaTask.setClassname("main.Main");
 						Path classPath = javaTask.createClasspath();
 						classPath.setLocation(new File(URI.create(ServerUtil.getWarFileLocation())));
-						javaTask.setArgs(appConfig.getArgs() + " " + customArgs);
+						javaTask.setArgs(subs.replace(appConfig.getArgs()) + " " + customArgs);
 						String webSwingToolkitJarPath = "\"" + URLDecoder.decode(WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
 						String webSwingToolkitJarPathSpecific;
 						String webToolkitClass;
@@ -271,13 +275,13 @@ public class SwingJvmConnection implements MessageListener {
 						log.info("Setting bootclasspath to: " + bootCp);
 						String debug = appConfig.isDebug() && (debugPort != 0) ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=" + debugPort + ",server=y,suspend=y " : "";
 						String aaFonts = appConfig.isAntiAliasText() ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
-						javaTask.setJvmargs(bootCp + debug + aaFonts + " -noverify -Dcom.sun.management.jmxremote " + appConfig.getVmArgs());
+						javaTask.setJvmargs(bootCp + debug + aaFonts + " -noverify -Dcom.sun.management.jmxremote " + subs.replace(appConfig.getVmArgs()));
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_CLIENT_ID, clientId);
-						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_CLASS_PATH, appConfig.generateClassPathString());
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(appConfig.generateClassPathString()));
 						addSysProperty(javaTask, Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 						addSysProperty(javaTask, Constants.JMS_URL, JmsService.getUrl());
 
-						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_MAIN_CLASS, appConfig.getMainClass());
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_MAIN_CLASS, subs.replace(appConfig.getMainClass()));
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs() + "");
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload() + "");
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload() + "");
@@ -312,8 +316,8 @@ public class SwingJvmConnection implements MessageListener {
 		return future;
 	}
 
-	private File getHomeDir(final SwingApplicationDescriptor appConfig) {
-		String dirString = appConfig.getHomeDir();
+	private File getHomeDir(final SwingApplicationDescriptor appConfig, StrSubstitutor subs) {
+		String dirString = subs.replace(appConfig.getHomeDir());
 		File homeDir;
 		if (dirString.startsWith("/") || dirString.startsWith("\\") || dirString.contains(":/") || dirString.contains(":\\")) {
 			// path is absolute
@@ -333,6 +337,19 @@ public class SwingJvmConnection implements MessageListener {
 		v.setKey(key);
 		v.setValue(value);
 		javaTask.addSysproperty(v);
+	}
+
+	public Map<String, String> getConfigSubstitutorMap() {
+		Map<String, String> result = new HashMap<String, String>();
+		result.putAll(System.getenv());
+		for (final String name : System.getProperties().stringPropertyNames()) {
+			result.put(name, System.getProperties().getProperty(name));
+		}
+
+		result.put(Constants.USER_NAME_SUBSTITUTE, webListener.getUser());
+		result.put(Constants.SESSION_ID_SUBSTITUTE, getClientId());
+
+		return result;
 	}
 
 	public String getClientId() {

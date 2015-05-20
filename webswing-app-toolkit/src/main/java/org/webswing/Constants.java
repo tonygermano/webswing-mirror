@@ -43,11 +43,13 @@ public interface Constants {
 	public static final String JMS_OVERAL_MEM_LIMIT = "webswing.jmsOveralMemoryLimit";
 	public static final String JMS_DEST_MEM_LIMIT = "webswing.jmsDestinationMemoryLimit";
 
-	// other
+	// swing start related properties
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";
 	public static final String SWING_SCREEN_HEIGHT = "webswing.screenHeight";
 	public static final int SWING_SCREEN_WIDTH_MIN = 300;
 	public static final int SWING_SCREEN_HEIGHT_MIN = 300;
+	public static final String USER_NAME_SUBSTITUTE = "user";
+	public static final String SESSION_ID_SUBSTITUTE = "sessionId";
 
 	// http request header names
 	public static final String HTTP_ATTR_RECORDING_FLAG = "X-webswing-recording";
