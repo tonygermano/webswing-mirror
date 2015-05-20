@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import main.Main;
 
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.shiro.realm.text.PropertiesRealm;
 import org.apache.shiro.subject.Subject;
 import org.atmosphere.cpr.AtmosphereResource;
@@ -102,6 +103,7 @@ public class ServerUtil {
 	public static List<ApplicationInfoMsg> createApplicationInfoMsg(AtmosphereResource r, boolean includeAdminApp) {
 		Map<String, SwingApplicationDescriptor> applications = ConfigurationManager.getInstance().getApplications();
 		List<ApplicationInfoMsg> apps = new ArrayList<ApplicationInfoMsg>();
+		StrSubstitutor subs = getConfigSubstitutorMap(getUserName(r), null);
 		if (applications.size() == 0) {
 			return null;
 		} else {
@@ -110,18 +112,22 @@ public class ServerUtil {
 				if (isUserAuthorizedForApplication(r, descriptor)) {
 					ApplicationInfoMsg app = new ApplicationInfoMsg();
 					app.setName(name);
-					if (descriptor.getIcon() == null) {
+					String icon = subs.replace(descriptor.getIcon());
+					String homeDir = subs.replace(descriptor.getHomeDir());
+					if (icon == null) {
 						app.setBase64Icon(loadImage(null));
 					} else {
-						if (new File(descriptor.getIcon()).exists()) {
-							app.setBase64Icon(loadImage(descriptor.getIcon()));
-						} else if (new File(descriptor.getHomeDir() + File.separator + descriptor.getIcon()).exists()) {
-							app.setBase64Icon(loadImage(descriptor.getHomeDir() + File.separator + descriptor.getIcon()));
-						} else if (new File(Main.getRootDir(), descriptor.getHomeDir() + File.separator + descriptor.getIcon()).exists()) {
-							app.setBase64Icon(loadImage(new File(Main.getRootDir(), descriptor.getHomeDir() + File.separator + descriptor.getIcon()).getAbsolutePath()));
+						if (new File(icon).exists()) {
+							app.setBase64Icon(loadImage(icon));
 						} else {
-							log.error("Icon loading failed. File " + descriptor.getIcon() + " or " + descriptor.getHomeDir() + File.separator + descriptor.getIcon() + " does not exist.");
-							app.setBase64Icon(loadImage(null));
+							if (new File(homeDir + File.separator + icon).exists()) {
+								app.setBase64Icon(loadImage(homeDir + File.separator + icon));
+							} else if (new File(Main.getRootDir(), homeDir + File.separator + icon).exists()) {
+								app.setBase64Icon(loadImage(new File(Main.getRootDir(), homeDir + File.separator + icon).getAbsolutePath()));
+							} else {
+								log.error("Icon loading failed. File " + icon + " or " + homeDir + File.separator + icon + " does not exist.");
+								app.setBase64Icon(loadImage(null));
+							}
 						}
 					}
 					apps.add(app);
@@ -316,6 +322,23 @@ public class ServerUtil {
 		} catch (NumberFormatException e) {
 			return 0;
 		}
+	}
+
+	public static StrSubstitutor getConfigSubstitutorMap(String user, String sessionId) {
+
+		Map<String, String> result = new HashMap<String, String>();
+		result.putAll(System.getenv());
+		for (final String name : System.getProperties().stringPropertyNames()) {
+			result.put(name, System.getProperties().getProperty(name));
+		}
+		if (user != null) {
+			result.put(Constants.USER_NAME_SUBSTITUTE, user);
+		}
+		if (sessionId != null) {
+			result.put(Constants.SESSION_ID_SUBSTITUTE, sessionId);
+		}
+
+		return new StrSubstitutor(result);
 	}
 
 	public static void broadcastMessage(AtmosphereResource r, EncodedMessage o) {

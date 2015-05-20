@@ -6,8 +6,6 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -219,7 +217,7 @@ public class SwingJvmConnection implements MessageListener {
 	public Future<?> start(final SwingApplicationDescriptor appConfig, final ConnectionHandshakeMsgIn handshake) {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final StrSubstitutor subs = new StrSubstitutor(getConfigSubstitutorMap());
+		final StrSubstitutor subs = ServerUtil.getConfigSubstitutorMap(webListener.getUser(), getClientId());
 
 		Future<?> future = swingAppExecutor.submit(new Callable<Object>() {
 			public Object call() throws Exception {
@@ -337,19 +335,6 @@ public class SwingJvmConnection implements MessageListener {
 		v.setKey(key);
 		v.setValue(value);
 		javaTask.addSysproperty(v);
-	}
-
-	public Map<String, String> getConfigSubstitutorMap() {
-		Map<String, String> result = new HashMap<String, String>();
-		result.putAll(System.getenv());
-		for (final String name : System.getProperties().stringPropertyNames()) {
-			result.put(name, System.getProperties().getProperty(name));
-		}
-
-		result.put(Constants.USER_NAME_SUBSTITUTE, webListener.getUser());
-		result.put(Constants.SESSION_ID_SUBSTITUTE, getClientId());
-
-		return result;
 	}
 
 	public String getClientId() {
