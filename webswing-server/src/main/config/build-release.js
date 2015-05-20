@@ -7,7 +7,11 @@
 	namespace : 'webswingRequirejs',
 	modules : [ {
 		name : "webswing-embed",
-		include : [ 'requireLib', 'main', 'jquery-private', 'text!templates/notSupportedBrowser.html' ],
+		include : [ 'requireLib', 'main', 'jquery-private'],
 		create : true
-	} ]
+	} ],
+	wrap: {
+		startFile: "${project.basedir}/src/main/config/parts/start.frag",
+		endFile: "${project.basedir}/src/main/config/parts/end.frag"
+	}
 })

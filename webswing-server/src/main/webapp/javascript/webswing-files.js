@@ -85,7 +85,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 					},
 					url : api.connectionUrl + 'upload',
 					dataType : 'json',
-					dropZone : dropZone,
+					dropZone : dropZone
 				});
 
 				jqUpload.on('fileuploadadd', function(e, data) {

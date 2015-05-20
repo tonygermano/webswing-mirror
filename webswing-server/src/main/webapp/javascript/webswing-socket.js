@@ -36,7 +36,7 @@ define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function(atmosphere,
 		if (api.recording != null) {
 			request.headers['X-webswing-recording'] = api.recording;
 		}
-		if (api.debugPort != null){
+		if (api.debugPort != null) {
 			request.headers['X-webswing-debugPort'] = api.debugPort;
 		}
 
@@ -76,20 +76,14 @@ define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function(atmosphere,
 
 	function decodeResponse(response) {
 		var message = response.responseBody;
-		try {
-			var data;
-			if (binary) {
-				data = AppFrameMsgOutProto.decode(message);
-				explodeEnumNames(data);
-			} else {
-				data = atmosphere.util.parseJSON(message);
-			}
-			return data;
-		} catch (e) {
-			console.error(e);
-			return;
+		var data;
+		if (binary) {
+			data = AppFrameMsgOutProto.decode(message);
+			explodeEnumNames(data);
+		} else {
+			data = atmosphere.util.parseJSON(message);
 		}
-
+		return data;
 	}
 
 	function dispose() {
