@@ -117,7 +117,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	private Rectangle deviceClip;
 
-	private Area userClip; // Untransformed clipping Area defined by the user
+	private Shape userClip; // Untransformed clipping Area defined by the user
 
 	private AffineTransform currentTransform;
 
@@ -881,7 +881,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * @return current clip
 	 */
 	public Shape getClip() {
-		return (userClip != null) ? new Area(untransformShape(userClip)) : null;
+		return untransformShape(userClip);
 	}
 
 	/**
@@ -936,10 +936,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
      * @param s used for clipping
 	 */
 	public void setClip(Shape s) {
-
-		Shape ts = transformShape(s);
-		userClip = (ts != null) ? new Area(ts) : null;
-
+		userClip = transformShape(s);
 	}
 
 	/**
@@ -949,16 +946,74 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
      * @param s used for clipping
 	 */
 	public void clip(Shape s) {
-		Shape ts = transformShape(s);
+		s = transformShape(s);
 		if (userClip != null) {
-			if (ts != null) {
-				userClip.intersect(new Area(ts));
-			} else {
-				userClip = null;
-			}
-		} else {
-			userClip = (ts != null) ? new Area(ts) : null;
+			s = intersectShapes(userClip, s);
 		}
+		userClip = s;
+	}
+
+	/**
+	 * Copied from SunGraphics2D
+	 */
+	Shape intersectShapes(Shape lhs, Shape rhs) {
+		return lhs instanceof Rectangle && rhs instanceof Rectangle ?
+			((Rectangle) lhs).intersection((Rectangle) rhs) :
+			(lhs instanceof Rectangle2D ?
+				intersectRectShape((Rectangle2D) lhs, rhs) :
+				(rhs instanceof Rectangle2D ?
+					intersectRectShape((Rectangle2D) rhs, lhs) :
+					intersectByArea(lhs, rhs)));
+	}
+
+	/**
+	 * Copied from SunGraphics2D
+	 */
+	Shape intersectRectShape(Rectangle2D lhs, Shape rhs) {
+		if (rhs instanceof Rectangle2D) {
+			Rectangle2D rhsRect = (Rectangle2D) rhs;
+			Rectangle2D result = new Rectangle2D.Double();
+
+			double x1 = Math.max(lhs.getMinX(), rhsRect.getMinX());
+			double x2 = Math.min(lhs.getMaxX(), rhsRect.getMaxX());
+			double y1 = Math.max(lhs.getMinY(), rhsRect.getMinY());
+			double y2 = Math.min(lhs.getMaxY(), rhsRect.getMaxY());
+			if (x2 - x1 >= 0.0D && y2 - y1 >= 0.0D) {
+				result.setFrameFromDiagonal(x1, y1, x2, y2);
+			} else {
+				result.setFrameFromDiagonal(0.0D, 0.0D, 0.0D, 0.0D);
+			}
+			return result;
+		} else if (lhs.contains(rhs.getBounds2D())) {
+			rhs = cloneShape(rhs);
+			return rhs;
+		} else {
+			return this.intersectByArea(lhs, rhs);
+		}
+	}
+
+	/**
+	 * Copied from SunGraphics2D
+	 */
+	protected static Shape cloneShape(Shape shape) {
+		return new GeneralPath(shape);
+	}
+
+	/**
+	 * Copied from SunGraphics2D
+	 */
+	Shape intersectByArea(Shape lhs, Shape rhs) {
+		Area var5 = new Area(lhs);
+
+		Area var6;
+		if (rhs instanceof Area) {
+			var6 = (Area) rhs;
+		} else {
+			var6 = new Area(rhs);
+		}
+
+		var5.intersect(var6);
+		return var5.isRectangular() ? var5.getBounds() : var5;
 	}
 
 	/*
@@ -1248,14 +1303,14 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	protected Shape transformShape(Shape s) {
-		return transformShape(getTransform(), s);
+		return transformShape(currentTransform, s);
 	}
 
 	protected Shape untransformShape(Shape s) {
 		if (s == null)
 			return null;
 		try {
-			return transformShape(getTransform().createInverse(), s);
+			return transformShape(currentTransform.createInverse(), s);
 		} catch (NoninvertibleTransformException e) {
 			return null;
 		}
