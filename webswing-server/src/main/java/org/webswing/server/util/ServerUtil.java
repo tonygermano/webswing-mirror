@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +39,9 @@ import org.webswing.model.admin.s2c.SwingSessionMsg;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
+import org.webswing.model.server.SwingAppletDescriptor;
 import org.webswing.model.server.SwingApplicationDescriptor;
+import org.webswing.model.server.SwingDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstance;
@@ -102,6 +105,8 @@ public class ServerUtil {
 
 	public static List<ApplicationInfoMsg> createApplicationInfoMsg(AtmosphereResource r, boolean includeAdminApp) {
 		Map<String, SwingApplicationDescriptor> applications = ConfigurationManager.getInstance().getApplications();
+		Map<String, SwingAppletDescriptor> applets = ConfigurationManager.getInstance().getApplets();
+
 		List<ApplicationInfoMsg> apps = new ArrayList<ApplicationInfoMsg>();
 		StrSubstitutor subs = getConfigSubstitutorMap(getUserName(r), null);
 		if (applications.size() == 0) {
@@ -110,29 +115,21 @@ public class ServerUtil {
 			for (String name : applications.keySet()) {
 				SwingApplicationDescriptor descriptor = applications.get(name);
 				if (isUserAuthorizedForApplication(r, descriptor)) {
-					ApplicationInfoMsg app = new ApplicationInfoMsg();
-					app.setName(name);
-					String icon = subs.replace(descriptor.getIcon());
-					String homeDir = subs.replace(descriptor.getHomeDir());
-					if (icon == null) {
-						app.setBase64Icon(loadImage(null));
-					} else {
-						if (new File(icon).exists()) {
-							app.setBase64Icon(loadImage(icon));
-						} else {
-							if (new File(homeDir + File.separator + icon).exists()) {
-								app.setBase64Icon(loadImage(homeDir + File.separator + icon));
-							} else if (new File(Main.getRootDir(), homeDir + File.separator + icon).exists()) {
-								app.setBase64Icon(loadImage(new File(Main.getRootDir(), homeDir + File.separator + icon).getAbsolutePath()));
-							} else {
-								log.error("Icon loading failed. File " + icon + " or " + homeDir + File.separator + icon + " does not exist.");
-								app.setBase64Icon(loadImage(null));
-							}
-						}
-					}
+					ApplicationInfoMsg app = toApplicationInfoMsg(descriptor, subs);
+					app.setApplet(false);
 					apps.add(app);
 				}
 			}
+			for (String name : applets.keySet()) {
+				SwingAppletDescriptor descriptor = applets.get(name);
+				if (isUserAuthorizedForApplication(r, descriptor)) {
+					ApplicationInfoMsg app = toApplicationInfoMsg(descriptor, subs);
+					app.setApplet(true);
+					apps.add(app);
+				}
+			}
+			Collections.sort(apps);
+
 			if (includeAdminApp) {
 				ApplicationInfoMsg adminConsole = new ApplicationInfoMsg();
 				adminConsole.setName(Constants.ADMIN_CONSOLE_APP_NAME);
@@ -142,7 +139,31 @@ public class ServerUtil {
 		return apps;
 	}
 
-	public static boolean isUserAuthorized(AtmosphereResource r, SwingApplicationDescriptor app, ConnectionHandshakeMsgIn h) {
+	private static ApplicationInfoMsg toApplicationInfoMsg(SwingDescriptor swingDesc, StrSubstitutor subs) {
+		ApplicationInfoMsg app = new ApplicationInfoMsg();
+		app.setName(swingDesc.getName());
+		String icon = subs.replace(swingDesc.getIcon());
+		String homeDir = subs.replace(swingDesc.getHomeDir());
+		if (icon == null) {
+			app.setBase64Icon(loadImage(null));
+		} else {
+			if (new File(icon).exists()) {
+				app.setBase64Icon(loadImage(icon));
+			} else {
+				if (new File(homeDir + File.separator + icon).exists()) {
+					app.setBase64Icon(loadImage(homeDir + File.separator + icon));
+				} else if (new File(Main.getRootDir(), homeDir + File.separator + icon).exists()) {
+					app.setBase64Icon(loadImage(new File(Main.getRootDir(), homeDir + File.separator + icon).getAbsolutePath()));
+				} else {
+					log.error("Icon loading failed. File " + icon + " or " + homeDir + File.separator + icon + " does not exist.");
+					app.setBase64Icon(loadImage(null));
+				}
+			}
+		}
+		return app;
+	}
+
+	public static boolean isUserAuthorized(AtmosphereResource r, SwingDescriptor app, ConnectionHandshakeMsgIn h) {
 
 		// mirror view
 		if (h.isMirrored()) {
@@ -155,7 +176,7 @@ public class ServerUtil {
 		return isUserAuthorizedForApplication(r, app);
 	}
 
-	public static boolean isUserAuthorizedForApplication(AtmosphereResource r, SwingApplicationDescriptor app) {
+	public static boolean isUserAuthorizedForApplication(AtmosphereResource r, SwingDescriptor app) {
 		if ((app.isAuthentication() || app.isAuthorization()) && isUserAnonymous(r)) {
 			return false;
 		}

@@ -94,7 +94,7 @@ define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function(atmosphere,
 	}
 
 	function send(message) {
-		if (socket != null && socket.request.isOpen) {
+		if (socket != null && socket.request.isOpen && !socket.request.closed) {
 			if (typeof message === "object") {
 				if (binary) {
 					var msg = new InputEventsFrameMsgInProto(message);

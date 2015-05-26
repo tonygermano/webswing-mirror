@@ -11,6 +11,8 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 	private Integer desktopWidth;
 	private Integer desktopHeight;
 	private String applicationName;
+	private String documentBase;
+	private boolean applet;
 	private boolean mirrored;
 	private boolean directDrawSupported;
 
@@ -70,4 +72,19 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 		this.directDrawSupported = directDrawSupported;
 	}
 
+	public boolean isApplet() {
+		return applet;
+	}
+
+	public void setApplet(boolean applet) {
+		this.applet = applet;
+	}
+
+	public String getDocumentBase() {
+		return documentBase;
+	}
+
+	public void setDocumentBase(String documentBase) {
+		this.documentBase = documentBase;
+	}
 }

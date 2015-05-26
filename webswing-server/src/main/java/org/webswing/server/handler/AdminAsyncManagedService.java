@@ -5,8 +5,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.config.managed.ManagedServiceInterceptor;
 import org.atmosphere.config.service.DeliverTo;

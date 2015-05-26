@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.admin.s2c.ServerPropertiesMsg;
+import org.webswing.model.server.SwingAppletDescriptor;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
 import org.webswing.model.server.WebswingConfigurationBackup;
@@ -62,8 +63,25 @@ public class ConfigurationManager {
 		return result;
 	}
 
+	public Map<String, SwingAppletDescriptor> getApplets() {
+		Map<String, SwingAppletDescriptor> result = new HashMap<String, SwingAppletDescriptor>();
+		for (SwingAppletDescriptor app : liveConfiguration.getApplets()) {
+			result.put(app.getName(), app);
+		}
+		return result;
+	}
+
 	public SwingApplicationDescriptor getApplication(String name) {
 		for (SwingApplicationDescriptor app : liveConfiguration.getApplications()) {
+			if (name != null && name.equals(app.getName())) {
+				return app;
+			}
+		}
+		return null;
+	}
+
+	public SwingAppletDescriptor getApplet(String name) {
+		for (SwingAppletDescriptor app : liveConfiguration.getApplets()) {
 			if (name != null && name.equals(app.getName())) {
 				return app;
 			}

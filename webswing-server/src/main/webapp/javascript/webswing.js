@@ -3,6 +3,12 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 	"use strict";
 
 	function initInstance(rootElement, options) {
+		//fix for ie - resolving documentBase
+		if (!window.location.origin) {
+			window.location.origin = window.location.protocol + "//" + window.location.hostname
+					+ (window.location.port ? ':' + window.location.port : '');
+		}
+
 		var api = {
 			rootElement : rootElement,
 			autoStart : false,
@@ -15,6 +21,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 			binarySocket : true,
 			recording : false,
 			debugPort : null,
+			documentBase : document.location.origin + document.location.pathname,
 			start : function(customization) {
 				if (customization != null) {
 					customization(api);

@@ -19,7 +19,7 @@ import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
 import org.webswing.model.admin.s2c.SwingSessionMsg;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.SimpleEventMsgOut;
-import org.webswing.model.server.SwingApplicationDescriptor;
+import org.webswing.model.server.SwingDescriptor;
 import org.webswing.server.stats.PerformanceStatsMonitor;
 import org.webswing.server.stats.jmx.WebswingMonitoringMXBeanImpl;
 import org.webswing.server.util.ServerUtil;
@@ -59,9 +59,18 @@ public class SwingInstanceManager {
 	}
 
 	public void connectSwingInstance(AtmosphereResource resource, ConnectionHandshakeMsgIn h) {
-		SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(h.getApplicationName());
+		SwingDescriptor app;
+		if (h.isApplet()) {
+			app = ConfigurationManager.getInstance().getApplet(h.getApplicationName());
+		} else {
+			app = ConfigurationManager.getInstance().getApplication(h.getApplicationName());
+		}
 		if (app == null) {
-			throw new RuntimeException("Application " + h.getApplicationName() + " is not configured.");
+			if (h.isApplet()) {
+				throw new RuntimeException("Applet " + h.getApplicationName() + " is not configured.");
+			} else {
+				throw new RuntimeException("Application " + h.getApplicationName() + " is not configured.");
+			}
 		}
 		if (ServerUtil.isUserAuthorized(resource, app, h)) {
 			SwingInstance swingInstance = swingInstances.get(h.getClientId());
@@ -105,7 +114,7 @@ public class SwingInstanceManager {
 		}
 	}
 
-	private boolean reachedMaxConnections(SwingApplicationDescriptor app) {
+	private boolean reachedMaxConnections(SwingDescriptor app) {
 		if (app.getMaxClients() < 0) {
 			return false;
 		} else if (app.getMaxClients() == 0) {

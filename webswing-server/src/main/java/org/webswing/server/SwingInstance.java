@@ -8,7 +8,7 @@ import org.webswing.model.MsgOut;
 import org.webswing.model.admin.s2c.SwingJvmStatsMsg;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn;
-import org.webswing.model.server.SwingApplicationDescriptor;
+import org.webswing.model.server.SwingDescriptor;
 import org.webswing.server.SwingJvmConnection.WebSessionListener;
 import org.webswing.server.handler.AdminAsyncManagedService;
 import org.webswing.server.model.EncodedMessage;
@@ -21,7 +21,7 @@ public class SwingInstance implements WebSessionListener {
 	private String user;
 	private AtmosphereResource resource;
 	private AtmosphereResource mirroredResource;
-	private SwingApplicationDescriptor application;
+	private SwingDescriptor application;
 	private SwingJvmConnection connection;
 	private SwingJvmStatsMsg latest = new SwingJvmStatsMsg();
 	private Date disconnectedSince;
@@ -29,7 +29,7 @@ public class SwingInstance implements WebSessionListener {
 	private final Date startedAt = new Date();
 	private Date endedAt = null;
 
-	public SwingInstance(ConnectionHandshakeMsgIn h, SwingApplicationDescriptor app, AtmosphereResource resource) {
+	public SwingInstance(ConnectionHandshakeMsgIn h, SwingDescriptor app, AtmosphereResource resource) {
 		this.application = app;
 		this.sessionRecorder = ServerUtil.isRecording(resource.getRequest()) ? new SessionRecorder(this) : null;
 		this.user = ServerUtil.getUserName(resource);

@@ -52,11 +52,11 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			public void run() {
 				long diff = System.currentTimeMillis() - lastMessageTimestamp;
 				int timeout = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) * 1000;
-				if (diff / 1000 > 10) {
-					Logger.info("Inactive for " + diff / 1000 + " seconds.");
+				if ((diff / 1000 > 10) && ((diff / 1000) % 10 == 0)) {
+					Logger.warn("Inactive for " + diff / 1000 + " seconds.");
 				}
 				if (diff > timeout) {
-					Logger.info("Exiting swing application due to inactivity for " + diff / 1000 + " seconds.");
+					Logger.warn("Exiting swing application due to inactivity for " + diff / 1000 + " seconds.");
 					System.exit(1);
 				}
 			}
@@ -94,7 +94,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			System.exit(1);
 		}
 
-		exitScheduler.scheduleWithFixedDelay(watchdog, 10, 10, TimeUnit.SECONDS);
+		exitScheduler.scheduleWithFixedDelay(watchdog, 1, 1, TimeUnit.SECONDS);
 	}
 
 	@Override

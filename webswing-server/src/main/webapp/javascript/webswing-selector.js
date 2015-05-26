@@ -17,7 +17,8 @@ define(
 					},
 					application_click : function() {
 						var appName = $(this).attr('data-name');
-						api.base.startApplication(appName);
+						var applet = $(this).attr('data-applet');
+						api.base.startApplication(appName, 'true' === applet);
 					}
 				};
 				var content;
@@ -26,14 +27,16 @@ define(
 					content = '<p>Sorry, there is no application available for you.</p>';
 				} else if (api.applicationName != null) {
 					var exists = false;
+					var isApplet= false;
 					apps.forEach(function(app) {
 						if (app.name === api.applicationName) {
 							exists = true;
+							isApplet = app.applet;
 						}
 					});
 					if (exists) {
 						if (!api.mirror) {
-							api.base.startApplication(api.applicationName);
+							api.base.startApplication(api.applicationName,isApplet);
 						} else {
 							api.base.startMirrorView(api.clientId, api.applicationName);
 						}
@@ -54,10 +57,11 @@ define(
 						} else {
 							content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" data-id="application" data-name="'
 									+ app.name
+									+ '" data-applet="'
+									+ app.applet
 									+ '"><img src="'
 									+ getImageString(app.base64Icon)
-									+ '" class="img-thumbnail"/><div class="caption">'
-									+ app.name + '</div></div></div>';
+									+ '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>';
 						}
 					}
 					content += '</div>';

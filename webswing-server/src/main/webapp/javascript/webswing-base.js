@@ -20,7 +20,7 @@
 	var windowImageHolders = {};
 	var directDraw = new WebswingDirectDraw({});
 
-	function startApplication(name) {
+	function startApplication(name, applet) {
 		api.canvas.get();
 		registerEventListeners(api.canvas.get());
 		resetState();
@@ -29,7 +29,8 @@
 			appName : name,
 			hasControl : true,
 			mirrorMode : false,
-			canPaint : true
+			canPaint : true,
+			applet : applet
 		}
 		handshake();
 		api.dialog.show(api.dialog.content.startingDialog);
@@ -391,7 +392,8 @@
 			event.preventDefault();
 			event.stopPropagation();
 			var keyevt = getKBKey('keypress', canvas, event);
-			if (!(keyevt.key.ctrl &&  keyevt.key.character == 118)) { // skip ctrl+v
+			if (!(keyevt.key.ctrl && keyevt.key.character == 118)) { // skip
+																		// ctrl+v
 				enqueueInputEvent(keyevt);
 			}
 			return false;
@@ -476,7 +478,9 @@
 				desktopWidth : canvas.offsetWidth,
 				desktopHeight : canvas.offsetHeight,
 				mirrored : api.context.mirrorMode,
-				directDrawSupported : api.typedArraysSupported
+				directDrawSupported : api.typedArraysSupported,
+				applet : api.context.applet,
+				documentBase : api.documentBase
 			}
 		};
 		return handshake;

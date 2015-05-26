@@ -18,6 +18,7 @@ message AppFrameMsgOutProto{
 message ApplicationInfoMsgProto{
 	required string name = 1;
 	optional bytes base64Icon = 2;
+	optional bool applet = 3;
 }
 
 message LinkActionMsgProto{
@@ -113,6 +114,8 @@ message ConnectionHandshakeMsgInProto{
 	optional string applicationName = 5;
 	optional bool mirrored = 6;
 	optional bool directDrawSupported = 7;
+	optional bool applet = 8;
+	optional string documentBase = 9;
 }
 
 message KeyboardEventMsgInProto{
