@@ -23,11 +23,11 @@
 
 JAVA_HOME=/opt/java7
 APP="WebSwing"
-BASE=..
+BASE=.
 LOGGING="-Djava.util.logging.config.file=$HOME/.manticore/logging.properties"
 
 PATH=$JAVA_HOME/bin:$PATH
-JAVA_OPTS="-Xmx2G -Xms256M -Xss264k -Djava.security.egd=file:///dev/urandom -d64 -server -XX:+AggressiveOpts -XX:+UseStringCache -XX:AllocatePrefetchLines=1 -XX:AllocatePrefetchStyle=1 -XX:+OptimizeStringConcat -XX:UseSSE=2 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC"
+JAVA_OPTS="-Xmx2G -Xms256M -Xss264k -Djava.security.egd=file:///dev/urandom -server -XX:+AggressiveOpts -XX:+UseStringCache -XX:AllocatePrefetchLines=1 -XX:AllocatePrefetchStyle=1 -XX:+OptimizeStringConcat -XX:UseSSE=2 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC"
 
 NICE=10
 PID=$BASE/logs/$APP.pid
@@ -96,7 +96,7 @@ function status {
         
         if UNIX95= ps -p $( cat $PID ) > /dev/null
 		then
-   			echo "$APP is running with PID [$PID]"
+   			echo "$APP is running with PID [$( cat $PID )]"
    			UNIX95= ps -ef | grep -v grep | grep $( cat $PID )	
    		else 
    			echo "$APP is NOT running, but stale PID [$PID] found"
@@ -115,13 +115,17 @@ function start {
     else
         echo "==== Starting $APP"
         touch $PID
-        cp $LOG "${LOG}_$(date '+%Y%m%d%H%M%S')"; >$LOG
-        if nohup nice -n$NICE sh -c " $COMMAND; sleep 5; echo \"$(date '+%Y-%m-%d %X'): $APP STOPPED\" >>$LOG; rm -f $PID " >>$LOG 2>&1 &
+        if [ -f $LOG ]
+        then
+          cp $LOG "${LOG}_$(date '+%Y%m%d%H%M%S')"; >$LOG
+        fi
+        if nohup nice -n$NICE sh -c " $COMMAND; sleep 1; echo \"$(date '+%Y-%m-%d %X'): $APP STOPPED\" >>$LOG; rm -f $PID " >>$LOG 2>&1 &
         then 
-        	 sleep 5
-        	 #echo "Found nohup PID $!"
+        	 sleep 1
+
         	 #UNIX95=  ps -o ppid -p $! | tail +2 > $PID
-        	 echo $! > $PID
+        	 pgrep -P $! > $PID
+
         	 echo "Started with PID [$( cat $PID )]"
              echo "$(date '+%Y-%m-%d %X'): $APP STARTED" >>$LOG
              tail -f $LOG
@@ -136,11 +140,11 @@ function stop1 {
 
     if [ -f $PID ]
     then
-        if pkill -P $(cat $PID)
+        if kill $(cat $PID)
         then
         	echo "Killed PID: [$( cat $PID )]"
             echo "$(date '+%Y-%m-%d %X'): $APP STOPPED" >>$LOG
-            /bin/rm $PID
+            /bin/rm -f $PID
         fi
     else
         echo "No pid file found, $APP already stopped?"
