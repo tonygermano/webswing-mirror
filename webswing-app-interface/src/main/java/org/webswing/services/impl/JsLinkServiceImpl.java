@@ -148,7 +148,7 @@ public class JsLinkServiceImpl implements JsLinkService {
 		for (Method m : arg.getClass().getMethods()) {
 			methods.add(m.getName());
 		}
-		result.setMethods(methods);
+		result.setMethods(new ArrayList<String>(methods));
 		String id = WebJSObject.createJavaReference(arg);
 		result.setId(id);
 		return result;

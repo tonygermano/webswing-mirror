@@ -18,6 +18,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_ALLOW_DOWNLOAD = "webswing.allowDownload";
 	public static final String SWING_START_SYS_PROP_ALLOW_UPLOAD = "webswing.allowUpload";
 	public static final String SWING_START_SYS_PROP_ALLOW_DELETE = "webswing.allowDelete";
+	public static final String SWING_START_SYS_PROP_ALLOW_JSLINK = "webswing.allowJsLink";
 	public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutAfterDisconectSec";
 	public static final String SWING_START_SYS_PROP_SYNC_TIMEOUT = "webswing.syncCallTimeout";
 	// applet startup properties

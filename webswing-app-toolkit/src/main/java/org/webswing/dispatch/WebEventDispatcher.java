@@ -16,10 +16,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
+
+import netscape.javascript.JSObject;
 
 import org.webswing.Constants;
 import org.webswing.model.MsgIn;
@@ -31,10 +34,12 @@ import org.webswing.model.c2s.PasteEventMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.c2s.UploadEventMsgIn;
 import org.webswing.model.c2s.UploadedEventMsgIn;
+import org.webswing.model.jslink.JSObjectMsg;
 import org.webswing.toolkit.WebClipboard;
 import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
@@ -59,6 +64,18 @@ public class WebEventDispatcher {
 		if (event instanceof ConnectionHandshakeMsgIn) {
 			ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
 			Util.getWebToolkit().initSize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
+			if (handshake.isApplet()) {
+				// refresh the applet object exposed in javascript in case of page reload/session continue
+				Runnable r = new Runnable() {
+
+					@Override
+					public void run() {
+						JSObject root = new WebJSObject(new JSObjectMsg("instanceObject"));
+						root.setMember("applet", WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS)));
+					}
+				};
+				new Thread(r).start();
+			}
 		}
 		if (event instanceof SimpleEventMsgIn) {
 			SimpleEventMsgIn msg = (SimpleEventMsgIn) event;

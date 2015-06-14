@@ -5,7 +5,7 @@
 	} else {
 		root.WebswingBase = factory(root.WebswingDirectDraw);
 	}
-}(this, function(WebswingDirectDraw) {
+}(this, function WebswingBase(WebswingDirectDraw) {
 	"use strict";
 
 	var api;
@@ -235,7 +235,11 @@
 						if (win.directDraw != null) {
 							// directdraw
 							return sequence.then(function(resolved) {
-								return directDraw.drawBin(win.directDraw, windowImageHolders[win.id]);
+								if(typeof win.directDraw==='string'){
+									return directDraw.draw64(win.directDraw, windowImageHolders[win.id]);
+								}else{
+									return directDraw.drawBin(win.directDraw, windowImageHolders[win.id]);
+								}
 							}).then(
 									function(resultImage) {
 										windowImageHolders[win.id] = resultImage;
@@ -431,8 +435,8 @@
 		var rect = canvas.getBoundingClientRect();
 		var root = document.documentElement;
 		// return relative mouse position
-		var mouseX = evt.clientX - rect.left;
-		var mouseY = evt.clientY - rect.top;
+		var mouseX = Math.round(evt.clientX - rect.left);
+		var mouseY = Math.round(evt.clientY - rect.top);
 		var delta = 0;
 		if (type == 'mousewheel') {
 			delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
@@ -485,7 +489,8 @@
 				mirrored : api.context.mirrorMode,
 				directDrawSupported : api.typedArraysSupported,
 				applet : api.context.applet,
-				documentBase : api.documentBase
+				documentBase : api.documentBase,
+				params : api.params
 			}
 		};
 		return handshake;

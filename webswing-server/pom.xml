@@ -288,6 +288,10 @@
 									<webApp>
 										<contextPath>/</contextPath>
 										<defaultsDescriptor>${project.basedir}/src/test/webapp/WEB-INF/jetty-maven-plugin-webdefault.xml</defaultsDescriptor>
+										<resourceBases>
+											<resourceBase>${project.basedir}/src/main/webapp</resourceBase>
+											<resourceBase>${project.basedir}/src/test/webapp</resourceBase>
+										</resourceBases>
 									</webApp>
 									<systemProperties>
 										<force>true</force>

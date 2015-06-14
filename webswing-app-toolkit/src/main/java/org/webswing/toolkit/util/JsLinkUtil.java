@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.naming.OperationNotSupportedException;
+
 import netscape.javascript.JSException;
 
 import org.webswing.model.jslink.JSObjectMsg;
@@ -122,12 +124,17 @@ public class JsLinkUtil {
 		return msgout;
 	}
 
+	public static AppFrameMsgOut getErrorResponse(JavaEvalRequestMsgIn javaReq, String error) {
+		return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq, new OperationNotSupportedException(error)));
+	}
+
 	public static AppFrameMsgOut callMatchingMethod(JavaEvalRequestMsgIn javaReq, Object javaRef) {
 		if (javaRef != null) {
 			Exception exception = null;
 			List<Method> candidates = new ArrayList<Method>();
 			for (Method m : javaRef.getClass().getMethods()) {
-				if (m.getName().equals(javaReq.getMethod()) && m.getParameterTypes().length == javaReq.getParams().size()) {
+				int requestParamCount = javaReq.getParams() != null ? javaReq.getParams().size() : 0;
+				if (m.getName().equals(javaReq.getMethod()) && m.getParameterTypes().length == requestParamCount) {
 					candidates.add(m);
 				}
 			}

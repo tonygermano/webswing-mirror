@@ -130,7 +130,7 @@ define([], function JsLink() {
 							var request = {
 								javaRequest : {
 									correlationId : jCorrelationId,
-									objectId : id,
+									objectId : javaRefMsg.id,
 									method : m,
 									params : params
 								}
@@ -155,6 +155,7 @@ define([], function JsLink() {
 	return {
 		init : function(wsApi) {
 			api = wsApi;
+			referenceCache['instanceObject']=api.extObject;
 			wsApi.jslink = {
 				process : process
 			};

@@ -21,6 +21,7 @@ public class SwingDescriptor implements Serializable {
 	private boolean allowDelete = true;
 	private boolean allowDownload = true;
 	private boolean allowUpload = true;
+	private boolean allowJsLink = true;
 
 	public String getName() {
 		return name;
@@ -159,6 +160,14 @@ public class SwingDescriptor implements Serializable {
 
 	public void setAllowUpload(boolean allowUpload) {
 		this.allowUpload = allowUpload;
+	}
+
+	public boolean isAllowJsLink() {
+		return allowJsLink;
+	}
+
+	public void setAllowJsLink(boolean allowJsLink) {
+		this.allowJsLink = allowJsLink;
 	}
 
 }

@@ -1,0 +1,49 @@
+
+<HTML>
+<HEAD>
+<TITLE>JApplet Demo Page</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<H1>Webswing applet demo page</H1>
+This page demonstrates the use of webswing to display applets.
+<hr>
+
+<div style="height:300px;width:200px" data-webswing-instance="webswing" data-webswing-options="{autoStart:true, anonym:true, applicationName:'showcase',debugPort:3333, connectionUrl:'http://localhost:8080'}">
+	<webswing-param name="pageparam1" value="value1"/>
+	<webswing-param name="pageparam2" value="value2"/>
+</div>
+
+<script>
+	(function (window, document) {
+	  var loader = function () {
+	    var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+	    script.src =  "http://localhost:8080/javascript/webswing-embed.js";
+	    tag.parentNode.insertBefore(script, tag);
+	  };
+	  window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+	})(window, document);
+</script>
+
+
+<div id="output">
+
+</div>
+<a href="javascript:loadParameterInfo();" >getParameterInfo()</a>
+<a href="javascript:loadAppletInfo();">getAppletInfo()</a>
+
+<script type="text/javascript">
+function loadParameterInfo(){
+	webswing.applet.getParameterInfo().then(function(result){
+			document.getElementById('output').innerHTML =result;	
+		});
+}
+function loadAppletInfo(){
+	webswing.applet.getAppletInfo().then(function(result){
+			document.getElementById('output').innerHTML =result;	
+		});
+}
+</script>
+
+<hr>
+</BODY>
+</HTML>

@@ -1,6 +1,7 @@
 package org.webswing.toolkit.jslink;
 
 import java.applet.Applet;
+import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeoutException;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 
+import org.webswing.Constants;
 import org.webswing.model.jslink.JSObjectMsg;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
@@ -24,6 +26,7 @@ public class WebJSObject extends JSObject {
 
 	private static final Map<String, WeakReference<JSObjectMsg>> jsGarbageCollectionMap = new HashMap<String, WeakReference<JSObjectMsg>>();
 	private static final WeakValueHashMap<String, Object> javaReferences = new WeakValueHashMap<String, Object>();
+	private static boolean jsLinkAllowed = Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK);
 
 	private JSObjectMsg jsThis;
 
@@ -113,6 +116,10 @@ public class WebJSObject extends JSObject {
 	}
 
 	public static String createJavaReference(Object arg) {
+		return createJavaReference(arg, UUID.randomUUID().toString());
+	}
+
+	public static String createJavaReference(Object arg, String newId) {
 		if (javaReferences.containsValue(arg)) {
 			String id = null;
 			for (String key : javaReferences.keySet()) {
@@ -122,7 +129,7 @@ public class WebJSObject extends JSObject {
 			}
 			return id;
 		} else {
-			String id = UUID.randomUUID().toString();
+			String id = newId;
 			javaReferences.put(id, arg);
 			return id;
 		}
@@ -134,8 +141,13 @@ public class WebJSObject extends JSObject {
 	}
 
 	public static void evaluateJava(JavaEvalRequestMsgIn javaReq) {
-		Object javaRef = javaReferences.get(javaReq.getObjectId());
-		AppFrameMsgOut result = JsLinkUtil.callMatchingMethod(javaReq, javaRef);
-		Services.getConnectionService().sendObject(result);
+		if (jsLinkAllowed) {
+			Object javaRef = javaReferences.get(javaReq.getObjectId());
+			AppFrameMsgOut result = JsLinkUtil.callMatchingMethod(javaReq, javaRef);
+			Services.getConnectionService().sendObject(result);
+		} else {
+			Serializable result = JsLinkUtil.getErrorResponse(javaReq, "JsLink is not allowed for this application. Set the 'allowJsLink' to true in webswing.config to enable it.");
+			Services.getConnectionService().sendObject(result);
+		}
 	}
 }

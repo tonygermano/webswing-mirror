@@ -45,6 +45,7 @@ import org.webswing.Constants;
 import org.webswing.model.MsgInternal;
 import org.webswing.model.MsgOut;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.c2s.ParamMsg;
 import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.model.internal.PrinterJobResultMsgInternal;
 import org.webswing.model.s2c.AppFrameMsgOut;
@@ -284,6 +285,7 @@ public class SwingJvmConnection implements MessageListener {
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload() + "");
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload() + "");
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_DELETE, appConfig.isAllowDelete() + "");
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, appConfig.isAllowJsLink() + "");
 
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw() + "");
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported() + "");
@@ -305,6 +307,9 @@ public class SwingJvmConnection implements MessageListener {
 							addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_APPLET_CLASS, applet.getAppletClass());
 							for (String key : applet.getParameters().keySet()) {
 								addSysProperty(javaTask, Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX + subs.replace(key), subs.replace(applet.getParameters().get(key)));
+							}
+							for (ParamMsg p : handshake.getParams()) {
+								addSysProperty(javaTask, Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX + p.getName(), p.getValue());
 							}
 						}
 

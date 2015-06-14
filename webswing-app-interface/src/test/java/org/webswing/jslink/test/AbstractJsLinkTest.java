@@ -13,6 +13,7 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
+import org.webswing.Constants;
 import org.webswing.ext.services.JsLinkService;
 import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.model.MsgOut;
@@ -23,6 +24,9 @@ import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.Services;
 
 public abstract class AbstractJsLinkTest {
+	static {
+		System.setProperty(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, "true");
+	}
 	private static final ObjectMapper mapper = new ObjectMapper();
 	ScriptEngine engine = null;
 	JSObject root = new WebJSObject(null);

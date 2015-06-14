@@ -10,7 +10,10 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 					+ (window.location.port ? ':' + window.location.port : '');
 		}
 
+		var extObject = {};
+
 		var api = {
+			extObject : extObject,
 			rootElement : rootElement,
 			autoStart : false,
 			applicationName : null,
@@ -63,7 +66,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 			api.dialog.show(api.dialog.content.readyDialog);
 		}
 
-		function configure(options) {
+		function configure(options, appletParams) {
 			options = options != null ? options : readOptions(api.rootElement);
 			if (options != null) {
 				api.autoStart = options.autoStart != null ? JSON.parse(options.autoStart) : api.autoStart;
@@ -81,23 +84,31 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 					api.connectionUrl = api.connectionUrl + '/';
 				}
 			}
-		}
-
-		function setControl(value) {
-			if (value) {
-				api.context.hasControl = true;
-			} else {
-				api.context.hasControl = false;
+			appletParams = appletParams != null ? appletParams : readAppletParams(api.rootElement);
+			if (appletParams != null) {
+				api.params = [];
+				for ( var prop in appletParams) {
+					if (typeof appletParams[prop] === 'string') {
+						api.params.push({
+							name : prop,
+							value : appletParams[prop]
+						});
+					}
+				}
 			}
 		}
 
-		return {
-			start : api.start,
-			disconnect : api.disconnect,
-			configure : configure,
-			kill : api.base.kill,
-			setControl : setControl
-		};
+		function setControl(value) {
+			api.context.hasControl = value ? true : false;
+		}
+
+
+		extObject.start = api.start;
+		extObject.disconnect = api.disconnect;
+		extObject.configure = configure;
+		extObject.kill = api.base.kill;
+		extObject.setControl = setControl;
+		return extObject;
 
 	}
 
@@ -111,6 +122,19 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 			}
 		}
 		return options;
+	}
+
+	function readAppletParams(element) {
+		var result = {}
+		var params = $(element).find('webswing-param');
+		for ( var i = 0; i < params.length; i++) {
+			var name = params[i].getAttribute('name');
+			var val = params[i].getAttribute('value');
+			if (name != null) {
+				result[name] = val;
+			}
+		}
+		return result;
 	}
 
 	function scanForInstances(root) {

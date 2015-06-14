@@ -52,7 +52,7 @@ public class Js2JavaCallTest extends AbstractJsLinkTest {
 
 	@Test
 	public void testCyclicRefArray() throws ScriptException, InterruptedException {
-		engine.eval("window.testObject.getCyclicArray().then(function(r){evalValue= r;})");
+		engine.eval("window.testObject.getCyclicArray().then(function(r){evalValue= r;},function(r){print(r)})");
 		assertEquals(testObject.getCyclicArray()[0], engine.eval("evalValue[0]"));
 	}
 
