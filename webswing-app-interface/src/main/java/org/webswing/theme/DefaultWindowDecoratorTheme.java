@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
 import org.webswing.common.WindowActionType;
 import org.webswing.common.WindowDecoratorTheme;
 import org.webswing.toolkit.extra.WindowManager;
-import org.webswing.util.Logger;
+import org.webswing.toolkit.util.Logger;
 
 public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 

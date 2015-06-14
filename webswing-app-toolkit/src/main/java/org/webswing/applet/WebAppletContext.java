@@ -15,8 +15,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import org.webswing.util.Logger;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Util;
 
 import sun.awt.image.URLImageSource;
 import sun.misc.Ref;

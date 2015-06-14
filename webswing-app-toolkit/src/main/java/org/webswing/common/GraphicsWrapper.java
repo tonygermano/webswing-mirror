@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.WebComponentPeer;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Util;
 
 public class GraphicsWrapper extends Graphics2D {
 

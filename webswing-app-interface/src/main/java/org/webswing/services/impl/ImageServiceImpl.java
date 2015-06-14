@@ -12,7 +12,7 @@ import javax.imageio.stream.ImageOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.webswing.common.WindowDecoratorTheme;
 import org.webswing.ext.services.ImageService;
-import org.webswing.util.Logger;
+import org.webswing.toolkit.util.Logger;
 
 import com.objectplanet.image.PngEncoder;
 

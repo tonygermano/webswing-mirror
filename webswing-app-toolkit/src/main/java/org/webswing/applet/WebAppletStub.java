@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.Map;
 
 import org.webswing.Constants;
-import org.webswing.util.Logger;
+import org.webswing.toolkit.util.Logger;
 
 public class WebAppletStub implements AppletStub {
 

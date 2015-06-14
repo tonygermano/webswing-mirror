@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.swing.JWindow;
 
 import org.webswing.Constants;
-import org.webswing.util.Logger;
+import org.webswing.toolkit.util.Logger;
 
 public class AppletContainer extends JWindow {
 

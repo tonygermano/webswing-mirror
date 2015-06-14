@@ -35,9 +35,9 @@ import org.webswing.toolkit.WebClipboard;
 import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
-import org.webswing.util.Logger;
-import org.webswing.util.Services;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
 
 public class WebEventDispatcher {
 

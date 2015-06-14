@@ -12,7 +12,9 @@ message AppFrameMsgOutProto{
 	repeated WindowMsgProto windows = 7;
 	optional WindowMsgProto closedWindow = 8;
 	optional SimpleEventMsgOutProto event = 9;
-	optional string sessionId = 10;
+	optional JsEvalRequestMsgOutProto jsRequest = 10;
+	optional JsResultMsgProto jsResult = 11;
+	optional string sessionId = 12;
 }
 
 message ApplicationInfoMsgProto{
@@ -90,7 +92,30 @@ enum SimpleEventMsgOutProto{
 	configurationError = 4;
 }
 
+message JsEvalRequestMsgOutProto{
+	optional string correlationId = 1;
+	optional string thisObjectId = 2;
+	optional JsEvalRequestTypeProto type = 3;
+	optional string evalString = 4;
+	repeated JSParamMsgProto params = 5;
+	repeated string garbageIds = 6;
+}
 
+enum JsEvalRequestTypeProto{
+	eval = 0;
+	call = 1;
+	setMember = 2;
+	getMember = 3;
+	deleteMember = 4;
+	setSlot = 5;
+	getSlot = 6;
+}
+
+message JSParamMsgProto{
+}
+
+message JsResultMsgProto{
+}
 /* ===================BROWSER -> SERVER====================*/
 message InputEventsFrameMsgInProto{
 	repeated InputEventMsgInProto events = 1;

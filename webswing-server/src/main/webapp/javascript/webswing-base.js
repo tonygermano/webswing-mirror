@@ -19,7 +19,7 @@
 
 	var windowImageHolders = {};
 	var directDraw = new WebswingDirectDraw({});
-	var iePastePromptHack=false;
+	var iePastePromptHack = false;
 
 	function startApplication(name, applet) {
 		api.canvas.get();
@@ -170,6 +170,9 @@
 				api.dialog.show(api.dialog.content.continueOldSessionDialog);
 			}
 			return;
+		}
+		if (data.jsRequest != null && api.context.mirrorMode == false) {
+			api.jslink.process(data.jsRequest);
 		}
 		if (api.context.canPaint) {
 			processRequest(api.canvas.get(), data);
@@ -372,12 +375,14 @@
 			// hanle paste event
 			if (keyevt.key.ctrl && keyevt.key.character == 86) { // ctrl+v
 				var text = prompt('Press ctrl+v and enter..');
-				iePastePromptHack=true;setTimeout(function(){iePastePromptHack=false;},10);
+				iePastePromptHack = true;
+				setTimeout(function() {
+					iePastePromptHack = false;
+				}, 10);
 				if (api.context.hasControl) {
 					api.socket.send({
 						paste : {
-							content : text,
-							clientId : api.context.clientId
+							content : text
 						}
 					});
 				}
@@ -394,7 +399,8 @@
 			event.preventDefault();
 			event.stopPropagation();
 			var keyevt = getKBKey('keypress', canvas, event);
-			if (!(keyevt.key.ctrl &&  keyevt.key.character == 118) && !(iePastePromptHack &&  keyevt.key.character == 118)) { // skip ctrl+v
+			if (!(keyevt.key.ctrl && keyevt.key.character == 118) && !(iePastePromptHack && keyevt.key.character == 118)) { // skip
+				// ctrl+v
 				enqueueInputEvent(keyevt);
 			}
 			return false;
@@ -433,7 +439,6 @@
 		}
 		return {
 			mouse : {
-				clientId : api.context.clientId,
 				x : mouseX,
 				y : mouseY,
 				type : type,
@@ -458,7 +463,6 @@
 		}
 		return {
 			key : {
-				clientId : api.context.clientId,
 				type : type,
 				character : char,
 				keycode : kk,
@@ -491,7 +495,6 @@
 		return {
 			event : {
 				type : message,
-				clientId : api.context.clientId
 			}
 		};
 	}

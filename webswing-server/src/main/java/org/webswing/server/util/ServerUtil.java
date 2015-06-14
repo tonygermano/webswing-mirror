@@ -83,7 +83,7 @@ public class ServerUtil {
 				o = mapper.readValue(s, c);
 				break;
 			} catch (IOException e) {
-				// do nothing
+				log.error("Failed to decode json message:", e);
 			}
 		}
 		return o;
@@ -97,7 +97,7 @@ public class ServerUtil {
 				o = protoMapper.decodeProto(message, c);
 				break;
 			} catch (IOException e) {
-				// do nothing
+				log.error("Failed to decode proto message:", e);
 			}
 		}
 		return o;

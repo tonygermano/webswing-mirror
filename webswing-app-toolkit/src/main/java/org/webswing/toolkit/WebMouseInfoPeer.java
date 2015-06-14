@@ -5,7 +5,7 @@ import java.awt.Window;
 import java.awt.peer.MouseInfoPeer;
 
 import org.webswing.toolkit.extra.WindowManager;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Util;
 
 
 public class WebMouseInfoPeer implements MouseInfoPeer{

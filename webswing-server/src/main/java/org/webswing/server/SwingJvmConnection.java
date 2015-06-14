@@ -33,7 +33,6 @@ import main.Main;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.apache.log4j.Level;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;

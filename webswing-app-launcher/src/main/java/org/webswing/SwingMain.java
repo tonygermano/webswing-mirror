@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.webswing.applet.AppletContainer;
-import org.webswing.util.Logger;
-import org.webswing.util.Services;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
 
 public class SwingMain {
 

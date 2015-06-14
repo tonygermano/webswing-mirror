@@ -16,13 +16,6 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/../lib/rt-win-shell.jar</systemPath>
 		</dependency>
-		<dependency>
-			<groupId>sun.plugin</groupId>
-			<artifactId>plugin</artifactId>
-			<version>1.6</version>
-			<scope>system</scope>
-			<systemPath>${java.home}/lib/plugin.jar</systemPath>
-		</dependency>
 	</dependencies>
 	<build>
 		<finalName>webswing-app-toolkit</finalName>

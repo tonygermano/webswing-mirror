@@ -1,9 +1,10 @@
 define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog', 'webswing-selector', 'webswing-login', 'webswing-canvas',
-		'webswing-identity', 'webswing-polyfill' ], function($, base, socket, files, dialog, selector, login, canvas, identity, polyfill) {
+		'webswing-identity', 'webswing-polyfill', 'webswing-jslink' ], function($, base, socket, files, dialog, selector, login, canvas, identity,
+		polyfill, jslink) {
 	"use strict";
 
 	function initInstance(rootElement, options) {
-		//fix for ie - resolving documentBase
+		// fix for ie - resolving documentBase
 		if (!window.location.origin) {
 			window.location.origin = window.location.protocol + "//" + window.location.hostname
 					+ (window.location.port ? ':' + window.location.port : '');
@@ -21,6 +22,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 			binarySocket : true,
 			recording : false,
 			debugPort : null,
+			javaCallTimeout : 3000,
 			documentBase : document.location.origin + document.location.pathname,
 			start : function(customization) {
 				if (customization != null) {
@@ -52,6 +54,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 		canvas.init(api);
 		identity.init(api);
 		polyfill.init(api);
+		jslink.init(api);
 		configure();
 
 		if (api.autoStart) {
@@ -68,11 +71,12 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 				api.args = options.args != null ? options.args : api.args;
 				api.anonym = options.anonym != null ? JSON.parse(options.anonym) : api.anonym;
 				api.binarySocket = options.binarySocket != null ? JSON.parse(options.binarySocket) : api.binarySocket;
-				api.recording = options.recording != null ? JSON.parse(options.recording) : api.recording ;
+				api.recording = options.recording != null ? JSON.parse(options.recording) : api.recording;
 				api.clientId = options.clientId != null ? options.clientId : api.clientId;
 				api.mirror = options.mirrorMode != null ? JSON.parse(options.mirrorMode) : api.mirror;
 				api.connectionUrl = options.connectionUrl != null ? options.connectionUrl : api.connectionUrl;
 				api.debugPort = options.debugPort != null ? options.debugPort : api.debugPort;
+				api.javaCallTimeout = options.javaCallTimeout != null ? parseInt(options.javaCallTimeout, 10) : api.javaCallTimeout;
 				if (api.connectionUrl.substr(api.connectionUrl.length - 1) !== '/') {
 					api.connectionUrl = api.connectionUrl + '/';
 				}

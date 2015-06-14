@@ -12,7 +12,7 @@ import javax.swing.RepaintManager;
 
 import org.webswing.SwingMain;
 import org.webswing.toolkit.extra.WebRepaintManager;
-import org.webswing.util.Logger;
+import org.webswing.toolkit.util.Logger;
 
 public class RedirectedMethods {
 
