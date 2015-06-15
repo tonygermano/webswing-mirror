@@ -371,7 +371,7 @@
 			// FF (163, 171, 173, ) -> en layout ]\/ keys
 			var kc = event.keyCode;
 			if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226)
-					|| (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
+					|| (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111) || (kc == 59) || (kc == 61))) {
 				event.preventDefault();
 				event.stopPropagation();
 			}
