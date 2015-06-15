@@ -304,6 +304,10 @@
 											<value>${webswingRoot}</value>
 										</systemProperty>
 										<systemProperty>
+											<name>user.dir</name>
+											<value>${webswingRoot}</value>
+										</systemProperty>
+										<systemProperty>
 											<name>webswing.tempDirBase</name>
 											<value>${project.build.outputDirectory}/tmp</value>
 										</systemProperty>

@@ -8,7 +8,7 @@
 This page demonstrates the use of webswing to display applets.
 <hr>
 
-<div style="height:300px;width:200px" data-webswing-instance="webswing" data-webswing-options="{autoStart:true, anonym:true, applicationName:'showcase',debugPort:3333, connectionUrl:'http://localhost:8080'}">
+<div style="width:700px;height:550px;" data-webswing-instance="webswing" data-webswing-options="{autoStart:true, anonym:true, applicationName:'SwingSet2 applet',debugPort:3333, connectionUrl:'http://localhost:8080'}">
 	<webswing-param name="pageparam1" value="value1"/>
 	<webswing-param name="pageparam2" value="value2"/>
 </div>
@@ -28,17 +28,17 @@ This page demonstrates the use of webswing to display applets.
 <div id="output">
 
 </div>
-<a href="javascript:loadParameterInfo();" >getParameterInfo()</a>
-<a href="javascript:loadAppletInfo();">getAppletInfo()</a>
+<a href="javascript:appletGetName();" >applet.getName()</a>
+<a href="javascript:appletToString();">applet.toString()</a>
 
 <script type="text/javascript">
-function loadParameterInfo(){
-	webswing.applet.getParameterInfo().then(function(result){
+function appletGetName(){
+	webswing.applet.getName().then(function(result){
 			document.getElementById('output').innerHTML =result;	
 		});
 }
-function loadAppletInfo(){
-	webswing.applet.getAppletInfo().then(function(result){
+function appletToString(){
+	webswing.applet.toString().then(function(result){
 			document.getElementById('output').innerHTML =result;	
 		});
 }

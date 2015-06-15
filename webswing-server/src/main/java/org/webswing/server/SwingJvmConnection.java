@@ -308,8 +308,10 @@ public class SwingJvmConnection implements MessageListener {
 							for (String key : applet.getParameters().keySet()) {
 								addSysProperty(javaTask, Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX + subs.replace(key), subs.replace(applet.getParameters().get(key)));
 							}
-							for (ParamMsg p : handshake.getParams()) {
-								addSysProperty(javaTask, Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX + p.getName(), p.getValue());
+							if (handshake.getParams() != null) {
+								for (ParamMsg p : handshake.getParams()) {
+									addSysProperty(javaTask, Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX + p.getName(), p.getValue());
+								}
 							}
 						}
 
