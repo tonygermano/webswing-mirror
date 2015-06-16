@@ -309,7 +309,7 @@
 										</systemProperty>
 										<systemProperty>
 											<name>webswing.tempDirBase</name>
-											<value>${project.build.outputDirectory}/tmp</value>
+											<value>${project.build.directory}/tmp</value>
 										</systemProperty>
 									</systemProperties>
 								</configuration>

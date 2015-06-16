@@ -1,13 +1,20 @@
 package org.webswing.classloader;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.URLStreamHandler;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.bcel.Constants;
@@ -31,6 +38,7 @@ import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.ClassLoaderRepository;
+import org.webswing.toolkit.util.Logger;
 import org.webswing.util.ClassLoaderUtil;
 
 import sun.security.util.SecurityConstants;
@@ -45,6 +53,7 @@ public class SwingClassloader extends ClassLoader {
 	private static BiMap<String, String> classReplacementMapping;
 	private static BiMap<String, String> methodReplacementMapping;
 	private static BiMap<String, String> methodOverrideMapping;
+	private static URLStreamHandler originalJarHandler;
 
 	static {
 		Builder<String, String> classBuilder = new ImmutableBiMap.Builder<String, String>();
@@ -141,16 +150,48 @@ public class SwingClassloader extends ClassLoader {
 		// methodOverrideBuilder.put("sk.web.swing.JFileChooser$$BCEL$$ createDialog (Ljava/awt/Component;)Ljavax/swing/JDialog;","org.webswing.special.OverridenMethods createDialog");
 		methodOverrideMapping = methodOverrideBuilder.build();
 
+		try {
+			List<Field> candidates = new ArrayList<Field>();
+			for (Field f : URL.class.getDeclaredFields()) {
+				if (f.getType() == URLStreamHandler.class) {
+					candidates.add(f);
+				}
+			}
+			Field f = candidates.get(0);
+			f.setAccessible(true);
+			originalJarHandler = (URLStreamHandler) f.get(new URL("jar:file:/sample.jar!/"));
+		} catch (Throwable t) {
+			Logger.error("Unable to resolve the original URL stream handler:", t);
+		}
 	}
 
 	private Hashtable<String, Class<?>> classes = new Hashtable<String, Class<?>>(); // Hashtable is synchronized thus thread-safe
 	private String[] ignored_packages;
 	private ClassLoaderRepository repository;
+	private final URLClassLoader repoClassLoader;
 
-	public SwingClassloader(ClassLoader parent) {
+	public SwingClassloader(URL[] classpath, ClassLoader parent) {
 		super(parent);
 		this.ignored_packages = new String[] { "java.", "javax.", "sun.", "org.xml.sax", "org.omg.CORBA", "org.w3c.dom", "org.webswing.special", "org.webswing.model", "org.webswing.toolkit", "netscape.javascript" };
-		this.repository = new ClassLoaderRepository(parent);
+		this.repoClassLoader = new URLClassLoader(classpath) {
+
+			@Override
+			public URL findResource(String name) {
+				// This is to prevent ClassCircularityError caused by custom jar URLStreamHandler (ie. in netbeans platform apps)
+				URL unsafe = super.findResource(name);
+				if (originalJarHandler != null && unsafe != null) {
+					try {
+						URL safeurl = new URL(null, unsafe.toString(), originalJarHandler);
+						return safeurl;
+					} catch (MalformedURLException e) {
+						Logger.error("Converting " + unsafe.toString() + " to safe url failed", e);
+					}
+				}
+				return unsafe;
+			}
+
+		};
+		this.repository = new ClassLoaderRepository(repoClassLoader);
 	}
 
 	protected synchronized Class<?> loadClass(String class_name, boolean resolve) throws ClassNotFoundException {
@@ -187,7 +228,7 @@ public class SwingClassloader extends ClassLoader {
 					byte[] bytes = clazz.getBytes();
 					java.security.Permissions perms = new java.security.Permissions();
 					perms.add(SecurityConstants.ALL_PERMISSION);
-					String classFilePath = this.getParent().getResource(clazz.getClassName().replace('.', '/') + ".class").toExternalForm();
+					String classFilePath = repoClassLoader.getResource(clazz.getClassName().replace('.', '/') + ".class").toExternalForm();
 					int jarSeparatorIndex = classFilePath.lastIndexOf('!');
 					boolean inJar = classFilePath.startsWith("jar:");
 					classFilePath = jarSeparatorIndex > 0 && inJar ? classFilePath.substring(4, jarSeparatorIndex) : classFilePath;
@@ -195,7 +236,7 @@ public class SwingClassloader extends ClassLoader {
 					try {
 						source = new CodeSource(new URL(classFilePath), new Certificate[] {});
 					} catch (MalformedURLException e) {
-						e.printStackTrace();
+						Logger.fatal("Exception resolving code source:", e);
 						// should not happen
 					}
 					ProtectionDomain allPermDomain = new java.security.ProtectionDomain(source, perms);
@@ -223,7 +264,7 @@ public class SwingClassloader extends ClassLoader {
 			return clazz;
 		}
 
-		Package s = super.getPackage(clazz.getPackageName());
+		Package s = getPackage(clazz.getPackageName());
 		if (s == null) {
 			super.definePackage(clazz.getPackageName(), null, null, null, null, null, null, null);
 		}
@@ -408,11 +449,21 @@ public class SwingClassloader extends ClassLoader {
 
 	@Override
 	public InputStream getResourceAsStream(String name) {
-		InputStream result = super.getResourceAsStream(name);
+		InputStream result = repoClassLoader.getResourceAsStream(name);
 		if (result == null) {
 			result = getParent().getResourceAsStream(name);
 		}
 		return result;
+	}
+
+	@Override
+	public URL getResource(String name) {
+		return repoClassLoader.getResource(name);
+	}
+
+	@Override
+	public Enumeration<URL> getResources(String name) throws IOException {
+		return repoClassLoader.getResources(name);
 	}
 
 }
