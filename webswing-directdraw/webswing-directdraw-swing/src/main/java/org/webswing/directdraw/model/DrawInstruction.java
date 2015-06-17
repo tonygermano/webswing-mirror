@@ -1,11 +1,9 @@
 package org.webswing.directdraw.model;
 
-import java.util.ArrayList;
-
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto;
-import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
-import org.webswing.directdraw.toolkit.WebImage;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.*;
+import org.webswing.directdraw.toolkit.*;
 
 public class DrawInstruction {
 
@@ -15,25 +13,13 @@ public class DrawInstruction {
 
 	public DrawInstruction(InstructionProto type, DrawConstant... args) {
 		instruction = type;
-		ArrayList<DrawConstant> constants = new ArrayList<DrawConstant>();
-		for (DrawConstant c : args) {
-			if (c != null) {
-				constants.add(c);
-			}
-		}
-		this.args = constants.toArray(new DrawConstant[constants.size()]);
+		this.args = args;
 	}
 
 	public DrawInstruction(WebImage image, DrawConstant... args) {
 		instruction = InstructionProto.DRAW_WEBIMAGE;
 		this.image = image;
-		ArrayList<DrawConstant> constants = new ArrayList<DrawConstant>();
-		for (DrawConstant c : args) {
-			if (c != null) {
-				constants.add(c);
-			}
-		}
-		this.args = constants.toArray(new DrawConstant[constants.size()]);
+		this.args = args;
 	}
 
 	public DrawConstant[] getArgs() {
@@ -68,5 +54,4 @@ public class DrawInstruction {
 	public String toString() {
 		return instruction.name();
 	}
-
 }
