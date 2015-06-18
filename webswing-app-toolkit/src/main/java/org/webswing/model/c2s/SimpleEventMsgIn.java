@@ -11,7 +11,6 @@ public class SimpleEventMsgIn implements MsgIn {
 	}
 
 	private SimpleEventType type;
-	private String clientId;
 
 	public SimpleEventType getType() {
 		return type;
@@ -19,14 +18,6 @@ public class SimpleEventMsgIn implements MsgIn {
 
 	public void setType(SimpleEventType type) {
 		this.type = type;
-	}
-
-	public String getClientId() {
-		return clientId;
-	}
-
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
 	}
 
 }

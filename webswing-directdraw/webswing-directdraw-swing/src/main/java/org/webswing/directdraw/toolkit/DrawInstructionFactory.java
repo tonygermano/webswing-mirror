@@ -57,7 +57,7 @@ public class DrawInstructionFactory {
 		DrawConstant transformConst = xform != null ? new TransformConst(ctx, xform) : DrawConstant.nullConst;
 		DrawConstant cropConst = crop != null ? new RectangleConst(ctx, crop) : DrawConstant.nullConst;
 		DrawConstant bkgConst = bkg != null ? new ColorConst(ctx, bkg) : DrawConstant.nullConst;
-		return new DrawInstruction((WebImage) image, transformConst, cropConst, bkgConst, toPathConst(clip));
+		return new DrawInstruction(image, transformConst, cropConst, bkgConst, toPathConst(clip));
 	}
 
 	public DrawInstruction drawString(String s, double x, double y, Font font, Shape clip) {
@@ -70,7 +70,8 @@ public class DrawInstructionFactory {
 
 	public DrawInstruction createGraphics(WebGraphics g) {
 		DrawConstant gid = new DrawConstant.Integer(g.getId());
-		DrawConstant transformConst = g.getTransform() != null ? new TransformConst(ctx, g.getTransform()) : DrawConstant.nullConst;
+		AffineTransform transform = g.getTransform();
+		DrawConstant transformConst =  transform != null ? new TransformConst(ctx, transform) : DrawConstant.nullConst;
 		DrawConstant compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
 		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
 		DrawInstruction paintinst = setPaint(g.getPaint());

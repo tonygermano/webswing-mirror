@@ -1,4 +1,4 @@
-package org.webswing.util;
+package org.webswing.toolkit.util;
 
 import java.awt.AWTEvent;
 import java.awt.Component;

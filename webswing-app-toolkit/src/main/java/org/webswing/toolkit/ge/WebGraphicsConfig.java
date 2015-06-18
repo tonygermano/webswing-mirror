@@ -10,8 +10,8 @@ import java.awt.image.ColorModel;
 import java.awt.image.VolatileImage;
 import java.awt.image.WritableRaster;
 
-import org.webswing.util.Services;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
 
 import sun.awt.image.BufferedImageGraphicsConfig;
 import sun.awt.image.OffScreenImage;

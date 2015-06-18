@@ -1,11 +1,16 @@
 package org.webswing.ext.services;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.concurrent.TimeoutException;
 
-public interface ServerConnectionService  {
+import org.webswing.model.MsgOut;
 
-    void sendJsonObject(Serializable jsonPaintRequest);
+public interface ServerConnectionService {
 
-    void sendShutdownNotification();
+	void sendObject(Serializable jsonPaintRequest);
 
+	void sendShutdownNotification();
+
+	Object sendObjectSync(MsgOut o, String correlationId) throws TimeoutException, IOException;
 }

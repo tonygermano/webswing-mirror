@@ -7,7 +7,7 @@
 	}
 
 	var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
-	script.src = document.location.origin + document.location.pathname + "javascript/require.js";
+	script.src = document.location.origin  + "/javascript/require.js";
 	script.setAttribute("data-main", "javascript/main.js");
 	tag.parentNode.insertBefore(script, tag);
 })(window, document);

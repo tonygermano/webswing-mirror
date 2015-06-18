@@ -1,8 +1,9 @@
-define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function(atmosphere, ProtoBuf, wsProto) {
+define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function WebswingSocket(atmosphere, ProtoBuf, wsProto) {
 	"use strict";
 	var api;
 	var socket = null;
 	var uuid = null;
+	var responseHandlers = {};
 	var binary;
 	var proto = ProtoBuf.loadProto(wsProto, "webswing.proto");
 	var InputEventsFrameMsgInProto = proto.build("org.webswing.server.model.proto.InputEventsFrameMsgInProto");
@@ -50,6 +51,15 @@ define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function(atmosphere,
 				if (data.sessionId != null) {
 					uuid = data.sessionId;
 				}
+				// javascript2java response handling
+				if (data.javaResponse != null && data.javaResponse.correlationId != null) {
+					var correlationId = data.javaResponse.correlationId;
+					if (responseHandlers[correlationId] != null) {
+						var callback = responseHandlers[correlationId];
+						delete responseHandlers[correlationId];
+						callback(data.javaResponse);
+					}
+				}
 				api.base.processMessage(data);
 			} catch (e) {
 				console.error(e);
@@ -78,6 +88,9 @@ define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function(atmosphere,
 		var message = response.responseBody;
 		var data;
 		if (binary) {
+			if (message.byteLength == 1) {
+				return {};// ignore atmosphere heartbeat
+			}
 			data = AppFrameMsgOutProto.decode(message);
 			explodeEnumNames(data);
 		} else {
@@ -106,6 +119,17 @@ define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function(atmosphere,
 				console.log("message is not an object " + message);
 			}
 		}
+	}
+
+	function awaitResponse(callback, request, correlationId, timeout) {
+		send(request);
+		responseHandlers[correlationId] = callback;
+		setTimeout(function() {
+			if (responseHandlers[correlationId] != null) {
+				delete responseHandlers[correlationId];
+				callback(new Error("Java call timed out after " + timeout + " ms."));
+			}
+		}, timeout);
 	}
 
 	function getuuid() {
@@ -144,6 +168,7 @@ define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function(atmosphere,
 				connect : connect,
 				send : send,
 				uuid : getuuid,
+				awaitResponse : awaitResponse,
 				dispose : dispose
 			};
 		}

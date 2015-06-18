@@ -15,8 +15,8 @@ import javax.swing.SwingUtilities;
 
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
-import org.webswing.util.Logger;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Util;
 
 public class WindowHierarchyTree {
 

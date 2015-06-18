@@ -24,6 +24,7 @@ import java.util.jar.JarFile;
 
 import org.webswing.Constants;
 import org.webswing.toolkit.WebToolkit;
+import org.webswing.util.ClassLoaderUtil;
 
 public class Main {
 

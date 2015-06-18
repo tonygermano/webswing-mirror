@@ -7,8 +7,12 @@ import java.util.Map;
 
 import javax.swing.JWindow;
 
+import netscape.javascript.JSObject;
+
 import org.webswing.Constants;
-import org.webswing.util.Logger;
+import org.webswing.model.jslink.JSObjectMsg;
+import org.webswing.toolkit.jslink.WebJSObject;
+import org.webswing.toolkit.util.Logger;
 
 public class AppletContainer extends JWindow {
 
@@ -35,6 +39,9 @@ public class AppletContainer extends JWindow {
 
 	public void start() {
 		applet.init();
+		WebJSObject.createJavaReference(applet, System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
+		JSObject root = new WebJSObject(new JSObjectMsg("instanceObject"));
+		root.setMember("applet", WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS)));
 		active = true;
 		applet.start();
 		this.pack();

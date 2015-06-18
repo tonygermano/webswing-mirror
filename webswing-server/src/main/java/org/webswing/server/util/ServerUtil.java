@@ -27,6 +27,7 @@ import org.apache.shiro.subject.Subject;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.FrameworkConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -56,6 +57,9 @@ public class ServerUtil {
 	private static final Map<String, byte[]> iconMap = new HashMap<String, byte[]>();
 	private static final ObjectMapper mapper = new ObjectMapper();
 	private static final ProtoMapper protoMapper = new ProtoMapper();
+	static {
+		mapper.setSerializationInclusion(Inclusion.NON_NULL);
+	}
 
 	public static String encode2Json(MsgOut m) {
 		try {
@@ -83,7 +87,7 @@ public class ServerUtil {
 				o = mapper.readValue(s, c);
 				break;
 			} catch (IOException e) {
-				// do nothing
+				log.error("Failed to decode json message:", e);
 			}
 		}
 		return o;
@@ -97,7 +101,7 @@ public class ServerUtil {
 				o = protoMapper.decodeProto(message, c);
 				break;
 			} catch (IOException e) {
-				// do nothing
+				log.error("Failed to decode proto message:", e);
 			}
 		}
 		return o;

@@ -18,8 +18,8 @@ import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.s2c.CursorChangeEventMsg;
 import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
-import org.webswing.util.Services;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
 
 public class WindowManager {
 
