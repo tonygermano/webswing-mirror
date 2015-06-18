@@ -54,7 +54,10 @@ public class SwingInstanceManager {
 	}
 
 	public synchronized Set<SwingInstance> getSwingInstanceSet() {
-		Set<SwingInstance> set = new HashSet<SwingInstance>(swingInstances.values());
+		Set<SwingInstance> set;
+		synchronized (this) {
+			set = new HashSet<SwingInstance>(swingInstances.values());
+		}
 		return set;
 	}
 
@@ -136,7 +139,9 @@ public class SwingInstanceManager {
 
 	public synchronized void notifySwingClose(SwingInstance swingInstance) {
 		closedInstances.add(ServerUtil.composeSwingInstanceStatus(swingInstance));
-		swingInstances.remove(swingInstance.getClientId());
+		synchronized (this) {
+			swingInstances.remove(swingInstance.getClientId());
+		}
 		notifySwingChangeChange();
 	}
 
@@ -184,16 +189,20 @@ public class SwingInstanceManager {
 	}
 
 	public boolean sendMessageToSwing(AtmosphereResource r, String clientId, MsgIn o) {
-		SwingInstance client = swingInstances.get(clientId);
-		if (client != null) {
-			return client.sendToSwing(r, o);
-		} else {
-			return false;
+		if (clientId != null) {
+			SwingInstance client = swingInstances.get(clientId);
+			if (client != null) {
+				return client.sendToSwing(r, o);
+			}
 		}
+		return false;
 	}
 
 	public SwingInstance findInstance(String clientId) {
-		return swingInstances.get(clientId);
+		if (clientId != null) {
+			return swingInstances.get(clientId);
+		}
+		return null;
 	}
 
 }

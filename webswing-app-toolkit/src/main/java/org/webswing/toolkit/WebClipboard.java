@@ -10,8 +10,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.webswing.util.Logger;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Util;
 
 public class WebClipboard extends Clipboard {
   private final boolean isSystemClipboard;

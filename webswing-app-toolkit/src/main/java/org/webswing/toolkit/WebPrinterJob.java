@@ -19,9 +19,9 @@ import javax.print.PrintService;
 
 import org.webswing.Constants;
 import org.webswing.model.internal.PrinterJobResultMsgInternal;
-import org.webswing.util.Logger;
-import org.webswing.util.Services;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
 
 public class WebPrinterJob extends PrinterJob {
 
@@ -104,7 +104,7 @@ public class WebPrinterJob extends PrinterJob {
 		printResult.setClientId(id);
 		printResult.setId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
 		printResult.setPdfFile(f);
-		Util.getWebToolkit().getPaintDispatcher().sendJsonObject(printResult);
+		Util.getWebToolkit().getPaintDispatcher().sendObject(printResult);
 	}
 
 	private int paintPdf(Graphics2D resultPdf, PageFormat pageFormat2, Printable printable2, int i) throws PrinterException {

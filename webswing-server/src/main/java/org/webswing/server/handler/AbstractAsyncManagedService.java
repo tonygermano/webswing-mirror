@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.atmosphere.cpr.AtmosphereHandler;
 import org.atmosphere.cpr.AtmosphereRequest;
@@ -25,6 +27,8 @@ import org.webswing.model.c2s.InputEventMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.c2s.PasteEventMsgIn;
 import org.webswing.model.c2s.UploadedEventMsgIn;
+import org.webswing.model.jslink.JavaEvalRequestMsgIn;
+import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.server.SwingInstanceManager;
 import org.webswing.server.model.EncodedMessage;
@@ -34,6 +38,8 @@ import org.webswing.server.util.StatUtils;
 abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractAsyncManagedService.class);
+
+	private Map<String, String> clientIdMap = new ConcurrentHashMap<String, String>();
 
 	public void onReady(final AtmosphereResource r) {
 		boolean includeAdminApp = ServerUtil.isUserinRole(r, Constants.ADMIN_ROLE);
@@ -49,6 +55,7 @@ abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 	}
 
 	public void onDisconnect(AtmosphereResourceEvent event) {
+		clientIdMap.remove(event.getResource().uuid());
 		SwingInstanceManager.getInstance().notifySessionDisconnected(event.getResource().uuid());
 	}
 
@@ -69,23 +76,33 @@ abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 					List<InputEventMsgIn> evts = frame.getEvents();
 					for (InputEventMsgIn evt : evts) {
 						if (evt.getHandshake() != null) {
+							clientIdMap.put(r.uuid(), evt.getHandshake().getClientId());
 							SwingInstanceManager.getInstance().connectSwingInstance(r, evt.getHandshake());
 						} else if (evt.getKey() != null) {
-							send(r, evt.getKey().getClientId(), evt.getKey(), length);
+							send(r, evt.getKey());
 						} else if (evt.getMouse() != null) {
-							send(r, evt.getMouse().getClientId(), evt.getMouse(), length);
+							send(r, evt.getMouse());
 						} else if (evt.getEvent() != null) {
-							send(r, evt.getEvent().getClientId(), evt.getEvent(), length);
+							send(r, evt.getEvent());
 						}
 					}
 				} else if (frame.getPaste() != null) {
 					PasteEventMsgIn p = frame.getPaste();
-					send(r, p.getClientId(), p, length);
+					send(r, p);
 				} else if (frame.getUploaded() != null) {
 					UploadedEventMsgIn p = frame.getUploaded();
-					send(r, p.getClientId(), p, length);
+					send(r, p);
+				} else if (frame.getJsResponse() != null) {
+					JsResultMsg p = frame.getJsResponse();
+					send(r, p);
+				} else if (frame.getJavaRequest() != null) {
+					JavaEvalRequestMsgIn p = frame.getJavaRequest();
+					send(r, p);
 				}
+			} else {
+				log.error("Unable to decode message: " + message);
 			}
+			StatUtils.logInboundData(SwingInstanceManager.getInstance().findInstance(clientIdMap.get(r.uuid())), length);
 		} catch (Exception e) {
 			log.error("Exception while processing websocket message.", e);
 		}
@@ -94,9 +111,8 @@ abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 	public void onTimeout(AtmosphereResourceEvent event) {
 	}
 
-	private static void send(AtmosphereResource r, String clientId, MsgIn o, int length) {
-		StatUtils.logInboundData(SwingInstanceManager.getInstance().findInstance(clientId), length);
-		SwingInstanceManager.getInstance().sendMessageToSwing(r, clientId, o);
+	private void send(AtmosphereResource r, MsgIn o) {
+		SwingInstanceManager.getInstance().sendMessageToSwing(r, clientIdMap.get(r.uuid()), o);
 	}
 
 	@Override

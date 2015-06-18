@@ -12,7 +12,9 @@ message AppFrameMsgOutProto{
 	repeated WindowMsgProto windows = 7;
 	optional WindowMsgProto closedWindow = 8;
 	optional SimpleEventMsgOutProto event = 9;
-	optional string sessionId = 10;
+	optional JsEvalRequestMsgOutProto jsRequest = 10;
+	optional JsResultMsgProto javaResponse = 11;
+	optional string sessionId = 12;
 }
 
 message ApplicationInfoMsgProto{
@@ -90,6 +92,48 @@ enum SimpleEventMsgOutProto{
 	configurationError = 4;
 }
 
+message JsEvalRequestMsgOutProto{
+	optional string correlationId = 1;
+	optional string thisObjectId = 2;
+	optional JsEvalRequestTypeProto type = 3;
+	optional string evalString = 4;
+	repeated JsParamMsgProto params = 5;
+	repeated string garbageIds = 6;
+
+	enum JsEvalRequestTypeProto{
+		eval = 0;
+		call = 1;
+		setMember = 2;
+		getMember = 3;
+		deleteMember = 4;
+		setSlot = 5;
+		getSlot = 6;
+	}
+}
+
+
+
+message JsParamMsgProto{
+	optional string primitive = 1;
+	optional JSObjectMsgProto  jsObject = 2;
+	optional JavaObjectRefMsgProto javaObject = 3;
+	repeated JsParamMsgProto array = 4;
+}
+
+message JSObjectMsgProto{
+	optional string id = 1;
+}
+
+message JavaObjectRefMsgProto{
+	optional string id = 1;
+	repeated string methods = 2;
+}
+
+message JsResultMsgProto{
+	optional string correlationId = 1;
+	optional string error = 2;
+	optional JsParamMsgProto value = 3;
+}
 
 /* ===================BROWSER -> SERVER====================*/
 message InputEventsFrameMsgInProto{
@@ -97,6 +141,8 @@ message InputEventsFrameMsgInProto{
 	optional PasteEventMsgInProto paste = 2;
 	optional UploadEventMsgInProto upload = 3;
 	optional UploadedEventMsgInProto uploaded = 4;
+	optional JsResultMsgProto jsResponse = 5;
+	optional JavaEvalRequestMsgInProto javaRequest = 6;
 }
 
 message InputEventMsgInProto{
@@ -116,17 +162,22 @@ message ConnectionHandshakeMsgInProto{
 	optional bool directDrawSupported = 7;
 	optional bool applet = 8;
 	optional string documentBase = 9;
+	repeated ParamMsgProto params = 10;
+}
+
+message ParamMsgProto{
+	optional string name = 1;
+	optional string value = 2;
 }
 
 message KeyboardEventMsgInProto{
-	optional string clientId = 1;
-	optional KeyEventTypeProto type = 2;
-	optional sint32 character = 3;
-	optional sint32 keycode = 4;
-	optional bool alt = 5;
-	optional bool ctrl = 6;
-	optional bool shift = 7;
-	optional bool meta = 8;
+	optional KeyEventTypeProto type = 1;
+	optional sint32 character = 2;
+	optional sint32 keycode = 3;
+	optional bool alt = 4;
+	optional bool ctrl = 5;
+	optional bool shift = 6;
+	optional bool meta = 7;
 
 	enum KeyEventTypeProto {
 		keypress = 0;
@@ -136,16 +187,15 @@ message KeyboardEventMsgInProto{
 }
 
 message MouseEventMsgInProto{
-	optional string clientId = 1;
+	optional MouseEventTypeProto type = 1;
 	optional sint32 x = 2;
 	optional sint32 y = 3;
-	optional MouseEventTypeProto type = 4;
-	optional sint32 wheelDelta = 5;
-	optional sint32 button = 6;
-	optional bool ctrl = 7;
-	optional bool alt = 8;
-	optional bool shift = 9;
-	optional bool meta = 10;
+	optional sint32 wheelDelta = 4;
+	optional sint32 button = 5;
+	optional bool ctrl = 6;
+	optional bool alt = 7;
+	optional bool shift = 8;
+	optional bool meta = 9;
 
 	enum MouseEventTypeProto {
 		mousemove = 0;
@@ -157,13 +207,11 @@ message MouseEventMsgInProto{
 }
 
 message PasteEventMsgInProto{
-	optional string clientId = 1;
-	optional string content = 2;
+	optional string content = 1;
 }
 
 message SimpleEventMsgInProto{
 	optional SimpleEventTypeProto type = 1;
-	optional string clientId = 2;
 
 	enum SimpleEventTypeProto {
 		unload = 0;
@@ -178,7 +226,6 @@ message SimpleEventMsgInProto{
 
 message UploadedEventMsgInProto{
 	repeated string files = 1;
-	optional string clientId = 2;
 }
 
 message UploadEventMsgInProto{
@@ -186,4 +233,10 @@ message UploadEventMsgInProto{
     optional string tempFileLocation = 3;
 }
 
+message JavaEvalRequestMsgInProto{
+	optional string correlationId = 1;
+	optional string objectId = 2;
+	optional string method = 3;
+	repeated JsParamMsgProto params = 4;
+}
 

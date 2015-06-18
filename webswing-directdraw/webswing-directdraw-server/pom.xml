@@ -69,7 +69,7 @@
 					</connectors>
 					<webAppConfig>
 						<baseResource implementation="org.mortbay.resource.ResourceCollection">
-							<resourcesAsCSV>src/main/webapp,src/test/webapp,../src/proto</resourcesAsCSV>
+							<resourcesAsCSV>src/main/webapp,src/test/webapp,../src/proto/javascript</resourcesAsCSV>
 						</baseResource>
 					</webAppConfig>
 					<webXml>src/test/webapp/WEB-INF/web.xml</webXml>

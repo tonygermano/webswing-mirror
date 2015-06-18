@@ -5,7 +5,7 @@
 	} else {
 		root.WebswingBase = factory(root.WebswingDirectDraw);
 	}
-}(this, function(WebswingDirectDraw) {
+}(this, function WebswingBase(WebswingDirectDraw) {
 	"use strict";
 
 	var api;
@@ -19,6 +19,7 @@
 
 	var windowImageHolders = {};
 	var directDraw = new WebswingDirectDraw({});
+	var iePastePromptHack = false;
 
 	function startApplication(name, applet) {
 		api.canvas.get();
@@ -170,6 +171,9 @@
 			}
 			return;
 		}
+		if (data.jsRequest != null && api.context.mirrorMode == false) {
+			api.jslink.process(data.jsRequest);
+		}
 		if (api.context.canPaint) {
 			processRequest(api.canvas.get(), data);
 		}
@@ -231,7 +235,11 @@
 						if (win.directDraw != null) {
 							// directdraw
 							return sequence.then(function(resolved) {
-								return directDraw.drawBin(win.directDraw, windowImageHolders[win.id]);
+								if(typeof win.directDraw==='string'){
+									return directDraw.draw64(win.directDraw, windowImageHolders[win.id]);
+								}else{
+									return directDraw.drawBin(win.directDraw, windowImageHolders[win.id]);
+								}
 							}).then(
 									function(resultImage) {
 										windowImageHolders[win.id] = resultImage;
@@ -363,7 +371,7 @@
 			// FF (163, 171, 173, ) -> en layout ]\/ keys
 			var kc = event.keyCode;
 			if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226)
-					|| (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
+					|| (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111) || (kc == 59) || (kc == 61))) {
 				event.preventDefault();
 				event.stopPropagation();
 			}
@@ -371,11 +379,14 @@
 			// hanle paste event
 			if (keyevt.key.ctrl && keyevt.key.character == 86) { // ctrl+v
 				var text = prompt('Press ctrl+v and enter..');
+				iePastePromptHack = true;
+				setTimeout(function() {
+					iePastePromptHack = false;
+				}, 10);
 				if (api.context.hasControl) {
 					api.socket.send({
 						paste : {
-							content : text,
-							clientId : api.context.clientId
+							content : text
 						}
 					});
 				}
@@ -392,8 +403,8 @@
 			event.preventDefault();
 			event.stopPropagation();
 			var keyevt = getKBKey('keypress', canvas, event);
-			if (!(keyevt.key.ctrl && keyevt.key.character == 118)) { // skip
-																		// ctrl+v
+			if (!(keyevt.key.ctrl && keyevt.key.character == 118) && !(iePastePromptHack && keyevt.key.character == 118)) { // skip
+				// ctrl+v
 				enqueueInputEvent(keyevt);
 			}
 			return false;
@@ -424,15 +435,14 @@
 		var rect = canvas.getBoundingClientRect();
 		var root = document.documentElement;
 		// return relative mouse position
-		var mouseX = evt.clientX - rect.left;
-		var mouseY = evt.clientY - rect.top;
+		var mouseX = Math.round(evt.clientX - rect.left);
+		var mouseY = Math.round(evt.clientY - rect.top);
 		var delta = 0;
 		if (type == 'mousewheel') {
 			delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 		}
 		return {
 			mouse : {
-				clientId : api.context.clientId,
 				x : mouseX,
 				y : mouseY,
 				type : type,
@@ -457,7 +467,6 @@
 		}
 		return {
 			key : {
-				clientId : api.context.clientId,
 				type : type,
 				character : char,
 				keycode : kk,
@@ -480,7 +489,8 @@
 				mirrored : api.context.mirrorMode,
 				directDrawSupported : api.typedArraysSupported,
 				applet : api.context.applet,
-				documentBase : api.documentBase
+				documentBase : api.documentBase,
+				params : api.params
 			}
 		};
 		return handshake;
@@ -490,7 +500,6 @@
 		return {
 			event : {
 				type : message,
-				clientId : api.context.clientId
 			}
 		};
 	}

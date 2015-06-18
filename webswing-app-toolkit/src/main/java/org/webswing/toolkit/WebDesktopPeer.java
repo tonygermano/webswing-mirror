@@ -9,8 +9,8 @@ import java.net.URI;
 
 import org.webswing.Constants;
 import org.webswing.model.internal.OpenFileResultMsgInternal;
-import org.webswing.util.Logger;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Util;
 
 public class WebDesktopPeer implements DesktopPeer {
 
@@ -55,7 +55,7 @@ public class WebDesktopPeer implements DesktopPeer {
         OpenFileResultMsgInternal f= new OpenFileResultMsgInternal();
         f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
         f.setF(file);
-        Util.getWebToolkit().getPaintDispatcher().sendJsonObject(f);
+        Util.getWebToolkit().getPaintDispatcher().sendObject(f);
     }
 
     @Override

@@ -6,7 +6,7 @@ import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.util.Map;
 
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Util;
 
 @SuppressWarnings("restriction")
 public class WebDragSourceContextPeer extends sun.awt.dnd.SunDragSourceContextPeer {

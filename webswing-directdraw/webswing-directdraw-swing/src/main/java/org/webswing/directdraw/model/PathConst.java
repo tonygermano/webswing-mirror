@@ -20,14 +20,14 @@ public class PathConst extends DrawConstant {
 		super(context);
 		PathProto.Builder model = PathProto.newBuilder();
 		if (pi != null) {
-			model.setWindingOdd(pi.getWindingRule() == PathIterator.WIND_EVEN_ODD ? true : false);
+			model.setWindingOdd(pi.getWindingRule() == PathIterator.WIND_EVEN_ODD);
 			double[] points = new double[6];
 			while (!pi.isDone()) {
 				int type = pi.currentSegment(points);
 				int pointCount = type == PathIterator.SEG_CLOSE ? 0 : type == PathIterator.SEG_MOVETO || type == PathIterator.SEG_LINETO ? 2 : type == PathIterator.SEG_QUADTO ? 4 : type == PathIterator.SEG_CUBICTO ? 6 : 0;
 				model.addType(SegmentTypeProto.valueOf(type));
-				for (double point : Arrays.copyOf(points, pointCount)) {
-					model.addPoints((int) point);
+				for (int i = 0; i < pointCount; i ++) {
+					model.addPoints((int) points[i]);
 				}
 				pi.next();
 			}

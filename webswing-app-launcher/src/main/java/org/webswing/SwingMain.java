@@ -6,7 +6,6 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.webswing.applet.AppletContainer;
-import org.webswing.util.Logger;
-import org.webswing.util.Services;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
 
 public class SwingMain {
 
@@ -35,7 +34,7 @@ public class SwingMain {
 					Logger.error("SwingMain:main ERROR: Required classpath file '" + f + "' does not exist!");
 				}
 			}
-			swingLibClassloader = new URLClassLoader(swingurls.toArray(new URL[0]), SwingMain.class.getClassLoader());
+			swingLibClassloader = Services.getClassloaderService().createSwingClassLoader(swingurls.toArray(new URL[0]), SwingMain.class.getClassLoader());
 
 			if (isApplet()) {
 				startApplet(args);
@@ -49,21 +48,19 @@ public class SwingMain {
 	}
 
 	private static void startSwingApp(String[] args) throws Exception {
-		ClassLoader swingClassloader = Services.getClassloaderService().createSwingClassLoader(swingLibClassloader);
-		Class<?> clazz = swingClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
+		Class<?> clazz = swingLibClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
 		Class<?> mainArgType[] = { (new String[0]).getClass() };
 		String progArgs[] = args;
 		java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
-		setupContextClassloader(swingClassloader);
+		setupContextClassloader(swingLibClassloader);
 		Object argsArray[] = { progArgs };
 		main.invoke(null, argsArray);
 	}
 
 	private static void startApplet(String[] args) throws Exception {
-		ClassLoader swingClassloader = Services.getClassloaderService().createSwingClassLoader(swingLibClassloader);
-		Class<?> appletClazz = swingClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
+		Class<?> appletClazz = swingLibClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
 		Map<String, String> props = resolveProps();
-		setupContextClassloader(swingClassloader);
+		setupContextClassloader(swingLibClassloader);
 		if (Applet.class.isAssignableFrom(appletClazz)) {
 			AppletContainer ac = new AppletContainer(appletClazz, props);
 			ac.start();

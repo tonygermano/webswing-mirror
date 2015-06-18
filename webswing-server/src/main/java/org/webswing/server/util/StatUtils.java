@@ -6,7 +6,7 @@ import javax.management.openmbean.CompositeData;
 
 import org.webswing.model.admin.s2c.SwingJvmStatsMsg;
 import org.webswing.server.SwingInstance;
-import org.webswing.util.Logger;
+import org.webswing.toolkit.util.Logger;
 
 public class StatUtils {
 

@@ -227,7 +227,7 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/swing-lib</outputDirectory>
 							<includeArtifactIds>
-								webswing-app-interface,webswing-app-launcher,webswing-directdraw-swing,protobuf-java,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,commons-io,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging,freehep-graphicsio-pdf,freehep-graphics2d,freehep-graphicsbase,freehep-graphicsio,freehep-io,lz4
+								webswing-app-interface,webswing-app-launcher,webswing-directdraw-swing,protobuf-java,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,commons-io,commons-lang,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging,freehep-graphicsio-pdf,freehep-graphics2d,freehep-graphicsbase,freehep-graphicsio,freehep-io,lz4,jackson-mapper-asl,jackson-core-asl
 							</includeArtifactIds>
 						</configuration>
 					</execution>
@@ -288,6 +288,10 @@
 									<webApp>
 										<contextPath>/</contextPath>
 										<defaultsDescriptor>${project.basedir}/src/test/webapp/WEB-INF/jetty-maven-plugin-webdefault.xml</defaultsDescriptor>
+										<resourceBases>
+											<resourceBase>${project.basedir}/src/main/webapp</resourceBase>
+											<resourceBase>${project.basedir}/src/test/webapp</resourceBase>
+										</resourceBases>
 									</webApp>
 									<systemProperties>
 										<force>true</force>
@@ -300,8 +304,12 @@
 											<value>${webswingRoot}</value>
 										</systemProperty>
 										<systemProperty>
+											<name>user.dir</name>
+											<value>${webswingRoot}</value>
+										</systemProperty>
+										<systemProperty>
 											<name>webswing.tempDirBase</name>
-											<value>${project.build.outputDirectory}/tmp</value>
+											<value>${project.build.directory}/tmp</value>
 										</systemProperty>
 									</systemProperties>
 								</configuration>

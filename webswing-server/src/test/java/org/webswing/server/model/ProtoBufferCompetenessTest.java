@@ -49,6 +49,7 @@ public class ProtoBufferCompetenessTest {
 
 	private static final String inMsgs = "org.webswing.model.c2s";
 	private static final String outMsgs = "org.webswing.model.s2c";
+	private static final String jsLinkMsgs = "org.webswing.model.jslink";
 
 	@Before
 	public void setUp() throws Exception {
@@ -59,9 +60,11 @@ public class ProtoBufferCompetenessTest {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		ArrayList<Class<?>> inMsgClasses = getClassesForPackage(inMsgs);
 		ArrayList<Class<?>> outMsgClasses = getClassesForPackage(outMsgs);
+		ArrayList<Class<?>> jsLinkMsgClasses = getClassesForPackage(jsLinkMsgs);
 		ArrayList<Class<?>> allClasses = new ArrayList<Class<?>>();
 		allClasses.addAll(inMsgClasses);
 		allClasses.addAll(outMsgClasses);
+		allClasses.addAll(jsLinkMsgClasses);
 		Map<Class<?>, Class<?>> classProtoMap = new HashMap<Class<?>, Class<?>>();
 		List<String> notFoundClasses = new ArrayList<String>();
 		for (Class<?> c : allClasses) {
@@ -200,12 +203,10 @@ public class ProtoBufferCompetenessTest {
 		org.webswing.server.model.proto.Webswing.InputEventMsgInProto.Builder b = InputEventMsgInProto.newBuilder();
 
 		org.webswing.server.model.proto.Webswing.SimpleEventMsgInProto.Builder seb = SimpleEventMsgInProto.newBuilder();
-		seb.setClientId("client");
 		seb.setType(SimpleEventTypeProto.killSwing);
 		b.setEvent(seb.build());
 		ProtoMapper pm = new ProtoMapper();
 		InputEventMsgIn ie = pm.decodeProto(b.build().toByteArray(), InputEventMsgIn.class);
-		assertTrue(ie.getEvent().getClientId().equals("client"));
 		assertTrue(ie.getEvent().getType().equals(SimpleEventMsgIn.SimpleEventType.killSwing));
 	}
 
@@ -233,7 +234,6 @@ public class ProtoBufferCompetenessTest {
 
 		org.webswing.server.model.proto.Webswing.InputEventMsgInProto.Builder ieb2 = InputEventMsgInProto.newBuilder();
 		org.webswing.server.model.proto.Webswing.SimpleEventMsgInProto.Builder seb = SimpleEventMsgInProto.newBuilder();
-		seb.setClientId("client");
 		seb.setType(SimpleEventTypeProto.killSwing);
 		ieb2.setEvent(seb.build());
 
@@ -253,7 +253,6 @@ public class ProtoBufferCompetenessTest {
 		assertTrue(!ie.getEvents().get(0).getMouse().isCtrl());
 		assertTrue(ie.getEvents().get(0).getMouse().getX() == 1);
 		assertTrue(ie.getEvents().get(0).getMouse().getY() == 2);
-		assertTrue(ie.getEvents().get(1).getEvent().getClientId().equals("client"));
 		assertTrue(ie.getEvents().get(1).getEvent().getType().equals(SimpleEventMsgIn.SimpleEventType.killSwing));
 	}
 
