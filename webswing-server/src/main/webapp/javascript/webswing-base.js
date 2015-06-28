@@ -20,6 +20,7 @@
 	var windowImageHolders = {};
 	var directDraw = new WebswingDirectDraw({});
 	var iePastePromptHack = false;
+	var ieVersion = detectIE();
 
 	function startApplication(name, applet) {
 		api.canvas.get();
@@ -235,9 +236,9 @@
 						if (win.directDraw != null) {
 							// directdraw
 							return sequence.then(function(resolved) {
-								if(typeof win.directDraw==='string'){
+								if (typeof win.directDraw === 'string') {
 									return directDraw.draw64(win.directDraw, windowImageHolders[win.id]);
-								}else{
+								} else {
 									return directDraw.drawBin(win.directDraw, windowImageHolders[win.id]);
 								}
 							}).then(
@@ -257,18 +258,33 @@
 							return sequence.then(function(resolved) {
 								return win.content.reduce(function(internalSeq, winContent) {
 									return internalSeq.then(function(done) {
-										return new Promise(function(resolved, rejected) {
-											if (winContent != null) {
-												var imageObj = new Image();
-												imageObj.onload = function() {
-													context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
-													imageObj.onload = null;
-													imageObj.src = '';
-													resolved();
-												};
-												imageObj.src = getImageString(winContent.base64Content);
-											}
-										});
+										return new Promise(
+												function(resolved, rejected) {
+													if (winContent != null) {
+														var imageObj = new Image();
+														var onloadFunction = function() {
+															context.drawImage(imageObj, win.posX + winContent.positionX, win.posY
+																	+ winContent.positionY);
+															resolved();
+															imageObj.onload = null;
+															imageObj.src = '';
+															if (imageObj.clearAttributes != null) {
+																imageObj.clearAttributes();
+															}
+															imageObj = null;
+														}
+														imageObj.onload = function() {
+															// fix for ie - onload is fired before the image is ready for rendering to canvas. This is
+															// a ugly quickfix
+															if (ieVersion && ieVersion <= 10){
+																window.setTimeout(onloadFunction, 20);
+															}else{
+																onloadFunction();
+															}
+														};
+														imageObj.src = getImageString(winContent.base64Content);
+													}
+												});
 									});
 								}, Promise.resolve());
 							});
@@ -510,6 +526,31 @@
 		} else {
 			el.bind(eventName, eventHandler);
 		}
+	}
+
+	function detectIE() {
+		var ua = window.navigator.userAgent;
+
+		var msie = ua.indexOf('MSIE ');
+		if (msie > 0) {
+			// IE 10 or older => return version number
+			return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+		}
+
+		var trident = ua.indexOf('Trident/');
+		if (trident > 0) {
+			// IE 11 => return version number
+			var rv = ua.indexOf('rv:');
+			return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+		}
+
+		var edge = ua.indexOf('Edge/');
+		if (edge > 0) {
+			// IE 12 => return version number
+			return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+		}
+		// other browser
+		return false;
 	}
 
 	return {

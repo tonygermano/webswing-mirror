@@ -41,6 +41,15 @@ define([ 'atmosphere', 'ProtoBuf', 'text!webswing.proto' ], function WebswingSoc
 			request.headers['X-webswing-debugPort'] = api.debugPort;
 		}
 
+		request.onOpen = function(response){
+			if(response.transport !=='websocket' && binary){
+				console.error('Webswing: Binary encoding not supported for '+response.transport+' transport. Falling back to json encoding.')
+				api.binarySocket=false;
+				dispose();
+				connect();
+			}
+		}
+
 		request.onReopen = function(response) {
 			api.dialog.hide();
 		};
