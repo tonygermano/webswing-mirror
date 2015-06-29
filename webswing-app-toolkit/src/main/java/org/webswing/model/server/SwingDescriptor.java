@@ -10,6 +10,7 @@ public class SwingDescriptor implements Serializable {
 	private String vmArgs = "";
 	private List<String> classPathEntries;
 	private String homeDir = System.getProperty("user.dir");
+	private String theme = "Murrine";
 	private int maxClients = 1;
 	private boolean antiAliasText = true;
 	private int swingSessionTimeout = 300;
@@ -168,6 +169,14 @@ public class SwingDescriptor implements Serializable {
 
 	public void setAllowJsLink(boolean allowJsLink) {
 		this.allowJsLink = allowJsLink;
+	}
+
+	public String getTheme() {
+		return theme;
+	}
+
+	public void setTheme(String theme) {
+		this.theme = theme;
 	}
 
 }

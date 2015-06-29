@@ -281,6 +281,7 @@ public class SwingJvmConnection implements MessageListener {
 						addSysProperty(javaTask, Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 						addSysProperty(javaTask, Constants.JMS_URL, JmsService.getUrl());
 
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_THEME, subs.replace(appConfig.getTheme()));
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs() + "");
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload() + "");
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload() + "");
