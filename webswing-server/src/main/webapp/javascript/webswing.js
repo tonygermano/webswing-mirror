@@ -1,6 +1,6 @@
 define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog', 'webswing-selector', 'webswing-login', 'webswing-canvas',
-		'webswing-identity', 'webswing-polyfill', 'webswing-jslink' ], function($, base, socket, files, dialog, selector, login, canvas, identity,
-		polyfill, jslink) {
+		'webswing-identity', 'webswing-polyfill', 'webswing-jslink', 'webswing-clipboard' ], function($, base, socket, files, dialog, selector,
+		login, canvas, identity, polyfill, jslink, clipboard) {
 	"use strict";
 
 	function initInstance(rootElement, options) {
@@ -27,6 +27,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 			debugPort : null,
 			javaCallTimeout : 3000,
 			documentBase : document.location.origin + document.location.pathname,
+			ieVersion : detectIE(),
 			start : function(customization) {
 				if (customization != null) {
 					customization(api);
@@ -58,6 +59,7 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 		identity.init(api);
 		polyfill.init(api);
 		jslink.init(api);
+		clipboard.init(api);
 		configure();
 
 		if (api.autoStart) {
@@ -102,7 +104,6 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 			api.context.hasControl = value ? true : false;
 		}
 
-
 		extObject.start = api.start;
 		extObject.disconnect = api.disconnect;
 		extObject.configure = configure;
@@ -110,6 +111,31 @@ define([ 'jquery', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswi
 		extObject.setControl = setControl;
 		return extObject;
 
+	}
+
+	function detectIE() {
+		var ua = window.navigator.userAgent;
+
+		var msie = ua.indexOf('MSIE ');
+		if (msie > 0) {
+			// IE 10 or older => return version number
+			return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+		}
+
+		var trident = ua.indexOf('Trident/');
+		if (trident > 0) {
+			// IE 11 => return version number
+			var rv = ua.indexOf('rv:');
+			return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+		}
+
+		var edge = ua.indexOf('Edge/');
+		if (edge > 0) {
+			// IE 12 => return version number
+			return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+		}
+		// other browser
+		return false;
 	}
 
 	function readOptions(element) {

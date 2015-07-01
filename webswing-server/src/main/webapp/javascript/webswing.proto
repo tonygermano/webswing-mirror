@@ -49,6 +49,7 @@ message CursorChangeEventMsgProto{
 
 message CopyEventMsgProto{
 	optional string content = 1;
+	optional string htmlContent = 2;
 }
 
 message FileDialogEventMsgProto{

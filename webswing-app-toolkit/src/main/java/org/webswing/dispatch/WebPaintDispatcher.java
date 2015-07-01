@@ -346,10 +346,10 @@ public class WebPaintDispatcher {
 		}
 	}
 
-	public void notifyCopyEvent(String content) {
+	public void notifyCopyEvent(String content, String html) {
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		CopyEventMsg copyEvent;
-		copyEvent = new CopyEventMsg(content);
+		copyEvent = new CopyEventMsg(content, html);
 		f.setCopyEvent(copyEvent);
 		Logger.debug("WebPaintDispatcher:notifyCopyEvent", f);
 		Services.getConnectionService().sendObject(f);

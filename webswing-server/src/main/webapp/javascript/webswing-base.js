@@ -19,12 +19,10 @@
 
 	var windowImageHolders = {};
 	var directDraw = new WebswingDirectDraw({});
-	var iePastePromptHack = false;
-	var ieVersion = detectIE();
 
 	function startApplication(name, applet) {
 		api.canvas.get();
-		registerEventListeners(api.canvas.get());
+		registerEventListeners(api.canvas.get(), api.canvas.getInput());
 		resetState();
 		api.context = {
 			clientId : api.login.user() + api.identity.get() + name,
@@ -40,7 +38,7 @@
 
 	function startMirrorView(clientId, appName) {
 		api.canvas.get();
-		registerEventListeners(api.canvas.get());
+		registerEventListeners(api.canvas.get(), api.canvas.getInput());
 		resetState();
 		api.context = {
 			clientId : clientId,
@@ -200,7 +198,7 @@
 			canvas.style.cursor = data.cursorChange.cursor;
 		}
 		if (data.copyEvent != null && api.context.hasControl) {
-			window.prompt("Copy to clipboard: Ctrl+C, Enter", data.copyEvent.content);
+			api.clipboard.copy(data.copyEvent);
 		}
 		if (data.fileDialogEvent != null && api.context.hasControl) {
 			if (data.fileDialogEvent.eventType === 'Open') {
@@ -258,33 +256,31 @@
 							return sequence.then(function(resolved) {
 								return win.content.reduce(function(internalSeq, winContent) {
 									return internalSeq.then(function(done) {
-										return new Promise(
-												function(resolved, rejected) {
-													if (winContent != null) {
-														var imageObj = new Image();
-														var onloadFunction = function() {
-															context.drawImage(imageObj, win.posX + winContent.positionX, win.posY
-																	+ winContent.positionY);
-															resolved();
-															imageObj.onload = null;
-															imageObj.src = '';
-															if (imageObj.clearAttributes != null) {
-																imageObj.clearAttributes();
-															}
-															imageObj = null;
-														}
-														imageObj.onload = function() {
-															// fix for ie - onload is fired before the image is ready for rendering to canvas. This is
-															// a ugly quickfix
-															if (ieVersion && ieVersion <= 10){
-																window.setTimeout(onloadFunction, 20);
-															}else{
-																onloadFunction();
-															}
-														};
-														imageObj.src = getImageString(winContent.base64Content);
+										return new Promise(function(resolved, rejected) {
+											if (winContent != null) {
+												var imageObj = new Image();
+												var onloadFunction = function() {
+													context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
+													resolved();
+													imageObj.onload = null;
+													imageObj.src = '';
+													if (imageObj.clearAttributes != null) {
+														imageObj.clearAttributes();
 													}
-												});
+													imageObj = null;
+												}
+												imageObj.onload = function() {
+													// fix for ie - onload is fired before the image is ready for rendering to canvas. This is
+													// a ugly quickfix
+													if (api.ieVersion && api.ieVersion <= 10) {
+														window.setTimeout(onloadFunction, 20);
+													} else {
+														onloadFunction();
+													}
+												};
+												imageObj.src = getImageString(winContent.base64Content);
+											}
+										});
 									});
 								}, Promise.resolve());
 							});
@@ -325,19 +321,19 @@
 		context.putImageData(copy, dx, dy);
 	}
 
-	function registerEventListeners(canvas) {
+	function registerEventListeners(canvas, input) {
 		bindEvent(canvas, 'mousedown', function(evt) {
 			var mousePos = getMousePos(canvas, evt, 'mousedown');
 			latestMouseMoveEvent = null;
 			enqueueInputEvent(mousePos);
-			canvas.focus();
+			focusInput(input);
 			return false;
 		}, false);
 		bindEvent(canvas, 'dblclick', function(evt) {
 			var mousePos = getMousePos(canvas, evt, 'dblclick');
 			latestMouseMoveEvent = null;
 			enqueueInputEvent(mousePos);
-			canvas.focus();
+			focusInput(input);
 			return false;
 		}, false);
 		bindEvent(canvas, 'mousemove', function(evt) {
@@ -350,6 +346,7 @@
 			var mousePos = getMousePos(canvas, evt, 'mouseup');
 			latestMouseMoveEvent = null;
 			enqueueInputEvent(mousePos);
+			focusInput(input);
 			return false;
 		}, false);
 		// IE9, Chrome, Safari, Opera
@@ -378,7 +375,7 @@
 			return false;
 		});
 
-		bindEvent(canvas, 'keydown', function(event) {
+		bindEvent(input, 'keydown', function(event) {
 			// 48-57
 			// 65-90
 			// 186-192
@@ -393,19 +390,8 @@
 			}
 			var keyevt = getKBKey('keydown', canvas, event);
 			// hanle paste event
-			if (keyevt.key.ctrl && keyevt.key.character == 86) { // ctrl+v
-				var text = prompt('Press ctrl+v and enter..');
-				iePastePromptHack = true;
-				setTimeout(function() {
-					iePastePromptHack = false;
-				}, 10);
-				if (api.context.hasControl) {
-					api.socket.send({
-						paste : {
-							content : text
-						}
-					});
-				}
+			if (keyevt.key.ctrl && (keyevt.key.character == 86 ||  keyevt.key.character == 118)) { // ctrl+v
+				// paste handled in paste event
 			} else {
 				// default action prevented
 				if (keyevt.key.ctrl && !keyevt.key.alt && !keyevt.key.altgr) {
@@ -415,21 +401,28 @@
 			}
 			return false;
 		}, false);
-		bindEvent(canvas, 'keypress', function(event) {
-			event.preventDefault();
-			event.stopPropagation();
+		bindEvent(input, 'keypress', function(event) {
 			var keyevt = getKBKey('keypress', canvas, event);
-			if (!(keyevt.key.ctrl && keyevt.key.character == 118) && !(iePastePromptHack && keyevt.key.character == 118)) { // skip
-				// ctrl+v
+			if (!(keyevt.key.ctrl && keyevt.key.character == 118)) { // skip ctrl+v
+				event.preventDefault();
+				event.stopPropagation();
 				enqueueInputEvent(keyevt);
 			}
 			return false;
 		}, false);
-		bindEvent(canvas, 'keyup', function(event) {
+		bindEvent(input, 'keyup', function(event) {
+			var keyevt = getKBKey('keyup', canvas, event);
+			if (!(keyevt.key.ctrl && keyevt.key.character == 118)) { // skip ctrl+v
+				event.preventDefault();
+				event.stopPropagation();
+			}
+			enqueueInputEvent(keyevt);
+			return false;
+		}, false);
+		bindEvent(input, 'paste', function(event) {
 			event.preventDefault();
 			event.stopPropagation();
-			var keyevt = getKBKey('keyup', canvas, event);
-			enqueueInputEvent(keyevt);
+			api.clipboard.paste(event.clipboardData);
 			return false;
 		}, false);
 		bindEvent(document, 'mousedown', function(evt) {
@@ -445,6 +438,13 @@
 				mouseDown = 0;
 			}
 		});
+	}
+
+	function focusInput(input) {
+		// In order to ensure that the browser will fire clipboard events, we always need to have something selected
+		input.value = ' ';
+		input.focus();
+		input.select();
 	}
 
 	function getMousePos(canvas, evt, type) {
@@ -526,31 +526,6 @@
 		} else {
 			el.bind(eventName, eventHandler);
 		}
-	}
-
-	function detectIE() {
-		var ua = window.navigator.userAgent;
-
-		var msie = ua.indexOf('MSIE ');
-		if (msie > 0) {
-			// IE 10 or older => return version number
-			return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-		}
-
-		var trident = ua.indexOf('Trident/');
-		if (trident > 0) {
-			// IE 11 => return version number
-			var rv = ua.indexOf('rv:');
-			return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-		}
-
-		var edge = ua.indexOf('Edge/');
-		if (edge > 0) {
-			// IE 12 => return version number
-			return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
-		}
-		// other browser
-		return false;
 	}
 
 	return {
