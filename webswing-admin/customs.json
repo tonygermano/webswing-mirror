@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "collapse": {
+            "context": "div"
+        }
+    },
+    "elements": {
+        "ws-application-list": {},
+        "ws-string-field": {},
+        "ws-substitutor-helper": {},
+        "ws-boolean-field": {},
+        "ws-string-list-field": {},
+        "tab": {},
+        "progressbar": {},
+        "tab-heading": {},
+        "ws-application-view": {},
+        "ws-webswing-config": {},
+        "tabset": {}
+    }
+}
