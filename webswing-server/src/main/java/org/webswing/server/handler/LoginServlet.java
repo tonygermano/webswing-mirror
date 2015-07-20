@@ -53,7 +53,7 @@ public class LoginServlet extends HttpServlet {
 			resp.setStatus(HttpServletResponse.SC_OK);
 			resp.getWriter().write(SecurityUtils.getSubject().getPrincipal() + "");
 		} else {
-			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			resp.getWriter().write("User is not authorized to access this location.");
 		}
 	}

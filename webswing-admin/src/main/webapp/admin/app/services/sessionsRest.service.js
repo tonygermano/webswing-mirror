@@ -1,35 +1,44 @@
-define([], function f() {
-    function sessionsRestService($http, $log, messageService) {
-        return {
-            getSessions: getSessions,
-            getSession:getSession
-        };
+(function (define) {
+    define([], function f() {
+        function sessionsRestService(baseUrl, $http, errorHandler, messageService) {
+            return {
+                getSessions: getSessions,
+                getSession: getSession,
+                killSession: killSession
+            };
 
-        function getSessions() {
-            return $http.get('/rest/admin/sessions').then(success, failed);
-            function success(data) {
-                return data.data;
+            function getSessions() {
+                return $http.get(baseUrl + '/rest/admin/sessions').then(success, failed);
+                function success(data) {
+                    return data.data;
+                }
+                function failed(data) {
+                    return errorHandler.handleRestError('load swing sessions', data, true);
+                }
             }
-            function failed(data) {
-                messageService.error('Failed to load swing sessions.');
-                $log.error('Loading of sessions failed with status ' + data.status + ' and message :' + data.data);
-                return null;
+
+            function getSession(id) {
+                return $http.get(baseUrl + '/rest/admin/session/' + id).then(success, failed);
+                function success(data) {
+                    return data.data;
+                }
+                function failed(data) {
+                    return errorHandler.handleRestError('load swing session ' + id, data, true);
+                }
+            }
+
+            function killSession(id) {
+                return $http.delete(baseUrl + '/rest/admin/session/' + id).then(success, failed);
+                function success(data) {
+                    messageService.info('Swing application shutdown completed.');
+                }
+                function failed(data) {
+                    return errorHandler.handleRestError('Swing application shutdown', data, true);
+                }
             }
         }
 
-        function getSession(id) {
-            return $http.get('/rest/admin/session/'+id).then(success, failed);
-            function success(data) {
-                return data.data;
-            }
-            function failed(data) {
-                messageService.error('Failed to load swing session '+id+'.');
-                $log.error('Loading of session '+id+' failed with status ' + data.status + ' and message :' + data.data);
-                return null;
-            }
-        }
-    }
-
-    sessionsRestService.$inject = ['$http', '$log', 'messageService'];
-    return sessionsRestService;
-});
+        sessionsRestService.$inject = ['baseUrl', '$http', 'errorHandler', 'messageService'];
+        return sessionsRestService;
+    });
+})(adminConsole.define);

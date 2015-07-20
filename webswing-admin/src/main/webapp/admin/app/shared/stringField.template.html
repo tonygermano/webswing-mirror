@@ -17,7 +17,11 @@
                 </div>
             </div>
             <div ng-if="vm.variables != null" collapse="!vm.helpVisible">
-                <div class="ws-helper alert alert-info" ><strong>Resolve to: </strong>{{vm.value|substitutor:vm.variables }}</div>
+                <div class="ws-helper alert alert-info" >
+                    <small><span class="glyphicon glyphicon-flash" ></span>This field supports variable replacement</small>
+                    <br/>
+                    <strong>Resolve to: </strong>{{vm.value|substitutor:vm.variables }}
+                </div>
             </div>
             <div ng-show="appForm.input.$invalid">
                 <span class="label label-danger" ng-show="appForm.input.$error.required">{{::vm.requiredMsg}}</span>

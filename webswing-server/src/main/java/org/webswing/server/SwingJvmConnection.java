@@ -220,7 +220,7 @@ public class SwingJvmConnection implements MessageListener {
 	public Future<?> start(final SwingDescriptor appConfig, final ConnectionHandshakeMsgIn handshake) {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final StrSubstitutor subs = ServerUtil.getConfigSubstitutorMap(webListener.getUser(), getClientId());
+		final StrSubstitutor subs = ServerUtil.getConfigSubstitutor(webListener.getUser(), getClientId());
 
 		Future<?> future = swingAppExecutor.submit(new Callable<Object>() {
 			public Object call() throws Exception {

@@ -71,6 +71,20 @@
 		<servlet-name>LoginServlet</servlet-name>
 		<servlet-class>org.webswing.server.handler.LoginServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>jersey-serlvet</servlet-name>
+		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+		<init-param>
+			<param-name>jersey.config.server.provider.packages</param-name>
+			<param-value>org.webswing.server.rest</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>jersey-serlvet</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>AtmosphereServlet</servlet-name>
 		<url-pattern>/async/*</url-pattern>
@@ -87,11 +101,11 @@
 		<servlet-name>LoginServlet</servlet-name>
 		<url-pattern>/login</url-pattern>
 	</servlet-mapping>
-	
+
 	<listener>
 		<listener-class>org.webswing.server.handler.StartupService</listener-class>
 	</listener>
-	
+
 	<listener>
 		<listener-class>org.webswing.server.handler.JmsService</listener-class>
 	</listener>

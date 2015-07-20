@@ -1,6 +1,7 @@
 package org.webswing.model.server;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SwingDescriptor implements Serializable {
@@ -8,8 +9,8 @@ public class SwingDescriptor implements Serializable {
 	private String name;
 	private String icon;
 	private String vmArgs = "";
-	private List<String> classPathEntries;
-	private String homeDir = System.getProperty("user.dir");
+	private List<String> classPathEntries = new ArrayList<String>();
+	private String homeDir = "${user.dir}";
 	private String theme = "Murrine";
 	private int maxClients = 1;
 	private boolean antiAliasText = true;

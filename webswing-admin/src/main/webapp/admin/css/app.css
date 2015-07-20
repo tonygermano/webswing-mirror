@@ -163,9 +163,10 @@ body {
 
 .mirror-view-dialog-body {
     min-height: 400px;
-    overflow : auto;
     padding: 0;
     overflow: auto;
+    border-width: 2px;
+    border-style: inset;
 }
 
 .mirror-view-dialog-header {
@@ -234,4 +235,11 @@ body {
 
 .ws-button-gap{
     margin-bottom: 10px;
+}
+
+.ws-update{
+    float: right; 
+    font-size: 15px;
+    position: relative;
+    bottom: -15px;
 }

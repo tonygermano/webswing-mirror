@@ -7,6 +7,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>webswing-server</module>
+		<module>webswing-admin</module>
 		<module>webswing-server-launcher</module>
 		<module>webswing-app-toolkit</module>
 		<module>webswing-app-toolkit-java6</module>
@@ -17,6 +18,23 @@
 		<module>webswing-directdraw</module>
 		<module>webswing-assembly</module>
 	</modules>
+	<properties>
+		<jersey.version>2.13</jersey.version>
+	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-mapper-asl</artifactId>
+				<version>1.9.13</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.4</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>

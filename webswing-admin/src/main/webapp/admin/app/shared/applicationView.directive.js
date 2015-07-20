@@ -1,78 +1,80 @@
-define(['text!shared/applicationView.template.html'], function f(htmlTemplate) {
-    function wsApplicationViewDirective() {
-        return {
-            restrict: 'E',
-            template: htmlTemplate,
-            scope: {
-                app: '=',
-                variables: '='
-            },
-            controllerAs: 'vm',
-            bindToController: true,
-            controller: wsApplicationViewDirectiveController
-        };
-    }
-
-    function wsApplicationViewDirectiveController($scope, $element, $attrs) {
-        var vm = this;
-        vm.readonly = watchBoolean('readonly', false);
-        vm.json = updateJson();
-        vm.aceLoaded = aceLoaded;
-        vm.updateJson = updateJson;
-        vm.exists = exists;
-
-        $scope.$watch('vm.json', function (value) {
-            try {
-                var newConfig = angular.fromJson(value);
-                angular.merge(vm.app, newConfig);
-            } catch (e) {
-            }
-        }, true);
-
-        $scope.$on('wsHelperOpened', function (evt, data, i) {
-            $scope.$broadcast('wsHelperClose', data, i);
-        });
-
-        function exists(obj) {
-            if (typeof obj === 'undefined') {
-                return false;
-            }
-            return true;
-        }
-        function updateJson() {
-            vm.json = angular.toJson(vm.app, true);
+(function (define) {
+    define(['text!shared/applicationView.template.html'], function f(htmlTemplate) {
+        function wsApplicationViewDirective() {
+            return {
+                restrict: 'E',
+                template: htmlTemplate,
+                scope: {
+                    app: '=',
+                    variables: '='
+                },
+                controllerAs: 'vm',
+                bindToController: true,
+                controller: wsApplicationViewDirectiveController
+            };
         }
 
-        function aceLoaded(editor) {
-            editor.setReadOnly(vm.readonly);
-            $scope.$watch("vm.readonly", function (value) {
-                editor.setReadOnly(value);
-            });
-            $scope.$watch('vm.app', function () {
-                updateJson();
-                editor.resize(true);
+        function wsApplicationViewDirectiveController($scope, $element, $attrs) {
+            var vm = this;
+            vm.readonly = watchBoolean('readonly', false);
+            vm.json = updateJson();
+            vm.aceLoaded = aceLoaded;
+            vm.updateJson = updateJson;
+            vm.exists = exists;
+
+            $scope.$watch('vm.json', function (value) {
+                try {
+                    var newConfig = angular.fromJson(value);
+                    angular.merge(vm.app, newConfig);
+                } catch (e) {
+                }
             }, true);
-        }
 
-        function watchBoolean(name, defaultVal) {
-            $scope.$watch(function () {
-                var val = resolve(name, defaultVal);
-                return  val !== false && val !== 'false';
-            }, function (newValue) {
-                vm[name] = newValue;
+            $scope.$on('wsHelperOpened', function (evt, data, i) {
+                $scope.$broadcast('wsHelperClose', data, i);
             });
-        }
 
-        function resolve(name, defaultVal) {
-            if ($attrs[name] != null) {
-                return $attrs[name];
-            } else {
-                return defaultVal;
+            function exists(obj) {
+                if (typeof obj === 'undefined') {
+                    return false;
+                }
+                return true;
+            }
+            function updateJson() {
+                vm.json = angular.toJson(vm.app, true);
+            }
+
+            function aceLoaded(editor) {
+                editor.setReadOnly(vm.readonly);
+                $scope.$watch("vm.readonly", function (value) {
+                    editor.setReadOnly(value);
+                });
+                $scope.$watch('vm.app', function () {
+                    updateJson();
+                    editor.resize(true);
+                }, true);
+            }
+
+            function watchBoolean(name, defaultVal) {
+                $scope.$watch(function () {
+                    var val = resolve(name, defaultVal);
+                    return  val !== false && val !== 'false';
+                }, function (newValue) {
+                    vm[name] = newValue;
+                });
+            }
+
+            function resolve(name, defaultVal) {
+                if ($attrs[name] != null) {
+                    return $attrs[name];
+                } else {
+                    return defaultVal;
+                }
             }
         }
-    }
 
-    wsApplicationViewDirectiveController.$inject = ['$scope', '$element', '$attrs'];
+        wsApplicationViewDirectiveController.$inject = ['$scope', '$element', '$attrs'];
 
-    return wsApplicationViewDirective;
-});
+        return wsApplicationViewDirective;
+    });
+})(adminConsole.define);

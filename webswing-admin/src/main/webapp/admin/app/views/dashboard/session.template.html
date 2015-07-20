@@ -2,6 +2,10 @@
     <button type="button" class="ws-button-gap btn btn-primary" ng-click="vm.back()">
         <span class="glyphicon glyphicon-arrow-left"></span> Back
     </button>
+    <div class="ws-update" ng-click="vm.refresh()">
+        <span ng-class="{'glyphicon':true,'glyphicon-repeat':vm.timer != null,'glyphicon-refresh':vm.timer == null} "> </span>
+        {{vm.lastUpdated| date:'h:mm:ss'}}
+    </div>
     <table class="table mirror-view-dialog-header-table">
         <tr>
             <td>

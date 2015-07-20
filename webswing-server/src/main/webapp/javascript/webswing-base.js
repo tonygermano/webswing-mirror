@@ -390,7 +390,7 @@
 			}
 			var keyevt = getKBKey('keydown', canvas, event);
 			// hanle paste event
-			if (keyevt.key.ctrl && (keyevt.key.character == 86 ||  keyevt.key.character == 118)) { // ctrl+v
+			if (keyevt.key.ctrl && (keyevt.key.character == 86 || keyevt.key.character == 118)) { // ctrl+v
 				// paste handled in paste event
 			} else {
 				// default action prevented
@@ -496,20 +496,23 @@
 
 	function getHandShake(canvas) {
 		var handshake = {
-			handshake : {
-				applicationName : api.context.appName,
-				clientId : api.context.clientId,
-				sessionId : api.socket.uuid(),
-				desktopWidth : canvas.offsetWidth,
-				desktopHeight : canvas.offsetHeight,
-				mirrored : api.context.mirrorMode,
-				directDrawSupported : api.typedArraysSupported,
-				applet : api.context.applet,
-				documentBase : api.documentBase,
-				params : api.params
-			}
+			applicationName : api.context.appName,
+			clientId : api.context.clientId,
+			sessionId : api.socket.uuid(),
+			mirrored : api.context.mirrorMode,
+			directDrawSupported : api.typedArraysSupported
+		}
+
+		if (!api.context.mirrorMode) {
+			handshake.applet = api.context.applet;
+			handshake.documentBase = api.documentBase;
+			handshake.params = api.params;
+			handshake.desktopWidth = canvas.offsetWidth;
+			handshake.desktopHeight = canvas.offsetHeight;
+		}
+		return {
+			handshake : handshake
 		};
-		return handshake;
 	}
 
 	function getMessageEvent(message) {

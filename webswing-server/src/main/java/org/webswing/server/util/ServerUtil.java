@@ -8,7 +8,6 @@ import java.net.URL;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,18 +31,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.MsgOut;
-import org.webswing.model.admin.c2s.ApplyConfigurationMsgIn;
-import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
-import org.webswing.model.admin.s2c.MessageMsg;
-import org.webswing.model.admin.s2c.MessageMsg.Type;
-import org.webswing.model.admin.s2c.SwingSessionMsg;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.server.SwingAppletDescriptor;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.SwingDescriptor;
-import org.webswing.model.server.WebswingConfiguration;
+import org.webswing.model.server.admin.SwingSession;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstance;
 import org.webswing.server.handler.FileServlet;
@@ -81,7 +75,7 @@ public class ServerUtil {
 
 	public static Object decodeJson(String s) {
 		Object o = null;
-		Class<?>[] classes = new Class<?>[] { InputEventsFrameMsgIn.class, ApplyConfigurationMsgIn.class };
+		Class<?>[] classes = new Class<?>[] { InputEventsFrameMsgIn.class };
 		for (Class<?> c : classes) {
 			try {
 				o = mapper.readValue(s, c);
@@ -112,7 +106,7 @@ public class ServerUtil {
 		Map<String, SwingAppletDescriptor> applets = ConfigurationManager.getInstance().getApplets();
 
 		List<ApplicationInfoMsg> apps = new ArrayList<ApplicationInfoMsg>();
-		StrSubstitutor subs = getConfigSubstitutorMap(getUserName(r), null);
+		StrSubstitutor subs = getConfigSubstitutor(getUserName(r), null);
 		if (applications.size() == 0) {
 			return null;
 		} else {
@@ -260,10 +254,11 @@ public class ServerUtil {
 		return warFile;
 	}
 
-	public static SwingSessionMsg composeSwingInstanceStatus(SwingInstance si) {
-		SwingSessionMsg result = new SwingSessionMsg();
+	public static SwingSession composeSwingInstanceStatus(SwingInstance si) {
+		SwingSession result = new SwingSession();
 		result.setId(si.getClientId());
-		result.setApplication(si.getApplicationName());
+		result.setApplet(si.getApplication() instanceof SwingAppletDescriptor);
+		result.setApplication(si.getApplication().getName());
 		result.setConnected(si.getSessionId() != null);
 		if (!result.getConnected()) {
 			result.setDisconnectedSince(si.getDisconnectedSince());
@@ -298,36 +293,12 @@ public class ServerUtil {
 		return false;
 	}
 
-	public static boolean validateConfigFile(byte[] content) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.readValue(content, WebswingConfiguration.class);
-		return true;
-	}
-
 	public static boolean validateUserFile(byte[] content) throws IOException {
 		PropertiesRealm r = new PropertiesRealm();
 		String tmpFileName = FileServlet.registerFile(content, UUID.randomUUID().toString(), 10, TimeUnit.SECONDS, "");
 		r.setResourcePath(tmpFileName);
 		r.init();
 		return true;
-	}
-
-	public static String composeAdminErrorReply(Exception e) {
-		return createJsonMessageFrame(Type.danger, e.getMessage());
-	}
-
-	public static String composeAdminSuccessReply(String s) {
-		return createJsonMessageFrame(Type.success, s);
-	}
-
-	private static String createJsonMessageFrame(Type t, String text) {
-		AdminConsoleFrameMsgOut response = new AdminConsoleFrameMsgOut();
-		MessageMsg message = new MessageMsg();
-		message.setType(t);
-		message.setText(text);
-		message.setTime(new Date());
-		response.setMessage(message);
-		return encode2Json(response);
 	}
 
 	public static boolean isRecording(HttpServletRequest r) {
@@ -349,7 +320,7 @@ public class ServerUtil {
 		}
 	}
 
-	public static StrSubstitutor getConfigSubstitutorMap(String user, String sessionId) {
+	public static Map<String, String> getConfigSubstitutorMap(String user, String sessionId) {
 
 		Map<String, String> result = new HashMap<String, String>();
 		result.putAll(System.getenv());
@@ -363,7 +334,11 @@ public class ServerUtil {
 			result.put(Constants.SESSION_ID_SUBSTITUTE, sessionId);
 		}
 
-		return new StrSubstitutor(result);
+		return result;
+	}
+
+	public static StrSubstitutor getConfigSubstitutor(String user, String sessionId) {
+		return new StrSubstitutor(getConfigSubstitutorMap(user, sessionId));
 	}
 
 	public static void broadcastMessage(AtmosphereResource r, EncodedMessage o) {

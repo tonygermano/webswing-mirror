@@ -4,7 +4,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 
-import org.webswing.model.admin.s2c.SwingJvmStatsMsg;
+import org.webswing.model.server.admin.SwingJvmStats;
 import org.webswing.server.SwingInstance;
 import org.webswing.toolkit.util.Logger;
 
@@ -12,13 +12,13 @@ public class StatUtils {
 
 	private static final int MB = 1024 * 1024;
 
-	public static SwingJvmStatsMsg getSwingInstanceStats(SwingInstance instance, MBeanServerConnection mBeanServerConnection) {
-		SwingJvmStatsMsg result = instance.getStats();
+	public static SwingJvmStats getSwingInstanceStats(SwingInstance instance, MBeanServerConnection mBeanServerConnection) {
+		SwingJvmStats result = instance.getStats();
 		resolveHeapMemory(mBeanServerConnection, result);
 		return result;
 	}
 
-	private static void resolveHeapMemory(MBeanServerConnection mBeanServerConnection, SwingJvmStatsMsg stats) {
+	private static void resolveHeapMemory(MBeanServerConnection mBeanServerConnection, SwingJvmStats stats) {
 		if (mBeanServerConnection != null) {
 			try {
 				Object o = mBeanServerConnection.getAttribute(new ObjectName("java.lang:type=Memory"), "HeapMemoryUsage");
@@ -33,7 +33,7 @@ public class StatUtils {
 
 	public static void logInboundData(SwingInstance instance, int length) {
 		if (instance != null) {
-			SwingJvmStatsMsg result = instance.getStats();
+			SwingJvmStats result = instance.getStats();
 			result.setInboundMsgCount(result.getInboundMsgCount() + 1);
 			result.setInboundDataSizeSum(result.getInboundDataSizeSum() + length);
 		}
@@ -41,7 +41,7 @@ public class StatUtils {
 
 	public static void logOutboundData(SwingInstance instance, int length) {
 		if (instance != null) {
-			SwingJvmStatsMsg result = instance.getStats();
+			SwingJvmStats result = instance.getStats();
 			result.setOutboundMsgCount(result.getOutboundMsgCount() + 1);
 			result.setOutboundDataSizeSum(result.getOutboundDataSizeSum() + length);
 		}

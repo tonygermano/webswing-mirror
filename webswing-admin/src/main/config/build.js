@@ -1,18 +1,19 @@
 ({
-	baseUrl : "${project.build.directory}/${project.build.finalName}/javascript",
-	dir : "${project.build.directory}/require-build/javascript/",
-	optimize : "none",
-	paths : {
-		requireLib : 'require'
-	},
-	namespace : 'webswingRequirejs',
-	modules : [ {
-		name : "webswing-embed",
-		include : [ 'requireLib', 'main', 'jquery-private'],
-		create : true
-	} ],
-	wrap: {
-		startFile: "${project.basedir}/src/main/config/parts/start.frag",
-		endFile: "${project.basedir}/src/main/config/parts/end.frag"
-	}
+    baseUrl: "${basedir}/src/main/webapp/admin/app",
+    dir: "${project.build.directory}/require-build/admin/app",
+    optimize: 'none',
+    map: {
+        '*': {
+            'text': 'libs/text'
+        }
+    },
+    modules: [{
+            name: "admin",
+            include: ['main', 'text'],
+            create: true
+        }],
+    wrap: {
+        start: "(function(require,define,requirejs) {",
+        end: "}(adminConsole.require,adminConsole.define,adminConsole.requirejs));"
+    }
 })

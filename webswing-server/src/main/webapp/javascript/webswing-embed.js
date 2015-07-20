@@ -7,7 +7,12 @@
 	}
 
 	var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
-	script.src = document.location.origin  + "/javascript/require.js";
-	script.setAttribute("data-main", "javascript/main.js");
+	script.src = document.location.origin + "/javascript/require.js";
 	tag.parentNode.insertBefore(script, tag);
+	script.onload = function() {
+		var script2 = document.createElement("script");
+		script2.src = "javascript/main.js";
+		tag.parentNode.insertBefore(script2, tag);
+	}
+
 })(window, document);

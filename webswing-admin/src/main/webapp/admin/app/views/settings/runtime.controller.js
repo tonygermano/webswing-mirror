@@ -1,25 +1,27 @@
-define([], function f() {
-    function SettingsRuntimeController(settingsRestService, configRestService) {
-        var vm = this;
-        vm.settings = {};
-        vm.config = {};
-        vm.variables = {};
+(function (define) {
+    define([], function f() {
+        function SettingsRuntimeController(settingsRestService, configRestService) {
+            var vm = this;
+            vm.settings = {};
+            vm.config = {};
+            vm.variables = {};
 
-        activate();
+            activate();
 
-        function activate() {
-            settingsRestService.getSettings().then(function (data) {
-                angular.extend(vm.settings, data);
-            });
-            configRestService.getConfig().then(function (data) {
-                angular.extend(vm.config, data);
-            });
-            configRestService.getVariables().then(function (data) {
-                angular.extend(vm.variables, data);
-            });
+            function activate() {
+                settingsRestService.getSettings().then(function (data) {
+                    angular.extend(vm.settings, data);
+                    return configRestService.getConfig();
+                }).then(function (data) {
+                    angular.extend(vm.config, data);
+                    return configRestService.getVariables();
+                }).then(function (data) {
+                    angular.extend(vm.variables, data);
+                });
+            }
         }
-    }
-    SettingsRuntimeController.$inject = ['settingsRestService', 'configRestService'];
+        SettingsRuntimeController.$inject = ['settingsRestService', 'configRestService'];
 
-    return SettingsRuntimeController;
-});
+        return SettingsRuntimeController;
+    });
+})(adminConsole.define);

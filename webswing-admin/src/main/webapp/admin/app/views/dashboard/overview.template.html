@@ -1,4 +1,9 @@
-<h2 class="sub-header">Running sessions</h2>
+<h2 class="sub-header">Running sessions 
+    <div class="ws-update" ng-click="vm.refresh()">
+        <span ng-class="{'glyphicon':true,'glyphicon-repeat':vm.timer != null,'glyphicon-refresh':vm.timer == null} "> </span>
+        {{vm.lastUpdated| date:'h:mm:ss'}}
+    </div>
+</h2>
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>

@@ -28,8 +28,8 @@
             }
         }
     });
-    require(['libs/angular', 'libs/bootstrap', 'libs/angular-route', 'libs/ui-ace', 'libs/ui-bootstrap', 'libs/ui-utils'], function () {
-        require(['app.module'], function (admin) {
+    require(['libs/jquery', 'libs/angular', 'libs/bootstrap', 'libs/angular-route', 'libs/ui-ace', 'libs/ui-bootstrap', 'libs/ui-utils'], function () {
+        require(['app.module'], function () {
             angular.bootstrap(root, ['wsAdmin']);
         }, errorHandler);
     }, errorHandler);

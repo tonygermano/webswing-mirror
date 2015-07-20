@@ -1,34 +1,32 @@
-define([], function f() {
-    function usersRestService($http, $log, messageService) {
-        return {
-            getUsers: getUsers,
-            setUsers: setUsers,
-        };
+(function (define) {
+    define([], function f() {
+        function usersRestService(baseUrl, $http, errorHandler, messageService) {
+            return {
+                getUsers: getUsers,
+                setUsers: setUsers
+            };
 
-        function getUsers() {
-            return $http.get('/rest/admin/users').then(success, failed);
-            function success(data) {
-                return data.data;
+            function getUsers() {
+                return $http.get(baseUrl + '/rest/admin/users').then(success, failed);
+                function success(data) {
+                    return data.data;
+                }
+                function failed(data) {
+                    return errorHandler.handleRestError('load user configuration', data, true);
+                }
             }
-            function failed(data) {
-                messageService.error('Failed to load users configuration.');
-                $log.error('Loading of users configuration failed with status ' + data.status + ' and message :' + data.data);
-                return null;
+            function setUsers(users) {
+                return $http.post(baseUrl + '/rest/admin/users', users).then(success, failed);
+                function success() {
+                    messageService.success('User properties saved.');
+                }
+                function failed(data) {
+                    return errorHandler.handleRestError('save user configuration', data, true);
+                }
             }
         }
-        function setUsers(users) {
-            return $http.post('/rest/admin/users', users).then(success, failed);
-            function success() {
-                messageService.success('Users properties saved.');
-            }
-            function failed(data) {
-                messageService.error('Failed to save users configuration.');
-                $log.error('Saving of users configuration failed with status ' + data.status + ' and message :' + data.data);
-                return null;
-            }
-        }
-    }
 
-    usersRestService.$inject = ['$http', '$log', 'messageService'];
-    return usersRestService;
-});
+        usersRestService.$inject = ['baseUrl', '$http', 'errorHandler', 'messageService'];
+        return usersRestService;
+    });
+})(adminConsole.define);

@@ -1,22 +1,22 @@
-define([], function f() {
-	function settingsRestService($http, $log, messageService) {
-		return {
-			getSettings : getSettings
-		};
+(function (define) {
+    define([], function f() {
+        function settingsRestService(baseUrl, $http, errorHandler, messageService) {
+            return {
+                getSettings: getSettings
+            };
 
-		function getSettings() {
-			return $http.get('/rest/admin/settings').then(success, failed);
-			function success(data) {
-				return data.data;
-			}
-			function failed(data) {
-				messageService.error('Failed to load server settings.');
-				$log.error('Loading of  server settings failed with status ' + data.status + ' and message :' + data.data);
-				return null;
-			}
-		}
-	}
+            function getSettings() {
+                return $http.get(baseUrl + '/rest/admin/settings').then(success, failed);
+                function success(data) {
+                    return data.data;
+                }
+                function failed(data) {
+                    return errorHandler.handleRestError('load server settings', data, true);
+                }
+            }
+        }
 
-	settingsRestService.$inject = [ '$http', '$log', 'messageService' ];
-	return settingsRestService;
-});
+        settingsRestService.$inject = ['baseUrl', '$http', 'errorHandler', 'messageService'];
+        return settingsRestService;
+    });
+})(adminConsole.define);
