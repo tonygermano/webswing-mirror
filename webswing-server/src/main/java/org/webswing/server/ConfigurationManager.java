@@ -35,12 +35,17 @@ public class ConfigurationManager {
 
 	private WebswingConfiguration liveConfiguration = new WebswingConfiguration();
 	private List<ConfigurationChangeListener> changeListeners = new ArrayList<ConfigurationChangeListener>();
+	private long configFileLastModified = -1;
 
 	private ConfigurationManager() {
 		reloadConfiguration();
 	}
 
 	public WebswingConfiguration getLiveConfiguration() {
+		if (configFileLastModified != getConfigFileModificationTime()) {
+			log.info("Webswing configuration file has been modified. Reloadinig active configuration. [" + getConfigFile().getAbsolutePath() + "]");
+			reloadConfiguration();
+		}
 		return liveConfiguration;
 	}
 
@@ -58,7 +63,7 @@ public class ConfigurationManager {
 
 	public Map<String, SwingApplicationDescriptor> getApplications() {
 		Map<String, SwingApplicationDescriptor> result = new HashMap<String, SwingApplicationDescriptor>();
-		for (SwingApplicationDescriptor app : liveConfiguration.getApplications()) {
+		for (SwingApplicationDescriptor app : getLiveConfiguration().getApplications()) {
 			result.put(app.getName(), app);
 		}
 		return result;
@@ -66,14 +71,14 @@ public class ConfigurationManager {
 
 	public Map<String, SwingAppletDescriptor> getApplets() {
 		Map<String, SwingAppletDescriptor> result = new HashMap<String, SwingAppletDescriptor>();
-		for (SwingAppletDescriptor app : liveConfiguration.getApplets()) {
+		for (SwingAppletDescriptor app : getLiveConfiguration().getApplets()) {
 			result.put(app.getName(), app);
 		}
 		return result;
 	}
 
 	public SwingApplicationDescriptor getApplication(String name) {
-		for (SwingApplicationDescriptor app : liveConfiguration.getApplications()) {
+		for (SwingApplicationDescriptor app : getLiveConfiguration().getApplications()) {
 			if (name != null && name.equals(app.getName())) {
 				return app;
 			}
@@ -82,7 +87,7 @@ public class ConfigurationManager {
 	}
 
 	public SwingAppletDescriptor getApplet(String name) {
-		for (SwingAppletDescriptor app : liveConfiguration.getApplets()) {
+		for (SwingAppletDescriptor app : getLiveConfiguration().getApplets()) {
 			if (name != null && name.equals(app.getName())) {
 				return app;
 			}
@@ -94,6 +99,7 @@ public class ConfigurationManager {
 		try {
 			WebswingConfiguration loaded = loadApplicationConfiguration();
 			if (loaded != null) {
+				configFileLastModified = getConfigFileModificationTime();
 				liveConfiguration = loaded;
 				notifyChange();
 			}
@@ -176,7 +182,7 @@ public class ConfigurationManager {
 		}
 	}
 
-	public WebswingConfiguration loadApplicationConfiguration() {
+	private WebswingConfiguration loadApplicationConfiguration() {
 		try {
 			WebswingConfiguration result = new WebswingConfiguration();
 			File config = getConfigFile();
@@ -195,6 +201,14 @@ public class ConfigurationManager {
 
 	private File getConfigFile() {
 		return getConfigFile(false);
+	}
+
+	private long getConfigFileModificationTime() {
+		File cf = getConfigFile();
+		if (cf.exists() && cf.canRead()) {
+			return cf.lastModified();
+		}
+		return configFileLastModified;
 	}
 
 	private File getConfigBackupFile() {
