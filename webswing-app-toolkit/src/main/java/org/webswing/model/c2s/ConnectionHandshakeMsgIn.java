@@ -1,5 +1,7 @@
 package org.webswing.model.c2s;
 
+import java.util.List;
+
 import org.webswing.model.MsgIn;
 
 public class ConnectionHandshakeMsgIn implements MsgIn {
@@ -11,8 +13,11 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 	private Integer desktopWidth;
 	private Integer desktopHeight;
 	private String applicationName;
+	private String documentBase;
+	private boolean applet;
 	private boolean mirrored;
 	private boolean directDrawSupported;
+	private List<ParamMsg> params;
 
 	public String getClientId() {
 		return clientId;
@@ -68,6 +73,30 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 
 	public void setDirectDrawSupported(boolean directDrawSupported) {
 		this.directDrawSupported = directDrawSupported;
+	}
+
+	public boolean isApplet() {
+		return applet;
+	}
+
+	public void setApplet(boolean applet) {
+		this.applet = applet;
+	}
+
+	public String getDocumentBase() {
+		return documentBase;
+	}
+
+	public void setDocumentBase(String documentBase) {
+		this.documentBase = documentBase;
+	}
+
+	public List<ParamMsg> getParams() {
+		return params;
+	}
+
+	public void setParams(List<ParamMsg> params) {
+		this.params = params;
 	}
 
 }

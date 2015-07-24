@@ -45,13 +45,16 @@ import org.webswing.Constants;
 import org.webswing.model.MsgInternal;
 import org.webswing.model.MsgOut;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.c2s.ParamMsg;
 import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.model.internal.PrinterJobResultMsgInternal;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.LinkActionMsg;
 import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
 import org.webswing.model.s2c.SimpleEventMsgOut;
+import org.webswing.model.server.SwingAppletDescriptor;
 import org.webswing.model.server.SwingApplicationDescriptor;
+import org.webswing.model.server.SwingDescriptor;
 import org.webswing.server.handler.FileServlet;
 import org.webswing.server.handler.JmsService;
 import org.webswing.server.util.Los;
@@ -81,7 +84,7 @@ public class SwingJvmConnection implements MessageListener {
 	private String customArgs = "";
 	private int debugPort = 0;
 
-	public SwingJvmConnection(ConnectionHandshakeMsgIn handshake, SwingApplicationDescriptor appConfig, WebSessionListener webListener, String customArgs, int debugPort) {
+	public SwingJvmConnection(ConnectionHandshakeMsgIn handshake, SwingDescriptor appConfig, WebSessionListener webListener, String customArgs, int debugPort) {
 		this.webListener = webListener;
 		this.clientId = handshake.getClientId();
 		this.customArgs = customArgs;
@@ -214,10 +217,10 @@ public class SwingJvmConnection implements MessageListener {
 		webListener.notifyClose();
 	}
 
-	public Future<?> start(final SwingApplicationDescriptor appConfig, final ConnectionHandshakeMsgIn handshake) {
+	public Future<?> start(final SwingDescriptor appConfig, final ConnectionHandshakeMsgIn handshake) {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final StrSubstitutor subs = ServerUtil.getConfigSubstitutorMap(webListener.getUser(), getClientId());
+		final StrSubstitutor subs = ServerUtil.getConfigSubstitutor(webListener.getUser(), getClientId());
 
 		Future<?> future = swingAppExecutor.submit(new Callable<Object>() {
 			public Object call() throws Exception {
@@ -230,9 +233,9 @@ public class SwingJvmConnection implements MessageListener {
 					project.init();
 					DefaultLogger logger = new SwingAntTimestampedLogger();
 					project.addBuildListener(logger);
-					PrintStream os = new PrintStream(new Los(clientId));
-					logger.setOutputPrintStream(os);
-					logger.setErrorPrintStream(os);
+					PrintStream out = new PrintStream(new Los(clientId));
+					logger.setOutputPrintStream(out);
+					logger.setErrorPrintStream(out);
 					logger.setMessageOutputLevel(Project.MSG_INFO);
 					// System.setOut(new PrintStream(new DemuxOutputStream(project, false)));
 					// System.setErr(new PrintStream(new DemuxOutputStream(project, true)));
@@ -247,7 +250,6 @@ public class SwingJvmConnection implements MessageListener {
 						javaTask.setClassname("main.Main");
 						Path classPath = javaTask.createClasspath();
 						classPath.setLocation(new File(URI.create(ServerUtil.getWarFileLocation())));
-						javaTask.setArgs(subs.replace(appConfig.getArgs()) + " " + customArgs);
 						String webSwingToolkitJarPath = "\"" + URLDecoder.decode(WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
 						String webSwingToolkitJarPathSpecific;
 						String webToolkitClass;
@@ -279,11 +281,12 @@ public class SwingJvmConnection implements MessageListener {
 						addSysProperty(javaTask, Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 						addSysProperty(javaTask, Constants.JMS_URL, JmsService.getUrl());
 
-						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_MAIN_CLASS, subs.replace(appConfig.getMainClass()));
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_THEME, subs.replace(appConfig.getTheme()));
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs() + "");
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload() + "");
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload() + "");
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_DELETE, appConfig.isAllowDelete() + "");
+						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, appConfig.isAllowJsLink() + "");
 
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw() + "");
 						addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported() + "");
@@ -292,8 +295,26 @@ public class SwingJvmConnection implements MessageListener {
 						addSysProperty(javaTask, "java.awt.headless", "false");
 						addSysProperty(javaTask, "java.awt.graphicsenv", "org.webswing.toolkit.ge.WebGraphicsEnvironment");
 						addSysProperty(javaTask, "java.awt.printerjob", "org.webswing.toolkit.WebPrinterJob");
-						addSysProperty(javaTask, Constants.SWING_SCREEN_WIDTH, ((screenWidth == null || screenWidth < Constants.SWING_SCREEN_WIDTH_MIN) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth) + "");
-						addSysProperty(javaTask, Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null || screenHeight < Constants.SWING_SCREEN_HEIGHT_MIN) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight) + "");
+						addSysProperty(javaTask, Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth) + "");
+						addSysProperty(javaTask, Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight) + "");
+
+						if (appConfig instanceof SwingApplicationDescriptor) {
+							SwingApplicationDescriptor application = (SwingApplicationDescriptor) appConfig;
+							javaTask.setArgs(subs.replace(application.getArgs()) + " " + customArgs);
+							addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_MAIN_CLASS, subs.replace(application.getMainClass()));
+						} else if (appConfig instanceof SwingAppletDescriptor) {
+							SwingAppletDescriptor applet = (SwingAppletDescriptor) appConfig;
+							addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_APPLET_DOCUMENT_BASE, handshake.getDocumentBase());
+							addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_APPLET_CLASS, applet.getAppletClass());
+							for (String key : applet.getParameters().keySet()) {
+								addSysProperty(javaTask, Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX + subs.replace(key), subs.replace(applet.getParameters().get(key)));
+							}
+							if (handshake.getParams() != null) {
+								for (ParamMsg p : handshake.getParams()) {
+									addSysProperty(javaTask, Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX + p.getName(), p.getValue());
+								}
+							}
+						}
 
 						javaTask.init();
 						javaTask.executeJava();
@@ -314,7 +335,7 @@ public class SwingJvmConnection implements MessageListener {
 		return future;
 	}
 
-	private File getHomeDir(final SwingApplicationDescriptor appConfig, StrSubstitutor subs) {
+	private File getHomeDir(final SwingDescriptor appConfig, StrSubstitutor subs) {
 		String dirString = subs.replace(appConfig.getHomeDir());
 		File homeDir;
 		if (dirString.startsWith("/") || dirString.startsWith("\\") || dirString.contains(":/") || dirString.contains(":\\")) {

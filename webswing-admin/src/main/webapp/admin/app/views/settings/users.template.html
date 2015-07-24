@@ -1,0 +1,14 @@
+<h1 class="page-header">Configure users</h1>
+<div class="form-horizontal">
+    <div class="row">
+        <div class="col-md-12">
+            <button type="button" class="btn btn-primary btn-sm" title="Reset to current live configuration." ui-jq="tooltip" ng-click="vm.reset()"><span class="glyphicon glyphicon-repeat"></span> Reset
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" title="Use this configuration in server runtime." ui-jq="tooltip" ng-click="vm.apply()"><span class="glyphicon glyphicon-ok"></span> Apply
+            </button>
+        </div>
+        <div class="ws-tabs col-md-12 ">
+            <div ui-ace="{ mode: 'properties'}" ng-model="vm.users"></div>
+        </div>
+    </div>
+</div>

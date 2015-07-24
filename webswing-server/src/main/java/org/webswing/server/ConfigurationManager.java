@@ -15,10 +15,12 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.model.admin.s2c.ServerPropertiesMsg;
+import org.webswing.model.server.SwingAppletDescriptor;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
 import org.webswing.model.server.WebswingConfigurationBackup;
+import org.webswing.model.server.admin.ServerProperties;
+import org.webswing.model.server.admin.UserConfiguration;
 import org.webswing.server.handler.JmsService;
 import org.webswing.server.util.ServerUtil;
 
@@ -42,8 +44,8 @@ public class ConfigurationManager {
 		return liveConfiguration;
 	}
 
-	public ServerPropertiesMsg getServerProperties() {
-		ServerPropertiesMsg result = new ServerPropertiesMsg();
+	public ServerProperties getServerProperties() {
+		ServerProperties result = new ServerProperties();
 		result.setTempFolder(System.getProperty(Constants.TEMP_DIR_PATH));
 		result.setJmsServerUrl(JmsService.getUrl());
 		result.setConfigFile(getConfigFile().toURI().toString());
@@ -62,8 +64,25 @@ public class ConfigurationManager {
 		return result;
 	}
 
+	public Map<String, SwingAppletDescriptor> getApplets() {
+		Map<String, SwingAppletDescriptor> result = new HashMap<String, SwingAppletDescriptor>();
+		for (SwingAppletDescriptor app : liveConfiguration.getApplets()) {
+			result.put(app.getName(), app);
+		}
+		return result;
+	}
+
 	public SwingApplicationDescriptor getApplication(String name) {
 		for (SwingApplicationDescriptor app : liveConfiguration.getApplications()) {
+			if (name != null && name.equals(app.getName())) {
+				return app;
+			}
+		}
+		return null;
+	}
+
+	public SwingAppletDescriptor getApplet(String name) {
+		for (SwingAppletDescriptor app : liveConfiguration.getApplets()) {
 			if (name != null && name.equals(app.getName())) {
 				return app;
 			}
@@ -83,21 +102,19 @@ public class ConfigurationManager {
 		}
 	}
 
-	public void applyApplicationConfiguration(byte[] content) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		WebswingConfiguration configuration = mapper.readValue(content, WebswingConfiguration.class);
-		if (configuration != null && !EqualsBuilder.reflectionEquals(liveConfiguration, configuration)) {
+	public void applyApplicationConfiguration(WebswingConfiguration content) throws Exception {
+		if (content != null && !EqualsBuilder.reflectionEquals(liveConfiguration, content)) {
 			backupApplicationConfiguration(liveConfiguration);
 			File config = getConfigFile();
-			mapper.writerWithDefaultPrettyPrinter().writeValue(config, configuration);
+			mapper.writerWithDefaultPrettyPrinter().writeValue(config, content);
 			reloadConfiguration();
 			notifyChange();
 		}
 	}
 
-	public void applyUserProperties(byte[] content) throws Exception {
+	public void applyUserProperties(UserConfiguration content) throws Exception {
 		File usersFile = new File(URI.create(ServerUtil.getUserPropsFileName()));
-		Files.write(content, usersFile);
+		Files.write(content.getUsers().getBytes(), usersFile);
 
 		notifyChange();
 	}
@@ -142,13 +159,13 @@ public class ConfigurationManager {
 		}
 	}
 
-	public String loadUserProperties() {
+	public UserConfiguration loadUserProperties() {
 		try {
 			String result = new String();
 			File users = new File(URI.create(ServerUtil.getUserPropsFileName()));
 			if (users.exists()) {
 				result = Files.toString(users, Charset.forName("UTF-8"));
-				return result;
+				return new UserConfiguration(result);
 			} else {
 				log.warn("User properties file " + users.getPath() + " does not exist.");
 				return null;

@@ -8,7 +8,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JWindow;
 
-import org.webswing.util.Services;
+import org.webswing.toolkit.util.Services;
 
 public class WebContainerPeer extends WebComponentPeer implements ContainerPeer {
 

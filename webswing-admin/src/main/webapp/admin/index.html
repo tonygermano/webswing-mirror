@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <title>Webswing.org console</title>
+        <link rel="stylesheet" href="css/bootstrap.css" />
+        <link rel="stylesheet" href="css/app.css" />
+
+    </head>
+    <body>
+    <ws-login></ws-login>
+    <ws-navbar></ws-navbar>
+    <div class="container-fluid">
+        <div class="row">
+            <ws-sidebar></ws-sidebar>
+            <div ng-view class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main"></div>
+            <ws-messages></ws-messages>
+        </div>
+    </div>
+    <script src="../javascript/webswing-embed.js"></script>
+    <script src="app/libs/acejs/ace.js"></script>
+    <script src="app/libs/require.adminConsole.js"></script>
+    <script data-webswing-global-var="webswingadmin" src="app/admin.js"></script>
+</body>
+</html>

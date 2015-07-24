@@ -89,6 +89,7 @@ public class Main {
 	}
 
 	private static void initializeExtLibServices(List<URL> urls) throws Exception {
+		// sets up Services class providing jms connection and other services in separated classloader to prevent classpath pollution of swing application.
 		ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[0]), null);
 		Class<?> classLoaderUtilclass = extLibClassLoader.loadClass("org.webswing.util.ClassLoaderUtil");
 		Method initializeServicesMethod = classLoaderUtilclass.getMethod("initializeServices");

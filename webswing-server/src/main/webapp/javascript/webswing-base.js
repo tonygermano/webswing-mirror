@@ -5,7 +5,7 @@
 	} else {
 		root.WebswingBase = factory(root.WebswingDirectDraw);
 	}
-}(this, function(WebswingDirectDraw) {
+}(this, function WebswingBase(WebswingDirectDraw) {
 	"use strict";
 
 	var api;
@@ -20,16 +20,17 @@
 	var windowImageHolders = {};
 	var directDraw = new WebswingDirectDraw({});
 
-	function startApplication(name) {
+	function startApplication(name, applet) {
 		api.canvas.get();
-		registerEventListeners(api.canvas.get());
+		registerEventListeners(api.canvas.get(), api.canvas.getInput());
 		resetState();
 		api.context = {
 			clientId : api.login.user() + api.identity.get() + name,
 			appName : name,
 			hasControl : true,
 			mirrorMode : false,
-			canPaint : true
+			canPaint : true,
+			applet : applet
 		}
 		handshake();
 		api.dialog.show(api.dialog.content.startingDialog);
@@ -37,7 +38,7 @@
 
 	function startMirrorView(clientId, appName) {
 		api.canvas.get();
-		registerEventListeners(api.canvas.get());
+		registerEventListeners(api.canvas.get(), api.canvas.getInput());
 		resetState();
 		api.context = {
 			clientId : clientId,
@@ -169,6 +170,9 @@
 			}
 			return;
 		}
+		if (data.jsRequest != null && api.context.mirrorMode == false) {
+			api.jslink.process(data.jsRequest);
+		}
 		if (api.context.canPaint) {
 			processRequest(api.canvas.get(), data);
 		}
@@ -194,7 +198,7 @@
 			canvas.style.cursor = data.cursorChange.cursor;
 		}
 		if (data.copyEvent != null && api.context.hasControl) {
-			window.prompt("Copy to clipboard: Ctrl+C, Enter", data.copyEvent.content);
+			api.clipboard.copy(data.copyEvent);
 		}
 		if (data.fileDialogEvent != null && api.context.hasControl) {
 			if (data.fileDialogEvent.eventType === 'Open') {
@@ -230,7 +234,11 @@
 						if (win.directDraw != null) {
 							// directdraw
 							return sequence.then(function(resolved) {
-								return directDraw.drawBin(win.directDraw, windowImageHolders[win.id]);
+								if (typeof win.directDraw === 'string') {
+									return directDraw.draw64(win.directDraw, windowImageHolders[win.id]);
+								} else {
+									return directDraw.drawBin(win.directDraw, windowImageHolders[win.id]);
+								}
 							}).then(
 									function(resultImage) {
 										windowImageHolders[win.id] = resultImage;
@@ -251,11 +259,24 @@
 										return new Promise(function(resolved, rejected) {
 											if (winContent != null) {
 												var imageObj = new Image();
-												imageObj.onload = function() {
+												var onloadFunction = function() {
 													context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
+													resolved();
 													imageObj.onload = null;
 													imageObj.src = '';
-													resolved();
+													if (imageObj.clearAttributes != null) {
+														imageObj.clearAttributes();
+													}
+													imageObj = null;
+												}
+												imageObj.onload = function() {
+													// fix for ie - onload is fired before the image is ready for rendering to canvas. This is
+													// a ugly quickfix
+													if (api.ieVersion && api.ieVersion <= 10) {
+														window.setTimeout(onloadFunction, 20);
+													} else {
+														onloadFunction();
+													}
 												};
 												imageObj.src = getImageString(winContent.base64Content);
 											}
@@ -300,19 +321,19 @@
 		context.putImageData(copy, dx, dy);
 	}
 
-	function registerEventListeners(canvas) {
+	function registerEventListeners(canvas, input) {
 		bindEvent(canvas, 'mousedown', function(evt) {
 			var mousePos = getMousePos(canvas, evt, 'mousedown');
 			latestMouseMoveEvent = null;
 			enqueueInputEvent(mousePos);
-			canvas.focus();
+			focusInput(input);
 			return false;
 		}, false);
 		bindEvent(canvas, 'dblclick', function(evt) {
 			var mousePos = getMousePos(canvas, evt, 'dblclick');
 			latestMouseMoveEvent = null;
 			enqueueInputEvent(mousePos);
-			canvas.focus();
+			focusInput(input);
 			return false;
 		}, false);
 		bindEvent(canvas, 'mousemove', function(evt) {
@@ -325,6 +346,7 @@
 			var mousePos = getMousePos(canvas, evt, 'mouseup');
 			latestMouseMoveEvent = null;
 			enqueueInputEvent(mousePos);
+			focusInput(input);
 			return false;
 		}, false);
 		// IE9, Chrome, Safari, Opera
@@ -353,7 +375,7 @@
 			return false;
 		});
 
-		bindEvent(canvas, 'keydown', function(event) {
+		bindEvent(input, 'keydown', function(event) {
 			// 48-57
 			// 65-90
 			// 186-192
@@ -362,22 +384,14 @@
 			// FF (163, 171, 173, ) -> en layout ]\/ keys
 			var kc = event.keyCode;
 			if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226)
-					|| (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111))) {
+					|| (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111) || (kc == 59) || (kc == 61))) {
 				event.preventDefault();
 				event.stopPropagation();
 			}
 			var keyevt = getKBKey('keydown', canvas, event);
 			// hanle paste event
-			if (keyevt.key.ctrl && keyevt.key.character == 86) { // ctrl+v
-				var text = prompt('Press ctrl+v and enter..');
-				if (api.context.hasControl) {
-					api.socket.send({
-						paste : {
-							content : text,
-							clientId : api.context.clientId
-						}
-					});
-				}
+			if (keyevt.key.ctrl && (keyevt.key.character == 86 || keyevt.key.character == 118)) { // ctrl+v
+				// paste handled in paste event
 			} else {
 				// default action prevented
 				if (keyevt.key.ctrl && !keyevt.key.alt && !keyevt.key.altgr) {
@@ -387,20 +401,28 @@
 			}
 			return false;
 		}, false);
-		bindEvent(canvas, 'keypress', function(event) {
-			event.preventDefault();
-			event.stopPropagation();
+		bindEvent(input, 'keypress', function(event) {
 			var keyevt = getKBKey('keypress', canvas, event);
-			if (!(keyevt.key.ctrl &&  keyevt.key.character == 118)) { // skip ctrl+v
+			if (!(keyevt.key.ctrl && keyevt.key.character == 118)) { // skip ctrl+v
+				event.preventDefault();
+				event.stopPropagation();
 				enqueueInputEvent(keyevt);
 			}
 			return false;
 		}, false);
-		bindEvent(canvas, 'keyup', function(event) {
+		bindEvent(input, 'keyup', function(event) {
+			var keyevt = getKBKey('keyup', canvas, event);
+			if (!(keyevt.key.ctrl && keyevt.key.character == 118)) { // skip ctrl+v
+				event.preventDefault();
+				event.stopPropagation();
+			}
+			enqueueInputEvent(keyevt);
+			return false;
+		}, false);
+		bindEvent(input, 'paste', function(event) {
 			event.preventDefault();
 			event.stopPropagation();
-			var keyevt = getKBKey('keyup', canvas, event);
-			enqueueInputEvent(keyevt);
+			api.clipboard.paste(event.clipboardData);
 			return false;
 		}, false);
 		bindEvent(document, 'mousedown', function(evt) {
@@ -418,19 +440,25 @@
 		});
 	}
 
+	function focusInput(input) {
+		// In order to ensure that the browser will fire clipboard events, we always need to have something selected
+		input.value = ' ';
+		input.focus();
+		input.select();
+	}
+
 	function getMousePos(canvas, evt, type) {
 		var rect = canvas.getBoundingClientRect();
 		var root = document.documentElement;
 		// return relative mouse position
-		var mouseX = evt.clientX - rect.left;
-		var mouseY = evt.clientY - rect.top;
+		var mouseX = Math.round(evt.clientX - rect.left);
+		var mouseY = Math.round(evt.clientY - rect.top);
 		var delta = 0;
 		if (type == 'mousewheel') {
 			delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
 		}
 		return {
 			mouse : {
-				clientId : api.context.clientId,
 				x : mouseX,
 				y : mouseY,
 				type : type,
@@ -455,7 +483,6 @@
 		}
 		return {
 			key : {
-				clientId : api.context.clientId,
 				type : type,
 				character : char,
 				keycode : kk,
@@ -469,24 +496,29 @@
 
 	function getHandShake(canvas) {
 		var handshake = {
-			handshake : {
-				applicationName : api.context.appName,
-				clientId : api.context.clientId,
-				sessionId : api.socket.uuid(),
-				desktopWidth : canvas.offsetWidth,
-				desktopHeight : canvas.offsetHeight,
-				mirrored : api.context.mirrorMode,
-				directDrawSupported : api.typedArraysSupported
-			}
+			applicationName : api.context.appName,
+			clientId : api.context.clientId,
+			sessionId : api.socket.uuid(),
+			mirrored : api.context.mirrorMode,
+			directDrawSupported : api.typedArraysSupported
+		}
+
+		if (!api.context.mirrorMode) {
+			handshake.applet = api.context.applet;
+			handshake.documentBase = api.documentBase;
+			handshake.params = api.params;
+			handshake.desktopWidth = canvas.offsetWidth;
+			handshake.desktopHeight = canvas.offsetHeight;
+		}
+		return {
+			handshake : handshake
 		};
-		return handshake;
 	}
 
 	function getMessageEvent(message) {
 		return {
 			event : {
 				type : message,
-				clientId : api.context.clientId
 			}
 		};
 	}

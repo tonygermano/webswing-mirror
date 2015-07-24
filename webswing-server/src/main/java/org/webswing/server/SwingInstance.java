@@ -5,12 +5,12 @@ import java.util.Date;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.webswing.model.MsgIn;
 import org.webswing.model.MsgOut;
-import org.webswing.model.admin.s2c.SwingJvmStatsMsg;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn;
-import org.webswing.model.server.SwingApplicationDescriptor;
+import org.webswing.model.c2s.SimpleEventMsgIn.SimpleEventType;
+import org.webswing.model.server.SwingDescriptor;
+import org.webswing.model.server.admin.SwingJvmStats;
 import org.webswing.server.SwingJvmConnection.WebSessionListener;
-import org.webswing.server.handler.AdminAsyncManagedService;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.stats.SessionRecorder;
 import org.webswing.server.util.ServerUtil;
@@ -21,15 +21,15 @@ public class SwingInstance implements WebSessionListener {
 	private String user;
 	private AtmosphereResource resource;
 	private AtmosphereResource mirroredResource;
-	private SwingApplicationDescriptor application;
+	private SwingDescriptor application;
 	private SwingJvmConnection connection;
-	private SwingJvmStatsMsg latest = new SwingJvmStatsMsg();
+	private SwingJvmStats latest = new SwingJvmStats();
 	private Date disconnectedSince;
 	private SessionRecorder sessionRecorder;
 	private final Date startedAt = new Date();
 	private Date endedAt = null;
 
-	public SwingInstance(ConnectionHandshakeMsgIn h, SwingApplicationDescriptor app, AtmosphereResource resource) {
+	public SwingInstance(ConnectionHandshakeMsgIn h, SwingDescriptor app, AtmosphereResource resource) {
 		this.application = app;
 		this.sessionRecorder = ServerUtil.isRecording(resource.getRequest()) ? new SessionRecorder(this) : null;
 		this.user = ServerUtil.getUserName(resource);
@@ -50,6 +50,12 @@ public class SwingInstance implements WebSessionListener {
 			}
 			return false;
 		}
+	}
+
+	public void kill() {
+		SimpleEventMsgIn simpleEventMsgIn = new SimpleEventMsgIn();
+		simpleEventMsgIn.setType(SimpleEventType.killSwing);
+		sendToSwing(null, simpleEventMsgIn);
 	}
 
 	public boolean registerMirroredWebSession(AtmosphereResource resource) {
@@ -77,10 +83,8 @@ public class SwingInstance implements WebSessionListener {
 			}
 		}
 		if (mirroredResource != null) {
-			synchronized (AdminAsyncManagedService.BROADCAST_LOCK) {
-				synchronized (mirroredResource) {
-					ServerUtil.broadcastMessage(mirroredResource, serialized);
-				}
+			synchronized (mirroredResource) {
+				ServerUtil.broadcastMessage(mirroredResource, serialized);
 			}
 		}
 	}
@@ -117,8 +121,8 @@ public class SwingInstance implements WebSessionListener {
 		return connection.getClientId();
 	}
 
-	public String getApplicationName() {
-		return application.getName();
+	public SwingDescriptor getApplication() {
+		return application;
 	}
 
 	public String getSessionId() {
@@ -155,11 +159,11 @@ public class SwingInstance implements WebSessionListener {
 		return endedAt;
 	}
 
-	public SwingJvmStatsMsg collectStats() {
+	public SwingJvmStats collectStats() {
 		return latest = StatUtils.getSwingInstanceStats(this, connection != null ? connection.getJmxConnection() : null);
 	}
 
-	public SwingJvmStatsMsg getStats() {
+	public SwingJvmStats getStats() {
 		return latest;
 	}
 

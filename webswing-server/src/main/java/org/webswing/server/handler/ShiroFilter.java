@@ -3,6 +3,7 @@ package org.webswing.server.handler;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
@@ -23,6 +24,8 @@ public class ShiroFilter extends AuthenticationFilter {
 		if (isLoginRequest(request, response)) {
 			return true;
 		} else {
+			HttpServletResponse httpResponse = WebUtils.toHttp(response);
+			httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
 			return false;
 		}
 	}

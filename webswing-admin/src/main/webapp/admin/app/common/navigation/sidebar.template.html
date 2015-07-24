@@ -1,0 +1,5 @@
+<div class="col-sm-3 col-md-2 sidebar">
+	<ul class="nav nav-sidebar">
+		<li ng-repeat="location in vm.locations" ng-class="{active:  vm.isActive(location)}"><a href="{{location.getDefaultUrl()}}">{{location.name}}</a></li>
+	</ul>
+</div>

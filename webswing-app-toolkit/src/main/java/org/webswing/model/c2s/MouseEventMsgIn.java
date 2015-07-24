@@ -9,7 +9,6 @@ public class MouseEventMsgIn implements MsgIn {
 		mousemove, mousedown, mouseup, mousewheel, dblclick;
 	}
 
-	private String clientId;
 	private int x;
 	private int y;
 	private MouseEventType type;
@@ -19,14 +18,6 @@ public class MouseEventMsgIn implements MsgIn {
 	private boolean alt;
 	private boolean shift;
 	private boolean meta;
-
-	public String getClientId() {
-		return clientId;
-	}
-
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
-	}
 
 	public int getX() {
 		return x;

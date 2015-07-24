@@ -19,13 +19,25 @@
 			<type>war</type>
 		</dependency>
 		<dependency>
+			<groupId>org.webswing</groupId>
+			<artifactId>webswing-admin</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
 			<groupId>org.atmosphere.client</groupId>
 			<artifactId>javascript</artifactId>
 			<version>2.2.11</version>
 			<type>war</type>
 		</dependency>
 
+
 		<!-- include in WEB-INF/lib -->
+		<dependency>
+			<groupId>org.webswing</groupId>
+			<artifactId>webswing-app-launcher</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.atmosphere</groupId>
 			<artifactId>atmosphere-runtime</artifactId>
@@ -40,7 +52,6 @@
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.9.13</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
@@ -52,11 +63,6 @@
 					<groupId>org.slf4j</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.webswing</groupId>
-			<artifactId>webswing-app-launcher</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.ant</groupId>
@@ -76,7 +82,6 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -92,6 +97,26 @@
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
 			<version>2.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>${jersey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet-core</artifactId>
+			<version>${jersey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+			<version>${jersey.version}</version>
 		</dependency>
 		<!-- TO BE EXCLUDED FROM WEB-INF/lib -->
 
@@ -125,6 +150,27 @@
 	<build>
 		<finalName>webswing-server</finalName>
 		<plugins>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>2.1.5</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<failOnNoGitDirectory>false</failOnNoGitDirectory>
+					<failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
+					<gitDescribe>
+						<dirty>-modified</dirty>
+						<always>false</always>
+						<abbrev>7</abbrev>
+					</gitDescribe>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>com.github.os72</groupId>
 				<artifactId>protoc-jar-maven-plugin</artifactId>
@@ -163,6 +209,16 @@
 					</execution>
 				</executions>
 				<configuration>
+					<webResources>
+						<resource>
+							<filtering>true</filtering>
+							<directory>src/main/webapp</directory>
+							<includes>
+								<include>index.html</include>
+							</includes>
+						</resource>
+					</webResources>
+					<warSourceDirectory>src/main/webapp</warSourceDirectory>
 					<packagingExcludes>
 						javascript/,
 						WEB-INF/lib/jetty-*.jar,
@@ -184,6 +240,15 @@
 						<manifest>
 							<mainClass>main.Main</mainClass>
 						</manifest>
+						<manifestEntries>
+							<remoteOriginUrl>${git.remote.origin.url}</remoteOriginUrl>
+							<branch>${git.branch}</branch>
+							<version>${project.version}</version>
+							<commitId>${git.commit.id}</commitId>
+							<describe>${git.commit.id.describe}</describe>
+							<commitTime>${git.commit.time}</commitTime>
+							<buildTime>${git.build.time}</buildTime>
+						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
@@ -227,7 +292,7 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/swing-lib</outputDirectory>
 							<includeArtifactIds>
-								webswing-app-interface,webswing-app-launcher,webswing-directdraw-swing,protobuf-java,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,commons-io,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging,freehep-graphicsio-pdf,freehep-graphics2d,freehep-graphicsbase,freehep-graphicsio,freehep-io,lz4
+								webswing-app-interface,webswing-app-launcher,webswing-directdraw-swing,protobuf-java,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,commons-io,commons-lang,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging,freehep-graphicsio-pdf,freehep-graphics2d,freehep-graphicsbase,freehep-graphicsio,freehep-io,lz4,jackson-mapper-asl,jackson-core-asl
 							</includeArtifactIds>
 						</configuration>
 					</execution>
@@ -288,6 +353,11 @@
 									<webApp>
 										<contextPath>/</contextPath>
 										<defaultsDescriptor>${project.basedir}/src/test/webapp/WEB-INF/jetty-maven-plugin-webdefault.xml</defaultsDescriptor>
+										<resourceBases>
+											<resourceBase>${project.basedir}/src/main/webapp</resourceBase>
+											<resourceBase>${project.basedir}/src/test/webapp</resourceBase>
+											<resourceBase>${project.basedir}/../webswing-admin/src/main/webapp</resourceBase>
+										</resourceBases>
 									</webApp>
 									<systemProperties>
 										<force>true</force>
@@ -300,8 +370,12 @@
 											<value>${webswingRoot}</value>
 										</systemProperty>
 										<systemProperty>
+											<name>user.dir</name>
+											<value>${webswingRoot}</value>
+										</systemProperty>
+										<systemProperty>
 											<name>webswing.tempDirBase</name>
-											<value>${project.build.outputDirectory}/tmp</value>
+											<value>${project.build.directory}/tmp</value>
 										</systemProperty>
 									</systemProperties>
 								</configuration>

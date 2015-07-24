@@ -1,6 +1,5 @@
 package org.webswing.server;
 
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -8,20 +7,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.MsgIn;
-import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
-import org.webswing.model.admin.s2c.SwingSessionMsg;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.SimpleEventMsgOut;
-import org.webswing.model.server.SwingApplicationDescriptor;
+import org.webswing.model.server.SwingDescriptor;
+import org.webswing.model.server.admin.Sessions;
+import org.webswing.model.server.admin.SwingSession;
 import org.webswing.server.stats.PerformanceStatsMonitor;
-import org.webswing.server.stats.jmx.WebswingMonitoringMXBeanImpl;
 import org.webswing.server.util.ServerUtil;
 
 public class SwingInstanceManager {
@@ -29,24 +24,12 @@ public class SwingInstanceManager {
 	private static SwingInstanceManager instance = new SwingInstanceManager();
 	private static final Logger log = LoggerFactory.getLogger(SwingInstanceManager.class);
 
-	private List<SwingSessionMsg> closedInstances = new ArrayList<SwingSessionMsg>();
+	private List<SwingSession> closedInstances = new ArrayList<SwingSession>();
 	private Map<String, SwingInstance> swingInstances = new ConcurrentHashMap<String, SwingInstance>();
 	private SwingInstanceChangeListener changeListener;
 
 	private SwingInstanceManager() {
 		new PerformanceStatsMonitor();
-		MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
-		try {
-			ObjectName mxbeanName = new ObjectName("org.webswing:type=WebswingMonitoring");
-			try {
-				platformMBeanServer.unregisterMBean(mxbeanName);
-			} catch (Exception e) {
-				// do nothing
-			}
-			platformMBeanServer.registerMBean(new WebswingMonitoringMXBeanImpl(), mxbeanName);
-		} catch (Exception e) {
-			log.error("Failed to register webswing monitoring jmx mbean", e);
-		}
 	}
 
 	public static SwingInstanceManager getInstance() {
@@ -54,18 +37,30 @@ public class SwingInstanceManager {
 	}
 
 	public synchronized Set<SwingInstance> getSwingInstanceSet() {
-		Set<SwingInstance> set = new HashSet<SwingInstance>(swingInstances.values());
+		Set<SwingInstance> set;
+		synchronized (this) {
+			set = new HashSet<SwingInstance>(swingInstances.values());
+		}
 		return set;
 	}
 
 	public void connectSwingInstance(AtmosphereResource resource, ConnectionHandshakeMsgIn h) {
-		SwingApplicationDescriptor app = ConfigurationManager.getInstance().getApplication(h.getApplicationName());
-		if (app == null) {
-			throw new RuntimeException("Application " + h.getApplicationName() + " is not configured.");
-		}
-		if (ServerUtil.isUserAuthorized(resource, app, h)) {
-			SwingInstance swingInstance = swingInstances.get(h.getClientId());
-			if (swingInstance == null) {// start new swing app
+		SwingInstance swingInstance = swingInstances.get(h.getClientId());
+		if (swingInstance == null) {// start new swing app
+			SwingDescriptor app;
+			if (h.isApplet()) {
+				app = ConfigurationManager.getInstance().getApplet(h.getApplicationName());
+			} else {
+				app = ConfigurationManager.getInstance().getApplication(h.getApplicationName());
+			}
+			if (app == null) {
+				if (h.isApplet()) {
+					throw new RuntimeException("Applet " + h.getApplicationName() + " is not configured.");
+				} else {
+					throw new RuntimeException("Application " + h.getApplicationName() + " is not configured.");
+				}
+			}
+			if (ServerUtil.isUserAuthorized(resource, app, h)) {
 				if (app != null && !h.isMirrored()) {
 					if (!reachedMaxConnections(app)) {
 						swingInstance = new SwingInstance(h, app, resource);
@@ -80,32 +75,36 @@ public class SwingInstanceManager {
 					ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.configurationError.buildMsgOut());
 				}
 			} else {
-				if (h.isMirrored()) {// connect as mirror viewer
+				log.error("Authorization error: User " + ServerUtil.getUserName(resource) + " is not authorized to connect to application " + app.getName() + (h.isMirrored() ? " [Mirrored view only available for admin role]" : ""));
+			}
+		} else {
+			if (h.isMirrored()) {// connect as mirror viewer
+				if (ServerUtil.isUserAuthorized(resource, swingInstance.getApplication(), h)) {
 					notifySessionDisconnected(resource.uuid());// disconnect possible running mirror sessions
 					boolean result = swingInstance.registerMirroredWebSession(resource);
 					if (!result) {
 						ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.applicationAlreadyRunning.buildMsgOut());
 					}
-				} else {// continue old session?
-					if (h.getSessionId() != null && h.getSessionId().equals(swingInstance.getSessionId())) {
-						swingInstance.sendToSwing(resource, h);
+				} else {
+					log.error("Authorization error: User " + ServerUtil.getUserName(resource) + " is not authorized. [Mirrored view only available for admin role]");
+				}
+			} else {// continue old session?
+				if (h.getSessionId() != null && h.getSessionId().equals(swingInstance.getSessionId())) {
+					swingInstance.sendToSwing(resource, h);
+				} else {
+					boolean result = swingInstance.registerPrimaryWebSession(resource);
+					if (result) {
+						ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.continueOldSession.buildMsgOut());
+						notifySwingChangeChange();
 					} else {
-						boolean result = swingInstance.registerPrimaryWebSession(resource);
-						if (result) {
-							ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.continueOldSession.buildMsgOut());
-							notifySwingChangeChange();
-						} else {
-							ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.applicationAlreadyRunning.buildMsgOut());
-						}
+						ServerUtil.broadcastMessage(resource, SimpleEventMsgOut.applicationAlreadyRunning.buildMsgOut());
 					}
 				}
 			}
-		} else {
-			log.error("Authorization error: User " + ServerUtil.getUserName(resource) + " is not authorized to connect to application " + app.getName() + (h.isMirrored() ? " [Mirrored view only available for admin role]" : ""));
 		}
 	}
 
-	private boolean reachedMaxConnections(SwingApplicationDescriptor app) {
+	private boolean reachedMaxConnections(SwingDescriptor app) {
 		if (app.getMaxClients() < 0) {
 			return false;
 		} else if (app.getMaxClients() == 0) {
@@ -113,7 +112,7 @@ public class SwingInstanceManager {
 		} else {
 			int count = 0;
 			for (SwingInstance si : getSwingInstanceSet()) {
-				if (app.getName().equals(si.getApplicationName()) && si.isRunning()) {
+				if (app.getName().equals(si.getApplication().getName()) && si.isRunning()) {
 					count++;
 				}
 			}
@@ -127,17 +126,36 @@ public class SwingInstanceManager {
 
 	public synchronized void notifySwingClose(SwingInstance swingInstance) {
 		closedInstances.add(ServerUtil.composeSwingInstanceStatus(swingInstance));
-		swingInstances.remove(swingInstance.getClientId());
+		synchronized (this) {
+			swingInstances.remove(swingInstance.getClientId());
+		}
 		notifySwingChangeChange();
 	}
 
-	public synchronized AdminConsoleFrameMsgOut extractStatus() {
-		AdminConsoleFrameMsgOut result = new AdminConsoleFrameMsgOut();
+	public synchronized Sessions getSessions() {
+		Sessions result = new Sessions();
 		for (SwingInstance si : getSwingInstanceSet()) {
 			result.getSessions().add(ServerUtil.composeSwingInstanceStatus(si));
 		}
 		result.setClosedSessions(closedInstances);
 		return result;
+	}
+
+	public synchronized SwingSession getSession(String id) {
+		for (SwingInstance si : getSwingInstanceSet()) {
+			if (si.getClientId().equals(id)) {
+				return ServerUtil.composeSwingInstanceStatus(si);
+			}
+		}
+		return null;
+	}
+
+	public void killSession(String id) {
+		for (SwingInstance si : getSwingInstanceSet()) {
+			if (si.getClientId().equals(id)) {
+				si.kill();
+			}
+		}
 	}
 
 	public void notifySessionDisconnected(String uuid) {
@@ -175,16 +193,20 @@ public class SwingInstanceManager {
 	}
 
 	public boolean sendMessageToSwing(AtmosphereResource r, String clientId, MsgIn o) {
-		SwingInstance client = swingInstances.get(clientId);
-		if (client != null) {
-			return client.sendToSwing(r, o);
-		} else {
-			return false;
+		if (clientId != null) {
+			SwingInstance client = swingInstances.get(clientId);
+			if (client != null) {
+				return client.sendToSwing(r, o);
+			}
 		}
+		return false;
 	}
 
 	public SwingInstance findInstance(String clientId) {
-		return swingInstances.get(clientId);
+		if (clientId != null) {
+			return swingInstances.get(clientId);
+		}
+		return null;
 	}
 
 }

@@ -12,7 +12,7 @@
 		create : true
 	} ],
 	wrap: {
-		startFile: "${project.basedir}/src/main/config/parts/start.frag",
+		start: "/*! Webswing version ${project.version} (${git.commit.id.describe})*/ \n try{",
 		endFile: "${project.basedir}/src/main/config/parts/end.frag"
 	}
 })

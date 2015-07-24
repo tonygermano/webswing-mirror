@@ -18,11 +18,20 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_ALLOW_DOWNLOAD = "webswing.allowDownload";
 	public static final String SWING_START_SYS_PROP_ALLOW_UPLOAD = "webswing.allowUpload";
 	public static final String SWING_START_SYS_PROP_ALLOW_DELETE = "webswing.allowDelete";
+	public static final String SWING_START_SYS_PROP_ALLOW_JSLINK = "webswing.allowJsLink";
 	public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutAfterDisconectSec";
+	public static final String SWING_START_SYS_PROP_SYNC_TIMEOUT = "webswing.syncCallTimeout";
+	public static final String SWING_START_SYS_PROP_THEME = "webswing.theme";
+
+	// applet startup properties
+	public static final String SWING_START_SYS_PROP_APPLET_CLASS = "webswing.appletClass";
+	public static final String SWING_START_STS_PROP_APPLET_PARAM_PREFIX = "webswing.appletParam_";
+	public static final String SWING_START_SYS_PROP_APPLET_DOCUMENT_BASE = "webswing.appletDocumentBase";
 
 	// JMS queue names
 	public static final String SWING2SERVER = "Swing2Server";
 	public static final String SERVER2SWING = "Server2Swing";
+	public static final String SERVER2SWING_SYNC = "Server2SwingSync";
 	public static final String JMS_URL = "webswing.jmsUrl";
 	public static final String JMS_URL_DEFAULT = "nio://127.0.0.1:34455";
 

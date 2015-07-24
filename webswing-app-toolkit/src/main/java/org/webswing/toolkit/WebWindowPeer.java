@@ -11,7 +11,7 @@ import java.awt.Window;
 import java.awt.peer.WindowPeer;
 
 import org.webswing.toolkit.extra.WindowManager;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Util;
 
 public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 

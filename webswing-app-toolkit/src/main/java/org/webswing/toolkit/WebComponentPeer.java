@@ -40,9 +40,9 @@ import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.ge.WebGraphicsConfig;
-import org.webswing.util.Logger;
-import org.webswing.util.Services;
-import org.webswing.util.Util;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
 
 import sun.awt.AWTAccessor;
 import sun.awt.CausedFocusEvent.Cause;

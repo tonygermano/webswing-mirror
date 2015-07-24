@@ -1,14 +1,16 @@
-define([ 'jquery' ], function($) {
+define([ 'jquery' ], function webswingCanvas($) {
 	"use strict";
 	var api;
 	var canvas;
+	var inputHandler;
 	var resizeCheck;
 
 	function create() {
 		if (canvas == null) {
-			api.rootElement
-					.append('<canvas data-id="canvas" style="display:block" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
+			api.rootElement.append('<canvas data-id="canvas" style="display:block" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
+			api.rootElement.append('<input data-id="input-handler" class="input-hidden" type="text" value="" />');
 			canvas = api.rootElement.find('canvas[data-id="canvas"]');
+			inputHandler = api.rootElement.find('input[data-id="input-handler"]');
 		}
 		if (resizeCheck == null) {
 			resizeCheck = setInterval(function() {
@@ -26,7 +28,9 @@ define([ 'jquery' ], function($) {
 	function dispose() {
 		if (canvas != null) {
 			canvas.remove();
+			inputHandler.remove();
 			canvas = null;
+			inputHandler=null;
 		}
 		if (resizeCheck != null) {
 			clearInterval(resizeCheck);
@@ -49,12 +53,20 @@ define([ 'jquery' ], function($) {
 		return canvas[0];
 	}
 
+	function getInput() {
+		if (inputHandler == null) {
+			create();
+		}
+		return inputHandler[0];
+	}
+
 	return {
 		init : function(wsApi) {
 			api = wsApi;
 			wsApi.canvas = {
 				dispose : dispose,
-				get : get
+				get : get,
+				getInput : getInput,
 			};
 		}
 	};

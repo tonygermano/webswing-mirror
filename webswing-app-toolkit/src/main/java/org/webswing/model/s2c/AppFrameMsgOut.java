@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.webswing.model.MsgOut;
+import org.webswing.model.jslink.JsEvalRequestMsgOut;
+import org.webswing.model.jslink.JsResultMsg;
 
 public class AppFrameMsgOut implements MsgOut {
 
 	private static final long serialVersionUID = 6019708608380425820L;
-
 	private List<ApplicationInfoMsg> applications;
 	private LinkActionMsg linkAction;
 	private WindowMoveActionMsg moveAction;
@@ -18,6 +19,8 @@ public class AppFrameMsgOut implements MsgOut {
 	private List<WindowMsg> windows;
 	private WindowMsg closedWindow;
 	private SimpleEventMsgOut event;
+	private JsEvalRequestMsgOut jsRequest;
+	private JsResultMsg javaResponse;
 	private String sessionId;
 
 	public WindowMsg getOrCreateWindowById(String guid) {
@@ -106,6 +109,22 @@ public class AppFrameMsgOut implements MsgOut {
 
 	public void setEvent(SimpleEventMsgOut event) {
 		this.event = event;
+	}
+
+	public JsEvalRequestMsgOut getJsRequest() {
+		return jsRequest;
+	}
+
+	public void setJsRequest(JsEvalRequestMsgOut jsRequest) {
+		this.jsRequest = jsRequest;
+	}
+
+	public JsResultMsg getJavaResponse() {
+		return javaResponse;
+	}
+
+	public void setJavaResponse(JsResultMsg javaResponse) {
+		this.javaResponse = javaResponse;
 	}
 
 	public String getSessionId() {

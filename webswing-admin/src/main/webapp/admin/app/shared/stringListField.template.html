@@ -1,0 +1,29 @@
+<form name="appForm" novalidate>
+    <div class="form-group">
+        <label class="col-lg-2 col-md-3 col-sm-4 control-label"> {{vm.label}} 
+            <span class="ws-tooltip glyphicon glyphicon-question-sign" ng-if="vm.desc != null" ui-jq="tooltip" title="{{vm.desc}}"></span>
+        </label>
+        <div ng-class="{'col-sm-offset-4': !$first,'col-md-offset-3':!$first,'col-lg-offset-2':!$first,'col-sm-8':true,'col-md-9':true,'col-lg-10':true, 'edit-app-list-entry':true} " ng-repeat="s in vm.value track by $index">
+            <div class="input-group">
+                <div class="input-group-addon" ng-click="vm.toggleHelper($index)"><span ng-if="vm.variables != null" ng-class="{'glyphicon':true, 'glyphicon-flash':!vm.helpVisible[$index],'glyphicon-chevron-up':vm.helpVisible[$index]}" ></span></div>
+                <input type="text" ng-readonly="vm.readonly" class="form-control" ng-model="vm.value[$index]" ng-click="vm.openHelper($index)">
+                <div class="input-group-btn" ng-if="!vm.readonly">
+                    <button class="btn btn-default" ng-if="$last" type="button" ng-click="vm.addString()">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                    <button class="btn btn-default" ng-hide="vm.value.length == 1" type="button" ng-click="vm.deleteString($index)">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </div>
+            </div>
+            <div collapse="!vm.helpVisible[$index]">
+                <div class="ws-helper alert alert-info" ><strong>Resolve to: </strong>{{vm.value[$index]|substitutor:vm.variables }}</div>
+            </div>
+        </div>
+        <div ng-if="vm.value.length === 0" class="col-lg-10 col-md-9 col-sm-8">
+            <button class="btn btn-default" type="button" ng-click="vm.addString()">
+                <span class="glyphicon glyphicon-plus"></span>
+            </button>
+        </div>
+    </div>
+</form>

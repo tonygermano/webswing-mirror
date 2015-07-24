@@ -19,18 +19,9 @@
 	</dependencies>
 	<build>
 		<finalName>webswing-app-toolkit</finalName>
-		<!-- <plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-				<compilerArguments>
-					<bootclasspath>${basedir}/../lib/rt1.7.0_60.jar</bootclasspath>
-				</compilerArguments>
-			</plugin>
-		</plugins> -->
+		<!-- <plugins> <plugin> <artifactId>maven-compiler-plugin</artifactId>
+			<version>3.1</version> <configuration> <source>1.7</source> <target>1.7</target>
+			</configuration> <compilerArguments> <bootclasspath>${basedir}/../lib/rt1.7.0_60.jar</bootclasspath>
+			</compilerArguments> </plugin> </plugins> -->
 	</build>
 </project>

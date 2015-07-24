@@ -7,6 +7,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>webswing-server</module>
+		<module>webswing-admin</module>
 		<module>webswing-server-launcher</module>
 		<module>webswing-app-toolkit</module>
 		<module>webswing-app-toolkit-java6</module>
@@ -17,6 +18,23 @@
 		<module>webswing-directdraw</module>
 		<module>webswing-assembly</module>
 	</modules>
+	<properties>
+		<jersey.version>2.13</jersey.version>
+	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-mapper-asl</artifactId>
+				<version>1.9.13</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.4</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -37,6 +55,26 @@
 						<bootclasspath>${basedir}/../lib/rt1.6.0_45.jar</bootclasspath>
 					</compilerArguments>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>enforce-java</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireJavaVersion>
+									<version>1.8.0</version>
+								</requireJavaVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

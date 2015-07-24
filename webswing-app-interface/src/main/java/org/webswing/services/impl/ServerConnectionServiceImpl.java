@@ -1,9 +1,13 @@
 package org.webswing.services.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.jms.Connection;
 import javax.jms.ExceptionListener;
@@ -19,9 +23,13 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.webswing.Constants;
 import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.model.MsgIn;
+import org.webswing.model.MsgOut;
+import org.webswing.model.jslink.JavaEvalRequestMsgIn;
+import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
-import org.webswing.util.Logger;
-import org.webswing.util.Util;
+import org.webswing.toolkit.jslink.WebJSObject;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Util;
 
 /**
  * @author Viktor_Meszaros This class is needed to achieve classpath isolation for swing application, all functionality dependent on external libs is implemented here.
@@ -29,7 +37,8 @@ import org.webswing.util.Util;
 public class ServerConnectionServiceImpl implements MessageListener, ServerConnectionService {
 
 	private static ServerConnectionServiceImpl impl;
-	private static ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(System.getProperty(Constants.JMS_URL));
+	private static ActiveMQConnectionFactory connectionFactory;
+	private static long syncTimeout = Long.getLong(Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT, 3000);
 
 	private Connection connection;
 	private Session session;
@@ -37,6 +46,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private long lastMessageTimestamp = System.currentTimeMillis();
 	private Runnable watchdog;
 	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor();
+
+	private Map<String, Object> syncCallResposeMap = new HashMap<String, Object>();
 
 	public static ServerConnectionServiceImpl getInstance() {
 		if (impl == null) {
@@ -46,17 +57,18 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	}
 
 	public ServerConnectionServiceImpl() {
+		connectionFactory = new ActiveMQConnectionFactory(System.getProperty(Constants.JMS_URL));
 		watchdog = new Runnable() {
 
 			@Override
 			public void run() {
 				long diff = System.currentTimeMillis() - lastMessageTimestamp;
 				int timeout = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) * 1000;
-				if (diff / 1000 > 10) {
-					Logger.info("Inactive for " + diff / 1000 + " seconds.");
+				if ((diff / 1000 > 10) && ((diff / 1000) % 10 == 0)) {
+					Logger.warn("Inactive for " + diff / 1000 + " seconds.");
 				}
 				if (diff > timeout) {
-					Logger.info("Exiting swing application due to inactivity for " + diff / 1000 + " seconds.");
+					Logger.warn("Exiting swing application due to inactivity for " + diff / 1000 + " seconds.");
 					System.exit(1);
 				}
 			}
@@ -94,7 +106,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			System.exit(1);
 		}
 
-		exitScheduler.scheduleWithFixedDelay(watchdog, 10, 10, TimeUnit.SECONDS);
+		exitScheduler.scheduleWithFixedDelay(watchdog, 1, 1, TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -123,7 +135,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	}
 
 	@Override
-	public void sendJsonObject(Serializable o) {
+	public void sendObject(Serializable o) {
 		try {
 			synchronized (this) {
 				producer.send(session.createObjectMessage(o));
@@ -133,12 +145,56 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		}
 	}
 
+	@Override
+	public Object sendObjectSync(MsgOut o, String correlationId) throws TimeoutException, IOException {
+		try {
+			Object syncObject = new Object();
+			syncCallResposeMap.put(correlationId, syncObject);
+			synchronized (this) {
+				producer.send(session.createObjectMessage(o));
+			}
+			Object result = null;
+			try {
+				synchronized (syncObject) {
+					syncObject.wait(syncTimeout);
+				}
+			} catch (InterruptedException e) {
+			}
+
+			result = syncCallResposeMap.get(correlationId);
+			syncCallResposeMap.remove(correlationId);
+			if (result == syncObject) {
+				throw new TimeoutException("Call timed out after " + syncTimeout + " ms");
+			}
+			return result;
+
+		} catch (JMSException e) {
+			Logger.error("ServerConnectionService.sendJsonObject", e);
+			throw new IOException(e.getMessage());
+		}
+	}
+
 	public void onMessage(Message msg) {
 		try {
 			lastMessageTimestamp = System.currentTimeMillis();
 			if (msg instanceof ObjectMessage) {
 				ObjectMessage omsg = (ObjectMessage) msg;
-				if (omsg.getObject() instanceof MsgIn) {
+				if (omsg.getObject() instanceof JsResultMsg) {
+					JsResultMsg syncmsg = (JsResultMsg) omsg.getObject();
+					String correlationId = syncmsg.getCorrelationId();
+					if (syncCallResposeMap.containsKey(correlationId)) {
+						Object syncObject = syncCallResposeMap.get(correlationId);
+						syncCallResposeMap.put(correlationId, omsg.getObject());
+						synchronized (syncObject) {
+							syncObject.notifyAll();
+						}
+					} else {
+						Logger.warn("No thread waiting for sync-ed message with id ", correlationId);
+					}
+				} else if (omsg.getObject() instanceof JavaEvalRequestMsgIn) {
+					JavaEvalRequestMsgIn javaReq = (JavaEvalRequestMsgIn) omsg.getObject();
+					WebJSObject.evaluateJava(javaReq);
+				} else if (omsg.getObject() instanceof MsgIn) {
 					Util.getWebToolkit().getEventDispatcher().dispatchEvent((MsgIn) omsg.getObject());
 				}
 			}

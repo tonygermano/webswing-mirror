@@ -1,0 +1,22 @@
+<h1 class="page-header">Runtime</h1>
+
+<div class="form-horizontal">
+    <ws-string-field readonly label="Host" value="vm.settings.host"></ws-string-field>
+    <ws-string-field readonly label="Port" value="vm.settings.port"></ws-string-field>
+    <ws-string-field readonly label="Configuration file" value="vm.settings.configFile"></ws-string-field>
+    <ws-string-field readonly label="User properties file" value="vm.settings.userProps"></ws-string-field>
+    <ws-string-field readonly label="Temp folder" value="vm.settings.tempFolder"></ws-string-field>
+    <ws-string-field readonly label="JMS server URL" value="vm.settings.jmsServerUrl"></ws-string-field>
+    <ws-string-field readonly label="War location" value="vm.settings.warLocation"></ws-string-field>
+
+    <h2 class="sub-header">
+        <small>Active Swing configuration</small>
+    </h2>
+    <div class="row">
+        <div class="col-md-12 ">
+            <ws-webswing-config readonly variables="vm.variables" config="vm.config"></ws-webswing-config>
+        </div>
+    </div>  
+
+
+</div>

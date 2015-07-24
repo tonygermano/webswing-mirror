@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.DirectDrawServicesAdapter;
 import org.webswing.services.impl.ddutil.FastDirectDrawServicesAdapter;
 

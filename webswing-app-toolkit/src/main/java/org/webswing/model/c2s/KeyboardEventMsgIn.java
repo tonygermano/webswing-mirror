@@ -10,7 +10,6 @@ public class KeyboardEventMsgIn implements MsgIn {
 		keypress, keydown, keyup;
 	}
 
-	private String clientId;
 	private KeyEventType type;
 	private int character;
 	private int keycode;
@@ -18,14 +17,6 @@ public class KeyboardEventMsgIn implements MsgIn {
 	private boolean ctrl;
 	private boolean shift;
 	private boolean meta;
-
-	public String getClientId() {
-		return clientId;
-	}
-
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
-	}
 
 	public KeyEventType getType() {
 		return type;

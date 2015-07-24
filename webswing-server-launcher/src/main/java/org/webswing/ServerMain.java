@@ -13,7 +13,7 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.webswing.util.Logger;
+import org.webswing.toolkit.util.Logger;
 
 public class ServerMain {
 

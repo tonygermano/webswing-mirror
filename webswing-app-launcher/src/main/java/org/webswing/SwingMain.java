@@ -1,26 +1,27 @@
 package org.webswing;
 
+import java.applet.Applet;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.webswing.util.Logger;
-import org.webswing.util.Services;
+import org.webswing.applet.AppletContainer;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
 
 public class SwingMain {
 
 	public static ClassLoader swingLibClassloader;
 
 	public static void main(String[] args) {
-		// set up instance of ExtLibImpl class providing jms connection and other services in separated classloader to prevent classpath pollution of swing application.
 		try {
-			// create classloader with swinglib classpath
 			List<URL> swingurls = new ArrayList<URL>();
 			String classpath = System.getProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH);
 			String[] cp = scanForFiles(classpath.split(";"), ".");
@@ -33,28 +34,64 @@ public class SwingMain {
 					Logger.error("SwingMain:main ERROR: Required classpath file '" + f + "' does not exist!");
 				}
 			}
-			swingLibClassloader = new URLClassLoader(swingurls.toArray(new URL[0]), SwingMain.class.getClassLoader());
-			ClassLoader swingClassloader = Services.getClassloaderService().createSwingClassLoader(swingLibClassloader);
-			Class<?> clazz = swingClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
-			Class<?> mainArgType[] = { (new String[0]).getClass() };
-			String progArgs[] = args;
-			java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
-			Thread.currentThread().setContextClassLoader(swingClassloader);
-			try {
-				EventQueue q = Toolkit.getDefaultToolkit().getSystemEventQueue();
-				Class<?> systemQueue = q.getClass();
-				Field cl = systemQueue.getDeclaredField("classLoader");
-				cl.setAccessible(true);
-				cl.set(q, Thread.currentThread().getContextClassLoader());
-			} catch (Exception e) {
-				Logger.error("Error in SwingMain: EventQueue thread - setting context classloader failed.", e);
+			swingLibClassloader = Services.getClassloaderService().createSwingClassLoader(swingurls.toArray(new URL[0]), SwingMain.class.getClassLoader());
+
+			if (isApplet()) {
+				startApplet(args);
+			} else {
+				startSwingApp(args);
 			}
-			Object argsArray[] = { progArgs };
-			main.invoke(null, argsArray);
 		} catch (Exception e) {
 			Logger.fatal("SwingMain:main", e);
 			System.exit(1);
 		}
+	}
+
+	private static void startSwingApp(String[] args) throws Exception {
+		Class<?> clazz = swingLibClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
+		Class<?> mainArgType[] = { (new String[0]).getClass() };
+		String progArgs[] = args;
+		java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
+		setupContextClassloader(swingLibClassloader);
+		Object argsArray[] = { progArgs };
+		main.invoke(null, argsArray);
+	}
+
+	private static void startApplet(String[] args) throws Exception {
+		Class<?> appletClazz = swingLibClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
+		Map<String, String> props = resolveProps();
+		setupContextClassloader(swingLibClassloader);
+		if (Applet.class.isAssignableFrom(appletClazz)) {
+			AppletContainer ac = new AppletContainer(appletClazz, props);
+			ac.start();
+		} else {
+			Logger.error("Error in SwingMain: " + appletClazz.getCanonicalName() + " class is not a subclass of Applet");
+		}
+	}
+
+	private static void setupContextClassloader(ClassLoader swingClassloader) {
+		Thread.currentThread().setContextClassLoader(swingClassloader);
+		try {
+			EventQueue q = Toolkit.getDefaultToolkit().getSystemEventQueue();
+			Class<?> systemQueue = q.getClass();
+			Field cl = systemQueue.getDeclaredField("classLoader");
+			cl.setAccessible(true);
+			cl.set(q, Thread.currentThread().getContextClassLoader());
+		} catch (Exception e) {
+			Logger.error("Error in SwingMain: EventQueue thread - setting context classloader failed.", e);
+		}
+	}
+
+	private static Map<String, String> resolveProps() {
+		HashMap<String, String> result = new HashMap<String, String>();
+		for (Object keyObj : System.getProperties().keySet()) {
+			String key = (String) keyObj;
+			if (key.startsWith(Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX)) {
+				String paramKey = key.substring(Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX.length());
+				result.put(paramKey, System.getProperty(key));
+			}
+		}
+		return result;
 	}
 
 	public static String[] scanForFiles(String[] patternPaths, String base) {
@@ -106,4 +143,11 @@ public class SwingMain {
 		return name.matches("^" + pathSeg.replaceAll("\\.", "\\\\.").replaceAll("\\[", "\\\\[").replaceAll("\\]", "\\\\]").replaceAll("\\?", ".").replaceAll("\\*", ".*") + "$");
 	}
 
+	private static boolean isApplet() {
+		if (System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

@@ -1,0 +1,28 @@
+<div >
+    <div class="list-group">
+        <div class="list-group-item" ng-repeat="app in vm.apps">
+            <div>
+                <div class="input-group">
+                    <div class="input-group-addon" ng-click="vm.toggleApp($index)"><span ng-class="{'glyphicon':true,'glyphicon-eye-open':!vm.visible[$index] && vm.readonly, 'glyphicon-pencil':!vm.visible[$index] && !vm.readonly,'glyphicon-chevron-up':vm.visible[$index]}" ></span></div>
+                    <input class="form-control" ng-model="vm.apps[$index].name" ng-readonly="vm.readonly" ng-click="vm.openApp($index)"/>
+                    <div class="input-group-btn"  ng-if="!vm.readonly">
+                        <button type="button" class="btn btn-primary" ng-click="vm.toggleApp($index)">
+                            <span class="glyphicon glyphicon-edit"> Edit</span>
+                        </button>
+                        <button ng-if="!vm.readonly" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-trash"> Delete</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li> Are you sure? </li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="" ng-click="vm.deleteApp($index)">Yes, delete it!</a></li>
+                        </ul>   		
+                    </div>
+                </div>
+                <div class="ws-tabs">
+                    <ws-application-view app="vm.apps[$index]" variables="vm.variables" readonly="{{vm.readonly}}" ng-if="vm.visible[$index]"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

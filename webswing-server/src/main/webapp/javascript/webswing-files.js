@@ -154,7 +154,6 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			function filesUploaded(files) {
 				api.socket.send({
 					uploaded : {
-						clientId : api.context.clientId,
 						files : files
 					}
 				});
@@ -164,8 +163,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				api.socket.send({
 					events : [ {
 						event : {
-							type : message,
-							clientId : api.context.clientId
+							type : message
 						}
 					} ]
 				});

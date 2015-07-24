@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,20 +26,18 @@ import org.apache.shiro.subject.Subject;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.FrameworkConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.MsgOut;
-import org.webswing.model.admin.c2s.ApplyConfigurationMsgIn;
-import org.webswing.model.admin.s2c.AdminConsoleFrameMsgOut;
-import org.webswing.model.admin.s2c.MessageMsg;
-import org.webswing.model.admin.s2c.MessageMsg.Type;
-import org.webswing.model.admin.s2c.SwingSessionMsg;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
+import org.webswing.model.server.SwingAppletDescriptor;
 import org.webswing.model.server.SwingApplicationDescriptor;
-import org.webswing.model.server.WebswingConfiguration;
+import org.webswing.model.server.SwingDescriptor;
+import org.webswing.model.server.admin.SwingSession;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstance;
 import org.webswing.server.handler.FileServlet;
@@ -53,6 +51,9 @@ public class ServerUtil {
 	private static final Map<String, byte[]> iconMap = new HashMap<String, byte[]>();
 	private static final ObjectMapper mapper = new ObjectMapper();
 	private static final ProtoMapper protoMapper = new ProtoMapper();
+	static {
+		mapper.setSerializationInclusion(Inclusion.NON_NULL);
+	}
 
 	public static String encode2Json(MsgOut m) {
 		try {
@@ -74,13 +75,13 @@ public class ServerUtil {
 
 	public static Object decodeJson(String s) {
 		Object o = null;
-		Class<?>[] classes = new Class<?>[] { InputEventsFrameMsgIn.class, ApplyConfigurationMsgIn.class };
+		Class<?>[] classes = new Class<?>[] { InputEventsFrameMsgIn.class };
 		for (Class<?> c : classes) {
 			try {
 				o = mapper.readValue(s, c);
 				break;
 			} catch (IOException e) {
-				// do nothing
+				log.error("Failed to decode json message:", e);
 			}
 		}
 		return o;
@@ -94,7 +95,7 @@ public class ServerUtil {
 				o = protoMapper.decodeProto(message, c);
 				break;
 			} catch (IOException e) {
-				// do nothing
+				log.error("Failed to decode proto message:", e);
 			}
 		}
 		return o;
@@ -102,37 +103,31 @@ public class ServerUtil {
 
 	public static List<ApplicationInfoMsg> createApplicationInfoMsg(AtmosphereResource r, boolean includeAdminApp) {
 		Map<String, SwingApplicationDescriptor> applications = ConfigurationManager.getInstance().getApplications();
+		Map<String, SwingAppletDescriptor> applets = ConfigurationManager.getInstance().getApplets();
+
 		List<ApplicationInfoMsg> apps = new ArrayList<ApplicationInfoMsg>();
-		StrSubstitutor subs = getConfigSubstitutorMap(getUserName(r), null);
+		StrSubstitutor subs = getConfigSubstitutor(getUserName(r), null);
 		if (applications.size() == 0) {
 			return null;
 		} else {
 			for (String name : applications.keySet()) {
 				SwingApplicationDescriptor descriptor = applications.get(name);
 				if (isUserAuthorizedForApplication(r, descriptor)) {
-					ApplicationInfoMsg app = new ApplicationInfoMsg();
-					app.setName(name);
-					String icon = subs.replace(descriptor.getIcon());
-					String homeDir = subs.replace(descriptor.getHomeDir());
-					if (icon == null) {
-						app.setBase64Icon(loadImage(null));
-					} else {
-						if (new File(icon).exists()) {
-							app.setBase64Icon(loadImage(icon));
-						} else {
-							if (new File(homeDir + File.separator + icon).exists()) {
-								app.setBase64Icon(loadImage(homeDir + File.separator + icon));
-							} else if (new File(Main.getRootDir(), homeDir + File.separator + icon).exists()) {
-								app.setBase64Icon(loadImage(new File(Main.getRootDir(), homeDir + File.separator + icon).getAbsolutePath()));
-							} else {
-								log.error("Icon loading failed. File " + icon + " or " + homeDir + File.separator + icon + " does not exist.");
-								app.setBase64Icon(loadImage(null));
-							}
-						}
-					}
+					ApplicationInfoMsg app = toApplicationInfoMsg(descriptor, subs);
+					app.setApplet(false);
 					apps.add(app);
 				}
 			}
+			for (String name : applets.keySet()) {
+				SwingAppletDescriptor descriptor = applets.get(name);
+				if (isUserAuthorizedForApplication(r, descriptor)) {
+					ApplicationInfoMsg app = toApplicationInfoMsg(descriptor, subs);
+					app.setApplet(true);
+					apps.add(app);
+				}
+			}
+			Collections.sort(apps);
+
 			if (includeAdminApp) {
 				ApplicationInfoMsg adminConsole = new ApplicationInfoMsg();
 				adminConsole.setName(Constants.ADMIN_CONSOLE_APP_NAME);
@@ -142,7 +137,31 @@ public class ServerUtil {
 		return apps;
 	}
 
-	public static boolean isUserAuthorized(AtmosphereResource r, SwingApplicationDescriptor app, ConnectionHandshakeMsgIn h) {
+	private static ApplicationInfoMsg toApplicationInfoMsg(SwingDescriptor swingDesc, StrSubstitutor subs) {
+		ApplicationInfoMsg app = new ApplicationInfoMsg();
+		app.setName(swingDesc.getName());
+		String icon = subs.replace(swingDesc.getIcon());
+		String homeDir = subs.replace(swingDesc.getHomeDir());
+		if (icon == null) {
+			app.setBase64Icon(loadImage(null));
+		} else {
+			if (new File(icon).exists()) {
+				app.setBase64Icon(loadImage(icon));
+			} else {
+				if (new File(homeDir + File.separator + icon).exists()) {
+					app.setBase64Icon(loadImage(homeDir + File.separator + icon));
+				} else if (new File(Main.getRootDir(), homeDir + File.separator + icon).exists()) {
+					app.setBase64Icon(loadImage(new File(Main.getRootDir(), homeDir + File.separator + icon).getAbsolutePath()));
+				} else {
+					log.error("Icon loading failed. File " + icon + " or " + homeDir + File.separator + icon + " does not exist.");
+					app.setBase64Icon(loadImage(null));
+				}
+			}
+		}
+		return app;
+	}
+
+	public static boolean isUserAuthorized(AtmosphereResource r, SwingDescriptor app, ConnectionHandshakeMsgIn h) {
 
 		// mirror view
 		if (h.isMirrored()) {
@@ -155,7 +174,7 @@ public class ServerUtil {
 		return isUserAuthorizedForApplication(r, app);
 	}
 
-	public static boolean isUserAuthorizedForApplication(AtmosphereResource r, SwingApplicationDescriptor app) {
+	public static boolean isUserAuthorizedForApplication(AtmosphereResource r, SwingDescriptor app) {
 		if ((app.isAuthentication() || app.isAuthorization()) && isUserAnonymous(r)) {
 			return false;
 		}
@@ -235,10 +254,11 @@ public class ServerUtil {
 		return warFile;
 	}
 
-	public static SwingSessionMsg composeSwingInstanceStatus(SwingInstance si) {
-		SwingSessionMsg result = new SwingSessionMsg();
+	public static SwingSession composeSwingInstanceStatus(SwingInstance si) {
+		SwingSession result = new SwingSession();
 		result.setId(si.getClientId());
-		result.setApplication(si.getApplicationName());
+		result.setApplet(si.getApplication() instanceof SwingAppletDescriptor);
+		result.setApplication(si.getApplication().getName());
 		result.setConnected(si.getSessionId() != null);
 		if (!result.getConnected()) {
 			result.setDisconnectedSince(si.getDisconnectedSince());
@@ -273,36 +293,12 @@ public class ServerUtil {
 		return false;
 	}
 
-	public static boolean validateConfigFile(byte[] content) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.readValue(content, WebswingConfiguration.class);
-		return true;
-	}
-
 	public static boolean validateUserFile(byte[] content) throws IOException {
 		PropertiesRealm r = new PropertiesRealm();
 		String tmpFileName = FileServlet.registerFile(content, UUID.randomUUID().toString(), 10, TimeUnit.SECONDS, "");
 		r.setResourcePath(tmpFileName);
 		r.init();
 		return true;
-	}
-
-	public static String composeAdminErrorReply(Exception e) {
-		return createJsonMessageFrame(Type.danger, e.getMessage());
-	}
-
-	public static String composeAdminSuccessReply(String s) {
-		return createJsonMessageFrame(Type.success, s);
-	}
-
-	private static String createJsonMessageFrame(Type t, String text) {
-		AdminConsoleFrameMsgOut response = new AdminConsoleFrameMsgOut();
-		MessageMsg message = new MessageMsg();
-		message.setType(t);
-		message.setText(text);
-		message.setTime(new Date());
-		response.setMessage(message);
-		return encode2Json(response);
 	}
 
 	public static boolean isRecording(HttpServletRequest r) {
@@ -324,7 +320,7 @@ public class ServerUtil {
 		}
 	}
 
-	public static StrSubstitutor getConfigSubstitutorMap(String user, String sessionId) {
+	public static Map<String, String> getConfigSubstitutorMap(String user, String sessionId) {
 
 		Map<String, String> result = new HashMap<String, String>();
 		result.putAll(System.getenv());
@@ -338,7 +334,11 @@ public class ServerUtil {
 			result.put(Constants.SESSION_ID_SUBSTITUTE, sessionId);
 		}
 
-		return new StrSubstitutor(result);
+		return result;
+	}
+
+	public static StrSubstitutor getConfigSubstitutor(String user, String sessionId) {
+		return new StrSubstitutor(getConfigSubstitutorMap(user, sessionId));
 	}
 
 	public static void broadcastMessage(AtmosphereResource r, EncodedMessage o) {

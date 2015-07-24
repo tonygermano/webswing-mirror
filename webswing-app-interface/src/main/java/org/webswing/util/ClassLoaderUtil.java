@@ -11,12 +11,13 @@ import org.apache.bcel.generic.InstructionList;
 import org.webswing.classloader.SwingClassLoaderFactory;
 import org.webswing.ext.services.ImageService;
 import org.webswing.ext.services.PdfService;
-import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.ext.services.SwingClassLoaderFactoryService;
 import org.webswing.services.impl.DirectDrawServiceImpl;
 import org.webswing.services.impl.ImageServiceImpl;
+import org.webswing.services.impl.JsLinkServiceImpl;
 import org.webswing.services.impl.PdfServiceImpl;
 import org.webswing.services.impl.ServerConnectionServiceImpl;
+import org.webswing.toolkit.util.Services;
 
 public class ClassLoaderUtil {
 
@@ -29,7 +30,8 @@ public class ClassLoaderUtil {
 		SwingClassLoaderFactoryService classloaderService = SwingClassLoaderFactory.getInstance();
 		DirectDrawServiceImpl directDrawServiceImpl = DirectDrawServiceImpl.getInstance();
 		ServerConnectionServiceImpl serverService = ServerConnectionServiceImpl.getInstance();
-		Services.initialize(imageService, pdfService, serverService, classloaderService, directDrawServiceImpl);
+		JsLinkServiceImpl jsLinkService = JsLinkServiceImpl.getInstance();
+		Services.initialize(imageService, pdfService, serverService, classloaderService, directDrawServiceImpl, jsLinkService);
 		// start jms connection to server
 		serverService.initialize();
 	}

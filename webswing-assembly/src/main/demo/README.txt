@@ -17,7 +17,7 @@ webswing.corsOrigins=http://other.domain1, http://other.domain2
 
 
 To embed webswing into your web page, just add following snippet (for all available options check the online documentation):
-<div style="height:500px;" data-webswing-instance="webswing" data-webswing-options="{autoStart:true, anonym:true, args='foo', applicationName:'SwingSet3', connectionUrl:'http://<webswing-host-and-port>'}">
+<div style="height:500px;" data-webswing-instance="webswing" data-webswing-options="{autoStart:true, anonym:true, args='foo', applicationName:'SwingSet3', connectionUrl:'http://<webswing-host-and-port>'}"></div>
 <script>
 	(function (window, document) {
 	  var loader = function () {

@@ -1,0 +1,24 @@
+
+<h4>Variables available for substitution: <input ng-model="vm.filter" class="form-control" placeholder="global search ..." type="text"/></h4>
+
+<div class="ws-variable-table">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Variable Name</th>
+                <th>Current Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="item in vm.data| filter:{$:vm.filter}">
+                <td class="ws-variable-table-first">
+                    {{::item.variable}}
+                </td>
+                <td>
+                    {{::item.value}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
