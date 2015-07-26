@@ -13,6 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.webswing.common.WindowDecoratorTheme;
 import org.webswing.ext.services.ImageService;
 import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Util;
 
 import com.objectplanet.image.PngEncoder;
 
@@ -72,7 +73,7 @@ public class ImageServiceImpl implements ImageService {
 					implclass = ImageServiceImpl.class.getClassLoader().loadClass(WindowDecoratorTheme.DECORATION_THEME_IMPL_DEFAULT);
 				} catch (ClassNotFoundException e1) {
 					Logger.fatal("ImageService: Fatal error:Default decoration theme not found.");
-					System.exit(1);
+					Util.getWebToolkit().exitSwing(1);
 				}
 			}
 			if (WindowDecoratorTheme.class.isAssignableFrom(implclass)) {
@@ -81,11 +82,11 @@ public class ImageServiceImpl implements ImageService {
 					this.windowDecorationTheme = theme;
 				} catch (Exception e) {
 					Logger.fatal("ImageService: exception when creating instance of " + implclass.getCanonicalName(), e);
-					System.exit(1);
+					Util.getWebToolkit().exitSwing(1);
 				}
 			} else {
 				Logger.fatal("ImageService: Fatal error: Decoration theme not instance of WindowDecoratorThemeIfc:" + implclass.getCanonicalName());
-				System.exit(1);
+				Util.getWebToolkit().exitSwing(1);
 			}
 		}
 		return windowDecorationTheme;

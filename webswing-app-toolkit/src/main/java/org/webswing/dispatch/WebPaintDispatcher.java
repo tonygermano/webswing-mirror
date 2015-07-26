@@ -127,11 +127,6 @@ public class WebPaintDispatcher {
 		}
 	}
 
-	public void notifyShutdown() {
-		Logger.info("WebPaintDispatcher:notifyShutdown");
-		Services.getConnectionService().sendShutdownNotification();
-	}
-
 	public void sendObject(Serializable object) {
 		Logger.info("WebPaintDispatcher:sendJsonObject", object);
 		Services.getConnectionService().sendObject(object);

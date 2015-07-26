@@ -10,7 +10,5 @@ public interface ServerConnectionService {
 
 	void sendObject(Serializable jsonPaintRequest);
 
-	void sendShutdownNotification();
-
 	Object sendObjectSync(MsgOut o, String correlationId) throws TimeoutException, IOException;
 }

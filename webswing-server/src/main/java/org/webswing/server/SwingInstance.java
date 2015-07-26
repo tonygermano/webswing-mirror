@@ -23,7 +23,6 @@ public class SwingInstance implements WebSessionListener {
 	private AtmosphereResource mirroredResource;
 	private SwingDescriptor application;
 	private SwingJvmConnection connection;
-	private SwingJvmStats latest = new SwingJvmStats();
 	private Date disconnectedSince;
 	private SessionRecorder sessionRecorder;
 	private final Date startedAt = new Date();
@@ -93,9 +92,14 @@ public class SwingInstance implements WebSessionListener {
 		if (connection.isRunning()) {
 			if (h instanceof SimpleEventMsgIn) {
 				SimpleEventMsgIn m = (SimpleEventMsgIn) h;
-				if (m.getType().equals(SimpleEventMsgIn.SimpleEventType.paintAck) && ((resource != null && r.uuid().equals(resource.uuid())) || (resource == null && mirroredResource != null && r.uuid().equals(mirroredResource.uuid())))) {
-					connection.send(h);
+				if (m.getType().equals(SimpleEventMsgIn.SimpleEventType.paintAck)) {
+					if (((resource != null && r.uuid().equals(resource.uuid())) || (resource == null && mirroredResource != null && r.uuid().equals(mirroredResource.uuid())))) {
+						connection.send(h);
+					}
 				} else if (m.getType().equals(SimpleEventMsgIn.SimpleEventType.unload)) {
+					if (resource != null && r.uuid().equals(resource.uuid())) {
+						connection.send(h);
+					}
 					SwingInstanceManager.getInstance().notifySessionDisconnected(r.uuid());
 				} else {
 					connection.send(h);
@@ -159,12 +163,8 @@ public class SwingInstance implements WebSessionListener {
 		return endedAt;
 	}
 
-	public SwingJvmStats collectStats() {
-		return latest = StatUtils.getSwingInstanceStats(this, connection != null ? connection.getJmxConnection() : null);
-	}
-
 	public SwingJvmStats getStats() {
-		return latest;
+		return connection.getLatest();
 	}
 
 }

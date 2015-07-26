@@ -1,15 +1,10 @@
 package org.webswing.toolkit;
 
-import java.awt.Desktop;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
