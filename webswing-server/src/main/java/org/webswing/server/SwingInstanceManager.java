@@ -16,7 +16,6 @@ import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.model.server.SwingDescriptor;
 import org.webswing.model.server.admin.Sessions;
 import org.webswing.model.server.admin.SwingSession;
-import org.webswing.server.stats.PerformanceStatsMonitor;
 import org.webswing.server.util.ServerUtil;
 
 public class SwingInstanceManager {
@@ -29,7 +28,6 @@ public class SwingInstanceManager {
 	private SwingInstanceChangeListener changeListener;
 
 	private SwingInstanceManager() {
-		new PerformanceStatsMonitor();
 	}
 
 	public static SwingInstanceManager getInstance() {

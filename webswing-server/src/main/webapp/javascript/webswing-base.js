@@ -145,9 +145,13 @@
 	function dispose() {
 		clearInterval(timer1);
 		clearInterval(timer2);
-		sendInput();
 		unload();
+		sendInput();
 		resetState();
+		document.removeEventListener('mousedown', mouseDownEventHandler);
+		document.removeEventListener('mouseout', mouseOutEventHandler);
+		document.removeEventListener('mouseup', mouseUpEventHandler);
+		window.removeEventListener('beforeunload', beforeUnloadEventHandler);
 	}
 
 	function processMessage(data) {
@@ -425,19 +429,28 @@
 			api.clipboard.paste(event.clipboardData);
 			return false;
 		}, false);
-		bindEvent(document, 'mousedown', function(evt) {
-			if (evt.which == 1) {
-				mouseDown = 1;
-			}
-		});
-		bindEvent(document, 'mouseout', function(evt) {
+
+		bindEvent(document, 'mousedown', mouseDownEventHandler);
+		bindEvent(document, 'mouseout', mouseOutEventHandler);
+		bindEvent(document, 'mouseup', mouseUpEventHandler);
+		bindEvent(window, 'beforeunload', beforeUnloadEventHandler);
+	}
+
+	function mouseDownEventHandler(evt) {
+		if (evt.which == 1) {
+			mouseDown = 1;
+		}
+	}
+	function mouseOutEventHandler(evt) {
+		mouseDown = 0;
+	}
+	function mouseUpEventHandler(evt) {
+		if (evt.which == 1) {
 			mouseDown = 0;
-		});
-		bindEvent(document, 'mouseup', function(evt) {
-			if (evt.which == 1) {
-				mouseDown = 0;
-			}
-		});
+		}
+	}
+	function beforeUnloadEventHandler(evt) {
+		dispose();
 	}
 
 	function focusInput(input) {
@@ -526,8 +539,6 @@
 	function bindEvent(el, eventName, eventHandler) {
 		if (el.addEventListener != null) {
 			el.addEventListener(eventName, eventHandler);
-		} else {
-			el.bind(eventName, eventHandler);
 		}
 	}
 

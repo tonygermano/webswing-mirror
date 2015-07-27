@@ -13,6 +13,7 @@ import javax.jms.Connection;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
@@ -24,9 +25,9 @@ import org.webswing.Constants;
 import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.model.MsgIn;
 import org.webswing.model.MsgOut;
+import org.webswing.model.internal.JvmStatsMsgInternal;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JsResultMsg;
-import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
@@ -43,6 +44,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private Connection connection;
 	private Session session;
 	private MessageProducer producer;
+	private MessageConsumer consumer;
 	private long lastMessageTimestamp = System.currentTimeMillis();
 	private Runnable watchdog;
 	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor();
@@ -62,14 +64,17 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 			@Override
 			public void run() {
-				long diff = System.currentTimeMillis() - lastMessageTimestamp;
+				long diff = System.currentTimeMillis() - lastMessageTimestamp - 10000; /*-10000 is to compensate for 10s js heartbeat interval*/
 				int timeout = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) * 1000;
+				timeout = timeout < 1000 ? 1000 : timeout;
 				if ((diff / 1000 > 10) && ((diff / 1000) % 10 == 0)) {
 					Logger.warn("Inactive for " + diff / 1000 + " seconds.");
 				}
 				if (diff > timeout) {
 					Logger.warn("Exiting swing application due to inactivity for " + diff / 1000 + " seconds.");
-					System.exit(1);
+					Util.getWebToolkit().exitSwing(1);
+				} else {
+					sendObject(getStats());
 				}
 			}
 		};
@@ -84,7 +89,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			Queue consumerDest = session.createQueue(clientId + Constants.SERVER2SWING);
 			Queue producerDest = session.createQueue(clientId + Constants.SWING2SERVER);
 			producer = session.createProducer(producerDest);
-			session.createConsumer(consumerDest).setMessageListener(this);
+			consumer = session.createConsumer(consumerDest);
+			consumer.setMessageListener(this);
 			connection.setExceptionListener(new ExceptionListener() {
 
 				@Override
@@ -92,6 +98,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					Logger.warn("JMS clien connection error: " + paramJMSException.getMessage());
 					try {
 						producer.close();
+						consumer.close();
 						session.close();
 						connection.close();
 					} catch (JMSException e) {
@@ -100,37 +107,28 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					ServerConnectionServiceImpl.this.initialize();
 				}
 			});
-			sendPidNotification();
 		} catch (JMSException e) {
 			Logger.error("Exiting swing application because could not connect to JMS:" + e.getMessage(), e);
-			System.exit(1);
+			Util.getWebToolkit().exitSwing(1);
 		}
+
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				ServerConnectionServiceImpl.this.disconnect();
+			}
+		});
 
 		exitScheduler.scheduleWithFixedDelay(watchdog, 1, 1, TimeUnit.SECONDS);
 	}
 
-	@Override
-	public void sendShutdownNotification() {
+	public void disconnect() {
 		try {
-			producer.send(session.createObjectMessage(SimpleEventMsgOut.shutDownNotification));
+			producer.close();
+			consumer.close();
+			session.close();
+			connection.close();
 		} catch (JMSException e) {
-			Logger.error("ServerConnectionService.sendShutdownNotification", e);
-		}
-	}
-
-	@SuppressWarnings("restriction")
-	public void sendPidNotification() {
-		try {
-			java.lang.management.RuntimeMXBean runtime = java.lang.management.ManagementFactory.getRuntimeMXBean();
-			java.lang.reflect.Field jvm = runtime.getClass().getDeclaredField("jvm");
-			jvm.setAccessible(true);
-			sun.management.VMManagement mgmt = (sun.management.VMManagement) jvm.get(runtime);
-			java.lang.reflect.Method pid_method = mgmt.getClass().getDeclaredMethod("getProcessId");
-			pid_method.setAccessible(true);
-			int pid = (Integer) pid_method.invoke(mgmt);
-			producer.send(session.createTextMessage(Constants.SWING_PID_NOTIFICATION + pid));
-		} catch (Exception e) {
-			Logger.error("ServerConnectionService.sendPidNotification", e);
+			Logger.info("Disconnecting from JMS server failed.", e.getMessage());
 		}
 	}
 
@@ -201,6 +199,15 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		} catch (Exception e) {
 			Logger.error("ServerConnectionService.onMessage", e);
 		}
+	}
+
+	private JvmStatsMsgInternal getStats() {
+		JvmStatsMsgInternal result = new JvmStatsMsgInternal();
+		int mb = 1024 * 1024;
+		Runtime runtime = Runtime.getRuntime();
+		result.setHeapSize(runtime.totalMemory() / mb);
+		result.setHeapSizeUsed((runtime.totalMemory() - runtime.freeMemory()) / mb);
+		return result;
 	}
 
 }

@@ -111,12 +111,7 @@ public class WebEventDispatcher {
 		switch (message.getType()) {
 		case killSwing:
 			Logger.info("Received kill signal. Swing application shutting down.");
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					System.exit(0);
-				}
-			});
+			Util.getWebToolkit().exitSwing(0);
 			break;
 		case deleteFile:
 			Util.getWebToolkit().getPaintDispatcher().notifyDeleteSelectedFile();
@@ -135,8 +130,15 @@ public class WebEventDispatcher {
 				Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaintAll();
 			}
 			break;
-		case hb:
 		case unload:
+			boolean instantExit = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) <= 0;
+			if (instantExit) {
+				Logger.warn("Exiting swing application. Client has disconnected from web session. (swingSessionTimeout setting is 0 or less)");
+				Util.getWebToolkit().exitSwing(1);
+			}
+			break;
+		case hb:
+			break;
 		}
 	}
 

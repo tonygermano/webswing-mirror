@@ -76,6 +76,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
 import org.webswing.dispatch.WebEventDispatcher;
@@ -516,4 +517,14 @@ public abstract class WebToolkit extends SunToolkit {
 	abstract public boolean webConpoenentPeerUpdateGraphicsData();
 
 	abstract public SurfaceData webComponentPeerReplaceSurfaceData(SurfaceManager mgr);
+
+	public void exitSwing(final int i) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				System.exit(i);
+			}
+		});
+
+	}
 }
