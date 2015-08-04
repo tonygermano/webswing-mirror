@@ -394,23 +394,6 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>com.github.skwakman.nodejs-maven-plugin</groupId>
-						<artifactId>nodejs-maven-plugin</artifactId>
-						<version>1.0.2</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>extract</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<targetDirectory>
-								${project.build.directory}/nodejs/
-							</targetDirectory>
-						</configuration>
-					</plugin>
-					<plugin>
 						<groupId>com.github.bringking</groupId>
 						<artifactId>requirejs-maven-plugin</artifactId>
 						<version>2.0.4</version>
@@ -423,7 +406,6 @@
 								<configuration>
 									<configFile>src/main/config/build.js</configFile>
 									<filterConfig>true</filterConfig>
-									<nodeExecutable>${project.build.directory}/nodejs/node</nodeExecutable>
 								</configuration>
 							</execution>
 						</executions>
@@ -483,7 +465,6 @@
 								<configuration>
 									<configFile>src/main/config/build-release.js</configFile>
 									<filterConfig>true</filterConfig>
-									<nodeExecutable>${project.build.directory}/nodejs/node</nodeExecutable>
 								</configuration>
 							</execution>
 						</executions>

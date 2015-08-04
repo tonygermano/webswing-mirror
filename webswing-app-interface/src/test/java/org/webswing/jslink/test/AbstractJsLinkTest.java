@@ -42,10 +42,6 @@ public abstract class AbstractJsLinkTest {
 		ServerConnectionService serverServiceImpl = new ServerConnectionService() {
 
 			@Override
-			public void sendShutdownNotification() {
-			}
-
-			@Override
 			public Object sendObjectSync(MsgOut o, String correlationId) throws IOException {
 				try {
 					engine.put("data", mapper.writeValueAsString(o));
@@ -69,14 +65,23 @@ public abstract class AbstractJsLinkTest {
 		};
 		Services.initialize(null, null, serverServiceImpl, null, null, jsLinkServiceImpl);
 
-		engine.eval("var define =function(array,f){ this[f.name]=f()}");
+		engine.eval("var define =function(array,f){ this['JsLink']=f()}");
 		engine.eval("self=this; this.setTimeout=function(f,t){f()}");
 		engine.eval(new FileReader("../webswing-server/src/main/webapp/javascript/es6promise.js"));
 		engine.eval("ES6Promise.polyfill()");
 		engine.eval(new FileReader("../webswing-server/src/main/webapp/javascript/webswing-jslink.js"));
 		engine.put("sendJava", this);
-		engine.eval("var result=null;var window={test:'test'};var api={javaCallTimeout:0,socket:{send:function(obj){result=obj;return result;},awaitResponse:function(callback, request, timeout){sendJava.send(JSON.stringify(request.javaRequest));callback(data.javaResponse);}}}");
-		engine.eval("JsLink.init(api)");
+		engine.eval("var result=null;var window={test:'test'};");
+		engine.eval("var cfg={javaCallTimeout:0}");
+		engine.eval("var send=function(obj){result=obj;return result;}");
+		engine.eval("var awaitResponse=function(callback, request, timeout){sendJava.send(JSON.stringify(request.javaRequest));callback(data.javaResponse);}");
+		engine.eval("var jslModule=new JsLink();");
+		engine.eval("jslModule.injects.cfg=cfg;");
+		engine.eval("jslModule.injects.external={};");
+		engine.eval("jslModule.injects.send=send;");
+		engine.eval("jslModule.injects.awaitResponse=awaitResponse;");
+                engine.eval("var api= {jslink:jslModule.provides}");
+                
 		specificSetUp();
 	}
 

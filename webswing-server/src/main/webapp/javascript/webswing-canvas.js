@@ -1,73 +1,76 @@
-define([ 'jquery' ], function webswingCanvas($) {
-	"use strict";
-	var api;
-	var canvas;
-	var inputHandler;
-	var resizeCheck;
+define(['jquery'], function amdFactory() {
+    "use strict";
+    return function CanvasModule() {
+        var module = this;
+        var api;
+        module.injects = api = {
+            cfg: 'webswing.config',
+            sendHandshake: 'base.handshake'
+        };
+        module.provides = {
+            dispose: dispose,
+            get: get,
+            getInput: getInput
+        };
 
-	function create() {
-		if (canvas == null) {
-			api.rootElement.append('<canvas data-id="canvas" style="display:block" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
-			api.rootElement.append('<input data-id="input-handler" class="input-hidden" type="text" value="" />');
-			canvas = api.rootElement.find('canvas[data-id="canvas"]');
-			inputHandler = api.rootElement.find('input[data-id="input-handler"]');
-		}
-		if (resizeCheck == null) {
-			resizeCheck = setInterval(function() {
-				if (!api.mirror && (canvas.width() !== width() || canvas.height() !== height())) {
-					var snapshot = get().getContext("2d").getImageData(0, 0, get().width, get().height);
-					get().width = width();
-					get().height = height();
-					get().getContext("2d").putImageData(snapshot, 0, 0);
-					api.base.handshake();
-				}
-			}, 500);
-		}
-	}
+        var canvas;
+        var inputHandler;
+        var resizeCheck;
 
-	function dispose() {
-		if (canvas != null) {
-			canvas.remove();
-			inputHandler.remove();
-			canvas = null;
-			inputHandler=null;
-		}
-		if (resizeCheck != null) {
-			clearInterval(resizeCheck);
-			resizeCheck = null;
-		}
-	}
+        function create() {
+            if (canvas == null) {
+                api.cfg.rootElement.append('<canvas data-id="canvas" style="display:block" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
+                api.cfg.rootElement.append('<input data-id="input-handler" class="input-hidden" type="text" value="" />');
+                canvas = api.cfg.rootElement.find('canvas[data-id="canvas"]');
+                inputHandler = api.cfg.rootElement.find('input[data-id="input-handler"]');
+            }
+            if (resizeCheck == null) {
+                resizeCheck = setInterval(function () {
+                    if (!api.cfg.mirror && (canvas.width() !== width() || canvas.height() !== height())) {
+                        var snapshot = get().getContext("2d").getImageData(0, 0, get().width, get().height);
+                        get().width = width();
+                        get().height = height();
+                        get().getContext("2d").putImageData(snapshot, 0, 0);
+                        api.sendHandshake();
+                    }
+                }, 500);
+            }
+        }
 
-	function width() {
-		return api.rootElement.width();
-	}
+        function dispose() {
+            if (canvas != null) {
+                canvas.remove();
+                inputHandler.remove();
+                canvas = null;
+                inputHandler = null;
+            }
+            if (resizeCheck != null) {
+                clearInterval(resizeCheck);
+                resizeCheck = null;
+            }
+        }
 
-	function height() {
-		return api.rootElement.height();
-	}
+        function width() {
+            return api.cfg.rootElement.width();
+        }
 
-	function get() {
-		if (canvas == null || resizeCheck != null) {
-			create();
-		}
-		return canvas[0];
-	}
+        function height() {
+            return api.cfg.rootElement.height();
+        }
 
-	function getInput() {
-		if (inputHandler == null) {
-			create();
-		}
-		return inputHandler[0];
-	}
+        function get() {
+            if (canvas == null || resizeCheck != null) {
+                create();
+            }
+            return canvas[0];
+        }
 
-	return {
-		init : function(wsApi) {
-			api = wsApi;
-			wsApi.canvas = {
-				dispose : dispose,
-				get : get,
-				getInput : getInput,
-			};
-		}
-	};
+        function getInput() {
+            if (inputHandler == null) {
+                create();
+            }
+            return inputHandler[0];
+        }
+    };
+
 });
