@@ -48,7 +48,7 @@ define(['jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'jq
         }
 
         function close() {
-            if (uploadBar != null || uploadBar.closest(api.cfg.rootElement).length !== 0) {
+            if (uploadBar != null && uploadBar.closest(api.cfg.rootElement).length !== 0) {
                 uploadBar.hide("fast");
                 uploadBar.detach();
             }

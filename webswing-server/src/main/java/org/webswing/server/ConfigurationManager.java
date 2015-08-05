@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -23,8 +24,6 @@ import org.webswing.model.server.admin.ServerProperties;
 import org.webswing.model.server.admin.UserConfiguration;
 import org.webswing.server.handler.JmsService;
 import org.webswing.server.util.ServerUtil;
-
-import com.google.common.io.Files;
 
 public class ConfigurationManager {
 
@@ -120,8 +119,7 @@ public class ConfigurationManager {
 
 	public void applyUserProperties(UserConfiguration content) throws Exception {
 		File usersFile = new File(URI.create(ServerUtil.getUserPropsFileName()));
-		Files.write(content.getUsers().getBytes(), usersFile);
-
+		FileUtils.writeByteArrayToFile(usersFile, content.getUsers().getBytes());
 		notifyChange();
 	}
 
@@ -170,7 +168,7 @@ public class ConfigurationManager {
 			String result = new String();
 			File users = new File(URI.create(ServerUtil.getUserPropsFileName()));
 			if (users.exists()) {
-				result = Files.toString(users, Charset.forName("UTF-8"));
+				result = FileUtils.readFileToString(users, Charset.forName("UTF-8"));
 				return new UserConfiguration(result);
 			} else {
 				log.warn("User properties file " + users.getPath() + " does not exist.");

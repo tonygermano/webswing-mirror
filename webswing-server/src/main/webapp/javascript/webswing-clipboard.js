@@ -34,7 +34,18 @@ define(['jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.css
             var input = copyBar.find('input[data-id="input"]');
             var textarea = copyBar.find('textarea[data-id="textarea"]');
             var currentFocus = document.activeElement;
-            textarea.val(data.content);
+            if(data.htmlContent!=null && data.htmlContent.length!==0){
+                textarea.val(data.htmlContent);
+                copyBar.find('span[data-id="html"]')
+                        .removeClass( "webswing-copy-content-inactive" )
+                        .addClass( "webswing-copy-content-active" );
+            }
+            if(data.content!=null && data.content.length!==0){
+                textarea.val(data.content);
+                copyBar.find('span[data-id="plaintext"]')
+                        .removeClass( "webswing-copy-content-inactive" )
+                        .addClass( "webswing-copy-content-active" );
+            }
             focusInput(input);
 
             if (api.cfg.ieVersion) {
