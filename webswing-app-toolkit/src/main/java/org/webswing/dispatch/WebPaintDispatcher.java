@@ -117,8 +117,7 @@ public class WebPaintDispatcher {
 				}
 			}
 		};
-		contentSender.scheduleWithFixedDelay(sendUpdate, 50, 50, TimeUnit.MILLISECONDS);
-
+		contentSender.scheduleWithFixedDelay(sendUpdate, 33, 33, TimeUnit.MILLISECONDS);
 	}
 
 	public void clientReadyToReceive() {

@@ -111,7 +111,6 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 });
                 inputEvtQueue = [];
             }
-
         }
 
         function enqueueMessageEvent(message) {
@@ -150,6 +149,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
 
         function ack() {
             enqueueMessageEvent('paintAck');
+            sendInput();
         }
 
         function kill() {
@@ -353,6 +353,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 latestMouseMoveEvent = null;
                 enqueueInputEvent(mousePos);
                 focusInput(input);
+                sendInput();
                 return false;
             }, false);
             bindEvent(canvas, 'dblclick', function (evt) {
@@ -360,6 +361,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 latestMouseMoveEvent = null;
                 enqueueInputEvent(mousePos);
                 focusInput(input);
+                sendInput();
                 return false;
             }, false);
             bindEvent(canvas, 'mousemove', function (evt) {
@@ -373,6 +375,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 latestMouseMoveEvent = null;
                 enqueueInputEvent(mousePos);
                 focusInput(input);
+                sendInput();
                 return false;
             }, false);
             // IE9, Chrome, Safari, Opera
@@ -443,6 +446,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                     event.stopPropagation();
                 }
                 enqueueInputEvent(keyevt);
+                sendInput();
                 return false;
             }, false);
             bindEvent(input, 'paste', function (event) {
