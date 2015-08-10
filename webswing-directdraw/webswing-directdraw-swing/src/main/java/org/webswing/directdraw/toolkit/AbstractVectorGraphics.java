@@ -49,7 +49,7 @@ import org.webswing.directdraw.util.DirectDrawUtils;
  * other convenience functions. It also handles the different drawSymbol and
  * fillSymbol methods and print colors. The drawing of framed strings is
  * broken down to lower level methods.
- * 
+ *
  * @author Simon Fischer
  * @author Mark Donszelmann
  * @author Steffen Greiffenberg
@@ -121,12 +121,12 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	private AffineTransform currentTransform;
 
-    private AffineTransform oldTransform = new AffineTransform(); // only for use in writeSetTransform to calculate the difference.
+	private AffineTransform oldTransform = new AffineTransform(); // only for use in writeSetTransform to calculate the difference.
 
 	/*
-     * ================================================================================
-     * 1. Constructors & Factory Methods
-     * ================================================================================
+	 * ================================================================================
+	 * 1. Constructors & Factory Methods
+	 * ================================================================================
 	 */
 
 	/**
@@ -140,10 +140,10 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * <LI>Composite: AlphaComposite.SRC_OVER
 	 * <LI>Clip: Rectangle(0, 0, size.width, size.height)
 	 * </UL>
-	 * 
-     * @param size rectangle specifying the bounds of the image
-     * @param doRestoreOnDispose true if writeGraphicsRestore() should be called
-     *        when this graphics context is disposed of.
+	 *
+	 * @param size rectangle specifying the bounds of the image
+	 * @param doRestoreOnDispose true if writeGraphicsRestore() should be called
+	 *        when this graphics context is disposed of.
 	 */
 	protected AbstractVectorGraphics(Dimension size) {
 		this.size = size;
@@ -176,11 +176,11 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * <LI>Clip: The size of the component, Rectangle(0, 0, size.width,
 	 * size.height)
 	 * </UL>
-	 * 
-     * @param component to be used to initialize the values of the graphics
-     *        state
-     * @param doRestoreOnDispose true if writeGraphicsRestore() should be called
-     *        when this graphics context is disposed of.
+	 *
+	 * @param component to be used to initialize the values of the graphics
+	 *        state
+	 * @param doRestoreOnDispose true if writeGraphicsRestore() should be called
+	 *        when this graphics context is disposed of.
 	 */
 	protected AbstractVectorGraphics(Component component) {
 		this.size = component.getSize();
@@ -203,10 +203,10 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Constructs a subgraphics context.
-	 * 
-     * @param graphics context to clone from
-     * @param doRestoreOnDispose true if writeGraphicsRestore() should be called
-     *        when this graphics context is disposed of.
+	 *
+	 * @param graphics context to clone from
+	 * @param doRestoreOnDispose true if writeGraphicsRestore() should be called
+	 *        when this graphics context is disposed of.
 	 */
 	protected AbstractVectorGraphics(AbstractVectorGraphics graphics) {
 		super();
@@ -228,7 +228,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Gets the current font.
-	 * 
+	 *
 	 * @return current font
 	 */
 	public Font getFont() {
@@ -316,19 +316,19 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	/**
-     * Draws frame and banner for a TextLayout, which is used for
-     * calculation auf ajustment
-	 * 
-     * @param tl TextLayout for frame calculation
-     * @param x coordinate to draw string
-     * @param y coordinate to draw string
-     * @param horizontal alignment of the text
-     * @param vertical alignment of the text
-     * @param framed true if text is surrounded by a frame
-     * @param frameColor color of the frame
-     * @param frameWidth witdh of the frame
-     * @param banner true if the frame is filled by a banner
-     * @param bannerColor color of the banner
+	 * Draws frame and banner for a TextLayout, which is used for
+	 * calculation auf ajustment
+	 *
+	 * @param tl TextLayout for frame calculation
+	 * @param x coordinate to draw string
+	 * @param y coordinate to draw string
+	 * @param horizontal alignment of the text
+	 * @param vertical alignment of the text
+	 * @param framed true if text is surrounded by a frame
+	 * @param frameColor color of the frame
+	 * @param frameWidth witdh of the frame
+	 * @param banner true if the frame is filled by a banner
+	 * @param bannerColor color of the banner
 	 * @return Offset for the string inside the frame
 	 */
 	private Point2D drawFrameAndBanner(TextLayout tl, double x, double y, int horizontal, int vertical, boolean framed, Color frameColor, double frameWidth, boolean banner, Color bannerColor) {
@@ -398,17 +398,17 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Draws frame, banner and aligned text inside
-	 * 
-     * @param str text to be drawn
-     * @param x coordinate to draw string
-     * @param y coordinate to draw string
-     * @param horizontal alignment of the text
-     * @param vertical alignment of the text
-     * @param framed true if text is surrounded by a frame
-     * @param frameColor color of the frame
-     * @param frameWidth witdh of the frame
-     * @param banner true if the frame is filled by a banner
-     * @param bannerColor color of the banner
+	 *
+	 * @param str text to be drawn
+	 * @param x coordinate to draw string
+	 * @param y coordinate to draw string
+	 * @param horizontal alignment of the text
+	 * @param vertical alignment of the text
+	 * @param framed true if text is surrounded by a frame
+	 * @param frameColor color of the frame
+	 * @param frameWidth witdh of the frame
+	 * @param banner true if the frame is filled by a banner
+	 * @param bannerColor color of the banner
 	 */
 	@SuppressWarnings("unchecked")
 	public void drawString(String str, double x, double y, int horizontal, int vertical, boolean framed, Color frameColor, double frameWidth, boolean banner, Color bannerColor) {
@@ -441,7 +441,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Gets the background color.
-	 * 
+	 *
 	 * @return background color
 	 */
 	public Color getBackground() {
@@ -450,8 +450,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Sets the background color.
-	 * 
-     * @param color background color to be set
+	 *
+	 * @param color background color to be set
 	 */
 	public void setBackground(Color color) {
 		backgroundColor = color;
@@ -459,7 +459,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Gets the current color.
-	 * 
+	 *
 	 * @return the current color
 	 */
 	public Color getColor() {
@@ -468,7 +468,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Gets the current paint.
-	 * 
+	 *
 	 * @return paint current paint
 	 */
 	public Paint getPaint() {
@@ -494,13 +494,13 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	/**
-     * Checks whether or not the specified <code>Shape</code> intersects
-     * the specified {@link Rectangle}, which is in device
-     * space.
-	 * 
-     * @param rect the area in device space to check for a hit
-     * @param s the <code>Shape</code> to check for a hit
-     * @param onStroke flag used to choose between testing the stroked or the filled shape.
+	 * Checks whether or not the specified <code>Shape</code> intersects
+	 * the specified {@link Rectangle}, which is in device
+	 * space.
+	 *
+	 * @param rect the area in device space to check for a hit
+	 * @param s the <code>Shape</code> to check for a hit
+	 * @param onStroke flag used to choose between testing the stroked or the filled shape.
 	 * @see java.awt.Graphics2D#hit(Rectangle, Shape, boolean)
 	 */
 	public boolean hit(Rectangle rect, Shape s, boolean onStroke) {
@@ -521,34 +521,46 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	/*
-     * ================================================================================ |
-     * XXX 5. Drawing Methods
-     * ================================================================================
+	 * ================================================================================ |
+	 * XXX 5. Drawing Methods
+	 * ================================================================================
 	 */
 
 	/* 5.3. Images */
 	public boolean drawImage(Image image, int x, int y, ImageObserver observer) {
-		int imageWidth = image.getWidth(observer);
-		int imageHeight = image.getHeight(observer);
-		return drawImage(image, x, y, x + imageWidth, y + imageHeight, 0, 0, imageWidth, imageHeight, null, observer);
+		if (image != null) {
+			int imageWidth = image.getWidth(observer);
+			int imageHeight = image.getHeight(observer);
+			return drawImage(image, x, y, x + imageWidth, y + imageHeight, 0, 0, imageWidth, imageHeight, null, observer);
+		}
+		return false;
 	}
 
 	public boolean drawImage(Image image, int x, int y, int width, int height, ImageObserver observer) {
-		int imageWidth = image.getWidth(observer);
-		int imageHeight = image.getHeight(observer);
-		return drawImage(image, x, y, x + width, y + height, 0, 0, imageWidth, imageHeight, null, observer);
+		if (image != null) {
+			int imageWidth = image.getWidth(observer);
+			int imageHeight = image.getHeight(observer);
+			return drawImage(image, x, y, x + width, y + height, 0, 0, imageWidth, imageHeight, null, observer);
+		}
+		return false;
 	}
 
 	public boolean drawImage(Image image, int x, int y, int width, int height, Color bgColor, ImageObserver observer) {
-		int imageWidth = image.getWidth(observer);
-		int imageHeight = image.getHeight(observer);
-		return drawImage(image, x, y, x + width, y + height, 0, 0, imageWidth, imageHeight, bgColor, observer);
+		if (image != null) {
+			int imageWidth = image.getWidth(observer);
+			int imageHeight = image.getHeight(observer);
+			return drawImage(image, x, y, x + width, y + height, 0, 0, imageWidth, imageHeight, bgColor, observer);
+		}
+		return false;
 	}
 
 	public boolean drawImage(Image image, int x, int y, Color bgColor, ImageObserver observer) {
-		int imageWidth = image.getWidth(observer);
-		int imageHeight = image.getHeight(observer);
-		return drawImage(image, x, y, x + imageWidth, y + imageHeight, 0, 0, imageWidth, imageHeight, bgColor, observer);
+		if (image != null) {
+			int imageWidth = image.getWidth(observer);
+			int imageHeight = image.getHeight(observer);
+			return drawImage(image, x, y, x + imageWidth, y + imageHeight, 0, 0, imageWidth, imageHeight, bgColor, observer);
+		}
+		return false;
 	}
 
 	public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
@@ -565,18 +577,18 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Draw and resizes (transparent) image. Calls writeImage(...).
-	 * 
-     * @param image image to be drawn
-     * @param dx1 destination image bounds
-     * @param dy1 destination image bounds
-     * @param dx2 destination image bounds
-     * @param dy2 destination image bounds
-     * @param sx1 source image bounds
-     * @param sy1 source image bounds
-     * @param sx2 source image bounds
-     * @param sy2 source image bounds
-     * @param bgColor background color
-     * @param observer for updates if image still incomplete
+	 *
+	 * @param image image to be drawn
+	 * @param dx1 destination image bounds
+	 * @param dy1 destination image bounds
+	 * @param dx2 destination image bounds
+	 * @param dy2 destination image bounds
+	 * @param sx1 source image bounds
+	 * @param sy1 source image bounds
+	 * @param sx2 source image bounds
+	 * @param sy2 source image bounds
+	 * @param bgColor background color
+	 * @param observer for updates if image still incomplete
 	 * @return true if successful
 	 */
 	public boolean drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgColor, ImageObserver observer) {
@@ -632,9 +644,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Draws a rendered image using a transform.
-	 * 
-     * @param image to be drawn
-     * @param xform transform to be used on the image
+	 *
+	 * @param image to be drawn
+	 * @param xform transform to be used on the image
 	 */
 	public void drawRenderedImage(RenderedImage image, AffineTransform xform) {
 		try {
@@ -650,9 +662,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Draws the string at (x, y). If TEXT_AS_SHAPES is set
-     * {@link #drawGlyphVector(java.awt.font.GlyphVector, float, float)} is used, otherwise
-     * {@link #writeString(String, double, double)} for a more direct output of the string.
-	 * 
+	 * {@link #drawGlyphVector(java.awt.font.GlyphVector, float, float)} is used, otherwise
+	 * {@link #writeString(String, double, double)} for a more direct output of the string.
+	 *
 	 * @param string
 	 * @param x
 	 * @param y
@@ -673,7 +685,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Use the transformation of the glyphvector and draw it
-	 * 
+	 *
 	 * @param g
 	 * @param x
 	 * @param y
@@ -737,13 +749,13 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	/*
-     * ================================================================================ |
-     * XXX 6. Transformations
-     * ================================================================================
+	 * ================================================================================ |
+	 * XXX 6. Transformations
+	 * ================================================================================
 	 */
 	/**
 	 * Get the current transform.
-	 * 
+	 *
 	 * @return current transform
 	 */
 	public AffineTransform getTransform() {
@@ -752,8 +764,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Set the current transform. Calls writeSetTransform(Transform).
-	 * 
-     * @param transform to be set
+	 *
+	 * @param transform to be set
 	 */
 	public void setTransform(AffineTransform transform) {
 		// Fix for FREEHEP-569
@@ -768,8 +780,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Transforms the current transform. Calls writeTransform(Transform)
-	 * 
-     * @param transform to be applied
+	 *
+	 * @param transform to be applied
 	 */
 	public void transform(AffineTransform transform) {
 		currentTransform.concatenate(transform);
@@ -782,9 +794,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Translates the current transform. Calls writeTransform(Transform)
-	 * 
-     * @param x amount by which to translate
-     * @param y amount by which to translate
+	 *
+	 * @param x amount by which to translate
+	 * @param y amount by which to translate
 	 */
 	public void translate(double x, double y) {
 		currentTransform.translate(x, y);
@@ -799,8 +811,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * Rotate the current transform over the Z-axis. Calls
 	 * writeTransform(Transform). Rotating with a positive angle theta rotates
 	 * points on the positive x axis toward the positive y axis.
-	 * 
-     * @param theta radians over which to rotate
+	 *
+	 * @param theta radians over which to rotate
 	 */
 	public void rotate(double theta) {
 		currentTransform.rotate(theta);
@@ -813,9 +825,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Scales the current transform. Calls writeTransform(Transform).
-	 * 
-     * @param sx amount used for scaling
-     * @param sy amount used for scaling
+	 *
+	 * @param sx amount used for scaling
+	 * @param sy amount used for scaling
 	 */
 	public void scale(double sx, double sy) {
 		currentTransform.scale(sx, sy);
@@ -828,9 +840,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Shears the current transform. Calls writeTransform(Transform).
-	 * 
-     * @param shx amount for shearing
-     * @param shy amount for shearing
+	 *
+	 * @param shx amount for shearing
+	 * @param shy amount for shearing
 	 */
 	public void shear(double shx, double shy) {
 		currentTransform.shear(shx, shy);
@@ -847,17 +859,17 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * internal transform, then this method needs to do nothing, BUT all
 	 * coordinates need to be transformed by the currentTransform before being
 	 * written out.
-	 * 
-     * @param transform to be written
+	 *
+	 * @param transform to be written
 	 */
 	protected abstract void writeTransform(AffineTransform transform) throws IOException;
 
 	/**
-     * Clears any existing transformation and sets the a new one.
-     * The default implementation calls writeTransform using the
-     * inverted affine transform to calculate it.
-    s     *
-     * @param transform to be written
+	 * Clears any existing transformation and sets the a new one.
+	 * The default implementation calls writeTransform using the
+	 * inverted affine transform to calculate it.
+	s     *
+	 * @param transform to be written
 	 */
 	protected void writeSetTransform(AffineTransform transform) throws IOException {
 		try {
@@ -870,14 +882,14 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	/*
-     * ================================================================================ |
-     * XXX 7. Clipping
-     * ================================================================================
+	 * ================================================================================ |
+	 * XXX 7. Clipping
+	 * ================================================================================
 	 */
 
 	/**
 	 * Gets the current clip in form of a Shape (Rectangle).
-	 * 
+	 *
 	 * @return current clip
 	 */
 	public Shape getClip() {
@@ -886,7 +898,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Gets the current clip in form of a Rectangle.
-	 * 
+	 *
 	 * @return current clip
 	 */
 	public Rectangle getClipBounds() {
@@ -896,7 +908,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Gets the current clip in form of a Rectangle.
-	 * 
+	 *
 	 * @return current clip
 	 */
 	public Rectangle getClipBounds(Rectangle r) {
@@ -908,11 +920,11 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Clips rectangle. Calls clip(Rectangle).
-	 * 
-     * @param x rectangle for clipping
-     * @param y rectangle for clipping
-     * @param width rectangle for clipping
-     * @param height rectangle for clipping
+	 *
+	 * @param x rectangle for clipping
+	 * @param y rectangle for clipping
+	 * @param width rectangle for clipping
+	 * @param height rectangle for clipping
 	 */
 	public void clipRect(int x, int y, int width, int height) {
 		clip(new Rectangle(x, y, width, height));
@@ -920,11 +932,11 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Clips rectangle. Calls clip(Rectangle).
-	 * 
-     * @param x rectangle for clipping
-     * @param y rectangle for clipping
-     * @param width rectangle for clipping
-     * @param height rectangle for clipping
+	 *
+	 * @param x rectangle for clipping
+	 * @param y rectangle for clipping
+	 * @param width rectangle for clipping
+	 * @param height rectangle for clipping
 	 */
 	public void setClip(int x, int y, int width, int height) {
 		setClip(new Rectangle(x, y, width, height));
@@ -932,8 +944,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Clips shape. Clears userClip and calls clip(Shape).
-	 * 
-     * @param s used for clipping
+	 *
+	 * @param s used for clipping
 	 */
 	public void setClip(Shape s) {
 		userClip = transformShape(s);
@@ -942,8 +954,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	/**
 	 * Clips using given shape. Dispatches to writeClip(Rectangle),
 	 * writeClip(Rectangle2D) or writeClip(Shape).
-	 * 
-     * @param s used for clipping
+	 *
+	 * @param s used for clipping
 	 */
 	public void clip(Shape s) {
 		s = transformShape(s);
@@ -957,13 +969,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * Copied from SunGraphics2D
 	 */
 	Shape intersectShapes(Shape lhs, Shape rhs) {
-		return lhs instanceof Rectangle && rhs instanceof Rectangle ?
-			((Rectangle) lhs).intersection((Rectangle) rhs) :
-			(lhs instanceof Rectangle2D ?
-				intersectRectShape((Rectangle2D) lhs, rhs) :
-				(rhs instanceof Rectangle2D ?
-					intersectRectShape((Rectangle2D) rhs, lhs) :
-					intersectByArea(lhs, rhs)));
+		return lhs instanceof Rectangle && rhs instanceof Rectangle ? ((Rectangle) lhs).intersection((Rectangle) rhs) : (lhs instanceof Rectangle2D ? intersectRectShape((Rectangle2D) lhs, rhs) : (rhs instanceof Rectangle2D ? intersectRectShape((Rectangle2D) rhs, lhs) : intersectByArea(lhs, rhs)));
 	}
 
 	/**
@@ -1017,15 +1023,15 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	/*
-     * ================================================================================ |
-     * XXX 8. Graphics State
-     * ================================================================================
+	 * ================================================================================ |
+	 * XXX 8. Graphics State
+	 * ================================================================================
 	 */
 
 	/* 8.1. stroke/linewidth */
 	/**
 	 * Get the current stroke.
-	 * 
+	 *
 	 * @return current stroke
 	 */
 	public Stroke getStroke() {
@@ -1035,8 +1041,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	/**
 	 * Sets the current stroke. Calls writeStroke if stroke is unequal to the
 	 * current stroke.
-	 * 
-     * @param stroke to be set
+	 *
+	 * @param stroke to be set
 	 */
 	public void setStroke(Stroke stroke) {
 		if (stroke.equals(currentStroke)) {
@@ -1056,8 +1062,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Sets the current color and the current paint. Calls writePaint(Color).
-	 * 
-     * @param color to be set
+	 *
+	 * @param color to be set
 	 */
 	public void setColor(Color color) {
 		if (color == null)
@@ -1076,10 +1082,10 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	/**
-     * Sets the current paint.  In the case paint is a Color the current color is also
-     * changed.
-	 * 
-     * @param paint to be set
+	 * Sets the current paint.  In the case paint is a Color the current color is also
+	 * changed.
+	 *
+	 * @param paint to be set
 	 */
 	public void setPaint(Paint paint) {
 		if (paint == null)
@@ -1102,17 +1108,17 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Writes out paint.
-	 * 
-     * @param paint to be written
+	 *
+	 * @param paint to be written
 	 */
 	protected abstract void writePaint(Paint paint) throws IOException;
 
 	/* 8.3. font */
 	/**
 	 * Gets the current font render context. This returns an standard
-     * FontRenderContext with anti-aliasing and uses
-     * fractional metrics.
-	 * 
+	 * FontRenderContext with anti-aliasing and uses
+	 * fractional metrics.
+	 *
 	 * @return current font render context
 	 */
 	public FontRenderContext getFontRenderContext() {
@@ -1123,9 +1129,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Gets the fontmetrics.
-	 * 
+	 *
 	 * @deprecated
-     * @param font to be used for retrieving fontmetrics
+	 * @param font to be used for retrieving fontmetrics
 	 * @return fontmetrics for given font
 	 */
 	public FontMetrics getFontMetrics(Font font) {
@@ -1135,7 +1141,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	/* 8.4. rendering hints */
 	/**
 	 * Gets a copy of the rendering hints.
-	 * 
+	 *
 	 * @return clone of table of rendering hints.
 	 */
 	public RenderingHints getRenderingHints() {
@@ -1144,8 +1150,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Adds to table of rendering hints.
-	 * 
-     * @param hints table to be added
+	 *
+	 * @param hints table to be added
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void addRenderingHints(Map hints) {
@@ -1154,8 +1160,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Sets table of rendering hints.
-	 * 
-     * @param hints table to be set
+	 *
+	 * @param hints table to be set
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void setRenderingHints(Map hints) {
@@ -1165,8 +1171,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Gets a given rendering hint.
-	 * 
-     * @param key hint key
+	 *
+	 * @param key hint key
 	 * @return hint associated to key
 	 */
 	public Object getRenderingHint(RenderingHints.Key key) {
@@ -1175,9 +1181,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Sets a given rendering hint.
-	 * 
-     * @param key hint key
-     * @param hint to be associated with key
+	 *
+	 * @param key hint key
+	 * @param hint to be associated with key
 	 */
 	public void setRenderingHint(RenderingHints.Key key, Object hint) {
 		// extra protection, failed on under MacOS X 10.2.6, jdk 1.4.1_01-39/14
@@ -1188,8 +1194,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Sets the current font.
-	 * 
-     * @param font to be set
+	 *
+	 * @param font to be set
 	 */
 	public void setFont(Font font) {
 		if (font == null)
@@ -1199,16 +1205,16 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	/*
-     * ================================================================================ |
-     * XXX 9. AUXILIARY
-     * ================================================================================
+	 * ================================================================================ |
+	 * XXX 9. AUXILIARY
+	 * ================================================================================
 	 */
 
 	/**
 	 * Handles an exception which has been caught. Dispatches exception to
 	 * writeWarning for UnsupportedOperationExceptions and writeError for others
-	 * 
-     * @param exception to be handled
+	 *
+	 * @param exception to be handled
 	 */
 	protected void handleException(Exception e) {
 		e.printStackTrace();
@@ -1216,7 +1222,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Gets current composite.
-	 * 
+	 *
 	 * @return current composite
 	 */
 	public Composite getComposite() {
@@ -1225,8 +1231,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Sets current composite.
-	 * 
-     * @param composite to be set
+	 *
+	 * @param composite to be set
 	 */
 	public void setComposite(Composite composite) {
 		if (composite == null)
@@ -1244,11 +1250,11 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	/**
 	 * Creates a polyline/polygon shape from a set of points. Needs to be
 	 * defined in subclass because its implementations could be device specific
-	 * 
-     * @param xPoints X coordinates of the polyline.
-     * @param yPoints Y coordinates of the polyline.
-     * @param nPoints number of points of the polyline.
-     * @param close is shape closed
+	 *
+	 * @param xPoints X coordinates of the polyline.
+	 * @param yPoints Y coordinates of the polyline.
+	 * @param nPoints number of points of the polyline.
+	 * @param close is shape closed
 	 */
 	protected Shape createShape(double[] xPoints, double[] yPoints, int nPoints, boolean close) {
 		GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
@@ -1264,13 +1270,13 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	/**
-     * Creates a polyline/polygon shape from a set of points.
-     * Needs a bias!
-	 * 
-     * @param xPoints X coordinates of the polyline.
-     * @param yPoints Y coordinates of the polyline.
-     * @param nPoints number of points of the polyline.
-     * @param close is shape closed
+	 * Creates a polyline/polygon shape from a set of points.
+	 * Needs a bias!
+	 *
+	 * @param xPoints X coordinates of the polyline.
+	 * @param yPoints Y coordinates of the polyline.
+	 * @param nPoints number of points of the polyline.
+	 * @param close is shape closed
 	 */
 	protected Shape createShape(int[] xPoints, int[] yPoints, int nPoints, boolean close, boolean biased) {
 
@@ -1319,11 +1325,11 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	/**
 	 * Draws an overline for the text at (x, y). The method is usesefull for
 	 * drivers that do not support overlines by itself.
-	 * 
-     * @param text text for width calulation
-     * @param font font for width calulation
-     * @param x position of text
-     * @param y position of text
+	 *
+	 * @param text text for width calulation
+	 * @param font font for width calulation
+	 * @param x position of text
+	 * @param y position of text
 	 */
 	protected void overLine(String text, Font font, float x, float y) {
 		TextLayout layout = new TextLayout(text, font, getFontRenderContext());

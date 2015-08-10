@@ -2,81 +2,109 @@
 #
 # Startup script for the Webswing 
 #
-# pidfile: /home/webswing/webswing.pid
-
 # Set environment.
 export HOME=/home/webswing
 export OPTS="-h 0.0.0.0 -j $HOME/jetty.properties -u $HOME/user.properties -c $HOME/webswing.config"
-export JAVA_HOME=/opt/java7
+export JAVA_HOME=/opt/java8
 export JAVA_OPTS="-Xmx128M"
-
 export LOG=$HOME/webswing.out
 export PID_PATH_NAME=$HOME/webswing.pid
 
+if [ -z `command -v $0` ]; then 
+    CURRENTDIR=`pwd`
+    cd `dirname $0` > /dev/null
+    SCRIPTPATH=`pwd`/
+    cd $CURRENTDIR
+else
+    SCRIPTPATH="" 
+fi
+
 if [ ! -f $HOME/webswing-server.war ]; then
     echo "Webswing executable not found in $HOME folder" 
-    exit 0
+    exit 1
 fi
 
 if [ ! -f $JAVA_HOME/bin/java ]; then
     echo "Java installation not found in $JAVA_HOME folder" 
-    exit 0
+    exit 1
+fi
+if [ -z `command -v xvfb-run` ]; then
+    echo "Unable to locate xvfb-run command. Please install Xvfb before starting Webswing." 
+    exit 1
+fi
+if [ ! -z `command -v ldconfig` ]; then
+    if [ `ldconfig -p | grep -i libxext | wc -l` -ne 1 ]; then 
+        echo "Missing dependent library libXext."
+        exit 1
+    fi
+    if [ `ldconfig -p | grep -i libxi | wc -l` -ne 1 ]; then
+        echo "Missing dependent library libXi."
+        exit 1
+    fi
+    if [ `ldconfig -p | grep -i libxtst | wc -l` -ne 1 ]; then
+        echo "Missing dependent library libXtst"
+        exit 1
+    fi
+    if [ `ldconfig -p | grep -i libxrender | wc -l` -ne 1 ]; then
+        echo "Missing dependent library libXrender."
+        exit 1
+    fi
 fi
 
 # See how we were called.
 case "$1" in
+    run)
+        # Run Webswing server- expects X Server to be running
+        if [ ! -f $PID_PATH_NAME ] || [ `ps -axo pid | grep "$(cat $PID_PATH_NAME)" | wc -l` -eq 0 ]; then
+            $JAVA_HOME/bin/java $JAVA_OPTS -jar $HOME/webswing-server.war $OPTS 2>> $LOG >> $LOG &
+            echo $! > $PID_PATH_NAME
+            wait $(cat $PID_PATH_NAME)
+        else
+            echo "Webswing is already running with pid $(cat $PID_PATH_NAME)"
+        fi
+        ;;
     start)
         # Start daemon.
-        echo -n "Starting Webswing: "
-        if [ ! -f $PID_PATH_NAME ]; then
-            if [ -z $DISPLAY ]; then
-              if [ `ps au | grep "X \:99" | wc -l` -eq 0 ]; then
-                xinit -- :99 &
-              fi
-              export XAUTHORITY=~/.Xauthority
-              export DISPLAY=':99'
-            fi
-            nohup $JAVA_HOME/bin/java $JAVA_OPTS -jar webswing-server.war $OPTS 2>> $LOG >> $LOG & echo $! > $PID_PATH_NAME
-        echo "STARTED"
+        if [ ! -f $PID_PATH_NAME ] || [ `ps -axo pid | grep "$(cat $PID_PATH_NAME)" | wc -l` -eq 0 ]; then
+            echo "Starting Webswing... "
+            xvfb-run $SCRIPTPATH$0 run  &
+            echo "Webswing STARTED"
         else
-            PID=$(cat $PID_PATH_NAME);
-            if [ `ps -axo pid | grep "$PID" | wc -l` -eq 0 ]; then
-                rm $PID_PATH_NAME
-                echo "Webswing is NOT running, but stale PID [$PID] found. Clearing..."
-            else
-                echo "Webswing is already running with pid $PID..."
-            fi
+            echo "Webswing is already running with pid $(cat $PID_PATH_NAME)"
         fi
         ;;
     stop)
         if [ -f $PID_PATH_NAME ]; then
-            PID=$(cat $PID_PATH_NAME);
             echo "Webswing stoping ..."
-            kill $PID;
-            echo "Webswing stopped ..."
-            rm $PID_PATH_NAME
+            kill -9 $(cat $PID_PATH_NAME);
+            if [ `ps -axo pid | grep "$(cat $PID_PATH_NAME)" | wc -l` -eq 0 ]; then
+                echo "Webswing stopped ..."
+                rm $PID_PATH_NAME
+            else
+                echo "Stopping Webswing failed."
+                exit 1
+            fi
         else
             echo "Webswing is not running ..."
         fi
     ;;
     status)
         if [ -f $PID_PATH_NAME ]; then
-            PID=$(cat $PID_PATH_NAME);
-            if [ `ps axo pid | grep "$PID" | wc -l` -eq 0 ]; then
+            if [ `ps axo pid | grep "$(cat $PID_PATH_NAME)" | wc -l` -eq 0 ]; then
                 rm $PID_PATH_NAME
             else
-                echo "Webswing is running with pid $PID."
+                echo "Webswing is running with pid $(cat $PID_PATH_NAME)."
             fi
         else
             echo "Webswing is not running ..."
         fi
     ;;
     restart)
-        $0 stop
-        $0 start
+        $SCRIPTPATH$0 stop
+        $SCRIPTPATH$0 start
     ;;
     *)
-        echo "Usage: $0 {start|stop|restart|status}"
+        echo "Usage: $0 {run|start|stop|restart|status}"
         exit 1
 esac
 

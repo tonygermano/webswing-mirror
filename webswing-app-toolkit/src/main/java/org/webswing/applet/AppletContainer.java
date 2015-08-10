@@ -5,7 +5,7 @@ import java.applet.AppletContext;
 import java.awt.Dimension;
 import java.util.Map;
 
-import javax.swing.JWindow;
+import javax.swing.JFrame;
 
 import netscape.javascript.JSObject;
 
@@ -14,7 +14,7 @@ import org.webswing.model.jslink.JSObjectMsg;
 import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.Logger;
 
-public class AppletContainer extends JWindow {
+public class AppletContainer extends JFrame {
 
 	private static final long serialVersionUID = 236630332897974628L;
 	private boolean active;
@@ -24,6 +24,7 @@ public class AppletContainer extends JWindow {
 	private WebAppletContext context;
 
 	public AppletContainer(Class<?> appletClazz, Map<String, String> props) {
+		this.setUndecorated(true);
 		this.setPreferredSize(getInitialDimensions());
 		this.setLocation(0, 0);
 		try {

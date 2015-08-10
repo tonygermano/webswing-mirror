@@ -1,101 +1,105 @@
-define(
-		[ 'jquery' ],
-		function($) {
-			"use strict";
-			var api;
+define(['jquery'], function amdFactory($) {
+    "use strict";
+    return function SelectorModule() {
+        var module = this;
+        var api;
+        module.injects = api = {
+            cfg: 'webswing.config',
+            getUser: 'login.user',
+            logout: 'login.logout',
+            startApplication: 'base.startApplication',
+            startMirrorView: 'base.startMirrorView',
+            showDialog: 'dialog.show',
+            hideDialog: 'dialog.hide'
+        };
+        module.provides = {
+            show: show,
+            hide: hide
+        };
 
-			function show(apps) {
-				var header = '';
-				if (!api.anonym) {
-					header = '<span class="pull-right"><a href="javascript:;" data-id="logout">Logout</a></span>';
-					header = header + '<h4 class="modal-title" id="myModalLabel">Hello <span>' + api.login.user() + '</span>. ';
-				}
-				header = header + 'Select your application:</h4>';
-				var events = {
-					logout_click : function() {
-						api.login.logout();
-					},
-					application_click : function() {
-						var appName = $(this).attr('data-name');
-						var applet = $(this).attr('data-applet');
-						api.base.startApplication(appName, 'true' === applet);
-					}
-				};
-				var content;
-				if (apps == null || apps.length == 0) {
-					header = null;
-					content = '<p>Sorry, there is no application available for you.</p>';
-				} else if (api.applicationName != null) {
-					var exists = false;
-					var isApplet= false;
-					apps.forEach(function(app) {
-						if (app.name === api.applicationName) {
-							exists = true;
-							isApplet = app.applet;
-						}
-					});
-					if (exists) {
-						if (!api.mirror) {
-							api.base.startApplication(api.applicationName,isApplet);
-						} else {
-							api.base.startMirrorView(api.clientId, api.applicationName);
-						}
-						return;
-					}
-					header = null;
-					content = '<p>Sorry, application "' + api.applicationName + '" is not available for you.</p>';
-				} else {
-					content = '<div class="row">';
-					for ( var i in apps) {
-						var app = apps[i];
-						if (app.name == 'adminConsoleApplicationName') {
-							content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" onclick="window.location.href = \''
-									+ api.connectionUrl
-									+ 'admin\';"><img src="'
-									+ api.connectionUrl
-									+ 'admin/img/admin.png" class="img-thumbnail"/><div class="caption">Admin console</div></div></div>';
-						} else {
-							content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" data-id="application" data-name="'
-									+ app.name
-									+ '" data-applet="'
-									+ app.applet
-									+ '"><img src="'
-									+ getImageString(app.base64Icon)
-									+ '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>';
-						}
-					}
-					content += '</div>';
-				}
-				api.dialog.show({
-					header : header,
-					content : content,
-					events : events
-				});
-			}
+        function show(apps) {
+            var header = '';
+            if (!api.cfg.anonym) {
+                header = '<span class="pull-right"><a href="javascript:;" data-id="logout">Logout</a></span>';
+                header = header + '<h4 class="modal-title" id="myModalLabel">Hello <span>' + api.getUser() + '</span>. ';
+            }
+            header = header + 'Select your application:</h4>';
+            var events = {
+                logout_click: function () {
+                    api.logout();
+                },
+                application_click: function () {
+                    var appName = $(this).attr('data-name');
+                    var applet = $(this).attr('data-applet');
+                    api.startApplication(appName, 'true' === applet);
+                }
+            };
+            var content;
+            if (apps == null || apps.length === 0) {
+                header = null;
+                content = '<p>Sorry, there is no application available for you.</p>';
+            } else if (api.cfg.applicationName != null) {
+                var exists = false;
+                var isApplet = false;
+                apps.forEach(function (app) {
+                    if (app.name === api.cfg.applicationName) {
+                        exists = true;
+                        isApplet = app.applet;
+                    }
+                });
+                if (exists) {
+                    if (!api.cfg.mirror) {
+                        api.startApplication(api.cfg.applicationName, isApplet);
+                    } else {
+                        api.startMirrorView(api.cfg.clientId, api.cfg.applicationName);
+                    }
+                    return;
+                }
+                header = null;
+                content = '<p>Sorry, application "' + api.cfg.applicationName + '" is not available for you.</p>';
+            } else {
+                content = '<div class="row">';
+                for (var i in apps) {
+                    var app = apps[i];
+                    if (app.name === 'adminConsoleApplicationName') {
+                        content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" onclick="window.location.href = \''
+                                + api.cfg.connectionUrl
+                                + 'admin\';"><img src="'
+                                + api.cfg.connectionUrl
+                                + 'admin/img/admin.png" class="img-thumbnail"/><div class="caption">Admin console</div></div></div>';
+                    } else {
+                        content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" data-id="application" data-name="'
+                                + app.name
+                                + '" data-applet="'
+                                + app.applet
+                                + '"><img src="'
+                                + getImageString(app.base64Icon)
+                                + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>';
+                    }
+                }
+                content += '</div>';
+            }
+            api.showDialog({
+                header: header,
+                content: content,
+                events: events
+            });
+        }
 
-			function getImageString(data) {
-				if (typeof data === 'object') {
-					var binary = '';
-					var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
-					for ( var i = 0, l = bytes.byteLength; i < l; i++) {
-						binary += String.fromCharCode(bytes[i]);
-					}
-					data = window.btoa(binary);
-				}
-				return 'data:image/png;base64,' + data
-			}
+        function getImageString(data) {
+            if (typeof data === 'object') {
+                var binary = '';
+                var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
+                for (var i = 0, l = bytes.byteLength; i < l; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                data = window.btoa(binary);
+            }
+            return 'data:image/png;base64,' + data;
+        }
 
-			function hide() {
-				api.dialog.hide();
-			}
-
-			return {
-				init : function(wsApi) {
-					api = wsApi;
-					wsApi.selector = {
-						show : show,
-						hide : hide
-					};
-				}
-			};
-		});
+        function hide() {
+            api.hideDialog();
+        }
+    };
+});

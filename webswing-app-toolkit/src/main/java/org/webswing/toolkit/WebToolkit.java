@@ -417,7 +417,7 @@ public abstract class WebToolkit extends SunToolkit {
 	}
 
 	public SystemTrayPeer createSystemTray(SystemTray paramSystemTray) {
-		throw new UnsupportedOperationException();
+		return new WebSystemTrayPeer();
 	}
 
 	public boolean isTraySupported() {

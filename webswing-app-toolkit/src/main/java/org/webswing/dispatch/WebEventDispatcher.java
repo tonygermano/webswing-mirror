@@ -1,5 +1,6 @@
 package org.webswing.dispatch;
 
+import java.applet.Applet;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -61,16 +62,18 @@ public class WebEventDispatcher {
 			dispatchKeyboardEvent((KeyboardEventMsgIn) event);
 		}
 		if (event instanceof ConnectionHandshakeMsgIn) {
-			ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
+			final ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
 			Util.getWebToolkit().initSize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
 			if (handshake.isApplet()) {
-				// refresh the applet object exposed in javascript in case of page reload/session continue
+				// resize and refresh the applet object exposed in javascript in case of page reload/session continue
 				Runnable r = new Runnable() {
 
 					@Override
 					public void run() {
+						Applet a = (Applet) WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
+						a.resize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
 						JSObject root = new WebJSObject(new JSObjectMsg("instanceObject"));
-						root.setMember("applet", WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS)));
+						root.setMember("applet", a);
 					}
 				};
 				new Thread(r).start();
