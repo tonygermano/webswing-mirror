@@ -80,7 +80,7 @@ public class RenderUtil {
 	}
 
 	private static void iprtDrawImage(Graphics2D g, DrawInstruction di, BufferedImage imageHolder, Map<DrawInstruction, BufferedImage> partialImageMap) {
-		Shape clip = getShape(getConst(0, di, DrawConstant.class), false);
+		Shape clip = getShape(getConst(0, di, DrawConstant.class));
 		AffineTransform original = g.getTransform();
 		g.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
 		g.setClip(clip);
@@ -97,8 +97,8 @@ public class RenderUtil {
 	private static void iprtDrawWebImage(Graphics2D g, DrawInstruction di) {
 		BufferedImage i = di.getImage().getSnapshot();
 		TransformConst t = getConst(0, di, TransformConst.class);
-		Rectangle2D crop = getConst(1, di, RectangleConst.class).getRectangle(false);
-		Shape clip = getShape(getConst(3, di, DrawConstant.class), false);
+		Rectangle2D.Float crop = getConst(1, di, RectangleConst.class).getRectangle();
+		Shape clip = getShape(getConst(3, di, DrawConstant.class));
 		g.setClip(clip);
 		AffineTransform original = g.getTransform();
 		g.transform(t.getAffineTransform());
@@ -110,7 +110,7 @@ public class RenderUtil {
 		StringConst s = getConst(0, di, StringConst.class);
 		FontConst f = getConst(1, di, FontConst.class);
 		TransformConst t = getConst(2, di, TransformConst.class);
-		Shape clip = getShape(getConst(3, di, DrawConstant.class), false);
+		Shape clip = getShape(getConst(3, di, DrawConstant.class));
 		g.setClip(clip);
 		AffineTransform original = g.getTransform();
 		g.transform(t.getAffineTransform());
@@ -123,7 +123,7 @@ public class RenderUtil {
 		PointsConst p = getConst(0, di, PointsConst.class);
 		Integer[] pts = p.getIntArray();
 		PathConst clip = getConst(1, di, PathConst.class);
-		g.setClip(getShape(clip, false));
+		g.setClip(getShape(clip));
 		AffineTransform original = g.getTransform();
 		g.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
 		g.clipRect(pts[0], pts[1], pts[2], pts[3]);
@@ -135,15 +135,15 @@ public class RenderUtil {
 	private static void iprtDraw(Graphics2D g, DrawInstruction di) {
 		DrawConstant path = getConst(0, di, DrawConstant.class);
 		DrawConstant clip = getConst(1, di, DrawConstant.class);
-		g.setClip(getShape(clip, false));
-		g.draw(getShape(path, true));
+		g.setClip(getShape(clip));
+		g.draw(getShape(path));
 	}
 
 	private static void iprtFill(Graphics2D g, DrawInstruction di) {
 		DrawConstant path = getConst(0, di, DrawConstant.class);
 		DrawConstant clip = getConst(1, di, DrawConstant.class);
-		g.setClip(getShape(clip, false));
-		g.fill(getShape(path, false));
+		g.setClip(getShape(clip));
+		g.fill(getShape(path));
 	}
 
 	private static void iprtSetComposite(Graphics2D currentg, DrawInstruction di) {
@@ -211,20 +211,19 @@ public class RenderUtil {
 		return result;
 	}
 
-	private static Shape getShape(DrawConstant s, boolean biased) {
-		Shape shape = null;
+	private static Shape getShape(DrawConstant s) {
 		if (s instanceof RectangleConst) {
-			return ((RectangleConst) s).getRectangle(biased);
+			return ((RectangleConst) s).getRectangle();
 		} else if (s instanceof RoundRectangleConst) {
-			return ((RoundRectangleConst) s).getRoundRectangle(biased);
+			return ((RoundRectangleConst) s).getRoundRectangle();
 		} else if (s instanceof EllipseConst) {
-			return ((EllipseConst) s).getEllipse(biased);
+			return ((EllipseConst) s).getEllipse();
 		} else if (s instanceof ArcConst) {
-			return ((ArcConst) s).getArc(biased);
+			return ((ArcConst) s).getArc();
 		} else if (s instanceof PathConst) {
-			return ((PathConst) s).getPath(biased);
+			return ((PathConst) s).getPath();
 		}
-		return shape;
+		return null;
 	}
 
 }

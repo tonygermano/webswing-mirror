@@ -568,39 +568,40 @@
 			}
 		}
 
-		function path(ctx, dConst, biased) {
-			var success = false;
-			ctx.beginPath();
-			// rectangle
-			if (dConst.rectangle != null) {
-				var rect = dConst.rectangle;
-				pathRectangle(ctx, rect, biased);
-				success = true;
+		function path(ctx, arg, biased) {
+		    if (arg == null) {
+		        return false;
+		    }
+		
+			if (arg.rectangle != null) {
+			    ctx.beginPath();
+				pathRectangle(ctx, arg.rectangle, biased);
+				return true;
 			}
-			// roundRectangle
-			if (dConst.roundRectangle != null) {
-				var rr = dConst.roundRectangle;
-				pathRoundRectangle(ctx, rr, biased);
-				success = true;
-			}
-
-			// ellipse
-			if (dConst.ellipse != null) {
-				var e = dConst.ellipse;
-				pathEllipse(ctx, e.x, e.y, e.w, e.h, biased);
-				success = true;
+			
+			if (arg.roundRectangle != null) {
+			    ctx.beginPath();
+				pathRoundRectangle(ctx, arg.roundRectangle, biased);
+				return true;
 			}
 
-			// arc
-			if (dConst.arc != null) {
-				pathArc(ctx, dConst.arc, biased);
-				success = true;
+			if (arg.ellipse != null) {
+			    ctx.beginPath();
+				pathEllipse(ctx, arg.ellipse, biased);
+				return true;
 			}
 
-			// generig path
-			if (dConst.path != null) {
-				var path = dConst.path;
-				var bias = biased ? 0.5 : 0;
+			if (arg.arc != null) {
+			    ctx.beginPath();
+				pathArc(ctx, arg.arc, biased);
+				return true;
+			}
+
+			// generic path
+			if (arg.path != null) {
+			    ctx.beginPath();
+				var path = arg.path;
+				var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
 				var off = 0;
 				path.type.forEach(function(type, index) {
 					switch (type) {
@@ -613,12 +614,14 @@
 						off += 2;
 						break;
 					case SegmentTypeProto.QUAD:
-						ctx.quadraticCurveTo(path.points[off + 0] + bias, path.points[off + 1] + bias, path.points[off + 2], path.points[off + 3]);
+						ctx.quadraticCurveTo(path.points[off + 0] + bias, path.points[off + 1] + bias,
+						                     path.points[off + 2] + bias, path.points[off + 3] + bias);
 						off += 4;
 						break;
 					case SegmentTypeProto.CUBIC:
-						ctx.bezierCurveTo(path.points[off + 0] + bias, path.points[off + 1] + bias, path.points[off + 2], path.points[off + 3],
-								path.points[off + 4], path.points[off + 5]);
+						ctx.bezierCurveTo(path.points[off + 0] + bias, path.points[off + 1] + bias,
+						                  path.points[off + 2] + bias, path.points[off + 3] + bias,
+								          path.points[off + 4] + bias, path.points[off + 5] + bias);
 						off += 6;
 						break;
 					case SegmentTypeProto.CLOSE:
@@ -628,78 +631,87 @@
 						console.log("segment.type:" + segment.type + " not recognized");
 					}
 				});
-				success = true;
+				return true;
 			}
-			return success;
+			return false;
 		}
 
 		function pathRectangle(ctx, rect, biased) {
-			var bias = biased ? 0.5 : 0;
-			var x = rect.x + bias;
-			var y = rect.y + bias;
-			ctx.moveTo(x, y);
-			ctx.lineTo(x + rect.w, y);
-			ctx.lineTo(x + rect.w, y + rect.h);
-			ctx.lineTo(x, y + rect.h);
-			ctx.lineTo(x, y);
+			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+			ctx.rect(rect.x + bias, rect.y + bias, rect.w, rect.h);
 		}
 
-		function pathEllipse(ctx, x, y, w, h, biased) {
-			var bias = biased ? 0.5 : 0;
-			x += bias;
-			y += bias;
-			var kappa = .5522848;
-			var ox = (w / 2) * kappa; // control point offset horizontal
-			var oy = (h / 2) * kappa; // control point offset vertical
-			var xe = x + w; // x-end
-			var ye = y + h; // y-end
-			var xm = x + w / 2; // x-middle
-			var ym = y + h / 2; // y-middle
+		function pathEllipse(ctx, elli, biased) {
+			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+			var kappa = 0.5522847498307933;
+			var pcv = 0.5 + kappa * 0.5;
+            var ncv = 0.5 - kappa * 0.5;
 
-			ctx.moveTo(x, ym);
-			ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
-			ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
-			ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-			ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+			ctx.moveTo(elli.x + bias + elli.w, elli.y + bias + 0.5 * elli.h);
+			var pts = getEllipseCoords([ 1.0,  pcv,  pcv,  1.0,  0.5,  1.0 ], elli, bias);
+			ctx.bezierCurveTo(pts[0], pts[1], pts[2], pts[3], pts[4], pts[5]);
+			pts = getEllipseCoords([ ncv,  1.0,  0.0,  pcv,  0.0,  0.5 ], elli, bias);
+			ctx.bezierCurveTo(pts[0], pts[1], pts[2], pts[3], pts[4], pts[5]);
+			pts = getEllipseCoords([ 0.0,  ncv,  ncv,  0.0,  0.5,  0.0 ], elli, bias);
+			ctx.bezierCurveTo(pts[0], pts[1], pts[2], pts[3], pts[4], pts[5]);
+			pts = getEllipseCoords([ pcv,  0.0,  1.0,  ncv,  1.0,  0.5 ], elli, bias);
+			ctx.bezierCurveTo(pts[0], pts[1], pts[2], pts[3], pts[4], pts[5]);
 			ctx.closePath();
+		}
+
+		function getEllipseCoords(pts, elli, bias) {
+			pts[0] = elli.x + bias + pts[0] * elli.w;
+			pts[1] = elli.y + bias + pts[1] * elli.h;
+			pts[2] = elli.x + bias + pts[2] * elli.w;
+			pts[3] = elli.y + bias + pts[3] * elli.h;
+			pts[4] = elli.x + bias + pts[4] * elli.w;
+			pts[5] = elli.y + bias + pts[5] * elli.h;
+			return pts;
 		}
 
 		function pathRoundRectangle(ctx, rr, biased) {
-			var bias = biased ? 0.5 : 0;
-			rr.x += bias;
-			rr.y += bias;
+			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
 			var acv = 0.22385762508460333;
-			var pts = getRRCoords([ 0, 0, 0, 0.5 ], rr);
+			
+			var pts = getRRCoords([ 0, 0, 0, 0.5 ], rr, bias);
 			ctx.moveTo(pts[0], pts[1]);
 
-			pts = getRRCoords([ 0, 0, 1, -0.5 ], rr);
+			pts = getRRCoords([ 0, 0, 1, -0.5 ], rr, bias);
 			ctx.lineTo(pts[0], pts[1]);
-			pts = getRRCoords([ 0, 0, 1, -acv, 0, acv, 1, 0, 0, 0.5, 1, 0 ], rr);
+			pts = getRRCoords([ 0, 0, 1, -acv, 0, acv, 1, 0, 0, 0.5, 1, 0 ], rr, bias);
 			ctx.bezierCurveTo(pts[0], pts[1], pts[2], pts[3], pts[4], pts[5]);
 
-			pts = getRRCoords([ 1, -0.5, 1, 0 ], rr);
+			pts = getRRCoords([ 1, -0.5, 1, 0 ], rr, bias);
 			ctx.lineTo(pts[0], pts[1]);
-			pts = getRRCoords([ 1, -acv, 1, 0, 1, 0, 1, -acv, 1, 0, 1, -0.5 ], rr);
+			pts = getRRCoords([ 1, -acv, 1, 0, 1, 0, 1, -acv, 1, 0, 1, -0.5 ], rr, bias);
 			ctx.bezierCurveTo(pts[0], pts[1], pts[2], pts[3], pts[4], pts[5]);
 
-			pts = getRRCoords([ 1, 0, 0, 0.5 ], rr);
+			pts = getRRCoords([ 1, 0, 0, 0.5 ], rr, bias);
 			ctx.lineTo(pts[0], pts[1]);
-			pts = getRRCoords([ 1, 0, 0, acv, 1, -acv, 0, 0, 1, -0.5, 0, 0 ], rr);
+			pts = getRRCoords([ 1, 0, 0, acv, 1, -acv, 0, 0, 1, -0.5, 0, 0 ], rr, bias);
 			ctx.bezierCurveTo(pts[0], pts[1], pts[2], pts[3], pts[4], pts[5]);
 
-			pts = getRRCoords([ 0, 0.5, 0, 0 ], rr);
+			pts = getRRCoords([ 0, 0.5, 0, 0 ], rr, bias);
 			ctx.lineTo(pts[0], pts[1]);
-			pts = getRRCoords([ 0, acv, 0, 0, 0, 0, 0, acv, 0, 0, 0, 0.5 ], rr);
+			pts = getRRCoords([ 0, acv, 0, 0, 0, 0, 0, acv, 0, 0, 0, 0.5 ], rr, bias);
 			ctx.bezierCurveTo(pts[0], pts[1], pts[2], pts[3], pts[4], pts[5]);
 
 			ctx.closePath();
 		}
+		
+		function getRRCoords(pts, rr, bias) {
+            var coords = [];
+            var nc = 0;
+            for ( var i = 0; i < pts.length; i += 4) {
+                coords[nc++] = rr.x + bias + pts[i + 0] * rr.w + pts[i + 1] * Math.abs(rr.arcW);
+                coords[nc++] = rr.y + bias + pts[i + 2] * rr.h + pts[i + 3] * Math.abs(rr.arcH);
+            }
+            return coords;
+        }
 
 		function pathArc(ctx, arc, biased) {
-			var bias = biased ? 0.5 : 0;
-			arc.x += bias;
-			arc.y += bias;
-			var w = arc.w / 2, h = arc.h / 2, x = arc.x + w, y = arc.y + h;
+			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+			var w = arc.w / 2, h = arc.h / 2, x = arc.x + bias + w, y = arc.y + bias + h;
 			var angStRad = -(arc.start * Math.PI / 180);
 			var ext = -arc.extent;
 			var arcSegs = 4;
@@ -712,8 +724,8 @@
 				arcSegs = cv == 0 ? 0 : arcSegs;
 			}
 			ctx.moveTo(x + Math.cos(angStRad) * w, y + Math.sin(angStRad) * h);
-			for ( var j = 1; j <= arcSegs; j++) {
-				var angle = angStRad + increment * (j - 1);
+			for ( var i = 0; i < arcSegs; i++) {
+				var angle = angStRad + increment * i;
 				var relx = Math.cos(angle);
 				var rely = Math.sin(angle);
 				var pts = [];
@@ -751,16 +763,6 @@
 
 			return "data:image/png;base64," + window.btoa(binary);
 			// return 'data:image/png;base64,' + image.data.toBase64();
-		}
-
-		function getRRCoords(pts, rr) {
-			var coords = [];
-			var nc = 0;
-			for ( var i = 0; i < pts.length; i += 4) {
-				coords[nc++] = rr.x + pts[i + 0] * rr.w + pts[i + 1] * Math.abs(rr.arcW);
-				coords[nc++] = rr.y + pts[i + 2] * rr.h + pts[i + 3] * Math.abs(rr.arcH);
-			}
-			return coords;
 		}
 
 		function parseColor(rgba) {

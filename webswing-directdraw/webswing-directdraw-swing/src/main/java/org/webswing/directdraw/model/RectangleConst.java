@@ -26,9 +26,7 @@ public class RectangleConst extends DrawConstant {
         return new Rectangle2D.Float(r.getX(), r.getY(), r.getW(), r.getH());
     }
 
-	public Rectangle2D.Float getRectangle(boolean biased) {
-		RectangleProto r = (RectangleProto) message;
-		float bias = biased ? 0.5f : 0f;
-		return new Rectangle2D.Float(r.getX() + bias, r.getY() + bias, r.getW(), r.getH());
+	public Rectangle2D.Float getRectangle() {
+        return getRectangle((RectangleProto) message);
 	}
 }

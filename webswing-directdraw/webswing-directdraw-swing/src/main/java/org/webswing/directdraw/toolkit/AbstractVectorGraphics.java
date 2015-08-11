@@ -260,15 +260,15 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	public void drawPolyline(int[] xPoints, int[] yPoints, int nPoints) {
-		draw(createShape(xPoints, yPoints, nPoints, false, true));
+		draw(createShape(xPoints, yPoints, nPoints, false));
 	}
 
 	public void drawPolygon(int[] xPoints, int[] yPoints, int nPoints) {
-		draw(createShape(xPoints, yPoints, nPoints, true, true));
+		draw(createShape(xPoints, yPoints, nPoints, true));
 	}
 
 	public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints) {
-		fill(createShape(xPoints, yPoints, nPoints, true, false));
+		fill(createShape(xPoints, yPoints, nPoints, true));
 	}
 
 	/**
@@ -1009,11 +1009,10 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
      * @param nPoints number of points of the polyline.
      * @param close is shape closed
 	 */
-	protected Shape createShape(int[] xPoints, int[] yPoints, int nPoints, boolean close, boolean biased) {
-        float offset = biased ? 0.5f : 0f;
-		GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+	protected Shape createShape(int[] xPoints, int[] yPoints, int nPoints, boolean close) {
+        GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 		if (nPoints > 0) {
-			path.moveTo(xPoints[0] + offset, yPoints[0] + offset);
+			path.moveTo(xPoints[0], yPoints[0]);
 			int lastX = xPoints[0];
 			int lastY = yPoints[0];
 			if (close && (Math.abs(xPoints[nPoints - 1] - lastX) < 1) && (Math.abs(yPoints[nPoints - 1] - lastY) < 1)) {
@@ -1021,7 +1020,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 			}
 			for (int i = 1; i < nPoints; i++) {
 				if ((Math.abs(xPoints[i] - lastX) > 1) || (Math.abs(yPoints[i] - lastY) > 1)) {
-					path.lineTo(xPoints[i] + offset, yPoints[i] + offset);
+					path.lineTo(xPoints[i], yPoints[i]);
 					lastX = xPoints[i];
 					lastY = yPoints[i];
 				}

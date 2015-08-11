@@ -24,9 +24,8 @@ public class RoundRectangleConst extends DrawConstant {
 		return "roundRectangle";
 	}
 
-	public RoundRectangle2D.Float getRoundRectangle(boolean biased) {
+	public RoundRectangle2D.Float getRoundRectangle() {
 		RoundRectangleProto rp = (RoundRectangleProto) message;
-		float bias = biased ? 0.5f : 0f;
-		return new RoundRectangle2D.Float(rp.getX() + bias, rp.getY() + bias, rp.getW(), rp.getH(), rp.getArcW(), rp.getArcH());
+		return new RoundRectangle2D.Float(rp.getX(), rp.getY(), rp.getW(), rp.getH(), rp.getArcW(), rp.getArcH());
 	}
 }
