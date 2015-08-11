@@ -68,22 +68,21 @@ message TransformProto {
 	optional sint32 m12X2 = 6;
 }
 
-
-message RectangleProto{
+message RectangleProto {
 	required sint32 x = 1;
 	required sint32 y = 2;
 	required sint32 w = 3;
 	required sint32 h = 4;
 }
 
-message EllipseProto{
+message EllipseProto {
 	required sint32 x = 1;
 	required sint32 y = 2;
 	required sint32 w = 3;
 	required sint32 h = 4;
 }
 
-message RoundRectangleProto{
+message RoundRectangleProto {
 	required sint32 x = 1;
 	required sint32 y = 2;
 	required sint32 w = 3;
@@ -91,7 +90,8 @@ message RoundRectangleProto{
 	optional sint32 arcW = 5;
 	optional sint32 arcH = 6;
 }
-message ArcProto{
+
+message ArcProto {
 	required sint32 x = 1;
 	required sint32 y = 2;
 	required sint32 w = 3;
@@ -188,7 +188,7 @@ message PointsProto {
 }
 
 message CompositeProto {
-	required CompositeTypeProto type= 1;
+	required CompositeTypeProto type = 1;
 	optional float alpha = 2;
 
 	enum CompositeTypeProto {

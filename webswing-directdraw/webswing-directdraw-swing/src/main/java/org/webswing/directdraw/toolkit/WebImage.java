@@ -15,13 +15,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.RenderedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.DrawConstant;
@@ -146,11 +140,7 @@ public class WebImage extends Image {
 
 	public boolean isDirty() {
 		synchronized (this) {
-			if (newInstructions.size() == 0) {
-				return false;
-			} else {
-				return true;
-			}
+            return newInstructions.size() != 0;
 		}
 	}
 
@@ -211,7 +201,7 @@ public class WebImage extends Image {
 		ihg.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
 		ihg.clip(new Rectangle(getImageHolder().getWidth(), getImageHolder().getHeight()));
 		if (ihg.getClip().getBounds().width > 0 && ihg.getClip().getBounds().height > 0) {
-			addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), null), new DrawConstant.Integer(0)));
+			addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip()), new DrawConstant.Integer(0)));
 		}
 		ihg.dispose();
 	}
@@ -358,8 +348,7 @@ public class WebImage extends Image {
 		}
 		webImageBuilder.setWidth(size.width);
 		webImageBuilder.setHeight(size.height);
-		WebImageProto result = webImageBuilder.build();
-		return result;
+        return webImageBuilder.build();
 	}
 
 	public void reset() {

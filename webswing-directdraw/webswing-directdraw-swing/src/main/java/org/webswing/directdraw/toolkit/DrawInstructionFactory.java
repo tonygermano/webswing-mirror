@@ -1,41 +1,12 @@
 package org.webswing.directdraw.toolkit;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GradientPaint;
-import java.awt.LinearGradientPaint;
-import java.awt.Paint;
-import java.awt.RadialGradientPaint;
-import java.awt.Shape;
-import java.awt.TexturePaint;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.*;
+import java.awt.geom.*;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.model.ArcConst;
-import org.webswing.directdraw.model.ColorConst;
-import org.webswing.directdraw.model.CompositeConst;
-import org.webswing.directdraw.model.DrawConstant;
-import org.webswing.directdraw.model.DrawInstruction;
-import org.webswing.directdraw.model.EllipseConst;
-import org.webswing.directdraw.model.FontConst;
-import org.webswing.directdraw.model.ImageConst;
-import org.webswing.directdraw.model.LinearGradientConst;
-import org.webswing.directdraw.model.PathConst;
-import org.webswing.directdraw.model.PointsConst;
-import org.webswing.directdraw.model.RadialGradientConst;
-import org.webswing.directdraw.model.RectangleConst;
-import org.webswing.directdraw.model.RoundRectangleConst;
-import org.webswing.directdraw.model.StringConst;
-import org.webswing.directdraw.model.StrokeConst;
-import org.webswing.directdraw.model.TransformConst;
-import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
-import org.webswing.directdraw.util.DirectDrawUtils;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.model.*;
+import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.*;
+import org.webswing.directdraw.util.*;
 
 public class DrawInstructionFactory {
 
@@ -74,10 +45,8 @@ public class DrawInstructionFactory {
 		DrawConstant transformConst =  transform != null ? new TransformConst(ctx, transform) : DrawConstant.nullConst;
 		DrawConstant compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
 		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
-		DrawInstruction paintinst = setPaint(g.getPaint());
-		DrawConstant[] paintConsts = DirectDrawUtils.concat(new DrawConstant[] { gid, transformConst, strokeConst, compositeConst }, paintinst.getArgs());
-
-		return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, paintConsts);
+		DrawInstruction paintInst = setPaint(g.getPaint());
+        return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, DirectDrawUtils.concat(new DrawConstant[] {gid, transformConst, strokeConst, compositeConst}, paintInst.getArgs()));
 	}
 
 	public DrawInstruction disposeGraphics(WebGraphics g) {

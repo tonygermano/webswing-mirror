@@ -1,32 +1,16 @@
 package org.webswing.directdraw.util;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.font.TextAttribute;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ImageObserver;
-import java.awt.image.RenderedImage;
-import java.awt.image.WritableRaster;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.awt.*;
+import java.awt.font.*;
+import java.awt.geom.*;
+import java.awt.image.*;
+import java.text.AttributedCharacterIterator.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.model.CompositeConst;
-import org.webswing.directdraw.model.DrawConstant;
-import org.webswing.directdraw.model.DrawInstruction;
-import org.webswing.directdraw.model.StrokeConst;
-import org.webswing.directdraw.model.TransformConst;
-import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.model.*;
+import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.*;
 
 public class DirectDrawUtils {
 
@@ -53,16 +37,16 @@ public class DirectDrawUtils {
 	 *            font
 	 * @return Attributes of font
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Hashtable getAttributes(Font font) {
-		Hashtable result = new Hashtable(7, (float) 0.9);
+//	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map<? extends Attribute, ?> getAttributes(Font font) {
+		Map<Attribute, Object> result = new HashMap<Attribute, Object>(7, (float) 0.9);
 		result.put(TextAttribute.TRANSFORM, font.getTransform());
 		result.put(TextAttribute.FAMILY, font.getName());
-		result.put(TextAttribute.SIZE, new Float(font.getSize2D()));
+		result.put(TextAttribute.SIZE, font.getSize2D());
 		result.put(TextAttribute.WEIGHT, (font.getStyle() & Font.BOLD) != 0 ? TextAttribute.WEIGHT_BOLD : TextAttribute.WEIGHT_REGULAR);
 		result.put(TextAttribute.POSTURE, (font.getStyle() & Font.ITALIC) != 0 ? TextAttribute.POSTURE_OBLIQUE : TextAttribute.POSTURE_REGULAR);
-		result.put(TextAttribute.SUPERSCRIPT, new Integer(0 /* no getter! */));
-		result.put(TextAttribute.WIDTH, new Float(1 /* no getter */));
+		result.put(TextAttribute.SUPERSCRIPT, 0);
+		result.put(TextAttribute.WIDTH, 1f);
 		return result;
 	}
 
@@ -122,14 +106,12 @@ public class DirectDrawUtils {
 		DrawInstruction graphicsCreate = null;
 		Map<Integer, DrawInstruction> graphicsCreateMap = new HashMap<Integer, DrawInstruction>();
 		List<DrawInstruction> newInstructions = new ArrayList<DrawInstruction>();
-		for (Iterator<DrawInstruction> i = instructions.iterator(); i.hasNext();) {
-			DrawInstruction current = i.next();
+		for (DrawInstruction current : instructions ) {
 			if (current.getInstruction().equals(InstructionProto.TRANSFORM)) {
 				if (mergedTx == null) {
 					mergedTx = ((TransformConst) current.getArgs()[0]).getAffineTransform();
 				} else {
-					AffineTransform currtc = ((TransformConst) current.getArgs()[0]).getAffineTransform();
-					mergedTx.concatenate(currtc);
+					mergedTx.concatenate(((TransformConst) current.getArgs()[0]).getAffineTransform());
 				}
 			} else if (current.getInstruction().equals(InstructionProto.SET_STROKE)) {
 				mergedStroke = ((StrokeConst) current.getArgs()[0]);
@@ -194,12 +176,5 @@ public class DirectDrawUtils {
 		if (mergedPaint != null) {
 			newInstructions.add(new DrawInstruction(InstructionProto.SET_PAINT, mergedPaint));
 		}
-	}
-
-	public static BufferedImage deepCopy(BufferedImage bi) {
-		ColorModel cm = bi.getColorModel();
-		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-		WritableRaster raster = bi.copyData(null);
-		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
 }

@@ -1,8 +1,7 @@
 package org.webswing.directdraw.model;
 
-import org.webswing.directdraw.DirectDraw;
-
-import com.google.protobuf.Message;
+import com.google.protobuf.*;
+import org.webswing.directdraw.*;
 
 public abstract class DrawConstant {
 
@@ -56,14 +55,14 @@ public abstract class DrawConstant {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (!(obj instanceof DrawConstant)) {
+            return false;
+        }
 		DrawConstant other = (DrawConstant) obj;
-		if (getHash() != other.getHash())
-			return false;
-		return true;
+		return getHash() == other.getHash();
 	}
 
 	abstract public String getFieldName();

@@ -1,34 +1,13 @@
 package org.webswing.directdraw.util;
 
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
+import java.awt.*;
+import java.awt.geom.*;
+import java.awt.image.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
-import org.webswing.directdraw.model.ArcConst;
-import org.webswing.directdraw.model.ColorConst;
-import org.webswing.directdraw.model.CompositeConst;
-import org.webswing.directdraw.model.DrawConstant;
-import org.webswing.directdraw.model.DrawInstruction;
-import org.webswing.directdraw.model.EllipseConst;
-import org.webswing.directdraw.model.FontConst;
-import org.webswing.directdraw.model.ImageConst;
-import org.webswing.directdraw.model.LinearGradientConst;
-import org.webswing.directdraw.model.PathConst;
-import org.webswing.directdraw.model.PointsConst;
-import org.webswing.directdraw.model.RadialGradientConst;
-import org.webswing.directdraw.model.RectangleConst;
-import org.webswing.directdraw.model.RoundRectangleConst;
-import org.webswing.directdraw.model.StringConst;
-import org.webswing.directdraw.model.StrokeConst;
-import org.webswing.directdraw.model.TransformConst;
-import org.webswing.directdraw.toolkit.WebImage;
+import org.webswing.directdraw.model.*;
+import org.webswing.directdraw.toolkit.*;
 
 public class RenderUtil {
 

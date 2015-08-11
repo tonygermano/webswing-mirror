@@ -1,16 +1,13 @@
 package org.webswing.directdraw.model;
 
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Path2D;
+import java.awt.*;
+import java.awt.geom.*;
 import java.awt.geom.Path2D.Float;
-import java.awt.geom.PathIterator;
-import java.util.Arrays;
 import java.util.List;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.proto.Directdraw.PathProto;
-import org.webswing.directdraw.proto.Directdraw.PathProto.SegmentTypeProto;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.PathProto.*;
 
 public class PathConst extends DrawConstant {
 
@@ -35,9 +32,9 @@ public class PathConst extends DrawConstant {
 		this.message = model.build();
 	}
 
-	public PathConst(DirectDraw context, Shape s, AffineTransform t) {
-		this(context, s.getPathIterator(t));
-		this.shape = t != null ? t.createTransformedShape(s) : s;
+	public PathConst(DirectDraw context, Shape s) {
+		this(context, s.getPathIterator(null));
+		this.shape = s;
 	}
 
 	public Shape getShape() {
