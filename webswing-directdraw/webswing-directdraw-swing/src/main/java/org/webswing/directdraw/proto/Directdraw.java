@@ -7138,13 +7138,13 @@ public final class Directdraw {
   public interface TransformProtoOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // optional float m00 = 1;
+    // optional float m00 = 1 [default = 1];
     /**
-     * <code>optional float m00 = 1;</code>
+     * <code>optional float m00 = 1 [default = 1];</code>
      */
     boolean hasM00();
     /**
-     * <code>optional float m00 = 1;</code>
+     * <code>optional float m00 = 1 [default = 1];</code>
      */
     float getM00();
 
@@ -7168,35 +7168,35 @@ public final class Directdraw {
      */
     float getM01();
 
-    // optional float m11 = 4;
+    // optional float m11 = 4 [default = 1];
     /**
-     * <code>optional float m11 = 4;</code>
+     * <code>optional float m11 = 4 [default = 1];</code>
      */
     boolean hasM11();
     /**
-     * <code>optional float m11 = 4;</code>
+     * <code>optional float m11 = 4 [default = 1];</code>
      */
     float getM11();
 
-    // optional sint32 m02X2 = 5;
+    // optional float m02 = 5;
     /**
-     * <code>optional sint32 m02X2 = 5;</code>
+     * <code>optional float m02 = 5;</code>
      */
-    boolean hasM02X2();
+    boolean hasM02();
     /**
-     * <code>optional sint32 m02X2 = 5;</code>
+     * <code>optional float m02 = 5;</code>
      */
-    int getM02X2();
+    float getM02();
 
-    // optional sint32 m12X2 = 6;
+    // optional float m12 = 6;
     /**
-     * <code>optional sint32 m12X2 = 6;</code>
+     * <code>optional float m12 = 6;</code>
      */
-    boolean hasM12X2();
+    boolean hasM12();
     /**
-     * <code>optional sint32 m12X2 = 6;</code>
+     * <code>optional float m12 = 6;</code>
      */
-    int getM12X2();
+    float getM12();
   }
   /**
    * Protobuf type {@code org.webswing.directdraw.proto.TransformProto}
@@ -7269,14 +7269,14 @@ public final class Directdraw {
               m11_ = input.readFloat();
               break;
             }
-            case 40: {
+            case 45: {
               bitField0_ |= 0x00000010;
-              m02X2_ = input.readSInt32();
+              m02_ = input.readFloat();
               break;
             }
-            case 48: {
+            case 53: {
               bitField0_ |= 0x00000020;
-              m12X2_ = input.readSInt32();
+              m12_ = input.readFloat();
               break;
             }
           }
@@ -7319,17 +7319,17 @@ public final class Directdraw {
     }
 
     private int bitField0_;
-    // optional float m00 = 1;
+    // optional float m00 = 1 [default = 1];
     public static final int M00_FIELD_NUMBER = 1;
     private float m00_;
     /**
-     * <code>optional float m00 = 1;</code>
+     * <code>optional float m00 = 1 [default = 1];</code>
      */
     public boolean hasM00() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional float m00 = 1;</code>
+     * <code>optional float m00 = 1 [default = 1];</code>
      */
     public float getM00() {
       return m00_;
@@ -7367,61 +7367,61 @@ public final class Directdraw {
       return m01_;
     }
 
-    // optional float m11 = 4;
+    // optional float m11 = 4 [default = 1];
     public static final int M11_FIELD_NUMBER = 4;
     private float m11_;
     /**
-     * <code>optional float m11 = 4;</code>
+     * <code>optional float m11 = 4 [default = 1];</code>
      */
     public boolean hasM11() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional float m11 = 4;</code>
+     * <code>optional float m11 = 4 [default = 1];</code>
      */
     public float getM11() {
       return m11_;
     }
 
-    // optional sint32 m02X2 = 5;
-    public static final int M02X2_FIELD_NUMBER = 5;
-    private int m02X2_;
+    // optional float m02 = 5;
+    public static final int M02_FIELD_NUMBER = 5;
+    private float m02_;
     /**
-     * <code>optional sint32 m02X2 = 5;</code>
+     * <code>optional float m02 = 5;</code>
      */
-    public boolean hasM02X2() {
+    public boolean hasM02() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional sint32 m02X2 = 5;</code>
+     * <code>optional float m02 = 5;</code>
      */
-    public int getM02X2() {
-      return m02X2_;
+    public float getM02() {
+      return m02_;
     }
 
-    // optional sint32 m12X2 = 6;
-    public static final int M12X2_FIELD_NUMBER = 6;
-    private int m12X2_;
+    // optional float m12 = 6;
+    public static final int M12_FIELD_NUMBER = 6;
+    private float m12_;
     /**
-     * <code>optional sint32 m12X2 = 6;</code>
+     * <code>optional float m12 = 6;</code>
      */
-    public boolean hasM12X2() {
+    public boolean hasM12() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional sint32 m12X2 = 6;</code>
+     * <code>optional float m12 = 6;</code>
      */
-    public int getM12X2() {
-      return m12X2_;
+    public float getM12() {
+      return m12_;
     }
 
     private void initFields() {
-      m00_ = 0F;
+      m00_ = 1F;
       m10_ = 0F;
       m01_ = 0F;
-      m11_ = 0F;
-      m02X2_ = 0;
-      m12X2_ = 0;
+      m11_ = 1F;
+      m02_ = 0F;
+      m12_ = 0F;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -7448,10 +7448,10 @@ public final class Directdraw {
         output.writeFloat(4, m11_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeSInt32(5, m02X2_);
+        output.writeFloat(5, m02_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeSInt32(6, m12X2_);
+        output.writeFloat(6, m12_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -7480,11 +7480,11 @@ public final class Directdraw {
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(5, m02X2_);
+          .computeFloatSize(5, m02_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(6, m12X2_);
+          .computeFloatSize(6, m12_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -7602,17 +7602,17 @@ public final class Directdraw {
 
       public Builder clear() {
         super.clear();
-        m00_ = 0F;
+        m00_ = 1F;
         bitField0_ = (bitField0_ & ~0x00000001);
         m10_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000002);
         m01_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000004);
-        m11_ = 0F;
+        m11_ = 1F;
         bitField0_ = (bitField0_ & ~0x00000008);
-        m02X2_ = 0;
+        m02_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000010);
-        m12X2_ = 0;
+        m12_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
@@ -7661,11 +7661,11 @@ public final class Directdraw {
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.m02X2_ = m02X2_;
+        result.m02_ = m02_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.m12X2_ = m12X2_;
+        result.m12_ = m12_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -7694,11 +7694,11 @@ public final class Directdraw {
         if (other.hasM11()) {
           setM11(other.getM11());
         }
-        if (other.hasM02X2()) {
-          setM02X2(other.getM02X2());
+        if (other.hasM02()) {
+          setM02(other.getM02());
         }
-        if (other.hasM12X2()) {
-          setM12X2(other.getM12X2());
+        if (other.hasM12()) {
+          setM12(other.getM12());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -7727,22 +7727,22 @@ public final class Directdraw {
       }
       private int bitField0_;
 
-      // optional float m00 = 1;
-      private float m00_ ;
+      // optional float m00 = 1 [default = 1];
+      private float m00_ = 1F;
       /**
-       * <code>optional float m00 = 1;</code>
+       * <code>optional float m00 = 1 [default = 1];</code>
        */
       public boolean hasM00() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional float m00 = 1;</code>
+       * <code>optional float m00 = 1 [default = 1];</code>
        */
       public float getM00() {
         return m00_;
       }
       /**
-       * <code>optional float m00 = 1;</code>
+       * <code>optional float m00 = 1 [default = 1];</code>
        */
       public Builder setM00(float value) {
         bitField0_ |= 0x00000001;
@@ -7751,11 +7751,11 @@ public final class Directdraw {
         return this;
       }
       /**
-       * <code>optional float m00 = 1;</code>
+       * <code>optional float m00 = 1 [default = 1];</code>
        */
       public Builder clearM00() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        m00_ = 0F;
+        m00_ = 1F;
         onChanged();
         return this;
       }
@@ -7826,22 +7826,22 @@ public final class Directdraw {
         return this;
       }
 
-      // optional float m11 = 4;
-      private float m11_ ;
+      // optional float m11 = 4 [default = 1];
+      private float m11_ = 1F;
       /**
-       * <code>optional float m11 = 4;</code>
+       * <code>optional float m11 = 4 [default = 1];</code>
        */
       public boolean hasM11() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional float m11 = 4;</code>
+       * <code>optional float m11 = 4 [default = 1];</code>
        */
       public float getM11() {
         return m11_;
       }
       /**
-       * <code>optional float m11 = 4;</code>
+       * <code>optional float m11 = 4 [default = 1];</code>
        */
       public Builder setM11(float value) {
         bitField0_ |= 0x00000008;
@@ -7850,77 +7850,77 @@ public final class Directdraw {
         return this;
       }
       /**
-       * <code>optional float m11 = 4;</code>
+       * <code>optional float m11 = 4 [default = 1];</code>
        */
       public Builder clearM11() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        m11_ = 0F;
+        m11_ = 1F;
         onChanged();
         return this;
       }
 
-      // optional sint32 m02X2 = 5;
-      private int m02X2_ ;
+      // optional float m02 = 5;
+      private float m02_ ;
       /**
-       * <code>optional sint32 m02X2 = 5;</code>
+       * <code>optional float m02 = 5;</code>
        */
-      public boolean hasM02X2() {
+      public boolean hasM02() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional sint32 m02X2 = 5;</code>
+       * <code>optional float m02 = 5;</code>
        */
-      public int getM02X2() {
-        return m02X2_;
+      public float getM02() {
+        return m02_;
       }
       /**
-       * <code>optional sint32 m02X2 = 5;</code>
+       * <code>optional float m02 = 5;</code>
        */
-      public Builder setM02X2(int value) {
+      public Builder setM02(float value) {
         bitField0_ |= 0x00000010;
-        m02X2_ = value;
+        m02_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint32 m02X2 = 5;</code>
+       * <code>optional float m02 = 5;</code>
        */
-      public Builder clearM02X2() {
+      public Builder clearM02() {
         bitField0_ = (bitField0_ & ~0x00000010);
-        m02X2_ = 0;
+        m02_ = 0F;
         onChanged();
         return this;
       }
 
-      // optional sint32 m12X2 = 6;
-      private int m12X2_ ;
+      // optional float m12 = 6;
+      private float m12_ ;
       /**
-       * <code>optional sint32 m12X2 = 6;</code>
+       * <code>optional float m12 = 6;</code>
        */
-      public boolean hasM12X2() {
+      public boolean hasM12() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional sint32 m12X2 = 6;</code>
+       * <code>optional float m12 = 6;</code>
        */
-      public int getM12X2() {
-        return m12X2_;
+      public float getM12() {
+        return m12_;
       }
       /**
-       * <code>optional sint32 m12X2 = 6;</code>
+       * <code>optional float m12 = 6;</code>
        */
-      public Builder setM12X2(int value) {
+      public Builder setM12(float value) {
         bitField0_ |= 0x00000020;
-        m12X2_ = value;
+        m12_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint32 m12X2 = 6;</code>
+       * <code>optional float m12 = 6;</code>
        */
-      public Builder clearM12X2() {
+      public Builder clearM12() {
         bitField0_ = (bitField0_ & ~0x00000020);
-        m12X2_ = 0;
+        m12_ = 0F;
         onChanged();
         return this;
       }
@@ -12803,25 +12803,25 @@ public final class Directdraw {
   public interface StrokeProtoOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required uint32 widthX10 = 1;
+    // required float width = 1;
     /**
-     * <code>required uint32 widthX10 = 1;</code>
+     * <code>required float width = 1;</code>
      */
-    boolean hasWidthX10();
+    boolean hasWidth();
     /**
-     * <code>required uint32 widthX10 = 1;</code>
+     * <code>required float width = 1;</code>
      */
-    int getWidthX10();
+    float getWidth();
 
-    // optional uint32 miterLimitX10 = 2;
+    // optional float miterLimit = 2;
     /**
-     * <code>optional uint32 miterLimitX10 = 2;</code>
+     * <code>optional float miterLimit = 2;</code>
      */
-    boolean hasMiterLimitX10();
+    boolean hasMiterLimit();
     /**
-     * <code>optional uint32 miterLimitX10 = 2;</code>
+     * <code>optional float miterLimit = 2;</code>
      */
-    int getMiterLimitX10();
+    float getMiterLimit();
 
     // optional .org.webswing.directdraw.proto.StrokeProto.StrokeJoinProto join = 3;
     /**
@@ -12843,29 +12843,29 @@ public final class Directdraw {
      */
     org.webswing.directdraw.proto.Directdraw.StrokeProto.StrokeCapProto getCap();
 
-    // repeated uint32 dashX10 = 5;
+    // repeated float dash = 5;
     /**
-     * <code>repeated uint32 dashX10 = 5;</code>
+     * <code>repeated float dash = 5;</code>
      */
-    java.util.List<java.lang.Integer> getDashX10List();
+    java.util.List<java.lang.Float> getDashList();
     /**
-     * <code>repeated uint32 dashX10 = 5;</code>
+     * <code>repeated float dash = 5;</code>
      */
-    int getDashX10Count();
+    int getDashCount();
     /**
-     * <code>repeated uint32 dashX10 = 5;</code>
+     * <code>repeated float dash = 5;</code>
      */
-    int getDashX10(int index);
+    float getDash(int index);
 
-    // optional uint32 dashOffset = 6;
+    // optional float dashOffset = 6;
     /**
-     * <code>optional uint32 dashOffset = 6;</code>
+     * <code>optional float dashOffset = 6;</code>
      */
     boolean hasDashOffset();
     /**
-     * <code>optional uint32 dashOffset = 6;</code>
+     * <code>optional float dashOffset = 6;</code>
      */
-    int getDashOffset();
+    float getDashOffset();
   }
   /**
    * Protobuf type {@code org.webswing.directdraw.proto.StrokeProto}
@@ -12918,14 +12918,14 @@ public final class Directdraw {
               }
               break;
             }
-            case 8: {
+            case 13: {
               bitField0_ |= 0x00000001;
-              widthX10_ = input.readUInt32();
+              width_ = input.readFloat();
               break;
             }
-            case 16: {
+            case 21: {
               bitField0_ |= 0x00000002;
-              miterLimitX10_ = input.readUInt32();
+              miterLimit_ = input.readFloat();
               break;
             }
             case 24: {
@@ -12950,30 +12950,30 @@ public final class Directdraw {
               }
               break;
             }
-            case 40: {
+            case 45: {
               if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-                dashX10_ = new java.util.ArrayList<java.lang.Integer>();
+                dash_ = new java.util.ArrayList<java.lang.Float>();
                 mutable_bitField0_ |= 0x00000010;
               }
-              dashX10_.add(input.readUInt32());
+              dash_.add(input.readFloat());
               break;
             }
             case 42: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000010) == 0x00000010) && input.getBytesUntilLimit() > 0) {
-                dashX10_ = new java.util.ArrayList<java.lang.Integer>();
+                dash_ = new java.util.ArrayList<java.lang.Float>();
                 mutable_bitField0_ |= 0x00000010;
               }
               while (input.getBytesUntilLimit() > 0) {
-                dashX10_.add(input.readUInt32());
+                dash_.add(input.readFloat());
               }
               input.popLimit(limit);
               break;
             }
-            case 48: {
+            case 53: {
               bitField0_ |= 0x00000010;
-              dashOffset_ = input.readUInt32();
+              dashOffset_ = input.readFloat();
               break;
             }
           }
@@ -12985,7 +12985,7 @@ public final class Directdraw {
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-          dashX10_ = java.util.Collections.unmodifiableList(dashX10_);
+          dash_ = java.util.Collections.unmodifiableList(dash_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -13201,36 +13201,36 @@ public final class Directdraw {
     }
 
     private int bitField0_;
-    // required uint32 widthX10 = 1;
-    public static final int WIDTHX10_FIELD_NUMBER = 1;
-    private int widthX10_;
+    // required float width = 1;
+    public static final int WIDTH_FIELD_NUMBER = 1;
+    private float width_;
     /**
-     * <code>required uint32 widthX10 = 1;</code>
+     * <code>required float width = 1;</code>
      */
-    public boolean hasWidthX10() {
+    public boolean hasWidth() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required uint32 widthX10 = 1;</code>
+     * <code>required float width = 1;</code>
      */
-    public int getWidthX10() {
-      return widthX10_;
+    public float getWidth() {
+      return width_;
     }
 
-    // optional uint32 miterLimitX10 = 2;
-    public static final int MITERLIMITX10_FIELD_NUMBER = 2;
-    private int miterLimitX10_;
+    // optional float miterLimit = 2;
+    public static final int MITERLIMIT_FIELD_NUMBER = 2;
+    private float miterLimit_;
     /**
-     * <code>optional uint32 miterLimitX10 = 2;</code>
+     * <code>optional float miterLimit = 2;</code>
      */
-    public boolean hasMiterLimitX10() {
+    public boolean hasMiterLimit() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional uint32 miterLimitX10 = 2;</code>
+     * <code>optional float miterLimit = 2;</code>
      */
-    public int getMiterLimitX10() {
-      return miterLimitX10_;
+    public float getMiterLimit() {
+      return miterLimit_;
     }
 
     // optional .org.webswing.directdraw.proto.StrokeProto.StrokeJoinProto join = 3;
@@ -13265,59 +13265,59 @@ public final class Directdraw {
       return cap_;
     }
 
-    // repeated uint32 dashX10 = 5;
-    public static final int DASHX10_FIELD_NUMBER = 5;
-    private java.util.List<java.lang.Integer> dashX10_;
+    // repeated float dash = 5;
+    public static final int DASH_FIELD_NUMBER = 5;
+    private java.util.List<java.lang.Float> dash_;
     /**
-     * <code>repeated uint32 dashX10 = 5;</code>
+     * <code>repeated float dash = 5;</code>
      */
-    public java.util.List<java.lang.Integer>
-        getDashX10List() {
-      return dashX10_;
+    public java.util.List<java.lang.Float>
+        getDashList() {
+      return dash_;
     }
     /**
-     * <code>repeated uint32 dashX10 = 5;</code>
+     * <code>repeated float dash = 5;</code>
      */
-    public int getDashX10Count() {
-      return dashX10_.size();
+    public int getDashCount() {
+      return dash_.size();
     }
     /**
-     * <code>repeated uint32 dashX10 = 5;</code>
+     * <code>repeated float dash = 5;</code>
      */
-    public int getDashX10(int index) {
-      return dashX10_.get(index);
+    public float getDash(int index) {
+      return dash_.get(index);
     }
 
-    // optional uint32 dashOffset = 6;
+    // optional float dashOffset = 6;
     public static final int DASHOFFSET_FIELD_NUMBER = 6;
-    private int dashOffset_;
+    private float dashOffset_;
     /**
-     * <code>optional uint32 dashOffset = 6;</code>
+     * <code>optional float dashOffset = 6;</code>
      */
     public boolean hasDashOffset() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional uint32 dashOffset = 6;</code>
+     * <code>optional float dashOffset = 6;</code>
      */
-    public int getDashOffset() {
+    public float getDashOffset() {
       return dashOffset_;
     }
 
     private void initFields() {
-      widthX10_ = 0;
-      miterLimitX10_ = 0;
+      width_ = 0F;
+      miterLimit_ = 0F;
       join_ = org.webswing.directdraw.proto.Directdraw.StrokeProto.StrokeJoinProto.JOIN_MITER;
       cap_ = org.webswing.directdraw.proto.Directdraw.StrokeProto.StrokeCapProto.CAP_BUTT;
-      dashX10_ = java.util.Collections.emptyList();
-      dashOffset_ = 0;
+      dash_ = java.util.Collections.emptyList();
+      dashOffset_ = 0F;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasWidthX10()) {
+      if (!hasWidth()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -13329,10 +13329,10 @@ public final class Directdraw {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeUInt32(1, widthX10_);
+        output.writeFloat(1, width_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeUInt32(2, miterLimitX10_);
+        output.writeFloat(2, miterLimit_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeEnum(3, join_.getNumber());
@@ -13340,11 +13340,11 @@ public final class Directdraw {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeEnum(4, cap_.getNumber());
       }
-      for (int i = 0; i < dashX10_.size(); i++) {
-        output.writeUInt32(5, dashX10_.get(i));
+      for (int i = 0; i < dash_.size(); i++) {
+        output.writeFloat(5, dash_.get(i));
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeUInt32(6, dashOffset_);
+        output.writeFloat(6, dashOffset_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -13357,11 +13357,11 @@ public final class Directdraw {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(1, widthX10_);
+          .computeFloatSize(1, width_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(2, miterLimitX10_);
+          .computeFloatSize(2, miterLimit_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
@@ -13373,16 +13373,13 @@ public final class Directdraw {
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < dashX10_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeUInt32SizeNoTag(dashX10_.get(i));
-        }
+        dataSize = 4 * getDashList().size();
         size += dataSize;
-        size += 1 * getDashX10List().size();
+        size += 1 * getDashList().size();
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(6, dashOffset_);
+          .computeFloatSize(6, dashOffset_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -13500,17 +13497,17 @@ public final class Directdraw {
 
       public Builder clear() {
         super.clear();
-        widthX10_ = 0;
+        width_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000001);
-        miterLimitX10_ = 0;
+        miterLimit_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000002);
         join_ = org.webswing.directdraw.proto.Directdraw.StrokeProto.StrokeJoinProto.JOIN_MITER;
         bitField0_ = (bitField0_ & ~0x00000004);
         cap_ = org.webswing.directdraw.proto.Directdraw.StrokeProto.StrokeCapProto.CAP_BUTT;
         bitField0_ = (bitField0_ & ~0x00000008);
-        dashX10_ = java.util.Collections.emptyList();
+        dash_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000010);
-        dashOffset_ = 0;
+        dashOffset_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
@@ -13543,11 +13540,11 @@ public final class Directdraw {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.widthX10_ = widthX10_;
+        result.width_ = width_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.miterLimitX10_ = miterLimitX10_;
+        result.miterLimit_ = miterLimit_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
@@ -13557,10 +13554,10 @@ public final class Directdraw {
         }
         result.cap_ = cap_;
         if (((bitField0_ & 0x00000010) == 0x00000010)) {
-          dashX10_ = java.util.Collections.unmodifiableList(dashX10_);
+          dash_ = java.util.Collections.unmodifiableList(dash_);
           bitField0_ = (bitField0_ & ~0x00000010);
         }
-        result.dashX10_ = dashX10_;
+        result.dash_ = dash_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000010;
         }
@@ -13581,11 +13578,11 @@ public final class Directdraw {
 
       public Builder mergeFrom(org.webswing.directdraw.proto.Directdraw.StrokeProto other) {
         if (other == org.webswing.directdraw.proto.Directdraw.StrokeProto.getDefaultInstance()) return this;
-        if (other.hasWidthX10()) {
-          setWidthX10(other.getWidthX10());
+        if (other.hasWidth()) {
+          setWidth(other.getWidth());
         }
-        if (other.hasMiterLimitX10()) {
-          setMiterLimitX10(other.getMiterLimitX10());
+        if (other.hasMiterLimit()) {
+          setMiterLimit(other.getMiterLimit());
         }
         if (other.hasJoin()) {
           setJoin(other.getJoin());
@@ -13593,13 +13590,13 @@ public final class Directdraw {
         if (other.hasCap()) {
           setCap(other.getCap());
         }
-        if (!other.dashX10_.isEmpty()) {
-          if (dashX10_.isEmpty()) {
-            dashX10_ = other.dashX10_;
+        if (!other.dash_.isEmpty()) {
+          if (dash_.isEmpty()) {
+            dash_ = other.dash_;
             bitField0_ = (bitField0_ & ~0x00000010);
           } else {
-            ensureDashX10IsMutable();
-            dashX10_.addAll(other.dashX10_);
+            ensureDashIsMutable();
+            dash_.addAll(other.dash_);
           }
           onChanged();
         }
@@ -13611,7 +13608,7 @@ public final class Directdraw {
       }
 
       public final boolean isInitialized() {
-        if (!hasWidthX10()) {
+        if (!hasWidth()) {
           
           return false;
         }
@@ -13637,68 +13634,68 @@ public final class Directdraw {
       }
       private int bitField0_;
 
-      // required uint32 widthX10 = 1;
-      private int widthX10_ ;
+      // required float width = 1;
+      private float width_ ;
       /**
-       * <code>required uint32 widthX10 = 1;</code>
+       * <code>required float width = 1;</code>
        */
-      public boolean hasWidthX10() {
+      public boolean hasWidth() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required uint32 widthX10 = 1;</code>
+       * <code>required float width = 1;</code>
        */
-      public int getWidthX10() {
-        return widthX10_;
+      public float getWidth() {
+        return width_;
       }
       /**
-       * <code>required uint32 widthX10 = 1;</code>
+       * <code>required float width = 1;</code>
        */
-      public Builder setWidthX10(int value) {
+      public Builder setWidth(float value) {
         bitField0_ |= 0x00000001;
-        widthX10_ = value;
+        width_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required uint32 widthX10 = 1;</code>
+       * <code>required float width = 1;</code>
        */
-      public Builder clearWidthX10() {
+      public Builder clearWidth() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        widthX10_ = 0;
+        width_ = 0F;
         onChanged();
         return this;
       }
 
-      // optional uint32 miterLimitX10 = 2;
-      private int miterLimitX10_ ;
+      // optional float miterLimit = 2;
+      private float miterLimit_ ;
       /**
-       * <code>optional uint32 miterLimitX10 = 2;</code>
+       * <code>optional float miterLimit = 2;</code>
        */
-      public boolean hasMiterLimitX10() {
+      public boolean hasMiterLimit() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional uint32 miterLimitX10 = 2;</code>
+       * <code>optional float miterLimit = 2;</code>
        */
-      public int getMiterLimitX10() {
-        return miterLimitX10_;
+      public float getMiterLimit() {
+        return miterLimit_;
       }
       /**
-       * <code>optional uint32 miterLimitX10 = 2;</code>
+       * <code>optional float miterLimit = 2;</code>
        */
-      public Builder setMiterLimitX10(int value) {
+      public Builder setMiterLimit(float value) {
         bitField0_ |= 0x00000002;
-        miterLimitX10_ = value;
+        miterLimit_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional uint32 miterLimitX10 = 2;</code>
+       * <code>optional float miterLimit = 2;</code>
        */
-      public Builder clearMiterLimitX10() {
+      public Builder clearMiterLimit() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        miterLimitX10_ = 0;
+        miterLimit_ = 0F;
         onChanged();
         return this;
       }
@@ -13775,101 +13772,101 @@ public final class Directdraw {
         return this;
       }
 
-      // repeated uint32 dashX10 = 5;
-      private java.util.List<java.lang.Integer> dashX10_ = java.util.Collections.emptyList();
-      private void ensureDashX10IsMutable() {
+      // repeated float dash = 5;
+      private java.util.List<java.lang.Float> dash_ = java.util.Collections.emptyList();
+      private void ensureDashIsMutable() {
         if (!((bitField0_ & 0x00000010) == 0x00000010)) {
-          dashX10_ = new java.util.ArrayList<java.lang.Integer>(dashX10_);
+          dash_ = new java.util.ArrayList<java.lang.Float>(dash_);
           bitField0_ |= 0x00000010;
          }
       }
       /**
-       * <code>repeated uint32 dashX10 = 5;</code>
+       * <code>repeated float dash = 5;</code>
        */
-      public java.util.List<java.lang.Integer>
-          getDashX10List() {
-        return java.util.Collections.unmodifiableList(dashX10_);
+      public java.util.List<java.lang.Float>
+          getDashList() {
+        return java.util.Collections.unmodifiableList(dash_);
       }
       /**
-       * <code>repeated uint32 dashX10 = 5;</code>
+       * <code>repeated float dash = 5;</code>
        */
-      public int getDashX10Count() {
-        return dashX10_.size();
+      public int getDashCount() {
+        return dash_.size();
       }
       /**
-       * <code>repeated uint32 dashX10 = 5;</code>
+       * <code>repeated float dash = 5;</code>
        */
-      public int getDashX10(int index) {
-        return dashX10_.get(index);
+      public float getDash(int index) {
+        return dash_.get(index);
       }
       /**
-       * <code>repeated uint32 dashX10 = 5;</code>
+       * <code>repeated float dash = 5;</code>
        */
-      public Builder setDashX10(
-          int index, int value) {
-        ensureDashX10IsMutable();
-        dashX10_.set(index, value);
+      public Builder setDash(
+          int index, float value) {
+        ensureDashIsMutable();
+        dash_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated uint32 dashX10 = 5;</code>
+       * <code>repeated float dash = 5;</code>
        */
-      public Builder addDashX10(int value) {
-        ensureDashX10IsMutable();
-        dashX10_.add(value);
+      public Builder addDash(float value) {
+        ensureDashIsMutable();
+        dash_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated uint32 dashX10 = 5;</code>
+       * <code>repeated float dash = 5;</code>
        */
-      public Builder addAllDashX10(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureDashX10IsMutable();
-        super.addAll(values, dashX10_);
+      public Builder addAllDash(
+          java.lang.Iterable<? extends java.lang.Float> values) {
+        ensureDashIsMutable();
+        super.addAll(values, dash_);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated uint32 dashX10 = 5;</code>
+       * <code>repeated float dash = 5;</code>
        */
-      public Builder clearDashX10() {
-        dashX10_ = java.util.Collections.emptyList();
+      public Builder clearDash() {
+        dash_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000010);
         onChanged();
         return this;
       }
 
-      // optional uint32 dashOffset = 6;
-      private int dashOffset_ ;
+      // optional float dashOffset = 6;
+      private float dashOffset_ ;
       /**
-       * <code>optional uint32 dashOffset = 6;</code>
+       * <code>optional float dashOffset = 6;</code>
        */
       public boolean hasDashOffset() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional uint32 dashOffset = 6;</code>
+       * <code>optional float dashOffset = 6;</code>
        */
-      public int getDashOffset() {
+      public float getDashOffset() {
         return dashOffset_;
       }
       /**
-       * <code>optional uint32 dashOffset = 6;</code>
+       * <code>optional float dashOffset = 6;</code>
        */
-      public Builder setDashOffset(int value) {
+      public Builder setDashOffset(float value) {
         bitField0_ |= 0x00000020;
         dashOffset_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional uint32 dashOffset = 6;</code>
+       * <code>optional float dashOffset = 6;</code>
        */
       public Builder clearDashOffset() {
         bitField0_ = (bitField0_ & ~0x00000020);
-        dashOffset_ = 0;
+        dashOffset_ = 0F;
         onChanged();
         return this;
       }
@@ -17400,58 +17397,58 @@ public final class Directdraw {
       "directdraw.proto.StrokeProto\022@\n\tcomposit" +
       "e\030\020 \001(\0132-.org.webswing.directdraw.proto." +
       "CompositeProto\"\032\n\nColorProto\022\014\n\004rgba\030\001 \002" +
-      "(\007\"\032\n\nImageProto\022\014\n\004data\030\001 \002(\014\"b\n\016Transf" +
-      "ormProto\022\013\n\003m00\030\001 \001(\002\022\013\n\003m10\030\002 \001(\002\022\013\n\003m0" +
-      "1\030\003 \001(\002\022\013\n\003m11\030\004 \001(\002\022\r\n\005m02X2\030\005 \001(\021\022\r\n\005m" +
-      "12X2\030\006 \001(\021\"<\n\016RectangleProto\022\t\n\001x\030\001 \002(\021\022" +
-      "\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\":\n\014Elli" +
-      "pseProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(" +
-      "\021\022\t\n\001h\030\004 \002(\021\"]\n\023RoundRectangleProto\022\t\n\001x",
-      "\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\022" +
-      "\014\n\004arcW\030\005 \001(\021\022\014\n\004arcH\030\006 \001(\021\"\307\001\n\010ArcProto" +
-      "\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004" +
-      " \002(\021\022\r\n\005start\030\005 \001(\021\022\016\n\006extent\030\006 \001(\021\022B\n\004t" +
-      "ype\030\007 \001(\01624.org.webswing.directdraw.prot" +
-      "o.ArcProto.ArcTypeProto\",\n\014ArcTypeProto\022" +
-      "\010\n\004OPEN\020\000\022\t\n\005CHORD\020\001\022\007\n\003PIE\020\002\"\300\001\n\tPathPr" +
-      "oto\022\022\n\nwindingOdd\030\001 \002(\010\022G\n\004type\030\002 \003(\01629." +
-      "org.webswing.directdraw.proto.PathProto." +
-      "SegmentTypeProto\022\016\n\006points\030\003 \003(\021\"F\n\020Segm",
-      "entTypeProto\022\010\n\004MOVE\020\000\022\010\n\004LINE\020\001\022\010\n\004QUAD" +
-      "\020\002\022\t\n\005CUBIC\020\003\022\t\n\005CLOSE\020\004\"\303\001\n\tFontProto\022\016" +
-      "\n\006family\030\001 \002(\t\022B\n\005style\030\002 \001(\01623.org.webs" +
-      "wing.directdraw.proto.FontProto.StylePro" +
-      "to\022\014\n\004size\030\003 \001(\r\022\016\n\006weight\030\004 \001(\r\"D\n\nStyl" +
-      "eProto\022\n\n\006NORMAL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006ITALI" +
-      "C\020\002\022\021\n\rBOLDANDITALIC\020\003\"\357\002\n\013StrokeProto\022\020" +
-      "\n\010widthX10\030\001 \002(\r\022\025\n\rmiterLimitX10\030\002 \001(\r\022" +
-      "H\n\004join\030\003 \001(\0162:.org.webswing.directdraw." +
-      "proto.StrokeProto.StrokeJoinProto\022F\n\003cap",
-      "\030\004 \001(\01629.org.webswing.directdraw.proto.S" +
-      "trokeProto.StrokeCapProto\022\017\n\007dashX10\030\005 \003" +
-      "(\r\022\022\n\ndashOffset\030\006 \001(\r\"A\n\017StrokeJoinProt" +
-      "o\022\016\n\nJOIN_MITER\020\000\022\016\n\nJOIN_ROUND\020\001\022\016\n\nJOI" +
-      "N_BEVEL\020\002\"=\n\016StrokeCapProto\022\014\n\010CAP_BUTT\020" +
-      "\000\022\r\n\tCAP_ROUND\020\001\022\016\n\nCAP_SQUARE\020\002\"\266\001\n\023Lin" +
-      "earGradientProto\022\016\n\006xStart\030\001 \002(\021\022\016\n\006ySta" +
-      "rt\030\002 \002(\021\022\014\n\004xEnd\030\003 \002(\021\022\014\n\004yEnd\030\004 \002(\021\022\016\n\006" +
-      "colors\030\005 \003(\007\022\021\n\tfractions\030\006 \003(\002\022@\n\006repea" +
-      "t\030\007 \002(\01620.org.webswing.directdraw.proto.",
-      "CyclicMethodProto\"\314\001\n\023RadialGradientProt" +
-      "o\022\017\n\007xCenter\030\001 \002(\021\022\017\n\007yCenter\030\002 \002(\021\022\016\n\006x" +
-      "Focus\030\003 \002(\021\022\016\n\006yFocus\030\004 \002(\021\022\016\n\006radius\030\005 " +
-      "\002(\021\022\016\n\006colors\030\006 \003(\007\022\021\n\tfractions\030\007 \003(\002\022@" +
-      "\n\006repeat\030\010 \002(\01620.org.webswing.directdraw" +
-      ".proto.CyclicMethodProto\"\035\n\013PointsProto\022" +
-      "\016\n\006points\030\001 \003(\021\"\231\002\n\016CompositeProto\022N\n\004ty" +
-      "pe\030\001 \002(\0162@.org.webswing.directdraw.proto" +
-      ".CompositeProto.CompositeTypeProto\022\020\n\005al" +
-      "pha\030\002 \001(\002:\0011\"\244\001\n\022CompositeTypeProto\022\t\n\005C",
-      "LEAR\020\001\022\007\n\003SRC\020\002\022\007\n\003DST\020\t\022\014\n\010SRC_OVER\020\003\022\014" +
-      "\n\010DST_OVER\020\004\022\n\n\006SRC_IN\020\005\022\n\n\006DST_IN\020\006\022\013\n\007" +
-      "SRC_OUT\020\007\022\013\n\007DST_OUT\020\010\022\014\n\010SRC_ATOP\020\n\022\014\n\010" +
-      "DST_ATOP\020\013\022\007\n\003XOR\020\014*:\n\021CyclicMethodProto" +
-      "\022\014\n\010NO_CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
+      "(\007\"\032\n\nImageProto\022\014\n\004data\030\001 \002(\014\"d\n\016Transf" +
+      "ormProto\022\016\n\003m00\030\001 \001(\002:\0011\022\013\n\003m10\030\002 \001(\002\022\013\n" +
+      "\003m01\030\003 \001(\002\022\016\n\003m11\030\004 \001(\002:\0011\022\013\n\003m02\030\005 \001(\002\022" +
+      "\013\n\003m12\030\006 \001(\002\"<\n\016RectangleProto\022\t\n\001x\030\001 \002(" +
+      "\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\":\n\014El" +
+      "lipseProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 " +
+      "\002(\021\022\t\n\001h\030\004 \002(\021\"]\n\023RoundRectangleProto\022\t\n",
+      "\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(" +
+      "\021\022\014\n\004arcW\030\005 \001(\021\022\014\n\004arcH\030\006 \001(\021\"\307\001\n\010ArcPro" +
+      "to\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h" +
+      "\030\004 \002(\021\022\r\n\005start\030\005 \001(\021\022\016\n\006extent\030\006 \001(\021\022B\n" +
+      "\004type\030\007 \001(\01624.org.webswing.directdraw.pr" +
+      "oto.ArcProto.ArcTypeProto\",\n\014ArcTypeProt" +
+      "o\022\010\n\004OPEN\020\000\022\t\n\005CHORD\020\001\022\007\n\003PIE\020\002\"\300\001\n\tPath" +
+      "Proto\022\022\n\nwindingOdd\030\001 \002(\010\022G\n\004type\030\002 \003(\0162" +
+      "9.org.webswing.directdraw.proto.PathProt" +
+      "o.SegmentTypeProto\022\016\n\006points\030\003 \003(\021\"F\n\020Se",
+      "gmentTypeProto\022\010\n\004MOVE\020\000\022\010\n\004LINE\020\001\022\010\n\004QU" +
+      "AD\020\002\022\t\n\005CUBIC\020\003\022\t\n\005CLOSE\020\004\"\303\001\n\tFontProto" +
+      "\022\016\n\006family\030\001 \002(\t\022B\n\005style\030\002 \001(\01623.org.we" +
+      "bswing.directdraw.proto.FontProto.StyleP" +
+      "roto\022\014\n\004size\030\003 \001(\r\022\016\n\006weight\030\004 \001(\r\"D\n\nSt" +
+      "yleProto\022\n\n\006NORMAL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006ITA" +
+      "LIC\020\002\022\021\n\rBOLDANDITALIC\020\003\"\346\002\n\013StrokeProto" +
+      "\022\r\n\005width\030\001 \002(\002\022\022\n\nmiterLimit\030\002 \001(\002\022H\n\004j" +
+      "oin\030\003 \001(\0162:.org.webswing.directdraw.prot" +
+      "o.StrokeProto.StrokeJoinProto\022F\n\003cap\030\004 \001",
+      "(\01629.org.webswing.directdraw.proto.Strok" +
+      "eProto.StrokeCapProto\022\014\n\004dash\030\005 \003(\002\022\022\n\nd" +
+      "ashOffset\030\006 \001(\002\"A\n\017StrokeJoinProto\022\016\n\nJO" +
+      "IN_MITER\020\000\022\016\n\nJOIN_ROUND\020\001\022\016\n\nJOIN_BEVEL" +
+      "\020\002\"=\n\016StrokeCapProto\022\014\n\010CAP_BUTT\020\000\022\r\n\tCA" +
+      "P_ROUND\020\001\022\016\n\nCAP_SQUARE\020\002\"\266\001\n\023LinearGrad" +
+      "ientProto\022\016\n\006xStart\030\001 \002(\021\022\016\n\006yStart\030\002 \002(" +
+      "\021\022\014\n\004xEnd\030\003 \002(\021\022\014\n\004yEnd\030\004 \002(\021\022\016\n\006colors\030" +
+      "\005 \003(\007\022\021\n\tfractions\030\006 \003(\002\022@\n\006repeat\030\007 \002(\016" +
+      "20.org.webswing.directdraw.proto.CyclicM",
+      "ethodProto\"\314\001\n\023RadialGradientProto\022\017\n\007xC" +
+      "enter\030\001 \002(\021\022\017\n\007yCenter\030\002 \002(\021\022\016\n\006xFocus\030\003" +
+      " \002(\021\022\016\n\006yFocus\030\004 \002(\021\022\016\n\006radius\030\005 \002(\021\022\016\n\006" +
+      "colors\030\006 \003(\007\022\021\n\tfractions\030\007 \003(\002\022@\n\006repea" +
+      "t\030\010 \002(\01620.org.webswing.directdraw.proto." +
+      "CyclicMethodProto\"\035\n\013PointsProto\022\016\n\006poin" +
+      "ts\030\001 \003(\021\"\231\002\n\016CompositeProto\022N\n\004type\030\001 \002(" +
+      "\0162@.org.webswing.directdraw.proto.Compos" +
+      "iteProto.CompositeTypeProto\022\020\n\005alpha\030\002 \001" +
+      "(\002:\0011\"\244\001\n\022CompositeTypeProto\022\t\n\005CLEAR\020\001\022",
+      "\007\n\003SRC\020\002\022\007\n\003DST\020\t\022\014\n\010SRC_OVER\020\003\022\014\n\010DST_O" +
+      "VER\020\004\022\n\n\006SRC_IN\020\005\022\n\n\006DST_IN\020\006\022\013\n\007SRC_OUT" +
+      "\020\007\022\013\n\007DST_OUT\020\010\022\014\n\010SRC_ATOP\020\n\022\014\n\010DST_ATO" +
+      "P\020\013\022\007\n\003XOR\020\014*:\n\021CyclicMethodProto\022\014\n\010NO_" +
+      "CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -17493,7 +17490,7 @@ public final class Directdraw {
           internal_static_org_webswing_directdraw_proto_TransformProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_TransformProto_descriptor,
-              new java.lang.String[] { "M00", "M10", "M01", "M11", "M02X2", "M12X2", });
+              new java.lang.String[] { "M00", "M10", "M01", "M11", "M02", "M12", });
           internal_static_org_webswing_directdraw_proto_RectangleProto_descriptor =
             getDescriptor().getMessageTypes().get(6);
           internal_static_org_webswing_directdraw_proto_RectangleProto_fieldAccessorTable = new
@@ -17535,7 +17532,7 @@ public final class Directdraw {
           internal_static_org_webswing_directdraw_proto_StrokeProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_StrokeProto_descriptor,
-              new java.lang.String[] { "WidthX10", "MiterLimitX10", "Join", "Cap", "DashX10", "DashOffset", });
+              new java.lang.String[] { "Width", "MiterLimit", "Join", "Cap", "Dash", "DashOffset", });
           internal_static_org_webswing_directdraw_proto_LinearGradientProto_descriptor =
             getDescriptor().getMessageTypes().get(13);
           internal_static_org_webswing_directdraw_proto_LinearGradientProto_fieldAccessorTable = new

@@ -60,12 +60,12 @@ message ImageProto {
 }
 
 message TransformProto {
-	optional float m00 = 1;
+	optional float m00 = 1 [default = 1];
 	optional float m10 = 2;
 	optional float m01 = 3;
-	optional float m11 = 4;
-	optional sint32 m02X2 = 5;
-	optional sint32 m12X2 = 6;
+	optional float m11 = 4 [default = 1];
+	optional float m02 = 5;
+	optional float m12 = 6;
 }
 
 message RectangleProto {
@@ -136,12 +136,12 @@ message FontProto {
 }
 
 message StrokeProto {
-	required uint32 widthX10 = 1;
-	optional uint32 miterLimitX10 = 2;
+	required float width = 1;
+	optional float miterLimit = 2;
 	optional StrokeJoinProto join = 3;
 	optional StrokeCapProto cap = 4;
-	repeated uint32 dashX10 = 5;
-	optional uint32 dashOffset = 6;
+	repeated float dash = 5;
+	optional float dashOffset = 6;
 
 	enum StrokeJoinProto {
 		JOIN_MITER = 0;

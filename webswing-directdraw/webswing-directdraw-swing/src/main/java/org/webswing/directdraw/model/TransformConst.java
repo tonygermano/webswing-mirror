@@ -26,10 +26,10 @@ public class TransformConst extends DrawConstant {
 			model.setM11((float) matrix[3]);
 		}
 		if (matrix[4] != 0) {
-			model.setM02X2((int) Math.round(matrix[4] * 2));
+			model.setM02((float) matrix[4]);
 		}
 		if (matrix[5] != 0) {
-			model.setM12X2((int) Math.round(matrix[5] * 2));
+			model.setM12((float) matrix[5]);
 		}
 		this.message = model.build();
 	}
@@ -53,10 +53,10 @@ public class TransformConst extends DrawConstant {
 			model.setM11((float) matrix[3]);
 		}
 		if (x != 0) {
-			model.setM02X2((int) Math.round(x * 2));
+			model.setM02((float) x);
 		}
 		if (y != 0) {
-			model.setM12X2((int) Math.round(y * 2));
+			model.setM12((float) y);
 		}
 		this.message = model.build();
 	}
@@ -68,6 +68,6 @@ public class TransformConst extends DrawConstant {
 
 	public AffineTransform getAffineTransform() {
 		TransformProto m = (TransformProto) this.message;
-		return new AffineTransform(m.hasM00() ? m.getM00() : 1, m.hasM10() ? m.getM10() : 0, m.hasM01() ? m.getM01() : 0, m.hasM11() ? m.getM11() : 1, m.hasM02X2() ? (m.getM02X2() / 2) : 0, m.hasM12X2() ? (m.getM12X2() / 2) : 0);
+		return new AffineTransform(m.getM00(), m.getM10(), m.getM01(), m.getM11(), m.getM02(), m.getM12());
 	}
 }

@@ -352,26 +352,18 @@
 
 		function iprtTransform(ctx, args, reset) {
 			var t = args[0].transform;
-			var a, b, c, d, e, f;
-			a = t.m00 != null ? t.m00 : 1;
-			b = t.m10 != null ? t.m10 : 0;
-			c = t.m01 != null ? t.m01 : 0;
-			d = t.m11 != null ? t.m11 : 1;
-			e = t.m02X2 != null ? t.m02X2 / 2 : 0;
-			f = t.m12X2 != null ? t.m12X2 / 2 : 0;
-			var m = [ a, b, c, d, e, f ];
 			if (reset) {
-				ctx.setTransform(a, b, c, d, e, f);
+				ctx.setTransform(t.m00, t.m10, t.m01, t.m11, t.m02, t.m12);
 			} else {
-				ctx.transform(a, b, c, d, e, f);
+				ctx.transform(t.m00, t.m10, t.m01, t.m11, t.m02, t.m12);
 			}
-			return m;
+			return [ t.m00, t.m10, t.m01, t.m11, t.m02, t.m12 ];
 		}
 
 		function iprtSetStroke(ctx, args) {
 			var stroke = args[0].stroke;
-			ctx.lineWidth = stroke.widthX10 / 10;
-			ctx.miterLimit = stroke.miterLimitX10 / 10;
+			ctx.lineWidth = stroke.width;
+			ctx.miterLimit = stroke.miterLimit;
 			switch (stroke.cap) {
 			case StrokeCapProto.CAP_BUTT:
 				ctx.lineCap = "butt";
@@ -394,12 +386,8 @@
 				ctx.lineJoin = "bevel";
 				break;
 			}
-			if (stroke.dashX10 != null) {
-				var dash = [];
-				for ( var i = 0; i < stroke.dashX10.length; i++) {
-					dash[i] = stroke.dashX10[i] / 10;
-				}
-				ctx.setLineDash(dash);
+			if (stroke.dash != null) {
+				ctx.setLineDash(stroke.dash);
 				ctx.lineDashOffset = stroke.dashOffset;
 			}
 		}
