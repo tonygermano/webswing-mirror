@@ -16610,13 +16610,13 @@ public final class Directdraw {
      */
     org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto getType();
 
-    // optional float alpha = 2;
+    // optional float alpha = 2 [default = 1];
     /**
-     * <code>optional float alpha = 2;</code>
+     * <code>optional float alpha = 2 [default = 1];</code>
      */
     boolean hasAlpha();
     /**
-     * <code>optional float alpha = 2;</code>
+     * <code>optional float alpha = 2 [default = 1];</code>
      */
     float getAlpha();
   }
@@ -16915,17 +16915,17 @@ public final class Directdraw {
       return type_;
     }
 
-    // optional float alpha = 2;
+    // optional float alpha = 2 [default = 1];
     public static final int ALPHA_FIELD_NUMBER = 2;
     private float alpha_;
     /**
-     * <code>optional float alpha = 2;</code>
+     * <code>optional float alpha = 2 [default = 1];</code>
      */
     public boolean hasAlpha() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional float alpha = 2;</code>
+     * <code>optional float alpha = 2 [default = 1];</code>
      */
     public float getAlpha() {
       return alpha_;
@@ -16933,7 +16933,7 @@ public final class Directdraw {
 
     private void initFields() {
       type_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto.CLEAR;
-      alpha_ = 0F;
+      alpha_ = 1F;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -17092,7 +17092,7 @@ public final class Directdraw {
         super.clear();
         type_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto.CLEAR;
         bitField0_ = (bitField0_ & ~0x00000001);
-        alpha_ = 0F;
+        alpha_ = 1F;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
@@ -17219,22 +17219,22 @@ public final class Directdraw {
         return this;
       }
 
-      // optional float alpha = 2;
-      private float alpha_ ;
+      // optional float alpha = 2 [default = 1];
+      private float alpha_ = 1F;
       /**
-       * <code>optional float alpha = 2;</code>
+       * <code>optional float alpha = 2 [default = 1];</code>
        */
       public boolean hasAlpha() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional float alpha = 2;</code>
+       * <code>optional float alpha = 2 [default = 1];</code>
        */
       public float getAlpha() {
         return alpha_;
       }
       /**
-       * <code>optional float alpha = 2;</code>
+       * <code>optional float alpha = 2 [default = 1];</code>
        */
       public Builder setAlpha(float value) {
         bitField0_ |= 0x00000002;
@@ -17243,11 +17243,11 @@ public final class Directdraw {
         return this;
       }
       /**
-       * <code>optional float alpha = 2;</code>
+       * <code>optional float alpha = 2 [default = 1];</code>
        */
       public Builder clearAlpha() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        alpha_ = 0F;
+        alpha_ = 1F;
         onChanged();
         return this;
       }
@@ -17443,15 +17443,15 @@ public final class Directdraw {
       "\002(\021\022\016\n\006colors\030\006 \003(\007\022\021\n\tfractions\030\007 \003(\002\022@" +
       "\n\006repeat\030\010 \002(\01620.org.webswing.directdraw" +
       ".proto.CyclicMethodProto\"\035\n\013PointsProto\022" +
-      "\016\n\006points\030\001 \003(\021\"\226\002\n\016CompositeProto\022N\n\004ty" +
+      "\016\n\006points\030\001 \003(\021\"\231\002\n\016CompositeProto\022N\n\004ty" +
       "pe\030\001 \002(\0162@.org.webswing.directdraw.proto" +
-      ".CompositeProto.CompositeTypeProto\022\r\n\005al" +
-      "pha\030\002 \001(\002\"\244\001\n\022CompositeTypeProto\022\t\n\005CLEA",
-      "R\020\001\022\007\n\003SRC\020\002\022\007\n\003DST\020\t\022\014\n\010SRC_OVER\020\003\022\014\n\010D" +
-      "ST_OVER\020\004\022\n\n\006SRC_IN\020\005\022\n\n\006DST_IN\020\006\022\013\n\007SRC" +
-      "_OUT\020\007\022\013\n\007DST_OUT\020\010\022\014\n\010SRC_ATOP\020\n\022\014\n\010DST" +
-      "_ATOP\020\013\022\007\n\003XOR\020\014*:\n\021CyclicMethodProto\022\014\n" +
-      "\010NO_CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
+      ".CompositeProto.CompositeTypeProto\022\020\n\005al" +
+      "pha\030\002 \001(\002:\0011\"\244\001\n\022CompositeTypeProto\022\t\n\005C",
+      "LEAR\020\001\022\007\n\003SRC\020\002\022\007\n\003DST\020\t\022\014\n\010SRC_OVER\020\003\022\014" +
+      "\n\010DST_OVER\020\004\022\n\n\006SRC_IN\020\005\022\n\n\006DST_IN\020\006\022\013\n\007" +
+      "SRC_OUT\020\007\022\013\n\007DST_OUT\020\010\022\014\n\010SRC_ATOP\020\n\022\014\n\010" +
+      "DST_ATOP\020\013\022\007\n\003XOR\020\014*:\n\021CyclicMethodProto" +
+      "\022\014\n\010NO_CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

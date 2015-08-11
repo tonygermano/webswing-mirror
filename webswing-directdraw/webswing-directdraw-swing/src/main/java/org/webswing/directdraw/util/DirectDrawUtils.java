@@ -144,7 +144,7 @@ public class DirectDrawUtils {
 				if (graphicsCreate != null) {
 					graphicsCreate.setArgs(concat(new DrawConstant[] { graphicsCreate.getArgs()[0], new TransformConst(ctx, mergedTx), mergedStroke, mergedComposite }, mergedPaint));
 					newInstructions.add(graphicsCreate);
-					graphicsCreateMap.remove(graphicsCreate.getArgs()[1]);
+					graphicsCreateMap.remove(graphicsCreate.getArgs()[1].getAddress());
 					graphicsCreate = null;
 				} else {
 					setGraphicsStatus(ctx, newInstructions, mergedTx, mergedStroke, mergedComposite, mergedPaint);

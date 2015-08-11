@@ -637,8 +637,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 */
 	protected void writeSetTransform(AffineTransform transform) throws IOException {
 		try {
-			AffineTransform deltaTransform = new AffineTransform(transform);
-			deltaTransform.concatenate(oldTransform.createInverse());
+			AffineTransform deltaTransform = oldTransform.createInverse();
+			deltaTransform.concatenate(transform);
 			writeTransform(deltaTransform);
 		} catch (NoninvertibleTransformException e) {
 			handleException(e);
@@ -886,9 +886,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * @return current font render context
 	 */
 	public FontRenderContext getFontRenderContext() {
-		// NOTE: not sure?
-		// Fixed for VG-285
-		return new FontRenderContext(new AffineTransform(1, 0, 0, 1, 0, 0), true, true);
+		boolean antialias = RenderingHints.VALUE_TEXT_ANTIALIAS_ON.equals(getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING));
+		boolean fractions = RenderingHints.VALUE_FRACTIONALMETRICS_ON.equals(getRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS));
+		return new FontRenderContext(new AffineTransform(), antialias, fractions);
 	}
 
 	/**

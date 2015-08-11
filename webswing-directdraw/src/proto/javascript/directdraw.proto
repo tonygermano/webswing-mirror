@@ -189,7 +189,7 @@ message PointsProto {
 
 message CompositeProto {
 	required CompositeTypeProto type = 1;
-	optional float alpha = 2;
+	optional float alpha = 2 [default = 1];
 
 	enum CompositeTypeProto {
 	    CLEAR = 1;

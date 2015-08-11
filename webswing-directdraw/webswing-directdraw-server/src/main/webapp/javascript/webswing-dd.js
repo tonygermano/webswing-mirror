@@ -541,9 +541,7 @@
 		function iprtSetComposite(ctx, args) {
 			var composite = args[0].composite;
 			if (composite != null) {
-				if (composite.alpha != null) {
-					ctx.globalAlpha = composite.alpha;
-				}
+			    ctx.globalAlpha = composite.alpha;
 				switch (composite.type) {
 				case CompositeTypeProto.CLEAR:
 					ctx.globalCompositeOperation = "destination-out";

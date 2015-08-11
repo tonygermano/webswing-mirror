@@ -25,7 +25,6 @@ public class CompositeConst extends DrawConstant {
 
 	public AlphaComposite getComposite() {
 		CompositeProto c = (CompositeProto) message;
-		float alpha = c.hasAlpha() ? c.getAlpha() : 1;
-		return AlphaComposite.getInstance(c.getType().getNumber(), alpha);
+		return AlphaComposite.getInstance(c.getType().getNumber(), c.getAlpha());
 	}
 }
