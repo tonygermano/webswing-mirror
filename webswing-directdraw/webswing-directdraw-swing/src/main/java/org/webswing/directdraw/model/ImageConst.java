@@ -41,16 +41,13 @@ public class ImageConst extends DrawConstant {
 	public String getFieldName() {
 		return "image";
 	}
-
-	public TexturePaint getTexturePaint(Rectangle2D anchor) {
-		ImageProto ip = (ImageProto) message;
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(ip.getData().newInput());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return new TexturePaint(img, anchor);
-	}
-
+    
+    public static BufferedImage getImage(ImageProto i) {
+        try {
+            return ImageIO.read(i.getData().newInput());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

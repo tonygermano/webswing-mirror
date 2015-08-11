@@ -45,8 +45,8 @@ public class DrawInstructionFactory {
 		DrawConstant transformConst =  transform != null ? new TransformConst(ctx, transform) : DrawConstant.nullConst;
 		DrawConstant compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
 		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
-		DrawInstruction paintInst = setPaint(g.getPaint());
-        return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, DirectDrawUtils.concat(new DrawConstant[] {gid, transformConst, strokeConst, compositeConst}, paintInst.getArgs()));
+		DrawConstant paintConst = getPaintConstant(g.getPaint());
+		return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, gid, transformConst, strokeConst, compositeConst, paintConst);
 	}
 
 	public DrawInstruction disposeGraphics(WebGraphics g) {
@@ -62,20 +62,24 @@ public class DrawInstructionFactory {
 	}
 
 	public DrawInstruction setPaint(Paint p) {
-		if (p instanceof Color) {
-			return new DrawInstruction(InstructionProto.SET_PAINT, new ColorConst(ctx, (Color) p));
-		} else if (p instanceof GradientPaint) {
-			return new DrawInstruction(InstructionProto.SET_PAINT, new LinearGradientConst(ctx, (GradientPaint) p));
-		} else if (p instanceof LinearGradientPaint) {
-			return new DrawInstruction(InstructionProto.SET_PAINT, new LinearGradientConst(ctx, (LinearGradientPaint) p));
-		} else if (p instanceof RadialGradientPaint) {
-			return new DrawInstruction(InstructionProto.SET_PAINT, new RadialGradientConst(ctx, (RadialGradientPaint) p));
-		} else if (p instanceof TexturePaint) {
-			TexturePaint t = (TexturePaint) p;
-			return new DrawInstruction(InstructionProto.SET_PAINT, new ImageConst(ctx, t.getImage(), null), new RectangleConst(ctx, t.getAnchorRect()));
-		}
-		return new DrawInstruction(InstructionProto.SET_PAINT);
+		return new DrawInstruction(InstructionProto.SET_PAINT, getPaintConstant(p));
 	}
+    
+    protected DrawConstant getPaintConstant(Paint p)
+    {
+        if (p instanceof Color) {
+            return new ColorConst(ctx, (Color) p);
+        } else if (p instanceof GradientPaint) {
+            return new LinearGradientConst(ctx, (GradientPaint) p);
+        } else if (p instanceof LinearGradientPaint) {
+            return new LinearGradientConst(ctx, (LinearGradientPaint) p);
+        } else if (p instanceof RadialGradientPaint) {
+            return new RadialGradientConst(ctx, (RadialGradientPaint) p);
+        } else if (p instanceof TexturePaint) {
+            return new TextureConst(ctx, (TexturePaint) p);
+        }
+        throw new UnsupportedOperationException();
+    }
 
 	public DrawInstruction setFont(Font f) {
 		return new DrawInstruction(InstructionProto.SET_FONT, new FontConst(ctx, f));

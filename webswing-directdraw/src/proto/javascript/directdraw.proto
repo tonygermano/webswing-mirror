@@ -49,6 +49,7 @@ message DrawConstantProto {
 	optional ArcProto arc = 14;
 	optional StrokeProto stroke = 15;
 	optional CompositeProto composite = 16;
+    optional TextureProto texture = 17;
 }
 
 message ColorProto {
@@ -205,4 +206,9 @@ message CompositeProto {
 		DST_ATOP = 11;
 		XOR = 12;
 	}
+}
+
+message TextureProto {
+    required ImageProto image = 1;
+    required RectangleProto anchor = 2;
 }

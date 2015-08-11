@@ -399,9 +399,9 @@
 				ctx.fillStyle = color;
 				ctx.strokeStyle = color;
 			}
-			if (constant.image != null) {
-				var anchor = args[1].rectangle;
-				var preloadedImage = constant.image.data;
+			if (constant.texture != null) {
+				var anchor = constant.texture.anchor;
+				var preloadedImage = constant.texture.image.data;
 				var ptrn;
 				if (anchor.x == 0 && anchor.y == 0 && anchor.w == preloadedImage.width && anchor == preloadedImage.height) {
 					ptrn = ctx.createPattern(preloadedImage, 'repeat');

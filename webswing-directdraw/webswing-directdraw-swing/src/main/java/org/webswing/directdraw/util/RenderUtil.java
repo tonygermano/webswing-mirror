@@ -205,10 +205,9 @@ public class RenderUtil {
 			result = ((LinearGradientConst) paintConst).getLinearGradientPaint();
 		} else if (paintConst instanceof RadialGradientConst) {
 			result = ((RadialGradientConst) paintConst).getRadialGradientPaint();
-		} else if (paintConst instanceof ImageConst) {
-			RectangleConst rect = getConst(offset + 1, di, RectangleConst.class);
-			result = ((ImageConst) paintConst).getTexturePaint(rect.getRectangle(false));
-		}
+		} else if (paintConst instanceof TextureConst) {
+            result = ((TextureConst) paintConst).getTexture();
+        }
 		return result;
 	}
 

@@ -87,22 +87,13 @@ public class DirectDrawUtils {
 		return result;
 	}
 
-	public static DrawConstant[] concat(DrawConstant[] a, DrawConstant[] b) {
-		int aLen = a.length;
-		int bLen = b.length;
-		DrawConstant[] c = new DrawConstant[aLen + bLen];
-		System.arraycopy(a, 0, c, 0, aLen);
-		System.arraycopy(b, 0, c, aLen, bLen);
-		return c;
-	}
-
 	public static void optimizeInstructions(DirectDraw ctx, List<DrawInstruction> instructions) {
 
 		// step 1. group consequent transformations
 		AffineTransform mergedTx = null;
 		StrokeConst mergedStroke = null;
 		CompositeConst mergedComposite = null;
-		DrawConstant[] mergedPaint = null;
+		DrawConstant mergedPaint = null;
 		DrawInstruction graphicsCreate = null;
 		Map<Integer, DrawInstruction> graphicsCreateMap = new HashMap<Integer, DrawInstruction>();
 		List<DrawInstruction> newInstructions = new ArrayList<DrawInstruction>();
@@ -118,11 +109,11 @@ public class DirectDrawUtils {
 			} else if (current.getInstruction().equals(InstructionProto.SET_COMPOSITE)) {
 				mergedComposite = ((CompositeConst) current.getArgs()[0]);
 			} else if (current.getInstruction().equals(InstructionProto.SET_PAINT)) {
-				mergedPaint = current.getArgs();
+				mergedPaint = current.getArgs()[0];
 			} else if (current.getInstruction().equals(InstructionProto.GRAPHICS_CREATE) || current.getInstruction().equals(InstructionProto.GRAPHICS_SWITCH)) {
 				boolean isGraphicsCreateInst = current.getInstruction().equals(InstructionProto.GRAPHICS_CREATE);
 				if (graphicsCreate != null) {
-					graphicsCreate.setArgs(concat(new DrawConstant[] { graphicsCreate.getArgs()[0], new TransformConst(ctx, mergedTx), mergedStroke, mergedComposite }, mergedPaint));
+					graphicsCreate.setArgs(new DrawConstant[] { graphicsCreate.getArgs()[0], new TransformConst(ctx, mergedTx), mergedStroke, mergedComposite, mergedPaint });
 					graphicsCreateMap.put(graphicsCreate.getArgs()[0].getAddress(), graphicsCreate);
 				}
 				graphicsCreate = isGraphicsCreateInst ? current : graphicsCreateMap.get(current.getArgs()[0].getAddress());
@@ -130,8 +121,8 @@ public class DirectDrawUtils {
 					mergedTx = ((TransformConst) graphicsCreate.getArgs()[1]).getAffineTransform();
 					mergedStroke = ((StrokeConst) graphicsCreate.getArgs()[2]);
 					mergedComposite = ((CompositeConst) graphicsCreate.getArgs()[3]);
-					mergedPaint = Arrays.copyOfRange(graphicsCreate.getArgs(), 4, graphicsCreate.getArgs().length);
-				} else {// if graphisc switch instruction and the create instruction already in result array
+					mergedPaint = graphicsCreate.getArgs()[4];
+				} else {// if graphics switch instruction and the create instruction already in result array
 						// then add all status change for old graphics and add the switch inst
 					setGraphicsStatus(ctx, newInstructions, mergedTx, mergedStroke, mergedComposite, mergedPaint);
 					mergedTx = null;
@@ -142,7 +133,7 @@ public class DirectDrawUtils {
 				}
 			} else {
 				if (graphicsCreate != null) {
-					graphicsCreate.setArgs(concat(new DrawConstant[] { graphicsCreate.getArgs()[0], new TransformConst(ctx, mergedTx), mergedStroke, mergedComposite }, mergedPaint));
+					graphicsCreate.setArgs(new DrawConstant[] { graphicsCreate.getArgs()[0], new TransformConst(ctx, mergedTx), mergedStroke, mergedComposite , mergedPaint });
 					newInstructions.add(graphicsCreate);
 					graphicsCreateMap.remove(graphicsCreate.getArgs()[1].getAddress());
 					graphicsCreate = null;
@@ -161,7 +152,7 @@ public class DirectDrawUtils {
 		instructions.addAll(newInstructions);
 	}
 
-	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> newInstructions, AffineTransform mergedTx, StrokeConst mergedStroke, CompositeConst mergedComposite, DrawConstant[] mergedPaint) {
+	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> newInstructions, AffineTransform mergedTx, StrokeConst mergedStroke, CompositeConst mergedComposite, DrawConstant mergedPaint) {
 		if (mergedTx != null) {
 			if (!mergedTx.isIdentity()) {
 				newInstructions.add(ctx.getInstructionFactory().transform(mergedTx));
