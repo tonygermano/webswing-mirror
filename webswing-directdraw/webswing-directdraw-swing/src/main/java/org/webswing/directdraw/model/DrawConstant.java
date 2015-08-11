@@ -9,8 +9,8 @@ public abstract class DrawConstant {
 
 	private DirectDraw context;
 
-	private int address = -1;
-	private Long hash = null;
+	private int id = -1;
+	protected Long hash = null;
 	protected Object message;
 
 	public DrawConstant(DirectDraw context) {
@@ -21,12 +21,12 @@ public abstract class DrawConstant {
 		return message;
 	}
 
-	public int getAddress() {
-		return address;
+	public int getId() {
+		return id;
 	}
 
-	public void setAddress(int address) {
-		this.address = address;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public DirectDraw getContext() {
@@ -71,43 +71,38 @@ public abstract class DrawConstant {
 
 		public NullConst() {
 			super(null);
+            hash = 0L;
 		}
 
-		@Override
+        @Override
+        public int getId()
+        {
+            // always have zero id
+            return 0;
+        }
+
+        @Override
 		public String getFieldName() {
 			return null;
 		}
-
-		@Override
-		protected long getHash() {
-			return 0;
-		}
-
-		@Override
-		public int hashCode() {
-			return 0;
-		}
-
 	}
 
 	public static class Integer extends DrawConstant {
 
 		public Integer(int integer) {
 			super(null);
-			setAddress(integer);
+			setId(integer);
 		}
 
 		@Override
 		public String getFieldName() {
 			return null;
 		}
-
 	}
 
 	public static class HashConst extends DrawConstant {
 
-		long hash;
-		DrawConstant parent;
+        private DrawConstant parent;
 
 		public HashConst(DrawConstant dc) {
 			super(null);
@@ -121,22 +116,15 @@ public abstract class DrawConstant {
 		}
 
 		@Override
-		protected long getHash() {
-			return hash;
-		}
-
-		@Override
-		public void setAddress(int address) {
-			parent.setAddress(address);
+		public void setId(int id) {
+            super.setId(id);
+			parent.setId(id);
 			parent = null;
-			super.setAddress(address);
 		}
 
 		@Override
 		public String getFieldName() {
 			return null;
 		}
-
 	}
-
 }

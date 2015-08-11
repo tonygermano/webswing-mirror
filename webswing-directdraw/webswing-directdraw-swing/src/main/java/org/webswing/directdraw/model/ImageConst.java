@@ -13,8 +13,6 @@ import org.webswing.directdraw.proto.Directdraw.*;
 
 public class ImageConst extends DrawConstant {
 
-	private long hash;
-
 	public ImageConst(DirectDraw context, BufferedImage img, Long hash) {
 		super(context);
 		ImageProto.Builder model = ImageProto.newBuilder();
@@ -30,11 +28,6 @@ public class ImageConst extends DrawConstant {
 			e.printStackTrace();
 		}
 		this.message = model.build();
-	}
-
-	@Override
-	protected long getHash() {
-		return hash;
 	}
 
 	@Override

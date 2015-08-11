@@ -35,7 +35,7 @@ public class RenderUtil {
 			case GRAPHICS_DISPOSE:
 				break;
 			case GRAPHICS_SWITCH:
-				currentg = gmap.get(getConst(0, di, DrawConstant.Integer.class).getAddress());
+				currentg = gmap.get(getConst(0, di, DrawConstant.Integer.class).getId());
 				break;
 			case FILL:
 				iprtFill(currentg, di);
@@ -184,7 +184,7 @@ public class RenderUtil {
 		if (paint != null) {
 			g.setPaint(paint);
 		}
-		gmap.put(idConst.getAddress(), g);
+		gmap.put(idConst.getId(), g);
 		return g;
 	}
 

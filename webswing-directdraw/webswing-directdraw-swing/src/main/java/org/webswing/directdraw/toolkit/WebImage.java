@@ -310,37 +310,34 @@ public class WebImage extends Image {
 				Integer[] points = ((PointsConst) constants[1]).getIntArray();
 				if (!imagePool.isInCache(imageHashConst)) {
 					ImageConst imageConst = new ImageConst(context, subImage, hash);
-					imagePool.getCachedConstant(new DrawConstant.HashConst(imageConst));
+					imagePool.addToCache(new DrawConstant.HashConst(imageConst));
 					DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
-					builder.setId(imageConst.getAddress());
+					builder.setId(imageConst.getId());
 					if (imageConst.getFieldName() != null) {
 						builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(imageConst.getFieldName()), imageConst.extractMessage(dd));
 					}
 					webImageBuilder.addImages(builder.build());
-					constants[1] = new PointsConst(context, imageConst.getAddress(), points[1], points[2]);
+					constants[1] = new PointsConst(context, imageConst.getId(), points[1], points[2]);
 				} else {
-					DrawConstant imageRef = imagePool.getCachedConstant(imageHashConst);
-					constants[1] = new PointsConst(context, imageRef.getAddress(), points[1], points[2]);
+                    constants[1] = new PointsConst(context, imagePool.getCached(imageHashConst).getId(), points[1], points[2]);
 				}
 			}
 		}
 		// build proto message
 		for (DrawInstruction ins : instructions) {
-			DrawConstant[] constants = ins.getArgs();
-			for (DrawConstant cons : constants) {
-				if (!(cons instanceof DrawConstant.Integer)) {
+			for (DrawConstant cons : ins.getArgs()) {
+				if (!(cons instanceof DrawConstant.Integer) && cons != DrawConstant.nullConst) {
 					// update cache
 					if (!constantPool.isInCache(cons)) {
-						constantPool.getCachedConstant(new DrawConstant.HashConst(cons));
+						constantPool.addToCache(new DrawConstant.HashConst(cons));
 						DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
-						builder.setId(cons.getAddress());
+						builder.setId(cons.getId());
 						if (cons.getFieldName() != null) {
 							builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(cons.getFieldName()), cons.extractMessage(dd));
 						}
 						webImageBuilder.addConstants(builder.build());
 					} else {
-						DrawConstant cached = constantPool.getCachedConstant(cons);
-						cons.setAddress(cached.getAddress());
+                        cons.setId(constantPool.getCached(cons).getId());
 					}
 				}
 			}

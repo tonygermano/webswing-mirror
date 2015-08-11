@@ -114,9 +114,9 @@ public class DirectDrawUtils {
 				boolean isGraphicsCreateInst = current.getInstruction().equals(InstructionProto.GRAPHICS_CREATE);
 				if (graphicsCreate != null) {
 					graphicsCreate.setArgs(new DrawConstant[] { graphicsCreate.getArgs()[0], new TransformConst(ctx, mergedTx), mergedStroke, mergedComposite, mergedPaint });
-					graphicsCreateMap.put(graphicsCreate.getArgs()[0].getAddress(), graphicsCreate);
+					graphicsCreateMap.put(graphicsCreate.getArgs()[0].getId(), graphicsCreate);
 				}
-				graphicsCreate = isGraphicsCreateInst ? current : graphicsCreateMap.get(current.getArgs()[0].getAddress());
+				graphicsCreate = isGraphicsCreateInst ? current : graphicsCreateMap.get(current.getArgs()[0].getId());
 				if (graphicsCreate != null) {
 					mergedTx = ((TransformConst) graphicsCreate.getArgs()[1]).getAffineTransform();
 					mergedStroke = ((StrokeConst) graphicsCreate.getArgs()[2]);
@@ -135,7 +135,7 @@ public class DirectDrawUtils {
 				if (graphicsCreate != null) {
 					graphicsCreate.setArgs(new DrawConstant[] { graphicsCreate.getArgs()[0], new TransformConst(ctx, mergedTx), mergedStroke, mergedComposite , mergedPaint });
 					newInstructions.add(graphicsCreate);
-					graphicsCreateMap.remove(graphicsCreate.getArgs()[1].getAddress());
+					graphicsCreateMap.remove(graphicsCreate.getArgs()[0].getId());
 					graphicsCreate = null;
 				} else {
 					setGraphicsStatus(ctx, newInstructions, mergedTx, mergedStroke, mergedComposite, mergedPaint);
