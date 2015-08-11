@@ -101,7 +101,9 @@ public class RenderUtil {
 		Shape clip = getShape(getConst(3, di, DrawConstant.class));
 		g.setClip(clip);
 		AffineTransform original = g.getTransform();
-		g.transform(t.getAffineTransform());
+        if (t != null) {
+            g.transform(t.getAffineTransform());
+        }
 		g.drawImage(i, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(), (int) crop.getX(), (int) crop.getY(), (int) crop.getX() + (int) crop.getWidth(), (int) crop.getY() + (int) crop.getHeight(), null);
 		g.setTransform(original);
 	}

@@ -154,9 +154,7 @@ public class DirectDrawUtils {
 
 	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> newInstructions, AffineTransform mergedTx, StrokeConst mergedStroke, CompositeConst mergedComposite, DrawConstant mergedPaint) {
 		if (mergedTx != null) {
-			if (!mergedTx.isIdentity()) {
-				newInstructions.add(ctx.getInstructionFactory().transform(mergedTx));
-			}
+            newInstructions.add(ctx.getInstructionFactory().transform(mergedTx));
 		}
 		if (mergedStroke != null) {
 			newInstructions.add(new DrawInstruction(InstructionProto.SET_STROKE, mergedStroke));

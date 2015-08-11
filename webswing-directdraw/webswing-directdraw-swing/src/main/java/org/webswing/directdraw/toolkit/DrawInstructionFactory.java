@@ -6,7 +6,6 @@ import java.awt.geom.*;
 import org.webswing.directdraw.*;
 import org.webswing.directdraw.model.*;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.*;
-import org.webswing.directdraw.util.*;
 
 public class DrawInstructionFactory {
 
@@ -41,8 +40,7 @@ public class DrawInstructionFactory {
 
 	public DrawInstruction createGraphics(WebGraphics g) {
 		DrawConstant gid = new DrawConstant.Integer(g.getId());
-		AffineTransform transform = g.getTransform();
-		DrawConstant transformConst =  transform != null ? new TransformConst(ctx, transform) : DrawConstant.nullConst;
+		DrawConstant transformConst =  new TransformConst(ctx, g.getTransform());
 		DrawConstant compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
 		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
 		DrawConstant paintConst = getPaintConstant(g.getPaint());
