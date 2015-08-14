@@ -306,6 +306,18 @@
 			<properties>
 				<webswingRoot>${project.build.directory}/demo</webswingRoot>
 			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.webswing</groupId>
+					<artifactId>webswing-demo-swingset3</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.webswing</groupId>
+					<artifactId>webswing-demo-nbplatform</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
 			<build>
 				<plugins>
 					<plugin>
@@ -327,6 +339,20 @@
 											<fileset
 												dir="${project.basedir}/../webswing-assembly/src/main/demo">
 												<include name="**/*" />
+											</fileset>
+										</copy>
+										<copy todir="${project.build.directory}/demo/demo/SwingSet3">
+											<fileset
+												dir="${project.basedir}/../webswing-demo/webswing-demo-swingset3/target">
+												<include name="lib/*.jar" />
+												<include name="SwingSet3.jar" />
+											</fileset>
+										</copy>
+										<copy todir="${project.build.directory}/demo/demo/nbmin">
+											<fileset
+												dir="${project.basedir}/../webswing-demo/webswing-demo-nbplatform/target">
+												<include name="lib/*.jar" />
+												<include name="nbplatform.jar" />
 											</fileset>
 										</copy>
 									</target>

@@ -5,7 +5,6 @@
 	<id>distribution</id>
 	<formats>
 		<format>zip</format>
-		<format>dir</format>
 	</formats>
 	<fileSets>
 		<fileSet>
@@ -20,6 +19,22 @@
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>*/**</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../webswing-demo/webswing-demo-swingset3/target</directory>
+			<outputDirectory>/demo/SwingSet3</outputDirectory>
+			<includes>
+				<include>lib/*.jar</include>
+				<include>SwingSet3.jar</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../webswing-demo/webswing-demo-nbplatform/target</directory>
+			<outputDirectory>/demo/nbmin</outputDirectory>
+			<includes>
+				<include>lib/*.jar</include>
+				<include>nbplatform.jar</include>
 			</includes>
 		</fileSet>
 	</fileSets>

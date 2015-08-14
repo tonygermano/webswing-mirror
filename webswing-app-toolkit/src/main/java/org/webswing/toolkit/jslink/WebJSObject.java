@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 import netscape.javascript.JSException;
@@ -27,7 +29,7 @@ public class WebJSObject extends JSObject {
 	private static final Map<String, WeakReference<JSObjectMsg>> jsGarbageCollectionMap = new HashMap<String, WeakReference<JSObjectMsg>>();
 	private static final WeakValueHashMap<String, Object> javaReferences = new WeakValueHashMap<String, Object>();
 	private static boolean jsLinkAllowed = Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK);
-
+	private static Executor javaEvalThread = Executors.newSingleThreadScheduledExecutor();
 	private JSObjectMsg jsThis;
 
 	public WebJSObject(JSObjectMsg jsThis) {
@@ -140,14 +142,21 @@ public class WebJSObject extends JSObject {
 		return o;
 	}
 
-	public static void evaluateJava(JavaEvalRequestMsgIn javaReq) {
-		if (jsLinkAllowed) {
-			Object javaRef = javaReferences.get(javaReq.getObjectId());
-			AppFrameMsgOut result = JsLinkUtil.callMatchingMethod(javaReq, javaRef);
-			Services.getConnectionService().sendObject(result);
-		} else {
-			Serializable result = JsLinkUtil.getErrorResponse(javaReq, "JsLink is not allowed for this application. Set the 'allowJsLink' to true in webswing.config to enable it.");
-			Services.getConnectionService().sendObject(result);
-		}
+	public static void evaluateJava(final JavaEvalRequestMsgIn javaReq) {
+		javaEvalThread.execute(new Runnable() {
+
+			@Override
+			public void run() {
+				if (jsLinkAllowed) {
+					Object javaRef = javaReferences.get(javaReq.getObjectId());
+					AppFrameMsgOut result = JsLinkUtil.callMatchingMethod(javaReq, javaRef);
+					Services.getConnectionService().sendObject(result);
+				} else {
+					Serializable result = JsLinkUtil.getErrorResponse(javaReq, "JsLink is not allowed for this application. Set the 'allowJsLink' to true in webswing.config to enable it.");
+					Services.getConnectionService().sendObject(result);
+				}
+			}
+		});
+
 	}
 }
