@@ -340,10 +340,10 @@ public class WebPaintDispatcher {
 		}
 	}
 
-	public void notifyCopyEvent(String content, String html) {
+	public void notifyCopyEvent(String content, String html, byte[] img, List<String> files, boolean other) {
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		CopyEventMsg copyEvent;
-		copyEvent = new CopyEventMsg(content, html);
+		copyEvent = new CopyEventMsg(content, html, img, files, other);
 		f.setCopyEvent(copyEvent);
 		Logger.debug("WebPaintDispatcher:notifyCopyEvent", f);
 		Services.getConnectionService().sendObject(f);

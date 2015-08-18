@@ -4,10 +4,11 @@ import java.applet.Applet;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -20,13 +21,13 @@ import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
-import javax.swing.text.JTextComponent;
 
 import netscape.javascript.JSObject;
 
 import org.webswing.Constants;
 import org.webswing.model.MsgIn;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.c2s.CopyEventMsgIn;
 import org.webswing.model.c2s.KeyboardEventMsgIn;
 import org.webswing.model.c2s.MouseEventMsgIn;
 import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
@@ -34,8 +35,10 @@ import org.webswing.model.c2s.PasteEventMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.c2s.UploadEventMsgIn;
 import org.webswing.model.c2s.UploadedEventMsgIn;
+import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.model.jslink.JSObjectMsg;
 import org.webswing.toolkit.WebClipboard;
+import org.webswing.toolkit.WebClipboardTransferable;
 import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
@@ -85,7 +88,11 @@ public class WebEventDispatcher {
 		}
 		if (event instanceof PasteEventMsgIn) {
 			PasteEventMsgIn paste = (PasteEventMsgIn) event;
-			handlePasteEvent(paste.getContent());
+			handlePasteEvent(paste);
+		}
+		if (event instanceof CopyEventMsgIn) {
+			CopyEventMsgIn copy = (CopyEventMsgIn) event;
+			handleCopyEvent(copy);
 		}
 		if (event instanceof UploadedEventMsgIn) {
 			handleUploadedEvent((UploadedEventMsgIn) event);
@@ -165,22 +172,10 @@ public class WebEventDispatcher {
 				}
 				AWTEvent e = new KeyEvent(src, type, when, modifiers, event.getKeycode(), (char) event.getCharacter(), KeyEvent.KEY_LOCATION_STANDARD);
 
-				// filter out ctrl+c for copy
-				if (event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && event.getCharacter() == 67 && event.isCtrl() == true && event.isAlt() == false && event.isAltgr() == false && event.isMeta() == false && event.isShift() == false) {
-					// on copy event - do nothing, default behavior calls
-					// setContents on WebClipboard, which notifies the browser
-				}
-				if (event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && event.getCharacter() == 86 && event.isCtrl() == true && event.isAlt() == false && event.isAltgr() == false && event.isMeta() == false && event.isShift() == false) {
-					// on paste event -do nothing
-				} else {
-					dispatchEventInSwing(w, e);
-					if (event.getKeycode() == 32 && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown) {// space
-																													// keycode
-																													// handle
-																													// press
-						event.setType(KeyboardEventMsgIn.KeyEventType.keypress);
-						dispatchKeyboardEvent(event);
-					}
+				dispatchEventInSwing(w, e);
+				if (event.getKeycode() == 32 && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown) {// space keycode handle press
+					event.setType(KeyboardEventMsgIn.KeyEventType.keypress);
+					dispatchKeyboardEvent(event);
 				}
 			}
 		}
@@ -279,21 +274,100 @@ public class WebEventDispatcher {
 		return 1;
 	}
 
-	private void handlePasteEvent(final String content) {
-		Logger.debug("WebEventDispatcher.handlePasteEvent", content);
-		final Component c = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-		if (c != null && c instanceof JTextComponent) {
-			SwingUtilities.invokeLater(new Runnable() {
+	private void handleCopyEvent(final CopyEventMsgIn copy) {
+		SwingUtilities.invokeLater(new Runnable() {
 
-				@Override
-				public void run() {
-					JTextComponent txtc = (JTextComponent) c;
-					WebClipboard wc = (WebClipboard) Util.getWebToolkit().getSystemClipboard();
-					wc.setContent(content);
-					txtc.paste();
+			@Override
+			public void run() {
+				if (copy.getType() != null) {
+					switch (copy.getType()) {
+					case copy:
+						dispatchCopyEvent();
+						break;
+					case cut:
+						dispatchCutEvent();
+						break;
+					case getFileFromClipboard:
+						handleClipboardFileDownload(copy);
+					}
 				}
-			});
+			}
+		});
+	}
+
+	private void handleClipboardFileDownload(CopyEventMsgIn copy) {
+		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD)) {
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			if (clipboard.isDataFlavorAvailable(DataFlavor.javaFileListFlavor)) {
+				try {
+					List<?> files = (List<?>) clipboard.getData(DataFlavor.javaFileListFlavor);
+					for (Object o : files) {
+						File file = (File) o;
+						if (file.getAbsolutePath().equals(copy.getFile())) {
+							if (file != null && file.exists() && !file.isDirectory() && file.canRead()) {
+								OpenFileResultMsgInternal f = new OpenFileResultMsgInternal();
+								f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
+								f.setF(file);
+								Util.getWebToolkit().getPaintDispatcher().sendObject(f);
+							} else {
+								Logger.error("Failed to download file " + copy.getFile() + " from clipboard. File is not accessible or is a directory");
+							}
+						}
+					}
+				} catch (Exception e) {
+					Logger.error("Failed to download file " + copy.getFile() + " from clipboard.", e);
+				}
+			}
 		}
+	}
+
+	private void handlePasteEvent(final PasteEventMsgIn paste) {
+		Logger.debug("WebEventDispatcher.handlePasteEvent", paste);
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				WebClipboardTransferable transferable = new WebClipboardTransferable(paste);
+				if (!transferable.isEmpty()) {
+					WebClipboard wc = (WebClipboard) Util.getWebToolkit().getSystemClipboard();
+					wc.setContents(transferable);
+				}
+				WebEventDispatcher.this.dispatchPasteEvent();
+			}
+		});
+	}
+
+	private void dispatchPasteEvent() {
+		KeyboardEventMsgIn event = new KeyboardEventMsgIn();
+		event.setType(KeyboardEventMsgIn.KeyEventType.keydown);
+		event.setCharacter(KeyEvent.VK_V);
+		event.setKeycode(KeyEvent.VK_V);// 'v'
+		event.setCtrl(true);
+		dispatchKeyboardEvent(event);
+		event.setType(KeyboardEventMsgIn.KeyEventType.keyup);
+		dispatchKeyboardEvent(event);
+	}
+
+	private void dispatchCopyEvent() {
+		KeyboardEventMsgIn event = new KeyboardEventMsgIn();
+		event.setType(KeyboardEventMsgIn.KeyEventType.keydown);
+		event.setCharacter(KeyEvent.VK_C); // 'c'
+		event.setKeycode(KeyEvent.VK_C);
+		event.setCtrl(true);
+		dispatchKeyboardEvent(event);
+		event.setType(KeyboardEventMsgIn.KeyEventType.keyup);
+		dispatchKeyboardEvent(event);
+	}
+
+	private void dispatchCutEvent() {
+		KeyboardEventMsgIn event = new KeyboardEventMsgIn();
+		event.setType(KeyboardEventMsgIn.KeyEventType.keydown);
+		event.setCharacter(KeyEvent.VK_X);
+		event.setKeycode(KeyEvent.VK_X);// 'x'
+		event.setCtrl(true);
+		dispatchKeyboardEvent(event);
+		event.setType(KeyboardEventMsgIn.KeyEventType.keyup);
+		dispatchKeyboardEvent(event);
 	}
 
 	public Point getLastMousePosition() {

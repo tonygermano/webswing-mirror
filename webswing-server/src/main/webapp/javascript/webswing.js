@@ -1,6 +1,6 @@
-define(['jquery', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog', 'webswing-selector',
-    'webswing-login', 'webswing-canvas', 'webswing-identity', 'webswing-jslink', 'webswing-clipboard', 'webswing-inject'], function f($, polyfill, Base, Socket,
-        Files, Dialog, Selector, Login, Canvas, Identity, JsLink, Clipboard, Injector) {
+define([ 'jquery', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog', 'webswing-selector',
+        'webswing-login', 'webswing-canvas', 'webswing-identity', 'webswing-jslink', 'webswing-clipboard', 'webswing-inject' ], function f($,
+        polyfill, Base, Socket, Files, Dialog, Selector, Login, Canvas, Identity, JsLink, Clipboard, Injector) {
     "use strict";
 
     var globalName = $('[data-webswing-global-var]');
@@ -10,8 +10,8 @@ define(['jquery', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webs
     if (globalName != null && globalName.length !== 0) {
         var name = globalName.data('webswingGlobalVar');
         global = window[name] = {
-            scan: scanForInstances,
-            bootstrap: bootstrap
+            scan : scanForInstances,
+            bootstrap : bootstrap
         };
         scanForInstances(window[name]);
     } else {
@@ -22,7 +22,7 @@ define(['jquery', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webs
         root = root != null ? root : global;
         var result = {};
         var instances = $('[data-webswing-instance]');
-        instances.each(function (index, instance) {
+        instances.each(function(index, instance) {
             var id = $(instance).data('webswingInstance');
             var active = $(instance).data('webswingActive');
             if (!active) {
@@ -33,7 +33,7 @@ define(['jquery', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webs
                 }
             }
         });
-        for (var exportName in result) {
+        for ( var exportName in result) {
             root[exportName] = result[exportName];
         }
     }
@@ -52,15 +52,15 @@ define(['jquery', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webs
         injector.module('jslink', new JsLink());
         injector.module('clipboard', new Clipboard());
         var externalObj = {
-            start: 'webswing.start',
-            disconnect: 'webswing.disconnect',
-            configure: 'webswing.configure',
-            kill: 'base.kill',
-            setControl: 'webswing.setControl'
+            start : 'webswing.start',
+            disconnect : 'webswing.disconnect',
+            configure : 'webswing.configure',
+            kill : 'base.kill',
+            setControl : 'webswing.setControl'
         };
         injector.module('external', {
-            provides: externalObj,
-            injects: externalObj
+            provides : externalObj,
+            injects : externalObj
         });
 
         if (customization != null) {
@@ -75,29 +75,30 @@ define(['jquery', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webs
         var module = this;
         var api;
         module.injects = api = {
-            cfg: 'webswing.config',
-            start: 'webswing.start',
-            disconnect: 'webswing.disconnect',
-            login: 'login.login',
-            connect: 'socket.connect',
-            showDialog: 'dialog.show',
-            readyDialog: 'dialog.content.readyDialog',
-            initializingDialog: 'dialog.content.initializingDialog',
-            disposeIdentity: 'identity.dispose',
-            disposeBase: 'base.dispose',
-            disposeCanvas: 'canvas.dispose',
-            disposeSocket: 'socket.dispose',
-            disposeFileDialog: 'files.close'
+            cfg : 'webswing.config',
+            start : 'webswing.start',
+            disconnect : 'webswing.disconnect',
+            login : 'login.login',
+            connect : 'socket.connect',
+            showDialog : 'dialog.show',
+            readyDialog : 'dialog.content.readyDialog',
+            initializingDialog : 'dialog.content.initializingDialog',
+            disposeIdentity : 'identity.dispose',
+            disposeBase : 'base.dispose',
+            disposeCanvas : 'canvas.dispose',
+            disposeSocket : 'socket.dispose',
+            disposeFileDialog : 'files.close',
+            disposeCopyBar : 'clipboard.dispose'
         };
         module.provides = {
-            config: defaultCtxConfig(),
-            start: start,
-            newSession: newSession,
-            disconnect: disconnect,
-            setControl: setControl,
-            configure: configure
+            config : defaultCtxConfig(),
+            start : start,
+            newSession : newSession,
+            disconnect : disconnect,
+            setControl : setControl,
+            configure : configure
         };
-        module.ready = function () {
+        module.ready = function() {
             configure();
             if (api.cfg.autoStart) {
                 api.start();
@@ -108,32 +109,32 @@ define(['jquery', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webs
 
         function defaultCtxConfig() {
             return {
-                rootElement: rootElement,
-                autoStart: false,
-                applicationName: null,
-                args: null,
-                anonym: false,
-                connectionUrl: location.origin + location.pathname,
-                mirror: false,
-                typedArraysSupported: typedArraysSupported,
-                binarySocket: true,
-                recording: false,
-                debugPort: null,
-                javaCallTimeout: 3000,
-                documentBase: document.location.origin + document.location.pathname,
-                ieVersion: detectIE(),
-                /*webswing instance context*/
-                clientId: null,
-                appName: null,
-                hasControl: false,
-                mirrorMode: false,
-                canPaint: false,
-                applet: false
+                rootElement : rootElement,
+                autoStart : false,
+                applicationName : null,
+                args : null,
+                anonym : false,
+                connectionUrl : location.origin + location.pathname,
+                mirror : false,
+                typedArraysSupported : typedArraysSupported,
+                binarySocket : true,
+                recording : false,
+                debugPort : null,
+                javaCallTimeout : 3000,
+                documentBase : document.location.origin + document.location.pathname,
+                ieVersion : detectIE(),
+                /* webswing instance context */
+                clientId : null,
+                appName : null,
+                hasControl : false,
+                mirrorMode : false,
+                canPaint : false,
+                applet : false
             };
         }
 
         function start() {
-            api.login(function () {
+            api.login(function() {
                 api.showDialog(api.initializingDialog);
                 api.connect();
             });
@@ -150,6 +151,7 @@ define(['jquery', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webs
             api.disposeBase();
             api.disposeCanvas();
             api.disposeSocket();
+            api.disposeCopyBar();
         }
 
         function configure(options, appletParams) {
@@ -174,11 +176,11 @@ define(['jquery', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webs
             appletParams = appletParams != null ? appletParams : readAppletParams(cfg.rootElement);
             if (appletParams != null) {
                 cfg.params = [];
-                for (var prop in appletParams) {
+                for ( var prop in appletParams) {
                     if (typeof appletParams[prop] === 'string') {
                         cfg.params.push({
-                            name: prop,
-                            value: appletParams[prop]
+                            name : prop,
+                            value : appletParams[prop]
                         });
                     }
                 }
@@ -204,7 +206,7 @@ define(['jquery', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webs
         function readAppletParams(element) {
             var result = {};
             var params = $(element).find('webswing-param');
-            for (var i = 0; i < params.length; i++) {
+            for ( var i = 0; i < params.length; i++) {
                 var name = params[i].getAttribute('name');
                 var val = params[i].getAttribute('value');
                 if (name != null) {

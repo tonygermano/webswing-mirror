@@ -10,6 +10,7 @@ public class InputEventsFrameMsgIn implements MsgIn {
 
 	private static final long serialVersionUID = -7046154705244466351L;
 	private List<InputEventMsgIn> events;
+	private CopyEventMsgIn copy;
 	private PasteEventMsgIn paste;
 	private UploadedEventMsgIn uploaded;
 
@@ -22,6 +23,14 @@ public class InputEventsFrameMsgIn implements MsgIn {
 
 	public void setEvents(List<InputEventMsgIn> events) {
 		this.events = events;
+	}
+
+	public CopyEventMsgIn getCopy() {
+		return copy;
+	}
+
+	public void setCopy(CopyEventMsgIn copy) {
+		this.copy = copy;
 	}
 
 	public PasteEventMsgIn getPaste() {

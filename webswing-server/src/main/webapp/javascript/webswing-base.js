@@ -1,43 +1,45 @@
-define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
+define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
     "use strict";
     return function BaseModule() {
         var module = this;
         var api;
         module.injects = api = {
-            cfg: 'webswing.config',
-            send: 'socket.send',
-            getSocketId: 'socket.uuid',
-            disposeSocket: 'socket.dispose',
-            getCanvas: 'canvas.get',
-            getInput: 'canvas.getInput',
-            disposeCanvas: 'canvas.dispose',
-            getUser: 'login.user',
-            getIdentity: 'identity.get',
-            showDialog: 'dialog.show',
-            hideDialog: 'dialog.hide',
-            startingDialog: 'dialog.content.startingDialog',
-            stoppedDialog: 'dialog.content.stoppedDialog',
-            applicationAlreadyRunning: 'dialog.content.applicationAlreadyRunning',
-            tooManyClientsNotification: 'dialog.content.tooManyClientsNotification',
-            continueOldSessionDialog: 'dialog.content.continueOldSessionDialog',
-            showSelector: 'selector.show',
-            openFileDialog: 'files.open',
-            closeFileDialog: 'files.close',
-            openLink: 'files.link',
-            print: 'files.print',
-            download: 'files.download',
-            copyToClipboard: 'clipboard.copy',
-            pasteFromClipboard: 'clipboard.paste',
-            processJsLink: 'jslink.process'
+            cfg : 'webswing.config',
+            send : 'socket.send',
+            getSocketId : 'socket.uuid',
+            disposeSocket : 'socket.dispose',
+            getCanvas : 'canvas.get',
+            getInput : 'canvas.getInput',
+            disposeCanvas : 'canvas.dispose',
+            getUser : 'login.user',
+            getIdentity : 'identity.get',
+            showDialog : 'dialog.show',
+            hideDialog : 'dialog.hide',
+            startingDialog : 'dialog.content.startingDialog',
+            stoppedDialog : 'dialog.content.stoppedDialog',
+            applicationAlreadyRunning : 'dialog.content.applicationAlreadyRunning',
+            tooManyClientsNotification : 'dialog.content.tooManyClientsNotification',
+            continueOldSessionDialog : 'dialog.content.continueOldSessionDialog',
+            showSelector : 'selector.show',
+            openFileDialog : 'files.open',
+            closeFileDialog : 'files.close',
+            openLink : 'files.link',
+            print : 'files.print',
+            download : 'files.download',
+            cut : 'clipboard.cut',
+            copy : 'clipboard.copy',
+            paste : 'clipboard.paste',
+            displayCopyBar: 'clipboard.displayCopyBar',
+            processJsLink : 'jslink.process'
         };
         module.provides = {
-            startApplication: startApplication,
-            startMirrorView: startMirrorView,
-            continueSession: continueSession,
-            kill: kill,
-            handshake: handshake,
-            processMessage: processMessage,
-            dispose: dispose
+            startApplication : startApplication,
+            startMirrorView : startMirrorView,
+            continueSession : continueSession,
+            kill : kill,
+            handshake : handshake,
+            processMessage : processMessage,
+            dispose : dispose
         };
 
         var timer1, timer2;
@@ -107,7 +109,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
             enqueueInputEvent();
             if (inputEvtQueue.length > 0) {
                 api.send({
-                    events: inputEvtQueue
+                    events : inputEvtQueue
                 });
                 inputEvtQueue = [];
             }
@@ -224,7 +226,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 canvas.style.cursor = data.cursorChange.cursor;
             }
             if (data.copyEvent != null && api.cfg.hasControl) {
-                api.copyToClipboard(data.copyEvent);
+                api.displayCopyBar(data.copyEvent);
             }
             if (data.fileDialogEvent != null && api.cfg.hasControl) {
                 if (data.fileDialogEvent.eventType === 'Open') {
@@ -237,13 +239,13 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 delete windowImageHolders[data.closedWindow];
             }
             // firs is always the background
-            for (var i in data.windows) {
+            for ( var i in data.windows) {
                 var win = data.windows[i];
                 if (win.id == 'BG') {
                     if (api.cfg.mirrorMode) {
                         adjustCanvasSize(canvas, win.width, win.height);
                     }
-                    for (var x in win.content) {
+                    for ( var x in win.content) {
                         var winContent = win.content[x];
                         if (winContent != null) {
                             clear(win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height, context);
@@ -256,19 +258,19 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
             // regular windows (background removed)
             if (data.windows != null) {
                 data.windows.reduce(
-                        function (sequence, win) {
+                        function(sequence, win) {
                             if (win.directDraw != null) {
                                 // directdraw
-                                return sequence.then(function (resolved) {
+                                return sequence.then(function(resolved) {
                                     if (typeof win.directDraw === 'string') {
                                         return directDraw.draw64(win.directDraw, windowImageHolders[win.id]);
                                     } else {
                                         return directDraw.drawBin(win.directDraw, windowImageHolders[win.id]);
                                     }
                                 }).then(
-                                        function (resultImage) {
+                                        function(resultImage) {
                                             windowImageHolders[win.id] = resultImage;
-                                            for (var x in win.content) {
+                                            for ( var x in win.content) {
                                                 var winContent = win.content[x];
                                                 if (winContent != null) {
                                                     context.drawImage(resultImage, winContent.positionX, winContent.positionY, winContent.width,
@@ -279,39 +281,42 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                                         });
                             } else {
                                 // imagedraw
-                                return sequence.then(function (resolved) {
-                                    return win.content.reduce(function (internalSeq, winContent) {
-                                        return internalSeq.then(function (done) {
-                                            return new Promise(function (resolved, rejected) {
-                                                if (winContent != null) {
-                                                    var imageObj = new Image();
-                                                    var onloadFunction = function () {
-                                                        context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
-                                                        resolved();
-                                                        imageObj.onload = null;
-                                                        imageObj.src = '';
-                                                        if (imageObj.clearAttributes != null) {
-                                                            imageObj.clearAttributes();
+                                return sequence.then(function(resolved) {
+                                    return win.content.reduce(function(internalSeq, winContent) {
+                                        return internalSeq.then(function(done) {
+                                            return new Promise(
+                                                    function(resolved, rejected) {
+                                                        if (winContent != null) {
+                                                            var imageObj = new Image();
+                                                            var onloadFunction = function() {
+                                                                context.drawImage(imageObj, win.posX + winContent.positionX, win.posY
+                                                                        + winContent.positionY);
+                                                                resolved();
+                                                                imageObj.onload = null;
+                                                                imageObj.src = '';
+                                                                if (imageObj.clearAttributes != null) {
+                                                                    imageObj.clearAttributes();
+                                                                }
+                                                                imageObj = null;
+                                                            };
+                                                            imageObj.onload = function() {
+                                                                // fix for ie - onload is fired before the image is ready for rendering to canvas.
+                                                                // This is
+                                                                // a ugly quickfix
+                                                                if (api.cfg.ieVersion && api.cfg.ieVersion <= 10) {
+                                                                    window.setTimeout(onloadFunction, 20);
+                                                                } else {
+                                                                    onloadFunction();
+                                                                }
+                                                            };
+                                                            imageObj.src = getImageString(winContent.base64Content);
                                                         }
-                                                        imageObj = null;
-                                                    };
-                                                    imageObj.onload = function () {
-                                                        // fix for ie - onload is fired before the image is ready for rendering to canvas. This is
-                                                        // a ugly quickfix
-                                                        if (api.cfg.ieVersion && api.cfg.ieVersion <= 10) {
-                                                            window.setTimeout(onloadFunction, 20);
-                                                        } else {
-                                                            onloadFunction();
-                                                        }
-                                                    };
-                                                    imageObj.src = getImageString(winContent.base64Content);
-                                                }
-                                            });
+                                                    });
                                         });
                                     }, Promise.resolve());
                                 });
                             }
-                        }, Promise.resolve()).then(function () {
+                        }, Promise.resolve()).then(function() {
                     ack();
                 });
             }
@@ -321,7 +326,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
             if (typeof data === 'object') {
                 var binary = '';
                 var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
-                for (var i = 0, l = bytes.byteLength; i < l; i++) {
+                for ( var i = 0, l = bytes.byteLength; i < l; i++) {
                     binary += String.fromCharCode(bytes[i]);
                 }
                 data = window.btoa(binary);
@@ -348,7 +353,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
         }
 
         function registerEventListeners(canvas, input) {
-            bindEvent(canvas, 'mousedown', function (evt) {
+            bindEvent(canvas, 'mousedown', function(evt) {
                 var mousePos = getMousePos(canvas, evt, 'mousedown');
                 latestMouseMoveEvent = null;
                 enqueueInputEvent(mousePos);
@@ -356,7 +361,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 sendInput();
                 return false;
             }, false);
-            bindEvent(canvas, 'dblclick', function (evt) {
+            bindEvent(canvas, 'dblclick', function(evt) {
                 var mousePos = getMousePos(canvas, evt, 'dblclick');
                 latestMouseMoveEvent = null;
                 enqueueInputEvent(mousePos);
@@ -364,13 +369,13 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 sendInput();
                 return false;
             }, false);
-            bindEvent(canvas, 'mousemove', function (evt) {
+            bindEvent(canvas, 'mousemove', function(evt) {
                 var mousePos = getMousePos(canvas, evt, 'mousemove');
                 mousePos.mouse.button = mouseDown;
                 latestMouseMoveEvent = mousePos;
                 return false;
             }, false);
-            bindEvent(canvas, 'mouseup', function (evt) {
+            bindEvent(canvas, 'mouseup', function(evt) {
                 var mousePos = getMousePos(canvas, evt, 'mouseup');
                 latestMouseMoveEvent = null;
                 enqueueInputEvent(mousePos);
@@ -379,7 +384,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 return false;
             }, false);
             // IE9, Chrome, Safari, Opera
-            bindEvent(canvas, "mousewheel", function (evt) {
+            bindEvent(canvas, "mousewheel", function(evt) {
                 var mousePos = getMousePos(canvas, evt, 'mousewheel');
                 latestMouseMoveEvent = null;
                 if (latestMouseWheelEvent != null) {
@@ -389,7 +394,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 return false;
             }, false);
             // firefox
-            bindEvent(canvas, "DOMMouseScroll", function (evt) {
+            bindEvent(canvas, "DOMMouseScroll", function(evt) {
                 var mousePos = getMousePos(canvas, evt, 'mousewheel');
                 latestMouseMoveEvent = null;
                 if (latestMouseWheelEvent != null) {
@@ -398,13 +403,13 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 latestMouseWheelEvent = mousePos;
                 return false;
             }, false);
-            bindEvent(canvas, 'contextmenu', function (event) {
+            bindEvent(canvas, 'contextmenu', function(event) {
                 event.preventDefault();
                 event.stopPropagation();
                 return false;
             });
 
-            bindEvent(input, 'keydown', function (event) {
+            bindEvent(input, 'keydown', function(event) {
                 // 48-57
                 // 65-90
                 // 186-192
@@ -419,9 +424,7 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 }
                 var keyevt = getKBKey('keydown', canvas, event);
                 // hanle paste event
-                if (keyevt.key.ctrl && (keyevt.key.character == 86 || keyevt.key.character == 118)) { // ctrl+v
-                    // paste handled in paste event
-                } else {
+                if (!(keyevt.key.ctrl && (keyevt.key.character == 88 || keyevt.key.character == 67 || keyevt.key.character == 86))) { // cut copy
                     // default action prevented
                     if (keyevt.key.ctrl && !keyevt.key.alt && !keyevt.key.altgr) {
                         event.preventDefault();
@@ -430,32 +433,44 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 }
                 return false;
             }, false);
-            bindEvent(input, 'keypress', function (event) {
+            bindEvent(input, 'keypress', function(event) {
                 var keyevt = getKBKey('keypress', canvas, event);
-                if (!(keyevt.key.ctrl && keyevt.key.character == 118)) { // skip ctrl+v
+                if (!(keyevt.key.ctrl && (keyevt.key.character == 120 || keyevt.key.character == 24 || keyevt.key.character == 99
+                        || keyevt.key.character == 118 || keyevt.key.character == 22))) { // cut copy paste handled separately
                     event.preventDefault();
                     event.stopPropagation();
                     enqueueInputEvent(keyevt);
                 }
                 return false;
             }, false);
-            bindEvent(input, 'keyup', function (event) {
+            bindEvent(input, 'keyup', function(event) {
                 var keyevt = getKBKey('keyup', canvas, event);
-                if (!(keyevt.key.ctrl && keyevt.key.character == 118)) { // skip ctrl+v
+                if (!(keyevt.key.ctrl && (keyevt.key.character == 88 || keyevt.key.character == 67 || keyevt.key.character == 86))) { // cut copy
                     event.preventDefault();
                     event.stopPropagation();
+                    enqueueInputEvent(keyevt);
+                    sendInput();
                 }
-                enqueueInputEvent(keyevt);
-                sendInput();
                 return false;
             }, false);
-            bindEvent(input, 'paste', function (event) {
+            bindEvent(input, 'cut', function(event) {
                 event.preventDefault();
                 event.stopPropagation();
-                api.pasteFromClipboard(event.clipboardData);
+                api.cut(event);
                 return false;
             }, false);
-
+            bindEvent(input, 'copy', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                api.copy(event);
+                return false;
+            }, false);
+            bindEvent(input, 'paste', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                api.paste(event);
+                return false;
+            }, false);
             bindEvent(document, 'mousedown', mouseDownEventHandler);
             bindEvent(document, 'mouseout', mouseOutEventHandler);
             bindEvent(document, 'mouseup', mouseUpEventHandler);
@@ -497,16 +512,16 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
             }
             return {
-                mouse: {
-                    x: mouseX,
-                    y: mouseY,
-                    type: type,
-                    wheelDelta: delta,
-                    button: evt.which,
-                    ctrl: evt.ctrlKey,
-                    alt: evt.altKey,
-                    shift: evt.shiftKey,
-                    meta: evt.metaKey
+                mouse : {
+                    x : mouseX,
+                    y : mouseY,
+                    type : type,
+                    wheelDelta : delta,
+                    button : evt.which,
+                    ctrl : evt.ctrlKey,
+                    alt : evt.altKey,
+                    shift : evt.shiftKey,
+                    meta : evt.metaKey
                 }
             };
         }
@@ -521,25 +536,25 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 kk = char;
             }
             return {
-                key: {
-                    type: type,
-                    character: char,
-                    keycode: kk,
-                    alt: evt.altKey,
-                    ctrl: evt.ctrlKey,
-                    shift: evt.shiftKey,
-                    meta: evt.metaKey
+                key : {
+                    type : type,
+                    character : char,
+                    keycode : kk,
+                    alt : evt.altKey,
+                    ctrl : evt.ctrlKey,
+                    shift : evt.shiftKey,
+                    meta : evt.metaKey
                 }
             };
         }
 
         function getHandShake(canvas) {
             var handshake = {
-                applicationName: api.cfg.appName,
-                clientId: api.cfg.clientId,
-                sessionId: api.getSocketId(),
-                mirrored: api.cfg.mirrorMode,
-                directDrawSupported: api.cfg.typedArraysSupported
+                applicationName : api.cfg.appName,
+                clientId : api.cfg.clientId,
+                sessionId : api.getSocketId(),
+                mirrored : api.cfg.mirrorMode,
+                directDrawSupported : api.cfg.typedArraysSupported
             };
 
             if (!api.cfg.mirrorMode) {
@@ -550,14 +565,14 @@ define(['webswing-dd'], function amdFactory(WebswingDirectDraw) {
                 handshake.desktopHeight = canvas.offsetHeight;
             }
             return {
-                handshake: handshake
+                handshake : handshake
             };
         }
 
         function getMessageEvent(message) {
             return {
-                event: {
-                    type: message
+                event : {
+                    type : message
                 }
             };
         }

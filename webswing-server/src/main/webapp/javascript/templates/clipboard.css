@@ -1,45 +1,193 @@
 .webswing-copyBarOuter {
-    display: none;
-    position: relative;
+	display: none;
+	position: relative;
 }
 
 .webswing-copyBar {
-    position: absolute;
-    right: 0px;
-    bottom: 0px;
-    padding: 5px;
-    width: 100%;
-    max-width: 480px;
-    border-top-width: 1px;
-    border-top-style: solid;
-    border-left-width: 1px;
-    border-left-style: solid;
-    border-top-left-radius: 10px;
-    background-color: #fff;
-    border-color: #ddd;
-    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+	padding: 5px;
+	width: 100%;
+	max-width: 480px;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-top-left-radius: 10px;
+	background-color: #fff;
+	border-color: #ddd;
+	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 }
 
 .webswing-copyButtonRow {
-    margin-right: 0 !important;
+	margin-right: 0 !important;
+}
+
+.webswing-contentBar {
+	margin-right: 0 !important;
+	min-height: 160px;
 }
 
 .webswing-copyBarTextArea {
-    width: 100%;
-    rows: 4;
+	width: 100%;
+	rows: 4;
 }
 
-.webswing-copy-content{
-    float:right;
-    color: lightgray;
-    font-family: monospace;
-    font-size: small;
+.webswing-copy-content {
+	float: right;
+	color: lightgray;
+	font-family: monospace;
+	font-size: small;
 }
 
-.webswing-copy-content-inactive{
-    color: lightgray;
+.webswing-copy-content-inactive {
+	color: lightgray;
 }
 
-.webswing-copy-content-active{
-    color: black;
+.webswing-copy-content-active {
+	color: black;
+}
+
+.webswing-minimize-symbol {
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-top-color: #dddddd;
+    border-width: 11px;
+    top: 11px;
+}
+
+.webswing-minimize-symbol:after {
+	position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    content: " ";
+    left: -10px;
+    bottom: -5px;
+    border-top-color: #FFF;
+    border-width: 10px;
+}
+
+.img-thumbnail {
+	padding: 4px;
+	line-height: 1.42857143;
+	background-color: #ffffff;
+	border: 1px solid #dddddd;
+	border-radius: 4px;
+	-webkit-transition: all 0.2s ease-in-out;
+	-o-transition: all 0.2s ease-in-out;
+	transition: all 0.2s ease-in-out;
+	display: inline-block;
+	max-width: 100%;
+	height: auto;
+}
+
+.nav {
+	margin-bottom: 5px;
+	padding-left: 0;
+	list-style: none;
+}
+
+.nav>li {
+	position: relative;
+	display: block;
+}
+
+.nav>li>span {
+	position: relative;
+	display: block;
+	padding: 5px 15px;
+}
+
+.nav>li>span:hover,.nav>li>span:focus {
+	text-decoration: none;
+	background-color: #eeeeee;
+}
+
+.nav>li.disabled>span {
+	color: #777777;
+}
+
+.nav>li.disabled>span:hover,.nav>li.disabled>span:focus {
+	color: #777777;
+	text-decoration: none;
+	background-color: transparent;
+	cursor: not-allowed;
+}
+
+.nav .open>span,.nav .open>span:hover,.nav .open>span:focus {
+	background-color: #eeeeee;
+	border-color: #337ab7;
+}
+
+.nav .nav-divider {
+	height: 1px;
+	margin: 9px 0;
+	overflow: hidden;
+	background-color: #e5e5e5;
+}
+
+.nav>li>span>img {
+	max-width: none;
+}
+
+.nav-tabs {
+	border-bottom: 1px solid #dddddd;
+}
+
+.nav-tabs>li {
+	float: left;
+	margin-bottom: -1px;
+}
+
+.nav-tabs>li>span {
+	margin-right: 2px;
+	line-height: 1.42857143;
+	border: 1px solid transparent;
+	border-radius: 4px 4px 0 0;
+}
+
+.nav-tabs>li>span:hover {
+	border-color: #eeeeee #eeeeee #dddddd;
+}
+
+.nav-tabs>li.active>span,.nav-tabs>li.active>span:hover,.nav-tabs>li.active>span:focus
+	{
+	color: #555555;
+	background-color: #ffffff;
+	border: 1px solid #dddddd;
+	border-bottom-color: transparent;
+	cursor: default;
+}
+
+
+
+.tab-content>.tab-pane {
+	display: none;
+}
+
+.tab-content>.active {
+	display: block;
+}
+
+.nav-tabs .dropdown-menu {
+	margin-top: -1px;
+	border-top-right-radius: 0;
+	border-top-left-radius: 0;
+}
+
+.clearfix:before,.clearfix:after,.nav:before,.nav:after {
+	content: " ";
+	display: table;
+}
+
+.clearfix:after,.nav:after {
+	clear: both;
 }

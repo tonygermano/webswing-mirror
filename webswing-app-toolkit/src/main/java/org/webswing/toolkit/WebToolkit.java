@@ -90,7 +90,6 @@ import sun.awt.SunToolkit;
 import sun.awt.image.SurfaceManager;
 import sun.java2d.SurfaceData;
 import sun.print.PrintJob2D;
-import sun.awt.datatransfer.DataTransferer;
 
 @SuppressWarnings("restriction")
 public abstract class WebToolkit extends SunToolkit {

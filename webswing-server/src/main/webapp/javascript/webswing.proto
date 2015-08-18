@@ -48,8 +48,11 @@ message CursorChangeEventMsgProto{
 }
 
 message CopyEventMsgProto{
-	optional string content = 1;
-	optional string htmlContent = 2;
+	optional string text = 1;
+	optional string html = 2;
+	optional bytes img = 3;
+	repeated string files = 4;
+	optional bool other = 5;
 }
 
 message FileDialogEventMsgProto{
@@ -140,10 +143,11 @@ message JsResultMsgProto{
 message InputEventsFrameMsgInProto{
 	repeated InputEventMsgInProto events = 1;
 	optional PasteEventMsgInProto paste = 2;
-	optional UploadEventMsgInProto upload = 3;
-	optional UploadedEventMsgInProto uploaded = 4;
-	optional JsResultMsgProto jsResponse = 5;
-	optional JavaEvalRequestMsgInProto javaRequest = 6;
+	optional CopyEventMsgInProto copy = 3;
+	optional UploadEventMsgInProto upload = 4;
+	optional UploadedEventMsgInProto uploaded = 5;
+	optional JsResultMsgProto jsResponse = 6;
+	optional JavaEvalRequestMsgInProto javaRequest = 7;
 }
 
 message InputEventMsgInProto{
@@ -207,8 +211,20 @@ message MouseEventMsgInProto{
 	}
 }
 
+message CopyEventMsgInProto{
+	optional CopyEventMsgTypeProto type = 1;
+	optional string file = 2;
+	enum CopyEventMsgTypeProto{
+		copy = 0;
+		cut = 1;
+		getFileFromClipboard = 2;
+	}
+}
+
 message PasteEventMsgInProto{
-	optional string content = 1;
+	optional string text = 1;
+	optional string html = 2;
+	optional string img = 3;
 }
 
 message SimpleEventMsgInProto{

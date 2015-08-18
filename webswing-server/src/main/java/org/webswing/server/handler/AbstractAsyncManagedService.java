@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.MsgIn;
+import org.webswing.model.c2s.CopyEventMsgIn;
 import org.webswing.model.c2s.InputEventMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.c2s.PasteEventMsgIn;
@@ -88,6 +89,9 @@ abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 					}
 				} else if (frame.getPaste() != null) {
 					PasteEventMsgIn p = frame.getPaste();
+					send(r, p);
+				} else if (frame.getCopy() != null) {
+					CopyEventMsgIn p = frame.getCopy();
 					send(r, p);
 				} else if (frame.getUploaded() != null) {
 					UploadedEventMsgIn p = frame.getUploaded();

@@ -1,21 +1,65 @@
 <div data-id="copyBar" class="webswing-copyBarOuter">
-    <div class="webswing-copyBar">
-        <div class="container-fluid">
-            <div class="webswing-copyBarButtonRow row ">
-                <p>Press CTRL+C to copy.</p>
-                <div class="webswing-copy-content">
-                    <span data-id="plaintext" class="webswing-copy-content-inactive">Plain-text</span>|
-                    <span data-id="html" class="webswing-copy-content-inactive">HTML</span>
-                </div>
-                <textarea data-id="textarea" class="webswing-copyBarTextArea" readonly rows="4"></textarea>
-                <input data-id="input" type="text" class="input-hidden" value=" " />
-                <div data-id="ie-clipboard" class="input-hidden"  contenteditable="true"></div>
-            </div>
-            <div class="webswing-copyBarButtonRow row ">
-                <div class="col-xs-offset-8 col-xs-4">
-                    <button class="btn btn-success btn-sm btn-block" data-id="closeBtn">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="webswing-copyBar">
+		<div class="container-fluid">
+			<div data-id="contentBar">
+				<div class="webswing-contentBar row">
+					<div class="col-xs-1">
+						<span class="webswing-minimize-symbol"></span>
+					</div>
+					<div class="col-xs-11">
+						<ul class="nav nav-tabs">
+							<li id="textTab" data-tab="text"><span>Text</span></li>
+							<li id="htmlTab" data-tab="html"><span>HTML</span></li>
+							<li id="imageTab" data-tab="image"><span>Image</span></li>
+							<li id="filesTab" data-tab="files"><span>Files</span></li>
+							<li id="otherTab" data-tab="other"><span>Other</span></li>
+						</ul>
+					</div>
+					<div class="col-xs-12 tab-content">
+						<div class="tab-pane" id="text">
+							<div>
+								<p>Press CTRL+C to copy.</p>
+								<textarea data-id="textarea" class="webswing-copyBarTextArea" readonly rows="4"></textarea>
+								<div data-id="ie-clipboard" class="input-hidden" contenteditable="true"></div>
+							</div>
+						</div>
+						<div class="tab-pane" id="html">
+							<div>
+								<p>Press CTRL+C to copy.</p>
+								<textarea data-id="htmlarea" class="webswing-copyBarTextArea" readonly rows="4"></textarea>
+							</div>
+						</div>
+						<div class="tab-pane" id="image">
+							<div>
+								<p>Right click on image and select 'Copy image'.</p>
+							</div>
+						</div>
+						<div class="tab-pane" id="files">
+							<div>
+								<p>Click on a link to download file from clipboard.</p>
+								<div class="webswing-copyFileList" id="wsFileList"></div>
+							</div>
+						</div>
+						<div class="tab-pane" id="other">
+							<div>
+								<p>Clipboard contains data, which may only be used within this application.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="webswing-copyBarButtonRow row ">
+				<div class="col-xs-8">
+					<div data-id="minimizedInfoBar">
+						<span data-id="plaintext" class="webswing-copy-content-inactive">Plain-text</span> | <span data-id="html" class="webswing-copy-content-inactive">HTML</span>
+						| <span data-id="image" class="webswing-copy-content-inactive">Image</span> | <span data-id="files" class="webswing-copy-content-inactive">Files</span>
+						| <span data-id="other" class="webswing-copy-content-inactive">Other</span>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<button class="btn btn-success btn-xs btn-block" data-id="closeBtn">Discard clipboard</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

@@ -18,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,12 +56,12 @@ public class ClipboardDemo extends JPanel {
 		setLayout(new BorderLayout());
 		JPanel panel = new JPanel(new GridLayout(2, 1));
 		DefaultTableModel model1 = new ClipboardTableModel(0, 4);
-		model1.addRow(new Object[] { createImage("resources/images/ClipboardDemo.gif"), "Simple text", "<p> Formated <b>HTML</b> text</p>", createFiles("resources/images/1.jpg") });
+		model1.addRow(new Object[] { createImage("resources/images/ClipboardDemo.gif"), "Simple text", "<p> Formated <b>HTML</b> text</p>", createFiles(2) });
 		model1.addRow(new Object[] { null, null, null, null });
 		model1.addRow(new Object[] { null, "Simple text", null, null });
 		model1.addRow(new Object[] { null, null, "<p> Formated <b>HTML</b> text</p>", null });
 		model1.addRow(new Object[] { createImage("resources/images/ClipboardDemo.gif"), null, null, null });
-		model1.addRow(new Object[] { null, null, null, createFiles("resources/images/ClipboardDemo.gif") });
+		model1.addRow(new Object[] { null, null, null, createFiles(1) });
 		JScrollPane scrollpane1 = new JScrollPane(createTable(model1));
 		scrollpane1.setBorder(BorderFactory.createTitledBorder("Copy Table"));
 		panel.add(scrollpane1);
@@ -197,7 +198,7 @@ public class ClipboardDemo extends JPanel {
 			return null;
 		} else {
 			try {
-				return ImageIO.read(new File(imageURL.toURI()));
+				return Toolkit.getDefaultToolkit().getImage(imageURL);
 			} catch (Exception e) {
 				System.err.println("Image cannot be loaded: " + path);
 				return null;
@@ -205,21 +206,25 @@ public class ClipboardDemo extends JPanel {
 		}
 	}
 
-	protected static List<File> createFiles(String... paths) {
+	protected static List<File> createFiles(int number) {
 		List<File> result = new ArrayList<File>();
-		for (String path : paths) {
-			java.net.URL url = ClipboardDemo.class.getResource(path);
-			if (url == null) {
-				System.err.println("Resource not found: " + path);
-				continue;
-			} else {
-				try {
-					result.add(new File(url.toURI()));
-				} catch (Exception e) {
-					System.err.println("Image cannot be loaded: " + path);
-					continue;
+		File file;
+		try {
+			int count = 0;
+			file = new File(ClipboardDemo.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+			for (File f : new File(file.getParent()).listFiles()) {
+				if (count < number) {
+					try {
+						result.add(f);
+						count++;
+					} catch (Exception e) {
+						System.err.println("Image cannot be loaded: " + f.getAbsolutePath());
+						continue;
+					}
 				}
 			}
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
 		}
 		return result;
 	}
