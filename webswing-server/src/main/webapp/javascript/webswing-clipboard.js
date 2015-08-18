@@ -11,7 +11,8 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
         var api;
         module.injects = api = {
             cfg : 'webswing.config',
-            send : 'socket.send'
+            send : 'socket.send',
+            getInput : 'canvas.getInput'
         };
         module.provides = {
             cut : cut,
@@ -87,18 +88,19 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                         var data = event.clipboardData || event.originalEvent.clipboardData;
                         text = data.getData('text/plain');
                         html = data.getData('text/html');
-                        for ( var i = 0; i < data.items.length; i++) {
-                            if (data.items[i].type.indexOf('image') === 0) {
-                                var img = data.items[i];
-                                var reader = new FileReader();
-                                reader.onload = function(event) {
-                                    sendPasteEvent(text, html, event.target.result);
-                                };
-                                reader.readAsDataURL(img.getAsFile());
-                                return;
+                        if (data.items != null) {
+                            for ( var i = 0; i < data.items.length; i++) {
+                                if (data.items[i].type.indexOf('image') === 0) {
+                                    var img = data.items[i];
+                                    var reader = new FileReader();
+                                    reader.onload = function(event) {
+                                        sendPasteEvent(text, html, event.target.result);
+                                    };
+                                    reader.readAsDataURL(img.getAsFile());
+                                    return;
+                                }
                             }
                         }
-
                     }
                     sendPasteEvent(text, html);
                 } else {
@@ -132,6 +134,10 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
             }
             api.cfg.rootElement.append(html);
             copyBar = api.cfg.rootElement.find('div[data-id="copyBar"]');
+            copyBar.on('click', function(event) {
+                clearTimeout(minimizer);
+                api.getInput().focus();
+            });
             copyBar.wsEventData = data;
             copyBar.minimized = false;
             var closeBtn = copyBar.find('button[data-id="closeBtn"]');
@@ -222,7 +228,7 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                 minimize();
             });
 
-            setTimeout(function() {
+            var minimizer = setTimeout(function() {
                 minimize();
             }, 2000);
 

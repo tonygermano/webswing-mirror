@@ -43,7 +43,7 @@ public class WebClipboard extends Clipboard {
 	}
 
 	public void setContents(Transferable contents) {
-		setContents(contents, owner);
+		super.setContents(contents, owner);
 	}
 
 	@Override

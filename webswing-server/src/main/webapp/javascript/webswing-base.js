@@ -5,12 +5,11 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
         var api;
         module.injects = api = {
             cfg : 'webswing.config',
+            disconnect:'webswing.disconnect',
             send : 'socket.send',
             getSocketId : 'socket.uuid',
-            disposeSocket : 'socket.dispose',
             getCanvas : 'canvas.get',
             getInput : 'canvas.getInput',
-            disposeCanvas : 'canvas.dispose',
             getUser : 'login.user',
             getIdentity : 'identity.get',
             showDialog : 'dialog.show',
@@ -185,9 +184,7 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
             if (data.event != null) {
                 if (data.event == "shutDownNotification") {
                     api.showDialog(api.stoppedDialog);
-                    api.disposeSocket();
-                    api.disposeCanvas();
-                    dispose();
+                    api.disconnect();
                 } else if (data.event == "applicationAlreadyRunning") {
                     api.showDialog(api.applicationAlreadyRunning);
                 } else if (data.event == "tooManyClientsNotification") {
