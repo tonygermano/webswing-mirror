@@ -210,19 +210,22 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
         }
 
         function queuePaintingRequest(data) {
-            if (drawingLock) {
-                drawingQ.push(data);
-            } else {
-                drawingLock = data;
-                processRequest(api.getCanvas(), data);
+            drawingQ.push(data);
+            if (!drawingLock) {
+                processNextQueuedFrame();
             }
         }
 
-        function releaseLock() {
+        function processNextQueuedFrame() {
             drawingLock = null;
             if (drawingQ.length > 0) {
                 drawingLock = drawingQ.shift();
-                processRequest(api.getCanvas(), drawingLock);
+                try {
+                    processRequest(api.getCanvas(), drawingLock);
+                } catch (error) {
+                    drawingLock = null;
+                    throw error;
+                }
             }
         }
 
@@ -283,10 +286,10 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
                     }, errorHandler);
                 }, Promise.resolve()).then(function() {
                     ack();
-                    releaseLock();
+                    processNextQueuedFrame();
                 }, errorHandler);
             } else {
-                releaseLock();
+                processNextQueuedFrame();
             }
         }
 
@@ -616,6 +619,7 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
         }
 
         function errorHandler(error) {
+            drawingLock = null;
             throw error;
         }
     };
