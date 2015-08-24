@@ -1,10 +1,10 @@
 package org.webswing.directdraw.model;
 
-import java.awt.AlphaComposite;
+import java.awt.*;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.proto.Directdraw.CompositeProto;
-import org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.CompositeProto.*;
 
 public class CompositeConst extends DrawConstant {
 
@@ -12,7 +12,7 @@ public class CompositeConst extends DrawConstant {
 		super(context);
 		CompositeProto.Builder model = CompositeProto.newBuilder();
 		model.setType(CompositeTypeProto.valueOf(composite.getRule()));
-		if (composite.getAlpha() != 1) {
+		if (composite.getAlpha() != 1f) {
 			model.setAlpha(composite.getAlpha());
 		}
 		this.message = model.build();
@@ -25,7 +25,6 @@ public class CompositeConst extends DrawConstant {
 
 	public AlphaComposite getComposite() {
 		CompositeProto c = (CompositeProto) message;
-		float alpha = c.hasAlpha() ? c.getAlpha() : 1;
-		return AlphaComposite.getInstance(c.getType().getNumber(), alpha);
+		return AlphaComposite.getInstance(c.getType().getNumber(), c.getAlpha());
 	}
 }

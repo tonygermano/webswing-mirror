@@ -15,13 +15,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.RenderedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.DrawConstant;
@@ -146,11 +140,7 @@ public class WebImage extends Image {
 
 	public boolean isDirty() {
 		synchronized (this) {
-			if (newInstructions.size() == 0) {
-				return false;
-			} else {
-				return true;
-			}
+            return newInstructions.size() != 0;
 		}
 	}
 
@@ -211,7 +201,7 @@ public class WebImage extends Image {
 		ihg.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
 		ihg.clip(new Rectangle(getImageHolder().getWidth(), getImageHolder().getHeight()));
 		if (ihg.getClip().getBounds().width > 0 && ihg.getClip().getBounds().height > 0) {
-			addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip(), null), new DrawConstant.Integer(0)));
+			addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip()), new DrawConstant.Integer(0)));
 		}
 		ihg.dispose();
 	}
@@ -320,37 +310,34 @@ public class WebImage extends Image {
 				Integer[] points = ((PointsConst) constants[1]).getIntArray();
 				if (!imagePool.isInCache(imageHashConst)) {
 					ImageConst imageConst = new ImageConst(context, subImage, hash);
-					imagePool.getCachedConstant(new DrawConstant.HashConst(imageConst));
+					imagePool.addToCache(new DrawConstant.HashConst(imageConst));
 					DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
-					builder.setId(imageConst.getAddress());
+					builder.setId(imageConst.getId());
 					if (imageConst.getFieldName() != null) {
 						builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(imageConst.getFieldName()), imageConst.extractMessage(dd));
 					}
 					webImageBuilder.addImages(builder.build());
-					constants[1] = new PointsConst(context, imageConst.getAddress(), points[1], points[2]);
+					constants[1] = new PointsConst(context, imageConst.getId(), points[1], points[2]);
 				} else {
-					DrawConstant imageRef = imagePool.getCachedConstant(imageHashConst);
-					constants[1] = new PointsConst(context, imageRef.getAddress(), points[1], points[2]);
+                    constants[1] = new PointsConst(context, imagePool.getCached(imageHashConst).getId(), points[1], points[2]);
 				}
 			}
 		}
 		// build proto message
 		for (DrawInstruction ins : instructions) {
-			DrawConstant[] constants = ins.getArgs();
-			for (DrawConstant cons : constants) {
-				if (!(cons instanceof DrawConstant.Integer)) {
+			for (DrawConstant cons : ins.getArgs()) {
+				if (!(cons instanceof DrawConstant.Integer) && cons != DrawConstant.nullConst) {
 					// update cache
 					if (!constantPool.isInCache(cons)) {
-						constantPool.getCachedConstant(new DrawConstant.HashConst(cons));
+						constantPool.addToCache(new DrawConstant.HashConst(cons));
 						DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
-						builder.setId(cons.getAddress());
+						builder.setId(cons.getId());
 						if (cons.getFieldName() != null) {
 							builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(cons.getFieldName()), cons.extractMessage(dd));
 						}
 						webImageBuilder.addConstants(builder.build());
 					} else {
-						DrawConstant cached = constantPool.getCachedConstant(cons);
-						cons.setAddress(cached.getAddress());
+                        cons.setId(constantPool.getCached(cons).getId());
 					}
 				}
 			}
@@ -358,8 +345,7 @@ public class WebImage extends Image {
 		}
 		webImageBuilder.setWidth(size.width);
 		webImageBuilder.setHeight(size.height);
-		WebImageProto result = webImageBuilder.build();
-		return result;
+        return webImageBuilder.build();
 	}
 
 	public void reset() {

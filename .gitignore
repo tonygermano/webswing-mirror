@@ -6,6 +6,9 @@ dist/
 .settings/
 .project
 .classpath
+*.iml
+.idea
+.attach_*
 webswing-server-debug/webswing.log
 webswing-server/webswing.log
 webswing-server-launcher/webswing.log

@@ -1,34 +1,13 @@
 package org.webswing.directdraw.util;
 
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
+import java.awt.*;
+import java.awt.geom.*;
+import java.awt.image.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
-import org.webswing.directdraw.model.ArcConst;
-import org.webswing.directdraw.model.ColorConst;
-import org.webswing.directdraw.model.CompositeConst;
-import org.webswing.directdraw.model.DrawConstant;
-import org.webswing.directdraw.model.DrawInstruction;
-import org.webswing.directdraw.model.EllipseConst;
-import org.webswing.directdraw.model.FontConst;
-import org.webswing.directdraw.model.ImageConst;
-import org.webswing.directdraw.model.LinearGradientConst;
-import org.webswing.directdraw.model.PathConst;
-import org.webswing.directdraw.model.PointsConst;
-import org.webswing.directdraw.model.RadialGradientConst;
-import org.webswing.directdraw.model.RectangleConst;
-import org.webswing.directdraw.model.RoundRectangleConst;
-import org.webswing.directdraw.model.StringConst;
-import org.webswing.directdraw.model.StrokeConst;
-import org.webswing.directdraw.model.TransformConst;
-import org.webswing.directdraw.toolkit.WebImage;
+import org.webswing.directdraw.model.*;
+import org.webswing.directdraw.toolkit.*;
 
 public class RenderUtil {
 
@@ -56,7 +35,7 @@ public class RenderUtil {
 			case GRAPHICS_DISPOSE:
 				break;
 			case GRAPHICS_SWITCH:
-				currentg = gmap.get(getConst(0, di, DrawConstant.Integer.class).getAddress());
+				currentg = gmap.get(getConst(0, di, DrawConstant.Integer.class).getId());
 				break;
 			case FILL:
 				iprtFill(currentg, di);
@@ -101,7 +80,7 @@ public class RenderUtil {
 	}
 
 	private static void iprtDrawImage(Graphics2D g, DrawInstruction di, BufferedImage imageHolder, Map<DrawInstruction, BufferedImage> partialImageMap) {
-		Shape clip = getShape(getConst(0, di, DrawConstant.class), false);
+		Shape clip = getShape(getConst(0, di, DrawConstant.class));
 		AffineTransform original = g.getTransform();
 		g.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
 		g.setClip(clip);
@@ -118,11 +97,13 @@ public class RenderUtil {
 	private static void iprtDrawWebImage(Graphics2D g, DrawInstruction di) {
 		BufferedImage i = di.getImage().getSnapshot();
 		TransformConst t = getConst(0, di, TransformConst.class);
-		Rectangle2D crop = getConst(1, di, RectangleConst.class).getRectangle(false);
-		Shape clip = getShape(getConst(3, di, DrawConstant.class), false);
+		Rectangle2D.Float crop = getConst(1, di, RectangleConst.class).getRectangle();
+		Shape clip = getShape(getConst(3, di, DrawConstant.class));
 		g.setClip(clip);
 		AffineTransform original = g.getTransform();
-		g.transform(t.getAffineTransform());
+        if (t != null) {
+            g.transform(t.getAffineTransform());
+        }
 		g.drawImage(i, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(), (int) crop.getX(), (int) crop.getY(), (int) crop.getX() + (int) crop.getWidth(), (int) crop.getY() + (int) crop.getHeight(), null);
 		g.setTransform(original);
 	}
@@ -131,7 +112,7 @@ public class RenderUtil {
 		StringConst s = getConst(0, di, StringConst.class);
 		FontConst f = getConst(1, di, FontConst.class);
 		TransformConst t = getConst(2, di, TransformConst.class);
-		Shape clip = getShape(getConst(3, di, DrawConstant.class), false);
+		Shape clip = getShape(getConst(3, di, DrawConstant.class));
 		g.setClip(clip);
 		AffineTransform original = g.getTransform();
 		g.transform(t.getAffineTransform());
@@ -144,7 +125,7 @@ public class RenderUtil {
 		PointsConst p = getConst(0, di, PointsConst.class);
 		Integer[] pts = p.getIntArray();
 		PathConst clip = getConst(1, di, PathConst.class);
-		g.setClip(getShape(clip, false));
+		g.setClip(getShape(clip));
 		AffineTransform original = g.getTransform();
 		g.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
 		g.clipRect(pts[0], pts[1], pts[2], pts[3]);
@@ -156,15 +137,15 @@ public class RenderUtil {
 	private static void iprtDraw(Graphics2D g, DrawInstruction di) {
 		DrawConstant path = getConst(0, di, DrawConstant.class);
 		DrawConstant clip = getConst(1, di, DrawConstant.class);
-		g.setClip(getShape(clip, false));
-		g.draw(getShape(path, true));
+		g.setClip(getShape(clip));
+		g.draw(getShape(path));
 	}
 
 	private static void iprtFill(Graphics2D g, DrawInstruction di) {
 		DrawConstant path = getConst(0, di, DrawConstant.class);
 		DrawConstant clip = getConst(1, di, DrawConstant.class);
-		g.setClip(getShape(clip, false));
-		g.fill(getShape(path, false));
+		g.setClip(getShape(clip));
+		g.fill(getShape(path));
 	}
 
 	private static void iprtSetComposite(Graphics2D currentg, DrawInstruction di) {
@@ -205,7 +186,7 @@ public class RenderUtil {
 		if (paint != null) {
 			g.setPaint(paint);
 		}
-		gmap.put(idConst.getAddress(), g);
+		gmap.put(idConst.getId(), g);
 		return g;
 	}
 
@@ -226,27 +207,25 @@ public class RenderUtil {
 			result = ((LinearGradientConst) paintConst).getLinearGradientPaint();
 		} else if (paintConst instanceof RadialGradientConst) {
 			result = ((RadialGradientConst) paintConst).getRadialGradientPaint();
-		} else if (paintConst instanceof ImageConst) {
-			RectangleConst rect = getConst(offset + 1, di, RectangleConst.class);
-			result = ((ImageConst) paintConst).getTexturePaint(rect.getRectangle(false));
-		}
+		} else if (paintConst instanceof TextureConst) {
+            result = ((TextureConst) paintConst).getTexture();
+        }
 		return result;
 	}
 
-	private static Shape getShape(DrawConstant s, boolean biased) {
-		Shape shape = null;
+	private static Shape getShape(DrawConstant s) {
 		if (s instanceof RectangleConst) {
-			return ((RectangleConst) s).getRectangle(biased);
+			return ((RectangleConst) s).getRectangle();
 		} else if (s instanceof RoundRectangleConst) {
-			return ((RoundRectangleConst) s).getRoundRectangle(biased);
+			return ((RoundRectangleConst) s).getRoundRectangle();
 		} else if (s instanceof EllipseConst) {
-			return ((EllipseConst) s).getEllipse(biased);
+			return ((EllipseConst) s).getEllipse();
 		} else if (s instanceof ArcConst) {
-			return ((ArcConst) s).getArc(biased);
+			return ((ArcConst) s).getArc();
 		} else if (s instanceof PathConst) {
-			return ((PathConst) s).getPath(biased);
+			return ((PathConst) s).getPath();
 		}
-		return shape;
+		return null;
 	}
 
 }

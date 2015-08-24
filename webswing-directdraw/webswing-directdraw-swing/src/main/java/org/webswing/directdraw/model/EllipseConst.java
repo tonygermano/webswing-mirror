@@ -22,10 +22,9 @@ public class EllipseConst extends DrawConstant {
 		return "ellipse";
 	}
 
-	public Ellipse2D.Float getEllipse(boolean biased) {
+	public Ellipse2D.Float getEllipse() {
 		EllipseProto e = (EllipseProto) message;
-		float bias = biased ? 0.5f : 0;
-		return new Ellipse2D.Float(e.getX() + bias, e.getY() + bias, e.getW(), e.getH());
+		return new Ellipse2D.Float(e.getX(), e.getY(), e.getW(), e.getH());
 	}
 
 }

@@ -26,9 +26,8 @@ public class ArcConst extends DrawConstant {
 		return "arc";
 	}
 
-	public Arc2D.Float getArc(boolean biased) {
+	public Arc2D.Float getArc() {
 		ArcProto a = (ArcProto) message;
-		float bias = biased ? 0.5f : 0;
-		return new Arc2D.Float(a.getX() + bias, a.getY() + bias, a.getW(), a.getH(), a.getStart(), a.getExtent(), a.getType().getNumber());
+		return new Arc2D.Float(a.getX(), a.getY(), a.getW(), a.getH(), a.getStart(), a.getExtent(), a.getType().getNumber());
 	}
 }

@@ -1,21 +1,17 @@
 package org.webswing.directdraw.model;
 
-import java.awt.TexturePaint;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.awt.*;
+import java.awt.geom.*;
+import java.awt.image.*;
+import java.io.*;
 
-import javax.imageio.ImageIO;
+import javax.imageio.*;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.proto.Directdraw.ImageProto;
-
-import com.google.protobuf.ByteString;
+import com.google.protobuf.*;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.*;
 
 public class ImageConst extends DrawConstant {
-
-	private long hash;
 
 	public ImageConst(DirectDraw context, BufferedImage img, Long hash) {
 		super(context);
@@ -35,24 +31,16 @@ public class ImageConst extends DrawConstant {
 	}
 
 	@Override
-	protected long getHash() {
-		return hash;
-	}
-
-	@Override
 	public String getFieldName() {
 		return "image";
 	}
-
-	public TexturePaint getTexturePaint(Rectangle2D anchor) {
-		ImageProto ip = (ImageProto) message;
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(ip.getData().newInput());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return new TexturePaint(img, anchor);
-	}
-
+    
+    public static BufferedImage getImage(ImageProto i) {
+        try {
+            return ImageIO.read(i.getData().newInput());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

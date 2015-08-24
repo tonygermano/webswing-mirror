@@ -49,6 +49,7 @@ message DrawConstantProto {
 	optional ArcProto arc = 14;
 	optional StrokeProto stroke = 15;
 	optional CompositeProto composite = 16;
+    optional TextureProto texture = 17;
 }
 
 message ColorProto {
@@ -60,30 +61,29 @@ message ImageProto {
 }
 
 message TransformProto {
-	optional float m00 = 1;
+	optional float m00 = 1 [default = 1];
 	optional float m10 = 2;
 	optional float m01 = 3;
-	optional float m11 = 4;
-	optional sint32 m02X2 = 5;
-	optional sint32 m12X2 = 6;
+	optional float m11 = 4 [default = 1];
+	optional float m02 = 5;
+	optional float m12 = 6;
 }
 
-
-message RectangleProto{
+message RectangleProto {
 	required sint32 x = 1;
 	required sint32 y = 2;
 	required sint32 w = 3;
 	required sint32 h = 4;
 }
 
-message EllipseProto{
+message EllipseProto {
 	required sint32 x = 1;
 	required sint32 y = 2;
 	required sint32 w = 3;
 	required sint32 h = 4;
 }
 
-message RoundRectangleProto{
+message RoundRectangleProto {
 	required sint32 x = 1;
 	required sint32 y = 2;
 	required sint32 w = 3;
@@ -91,7 +91,8 @@ message RoundRectangleProto{
 	optional sint32 arcW = 5;
 	optional sint32 arcH = 6;
 }
-message ArcProto{
+
+message ArcProto {
 	required sint32 x = 1;
 	required sint32 y = 2;
 	required sint32 w = 3;
@@ -136,12 +137,12 @@ message FontProto {
 }
 
 message StrokeProto {
-	required uint32 widthX10 = 1;
-	optional uint32 miterLimitX10 = 2;
+	required float width = 1;
+	optional float miterLimit = 2;
 	optional StrokeJoinProto join = 3;
 	optional StrokeCapProto cap = 4;
-	repeated uint32 dashX10 = 5;
-	optional uint32 dashOffset = 6;
+	repeated float dash = 5;
+	optional float dashOffset = 6;
 
 	enum StrokeJoinProto {
 		JOIN_MITER = 0;
@@ -188,8 +189,8 @@ message PointsProto {
 }
 
 message CompositeProto {
-	required CompositeTypeProto type= 1;
-	optional float alpha = 2;
+	required CompositeTypeProto type = 1;
+	optional float alpha = 2 [default = 1];
 
 	enum CompositeTypeProto {
 	    CLEAR = 1;
@@ -205,4 +206,9 @@ message CompositeProto {
 		DST_ATOP = 11;
 		XOR = 12;
 	}
+}
+
+message TextureProto {
+    required ImageProto image = 1;
+    required RectangleProto anchor = 2;
 }

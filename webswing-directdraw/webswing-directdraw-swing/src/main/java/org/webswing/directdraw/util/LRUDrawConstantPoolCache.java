@@ -10,104 +10,78 @@ public class LRUDrawConstantPoolCache {
     private DoubleLinkedListNode head;
     private DoubleLinkedListNode end;
     private int capacity;
-    private int len;
+    // reserve zero id for null constants
+    private int nextId = 1;
 
     public LRUDrawConstantPoolCache(int capacity) {
         this.capacity = capacity;
-        len = 0;
     }
 
     public synchronized boolean contains(DrawConstant constant) {
         return map.containsKey(constant);
     }
 
-    private int removeNode(DoubleLinkedListNode node) {
-        DoubleLinkedListNode cur = node;
-        DoubleLinkedListNode pre = cur.pre;
-        DoubleLinkedListNode post = cur.next;
-
-        if (pre != null) {
-            pre.next = post;
-        } else {
-            head = post;
-        }
-
-        if (post != null) {
-            post.pre = pre;
-        } else {
-            end = pre;
-        }
-        return cur.getAddress();
-    }
-
-    private void setHead(DoubleLinkedListNode node) {
-        node.next = head;
-        node.pre = null;
-        if (head != null) {
-            head.pre = node;
-        }
-
-        head = node;
-        if (end == null) {
-            end = node;
-        }
-    }
-
-    public DrawConstant set(DrawConstant constant) {
+    public DrawConstant getOrAdd(DrawConstant constant) {
         if (map.containsKey(constant)) {
             DoubleLinkedListNode oldNode = map.get(constant);
-            removeNode(oldNode);
-            setHead(oldNode);
+            oldNode.remove();
+            oldNode.makeHead();
             return oldNode.getVal();
         } else {
-            DoubleLinkedListNode newNode = new DoubleLinkedListNode(constant);
-            if (len < capacity) {
-                setHead(newNode);
-                newNode.setAddress(len);
-                map.put(newNode.getVal(), newNode);
-                len++;
-                return newNode.getVal();
-            } else {
-                int evictedAddress = end.getAddress();
+            if (nextId >= capacity) {
+                // remove oldest node
                 map.remove(end.getVal());
-                onElementRemoved(end.val);
-                end = end.pre;
-                if (end != null) {
-                    end.next = null;
-                }
-                setHead(newNode);
-                newNode.setAddress(evictedAddress);
-                map.put(newNode.getVal(), newNode);
-                return newNode.getVal();
+                end.remove();
             }
+            DoubleLinkedListNode newNode = new DoubleLinkedListNode(constant);
+            newNode.makeHead();
+            newNode.setId(nextId++);
+            map.put(constant, newNode);
+            return constant;
         }
     }
-
-    public void onElementRemoved(DrawConstant val) {
-		
-	}
 
 	private class DoubleLinkedListNode {
 
-        DrawConstant val;
-        DoubleLinkedListNode pre;
-        DoubleLinkedListNode next;
+        private DrawConstant val;
+        private DoubleLinkedListNode pre;
+        private DoubleLinkedListNode next;
 
         public DoubleLinkedListNode(DrawConstant value) {
             val = value;
         }
 
-        public int getAddress() {
-            return val.getAddress();
-        }
-
-        public void setAddress(int address) {
-            val.setAddress(address);
+        public void setId(int id) {
+            val.setId(id);
         }
 
         public DrawConstant getVal() {
             return val;
         }
 
+        public void remove() {
+            if (pre != null) {
+                pre.next = next;
+            } else {
+                head = next;
+            }
+            if (next != null) {
+                next.pre = pre;
+            } else {
+                end = pre;
+            }
+        }
+
+        public void makeHead() {
+            next = head;
+            pre = null;
+            if (head != null) {
+                head.pre = this;
+            }
+            head = this;
+            if (end == null) {
+                end = this;
+            }
+        }
     }
 }

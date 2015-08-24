@@ -2,47 +2,17 @@
 // Modification to original: merged with AbstractVectorGraphicsIO
 package org.webswing.directdraw.toolkit;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Composite;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.Image;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.Toolkit;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
-import java.awt.font.TextLayout;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-import java.awt.image.ImageObserver;
-import java.awt.image.RenderedImage;
-import java.awt.image.renderable.RenderContext;
-import java.awt.image.renderable.RenderableImage;
-import java.io.IOException;
-import java.text.AttributedCharacterIterator;
-import java.util.Map;
+import java.awt.*;
+import java.awt.font.*;
+import java.awt.geom.*;
+import java.awt.image.*;
+import java.awt.image.renderable.*;
+import java.io.*;
+import java.text.*;
+import java.text.AttributedCharacterIterator.*;
+import java.util.*;
 
-import org.webswing.directdraw.util.DirectDrawUtils;
+import org.webswing.directdraw.util.*;
 
 /**
  * This class implements all conversions from integer to double as well as a few
@@ -57,49 +27,7 @@ import org.webswing.directdraw.util.DirectDrawUtils;
  * @version $Id: AbstractVectorGraphics.java 10516 2007-02-06 21:11:19Z duns $
  */
 public abstract class AbstractVectorGraphics extends Graphics2D {
-
-	public static final boolean TEXT_AS_SHAPES = false;
-	/**
-	 * Constant indicating that a string should be aligned vertically with the
-	 * baseline of the text. This is the default in drawString calls which do
-	 * not specify an alignment.
-	 */
-	public static final int TEXT_BASELINE = 0;
-
-	/**
-	 * Constant indicating that a string should be aligned vertically with the
-	 * top of the text.
-	 */
-	public static final int TEXT_TOP = 1;
-
-	/**
-	 * Constant indicating that a string should be aligned vertically with the
-	 * bottom of the text.
-	 */
-	public static final int TEXT_BOTTOM = 3;
-
-	/**
-	 * Constant indicating that a string should be aligned by the center. This
-	 * is used for both horizontal and vertical alignment.
-	 */
-	public static final int TEXT_CENTER = 2;
-
-	/**
-	 * Constant indicating that a string should be aligned horizontally with the
-	 * left side of the text. This is the default for drawString calls which do
-	 * not specify an alignment.
-	 */
-	public static final int TEXT_LEFT = 1;
-
-	/**
-	 * Constant indicating that the string should be aligned horizontally with
-	 * the right side of the text.
-	 */
-	public static final int TEXT_RIGHT = 3;
-
 	private Dimension size;
-
-	private int colorMode;
 
 	private Color backgroundColor;
 
@@ -140,10 +68,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * <LI>Composite: AlphaComposite.SRC_OVER
 	 * <LI>Clip: Rectangle(0, 0, size.width, size.height)
 	 * </UL>
-	 *
-	 * @param size rectangle specifying the bounds of the image
-	 * @param doRestoreOnDispose true if writeGraphicsRestore() should be called
-	 *        when this graphics context is disposed of.
+	 * 
+     * @param size rectangle specifying the bounds of the image
 	 */
 	protected AbstractVectorGraphics(Dimension size) {
 		this.size = size;
@@ -152,7 +78,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 		userClip = null;
 		currentTransform = new AffineTransform();
 		currentComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER);
-		currentStroke = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
+		currentStroke = new BasicStroke();
 
 		currentColor = Color.BLACK;
 		currentPaint = Color.BLACK;
@@ -176,11 +102,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * <LI>Clip: The size of the component, Rectangle(0, 0, size.width,
 	 * size.height)
 	 * </UL>
-	 *
-	 * @param component to be used to initialize the values of the graphics
-	 *        state
-	 * @param doRestoreOnDispose true if writeGraphicsRestore() should be called
-	 *        when this graphics context is disposed of.
+	 * 
+     * @param component to be used to initialize the values of the graphics
+     *        state
 	 */
 	protected AbstractVectorGraphics(Component component) {
 		this.size = component.getSize();
@@ -190,7 +114,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 		GraphicsConfiguration gc = component.getGraphicsConfiguration();
 		currentTransform = (gc != null) ? gc.getDefaultTransform() : new AffineTransform();
 		currentComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER);
-		currentStroke = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
+		currentStroke = new BasicStroke();
 
 		currentColor = Color.BLACK;
 		currentPaint = Color.BLACK;
@@ -202,24 +126,21 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	/**
-	 * Constructs a subgraphics context.
-	 *
-	 * @param graphics context to clone from
-	 * @param doRestoreOnDispose true if writeGraphicsRestore() should be called
-	 *        when this graphics context is disposed of.
+	 * Constructs a sub-graphics context.
+	 * 
+     * @param graphics context to clone from
 	 */
 	protected AbstractVectorGraphics(AbstractVectorGraphics graphics) {
 		super();
 		backgroundColor = graphics.backgroundColor;
 		currentColor = graphics.currentColor;
 		currentPaint = graphics.currentPaint;
-		colorMode = graphics.colorMode;
 		currentFont = graphics.currentFont;
 
 		size = new Dimension(graphics.size);
 
 		deviceClip = new Rectangle(graphics.deviceClip);
-		userClip = (graphics.userClip != null) ? new Area(graphics.userClip) : null;
+		userClip = graphics.userClip;
 		currentTransform = new AffineTransform(graphics.currentTransform);
 		currentComposite = graphics.currentComposite;
 		currentStroke = graphics.currentStroke;
@@ -282,27 +203,6 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 		translate((double) x, (double) y);
 	}
 
-	/*--------------------------------------------------------------------------------
-	 | 8.1. stroke/linewidth
-	 *--------------------------------------------------------------------------------*/
-	public void setLineWidth(int width) {
-		setLineWidth((double) width);
-	}
-
-	public void setLineWidth(double width) {
-		Stroke stroke = getStroke();
-		if (stroke instanceof BasicStroke) {
-			BasicStroke cs = (BasicStroke) stroke;
-			if (cs.getLineWidth() != width) {
-				stroke = new BasicStroke((float) width, cs.getEndCap(), cs.getLineJoin(), cs.getMiterLimit(), cs.getDashArray(), cs.getDashPhase());
-				setStroke(stroke);
-			}
-		} else {
-			stroke = new BasicStroke((float) width);
-			setStroke(stroke);
-		}
-	}
-
 	public void drawString(String str, int x, int y) {
 		drawString(str, (double) x, (double) y);
 	}
@@ -315,129 +215,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 		drawString(iterator, (float) x, (float) y);
 	}
 
-	/**
-	 * Draws frame and banner for a TextLayout, which is used for
-	 * calculation auf ajustment
-	 *
-	 * @param tl TextLayout for frame calculation
-	 * @param x coordinate to draw string
-	 * @param y coordinate to draw string
-	 * @param horizontal alignment of the text
-	 * @param vertical alignment of the text
-	 * @param framed true if text is surrounded by a frame
-	 * @param frameColor color of the frame
-	 * @param frameWidth witdh of the frame
-	 * @param banner true if the frame is filled by a banner
-	 * @param bannerColor color of the banner
-	 * @return Offset for the string inside the frame
-	 */
-	private Point2D drawFrameAndBanner(TextLayout tl, double x, double y, int horizontal, int vertical, boolean framed, Color frameColor, double frameWidth, boolean banner, Color bannerColor) {
-
-		// calculate string bounds for alignment
-		Rectangle2D bounds = tl.getBounds();
-
-		// calculate real bounds
-		bounds.setRect(bounds.getX(), bounds.getY(),
-		// care for Italic fonts too
-				Math.max(tl.getAdvance(), bounds.getWidth()), bounds.getHeight());
-
-		// add x and y
-		AffineTransform at = AffineTransform.getTranslateInstance(x, y);
-
-		// horizontal alignment
-		if (horizontal == TEXT_RIGHT) {
-			at.translate(-bounds.getWidth(), 0);
-		} else if (horizontal == TEXT_CENTER) {
-			at.translate(-bounds.getWidth() / 2, 0);
-		}
-
-		// vertical alignment
-		if (vertical == TEXT_BASELINE) {
-			// no translation needed
-		} else if (vertical == TEXT_TOP) {
-			at.translate(0, -bounds.getY());
-		} else if (vertical == TEXT_CENTER) {
-			// the following adds supersript ascent too,
-			// so it does not work
-			// at.translate(0, tl.getAscent() / 2);
-			// this is nearly the same
-			at.translate(0, tl.getDescent());
-		} else if (vertical == TEXT_BOTTOM) {
-			at.translate(0, -bounds.getHeight() - bounds.getY());
-		}
-
-		// transform the bounds
-		bounds = at.createTransformedShape(bounds).getBounds2D();
-		// create the result with the same transformation
-		Point2D result = at.transform(new Point2D.Double(0, 0), new Point2D.Double());
-
-		// space between string and border
-		double adjustment = (getFont().getSize2D() * 2) / 10;
-
-		// add the adjustment
-		bounds.setRect(bounds.getX() - adjustment, bounds.getY() - adjustment, bounds.getWidth() + 2 * adjustment, bounds.getHeight() + 2 * adjustment);
-
-		if (banner) {
-			Paint paint = getPaint();
-			setColor(bannerColor);
-			fill(bounds);
-			setPaint(paint);
-		}
-		if (framed) {
-			Paint paint = getPaint();
-			Stroke stroke = getStroke();
-			setColor(frameColor);
-			setLineWidth(frameWidth);
-			draw(bounds);
-			setPaint(paint);
-			setStroke(stroke);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Draws frame, banner and aligned text inside
-	 *
-	 * @param str text to be drawn
-	 * @param x coordinate to draw string
-	 * @param y coordinate to draw string
-	 * @param horizontal alignment of the text
-	 * @param vertical alignment of the text
-	 * @param framed true if text is surrounded by a frame
-	 * @param frameColor color of the frame
-	 * @param frameWidth witdh of the frame
-	 * @param banner true if the frame is filled by a banner
-	 * @param bannerColor color of the banner
-	 */
-	@SuppressWarnings("unchecked")
-	public void drawString(String str, double x, double y, int horizontal, int vertical, boolean framed, Color frameColor, double frameWidth, boolean banner, Color bannerColor) {
-
-		// change the x offset for the next drawing
-		// change y offset for vertical text
-		TextLayout tl = new TextLayout(str, DirectDrawUtils.getAttributes(getFont()), getFontRenderContext());
-
-		// draw the frame
-		Point2D offset = drawFrameAndBanner(tl, x, y, horizontal, vertical, framed, frameColor, frameWidth, banner, bannerColor);
-
-		// draw the string
-		drawString(str, offset.getX(), offset.getY());
-	}
-
 	// ------------------ other wrapper methods ----------------
-
-	public void drawString(String str, double x, double y, int horizontal, int vertical) {
-		drawString(str, x, y, horizontal, vertical, false, null, 0, false, null);
-	}
-
-	/* 8.2. paint/color */
-	public int getColorMode() {
-		return colorMode;
-	}
-
-	public void setColorMode(int colorMode) {
-		this.colorMode = colorMode;
-	}
 
 	/**
 	 * Gets the background color.
@@ -475,22 +253,22 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 		return currentPaint;
 	}
 
-	public void rotate(double theta, double x, double y) {
-		translate(x, y);
+	public void rotate(double theta, double anchorX, double anchorY) {
+		translate(anchorX, anchorY);
 		rotate(theta);
-		translate(-x, -y);
+		translate(-anchorX, -anchorY);
 	}
 
 	public void drawPolyline(int[] xPoints, int[] yPoints, int nPoints) {
-		draw(createShape(xPoints, yPoints, nPoints, false, true));
+		draw(createShape(xPoints, yPoints, nPoints, false));
 	}
 
 	public void drawPolygon(int[] xPoints, int[] yPoints, int nPoints) {
-		draw(createShape(xPoints, yPoints, nPoints, true, true));
+		draw(createShape(xPoints, yPoints, nPoints, true));
 	}
 
 	public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints) {
-		fill(createShape(xPoints, yPoints, nPoints, true, false));
+		fill(createShape(xPoints, yPoints, nPoints, true));
 	}
 
 	/**
@@ -512,12 +290,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 			s = getTransform().createTransformedShape(s);
 		}
 
-		Area area = new Area(s);
-		if (getClip() != null) {
-			area.intersect(new Area(getClip()));
-		}
-
-		return area.intersects(rect);
+		return s.intersects(rect);
 	}
 
 	/*
@@ -664,10 +437,6 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * Draws the string at (x, y). If TEXT_AS_SHAPES is set
 	 * {@link #drawGlyphVector(java.awt.font.GlyphVector, float, float)} is used, otherwise
 	 * {@link #writeString(String, double, double)} for a more direct output of the string.
-	 *
-	 * @param string
-	 * @param x
-	 * @param y
 	 */
 	public void drawString(String string, double x, double y) {
 		// something to draw?
@@ -685,10 +454,6 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	/**
 	 * Use the transformation of the glyphvector and draw it
-	 *
-	 * @param g
-	 * @param x
-	 * @param y
 	 */
 	public void drawGlyphVector(GlyphVector g, float x, float y) {
 		fill(g.getOutline(x, y));
@@ -703,7 +468,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 		// initial attributes, we us TextAttribute.equals() rather
 		// than Font.equals() because using Font.equals() we do
 		// not get a 'false' if underline etc. is changed
-		Map/* <TextAttribute, ?> */attributes = DirectDrawUtils.getAttributes(font);
+		Map<? extends Attribute, ?> attributes = DirectDrawUtils.getAttributes(font);
 
 		// stores all characters which are written with the same font
 		// if font is changed the buffer will be written and cleared
@@ -865,16 +630,15 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	protected abstract void writeTransform(AffineTransform transform) throws IOException;
 
 	/**
-	 * Clears any existing transformation and sets the a new one.
-	 * The default implementation calls writeTransform using the
-	 * inverted affine transform to calculate it.
-	s     *
-	 * @param transform to be written
+     * Clears any existing transformation and sets the a new one.
+     * The default implementation calls writeTransform using the
+     * inverted affine transform to calculate it.
+     * @param transform to be written
 	 */
 	protected void writeSetTransform(AffineTransform transform) throws IOException {
 		try {
-			AffineTransform deltaTransform = new AffineTransform(transform);
-			deltaTransform.concatenate(oldTransform.createInverse());
+			AffineTransform deltaTransform = oldTransform.createInverse();
+			deltaTransform.concatenate(transform);
 			writeTransform(deltaTransform);
 		} catch (NoninvertibleTransformException e) {
 			handleException(e);
@@ -1056,7 +820,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 		currentStroke = stroke;
 	}
 
-	public abstract void writeStroke(Stroke stroke) throws IOException;;
+	public abstract void writeStroke(Stroke stroke) throws IOException;
 
 	/* 8.2 Paint */
 
@@ -1122,9 +886,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * @return current font render context
 	 */
 	public FontRenderContext getFontRenderContext() {
-		// NOTE: not sure?
-		// Fixed for VG-285
-		return new FontRenderContext(new AffineTransform(1, 0, 0, 1, 0, 0), true, true);
+		boolean antialias = RenderingHints.VALUE_TEXT_ANTIALIAS_ON.equals(getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING));
+		boolean fractions = RenderingHints.VALUE_FRACTIONALMETRICS_ON.equals(getRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS));
+		return new FontRenderContext(new AffineTransform(), antialias, fractions);
 	}
 
 	/**
@@ -1134,6 +898,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * @param font to be used for retrieving fontmetrics
 	 * @return fontmetrics for given font
 	 */
+	@SuppressWarnings("deprecation")
 	public FontMetrics getFontMetrics(Font font) {
 		return Toolkit.getDefaultToolkit().getFontMetrics(font);
 	}
@@ -1153,9 +918,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 *
 	 * @param hints table to be added
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void addRenderingHints(Map hints) {
-		hints.putAll(hints);
+	public void addRenderingHints(Map<?, ?> hints) {
+		this.hints.putAll(hints);
 	}
 
 	/**
@@ -1163,10 +927,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 *
 	 * @param hints table to be set
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void setRenderingHints(Map hints) {
-		hints.clear();
-		hints.putAll(hints);
+	public void setRenderingHints(Map<?, ?> hints) {
+		this.hints.clear();
+		this.hints.putAll(hints);
 	}
 
 	/**
@@ -1200,21 +963,18 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	public void setFont(Font font) {
 		if (font == null)
 			return;
-
 		currentFont = font;
 	}
 
 	/*
-	 * ================================================================================ |
-	 * XXX 9. AUXILIARY
-	 * ================================================================================
+     * ================================================================================
+     * XXX 9. AUXILIARY
+     * ================================================================================
 	 */
 
 	/**
 	 * Handles an exception which has been caught. Dispatches exception to
 	 * writeWarning for UnsupportedOperationExceptions and writeError for others
-	 *
-	 * @param exception to be handled
 	 */
 	protected void handleException(Exception e) {
 		e.printStackTrace();
@@ -1229,61 +989,30 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 		return currentComposite;
 	}
 
-	/**
-	 * Sets current composite.
-	 *
-	 * @param composite to be set
-	 */
+    @Override
 	public void setComposite(Composite composite) {
-		if (composite == null)
-			return;
-
-		if (composite.equals(getPaint()))
-			return;
-
-		currentComposite = composite;
-		writeComposite(composite);
+		if (composite == null || composite.equals(getComposite())) {
+            return;
+        }
+        currentComposite = composite;
+        writeComposite(composite);
 	}
 
 	protected abstract void writeComposite(Composite composite);
 
 	/**
-	 * Creates a polyline/polygon shape from a set of points. Needs to be
-	 * defined in subclass because its implementations could be device specific
-	 *
-	 * @param xPoints X coordinates of the polyline.
-	 * @param yPoints Y coordinates of the polyline.
-	 * @param nPoints number of points of the polyline.
-	 * @param close is shape closed
+     * Creates a polyline/polygon shape from a set of points.
+     * Needs a bias!
+	 * 
+     * @param xPoints X coordinates of the polyline.
+     * @param yPoints Y coordinates of the polyline.
+     * @param nPoints number of points of the polyline.
+     * @param close is shape closed
 	 */
-	protected Shape createShape(double[] xPoints, double[] yPoints, int nPoints, boolean close) {
-		GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+	protected Shape createShape(int[] xPoints, int[] yPoints, int nPoints, boolean close) {
+        GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 		if (nPoints > 0) {
-			path.moveTo((float) xPoints[0], (float) yPoints[0]);
-			for (int i = 1; i < nPoints; i++) {
-				path.lineTo((float) xPoints[i], (float) yPoints[i]);
-			}
-			if (close)
-				path.closePath();
-		}
-		return path;
-	}
-
-	/**
-	 * Creates a polyline/polygon shape from a set of points.
-	 * Needs a bias!
-	 *
-	 * @param xPoints X coordinates of the polyline.
-	 * @param yPoints Y coordinates of the polyline.
-	 * @param nPoints number of points of the polyline.
-	 * @param close is shape closed
-	 */
-	protected Shape createShape(int[] xPoints, int[] yPoints, int nPoints, boolean close, boolean biased) {
-
-		float offset = biased ? (float) 0.5 : 0.0f;
-		GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-		if (nPoints > 0) {
-			path.moveTo(xPoints[0] + offset, yPoints[0] + offset);
+			path.moveTo(xPoints[0], yPoints[0]);
 			int lastX = xPoints[0];
 			int lastY = yPoints[0];
 			if (close && (Math.abs(xPoints[nPoints - 1] - lastX) < 1) && (Math.abs(yPoints[nPoints - 1] - lastY) < 1)) {
@@ -1291,7 +1020,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 			}
 			for (int i = 1; i < nPoints; i++) {
 				if ((Math.abs(xPoints[i] - lastX) > 1) || (Math.abs(yPoints[i] - lastY) > 1)) {
-					path.lineTo(xPoints[i] + offset, yPoints[i] + offset);
+					path.lineTo(xPoints[i], yPoints[i]);
 					lastX = xPoints[i];
 					lastY = yPoints[i];
 				}
@@ -1321,24 +1050,4 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 			return null;
 		}
 	}
-
-	/**
-	 * Draws an overline for the text at (x, y). The method is usesefull for
-	 * drivers that do not support overlines by itself.
-	 *
-	 * @param text text for width calulation
-	 * @param font font for width calulation
-	 * @param x position of text
-	 * @param y position of text
-	 */
-	protected void overLine(String text, Font font, float x, float y) {
-		TextLayout layout = new TextLayout(text, font, getFontRenderContext());
-		float width = Math.max(layout.getAdvance(), (float) layout.getBounds().getWidth());
-
-		GeneralPath path = new GeneralPath();
-		path.moveTo(x, y + (float) layout.getBounds().getY() - layout.getAscent());
-		path.lineTo(x + width, y + (float) layout.getBounds().getY() - layout.getAscent() - layout.getAscent());
-		draw(path);
-	}
-
 }

@@ -10,8 +10,12 @@ public class DrawConstantPool {
         pool = new LRUDrawConstantPoolCache(size);
     }
 
-    public DrawConstant getCachedConstant(DrawConstant constant) {
-        return pool.set(constant);
+    public DrawConstant getCached(DrawConstant constant) {
+        return pool.getOrAdd(constant);
+    }
+
+    public void addToCache(DrawConstant constant) {
+        pool.getOrAdd(constant);
     }
 
     public boolean isInCache(DrawConstant constant) {

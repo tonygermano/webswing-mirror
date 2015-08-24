@@ -42,7 +42,7 @@ public class DrawInstruction {
 		DrawInstructionProto.Builder builder = DrawInstructionProto.newBuilder();
 		builder.setInst(instruction);
 		for (DrawConstant c : args) {
-			builder.addArgs(c.getAddress());
+			builder.addArgs(c.getId());
 		}
 		if (image != null) {
 			builder.setWebImage(image.toMessage(dd).toByteString());

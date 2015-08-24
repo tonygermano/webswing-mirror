@@ -1,16 +1,13 @@
 package org.webswing.directdraw.model;
 
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Path2D;
+import java.awt.*;
+import java.awt.geom.*;
 import java.awt.geom.Path2D.Float;
-import java.awt.geom.PathIterator;
-import java.util.Arrays;
 import java.util.List;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.proto.Directdraw.PathProto;
-import org.webswing.directdraw.proto.Directdraw.PathProto.SegmentTypeProto;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.PathProto.*;
 
 public class PathConst extends DrawConstant {
 
@@ -35,9 +32,9 @@ public class PathConst extends DrawConstant {
 		this.message = model.build();
 	}
 
-	public PathConst(DirectDraw context, Shape s, AffineTransform t) {
-		this(context, s.getPathIterator(t));
-		this.shape = t != null ? t.createTransformedShape(s) : s;
+	public PathConst(DirectDraw context, Shape s) {
+		this(context, s.getPathIterator(null));
+		this.shape = s;
 	}
 
 	public Shape getShape() {
@@ -49,9 +46,8 @@ public class PathConst extends DrawConstant {
 		return "path";
 	}
 
-	public Path2D.Float getPath(boolean biased) {
+	public Path2D.Float getPath() {
 		PathProto p = (PathProto) message;
-		float bias = biased ? 0.5f : 0;
 		Float path = new Path2D.Float(p.getWindingOdd() ? PathIterator.WIND_EVEN_ODD : PathIterator.WIND_NON_ZERO);
 		List<java.lang.Integer> pts = p.getPointsList();
 		int offset = 0;
@@ -59,16 +55,16 @@ public class PathConst extends DrawConstant {
 			int pointCount = type == SegmentTypeProto.CLOSE ? 0 : type == SegmentTypeProto.MOVE || type == SegmentTypeProto.LINE ? 2 : type == SegmentTypeProto.QUAD ? 4 : type == SegmentTypeProto.CUBIC ? 6 : 0;
 			switch (type) {
 			case MOVE:
-				path.moveTo(pts.get(offset) + bias, pts.get(offset + 1) + bias);
+				path.moveTo(pts.get(offset), pts.get(offset + 1));
 				break;
 			case LINE:
-				path.lineTo(pts.get(offset) + bias, pts.get(offset + 1) + bias);
+				path.lineTo(pts.get(offset), pts.get(offset + 1));
 				break;
 			case QUAD:
-				path.quadTo(pts.get(offset) + bias, pts.get(offset + 1) + bias, pts.get(offset + 2), pts.get(offset + 3));
+				path.quadTo(pts.get(offset), pts.get(offset + 1), pts.get(offset + 2), pts.get(offset + 3));
 				break;
 			case CUBIC:
-				path.curveTo(pts.get(offset) + bias, pts.get(offset + 1) + bias, pts.get(offset + 2), pts.get(offset + 3), pts.get(offset + 4), pts.get(offset + 5));
+				path.curveTo(pts.get(offset), pts.get(offset + 1), pts.get(offset + 2), pts.get(offset + 3), pts.get(offset + 4), pts.get(offset + 5));
 				break;
 			case CLOSE:
 				path.closePath();
