@@ -14,6 +14,8 @@ public class SwingSession implements Serializable {
 	private Boolean connected;
 	private Boolean applet;
 	private Date disconnectedSince;
+	private Boolean recorded;
+	private String recordingFile;
 	private SwingJvmStats state;
 
 	public String getId() {
@@ -86,6 +88,22 @@ public class SwingSession implements Serializable {
 
 	public void setApplet(Boolean applet) {
 		this.applet = applet;
+	}
+
+	public Boolean getRecorded() {
+		return recorded;
+	}
+
+	public void setRecorded(Boolean recorded) {
+		this.recorded = recorded;
+	}
+
+	public String getRecordingFile() {
+		return recordingFile;
+	}
+
+	public void setRecordingFile(String recordingFile) {
+		this.recordingFile = recordingFile;
 	}
 
 }

@@ -13,6 +13,9 @@ public class LinkActionMsg implements Msg {
 	private LinkActionType action;
 	private String src;
 
+	public LinkActionMsg() {
+	}
+
 	public LinkActionMsg(LinkActionType action, String url) {
 		super();
 		this.action = action;

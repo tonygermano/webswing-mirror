@@ -21,6 +21,7 @@ public class AppFrameMsgOut implements MsgOut {
 	private SimpleEventMsgOut event;
 	private JsEvalRequestMsgOut jsRequest;
 	private JsResultMsg javaResponse;
+	private PlaybackInfoMsg playback;
 	private String sessionId;
 
 	public WindowMsg getOrCreateWindowById(String guid) {
@@ -133,6 +134,14 @@ public class AppFrameMsgOut implements MsgOut {
 
 	public void setSessionId(String sessionId) {
 		this.sessionId = sessionId;
+	}
+
+	public PlaybackInfoMsg getPlayback() {
+		return playback;
+	}
+
+	public void setPlayback(PlaybackInfoMsg playback) {
+		this.playback = playback;
 	}
 
 }

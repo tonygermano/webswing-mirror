@@ -13,6 +13,9 @@ public class CopyEventMsg implements Msg {
 	private List<String> files;
 	private boolean other;
 
+	public CopyEventMsg() {
+	}
+
 	public CopyEventMsg(String text, String html, byte[] img, List<String> files, boolean other) {
 		super();
 		this.text = text;

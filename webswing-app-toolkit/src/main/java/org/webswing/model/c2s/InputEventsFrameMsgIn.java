@@ -13,6 +13,7 @@ public class InputEventsFrameMsgIn implements MsgIn {
 	private CopyEventMsgIn copy;
 	private PasteEventMsgIn paste;
 	private UploadedEventMsgIn uploaded;
+	private PlaybackCommandMsgIn playback;
 
 	private JsResultMsg jsResponse;// java2js call return value
 	private JavaEvalRequestMsgIn javaRequest;// js2java call
@@ -63,6 +64,14 @@ public class InputEventsFrameMsgIn implements MsgIn {
 
 	public void setJavaRequest(JavaEvalRequestMsgIn javaRequest) {
 		this.javaRequest = javaRequest;
+	}
+
+	public PlaybackCommandMsgIn getPlayback() {
+		return playback;
+	}
+
+	public void setPlayback(PlaybackCommandMsgIn playback) {
+		this.playback = playback;
 	}
 
 }

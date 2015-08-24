@@ -8,10 +8,8 @@ import java.awt.GraphicsConfiguration;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Properties;
 
 import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.webswing.ext.services.PdfService;

@@ -1,7 +1,7 @@
-define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.css' ], function amdFactory($, html, css) {
+define(['jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.css'], function amdFactory($, html, css) {
     "use strict";
     var style = $("<style></style>", {
-        type : "text/css"
+        type: "text/css"
     });
     style.text(css);
     $("head").prepend(style);
@@ -10,29 +10,29 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
         var module = this;
         var api;
         module.injects = api = {
-            cfg : 'webswing.config',
-            send : 'socket.send',
-            getInput : 'canvas.getInput'
+            cfg: 'webswing.config',
+            send: 'socket.send',
+            getInput: 'canvas.getInput'
         };
         module.provides = {
-            cut : cut,
-            copy : copy,
-            paste : paste,
-            displayCopyBar : displayCopyBar,
-            dispose : close
+            cut: cut,
+            copy: copy,
+            paste: paste,
+            displayCopyBar: displayCopyBar,
+            dispose: close
         };
 
         var copyBar;
 
         function cut(event) {
-            copy(event, true)
+            copy(event, true);
         }
 
         function copy(event, cut) {
             if (copyBar == null || copyBar.minimized === true) {
                 api.send({
-                    copy : {
-                        type : cut === true ? 'cut' : 'copy'
+                    copy: {
+                        type: cut === true ? 'cut' : 'copy'
                     }
                 });
             } else {
@@ -44,7 +44,7 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                     if (data.html != null) {
                         ieClipboardDiv.html(data.html);
                         focusIeClipboardDiv();
-                        setTimeout(function() {
+                        setTimeout(function () {
                             close();
                         }, 0);
                     } else {
@@ -53,14 +53,7 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                         close();
                     }
 
-                    function focusIeClipboardDiv() {
-                        ieClipboardDiv.focus();
-                        var range = document.createRange();
-                        range.selectNodeContents((ieClipboardDiv.get(0)));
-                        var selection = window.getSelection();
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                    }
+
                 } else {
                     // handling of copy events for rest of browsers
                     event = event.originalEvent || event;
@@ -76,6 +69,15 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
             }
         }
 
+        function focusIeClipboardDiv() {
+            ieClipboardDiv.focus();
+            var range = document.createRange();
+            range.selectNodeContents((ieClipboardDiv.get(0)));
+            var selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+        
         function paste(event) {
             if (api.cfg.hasControl) {
                 if (useLocalClipboard()) {
@@ -89,11 +91,11 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                         text = data.getData('text/plain');
                         html = data.getData('text/html');
                         if (data.items != null) {
-                            for ( var i = 0; i < data.items.length; i++) {
+                            for (var i = 0; i < data.items.length; i++) {
                                 if (data.items[i].type.indexOf('image') === 0) {
                                     var img = data.items[i];
                                     var reader = new FileReader();
-                                    reader.onload = function(event) {
+                                    reader.onload = function (event) {
                                         sendPasteEvent(text, html, event.target.result);
                                     };
                                     reader.readAsDataURL(img.getAsFile());
@@ -104,7 +106,7 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                     }
                     sendPasteEvent(text, html);
                 } else {
-                    sendPasteEvent()
+                    sendPasteEvent();
                 }
             }
         }
@@ -118,10 +120,10 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                 pasteObj.html = html;
             }
             if (img != null) {
-                pasteObj.img = img
+                pasteObj.img = img;
             }
             api.send({
-                paste : pasteObj
+                paste: pasteObj
             });
         }
 
@@ -134,14 +136,14 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
             }
             api.cfg.rootElement.append(html);
             copyBar = api.cfg.rootElement.find('div[data-id="copyBar"]');
-            copyBar.on('click', function(event) {
+            copyBar.on('click', function (event) {
                 clearTimeout(minimizer);
                 api.getInput().focus();
             });
             copyBar.wsEventData = data;
             copyBar.minimized = false;
             var closeBtn = copyBar.find('button[data-id="closeBtn"]');
-            closeBtn.click(function() {
+            closeBtn.click(function () {
                 close();
             });
             copyBar.show("fast");
@@ -177,7 +179,7 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                 copyBar.find('#filesTab').remove();
             } else {
                 var fileListElement = copyBar.find('#wsFileList');
-                for ( var i = 0; i < data.files.length; i++) {
+                for (var i = 0; i < data.files.length; i++) {
                     var fileName = data.files[i];
                     var link = $('<a>');
                     if (fileName.indexOf("#") === 0) {
@@ -185,11 +187,11 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                         link.html(data.files[i].substring(1));
                     } else {
                         link.html(data.files[i]);
-                        link.on('click', function(event) {
+                        link.on('click', function (event) {
                             api.send({
-                                copy : {
-                                    type : 'getFileFromClipboard',
-                                    file : $(event.currentTarget).html()
+                                copy: {
+                                    type: 'getFileFromClipboard',
+                                    file: $(event.currentTarget).html()
                                 }
                             });
                         });
@@ -211,7 +213,7 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
             var tabs = copyBar.find('.nav-tabs>li');
             tabs.first().addClass('active');
             copyBar.find('.tab-pane').first().addClass('active');
-            tabs.on('click', function(event) {
+            tabs.on('click', function (event) {
                 tabs.removeClass('active');
                 copyBar.find('.tab-pane').removeClass('active');
                 $(event.currentTarget).addClass('active');
@@ -219,16 +221,16 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
             });
 
             var infoBar = copyBar.find('div[data-id="minimizedInfoBar"]');
-            infoBar.on('click', function(event) {// maximize
+            infoBar.on('click', function (event) {// maximize
                 maximize();
             });
 
             var minimizeBtn = copyBar.find('.webswing-minimize-symbol');
-            minimizeBtn.on('click', function(event) {// minimize
+            minimizeBtn.on('click', function (event) {// minimize
                 minimize();
             });
 
-            var minimizer = setTimeout(function() {
+            var minimizer = setTimeout(function () {
                 minimize();
             }, 2000);
 
@@ -268,13 +270,12 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
             if (typeof data === 'object') {
                 var binary = '';
                 var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
-                for ( var i = 0, l = bytes.byteLength; i < l; i++) {
+                for (var i = 0, l = bytes.byteLength; i < l; i++) {
                     binary += String.fromCharCode(bytes[i]);
                 }
                 data = window.btoa(binary);
             }
             return 'data:image/png;base64,' + data;
         }
-
     };
 });

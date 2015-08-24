@@ -31,6 +31,7 @@ import org.webswing.model.c2s.UploadedEventMsgIn;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.SwingInstanceManager;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.util.ServerUtil;
@@ -45,7 +46,7 @@ abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 	public void onReady(final AtmosphereResource r) {
 		boolean includeAdminApp = ServerUtil.isUserinRole(r, Constants.ADMIN_ROLE);
 		AppFrameMsgOut appInfo = new AppFrameMsgOut();
-		appInfo.setApplications(ServerUtil.createApplicationInfoMsg(r, includeAdminApp));
+		appInfo.setApplications(getApplicationList(r, includeAdminApp));
 		appInfo.setSessionId(r.uuid());
 		EncodedMessage encoded = new EncodedMessage(appInfo);
 		if (r.forceBinaryWrite()) {
@@ -53,6 +54,10 @@ abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 		} else {
 			r.write(encoded.getJsonMessage());
 		}
+	}
+
+	protected List<ApplicationInfoMsg> getApplicationList(AtmosphereResource r, boolean includeAdmin) {
+		return ServerUtil.createApplicationInfoMsg(r, includeAdmin);
 	}
 
 	public void onDisconnect(AtmosphereResourceEvent event) {

@@ -14,7 +14,8 @@ message AppFrameMsgOutProto{
 	optional SimpleEventMsgOutProto event = 9;
 	optional JsEvalRequestMsgOutProto jsRequest = 10;
 	optional JsResultMsgProto javaResponse = 11;
-	optional string sessionId = 12;
+	optional PlaybackInfoMsgProto playback = 12;
+	optional string sessionId = 13;
 }
 
 message ApplicationInfoMsgProto{
@@ -139,6 +140,11 @@ message JsResultMsgProto{
 	optional JsParamMsgProto value = 3;
 }
 
+message PlaybackInfoMsgProto{
+	optional uint32 current = 1;
+	optional uint32 total = 2;
+}
+
 /* ===================BROWSER -> SERVER====================*/
 message InputEventsFrameMsgInProto{
 	repeated InputEventMsgInProto events = 1;
@@ -148,6 +154,7 @@ message InputEventsFrameMsgInProto{
 	optional UploadedEventMsgInProto uploaded = 5;
 	optional JsResultMsgProto jsResponse = 6;
 	optional JavaEvalRequestMsgInProto javaRequest = 7;
+	optional PlaybackCommandMsgInProto playback = 8;
 }
 
 message InputEventMsgInProto{
@@ -255,5 +262,18 @@ message JavaEvalRequestMsgInProto{
 	optional string objectId = 2;
 	optional string method = 3;
 	repeated JsParamMsgProto params = 4;
+}
+
+message PlaybackCommandMsgInProto{
+	optional PlaybackCommandProto command = 1;
+
+	enum PlaybackCommandProto{
+		reset = 0;
+		play = 1;
+		stop = 2;
+		step = 3;
+		step10 = 4;
+		step100 = 5;
+	}
 }
 
