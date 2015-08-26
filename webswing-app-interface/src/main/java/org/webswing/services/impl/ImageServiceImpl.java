@@ -1,6 +1,8 @@
 package org.webswing.services.impl;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +11,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.stream.ImageOutputStream;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.webswing.common.WindowDecoratorTheme;
 import org.webswing.ext.services.ImageService;
@@ -95,5 +98,21 @@ public class ImageServiceImpl implements ImageService {
 	@Override
 	public void moveFile(File srcFile, File destFile) throws IOException {
 		FileUtils.moveFile(srcFile, destFile);
+	}
+
+	@Override
+	public Image readFromDataUrl(String dataUrl) {
+		String encodingPrefix = "base64,";
+		int contentStartIndex = dataUrl.indexOf(encodingPrefix) + encodingPrefix.length();
+		byte[] imageData = Base64.decodeBase64(dataUrl.substring(contentStartIndex));
+
+		// create BufferedImage from byteArray
+		BufferedImage inputImage = null;
+		try {
+			inputImage = ImageIO.read(new ByteArrayInputStream(imageData));
+		} catch (IOException e) {
+			Logger.error("ImageService: reading image from dataUrl failed", e);
+		}
+		return inputImage;
 	}
 }

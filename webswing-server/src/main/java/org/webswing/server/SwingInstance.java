@@ -12,7 +12,7 @@ import org.webswing.model.server.SwingDescriptor;
 import org.webswing.model.server.admin.SwingJvmStats;
 import org.webswing.server.SwingJvmConnection.WebSessionListener;
 import org.webswing.server.model.EncodedMessage;
-import org.webswing.server.stats.SessionRecorder;
+import org.webswing.server.recording.SessionRecorder;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.server.util.StatUtils;
 
@@ -30,10 +30,10 @@ public class SwingInstance implements WebSessionListener {
 
 	public SwingInstance(ConnectionHandshakeMsgIn h, SwingDescriptor app, AtmosphereResource resource) {
 		this.application = app;
-		this.sessionRecorder = ServerUtil.isRecording(resource.getRequest()) ? new SessionRecorder(this) : null;
 		this.user = ServerUtil.getUserName(resource);
 		registerPrimaryWebSession(resource);
 		this.connection = new SwingJvmConnection(h, app, this, ServerUtil.getCustomArgs(resource.getRequest()), ServerUtil.getDebugPort(resource.getRequest()));
+		this.sessionRecorder = ServerUtil.isRecording(resource.getRequest()) ? new SessionRecorder(this) : null;
 	}
 
 	public boolean registerPrimaryWebSession(AtmosphereResource resource) {
@@ -167,4 +167,11 @@ public class SwingInstance implements WebSessionListener {
 		return connection.getLatest();
 	}
 
+	public Boolean isRecording() {
+		return sessionRecorder != null && !sessionRecorder.isFailed();
+	}
+
+	public String getRecordingFile() {
+		return sessionRecorder != null ? sessionRecorder.getFileName() : null;
+	}
 }

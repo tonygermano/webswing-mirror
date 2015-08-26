@@ -54,6 +54,11 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
                 request.webSocketBinaryType = 'arraybuffer';
             }
 
+            if (api.cfg.recordingPlayback) {
+                request.url =  api.cfg.connectionUrl + 'async/swing-play';
+                request.headers['file'] = api.cfg.recordingPlayback;
+            }
+
             if (api.cfg.args != null) {
                 request.headers['X-webswing-args'] = api.cfg.args;
             }
@@ -135,7 +140,6 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
             atmosphere.unsubscribe(socket);
             socket = null;
             uuid = null;
-            binary = null;
         }
 
         function send(message) {

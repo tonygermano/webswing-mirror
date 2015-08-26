@@ -8,6 +8,7 @@
             vm.lastUpdated = null;
             vm.refresh = refresh;
             vm.timer = undefined;
+            vm.play = play;
 
             refresh();
 
@@ -32,6 +33,10 @@
 
             function view(session) {
                 $location.path('/dashboard/session/' + session.id);
+            }
+
+            function play(session){
+                $location.url('/dashboard/playback?playback='+session.recordingFile);
             }
         }
         OverviewController.$inject = ['$scope', '$timeout', '$location', 'sessionsRestService'];

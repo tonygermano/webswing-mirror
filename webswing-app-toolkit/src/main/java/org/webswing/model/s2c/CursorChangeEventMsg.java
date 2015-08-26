@@ -17,6 +17,9 @@ public class CursorChangeEventMsg implements Msg {
 	public static final String NOT_ALLOWED_CURSOR = "not-allowed";
 	private String cursor;
 
+	public CursorChangeEventMsg() {
+	}
+
 	public CursorChangeEventMsg(String cursor) {
 		super();
 		this.cursor = cursor;

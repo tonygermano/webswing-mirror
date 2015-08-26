@@ -1,12 +1,14 @@
 (function (define) {
     define([
         'views/dashboard/overview.controller',
-        'views/dashboard/session.controller'
-    ], function f(DashboardOverviewController, DashboardSessionController) {
+        'views/dashboard/session.controller',
+        'views/dashboard/playback.controller'
+    ], function f(DashboardOverviewController, DashboardSessionController, DashboardPlaybackController) {
         var module = angular.module('wsDashboard', []);
 
         module.controller('DashboardOverviewController', DashboardOverviewController);
         module.controller('DashboardSessionController', DashboardSessionController);
+        module.controller('DashboardPlaybackController', DashboardPlaybackController);
 
         module.run(['navigationService', function (navigationService) {
                 var dashboard = navigationService.addLocation('Dashboard', '#/dashboard');
@@ -23,6 +25,11 @@
                     controller: 'DashboardSessionController',
                     controllerAs: 'vm',
                     templateUrl: 'app/views/dashboard/session.template.html'
+                });
+                $routeProvider.when('/dashboard/playback', {
+                    controller: 'DashboardPlaybackController',
+                    controllerAs: 'vm',
+                    templateUrl: 'app/views/dashboard/playback.template.html'
                 });
                 $routeProvider.otherwise('/dashboard/overview');
             }]);

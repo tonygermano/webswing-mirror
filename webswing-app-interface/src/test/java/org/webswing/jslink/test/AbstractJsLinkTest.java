@@ -3,6 +3,7 @@ package org.webswing.jslink.test;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.concurrent.ExecutionException;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -80,13 +81,19 @@ public abstract class AbstractJsLinkTest {
 		engine.eval("jslModule.injects.external={};");
 		engine.eval("jslModule.injects.send=send;");
 		engine.eval("jslModule.injects.awaitResponse=awaitResponse;");
-                engine.eval("var api= {jslink:jslModule.provides}");
-                
+		engine.eval("var api= {jslink:jslModule.provides}");
+
 		specificSetUp();
 	}
 
 	public void send(String obj) throws JsonParseException, JsonMappingException, IOException {
-		WebJSObject.evaluateJava(mapper.readValue(obj, JavaEvalRequestMsgIn.class));
+		try {
+			WebJSObject.evaluateJava(mapper.readValue(obj, JavaEvalRequestMsgIn.class)).get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

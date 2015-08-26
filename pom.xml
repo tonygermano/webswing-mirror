@@ -16,6 +16,7 @@
 		<module>webswing-app-launcher</module>
 		<module>webswing-app-interface</module>
 		<module>webswing-directdraw</module>
+		<module>webswing-demo</module>
 		<module>webswing-assembly</module>
 	</modules>
 	<properties>

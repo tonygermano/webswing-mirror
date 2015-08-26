@@ -12,6 +12,9 @@ public class WindowMoveActionMsg implements Msg {
 	private int width;
 	private int height;
 
+	public WindowMoveActionMsg() {
+	}
+
 	public WindowMoveActionMsg(int sx, int sy, int dx, int dy, int width, int height) {
 		super();
 		this.sx = sx;

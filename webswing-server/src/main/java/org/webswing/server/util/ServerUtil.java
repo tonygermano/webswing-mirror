@@ -33,6 +33,7 @@ import org.webswing.Constants;
 import org.webswing.model.MsgOut;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
+import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.server.SwingAppletDescriptor;
 import org.webswing.model.server.SwingApplicationDescriptor;
@@ -101,6 +102,15 @@ public class ServerUtil {
 		return o;
 	}
 
+	public static AppFrameMsgOut decodePlaybackProto(byte[] message) {
+		try {
+			return protoMapper.decodeProto(message, AppFrameMsgOut.class);
+		} catch (IOException e) {
+			log.error("Failed to decode proto message:", e);
+			return null;
+		}
+	}
+
 	public static List<ApplicationInfoMsg> createApplicationInfoMsg(AtmosphereResource r, boolean includeAdminApp) {
 		Map<String, SwingApplicationDescriptor> applications = ConfigurationManager.getInstance().getApplications();
 		Map<String, SwingAppletDescriptor> applets = ConfigurationManager.getInstance().getApplets();
@@ -137,11 +147,11 @@ public class ServerUtil {
 		return apps;
 	}
 
-	private static ApplicationInfoMsg toApplicationInfoMsg(SwingDescriptor swingDesc, StrSubstitutor subs) {
+	public static ApplicationInfoMsg toApplicationInfoMsg(SwingDescriptor swingDesc, StrSubstitutor subs) {
 		ApplicationInfoMsg app = new ApplicationInfoMsg();
 		app.setName(swingDesc.getName());
-		String icon = subs.replace(swingDesc.getIcon());
-		String homeDir = subs.replace(swingDesc.getHomeDir());
+		String icon = subs != null ? subs.replace(swingDesc.getIcon()) : swingDesc.getIcon();
+		String homeDir = subs != null ? subs.replace(swingDesc.getHomeDir()) : swingDesc.getHomeDir();
 		if (icon == null) {
 			app.setBase64Icon(loadImage(null));
 		} else {
@@ -267,6 +277,8 @@ public class ServerUtil {
 		result.setUser(si.getUser());
 		result.setEndedAt(si.getEndedAt());
 		result.setState(si.getStats());
+		result.setRecorded(si.isRecording());
+		result.setRecordingFile(si.getRecordingFile());
 		return result;
 	}
 

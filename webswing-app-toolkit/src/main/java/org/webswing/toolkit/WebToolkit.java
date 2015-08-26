@@ -90,7 +90,6 @@ import sun.awt.SunToolkit;
 import sun.awt.image.SurfaceManager;
 import sun.java2d.SurfaceData;
 import sun.print.PrintJob2D;
-import sun.awt.datatransfer.DataTransferer;
 
 @SuppressWarnings("restriction")
 public abstract class WebToolkit extends SunToolkit {
@@ -146,14 +145,11 @@ public abstract class WebToolkit extends SunToolkit {
 	// /////////////////// Toolkit Implementation//////////////////////////////////////////////////
 	private static WebMouseInfoPeer mPeer;
 
-	public DataTransferer getDataTransferer() {// java 8
-		return WebDataTransfer.getInstanceImpl();
-	}
-
 	public WebToolkit() {
 		if (System.getProperty("java.version").startsWith("1.6") || System.getProperty("java.version").startsWith("1.7")) {
 			try {
 				Method m = SunToolkit.class.getDeclaredMethod("setDataTransfererClassName", String.class);
+				m.setAccessible(true);
 				m.invoke(null, "org.webswing.toolkit.WebDataTransfer");
 			} catch (Exception e) {
 				// do nothing

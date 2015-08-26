@@ -56,8 +56,7 @@ public class WebToolkit8 extends WebToolkit {
 
 	@Override
 	public DataTransferer getDataTransferer() {
-		// TODO Auto-generated method stub
-		return null;
+		return WebDataTransfer.getInstanceImpl();
 	}
 
 	@Override

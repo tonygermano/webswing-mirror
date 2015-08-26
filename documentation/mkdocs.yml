@@ -1,0 +1,10 @@
+site_name: Webswing 2.3-SNAPSHOT
+site_url: http://www.webswing.org
+repo_url: https://bitbucket.org/meszarv/webswing/src
+pages:
+- Introduction : index.md
+- Setup: 
+    - 'Setup and Configuration' : setup/setup.md
+    - 'Advanced Setup and Configuration' : setup/setup2.md
+- 'Development Guide': development.md
+theme: readthedocs
