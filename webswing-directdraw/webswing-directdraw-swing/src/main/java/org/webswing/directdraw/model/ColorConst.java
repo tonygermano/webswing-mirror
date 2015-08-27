@@ -1,17 +1,16 @@
 package org.webswing.directdraw.model;
 
-import java.awt.Color;
+import java.awt.*;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.proto.Directdraw.ColorProto;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.*;
 
 public class ColorConst extends DrawConstant {
 
 	public ColorConst(DirectDraw context, Color c) {
 		super(context);
 		ColorProto.Builder model = ColorProto.newBuilder();
-		int rgba = (c.getRGB() << 8) | c.getAlpha();
-		model.setRgba(rgba);
+		model.setRgba(toRGBA(c));
 		this.message = model.build();
 	}
 
@@ -31,4 +30,8 @@ public class ColorConst extends DrawConstant {
 		int a = rgba & 0x000000FF;
 		return new Color(r, g, b, a);
 	}
+    
+    public static int toRGBA(Color color) {
+        return (color.getRGB() << 8) | color.getAlpha();
+    }
 }

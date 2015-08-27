@@ -423,108 +423,138 @@
 				ctx.strokeStyle = ptrn;
 			}
 			if (constant.linearGrad != null) {
-				var g = constant.linearGrad;
-				// in case of cyclic gradient calculate repeat counts
-				var repeatcount = 1;
-				var xIncrement = g.xEnd - g.xStart;
-				var yIncrement = g.yEnd - g.yStart;
-				var increaseCount = 0, decreaseCount = 0;
-				var bCanvasMin, bCanvasMax, bStartPoint, bIncrement;
-				if (g.repeat != null && g.repeat != CyclicMethodProto.NO_CYCLE) {
-					var c = imageContext.canvas;
-					if ((g.yStart - g.yEnd) != 0) {
-						var a = -(g.xStart - g.xEnd) / (g.yStart - g.yEnd);
-						bCanvasMin = Math.min(0, -a * c.width, c.height, c.height - a * c.width);
-						bCanvasMax = Math.max(0, -a * c.width, c.height, c.height - a * c.width);
-						bStartPoint = (g.yStart - a * g.xStart);
-						bIncrement = (g.yEnd - a * g.xEnd) - bStartPoint;
-					} else {
-						bCanvasMin = 0;
-						bCanvasMax = c.width;
-						bStartPoint = g.xStart;
-						bIncrement = xIncrement;
-					}
-					// repeat by increasing
-					var maxCount = (bCanvasMax + (bStartPoint % bIncrement) - (bCanvasMax % bIncrement) - bStartPoint) / bIncrement;
-					// repeat decreasing
-					var minCount = -(bCanvasMin + (bStartPoint % bIncrement) - (bCanvasMin % bIncrement) - bStartPoint) / bIncrement + 1;
-					increaseCount = (maxCount > 0 ? maxCount : 0) + (minCount < 0 ? -minCount : 0);
-					decreaseCount = (minCount > 0 ? minCount : 0) + (maxCount < 0 ? -maxCount : 0);
-					repeatcount = increaseCount + 1 + decreaseCount;
-				}
-				var gradient = ctx.createLinearGradient(g.xStart - xIncrement * decreaseCount, g.yStart - yIncrement * decreaseCount, g.xEnd
-						+ xIncrement * increaseCount, g.yEnd + yIncrement * increaseCount);
-				for ( var rep = -decreaseCount; rep < repeatcount - decreaseCount; rep++) {
-
-					if (rep % 2 == 0) {
-						for ( var i = 0; i < g.colors.length; i++) {
-							gradient.addColorStop(g.fractions[i] / repeatcount + (rep + decreaseCount) / repeatcount, parseColor(g.colors[i]));
-						}
-					} else {
-						for ( var i = g.colors.length - 1; i >= 0; i--) {
-							gradient.addColorStop(Math.abs(1 - (g.fractions[i])) / repeatcount + (rep + decreaseCount) / repeatcount,
-									parseColor(g.colors[i]));
-						}
-					}
-				}
+				var gradient = iprtLinearGradient(ctx, constant.linearGrad, imageContext);
 				ctx.fillStyle = gradient;
 				ctx.strokeStyle = gradient;
 			}
 			if (constant.radialGrad != null) {
-				var rg = constant.radialGrad;
-				// fix focus if outside radius
-				var phi, maxFocusX, maxFocusY, fX, fY, directionX, directionY;
-				phi = 1 / Math.tan((rg.xFocus - rg.xCenter) / (rg.yFocus - rg.yCenter));
-				directionX = rg.xFocus - rg.xCenter < 0 ? -1 : 1;
-				directionY = rg.yFocus - rg.yCenter < 0 ? -1 : 1;
-				maxFocusX = rg.xCenter + (directionX * rg.radius * Math.cos(phi));
-				maxFocusY = rg.yCenter + (directionY * rg.radius * Math.sin(phi));
-				var useMaxFocus = Math.sqrt(Math.pow(maxFocusX - rg.xCenter, 2) + Math.pow(maxFocusY - rg.yCenter, 2)) < Math.sqrt(Math.pow(rg.xFocus
-						- rg.xCenter, 2)
-						+ Math.pow(rg.yFocus - rg.yCenter, 2));
-				fX = useMaxFocus ? (directionX == 1 ? Math.floor(maxFocusX) : Math.ceil(maxFocusX)) : rg.xFocus;
-				fY = useMaxFocus ? (directionY == 1 ? Math.floor(maxFocusY) : Math.ceil(maxFocusY)) : rg.yFocus;
-
-				// in case of cyclic gradient calculate repeat counts
-				var repeatcount = 1;
-				if (rg.repeat != null && rg.repeat != CyclicMethodProto.NO_CYCLE) {
-					var gradientsize;
-					if (fX == rg.xCenter && fY == rg.yCenter) {
-						gradientsize = rg.radius;
-					} else {
-						var distanceFromCenterToFocus = Math.sqrt(Math.pow(rg.xFocus - rg.xCenter, 2) + Math.pow(rg.yFocus - rg.yCenter, 2));
-						gradientsize = Math.min(distanceFromCenterToFocus, rg.radius - distanceFromCenterToFocus);
-					}
-					repeatcount = Math.ceil(Math.sqrt(Math.pow(imageContext.canvas.height, 2) + Math.pow(imageContext.canvas.width, 2))
-							/ gradientsize);
-					repeatcount = Math.min(MAX_GRADIENT_CYCLE_REPEAT_COUNT, repeatcount);
-				}
-
-				// create gradient
-				var xCentershift = (fX - rg.xCenter) * (repeatcount - 1);
-				var yCentershift = (fY - rg.yCenter) * (repeatcount - 1);
-				var grd = ctx.createRadialGradient(fX, fY, 0, rg.xCenter - xCentershift, rg.yCenter - yCentershift, rg.radius * repeatcount);
-				for ( var rep = 0; rep < repeatcount; rep++) {
-					if (rg.repeat == CyclicMethodProto.REFLECT) {
-						if (rep % 2 == 0) {
-							for ( var i = 0; i < rg.colors.length; i++) {
-								grd.addColorStop(rg.fractions[i] / repeatcount + rep / repeatcount, parseColor(rg.colors[i]));
-							}
-						} else {
-							for ( var i = rg.colors.length - 1; i >= 0; i--) {
-								grd.addColorStop(Math.abs(1 - (rg.fractions[i])) / repeatcount + rep / repeatcount, parseColor(rg.colors[i]));
-							}
-						}
-					} else {
-						for ( var i = 0; i < rg.colors.length; i++) {
-							grd.addColorStop(rg.fractions[i] / repeatcount + rep / repeatcount, parseColor(rg.colors[i]));
-						}
-					}
-				}
-				ctx.fillStyle = grd;
-				ctx.strokeStyle = grd;
+				var gradient = iprtRadialGradient(ctx, constant.radialGrad, imageContext);
+				ctx.fillStyle = gradient;
+				ctx.strokeStyle = gradient;
 			}
 		}
+		
+		function iprtLinearGradient(ctx, g, imageContext) {
+		    var x0 = g.xStart;
+		    var y0 = g.yStart;
+            var dx = g.xEnd - x0;
+            var dy = g.yEnd - y0;
+            // in case of cyclic gradient calculate repeat counts
+            var repeatCount = 1, increaseCount = repeatCount, decreaseCount = 0;
+            if (g.repeat != CyclicMethodProto.NO_CYCLE && (dx != 0 || dy != 0)) {
+                // calculate how many times gradient will completely repeat in both directions until it touches canvas corners
+                var c = imageContext.canvas;
+                var times = [calculateTimes(x0, y0, dx, dy, 0, 0),
+                             calculateTimes(x0, y0, dx, dy, c.width, 0),
+                             calculateTimes(x0, y0, dx, dy, c.width, c.height),
+                             calculateTimes(x0, y0, dx, dy, 0, c.height)];
+                // increase count is maximum of all positive times rounded up
+                increaseCount = Math.ceil(Math.max.apply(Math, times));
+                // decrease count is maximum of all negative times rounded up (with inverted sign)
+                decreaseCount = Math.ceil(-Math.min.apply(Math, times));
+                repeatCount = increaseCount + decreaseCount;
+            }
+            var gradient = ctx.createLinearGradient(x0 - dx * decreaseCount, y0 - dy * decreaseCount, x0 + dx * increaseCount, y0 + dy * increaseCount);
+            for (var rep = -decreaseCount, offset = 0; rep < increaseCount; rep++, offset++) {
+                if (g.repeat != CyclicMethodProto.REFLECT || rep % 2 == 0) {
+                    for (var i = 0; i < g.colors.length; i++) {
+                        gradient.addColorStop((offset + g.fractions[i]) / repeatCount, parseColor(g.colors[i]));
+                    }
+                } else {
+                    // reflect colors
+                    for (var i = g.colors.length - 1; i >= 0; i--) {
+                        gradient.addColorStop((offset + (1 - g.fractions[i])) / repeatCount, parseColor(g.colors[i]));
+                    }
+                }
+            }
+            return gradient;
+		}
+		
+		// calculates how many times vector (dx, dy) will repeat from (x0, y0) until it touches a straight line
+		// which goes through (x1, y1) and perpendicular to the vector
+		function calculateTimes(x0, y0, dx, dy, x1, y1) {
+		    return ((x1 - x0) * dx + (y1 - y0) * dy) / (dx * dx + dy * dy);
+		}
+		
+		function iprtRadialGradient(ctx, g, imageContext) {
+		    fixFocusPoint(g);
+		    var fX = g.xFocus;
+		    var fY = g.yFocus;
+		    var dx = g.xCenter - fX;
+		    var dy = g.yCenter - fY;
+		    var r = g.radius;
+            // in case of cyclic gradient calculate repeat counts
+            var repeatCount = 1;
+            if (g.repeat != CyclicMethodProto.NO_CYCLE) {
+                if (dx == 0 && dy == 0) {
+                    // calculate how many times gradient will completely repeat in both directions until it touches canvas corners
+                    var c = imageContext.canvas;
+                    var times = [getDistance(fX, fY, 0, 0) / r,
+                                 getDistance(fX, fY, c.width, 0) / r,
+                                 getDistance(fX, fY, c.width, c.height) / r,
+                                 getDistance(fX, fY, 0, c.height) / r];
+                    repeatCount = Math.ceil(Math.max.apply(Math, times));
+                } else {
+                    var distance = Math.sqrt(dx * dx + dy * dy);
+                    // calculate vector which goes from focus point through center to the circle bound
+                    var vdX = dx + r * dx / distance;
+                    var vdY = dy + r * dy / distance;
+                    // and in opposite direction
+                    var ovdX = dx - r * dx / distance;
+                    var ovdY = dy - r * dy / distance;
+                    // calculate how many times gradient will completely repeat in both directions until it touches canvas corners
+                    var c = imageContext.canvas;
+                    var times = [calculateTimes(fX, fY, vdX, vdY, 0, 0),
+                                 calculateTimes(fX, fY, vdX, vdY, c.width, 0),
+                                 calculateTimes(fX, fY, vdX, vdY, c.width, c.height),
+                                 calculateTimes(fX, fY, vdX, vdY, 0, c.height),
+                                 calculateTimes(fX, fY, ovdX, ovdY, 0, 0),
+                                 calculateTimes(fX, fY, ovdX, ovdY, c.width, 0),
+                                 calculateTimes(fX, fY, ovdX, ovdY, c.width, c.height),
+                                 calculateTimes(fX, fY, ovdX, ovdY, 0, c.height)];
+                    repeatCount = Math.ceil(Math.max.apply(Math, times));
+                }
+            }
+            // in case of repeat focus stays in the same place, radius and distance between focus and center are multiplied
+            var gradient = ctx.createRadialGradient(fX, fY, 0, fX + repeatCount * dx, fY + repeatCount * dy, r * repeatCount);
+            for (var rep = 0; rep < repeatCount; rep++) {
+                if (g.repeat != CyclicMethodProto.REFLECT || rep % 2 == 0) {
+                    for (var i = 0; i < g.colors.length; i++) {
+                        gradient.addColorStop((rep + g.fractions[i]) / repeatCount, parseColor(g.colors[i]));
+                    }
+                } else {
+                    // reflect colors
+                    for (var i = g.colors.length - 1; i >= 0; i--) {
+                        gradient.addColorStop((rep + (1 - g.fractions[i])) / repeatCount, parseColor(g.colors[i]));
+                    }
+                }
+            }
+            return gradient;
+        }
+        
+        // fix gradient focus point as java does
+        function fixFocusPoint(gradient) {
+            var dx = gradient.xFocus - gradient.xCenter;
+            var dy = gradient.yFocus - gradient.yCenter;
+            if (dx == 0 && dy == 0) {
+                return;
+            }
+            var scaleBack = gradient.repeat != CyclicMethodProto.NO_CYCLE ? 0.99 : 1;
+            var radiusSq = gradient.radius * gradient.radius;
+            var distSq = (dx * dx) + (dy * dy);
+            // test if distance from focus to center is greater than the radius
+            if (distSq > radiusSq * scaleBack) {
+                // clamp focus to radius
+                var scale = Math.sqrt(radiusSq * scaleBack / distSq);
+                // modify source object to skip fixes later
+                gradient.xFocus = gradient.xCenter + dx * scale;
+                gradient.yFocus = gradient.yCenter + dy * scale;
+            }
+        }
+        
+        function getDistance(x0, y0, x1, y1) {
+            return Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+        }
 
 		function iprtSetComposite(ctx, args) {
 			var composite = args[0].composite;
@@ -702,7 +732,7 @@
 		function getRRCoords(pts, rr, bias) {
             var coords = [];
             var nc = 0;
-            for ( var i = 0; i < pts.length; i += 4) {
+            for (var i = 0; i < pts.length; i += 4) {
                 coords[nc++] = rr.x + bias + pts[i + 0] * rr.w + pts[i + 1] * Math.abs(rr.arcW);
                 coords[nc++] = rr.y + bias + pts[i + 2] * rr.h + pts[i + 3] * Math.abs(rr.arcH);
             }
@@ -724,7 +754,7 @@
 				arcSegs = cv == 0 ? 0 : arcSegs;
 			}
 			ctx.moveTo(x + Math.cos(angStRad) * w, y + Math.sin(angStRad) * h);
-			for ( var i = 0; i < arcSegs; i++) {
+			for (var i = 0; i < arcSegs; i++) {
 				var angle = angStRad + increment * i;
 				var relx = Math.cos(angle);
 				var rely = Math.sin(angle);

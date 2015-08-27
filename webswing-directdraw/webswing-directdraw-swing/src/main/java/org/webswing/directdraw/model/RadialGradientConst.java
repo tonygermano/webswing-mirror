@@ -1,13 +1,10 @@
 package org.webswing.directdraw.model;
 
-import java.awt.Color;
-import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.Point;
-import java.awt.RadialGradientPaint;
+import java.awt.*;
+import java.awt.MultipleGradientPaint.*;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.proto.Directdraw.CyclicMethodProto;
-import org.webswing.directdraw.proto.Directdraw.RadialGradientProto;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.*;
 
 public class RadialGradientConst extends DrawConstant {
 
@@ -19,11 +16,11 @@ public class RadialGradientConst extends DrawConstant {
 		model.setXFocus((int) rgp.getFocusPoint().getX());
 		model.setYFocus((int) rgp.getFocusPoint().getY());
 		model.setRadius((int) rgp.getRadius());
-		for (Color c : rgp.getColors()) {
-			model.addColors((c.getRGB() << 8) | c.getAlpha());
+		for (Color color : rgp.getColors()) {
+			model.addColors(ColorConst.toRGBA(color));
 		}
-		for (float f : rgp.getFractions()) {
-			model.addFractions(f);
+		for (float fraction : rgp.getFractions()) {
+			model.addFractions(fraction);
 		}
 		model.setRepeat(CyclicMethodProto.valueOf(rgp.getCycleMethod().name()));
 		this.message = model.build();
@@ -39,11 +36,11 @@ public class RadialGradientConst extends DrawConstant {
 		Point center = new Point(gp.getXCenter(), gp.getYCenter());
 		float radius = gp.getRadius();
 		Point focus = new Point(gp.getXFocus(), gp.getYFocus());
-		Color[] colors = gp.getColorsCount() > 0 ? new Color[gp.getColorsCount()] : null;
+		Color[] colors = gp.getColorsCount() > 0 ? new Color[gp.getColorsCount()] : new Color[0];
 		for (int i = 0; i < gp.getColorsCount(); i++) {
 			colors[i] = ColorConst.getColor(gp.getColors(i));
 		}
-		float[] fractions = gp.getFractionsCount() > 0 ? new float[gp.getFractionsCount()] : null;
+		float[] fractions = gp.getFractionsCount() > 0 ? new float[gp.getFractionsCount()] : new float[0];
 		for (int i = 0; i < gp.getFractionsCount(); i++) {
 			fractions[i] = gp.getFractions(i);
 		}
