@@ -126,7 +126,6 @@ message FontProto {
 	required string family = 1;
 	optional StyleProto style = 2;
 	optional uint32 size = 3;
-	optional uint32 weight = 4;
 
 	enum StyleProto{
 		NORMAL = 0;
