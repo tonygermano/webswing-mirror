@@ -31,6 +31,9 @@ public class FontConst extends DrawConstant {
         model.setFamily(DirectDrawUtils.windowsFonts.getProperty(family, family));
         model.setSize(font.getSize());
         model.setStyle(StyleProto.valueOf(font.getStyle()));
+        if (font.isTransformed()) {
+            model.setTransform((TransformProto) new TransformConst(getContext(), font.getTransform()).toMessage());
+        }
         return model.build();
     }
 

@@ -59,6 +59,7 @@ public class RenderUtil {
 				iprtSetComposite(currentg, di);
 				break;
 			case SET_FONT:
+                iprtSetFont(currentg, di);
 				break;
 			case SET_PAINT:
 				iprtSetPaint(currentg, di);
@@ -110,15 +111,10 @@ public class RenderUtil {
 
 	private static void iprtDrawString(Graphics2D g, DrawInstruction di) {
 		StringConst s = getConst(0, di, StringConst.class);
-		FontConst f = getConst(1, di, FontConst.class);
-		TransformConst t = getConst(2, di, TransformConst.class);
-		Shape clip = getShape(getConst(3, di, DrawConstant.class));
+		PointsConst p = getConst(1, di, PointsConst.class);
+		Shape clip = getShape(getConst(2, di, DrawConstant.class));
 		g.setClip(clip);
-		AffineTransform original = g.getTransform();
-		g.transform(t.getAffineTransform());
-		g.setFont(f.getFont());
-		g.drawString(s.getString(), 0, 0);
-		g.setTransform(original);
+		g.drawString(s.getString(), p.getPoints()[0], p.getPoints()[1]);
 	}
 
 	private static void iprtCopyArea(Graphics2D g, DrawInstruction di, BufferedImage result) {
@@ -152,6 +148,11 @@ public class RenderUtil {
 		currentg.setComposite(c.getComposite());
 	}
 
+    private static void iprtSetFont(Graphics2D currentg, DrawInstruction di) {
+        FontConst f = getConst(0, di, FontConst.class);
+        currentg.setFont(f.getFont());
+    }
+
 	private static void iprtTransform(Graphics2D currentg, DrawInstruction di) {
 		TransformConst t = getConst(0, di, TransformConst.class);
 		currentg.transform(t.getAffineTransform());
@@ -172,6 +173,7 @@ public class RenderUtil {
 		StrokeConst stroke = getConst(2, di, StrokeConst.class);
 		CompositeConst composite = getConst(3, di, CompositeConst.class);
 		Paint paint = getPaint(4, di);
+		FontConst font = getConst(5, di, FontConst.class);
 		Graphics2D g = (Graphics2D) result.getGraphics();
 		if (transform != null) {
 			g.setTransform(transform.getAffineTransform());
@@ -185,6 +187,9 @@ public class RenderUtil {
 		if (paint != null) {
 			g.setPaint(paint);
 		}
+        if (font != null) {
+            g.setFont(font.getFont());
+        }
 		gmap.put(idConst.getInt(), g);
 		return g;
 	}

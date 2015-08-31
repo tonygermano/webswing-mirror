@@ -34,8 +34,8 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(image, transformConst, cropConst, bkgConst, toPathConst(clip));
 	}
 
-	public DrawInstruction drawString(String s, double x, double y, Font font, Shape clip) {
-		return new DrawInstruction(InstructionProto.DRAW_STRING, new StringConst(ctx, s), new FontConst(ctx, font), new TransformConst(ctx, font, x, y), toPathConst(clip));
+	public DrawInstruction drawString(String s, double x, double y, Shape clip) {
+		return new DrawInstruction(InstructionProto.DRAW_STRING, new StringConst(ctx, s), new PointsConst(ctx, (int) x, (int) y), toPathConst(clip));
 	}
 
 	public DrawInstruction copyArea(int destX, int destY, int width, int height, int absDx, int absDy, Shape clip) {
@@ -48,7 +48,8 @@ public class DrawInstructionFactory {
 		DrawConstant compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
 		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
 		DrawConstant paintConst = getPaintConstant(g.getPaint());
-		return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, gid, transformConst, strokeConst, compositeConst, paintConst);
+        DrawConstant fontConst = new FontConst(ctx, g.getFont());
+		return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, gid, transformConst, strokeConst, compositeConst, paintConst, fontConst);
 	}
 
 	public DrawInstruction disposeGraphics(WebGraphics g) {
@@ -83,8 +84,8 @@ public class DrawInstructionFactory {
         throw new UnsupportedOperationException();
     }
 
-	public DrawInstruction setFont(Font f) {
-		return new DrawInstruction(InstructionProto.SET_FONT, new FontConst(ctx, f));
+	public DrawInstruction setFont(Font font) {
+		return new DrawInstruction(InstructionProto.SET_FONT, new FontConst(ctx, font));
 	}
 
 	public DrawInstruction setStroke(BasicStroke stroke) {

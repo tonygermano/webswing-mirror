@@ -60,7 +60,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected void writeString(String string, double x, double y) throws IOException {
-		thisImage.addInstruction(this, dif.drawString(string, x, y, getFont(), getClip()));
+		thisImage.addInstruction(this, dif.drawString(string, x, y, getClip()));
 	}
 
 	@Override
@@ -90,7 +90,12 @@ public class WebGraphics extends AbstractVectorGraphics {
 		}
 	}
 
-	@Override
+    @Override
+    protected void writeFont(Font font) {
+        thisImage.addInstruction(this, dif.setFont(font));
+    }
+
+    @Override
 	public void copyArea(int x, int y, int width, int height, int dx, int dy) {
 		Point2D abs = getTransform().transform(new Point(x, y), null);
 		int absx = (int) abs.getX();

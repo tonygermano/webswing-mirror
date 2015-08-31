@@ -1,6 +1,5 @@
 package org.webswing.directdraw.model;
 
-import java.awt.*;
 import java.awt.geom.*;
 
 import org.webswing.directdraw.*;
@@ -13,12 +12,6 @@ public class TransformConst extends DrawConstant {
 	public TransformConst(DirectDraw context, AffineTransform transform) {
 		super(context);
 		this.transform = transform;
-	}
-
-	public TransformConst(DirectDraw context, Font font, double x, double y) {
-		super(context);
-        this.transform = font.getTransform();
-        transform.translate(x, y);
 	}
 
 	@Override

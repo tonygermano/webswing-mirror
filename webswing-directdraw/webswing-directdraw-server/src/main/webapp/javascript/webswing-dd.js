@@ -24,9 +24,9 @@
 		var StrokeCapProto = proto.build("org.webswing.directdraw.proto.StrokeProto.StrokeCapProto");
 		var StyleProto = proto.build("org.webswing.directdraw.proto.FontProto.StyleProto");
 		var CompositeTypeProto = proto.build("org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto");
-		var MAX_GRADIENT_CYCLE_REPEAT_COUNT = 20;
 		var constantPoolCache = c.constantPoolCache || {};
 		var imagePoolCache = c.imagePoolCache || {};
+		var fontTransform = null;
 
 		function draw64(data, targetCanvas) {
 			var image = WebImageProto.decode64(data);
@@ -178,12 +178,16 @@
 				break;
 			case InstructionProto.SET_COMPOSITE:
 				iprtSetComposite(ctx, args);
-				imageContext.graphicsStates[imageContext.currentStateId].composite = args;
+				imageContext.graphicsStates[imageContext.currentStateId].compositeArgs = args;
 				break;
+			case InstructionProto.SET_FONT:
+			    iprtSetFont(ctx, args);
+			    imageContext.graphicsStates[imageContext.currentStateId].fontArgs = args;
+                break;
 			case InstructionProto.TRANSFORM:
 				var tx = iprtTransform(ctx, args);
-				imageContext.graphicsStates[imageContext.currentStateId].transformArgs = concatTransform(
-						imageContext.graphicsStates[imageContext.currentStateId].transformArgs, tx);
+				imageContext.graphicsStates[imageContext.currentStateId].transform = concatTransform(
+						imageContext.graphicsStates[imageContext.currentStateId].transform, tx);
 				break;
 			default:
 				console.log("instCode:" + instCode + " not recognized");
@@ -200,12 +204,15 @@
 				if (graphicsStates[id].paintArgs != null) {
 					iprtSetPaint(ctx, graphicsStates[id].paintArgs);
 				}
-				if (graphicsStates[id].composite != null) {
-					iprtSetComposite(ctx, graphicsStates[id].composite);
+				if (graphicsStates[id].compositeArgs != null) {
+					iprtSetComposite(ctx, graphicsStates[id].compositeArgs);
 				}
-				if (graphicsStates[id].transformArgs != null) {
-					var m = graphicsStates[id].transformArgs;
-					ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
+				if (graphicsStates[id].fontArgs != null) {
+				    iprtSetFont(ctx, graphicsStates[id].fontArgs);
+				}
+				if (graphicsStates[id].transform != null) {
+					var t = graphicsStates[id].transform;
+					ctx.setTransform(t[0], t[1], t[2], t[3], t[4], t[5]);
 				}
 			} else {
 				console.log("Graphics with id " + id + " not initialized!");
@@ -213,25 +220,27 @@
 			imageContext.currentStateId = id;
 		}
 
-		function iprtGraphicsCreate(ctx, thisId, args, imageContext) {
+		function iprtGraphicsCreate(ctx, id, args, imageContext) {
 			var graphicsStates = imageContext.graphicsStates;
-			if (graphicsStates[thisId] == null) {
-				graphicsStates[thisId] = {};
-				imageContext.currentStateId = thisId;
+			if (graphicsStates[id] == null) {
+				graphicsStates[id] = {};
+				imageContext.currentStateId = id;
 				args.shift();
-				var tx = iprtTransform(ctx, args, true);
-				imageContext.graphicsStates[thisId].transformArgs = tx;
+				imageContext.graphicsStates[id].transform = iprtTransform(ctx, args, true);
 				args.shift();
 				iprtSetStroke(ctx, args);
-				imageContext.graphicsStates[thisId].strokeArgs = args.slice(0, 1);
+				imageContext.graphicsStates[id].strokeArgs = args.slice(0, 1);
 				args.shift();
 				iprtSetComposite(ctx, args);
-				imageContext.graphicsStates[thisId].composite = args.slice(0, 1);
+				imageContext.graphicsStates[id].compositeArgs = args.slice(0, 1);
 				args.shift();
 				iprtSetPaint(ctx, args, imageContext);
-				imageContext.graphicsStates[thisId].paintArgs = args;
+				imageContext.graphicsStates[id].paintArgs = args;
+				args.shift();
+                iprtSetFont(ctx, args);
+                imageContext.graphicsStates[id].fontArgs = args;
 			} else {
-				console.log("Graphics with id " + thisId + " already exist!");
+				console.log("Graphics with id " + id + " already exist!");
 			}
 
 		}
@@ -302,35 +311,40 @@
 		}
 
 		function iprtDrawString(ctx, args) {
-			var string, font, transform, clip;
-			string = args[0].string;
-			font = args[1].font;
-			transform = args[2];
-			clip = args[3];
+			var string = args[0].string;
+			var points = args[1].points.points;
+			var clip = args[2];
 			ctx.save();
 			if (path(ctx, clip)) {
 				ctx.clip(fillRule(clip));
 			}
-			iprtTransform(ctx, [ transform ]);
-			var style = '';
-			switch (font.style) {
-			case StyleProto.NORMAL:
-				style = '';
-				break;
-			case StyleProto.OBLIQUE:
-				style = 'bold';
-				break;
-			case StyleProto.OBLIQUE:
-				style = 'italic';
-				break;
-			case StyleProto.BOLDANDITALIC:
-				style = 'bold italic';
-				break;
+			if (fontTransform != null) {
+			    var t = fontTransform;
+			    ctx.transform(t.m00, t.m10, t.m01, t.m11, t.m02, t.m12);
 			}
-			ctx.font = style + " " + font.size + "px " + font.family;
-			ctx.fillText(string, 0, 0);
-
+			ctx.fillText(string, points[0], points[1]);
 			ctx.restore();
+		}
+		
+		function iprtSetFont(ctx, args) {
+		    var font = args[0].font;
+		    var style = '';
+            switch (font.style) {
+            case StyleProto.NORMAL:
+                style = '';
+                break;
+            case StyleProto.OBLIQUE:
+                style = 'bold';
+                break;
+            case StyleProto.OBLIQUE:
+                style = 'italic';
+                break;
+            case StyleProto.BOLDANDITALIC:
+                style = 'bold italic';
+                break;
+            }
+            ctx.font = style + " " + font.size + "px " + font.family;
+            fontTransform = font.transform;
 		}
 
 		function iprtCopyArea(ctx, args, imageContext) {

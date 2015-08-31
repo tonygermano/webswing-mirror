@@ -961,10 +961,14 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * @param font to be set
 	 */
 	public void setFont(Font font) {
-		if (font == null)
-			return;
+		if (font == null || currentFont.equals(font)) {
+            return;
+        }
 		currentFont = font;
+        writeFont(currentFont);
 	}
+    
+    protected abstract void writeFont(Font font);
 
 	/*
      * ================================================================================
