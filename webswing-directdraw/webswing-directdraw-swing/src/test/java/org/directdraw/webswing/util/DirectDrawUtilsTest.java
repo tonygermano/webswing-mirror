@@ -42,7 +42,7 @@ public class DirectDrawUtilsTest {
 
 		inst.add(f.draw(new Rectangle(), null));// draw
 
-		inst.add(f.transform(new AffineTransform(1, 0, 0, 1, 10, 10)));// ingored
+		inst.add(f.transform(new AffineTransform(1, 0, 0, 1, 10, 10)));// ignored
 		inst.add(f.setPaint(Color.black));
 		inst.add(f.setComposite(AlphaComposite.Dst));
 		inst.add(f.setStroke(new BasicStroke(1)));
@@ -50,7 +50,7 @@ public class DirectDrawUtilsTest {
 		DirectDrawUtils.optimizeInstructions(dd, inst);
 		assertEquals("Count not valid", 2, inst.size());
 		assertEquals("Transform not expected", new AffineTransform(1, 0, 0, 1, 20, 20), ((TransformConst) inst.get(0).getArgs()[1]).getAffineTransform());
-		assertEquals("Stroke not expected", 2, (int) ((BasicStroke) ((StrokeConst) inst.get(0).getArgs()[2]).getStroke()).getLineWidth());
+		assertEquals("Stroke not expected", 2, (int) ((StrokeConst) inst.get(0).getArgs()[2]).getStroke().getLineWidth());
 		assertEquals("Composite not expected", AlphaComposite.Src, ((CompositeConst) inst.get(0).getArgs()[3]).getComposite());
 		assertEquals("Color not expected", Color.blue, ((ColorConst) inst.get(0).getArgs()[4]).getColor());
 	}
@@ -87,7 +87,7 @@ public class DirectDrawUtilsTest {
 		DirectDrawUtils.optimizeInstructions(dd, inst);
 		assertEquals("Count not valid", 2, inst.size());
 		assertEquals("Transform not expected", new AffineTransform(1, 0, 0, 1, 10, 10), ((TransformConst) inst.get(0).getArgs()[1]).getAffineTransform());
-		assertEquals("Stroke not expected", 2, (int) ((BasicStroke) ((StrokeConst) inst.get(0).getArgs()[2]).getStroke()).getLineWidth());
+		assertEquals("Stroke not expected", 2, (int) ((StrokeConst) inst.get(0).getArgs()[2]).getStroke().getLineWidth());
 		assertEquals("Composite not expected", AlphaComposite.Dst, ((CompositeConst) inst.get(0).getArgs()[3]).getComposite());
 		assertEquals("Color not expected", Color.blue, ((ColorConst) inst.get(0).getArgs()[4]).getColor());
 	}

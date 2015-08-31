@@ -51,7 +51,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 			crop = crop != null ? crop : new Rectangle2D.Float(0, 0, image.getWidth(observer), image.getHeight(observer));
 			WebImage wi = image instanceof WebImage ? (WebImage) image : ((VolatileWebImageWrapper) image).getWebImage();
 			if (wi.isDirty()) {
-				thisImage.addInstruction(this, dif.drawImage(wi.extractReadOnlyWebImage(false), xform, crop, bkg, getClip()));
+				thisImage.addInstruction(this, dif.drawWebImage(wi.extractReadOnlyWebImage(false), xform, crop, bkg, getClip()));
 			}
 		} else {
 			thisImage.addImage(this, image, observer, xform, crop);

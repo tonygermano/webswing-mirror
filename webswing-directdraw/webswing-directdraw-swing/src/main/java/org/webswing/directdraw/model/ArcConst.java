@@ -1,24 +1,18 @@
 package org.webswing.directdraw.model;
 
-import java.awt.geom.Arc2D;
+import java.awt.geom.*;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.proto.Directdraw.ArcProto;
-import org.webswing.directdraw.proto.Directdraw.ArcProto.ArcTypeProto;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.ArcProto.*;
 
 public class ArcConst extends DrawConstant {
 
-	public ArcConst(DirectDraw context, Arc2D r) {
+    private Arc2D arc;
+    
+	public ArcConst(DirectDraw context, Arc2D arc) {
 		super(context);
-		ArcProto.Builder model = ArcProto.newBuilder();
-		model.setX((int) r.getX());
-		model.setY((int) r.getY());
-		model.setW((int) r.getWidth());
-		model.setH((int) r.getHeight());
-		model.setStart((int) r.getAngleStart());
-		model.setExtent((int) r.getAngleExtent());
-		model.setType(ArcTypeProto.valueOf(r.getArcType()));
-		this.message = model.build();
+        this.arc = arc;
 	}
 
 	@Override
@@ -26,8 +20,31 @@ public class ArcConst extends DrawConstant {
 		return "arc";
 	}
 
-	public Arc2D.Float getArc() {
-		ArcProto a = (ArcProto) message;
-		return new Arc2D.Float(a.getX(), a.getY(), a.getW(), a.getH(), a.getStart(), a.getExtent(), a.getType().getNumber());
+    @Override
+    public Object toMessage() {
+        ArcProto.Builder model = ArcProto.newBuilder();
+        model.setX((int) arc.getX());
+        model.setY((int) arc.getY());
+        model.setW((int) arc.getWidth());
+        model.setH((int) arc.getHeight());
+        model.setStart((int) arc.getAngleStart());
+        model.setExtent((int) arc.getAngleExtent());
+        model.setType(ArcTypeProto.valueOf(arc.getArcType()));
+        return model.build();
+    }
+
+    @Override
+    public int hashCode() {
+        return arc.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this ||
+            o instanceof ArcConst && arc.equals(((ArcConst) o).arc);
+    }
+
+    public Arc2D getArc() {
+		return arc;
 	}
 }

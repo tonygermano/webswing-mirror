@@ -1,38 +1,18 @@
 package org.webswing.directdraw.toolkit;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.Transparency;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
-import java.awt.image.RenderedImage;
+import java.awt.*;
+import java.awt.geom.*;
+import java.awt.image.*;
 import java.util.*;
+import java.util.List;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.model.DrawConstant;
-import org.webswing.directdraw.model.DrawConstant.HashConst;
-import org.webswing.directdraw.model.DrawInstruction;
-import org.webswing.directdraw.model.ImageConst;
-import org.webswing.directdraw.model.PathConst;
-import org.webswing.directdraw.model.PointsConst;
-import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
-import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
-import org.webswing.directdraw.proto.Directdraw.WebImageProto;
-import org.webswing.directdraw.util.DirectDrawUtils;
-import org.webswing.directdraw.util.DrawConstantPool;
-import org.webswing.directdraw.util.RenderUtil;
-
-import sun.awt.image.SurfaceManager;
-import sun.java2d.SurfaceData;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.model.*;
+import org.webswing.directdraw.proto.Directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.*;
+import org.webswing.directdraw.util.*;
+import sun.awt.image.*;
+import sun.java2d.*;
 
 public class WebImage extends Image {
 
@@ -201,7 +181,7 @@ public class WebImage extends Image {
 		ihg.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
 		ihg.clip(new Rectangle(getImageHolder().getWidth(), getImageHolder().getHeight()));
 		if (ihg.getClip().getBounds().width > 0 && ihg.getClip().getBounds().height > 0) {
-			addInstruction(g, new DrawInstruction(InstructionProto.DRAW_IMAGE, new PathConst(context, ihg.getClip()), new DrawConstant.Integer(0)));
+			addInstruction(g, context.getInstructionFactory().drawImage(ihg.getClip()));
 		}
 		ihg.dispose();
 	}
@@ -267,7 +247,8 @@ public class WebImage extends Image {
 			for (DrawInstruction ins : newInstructions) {
 				DrawConstant[] constants = ins.getArgs();
 				if (ins.getInstruction() == InstructionProto.DRAW_IMAGE) {
-					Rectangle2D bounds = ((PathConst) constants[0]).getShape().getBounds().createIntersection(new Rectangle(imageHolder.getWidth(), imageHolder.getHeight()));
+                    Rectangle hold = new Rectangle(imageHolder.getWidth(), imageHolder.getHeight());
+					Rectangle2D bounds = hold.createIntersection(RenderUtil.getShape(constants[0]).getBounds());
 					BufferedImage subImage = new BufferedImage((int) bounds.getWidth(), (int) bounds.getHeight(), BufferedImage.TYPE_INT_ARGB);
 					Graphics sig = subImage.getGraphics();
 					sig.drawImage(imageHolder.getSubimage((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight()), 0, 0, null);
@@ -305,35 +286,33 @@ public class WebImage extends Image {
 				DrawConstant[] constants = ins.getArgs();
 				// compute image hash and link containing image
 				BufferedImage subImage = partialImageMap.get(ins);
-				long hash = context.getServices().computeHash(subImage);
-				HashConst imageHashConst = new DrawConstant.HashConst(hash);
-				Integer[] points = ((PointsConst) constants[1]).getIntArray();
-				if (!imagePool.isInCache(imageHashConst)) {
-					ImageConst imageConst = new ImageConst(context, subImage, hash);
-					imagePool.addToCache(new DrawConstant.HashConst(imageConst));
+                ImageConst imageConst = new ImageConst(context, subImage);
+				int[] points = ((PointsConst) constants[1]).getPoints();
+				if (!imagePool.isInCache(imageConst)) {
+					imagePool.addToCache(imageConst);
 					DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
 					builder.setId(imageConst.getId());
 					if (imageConst.getFieldName() != null) {
-						builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(imageConst.getFieldName()), imageConst.extractMessage(dd));
+						builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(imageConst.getFieldName()), imageConst.toMessage());
 					}
 					webImageBuilder.addImages(builder.build());
 					constants[1] = new PointsConst(context, imageConst.getId(), points[1], points[2]);
 				} else {
-                    constants[1] = new PointsConst(context, imagePool.getCached(imageHashConst).getId(), points[1], points[2]);
+                    constants[1] = new PointsConst(context, imagePool.getCached(imageConst).getId(), points[1], points[2]);
 				}
 			}
 		}
 		// build proto message
 		for (DrawInstruction ins : instructions) {
 			for (DrawConstant cons : ins.getArgs()) {
-				if (!(cons instanceof DrawConstant.Integer) && cons != DrawConstant.nullConst) {
+				if (!(cons instanceof DrawConstant.IntegerConst) && cons != DrawConstant.nullConst) {
 					// update cache
 					if (!constantPool.isInCache(cons)) {
-						constantPool.addToCache(new DrawConstant.HashConst(cons));
+						constantPool.addToCache(cons);
 						DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
 						builder.setId(cons.getId());
 						if (cons.getFieldName() != null) {
-							builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(cons.getFieldName()), cons.extractMessage(dd));
+							builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(cons.getFieldName()), cons.toMessage());
 						}
 						webImageBuilder.addConstants(builder.build());
 					} else {

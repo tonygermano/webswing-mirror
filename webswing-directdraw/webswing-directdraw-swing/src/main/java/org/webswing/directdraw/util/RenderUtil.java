@@ -35,7 +35,7 @@ public class RenderUtil {
 			case GRAPHICS_DISPOSE:
 				break;
 			case GRAPHICS_SWITCH:
-				currentg = gmap.get(getConst(0, di, DrawConstant.Integer.class).getId());
+				currentg = gmap.get(getConst(0, di, DrawConstant.IntegerConst.class).getInt());
 				break;
 			case FILL:
 				iprtFill(currentg, di);
@@ -87,7 +87,7 @@ public class RenderUtil {
 		if (imageHolder != null) {
 			g.drawImage(imageHolder, 0, 0, null);
 		} else if (partialImageMap != null && partialImageMap.containsKey(di)) {
-			Integer[] points = getConst(1, di, PointsConst.class).getIntArray();
+			int[] points = getConst(1, di, PointsConst.class).getPoints();
 			g.drawImage(partialImageMap.get(di), points[1], points[2], null);
 		}
 		g.setTransform(original);
@@ -97,14 +97,14 @@ public class RenderUtil {
 	private static void iprtDrawWebImage(Graphics2D g, DrawInstruction di) {
 		BufferedImage i = di.getImage().getSnapshot();
 		TransformConst t = getConst(0, di, TransformConst.class);
-		Rectangle2D.Float crop = getConst(1, di, RectangleConst.class).getRectangle();
+		Rectangle2D crop = getConst(1, di, RectangleConst.class).getRectangle();
 		Shape clip = getShape(getConst(3, di, DrawConstant.class));
 		g.setClip(clip);
 		AffineTransform original = g.getTransform();
         if (t != null) {
             g.transform(t.getAffineTransform());
         }
-		g.drawImage(i, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(), (int) crop.getX(), (int) crop.getY(), (int) crop.getX() + (int) crop.getWidth(), (int) crop.getY() + (int) crop.getHeight(), null);
+		g.drawImage(i, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(), (int) crop.getX(), (int) crop.getY(), (int) crop.getMaxX(), (int) crop.getMaxY(), null);
 		g.setTransform(original);
 	}
 
@@ -122,14 +122,13 @@ public class RenderUtil {
 	}
 
 	private static void iprtCopyArea(Graphics2D g, DrawInstruction di, BufferedImage result) {
-		PointsConst p = getConst(0, di, PointsConst.class);
-		Integer[] pts = p.getIntArray();
+        int[] points = getConst(0, di, PointsConst.class).getPoints();
 		PathConst clip = getConst(1, di, PathConst.class);
 		g.setClip(getShape(clip));
 		AffineTransform original = g.getTransform();
 		g.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
-		g.clipRect(pts[0], pts[1], pts[2], pts[3]);
-		g.translate(pts[4], pts[5]);
+		g.clipRect(points[0], points[1], points[2], points[3]);
+		g.translate(points[4], points[5]);
 		g.drawImage(result, 0, 0, null);
 		g.setTransform(original);
 	}
@@ -168,7 +167,7 @@ public class RenderUtil {
 	}
 
 	private static Graphics2D iprtGraphicsCreate(BufferedImage result, DrawInstruction di, Map<Integer, Graphics2D> gmap) {
-		DrawConstant.Integer idConst = getConst(0, di, DrawConstant.Integer.class);
+		DrawConstant.IntegerConst idConst = getConst(0, di, DrawConstant.IntegerConst.class);
 		TransformConst transform = getConst(1, di, TransformConst.class);
 		StrokeConst stroke = getConst(2, di, StrokeConst.class);
 		CompositeConst composite = getConst(3, di, CompositeConst.class);
@@ -186,7 +185,7 @@ public class RenderUtil {
 		if (paint != null) {
 			g.setPaint(paint);
 		}
-		gmap.put(idConst.getId(), g);
+		gmap.put(idConst.getInt(), g);
 		return g;
 	}
 
@@ -208,12 +207,12 @@ public class RenderUtil {
 		} else if (paintConst instanceof RadialGradientConst) {
 			result = ((RadialGradientConst) paintConst).getRadialGradientPaint();
 		} else if (paintConst instanceof TextureConst) {
-            result = ((TextureConst) paintConst).getTexture();
+            result = ((TextureConst) paintConst).getTexturePaint();
         }
 		return result;
 	}
 
-	private static Shape getShape(DrawConstant s) {
+	public static Shape getShape(DrawConstant s) {
 		if (s instanceof RectangleConst) {
 			return ((RectangleConst) s).getRectangle();
 		} else if (s instanceof RoundRectangleConst) {
@@ -223,7 +222,7 @@ public class RenderUtil {
 		} else if (s instanceof ArcConst) {
 			return ((ArcConst) s).getArc();
 		} else if (s instanceof PathConst) {
-			return ((PathConst) s).getPath();
+			return ((PathConst) s).getShape();
 		}
 		return null;
 	}

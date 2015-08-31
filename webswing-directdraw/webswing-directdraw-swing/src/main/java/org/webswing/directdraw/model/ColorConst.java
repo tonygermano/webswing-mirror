@@ -7,11 +7,11 @@ import org.webswing.directdraw.proto.Directdraw.*;
 
 public class ColorConst extends DrawConstant {
 
-	public ColorConst(DirectDraw context, Color c) {
+    private Color color;
+    
+	public ColorConst(DirectDraw context, Color color) {
 		super(context);
-		ColorProto.Builder model = ColorProto.newBuilder();
-		model.setRgba(toRGBA(c));
-		this.message = model.build();
+        this.color = color;
 	}
 
 	@Override
@@ -19,18 +19,28 @@ public class ColorConst extends DrawConstant {
 		return "color";
 	}
 
-	public Color getColor() {
-		return getColor(((ColorProto) message).getRgba());
+    @Override
+    public Object toMessage() {
+        ColorProto.Builder model = ColorProto.newBuilder();
+        model.setRgba(toRGBA(color));
+        return model.build();
+    }
+
+    @Override
+    public int hashCode() {
+        return color.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this ||
+            o instanceof ColorConst && color.equals(((ColorConst) o).color);
+    }
+
+    public Color getColor() {
+		return color;
 	}
 
-	public static Color getColor(int rgba) {
-		int r = rgba >> 24 & 0x000000FF;
-		int g = rgba >> 16 & 0x000000FF;
-		int b = rgba >> 8 & 0x000000FF;
-		int a = rgba & 0x000000FF;
-		return new Color(r, g, b, a);
-	}
-    
     public static int toRGBA(Color color) {
         return (color.getRGB() << 8) | color.getAlpha();
     }

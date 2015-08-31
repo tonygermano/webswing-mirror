@@ -166,4 +166,13 @@ public class DirectDrawUtils {
 			newInstructions.add(new DrawInstruction(InstructionProto.SET_PAINT, mergedPaint));
 		}
 	}
+
+    public static int hashCode(double value) {
+        long bits = Double.doubleToLongBits(value);
+        return (int) (bits ^ (bits >>> 32));
+    }
+
+    public static int hashCode(float value) {
+        return Float.floatToIntBits(value);
+    }
 }

@@ -1,22 +1,17 @@
 package org.webswing.directdraw.model;
 
-import java.awt.geom.RoundRectangle2D;
+import java.awt.geom.*;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.proto.Directdraw.RoundRectangleProto;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.*;
 
 public class RoundRectangleConst extends DrawConstant {
 
-	public RoundRectangleConst(DirectDraw context, RoundRectangle2D r) {
+    private RoundRectangle2D roundRectangle;
+    
+	public RoundRectangleConst(DirectDraw context, RoundRectangle2D roundRectangle) {
 		super(context);
-		RoundRectangleProto.Builder model = RoundRectangleProto.newBuilder();
-		model.setX((int) r.getX());
-		model.setY((int) r.getY());
-		model.setW((int) r.getWidth());
-		model.setH((int) r.getHeight());
-		model.setArcH((int) r.getArcHeight());
-		model.setArcW((int) r.getArcWidth());
-		this.message = model.build();
+        this.roundRectangle = roundRectangle;
 	}
 
 	@Override
@@ -24,8 +19,30 @@ public class RoundRectangleConst extends DrawConstant {
 		return "roundRectangle";
 	}
 
-	public RoundRectangle2D.Float getRoundRectangle() {
-		RoundRectangleProto rp = (RoundRectangleProto) message;
-		return new RoundRectangle2D.Float(rp.getX(), rp.getY(), rp.getW(), rp.getH(), rp.getArcW(), rp.getArcH());
+    @Override
+    public Object toMessage() {
+        RoundRectangleProto.Builder model = RoundRectangleProto.newBuilder();
+        model.setX((int) roundRectangle.getX());
+        model.setY((int) roundRectangle.getY());
+        model.setW((int) roundRectangle.getWidth());
+        model.setH((int) roundRectangle.getHeight());
+        model.setArcH((int) roundRectangle.getArcHeight());
+        model.setArcW((int) roundRectangle.getArcWidth());
+        return model.build();
+    }
+
+    @Override
+    public int hashCode() {
+        return roundRectangle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this ||
+            o instanceof RoundRectangleConst && roundRectangle.equals(((RoundRectangleConst) o).roundRectangle);
+    }
+
+    public RoundRectangle2D getRoundRectangle() {
+		return roundRectangle;
 	}
 }

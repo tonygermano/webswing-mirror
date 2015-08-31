@@ -1,25 +1,22 @@
 package org.webswing.directdraw.model;
 
-import java.awt.Font;
+import java.awt.*;
 import java.util.*;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.proto.Directdraw.FontProto;
-import org.webswing.directdraw.proto.Directdraw.FontProto.StyleProto;
-import org.webswing.directdraw.util.DirectDrawUtils;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.FontProto.*;
+import org.webswing.directdraw.util.*;
 
 public class FontConst extends DrawConstant {
 
 	private static Map<Font, String> families = new HashMap<Font, String>();
 
-	public FontConst(DirectDraw context, Font f) {
+    private Font font;
+    
+	public FontConst(DirectDraw context, Font font) {
 		super(context);
-		FontProto.Builder model = FontProto.newBuilder();
-		String family = getFamily(f);
-		model.setFamily(DirectDrawUtils.windowsFonts.getProperty(family, family));
-		model.setSize(f.getSize());
-		model.setStyle(StyleProto.valueOf(f.getStyle()));
-		this.message = model.build();
+		this.font = font;
 	}
 
 	@Override
@@ -27,12 +24,29 @@ public class FontConst extends DrawConstant {
 		return "font";
 	}
 
-	public Font getFont() {
-		FontProto f = (FontProto) message;
-		String name = DirectDrawUtils.webFonts.getProperty(f.getFamily(), f.getFamily());
-		int style = f.getStyle().getNumber();
-		int size = f.getSize();
-		return new Font(name, style, size);
+    @Override
+    public Object toMessage() {
+        FontProto.Builder model = FontProto.newBuilder();
+        String family = getFamily(font);
+        model.setFamily(DirectDrawUtils.windowsFonts.getProperty(family, family));
+        model.setSize(font.getSize());
+        model.setStyle(StyleProto.valueOf(font.getStyle()));
+        return model.build();
+    }
+
+    @Override
+    public int hashCode() {
+        return font.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this ||
+            o instanceof FontConst && font.equals(((FontConst) o).font);
+    }
+
+    public Font getFont() {
+		return font;
 	}
 
 	private static String getFamily(Font font) {

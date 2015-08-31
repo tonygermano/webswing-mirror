@@ -8,14 +8,11 @@ import org.webswing.directdraw.proto.Directdraw.CompositeProto.*;
 
 public class CompositeConst extends DrawConstant {
 
+    private AlphaComposite composite;
+    
 	public CompositeConst(DirectDraw context, AlphaComposite composite) {
 		super(context);
-		CompositeProto.Builder model = CompositeProto.newBuilder();
-		model.setType(CompositeTypeProto.valueOf(composite.getRule()));
-		if (composite.getAlpha() != 1f) {
-			model.setAlpha(composite.getAlpha());
-		}
-		this.message = model.build();
+		this.composite = composite;
 	}
 
 	@Override
@@ -23,8 +20,28 @@ public class CompositeConst extends DrawConstant {
 		return "composite";
 	}
 
-	public AlphaComposite getComposite() {
-		CompositeProto c = (CompositeProto) message;
-		return AlphaComposite.getInstance(c.getType().getNumber(), c.getAlpha());
+    @Override
+    public Object toMessage() {
+        CompositeProto.Builder model = CompositeProto.newBuilder();
+        model.setType(CompositeTypeProto.valueOf(composite.getRule()));
+        if (composite.getAlpha() != 1f) {
+            model.setAlpha(composite.getAlpha());
+        }
+        return model.build();
+    }
+
+    @Override
+    public int hashCode() {
+        return composite.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this ||
+            o instanceof CompositeConst && composite.equals(((CompositeConst) o).composite);
+    }
+
+    public AlphaComposite getComposite() {
+		return composite;
 	}
 }

@@ -1,12 +1,14 @@
 package org.webswing.directdraw.model;
 
-import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.*;
 
 public class StringConst extends DrawConstant {
 
-	public StringConst(DirectDraw context, String s) {
+    private String string;
+    
+	public StringConst(DirectDraw context, String string) {
 		super(context);
-		this.message = s;
+        this.string = string;
 	}
 
 	@Override
@@ -14,7 +16,23 @@ public class StringConst extends DrawConstant {
 		return "string";
 	}
 
-	public String getString() {
-		return (String) message;
+    @Override
+    public Object toMessage() {
+        return string;
+    }
+
+    @Override
+    public int hashCode() {
+        return string.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this ||
+            o instanceof StringConst && string.equals(((StringConst) o).string);
+    }
+
+    public String getString() {
+	    return string;
 	}
 }

@@ -1,11 +1,8 @@
 package org.webswing.directdraw.model;
 
-import java.awt.*;
-import java.awt.geom.*;
 import java.awt.image.*;
 import java.io.*;
-
-import javax.imageio.*;
+import java.util.*;
 
 import com.google.protobuf.*;
 import org.webswing.directdraw.*;
@@ -13,34 +10,39 @@ import org.webswing.directdraw.proto.Directdraw.*;
 
 public class ImageConst extends DrawConstant {
 
-	public ImageConst(DirectDraw context, BufferedImage img, Long hash) {
+    private byte[] image;
+    private long hash;
+    
+	public ImageConst(DirectDraw context, BufferedImage image) {
 		super(context);
-		ImageProto.Builder model = ImageProto.newBuilder();
-		byte[] imgData = context.getServices().getPngImage(img);
-		if (hash == null) {
-			this.hash = context.getServices().computeHash(img);
-		} else {
-			this.hash = hash;
-		}
-		try {
-			model.setData(ByteString.readFrom(new ByteArrayInputStream(imgData)));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		this.message = model.build();
+        this.image = context.getServices().getPngImage(image);
+        this.hash = context.getServices().computeHash(image);
 	}
 
 	@Override
 	public String getFieldName() {
 		return "image";
 	}
-    
-    public static BufferedImage getImage(ImageProto i) {
+
+    @Override
+    public Object toMessage() {
+        ImageProto.Builder model = ImageProto.newBuilder();
         try {
-            return ImageIO.read(i.getData().newInput());
+            model.setData(ByteString.readFrom(new ByteArrayInputStream(image)));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return model.build();
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) hash;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this ||
+            o instanceof ImageConst && Arrays.equals(image, ((ImageConst) o).image);
     }
 }

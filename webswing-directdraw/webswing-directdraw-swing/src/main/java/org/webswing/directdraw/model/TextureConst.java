@@ -13,12 +13,13 @@ import org.webswing.directdraw.proto.Directdraw.*;
 
 public class TextureConst extends DrawConstant {
     
-    public TextureConst(DirectDraw context, TexturePaint t) {
+    private TexturePaint texturePaint;
+    private ImageConst texture;
+    
+    public TextureConst(DirectDraw context, TexturePaint texturePaint) {
         super(context);
-        TextureProto.Builder model = TextureProto.newBuilder();
-        model.setImage((ImageProto) new ImageConst(context, t.getImage(), null).message);
-        model.setAnchor((RectangleProto) new RectangleConst(context, t.getAnchorRect()).message);
-        this.message = model.build();
+        this.texturePaint = texturePaint;
+        this.texture = new ImageConst(getContext(), texturePaint.getImage());
     }
 
     @Override
@@ -26,8 +27,36 @@ public class TextureConst extends DrawConstant {
         return "texture";
     }
 
-    public TexturePaint getTexture() {
-        TextureProto t = (TextureProto) message;
-        return new TexturePaint(ImageConst.getImage(t.getImage()), RectangleConst.getRectangle(t.getAnchor()));
+    @Override
+    public Object toMessage() {
+        TextureProto.Builder model = TextureProto.newBuilder();
+        model.setImage((ImageProto) texture.toMessage());
+        model.setAnchor((RectangleProto) new RectangleConst(getContext(), texturePaint.getAnchorRect()).toMessage());
+        return model.build();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        result = 31 * result + texture.hashCode();
+        result = 31 * result + texturePaint.getAnchorRect().hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof TextureConst)) {
+            return false;
+        }
+        TextureConst other = (TextureConst) o;
+        return texture.equals(other.texture) &&
+            texturePaint.getAnchorRect().equals(other.texturePaint.getAnchorRect());
+    }
+
+    public TexturePaint getTexturePaint() {
+        return texturePaint;
     }
 }

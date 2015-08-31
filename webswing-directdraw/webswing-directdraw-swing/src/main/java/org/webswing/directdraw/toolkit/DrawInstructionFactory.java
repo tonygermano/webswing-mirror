@@ -23,7 +23,11 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(InstructionProto.FILL, toPathConst(s), toPathConst(clip));
 	}
 
-	public DrawInstruction drawImage(WebImage image, AffineTransform xform, Rectangle2D.Float crop, Color bkg, Shape clip) {
+    public DrawInstruction drawImage(Shape clip) {
+        return new DrawInstruction(InstructionProto.DRAW_IMAGE, toPathConst(clip), /*placeholder*/ DrawConstant.nullConst);
+    }
+
+	public DrawInstruction drawWebImage(WebImage image, AffineTransform xform, Rectangle2D.Float crop, Color bkg, Shape clip) {
 		DrawConstant transformConst = xform != null ? new TransformConst(ctx, xform) : DrawConstant.nullConst;
 		DrawConstant cropConst = crop != null ? new RectangleConst(ctx, crop) : DrawConstant.nullConst;
 		DrawConstant bkgConst = bkg != null ? new ColorConst(ctx, bkg) : DrawConstant.nullConst;
@@ -39,7 +43,7 @@ public class DrawInstructionFactory {
 	}
 
 	public DrawInstruction createGraphics(WebGraphics g) {
-		DrawConstant gid = new DrawConstant.Integer(g.getId());
+		DrawConstant gid = new DrawConstant.IntegerConst(g.getId());
 		DrawConstant transformConst =  new TransformConst(ctx, g.getTransform());
 		DrawConstant compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
 		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
@@ -48,11 +52,11 @@ public class DrawInstructionFactory {
 	}
 
 	public DrawInstruction disposeGraphics(WebGraphics g) {
-		return new DrawInstruction(InstructionProto.GRAPHICS_DISPOSE, new DrawConstant.Integer(g.getId()));
+		return new DrawInstruction(InstructionProto.GRAPHICS_DISPOSE, new DrawConstant.IntegerConst(g.getId()));
 	}
 
 	public DrawInstruction switchGraphics(WebGraphics g) {
-		return new DrawInstruction(InstructionProto.GRAPHICS_SWITCH, new DrawConstant.Integer(g.getId()));
+		return new DrawInstruction(InstructionProto.GRAPHICS_SWITCH, new DrawConstant.IntegerConst(g.getId()));
 	}
 
 	public DrawInstruction transform(AffineTransform at) {
@@ -100,7 +104,7 @@ public class DrawInstructionFactory {
 		} else if (s instanceof Arc2D) {
 			return new ArcConst(ctx, (Arc2D) s);
 		} else {
-			return new PathConst(ctx, s.getPathIterator(null));
+			return new PathConst(ctx, s);
 		}
 	}
 

@@ -1,32 +1,46 @@
 package org.webswing.directdraw.model;
 
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 
-import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.proto.Directdraw.RectangleProto;
+import org.webswing.directdraw.*;
+import org.webswing.directdraw.proto.Directdraw.*;
 
 public class RectangleConst extends DrawConstant {
 
-	public RectangleConst(DirectDraw context, Rectangle2D r) {
+    private Rectangle2D rectangle;
+    
+	public RectangleConst(DirectDraw context, Rectangle2D rectangle) {
 		super(context);
-		RectangleProto.Builder model = RectangleProto.newBuilder();
-		model.setX((int) r.getX());
-		model.setY((int) r.getY());
-		model.setW((int) r.getWidth());
-		model.setH((int) r.getHeight());
-		this.message = model.build();
+        this.rectangle = rectangle;
 	}
 
 	@Override
 	public String getFieldName() {
 		return "rectangle";
 	}
-    
-    public static Rectangle2D.Float getRectangle(RectangleProto r) {
-        return new Rectangle2D.Float(r.getX(), r.getY(), r.getW(), r.getH());
+
+    @Override
+    public Object toMessage() {
+        RectangleProto.Builder model = RectangleProto.newBuilder();
+        model.setX((int) rectangle.getX());
+        model.setY((int) rectangle.getY());
+        model.setW((int) rectangle.getWidth());
+        model.setH((int) rectangle.getHeight());
+        return model.build();
     }
 
-	public Rectangle2D.Float getRectangle() {
-        return getRectangle((RectangleProto) message);
+    @Override
+    public int hashCode() {
+        return rectangle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this ||
+            o instanceof RectangleConst && rectangle.equals(((RectangleConst) o).rectangle);
+    }
+
+    public Rectangle2D getRectangle() {
+        return rectangle;
 	}
 }
