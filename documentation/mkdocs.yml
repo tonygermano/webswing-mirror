@@ -1,10 +1,29 @@
 site_name: Webswing 2.3-SNAPSHOT
+site_description: Instant Swing to Web solution.
+site_author: Viktor Meszaros
 site_url: http://www.webswing.org
 repo_url: https://bitbucket.org/meszarv/webswing/src
 pages:
 - Introduction : index.md
-- Setup: 
-    - 'Setup and Configuration' : setup/setup.md
-    - 'Advanced Setup and Configuration' : setup/setup2.md
-- 'Development Guide': development.md
-theme: readthedocs
+- Server: 
+    - 'Instalation guide' : server/install.md
+    - 'Startup options' : server/setup.md
+    - 'Login configuration' : server/auth.md
+    - 'Tomcat deployment' : server/tomcat.md
+- Swing setup: 
+    - 'Swing application' : app/swing.md
+    - 'Netbeans Platform' : app/netbeans.md
+    - 'Java Applets' : app/applet.md
+    - 'Desktop Integration' : app/integration.md
+    - 'Embeding and URL settings' : app/browser.md
+    - 'JsLink: java <-> javascript' : app/jslink.md
+- 'Development': dev/development.md
+- 'FAQ' : faq.md
+
+markdown_extensions:
+    - toc:
+        permalink: 
+    - admonition:
+
+copyright: Copyright &copy; 2015 Viktor Meszaros
+theme: mkdocs
