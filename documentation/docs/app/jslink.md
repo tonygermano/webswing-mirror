@@ -23,7 +23,7 @@ JSObject global = JSObject.getWindow(null);
 The variable `global` now represents the javascript global object. Now we can evaluate any Javascript on this object. 
 
 ```java
-Object res = global.eval("return 'Hello world';");
+Object res = global.eval("var hello = 'Hello world'; return hello;");
 assert res instanceof String && assert res.equals("Hello world");
 ```
 
@@ -44,15 +44,15 @@ boolean          | java.lang.Boolean
 JavaObjectRef*   | refered Java object
 other            | netscape.javascript.JSObject
 
-*JavaObjectRef is javascript object created by this API when Java object is passed to javascript using `setMember`, `setSlot` or `call` methods.
+*JavaObjectRef is javascript object created by this API when Java object is passed to javascript using `setMember`, `setSlot` or `call` methods. See Invoking Java from Javascript chapter
 
 >Tip: When returning data from eval. Serialize them to json rather then sending a javascript object directly. Querying the content using `JSObject` interface is costly as each method call requires a server roundtrip.
 
-**JSObject methods**
+**JSObject methods [[javadoc]](http://www.oracle.com/webfolder/technetwork/java/plugin2/liveconnect/jsobject-javadoc/netscape/javascript/JSObject.html)**
 
 Method name | Description
 ------------| -----------
-eval        | Evaluates the javascritp in argument and returns result.
+eval        | Evaluates the javascript in argument and returns result.
 call        | calls a function on object represented by this JSObject.
 setMember   | creates or sets property on object represented by this JSObject with value from agument.
 getMember   | returns property from object represented by this JSObject.
@@ -62,11 +62,54 @@ getSlot     | returns the value from array represented by this JSObject on speci
 
 ## Invoking Java from Javascript
 
+Before we can make any Java calls from Javascript we need to expose a Java object instance and store a reference to it in variable. 
+Assume we have a singleton `PingService` class with one method called `ping()` which we want to call from javascript. Let's expose this service to javascipt:
 
+```java
+public class PingService{
+	static PingService singleton = new PingService();
 
+    public String ping(){
+        return "pong";
+    }
+}
 
+JSObject global = JSObject.getWindow(null);
+global.setMember("pingService", PingService.singleton);
+```
 
+The above `setMember` method will send a singleton's object reference to javascript and expose all his **public** methods as javascript functions. This singleton reference will be stored in `pingService` property of global object.  
+
+>Note: Make sure you keep a reference to your service object in java to avoid garbage collection, otherwise you will get exception when calling service from javascript. 
+
+Now let's call the `ping` method from javascript. As you can see below the `ping` function does not return the result directly, but it returns a [Promise](http://www.html5rocks.com/en/tutorials/es6/promises), which resolves to value returned by java method. If the result is not returned from java within 3 seconds or the java method throws an exception, the promise is rejected and the error is handled in the catch block. 
+
+```javascript
+pingService.ping().then(
+    function(result){
+        alert(result);
+    }
+).catch(
+    function(error){
+        console.log(error);
+    }
+)
+```
+
+> Note: To adjust the java call timeout limit, set the `javaCallTimeout` property to your webswing javascipt. [See embeding documentation](browser.md)
 
 ## Applet specifics
 
-## Security setting
+To simplify transition of Applets, Webswing will automatically expose the Applet object to javascript. Applet object reference will be stored in the webswing instance variable as defined by `data-webswing-instance="myWebswing"` element atribute ([See embeding documentation](browser.md)). For example:
+
+```javascript
+myWebswing.applet.getAppletInfo().then(
+    function(result){
+        alert("my applet info:"+result);
+    }
+)
+```
+
+## Security configuration
+
+JsLink framework can be disabled in webswing configuration by setting the `allowJsLink` property to false. 

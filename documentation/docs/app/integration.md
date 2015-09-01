@@ -40,14 +40,12 @@ Webswing has a built-in clipboard integration. Due to various browser security l
 
 When user triggers copy operation from swing application by pressing `ctrl+c` or in menu option, webswing analyzes the data written to clipboard and notifies the client what type of data is available in clipboard by small dialog.
 
-![file dialog](img/filedialog.png)
-
 Webswing recognizes 5 basic types. 
 
 1. Plain text 
-2. HTML 
-3. Image
-4. Files
+2. HTML  ![html copy dialog](img/htmlcopy.png)
+3. Image ![image copy dialog](img/imagecopy.png)
+4. Files ![file copy dialog](img/filescopy.png)
 5. Other (ie. application specific types)
 
 This dialog only informs the user that data is available in swing clipboard. To copy the `Plain text` or `HTML` type to local clipboard user has to press `ctrl+c` again while the dialog is visible. For copying the `image` user has to use the browser default behavior to copy the image to local clipboard. 
@@ -61,6 +59,10 @@ If the swing clipboard contains `files` and `allowDownload` option is enabled, u
 Paste operation can be triggered by `ctrl+v` keyboard shortcut. But here it gets a little tricky, because we have our swing clipboard data sitting on the server and we have a local browser clipboard data. So we need to decide which one to use for the paste operation.    
 
 Solution is simple. If the clipboard dialog is open we use the Swing clipboard, because we know user has just coppied some data there. If the clipboard is not visible, we try to get the data from local browser clipboard. 
+
+![minimized copy dialog](img/paste.png)
+
+>Note: if paste operation is trigered from context menu, it will always use the swing clipboard data. 
 
 **Pasting from swing clipboard**
 All types are accessible to application if pasting from swing clipboard. 

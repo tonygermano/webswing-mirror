@@ -12,6 +12,21 @@ Following configurations are available by default:
 ### Anonymous access (skip login screen)
 [http://localhost:8080?anonym=true](http://localhost:8080?anonym=true) : tells the server to authenticate the application with anonymous user. This user has access only to applications with `authentication` and `authorization` set to `false` in `webswing.config` file. 
 
+### Disable binary socket
+[http://localhost:8080?binarySocket=false](http://localhost:8080?binarySocket=false) : Binary socket is enabled by default. If you wish to use json for transfering data through websocket, set this option to false.
+
+### Session recording
+[http://localhost:8080?recording=true](http://localhost:8080?recording=true) : if recording is enabled, webswing will create a recording file in temp foler, which can be later used for replay of the application frame by frame just like a movie.
+
+### Session playback 
+[http://localhost:8080?recordingPlayback=path/to/recordingFile.wss](http://localhost:8080?recordingPlayback=path) : This option can be used to play the recording file. This option is internaly used in Admin console for playback of finished sessions. Only users with admin role are allowed to playback recordings.
+
+### Debugging 
+[http://localhost:8080?debugPort=8000](http://localhost:8080?debugPort=8000) : See [debuging guide](../dev/development.md#debugging)
+
+
+ 
+
 URL parameters can be combined together.
 
 If your deployment has other specific requirements which are not achievable by this set of parameters, you can embed Webswing's javascript snippet to your own web page, where you have full control and ability to further customize the behavior.

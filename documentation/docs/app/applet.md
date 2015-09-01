@@ -15,7 +15,7 @@ Webswing offers a easy way to continue using your applets on your page the same 
 
 In Admin console you can set up your java applet in `Settings` -> `Server configuration` -> `Applets`. Most of the settings in the panel are same as with standard [Swing applications](swing.md), the only diference is in `Java settings` tab, where you set up your `appletClass` and additional `parameters` for applets.
 
-![Applet configuration screen](app/applet-config.png)
+![Applet configuration screen](img/applet-config.png)
 
 This is how a sample java applet configuration looks like in json:
 
