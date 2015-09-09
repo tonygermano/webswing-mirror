@@ -33,6 +33,7 @@ public class RenderUtil {
 				currentg = iprtGraphicsCreate(result, di, gmap);
 				break;
 			case GRAPHICS_DISPOSE:
+                gmap.remove(getConst(0, di, DrawConstant.IntegerConst.class).getInt());
 				break;
 			case GRAPHICS_SWITCH:
 				currentg = gmap.get(getConst(0, di, DrawConstant.IntegerConst.class).getInt());

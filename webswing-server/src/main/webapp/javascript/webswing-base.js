@@ -538,7 +538,6 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
 
         function getMousePos(canvas, evt, type) {
             var rect = canvas.getBoundingClientRect();
-            var root = document.documentElement;
             // return relative mouse position
             var mouseX = Math.round(evt.clientX - rect.left);
             var mouseY = Math.round(evt.clientY - rect.top);

@@ -156,6 +156,13 @@ public class WebImage extends Image {
 			newInstructions.add(in);
 		}
 	}
+    
+    public void dispose(WebGraphics g) {
+        synchronized (this) {
+            newInstructions.add(context.getInstructionFactory().disposeGraphics(g));
+            usedGs.remove(g);
+        }
+    }
 
 	public void addImage(WebGraphics g, Object image, ImageObserver o, AffineTransform xform, Rectangle2D.Float crop) {
 		Graphics2D ihg = (Graphics2D) getImageHolder().getGraphics();
