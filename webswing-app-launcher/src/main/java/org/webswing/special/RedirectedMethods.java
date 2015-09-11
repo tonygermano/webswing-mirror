@@ -1,18 +1,14 @@
 package org.webswing.special;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.net.URL;
-import java.util.Enumeration;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
-import javax.swing.JDesktopPane;
-import javax.swing.RepaintManager;
+import javax.swing.*;
 
-import org.webswing.SwingMain;
-import org.webswing.toolkit.extra.WebRepaintManager;
-import org.webswing.toolkit.util.Logger;
+import org.webswing.*;
+import org.webswing.toolkit.extra.*;
+import org.webswing.toolkit.util.*;
 
 public class RedirectedMethods {
 
@@ -34,19 +30,19 @@ public class RedirectedMethods {
 	}
 
 	public static ClassLoader getSystemClassLoader() {
-		return SwingMain.swingLibClassloader;
+		return SwingMain.swingLibClassLoader;
 	}
 
 	public static URL getSystemResource(String name) {
-		return SwingMain.swingLibClassloader.getResource(name);
+		return SwingMain.swingLibClassLoader.getResource(name);
 	}
 
 	public static InputStream getSystemResourceAsStream(String name) {
-		return SwingMain.swingLibClassloader.getResourceAsStream(name);
+		return SwingMain.swingLibClassLoader.getResourceAsStream(name);
 	}
 
 	public static Enumeration<URL> getSystemResources(String name) throws IOException {
-		return SwingMain.swingLibClassloader.getResources(name);
+		return SwingMain.swingLibClassLoader.getResources(name);
 	}
 
 	public static void setCurrentManager(RepaintManager manager) {

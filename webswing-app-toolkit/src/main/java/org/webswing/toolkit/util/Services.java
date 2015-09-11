@@ -1,11 +1,6 @@
 package org.webswing.toolkit.util;
 
-import org.webswing.ext.services.DirectDrawService;
-import org.webswing.ext.services.ImageService;
-import org.webswing.ext.services.JsLinkService;
-import org.webswing.ext.services.PdfService;
-import org.webswing.ext.services.ServerConnectionService;
-import org.webswing.ext.services.SwingClassLoaderFactoryService;
+import org.webswing.ext.services.*;
 
 public class Services {
 
@@ -49,7 +44,7 @@ public class Services {
 		return serverService;
 	}
 
-	public static SwingClassLoaderFactoryService getClassloaderService() {
+	public static SwingClassLoaderFactoryService getClassLoaderService() {
 		if (classloaderService == null) {
 			Logger.fatal("Classloader service has not been initialize. Exiting...");
 			Util.getWebToolkit().exitSwing(1);

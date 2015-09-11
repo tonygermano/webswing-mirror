@@ -1,43 +1,33 @@
 package org.webswing;
 
-import java.applet.Applet;
-import java.awt.EventQueue;
-import java.awt.Toolkit;
-import java.io.File;
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.applet.*;
+import java.awt.*;
+import java.io.*;
+import java.lang.reflect.*;
+import java.net.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
-import org.webswing.applet.AppletContainer;
-import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Services;
+import org.webswing.applet.*;
+import org.webswing.toolkit.util.*;
 
 public class SwingMain {
 
-	public static ClassLoader swingLibClassloader;
+	public static ClassLoader swingLibClassLoader;
 
 	public static void main(String[] args) {
 		try {
-			List<URL> swingurls = new ArrayList<URL>();
-			String classpath = System.getProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH);
-			String[] cp = scanForFiles(classpath.split(";"), ".");
-			Logger.debug("Swing classpath: " + Arrays.asList(cp));
-			for (String f : cp) {
-				File file = new File(f);
-				if (file.exists()) {
-					swingurls.add(file.toURI().toURL());
-				} else {
-					Logger.error("SwingMain:main ERROR: Required classpath file '" + f + "' does not exist!");
-				}
-			}
-			swingLibClassloader = Services.getClassloaderService().createSwingClassLoader(swingurls.toArray(new URL[0]), SwingMain.class.getClassLoader());
+			URL[] urls = populateClassPath();
+            /*
+             * wrap into additional URLClassLoader with class path urls because
+             * some resources may contain classes from packages that should be loaded
+             * with parent class loader that otherwise would not have a classpath
+             */
+            ClassLoader wrapper = new URLClassLoader(urls, SwingMain.class.getClassLoader());
+            swingLibClassLoader = Services.getClassLoaderService().createSwingClassLoader(urls, wrapper);
 
 			if (isApplet()) {
-				startApplet(args);
+				startApplet();
 			} else {
 				startSwingApp(args);
 			}
@@ -48,19 +38,18 @@ public class SwingMain {
 	}
 
 	private static void startSwingApp(String[] args) throws Exception {
-		Class<?> clazz = swingLibClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
+		Class<?> clazz = swingLibClassLoader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
 		Class<?> mainArgType[] = { (new String[0]).getClass() };
-		String progArgs[] = args;
-		java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
-		setupContextClassloader(swingLibClassloader);
-		Object argsArray[] = { progArgs };
+        java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
+		setupContextClassLoader(swingLibClassLoader);
+		Object argsArray[] = { args };
 		main.invoke(null, argsArray);
 	}
 
-	private static void startApplet(String[] args) throws Exception {
-		Class<?> appletClazz = swingLibClassloader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
+	private static void startApplet() throws Exception {
+		Class<?> appletClazz = swingLibClassLoader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
 		Map<String, String> props = resolveProps();
-		setupContextClassloader(swingLibClassloader);
+		setupContextClassLoader(swingLibClassLoader);
 		if (Applet.class.isAssignableFrom(appletClazz)) {
 			AppletContainer ac = new AppletContainer(appletClazz, props);
 			ac.start();
@@ -69,8 +58,8 @@ public class SwingMain {
 		}
 	}
 
-	private static void setupContextClassloader(ClassLoader swingClassloader) {
-		Thread.currentThread().setContextClassLoader(swingClassloader);
+	private static void setupContextClassLoader(ClassLoader swingClassLoader) {
+		Thread.currentThread().setContextClassLoader(swingClassLoader);
 		try {
 			EventQueue q = Toolkit.getDefaultToolkit().getSystemEventQueue();
 			Class<?> systemQueue = q.getClass();
@@ -78,7 +67,7 @@ public class SwingMain {
 			cl.setAccessible(true);
 			cl.set(q, Thread.currentThread().getContextClassLoader());
 		} catch (Exception e) {
-			Logger.error("Error in SwingMain: EventQueue thread - setting context classloader failed.", e);
+			Logger.error("Error in SwingMain: EventQueue thread - setting context class loader failed.", e);
 		}
 	}
 
@@ -94,14 +83,30 @@ public class SwingMain {
 		return result;
 	}
 
-	public static String[] scanForFiles(String[] patternPaths, String base) {
-		base = base.replaceAll("\\\\", "/");
+    public static URL[] populateClassPath() throws MalformedURLException
+    {
+        List<URL> urls = new ArrayList<URL>();
+        String classpath = System.getProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH);
+        String[] cp = scanForFiles(classpath.split(";"));
+        Logger.debug("Swing classpath: " + Arrays.asList(cp));
+        for (String f : cp) {
+            File file = new File(f);
+            if (file.exists()) {
+                urls.add(file.toURI().toURL());
+            } else {
+                Logger.error("SwingMain:main ERROR: Required classpath file '" + f + "' does not exist!");
+            }
+        }
+        return urls.toArray(new URL[urls.size()]);
+    }
+    
+	public static String[] scanForFiles(String[] patternPaths) {
 		List<String> result = new ArrayList<String>();
 		for (String pattern : patternPaths) {
 			if (pattern.contains("?") || pattern.contains("*")) {
 				pattern = pattern.replaceAll("\\\\", "/");
 				String[] pathSegs = pattern.split("/");
-				boolean absolute = pathSegs[0].length() == 0 || pathSegs[0].contains(":") ? true : false;
+				boolean absolute = pathSegs[0].length() == 0 || pathSegs[0].contains(":");
 				String currentBase = absolute ? "/" : "";
 				scanForPatternFiles(pathSegs, currentBase, result);
 			} else {
@@ -144,10 +149,6 @@ public class SwingMain {
 	}
 
 	private static boolean isApplet() {
-		if (System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null) {
-			return true;
-		} else {
-			return false;
-		}
+        return System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null;
 	}
 }
