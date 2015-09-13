@@ -57,8 +57,13 @@ public interface Constants {
 	public static final String SWING_SCREEN_HEIGHT = "webswing.screenHeight";
 	public static final int SWING_SCREEN_WIDTH_MIN = 300;
 	public static final int SWING_SCREEN_HEIGHT_MIN = 300;
+
+	//webswing configuration variables
 	public static final String USER_NAME_SUBSTITUTE = "user";
-	public static final String SESSION_ID_SUBSTITUTE = "sessionId";
+	public static final String SESSION_ID_SUBSTITUTE = "clientId";
+	public static final String SESSION_IP_SUBSTITUTE = "clientIp";
+	public static final String SESSION_LOCALE_SUBSTITUTE = "clientLocale";
+	public static final String SESSION_CUSTOMARGS_SUBSTITUTE = "customArgs";
 
 	// http request header names
 	public static final String HTTP_ATTR_RECORDING_FLAG = "X-webswing-recording";

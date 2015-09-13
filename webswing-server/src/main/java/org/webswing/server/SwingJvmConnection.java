@@ -35,6 +35,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.apache.tools.ant.types.Environment.Variable;
 import org.apache.tools.ant.types.Path;
+import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -77,6 +78,7 @@ public class SwingJvmConnection implements MessageListener {
 	private WebSessionListener webListener;
 	private Future<?> app;
 	private String clientId;
+	private String clientIp;
 	private SwingJvmStats latest = new SwingJvmStats();
 
 	private ExecutorService swingAppExecutor = Executors.newSingleThreadExecutor();
@@ -84,11 +86,12 @@ public class SwingJvmConnection implements MessageListener {
 	private String customArgs = "";
 	private int debugPort = 0;
 
-	public SwingJvmConnection(ConnectionHandshakeMsgIn handshake, SwingDescriptor appConfig, WebSessionListener webListener, String customArgs, int debugPort) {
+	public SwingJvmConnection(ConnectionHandshakeMsgIn handshake, SwingDescriptor appConfig, WebSessionListener webListener, AtmosphereResource resource) {
 		this.webListener = webListener;
 		this.clientId = handshake.getClientId();
-		this.customArgs = customArgs;
-		this.debugPort = debugPort;
+		this.customArgs = ServerUtil.getCustomArgs(resource.getRequest());
+		this.debugPort = ServerUtil.getDebugPort(resource.getRequest());
+		this.clientIp = ServerUtil.getClientIp(resource.getRequest());
 		try {
 			initialize();
 			app = start(appConfig, handshake);
@@ -219,7 +222,7 @@ public class SwingJvmConnection implements MessageListener {
 	public Future<?> start(final SwingDescriptor appConfig, final ConnectionHandshakeMsgIn handshake) {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final StrSubstitutor subs = ServerUtil.getConfigSubstitutor(webListener.getUser(), getClientId());
+		final StrSubstitutor subs = ServerUtil.getConfigSubstitutor(webListener.getUser(), clientId, clientIp, handshake.getLocale(), customArgs);
 
 		Future<?> future = swingAppExecutor.submit(new Callable<Object>() {
 			public Object call() throws Exception {
@@ -299,7 +302,7 @@ public class SwingJvmConnection implements MessageListener {
 
 						if (appConfig instanceof SwingApplicationDescriptor) {
 							SwingApplicationDescriptor application = (SwingApplicationDescriptor) appConfig;
-							javaTask.setArgs(subs.replace(application.getArgs()) + " " + customArgs);
+							javaTask.setArgs(subs.replace(application.getArgs()));
 							addSysProperty(javaTask, Constants.SWING_START_SYS_PROP_MAIN_CLASS, subs.replace(application.getMainClass()));
 						} else if (appConfig instanceof SwingAppletDescriptor) {
 							SwingAppletDescriptor applet = (SwingAppletDescriptor) appConfig;

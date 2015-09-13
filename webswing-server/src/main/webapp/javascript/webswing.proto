@@ -175,6 +175,7 @@ message ConnectionHandshakeMsgInProto{
 	optional bool applet = 8;
 	optional string documentBase = 9;
 	repeated ParamMsgProto params = 10;
+	optional string locale = 11;
 }
 
 message ParamMsgProto{

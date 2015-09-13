@@ -12,6 +12,7 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
             getInput : 'canvas.getInput',
             getUser : 'login.user',
             getIdentity : 'identity.get',
+            getLocale : 'identity.getLocale',
             showDialog : 'dialog.show',
             hideDialog : 'dialog.hide',
             startingDialog : 'dialog.content.startingDialog',
@@ -588,6 +589,7 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
                 applicationName : api.cfg.appName,
                 clientId : api.cfg.clientId,
                 sessionId : api.getSocketId(),
+                locale : api.getLocale(),
                 mirrored : api.cfg.mirrorMode,
                 directDrawSupported : api.cfg.typedArraysSupported
             };

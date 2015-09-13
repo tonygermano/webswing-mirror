@@ -50,7 +50,7 @@ public class AdminConsoleRestServiceImpl implements AdminConsoleRestService {
 	@Override
 	public Map<String, String> getVariables() {
 		checkAuthorization();
-		Map<String, String> vars = ServerUtil.getConfigSubstitutorMap(getUsername(), "<sessionId>");
+		Map<String, String> vars = ServerUtil.getConfigSubstitutorMap(getUsername(), "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing custom args>");
 		return vars;
 	}
 
