@@ -47,6 +47,7 @@
 			<param-name>org.atmosphere.websocket.maxBinaryMessageSize</param-name>
 			<param-value>1048576</param-value>
 		</init-param>
+
 		<load-on-startup>0</load-on-startup>
 		<async-supported>true</async-supported>
 	</servlet>
@@ -114,4 +115,12 @@
 		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
 	</listener>
 
+	<listener>
+		<listener-class>org.atmosphere.cpr.SessionSupport</listener-class>
+	</listener>
+	
+	<context-param>
+		<param-name>org.atmosphere.cpr.SessionSupport</param-name>
+		<param-value>true</param-value>
+	</context-param>
 </web-app>
