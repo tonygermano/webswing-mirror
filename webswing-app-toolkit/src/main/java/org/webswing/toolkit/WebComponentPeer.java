@@ -398,9 +398,9 @@ public class WebComponentPeer implements ComponentPeer {
 		}
 	}
 
-	public boolean requestFocus(Component paramComponent, boolean paramBoolean1, boolean paramBoolean2, long paramLong, Cause paramCause) {
+	public boolean requestFocus(Component paramComponent, boolean temporary, boolean focusedWindowChangeAllowed, long time, Cause paramCause) {
 		Point p = SwingUtilities.convertPoint(paramComponent, new Point(0, 0), (Component) target);
-		Util.getWebToolkit().getWindowManager().activateWindow((Window) target, paramComponent, p.x, p.y, paramBoolean1);
+		Util.getWebToolkit().getWindowManager().activateWindow((Window) target, paramComponent, p.x, p.y, temporary, focusedWindowChangeAllowed);
 		return true;
 	}
 

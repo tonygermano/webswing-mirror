@@ -209,7 +209,7 @@ public class WebEventDispatcher {
 			int clickcount = 0;
 			int buttons = Util.getMouseButtonsAWTFlag(event.getButton());
 			if (buttons != 0 && event.getType() == MouseEventType.mousedown) {
-				WindowManager.getInstance().activateWindow(w, x, y);
+				WindowManager.getInstance().activateWindow(w, null, x, y, false, true);
 			}
 			switch (event.getType()) {
 			case mousemove:
@@ -258,6 +258,7 @@ public class WebEventDispatcher {
 			default:
 				break;
 			}
+
 		}
 	}
 
