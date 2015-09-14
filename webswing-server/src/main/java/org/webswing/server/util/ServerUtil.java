@@ -23,6 +23,7 @@ import main.Main;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.shiro.realm.text.PropertiesRealm;
 import org.apache.shiro.subject.Subject;
+import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.FrameworkConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -116,7 +117,7 @@ public class ServerUtil {
 		Map<String, SwingAppletDescriptor> applets = ConfigurationManager.getInstance().getApplets();
 
 		List<ApplicationInfoMsg> apps = new ArrayList<ApplicationInfoMsg>();
-		StrSubstitutor subs = getConfigSubstitutor(getUserName(r), null);
+		StrSubstitutor subs = getConfigSubstitutor(getUserName(r), null, ServerUtil.getClientIp(r.getRequest()), null, null);
 		if (applications.size() == 0) {
 			return null;
 		} else {
@@ -332,7 +333,11 @@ public class ServerUtil {
 		}
 	}
 
-	public static Map<String, String> getConfigSubstitutorMap(String user, String sessionId) {
+	public static String getClientIp(AtmosphereRequest request) {
+		return request.getRemoteAddr();
+	}
+
+	public static Map<String, String> getConfigSubstitutorMap(String user, String sessionId, String clientIp, String locale, String customArgs) {
 
 		Map<String, String> result = new HashMap<String, String>();
 		result.putAll(System.getenv());
@@ -345,12 +350,20 @@ public class ServerUtil {
 		if (sessionId != null) {
 			result.put(Constants.SESSION_ID_SUBSTITUTE, sessionId);
 		}
-
+		if (clientIp != null) {
+			result.put(Constants.SESSION_IP_SUBSTITUTE, clientIp);
+		}
+		if (locale != null) {
+			result.put(Constants.SESSION_LOCALE_SUBSTITUTE, locale);
+		}
+		if (customArgs != null) {
+			result.put(Constants.SESSION_CUSTOMARGS_SUBSTITUTE, customArgs);
+		}
 		return result;
 	}
 
-	public static StrSubstitutor getConfigSubstitutor(String user, String sessionId) {
-		return new StrSubstitutor(getConfigSubstitutorMap(user, sessionId));
+	public static StrSubstitutor getConfigSubstitutor(String user, String sessionId, String clientIp, String locale, String customArgs) {
+		return new StrSubstitutor(getConfigSubstitutorMap(user, sessionId, clientIp, locale, customArgs));
 	}
 
 	public static void broadcastMessage(AtmosphereResource r, EncodedMessage o) {

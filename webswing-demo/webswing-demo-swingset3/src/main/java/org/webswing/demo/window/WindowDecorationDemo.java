@@ -147,6 +147,13 @@ public class WindowDecorationDemo extends JPanel {
 				getComponentAt(initialClick);
 			}
 		});
+		JLabel maximize = new JLabel("maximize");
+		maximize.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				((JFrame) thisWindow).setExtendedState(JFrame.MAXIMIZED_BOTH);
+			}
+		});
 		JLabel close = new JLabel("close");
 		close.addMouseListener(new MouseAdapter() {
 
@@ -163,6 +170,9 @@ public class WindowDecorationDemo extends JPanel {
 		if (thisWindow != null) {
 			additional.add(moveButton);
 			additional.add(context);
+			if (thisWindow instanceof JFrame) {
+				additional.add(maximize);
+			}
 			additional.add(close);
 			content.add(additional);
 		}

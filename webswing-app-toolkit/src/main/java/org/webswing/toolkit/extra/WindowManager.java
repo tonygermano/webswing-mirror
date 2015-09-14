@@ -98,7 +98,7 @@ public class WindowManager {
 	}
 
 	@SuppressWarnings("restriction")
-	public void activateWindow(Window w, Component newFocusOwner, int x, int y, boolean tmp) {
+	public void activateWindow(Window w, Component newFocusOwner, int x, int y, boolean tmp, boolean focusedWindowChangeAllowed) {
 		if (!zorder.contains(w)) {
 			zorder.addWindow(w);
 		}
@@ -107,21 +107,25 @@ public class WindowManager {
 		if (!zorder.isInSameModalBranch(activeWindow, w) && !(w instanceof sun.awt.ModalExclude)) {
 			return;
 		}
+		if (focusedWindowChangeAllowed || activeWindow == w) {
 
-		if (newFocusOwner != null && newFocusOwner.isFocusable() && w.isFocusableWindow()) {
-			FocusEvent gainedFocusEvent = new FocusEvent(newFocusOwner, FocusEvent.FOCUS_GAINED, tmp);
-			WebEventDispatcher.dispatchEventInSwing(w, gainedFocusEvent);
+			if (newFocusOwner != null && newFocusOwner.isFocusable() && w.isFocusableWindow()) {
+				FocusEvent gainedFocusEvent = new FocusEvent(newFocusOwner, FocusEvent.FOCUS_GAINED, tmp);
+				WebEventDispatcher.dispatchEventInSwing(w, gainedFocusEvent);
+			}
+
+			if (SwingUtilities.isRectangleContainingRectangle(new Rectangle(0, 0, w.getWidth(), w.getHeight()), new Rectangle(x, y, 0, 0))) {
+				bringToFront(w);
+			} else {
+				bringToFront(null);
+			}
 		}
-		if (SwingUtilities.isRectangleContainingRectangle(new Rectangle(0, 0, w.getWidth(), w.getHeight()), new Rectangle(x, y, 0, 0))) {
-			bringToFront(w);
-		} else {
-			bringToFront(null);
-		}
+
 	}
 
 	public void activateWindow(Window w, int x, int y) {
 		Component newFocusOwner = SwingUtilities.getDeepestComponentAt(w, x, y);
-		activateWindow(w, newFocusOwner, x, y, false);
+		activateWindow(w, newFocusOwner, x, y, false, true);
 	}
 
 	public Window getVisibleWindowOnPosition(int x, int y) {

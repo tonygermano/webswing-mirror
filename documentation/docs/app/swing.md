@@ -69,6 +69,9 @@ Variable Name 				| Description
 ----------------------------|------------
 **`${user}`**					| Webswing specific logged in user name.
 **`${clientId}`** 				| Webswing specific unique browser identifier. 
+**`${clientIp}`**				| IP address of browser which started this application.
+**`${clientLocale}`**			| Locale of browser which started this application.
+**`${customArgs}`**				| Custom Arguments specified in URL parameters. [See details](browser/#additional-application-arguments)
 **Java system Properties** 		| All properties accessible to server's JVM using System.getProperty method
 **System environment variables**| All OS level environment variables accessible to script that started webswing server JVM. 
 

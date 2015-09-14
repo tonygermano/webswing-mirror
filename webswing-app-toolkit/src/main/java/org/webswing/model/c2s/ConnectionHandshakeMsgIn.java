@@ -14,6 +14,7 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 	private Integer desktopHeight;
 	private String applicationName;
 	private String documentBase;
+	private String locale;
 	private boolean applet;
 	private boolean mirrored;
 	private boolean directDrawSupported;
@@ -97,6 +98,14 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 
 	public void setParams(List<ParamMsg> params) {
 		this.params = params;
+	}
+
+	public String getLocale() {
+		return locale;
+	}
+
+	public void setLocale(String locale) {
+		this.locale = locale;
 	}
 
 }

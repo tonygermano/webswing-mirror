@@ -4,6 +4,7 @@ define([], function amdFactory() {
         var module = this;
         module.provides = {
             get: get,
+            getLocale: getLocale,
             dispose: dispose
         };
 
@@ -17,6 +18,11 @@ define([], function amdFactory() {
                 createCookie(cookieName, id, 1);
                 return id;
             }
+        }
+
+        function getLocale(){
+            var lang = (navigator.language || navigator.browserLanguage).split('-')[0];
+            return lang;
         }
 
         function dispose() {

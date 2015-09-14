@@ -6,7 +6,7 @@ Webswing project page [Webswing.org](http://webswing.org)
 
 Documentation sources are located in [/documentation folder](https://bitbucket.org/meszarv/webswing/src/)
 
->Note: Please help us improve this documentation by sending us feedback / pull request / grammar of spelling problems you may find int this documentation. Any improvement suggestions are appreciated.  
+>Note: Please help us improve this documentation by sending us feedback or pull requests.  Any improvements or suggestions are appreciated.   
 
 ---
 

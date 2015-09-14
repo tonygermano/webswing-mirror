@@ -32,7 +32,7 @@ public class SwingInstance implements WebSessionListener {
 		this.application = app;
 		this.user = ServerUtil.getUserName(resource);
 		registerPrimaryWebSession(resource);
-		this.connection = new SwingJvmConnection(h, app, this, ServerUtil.getCustomArgs(resource.getRequest()), ServerUtil.getDebugPort(resource.getRequest()));
+		this.connection = new SwingJvmConnection(h, app, this, resource);
 		this.sessionRecorder = ServerUtil.isRecording(resource.getRequest()) ? new SessionRecorder(this) : null;
 	}
 
