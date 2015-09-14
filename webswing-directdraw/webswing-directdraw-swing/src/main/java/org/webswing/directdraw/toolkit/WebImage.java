@@ -25,7 +25,6 @@ public class WebImage extends Image {
 	private volatile int lastGraphicsId = 0;
 	private WebGraphics lastUsedG = null;
 	private Set<WebGraphics> usedGs = new HashSet<WebGraphics>();
-	private List<DrawInstruction> instructions = new ArrayList<DrawInstruction>();
 	private List<DrawInstruction> newInstructions = new ArrayList<DrawInstruction>();
 
 	@SuppressWarnings("restriction")
@@ -226,14 +225,21 @@ public class WebImage extends Image {
 				throw new UnsupportedOperationException("This is read only instance of webimage.");
 			}
 
+            @Override
 			public WebImageProto toMessage(DirectDraw dd) {
 				return toMessageInternal(dd);
 			}
 
-		};
+            @Override
+            public boolean isDirty()
+            {
+                return false;
+            }
+        };
 		synchronized (this) {
 			result.id = id;
 			result.newInstructions = newInstructions;
+            newInstructions = new ArrayList<DrawInstruction>();
 			result.chunks = chunks;
 			// extract the areas where images were painted. For saving some
 			// memory by not keeping the full window image
@@ -272,13 +278,8 @@ public class WebImage extends Image {
 		DrawConstantPool imagePool = dd.getImagePool();
 
 		WebImageProto.Builder webImageBuilder = WebImageProto.newBuilder();
-		synchronized (this) { // TODO: remove this and keep only instructions
-			// field
-			instructions = newInstructions;
-			newInstructions = new ArrayList<DrawInstruction>();
-		}
 
-		DirectDrawUtils.optimizeInstructions(dd, instructions);
+		DirectDrawUtils.optimizeInstructions(dd, newInstructions);
 		// System.out.println(instructions + (imageHolder == null ? "" : "*"));
 		// first process chunks
 		if (chunks != null && chunks.size() > 0) {
@@ -310,7 +311,7 @@ public class WebImage extends Image {
 			}
 		}
 		// build proto message
-		for (DrawInstruction ins : instructions) {
+		for (DrawInstruction ins : newInstructions) {
 			for (DrawConstant cons : ins.getArgs()) {
 				if (!(cons instanceof DrawConstant.IntegerConst) && cons != DrawConstant.nullConst) {
 					// update cache
@@ -334,7 +335,7 @@ public class WebImage extends Image {
         return webImageBuilder.build();
 	}
 
-	public void reset() {
+	public synchronized void reset() {
 		imageHolder = null;
 		newInstructions = new ArrayList<DrawInstruction>();
 		chunks = new ArrayList<WebImage>();

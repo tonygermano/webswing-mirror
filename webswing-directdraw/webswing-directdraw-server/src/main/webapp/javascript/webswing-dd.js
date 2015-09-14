@@ -645,7 +645,7 @@
 			if (arg.path != null) {
 			    ctx.beginPath();
 				var path = arg.path;
-				var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+				var bias = calculateBias(ctx, biased);
 				var off = 0;
 				path.type.forEach(function(type, index) {
 					switch (type) {
@@ -681,12 +681,12 @@
 		}
 
 		function pathRectangle(ctx, rect, biased) {
-			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+			var bias = calculateBias(ctx, biased);
 			ctx.rect(rect.x + bias, rect.y + bias, rect.w, rect.h);
 		}
 
 		function pathEllipse(ctx, elli, biased) {
-			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+			var bias = calculateBias(ctx, biased);
 			var kappa = 0.5522847498307933;
 			var pcv = 0.5 + kappa * 0.5;
             var ncv = 0.5 - kappa * 0.5;
@@ -714,7 +714,7 @@
 		}
 
 		function pathRoundRectangle(ctx, rr, biased) {
-			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+			var bias = calculateBias(ctx, biased);
 			var acv = 0.22385762508460333;
 			
 			var pts = getRRCoords([ 0, 0, 0, 0.5 ], rr, bias);
@@ -754,7 +754,7 @@
         }
 
 		function pathArc(ctx, arc, biased) {
-			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+			var bias = calculateBias(ctx, biased);
 			var w = arc.w / 2, h = arc.h / 2, x = arc.x + bias + w, y = arc.y + bias + h;
 			var angStRad = -(arc.start * Math.PI / 180);
 			var ext = -arc.extent;
@@ -795,6 +795,10 @@
 				ctx.closePath();
 				break;
 			}
+		}
+		
+		function calculateBias(ctx, biased) {
+		    return (ctx.lineWidth & 1) && biased ? 0.5 : 0;
 		}
 
 		function getImageData(image) {
