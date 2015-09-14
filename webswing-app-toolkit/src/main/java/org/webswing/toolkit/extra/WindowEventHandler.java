@@ -65,10 +65,11 @@ public class WindowEventHandler {
 							moveWindow(w, o.x, o.y);
 							resizeWindow(w, o.width, o.height);
 						} else {
-							moveWindow(w, 0, 0);
-							resizeWindow(w, size.width, size.height);
 							if (w instanceof JFrame) {
 								((JFrame) w).setExtendedState(JFrame.MAXIMIZED_BOTH);
+							} else {
+								moveWindow(w, 0, 0);
+								resizeWindow(w, size.width, size.height);
 							}
 						}
 						previousSize.put(w, o);

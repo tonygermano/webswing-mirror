@@ -8,9 +8,9 @@ import java.awt.Toolkit;
 import java.awt.peer.FramePeer;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.webswing.toolkit.extra.WindowManager;
-import org.webswing.toolkit.util.Util;
 
 public class WebFramePeer extends WebWindowPeer implements FramePeer {
 
@@ -26,7 +26,19 @@ public class WebFramePeer extends WebWindowPeer implements FramePeer {
 	public void setState(int paramInt) {
 		state = paramInt;
 		if (state == Frame.MAXIMIZED_BOTH) {
-			WindowManager.getInstance().maximizeFrame((JFrame) target);
+			final JFrame f = (JFrame) target;
+			f.setLocation(0, 0);
+			final Dimension originalSize = f.getSize();
+			final Dimension newSize = Toolkit.getDefaultToolkit().getScreenSize();
+			if (!originalSize.equals(newSize)) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						f.setSize(newSize);
+						WindowManager.getInstance().requestRepaintAfterMove(f, new Rectangle(f.getX(), f.getY(), originalSize.width, originalSize.height));
+					}
+				});
+			}
 		}
 	}
 

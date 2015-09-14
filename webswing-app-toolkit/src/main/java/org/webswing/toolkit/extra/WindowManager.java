@@ -1,10 +1,8 @@
 package org.webswing.toolkit.extra;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
@@ -12,7 +10,6 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.WindowActionType;
@@ -166,13 +163,6 @@ public class WindowManager {
 
 	public void setCurrentCursor(String currentCursor) {
 		this.currentCursor = currentCursor;
-	}
-
-	public void maximizeFrame(JFrame f) {
-		Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
-		eventhandler.moveWindow(f, 0, 0);
-		eventhandler.resizeWindow(f, (int) size.getWidth(), (int) size.getHeight());
-		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	}
 
 }
