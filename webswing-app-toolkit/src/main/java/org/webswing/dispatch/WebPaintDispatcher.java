@@ -2,6 +2,7 @@ package org.webswing.dispatch;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -20,6 +21,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
@@ -218,29 +220,39 @@ public class WebPaintDispatcher {
 			WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(w);
 			if (peer != null) {
 				Rectangle b = w.getBounds();
-				// move the window position to same position relative to
-				// previous size;
-				if (oldWidht != 0 && oldHeight != 0) {
-					Dimension current = Util.getWebToolkit().getScreenSize();
-					int xCenterWinPoint = b.x + (b.width / 2);
-					int yCenterWinPoint = b.y + (b.height / 2);
-					boolean xCenterValid = b.width < oldWidht;
-					boolean yCenterValid = b.height < oldHeight;
-					double xrelative = (double) xCenterWinPoint / (double) oldWidht;
-					double yrelative = (double) yCenterWinPoint / (double) oldHeight;
-					int xCenterCurrent = (int) (current.width * xrelative);
-					int yCenterCurrent = (int) (current.height * yrelative);
-					int newx = xCenterCurrent - (b.width / 2);
-					int newy = yCenterCurrent - (b.height / 2);
-					if (xCenterValid || newx < b.x) {
-						b.x = newx >= 0 ? newx : 0;
+				Dimension current = Util.getWebToolkit().getScreenSize();
+
+				if (peer.getTarget() instanceof JFrame) {
+					JFrame frame = (JFrame) peer.getTarget();
+					//maximized window - auto resize
+					if (frame.getExtendedState() == Frame.MAXIMIZED_BOTH) {
+						w.setLocation(0, 0);
+						w.setBounds(0, 0, current.width, current.height);
 					}
-					if (yCenterValid || newy < b.y) {
-						b.y = newy >= 0 ? newy : 0;
+				} else {
+					// move the window position to same position relative to
+					// previous size;
+					if (oldWidht != 0 && oldHeight != 0) {
+						int xCenterWinPoint = b.x + (b.width / 2);
+						int yCenterWinPoint = b.y + (b.height / 2);
+						boolean xCenterValid = b.width < oldWidht;
+						boolean yCenterValid = b.height < oldHeight;
+						double xrelative = (double) xCenterWinPoint / (double) oldWidht;
+						double yrelative = (double) yCenterWinPoint / (double) oldHeight;
+						int xCenterCurrent = (int) (current.width * xrelative);
+						int yCenterCurrent = (int) (current.height * yrelative);
+						int newx = xCenterCurrent - (b.width / 2);
+						int newy = yCenterCurrent - (b.height / 2);
+						if (xCenterValid || newx < b.x) {
+							b.x = newx >= 0 ? newx : 0;
+						}
+						if (yCenterValid || newy < b.y) {
+							b.y = newy >= 0 ? newy : 0;
+						}
+						w.setLocation(b.x, b.y);
 					}
-					w.setLocation(b.x, b.y);
+					peer.setBounds(b.x, b.y, b.width, b.height, 0);
 				}
-				peer.setBounds(b.x, b.y, b.width, b.height, 0);
 			}
 		}
 	}

@@ -193,6 +193,10 @@ public abstract class WebToolkit extends SunToolkit {
 		return true;
 	}
 
+	public boolean isFrameStateSupported(int state) throws HeadlessException {
+		return true;
+	}
+
 	public KeyboardFocusManagerPeer createKeyboardFocusManagerPeer(KeyboardFocusManager paramKeyboardFocusManager) throws HeadlessException {
 		return new WebKeyboardFocusManagerPeer();
 	}

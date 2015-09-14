@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.WindowActionType;
@@ -66,6 +67,9 @@ public class WindowEventHandler {
 						} else {
 							moveWindow(w, 0, 0);
 							resizeWindow(w, size.width, size.height);
+							if (w instanceof JFrame) {
+								((JFrame) w).setExtendedState(JFrame.MAXIMIZED_BOTH);
+							}
 						}
 						previousSize.put(w, o);
 					}
@@ -130,11 +134,14 @@ public class WindowEventHandler {
 		}
 	}
 
-	private void moveWindow(Window w, int x, int y) {
+	public void moveWindow(Window w, int x, int y) {
 		w.setLocation(x, y);
 	}
 
-	private void resizeWindow(final Window w, int width, int height) {
+	public void resizeWindow(final Window w, int width, int height) {
+		if (w instanceof JFrame) {
+			((JFrame) w).setExtendedState(JFrame.NORMAL);
+		}
 		final Dimension originalSize = w.getSize();
 		final Dimension newSize = new Dimension(width, height);
 		validateSize(w, newSize);
