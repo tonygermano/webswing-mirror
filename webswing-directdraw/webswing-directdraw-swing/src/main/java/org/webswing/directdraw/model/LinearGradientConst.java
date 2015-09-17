@@ -2,6 +2,7 @@ package org.webswing.directdraw.model;
 
 import java.awt.*;
 import java.awt.MultipleGradientPaint.*;
+import java.awt.geom.*;
 import java.util.*;
 
 import org.webswing.directdraw.*;
@@ -18,9 +19,21 @@ public class LinearGradientConst extends DrawConstant {
 
 	public LinearGradientConst(DirectDraw context, GradientPaint gradientPaint) {
 		super(context);
-        this.linearGradientPaint = new LinearGradientPaint(gradientPaint.getPoint1(), gradientPaint.getPoint2(), 
-            new float[] {0f, 1f}, new Color[] {gradientPaint.getColor1(), gradientPaint.getColor2()},
-            gradientPaint.isCyclic() ? CycleMethod.REPEAT : CycleMethod.NO_CYCLE);
+        if (gradientPaint.getPoint1().equals(gradientPaint.getPoint2())) {
+            /* such LinearGradientPaint should behave like a single color
+             * maybe it would be good to create a separate class for GradientPaint
+             * to avoid this workaround as canvas handles zero-vector gradients correctly
+             */
+            Color color = gradientPaint.getColor1();
+            Point2D point = gradientPaint.getPoint1();
+            this.linearGradientPaint = new LinearGradientPaint(point, new Point2D.Double(point.getX(), point.getY() + 1),
+                new float[] {0f, 1f}, new Color[] {color, color},
+                CycleMethod.NO_CYCLE);
+        } else {
+            this.linearGradientPaint = new LinearGradientPaint(gradientPaint.getPoint1(), gradientPaint.getPoint2(),
+                new float[] {0f, 1f}, new Color[] {gradientPaint.getColor1(), gradientPaint.getColor2()},
+                gradientPaint.isCyclic() ? CycleMethod.REPEAT : CycleMethod.NO_CYCLE);
+        }
 	}
 
 	@Override
