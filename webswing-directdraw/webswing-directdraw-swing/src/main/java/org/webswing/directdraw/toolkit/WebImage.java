@@ -119,7 +119,7 @@ public class WebImage extends Image {
 
 	public boolean isDirty() {
 		synchronized (this) {
-            return newInstructions.size() != 0;
+            return !newInstructions.isEmpty();
 		}
 	}
 
@@ -127,16 +127,16 @@ public class WebImage extends Image {
 		if (g != null && g.isDisposed()) {
 			throw new RuntimeException("Drawing to disposed graphics.");
 		}
-		if (in.getInstruction().equals(InstructionProto.COPY_AREA) && newInstructions.size() > 0) {
-			// copy area instruction must be isolated and always as a first
-			// instruction
-			WebImage newChunk = extractReadOnlyWebImage(true);
-			chunks = newChunk.chunks;
-			newChunk.chunks = null;
-			chunks.add(newChunk);
-		}
-		DrawInstructionFactory factory = context.getInstructionFactory();
-		synchronized (this) {
+        synchronized (this) {
+            if (in.getInstruction().equals(InstructionProto.COPY_AREA) && !newInstructions.isEmpty()) {
+                // copy area instruction must be isolated and always as a first
+                // instruction
+                WebImage newChunk = extractReadOnlyWebImage(true);
+                chunks = newChunk.chunks;
+                newChunk.chunks = null;
+                chunks.add(newChunk);
+            }
+            DrawInstructionFactory factory = context.getInstructionFactory();
 			if (lastUsedG != g) {
 				if (!usedGs.contains(g)) {
 					newInstructions.add(factory.createGraphics(g));
@@ -158,7 +158,6 @@ public class WebImage extends Image {
     
     public void dispose(WebGraphics g) {
         synchronized (this) {
-            newInstructions.add(context.getInstructionFactory().disposeGraphics(g));
             usedGs.remove(g);
         }
     }
@@ -335,12 +334,14 @@ public class WebImage extends Image {
         return webImageBuilder.build();
 	}
 
-	public synchronized void reset() {
-		imageHolder = null;
-		newInstructions = new ArrayList<DrawInstruction>();
-		chunks = new ArrayList<WebImage>();
-		lastUsedG = null;
-		usedGs.clear();
+	public void reset() {
+        synchronized (this) {
+            imageHolder = null;
+            newInstructions = new ArrayList<DrawInstruction>();
+            chunks = new ArrayList<WebImage>();
+            lastUsedG = null;
+            usedGs.clear();
+        }
 	}
 
 	public WebImageProto toMessage(DirectDraw dd) {
