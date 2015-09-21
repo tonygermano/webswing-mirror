@@ -2,20 +2,17 @@ package org.webswing.directdraw.model;
 
 import java.awt.*;
 import java.awt.geom.*;
-import java.util.*;
+import java.util.List;
 
 import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.PathProto.*;
-import org.webswing.directdraw.util.*;
 
-public class PathConst extends DrawConstant {
+public class PathConst extends MutableDrawConstantHolder<Shape, PathProto>
+{
 
-	private Shape shape;
-
-	public PathConst(DirectDraw context, Shape shape) {
-		super(context);
-        this.shape = shape;
+	public PathConst(DirectDraw context, Shape value) {
+		super(context, value);
 	}
 
 	@Override
@@ -24,9 +21,9 @@ public class PathConst extends DrawConstant {
 	}
 
     @Override
-    public Object toMessage() {
+    public PathProto buildMessage(Shape value) {
         PathProto.Builder model = PathProto.newBuilder();
-        PathIterator iterator = shape.getPathIterator(null);
+        PathIterator iterator = value.getPathIterator(null);
         if (iterator != null) {
             model.setWindingOdd(iterator.getWindingRule() == PathIterator.WIND_EVEN_ODD);
             double[] points = new double[6];
@@ -59,56 +56,31 @@ public class PathConst extends DrawConstant {
     }
 
     @Override
-    public int hashCode() {
-        int result = 1;
-        PathIterator iterator = shape.getPathIterator(null);
-        if (iterator != null) {
-            result = 31 * result + iterator.getWindingRule();
-            double[] points = new double[6];
-            while (!iterator.isDone()) {
-                int type = iterator.currentSegment(points);
-                result = 31 * result + type;
-                int pointCount = getPointCount(type);
-                for (int i = 0; i < pointCount; i ++) {
-                    result = 31 * result + DirectDrawUtils.hashCode(points[i]);
-                }
-                iterator.next();
-            }
-        }
-        return result;
+    public Shape getValue() {
+        Path2D.Float path = new Path2D.Float(message.getWindingOdd() ? PathIterator.WIND_EVEN_ODD : PathIterator.WIND_NON_ZERO);
+		List<Integer> pts = message.getPointsList();
+		int offset = 0;
+		for (SegmentTypeProto type : message.getTypeList()) {
+			int pointCount = type == SegmentTypeProto.CLOSE ? 0 : type == SegmentTypeProto.MOVE || type == SegmentTypeProto.LINE ? 2 : type == SegmentTypeProto.QUAD ? 4 : type == SegmentTypeProto.CUBIC ? 6 : 0;
+			switch (type) {
+			case MOVE:
+				path.moveTo(pts.get(offset), pts.get(offset + 1));
+				break;
+			case LINE:
+				path.lineTo(pts.get(offset), pts.get(offset + 1));
+				break;
+			case QUAD:
+				path.quadTo(pts.get(offset), pts.get(offset + 1), pts.get(offset + 2), pts.get(offset + 3));
+				break;
+			case CUBIC:
+				path.curveTo(pts.get(offset), pts.get(offset + 1), pts.get(offset + 2), pts.get(offset + 3), pts.get(offset + 4), pts.get(offset + 5));
+				break;
+			case CLOSE:
+				path.closePath();
+				break;
+			}
+			offset += pointCount;
+		}
+		return path;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (!(o instanceof PathConst)) {
-            return false;
-        }
-        PathIterator iterator = shape.getPathIterator(null);
-        PathIterator other = ((PathConst) o).shape.getPathIterator(null);
-        if (iterator != null && other != null) {
-            if (iterator.getWindingRule() != other.getWindingRule()) {
-                return false;
-            }
-            double[] points = new double[6];
-            double[] otherPoints = new double[6];
-            while (!iterator.isDone() && !other.isDone()) {
-                iterator.currentSegment(points);
-                other.currentSegment(otherPoints);
-                if (!Arrays.equals(points, otherPoints)) {
-                    return false;
-                }
-                iterator.next();
-                other.next();
-            }
-            return iterator.isDone() == other.isDone();
-        }
-        return iterator == null && other == null;
-    }
-
-    public Shape getShape() {
-        return shape;
-	}
 }

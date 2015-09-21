@@ -6,13 +6,11 @@ import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.ArcProto.*;
 
-public class ArcConst extends DrawConstant {
+public class ArcConst extends MutableDrawConstantHolder<Arc2D, ArcProto>
+{
 
-    private Arc2D arc;
-    
-	public ArcConst(DirectDraw context, Arc2D arc) {
-		super(context);
-        this.arc = arc;
+	public ArcConst(DirectDraw context, Arc2D value) {
+		super(context, value);
 	}
 
 	@Override
@@ -21,30 +19,20 @@ public class ArcConst extends DrawConstant {
 	}
 
     @Override
-    public Object toMessage() {
+    public ArcProto buildMessage(Arc2D value) {
         ArcProto.Builder model = ArcProto.newBuilder();
-        model.setX((int) arc.getX());
-        model.setY((int) arc.getY());
-        model.setW((int) arc.getWidth());
-        model.setH((int) arc.getHeight());
-        model.setStart((int) arc.getAngleStart());
-        model.setExtent((int) arc.getAngleExtent());
-        model.setType(ArcTypeProto.valueOf(arc.getArcType()));
+        model.setX((int) value.getX());
+        model.setY((int) value.getY());
+        model.setW((int) value.getWidth());
+        model.setH((int) value.getHeight());
+        model.setStart((int) value.getAngleStart());
+        model.setExtent((int) value.getAngleExtent());
+        model.setType(ArcTypeProto.valueOf(value.getArcType()));
         return model.build();
     }
 
     @Override
-    public int hashCode() {
-        return arc.hashCode();
+    public Arc2D getValue() {
+        return new Arc2D.Float(message.getX(), message.getY(), message.getW(), message.getH(), message.getStart(), message.getExtent(), message.getType().getNumber());
     }
-
-    @Override
-    public boolean equals(Object o) {
-        return o == this ||
-            o instanceof ArcConst && arc.equals(((ArcConst) o).arc);
-    }
-
-    public Arc2D getArc() {
-		return arc;
-	}
 }

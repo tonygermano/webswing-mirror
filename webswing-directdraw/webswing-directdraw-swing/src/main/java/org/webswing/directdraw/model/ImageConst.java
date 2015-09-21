@@ -4,19 +4,20 @@ import java.awt.image.*;
 import java.io.*;
 import java.util.*;
 
+import javax.imageio.*;
+
 import com.google.protobuf.*;
 import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 
-public class ImageConst extends DrawConstant {
+public class ImageConst extends ImmutableDrawConstantHolder<byte[]>
+{
 
-    private byte[] image;
-    private long hash;
+    protected long hash;
     
-	public ImageConst(DirectDraw context, BufferedImage image) {
-		super(context);
-        this.image = context.getServices().getPngImage(image);
-        this.hash = context.getServices().computeHash(image);
+	public ImageConst(DirectDraw context, BufferedImage value) {
+		super(context, context.getServices().getPngImage(value));
+        this.hash = context.getServices().computeHash(value);
 	}
 
 	@Override
@@ -25,13 +26,9 @@ public class ImageConst extends DrawConstant {
 	}
 
     @Override
-    public Object toMessage() {
+    public ImageProto toMessage() {
         ImageProto.Builder model = ImageProto.newBuilder();
-        try {
-            model.setData(ByteString.readFrom(new ByteArrayInputStream(image)));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        model.setData(ByteString.copyFrom(value));
         return model.build();
     }
 
@@ -43,6 +40,15 @@ public class ImageConst extends DrawConstant {
     @Override
     public boolean equals(Object o) {
         return o == this ||
-            o instanceof ImageConst && Arrays.equals(image, ((ImageConst) o).image);
+            o instanceof ImageConst && Arrays.equals(value, ((ImageConst) o).value);
+    }
+    
+    public static BufferedImage getValue(ImageProto proto) {
+        try {
+            return ImageIO.read(proto.getData().newInput());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

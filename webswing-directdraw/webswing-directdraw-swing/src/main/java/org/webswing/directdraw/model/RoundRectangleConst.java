@@ -5,13 +5,11 @@ import java.awt.geom.*;
 import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 
-public class RoundRectangleConst extends DrawConstant {
+public class RoundRectangleConst extends MutableDrawConstantHolder<RoundRectangle2D, RoundRectangleProto>
+{
 
-    private RoundRectangle2D roundRectangle;
-    
-	public RoundRectangleConst(DirectDraw context, RoundRectangle2D roundRectangle) {
-		super(context);
-        this.roundRectangle = roundRectangle;
+	public RoundRectangleConst(DirectDraw context, RoundRectangle2D value) {
+		super(context, value);
 	}
 
 	@Override
@@ -20,29 +18,19 @@ public class RoundRectangleConst extends DrawConstant {
 	}
 
     @Override
-    public Object toMessage() {
+    public RoundRectangleProto buildMessage(RoundRectangle2D value) {
         RoundRectangleProto.Builder model = RoundRectangleProto.newBuilder();
-        model.setX((int) roundRectangle.getX());
-        model.setY((int) roundRectangle.getY());
-        model.setW((int) roundRectangle.getWidth());
-        model.setH((int) roundRectangle.getHeight());
-        model.setArcH((int) roundRectangle.getArcHeight());
-        model.setArcW((int) roundRectangle.getArcWidth());
+        model.setX((int) value.getX());
+        model.setY((int) value.getY());
+        model.setW((int) value.getWidth());
+        model.setH((int) value.getHeight());
+        model.setArcH((int) value.getArcHeight());
+        model.setArcW((int) value.getArcWidth());
         return model.build();
     }
 
     @Override
-    public int hashCode() {
-        return roundRectangle.hashCode();
+    public RoundRectangle2D getValue() {
+        return new RoundRectangle2D.Float(message.getX(), message.getY(), message.getW(), message.getH(), message.getArcW(), message.getArcH());
     }
-
-    @Override
-    public boolean equals(Object o) {
-        return o == this ||
-            o instanceof RoundRectangleConst && roundRectangle.equals(((RoundRectangleConst) o).roundRectangle);
-    }
-
-    public RoundRectangle2D getRoundRectangle() {
-		return roundRectangle;
-	}
 }

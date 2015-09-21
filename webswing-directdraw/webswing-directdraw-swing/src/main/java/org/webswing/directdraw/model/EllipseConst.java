@@ -5,42 +5,30 @@ import java.awt.geom.*;
 import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 
-public class EllipseConst extends DrawConstant {
+public class EllipseConst extends MutableDrawConstantHolder<Ellipse2D, EllipseProto>
+{
 
-    private Ellipse2D ellipse;
-    
-	public EllipseConst(DirectDraw context, Ellipse2D ellipse) {
-		super(context);
-        this.ellipse = ellipse;
+	public EllipseConst(DirectDraw context, Ellipse2D value) {
+		super(context, value);
 	}
 
-	@Override
+    @Override
+    protected EllipseProto buildMessage(Ellipse2D value) {
+        EllipseProto.Builder model = EllipseProto.newBuilder();
+        model.setX((int) value.getX());
+        model.setY((int) value.getY());
+        model.setW((int) value.getWidth());
+        model.setH((int) value.getHeight());
+        return model.build();
+    }
+
+    @Override
 	public String getFieldName() {
 		return "ellipse";
 	}
 
     @Override
-    public Object toMessage() {
-        EllipseProto.Builder model = EllipseProto.newBuilder();
-        model.setX((int) ellipse.getX());
-        model.setY((int) ellipse.getY());
-        model.setW((int) ellipse.getWidth());
-        model.setH((int) ellipse.getHeight());
-        return model.build();
+    public Ellipse2D getValue() {
+        return new Ellipse2D.Float(message.getX(), message.getY(), message.getW(), message.getH());
     }
-
-    @Override
-    public int hashCode() {
-        return ellipse.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return o == this ||
-            o instanceof EllipseConst && ellipse.equals(((EllipseConst) o).ellipse);
-    }
-
-    public Ellipse2D getEllipse() {
-		return ellipse;
-	}
 }

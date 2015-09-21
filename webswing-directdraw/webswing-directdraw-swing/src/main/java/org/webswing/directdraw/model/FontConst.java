@@ -8,15 +8,13 @@ import org.webswing.directdraw.proto.Directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.FontProto.*;
 import org.webswing.directdraw.util.*;
 
-public class FontConst extends DrawConstant {
+public class FontConst extends ImmutableDrawConstantHolder<Font>
+{
 
 	private static Map<Font, String> families = new HashMap<Font, String>();
 
-    private Font font;
-    
-	public FontConst(DirectDraw context, Font font) {
-		super(context);
-		this.font = font;
+	public FontConst(DirectDraw context, Font value) {
+		super(context, value);
 	}
 
 	@Override
@@ -25,34 +23,19 @@ public class FontConst extends DrawConstant {
 	}
 
     @Override
-    public Object toMessage() {
+    public FontProto toMessage() {
         FontProto.Builder model = FontProto.newBuilder();
-        String family = getFamily(font);
+        String family = getFamily(value);
         model.setFamily(DirectDrawUtils.windowsFonts.getProperty(family, family));
-        model.setSize(font.getSize());
-        model.setStyle(StyleProto.valueOf(font.getStyle()));
-        if (font.isTransformed()) {
-            model.setTransform((TransformProto) new TransformConst(getContext(), font.getTransform()).toMessage());
+        model.setSize(value.getSize());
+        model.setStyle(StyleProto.valueOf(value.getStyle()));
+        if (value.isTransformed()) {
+            model.setTransform(new TransformConst(getContext(), value.getTransform()).toMessage());
         }
         return model.build();
     }
 
-    @Override
-    public int hashCode() {
-        return font.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return o == this ||
-            o instanceof FontConst && font.equals(((FontConst) o).font);
-    }
-
-    public Font getFont() {
-		return font;
-	}
-
-	private static String getFamily(Font font) {
+    private static String getFamily(Font font) {
 		String family = families.get(font);
 		if (family == null)
 		{

@@ -2,13 +2,11 @@ package org.webswing.directdraw.model;
 
 import org.webswing.directdraw.*;
 
-public class StringConst extends DrawConstant {
+public class StringConst extends ImmutableDrawConstantHolder<String>
+{
 
-    private String string;
-    
-	public StringConst(DirectDraw context, String string) {
-		super(context);
-        this.string = string;
+	public StringConst(DirectDraw context, String value) {
+		super(context, value);
 	}
 
 	@Override
@@ -17,22 +15,7 @@ public class StringConst extends DrawConstant {
 	}
 
     @Override
-    public Object toMessage() {
-        return string;
+    public String toMessage() {
+        return getValue();
     }
-
-    @Override
-    public int hashCode() {
-        return string.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return o == this ||
-            o instanceof StringConst && string.equals(((StringConst) o).string);
-    }
-
-    public String getString() {
-	    return string;
-	}
 }

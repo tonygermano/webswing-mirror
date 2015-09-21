@@ -43,7 +43,7 @@ public class DrawInstructionFactory {
 	}
 
 	public DrawInstruction createGraphics(WebGraphics g) {
-		DrawConstant gid = new DrawConstant.IntegerConst(g.getId());
+		DrawConstant gid = new IntegerConst(g.getId());
 		DrawConstant transformConst =  new TransformConst(ctx, g.getTransform());
 		DrawConstant compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
 		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
@@ -53,11 +53,11 @@ public class DrawInstructionFactory {
 	}
 
 	public DrawInstruction disposeGraphics(WebGraphics g) {
-		return new DrawInstruction(InstructionProto.GRAPHICS_DISPOSE, new DrawConstant.IntegerConst(g.getId()));
+		return new DrawInstruction(InstructionProto.GRAPHICS_DISPOSE, new IntegerConst(g.getId()));
 	}
 
 	public DrawInstruction switchGraphics(WebGraphics g) {
-		return new DrawInstruction(InstructionProto.GRAPHICS_SWITCH, new DrawConstant.IntegerConst(g.getId()));
+		return new DrawInstruction(InstructionProto.GRAPHICS_SWITCH, new IntegerConst(g.getId()));
 	}
 
 	public DrawInstruction transform(AffineTransform at) {
@@ -73,7 +73,7 @@ public class DrawInstructionFactory {
         if (p instanceof Color) {
             return new ColorConst(ctx, (Color) p);
         } else if (p instanceof GradientPaint) {
-            return new LinearGradientConst(ctx, (GradientPaint) p);
+            return new GradientConst(ctx, (GradientPaint) p);
         } else if (p instanceof LinearGradientPaint) {
             return new LinearGradientConst(ctx, (LinearGradientPaint) p);
         } else if (p instanceof RadialGradientPaint) {

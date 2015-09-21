@@ -261,7 +261,7 @@ public class WebImage extends Image {
 				DrawConstant[] constants = ins.getArgs();
 				if (ins.getInstruction() == InstructionProto.DRAW_IMAGE) {
                     Rectangle hold = new Rectangle(imageHolder.getWidth(), imageHolder.getHeight());
-					Rectangle2D bounds = hold.createIntersection(RenderUtil.getShape(constants[0]).getBounds());
+					Rectangle2D bounds = hold.createIntersection(((Shape) constants[0].getValue()).getBounds());
 					BufferedImage subImage = new BufferedImage((int) bounds.getWidth(), (int) bounds.getHeight(), BufferedImage.TYPE_INT_ARGB);
 					Graphics sig = subImage.getGraphics();
 					sig.drawImage(imageHolder.getSubimage((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight()), 0, 0, null);
@@ -295,7 +295,7 @@ public class WebImage extends Image {
 				// compute image hash and link containing image
 				BufferedImage subImage = partialImageMap.get(ins);
                 ImageConst imageConst = new ImageConst(context, subImage);
-				int[] points = ((PointsConst) constants[1]).getPoints();
+                int[] points = ((PointsConst) constants[1]).getValue();
 				if (!imagePool.isInCache(imageConst)) {
 					imagePool.addToCache(imageConst);
 					DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
@@ -313,7 +313,7 @@ public class WebImage extends Image {
 		// build proto message
 		for (DrawInstruction ins : newInstructions) {
 			for (DrawConstant cons : ins.getArgs()) {
-				if (!(cons instanceof DrawConstant.IntegerConst) && cons != DrawConstant.nullConst) {
+				if (!(cons instanceof IntegerConst) && cons != DrawConstant.nullConst) {
 					// update cache
 					if (!constantPool.isInCache(cons)) {
 						constantPool.addToCache(cons);

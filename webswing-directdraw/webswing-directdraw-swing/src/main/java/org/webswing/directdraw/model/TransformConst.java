@@ -5,13 +5,11 @@ import java.awt.geom.*;
 import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 
-public class TransformConst extends DrawConstant {
+public class TransformConst extends MutableDrawConstantHolder<AffineTransform, TransformProto>
+{
 
-    private AffineTransform transform;
-    
-	public TransformConst(DirectDraw context, AffineTransform transform) {
-		super(context);
-		this.transform = transform;
+	public TransformConst(DirectDraw context, AffineTransform value) {
+		super(context, value);
 	}
 
 	@Override
@@ -20,41 +18,31 @@ public class TransformConst extends DrawConstant {
 	}
 
     @Override
-    public Object toMessage() {
+    public TransformProto buildMessage(AffineTransform value) {
         TransformProto.Builder model = TransformProto.newBuilder();
-        if (transform.getScaleX() != 1) {
-            model.setM00((float) transform.getScaleX());
+        if (value.getScaleX() != 1) {
+            model.setM00((float) value.getScaleX());
         }
-        if (transform.getShearY() != 0) {
-            model.setM10((float) transform.getShearY());
+        if (value.getShearY() != 0) {
+            model.setM10((float) value.getShearY());
         }
-        if (transform.getShearX() != 0) {
-            model.setM01((float) transform.getShearX());
+        if (value.getShearX() != 0) {
+            model.setM01((float) value.getShearX());
         }
-        if (transform.getScaleY() != 1) {
-            model.setM11((float) transform.getScaleY());
+        if (value.getScaleY() != 1) {
+            model.setM11((float) value.getScaleY());
         }
-        if (transform.getTranslateX() != 0) {
-            model.setM02((float) transform.getTranslateX());
+        if (value.getTranslateX() != 0) {
+            model.setM02((float) value.getTranslateX());
         }
-        if (transform.getTranslateY() != 0) {
-            model.setM12((float) transform.getTranslateY());
+        if (value.getTranslateY() != 0) {
+            model.setM12((float) value.getTranslateY());
         }
         return model.build();
     }
 
     @Override
-    public int hashCode() {
-        return transform.hashCode();
+    public AffineTransform getValue() {
+        return new AffineTransform(message.getM00(), message.getM10(), message.getM01(), message.getM11(), message.getM02(), message.getM12());
     }
-
-    @Override
-    public boolean equals(Object o) {
-        return o == this ||
-            o instanceof TransformConst && transform.equals(((TransformConst) o).transform);
-    }
-
-    public AffineTransform getAffineTransform() {
-		return transform;
-	}
 }

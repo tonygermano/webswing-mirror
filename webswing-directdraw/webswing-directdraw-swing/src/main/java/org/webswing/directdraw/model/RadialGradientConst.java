@@ -7,13 +7,11 @@ import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 import org.webswing.directdraw.util.*;
 
-public class RadialGradientConst extends DrawConstant {
+public class RadialGradientConst extends ImmutableDrawConstantHolder<RadialGradientPaint>
+{
 
-    private RadialGradientPaint radialGradientPaint;
-    
-	public RadialGradientConst(DirectDraw context, RadialGradientPaint radialGradientPaint) {
-		super(context);
-        this.radialGradientPaint = radialGradientPaint;
+	public RadialGradientConst(DirectDraw context, RadialGradientPaint value) {
+		super(context, value);
 	}
 
 	@Override
@@ -22,32 +20,32 @@ public class RadialGradientConst extends DrawConstant {
 	}
 
     @Override
-    public Object toMessage() {
+    public RadialGradientProto toMessage() {
         RadialGradientProto.Builder model = RadialGradientProto.newBuilder();
-        model.setXCenter((int) radialGradientPaint.getCenterPoint().getX());
-        model.setYCenter((int) radialGradientPaint.getCenterPoint().getY());
-        model.setXFocus((int) radialGradientPaint.getFocusPoint().getX());
-        model.setYFocus((int) radialGradientPaint.getFocusPoint().getY());
-        model.setRadius((int) radialGradientPaint.getRadius());
-        for (Color color : radialGradientPaint.getColors()) {
+        model.setXCenter((int) value.getCenterPoint().getX());
+        model.setYCenter((int) value.getCenterPoint().getY());
+        model.setXFocus((int) value.getFocusPoint().getX());
+        model.setYFocus((int) value.getFocusPoint().getY());
+        model.setRadius((int) value.getRadius());
+        for (Color color : value.getColors()) {
             model.addColors(ColorConst.toRGBA(color));
         }
-        for (float fraction : radialGradientPaint.getFractions()) {
+        for (float fraction : value.getFractions()) {
             model.addFractions(fraction);
         }
-        model.setRepeat(CyclicMethodProto.valueOf(radialGradientPaint.getCycleMethod().name()));
+        model.setRepeat(CyclicMethodProto.valueOf(value.getCycleMethod().name()));
         return model.build();
     }
 
     @Override
     public int hashCode() {
         int result = 1;
-        result = 31 * result + radialGradientPaint.getCenterPoint().hashCode();
-        result = 31 * result + radialGradientPaint.getFocusPoint().hashCode();
-        result = 31 * result + DirectDrawUtils.hashCode(radialGradientPaint.getRadius());
-        result = 31 * result + Arrays.hashCode(radialGradientPaint.getColors());
-        result = 31 * result + Arrays.hashCode(radialGradientPaint.getFractions());
-        result = 31 * result + radialGradientPaint.getCycleMethod().hashCode();
+        result = 31 * result + value.getCenterPoint().hashCode();
+        result = 31 * result + value.getFocusPoint().hashCode();
+        result = 31 * result + DirectDrawUtils.hashCode(value.getRadius());
+        result = 31 * result + Arrays.hashCode(value.getColors());
+        result = 31 * result + Arrays.hashCode(value.getFractions());
+        result = 31 * result + value.getCycleMethod().hashCode();
         return result;
     }
 
@@ -60,15 +58,11 @@ public class RadialGradientConst extends DrawConstant {
             return false;
         }
         RadialGradientConst other = (RadialGradientConst) o;
-        return radialGradientPaint.getCenterPoint().equals(other.radialGradientPaint.getCenterPoint()) &&
-            radialGradientPaint.getFocusPoint().equals(other.radialGradientPaint.getFocusPoint()) &&
-            Float.floatToIntBits(radialGradientPaint.getRadius()) == Float.floatToIntBits(other.radialGradientPaint.getRadius()) &&
-            Arrays.equals(radialGradientPaint.getColors(), other.radialGradientPaint.getColors()) &&
-            Arrays.equals(radialGradientPaint.getFractions(), other.radialGradientPaint.getFractions()) &&
-            radialGradientPaint.getCycleMethod() == other.radialGradientPaint.getCycleMethod();
+        return value.getCenterPoint().equals(other.value.getCenterPoint()) &&
+            value.getFocusPoint().equals(other.value.getFocusPoint()) &&
+            Float.floatToIntBits(value.getRadius()) == Float.floatToIntBits(other.value.getRadius()) &&
+            Arrays.equals(value.getColors(), other.value.getColors()) &&
+            Arrays.equals(value.getFractions(), other.value.getFractions()) &&
+            value.getCycleMethod() == other.value.getCycleMethod();
     }
-
-    public RadialGradientPaint getRadialGradientPaint() {
-		return radialGradientPaint;
-	}
 }

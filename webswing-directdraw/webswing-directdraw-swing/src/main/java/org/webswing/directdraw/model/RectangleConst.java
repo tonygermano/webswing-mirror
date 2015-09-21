@@ -5,13 +5,11 @@ import java.awt.geom.*;
 import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 
-public class RectangleConst extends DrawConstant {
+public class RectangleConst extends MutableDrawConstantHolder<Rectangle2D, RectangleProto>
+{
 
-    private Rectangle2D rectangle;
-    
-	public RectangleConst(DirectDraw context, Rectangle2D rectangle) {
-		super(context);
-        this.rectangle = rectangle;
+	public RectangleConst(DirectDraw context, Rectangle2D value) {
+		super(context, value);
 	}
 
 	@Override
@@ -20,27 +18,21 @@ public class RectangleConst extends DrawConstant {
 	}
 
     @Override
-    public Object toMessage() {
+    public RectangleProto buildMessage(Rectangle2D value) {
         RectangleProto.Builder model = RectangleProto.newBuilder();
-        model.setX((int) rectangle.getX());
-        model.setY((int) rectangle.getY());
-        model.setW((int) rectangle.getWidth());
-        model.setH((int) rectangle.getHeight());
+        model.setX((int) value.getX());
+        model.setY((int) value.getY());
+        model.setW((int) value.getWidth());
+        model.setH((int) value.getHeight());
         return model.build();
     }
 
     @Override
-    public int hashCode() {
-        return rectangle.hashCode();
+    public Rectangle2D getValue() {
+        return getValue(message);
     }
-
-    @Override
-    public boolean equals(Object o) {
-        return o == this ||
-            o instanceof RectangleConst && rectangle.equals(((RectangleConst) o).rectangle);
+    
+    public static Rectangle2D getValue(RectangleProto proto) {
+        return new Rectangle2D.Float(proto.getX(), proto.getY(), proto.getW(), proto.getH());
     }
-
-    public Rectangle2D getRectangle() {
-        return rectangle;
-	}
 }

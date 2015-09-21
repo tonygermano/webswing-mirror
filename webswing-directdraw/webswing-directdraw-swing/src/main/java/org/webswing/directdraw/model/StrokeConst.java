@@ -6,13 +6,11 @@ import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.StrokeProto.*;
 
-public class StrokeConst extends DrawConstant {
+public class StrokeConst extends ImmutableDrawConstantHolder<BasicStroke>
+{
 
-    private BasicStroke stroke;
-    
-	public StrokeConst(DirectDraw context, BasicStroke stroke) {
-		super(context);
-        this.stroke = stroke;
+	public StrokeConst(DirectDraw context, BasicStroke value) {
+		super(context, value);
 	}
 
 	@Override
@@ -21,33 +19,18 @@ public class StrokeConst extends DrawConstant {
 	}
 
     @Override
-    public Object toMessage() {
+    public StrokeProto toMessage() {
         StrokeProto.Builder model = StrokeProto.newBuilder();
-        model.setWidth(stroke.getLineWidth());
-        model.setMiterLimit(stroke.getMiterLimit());
-        model.setJoin(StrokeJoinProto.valueOf(stroke.getLineJoin()));
-        model.setCap(StrokeCapProto.valueOf(stroke.getEndCap()));
-        model.setDashOffset(stroke.getDashPhase());
-        if (stroke.getDashArray() != null && stroke.getDashArray().length > 0) {
-            for (float d : stroke.getDashArray()) {
+        model.setWidth(value.getLineWidth());
+        model.setMiterLimit(value.getMiterLimit());
+        model.setJoin(StrokeJoinProto.valueOf(value.getLineJoin()));
+        model.setCap(StrokeCapProto.valueOf(value.getEndCap()));
+        model.setDashOffset(value.getDashPhase());
+        if (value.getDashArray() != null && value.getDashArray().length > 0) {
+            for (float d : value.getDashArray()) {
                 model.addDash(d);
             }
         }
         return model.build();
     }
-
-    @Override
-    public int hashCode() {
-        return stroke.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return o == this ||
-            o instanceof StrokeConst && stroke.equals(((StrokeConst) o).stroke);
-    }
-
-    public BasicStroke getStroke() {
-		return stroke;
-	}
 }

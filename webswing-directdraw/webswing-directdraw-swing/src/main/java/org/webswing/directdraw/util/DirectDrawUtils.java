@@ -101,9 +101,9 @@ public class DirectDrawUtils {
 		for (DrawInstruction current : instructions ) {
 			if (current.getInstruction().equals(InstructionProto.TRANSFORM)) {
 				if (mergedTx == null) {
-					mergedTx = ((TransformConst) current.getArgs()[0]).getAffineTransform();
+                    mergedTx = ((TransformConst) current.getArgs()[0]).getValue();
 				} else {
-					mergedTx.concatenate(((TransformConst) current.getArgs()[0]).getAffineTransform());
+                    mergedTx.concatenate(((TransformConst) current.getArgs()[0]).getValue());
 				}
 			} else if (current.getInstruction().equals(InstructionProto.SET_STROKE)) {
 				mergedStroke = current.getArgs()[0];
@@ -121,7 +121,7 @@ public class DirectDrawUtils {
 				}
 				graphicsCreate = isGraphicsCreateInst ? current : graphicsCreateMap.get(current.getArgs()[0].getId());
 				if (graphicsCreate != null) {
-					mergedTx = ((TransformConst) graphicsCreate.getArgs()[1]).getAffineTransform();
+                    mergedTx = ((TransformConst) graphicsCreate.getArgs()[1]).getValue();
 					mergedStroke = graphicsCreate.getArgs()[2];
 					mergedComposite = graphicsCreate.getArgs()[3];
 					mergedPaint = graphicsCreate.getArgs()[4];
@@ -183,5 +183,9 @@ public class DirectDrawUtils {
 
     public static int hashCode(float value) {
         return Float.floatToIntBits(value);
+    }
+
+    public static int hashCode(boolean value) {
+        return value ? 1231 : 1237;
     }
 }

@@ -11,15 +11,11 @@ import java.awt.*;
 import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 
-public class TextureConst extends DrawConstant {
+public class TextureConst extends MutableDrawConstantHolder<TexturePaint, TextureProto>
+{
     
-    private TexturePaint texturePaint;
-    private ImageConst texture;
-    
-    public TextureConst(DirectDraw context, TexturePaint texturePaint) {
-        super(context);
-        this.texturePaint = texturePaint;
-        this.texture = new ImageConst(getContext(), texturePaint.getImage());
+    public TextureConst(DirectDraw context, TexturePaint value) {
+        super(context, value);
     }
 
     @Override
@@ -28,35 +24,15 @@ public class TextureConst extends DrawConstant {
     }
 
     @Override
-    public Object toMessage() {
+    public TextureProto buildMessage(TexturePaint value) {
         TextureProto.Builder model = TextureProto.newBuilder();
-        model.setImage((ImageProto) texture.toMessage());
-        model.setAnchor((RectangleProto) new RectangleConst(getContext(), texturePaint.getAnchorRect()).toMessage());
+        model.setImage(new ImageConst(getContext(), value.getImage()).toMessage());
+        model.setAnchor(new RectangleConst(getContext(), value.getAnchorRect()).toMessage());
         return model.build();
     }
 
     @Override
-    public int hashCode() {
-        int result = 1;
-        result = 31 * result + texture.hashCode();
-        result = 31 * result + texturePaint.getAnchorRect().hashCode();
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (!(o instanceof TextureConst)) {
-            return false;
-        }
-        TextureConst other = (TextureConst) o;
-        return texture.equals(other.texture) &&
-            texturePaint.getAnchorRect().equals(other.texturePaint.getAnchorRect());
-    }
-
-    public TexturePaint getTexturePaint() {
-        return texturePaint;
+    public TexturePaint getValue() {
+        return new TexturePaint(ImageConst.getValue(message.getImage()), RectangleConst.getValue(message.getAnchor()));
     }
 }

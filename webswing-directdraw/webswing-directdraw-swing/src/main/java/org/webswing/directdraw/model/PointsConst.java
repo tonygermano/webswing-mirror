@@ -5,13 +5,11 @@ import java.util.*;
 import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 
-public class PointsConst extends DrawConstant {
+public class PointsConst extends ImmutableDrawConstantHolder<int[]>
+{
 
-    int[] points;
-    
-	public PointsConst(DirectDraw context, int... points) {
-		super(context);
-        this.points = points;
+	public PointsConst(DirectDraw context, int... value) {
+		super(context, value);
 	}
 
 	@Override
@@ -20,11 +18,11 @@ public class PointsConst extends DrawConstant {
 	}
 
     @Override
-    public Object toMessage() {
+    public PointsProto toMessage() {
         PointsProto.Builder model = PointsProto.newBuilder();
-        if (points != null) {
-            for (int i = 0; i < points.length; i++) {
-                model.addPoints(points[i]);
+        if (value != null) {
+            for (int i = 0; i < value.length; i++) {
+                model.addPoints(value[i]);
             }
         }
         return model.build();
@@ -32,16 +30,12 @@ public class PointsConst extends DrawConstant {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(points);
+        return Arrays.hashCode(value);
     }
 
     @Override
     public boolean equals(Object o) {
         return o == this || 
-            o instanceof PointsConst && Arrays.equals(points, ((PointsConst) o).points);
+            o instanceof PointsConst && Arrays.equals(value, ((PointsConst) o).value);
     }
-
-    public int[] getPoints() {
-		return points;
-	}
 }
