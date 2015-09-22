@@ -49,7 +49,7 @@ public class Services {
 		return serverService;
 	}
 
-	public static SwingClassLoaderFactoryService getClassloaderService() {
+	public static SwingClassLoaderFactoryService getClassLoaderService() {
 		if (classloaderService == null) {
 			Logger.fatal("Classloader service has not been initialize. Exiting...");
 			Util.getWebToolkit().exitSwing(1);

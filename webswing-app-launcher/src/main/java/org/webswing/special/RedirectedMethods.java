@@ -34,19 +34,19 @@ public class RedirectedMethods {
 	}
 
 	public static ClassLoader getSystemClassLoader() {
-		return SwingMain.swingLibClassloader;
+		return SwingMain.swingLibClassLoader;
 	}
 
 	public static URL getSystemResource(String name) {
-		return SwingMain.swingLibClassloader.getResource(name);
+		return SwingMain.swingLibClassLoader.getResource(name);
 	}
 
 	public static InputStream getSystemResourceAsStream(String name) {
-		return SwingMain.swingLibClassloader.getResourceAsStream(name);
+		return SwingMain.swingLibClassLoader.getResourceAsStream(name);
 	}
 
 	public static Enumeration<URL> getSystemResources(String name) throws IOException {
-		return SwingMain.swingLibClassloader.getResources(name);
+		return SwingMain.swingLibClassLoader.getResources(name);
 	}
 
 	public static void setCurrentManager(RepaintManager manager) {
