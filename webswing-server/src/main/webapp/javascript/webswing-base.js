@@ -1,4 +1,4 @@
-define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
+define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDraw, util) {
     "use strict";
     return function BaseModule() {
         var module = this;
@@ -6,10 +6,13 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
         module.injects = api = {
             cfg : 'webswing.config',
             disconnect : 'webswing.disconnect',
-            send : 'socket.send',
             getSocketId : 'socket.uuid',
             getCanvas : 'canvas.get',
-            getInput : 'canvas.getInput',
+            registerInput : 'input.register',
+            sendInput : 'input.sendInput',
+            disposeInput : 'input.dispose',
+            registerTouch : 'touch.register',
+            disposeTouch : 'touch.dispose',
             getUser : 'login.user',
             getIdentity : 'identity.get',
             getLocale : 'identity.getLocale',
@@ -26,9 +29,6 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
             openLink : 'files.link',
             print : 'files.print',
             download : 'files.download',
-            cut : 'clipboard.cut',
-            copy : 'clipboard.copy',
-            paste : 'clipboard.paste',
             displayCopyBar : 'clipboard.displayCopyBar',
             processJsLink : 'jslink.process',
             playbackInfo : 'playback.playbackInfo'
@@ -44,11 +44,6 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
         };
 
         var timer1, timer2;
-        var latestMouseMoveEvent = null;
-        var latestMouseWheelEvent = null;
-        var latestWindowResizeEvent = null;
-        var mouseDown = 0;
-        var inputEvtQueue = [];
         var drawingLock;
         var drawingQ = [];
 
@@ -56,29 +51,33 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
         var directDraw = new WebswingDirectDraw({});
 
         function startApplication(name, applet) {
-            registerEventListeners(api.getCanvas(), api.getInput());
-            resetState();
-            api.cfg.clientId = api.getUser() + api.getIdentity() + name;
-            api.cfg.appName = name;
-            api.cfg.hasControl = true;
-            api.cfg.mirrorMode = false;
-            api.cfg.canPaint = true;
-            api.cfg.applet = applet;
-            handshake();
-            api.showDialog(api.startingDialog);
+            initialize(api.getUser() + api.getIdentity() + name, name, applet, false);
         }
 
         function startMirrorView(clientId, appName) {
-            registerEventListeners(api.getCanvas(), api.getInput());
+            initialize(clientId, appName, null, true)
+        }
+
+        function initialize(clientId, name, applet, isMirror) {
+            api.registerInput();
+            api.registerTouch();
+            window.addEventListener('beforeunload', beforeUnloadEventHandler);
             resetState();
             api.cfg.clientId = clientId;
-            api.cfg.appName = appName;
-            api.cfg.hasControl = false;
-            api.cfg.mirrorMode = true;
+            api.cfg.appName = name;
             api.cfg.canPaint = true;
+            api.cfg.hasControl = !isMirror;
+            api.cfg.mirrorMode = isMirror;
+            api.cfg.applet = applet != null ? applet : api.cfg.applet;
             handshake();
-            repaint();
+            if (isMirror) {
+                repaint();
+            }
             api.showDialog(api.startingDialog);
+        }
+
+        function beforeUnloadEventHandler(evt) {
+            dispose();
         }
 
         function continueSession() {
@@ -97,87 +96,54 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
             api.cfg.canPaint = false;
             clearInterval(timer1);
             clearInterval(timer2);
-            timer1 = setInterval(sendInput, 100);
+            timer1 = setInterval(api.sendInput, 100);
             timer2 = setInterval(heartbeat, 10000);
-            latestMouseMoveEvent = null;
-            latestMouseWheelEvent = null;
-            latestWindowResizeEvent = null;
-            mouseDown = 0;
-            inputEvtQueue = [];
             windowImageHolders = {};
             directDraw = new WebswingDirectDraw({});
         }
 
-        function sendInput() {
-            enqueueInputEvent();
-            if (inputEvtQueue.length > 0) {
-                api.send({
-                    events : inputEvtQueue
-                });
-                inputEvtQueue = [];
-            }
-        }
-
-        function enqueueMessageEvent(message) {
-            inputEvtQueue.push(getMessageEvent(message));
-        }
-
-        function enqueueInputEvent(message) {
+        function sendMessageEvent(message) {
             if (api.cfg.hasControl) {
-                if (latestMouseMoveEvent != null) {
-                    inputEvtQueue.push(latestMouseMoveEvent);
-                    latestMouseMoveEvent = null;
-                }
-                if (latestMouseWheelEvent != null) {
-                    inputEvtQueue.push(latestMouseWheelEvent);
-                    latestMouseWheelEvent = null;
-                }
-                if (latestWindowResizeEvent != null) {
-                    inputEvtQueue.push(latestWindowResizeEvent);
-                    latestWindowResizeEvent = null;
-                }
-                if (message != null) {
-                    if (JSON.stringify(inputEvtQueue[inputEvtQueue.length - 1]) !== JSON.stringify(message)) {
-                        inputEvtQueue.push(message);
+                api.sendInput({
+                    event : {
+                        type : message
                     }
-                }
+                });
             }
         }
 
         function heartbeat() {
-            enqueueMessageEvent('hb');
+            sendMessageEvent('hb');
         }
 
         function repaint() {
-            enqueueMessageEvent('repaint');
+            sendMessageEvent('repaint');
         }
 
         function ack() {
-            enqueueMessageEvent('paintAck');
-            sendInput();
+            sendMessageEvent('paintAck');
         }
 
         function kill() {
-            enqueueMessageEvent('killSwing');
+            sendMessageEvent('killSwing');
         }
 
         function unload() {
-            enqueueMessageEvent('unload');
+            sendMessageEvent('unload');
         }
 
         function handshake() {
-            inputEvtQueue.push(getHandShake(api.getCanvas()));
+            api.sendInput(getHandShake(api.getCanvas()));
         }
 
         function dispose() {
             clearInterval(timer1);
             clearInterval(timer2);
             unload();
-            sendInput();
+            api.sendInput();
             resetState();
-            document.removeEventListener('mousedown', mouseDownEventHandler);
-            document.removeEventListener('mouseout', mouseOutEventHandler);
-            document.removeEventListener('mouseup', mouseUpEventHandler);
+            api.disposeInput();
+            api.disposeTouch();
             window.removeEventListener('beforeunload', beforeUnloadEventHandler);
         }
 
@@ -327,7 +293,7 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
                                     onloadFunction();
                                 }
                             };
-                            imageObj.src = getImageString(winContent.base64Content);
+                            imageObj.src = util.getImageString(winContent.base64Content);
                         }
                     });
                 }, errorHandler);
@@ -358,18 +324,6 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
             });
         }
 
-        function getImageString(data) {
-            if (typeof data === 'object') {
-                var binary = '';
-                var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
-                for ( var i = 0, l = bytes.byteLength; i < l; i++) {
-                    binary += String.fromCharCode(bytes[i]);
-                }
-                data = window.btoa(binary);
-            }
-            return 'data:image/png;base64,' + data;
-        }
-
         function adjustCanvasSize(canvas, width, height) {
             if (canvas.width != width || canvas.height != height) {
                 var snapshot = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
@@ -386,202 +340,6 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
         function copy(sx, sy, dx, dy, w, h, context) {
             var copy = context.getImageData(sx, sy, w, h);
             context.putImageData(copy, dx, dy);
-        }
-
-        function registerEventListeners(canvas, input) {
-            bindEvent(canvas, 'mousedown', function(evt) {
-                var mousePos = getMousePos(canvas, evt, 'mousedown');
-                latestMouseMoveEvent = null;
-                enqueueInputEvent(mousePos);
-                focusInput(input);
-                sendInput();
-                return false;
-            }, false);
-            bindEvent(canvas, 'dblclick', function(evt) {
-                var mousePos = getMousePos(canvas, evt, 'dblclick');
-                latestMouseMoveEvent = null;
-                enqueueInputEvent(mousePos);
-                focusInput(input);
-                sendInput();
-                return false;
-            }, false);
-            bindEvent(canvas, 'mousemove', function(evt) {
-                var mousePos = getMousePos(canvas, evt, 'mousemove');
-                mousePos.mouse.button = mouseDown;
-                latestMouseMoveEvent = mousePos;
-                return false;
-            }, false);
-            bindEvent(canvas, 'mouseup', function(evt) {
-                var mousePos = getMousePos(canvas, evt, 'mouseup');
-                latestMouseMoveEvent = null;
-                enqueueInputEvent(mousePos);
-                focusInput(input);
-                sendInput();
-                return false;
-            }, false);
-            // IE9, Chrome, Safari, Opera
-            bindEvent(canvas, "mousewheel", function(evt) {
-                var mousePos = getMousePos(canvas, evt, 'mousewheel');
-                latestMouseMoveEvent = null;
-                if (latestMouseWheelEvent != null) {
-                    mousePos.mouse.wheelDelta += latestMouseWheelEvent.mouse.wheelDelta;
-                }
-                latestMouseWheelEvent = mousePos;
-                return false;
-            }, false);
-            // firefox
-            bindEvent(canvas, "DOMMouseScroll", function(evt) {
-                var mousePos = getMousePos(canvas, evt, 'mousewheel');
-                latestMouseMoveEvent = null;
-                if (latestMouseWheelEvent != null) {
-                    mousePos.mouse.wheelDelta += latestMouseWheelEvent.mouse.wheelDelta;
-                }
-                latestMouseWheelEvent = mousePos;
-                return false;
-            }, false);
-            bindEvent(canvas, 'contextmenu', function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                return false;
-            });
-
-            bindEvent(input, 'keydown', function(event) {
-                // 48-57
-                // 65-90
-                // 186-192
-                // 219-222
-                // 226
-                // FF (163, 171, 173, ) -> en layout ]\/ keys
-                var kc = event.keyCode;
-                if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226)
-                        || (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111) || (kc == 59) || (kc == 61))) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                var keyevt = getKBKey('keydown', canvas, event);
-                // hanle paste event
-                if (!(keyevt.key.ctrl && (keyevt.key.character == 88 || keyevt.key.character == 67 || keyevt.key.character == 86))) { // cut copy
-                    // default action prevented
-                    if (keyevt.key.ctrl && !keyevt.key.alt && !keyevt.key.altgr) {
-                        event.preventDefault();
-                    }
-                    enqueueInputEvent(keyevt);
-                }
-                return false;
-            }, false);
-            bindEvent(input, 'keypress', function(event) {
-                var keyevt = getKBKey('keypress', canvas, event);
-                if (!(keyevt.key.ctrl && (keyevt.key.character == 120 || keyevt.key.character == 24 || keyevt.key.character == 99
-                        || keyevt.key.character == 118 || keyevt.key.character == 22))) { // cut copy paste handled separately
-                    event.preventDefault();
-                    event.stopPropagation();
-                    enqueueInputEvent(keyevt);
-                }
-                return false;
-            }, false);
-            bindEvent(input, 'keyup', function(event) {
-                var keyevt = getKBKey('keyup', canvas, event);
-                if (!(keyevt.key.ctrl && (keyevt.key.character == 88 || keyevt.key.character == 67 || keyevt.key.character == 86))) { // cut copy
-                    event.preventDefault();
-                    event.stopPropagation();
-                    enqueueInputEvent(keyevt);
-                    sendInput();
-                }
-                return false;
-            }, false);
-            bindEvent(input, 'cut', function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                api.cut(event);
-                return false;
-            }, false);
-            bindEvent(input, 'copy', function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                api.copy(event);
-                return false;
-            }, false);
-            bindEvent(input, 'paste', function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                api.paste(event);
-                return false;
-            }, false);
-            bindEvent(document, 'mousedown', mouseDownEventHandler);
-            bindEvent(document, 'mouseout', mouseOutEventHandler);
-            bindEvent(document, 'mouseup', mouseUpEventHandler);
-            bindEvent(window, 'beforeunload', beforeUnloadEventHandler);
-        }
-
-        function mouseDownEventHandler(evt) {
-            if (evt.which == 1) {
-                mouseDown = 1;
-            }
-        }
-        function mouseOutEventHandler(evt) {
-            mouseDown = 0;
-        }
-        function mouseUpEventHandler(evt) {
-            if (evt.which == 1) {
-                mouseDown = 0;
-            }
-        }
-        function beforeUnloadEventHandler(evt) {
-            dispose();
-        }
-
-        function focusInput(input) {
-            // In order to ensure that the browser will fire clipboard events, we always need to have something selected
-            input.value = ' ';
-            input.focus();
-            input.select();
-        }
-
-        function getMousePos(canvas, evt, type) {
-            var rect = canvas.getBoundingClientRect();
-            var root = document.documentElement;
-            // return relative mouse position
-            var mouseX = Math.round(evt.clientX - rect.left);
-            var mouseY = Math.round(evt.clientY - rect.top);
-            var delta = 0;
-            if (type == 'mousewheel') {
-                delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
-            }
-            return {
-                mouse : {
-                    x : mouseX,
-                    y : mouseY,
-                    type : type,
-                    wheelDelta : delta,
-                    button : evt.which,
-                    ctrl : evt.ctrlKey,
-                    alt : evt.altKey,
-                    shift : evt.shiftKey,
-                    meta : evt.metaKey
-                }
-            };
-        }
-
-        function getKBKey(type, canvas, evt) {
-            var char = evt.which;
-            if (char == 0 && evt.key != null) {
-                char = evt.key.charCodeAt(0);
-            }
-            var kk = evt.keyCode;
-            if (kk == 0) {
-                kk = char;
-            }
-            return {
-                key : {
-                    type : type,
-                    character : char,
-                    keycode : kk,
-                    alt : evt.altKey,
-                    ctrl : evt.ctrlKey,
-                    shift : evt.shiftKey,
-                    meta : evt.metaKey
-                }
-            };
         }
 
         function getHandShake(canvas) {
@@ -604,20 +362,6 @@ define([ 'webswing-dd' ], function amdFactory(WebswingDirectDraw) {
             return {
                 handshake : handshake
             };
-        }
-
-        function getMessageEvent(message) {
-            return {
-                event : {
-                    type : message
-                }
-            };
-        }
-
-        function bindEvent(el, eventName, eventHandler) {
-            if (el.addEventListener != null) {
-                el.addEventListener(eventName, eventHandler);
-            }
         }
 
         function errorHandler(error) {
