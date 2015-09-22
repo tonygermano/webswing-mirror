@@ -1,19 +1,23 @@
 package org.webswing.directdraw.model;
 
+import java.awt.image.*;
+import java.util.*;
+
 import org.webswing.directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.*;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.*;
 import org.webswing.directdraw.toolkit.*;
 
-public class DrawInstruction {
+public class DrawInstruction implements Iterable<DrawConstant> {
 
-	private InstructionProto instruction;
-	private DrawConstant[] args;
-	private WebImage image;
+	private final InstructionProto instruction;
+	private final DrawConstant[] args;
+	private final WebImage image;
 
-	public DrawInstruction(InstructionProto type, DrawConstant... args) {
-		instruction = type;
+	public DrawInstruction(InstructionProto instruction, DrawConstant... args) {
+		this.instruction = instruction;
 		this.args = args;
+        this.image = null;
 	}
 
 	public DrawInstruction(WebImage image, DrawConstant... args) {
@@ -22,16 +26,12 @@ public class DrawInstruction {
 		this.args = args;
 	}
 
-	public DrawConstant[] getArgs() {
-		return args;
+	public DrawConstant getArg(int index) {
+		return args[index];
 	}
 
-	public void setArgs(DrawConstant[] args) {
-		this.args = args;
-	}
-
-	public WebImage getImage() {
-		return image;
+	public BufferedImage getImage() {
+		return image.getSnapshot();
 	}
 
 	public InstructionProto getInstruction() {
@@ -50,7 +50,30 @@ public class DrawInstruction {
 		return builder.build();
 	}
 
-	@Override
+    @Override
+    public Iterator<DrawConstant> iterator() {
+        return new Iterator<DrawConstant>()
+        {
+            int index;
+            
+            @Override
+            public boolean hasNext() {
+                return index < args.length;
+            }
+
+            @Override
+            public DrawConstant next() {
+                return args[index++];
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("remove");
+            }
+        };
+    }
+
+    @Override
 	public String toString() {
 		return instruction.name();
 	}

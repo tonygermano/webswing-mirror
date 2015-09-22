@@ -43,14 +43,18 @@ public class DrawInstructionFactory {
 	}
 
 	public DrawInstruction createGraphics(WebGraphics g) {
-		DrawConstant gid = new IntegerConst(g.getId());
+		DrawConstant id = new IntegerConst(g.getId());
 		DrawConstant transformConst =  new TransformConst(ctx, g.getTransform());
 		DrawConstant compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
 		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
 		DrawConstant paintConst = getPaintConstant(g.getPaint());
         DrawConstant fontConst = new FontConst(ctx, g.getFont());
-		return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, gid, transformConst, strokeConst, compositeConst, paintConst, fontConst);
+		return createGraphics(id, transformConst, strokeConst, compositeConst, paintConst, fontConst);
 	}
+
+    public DrawInstruction createGraphics(DrawConstant id, DrawConstant transform, DrawConstant stroke, DrawConstant composite, DrawConstant paint, DrawConstant font) {
+        return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, id, transform, stroke, composite, paint, font);
+    }
 
 	public DrawInstruction disposeGraphics(WebGraphics g) {
 		return new DrawInstruction(InstructionProto.GRAPHICS_DISPOSE, new IntegerConst(g.getId()));

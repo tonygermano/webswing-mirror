@@ -101,31 +101,31 @@ public class DirectDrawUtils {
 		for (DrawInstruction current : instructions ) {
 			if (current.getInstruction().equals(InstructionProto.TRANSFORM)) {
 				if (mergedTx == null) {
-                    mergedTx = ((TransformConst) current.getArgs()[0]).getValue();
+                    mergedTx = ((TransformConst) current.getArg(0)).getValue();
 				} else {
-                    mergedTx.concatenate(((TransformConst) current.getArgs()[0]).getValue());
+                    mergedTx.concatenate(((TransformConst) current.getArg(0)).getValue());
 				}
 			} else if (current.getInstruction().equals(InstructionProto.SET_STROKE)) {
-				mergedStroke = current.getArgs()[0];
+				mergedStroke = current.getArg(0);
 			} else if (current.getInstruction().equals(InstructionProto.SET_COMPOSITE)) {
-				mergedComposite = current.getArgs()[0];
+				mergedComposite = current.getArg(0);
 			} else if (current.getInstruction().equals(InstructionProto.SET_PAINT)) {
-                mergedPaint = current.getArgs()[0];
+                mergedPaint = current.getArg(0);
             } else if (current.getInstruction().equals(InstructionProto.SET_FONT)) {
-                mergedFont = current.getArgs()[0];
+                mergedFont = current.getArg(0);
 			} else if (current.getInstruction().equals(InstructionProto.GRAPHICS_CREATE) || current.getInstruction().equals(InstructionProto.GRAPHICS_SWITCH)) {
 				boolean isGraphicsCreateInst = current.getInstruction().equals(InstructionProto.GRAPHICS_CREATE);
 				if (graphicsCreate != null) {
-					graphicsCreate.setArgs(new DrawConstant[] { graphicsCreate.getArgs()[0], new TransformConst(ctx, mergedTx), mergedStroke, mergedComposite, mergedPaint, mergedFont });
-					graphicsCreateMap.put(graphicsCreate.getArgs()[0].getId(), graphicsCreate);
+					graphicsCreate = createGraphics(ctx, graphicsCreate.getArg(0), mergedTx, mergedStroke, mergedComposite, mergedPaint, mergedFont);
+					graphicsCreateMap.put(graphicsCreate.getArg(0).getId(), graphicsCreate);
 				}
-				graphicsCreate = isGraphicsCreateInst ? current : graphicsCreateMap.get(current.getArgs()[0].getId());
+				graphicsCreate = isGraphicsCreateInst ? current : graphicsCreateMap.get(current.getArg(0).getId());
 				if (graphicsCreate != null) {
-                    mergedTx = ((TransformConst) graphicsCreate.getArgs()[1]).getValue();
-					mergedStroke = graphicsCreate.getArgs()[2];
-					mergedComposite = graphicsCreate.getArgs()[3];
-					mergedPaint = graphicsCreate.getArgs()[4];
-					mergedFont = graphicsCreate.getArgs()[5];
+                    mergedTx = ((TransformConst) graphicsCreate.getArg(1)).getValue();
+					mergedStroke = graphicsCreate.getArg(2);
+					mergedComposite = graphicsCreate.getArg(3);
+					mergedPaint = graphicsCreate.getArg(4);
+					mergedFont = graphicsCreate.getArg(5);
 				} else {// if graphics switch instruction and the create instruction already in result array
 						// then add all status change for old graphics and add the switch inst
 					setGraphicsStatus(ctx, newInstructions, mergedTx, mergedStroke, mergedComposite, mergedPaint, mergedFont);
@@ -138,9 +138,9 @@ public class DirectDrawUtils {
 				}
 			} else {
 				if (graphicsCreate != null) {
-					graphicsCreate.setArgs(new DrawConstant[] { graphicsCreate.getArgs()[0], new TransformConst(ctx, mergedTx), mergedStroke, mergedComposite , mergedPaint, mergedFont });
+					graphicsCreate = createGraphics(ctx, graphicsCreate.getArg(0), mergedTx, mergedStroke, mergedComposite , mergedPaint, mergedFont);
 					newInstructions.add(graphicsCreate);
-					graphicsCreateMap.remove(graphicsCreate.getArgs()[0].getId());
+					graphicsCreateMap.remove(graphicsCreate.getArg(0).getId());
 					graphicsCreate = null;
 				} else {
 					setGraphicsStatus(ctx, newInstructions, mergedTx, mergedStroke, mergedComposite, mergedPaint, mergedFont);
@@ -158,21 +158,25 @@ public class DirectDrawUtils {
 		instructions.addAll(newInstructions);
 	}
 
-	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> newInstructions, AffineTransform mergedTx, DrawConstant mergedStroke, DrawConstant mergedComposite, DrawConstant mergedPaint, DrawConstant mergedFont) {
-		if (mergedTx != null) {
-            newInstructions.add(ctx.getInstructionFactory().transform(mergedTx));
+    private static DrawInstruction createGraphics(DirectDraw ctx, DrawConstant id, AffineTransform transform, DrawConstant stroke, DrawConstant composite, DrawConstant paint, DrawConstant font) {
+        return ctx.getInstructionFactory().createGraphics(id, new TransformConst(ctx, transform), stroke, composite, paint, font);
+    }
+
+	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> instructions, AffineTransform transform, DrawConstant stroke, DrawConstant composite, DrawConstant paint, DrawConstant font) {
+		if (transform != null) {
+            instructions.add(ctx.getInstructionFactory().transform(transform));
 		}
-		if (mergedStroke != null) {
-			newInstructions.add(new DrawInstruction(InstructionProto.SET_STROKE, mergedStroke));
+		if (stroke != null) {
+			instructions.add(new DrawInstruction(InstructionProto.SET_STROKE, stroke));
 		}
-		if (mergedComposite != null) {
-			newInstructions.add(new DrawInstruction(InstructionProto.SET_COMPOSITE, mergedComposite));
+		if (composite != null) {
+			instructions.add(new DrawInstruction(InstructionProto.SET_COMPOSITE, composite));
 		}
-		if (mergedPaint != null) {
-			newInstructions.add(new DrawInstruction(InstructionProto.SET_PAINT, mergedPaint));
+		if (paint != null) {
+			instructions.add(new DrawInstruction(InstructionProto.SET_PAINT, paint));
 		}
-        if (mergedFont != null) {
-            newInstructions.add(new DrawInstruction(InstructionProto.SET_FONT, mergedFont));
+        if (font != null) {
+            instructions.add(new DrawInstruction(InstructionProto.SET_FONT, font));
         }
 	}
 

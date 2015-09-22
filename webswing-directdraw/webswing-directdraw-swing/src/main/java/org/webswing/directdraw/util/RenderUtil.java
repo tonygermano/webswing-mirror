@@ -98,7 +98,7 @@ public class RenderUtil {
 	}
 
 	private static void iprtDrawWebImage(Graphics2D g, DrawInstruction di) {
-		BufferedImage i = di.getImage().getSnapshot();
+		BufferedImage i = di.getImage();
 		AffineTransform t = getValue(0, di);
         Rectangle2D crop = getValue(1, di);
 		Shape clip = getShape(3, di);
@@ -187,18 +187,12 @@ public class RenderUtil {
 
     @SuppressWarnings({"unchecked", "unused"})
     private static <T> T getValue(int index, DrawInstruction instruction, Class<? extends T> cls) {
-        if (instruction.getArgs().length > index) {
-            return (T) instruction.getArgs()[index].getValue();
-        }
-        return null;
+        return (T) instruction.getArg(index).getValue();
     }
 
     @SuppressWarnings("unchecked")
     private static <T> T getValue(int index, DrawInstruction instruction) {
-        if (instruction.getArgs().length > index) {
-            return (T) instruction.getArgs()[index].getValue();
-        }
-        return null;
+        return (T) instruction.getArg(index).getValue();
     }
 
 	private static Paint getPaint(int index, DrawInstruction instruction) {
