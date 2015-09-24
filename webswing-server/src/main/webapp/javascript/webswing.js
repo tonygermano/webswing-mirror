@@ -1,6 +1,6 @@
-define([ 'jquery','text!templates/base.css' ,'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog', 'webswing-selector',
-        'webswing-login', 'webswing-canvas', 'webswing-identity', 'webswing-jslink', 'webswing-clipboard', 'webswing-playback', 'webswing-inject' ],
-        function f($, css, polyfill, Base, Socket, Files, Dialog, Selector, Login, Canvas, Identity, JsLink, Clipboard, Playback, Injector) {
+define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog', 'webswing-selector',
+        'webswing-login', 'webswing-canvas', 'webswing-identity', 'webswing-jslink', 'webswing-clipboard', 'webswing-playback', 'webswing-input', 'webswing-touch', 'webswing-inject' ],
+        function f($, css, util, polyfill, Base, Socket, Files, Dialog, Selector, Login, Canvas, Identity, JsLink, Clipboard, Playback, Input, Touch, Injector) {
             "use strict";
             var style = $("<style></style>", {
                 type : "text/css"
@@ -49,6 +49,8 @@ define([ 'jquery','text!templates/base.css' ,'webswing-polyfill', 'webswing-base
                 injector.module('dialog', new Dialog());
                 injector.module('canvas', new Canvas());
                 injector.module('base', new Base());
+                injector.module('input', new Input());
+                injector.module('touch', new Touch());
                 injector.module('socket', new Socket());
                 injector.module('files', new Files());
                 injector.module('selector', new Selector());
@@ -130,14 +132,15 @@ define([ 'jquery','text!templates/base.css' ,'webswing-polyfill', 'webswing-base
                         debugPort : null,
                         javaCallTimeout : 3000,
                         documentBase : document.location.origin + document.location.pathname,
-                        ieVersion : detectIE(),
+                        ieVersion : util.detectIE(),
                         /* webswing instance context */
                         clientId : null,
                         appName : null,
                         hasControl : false,
                         mirrorMode : false,
                         canPaint : false,
-                        applet : false
+                        applet : false,
+                        virtualKB :false
                     };
                 }
 
@@ -232,29 +235,5 @@ define([ 'jquery','text!templates/base.css' ,'webswing-polyfill', 'webswing-base
                     return result;
                 }
 
-                function detectIE() {
-                    var ua = window.navigator.userAgent;
-
-                    var msie = ua.indexOf('MSIE ');
-                    if (msie > 0) {
-                        // IE 10 or older => return version number
-                        return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-                    }
-
-                    var trident = ua.indexOf('Trident/');
-                    if (trident > 0) {
-                        // IE 11 => return version number
-                        var rv = ua.indexOf('rv:');
-                        return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-                    }
-
-                    var edge = ua.indexOf('Edge/');
-                    if (edge > 0) {
-                        // IE 12 => return version number
-                        return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
-                    }
-                    // other browser
-                    return false;
-                }
             }
         });

@@ -1,12 +1,14 @@
 package org.webswing;
 
-import java.applet.*;
-import java.awt.*;
-import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
+import java.applet.Applet;
+import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.*;
-import java.util.List;
 
 import org.webswing.applet.*;
 import org.webswing.toolkit.util.*;
@@ -18,13 +20,13 @@ public class SwingMain {
 	public static void main(String[] args) {
 		try {
 			URL[] urls = populateClassPath();
-            /*
-             * wrap into additional URLClassLoader with class path urls because
-             * some resources may contain classes from packages that should be loaded
-             * with parent class loader that otherwise would not have a classpath
-             */
-            ClassLoader wrapper = new URLClassLoader(urls, SwingMain.class.getClassLoader());
-            swingLibClassLoader = Services.getClassLoaderService().createSwingClassLoader(urls, wrapper);
+			/*
+			 * wrap into additional URLClassLoader with class path urls because
+			 * some resources may contain classes from packages that should be loaded
+			 * with parent class loader that otherwise would not have a classpath
+			 */
+			ClassLoader wrapper = new URLClassLoader(urls, SwingMain.class.getClassLoader());
+			swingLibClassLoader = Services.getClassLoaderService().createSwingClassLoader(urls, wrapper);
 
 			if (isApplet()) {
 				startApplet();
@@ -40,7 +42,7 @@ public class SwingMain {
 	private static void startSwingApp(String[] args) throws Exception {
 		Class<?> clazz = swingLibClassLoader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
 		Class<?> mainArgType[] = { (new String[0]).getClass() };
-        java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
+		java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
 		setupContextClassLoader(swingLibClassLoader);
 		Object argsArray[] = { args };
 		main.invoke(null, argsArray);
@@ -83,23 +85,22 @@ public class SwingMain {
 		return result;
 	}
 
-    public static URL[] populateClassPath() throws MalformedURLException
-    {
-        List<URL> urls = new ArrayList<URL>();
-        String classpath = System.getProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH);
-        String[] cp = scanForFiles(classpath.split(";"));
-        Logger.debug("Swing classpath: " + Arrays.asList(cp));
-        for (String f : cp) {
-            File file = new File(f);
-            if (file.exists()) {
-                urls.add(file.toURI().toURL());
-            } else {
-                Logger.error("SwingMain:main ERROR: Required classpath file '" + f + "' does not exist!");
-            }
-        }
-        return urls.toArray(new URL[urls.size()]);
-    }
-    
+	public static URL[] populateClassPath() throws MalformedURLException {
+		List<URL> urls = new ArrayList<URL>();
+		String classpath = System.getProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH);
+		String[] cp = scanForFiles(classpath.split(";"));
+		Logger.debug("Swing classpath: " + Arrays.asList(cp));
+		for (String f : cp) {
+			File file = new File(f);
+			if (file.exists()) {
+				urls.add(file.toURI().toURL());
+			} else {
+				Logger.error("SwingMain:main ERROR: Required classpath file '" + f + "' does not exist!");
+			}
+		}
+		return urls.toArray(new URL[urls.size()]);
+	}
+
 	public static String[] scanForFiles(String[] patternPaths) {
 		List<String> result = new ArrayList<String>();
 		for (String pattern : patternPaths) {
@@ -149,6 +150,6 @@ public class SwingMain {
 	}
 
 	private static boolean isApplet() {
-        return System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null;
+		return System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null;
 	}
 }

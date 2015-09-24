@@ -1,4 +1,4 @@
-define(['jquery'], function amdFactory($) {
+define(['jquery','webswing-util'], function amdFactory($, util) {
     "use strict";
     return function SelectorModule() {
         var module = this;
@@ -73,7 +73,7 @@ define(['jquery'], function amdFactory($) {
                                 + '" data-applet="'
                                 + app.applet
                                 + '"><img src="'
-                                + getImageString(app.base64Icon)
+                                + util.getImageString(app.base64Icon)
                                 + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>';
                     }
                 }
@@ -84,18 +84,6 @@ define(['jquery'], function amdFactory($) {
                 content: content,
                 events: events
             });
-        }
-
-        function getImageString(data) {
-            if (typeof data === 'object') {
-                var binary = '';
-                var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
-                for (var i = 0, l = bytes.byteLength; i < l; i++) {
-                    binary += String.fromCharCode(bytes[i]);
-                }
-                data = window.btoa(binary);
-            }
-            return 'data:image/png;base64,' + data;
         }
 
         function hide() {
