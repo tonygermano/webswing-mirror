@@ -19,7 +19,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
-import java.io.IOException;
 
 public class WebGraphics extends AbstractVectorGraphics {
 
@@ -57,42 +56,42 @@ public class WebGraphics extends AbstractVectorGraphics {
 	}
 
 	@Override
-	protected void writeImage(RenderedImage image, AffineTransform xform) throws IOException {
-		thisImage.addImage(this, image, null, xform, null);
+	protected void writeImage(RenderedImage image, AffineTransform transform) {
+		thisImage.addImage(this, image, null, transform, null);
 	}
 
 	@Override
-	protected void writeImage(Image image, ImageObserver observer, AffineTransform xform, Rectangle2D.Float crop, Color bkg) throws IOException {
+	protected void writeImage(Image image, ImageObserver observer, AffineTransform transform, Rectangle2D.Float crop, Color bgcolor) {
 		if (image instanceof WebImage || image instanceof VolatileWebImageWrapper) {
 			crop = crop != null ? crop : new Rectangle2D.Float(0, 0, image.getWidth(observer), image.getHeight(observer));
 			WebImage wi = image instanceof WebImage ? (WebImage) image : ((VolatileWebImageWrapper) image).getWebImage();
 			if (wi.isDirty()) {
-				thisImage.addInstruction(this, dif.drawWebImage(wi.extractReadOnlyWebImage(false), xform, crop, bkg, getClip()));
+				thisImage.addInstruction(this, dif.drawWebImage(wi.extractReadOnlyWebImage(false), transform, crop, bgcolor, getClip()));
 			}
 		} else {
-			thisImage.addImage(this, image, observer, xform, crop);
+			thisImage.addImage(this, image, observer, transform, crop);
 		}
 	}
 
 	@Override
-	protected void writeString(String string, double x, double y) throws IOException {
+	protected void writeString(String string, double x, double y) {
 		thisImage.addInstruction(this, dif.drawString(string, x, y, getClip()));
 	}
 
 	@Override
-	protected void writeTransform(AffineTransform transform) throws IOException {
+	protected void writeTransform(AffineTransform transform) {
 		thisImage.addInstruction(this, dif.transform(transform));
 
 	}
 
 	@Override
-	protected void writePaint(Paint paint) throws IOException {
+	protected void writePaint(Paint paint) {
 		thisImage.addInstruction(this, dif.setPaint(paint));
 
 	}
 
 	@Override
-	public void writeStroke(Stroke stroke) throws IOException {
+	public void writeStroke(Stroke stroke) {
 		if (stroke instanceof BasicStroke) {
 			thisImage.addInstruction(this, dif.setStroke((BasicStroke) stroke));
 		}
