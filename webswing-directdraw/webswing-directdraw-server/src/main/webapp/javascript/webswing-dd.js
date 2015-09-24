@@ -26,7 +26,6 @@
 		var CompositeTypeProto = proto.build("org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto");
 		var constantPoolCache = c.constantPoolCache || {};
 		var imagePoolCache = c.imagePoolCache || {};
-		var fontTransform = null;
 
 		function draw64(data, targetCanvas) {
 			var image = WebImageProto.decode64(data);
@@ -138,61 +137,63 @@
 		}
 
 		function interpretInstruction(ctx, instruction, imageContext) {
-			var instCode = instruction.inst;
 			var args = resolveArgs(instruction.args, constantPoolCache);
-			switch (instCode) {
-			case InstructionProto.GRAPHICS_CREATE:
-				iprtGraphicsCreate(ctx, instruction.args[0], args, imageContext);
-				break;
-			case InstructionProto.GRAPHICS_SWITCH:
-				iprtGraphicsSwitch(ctx, instruction.args[0], imageContext);
-				break;
-			case InstructionProto.GRAPHICS_DISPOSE:
-				delete imageContext.graphicsStates[instruction.args[0]];
-				break;
-			case InstructionProto.DRAW:
-				iprtDraw(ctx, args);
-				break;
-			case InstructionProto.FILL:
-				iprtFill(ctx, args);
-				break;
-			case InstructionProto.DRAW_IMAGE:
-				iprtDrawImage(ctx, args);
-				break;
-			case InstructionProto.DRAW_WEBIMAGE:
-				return iprtDrawWebImage(ctx, args, instruction.webImage, imageContext);
-				break;
-			case InstructionProto.DRAW_STRING:
-				iprtDrawString(ctx, args);
-				break;
-			case InstructionProto.COPY_AREA:
-				iprtCopyArea(ctx, args, imageContext);
-				break;
-			case InstructionProto.SET_STROKE:
-				iprtSetStroke(ctx, args);
-				imageContext.graphicsStates[imageContext.currentStateId].strokeArgs = args;
-				break;
-			case InstructionProto.SET_PAINT:
-				iprtSetPaint(ctx, args, imageContext);
-				imageContext.graphicsStates[imageContext.currentStateId].paintArgs = args;
-				break;
-			case InstructionProto.SET_COMPOSITE:
-				iprtSetComposite(ctx, args);
-				imageContext.graphicsStates[imageContext.currentStateId].compositeArgs = args;
-				break;
-			case InstructionProto.SET_FONT:
-			    iprtSetFont(ctx, args);
-			    imageContext.graphicsStates[imageContext.currentStateId].fontArgs = args;
-                break;
-			case InstructionProto.TRANSFORM:
-				var tx = iprtTransform(ctx, args);
-				imageContext.graphicsStates[imageContext.currentStateId].transform = concatTransform(
-						imageContext.graphicsStates[imageContext.currentStateId].transform, tx);
-				break;
-			default:
-				console.log("instCode:" + instCode + " not recognized");
+			var graphicsState = imageContext.graphicsStates[imageContext.currentStateId];
+			switch (instruction.inst) {
+                case InstructionProto.GRAPHICS_CREATE:
+                    iprtGraphicsCreate(ctx, instruction.args[0], args, imageContext);
+                    break;
+                case InstructionProto.GRAPHICS_SWITCH:
+                    iprtGraphicsSwitch(ctx, instruction.args[0], imageContext);
+                    break;
+                case InstructionProto.GRAPHICS_DISPOSE:
+                    iprtGraphicsDispose(instruction.args[0], imageContext);
+                    break;
+                case InstructionProto.DRAW:
+                    iprtDraw(ctx, args);
+                    break;
+                case InstructionProto.FILL:
+                    iprtFill(ctx, args);
+                    break;
+                case InstructionProto.DRAW_IMAGE:
+                    iprtDrawImage(ctx, args);
+                    break;
+                case InstructionProto.DRAW_WEBIMAGE:
+                    return iprtDrawWebImage(ctx, args, instruction.webImage);
+                    break;
+                case InstructionProto.DRAW_STRING:
+                    iprtDrawString(ctx, args, graphicsState.fontTransform);
+                    break;
+                case InstructionProto.COPY_AREA:
+                    iprtCopyArea(ctx, args);
+                    break;
+                case InstructionProto.SET_STROKE:
+                    graphicsState.strokeArgs = args;
+                    iprtSetStroke(ctx, args);
+                    break;
+                case InstructionProto.SET_PAINT:
+                    graphicsState.paintArgs = args;
+                    iprtSetPaint(ctx, args);
+                    break;
+                case InstructionProto.SET_COMPOSITE:
+                    graphicsState.compositeArgs = args;
+                    iprtSetComposite(ctx, args);
+                    break;
+                case InstructionProto.SET_FONT:
+                    graphicsState.fontArgs = args;
+                    graphicsState.fontTransform = iprtSetFont(ctx, args);
+                    break;
+                case InstructionProto.TRANSFORM:
+                    graphicsState.transform = concatTransform(graphicsState.transform, iprtTransform(ctx, args));
+                    break;
+                default:
+                    console.log("instruction code: " + instruction.inst + " not recognized");
 			}
 			return Promise.resolve();
+		}
+		
+		function iprtGraphicsDispose(id, imageContext) {
+		    delete imageContext.graphicsStates[id];
 		}
 
 		function iprtGraphicsSwitch(ctx, id, imageContext) {
@@ -226,23 +227,22 @@
 				graphicsStates[id] = {};
 				imageContext.currentStateId = id;
 				args.shift();
-				imageContext.graphicsStates[id].transform = iprtTransform(ctx, args, true);
+				graphicsStates[id].transform = iprtTransform(ctx, args, true);
 				args.shift();
 				iprtSetStroke(ctx, args);
-				imageContext.graphicsStates[id].strokeArgs = args.slice(0, 1);
+				graphicsStates[id].strokeArgs = args.slice(0, 1);
 				args.shift();
 				iprtSetComposite(ctx, args);
-				imageContext.graphicsStates[id].compositeArgs = args.slice(0, 1);
+				graphicsStates[id].compositeArgs = args.slice(0, 1);
 				args.shift();
-				iprtSetPaint(ctx, args, imageContext);
-				imageContext.graphicsStates[id].paintArgs = args;
+				iprtSetPaint(ctx, args);
+				graphicsStates[id].paintArgs = args;
 				args.shift();
-                iprtSetFont(ctx, args);
-                imageContext.graphicsStates[id].fontArgs = args;
+                graphicsStates[id].fontArgs = args;
+                graphicsStates[id].fontTransform = iprtSetFont(ctx, args);
 			} else {
 				console.log("Graphics with id " + id + " already exist!");
 			}
-
 		}
 
 		function iprtDraw(ctx, args) {
@@ -285,7 +285,7 @@
 			ctx.restore();
 		}
 
-		function iprtDrawWebImage(ctx, args, imagedata, imageContext) {
+		function iprtDrawWebImage(ctx, args, imagedata) {
 			var transform = null, crop = null, clip = null;
 
 			if (args[0].transform != null) {
@@ -310,7 +310,7 @@
 			});
 		}
 
-		function iprtDrawString(ctx, args) {
+		function iprtDrawString(ctx, args, fontTransform) {
 			var string = args[0].string;
 			var points = args[1].points.points;
 			var clip = args[2];
@@ -344,10 +344,10 @@
                 break;
             }
             ctx.font = style + " " + font.size + "px " + font.family;
-            fontTransform = font.transform;
+            return font.transform;
 		}
 
-		function iprtCopyArea(ctx, args, imageContext) {
+		function iprtCopyArea(ctx, args) {
 			var p = args[0].points.points;
 			var clip = args[1];
 			ctx.save();
@@ -360,7 +360,7 @@
 			ctx.rect(p[0], p[1], p[2], p[3]);
 			ctx.clip();
 			ctx.translate(p[4], p[5]);
-			ctx.drawImage(imageContext.canvas, 0, 0);
+			ctx.drawImage(ctx.canvas, 0, 0);
 			ctx.restore();
 		}
 
@@ -406,14 +406,13 @@
 			}
 		}
 
-		function iprtSetPaint(ctx, args, imageContext) {
+		function iprtSetPaint(ctx, args) {
 			var constant = args[0];
 			if (constant.color != null) {
 				var color = parseColor(constant.color.rgba);
 				ctx.fillStyle = color;
 				ctx.strokeStyle = color;
-			}
-			if (constant.texture != null) {
+			} else if (constant.texture != null) {
 				var anchor = constant.texture.anchor;
 				var preloadedImage = constant.texture.image.data;
 				var ptrn;
@@ -435,20 +434,18 @@
 				}
 				ctx.fillStyle = ptrn;
 				ctx.strokeStyle = ptrn;
-			}
-			if (constant.linearGrad != null) {
-				var gradient = iprtLinearGradient(ctx, constant.linearGrad, imageContext);
+			} else if (constant.linearGrad != null) {
+				var gradient = iprtLinearGradient(ctx, constant.linearGrad);
 				ctx.fillStyle = gradient;
 				ctx.strokeStyle = gradient;
-			}
-			if (constant.radialGrad != null) {
-				var gradient = iprtRadialGradient(ctx, constant.radialGrad, imageContext);
+			} else if (constant.radialGrad != null) {
+				var gradient = iprtRadialGradient(ctx, constant.radialGrad);
 				ctx.fillStyle = gradient;
 				ctx.strokeStyle = gradient;
 			}
 		}
 		
-		function iprtLinearGradient(ctx, g, imageContext) {
+		function iprtLinearGradient(ctx, g) {
 		    var x0 = g.xStart;
 		    var y0 = g.yStart;
             var dx = g.xEnd - x0;
@@ -457,7 +454,7 @@
             var repeatCount = 1, increaseCount = repeatCount, decreaseCount = 0;
             if (g.repeat != CyclicMethodProto.NO_CYCLE && (dx != 0 || dy != 0)) {
                 // calculate how many times gradient will completely repeat in both directions until it touches canvas corners
-                var c = imageContext.canvas;
+                var c = ctx.canvas;
                 var times = [calculateTimes(x0, y0, dx, dy, 0, 0),
                              calculateTimes(x0, y0, dx, dy, c.width, 0),
                              calculateTimes(x0, y0, dx, dy, c.width, c.height),
@@ -490,7 +487,7 @@
 		    return ((x1 - x0) * dx + (y1 - y0) * dy) / (dx * dx + dy * dy);
 		}
 		
-		function iprtRadialGradient(ctx, g, imageContext) {
+		function iprtRadialGradient(ctx, g) {
 		    fixFocusPoint(g);
 		    var fX = g.xFocus;
 		    var fY = g.yFocus;
@@ -502,7 +499,7 @@
             if (g.repeat != CyclicMethodProto.NO_CYCLE) {
                 if (dx == 0 && dy == 0) {
                     // calculate how many times gradient will completely repeat in both directions until it touches canvas corners
-                    var c = imageContext.canvas;
+                    var c = ctx.canvas;
                     var times = [getDistance(fX, fY, 0, 0) / r,
                                  getDistance(fX, fY, c.width, 0) / r,
                                  getDistance(fX, fY, c.width, c.height) / r,
@@ -517,7 +514,7 @@
                     var ovdX = dx - r * dx / distance;
                     var ovdY = dy - r * dy / distance;
                     // calculate how many times gradient will completely repeat in both directions until it touches canvas corners
-                    var c = imageContext.canvas;
+                    var c = ctx.canvas;
                     var times = [calculateTimes(fX, fY, vdX, vdY, 0, 0),
                                  calculateTimes(fX, fY, vdX, vdY, c.width, 0),
                                  calculateTimes(fX, fY, vdX, vdY, c.width, c.height),
