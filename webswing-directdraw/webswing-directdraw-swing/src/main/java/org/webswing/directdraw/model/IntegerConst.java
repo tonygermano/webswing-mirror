@@ -1,9 +1,3 @@
-/**
- * <p>Title: FundCount, LLC</p>
- * <p>Description: FundCount project</p>
- * <p>Copyright: Copyright (c) 2001-2015 FundCount, LLC</p>
- * <p>Company: FundCount, LLC</p>
- */
 package org.webswing.directdraw.model;
 
 public class IntegerConst extends DrawConstant<Integer> {
