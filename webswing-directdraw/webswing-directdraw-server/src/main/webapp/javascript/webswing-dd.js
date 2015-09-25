@@ -126,6 +126,8 @@
 				constantPoolCache[constant.id] = constant;
 				if (constant.image != null) {
 					imagesToPrepare.push(constant.image);
+				} else if (constant.texture != null) {
+					imagesToPrepare.push(constant.texture.image);
 				}
 			});
 			if (image.images != null) {
@@ -320,9 +322,11 @@
 			}
 			if (fontTransform != null) {
 			    var t = fontTransform;
-			    ctx.transform(t.m00, t.m10, t.m01, t.m11, t.m02, t.m12);
+			    ctx.transform(t.m00, t.m10, t.m01, t.m11, t.m02 + points[0], t.m12 + points[1]);
+			    ctx.fillText(string, 0, 0);
+			} else {
+				ctx.fillText(string, points[0], points[1]);
 			}
-			ctx.fillText(string, points[0], points[1]);
 			ctx.restore();
 		}
 		
@@ -550,7 +554,7 @@
             if (dx == 0 && dy == 0) {
                 return;
             }
-            var scaleBack = gradient.repeat != CyclicMethodProto.NO_CYCLE ? 0.99 : 1;
+            var scaleBack = 0.99;
             var radiusSq = gradient.radius * gradient.radius;
             var distSq = (dx * dx) + (dy * dy);
             // test if distance from focus to center is greater than the radius
