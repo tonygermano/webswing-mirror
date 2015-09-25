@@ -1,12 +1,12 @@
 package org.webswing.directdraw.model;
 
-import java.awt.image.*;
-import java.util.*;
+import java.awt.image.BufferedImage;
+import java.util.Iterator;
 
-import org.webswing.directdraw.*;
-import org.webswing.directdraw.proto.Directdraw.*;
-import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.*;
-import org.webswing.directdraw.toolkit.*;
+import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto;
+import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
+import org.webswing.directdraw.toolkit.WebImage;
 
 public class DrawInstruction implements Iterable<DrawConstant> {
 
@@ -17,7 +17,7 @@ public class DrawInstruction implements Iterable<DrawConstant> {
 	public DrawInstruction(InstructionProto instruction, DrawConstant... args) {
 		this.instruction = instruction;
 		this.args = args;
-        this.image = null;
+		this.image = null;
 	}
 
 	public DrawInstruction(WebImage image, DrawConstant... args) {
@@ -50,30 +50,29 @@ public class DrawInstruction implements Iterable<DrawConstant> {
 		return builder.build();
 	}
 
-    @Override
-    public Iterator<DrawConstant> iterator() {
-        return new Iterator<DrawConstant>()
-        {
-            int index;
-            
-            @Override
-            public boolean hasNext() {
-                return index < args.length;
-            }
+	@Override
+	public Iterator<DrawConstant> iterator() {
+		return new Iterator<DrawConstant>() {
+			int index;
 
-            @Override
-            public DrawConstant next() {
-                return args[index++];
-            }
+			@Override
+			public boolean hasNext() {
+				return index < args.length;
+			}
 
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException("remove");
-            }
-        };
-    }
+			@Override
+			public DrawConstant next() {
+				return args[index++];
+			}
 
-    @Override
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException("remove");
+			}
+		};
+	}
+
+	@Override
 	public String toString() {
 		return instruction.name();
 	}

@@ -1,6 +1,11 @@
 package org.webswing.toolkit.util;
 
-import org.webswing.ext.services.*;
+import org.webswing.ext.services.DirectDrawService;
+import org.webswing.ext.services.ImageService;
+import org.webswing.ext.services.JsLinkService;
+import org.webswing.ext.services.PdfService;
+import org.webswing.ext.services.ServerConnectionService;
+import org.webswing.ext.services.SwingClassLoaderFactoryService;
 
 public class Services {
 

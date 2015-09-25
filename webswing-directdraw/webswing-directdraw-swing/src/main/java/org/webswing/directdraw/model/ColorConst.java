@@ -1,12 +1,11 @@
 package org.webswing.directdraw.model;
 
-import java.awt.*;
+import java.awt.Color;
 
-import org.webswing.directdraw.*;
-import org.webswing.directdraw.proto.Directdraw.*;
+import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.proto.Directdraw.ColorProto;
 
-public class ColorConst extends ImmutableDrawConstantHolder<Color>
-{
+public class ColorConst extends ImmutableDrawConstantHolder<Color> {
 
 	public ColorConst(DirectDraw context, Color value) {
 		super(context, value);
@@ -17,14 +16,14 @@ public class ColorConst extends ImmutableDrawConstantHolder<Color>
 		return "color";
 	}
 
-    @Override
-    public ColorProto toMessage() {
-        ColorProto.Builder model = ColorProto.newBuilder();
-        model.setRgba(toRGBA(value));
-        return model.build();
-    }
+	@Override
+	public ColorProto toMessage() {
+		ColorProto.Builder model = ColorProto.newBuilder();
+		model.setRgba(toRGBA(value));
+		return model.build();
+	}
 
-    public static int toRGBA(Color color) {
-        return (color.getRGB() << 8) | color.getAlpha();
-    }
+	public static int toRGBA(Color color) {
+		return (color.getRGB() << 8) | color.getAlpha();
+	}
 }

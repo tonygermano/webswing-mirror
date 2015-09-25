@@ -1,18 +1,42 @@
 package org.webswing.directdraw.toolkit;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.util.*;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Transparency;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
+import java.awt.image.RenderedImage;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
-import org.webswing.directdraw.*;
-import org.webswing.directdraw.model.*;
-import org.webswing.directdraw.proto.Directdraw.*;
-import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.*;
-import org.webswing.directdraw.util.*;
-import sun.awt.image.*;
-import sun.java2d.*;
+import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.model.DrawConstant;
+import org.webswing.directdraw.model.DrawInstruction;
+import org.webswing.directdraw.model.ImageConst;
+import org.webswing.directdraw.model.IntegerConst;
+import org.webswing.directdraw.model.PointsConst;
+import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
+import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
+import org.webswing.directdraw.proto.Directdraw.WebImageProto;
+import org.webswing.directdraw.util.DirectDrawUtils;
+import org.webswing.directdraw.util.DrawConstantPool;
+import org.webswing.directdraw.util.RenderUtil;
+import sun.awt.image.SurfaceManager;
+import sun.java2d.SurfaceData;
 
 public class WebImage extends Image {
 
@@ -30,67 +54,67 @@ public class WebImage extends Image {
 	@SuppressWarnings("restriction")
 	public WebImage(DirectDraw dd, int w, int h) {
 		this(dd, w, h, new ArrayList<WebImage>(), new ArrayList<DrawInstruction>());
-        this.usedGraphics = new HashSet<WebGraphics>();
+		this.usedGraphics = new HashSet<WebGraphics>();
 	}
 
-    private WebImage(DirectDraw dd, int w, int h, List<WebImage> chunks, List<DrawInstruction> instructions) {
-        this.context = dd;
-        this.size = new Dimension(w, h);
-        this.chunks = chunks;
-        this.instructions = instructions;
-        
-        SurfaceManager.setManager(this, new SurfaceManager() {
+	private WebImage(DirectDraw dd, int w, int h, List<WebImage> chunks, List<DrawInstruction> instructions) {
+		this.context = dd;
+		this.size = new Dimension(w, h);
+		this.chunks = chunks;
+		this.instructions = instructions;
 
-            @SuppressWarnings("unused")
-            // java 1.6
-            public SurfaceData getSourceSurfaceData(sun.java2d.SurfaceData s, sun.java2d.loops.CompositeType c, java.awt.Color color, boolean b) {
-                BufferedImage snapshot = WebImage.this.getSnapshot();
-                SurfaceManager m = SurfaceManager.getManager(snapshot);
-                try {
-                    return (SurfaceData) m.getClass().getDeclaredMethod("getSourceSurfaceData", sun.java2d.SurfaceData.class, sun.java2d.loops.CompositeType.class, java.awt.Color.class, Boolean.TYPE).invoke(m, s, c, color, b);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
+		SurfaceManager.setManager(this, new SurfaceManager() {
 
-            @SuppressWarnings("unused")
-            // java 1.6
-            public SurfaceData getDestSurfaceData() {
-                BufferedImage snapshot = WebImage.this.getSnapshot();
-                SurfaceManager m = SurfaceManager.getManager(snapshot);
-                try {
-                    return (SurfaceData) m.getClass().getDeclaredMethod("getDestSurfaceData").invoke(m);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
+			@SuppressWarnings("unused")
+			// java 1.6
+			public SurfaceData getSourceSurfaceData(sun.java2d.SurfaceData s, sun.java2d.loops.CompositeType c, java.awt.Color color, boolean b) {
+				BufferedImage snapshot = WebImage.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("getSourceSurfaceData", sun.java2d.SurfaceData.class, sun.java2d.loops.CompositeType.class, java.awt.Color.class, Boolean.TYPE).invoke(m, s, c, color, b);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
 
-            public SurfaceData getPrimarySurfaceData() {// java 1.7
-                BufferedImage snapshot = WebImage.this.getSnapshot();
-                SurfaceManager m = SurfaceManager.getManager(snapshot);
-                try {
-                    return (SurfaceData) m.getClass().getDeclaredMethod("getPrimarySurfaceData").invoke(m);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
+			@SuppressWarnings("unused")
+			// java 1.6
+			public SurfaceData getDestSurfaceData() {
+				BufferedImage snapshot = WebImage.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("getDestSurfaceData").invoke(m);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
 
-            public SurfaceData restoreContents() {// java 1.7
-                BufferedImage snapshot = WebImage.this.getSnapshot();
-                SurfaceManager m = SurfaceManager.getManager(snapshot);
-                try {
-                    return (SurfaceData) m.getClass().getDeclaredMethod("restoreContents").invoke(m);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        });
-    }
-    
+			public SurfaceData getPrimarySurfaceData() {// java 1.7
+				BufferedImage snapshot = WebImage.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("getPrimarySurfaceData").invoke(m);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			public SurfaceData restoreContents() {// java 1.7
+				BufferedImage snapshot = WebImage.this.getSnapshot();
+				SurfaceManager m = SurfaceManager.getManager(snapshot);
+				try {
+					return (SurfaceData) m.getClass().getDeclaredMethod("restoreContents").invoke(m);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+		});
+	}
+
 	@Override
 	public int getWidth(ImageObserver paramImageObserver) {
 		return size.width;
@@ -126,7 +150,7 @@ public class WebImage extends Image {
 
 	public boolean isDirty() {
 		synchronized (this) {
-            return !instructions.isEmpty();
+			return !instructions.isEmpty();
 		}
 	}
 
@@ -134,16 +158,16 @@ public class WebImage extends Image {
 		if (g != null && g.isDisposed()) {
 			throw new RuntimeException("Drawing to disposed graphics.");
 		}
-        synchronized (this) {
-            if (in.getInstruction().equals(InstructionProto.COPY_AREA) && !instructions.isEmpty()) {
-                // copy area instruction must be isolated and always as a first
-                // instruction
-                WebImage newChunk = extractReadOnlyWebImage(true);
-                chunks = newChunk.chunks;
-                newChunk.chunks = null;
-                chunks.add(newChunk);
-            }
-            DrawInstructionFactory factory = context.getInstructionFactory();
+		synchronized (this) {
+			if (in.getInstruction().equals(InstructionProto.COPY_AREA) && !instructions.isEmpty()) {
+				// copy area instruction must be isolated and always as a first
+				// instruction
+				WebImage newChunk = extractReadOnlyWebImage(true);
+				chunks = newChunk.chunks;
+				newChunk.chunks = null;
+				chunks.add(newChunk);
+			}
+			DrawInstructionFactory factory = context.getInstructionFactory();
 			if (lastUsedG != g) {
 				if (!usedGraphics.contains(g)) {
 					instructions.add(factory.createGraphics(g));
@@ -162,12 +186,12 @@ public class WebImage extends Image {
 			instructions.add(in);
 		}
 	}
-    
-    public void dispose(WebGraphics g) {
-        synchronized (this) {
-            usedGraphics.remove(g);
-        }
-    }
+
+	public void dispose(WebGraphics g) {
+		synchronized (this) {
+			usedGraphics.remove(g);
+		}
+	}
 
 	public void addImage(WebGraphics g, Object image, ImageObserver o, AffineTransform xform, Rectangle2D.Float crop) {
 		Graphics2D ihg = (Graphics2D) getImageHolder().getGraphics();
@@ -224,16 +248,16 @@ public class WebImage extends Image {
 	}
 
 	public WebImage extractReadOnlyWebImage(boolean reset) {
-        WebImage result;
-        synchronized (this) {
-            result = reset ?
-                new ReadOnlyWebImage(context, size.width, size.height, chunks, instructions) :
-                new ReadOnlyWebImage(context, size.width, size.height, new ArrayList<WebImage>(chunks), new ArrayList<DrawInstruction>(instructions));
-            result.id = id;
-            // extract the areas where images were painted. For saving some
-            // memory by not keeping the full window image
-            // but just the relevant areas
-            result.preprocessDrawImageInstructions(imageHolder);
+		WebImage result;
+		synchronized (this) {
+			result = reset ?
+				new ReadOnlyWebImage(context, size.width, size.height, chunks, instructions) :
+				new ReadOnlyWebImage(context, size.width, size.height, new ArrayList<WebImage>(chunks), new ArrayList<DrawInstruction>(instructions));
+			result.id = id;
+			// extract the areas where images were painted. For saving some
+			// memory by not keeping the full window image
+			// but just the relevant areas
+			result.preprocessDrawImageInstructions(imageHolder);
 			if (reset) {
 				reset();
 			}
@@ -247,18 +271,18 @@ public class WebImage extends Image {
 			// find drawImage instructions and save subImages to subImageMap
 			// (these are later encoded to proto message)
 			for (int index = 0; index < instructions.size(); index++) {
-                DrawInstruction instruction = instructions.get(index);
+				DrawInstruction instruction = instructions.get(index);
 				if (instruction.getInstruction() == InstructionProto.DRAW_IMAGE) {
-                    Rectangle hold = new Rectangle(imageHolder.getWidth(), imageHolder.getHeight());
+					Rectangle hold = new Rectangle(imageHolder.getWidth(), imageHolder.getHeight());
 					Rectangle2D bounds = hold.createIntersection(((Shape) instruction.getArg(0).getValue()).getBounds());
 					BufferedImage subImage = new BufferedImage((int) bounds.getWidth(), (int) bounds.getHeight(), BufferedImage.TYPE_INT_ARGB);
 					Graphics sig = subImage.getGraphics();
 					sig.drawImage(imageHolder.getSubimage((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight()), 0, 0, null);
 					sig.dispose();
 					PointsConst points = new PointsConst(context, 0, (int) bounds.getX(), (int) bounds.getY());
-                    instruction = new DrawInstruction(InstructionProto.DRAW_IMAGE, instruction.getArg(0), points);
-                    instructions.set(index, instruction);
-                    partialImageMap.put(instruction, subImage);
+					instruction = new DrawInstruction(InstructionProto.DRAW_IMAGE, instruction.getArg(0), points);
+					instructions.set(index, instruction);
+					partialImageMap.put(instruction, subImage);
 				}
 			}
 		}
@@ -281,58 +305,58 @@ public class WebImage extends Image {
 
 		// build proto message
 		for (DrawInstruction instruction : instructions) {
-            if (instruction.getInstruction() == InstructionProto.DRAW_IMAGE) {
-                // compute image hash and link containing image
-                BufferedImage subImage = partialImageMap.get(instruction);
-                ImageConst imageConst = new ImageConst(context, subImage);
-                int id;
-                int[] points = ((PointsConst) instruction.getArg(1)).getValue();
-                if (!imagePool.isInCache(imageConst)) {
-                    imagePool.addToCache(imageConst);
-                    DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
-                    builder.setId(imageConst.getId());
-                    if (imageConst.getFieldName() != null) {
-                        builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(imageConst.getFieldName()), imageConst.toMessage());
-                    }
-                    webImageBuilder.addImages(builder.build());
-                    id = imageConst.getId();
-                } else {
-                    id = imagePool.getCached(imageConst).getId();
-                }
-                instruction = new DrawInstruction(InstructionProto.DRAW_IMAGE, instruction.getArg(0), new PointsConst(context, id, points[1], points[2]));
-            }
-            for (DrawConstant cons : instruction) {
-                if (!(cons instanceof IntegerConst) && cons != DrawConstant.nullConst) {
-                    // update cache
-                    if (!constantPool.isInCache(cons)) {
-                        constantPool.addToCache(cons);
-                        DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
-                        builder.setId(cons.getId());
-                        if (cons.getFieldName() != null) {
-                            builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(cons.getFieldName()), cons.toMessage());
-                        }
-                        webImageBuilder.addConstants(builder.build());
-                    } else {
-                        cons.setId(constantPool.getCached(cons).getId());
-                    }
-                }
-            }
+			if (instruction.getInstruction() == InstructionProto.DRAW_IMAGE) {
+				// compute image hash and link containing image
+				BufferedImage subImage = partialImageMap.get(instruction);
+				ImageConst imageConst = new ImageConst(context, subImage);
+				int id;
+				int[] points = ((PointsConst) instruction.getArg(1)).getValue();
+				if (!imagePool.isInCache(imageConst)) {
+					imagePool.addToCache(imageConst);
+					DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
+					builder.setId(imageConst.getId());
+					if (imageConst.getFieldName() != null) {
+						builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(imageConst.getFieldName()), imageConst.toMessage());
+					}
+					webImageBuilder.addImages(builder.build());
+					id = imageConst.getId();
+				} else {
+					id = imagePool.getCached(imageConst).getId();
+				}
+				instruction = new DrawInstruction(InstructionProto.DRAW_IMAGE, instruction.getArg(0), new PointsConst(context, id, points[1], points[2]));
+			}
+			for (DrawConstant cons : instruction) {
+				if (!(cons instanceof IntegerConst) && cons != DrawConstant.nullConst) {
+					// update cache
+					if (!constantPool.isInCache(cons)) {
+						constantPool.addToCache(cons);
+						DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
+						builder.setId(cons.getId());
+						if (cons.getFieldName() != null) {
+							builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(cons.getFieldName()), cons.toMessage());
+						}
+						webImageBuilder.addConstants(builder.build());
+					} else {
+						cons.setId(constantPool.getCached(cons).getId());
+					}
+				}
+			}
 			webImageBuilder.addInstructions(instruction.toMessage(dd));
 		}
 		webImageBuilder.setWidth(size.width);
 		webImageBuilder.setHeight(size.height);
-        return webImageBuilder.build();
+		return webImageBuilder.build();
 	}
 
 	public void reset() {
-        synchronized (this) {
-            imageHolder = null;
-            lastUsedG = null;
-            usedGraphics.clear();
-            // do not clear these collections as they are be copied to read-only instance
-            instructions = new ArrayList<DrawInstruction>();
-            chunks = new ArrayList<WebImage>();
-        }
+		synchronized (this) {
+			imageHolder = null;
+			lastUsedG = null;
+			usedGraphics.clear();
+			// do not clear these collections as they are be copied to read-only instance
+			instructions = new ArrayList<DrawInstruction>();
+			chunks = new ArrayList<WebImage>();
+		}
 	}
 
 	public WebImageProto toMessage(DirectDraw dd) {
@@ -348,32 +372,31 @@ public class WebImage extends Image {
 	public BufferedImage getSnapshot(BufferedImage result) {
 		return RenderUtil.render(result, this, imageHolder, partialImageMap, chunks, instructions, size);
 	}
-    
-    private static class ReadOnlyWebImage extends WebImage {
 
-        public ReadOnlyWebImage(DirectDraw dd, int w, int h, List<WebImage> chunks, List<DrawInstruction> instructions)
-        {
-            super(dd, w, h, chunks, instructions);
-        }
+	private static class ReadOnlyWebImage extends WebImage {
 
-        @Override
-        public void addInstruction(WebGraphics g, DrawInstruction in) {
-            throw new UnsupportedOperationException("This is read only instance of webimage.");
-        }
+		public ReadOnlyWebImage(DirectDraw dd, int w, int h, List<WebImage> chunks, List<DrawInstruction> instructions) {
+			super(dd, w, h, chunks, instructions);
+		}
 
-        @Override
-        public WebImageProto toMessage(DirectDraw dd) {
-            return toMessageInternal(dd);
-        }
+		@Override
+		public void addInstruction(WebGraphics g, DrawInstruction in) {
+			throw new UnsupportedOperationException("This is read only instance of webimage.");
+		}
 
-        @Override
-        public void dispose(WebGraphics g) {
-            // nothing to dispose
-        }
+		@Override
+		public WebImageProto toMessage(DirectDraw dd) {
+			return toMessageInternal(dd);
+		}
 
-        @Override
-        public void reset() {
-            // do nothing
-        }
-    }
+		@Override
+		public void dispose(WebGraphics g) {
+			// nothing to dispose
+		}
+
+		@Override
+		public void reset() {
+			// do nothing
+		}
+	}
 }

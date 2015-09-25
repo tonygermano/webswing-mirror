@@ -8,10 +8,15 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.webswing.applet.*;
-import org.webswing.toolkit.util.*;
+import org.webswing.applet.AppletContainer;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
 
 public class SwingMain {
 

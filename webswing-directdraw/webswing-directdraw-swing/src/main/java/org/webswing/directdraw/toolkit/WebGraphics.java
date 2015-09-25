@@ -1,9 +1,25 @@
 package org.webswing.directdraw.toolkit;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.io.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.ImageObserver;
+import java.awt.image.RenderedImage;
+import java.io.IOException;
 
 public class WebGraphics extends AbstractVectorGraphics {
 
@@ -90,12 +106,12 @@ public class WebGraphics extends AbstractVectorGraphics {
 		}
 	}
 
-    @Override
-    protected void writeFont(Font font) {
-        thisImage.addInstruction(this, dif.setFont(font));
-    }
+	@Override
+	protected void writeFont(Font font) {
+		thisImage.addInstruction(this, dif.setFont(font));
+	}
 
-    @Override
+	@Override
 	public void copyArea(int x, int y, int width, int height, int dx, int dy) {
 		Point2D abs = getTransform().transform(new Point(x, y), null);
 		int absx = (int) abs.getX();
@@ -131,8 +147,8 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	public void dispose() {
-        thisImage.addInstruction(this, dif.disposeGraphics(this));
-        thisImage.dispose(this);
+		thisImage.addInstruction(this, dif.disposeGraphics(this));
+		thisImage.dispose(this);
 		disposed = true;
 	}
 

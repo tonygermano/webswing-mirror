@@ -1,18 +1,25 @@
 package org.directdraw.webswing.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.util.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Rectangle;
+import java.awt.TexturePaint;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.*;
-import org.webswing.directdraw.*;
-import org.webswing.directdraw.model.*;
-import org.webswing.directdraw.toolkit.*;
-import org.webswing.directdraw.util.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.model.DrawInstruction;
+import org.webswing.directdraw.toolkit.DrawInstructionFactory;
+import org.webswing.directdraw.toolkit.WebGraphics;
+import org.webswing.directdraw.toolkit.WebImage;
+import org.webswing.directdraw.util.DirectDrawUtils;
 
 public class DirectDrawUtilsTest {
 
@@ -49,10 +56,10 @@ public class DirectDrawUtilsTest {
 
 		DirectDrawUtils.optimizeInstructions(dd, inst);
 		assertEquals("Count not valid", 2, inst.size());
-        assertEquals("Transform not expected", new AffineTransform(1, 0, 0, 1, 20, 20), inst.get(0).getArg(1).getValue());
-        assertEquals("Stroke not expected", new BasicStroke(2), inst.get(0).getArg(2).getValue());
-        assertEquals("Composite not expected", AlphaComposite.Src, inst.get(0).getArg(3).getValue());
-        assertEquals("Color not expected", Color.blue, inst.get(0).getArg(4).getValue());
+		assertEquals("Transform not expected", new AffineTransform(1, 0, 0, 1, 20, 20), inst.get(0).getArg(1).getValue());
+		assertEquals("Stroke not expected", new BasicStroke(2), inst.get(0).getArg(2).getValue());
+		assertEquals("Composite not expected", AlphaComposite.Src, inst.get(0).getArg(3).getValue());
+		assertEquals("Color not expected", Color.blue, inst.get(0).getArg(4).getValue());
 	}
 
 	@Test
@@ -86,10 +93,10 @@ public class DirectDrawUtilsTest {
 
 		DirectDrawUtils.optimizeInstructions(dd, inst);
 		assertEquals("Count not valid", 2, inst.size());
-        assertEquals("Transform not expected", new AffineTransform(1, 0, 0, 1, 10, 10), inst.get(0).getArg(1).getValue());
-        assertEquals("Stroke not expected", new BasicStroke(2), inst.get(0).getArg(2).getValue());
-        assertEquals("Composite not expected", AlphaComposite.Dst, inst.get(0).getArg(3).getValue());
-        assertEquals("Color not expected", Color.blue, inst.get(0).getArg(4).getValue());
+		assertEquals("Transform not expected", new AffineTransform(1, 0, 0, 1, 10, 10), inst.get(0).getArg(1).getValue());
+		assertEquals("Stroke not expected", new BasicStroke(2), inst.get(0).getArg(2).getValue());
+		assertEquals("Composite not expected", AlphaComposite.Dst, inst.get(0).getArg(3).getValue());
+		assertEquals("Color not expected", Color.blue, inst.get(0).getArg(4).getValue());
 	}
 
 	@Test
@@ -108,7 +115,7 @@ public class DirectDrawUtilsTest {
 
 		DirectDrawUtils.optimizeInstructions(dd, inst);
 		assertEquals("Count not valid", 4, inst.size());
-        assertEquals("Color not expected", Color.green, inst.get(2).getArg(0).getValue());
+		assertEquals("Color not expected", Color.green, inst.get(2).getArg(0).getValue());
 	}
 
 	@Test
@@ -127,7 +134,7 @@ public class DirectDrawUtilsTest {
 
 		DirectDrawUtils.optimizeInstructions(dd, inst);
 		assertEquals("Count not valid", 4, inst.size());
-        assertEquals("Transform not expected", new AffineTransform(1, 0, 0, 1, 20, 70), inst.get(2).getArg(0).getValue());
+		assertEquals("Transform not expected", new AffineTransform(1, 0, 0, 1, 20, 70), inst.get(2).getArg(0).getValue());
 	}
 
 	@Test
@@ -146,7 +153,7 @@ public class DirectDrawUtilsTest {
 
 		DirectDrawUtils.optimizeInstructions(dd, inst);
 		assertEquals("Count not valid", 4, inst.size());
-        assertEquals("Composite not expected", AlphaComposite.SrcAtop, inst.get(2).getArg(0).getValue());
+		assertEquals("Composite not expected", AlphaComposite.SrcAtop, inst.get(2).getArg(0).getValue());
 	}
 
 }

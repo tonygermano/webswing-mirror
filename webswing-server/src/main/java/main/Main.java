@@ -1,17 +1,28 @@
 package main;
 
-import java.awt.*;
-import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
-import java.security.*;
-import java.text.*;
-import java.util.*;
+import java.awt.Toolkit;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.security.ProtectionDomain;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
-import java.util.jar.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
-import org.webswing.*;
-import org.webswing.toolkit.*;
+import org.webswing.Constants;
+import org.webswing.toolkit.WebToolkit;
 
 public class Main {
 
@@ -67,8 +78,8 @@ public class Main {
 	}
 
 	private static void retainOnlyLauncherUrl(List<URL> urls) {
-		for (Iterator<URL> i = urls.iterator(); i.hasNext();) {
-            if (!i.next().getFile().contains("webswing-app-launcher")) {
+		for (Iterator<URL> i = urls.iterator(); i.hasNext(); ) {
+			if (!i.next().getFile().contains("webswing-app-launcher")) {
 				i.remove();
 			}
 		}

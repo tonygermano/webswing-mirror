@@ -1,11 +1,42 @@
 package org.webswing.directdraw.toolkit;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.LinearGradientPaint;
+import java.awt.Paint;
+import java.awt.RadialGradientPaint;
+import java.awt.Shape;
+import java.awt.TexturePaint;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 
-import org.webswing.directdraw.*;
-import org.webswing.directdraw.model.*;
-import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.*;
+import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.model.ArcConst;
+import org.webswing.directdraw.model.ColorConst;
+import org.webswing.directdraw.model.CompositeConst;
+import org.webswing.directdraw.model.DrawConstant;
+import org.webswing.directdraw.model.DrawInstruction;
+import org.webswing.directdraw.model.EllipseConst;
+import org.webswing.directdraw.model.FontConst;
+import org.webswing.directdraw.model.GradientConst;
+import org.webswing.directdraw.model.IntegerConst;
+import org.webswing.directdraw.model.LinearGradientConst;
+import org.webswing.directdraw.model.PathConst;
+import org.webswing.directdraw.model.PointsConst;
+import org.webswing.directdraw.model.RadialGradientConst;
+import org.webswing.directdraw.model.RectangleConst;
+import org.webswing.directdraw.model.RoundRectangleConst;
+import org.webswing.directdraw.model.StringConst;
+import org.webswing.directdraw.model.StrokeConst;
+import org.webswing.directdraw.model.TextureConst;
+import org.webswing.directdraw.model.TransformConst;
+import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
 
 public class DrawInstructionFactory {
 
@@ -23,9 +54,9 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(InstructionProto.FILL, toPathConst(s), toPathConst(clip));
 	}
 
-    public DrawInstruction drawImage(Shape clip) {
-        return new DrawInstruction(InstructionProto.DRAW_IMAGE, toPathConst(clip), /*placeholder*/ DrawConstant.nullConst);
-    }
+	public DrawInstruction drawImage(Shape clip) {
+		return new DrawInstruction(InstructionProto.DRAW_IMAGE, toPathConst(clip), /*placeholder*/ DrawConstant.nullConst);
+	}
 
 	public DrawInstruction drawWebImage(WebImage image, AffineTransform xform, Rectangle2D.Float crop, Color bkg, Shape clip) {
 		DrawConstant transformConst = xform != null ? new TransformConst(ctx, xform) : DrawConstant.nullConst;
@@ -44,17 +75,17 @@ public class DrawInstructionFactory {
 
 	public DrawInstruction createGraphics(WebGraphics g) {
 		DrawConstant id = new IntegerConst(g.getId());
-		DrawConstant transformConst =  new TransformConst(ctx, g.getTransform());
+		DrawConstant transformConst = new TransformConst(ctx, g.getTransform());
 		DrawConstant compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
 		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
 		DrawConstant paintConst = getPaintConstant(g.getPaint());
-        DrawConstant fontConst = new FontConst(ctx, g.getFont());
+		DrawConstant fontConst = new FontConst(ctx, g.getFont());
 		return createGraphics(id, transformConst, strokeConst, compositeConst, paintConst, fontConst);
 	}
 
-    public DrawInstruction createGraphics(DrawConstant id, DrawConstant transform, DrawConstant stroke, DrawConstant composite, DrawConstant paint, DrawConstant font) {
-        return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, id, transform, stroke, composite, paint, font);
-    }
+	public DrawInstruction createGraphics(DrawConstant id, DrawConstant transform, DrawConstant stroke, DrawConstant composite, DrawConstant paint, DrawConstant font) {
+		return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, id, transform, stroke, composite, paint, font);
+	}
 
 	public DrawInstruction disposeGraphics(WebGraphics g) {
 		return new DrawInstruction(InstructionProto.GRAPHICS_DISPOSE, new IntegerConst(g.getId()));
@@ -71,22 +102,21 @@ public class DrawInstructionFactory {
 	public DrawInstruction setPaint(Paint p) {
 		return new DrawInstruction(InstructionProto.SET_PAINT, getPaintConstant(p));
 	}
-    
-    protected DrawConstant getPaintConstant(Paint p)
-    {
-        if (p instanceof Color) {
-            return new ColorConst(ctx, (Color) p);
-        } else if (p instanceof GradientPaint) {
-            return new GradientConst(ctx, (GradientPaint) p);
-        } else if (p instanceof LinearGradientPaint) {
-            return new LinearGradientConst(ctx, (LinearGradientPaint) p);
-        } else if (p instanceof RadialGradientPaint) {
-            return new RadialGradientConst(ctx, (RadialGradientPaint) p);
-        } else if (p instanceof TexturePaint) {
-            return new TextureConst(ctx, (TexturePaint) p);
-        }
-        throw new UnsupportedOperationException();
-    }
+
+	protected DrawConstant getPaintConstant(Paint p) {
+		if (p instanceof Color) {
+			return new ColorConst(ctx, (Color) p);
+		} else if (p instanceof GradientPaint) {
+			return new GradientConst(ctx, (GradientPaint) p);
+		} else if (p instanceof LinearGradientPaint) {
+			return new LinearGradientConst(ctx, (LinearGradientPaint) p);
+		} else if (p instanceof RadialGradientPaint) {
+			return new RadialGradientConst(ctx, (RadialGradientPaint) p);
+		} else if (p instanceof TexturePaint) {
+			return new TextureConst(ctx, (TexturePaint) p);
+		}
+		throw new UnsupportedOperationException();
+	}
 
 	public DrawInstruction setFont(Font font) {
 		return new DrawInstruction(InstructionProto.SET_FONT, new FontConst(ctx, font));

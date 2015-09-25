@@ -49,7 +49,7 @@ message DrawConstantProto {
 	optional ArcProto arc = 14;
 	optional StrokeProto stroke = 15;
 	optional CompositeProto composite = 16;
-    optional TextureProto texture = 17;
+	optional TextureProto texture = 17;
 }
 
 message ColorProto {
@@ -103,7 +103,7 @@ message ArcProto {
 
 	enum ArcTypeProto {
 		OPEN = 0;
-		CHORD =1;
+		CHORD = 1;
 		PIE = 2;
 	}
 }
@@ -126,9 +126,9 @@ message FontProto {
 	required string family = 1;
 	optional StyleProto style = 2;
 	optional uint32 size = 3;
-    optional TransformProto transform = 4;
+	optional TransformProto transform = 4;
 
-	enum StyleProto{
+	enum StyleProto {
 		NORMAL = 0;
 		OBLIQUE = 1;
 		ITALIC = 2;
@@ -178,7 +178,7 @@ message RadialGradientProto {
 	required CyclicMethodProto repeat = 8;
 }
 
-enum CyclicMethodProto{
+enum CyclicMethodProto {
 	NO_CYCLE = 0;
 	REFLECT = 1;
 	REPEAT = 2;
@@ -193,9 +193,9 @@ message CompositeProto {
 	optional float alpha = 2 [default = 1];
 
 	enum CompositeTypeProto {
-	    CLEAR = 1;
-	    SRC = 2;
-	    DST = 9;
+		CLEAR = 1;
+		SRC = 2;
+		DST = 9;
 		SRC_OVER = 3;
 		DST_OVER = 4;
 		SRC_IN = 5;
@@ -209,6 +209,6 @@ message CompositeProto {
 }
 
 message TextureProto {
-    required ImageProto image = 1;
-    required RectangleProto anchor = 2;
+	required ImageProto image = 1;
+	required RectangleProto anchor = 2;
 }

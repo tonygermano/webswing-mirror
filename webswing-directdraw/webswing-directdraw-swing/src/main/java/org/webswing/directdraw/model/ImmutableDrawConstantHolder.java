@@ -6,7 +6,7 @@
  */
 package org.webswing.directdraw.model;
 
-import org.webswing.directdraw.*;
+import org.webswing.directdraw.DirectDraw;
 
 /**
  * <u>Holder for immutable values</u> that would be serialized on demand.
@@ -14,26 +14,26 @@ import org.webswing.directdraw.*;
  * And it makes no sense to serialize other immutable values as they'll be needed later for rendering.
  */
 public abstract class ImmutableDrawConstantHolder<T> extends DrawConstant<T> {
-    
-    protected final T value;
-    
-    public ImmutableDrawConstantHolder(DirectDraw context, T value) {
-        super(context);
-        this.value = value;
-    }
-    
-    public final T getValue() {
-        return value;
-    }
 
-    @Override
-    public int hashCode() {
-        return value.hashCode();
-    }
+	protected final T value;
 
-    @Override
-    public boolean equals(Object o) {
-        return o == this ||
-            o instanceof ImmutableDrawConstantHolder && value.equals(((ImmutableDrawConstantHolder) o).getValue());
-    }
+	public ImmutableDrawConstantHolder(DirectDraw context, T value) {
+		super(context);
+		this.value = value;
+	}
+
+	public final T getValue() {
+		return value;
+	}
+
+	@Override
+	public int hashCode() {
+		return value.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return o == this ||
+			o instanceof ImmutableDrawConstantHolder && value.equals(((ImmutableDrawConstantHolder) o).getValue());
+	}
 }

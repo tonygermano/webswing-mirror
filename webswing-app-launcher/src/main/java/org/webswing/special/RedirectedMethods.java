@@ -1,14 +1,18 @@
 package org.webswing.special;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.net.URL;
+import java.util.Enumeration;
 
-import javax.swing.*;
+import javax.swing.JDesktopPane;
+import javax.swing.RepaintManager;
 
-import org.webswing.*;
-import org.webswing.toolkit.extra.*;
-import org.webswing.toolkit.util.*;
+import org.webswing.SwingMain;
+import org.webswing.toolkit.extra.WebRepaintManager;
+import org.webswing.toolkit.util.Logger;
 
 public class RedirectedMethods {
 
