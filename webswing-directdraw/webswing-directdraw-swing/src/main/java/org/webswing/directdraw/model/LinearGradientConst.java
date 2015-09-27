@@ -1,48 +1,17 @@
 package org.webswing.directdraw.model;
 
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.LinearGradientPaint;
-import java.awt.Point;
-import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.geom.Point2D;
+import java.util.Arrays;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.proto.Directdraw.CyclicMethodProto;
 import org.webswing.directdraw.proto.Directdraw.LinearGradientProto;
 
-public class LinearGradientConst extends DrawConstant {
+public class LinearGradientConst extends ImmutableDrawConstantHolder<LinearGradientPaint> {
 
-	public LinearGradientConst(DirectDraw context, LinearGradientPaint lgp) {
-		super(context);
-		LinearGradientProto.Builder model = LinearGradientProto.newBuilder();
-		model.setXStart((int) lgp.getStartPoint().getX());
-		model.setYStart((int) lgp.getStartPoint().getY());
-		model.setXEnd((int) lgp.getEndPoint().getX());
-		model.setYEnd((int) lgp.getEndPoint().getY());
-		for (Color c : lgp.getColors()) {
-			model.addColors((c.getRGB() << 8) | c.getAlpha());
-		}
-		for (float f : lgp.getFractions()) {
-			model.addFractions(f);
-		}
-		model.setRepeat(CyclicMethodProto.valueOf(lgp.getCycleMethod().name()));
-		this.message = model.build();
-	}
-
-	public LinearGradientConst(DirectDraw context, GradientPaint p) {
-		super(context);
-		LinearGradientProto.Builder model = LinearGradientProto.newBuilder();
-		model.setXStart((int) p.getPoint1().getX());
-		model.setYStart((int) p.getPoint1().getY());
-		model.setXEnd((int) p.getPoint2().getX());
-		model.setYEnd((int) p.getPoint2().getY());
-		model.addColors((p.getColor1().getRGB() << 8) | p.getColor1().getAlpha());
-		model.addColors((p.getColor2().getRGB() << 8) | p.getColor2().getAlpha());
-		model.addFractions(0);
-		model.addFractions(1);
-		model.setRepeat(p.isCyclic() ? CyclicMethodProto.REPEAT : CyclicMethodProto.NO_CYCLE);
-		this.message = model.build();
+	public LinearGradientConst(DirectDraw context, LinearGradientPaint value) {
+		super(context, value);
 	}
 
 	@Override
@@ -50,21 +19,47 @@ public class LinearGradientConst extends DrawConstant {
 		return "linearGrad";
 	}
 
-	public LinearGradientPaint getLinearGradientPaint() {
-		LinearGradientProto glp = (LinearGradientProto) message;
-		Color[] colors = glp.getColorsCount() > 0 ? new Color[glp.getColorsCount()] : null;
-		for (int i = 0; i < glp.getColorsCount(); i++) {
-			colors[i] = ColorConst.getColor(glp.getColors(i));
+	@Override
+	public LinearGradientProto toMessage() {
+		LinearGradientProto.Builder model = LinearGradientProto.newBuilder();
+		model.setXStart((int) value.getStartPoint().getX());
+		model.setYStart((int) value.getStartPoint().getY());
+		model.setXEnd((int) value.getEndPoint().getX());
+		model.setYEnd((int) value.getEndPoint().getY());
+		for (Color color : value.getColors()) {
+			model.addColors(ColorConst.toRGBA(color));
 		}
-		float[] fractions = glp.getFractionsCount() > 0 ? new float[glp.getFractionsCount()] : null;
-		for (int i = 0; i < glp.getFractionsCount(); i++) {
-			fractions[i] = glp.getFractions(i);
+		for (float fraction : value.getFractions()) {
+			model.addFractions(fraction);
 		}
-		Point2D end = new Point(glp.getXEnd(), glp.getYEnd());
-		Point2D start = new Point(glp.getXStart(), glp.getYStart());
-		CycleMethod cycleMethod = CycleMethod.valueOf(glp.getRepeat().name());
-
-		return new LinearGradientPaint(start, end, fractions, colors, cycleMethod);
+		model.setRepeat(CyclicMethodProto.valueOf(value.getCycleMethod().name()));
+		return model.build();
 	}
 
+	@Override
+	public int hashCode() {
+		int result = 1;
+		result = 31 * result + value.getStartPoint().hashCode();
+		result = 31 * result + value.getEndPoint().hashCode();
+		result = 31 * result + Arrays.hashCode(value.getColors());
+		result = 31 * result + Arrays.hashCode(value.getFractions());
+		result = 31 * result + value.getCycleMethod().hashCode();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (!(o instanceof LinearGradientConst)) {
+			return false;
+		}
+		LinearGradientConst other = (LinearGradientConst) o;
+		return value.getStartPoint().equals(other.value.getStartPoint()) &&
+			value.getEndPoint().equals(other.value.getEndPoint()) &&
+			Arrays.equals(value.getColors(), other.value.getColors()) &&
+			Arrays.equals(value.getFractions(), other.value.getFractions()) &&
+			value.getCycleMethod() == other.value.getCycleMethod();
+	}
 }

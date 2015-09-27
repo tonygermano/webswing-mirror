@@ -1,33 +1,31 @@
-/**
- * <p>Title: FundCount, LLC</p>
- * <p>Description: FundCount project</p>
- * <p>Copyright: Copyright (c) 2001-2015 FundCount, LLC</p>
- * <p>Company: FundCount, LLC</p>
- */
 package org.webswing.directdraw.model;
 
-import java.awt.*;
+import java.awt.TexturePaint;
 
-import org.webswing.directdraw.*;
-import org.webswing.directdraw.proto.Directdraw.*;
+import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.proto.Directdraw.TextureProto;
 
-public class TextureConst extends DrawConstant {
-    
-    public TextureConst(DirectDraw context, TexturePaint t) {
-        super(context);
-        TextureProto.Builder model = TextureProto.newBuilder();
-        model.setImage((ImageProto) new ImageConst(context, t.getImage(), null).message);
-        model.setAnchor((RectangleProto) new RectangleConst(context, t.getAnchorRect()).message);
-        this.message = model.build();
-    }
+public class TextureConst extends MutableDrawConstantHolder<TexturePaint, TextureProto> {
 
-    @Override
-    public String getFieldName() {
-        return "texture";
-    }
+	public TextureConst(DirectDraw context, TexturePaint value) {
+		super(context, value);
+	}
 
-    public TexturePaint getTexture() {
-        TextureProto t = (TextureProto) message;
-        return new TexturePaint(ImageConst.getImage(t.getImage()), RectangleConst.getRectangle(t.getAnchor()));
-    }
+	@Override
+	public String getFieldName() {
+		return "texture";
+	}
+
+	@Override
+	public TextureProto buildMessage(TexturePaint value) {
+		TextureProto.Builder model = TextureProto.newBuilder();
+		model.setImage(new ImageConst(getContext(), value.getImage()).toMessage());
+		model.setAnchor(new RectangleConst(getContext(), value.getAnchorRect()).toMessage());
+		return model.build();
+	}
+
+	@Override
+	public TexturePaint getValue() {
+		return new TexturePaint(ImageConst.getValue(message.getImage()), RectangleConst.getValue(message.getAnchor()));
+	}
 }

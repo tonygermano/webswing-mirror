@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -48,7 +47,7 @@ public class Main {
 			initTempDirPath(args);
 			populateClasspathFromDir("WEB-INF/server-lib", urls);
 		}
-		ClassLoader defaultCL = new URLClassLoader(urls.toArray(new URL[0]), null);
+		ClassLoader defaultCL = new URLClassLoader(urls.toArray(new URL[urls.size()]), null);
 		Thread.currentThread().setContextClassLoader(defaultCL);
 		Class<?> mainClass;
 		if (client) {
@@ -57,7 +56,7 @@ public class Main {
 			mainClass = defaultCL.loadClass("org.webswing.ServerMain");
 		}
 
-		Method method = mainClass.getMethod("main", new Class[] { args.getClass() });
+		Method method = mainClass.getMethod("main", args.getClass());
 		method.setAccessible(true);
 		try {
 			method.invoke(null, new Object[] { args });
@@ -79,9 +78,8 @@ public class Main {
 	}
 
 	private static void retainOnlyLauncherUrl(List<URL> urls) {
-		for (Iterator<URL> i = urls.iterator(); i.hasNext();) {
-			URL thisurl = i.next();
-			if (!thisurl.getFile().contains("webswing-app-launcher")) {
+		for (Iterator<URL> i = urls.iterator(); i.hasNext(); ) {
+			if (!i.next().getFile().contains("webswing-app-launcher")) {
 				i.remove();
 			}
 		}
@@ -90,14 +88,14 @@ public class Main {
 
 	private static void initializeExtLibServices(List<URL> urls) throws Exception {
 		// sets up Services class providing jms connection and other services in separated classloader to prevent classpath pollution of swing application.
-		ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[0]), null);
-		Class<?> classLoaderUtilclass = extLibClassLoader.loadClass("org.webswing.util.ClassLoaderUtil");
-		Method initializeServicesMethod = classLoaderUtilclass.getMethod("initializeServices");
+		ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), null);
+		Class<?> classLoaderUtilClass = extLibClassLoader.loadClass("org.webswing.util.ClassLoaderUtil");
+		Method initializeServicesMethod = classLoaderUtilClass.getMethod("initializeServices");
 		initializeServicesMethod.invoke(null);
 		((WebToolkit) Toolkit.getDefaultToolkit()).init();
 	}
 
-	private static void populateClasspathFromDir(String dir, List<URL> urls) throws IOException, MalformedURLException {
+	private static void populateClasspathFromDir(String dir, List<URL> urls) throws IOException {
 		for (URL f : getFilesFromPath(Main.class.getClassLoader().getResource(dir))) {
 			urls.add(f);
 		}

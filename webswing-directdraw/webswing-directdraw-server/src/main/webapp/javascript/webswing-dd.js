@@ -24,7 +24,6 @@
 		var StrokeCapProto = proto.build("org.webswing.directdraw.proto.StrokeProto.StrokeCapProto");
 		var StyleProto = proto.build("org.webswing.directdraw.proto.FontProto.StyleProto");
 		var CompositeTypeProto = proto.build("org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto");
-		var MAX_GRADIENT_CYCLE_REPEAT_COUNT = 20;
 		var constantPoolCache = c.constantPoolCache || {};
 		var imagePoolCache = c.imagePoolCache || {};
 
@@ -127,6 +126,8 @@
 				constantPoolCache[constant.id] = constant;
 				if (constant.image != null) {
 					imagesToPrepare.push(constant.image);
+				} else if (constant.texture != null) {
+					imagesToPrepare.push(constant.texture.image);
 				}
 			});
 			if (image.images != null) {
@@ -138,57 +139,63 @@
 		}
 
 		function interpretInstruction(ctx, instruction, imageContext) {
-			var instCode = instruction.inst;
 			var args = resolveArgs(instruction.args, constantPoolCache);
-			switch (instCode) {
-			case InstructionProto.GRAPHICS_CREATE:
-				iprtGraphicsCreate(ctx, instruction.args[0], args, imageContext);
-				break;
-			case InstructionProto.GRAPHICS_SWITCH:
-				iprtGraphicsSwitch(ctx, instruction.args[0], imageContext);
-				break;
-			case InstructionProto.GRAPHICS_DISPOSE:
-				delete imageContext.graphicsStates[instruction.args[0]];
-				break;
-			case InstructionProto.DRAW:
-				iprtDraw(ctx, args);
-				break;
-			case InstructionProto.FILL:
-				iprtFill(ctx, args);
-				break;
-			case InstructionProto.DRAW_IMAGE:
-				iprtDrawImage(ctx, args);
-				break;
-			case InstructionProto.DRAW_WEBIMAGE:
-				return iprtDrawWebImage(ctx, args, instruction.webImage, imageContext);
-				break;
-			case InstructionProto.DRAW_STRING:
-				iprtDrawString(ctx, args);
-				break;
-			case InstructionProto.COPY_AREA:
-				iprtCopyArea(ctx, args, imageContext);
-				break;
-			case InstructionProto.SET_STROKE:
-				iprtSetStroke(ctx, args);
-				imageContext.graphicsStates[imageContext.currentStateId].strokeArgs = args;
-				break;
-			case InstructionProto.SET_PAINT:
-				iprtSetPaint(ctx, args, imageContext);
-				imageContext.graphicsStates[imageContext.currentStateId].paintArgs = args;
-				break;
-			case InstructionProto.SET_COMPOSITE:
-				iprtSetComposite(ctx, args);
-				imageContext.graphicsStates[imageContext.currentStateId].composite = args;
-				break;
-			case InstructionProto.TRANSFORM:
-				var tx = iprtTransform(ctx, args);
-				imageContext.graphicsStates[imageContext.currentStateId].transformArgs = concatTransform(
-						imageContext.graphicsStates[imageContext.currentStateId].transformArgs, tx);
-				break;
-			default:
-				console.log("instCode:" + instCode + " not recognized");
+			var graphicsState = imageContext.graphicsStates[imageContext.currentStateId];
+			switch (instruction.inst) {
+				case InstructionProto.GRAPHICS_CREATE:
+					iprtGraphicsCreate(ctx, instruction.args[0], args, imageContext);
+					break;
+				case InstructionProto.GRAPHICS_SWITCH:
+					iprtGraphicsSwitch(ctx, instruction.args[0], imageContext);
+					break;
+				case InstructionProto.GRAPHICS_DISPOSE:
+					iprtGraphicsDispose(instruction.args[0], imageContext);
+					break;
+				case InstructionProto.DRAW:
+					iprtDraw(ctx, args);
+					break;
+				case InstructionProto.FILL:
+					iprtFill(ctx, args);
+					break;
+				case InstructionProto.DRAW_IMAGE:
+					iprtDrawImage(ctx, args);
+					break;
+				case InstructionProto.DRAW_WEBIMAGE:
+					return iprtDrawWebImage(ctx, args, instruction.webImage);
+					break;
+				case InstructionProto.DRAW_STRING:
+					iprtDrawString(ctx, args, graphicsState.fontTransform);
+					break;
+				case InstructionProto.COPY_AREA:
+					iprtCopyArea(ctx, args);
+					break;
+				case InstructionProto.SET_STROKE:
+					graphicsState.strokeArgs = args;
+					iprtSetStroke(ctx, args);
+					break;
+				case InstructionProto.SET_PAINT:
+					graphicsState.paintArgs = args;
+					iprtSetPaint(ctx, args);
+					break;
+				case InstructionProto.SET_COMPOSITE:
+					graphicsState.compositeArgs = args;
+					iprtSetComposite(ctx, args);
+					break;
+				case InstructionProto.SET_FONT:
+					graphicsState.fontArgs = args;
+					graphicsState.fontTransform = iprtSetFont(ctx, args);
+					break;
+				case InstructionProto.TRANSFORM:
+					graphicsState.transform = concatTransform(graphicsState.transform, iprtTransform(ctx, args));
+					break;
+				default:
+					console.log("instruction code: " + instruction.inst + " not recognized");
 			}
 			return Promise.resolve();
+		}
+		
+		function iprtGraphicsDispose(id, imageContext) {
+			delete imageContext.graphicsStates[id];
 		}
 
 		function iprtGraphicsSwitch(ctx, id, imageContext) {
@@ -200,12 +207,15 @@
 				if (graphicsStates[id].paintArgs != null) {
 					iprtSetPaint(ctx, graphicsStates[id].paintArgs);
 				}
-				if (graphicsStates[id].composite != null) {
-					iprtSetComposite(ctx, graphicsStates[id].composite);
+				if (graphicsStates[id].compositeArgs != null) {
+					iprtSetComposite(ctx, graphicsStates[id].compositeArgs);
 				}
-				if (graphicsStates[id].transformArgs != null) {
-					var m = graphicsStates[id].transformArgs;
-					ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
+				if (graphicsStates[id].fontArgs != null) {
+					iprtSetFont(ctx, graphicsStates[id].fontArgs);
+				}
+				if (graphicsStates[id].transform != null) {
+					var t = graphicsStates[id].transform;
+					ctx.setTransform(t[0], t[1], t[2], t[3], t[4], t[5]);
 				}
 			} else {
 				console.log("Graphics with id " + id + " not initialized!");
@@ -213,27 +223,28 @@
 			imageContext.currentStateId = id;
 		}
 
-		function iprtGraphicsCreate(ctx, thisId, args, imageContext) {
+		function iprtGraphicsCreate(ctx, id, args, imageContext) {
 			var graphicsStates = imageContext.graphicsStates;
-			if (graphicsStates[thisId] == null) {
-				graphicsStates[thisId] = {};
-				imageContext.currentStateId = thisId;
+			if (graphicsStates[id] == null) {
+				graphicsStates[id] = {};
+				imageContext.currentStateId = id;
 				args.shift();
-				var tx = iprtTransform(ctx, args, true);
-				imageContext.graphicsStates[thisId].transformArgs = tx;
+				graphicsStates[id].transform = iprtTransform(ctx, args, true);
 				args.shift();
 				iprtSetStroke(ctx, args);
-				imageContext.graphicsStates[thisId].strokeArgs = args.slice(0, 1);
+				graphicsStates[id].strokeArgs = args.slice(0, 1);
 				args.shift();
 				iprtSetComposite(ctx, args);
-				imageContext.graphicsStates[thisId].composite = args.slice(0, 1);
+				graphicsStates[id].compositeArgs = args.slice(0, 1);
 				args.shift();
-				iprtSetPaint(ctx, args, imageContext);
-				imageContext.graphicsStates[thisId].paintArgs = args;
+				iprtSetPaint(ctx, args);
+				graphicsStates[id].paintArgs = args;
+				args.shift();
+				graphicsStates[id].fontArgs = args;
+				graphicsStates[id].fontTransform = iprtSetFont(ctx, args);
 			} else {
-				console.log("Graphics with id " + thisId + " already exist!");
+				console.log("Graphics with id " + id + " already exist!");
 			}
-
 		}
 
 		function iprtDraw(ctx, args) {
@@ -276,7 +287,7 @@
 			ctx.restore();
 		}
 
-		function iprtDrawWebImage(ctx, args, imagedata, imageContext) {
+		function iprtDrawWebImage(ctx, args, imagedata) {
 			var transform = null, crop = null, clip = null;
 
 			if (args[0].transform != null) {
@@ -301,17 +312,26 @@
 			});
 		}
 
-		function iprtDrawString(ctx, args) {
-			var string, font, transform, clip;
-			string = args[0].string;
-			font = args[1].font;
-			transform = args[2];
-			clip = args[3];
+		function iprtDrawString(ctx, args, fontTransform) {
+			var string = args[0].string;
+			var points = args[1].points.points;
+			var clip = args[2];
 			ctx.save();
 			if (path(ctx, clip)) {
 				ctx.clip(fillRule(clip));
 			}
-			iprtTransform(ctx, [ transform ]);
+			if (fontTransform != null) {
+				var t = fontTransform;
+				ctx.transform(t.m00, t.m10, t.m01, t.m11, t.m02 + points[0], t.m12 + points[1]);
+				ctx.fillText(string, 0, 0);
+			} else {
+				ctx.fillText(string, points[0], points[1]);
+			}
+			ctx.restore();
+		}
+		
+		function iprtSetFont(ctx, args) {
+			var font = args[0].font;
 			var style = '';
 			switch (font.style) {
 			case StyleProto.NORMAL:
@@ -328,12 +348,10 @@
 				break;
 			}
 			ctx.font = style + " " + font.size + "px " + font.family;
-			ctx.fillText(string, 0, 0);
-
-			ctx.restore();
+			return font.transform;
 		}
 
-		function iprtCopyArea(ctx, args, imageContext) {
+		function iprtCopyArea(ctx, args) {
 			var p = args[0].points.points;
 			var clip = args[1];
 			ctx.save();
@@ -346,7 +364,7 @@
 			ctx.rect(p[0], p[1], p[2], p[3]);
 			ctx.clip();
 			ctx.translate(p[4], p[5]);
-			ctx.drawImage(imageContext.canvas, 0, 0);
+			ctx.drawImage(ctx.canvas, 0, 0);
 			ctx.restore();
 		}
 
@@ -392,14 +410,13 @@
 			}
 		}
 
-		function iprtSetPaint(ctx, args, imageContext) {
+		function iprtSetPaint(ctx, args) {
 			var constant = args[0];
 			if (constant.color != null) {
 				var color = parseColor(constant.color.rgba);
 				ctx.fillStyle = color;
 				ctx.strokeStyle = color;
-			}
-			if (constant.texture != null) {
+			} else if (constant.texture != null) {
 				var anchor = constant.texture.anchor;
 				var preloadedImage = constant.texture.image.data;
 				var ptrn;
@@ -421,115 +438,143 @@
 				}
 				ctx.fillStyle = ptrn;
 				ctx.strokeStyle = ptrn;
-			}
-			if (constant.linearGrad != null) {
-				var g = constant.linearGrad;
-				// in case of cyclic gradient calculate repeat counts
-				var repeatcount = 1;
-				var xIncrement = g.xEnd - g.xStart;
-				var yIncrement = g.yEnd - g.yStart;
-				var increaseCount = 0, decreaseCount = 0;
-				var bCanvasMin, bCanvasMax, bStartPoint, bIncrement;
-				if (g.repeat != null && g.repeat != CyclicMethodProto.NO_CYCLE) {
-					var c = imageContext.canvas;
-					if ((g.yStart - g.yEnd) != 0) {
-						var a = -(g.xStart - g.xEnd) / (g.yStart - g.yEnd);
-						bCanvasMin = Math.min(0, -a * c.width, c.height, c.height - a * c.width);
-						bCanvasMax = Math.max(0, -a * c.width, c.height, c.height - a * c.width);
-						bStartPoint = (g.yStart - a * g.xStart);
-						bIncrement = (g.yEnd - a * g.xEnd) - bStartPoint;
-					} else {
-						bCanvasMin = 0;
-						bCanvasMax = c.width;
-						bStartPoint = g.xStart;
-						bIncrement = xIncrement;
-					}
-					// repeat by increasing
-					var maxCount = (bCanvasMax + (bStartPoint % bIncrement) - (bCanvasMax % bIncrement) - bStartPoint) / bIncrement;
-					// repeat decreasing
-					var minCount = -(bCanvasMin + (bStartPoint % bIncrement) - (bCanvasMin % bIncrement) - bStartPoint) / bIncrement + 1;
-					increaseCount = (maxCount > 0 ? maxCount : 0) + (minCount < 0 ? -minCount : 0);
-					decreaseCount = (minCount > 0 ? minCount : 0) + (maxCount < 0 ? -maxCount : 0);
-					repeatcount = increaseCount + 1 + decreaseCount;
-				}
-				var gradient = ctx.createLinearGradient(g.xStart - xIncrement * decreaseCount, g.yStart - yIncrement * decreaseCount, g.xEnd
-						+ xIncrement * increaseCount, g.yEnd + yIncrement * increaseCount);
-				for ( var rep = -decreaseCount; rep < repeatcount - decreaseCount; rep++) {
-
-					if (rep % 2 == 0) {
-						for ( var i = 0; i < g.colors.length; i++) {
-							gradient.addColorStop(g.fractions[i] / repeatcount + (rep + decreaseCount) / repeatcount, parseColor(g.colors[i]));
-						}
-					} else {
-						for ( var i = g.colors.length - 1; i >= 0; i--) {
-							gradient.addColorStop(Math.abs(1 - (g.fractions[i])) / repeatcount + (rep + decreaseCount) / repeatcount,
-									parseColor(g.colors[i]));
-						}
-					}
-				}
+			} else if (constant.linearGrad != null) {
+				var gradient = iprtLinearGradient(ctx, constant.linearGrad);
+				ctx.fillStyle = gradient;
+				ctx.strokeStyle = gradient;
+			} else if (constant.radialGrad != null) {
+				var gradient = iprtRadialGradient(ctx, constant.radialGrad);
 				ctx.fillStyle = gradient;
 				ctx.strokeStyle = gradient;
 			}
-			if (constant.radialGrad != null) {
-				var rg = constant.radialGrad;
-				// fix focus if outside radius
-				var phi, maxFocusX, maxFocusY, fX, fY, directionX, directionY;
-				phi = 1 / Math.tan((rg.xFocus - rg.xCenter) / (rg.yFocus - rg.yCenter));
-				directionX = rg.xFocus - rg.xCenter < 0 ? -1 : 1;
-				directionY = rg.yFocus - rg.yCenter < 0 ? -1 : 1;
-				maxFocusX = rg.xCenter + (directionX * rg.radius * Math.cos(phi));
-				maxFocusY = rg.yCenter + (directionY * rg.radius * Math.sin(phi));
-				var useMaxFocus = Math.sqrt(Math.pow(maxFocusX - rg.xCenter, 2) + Math.pow(maxFocusY - rg.yCenter, 2)) < Math.sqrt(Math.pow(rg.xFocus
-						- rg.xCenter, 2)
-						+ Math.pow(rg.yFocus - rg.yCenter, 2));
-				fX = useMaxFocus ? (directionX == 1 ? Math.floor(maxFocusX) : Math.ceil(maxFocusX)) : rg.xFocus;
-				fY = useMaxFocus ? (directionY == 1 ? Math.floor(maxFocusY) : Math.ceil(maxFocusY)) : rg.yFocus;
-
-				// in case of cyclic gradient calculate repeat counts
-				var repeatcount = 1;
-				if (rg.repeat != null && rg.repeat != CyclicMethodProto.NO_CYCLE) {
-					var gradientsize;
-					if (fX == rg.xCenter && fY == rg.yCenter) {
-						gradientsize = rg.radius;
-					} else {
-						var distanceFromCenterToFocus = Math.sqrt(Math.pow(rg.xFocus - rg.xCenter, 2) + Math.pow(rg.yFocus - rg.yCenter, 2));
-						gradientsize = Math.min(distanceFromCenterToFocus, rg.radius - distanceFromCenterToFocus);
-					}
-					repeatcount = Math.ceil(Math.sqrt(Math.pow(imageContext.canvas.height, 2) + Math.pow(imageContext.canvas.width, 2))
-							/ gradientsize);
-					repeatcount = Math.min(MAX_GRADIENT_CYCLE_REPEAT_COUNT, repeatcount);
-				}
-
-				// create gradient
-				var xCentershift = (fX - rg.xCenter) * (repeatcount - 1);
-				var yCentershift = (fY - rg.yCenter) * (repeatcount - 1);
-				var grd = ctx.createRadialGradient(fX, fY, 0, rg.xCenter - xCentershift, rg.yCenter - yCentershift, rg.radius * repeatcount);
-				for ( var rep = 0; rep < repeatcount; rep++) {
-					if (rg.repeat == CyclicMethodProto.REFLECT) {
-						if (rep % 2 == 0) {
-							for ( var i = 0; i < rg.colors.length; i++) {
-								grd.addColorStop(rg.fractions[i] / repeatcount + rep / repeatcount, parseColor(rg.colors[i]));
-							}
-						} else {
-							for ( var i = rg.colors.length - 1; i >= 0; i--) {
-								grd.addColorStop(Math.abs(1 - (rg.fractions[i])) / repeatcount + rep / repeatcount, parseColor(rg.colors[i]));
-							}
-						}
-					} else {
-						for ( var i = 0; i < rg.colors.length; i++) {
-							grd.addColorStop(rg.fractions[i] / repeatcount + rep / repeatcount, parseColor(rg.colors[i]));
-						}
-					}
-				}
-				ctx.fillStyle = grd;
-				ctx.strokeStyle = grd;
+		}
+		
+		function iprtLinearGradient(ctx, g) {
+			var x0 = g.xStart;
+			var y0 = g.yStart;
+			var dx = g.xEnd - x0;
+			var dy = g.yEnd - y0;
+			// in case of cyclic gradient calculate repeat counts
+			var repeatCount = 1, increaseCount = repeatCount, decreaseCount = 0;
+			if (g.repeat != CyclicMethodProto.NO_CYCLE && (dx != 0 || dy != 0)) {
+				// calculate how many times gradient will completely repeat in both directions until it touches canvas corners
+				var c = ctx.canvas;
+				var times = [calculateTimes(x0, y0, dx, dy, 0, 0),
+							 calculateTimes(x0, y0, dx, dy, c.width, 0),
+							 calculateTimes(x0, y0, dx, dy, c.width, c.height),
+							 calculateTimes(x0, y0, dx, dy, 0, c.height)];
+				// increase count is maximum of all positive times rounded up
+				increaseCount = Math.ceil(Math.max.apply(Math, times));
+				// decrease count is maximum of all negative times rounded up (with inverted sign)
+				decreaseCount = Math.ceil(-Math.min.apply(Math, times));
+				repeatCount = increaseCount + decreaseCount;
 			}
+			var gradient = ctx.createLinearGradient(x0 - dx * decreaseCount, y0 - dy * decreaseCount, x0 + dx * increaseCount, y0 + dy * increaseCount);
+			for (var rep = -decreaseCount, offset = 0; rep < increaseCount; rep++, offset++) {
+				if (g.repeat != CyclicMethodProto.REFLECT || rep % 2 == 0) {
+					for (var i = 0; i < g.colors.length; i++) {
+						gradient.addColorStop((offset + g.fractions[i]) / repeatCount, parseColor(g.colors[i]));
+					}
+				} else {
+					// reflect colors
+					for (var i = g.colors.length - 1; i >= 0; i--) {
+						gradient.addColorStop((offset + (1 - g.fractions[i])) / repeatCount, parseColor(g.colors[i]));
+					}
+				}
+			}
+			return gradient;
+		}
+		
+		// calculates how many times vector (dx, dy) will repeat from (x0, y0) until it touches a straight line
+		// which goes through (x1, y1) and perpendicular to the vector
+		function calculateTimes(x0, y0, dx, dy, x1, y1) {
+			return ((x1 - x0) * dx + (y1 - y0) * dy) / (dx * dx + dy * dy);
+		}
+		
+		function iprtRadialGradient(ctx, g) {
+			fixFocusPoint(g);
+			var fX = g.xFocus;
+			var fY = g.yFocus;
+			var dx = g.xCenter - fX;
+			var dy = g.yCenter - fY;
+			var r = g.radius;
+			// in case of cyclic gradient calculate repeat counts
+			var repeatCount = 1;
+			if (g.repeat != CyclicMethodProto.NO_CYCLE) {
+				if (dx == 0 && dy == 0) {
+					// calculate how many times gradient will completely repeat in both directions until it touches canvas corners
+					var c = ctx.canvas;
+					var times = [getDistance(fX, fY, 0, 0) / r,
+								 getDistance(fX, fY, c.width, 0) / r,
+								 getDistance(fX, fY, c.width, c.height) / r,
+								 getDistance(fX, fY, 0, c.height) / r];
+					repeatCount = Math.ceil(Math.max.apply(Math, times));
+				} else {
+					var distance = Math.sqrt(dx * dx + dy * dy);
+					// calculate vector which goes from focus point through center to the circle bound
+					var vdX = dx + r * dx / distance;
+					var vdY = dy + r * dy / distance;
+					// and in opposite direction
+					var ovdX = dx - r * dx / distance;
+					var ovdY = dy - r * dy / distance;
+					// calculate how many times gradient will completely repeat in both directions until it touches canvas corners
+					var c = ctx.canvas;
+					var times = [calculateTimes(fX, fY, vdX, vdY, 0, 0),
+								 calculateTimes(fX, fY, vdX, vdY, c.width, 0),
+								 calculateTimes(fX, fY, vdX, vdY, c.width, c.height),
+								 calculateTimes(fX, fY, vdX, vdY, 0, c.height),
+								 calculateTimes(fX, fY, ovdX, ovdY, 0, 0),
+								 calculateTimes(fX, fY, ovdX, ovdY, c.width, 0),
+								 calculateTimes(fX, fY, ovdX, ovdY, c.width, c.height),
+								 calculateTimes(fX, fY, ovdX, ovdY, 0, c.height)];
+					repeatCount = Math.ceil(Math.max.apply(Math, times));
+				}
+			}
+			// in case of repeat focus stays in the same place, radius and distance between focus and center are multiplied
+			var gradient = ctx.createRadialGradient(fX, fY, 0, fX + repeatCount * dx, fY + repeatCount * dy, r * repeatCount);
+			for (var rep = 0; rep < repeatCount; rep++) {
+				if (g.repeat != CyclicMethodProto.REFLECT || rep % 2 == 0) {
+					for (var i = 0; i < g.colors.length; i++) {
+						gradient.addColorStop((rep + g.fractions[i]) / repeatCount, parseColor(g.colors[i]));
+					}
+				} else {
+					// reflect colors
+					for (var i = g.colors.length - 1; i >= 0; i--) {
+						gradient.addColorStop((rep + (1 - g.fractions[i])) / repeatCount, parseColor(g.colors[i]));
+					}
+				}
+			}
+			return gradient;
+		}
+		
+		// fix gradient focus point as java does
+		function fixFocusPoint(gradient) {
+			var dx = gradient.xFocus - gradient.xCenter;
+			var dy = gradient.yFocus - gradient.yCenter;
+			if (dx == 0 && dy == 0) {
+				return;
+			}
+			var scaleBack = 0.99;
+			var radiusSq = gradient.radius * gradient.radius;
+			var distSq = (dx * dx) + (dy * dy);
+			// test if distance from focus to center is greater than the radius
+			if (distSq > radiusSq * scaleBack) {
+				// clamp focus to radius
+				var scale = Math.sqrt(radiusSq * scaleBack / distSq);
+				// modify source object to skip fixes later
+				gradient.xFocus = gradient.xCenter + dx * scale;
+				gradient.yFocus = gradient.yCenter + dy * scale;
+			}
+		}
+		
+		function getDistance(x0, y0, x1, y1) {
+			return Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
 		}
 
 		function iprtSetComposite(ctx, args) {
 			var composite = args[0].composite;
 			if (composite != null) {
-			    ctx.globalAlpha = composite.alpha;
+				ctx.globalAlpha = composite.alpha;
 				switch (composite.type) {
 				case CompositeTypeProto.CLEAR:
 					ctx.globalCompositeOperation = "destination-out";
@@ -569,39 +614,39 @@
 		}
 
 		function path(ctx, arg, biased) {
-		    if (arg == null) {
-		        return false;
-		    }
+			if (arg == null) {
+				return false;
+			}
 		
 			if (arg.rectangle != null) {
-			    ctx.beginPath();
+				ctx.beginPath();
 				pathRectangle(ctx, arg.rectangle, biased);
 				return true;
 			}
 			
 			if (arg.roundRectangle != null) {
-			    ctx.beginPath();
+				ctx.beginPath();
 				pathRoundRectangle(ctx, arg.roundRectangle, biased);
 				return true;
 			}
 
 			if (arg.ellipse != null) {
-			    ctx.beginPath();
+				ctx.beginPath();
 				pathEllipse(ctx, arg.ellipse, biased);
 				return true;
 			}
 
 			if (arg.arc != null) {
-			    ctx.beginPath();
+				ctx.beginPath();
 				pathArc(ctx, arg.arc, biased);
 				return true;
 			}
 
 			// generic path
 			if (arg.path != null) {
-			    ctx.beginPath();
+				ctx.beginPath();
 				var path = arg.path;
-				var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+				var bias = calculateBias(ctx, biased);
 				var off = 0;
 				path.type.forEach(function(type, index) {
 					switch (type) {
@@ -615,13 +660,13 @@
 						break;
 					case SegmentTypeProto.QUAD:
 						ctx.quadraticCurveTo(path.points[off + 0] + bias, path.points[off + 1] + bias,
-						                     path.points[off + 2] + bias, path.points[off + 3] + bias);
+											 path.points[off + 2] + bias, path.points[off + 3] + bias);
 						off += 4;
 						break;
 					case SegmentTypeProto.CUBIC:
 						ctx.bezierCurveTo(path.points[off + 0] + bias, path.points[off + 1] + bias,
-						                  path.points[off + 2] + bias, path.points[off + 3] + bias,
-								          path.points[off + 4] + bias, path.points[off + 5] + bias);
+										  path.points[off + 2] + bias, path.points[off + 3] + bias,
+										  path.points[off + 4] + bias, path.points[off + 5] + bias);
 						off += 6;
 						break;
 					case SegmentTypeProto.CLOSE:
@@ -637,15 +682,15 @@
 		}
 
 		function pathRectangle(ctx, rect, biased) {
-			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+			var bias = calculateBias(ctx, biased);
 			ctx.rect(rect.x + bias, rect.y + bias, rect.w, rect.h);
 		}
 
 		function pathEllipse(ctx, elli, biased) {
-			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+			var bias = calculateBias(ctx, biased);
 			var kappa = 0.5522847498307933;
 			var pcv = 0.5 + kappa * 0.5;
-            var ncv = 0.5 - kappa * 0.5;
+			var ncv = 0.5 - kappa * 0.5;
 
 			ctx.moveTo(elli.x + bias + elli.w, elli.y + bias + 0.5 * elli.h);
 			var pts = getEllipseCoords([ 1.0,  pcv,  pcv,  1.0,  0.5,  1.0 ], elli, bias);
@@ -670,7 +715,7 @@
 		}
 
 		function pathRoundRectangle(ctx, rr, biased) {
-			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+			var bias = calculateBias(ctx, biased);
 			var acv = 0.22385762508460333;
 			
 			var pts = getRRCoords([ 0, 0, 0, 0.5 ], rr, bias);
@@ -700,17 +745,17 @@
 		}
 		
 		function getRRCoords(pts, rr, bias) {
-            var coords = [];
-            var nc = 0;
-            for ( var i = 0; i < pts.length; i += 4) {
-                coords[nc++] = rr.x + bias + pts[i + 0] * rr.w + pts[i + 1] * Math.abs(rr.arcW);
-                coords[nc++] = rr.y + bias + pts[i + 2] * rr.h + pts[i + 3] * Math.abs(rr.arcH);
-            }
-            return coords;
-        }
+			var coords = [];
+			var nc = 0;
+			for (var i = 0; i < pts.length; i += 4) {
+				coords[nc++] = rr.x + bias + pts[i + 0] * rr.w + pts[i + 1] * Math.abs(rr.arcW);
+				coords[nc++] = rr.y + bias + pts[i + 2] * rr.h + pts[i + 3] * Math.abs(rr.arcH);
+			}
+			return coords;
+		}
 
 		function pathArc(ctx, arc, biased) {
-			var bias = (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+			var bias = calculateBias(ctx, biased);
 			var w = arc.w / 2, h = arc.h / 2, x = arc.x + bias + w, y = arc.y + bias + h;
 			var angStRad = -(arc.start * Math.PI / 180);
 			var ext = -arc.extent;
@@ -724,7 +769,7 @@
 				arcSegs = cv == 0 ? 0 : arcSegs;
 			}
 			ctx.moveTo(x + Math.cos(angStRad) * w, y + Math.sin(angStRad) * h);
-			for ( var i = 0; i < arcSegs; i++) {
+			for (var i = 0; i < arcSegs; i++) {
 				var angle = angStRad + increment * i;
 				var relx = Math.cos(angle);
 				var rely = Math.sin(angle);
@@ -751,6 +796,10 @@
 				ctx.closePath();
 				break;
 			}
+		}
+		
+		function calculateBias(ctx, biased) {
+			return (ctx.lineWidth & 1) && biased ? 0.5 : 0;
 		}
 
 		function getImageData(image) {

@@ -48,7 +48,7 @@ public class SwingMain {
 		Class<?> clazz = swingLibClassLoader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
 		Class<?> mainArgType[] = { (new String[0]).getClass() };
 		java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
-		setupContextClassloader(swingLibClassLoader);
+		setupContextClassLoader(swingLibClassLoader);
 		Object argsArray[] = { args };
 		main.invoke(null, argsArray);
 	}
@@ -56,7 +56,7 @@ public class SwingMain {
 	private static void startApplet() throws Exception {
 		Class<?> appletClazz = swingLibClassLoader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
 		Map<String, String> props = resolveProps();
-		setupContextClassloader(swingLibClassLoader);
+		setupContextClassLoader(swingLibClassLoader);
 		if (Applet.class.isAssignableFrom(appletClazz)) {
 			AppletContainer ac = new AppletContainer(appletClazz, props);
 			ac.start();
@@ -65,8 +65,8 @@ public class SwingMain {
 		}
 	}
 
-	private static void setupContextClassloader(ClassLoader swingClassloader) {
-		Thread.currentThread().setContextClassLoader(swingClassloader);
+	private static void setupContextClassLoader(ClassLoader swingClassLoader) {
+		Thread.currentThread().setContextClassLoader(swingClassLoader);
 		try {
 			EventQueue q = Toolkit.getDefaultToolkit().getSystemEventQueue();
 			Class<?> systemQueue = q.getClass();

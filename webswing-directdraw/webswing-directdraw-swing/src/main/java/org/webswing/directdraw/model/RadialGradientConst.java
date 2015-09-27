@@ -1,32 +1,18 @@
 package org.webswing.directdraw.model;
 
 import java.awt.Color;
-import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.Point;
 import java.awt.RadialGradientPaint;
+import java.util.Arrays;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.proto.Directdraw.CyclicMethodProto;
 import org.webswing.directdraw.proto.Directdraw.RadialGradientProto;
+import org.webswing.directdraw.util.DirectDrawUtils;
 
-public class RadialGradientConst extends DrawConstant {
+public class RadialGradientConst extends ImmutableDrawConstantHolder<RadialGradientPaint> {
 
-	public RadialGradientConst(DirectDraw context, RadialGradientPaint rgp) {
-		super(context);
-		RadialGradientProto.Builder model = RadialGradientProto.newBuilder();
-		model.setXCenter((int) rgp.getCenterPoint().getX());
-		model.setYCenter((int) rgp.getCenterPoint().getY());
-		model.setXFocus((int) rgp.getFocusPoint().getX());
-		model.setYFocus((int) rgp.getFocusPoint().getY());
-		model.setRadius((int) rgp.getRadius());
-		for (Color c : rgp.getColors()) {
-			model.addColors((c.getRGB() << 8) | c.getAlpha());
-		}
-		for (float f : rgp.getFractions()) {
-			model.addFractions(f);
-		}
-		model.setRepeat(CyclicMethodProto.valueOf(rgp.getCycleMethod().name()));
-		this.message = model.build();
+	public RadialGradientConst(DirectDraw context, RadialGradientPaint value) {
+		super(context, value);
 	}
 
 	@Override
@@ -34,20 +20,50 @@ public class RadialGradientConst extends DrawConstant {
 		return "radialGrad";
 	}
 
-	public RadialGradientPaint getRadialGradientPaint() {
-		RadialGradientProto gp = (RadialGradientProto) message;
-		Point center = new Point(gp.getXCenter(), gp.getYCenter());
-		float radius = gp.getRadius();
-		Point focus = new Point(gp.getXFocus(), gp.getYFocus());
-		Color[] colors = gp.getColorsCount() > 0 ? new Color[gp.getColorsCount()] : null;
-		for (int i = 0; i < gp.getColorsCount(); i++) {
-			colors[i] = ColorConst.getColor(gp.getColors(i));
+	@Override
+	public RadialGradientProto toMessage() {
+		RadialGradientProto.Builder model = RadialGradientProto.newBuilder();
+		model.setXCenter((int) value.getCenterPoint().getX());
+		model.setYCenter((int) value.getCenterPoint().getY());
+		model.setXFocus((int) value.getFocusPoint().getX());
+		model.setYFocus((int) value.getFocusPoint().getY());
+		model.setRadius((int) value.getRadius());
+		for (Color color : value.getColors()) {
+			model.addColors(ColorConst.toRGBA(color));
 		}
-		float[] fractions = gp.getFractionsCount() > 0 ? new float[gp.getFractionsCount()] : null;
-		for (int i = 0; i < gp.getFractionsCount(); i++) {
-			fractions[i] = gp.getFractions(i);
+		for (float fraction : value.getFractions()) {
+			model.addFractions(fraction);
 		}
-		CycleMethod cycleMethod = CycleMethod.valueOf(gp.getRepeat().name());
-		return new RadialGradientPaint(center, radius, focus, fractions, colors, cycleMethod);
+		model.setRepeat(CyclicMethodProto.valueOf(value.getCycleMethod().name()));
+		return model.build();
+	}
+
+	@Override
+	public int hashCode() {
+		int result = 1;
+		result = 31 * result + value.getCenterPoint().hashCode();
+		result = 31 * result + value.getFocusPoint().hashCode();
+		result = 31 * result + DirectDrawUtils.hashCode(value.getRadius());
+		result = 31 * result + Arrays.hashCode(value.getColors());
+		result = 31 * result + Arrays.hashCode(value.getFractions());
+		result = 31 * result + value.getCycleMethod().hashCode();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (!(o instanceof RadialGradientConst)) {
+			return false;
+		}
+		RadialGradientConst other = (RadialGradientConst) o;
+		return value.getCenterPoint().equals(other.value.getCenterPoint()) &&
+			value.getFocusPoint().equals(other.value.getFocusPoint()) &&
+			Float.floatToIntBits(value.getRadius()) == Float.floatToIntBits(other.value.getRadius()) &&
+			Arrays.equals(value.getColors(), other.value.getColors()) &&
+			Arrays.equals(value.getFractions(), other.value.getFractions()) &&
+			value.getCycleMethod() == other.value.getCycleMethod();
 	}
 }

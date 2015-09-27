@@ -12211,15 +12211,19 @@ public final class Directdraw {
      */
     int getSize();
 
-    // optional uint32 weight = 4;
+    // optional .org.webswing.directdraw.proto.TransformProto transform = 4;
     /**
-     * <code>optional uint32 weight = 4;</code>
+     * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
      */
-    boolean hasWeight();
+    boolean hasTransform();
     /**
-     * <code>optional uint32 weight = 4;</code>
+     * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
      */
-    int getWeight();
+    org.webswing.directdraw.proto.Directdraw.TransformProto getTransform();
+    /**
+     * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
+     */
+    org.webswing.directdraw.proto.Directdraw.TransformProtoOrBuilder getTransformOrBuilder();
   }
   /**
    * Protobuf type {@code org.webswing.directdraw.proto.FontProto}
@@ -12293,9 +12297,17 @@ public final class Directdraw {
               size_ = input.readUInt32();
               break;
             }
-            case 32: {
+            case 34: {
+              org.webswing.directdraw.proto.Directdraw.TransformProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000008) == 0x00000008)) {
+                subBuilder = transform_.toBuilder();
+              }
+              transform_ = input.readMessage(org.webswing.directdraw.proto.Directdraw.TransformProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(transform_);
+                transform_ = subBuilder.buildPartial();
+              }
               bitField0_ |= 0x00000008;
-              weight_ = input.readUInt32();
               break;
             }
           }
@@ -12513,27 +12525,33 @@ public final class Directdraw {
       return size_;
     }
 
-    // optional uint32 weight = 4;
-    public static final int WEIGHT_FIELD_NUMBER = 4;
-    private int weight_;
+    // optional .org.webswing.directdraw.proto.TransformProto transform = 4;
+    public static final int TRANSFORM_FIELD_NUMBER = 4;
+    private org.webswing.directdraw.proto.Directdraw.TransformProto transform_;
     /**
-     * <code>optional uint32 weight = 4;</code>
+     * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
      */
-    public boolean hasWeight() {
+    public boolean hasTransform() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional uint32 weight = 4;</code>
+     * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
      */
-    public int getWeight() {
-      return weight_;
+    public org.webswing.directdraw.proto.Directdraw.TransformProto getTransform() {
+      return transform_;
+    }
+    /**
+     * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
+     */
+    public org.webswing.directdraw.proto.Directdraw.TransformProtoOrBuilder getTransformOrBuilder() {
+      return transform_;
     }
 
     private void initFields() {
       family_ = "";
       style_ = org.webswing.directdraw.proto.Directdraw.FontProto.StyleProto.NORMAL;
       size_ = 0;
-      weight_ = 0;
+      transform_ = org.webswing.directdraw.proto.Directdraw.TransformProto.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -12561,7 +12579,7 @@ public final class Directdraw {
         output.writeUInt32(3, size_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeUInt32(4, weight_);
+        output.writeMessage(4, transform_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -12586,7 +12604,7 @@ public final class Directdraw {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(4, weight_);
+          .computeMessageSize(4, transform_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -12696,6 +12714,7 @@ public final class Directdraw {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getTransformFieldBuilder();
         }
       }
       private static Builder create() {
@@ -12710,7 +12729,11 @@ public final class Directdraw {
         bitField0_ = (bitField0_ & ~0x00000002);
         size_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        weight_ = 0;
+        if (transformBuilder_ == null) {
+          transform_ = org.webswing.directdraw.proto.Directdraw.TransformProto.getDefaultInstance();
+        } else {
+          transformBuilder_.clear();
+        }
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
@@ -12755,7 +12778,11 @@ public final class Directdraw {
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.weight_ = weight_;
+        if (transformBuilder_ == null) {
+          result.transform_ = transform_;
+        } else {
+          result.transform_ = transformBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -12783,8 +12810,8 @@ public final class Directdraw {
         if (other.hasSize()) {
           setSize(other.getSize());
         }
-        if (other.hasWeight()) {
-          setWeight(other.getWeight());
+        if (other.hasTransform()) {
+          mergeTransform(other.getTransform());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -12960,37 +12987,121 @@ public final class Directdraw {
         return this;
       }
 
-      // optional uint32 weight = 4;
-      private int weight_ ;
+      // optional .org.webswing.directdraw.proto.TransformProto transform = 4;
+      private org.webswing.directdraw.proto.Directdraw.TransformProto transform_ = org.webswing.directdraw.proto.Directdraw.TransformProto.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.directdraw.proto.Directdraw.TransformProto, org.webswing.directdraw.proto.Directdraw.TransformProto.Builder, org.webswing.directdraw.proto.Directdraw.TransformProtoOrBuilder> transformBuilder_;
       /**
-       * <code>optional uint32 weight = 4;</code>
+       * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
        */
-      public boolean hasWeight() {
+      public boolean hasTransform() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional uint32 weight = 4;</code>
+       * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
        */
-      public int getWeight() {
-        return weight_;
+      public org.webswing.directdraw.proto.Directdraw.TransformProto getTransform() {
+        if (transformBuilder_ == null) {
+          return transform_;
+        } else {
+          return transformBuilder_.getMessage();
+        }
       }
       /**
-       * <code>optional uint32 weight = 4;</code>
+       * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
        */
-      public Builder setWeight(int value) {
+      public Builder setTransform(org.webswing.directdraw.proto.Directdraw.TransformProto value) {
+        if (transformBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          transform_ = value;
+          onChanged();
+        } else {
+          transformBuilder_.setMessage(value);
+        }
         bitField0_ |= 0x00000008;
-        weight_ = value;
-        onChanged();
         return this;
       }
       /**
-       * <code>optional uint32 weight = 4;</code>
+       * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
        */
-      public Builder clearWeight() {
-        bitField0_ = (bitField0_ & ~0x00000008);
-        weight_ = 0;
-        onChanged();
+      public Builder setTransform(
+          org.webswing.directdraw.proto.Directdraw.TransformProto.Builder builderForValue) {
+        if (transformBuilder_ == null) {
+          transform_ = builderForValue.build();
+          onChanged();
+        } else {
+          transformBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000008;
         return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
+       */
+      public Builder mergeTransform(org.webswing.directdraw.proto.Directdraw.TransformProto value) {
+        if (transformBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) == 0x00000008) &&
+              transform_ != org.webswing.directdraw.proto.Directdraw.TransformProto.getDefaultInstance()) {
+            transform_ =
+              org.webswing.directdraw.proto.Directdraw.TransformProto.newBuilder(transform_).mergeFrom(value).buildPartial();
+          } else {
+            transform_ = value;
+          }
+          onChanged();
+        } else {
+          transformBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000008;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
+       */
+      public Builder clearTransform() {
+        if (transformBuilder_ == null) {
+          transform_ = org.webswing.directdraw.proto.Directdraw.TransformProto.getDefaultInstance();
+          onChanged();
+        } else {
+          transformBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000008);
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.TransformProto.Builder getTransformBuilder() {
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return getTransformFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.TransformProtoOrBuilder getTransformOrBuilder() {
+        if (transformBuilder_ != null) {
+          return transformBuilder_.getMessageOrBuilder();
+        } else {
+          return transform_;
+        }
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.directdraw.proto.Directdraw.TransformProto, org.webswing.directdraw.proto.Directdraw.TransformProto.Builder, org.webswing.directdraw.proto.Directdraw.TransformProtoOrBuilder> 
+          getTransformFieldBuilder() {
+        if (transformBuilder_ == null) {
+          transformBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.webswing.directdraw.proto.Directdraw.TransformProto, org.webswing.directdraw.proto.Directdraw.TransformProto.Builder, org.webswing.directdraw.proto.Directdraw.TransformProtoOrBuilder>(
+                  transform_,
+                  getParentForChildren(),
+                  isClean());
+          transform_ = null;
+        }
+        return transformBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:org.webswing.directdraw.proto.FontProto)
@@ -18357,43 +18468,45 @@ public final class Directdraw {
       "ectdraw.proto.PathProto.SegmentTypeProto" +
       "\022\016\n\006points\030\003 \003(\021\"F\n\020SegmentTypeProto\022\010\n\004" +
       "MOVE\020\000\022\010\n\004LINE\020\001\022\010\n\004QUAD\020\002\022\t\n\005CUBIC\020\003\022\t\n" +
-      "\005CLOSE\020\004\"\303\001\n\tFontProto\022\016\n\006family\030\001 \002(\t\022B" +
+      "\005CLOSE\020\004\"\365\001\n\tFontProto\022\016\n\006family\030\001 \002(\t\022B" +
       "\n\005style\030\002 \001(\01623.org.webswing.directdraw." +
       "proto.FontProto.StyleProto\022\014\n\004size\030\003 \001(\r" +
-      "\022\016\n\006weight\030\004 \001(\r\"D\n\nStyleProto\022\n\n\006NORMAL" +
-      "\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006ITALIC\020\002\022\021\n\rBOLDANDIT" +
-      "ALIC\020\003\"\346\002\n\013StrokeProto\022\r\n\005width\030\001 \002(\002\022\022\n" +
-      "\nmiterLimit\030\002 \001(\002\022H\n\004join\030\003 \001(\0162:.org.we",
-      "bswing.directdraw.proto.StrokeProto.Stro" +
-      "keJoinProto\022F\n\003cap\030\004 \001(\01629.org.webswing." +
-      "directdraw.proto.StrokeProto.StrokeCapPr" +
-      "oto\022\014\n\004dash\030\005 \003(\002\022\022\n\ndashOffset\030\006 \001(\002\"A\n" +
-      "\017StrokeJoinProto\022\016\n\nJOIN_MITER\020\000\022\016\n\nJOIN" +
-      "_ROUND\020\001\022\016\n\nJOIN_BEVEL\020\002\"=\n\016StrokeCapPro" +
-      "to\022\014\n\010CAP_BUTT\020\000\022\r\n\tCAP_ROUND\020\001\022\016\n\nCAP_S" +
-      "QUARE\020\002\"\266\001\n\023LinearGradientProto\022\016\n\006xStar" +
-      "t\030\001 \002(\021\022\016\n\006yStart\030\002 \002(\021\022\014\n\004xEnd\030\003 \002(\021\022\014\n" +
-      "\004yEnd\030\004 \002(\021\022\016\n\006colors\030\005 \003(\007\022\021\n\tfractions",
-      "\030\006 \003(\002\022@\n\006repeat\030\007 \002(\01620.org.webswing.di" +
-      "rectdraw.proto.CyclicMethodProto\"\314\001\n\023Rad" +
-      "ialGradientProto\022\017\n\007xCenter\030\001 \002(\021\022\017\n\007yCe" +
-      "nter\030\002 \002(\021\022\016\n\006xFocus\030\003 \002(\021\022\016\n\006yFocus\030\004 \002" +
-      "(\021\022\016\n\006radius\030\005 \002(\021\022\016\n\006colors\030\006 \003(\007\022\021\n\tfr" +
-      "actions\030\007 \003(\002\022@\n\006repeat\030\010 \002(\01620.org.webs" +
-      "wing.directdraw.proto.CyclicMethodProto\"" +
-      "\035\n\013PointsProto\022\016\n\006points\030\001 \003(\021\"\231\002\n\016Compo" +
-      "siteProto\022N\n\004type\030\001 \002(\0162@.org.webswing.d" +
-      "irectdraw.proto.CompositeProto.Composite",
-      "TypeProto\022\020\n\005alpha\030\002 \001(\002:\0011\"\244\001\n\022Composit" +
-      "eTypeProto\022\t\n\005CLEAR\020\001\022\007\n\003SRC\020\002\022\007\n\003DST\020\t\022" +
-      "\014\n\010SRC_OVER\020\003\022\014\n\010DST_OVER\020\004\022\n\n\006SRC_IN\020\005\022" +
-      "\n\n\006DST_IN\020\006\022\013\n\007SRC_OUT\020\007\022\013\n\007DST_OUT\020\010\022\014\n" +
-      "\010SRC_ATOP\020\n\022\014\n\010DST_ATOP\020\013\022\007\n\003XOR\020\014\"\207\001\n\014T" +
-      "extureProto\0228\n\005image\030\001 \002(\0132).org.webswin" +
-      "g.directdraw.proto.ImageProto\022=\n\006anchor\030" +
-      "\002 \002(\0132-.org.webswing.directdraw.proto.Re" +
-      "ctangleProto*:\n\021CyclicMethodProto\022\014\n\010NO_" +
-      "CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
+      "\022@\n\ttransform\030\004 \001(\0132-.org.webswing.direc" +
+      "tdraw.proto.TransformProto\"D\n\nStyleProto" +
+      "\022\n\n\006NORMAL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006ITALIC\020\002\022\021\n" +
+      "\rBOLDANDITALIC\020\003\"\346\002\n\013StrokeProto\022\r\n\005widt",
+      "h\030\001 \002(\002\022\022\n\nmiterLimit\030\002 \001(\002\022H\n\004join\030\003 \001(" +
+      "\0162:.org.webswing.directdraw.proto.Stroke" +
+      "Proto.StrokeJoinProto\022F\n\003cap\030\004 \001(\01629.org" +
+      ".webswing.directdraw.proto.StrokeProto.S" +
+      "trokeCapProto\022\014\n\004dash\030\005 \003(\002\022\022\n\ndashOffse" +
+      "t\030\006 \001(\002\"A\n\017StrokeJoinProto\022\016\n\nJOIN_MITER" +
+      "\020\000\022\016\n\nJOIN_ROUND\020\001\022\016\n\nJOIN_BEVEL\020\002\"=\n\016St" +
+      "rokeCapProto\022\014\n\010CAP_BUTT\020\000\022\r\n\tCAP_ROUND\020" +
+      "\001\022\016\n\nCAP_SQUARE\020\002\"\266\001\n\023LinearGradientProt" +
+      "o\022\016\n\006xStart\030\001 \002(\021\022\016\n\006yStart\030\002 \002(\021\022\014\n\004xEn",
+      "d\030\003 \002(\021\022\014\n\004yEnd\030\004 \002(\021\022\016\n\006colors\030\005 \003(\007\022\021\n" +
+      "\tfractions\030\006 \003(\002\022@\n\006repeat\030\007 \002(\01620.org.w" +
+      "ebswing.directdraw.proto.CyclicMethodPro" +
+      "to\"\314\001\n\023RadialGradientProto\022\017\n\007xCenter\030\001 " +
+      "\002(\021\022\017\n\007yCenter\030\002 \002(\021\022\016\n\006xFocus\030\003 \002(\021\022\016\n\006" +
+      "yFocus\030\004 \002(\021\022\016\n\006radius\030\005 \002(\021\022\016\n\006colors\030\006" +
+      " \003(\007\022\021\n\tfractions\030\007 \003(\002\022@\n\006repeat\030\010 \002(\0162" +
+      "0.org.webswing.directdraw.proto.CyclicMe" +
+      "thodProto\"\035\n\013PointsProto\022\016\n\006points\030\001 \003(\021" +
+      "\"\231\002\n\016CompositeProto\022N\n\004type\030\001 \002(\0162@.org.",
+      "webswing.directdraw.proto.CompositeProto" +
+      ".CompositeTypeProto\022\020\n\005alpha\030\002 \001(\002:\0011\"\244\001" +
+      "\n\022CompositeTypeProto\022\t\n\005CLEAR\020\001\022\007\n\003SRC\020\002" +
+      "\022\007\n\003DST\020\t\022\014\n\010SRC_OVER\020\003\022\014\n\010DST_OVER\020\004\022\n\n" +
+      "\006SRC_IN\020\005\022\n\n\006DST_IN\020\006\022\013\n\007SRC_OUT\020\007\022\013\n\007DS" +
+      "T_OUT\020\010\022\014\n\010SRC_ATOP\020\n\022\014\n\010DST_ATOP\020\013\022\007\n\003X" +
+      "OR\020\014\"\207\001\n\014TextureProto\0228\n\005image\030\001 \002(\0132).o" +
+      "rg.webswing.directdraw.proto.ImageProto\022" +
+      "=\n\006anchor\030\002 \002(\0132-.org.webswing.directdra" +
+      "w.proto.RectangleProto*:\n\021CyclicMethodPr",
+      "oto\022\014\n\010NO_CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT" +
+      "\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -18471,7 +18584,7 @@ public final class Directdraw {
           internal_static_org_webswing_directdraw_proto_FontProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_FontProto_descriptor,
-              new java.lang.String[] { "Family", "Style", "Size", "Weight", });
+              new java.lang.String[] { "Family", "Style", "Size", "Transform", });
           internal_static_org_webswing_directdraw_proto_StrokeProto_descriptor =
             getDescriptor().getMessageTypes().get(12);
           internal_static_org_webswing_directdraw_proto_StrokeProto_fieldAccessorTable = new

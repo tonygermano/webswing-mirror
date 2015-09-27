@@ -1,21 +1,35 @@
 package org.webswing.directdraw.util;
 
-import java.awt.*;
-import java.awt.font.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.text.AttributedCharacterIterator.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.font.TextAttribute;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ImageObserver;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
+import java.text.AttributedCharacterIterator.Attribute;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
-import org.webswing.directdraw.*;
-import org.webswing.directdraw.model.*;
-import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.*;
+import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.model.DrawConstant;
+import org.webswing.directdraw.model.DrawInstruction;
+import org.webswing.directdraw.model.TransformConst;
+import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
 
 public class DirectDrawUtils {
 
 	public static final Properties windowsFonts = new Properties();
 	public static final Properties webFonts = new Properties();
+
 	static {
 		// logical fonts
 		windowsFonts.setProperty("Dialog", "Arial");
@@ -33,8 +47,8 @@ public class DirectDrawUtils {
 	/**
 	 * there is a bug in the jdk 1.6 which makes Font.getAttributes() not work correctly. The method does not return all values. What we dow here is using the old JDK 1.5 method.
 	 * 
-	 * @param font
-	 *            font
+	 * @param font font
+	 *
 	 * @return Attributes of font
 	 */
 //	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -91,79 +105,105 @@ public class DirectDrawUtils {
 
 		// step 1. group consequent transformations
 		AffineTransform mergedTx = null;
-		StrokeConst mergedStroke = null;
-		CompositeConst mergedComposite = null;
+		DrawConstant mergedStroke = null;
+		DrawConstant mergedComposite = null;
 		DrawConstant mergedPaint = null;
+		DrawConstant mergedFont = null;
 		DrawInstruction graphicsCreate = null;
 		Map<Integer, DrawInstruction> graphicsCreateMap = new HashMap<Integer, DrawInstruction>();
 		List<DrawInstruction> newInstructions = new ArrayList<DrawInstruction>();
-		for (DrawInstruction current : instructions ) {
+		for (DrawInstruction current : instructions) {
 			if (current.getInstruction().equals(InstructionProto.TRANSFORM)) {
 				if (mergedTx == null) {
-					mergedTx = ((TransformConst) current.getArgs()[0]).getAffineTransform();
+					mergedTx = ((TransformConst) current.getArg(0)).getValue();
 				} else {
-					mergedTx.concatenate(((TransformConst) current.getArgs()[0]).getAffineTransform());
+					mergedTx.concatenate(((TransformConst) current.getArg(0)).getValue());
 				}
 			} else if (current.getInstruction().equals(InstructionProto.SET_STROKE)) {
-				mergedStroke = ((StrokeConst) current.getArgs()[0]);
+				mergedStroke = current.getArg(0);
 			} else if (current.getInstruction().equals(InstructionProto.SET_COMPOSITE)) {
-				mergedComposite = ((CompositeConst) current.getArgs()[0]);
+				mergedComposite = current.getArg(0);
 			} else if (current.getInstruction().equals(InstructionProto.SET_PAINT)) {
-				mergedPaint = current.getArgs()[0];
+				mergedPaint = current.getArg(0);
+			} else if (current.getInstruction().equals(InstructionProto.SET_FONT)) {
+				mergedFont = current.getArg(0);
 			} else if (current.getInstruction().equals(InstructionProto.GRAPHICS_CREATE) || current.getInstruction().equals(InstructionProto.GRAPHICS_SWITCH)) {
 				boolean isGraphicsCreateInst = current.getInstruction().equals(InstructionProto.GRAPHICS_CREATE);
 				if (graphicsCreate != null) {
-					graphicsCreate.setArgs(new DrawConstant[] { graphicsCreate.getArgs()[0], new TransformConst(ctx, mergedTx), mergedStroke, mergedComposite, mergedPaint });
-					graphicsCreateMap.put(graphicsCreate.getArgs()[0].getId(), graphicsCreate);
+					graphicsCreate = createGraphics(ctx, graphicsCreate.getArg(0), mergedTx, mergedStroke, mergedComposite, mergedPaint, mergedFont);
+					graphicsCreateMap.put(graphicsCreate.getArg(0).getId(), graphicsCreate);
 				}
-				graphicsCreate = isGraphicsCreateInst ? current : graphicsCreateMap.get(current.getArgs()[0].getId());
+				graphicsCreate = isGraphicsCreateInst ? current : graphicsCreateMap.get(current.getArg(0).getId());
 				if (graphicsCreate != null) {
-					mergedTx = ((TransformConst) graphicsCreate.getArgs()[1]).getAffineTransform();
-					mergedStroke = ((StrokeConst) graphicsCreate.getArgs()[2]);
-					mergedComposite = ((CompositeConst) graphicsCreate.getArgs()[3]);
-					mergedPaint = graphicsCreate.getArgs()[4];
+					mergedTx = ((TransformConst) graphicsCreate.getArg(1)).getValue();
+					mergedStroke = graphicsCreate.getArg(2);
+					mergedComposite = graphicsCreate.getArg(3);
+					mergedPaint = graphicsCreate.getArg(4);
+					mergedFont = graphicsCreate.getArg(5);
 				} else {// if graphics switch instruction and the create instruction already in result array
-						// then add all status change for old graphics and add the switch inst
-					setGraphicsStatus(ctx, newInstructions, mergedTx, mergedStroke, mergedComposite, mergedPaint);
+					// then add all status change for old graphics and add the switch inst
+					setGraphicsStatus(ctx, newInstructions, mergedTx, mergedStroke, mergedComposite, mergedPaint, mergedFont);
 					mergedTx = null;
 					mergedStroke = null;
 					mergedComposite = null;
 					mergedPaint = null;
+					mergedFont = null;
 					newInstructions.add(current);
 				}
 			} else {
 				if (graphicsCreate != null) {
-					graphicsCreate.setArgs(new DrawConstant[] { graphicsCreate.getArgs()[0], new TransformConst(ctx, mergedTx), mergedStroke, mergedComposite , mergedPaint });
+					graphicsCreate = createGraphics(ctx, graphicsCreate.getArg(0), mergedTx, mergedStroke, mergedComposite, mergedPaint, mergedFont);
 					newInstructions.add(graphicsCreate);
-					graphicsCreateMap.remove(graphicsCreate.getArgs()[0].getId());
+					graphicsCreateMap.remove(graphicsCreate.getArg(0).getId());
 					graphicsCreate = null;
 				} else {
-					setGraphicsStatus(ctx, newInstructions, mergedTx, mergedStroke, mergedComposite, mergedPaint);
+					setGraphicsStatus(ctx, newInstructions, mergedTx, mergedStroke, mergedComposite, mergedPaint, mergedFont);
 				}
 				mergedTx = null;
 				mergedStroke = null;
 				mergedComposite = null;
 				mergedPaint = null;
+				mergedFont = null;
 				newInstructions.add(current);
 			}
 		}
-		// if transform is last instruction, it will be omited from the result
+		// if transform is last instruction, it will be omitted from the result
 		instructions.clear();
 		instructions.addAll(newInstructions);
 	}
 
-	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> newInstructions, AffineTransform mergedTx, StrokeConst mergedStroke, CompositeConst mergedComposite, DrawConstant mergedPaint) {
-		if (mergedTx != null) {
-            newInstructions.add(ctx.getInstructionFactory().transform(mergedTx));
+	private static DrawInstruction createGraphics(DirectDraw ctx, DrawConstant id, AffineTransform transform, DrawConstant stroke, DrawConstant composite, DrawConstant paint, DrawConstant font) {
+		return ctx.getInstructionFactory().createGraphics(id, new TransformConst(ctx, transform), stroke, composite, paint, font);
+	}
+
+	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> instructions, AffineTransform transform, DrawConstant stroke, DrawConstant composite, DrawConstant paint, DrawConstant font) {
+		if (transform != null) {
+			instructions.add(ctx.getInstructionFactory().transform(transform));
 		}
-		if (mergedStroke != null) {
-			newInstructions.add(new DrawInstruction(InstructionProto.SET_STROKE, mergedStroke));
+		if (stroke != null) {
+			instructions.add(new DrawInstruction(InstructionProto.SET_STROKE, stroke));
 		}
-		if (mergedComposite != null) {
-			newInstructions.add(new DrawInstruction(InstructionProto.SET_COMPOSITE, mergedComposite));
+		if (composite != null) {
+			instructions.add(new DrawInstruction(InstructionProto.SET_COMPOSITE, composite));
 		}
-		if (mergedPaint != null) {
-			newInstructions.add(new DrawInstruction(InstructionProto.SET_PAINT, mergedPaint));
+		if (paint != null) {
+			instructions.add(new DrawInstruction(InstructionProto.SET_PAINT, paint));
 		}
+		if (font != null) {
+			instructions.add(new DrawInstruction(InstructionProto.SET_FONT, font));
+		}
+	}
+
+	public static int hashCode(double value) {
+		long bits = Double.doubleToLongBits(value);
+		return (int) (bits ^ (bits >>> 32));
+	}
+
+	public static int hashCode(float value) {
+		return Float.floatToIntBits(value);
+	}
+
+	public static int hashCode(boolean value) {
+		return value ? 1231 : 1237;
 	}
 }

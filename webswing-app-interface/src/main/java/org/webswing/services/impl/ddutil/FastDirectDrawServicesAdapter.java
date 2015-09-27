@@ -2,20 +2,18 @@ package org.webswing.services.impl.ddutil;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import net.jpountz.xxhash.StreamingXXHash64;
 import net.jpountz.xxhash.XXHashFactory;
-
 import org.webswing.directdraw.DirectDrawServicesAdapter;
 import org.webswing.directdraw.util.ImageConsumerAdapter;
 import org.webswing.services.impl.ImageServiceImpl;
 
 public class FastDirectDrawServicesAdapter extends DirectDrawServicesAdapter {
+
 	XXHashFactory hashfactory = XXHashFactory.fastestInstance();
-	FileOutputStream out;
 	long seed = 12345L;
 
 	@Override

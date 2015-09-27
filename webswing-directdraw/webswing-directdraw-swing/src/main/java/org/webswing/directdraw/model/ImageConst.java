@@ -1,46 +1,53 @@
 package org.webswing.directdraw.model;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.io.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Arrays;
 
-import javax.imageio.*;
+import javax.imageio.ImageIO;
 
-import com.google.protobuf.*;
-import org.webswing.directdraw.*;
-import org.webswing.directdraw.proto.Directdraw.*;
+import com.google.protobuf.ByteString;
+import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.proto.Directdraw.ImageProto;
 
-public class ImageConst extends DrawConstant {
+public class ImageConst extends ImmutableDrawConstantHolder<byte[]> {
 
-	public ImageConst(DirectDraw context, BufferedImage img, Long hash) {
-		super(context);
-		ImageProto.Builder model = ImageProto.newBuilder();
-		byte[] imgData = context.getServices().getPngImage(img);
-		if (hash == null) {
-			this.hash = context.getServices().computeHash(img);
-		} else {
-			this.hash = hash;
-		}
-		try {
-			model.setData(ByteString.readFrom(new ByteArrayInputStream(imgData)));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		this.message = model.build();
+	protected long hash;
+
+	public ImageConst(DirectDraw context, BufferedImage value) {
+		super(context, context.getServices().getPngImage(value));
+		this.hash = context.getServices().computeHash(value);
 	}
 
 	@Override
 	public String getFieldName() {
 		return "image";
 	}
-    
-    public static BufferedImage getImage(ImageProto i) {
-        try {
-            return ImageIO.read(i.getData().newInput());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
+	@Override
+	public ImageProto toMessage() {
+		ImageProto.Builder model = ImageProto.newBuilder();
+		model.setData(ByteString.copyFrom(value));
+		return model.build();
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) hash;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return o == this ||
+			o instanceof ImageConst && Arrays.equals(value, ((ImageConst) o).value);
+	}
+
+	public static BufferedImage getValue(ImageProto proto) {
+		try {
+			return ImageIO.read(proto.getData().newInput());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

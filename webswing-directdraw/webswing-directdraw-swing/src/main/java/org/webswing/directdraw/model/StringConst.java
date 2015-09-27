@@ -2,11 +2,10 @@ package org.webswing.directdraw.model;
 
 import org.webswing.directdraw.DirectDraw;
 
-public class StringConst extends DrawConstant {
+public class StringConst extends ImmutableDrawConstantHolder<String> {
 
-	public StringConst(DirectDraw context, String s) {
-		super(context);
-		this.message = s;
+	public StringConst(DirectDraw context, String value) {
+		super(context, value);
 	}
 
 	@Override
@@ -14,7 +13,8 @@ public class StringConst extends DrawConstant {
 		return "string";
 	}
 
-	public String getString() {
-		return (String) message;
+	@Override
+	public String toMessage() {
+		return getValue();
 	}
 }

@@ -1,9 +1,25 @@
 package org.webswing.directdraw.toolkit;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.io.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.ImageObserver;
+import java.awt.image.RenderedImage;
+import java.io.IOException;
 
 public class WebGraphics extends AbstractVectorGraphics {
 
@@ -51,7 +67,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 			crop = crop != null ? crop : new Rectangle2D.Float(0, 0, image.getWidth(observer), image.getHeight(observer));
 			WebImage wi = image instanceof WebImage ? (WebImage) image : ((VolatileWebImageWrapper) image).getWebImage();
 			if (wi.isDirty()) {
-				thisImage.addInstruction(this, dif.drawImage(wi.extractReadOnlyWebImage(false), xform, crop, bkg, getClip()));
+				thisImage.addInstruction(this, dif.drawWebImage(wi.extractReadOnlyWebImage(false), xform, crop, bkg, getClip()));
 			}
 		} else {
 			thisImage.addImage(this, image, observer, xform, crop);
@@ -60,7 +76,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected void writeString(String string, double x, double y) throws IOException {
-		thisImage.addInstruction(this, dif.drawString(string, x, y, getFont(), getClip()));
+		thisImage.addInstruction(this, dif.drawString(string, x, y, getClip()));
 	}
 
 	@Override
@@ -88,6 +104,11 @@ public class WebGraphics extends AbstractVectorGraphics {
 			AlphaComposite ac = (AlphaComposite) composite;
 			thisImage.addInstruction(this, dif.setComposite(ac));
 		}
+	}
+
+	@Override
+	protected void writeFont(Font font) {
+		thisImage.addInstruction(this, dif.setFont(font));
 	}
 
 	@Override
@@ -126,7 +147,8 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	public void dispose() {
-		// thisImage.addInstruction(this, dif.disposeGraphics(this));
+		thisImage.addInstruction(this, dif.disposeGraphics(this));
+		thisImage.dispose(this);
 		disposed = true;
 	}
 

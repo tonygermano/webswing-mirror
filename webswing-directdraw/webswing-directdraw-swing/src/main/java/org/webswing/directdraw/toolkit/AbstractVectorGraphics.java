@@ -2,17 +2,47 @@
 // Modification to original: merged with AbstractVectorGraphicsIO
 package org.webswing.directdraw.toolkit;
 
-import java.awt.*;
-import java.awt.font.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.awt.image.renderable.*;
-import java.io.*;
-import java.text.*;
-import java.text.AttributedCharacterIterator.*;
-import java.util.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Composite;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.Toolkit;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.ImageObserver;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.RenderContext;
+import java.awt.image.renderable.RenderableImage;
+import java.io.IOException;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedCharacterIterator.Attribute;
+import java.util.Map;
 
-import org.webswing.directdraw.util.*;
+import org.webswing.directdraw.util.DirectDrawUtils;
 
 /**
  * This class implements all conversions from integer to double as well as a few
@@ -27,6 +57,7 @@ import org.webswing.directdraw.util.*;
  * @version $Id: AbstractVectorGraphics.java 10516 2007-02-06 21:11:19Z duns $
  */
 public abstract class AbstractVectorGraphics extends Graphics2D {
+
 	private Dimension size;
 
 	private Color backgroundColor;
@@ -69,7 +100,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * <LI>Clip: Rectangle(0, 0, size.width, size.height)
 	 * </UL>
 	 * 
-     * @param size rectangle specifying the bounds of the image
+	 * @param size rectangle specifying the bounds of the image
 	 */
 	protected AbstractVectorGraphics(Dimension size) {
 		this.size = size;
@@ -103,8 +134,8 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * size.height)
 	 * </UL>
 	 * 
-     * @param component to be used to initialize the values of the graphics
-     *        state
+	 * @param component to be used to initialize the values of the graphics
+	 *        state
 	 */
 	protected AbstractVectorGraphics(Component component) {
 		this.size = component.getSize();
@@ -128,7 +159,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	/**
 	 * Constructs a sub-graphics context.
 	 * 
-     * @param graphics context to clone from
+	 * @param graphics context to clone from
 	 */
 	protected AbstractVectorGraphics(AbstractVectorGraphics graphics) {
 		super();
@@ -382,7 +413,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 																// and not dest
 																// flipped or
 																// vice versa
-			boolean flipVertical = (dy2 < dy1) ^ (sy2 < sy1); // <=> source
+			boolean flipVertical = (dy2 < dy1) ^ (sy2 < sy1);	// <=> source
 																// flipped XOR
 																// dest flipped
 
@@ -630,10 +661,10 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	protected abstract void writeTransform(AffineTransform transform) throws IOException;
 
 	/**
-     * Clears any existing transformation and sets the a new one.
-     * The default implementation calls writeTransform using the
-     * inverted affine transform to calculate it.
-     * @param transform to be written
+	 * Clears any existing transformation and sets the a new one.
+	 * The default implementation calls writeTransform using the
+	 * inverted affine transform to calculate it.
+	 * @param transform to be written
 	 */
 	protected void writeSetTransform(AffineTransform transform) throws IOException {
 		try {
@@ -733,7 +764,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * Copied from SunGraphics2D
 	 */
 	Shape intersectShapes(Shape lhs, Shape rhs) {
-		return lhs instanceof Rectangle && rhs instanceof Rectangle ? ((Rectangle) lhs).intersection((Rectangle) rhs) : (lhs instanceof Rectangle2D ? intersectRectShape((Rectangle2D) lhs, rhs) : (rhs instanceof Rectangle2D ? intersectRectShape((Rectangle2D) rhs, lhs) : intersectByArea(lhs, rhs)));
+		return lhs instanceof Rectangle && rhs instanceof Rectangle ?
+			((Rectangle) lhs).intersection((Rectangle) rhs) :
+			(lhs instanceof Rectangle2D ? intersectRectShape((Rectangle2D) lhs, rhs) : (rhs instanceof Rectangle2D ? intersectRectShape((Rectangle2D) rhs, lhs) : intersectByArea(lhs, rhs)));
 	}
 
 	/**
@@ -961,10 +994,14 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	 * @param font to be set
 	 */
 	public void setFont(Font font) {
-		if (font == null)
+		if (font == null || currentFont.equals(font)) {
 			return;
+		}
 		currentFont = font;
+		writeFont(currentFont);
 	}
+
+	protected abstract void writeFont(Font font);
 
 	/*
      * ================================================================================
@@ -989,28 +1026,28 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 		return currentComposite;
 	}
 
-    @Override
+	@Override
 	public void setComposite(Composite composite) {
 		if (composite == null || composite.equals(getComposite())) {
-            return;
-        }
-        currentComposite = composite;
-        writeComposite(composite);
+			return;
+		}
+		currentComposite = composite;
+		writeComposite(composite);
 	}
 
 	protected abstract void writeComposite(Composite composite);
 
 	/**
-     * Creates a polyline/polygon shape from a set of points.
-     * Needs a bias!
+	 * Creates a polyline/polygon shape from a set of points.
+	 * Needs a bias!
 	 * 
-     * @param xPoints X coordinates of the polyline.
-     * @param yPoints Y coordinates of the polyline.
-     * @param nPoints number of points of the polyline.
-     * @param close is shape closed
+	 * @param xPoints X coordinates of the polyline.
+	 * @param yPoints Y coordinates of the polyline.
+	 * @param nPoints number of points of the polyline.
+	 * @param close is shape closed
 	 */
 	protected Shape createShape(int[] xPoints, int[] yPoints, int nPoints, boolean close) {
-        GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+		GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 		if (nPoints > 0) {
 			path.moveTo(xPoints[0], yPoints[0]);
 			int lastX = xPoints[0];
