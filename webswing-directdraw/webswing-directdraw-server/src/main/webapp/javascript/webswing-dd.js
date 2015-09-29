@@ -578,12 +578,14 @@
 				switch (composite.type) {
 				case CompositeTypeProto.CLEAR:
 					ctx.globalCompositeOperation = "destination-out";
+					ctx.globalAlpha = 1;
 					break;
 				case CompositeTypeProto.SRC:
 					ctx.globalCompositeOperation = "source-over";
 					break;
 				case CompositeTypeProto.DST:
-					ctx.globalCompositeOperation = "destination-in";
+					ctx.globalCompositeOperation = "destination-over";
+					ctx.globalAlpha = 0;
 					break;
 				case CompositeTypeProto.SRC_OVER:
 					ctx.globalCompositeOperation = "source-over";
@@ -605,6 +607,9 @@
 					break;
 				case CompositeTypeProto.SRC_ATOP:
 					ctx.globalCompositeOperation = "source-atop";
+					break;
+				case CompositeTypeProto.DST_ATOP:
+					ctx.globalCompositeOperation = "destination-atop";
 					break;
 				case CompositeTypeProto.XOR:
 					ctx.globalCompositeOperation = "xor";

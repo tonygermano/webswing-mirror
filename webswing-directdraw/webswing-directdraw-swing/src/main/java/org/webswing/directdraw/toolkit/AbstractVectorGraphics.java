@@ -184,10 +184,13 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	@Override
 	public void clearRect(int x, int y, int width, int height) {
-		Paint temp = getPaint();
-		setPaint(getBackground());
+		Composite oldComposite = getComposite();
+		Paint oldPaint = getPaint();
+		setComposite(AlphaComposite.Src);
+		setColor(getBackground());
 		fillRect(x, y, width, height);
-		setPaint(temp);
+		setPaint(oldPaint);
+		setComposite(oldComposite);
 	}
 
 	@Override

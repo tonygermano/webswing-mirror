@@ -11,7 +11,6 @@ import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
@@ -30,18 +29,13 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JToolTip;
 import javax.swing.UIManager;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.metal.MetalToolTipUI;
 
 import org.webswing.directdraw.toolkit.WebGraphics;
 
@@ -462,41 +456,180 @@ public class Tests {
 			return false;
 		}
 
-		Image i2 = DrawServlet.getImage(g instanceof WebGraphics);
-		Graphics2D source = (Graphics2D) i2.getGraphics();
-		source.setBackground(new Color(0, 0, 0, 0));
-		source.clearRect(0, 0, i2.getWidth(null), i2.getHeight(null));
-		source.setColor(new Color(255, 0, 0));
-		source.fillRect(0, 0, 25, 25);
-
-		compositetestopp(g, i2, 0, 0, AlphaComposite.Src);
-
-		compositetestopp(g, i2, 50, 0, AlphaComposite.SrcOver);
-
-		compositetestopp(g, i2, 100, 0, AlphaComposite.SrcIn);
-
-		compositetestopp(g, i2, 0, 50, AlphaComposite.SrcOut);
-
-		compositetestopp(g, i2, 50, 50, AlphaComposite.SrcAtop);
-
-		compositetestopp(g, i2, 150, 0, AlphaComposite.Xor);
-
-		compositetestopp(g, i2, 150, 50, AlphaComposite.Clear);
-
-		compositetestopp(g, i2, 200, 0, AlphaComposite.Dst);
-
-		compositetestopp(g, i2, 250, 0, AlphaComposite.DstOver);
-
-		compositetestopp(g, i2, 300, 0, AlphaComposite.DstIn);
-
-		compositetestopp(g, i2, 200, 50, AlphaComposite.DstOut);
-
-		compositetestopp(g, i2, 250, 50, AlphaComposite.DstAtop);
+		compositeTestOp(g, 0, 0, AlphaComposite.Src);
+		compositeTestOp(g, 50, 0, AlphaComposite.SrcOver);
+		compositeTestOp(g, 100, 0, AlphaComposite.SrcIn);
+		compositeTestOp(g, 150, 0, AlphaComposite.SrcOut);
+		compositeTestOp(g, 200, 0, AlphaComposite.SrcAtop);
+		compositeTestOp(g, 250, 0, AlphaComposite.Xor);
+		
+		compositeTestOp(g, 0, 50, AlphaComposite.Dst);
+		compositeTestOp(g, 50, 50, AlphaComposite.DstOver);
+		compositeTestOp(g, 100, 50, AlphaComposite.DstIn);
+		compositeTestOp(g, 150, 50, AlphaComposite.DstOut);
+		compositeTestOp(g, 200, 50, AlphaComposite.DstAtop);
+		compositeTestOp(g, 250, 50, AlphaComposite.Clear);
 
 		return true;
 	}
 
-	public static boolean t17MetalTooltipTest(Graphics2D g, Integer repeat) throws IOException {
+	public static boolean t17SemitransparentCompositeModesTest(Graphics2D g, Integer repeat) throws IOException {
+		if (repeat > 0) {
+			return false;
+		}
+
+		compositeTestOp(g, 0, 0, AlphaComposite.SRC, 0.5f);
+		compositeTestOp(g, 50, 0, AlphaComposite.SRC_OVER, 0.5f);
+		compositeTestOp(g, 100, 0, AlphaComposite.SRC_IN, 0.5f);
+		compositeTestOp(g, 150, 0, AlphaComposite.SRC_OUT, 0.5f);
+		compositeTestOp(g, 200, 0, AlphaComposite.SRC_ATOP, 0.5f);
+		compositeTestOp(g, 250, 0, AlphaComposite.XOR, 0.5f);
+
+		compositeTestOp(g, 0, 50, AlphaComposite.DST, 0.5f);
+		compositeTestOp(g, 50, 50, AlphaComposite.DST_OVER, 0.5f);
+		compositeTestOp(g, 100, 50, AlphaComposite.DST_IN, 0.5f);
+		compositeTestOp(g, 150, 50, AlphaComposite.DST_OUT, 0.5f);
+		compositeTestOp(g, 200, 50, AlphaComposite.DST_ATOP, 0.5f);
+		compositeTestOp(g, 250, 50, AlphaComposite.CLEAR, 0.5f);
+
+		return true;
+	}
+
+	public static boolean t18TransparentCompositeModesTest(Graphics2D g, Integer repeat) throws IOException {
+		if (repeat > 0) {
+			return false;
+		}
+
+		compositeTestOp(g, 0, 0, AlphaComposite.SRC, 0f);
+		compositeTestOp(g, 50, 0, AlphaComposite.SRC_OVER, 0f);
+		compositeTestOp(g, 100, 0, AlphaComposite.SRC_IN, 0f);
+		compositeTestOp(g, 150, 0, AlphaComposite.SRC_OUT, 0f);
+		compositeTestOp(g, 200, 0, AlphaComposite.SRC_ATOP, 0f);
+		compositeTestOp(g, 250, 0, AlphaComposite.XOR, 0f);
+
+		compositeTestOp(g, 0, 50, AlphaComposite.DST, 0f);
+		compositeTestOp(g, 50, 50, AlphaComposite.DST_OVER, 0f);
+		compositeTestOp(g, 100, 50, AlphaComposite.DST_IN, 0f);
+		compositeTestOp(g, 150, 50, AlphaComposite.DST_OUT, 0f);
+		compositeTestOp(g, 200, 50, AlphaComposite.DST_ATOP, 0f);
+		compositeTestOp(g, 250, 50, AlphaComposite.CLEAR, 0f);
+
+		return true;
+	}
+
+	private static void compositeTestOp(Graphics2D g, int x, int y, int compositeRule, float alpha) {
+		compositeTestOp(g, x, y, AlphaComposite.getInstance(compositeRule, alpha));
+	}
+
+	private static void compositeTestOp(Graphics2D g, int x, int y, AlphaComposite c) {
+		g.setPaint(new GradientPaint(new Point(x, y), Color.yellow, new Point(x + 50, y + 50), Color.green));
+		g.fillRect(x, y, 50, 50);
+		
+		Image img = DrawServlet.getImage(g instanceof WebGraphics, 50, 50);
+		Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
+		imgGraphics.setColor(new Color(0, 0, 255));
+		imgGraphics.fillRect(0, 0, 25, 25);
+		imgGraphics.setComposite(c);
+		imgGraphics.setColor(new Color(255, 0, 0));
+		imgGraphics.fillOval(10, 10, 25, 25);
+		
+		g.drawImage(img, x, y, null);
+		g.setColor(Color.black);
+		g.drawString("" + c.getRule(), x + 30, y + 40);
+	}
+
+	public static boolean t19CompositeImagesTest(Graphics2D g, Integer repeat) throws IOException {
+		if (repeat > 0) {
+			return false;
+		}
+
+		compositeImagesTestOp(g, 0, 0, AlphaComposite.Src);
+		compositeImagesTestOp(g, 50, 0, AlphaComposite.SrcOver);
+		compositeImagesTestOp(g, 100, 0, AlphaComposite.SrcIn);
+		compositeImagesTestOp(g, 150, 0, AlphaComposite.SrcOut);
+		compositeImagesTestOp(g, 200, 0, AlphaComposite.SrcAtop);
+		compositeImagesTestOp(g, 250, 0, AlphaComposite.Xor);
+
+		compositeImagesTestOp(g, 0, 50, AlphaComposite.Dst);
+		compositeImagesTestOp(g, 50, 50, AlphaComposite.DstOver);
+		compositeImagesTestOp(g, 100, 50, AlphaComposite.DstIn);
+		compositeImagesTestOp(g, 150, 50, AlphaComposite.DstOut);
+		compositeImagesTestOp(g, 200, 50, AlphaComposite.DstAtop);
+		compositeImagesTestOp(g, 250, 50, AlphaComposite.Clear);
+
+		return true;
+	}
+
+	public static boolean t20SemitransparentCompositeImagesTest(Graphics2D g, Integer repeat) throws IOException {
+		if (repeat > 0) {
+			return false;
+		}
+
+		compositeImagesTestOp(g, 0, 0, AlphaComposite.SRC, 0.5f);
+		compositeImagesTestOp(g, 50, 0, AlphaComposite.SRC_OVER, 0.5f);
+		compositeImagesTestOp(g, 100, 0, AlphaComposite.SRC_IN, 0.5f);
+		compositeImagesTestOp(g, 150, 0, AlphaComposite.SRC_OUT, 0.5f);
+		compositeImagesTestOp(g, 200, 0, AlphaComposite.SRC_ATOP, 0.5f);
+		compositeImagesTestOp(g, 250, 0, AlphaComposite.XOR, 0.5f);
+
+		compositeImagesTestOp(g, 0, 50, AlphaComposite.DST, 0.5f);
+		compositeImagesTestOp(g, 50, 50, AlphaComposite.DST_OVER, 0.5f);
+		compositeImagesTestOp(g, 100, 50, AlphaComposite.DST_IN, 0.5f);
+		compositeImagesTestOp(g, 150, 50, AlphaComposite.DST_OUT, 0.5f);
+		compositeImagesTestOp(g, 200, 50, AlphaComposite.DST_ATOP, 0.5f);
+		compositeImagesTestOp(g, 250, 50, AlphaComposite.CLEAR, 0.5f);
+
+		return true;
+	}
+
+	public static boolean t21TransparentCompositeImagesTest(Graphics2D g, Integer repeat) throws IOException {
+		if (repeat > 0) {
+			return false;
+		}
+
+		compositeImagesTestOp(g, 0, 0, AlphaComposite.SRC, 0f);
+		compositeImagesTestOp(g, 50, 0, AlphaComposite.SRC_OVER, 0f);
+		compositeImagesTestOp(g, 100, 0, AlphaComposite.SRC_IN, 0f);
+		compositeImagesTestOp(g, 150, 0, AlphaComposite.SRC_OUT, 0f);
+		compositeImagesTestOp(g, 200, 0, AlphaComposite.SRC_ATOP, 0f);
+		compositeImagesTestOp(g, 250, 0, AlphaComposite.XOR, 0f);
+
+		compositeImagesTestOp(g, 0, 50, AlphaComposite.DST, 0f);
+		compositeImagesTestOp(g, 50, 50, AlphaComposite.DST_OVER, 0f);
+		compositeImagesTestOp(g, 100, 50, AlphaComposite.DST_IN, 0f);
+		compositeImagesTestOp(g, 150, 50, AlphaComposite.DST_OUT, 0f);
+		compositeImagesTestOp(g, 200, 50, AlphaComposite.DST_ATOP, 0f);
+		compositeImagesTestOp(g, 250, 50, AlphaComposite.CLEAR, 0f);
+
+		return true;
+	}
+
+	private static void compositeImagesTestOp(Graphics2D g, int x, int y, int compositeRule, float alpha) {
+		compositeImagesTestOp(g, x, y, AlphaComposite.getInstance(compositeRule, alpha));
+	}
+
+	private static void compositeImagesTestOp(Graphics2D g, int x, int y, AlphaComposite c) {
+		g.setPaint(new GradientPaint(new Point(x, y), Color.yellow, new Point(x + 50, y + 50), Color.green));
+		g.fillRect(x, y, 50, 50);
+		
+		Image oval = DrawServlet.getImage(g instanceof WebGraphics);
+		Graphics2D ovalGraphics = (Graphics2D) oval.getGraphics();
+		ovalGraphics.setColor(new Color(255, 0, 0));
+		ovalGraphics.fillOval(10, 10, 25, 25);
+
+		Image img = DrawServlet.getImage(g instanceof WebGraphics, 50, 50);
+		Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
+		imgGraphics.setColor(new Color(0, 0, 255));
+		imgGraphics.fillRect(0, 0, 25, 25);
+		imgGraphics.setComposite(c);
+		imgGraphics.drawImage(oval, 0, 0, null);
+		
+		g.drawImage(img, x, y, null);
+		g.setColor(Color.black);
+		g.drawString("" + c.getRule(), x + 30, y + 40);
+	}
+
+	public static boolean t22MetalTooltipTest(Graphics2D g, Integer repeat) throws IOException {
 		if (repeat > 0) {
 			return false;
 		}
@@ -505,7 +638,7 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t18OverlayedImagesWithTransparencyTest(Graphics2D g, Integer repeat) throws IOException {
+	public static boolean t23OverlayedImagesWithTransparencyTest(Graphics2D g, Integer repeat) throws IOException {
 		if (repeat > 0) {
 			return false;
 		}
@@ -520,26 +653,6 @@ public class Tests {
 		g.fill(new Rectangle(250, 0, 100, 100));
 		g.drawImage(image, 250, 0, 100, 100, null);
 		return true;
-	}
-
-	private static void compositetestopp(Graphics2D g, Image i2, int x, int y, AlphaComposite c) {
-		Image i;
-		Graphics2D dest;
-		g.setClip(x, y, 50, 50);
-		g.setPaint(new LinearGradientPaint(new Point(x, y), new Point(x + 50, y + 50), new float[] { 0, 1 }, new Color[] { Color.yellow, Color.green }));
-		g.fillRect(x, y, 50, 50);
-		i = DrawServlet.getImage(g instanceof WebGraphics);
-		dest = (Graphics2D) i.getGraphics();
-		dest.setBackground(new Color(0, 0, 0, 0));
-		dest.clearRect(0, 0, i2.getWidth(null), i2.getHeight(null));
-		dest.setColor(new Color(0, 0, 255));
-		dest.fillRect(0, 0, 25, 25);
-		dest.setComposite(c);
-		dest.setColor(new Color(255, 0, 0));
-		dest.fillOval(10, 10, 25, 25);
-		g.setColor(Color.black);
-		g.drawString("" + c.getRule(), x + 30, y + 40);
-		g.drawImage(i, x, y, null);
 	}
 
 	private static void printJComponentHelper(String laf, Graphics2D g, JComponent c) {

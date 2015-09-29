@@ -106,6 +106,10 @@ public class DrawServlet extends HttpServlet {
 		return web ? dd.createImage(500, 100) : new BufferedImage(500, 100, BufferedImage.TYPE_INT_ARGB);
 	}
 
+	public static Image getImage(boolean web, int width, int height) {
+		return web ? dd.createImage(width, height) : new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	}
+
 	private static final ObjectMapper mapper = new ObjectMapper();
 
 	public static String encodeImage(BufferedImage window) {
