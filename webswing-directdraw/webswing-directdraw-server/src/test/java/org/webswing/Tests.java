@@ -655,6 +655,35 @@ public class Tests {
 		return true;
 	}
 
+	public static boolean t24TransparentCompositeOverImageTest(Graphics2D g, Integer repeat) throws IOException {
+		if (repeat > 0) {
+			return false;
+		}
+		BufferedImage image = ImageIO.read(new File(Tests.class.getClassLoader().getResource("ws.png").getFile()));
+		g.drawImage(image, 0, 0, null);
+		
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+		g.setColor(Color.yellow);
+		g.fillRect(0, 0, image.getWidth(), image.getHeight());
+		
+		return true;
+	}
+
+	public static boolean t25TransparentFillOverImageTest(Graphics2D g, Integer repeat) throws IOException {
+		if (repeat > 0) {
+			return false;
+		}
+		BufferedImage image = ImageIO.read(new File(Tests.class.getClassLoader().getResource("ws.png").getFile()));
+
+		g.setBackground(Color.white);
+		g.clearRect(0, 0, image.getWidth() + 100, image.getHeight());
+		g.drawImage(image, 50, 0, null);
+		g.setColor(new Color(0, 255, 255, 128));
+		g.fillRect(0, 0, image.getWidth() + 100, image.getHeight());
+
+		return true;
+	}
+	
 	private static void printJComponentHelper(String laf, Graphics2D g, JComponent c) {
 		try {
 			UIManager.setLookAndFeel(laf == null ? "javax.swing.plaf.metal.MetalLookAndFeel" : laf);
