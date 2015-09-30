@@ -1,5 +1,6 @@
 package org.webswing.services.impl.ddutil;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.nio.ByteBuffer;
@@ -27,9 +28,9 @@ public class FastDirectDrawServicesAdapter extends DirectDrawServicesAdapter {
 	}
 
 	@Override
-	public long computeHash(BufferedImage subImage) {
+	public long computeHash(Image subImage) {
 		final StreamingXXHash64 shash = hashfactory.newStreamingHash64(seed);
-		final ByteBuffer byteBuffer = ByteBuffer.allocate(subImage.getWidth() * 4);
+		final ByteBuffer byteBuffer = ByteBuffer.allocate(subImage.getWidth(null) * 4);
 		final IntBuffer intBuffer = byteBuffer.asIntBuffer();
 		ImageConsumerAdapter ic = new ImageConsumerAdapter() {
 			@Override

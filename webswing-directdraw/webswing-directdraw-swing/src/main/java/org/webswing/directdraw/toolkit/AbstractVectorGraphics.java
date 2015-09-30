@@ -330,7 +330,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 			int imageHeight = img.getHeight(observer);
 			return drawImage(img, x, y, x + imageWidth, y + imageHeight, 0, 0, imageWidth, imageHeight, null, observer);
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -340,7 +340,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 			int imageHeight = img.getHeight(observer);
 			return drawImage(img, x, y, x + width, y + height, 0, 0, imageWidth, imageHeight, null, observer);
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -350,7 +350,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 			int imageHeight = img.getHeight(observer);
 			return drawImage(img, x, y, x + width, y + height, 0, 0, imageWidth, imageHeight, bgcolor, observer);
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -360,7 +360,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 			int imageHeight = img.getHeight(observer);
 			return drawImage(img, x, y, x + imageWidth, y + imageHeight, 0, 0, imageWidth, imageHeight, bgcolor, observer);
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -369,16 +369,11 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	@Override
-	public void drawImage(BufferedImage img, BufferedImageOp op, int x, int y) {
-		if (op == null) {
-			drawImage(img, x, y, null);
-		} else {
-			drawImage(op.filter(img, null), x, y, null);
-		}
-	}
-
-	@Override
 	public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgcolor, ImageObserver observer) {
+		if (img == null) {
+			return true;
+		}
+		
 		int srcX = Math.min(sx1, sx2);
 		int srcY = Math.min(sy1, sy2);
 		int srcWidth = Math.abs(sx2 - sx1);
@@ -407,15 +402,22 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 		double sy = (double) height / srcHeight;
 		sy = flipVertical ? -1 * sy : sy;
 
-		writeImage(img, observer, new AffineTransform(sx, 0, 0, sy, tx, ty), crop, bgcolor);
-		return true;
+		return writeImage(img, new AffineTransform(sx, 0, 0, sy, tx, ty), crop, bgcolor, observer);
 	}
 
 	@Override
 	public boolean drawImage(Image img, AffineTransform xform, ImageObserver obs) {
-		writeImage(img, obs, xform, null, null);
-		return true;
+		return img == null || writeImage(img, xform, obs);
 	}
+	
+    @Override
+    public void drawImage(BufferedImage img, BufferedImageOp op, int x, int y) {
+        if (op == null) {
+            drawImage(img, x, y, null);
+        } else {
+            drawImage(op.filter(img, null), x, y, null);
+        }
+    }
 
 	@Override
 	public void drawRenderableImage(RenderableImage img, AffineTransform xform) {
@@ -429,7 +431,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	protected abstract void writeImage(RenderedImage image, AffineTransform transform);
 
-	protected abstract void writeImage(Image image, ImageObserver observer, AffineTransform transform, Rectangle2D.Float crop, Color bgcolor);
+	protected abstract boolean writeImage(Image image, AffineTransform transform, ImageObserver observer);
+
+	protected abstract boolean writeImage(Image image, AffineTransform transform, Rectangle2D crop, Color bgcolor, ImageObserver observer);
 
 	/**
 	 * Draws the string at (x, y). If TEXT_AS_SHAPES is set

@@ -6,7 +6,6 @@ message WebImageProto {
 	required uint32 height = 3;
 	repeated DrawInstructionProto instructions = 4;
 	repeated DrawConstantProto constants = 5;
-	repeated DrawConstantProto images = 6;
 }
 
 message DrawInstructionProto {

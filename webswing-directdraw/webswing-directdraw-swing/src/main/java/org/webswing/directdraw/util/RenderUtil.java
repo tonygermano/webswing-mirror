@@ -1,5 +1,6 @@
 package org.webswing.directdraw.util;
 
+import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -10,113 +11,128 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.webswing.directdraw.model.DrawInstruction;
 import org.webswing.directdraw.toolkit.WebImage;
 
 public class RenderUtil {
 
-	public static BufferedImage render(WebImage webImage, BufferedImage imageHolder, Map<DrawInstruction, BufferedImage> partialImageMap, List<WebImage> chunks, List<DrawInstruction> newInstructions, Dimension size) {
+	public static BufferedImage render(List<WebImage> chunks, List<DrawInstruction> newInstructions, Dimension size) {
 		BufferedImage result = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g = (Graphics2D) result.getGraphics();
+		render(result, chunks, newInstructions);
+		return result;
+	}
+
+	public static BufferedImage render(BufferedImage result, List<WebImage> chunks, List<DrawInstruction> instructions) {
+		Map<Integer, Graphics2D> map = new HashMap<Integer, Graphics2D>();
+
 		if (chunks != null) {
 			for (WebImage chunk : chunks) {
 				chunk.getSnapshot(result);
 			}
 		}
-		render(result, webImage, imageHolder, partialImageMap, chunks, newInstructions, size);
-		g.dispose();
-		return result;
-	}
 
-	public static BufferedImage render(BufferedImage result, WebImage webImage, BufferedImage imageHolder, Map<DrawInstruction, BufferedImage> partialImageMap, List<WebImage> chunks, List<DrawInstruction> newInstructions, Dimension size) {
-		Map<Integer, Graphics2D> gmap = new HashMap<Integer, Graphics2D>();
-		Graphics2D currentg = null;
-		for (DrawInstruction di : newInstructions) {
+		Graphics2D currentGraphics = null;
+		for (DrawInstruction di : instructions) {
 			switch (di.getInstruction()) {
 				case GRAPHICS_CREATE:
-					currentg = iprtGraphicsCreate(result, di, gmap);
+					currentGraphics = iprtGraphicsCreate(result, di, map);
 					break;
 				case GRAPHICS_DISPOSE: {
-					gmap.remove(getValue(0, di, Integer.class));
+					Graphics2D graphics = map.remove(getValue(0, di, Integer.class));
+					if (graphics != null) {
+						graphics.dispose();
+					}
 					break;
 				}
 				case GRAPHICS_SWITCH: {
-					currentg = gmap.get(getValue(0, di, Integer.class));
+					currentGraphics = map.get(getValue(0, di, Integer.class));
 					break;
 				}
 				case FILL:
-					iprtFill(currentg, di);
+					iprtFill(currentGraphics, di);
 					break;
 				case DRAW:
-					iprtDraw(currentg, di);
+					iprtDraw(currentGraphics, di);
 					break;
 				case DRAW_STRING:
-					iprtDrawString(currentg, di);
+					iprtDrawString(currentGraphics, di);
 					break;
 				case DRAW_WEBIMAGE:
-					iprtDrawWebImage(currentg, di);
+					iprtDrawWebImage(currentGraphics, di);
 					break;
 				case DRAW_IMAGE:
-					iprtDrawImage(currentg, di, imageHolder, partialImageMap);
+					iprtDrawImage(currentGraphics, di);
 					break;
 				case COPY_AREA:
-					iprtCopyArea(currentg, di, result);
+					iprtCopyArea(currentGraphics, di, result);
 					break;
 				case SET_COMPOSITE:
-					iprtSetComposite(currentg, di);
+					iprtSetComposite(currentGraphics, di);
 					break;
 				case SET_FONT:
-					iprtSetFont(currentg, di);
+					iprtSetFont(currentGraphics, di);
 					break;
 				case SET_PAINT:
-					iprtSetPaint(currentg, di);
+					iprtSetPaint(currentGraphics, di);
 					break;
 				case SET_STROKE:
-					iprtSetStroke(currentg, di);
+					iprtSetStroke(currentGraphics, di);
 					break;
 				case TRANSFORM:
-					iprtTransform(currentg, di);
+					iprtTransform(currentGraphics, di);
 					break;
 			}
 		}
 
-		for (Graphics2D g2d : gmap.values()) {
+		for (Graphics2D g2d : map.values()) {
 			g2d.dispose();
 		}
 
 		return result;
 	}
 
-	private static void iprtDrawImage(Graphics2D g, DrawInstruction di, BufferedImage imageHolder, Map<DrawInstruction, BufferedImage> partialImageMap) {
-		AffineTransform original = g.getTransform();
-		g.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
-		g.setClip(getShape(0, di));
-		if (imageHolder != null) {
-			g.drawImage(imageHolder, 0, 0, null);
-		} else if (partialImageMap != null && partialImageMap.containsKey(di)) {
-			int[] points = getValue(1, di);
-			g.drawImage(partialImageMap.get(di), points[1], points[2], null);
+	private static void iprtDrawImage(Graphics2D g, DrawInstruction di) {
+		BufferedImage image = getImage(0, di);
+		AffineTransform transform = getValue(1, di);
+		Rectangle2D crop = getValue(2, di);
+		Color bgcolor = getValue(3, di);
+		Shape clip = getValue(4, di);
+		g.setClip(clip);
+		if (crop == null) {
+			g.drawImage(image, transform, null);
+		} else {
+			AffineTransform original = g.getTransform();
+			g.transform(transform);
+			g.drawImage(image, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(),
+				(int) crop.getX(), (int) crop.getY(), (int) crop.getMaxX(), (int) crop.getMaxY(), bgcolor, null);
+			g.setTransform(original);
 		}
-		g.setTransform(original);
-
 	}
 
 	private static void iprtDrawWebImage(Graphics2D g, DrawInstruction di) {
-		BufferedImage i = di.getImage();
-		AffineTransform t = getValue(0, di);
+		BufferedImage image = di.getImage();
+		AffineTransform transform = getValue(0, di);
 		Rectangle2D crop = getValue(1, di);
+		Color bgColor = getValue(2, di);
 		Shape clip = getShape(3, di);
 		g.setClip(clip);
-		AffineTransform original = g.getTransform();
-		if (t != null) {
-			g.transform(t);
+		if (crop == null) {
+			g.drawImage(image, transform, null);
+		} else {
+			AffineTransform original = g.getTransform();
+			g.transform(transform);
+			g.drawImage(image, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(),
+				(int) crop.getX(), (int) crop.getY(), (int) crop.getMaxX(), (int) crop.getMaxY(), bgColor, null);
+			g.setTransform(original);
 		}
-		g.drawImage(i, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(), (int) crop.getX(), (int) crop.getY(), (int) crop.getMaxX(), (int) crop.getMaxY(), null);
-		g.setTransform(original);
 	}
 
 	private static void iprtDrawString(Graphics2D g, DrawInstruction di) {
@@ -173,7 +189,7 @@ public class RenderUtil {
 		Composite composite = getValue(3, di);
 		Paint paint = getPaint(4, di);
 		Font font = getValue(5, di);
-		Graphics2D g = (Graphics2D) result.getGraphics();
+		Graphics2D g = result.createGraphics();
 		if (transform != null) {
 			g.setTransform(transform);
 		}
@@ -211,4 +227,12 @@ public class RenderUtil {
 		return getValue(index, instruction);
 	}
 
+	public static BufferedImage getImage(int index, DrawInstruction instruction) {
+		try {
+			return ImageIO.read(new ByteArrayInputStream((byte[]) getValue(index, instruction)));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

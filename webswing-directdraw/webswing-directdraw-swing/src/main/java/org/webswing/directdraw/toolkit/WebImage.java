@@ -1,34 +1,21 @@
 package org.webswing.directdraw.toolkit;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.Transparency;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
-import java.awt.image.RenderedImage;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.DrawConstant;
 import org.webswing.directdraw.model.DrawInstruction;
-import org.webswing.directdraw.model.ImageConst;
 import org.webswing.directdraw.model.IntegerConst;
-import org.webswing.directdraw.model.PointsConst;
 import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
 import org.webswing.directdraw.proto.Directdraw.WebImageProto;
@@ -44,8 +31,6 @@ public class WebImage extends Image {
 	private List<WebImage> chunks;
 	private DirectDraw context;
 	private Dimension size;
-	private BufferedImage imageHolder;
-	Map<DrawInstruction, BufferedImage> partialImageMap;
 	private volatile int lastGraphicsId = 0;
 	private WebGraphics lastUsedG = null;
 	private Set<WebGraphics> usedGraphics;
@@ -193,60 +178,6 @@ public class WebImage extends Image {
 		}
 	}
 
-	public void addImage(WebGraphics g, Object image, ImageObserver o, AffineTransform xform, Rectangle2D.Float crop) {
-		Graphics2D ihg = (Graphics2D) getImageHolder().getGraphics();
-		ihg.setTransform(g.getTransform());
-		ihg.setClip(g.getClip());
-		if (xform != null) {
-			ihg.transform(xform);
-		}
-		if (image instanceof Image) {
-			Image i = (Image) image;
-			if (crop != null) {
-				ihg.drawImage(i, 0, 0, (int) crop.width, (int) crop.height, (int) crop.x, (int) crop.y, (int) (crop.x + crop.width), (int) (crop.y + crop.height), o);
-				ihg.clip(new Rectangle((int) crop.width, (int) crop.height));
-			} else {
-				ihg.drawImage(i, 0, 0, o);
-				ihg.clip(new Rectangle(i.getWidth(o), i.getHeight(o)));
-			}
-		} else if (image instanceof RenderedImage) {
-			RenderedImage i = (RenderedImage) image;
-			ihg.drawRenderedImage(i, null);
-			ihg.clip(new Rectangle(i.getWidth(), i.getHeight()));
-		}
-		ihg.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
-		ihg.clip(new Rectangle(getImageHolder().getWidth(), getImageHolder().getHeight()));
-		if (ihg.getClip().getBounds().width > 0 && ihg.getClip().getBounds().height > 0) {
-			addInstruction(g, context.getInstructionFactory().drawImage(ihg.getClip()));
-		}
-		ihg.dispose();
-	}
-
-	public void addFillInstruction(WebGraphics g, Shape fillShape) {
-		if (imageHolder != null) {
-			Graphics2D ihg = (Graphics2D) getImageHolder().getGraphics();
-			ihg.setTransform(g.getTransform());
-			ihg.setClip(g.getClip());
-			if (g.getPaint().getTransparency() == Transparency.OPAQUE) {
-				ihg.setComposite(AlphaComposite.Src);
-				ihg.setPaint(new Color(0, 0, 0, 0));
-				ihg.fill(fillShape);
-			} else {
-				ihg.setPaint(g.getPaint());
-				ihg.fill(fillShape);
-			}
-			ihg.dispose();
-		}
-		addInstruction(g, context.getInstructionFactory().fill(fillShape, g.getClip()));
-	}
-
-	private BufferedImage getImageHolder() {
-		if (imageHolder == null) {
-			imageHolder = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-		}
-		return imageHolder;
-	}
-
 	public WebImage extractReadOnlyWebImage(boolean reset) {
 		WebImage result;
 		synchronized (this) {
@@ -254,10 +185,6 @@ public class WebImage extends Image {
 				new ReadOnlyWebImage(context, size.width, size.height, chunks, instructions) :
 				new ReadOnlyWebImage(context, size.width, size.height, new ArrayList<WebImage>(chunks), new ArrayList<DrawInstruction>(instructions));
 			result.id = id;
-			// extract the areas where images were painted. For saving some
-			// memory by not keeping the full window image
-			// but just the relevant areas
-			result.preprocessDrawImageInstructions(imageHolder);
 			if (reset) {
 				reset();
 			}
@@ -265,32 +192,8 @@ public class WebImage extends Image {
 		return result;
 	}
 
-	protected void preprocessDrawImageInstructions(BufferedImage imageHolder) {
-		if (imageHolder != null) {
-			partialImageMap = new HashMap<DrawInstruction, BufferedImage>();
-			// find drawImage instructions and save subImages to subImageMap
-			// (these are later encoded to proto message)
-			for (int index = 0; index < instructions.size(); index++) {
-				DrawInstruction instruction = instructions.get(index);
-				if (instruction.getInstruction() == InstructionProto.DRAW_IMAGE) {
-					Rectangle hold = new Rectangle(imageHolder.getWidth(), imageHolder.getHeight());
-					Rectangle2D bounds = hold.createIntersection(((Shape) instruction.getArg(0).getValue()).getBounds());
-					BufferedImage subImage = new BufferedImage((int) bounds.getWidth(), (int) bounds.getHeight(), BufferedImage.TYPE_INT_ARGB);
-					Graphics sig = subImage.getGraphics();
-					sig.drawImage(imageHolder.getSubimage((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight()), 0, 0, null);
-					sig.dispose();
-					PointsConst points = new PointsConst(context, 0, (int) bounds.getX(), (int) bounds.getY());
-					instruction = new DrawInstruction(InstructionProto.DRAW_IMAGE, instruction.getArg(0), points);
-					instructions.set(index, instruction);
-					partialImageMap.put(instruction, subImage);
-				}
-			}
-		}
-	}
-
 	protected WebImageProto toMessageInternal(DirectDraw dd) {
 		DrawConstantPool constantPool = dd.getConstantPool();
-		DrawConstantPool imagePool = dd.getImagePool();
 
 		WebImageProto.Builder webImageBuilder = WebImageProto.newBuilder();
 
@@ -305,26 +208,6 @@ public class WebImage extends Image {
 
 		// build proto message
 		for (DrawInstruction instruction : instructions) {
-			if (instruction.getInstruction() == InstructionProto.DRAW_IMAGE) {
-				// compute image hash and link containing image
-				BufferedImage subImage = partialImageMap.get(instruction);
-				ImageConst imageConst = new ImageConst(context, subImage);
-				int id;
-				int[] points = ((PointsConst) instruction.getArg(1)).getValue();
-				if (!imagePool.isInCache(imageConst)) {
-					imagePool.addToCache(imageConst);
-					DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
-					builder.setId(imageConst.getId());
-					if (imageConst.getFieldName() != null) {
-						builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(imageConst.getFieldName()), imageConst.toMessage());
-					}
-					webImageBuilder.addImages(builder.build());
-					id = imageConst.getId();
-				} else {
-					id = imagePool.getCached(imageConst).getId();
-				}
-				instruction = new DrawInstruction(InstructionProto.DRAW_IMAGE, instruction.getArg(0), new PointsConst(context, id, points[1], points[2]));
-			}
 			for (DrawConstant cons : instruction) {
 				if (!(cons instanceof IntegerConst) && cons != DrawConstant.nullConst) {
 					// update cache
@@ -350,7 +233,6 @@ public class WebImage extends Image {
 
 	public void reset() {
 		synchronized (this) {
-			imageHolder = null;
 			lastUsedG = null;
 			usedGraphics.clear();
 			// do not clear these collections as they are be copied to read-only instance
@@ -366,11 +248,11 @@ public class WebImage extends Image {
 	}
 
 	public BufferedImage getSnapshot() {
-		return RenderUtil.render(this, imageHolder, partialImageMap, chunks, instructions, size);
+		return RenderUtil.render(chunks, instructions, size);
 	}
 
 	public BufferedImage getSnapshot(BufferedImage result) {
-		return RenderUtil.render(result, this, imageHolder, partialImageMap, chunks, instructions, size);
+		return RenderUtil.render(result, chunks, instructions);
 	}
 
 	private static class ReadOnlyWebImage extends WebImage {
