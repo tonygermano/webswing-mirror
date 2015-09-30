@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +42,7 @@ public class DrawServlet extends HttpServlet {
 			return;
 		}
 
-		String testmethod = request.getParameter("test");
+		String testMethod = request.getParameter("test");
 		boolean resetCache = request.getParameter("reset") != null;
 
 		if (resetCache) {
@@ -61,17 +60,17 @@ public class DrawServlet extends HttpServlet {
 			}
 		});
 		JsonMsg json = new JsonMsg();
-		draw(testmethod, json);
+		draw(testMethod, json);
 
 		String encoded = encode(json);
 		response.getWriter().print(encoded);
-		System.out.println(testmethod);
+		System.out.println(testMethod);
 	}
 
-	private void draw(String testmethod, JsonMsg json) {
+	private void draw(String testMethod, JsonMsg json) {
 		try {
 			boolean success = true;
-			Method m = Tests.class.getDeclaredMethod(testmethod, Graphics2D.class, Integer.class);
+			Method m = Tests.class.getDeclaredMethod(testMethod, Graphics2D.class, int.class);
 			for (int j = 0; success; j++) {
 				// image
 				Image i = getImage(false);
@@ -123,11 +122,8 @@ public class DrawServlet extends HttpServlet {
 	public static byte[] getPngImage(BufferedImage imageContent) {
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
-			ImageIO.write(imageContent, "png", ios);
-			byte[] result = baos.toByteArray();
-			baos.close();
-			return result;
+			ImageIO.write(imageContent, "png", baos);
+			return baos.toByteArray();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
