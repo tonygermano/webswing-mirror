@@ -28,7 +28,6 @@ import sun.java2d.SurfaceData;
 public class WebImage extends Image {
 
 	private String id = UUID.randomUUID().toString();
-	private List<WebImage> chunks;
 	private DirectDraw context;
 	private Dimension size;
 	private volatile int lastGraphicsId = 0;
@@ -38,14 +37,13 @@ public class WebImage extends Image {
 
 	@SuppressWarnings("restriction")
 	public WebImage(DirectDraw dd, int w, int h) {
-		this(dd, w, h, new ArrayList<WebImage>(), new ArrayList<DrawInstruction>());
+		this(dd, w, h, new ArrayList<DrawInstruction>());
 		this.usedGraphics = new HashSet<WebGraphics>();
 	}
 
-	private WebImage(DirectDraw dd, int w, int h, List<WebImage> chunks, List<DrawInstruction> instructions) {
+	private WebImage(DirectDraw dd, int w, int h, List<DrawInstruction> instructions) {
 		this.context = dd;
 		this.size = new Dimension(w, h);
-		this.chunks = chunks;
 		this.instructions = instructions;
 
 		SurfaceManager.setManager(this, new SurfaceManager() {
@@ -144,14 +142,6 @@ public class WebImage extends Image {
 			throw new RuntimeException("Drawing to disposed graphics.");
 		}
 		synchronized (this) {
-			if (in.getInstruction().equals(InstructionProto.COPY_AREA) && !instructions.isEmpty()) {
-				// copy area instruction must be isolated and always as a first
-				// instruction
-				WebImage newChunk = extractReadOnlyWebImage(true);
-				chunks = newChunk.chunks;
-				newChunk.chunks = null;
-				chunks.add(newChunk);
-			}
 			DrawInstructionFactory factory = context.getInstructionFactory();
 			if (lastUsedG != g) {
 				if (!usedGraphics.contains(g)) {
@@ -182,8 +172,8 @@ public class WebImage extends Image {
 		WebImage result;
 		synchronized (this) {
 			result = reset ?
-				new ReadOnlyWebImage(context, size.width, size.height, chunks, instructions) :
-				new ReadOnlyWebImage(context, size.width, size.height, new ArrayList<WebImage>(chunks), new ArrayList<DrawInstruction>(instructions));
+				new ReadOnlyWebImage(context, size.width, size.height, instructions) :
+				new ReadOnlyWebImage(context, size.width, size.height, new ArrayList<DrawInstruction>(instructions));
 			result.id = id;
 			if (reset) {
 				reset();
@@ -198,13 +188,6 @@ public class WebImage extends Image {
 		WebImageProto.Builder webImageBuilder = WebImageProto.newBuilder();
 
 		DirectDrawUtils.optimizeInstructions(dd, instructions);
-		// System.out.println(instructions + (imageHolder == null ? "" : "*"));
-		// first process chunks
-		if (chunks != null && chunks.size() > 0) {
-			for (WebImage chunk : chunks) {
-				webImageBuilder.addChunks(chunk.toMessage(dd));
-			}
-		}
 
 		// build proto message
 		for (DrawInstruction instruction : instructions) {
@@ -237,7 +220,6 @@ public class WebImage extends Image {
 			usedGraphics.clear();
 			// do not clear these collections as they are be copied to read-only instance
 			instructions = new ArrayList<DrawInstruction>();
-			chunks = new ArrayList<WebImage>();
 		}
 	}
 
@@ -248,17 +230,17 @@ public class WebImage extends Image {
 	}
 
 	public BufferedImage getSnapshot() {
-		return RenderUtil.render(chunks, instructions, size);
+		return RenderUtil.render(instructions, size);
 	}
 
 	public BufferedImage getSnapshot(BufferedImage result) {
-		return RenderUtil.render(result, chunks, instructions);
+		return RenderUtil.render(result, instructions);
 	}
 
 	private static class ReadOnlyWebImage extends WebImage {
 
-		public ReadOnlyWebImage(DirectDraw dd, int w, int h, List<WebImage> chunks, List<DrawInstruction> instructions) {
-			super(dd, w, h, chunks, instructions);
+		public ReadOnlyWebImage(DirectDraw dd, int w, int h, List<DrawInstruction> instructions) {
+			super(dd, w, h, instructions);
 		}
 
 		@Override

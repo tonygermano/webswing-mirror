@@ -20,24 +20,17 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import org.webswing.directdraw.model.DrawInstruction;
-import org.webswing.directdraw.toolkit.WebImage;
 
 public class RenderUtil {
 
-	public static BufferedImage render(List<WebImage> chunks, List<DrawInstruction> newInstructions, Dimension size) {
+	public static BufferedImage render(List<DrawInstruction> newInstructions, Dimension size) {
 		BufferedImage result = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-		render(result, chunks, newInstructions);
+		render(result, newInstructions);
 		return result;
 	}
 
-	public static BufferedImage render(BufferedImage result, List<WebImage> chunks, List<DrawInstruction> instructions) {
+	public static BufferedImage render(BufferedImage result, List<DrawInstruction> instructions) {
 		Map<Integer, Graphics2D> map = new HashMap<Integer, Graphics2D>();
-
-		if (chunks != null) {
-			for (WebImage chunk : chunks) {
-				chunk.getSnapshot(result);
-			}
-		}
 
 		Graphics2D currentGraphics = null;
 		for (DrawInstruction di : instructions) {

@@ -27,44 +27,15 @@
 		var constantPoolCache = c.constantPoolCache || {};
 
 		function draw64(data, targetCanvas) {
-			var image = WebImageProto.decode64(data);
-			return drawChunks(image, targetCanvas).then(function(result) {
-				return drawWebImage(image, result);
-			}, function(error) {
-				throw error;
-			});
+			return drawWebImage(WebImageProto.decode64(data), targetCanvas);
 		}
 
 		function drawBin(data, targetCanvas) {
-			var image = WebImageProto.decode(data);
-			return drawChunks(image, targetCanvas).then(function(result) {
-				return drawWebImage(image, result);
-			}, function(error) {
-				throw error;
-			});
+			return drawWebImage(WebImageProto.decode(data), targetCanvas);
 		}
 
 		function drawProto(data, targetCanvas) {
-			var image = data;
-			return drawChunks(image, targetCanvas).then(function(result) {
-				return drawWebImage(image, result);
-			}, function(error) {
-				throw error;
-			});
-		}
-
-		function drawChunks(image, targetCanvas) {
-			if (image.chunks != null) {
-				return image.chunks.reduce(function(seq, current) {
-					return seq.then(function(result) {
-						return drawWebImage(current, result);
-					}, function(error) {
-						throw error;
-					});
-				}, Promise.resolve(targetCanvas));
-			} else {
-				return Promise.resolve(targetCanvas);
-			}
+			return drawWebImage(data, targetCanvas);
 		}
 
 		function drawWebImage(image, targetCanvas) {
