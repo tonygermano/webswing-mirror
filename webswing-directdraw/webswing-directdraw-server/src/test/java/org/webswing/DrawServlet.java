@@ -26,12 +26,13 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.toolkit.VolatileWebImageWrapper;
 import org.webswing.directdraw.toolkit.WebImage;
+import org.webswing.services.impl.ddutil.FastDirectDrawServicesAdapter;
 
 public class DrawServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 2084660222487051245L;
 
-	public static DirectDraw dd = new DirectDraw();
+	public static DirectDraw dd = new DirectDraw(new FastDirectDrawServicesAdapter());
 
 	protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html");

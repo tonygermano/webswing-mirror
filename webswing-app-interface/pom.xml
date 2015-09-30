@@ -50,8 +50,6 @@
 			<groupId>com.objectplanet.image</groupId>
 			<artifactId>pngencoder</artifactId>
 			<version>1</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/../lib/pngencoder.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
