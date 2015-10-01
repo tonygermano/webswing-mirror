@@ -37,7 +37,9 @@ public class DirectDrawServicesAdapter {
 		ImageConsumerAdapter ic = new ImageConsumerAdapter() {
 			@Override
 			public void setPixels(int x, int y, int w, int h, ColorModel model, int[] pixels, int off, int scansize) {
-				hash = hash * 31 + Arrays.hashCode(pixels);
+				for (int i = off; i < off + scansize; i++) {
+					hash = hash * 31 + pixels[i];
+				}
 			}
 		};
 		subImage.getSource().startProduction(ic);
