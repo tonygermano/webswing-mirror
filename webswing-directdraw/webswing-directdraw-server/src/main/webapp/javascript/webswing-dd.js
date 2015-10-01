@@ -242,16 +242,20 @@
 			if (transform != null) {
 				iprtTransform(ctx, [ transform ]);
 			}
+			if (bgcolor != null) {
+				ctx.fillStyle = parseColor(bgcolor.color.rgba);
+				ctx.beginPath();
+				if (crop == null) {
+					ctx.rect(0, 0, image.width, image.height);
+				} else {
+					ctx.rect(0, 0, crop.rectangle.w, crop.rectangle.h);
+				}
+				ctx.fill();
+			}
 			if (crop == null) {
 				ctx.drawImage(image, 0, 0);
 			} else {
 				crop = crop.rectangle;
-				if (bgcolor != null) {
-					iprtSetPaint(ctx, [ bgcolor ]);
-					ctx.beginPath();
-					ctx.rect(0, 0, crop.w, crop.h);
-					ctx.fill();
-				}
 				ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
 			}
 			ctx.restore();
@@ -271,16 +275,20 @@
 				if (transform != null) {
 					iprtTransform(ctx, [ transform ]);
 				}
+				if (bgcolor != null) {
+					ctx.fillStyle = parseColor(bgcolor.color.rgba);
+					ctx.beginPath();
+					if (crop == null) {
+						ctx.rect(0, 0, imageCanvas.width, imageCanvas.height);
+					} else {
+						ctx.rect(0, 0, crop.rectangle.w, crop.rectangle.h);
+					}
+					ctx.fill();
+				}
 				if (crop == null) {
 					ctx.drawImage(imageCanvas, 0, 0);
 				} else {
 					crop = crop.rectangle;
-					if (bgcolor != null) {
-						iprtSetPaint(ctx, [ bgcolor ]);
-						ctx.beginPath();
-						ctx.rect(0, 0, crop.w, crop.h);
-						ctx.fill();
-					}
 					ctx.drawImage(imageCanvas, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
 				}
 				ctx.restore();

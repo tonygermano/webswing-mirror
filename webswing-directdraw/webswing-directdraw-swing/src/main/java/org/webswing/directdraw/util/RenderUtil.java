@@ -99,15 +99,17 @@ public class RenderUtil {
 		Color bgcolor = getValue(3, di);
 		Shape clip = getValue(4, di);
 		g.setClip(clip);
-		if (crop == null) {
-			g.drawImage(image, transform, null);
-		} else {
-			AffineTransform original = g.getTransform();
+		AffineTransform original = g.getTransform();
+		if (transform != null) {
 			g.transform(transform);
+		}
+		if (crop == null) {
+			g.drawImage(image, 0, 0, bgcolor, null);
+		} else {
 			g.drawImage(image, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(),
 				(int) crop.getX(), (int) crop.getY(), (int) crop.getMaxX(), (int) crop.getMaxY(), bgcolor, null);
-			g.setTransform(original);
 		}
+		g.setTransform(original);
 	}
 
 	private static void iprtDrawWebImage(Graphics2D g, DrawInstruction di) {
@@ -117,15 +119,17 @@ public class RenderUtil {
 		Color bgColor = getValue(2, di);
 		Shape clip = getShape(3, di);
 		g.setClip(clip);
-		if (crop == null) {
-			g.drawImage(image, transform, null);
-		} else {
-			AffineTransform original = g.getTransform();
+		AffineTransform original = g.getTransform();
+		if (transform != null) {
 			g.transform(transform);
+		}
+		if (crop == null) {
+			g.drawImage(image, 0, 0, bgColor, null);
+		} else {
 			g.drawImage(image, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(),
 				(int) crop.getX(), (int) crop.getY(), (int) crop.getMaxX(), (int) crop.getMaxY(), bgColor, null);
-			g.setTransform(original);
 		}
+		g.setTransform(original);
 	}
 
 	private static void iprtDrawString(Graphics2D g, DrawInstruction di) {

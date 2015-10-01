@@ -523,7 +523,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	@Override
 	public void setTransform(AffineTransform Tx) {
-		// Fix for FREEHEP-569
+		if (currentTransform.equals(Tx)) {
+			return;
+		}
 		oldTransform.setTransform(currentTransform);
 		currentTransform.setTransform(Tx);
 		writeSetTransform(Tx);

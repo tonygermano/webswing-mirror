@@ -691,6 +691,63 @@ public class Tests {
 
 		return true;
 	}
+
+	@SuppressWarnings("unused")
+	public static boolean t26DrawImageWithBackgroundTest(Graphics2D g, int repeat) {
+		if (repeat != 0) {
+			return false;
+		}
+		Image img = new BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
+		imgGraphics.setColor(Color.blue);
+		imgGraphics.fillRect(10, 10, 30, 30);
+		imgGraphics.dispose();
+
+		drawImagesWithBackground(g, img);
+		
+		return true;
+	}
+
+	@SuppressWarnings("unused")
+	public static boolean t28DrawWebImageWithBackgroundTest(Graphics2D g, int repeat) {
+		if (repeat != 0) {
+			return false;
+		}
+		Image img = DrawServlet.getImage(g instanceof WebGraphics, 50, 50);
+		Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
+		imgGraphics.setColor(Color.red);
+		imgGraphics.fillRect(10, 10, 30, 30);
+		imgGraphics.dispose();
+
+		drawImagesWithBackground(g, img);
+		
+		return true;
+	}
+
+	private static void drawImagesWithBackground(Graphics2D g, Image img) {
+		g.setColor(Color.pink);
+		g.fillRect(0, 0, 500, 100);
+
+		Color opaque = Color.cyan;
+		Color transparent = new Color(0, 255, 255, 128);
+
+		g.drawImage(img, 0, 0, null);
+		g.drawImage(img, 50, 0, opaque, null);
+		g.drawImage(img, 100, 0, transparent, null);
+		g.drawImage(img, 150, 0, 175, 25, 0, 0, 25, 25, null);
+		g.drawImage(img, 200, 0, 225, 25, 0, 0, 25, 25, opaque, null);
+		g.drawImage(img, 250, 0, 275, 25, 0, 0, 25, 25, transparent, null);
+		g.drawImage(img, new AffineTransform(1, 0, 0, 1, 400, 0), null);
+		g.drawImage(img, new AffineTransform(1, 0.5, 0, 1, 450, 0), null);
+		g.drawImage(img, 5, 55, 40, 40, null);
+		g.drawImage(img, 55, 55, 40, 40, opaque, null);
+		g.drawImage(img, 105, 55, 40, 40, transparent, null);
+		g.drawImage(img, 150, 50, 200, 100, 0, 0, 25, 25, null);
+		g.drawImage(img, 200, 50, 250, 100, 0, 0, 25, 25, opaque, null);
+		g.drawImage(img, 250, 50, 300, 100, 0, 0, 25, 25, transparent, null);
+		g.drawImage(img, new AffineTransform(0.5, 0, 0, 0.5, 400, 50), null);
+		g.drawImage(img, new AffineTransform(0.5, 0.5, 0, 0.5, 450, 50), null);
+	}
 	
 	private static void printJComponentHelper(String laf, Graphics2D g, JComponent c) {
 		try {
