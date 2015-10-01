@@ -709,7 +709,7 @@ public class Tests {
 	}
 
 	@SuppressWarnings("unused")
-	public static boolean t28DrawWebImageWithBackgroundTest(Graphics2D g, int repeat) {
+	public static boolean t27DrawWebImageWithBackgroundTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
 			return false;
 		}
@@ -741,12 +741,46 @@ public class Tests {
 		g.drawImage(img, new AffineTransform(1, 0.5, 0, 1, 450, 0), null);
 		g.drawImage(img, 5, 55, 40, 40, null);
 		g.drawImage(img, 55, 55, 40, 40, opaque, null);
+		// The next on isn't working in java and seems to be a bug on their side. I've sent them a report.
 		g.drawImage(img, 105, 55, 40, 40, transparent, null);
 		g.drawImage(img, 150, 50, 200, 100, 0, 0, 25, 25, null);
 		g.drawImage(img, 200, 50, 250, 100, 0, 0, 25, 25, opaque, null);
+		// The next on isn't working in java and seems to be a bug on their side. I've sent them a report.
 		g.drawImage(img, 250, 50, 300, 100, 0, 0, 25, 25, transparent, null);
 		g.drawImage(img, new AffineTransform(0.5, 0, 0, 0.5, 400, 50), null);
 		g.drawImage(img, new AffineTransform(0.5, 0.5, 0, 0.5, 450, 50), null);
+	}
+
+	@SuppressWarnings("unused")
+	public static boolean t28VariousImageTypesTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
+			return false;
+		}
+		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("rgb.png"));
+		g.setBackground(Color.yellow);
+		g.clearRect(0, 0, 350, 100);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_INT_RGB), 0, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_INT_ARGB), 50, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_INT_ARGB_PRE), 100, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_INT_BGR), 150, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_3BYTE_BGR), 200, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_4BYTE_ABGR), 250, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_4BYTE_ABGR_PRE), 300, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_USHORT_565_RGB), 0, 50, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_USHORT_555_RGB), 50, 50, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_BYTE_GRAY), 100, 50, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_USHORT_GRAY), 150, 50, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_BYTE_BINARY), 200, 50, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_BYTE_INDEXED), 250, 50, 50, 50, null);
+		return true;
+	}
+	
+	private static Image copyImage(BufferedImage image, int type) {
+		BufferedImage copy = new BufferedImage(image.getWidth(), image.getHeight(), type);
+		Graphics2D g = copy.createGraphics();
+		g.drawImage(image, 0, 0, null);
+		g.dispose();
+		return copy;
 	}
 	
 	private static void printJComponentHelper(String laf, Graphics2D g, JComponent c) {
