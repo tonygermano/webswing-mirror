@@ -775,6 +775,106 @@ public class Tests {
 		return true;
 	}
 	
+	@SuppressWarnings("unused")
+	public static boolean t29BiasedLinesTest(Graphics2D g, int repeat) {
+		if (repeat != 0) {
+			return false;
+		}
+		g.setTransform(new AffineTransform(5, 0, 0, 5, 5, 5));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(4, 0, 0, 4, 10, 10));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(3, 0, 0, 3, 15, 15));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(2, 0, 0, 2, 20, 20));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(1.5, 0, 0, 1.5, 25, 25));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(1, 0, 0, 1, 30, 30));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(0.5, 0, 0, 0.5, 35, 35));
+		filledThenStroked(g);
+
+		g.setTransform(new AffineTransform(5, 0, 0, 5, 90, 5));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(4, 0, 0, 4, 95, 10));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(3, 0, 0, 3, 100, 15));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(2, 0, 0, 2, 105, 20));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(1.5, 0, 0, 1.5, 110, 25));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(1, 0, 0, 1, 115, 30));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(0.5, 0, 0, 0.5, 120, 35));
+		strokedThenFilled(g);
+
+		/**
+		 * The next tests compare stroke width rounding
+		 * when using fraction width and different scales.
+		 * Due to XOR if stroke widths are equal nothing will be drawn.
+		 */
+		g.setTransform(new AffineTransform());
+		g.setComposite(AlphaComposite.Xor);
+		
+		g.setStroke(new BasicStroke(1f));
+		g.drawRect(175, 5, 40, 40);
+		g.setStroke(new BasicStroke(0.1f));
+		g.drawRect(175, 5, 40, 40);
+		
+		g.setStroke(new BasicStroke(1f));
+		g.drawRect(225, 5, 40, 40);
+		g.setStroke(new BasicStroke(0.5f));
+		g.drawRect(225, 5, 40, 40);
+
+		g.setStroke(new BasicStroke(1f));
+		g.drawRect(175, 55, 40, 40);
+		g.setStroke(new BasicStroke(1.1f));
+		g.drawRect(175, 55, 40, 40);
+
+		g.setStroke(new BasicStroke(2f));
+		g.drawRect(225, 55, 40, 40);
+		g.setStroke(new BasicStroke(1.5f));
+		g.drawRect(225, 55, 40, 40);
+
+		g.setStroke(new BasicStroke(3f));
+		g.drawRect(275, 5, 40, 40);
+		g.setTransform(new AffineTransform(2, 0, 0, 2, 275, 5));
+		g.setStroke(new BasicStroke(1.5f));
+		g.drawRect(0, 0, 20, 20);
+
+		g.setStroke(new BasicStroke(12f));
+		g.setTransform(new AffineTransform(1d/3, 0, 0, 1d/4, 275, 55));
+		g.drawRect(0, 0, 180, 160);
+		g.setTransform(new AffineTransform(3, 0, 0, 2, 275, 55));
+		g.setStroke(new BasicStroke(1.5f));
+		g.drawRect(0, 0, 20, 20);
+
+		g.setStroke(new BasicStroke(12f));
+		g.setTransform(new AffineTransform(1d/4, 0, 0, 1d/3, 345, 5));
+		g.drawRect(0, 0, 160, 180);
+		g.setTransform(new AffineTransform(2, 0, 0, 3, 345, 5));
+		g.setStroke(new BasicStroke(1.45f));
+		g.drawRect(0, 0, 20, 20);
+
+		return true;
+	}
+	
+	private static void filledThenStroked(Graphics2D g) {
+		g.setColor(Color.blue);
+		g.fillRect(0, 0, 15, 15);
+		g.setColor(Color.red);
+		g.drawRect(0, 0, 15, 15);
+	}
+
+	private static void strokedThenFilled(Graphics2D g) {
+		g.setColor(Color.red);
+		g.drawRect(0, 0, 15, 15);
+		g.setColor(Color.blue);
+		g.fillRect(0, 0, 15, 15);
+	}
+
 	private static Image copyImage(BufferedImage image, int type) {
 		BufferedImage copy = new BufferedImage(image.getWidth(), image.getHeight(), type);
 		Graphics2D g = copy.createGraphics();
