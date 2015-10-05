@@ -863,18 +863,12 @@
 		}
 
 		return {
-			draw64 : function(data, targetCanvas) {
-				return draw64(data, targetCanvas);
-			},
-			drawBin : function(data, targetCanvas) {
-				return drawBin(data, targetCanvas);
-			},
-			drawProto : function(data, targetCanvas) {
-				return drawProto(data, targetCanvas);
-			},
+			draw64 : draw64,
+			drawBin : drawBin,
+			drawProto : drawProto,
 			getConstantPoolCache : function() {
 				return constantPoolCache;
-			},
+			}
 		};
 	};
 }));

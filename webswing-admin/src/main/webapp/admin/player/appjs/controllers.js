@@ -130,16 +130,12 @@ angular.module('ws-player.controllers', [])
 						frame.canvas = $scope.cloneCanvas(previousFrame.canvas);
 						var imageholdercopy = {};
 						var directDrawConfig = {
-							constantPoolCache: {},
-							imagePoolCache: {}
+							constantPoolCache: {}
 						};
 						for (var iHolder in previousFrame.ws.getWindowImageHolders()) {
 							imageholdercopy[iHolder] = $scope.cloneCanvas(previousFrame.ws.getWindowImageHolders()[iHolder]);
 						}
-						for (var imagePoolEntry in previousFrame.ws.getDirectDraw().getImagePoolCache()) {
-							directDrawConfig.imagePoolCache[imagePoolEntry] = previousFrame.ws.getDirectDraw().getImagePoolCache()[imagePoolEntry];
-						}
-						for (var constantPoolEntry in previousFrame.ws.getDirectDraw().getImagePoolCache()) {
+						for (var constantPoolEntry in previousFrame.ws.getDirectDraw().getConstantPoolCache()) {
 							directDrawConfig.constantPoolCache[constantPoolEntry] = previousFrame.ws.getDirectDraw().getConstantPoolCache()[constantPoolEntry];
 						}
 						frame.ws = new WebswingBase({
