@@ -217,11 +217,21 @@ public class SwingClassloader extends URLClassLoader {
 				if (class_name.indexOf("$$BCEL$$") >= 0) {
 					clazz = createClass(class_name);
 				} else { // Fourth try: Load classes via repository
-					if ((clazz = repository.loadClass(class_name)) != null) {
+					try {
+						clazz = repository.loadClass(class_name);
 						clazz = modifyClass(clazz);
 						repository.removeClass(clazz);
-					} else {
-						throw new ClassNotFoundException(class_name);
+					} catch (ClassNotFoundException e) {
+						//in case the class was loaded from external source using defineClass (ie. remote EJB stub)
+						cl = findLoadedClass(class_name);
+						if (cl != null) {
+							if (resolve) {
+								resolveClass(cl);
+							}
+							return cl;
+						} else {
+							throw new ClassNotFoundException(class_name);
+						}
 					}
 				}
 				if (clazz != null) {
