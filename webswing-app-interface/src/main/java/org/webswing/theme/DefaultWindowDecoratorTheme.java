@@ -237,11 +237,14 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 
 		String title = getTitle(window);
 		g.setFont(UIManager.getFont("TitledBorder.font"));
-		LineMetrics lineMetrics = g.getFontMetrics().getLineMetrics(title, g);
+		float lineMetricsHeight = is.TITLE.getHeight();
+		if (g.getFontMetrics() != null) {
+			lineMetricsHeight = g.getFontMetrics().getLineMetrics(title, g).getHeight();
+		}
 
 		x += is.MENU.getWidth() + BUTTON_SPACING;
 		g.setColor(is.TEXT_COLOR);
-		g.drawString(title, x, y + (is.TITLE.getHeight() - (int) lineMetrics.getHeight()) / 2 + (int) lineMetrics.getHeight());
+		g.drawString(title, x, y + (is.TITLE.getHeight() - (int) lineMetricsHeight) / 2 + (int) lineMetricsHeight);
 
 		x = xOffset + w - BUTTON_SPACING;
 		x -= is.CLOSE.getWidth();
