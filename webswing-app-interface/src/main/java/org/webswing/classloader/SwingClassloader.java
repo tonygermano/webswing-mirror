@@ -48,7 +48,7 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableBiMap.Builder;
 
 @SuppressWarnings("restriction")
-public class SwingClassloader extends ClassLoader {
+public class SwingClassloader extends URLClassLoader {
 
 	private static BiMap<String, String> classReplacementMapping;
 	private static BiMap<String, String> methodReplacementMapping;
@@ -171,7 +171,7 @@ public class SwingClassloader extends ClassLoader {
 	private final URLClassLoader repoClassLoader;
 
 	public SwingClassloader(URL[] classpath, ClassLoader parent) {
-		super(parent);
+		super(new URL[] {}, parent);
 		this.ignored_packages = new String[] { "java.", "javax.", "sun.", "org.xml.sax", "org.omg.CORBA", "org.w3c.dom", "org.webswing.special", "org.webswing.model", "org.webswing.toolkit", "netscape.javascript" };
 		this.repoClassLoader = new URLClassLoader(classpath) {
 
@@ -217,11 +217,21 @@ public class SwingClassloader extends ClassLoader {
 				if (class_name.indexOf("$$BCEL$$") >= 0) {
 					clazz = createClass(class_name);
 				} else { // Fourth try: Load classes via repository
-					if ((clazz = repository.loadClass(class_name)) != null) {
+					try {
+						clazz = repository.loadClass(class_name);
 						clazz = modifyClass(clazz);
 						repository.removeClass(clazz);
-					} else {
-						throw new ClassNotFoundException(class_name);
+					} catch (ClassNotFoundException e) {
+						//in case the class was loaded from external source using defineClass (ie. remote EJB stub)
+						cl = findLoadedClass(class_name);
+						if (cl != null) {
+							if (resolve) {
+								resolveClass(cl);
+							}
+							return cl;
+						} else {
+							throw new ClassNotFoundException(class_name);
+						}
 					}
 				}
 				if (clazz != null) {
@@ -251,6 +261,21 @@ public class SwingClassloader extends ClassLoader {
 		}
 		classes.put(class_name, cl);
 		return cl;
+	}
+
+	@Override
+	protected void addURL(URL url) {
+		try {
+			java.lang.reflect.Method m = repoClassLoader.getClass().getSuperclass().getDeclaredMethod("addURL", URL.class);
+			m.setAccessible(true);
+			m.invoke(repoClassLoader, url);
+		} catch (Exception e) {
+			Logger.error("Failed to addURL to SwingClassloader", e);
+		}
+	}
+
+	protected void addAppURL(URL url) {
+		addURL(url);
 	}
 
 	private JavaClass createClass(String class_name) {
