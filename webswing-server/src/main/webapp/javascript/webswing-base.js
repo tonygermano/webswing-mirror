@@ -15,6 +15,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             disposeTouch : 'touch.dispose',
             getUser : 'login.user',
             getIdentity : 'identity.get',
+            disposeIdentity : 'identity.dispose',
             getLocale : 'identity.getLocale',
             showDialog : 'dialog.show',
             hideDialog : 'dialog.hide',
@@ -50,7 +51,10 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
         var windowImageHolders = {};
         var directDraw = new WebswingDirectDraw({});
 
-        function startApplication(name, applet) {
+        function startApplication(name, applet, alwaysReset) {
+            if (alwaysReset===true){
+                api.disposeIdentity();
+            }
             initialize(api.getUser() + api.getIdentity() + name, name, applet, false);
         }
 

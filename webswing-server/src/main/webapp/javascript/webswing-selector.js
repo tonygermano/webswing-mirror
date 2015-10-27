@@ -31,7 +31,8 @@ define(['jquery','webswing-util'], function amdFactory($, util) {
                 application_click: function () {
                     var appName = $(this).attr('data-name');
                     var applet = $(this).attr('data-applet');
-                    api.startApplication(appName, 'true' === applet);
+                    var restart = $(this).attr('data-always-restart');
+                    api.startApplication(appName, 'true' === applet, 'true' === restart);
                 }
             };
             var content;
@@ -41,15 +42,17 @@ define(['jquery','webswing-util'], function amdFactory($, util) {
             } else if (api.cfg.applicationName != null) {
                 var exists = false;
                 var isApplet = false;
+                var alwaysRestart = false;
                 apps.forEach(function (app) {
                     if (app.name === api.cfg.applicationName) {
                         exists = true;
                         isApplet = app.applet;
+                        alwaysRestart = app.alwaysRestart;
                     }
                 });
                 if (exists) {
                     if (!api.cfg.mirror) {
-                        api.startApplication(api.cfg.applicationName, isApplet);
+                        api.startApplication(api.cfg.applicationName, isApplet, alwaysRestart);
                     } else {
                         api.startMirrorView(api.cfg.clientId, api.cfg.applicationName);
                     }
@@ -72,6 +75,8 @@ define(['jquery','webswing-util'], function amdFactory($, util) {
                                 + app.name
                                 + '" data-applet="'
                                 + app.applet
+                                + '" data-always-restart="'
+                                + app.alwaysRestart
                                 + '"><img src="'
                                 + util.getImageString(app.base64Icon)
                                 + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>';

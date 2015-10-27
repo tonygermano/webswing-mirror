@@ -151,6 +151,7 @@ public class ServerUtil {
 	public static ApplicationInfoMsg toApplicationInfoMsg(SwingDescriptor swingDesc, StrSubstitutor subs) {
 		ApplicationInfoMsg app = new ApplicationInfoMsg();
 		app.setName(swingDesc.getName());
+		app.setAlwaysRestart(swingDesc.getSwingSessionTimeout() == 0);
 		String icon = subs != null ? subs.replace(swingDesc.getIcon()) : swingDesc.getIcon();
 		String homeDir = subs != null ? subs.replace(swingDesc.getHomeDir()) : swingDesc.getHomeDir();
 		if (icon == null) {

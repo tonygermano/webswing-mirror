@@ -7,6 +7,7 @@ public class ApplicationInfoMsg implements Msg, Comparable<ApplicationInfoMsg> {
 	private String name;
 	private byte[] base64Icon;
 	private boolean applet;
+	private boolean alwaysRestart;
 
 	public String getName() {
 		return name;
@@ -39,4 +40,13 @@ public class ApplicationInfoMsg implements Msg, Comparable<ApplicationInfoMsg> {
 		}
 		return 0;
 	}
+
+	public void setAlwaysRestart(boolean b) {
+		alwaysRestart = b;
+	}
+
+	public boolean isAlwaysRestart() {
+		return alwaysRestart;
+	}
+
 }
