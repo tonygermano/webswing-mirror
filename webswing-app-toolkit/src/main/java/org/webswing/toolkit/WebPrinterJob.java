@@ -30,7 +30,7 @@ public class WebPrinterJob extends PrinterJob {
 	private PageFormat pageFormat;
 	private int copies;
 	private String jobName;
-	private PrintService service = new WebPrintService();
+	private PrintService service = WebPrintService.getService();
 
 	@Override
 	public void setPrintable(Printable painter) {

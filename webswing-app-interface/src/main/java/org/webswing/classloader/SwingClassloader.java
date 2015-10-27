@@ -111,6 +111,9 @@ public class SwingClassloader extends URLClassLoader {
 		if (System.getProperty(org.webswing.Constants.SWING_START_SYS_PROP_ISOLATED_FS, "").equalsIgnoreCase("true")) {
 			methodReplacementBuilder.put("java.io.File listRoots ()[Ljava/io/File;", "org.webswing.special.RedirectedMethods listRoots ()[Ljava/io/File;");
 		}
+		//printing methods
+		//PrintService[] javax.print.PrintServiceLookup.lookupPrintServices(DocFlavor flavor, AttributeSet attributes)
+		methodReplacementBuilder.put("javax.print.PrintServiceLookup lookupPrintServices (Ljavax/print/DocFlavor;Ljavax/print/attribute/AttributeSet;)[Ljavax/print/PrintService;", "org.webswing.special.RedirectedMethods lookupPrintServices (Ljavax/print/DocFlavor;Ljavax/print/attribute/AttributeSet;)[Ljavax/print/PrintService;");
 
 		// methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;)Ljava/lang/String;");
 		// methodReplacementBuilder.put("javax.swing.JOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", "org.webswing.special.RedirectedJOptionPane showInputDialog (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;");

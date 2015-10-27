@@ -7,12 +7,17 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.util.Enumeration;
 
+import javax.print.DocFlavor;
+import javax.print.PrintService;
+import javax.print.attribute.AttributeSet;
 import javax.swing.JDesktopPane;
 import javax.swing.RepaintManager;
 
 import org.webswing.SwingMain;
+import org.webswing.toolkit.WebPrintService;
 import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Util;
 
 public class RedirectedMethods {
 
@@ -69,5 +74,9 @@ public class RedirectedMethods {
 		} else {
 			target.putClientProperty(key, value);
 		}
+	}
+
+	public static PrintService[] lookupPrintServices(DocFlavor flavor, AttributeSet attributes) {
+		return new PrintService[] { WebPrintService.getService() };
 	}
 }
