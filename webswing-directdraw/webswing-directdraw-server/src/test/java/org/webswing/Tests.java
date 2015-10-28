@@ -3,16 +3,15 @@ package org.webswing;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Point;
@@ -26,45 +25,38 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JToolTip;
 import javax.swing.UIManager;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.metal.MetalToolTipUI;
+import javax.swing.WindowConstants;
 
 import org.webswing.directdraw.toolkit.WebGraphics;
 
 public class Tests {
 
-	public static boolean t00DrawLineTest(Graphics2D g, Integer repeat) {
+	@SuppressWarnings("unused")
+	public static boolean t00DrawLineTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
 			return false;
 		}
-		Color c1 = Color.red;
-		Color c2 = Color.green;
-		Color c3 = Color.blue;
-		g.setColor(c1);
+		g.setColor(Color.red);
 		g.setStroke(new BasicStroke(7, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 2.5f, new float[] { 3, 15, 40, 15 }, 10));
 		g.drawPolyline(new int[] { 20, 20, 100, 100 }, new int[] { 5, 50, 50, 95 }, 4);
-		g.setColor(c2);
+		g.setColor(Color.green);
 		g.setStroke(new BasicStroke(7, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 2.5f, new float[] { 3, 15, 40, 15 }, 50));
 		g.drawPolyline(new int[] { 120, 120, 200, 200 }, new int[] { 5, 50, 50, 95 }, 4);
-		g.setColor(c3);
+		g.setColor(Color.blue);
 		g.setStroke(new BasicStroke(7, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 2.5f, new float[] { 3, 15, 40, 15 }, 100));
 		g.drawPolyline(new int[] { 220, 220, 300, 300 }, new int[] { 5, 50, 50, 95 }, 4);
 
-		g.setColor(c2);
+		g.setColor(Color.green);
 		g.setStroke(new BasicStroke(7, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 2.5f));
 		g.drawPolyline(new int[] { 320, 320, 340, 340 }, new int[] { 20, 80, 20, 80 }, 4);
 		g.setStroke(new BasicStroke(7, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f));
@@ -75,17 +67,17 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t01DrawImageTest(Graphics2D g, Integer repeat) throws IOException {
+	public static boolean t01DrawImageTest(Graphics2D g, int repeat) throws IOException {
 		if (repeat != 0) {
 			return false;
 		}
-		BufferedImage image = ImageIO.read(new File(Tests.class.getClassLoader().getResource("ws.png").getFile()));
+		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("ws.png"));
 		g.drawImage(image, 10, 10, 180, 80, 25, 25, 100, 100, null);
 		g.drawImage(image, 200, 10, 380, 80, 100, 100, 25, 25, null);
 		return true;
 	}
 
-	public static boolean t02FillRectTest(Graphics2D g, Integer repeat) {
+	public static boolean t02FillRectTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
 			return false;
 		}
@@ -95,13 +87,13 @@ public class Tests {
 		Color c3 = Color.blue;
 		Color c4 = Color.yellow;
 		g.setColor(c);
-		g.draw(new Arc2D.Double(new Rectangle2D.Double(0, 0, 48, 30), 15, 250, 0));
-		g.draw(new Arc2D.Double(new Rectangle2D.Double(0, 33, 48, 30), 15, 250, 1));
-		g.draw(new Arc2D.Double(new Rectangle2D.Double(0, 66, 48, 30), 15, 250, 2));
+		g.draw(new Arc2D.Double(new Rectangle2D.Double(0, 0, 48, 30), 15, 250, Arc2D.OPEN));
+		g.draw(new Arc2D.Double(new Rectangle2D.Double(0, 33, 48, 30), 15, 250, Arc2D.CHORD));
+		g.draw(new Arc2D.Double(new Rectangle2D.Double(0, 66, 48, 30), 15, 250, Arc2D.PIE));
 		g.setColor(c1);
-		g.fill(new Arc2D.Double(new Rectangle2D.Double(50, 0, 48, 30), 15, 250, 0));
-		g.fill(new Arc2D.Double(new Rectangle2D.Double(50, 33, 48, 30), 15, 250, 1));
-		g.fill(new Arc2D.Double(new Rectangle2D.Double(50, 66, 48, 30), 15, 250, 2));
+		g.fill(new Arc2D.Double(new Rectangle2D.Double(50, 0, 48, 30), 15, 250, Arc2D.OPEN));
+		g.fill(new Arc2D.Double(new Rectangle2D.Double(50, 33, 48, 30), 15, 250, Arc2D.CHORD));
+		g.fill(new Arc2D.Double(new Rectangle2D.Double(50, 66, 48, 30), 15, 250, Arc2D.PIE));
 		g.setColor(c2);
 		g.draw(new Rectangle2D.Double(100, 0, 48, 48));
 		g.fill(new Rectangle2D.Double(100, 50, 48, 48));
@@ -114,11 +106,11 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t03TransformTest(Graphics2D g, Integer repeat) throws IOException {
+	public static boolean t03TransformTest(Graphics2D g, int repeat) throws IOException {
 		if (repeat != 0) {
 			return false;
 		}
-		BufferedImage image = ImageIO.read(new File(Tests.class.getClassLoader().getResource("ws.png").getFile()));
+		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("ws.png"));
 		g.rotate(Math.PI / 4, 50, 50);
 		g.drawImage(image, 0, 0, 100, 100, null);
 		g.rotate(-(Math.PI / 4), 50, 50);
@@ -133,11 +125,12 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t04TexturePaintTest(Graphics2D g, Integer repeat) throws IOException {
+	@SuppressWarnings("unused")
+	public static boolean t04TexturePaintTest(Graphics2D g, int repeat) throws IOException {
 		if (repeat != 0) {
 			return false;
 		}
-		BufferedImage image = ImageIO.read(new File(Tests.class.getClassLoader().getResource("ws.png").getFile()));
+		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("ws.png"));
 		g.setPaint(Color.orange);
 		g.fillRect(0, 0, 500, 100);
 		g.setPaint(new TexturePaint(image, new Rectangle2D.Double(50, 50, 48, 48)));
@@ -147,7 +140,8 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t05LinearGradientTest(Graphics2D g, Integer repeat) {
+	@SuppressWarnings("unused")
+	public static boolean t05LinearGradientTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
 			return false;
 		}
@@ -155,78 +149,81 @@ public class Tests {
 		g.fillRect(0, 0, 100, 100);
 		g.setColor(Color.BLACK);
 		g.drawRect(0, 0, 100, 100);
-		g.setPaint(new LinearGradientPaint(new Point2D.Float(200, 100), new Point2D.Float(150, 50), new float[] { 0f, 0.5f, 1f }, new Color[] { Color.BLUE, Color.green, Color.yellow }, CycleMethod.REFLECT));
+		float[] fractions = new float[] { 0f, 0.5f, 1f };
+		Color[] colors = new Color[] { Color.BLUE, Color.green, Color.yellow };
+		g.setPaint(new LinearGradientPaint(new Point2D.Float(200, 100), new Point2D.Float(150, 50), fractions, colors, CycleMethod.REFLECT));
 		g.fillRect(100, 0, 100, 100);
 		g.setColor(Color.BLACK);
 		g.drawRect(100, 0, 100, 100);
-		g.setPaint(new LinearGradientPaint(new Point2D.Float(900, 20), new Point2D.Float(900, 0), new float[] { 0f, 0.5f, 1f }, new Color[] { Color.BLUE, Color.green, Color.yellow }, CycleMethod.REFLECT));
+		g.setPaint(new LinearGradientPaint(new Point2D.Float(900, 20), new Point2D.Float(900, 0), fractions, colors, CycleMethod.REFLECT));
 		g.fillRect(200, 0, 150, 100);
 		g.setColor(Color.BLACK);
 		g.drawRect(200, 0, 150, 100);
-		g.setPaint(new LinearGradientPaint(new Point2D.Float(1050, 0), new Point2D.Float(1000, 0), new float[] { 0f, 0.5f, 1f }, new Color[] { Color.BLUE, Color.green, Color.yellow }, CycleMethod.REFLECT));
+		g.setPaint(new LinearGradientPaint(new Point2D.Float(1050, 0), new Point2D.Float(1000, 0), fractions, colors, CycleMethod.REFLECT));
 		g.fillRect(350, 0, 150, 100);
 		g.setColor(Color.BLACK);
 		g.drawRect(350, 0, 150, 100);
 		return true;
 	}
 
-	public static boolean t06RadialGradientTest(Graphics2D g, Integer repeat) {
+	@SuppressWarnings("unused")
+	public static boolean t06RadialGradientTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
 			return false;
 		}
-		g.setPaint(new RadialGradientPaint(new Point2D.Float(25, 25), 25, new float[] { 0, 0.5f, 1 }, new Color[] { Color.white, Color.red, Color.black }));
+		float[] fractions = new float[] { 0, 0.5f, 1 };
+		Color[] colors = new Color[] { Color.white, Color.red, Color.black };
+		g.setPaint(new RadialGradientPaint(new Point2D.Float(25, 25), 25, fractions, colors));
 		g.fillOval(0, 0, 50, 50);
-		g.setPaint(new RadialGradientPaint(new Point2D.Float(25, 75), 25, new Point2D.Float(50, 100), new float[] { 0, 0.5f, 1 }, new Color[] { Color.white, Color.red, Color.black }, CycleMethod.NO_CYCLE));
+		g.setPaint(new RadialGradientPaint(new Point2D.Float(25, 75), 25, new Point2D.Float(50, 100), fractions, colors, CycleMethod.NO_CYCLE));
 		g.fillOval(0, 50, 50, 50);
-		g.setPaint(new RadialGradientPaint(new Point2D.Float(75, 25), 25, new Point2D.Float(85, 35), new float[] { 0, 0.5f, 1 }, new Color[] { Color.white, Color.red, Color.black }, CycleMethod.NO_CYCLE));
+		g.setPaint(new RadialGradientPaint(new Point2D.Float(75, 25), 25, new Point2D.Float(85, 35), fractions, colors, CycleMethod.NO_CYCLE));
 		g.fillOval(50, 0, 50, 50);
-		g.setPaint(new RadialGradientPaint(new Point2D.Float(75, 75), 25, new Point2D.Float(50, 50), new float[] { 0, 0.5f, 1 }, new Color[] { Color.white, Color.red, Color.black }, CycleMethod.NO_CYCLE));
+		g.setPaint(new RadialGradientPaint(new Point2D.Float(75, 75), 25, new Point2D.Float(50, 50), fractions, colors, CycleMethod.NO_CYCLE));
 		g.fillOval(50, 50, 50, 50);
-		g.setPaint(new RadialGradientPaint(new Point2D.Float(150, 50), 25, new float[] { 0, 0.5f, 1 }, new Color[] { Color.white, Color.red, Color.black }, CycleMethod.REFLECT));
+		g.setPaint(new RadialGradientPaint(new Point2D.Float(150, 50), 25, fractions, colors, CycleMethod.REFLECT));
 		g.fillOval(100, 0, 100, 100);
-		g.setPaint(new RadialGradientPaint(new Point2D.Float(250, 50), 25, new float[] { 0, 0.5f, 1 }, new Color[] { Color.white, Color.red, Color.black }, CycleMethod.REPEAT));
+		g.setPaint(new RadialGradientPaint(new Point2D.Float(250, 50), 25, fractions, colors, CycleMethod.REPEAT));
 		g.fillOval(200, 0, 100, 100);
-		g.setPaint(new RadialGradientPaint(new Point2D.Float(350, 50), 25, new Point2D.Float(340, 35), new float[] { 0, 0.5f, 1 }, new Color[] { Color.white, Color.red, Color.black }, CycleMethod.REFLECT));
+		g.setPaint(new RadialGradientPaint(new Point2D.Float(350, 50), 25, new Point2D.Float(340, 35), fractions, colors, CycleMethod.REFLECT));
 		g.fillOval(300, 0, 100, 100);
-		g.setPaint(new RadialGradientPaint(new Point2D.Float(450, 50), 25, new Point2D.Float(460, 65), new float[] { 0, 0.5f, 1 }, new Color[] { Color.white, Color.red, Color.black }, CycleMethod.REPEAT));
+		g.setPaint(new RadialGradientPaint(new Point2D.Float(450, 50), 25, new Point2D.Float(460, 65), fractions, colors, CycleMethod.REPEAT));
 		g.fillOval(400, 0, 100, 100);
 		return true;
 	}
 
-	public static boolean t07ClipTest(Graphics2D g, Integer repeat) {
+	@SuppressWarnings("unused")
+	public static boolean t07ClipTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
 			return false;
 		}
-		Color c = Color.orange;
-		Color c1 = Color.red;
-		Color c2 = Color.green;
-		Color c3 = Color.blue;
-		g.setColor(c);
-		g.setClip(new Arc2D.Double(new Rectangle2D.Double(0, 0, 98, 48), 15, 250, 0));
+		g.setColor(Color.orange);
+		g.setClip(new Arc2D.Double(new Rectangle2D.Double(0, 0, 98, 48), 15, 250, Arc2D.OPEN));
 		g.fillRect(0, 0, 500, 100);
-		g.setColor(c1);
-		g.setClip(new Arc2D.Double(new Rectangle2D.Double(0, 50, 98, 48), 15, 250, 2));
+		g.setColor(Color.red);
+		g.setClip(new Arc2D.Double(new Rectangle2D.Double(0, 50, 98, 48), 15, 250, Arc2D.PIE));
 		g.fillRect(0, 0, 500, 100);
 
-		g.setColor(c1);
+		g.setColor(Color.red);
 		g.setClip(new Rectangle2D.Double(100, 0, 98, 98));
 		g.fillRect(0, 0, 500, 100);
-		g.setColor(c2);
+		g.setColor(Color.green);
 		g.clip(new Rectangle2D.Double(100, 20, 98, 48));
 		g.fillRect(0, 0, 500, 100);
 
 		g.setClip(new Rectangle2D.Double(200, 0, 98, 98));
 		g.fillRect(0, 0, 500, 100);
-		g.setColor(c1);
+		g.setColor(Color.red);
 		g.clip(new RoundRectangle2D.Double(200, 0, 98, 98, 40, 40));
 		g.fillRect(0, 0, 500, 100);
-		g.setColor(c3);
+		g.setColor(Color.blue);
 		g.clip(new Ellipse2D.Double(200, 0, 248, 98));
 		g.fillRect(0, 0, 500, 100);
 		return true;
 	}
 
-	public static boolean t08StringsTest(Graphics2D vg, Integer repeat) {
+	@SuppressWarnings("unused")
+	public static boolean t08StringsTest(Graphics2D vg, int repeat) {
 		if (repeat != 0) {
 			return false;
 		}
@@ -294,8 +291,9 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t09JButtonTest(Graphics2D g, Integer repeat) {
-		if (repeat != 0) {
+	@SuppressWarnings("unused")
+	public static boolean t09JButtonTest(Graphics2D g, int repeat) {
+		if (repeat > 0) {
 			return false;
 		}
 		JPanel scrP = new JPanel();
@@ -308,25 +306,14 @@ public class Tests {
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
-	private static void layout(Component sd) {
-		if (sd instanceof JComponent) {
-			for (Component jc : ((Container) sd).getComponents()) {
-				layout(jc);
-			}
-			sd.invalidate();
-			sd.validate();
-			sd.layout();
-		}
-	}
-
-	public static boolean t10CopyAreaTest(Graphics2D g, Integer repeat) {
+	@SuppressWarnings("unused")
+	public static boolean t10CopyAreaTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
 			return false;
 		}
 		Color c = Color.ORANGE;
 		g.setColor(c);
-		g.fill(new Arc2D.Double(new Rectangle2D.Double(0, 0, 48, 30), 15, 250, 0));
+		g.fill(new Arc2D.Double(new Rectangle2D.Double(0, 0, 48, 30), 15, 250, Arc2D.OPEN));
 
 		g.copyArea(0, 0, 50, 50, 0, 50);
 
@@ -341,7 +328,7 @@ public class Tests {
 		Image i = DrawServlet.getImage(g instanceof WebGraphics);
 		Graphics2D gx = (Graphics2D) i.getGraphics();
 		gx.setColor(Color.blue);
-		gx.fill(new Arc2D.Double(new Rectangle2D.Double(0, 0, 48, 30), 15, 250, 0));
+		gx.fill(new Arc2D.Double(new Rectangle2D.Double(0, 0, 48, 30), 15, 250, Arc2D.OPEN));
 		gx.copyArea(10, 10, 50, 50, 0, 50);
 		gx.dispose();
 		g.translate(150, -25);
@@ -349,7 +336,8 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t11MultiLevelGraphicsTest(Graphics2D g, Integer repeat) {
+	@SuppressWarnings("unused")
+	public static boolean t11MultiLevelGraphicsTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
 			return false;
 		}
@@ -384,7 +372,8 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t12DrawWebImageTest(Graphics2D g, Integer repeat) {
+	@SuppressWarnings("unused")
+	public static boolean t12DrawWebImageTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
 			return false;
 		}
@@ -392,7 +381,7 @@ public class Tests {
 		Graphics2D gx = (Graphics2D) i.getGraphics();
 		t02FillRectTest(gx, 0);
 		gx.dispose();
-		g.setClip(new Arc2D.Double(new Rectangle2D.Double(0, 0, 500, 100), 15, 360, 0));
+		g.setClip(new Arc2D.Double(new Rectangle2D.Double(0, 0, 500, 100), 15, 360, Arc2D.OPEN));
 		g.translate(500, 100);
 		g.rotate(Math.PI);
 		g.drawImage(i, 0, 0, 100, 100, 400, 0, 500, 100, null);
@@ -405,7 +394,8 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t13ImageCacheTest(Graphics2D g, Integer repeat) throws IOException {
+	@SuppressWarnings("unused")
+	public static boolean t13ImageCacheTest(Graphics2D g, int repeat) throws IOException {
 		if (repeat > 3) {
 			return false;
 		}
@@ -426,11 +416,12 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t14ImageCacheTest(Graphics2D g, Integer repeat) throws IOException {
+	@SuppressWarnings("unused")
+	public static boolean t14ImageCacheTest(Graphics2D g, int repeat) throws IOException {
 		if (repeat > 1) {
 			return false;
 		}
-		BufferedImage image = ImageIO.read(new File(Tests.class.getClassLoader().getResource("ws.png").getFile()));
+		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("ws.png"));
 
 		switch (repeat) {
 		case 0:
@@ -443,11 +434,12 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t15MultipleCopyAreaTestTest(Graphics2D g, Integer repeat) throws IOException {
-		if (repeat > 0) {
+	@SuppressWarnings("unused")
+	public static boolean t15MultipleCopyAreaTestTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
 			return false;
 		}
-		BufferedImage image = ImageIO.read(new File(Tests.class.getClassLoader().getResource("ws.png").getFile()));
+		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("ws.png"));
 		g.drawImage(image, 0, 0, null);
 		g.copyArea(0, 0, 120, 100, 130, 0);
 		g.drawImage(image, 0, 30, null);
@@ -457,47 +449,193 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t16CompositeModesTest(Graphics2D g, Integer repeat) throws IOException {
-		if (repeat > 0) {
+	@SuppressWarnings("unused")
+	public static boolean t16CompositeModesTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
 			return false;
 		}
 
-		Image i2 = DrawServlet.getImage(g instanceof WebGraphics);
-		Graphics2D source = (Graphics2D) i2.getGraphics();
-		source.setBackground(new Color(0, 0, 0, 0));
-		source.clearRect(0, 0, i2.getWidth(null), i2.getHeight(null));
-		source.setColor(new Color(255, 0, 0));
-		source.fillRect(0, 0, 25, 25);
-
-		compositetestopp(g, i2, 0, 0, AlphaComposite.Src);
-
-		compositetestopp(g, i2, 50, 0, AlphaComposite.SrcOver);
-
-		compositetestopp(g, i2, 100, 0, AlphaComposite.SrcIn);
-
-		compositetestopp(g, i2, 0, 50, AlphaComposite.SrcOut);
-
-		compositetestopp(g, i2, 50, 50, AlphaComposite.SrcAtop);
-
-		compositetestopp(g, i2, 150, 0, AlphaComposite.Xor);
-
-		compositetestopp(g, i2, 150, 50, AlphaComposite.Clear);
-
-		compositetestopp(g, i2, 200, 0, AlphaComposite.Dst);
-
-		compositetestopp(g, i2, 250, 0, AlphaComposite.DstOver);
-
-		compositetestopp(g, i2, 300, 0, AlphaComposite.DstIn);
-
-		compositetestopp(g, i2, 200, 50, AlphaComposite.DstOut);
-
-		compositetestopp(g, i2, 250, 50, AlphaComposite.DstAtop);
+		compositeTestOp(g, 0, 0, AlphaComposite.Src);
+		compositeTestOp(g, 50, 0, AlphaComposite.SrcOver);
+		compositeTestOp(g, 100, 0, AlphaComposite.SrcIn);
+		compositeTestOp(g, 150, 0, AlphaComposite.SrcOut);
+		compositeTestOp(g, 200, 0, AlphaComposite.SrcAtop);
+		compositeTestOp(g, 250, 0, AlphaComposite.Xor);
+		
+		compositeTestOp(g, 0, 50, AlphaComposite.Dst);
+		compositeTestOp(g, 50, 50, AlphaComposite.DstOver);
+		compositeTestOp(g, 100, 50, AlphaComposite.DstIn);
+		compositeTestOp(g, 150, 50, AlphaComposite.DstOut);
+		compositeTestOp(g, 200, 50, AlphaComposite.DstAtop);
+		compositeTestOp(g, 250, 50, AlphaComposite.Clear);
 
 		return true;
 	}
 
-	public static boolean t17MetalTooltipTest(Graphics2D g, Integer repeat) throws IOException {
-		if (repeat > 0) {
+	@SuppressWarnings("unused")
+	public static boolean t17SemitransparentCompositeModesTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
+			return false;
+		}
+
+		compositeTestOp(g, 0, 0, AlphaComposite.SRC, 0.5f);
+		compositeTestOp(g, 50, 0, AlphaComposite.SRC_OVER, 0.5f);
+		compositeTestOp(g, 100, 0, AlphaComposite.SRC_IN, 0.5f);
+		compositeTestOp(g, 150, 0, AlphaComposite.SRC_OUT, 0.5f);
+		compositeTestOp(g, 200, 0, AlphaComposite.SRC_ATOP, 0.5f);
+		compositeTestOp(g, 250, 0, AlphaComposite.XOR, 0.5f);
+
+		compositeTestOp(g, 0, 50, AlphaComposite.DST, 0.5f);
+		compositeTestOp(g, 50, 50, AlphaComposite.DST_OVER, 0.5f);
+		compositeTestOp(g, 100, 50, AlphaComposite.DST_IN, 0.5f);
+		compositeTestOp(g, 150, 50, AlphaComposite.DST_OUT, 0.5f);
+		compositeTestOp(g, 200, 50, AlphaComposite.DST_ATOP, 0.5f);
+		compositeTestOp(g, 250, 50, AlphaComposite.CLEAR, 0.5f);
+
+		return true;
+	}
+
+	@SuppressWarnings("unused")
+	public static boolean t18TransparentCompositeModesTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
+			return false;
+		}
+
+		compositeTestOp(g, 0, 0, AlphaComposite.SRC, 0f);
+		compositeTestOp(g, 50, 0, AlphaComposite.SRC_OVER, 0f);
+		compositeTestOp(g, 100, 0, AlphaComposite.SRC_IN, 0f);
+		compositeTestOp(g, 150, 0, AlphaComposite.SRC_OUT, 0f);
+		compositeTestOp(g, 200, 0, AlphaComposite.SRC_ATOP, 0f);
+		compositeTestOp(g, 250, 0, AlphaComposite.XOR, 0f);
+
+		compositeTestOp(g, 0, 50, AlphaComposite.DST, 0f);
+		compositeTestOp(g, 50, 50, AlphaComposite.DST_OVER, 0f);
+		compositeTestOp(g, 100, 50, AlphaComposite.DST_IN, 0f);
+		compositeTestOp(g, 150, 50, AlphaComposite.DST_OUT, 0f);
+		compositeTestOp(g, 200, 50, AlphaComposite.DST_ATOP, 0f);
+		compositeTestOp(g, 250, 50, AlphaComposite.CLEAR, 0f);
+
+		return true;
+	}
+
+	private static void compositeTestOp(Graphics2D g, int x, int y, int compositeRule, float alpha) {
+		compositeTestOp(g, x, y, AlphaComposite.getInstance(compositeRule, alpha));
+	}
+
+	private static void compositeTestOp(Graphics2D g, int x, int y, AlphaComposite c) {
+		g.setPaint(new GradientPaint(new Point(x, y), Color.yellow, new Point(x + 50, y + 50), Color.green));
+		g.fillRect(x, y, 50, 50);
+		
+		Image img = DrawServlet.getImage(g instanceof WebGraphics, 50, 50);
+		Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
+		imgGraphics.setColor(new Color(0, 0, 255));
+		imgGraphics.fillRect(0, 0, 25, 25);
+		imgGraphics.setComposite(c);
+		imgGraphics.setColor(new Color(255, 0, 0));
+		imgGraphics.fillOval(10, 10, 25, 25);
+		
+		g.drawImage(img, x, y, null);
+		g.setColor(Color.black);
+		g.drawString("" + c.getRule(), x + 30, y + 40);
+	}
+
+	@SuppressWarnings("unused")
+	public static boolean t19CompositeImagesTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
+			return false;
+		}
+
+		compositeImagesTestOp(g, 0, 0, AlphaComposite.Src);
+		compositeImagesTestOp(g, 50, 0, AlphaComposite.SrcOver);
+		compositeImagesTestOp(g, 100, 0, AlphaComposite.SrcIn);
+		compositeImagesTestOp(g, 150, 0, AlphaComposite.SrcOut);
+		compositeImagesTestOp(g, 200, 0, AlphaComposite.SrcAtop);
+		compositeImagesTestOp(g, 250, 0, AlphaComposite.Xor);
+
+		compositeImagesTestOp(g, 0, 50, AlphaComposite.Dst);
+		compositeImagesTestOp(g, 50, 50, AlphaComposite.DstOver);
+		compositeImagesTestOp(g, 100, 50, AlphaComposite.DstIn);
+		compositeImagesTestOp(g, 150, 50, AlphaComposite.DstOut);
+		compositeImagesTestOp(g, 200, 50, AlphaComposite.DstAtop);
+		compositeImagesTestOp(g, 250, 50, AlphaComposite.Clear);
+
+		return true;
+	}
+
+	@SuppressWarnings("unused")
+	public static boolean t20SemitransparentCompositeImagesTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
+			return false;
+		}
+
+		compositeImagesTestOp(g, 0, 0, AlphaComposite.SRC, 0.5f);
+		compositeImagesTestOp(g, 50, 0, AlphaComposite.SRC_OVER, 0.5f);
+		compositeImagesTestOp(g, 100, 0, AlphaComposite.SRC_IN, 0.5f);
+		compositeImagesTestOp(g, 150, 0, AlphaComposite.SRC_OUT, 0.5f);
+		compositeImagesTestOp(g, 200, 0, AlphaComposite.SRC_ATOP, 0.5f);
+		compositeImagesTestOp(g, 250, 0, AlphaComposite.XOR, 0.5f);
+
+		compositeImagesTestOp(g, 0, 50, AlphaComposite.DST, 0.5f);
+		compositeImagesTestOp(g, 50, 50, AlphaComposite.DST_OVER, 0.5f);
+		compositeImagesTestOp(g, 100, 50, AlphaComposite.DST_IN, 0.5f);
+		compositeImagesTestOp(g, 150, 50, AlphaComposite.DST_OUT, 0.5f);
+		compositeImagesTestOp(g, 200, 50, AlphaComposite.DST_ATOP, 0.5f);
+		compositeImagesTestOp(g, 250, 50, AlphaComposite.CLEAR, 0.5f);
+
+		return true;
+	}
+
+	@SuppressWarnings("unused")
+	public static boolean t21TransparentCompositeImagesTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
+			return false;
+		}
+
+		compositeImagesTestOp(g, 0, 0, AlphaComposite.SRC, 0f);
+		compositeImagesTestOp(g, 50, 0, AlphaComposite.SRC_OVER, 0f);
+		compositeImagesTestOp(g, 100, 0, AlphaComposite.SRC_IN, 0f);
+		compositeImagesTestOp(g, 150, 0, AlphaComposite.SRC_OUT, 0f);
+		compositeImagesTestOp(g, 200, 0, AlphaComposite.SRC_ATOP, 0f);
+		compositeImagesTestOp(g, 250, 0, AlphaComposite.XOR, 0f);
+
+		compositeImagesTestOp(g, 0, 50, AlphaComposite.DST, 0f);
+		compositeImagesTestOp(g, 50, 50, AlphaComposite.DST_OVER, 0f);
+		compositeImagesTestOp(g, 100, 50, AlphaComposite.DST_IN, 0f);
+		compositeImagesTestOp(g, 150, 50, AlphaComposite.DST_OUT, 0f);
+		compositeImagesTestOp(g, 200, 50, AlphaComposite.DST_ATOP, 0f);
+		compositeImagesTestOp(g, 250, 50, AlphaComposite.CLEAR, 0f);
+
+		return true;
+	}
+
+	private static void compositeImagesTestOp(Graphics2D g, int x, int y, int compositeRule, float alpha) {
+		compositeImagesTestOp(g, x, y, AlphaComposite.getInstance(compositeRule, alpha));
+	}
+
+	private static void compositeImagesTestOp(Graphics2D g, int x, int y, AlphaComposite c) {
+		g.setPaint(new GradientPaint(new Point(x, y), Color.yellow, new Point(x + 50, y + 50), Color.green));
+		g.fillRect(x, y, 50, 50);
+		
+		Image oval = DrawServlet.getImage(g instanceof WebGraphics);
+		Graphics2D ovalGraphics = (Graphics2D) oval.getGraphics();
+		ovalGraphics.setColor(new Color(255, 0, 0));
+		ovalGraphics.fillOval(10, 10, 25, 25);
+
+		Image img = DrawServlet.getImage(g instanceof WebGraphics, 50, 50);
+		Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
+		imgGraphics.setColor(new Color(0, 0, 255));
+		imgGraphics.fillRect(0, 0, 25, 25);
+		imgGraphics.setComposite(c);
+		imgGraphics.drawImage(oval, 0, 0, null);
+		
+		g.drawImage(img, x, y, null);
+		g.setColor(Color.black);
+		g.drawString("" + c.getRule(), x + 30, y + 40);
+	}
+
+	@SuppressWarnings("unused")
+	public static boolean t22MetalTooltipTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
 			return false;
 		}
 		SliderDemo sd = new SliderDemo();
@@ -505,11 +643,12 @@ public class Tests {
 		return true;
 	}
 
-	public static boolean t18OverlayedImagesWithTransparencyTest(Graphics2D g, Integer repeat) throws IOException {
-		if (repeat > 0) {
+	@SuppressWarnings("unused")
+	public static boolean t23OverlayedImagesWithTransparencyTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
 			return false;
 		}
-		BufferedImage image = ImageIO.read(new File(Tests.class.getClassLoader().getResource("java.png").getFile()));
+		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("java.png"));
 		g.drawImage(image, 0, 0, 100, 100, null);
 		g.setColor(Color.yellow);
 		g.fill(new Rectangle(50, 0, 100, 100));
@@ -522,26 +661,228 @@ public class Tests {
 		return true;
 	}
 
-	private static void compositetestopp(Graphics2D g, Image i2, int x, int y, AlphaComposite c) {
-		Image i;
-		Graphics2D dest;
-		g.setClip(x, y, 50, 50);
-		g.setPaint(new LinearGradientPaint(new Point(x, y), new Point(x + 50, y + 50), new float[] { 0, 1 }, new Color[] { Color.yellow, Color.green }));
-		g.fillRect(x, y, 50, 50);
-		i = DrawServlet.getImage(g instanceof WebGraphics);
-		dest = (Graphics2D) i.getGraphics();
-		dest.setBackground(new Color(0, 0, 0, 0));
-		dest.clearRect(0, 0, i2.getWidth(null), i2.getHeight(null));
-		dest.setColor(new Color(0, 0, 255));
-		dest.fillRect(0, 0, 25, 25);
-		dest.setComposite(c);
-		dest.setColor(new Color(255, 0, 0));
-		dest.fillOval(10, 10, 25, 25);
-		g.setColor(Color.black);
-		g.drawString("" + c.getRule(), x + 30, y + 40);
-		g.drawImage(i, x, y, null);
+	@SuppressWarnings("unused")
+	public static boolean t24TransparentCompositeOverImageTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
+			return false;
+		}
+		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("ws.png"));
+		g.drawImage(image, 0, 0, null);
+		
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+		g.setColor(Color.yellow);
+		g.fillRect(0, 0, image.getWidth(), image.getHeight());
+		
+		return true;
 	}
 
+	@SuppressWarnings("unused")
+	public static boolean t25TransparentFillOverImageTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
+			return false;
+		}
+		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("ws.png"));
+
+		g.setBackground(Color.white);
+		g.clearRect(0, 0, image.getWidth() + 100, image.getHeight());
+		g.drawImage(image, 50, 0, null);
+		g.setColor(new Color(0, 255, 255, 128));
+		g.fillRect(0, 0, image.getWidth() + 100, image.getHeight());
+
+		return true;
+	}
+
+	@SuppressWarnings("unused")
+	public static boolean t26DrawImageWithBackgroundTest(Graphics2D g, int repeat) {
+		if (repeat != 0) {
+			return false;
+		}
+		Image img = new BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
+		imgGraphics.setColor(Color.blue);
+		imgGraphics.fillRect(10, 10, 30, 30);
+		imgGraphics.dispose();
+
+		drawImagesWithBackground(g, img);
+		
+		return true;
+	}
+
+	@SuppressWarnings("unused")
+	public static boolean t27DrawWebImageWithBackgroundTest(Graphics2D g, int repeat) {
+		if (repeat != 0) {
+			return false;
+		}
+		Image img = DrawServlet.getImage(g instanceof WebGraphics, 50, 50);
+		Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
+		imgGraphics.setColor(Color.red);
+		imgGraphics.fillRect(10, 10, 30, 30);
+		imgGraphics.dispose();
+
+		drawImagesWithBackground(g, img);
+		
+		return true;
+	}
+
+	private static void drawImagesWithBackground(Graphics2D g, Image img) {
+		g.setColor(Color.pink);
+		g.fillRect(0, 0, 500, 100);
+
+		Color opaque = Color.cyan;
+		Color transparent = new Color(0, 255, 255, 128);
+
+		g.drawImage(img, 0, 0, null);
+		g.drawImage(img, 50, 0, opaque, null);
+		g.drawImage(img, 100, 0, transparent, null);
+		g.drawImage(img, 150, 0, 175, 25, 0, 0, 25, 25, null);
+		g.drawImage(img, 200, 0, 225, 25, 0, 0, 25, 25, opaque, null);
+		g.drawImage(img, 250, 0, 275, 25, 0, 0, 25, 25, transparent, null);
+		g.drawImage(img, new AffineTransform(1, 0, 0, 1, 400, 0), null);
+		g.drawImage(img, new AffineTransform(1, 0.5, 0, 1, 450, 0), null);
+		g.drawImage(img, 5, 55, 40, 40, null);
+		g.drawImage(img, 55, 55, 40, 40, opaque, null);
+		// The next on isn't working in java and seems to be a bug on their side. I've sent them a report.
+		g.drawImage(img, 105, 55, 40, 40, transparent, null);
+		g.drawImage(img, 150, 50, 200, 100, 0, 0, 25, 25, null);
+		g.drawImage(img, 200, 50, 250, 100, 0, 0, 25, 25, opaque, null);
+		// The next on isn't working in java and seems to be a bug on their side. I've sent them a report.
+		g.drawImage(img, 250, 50, 300, 100, 0, 0, 25, 25, transparent, null);
+		g.drawImage(img, new AffineTransform(0.5, 0, 0, 0.5, 400, 50), null);
+		g.drawImage(img, new AffineTransform(0.5, 0.5, 0, 0.5, 450, 50), null);
+	}
+
+	@SuppressWarnings("unused")
+	public static boolean t28VariousImageTypesTest(Graphics2D g, int repeat) throws IOException {
+		if (repeat != 0) {
+			return false;
+		}
+		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("rgb.png"));
+		g.setBackground(Color.yellow);
+		g.clearRect(0, 0, 350, 100);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_INT_RGB), 0, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_INT_ARGB), 50, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_INT_ARGB_PRE), 100, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_INT_BGR), 150, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_3BYTE_BGR), 200, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_4BYTE_ABGR), 250, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_4BYTE_ABGR_PRE), 300, 0, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_USHORT_565_RGB), 0, 50, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_USHORT_555_RGB), 50, 50, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_BYTE_GRAY), 100, 50, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_USHORT_GRAY), 150, 50, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_BYTE_BINARY), 200, 50, 50, 50, null);
+		g.drawImage(copyImage(image, BufferedImage.TYPE_BYTE_INDEXED), 250, 50, 50, 50, null);
+		return true;
+	}
+	
+	@SuppressWarnings("unused")
+	public static boolean t29BiasedLinesTest(Graphics2D g, int repeat) {
+		if (repeat != 0) {
+			return false;
+		}
+		g.setTransform(new AffineTransform(5, 0, 0, 5, 5, 5));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(4, 0, 0, 4, 10, 10));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(3, 0, 0, 3, 15, 15));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(2, 0, 0, 2, 20, 20));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(1.5, 0, 0, 1.5, 25, 25));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(1, 0, 0, 1, 30, 30));
+		filledThenStroked(g);
+		g.setTransform(new AffineTransform(0.5, 0, 0, 0.5, 35, 35));
+		filledThenStroked(g);
+
+		g.setTransform(new AffineTransform(5, 0, 0, 5, 90, 5));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(4, 0, 0, 4, 95, 10));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(3, 0, 0, 3, 100, 15));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(2, 0, 0, 2, 105, 20));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(1.5, 0, 0, 1.5, 110, 25));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(1, 0, 0, 1, 115, 30));
+		strokedThenFilled(g);
+		g.setTransform(new AffineTransform(0.5, 0, 0, 0.5, 120, 35));
+		strokedThenFilled(g);
+
+		/**
+		 * The next tests compare stroke width rounding
+		 * when using fraction width and different scales.
+		 * Due to XOR if stroke widths are equal nothing will be drawn.
+		 */
+		g.setTransform(new AffineTransform());
+		g.setComposite(AlphaComposite.Xor);
+		
+		g.setStroke(new BasicStroke(1f));
+		g.drawRect(175, 5, 40, 40);
+		g.setStroke(new BasicStroke(0.1f));
+		g.drawRect(175, 5, 40, 40);
+		
+		g.setStroke(new BasicStroke(1f));
+		g.drawRect(225, 5, 40, 40);
+		g.setStroke(new BasicStroke(0.5f));
+		g.drawRect(225, 5, 40, 40);
+
+		g.setStroke(new BasicStroke(1f));
+		g.drawRect(175, 55, 40, 40);
+		g.setStroke(new BasicStroke(1.1f));
+		g.drawRect(175, 55, 40, 40);
+
+		g.setStroke(new BasicStroke(2f));
+		g.drawRect(225, 55, 40, 40);
+		g.setStroke(new BasicStroke(1.5f));
+		g.drawRect(225, 55, 40, 40);
+
+		g.setStroke(new BasicStroke(3f));
+		g.drawRect(275, 5, 40, 40);
+		g.setTransform(new AffineTransform(2, 0, 0, 2, 275, 5));
+		g.setStroke(new BasicStroke(1.5f));
+		g.drawRect(0, 0, 20, 20);
+
+		g.setStroke(new BasicStroke(12f));
+		g.setTransform(new AffineTransform(1d/3, 0, 0, 1d/4, 275, 55));
+		g.drawRect(0, 0, 180, 160);
+		g.setTransform(new AffineTransform(3, 0, 0, 2, 275, 55));
+		g.setStroke(new BasicStroke(1.5f));
+		g.drawRect(0, 0, 20, 20);
+
+		g.setStroke(new BasicStroke(12f));
+		g.setTransform(new AffineTransform(1d/4, 0, 0, 1d/3, 345, 5));
+		g.drawRect(0, 0, 160, 180);
+		g.setTransform(new AffineTransform(2, 0, 0, 3, 345, 5));
+		g.setStroke(new BasicStroke(1.45f));
+		g.drawRect(0, 0, 20, 20);
+
+		return true;
+	}
+	
+	private static void filledThenStroked(Graphics2D g) {
+		g.setColor(Color.blue);
+		g.fillRect(0, 0, 15, 15);
+		g.setColor(Color.red);
+		g.drawRect(0, 0, 15, 15);
+	}
+
+	private static void strokedThenFilled(Graphics2D g) {
+		g.setColor(Color.red);
+		g.drawRect(0, 0, 15, 15);
+		g.setColor(Color.blue);
+		g.fillRect(0, 0, 15, 15);
+	}
+
+	private static Image copyImage(BufferedImage image, int type) {
+		BufferedImage copy = new BufferedImage(image.getWidth(), image.getHeight(), type);
+		Graphics2D g = copy.createGraphics();
+		g.drawImage(image, 0, 0, null);
+		g.dispose();
+		return copy;
+	}
+	
 	private static void printJComponentHelper(String laf, Graphics2D g, JComponent c) {
 		try {
 			UIManager.setLookAndFeel(laf == null ? "javax.swing.plaf.metal.MetalLookAndFeel" : laf);
@@ -561,27 +902,29 @@ public class Tests {
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("tests");
 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		JPanel content = new JPanel();
-		content.setLayout(new FlowLayout(FlowLayout.LEFT));
+		content.setLayout(new GridBagLayout());
+		int y = 0;
 		for (String m : DrawServlet.getTestMethods()) {
 			Image image = getImage(m, true);
-			content.add(new JLabel(new ImageIcon(image)));
+			content.add(new JLabel(new ImageIcon(image)), new GridBagConstraints(0, y, 1, 1, 0, 0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 			image = getImage(m, false);
-			content.add(new JLabel(new ImageIcon(image)));
+			content.add(new JLabel(new ImageIcon(image)), new GridBagConstraints(1, y++, 1, 1, 0, 0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 		}
-		content.setPreferredSize(new Dimension(1000, 2000));
 		frame.getContentPane().add(new JScrollPane(content));
 		frame.pack();
 		frame.setSize(1280, 700);
 		frame.setVisible(true);
 	}
 
-	public static Image getImage(String name, boolean webimage) {
-		Image i = DrawServlet.getImage(webimage);
+	public static Image getImage(String name, boolean web) {
+		Image i = DrawServlet.getImage(web);
 		Graphics2D g = (Graphics2D) i.getGraphics();
 		try {
-			Tests.class.getDeclaredMethod(name, Graphics2D.class, Integer.class).invoke(null, g, 0);
+			Tests.class.getDeclaredMethod(name, Graphics2D.class, int.class).invoke(null, g, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

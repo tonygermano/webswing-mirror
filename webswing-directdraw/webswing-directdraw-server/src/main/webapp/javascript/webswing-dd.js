@@ -25,49 +25,17 @@
 		var StyleProto = proto.build("org.webswing.directdraw.proto.FontProto.StyleProto");
 		var CompositeTypeProto = proto.build("org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto");
 		var constantPoolCache = c.constantPoolCache || {};
-		var imagePoolCache = c.imagePoolCache || {};
 
 		function draw64(data, targetCanvas) {
-			var image = WebImageProto.decode64(data);
-			return drawChunks(image, targetCanvas).then(function(result) {
-				return drawWebImage(image, result);
-			}, function(error) {
-				throw error;
-			});
+			return drawWebImage(WebImageProto.decode64(data), targetCanvas);
 		}
 
 		function drawBin(data, targetCanvas) {
-			var offset = data.offset;
-			var image = WebImageProto.decode(data);
-			data.offset = offset;
-			return drawChunks(image, targetCanvas).then(function(result) {
-				return drawWebImage(image, result);
-			}, function(error) {
-				throw error;
-			});
+			return drawWebImage(WebImageProto.decode(data), targetCanvas);
 		}
 
 		function drawProto(data, targetCanvas) {
-			var image = data;
-			return drawChunks(image, targetCanvas).then(function(result) {
-				return drawWebImage(image, result);
-			}, function(error) {
-				throw error;
-			});
-		}
-
-		function drawChunks(image, targetCanvas) {
-			if (image.chunks != null) {
-				return image.chunks.reduce(function(seq, current) {
-					return seq.then(function(result) {
-						return drawWebImage(current, result);
-					}, function(error) {
-						throw error;
-					});
-				}, Promise.resolve(targetCanvas));
-			} else {
-				return Promise.resolve(targetCanvas);
-			}
+			return drawWebImage(data, targetCanvas);
 		}
 
 		function drawWebImage(image, targetCanvas) {
@@ -90,11 +58,8 @@
 						currentStateId : null
 					};
 
-					var imagesToPrepare;
-					imagesToPrepare = [];
-					populateConstantsPool(image, imagesToPrepare);
-
-					prepareImages(imagesToPrepare).then(function(preloadedImageConstants) {
+					var images = populateConstantsPool(image.constants);
+					prepareImages(images).then(function() {
 						var ctx = imageContext.canvas.getContext("2d");
 						if (image.instructions != null) {
 							ctx.save();
@@ -121,21 +86,17 @@
 			});
 		}
 
-		function populateConstantsPool(image, imagesToPrepare) {
-			image.constants.forEach(function(constant, index) {
+		function populateConstantsPool(constants) {
+			var images = [];
+			constants.forEach(function(constant) {
 				constantPoolCache[constant.id] = constant;
 				if (constant.image != null) {
-					imagesToPrepare.push(constant.image);
+					images.push(constant.image);
 				} else if (constant.texture != null) {
-					imagesToPrepare.push(constant.texture.image);
+					images.push(constant.texture.image);
 				}
 			});
-			if (image.images != null) {
-				image.images.forEach(function(imgConst) {
-					imagePoolCache[imgConst.id] = imgConst;
-					imagesToPrepare.push(imgConst.image);
-				});
-			}
+			return images;
 		}
 
 		function interpretInstruction(ctx, instruction, imageContext) {
@@ -268,38 +229,45 @@
 		}
 
 		function iprtDrawImage(ctx, args) {
-			var clip = null, image = null, p = null;
-			if (args[1] != null) {
-				p = args[1].points.points;
-				image = imagePoolCache[p[0]].image.data;
-			}
-			if (args[0] != null) {
-				clip = args[0];
-			}
-
 			ctx.save();
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
+			var image = args[0].image.data;
+			var transform = args[1];
+			var crop = args[2];
+			var bgcolor = args[3];
+			var clip = args[4];
+			
 			if (path(ctx, clip)) {
 				ctx.clip(fillRule(clip));
 			}
-			ctx.translate(p[1], p[2]);
-			ctx.drawImage(image, 0, 0, image.width, image.height);
+			if (transform != null) {
+				iprtTransform(ctx, [ transform ]);
+			}
+			if (bgcolor != null) {
+				ctx.fillStyle = parseColor(bgcolor.color.rgba);
+				ctx.beginPath();
+				if (crop == null) {
+					ctx.rect(0, 0, image.width, image.height);
+				} else {
+					ctx.rect(0, 0, crop.rectangle.w, crop.rectangle.h);
+				}
+				ctx.fill();
+			}
+			if (crop == null) {
+				ctx.drawImage(image, 0, 0);
+			} else {
+				crop = crop.rectangle;
+				ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
+			}
 			ctx.restore();
 		}
 
-		function iprtDrawWebImage(ctx, args, imagedata) {
-			var transform = null, crop = null, clip = null;
+		function iprtDrawWebImage(ctx, args, webImageData) {
+			var transform = args[0];
+			var crop = args[1];
+			var bgcolor = args[2];
+			var clip = args[3];
 
-			if (args[0].transform != null) {
-				transform = args[0];
-			}
-			if (args[1].rectangle != null) {
-				crop = args[1].rectangle;
-			}
-			if (args[3] != null) {
-				clip = args[3];
-			}
-			return drawBin(imagedata).then(function(imageCanvas) {
+			return drawBin(webImageData).then(function(imageCanvas) {
 				ctx.save();
 				if (path(ctx, clip)) {
 					ctx.clip(fillRule(clip));
@@ -307,7 +275,22 @@
 				if (transform != null) {
 					iprtTransform(ctx, [ transform ]);
 				}
-				ctx.drawImage(imageCanvas, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
+				if (bgcolor != null) {
+					ctx.fillStyle = parseColor(bgcolor.color.rgba);
+					ctx.beginPath();
+					if (crop == null) {
+						ctx.rect(0, 0, imageCanvas.width, imageCanvas.height);
+					} else {
+						ctx.rect(0, 0, crop.rectangle.w, crop.rectangle.h);
+					}
+					ctx.fill();
+				}
+				if (crop == null) {
+					ctx.drawImage(imageCanvas, 0, 0);
+				} else {
+					crop = crop.rectangle;
+					ctx.drawImage(imageCanvas, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
+				}
 				ctx.restore();
 			});
 		}
@@ -578,12 +561,14 @@
 				switch (composite.type) {
 				case CompositeTypeProto.CLEAR:
 					ctx.globalCompositeOperation = "destination-out";
+					ctx.globalAlpha = 1;
 					break;
 				case CompositeTypeProto.SRC:
 					ctx.globalCompositeOperation = "source-over";
 					break;
 				case CompositeTypeProto.DST:
-					ctx.globalCompositeOperation = "destination-in";
+					ctx.globalCompositeOperation = "destination-over";
+					ctx.globalAlpha = 0;
 					break;
 				case CompositeTypeProto.SRC_OVER:
 					ctx.globalCompositeOperation = "source-over";
@@ -605,6 +590,9 @@
 					break;
 				case CompositeTypeProto.SRC_ATOP:
 					ctx.globalCompositeOperation = "source-atop";
+					break;
+				case CompositeTypeProto.DST_ATOP:
+					ctx.globalCompositeOperation = "destination-atop";
 					break;
 				case CompositeTypeProto.XOR:
 					ctx.globalCompositeOperation = "xor";
@@ -802,6 +790,36 @@
 			return (ctx.lineWidth & 1) && biased ? 0.5 : 0;
 		}
 
+		function parseColor(rgba) {
+			var mask = 0x000000FF;
+			return 'rgba(' + ((rgba >>> 24) & mask) + ',' + ((rgba >>> 16) & mask) + ',' + ((rgba) >>> 8 & mask) + ',' + ((rgba & mask) / 255) + ')';
+		}
+
+		function prepareImages(images) {
+			return new Promise(function(resolve, reject) {
+				try {
+					if (images.length > 0) {
+						var loadedImages = images.map(function(image) {
+							return new Promise(function(resolve) {
+								var img = new Image();
+								img.onload = function() {
+									image.data = img;
+									resolve();
+								};
+								img.src = getImageData(image);
+							});
+						});
+						Promise.all(loadedImages).then(resolve);
+					} else {
+						resolve();
+					}
+				} catch (e) {
+					config.onErrorMessage(error);
+					reject(e);
+				}
+			});
+		}
+		
 		function getImageData(image) {
 			var binary = '';
 			var bytes = new Uint8Array(image.data.buffer, image.data.offset, image.data.limit - image.data.offset);
@@ -812,41 +830,6 @@
 
 			return "data:image/png;base64," + window.btoa(binary);
 			// return 'data:image/png;base64,' + image.data.toBase64();
-		}
-
-		function parseColor(rgba) {
-			var mask = 0x000000FF;
-			return 'rgba(' + ((rgba >>> 24) & mask) + ',' + ((rgba >>> 16) & mask) + ',' + ((rgba) >>> 8 & mask) + ',' + ((rgba & mask) / 255) + ')';
-		}
-
-		function prepareImages(imageConstants) {
-			return new Promise(function(resolve, reject) {
-				try {
-					var preloadedImageConstants;
-					preloadedImageConstants = [];
-					if (imageConstants.length > 0) {
-						var loadPromisesArray = imageConstants.map(function(constant) {
-							return new Promise(function(resolve, reject) {
-								var img = new Image();
-								img.onload = function() {
-									constant.data = img;
-									preloadedImageConstants.push(img);
-									resolve();
-								};
-								img.src = getImageData(constant);
-							});
-						});
-						Promise.all(loadPromisesArray).then(function(preloadedImageConstants) {
-							resolve(preloadedImageConstants);
-						});
-					} else {
-						resolve(preloadedImageConstants);
-					}
-				} catch (e) {
-					config.onErrorMessage(error);
-					reject(e);
-				}
-			});
 		}
 
 		function fillRule(constant) {
@@ -880,20 +863,11 @@
 		}
 
 		return {
-			draw64 : function(data, targetCanvas) {
-				return draw64(data, targetCanvas);
-			},
-			drawBin : function(data, targetCanvas) {
-				return drawBin(data, targetCanvas);
-			},
-			drawProto : function(data, targetCanvas) {
-				return drawProto(data, targetCanvas);
-			},
+			draw64 : draw64,
+			drawBin : drawBin,
+			drawProto : drawProto,
 			getConstantPoolCache : function() {
 				return constantPoolCache;
-			},
-			getImagePoolCache : function() {
-				return imagePoolCache;
 			}
 		};
 	};

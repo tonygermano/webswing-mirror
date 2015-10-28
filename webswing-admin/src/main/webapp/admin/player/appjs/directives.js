@@ -101,8 +101,7 @@ angular.module('ws-player.directives', [])
 					}
 					scope.draw = function() {
 						var dd = new WebswingDirectDraw({
-							constantPoolCache: scope.ws.getDirectDraw().getConstantPoolCache(),
-							imagePoolCache: scope.ws.getDirectDraw().getImagePoolCache()
+							constantPoolCache: scope.ws.getDirectDraw().getConstantPoolCache()
 						});
 						dd.drawProto(scope.webimage).then(function(result) {
 							scope.$apply(function() {

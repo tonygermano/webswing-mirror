@@ -1,5 +1,6 @@
 package org.webswing.directdraw;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.io.ByteArrayOutputStream;
@@ -7,10 +8,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
-import org.webswing.directdraw.proto.Directdraw.WebImageProto;
 import org.webswing.directdraw.util.ImageConsumerAdapter;
 
 public class DirectDrawServicesAdapter {
@@ -18,11 +17,8 @@ public class DirectDrawServicesAdapter {
 	public byte[] getPngImage(BufferedImage imageContent) {
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
-			ImageIO.write(imageContent, "png", ios);
-			byte[] result = baos.toByteArray();
-			baos.close();
-			return result;
+			ImageIO.write(imageContent, "png", baos);
+			return baos.toByteArray();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -37,11 +33,13 @@ public class DirectDrawServicesAdapter {
 		return Base64.encodeBase64String(bytes);
 	}
 
-	public long computeHash(BufferedImage subImage) {
+	public long computeHash(Image subImage) {
 		ImageConsumerAdapter ic = new ImageConsumerAdapter() {
 			@Override
 			public void setPixels(int x, int y, int w, int h, ColorModel model, int[] pixels, int off, int scansize) {
-				hash = hash * 31 + (Arrays.hashCode(pixels));
+				for (int i = off; i < off + scansize; i++) {
+					hash = hash * 31 + pixels[i];
+				}
 			}
 		};
 		subImage.getSource().startProduction(ic);

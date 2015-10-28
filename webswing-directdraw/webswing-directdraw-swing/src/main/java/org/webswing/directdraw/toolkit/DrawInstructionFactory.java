@@ -15,6 +15,7 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.ArcConst;
@@ -25,6 +26,7 @@ import org.webswing.directdraw.model.DrawInstruction;
 import org.webswing.directdraw.model.EllipseConst;
 import org.webswing.directdraw.model.FontConst;
 import org.webswing.directdraw.model.GradientConst;
+import org.webswing.directdraw.model.ImageConst;
 import org.webswing.directdraw.model.IntegerConst;
 import org.webswing.directdraw.model.LinearGradientConst;
 import org.webswing.directdraw.model.PathConst;
@@ -54,15 +56,18 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(InstructionProto.FILL, toPathConst(s), toPathConst(clip));
 	}
 
-	public DrawInstruction drawImage(Shape clip) {
-		return new DrawInstruction(InstructionProto.DRAW_IMAGE, toPathConst(clip), /*placeholder*/ DrawConstant.nullConst);
+	public DrawInstruction drawImage(BufferedImage image, AffineTransform transform, Rectangle2D crop, Color bgcolor, Shape clip) {
+		DrawConstant transformConst = transform != null ? new TransformConst(ctx, transform) : DrawConstant.nullConst;
+		DrawConstant cropConst = crop != null ? new RectangleConst(ctx, crop) : DrawConstant.nullConst;
+		DrawConstant bgConst = bgcolor != null ? new ColorConst(ctx, bgcolor) : DrawConstant.nullConst;
+		return new DrawInstruction(InstructionProto.DRAW_IMAGE, new ImageConst(ctx, image), transformConst, cropConst, bgConst, toPathConst(clip));
 	}
 
-	public DrawInstruction drawWebImage(WebImage image, AffineTransform xform, Rectangle2D.Float crop, Color bkg, Shape clip) {
-		DrawConstant transformConst = xform != null ? new TransformConst(ctx, xform) : DrawConstant.nullConst;
+	public DrawInstruction drawWebImage(WebImage image, AffineTransform transform, Rectangle2D crop, Color bgcolor, Shape clip) {
+		DrawConstant transformConst = transform != null ? new TransformConst(ctx, transform) : DrawConstant.nullConst;
 		DrawConstant cropConst = crop != null ? new RectangleConst(ctx, crop) : DrawConstant.nullConst;
-		DrawConstant bkgConst = bkg != null ? new ColorConst(ctx, bkg) : DrawConstant.nullConst;
-		return new DrawInstruction(image, transformConst, cropConst, bkgConst, toPathConst(clip));
+		DrawConstant bgConst = bgcolor != null ? new ColorConst(ctx, bgcolor) : DrawConstant.nullConst;
+		return new DrawInstruction(image, transformConst, cropConst, bgConst, toPathConst(clip));
 	}
 
 	public DrawInstruction drawString(String s, double x, double y, Shape clip) {

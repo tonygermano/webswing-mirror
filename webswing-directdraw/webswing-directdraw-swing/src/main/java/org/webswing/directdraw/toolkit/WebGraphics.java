@@ -7,6 +7,7 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -17,9 +18,9 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
-import java.io.IOException;
 
 public class WebGraphics extends AbstractVectorGraphics {
 
@@ -51,48 +52,87 @@ public class WebGraphics extends AbstractVectorGraphics {
 		}
 	}
 
-	@Override
-	public void fill(Shape s) {
-		thisImage.addFillInstruction(this, s);
+	private BufferedImage toBufferedImage(RenderedImage image) {
+		if (image instanceof BufferedImage) {
+			return (BufferedImage) image;
+		}
+		BufferedImage bufferedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		Graphics2D graphics = bufferedImage.createGraphics();
+		graphics.drawRenderedImage(image, new AffineTransform());
+		return bufferedImage;
 	}
 
-	@Override
-	protected void writeImage(RenderedImage image, AffineTransform xform) throws IOException {
-		thisImage.addImage(this, image, null, xform, null);
-	}
-
-	@Override
-	protected void writeImage(Image image, ImageObserver observer, AffineTransform xform, Rectangle2D.Float crop, Color bkg) throws IOException {
+	protected boolean writeImage(Image image, AffineTransform transform, ImageObserver observer) {
 		if (image instanceof WebImage || image instanceof VolatileWebImageWrapper) {
-			crop = crop != null ? crop : new Rectangle2D.Float(0, 0, image.getWidth(observer), image.getHeight(observer));
 			WebImage wi = image instanceof WebImage ? (WebImage) image : ((VolatileWebImageWrapper) image).getWebImage();
 			if (wi.isDirty()) {
-				thisImage.addInstruction(this, dif.drawWebImage(wi.extractReadOnlyWebImage(false), xform, crop, bkg, getClip()));
+				thisImage.addInstruction(this, dif.drawWebImage(wi.extractReadOnlyWebImage(false), transform, null, null, getClip()));
 			}
+			return true;
 		} else {
-			thisImage.addImage(this, image, observer, xform, crop);
+			ImageConvertResult result = toBufferedImage(image, observer);
+			thisImage.addInstruction(this, dif.drawImage(result.image, transform, null, null, getClip()));
+			return result.status;
 		}
 	}
 
 	@Override
-	protected void writeString(String string, double x, double y) throws IOException {
+	public void fill(Shape s) {
+		thisImage.addInstruction(this, dif.fill(s, getClip()));
+	}
+
+	@Override
+	protected void writeImage(RenderedImage image, AffineTransform transform) {
+		thisImage.addInstruction(this, dif.drawImage(toBufferedImage(image), transform, null, null, getClip()));
+	}
+
+	@Override
+	protected boolean writeImage(Image image, AffineTransform transform, Rectangle2D crop, Color bgcolor, ImageObserver observer) {
+		if (image instanceof WebImage || image instanceof VolatileWebImageWrapper) {
+			WebImage wi = image instanceof WebImage ? (WebImage) image : ((VolatileWebImageWrapper) image).getWebImage();
+			if (wi.isDirty()) {
+				thisImage.addInstruction(this, dif.drawWebImage(wi.extractReadOnlyWebImage(false), transform, crop, bgcolor, getClip()));
+			}
+			return true;
+		} else {
+			ImageConvertResult result = toBufferedImage(image, observer);
+			thisImage.addInstruction(this, dif.drawImage(result.image, transform, crop, bgcolor, getClip()));
+			return result.status;
+		}
+	}
+
+	private ImageConvertResult toBufferedImage(Image image, ImageObserver observer) {
+		if (image instanceof BufferedImage) {
+			return new ImageConvertResult(true, (BufferedImage) image);
+		}
+		BufferedImage bufferedImage = new BufferedImage(image.getWidth(observer), image.getHeight(observer), BufferedImage.TYPE_INT_ARGB);
+		Graphics2D graphics = bufferedImage.createGraphics();
+		try {
+			return new ImageConvertResult(graphics.drawImage(image, 0, 0, observer), bufferedImage);
+		} finally {
+			graphics.dispose();
+		}
+	}
+
+	@Override
+	protected void writeString(String string, double x, double y) {
 		thisImage.addInstruction(this, dif.drawString(string, x, y, getClip()));
 	}
 
 	@Override
-	protected void writeTransform(AffineTransform transform) throws IOException {
+	protected void writeTransform(AffineTransform transform) {
 		thisImage.addInstruction(this, dif.transform(transform));
 
 	}
 
 	@Override
-	protected void writePaint(Paint paint) throws IOException {
+	protected void writePaint(Paint paint) {
 		thisImage.addInstruction(this, dif.setPaint(paint));
 
 	}
 
 	@Override
-	public void writeStroke(Stroke stroke) throws IOException {
+	public void writeStroke(Stroke stroke) {
 		if (stroke instanceof BasicStroke) {
 			thisImage.addInstruction(this, dif.setStroke((BasicStroke) stroke));
 		}
@@ -156,4 +196,14 @@ public class WebGraphics extends AbstractVectorGraphics {
 		return id;
 	}
 
+	private static class ImageConvertResult {
+
+		public final boolean status;
+		public final BufferedImage image;
+
+		public ImageConvertResult(boolean status, BufferedImage image) {
+			this.status = status;
+			this.image = image;
+		}
+	}
 }

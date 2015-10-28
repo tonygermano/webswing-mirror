@@ -1,12 +1,10 @@
 package org.webswing.directdraw.proto;
 
 message WebImageProto {
-	repeated WebImageProto chunks = 1;
-	required uint32 width = 2;
-	required uint32 height = 3;
-	repeated DrawInstructionProto instructions = 4;
-	repeated DrawConstantProto constants = 5;
-	repeated DrawConstantProto images = 6;
+	required uint32 width = 1;
+	required uint32 height = 2;
+	repeated DrawInstructionProto instructions = 3;
+	repeated DrawConstantProto constants = 4;
 }
 
 message DrawInstructionProto {
