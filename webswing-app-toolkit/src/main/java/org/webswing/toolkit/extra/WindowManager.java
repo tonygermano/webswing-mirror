@@ -1,6 +1,7 @@
 package org.webswing.toolkit.extra;
 
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -99,12 +100,14 @@ public class WindowManager {
 
 	@SuppressWarnings("restriction")
 	public void activateWindow(Window w, Component newFocusOwner, int x, int y, boolean tmp, boolean focusedWindowChangeAllowed) {
+		boolean newWindow = false;
 		if (!zorder.contains(w)) {
 			zorder.addWindow(w);
+			newWindow = true;
 		}
 
 		// dont allow activation outside modal dialog ancestors
-		if (!zorder.isInSameModalBranch(activeWindow, w) && !(w instanceof sun.awt.ModalExclude)) {
+		if (!(isModal(w) && newWindow) && !zorder.isInSameModalBranch(activeWindow, w) && !(w instanceof sun.awt.ModalExclude)) {
 			return;
 		}
 		if (focusedWindowChangeAllowed || activeWindow == w) {
@@ -121,6 +124,10 @@ public class WindowManager {
 			}
 		}
 
+	}
+
+	private boolean isModal(Window w) {
+		return (w instanceof Dialog) && ((Dialog) w).isModal();
 	}
 
 	public void activateWindow(Window w, int x, int y) {

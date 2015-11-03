@@ -288,8 +288,21 @@ public class WindowHierarchyTree {
 		}
 		Window modalParentofActive = getModalParent(active);
 		Window modalParentofCurrent = getModalParent(current);
-		if (modalParentofActive == null || modalParentofActive == modalParentofCurrent || current == modalParentofCurrent) {
+		boolean isActiveParentOfCurrent = isParent(modalParentofActive, modalParentofCurrent);
+		if (modalParentofActive == null || modalParentofActive == modalParentofCurrent || (current == modalParentofCurrent && isActiveParentOfCurrent)) {
 			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean isParent(Window parent, Window child) {
+		if (parent != null && child != null) {
+			if (child.getParent() != null) {
+				return child.getParent() == parent || isParent(parent, (Window) child.getParent());
+			} else {
+				return false;
+			}
 		} else {
 			return false;
 		}
