@@ -66,10 +66,10 @@ public class WindowManager {
 
 	public void removeWindow(Window target) {
 		synchronized (WebPaintDispatcher.webPaintLock) {
+			zorder.removeWindow(target);
 			if (target == activeWindow) {
 				activeWindow = null;
 			}
-			zorder.removeWindow(target);
 		}
 	}
 
