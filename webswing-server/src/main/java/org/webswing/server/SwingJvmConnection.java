@@ -3,6 +3,7 @@ package org.webswing.server;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.util.UUID;
@@ -252,17 +253,17 @@ public class SwingJvmConnection implements MessageListener {
 						javaTask.setClassname("main.Main");
 						Path classPath = javaTask.createClasspath();
 						classPath.setLocation(new File(URI.create(ServerUtil.getWarFileLocation())));
-						String webSwingToolkitJarPath = "\"" + URLDecoder.decode(WebToolkit.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
+						String webSwingToolkitJarPath = getClassPathForClass(WebToolkit.class);
 						String webSwingToolkitJarPathSpecific;
 						String webToolkitClass;
 						if (System.getProperty("java.version").startsWith("1.6")) {
-							webSwingToolkitJarPathSpecific = "\"" + URLDecoder.decode(WebToolkit6.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
+							webSwingToolkitJarPathSpecific = getClassPathForClass(WebToolkit6.class);
 							webToolkitClass = WebToolkit6.class.getCanonicalName();
 						} else if (System.getProperty("java.version").startsWith("1.7")) {
-							webSwingToolkitJarPathSpecific = "\"" + URLDecoder.decode(WebToolkit7.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
+							webSwingToolkitJarPathSpecific = getClassPathForClass(WebToolkit7.class);
 							webToolkitClass = WebToolkit7.class.getCanonicalName();
 						} else if (System.getProperty("java.version").startsWith("1.8")) {
-							webSwingToolkitJarPathSpecific = "\"" + URLDecoder.decode(WebToolkit8.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8") + "\"";
+							webSwingToolkitJarPathSpecific = getClassPathForClass(WebToolkit8.class);
 							webToolkitClass = WebToolkit8.class.getCanonicalName();
 						} else {
 							log.error("Java version " + System.getProperty("java.version") + " not supported in this version. Check www.webswing.org for supported versions.");
@@ -331,6 +332,14 @@ public class SwingJvmConnection implements MessageListener {
 				}
 				close();
 				return null;
+			}
+
+			private String getClassPathForClass(Class<?> clazz) throws UnsupportedEncodingException {
+				String cp = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8");
+				if (cp.endsWith(clazz.getCanonicalName().replace(".", "/") + ".class")) {
+					cp = cp.substring(0, cp.length() - (clazz.getCanonicalName().length() + 8));
+				}
+				return "\"" + cp + "\"";
 			}
 
 		});
