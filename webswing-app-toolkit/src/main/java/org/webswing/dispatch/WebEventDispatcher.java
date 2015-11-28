@@ -47,6 +47,9 @@ import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
 
+import sun.awt.CausedFocusEvent;
+
+@SuppressWarnings("restriction")
 public class WebEventDispatcher {
 
 	private MouseEvent lastMouseEvent;
@@ -209,7 +212,7 @@ public class WebEventDispatcher {
 			int clickcount = 0;
 			int buttons = Util.getMouseButtonsAWTFlag(event.getButton());
 			if (buttons != 0 && event.getType() == MouseEventType.mousedown) {
-				WindowManager.getInstance().activateWindow(w, null, x, y, false, true);
+				WindowManager.getInstance().activateWindow(w, null, x, y, false, true, CausedFocusEvent.Cause.MOUSE_EVENT);
 			}
 			switch (event.getType()) {
 			case mousemove:

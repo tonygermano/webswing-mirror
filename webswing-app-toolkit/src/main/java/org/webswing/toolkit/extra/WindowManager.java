@@ -5,9 +5,9 @@ import java.awt.Dialog;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
-import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +18,14 @@ import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.s2c.CursorChangeEventMsg;
 import org.webswing.toolkit.WebComponentPeer;
+import org.webswing.toolkit.WebKeyboardFocusManagerPeer;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
 
+import sun.awt.CausedFocusEvent;
+
+@SuppressWarnings("restriction")
 public class WindowManager {
 
 	private static WindowManager singleton = null;
@@ -98,8 +102,8 @@ public class WindowManager {
 		activateWindow(w, 0, 0);
 	}
 
-	@SuppressWarnings("restriction")
-	public void activateWindow(Window w, Component newFocusOwner, int x, int y, boolean tmp, boolean focusedWindowChangeAllowed) {
+	public boolean activateWindow(Window w, Component newFocusOwner, int x, int y, boolean tmp, boolean focusedWindowChangeAllowed, CausedFocusEvent.Cause cause) {
+		boolean success = false;
 		boolean newWindow = false;
 		if (!zorder.contains(w)) {
 			zorder.addWindow(w);
@@ -108,13 +112,23 @@ public class WindowManager {
 
 		// dont allow activation outside modal dialog ancestors
 		if (!(isModal(w) && newWindow) && !zorder.isInSameModalBranch(activeWindow, w) && !(w instanceof sun.awt.ModalExclude)) {
-			return;
+			return success;
 		}
 		if (focusedWindowChangeAllowed || activeWindow == w) {
 
 			if (newFocusOwner != null && newFocusOwner.isFocusable() && w.isFocusableWindow()) {
-				FocusEvent gainedFocusEvent = new FocusEvent(newFocusOwner, FocusEvent.FOCUS_GAINED, tmp);
-				WebEventDispatcher.dispatchEventInSwing(w, gainedFocusEvent);
+				int result = WebKeyboardFocusManagerPeer.shouldNativelyFocusHeavyweight(w, newFocusOwner, tmp, true, new Date().getTime(), cause);
+				switch (result) {
+				case 1:
+					success = true;
+					break;
+				case 2:
+					WebKeyboardFocusManagerPeer.deliverFocus(w, newFocusOwner, tmp, true, new Date().getTime(), cause);
+					success = true;
+					break;
+				default:
+					break;
+				}
 			}
 
 			if (SwingUtilities.isRectangleContainingRectangle(new Rectangle(0, 0, w.getWidth(), w.getHeight()), new Rectangle(x, y, 0, 0))) {
@@ -123,6 +137,7 @@ public class WindowManager {
 				bringToFront(null);
 			}
 		}
+		return success;
 
 	}
 
@@ -132,7 +147,7 @@ public class WindowManager {
 
 	public void activateWindow(Window w, int x, int y) {
 		Component newFocusOwner = SwingUtilities.getDeepestComponentAt(w, x, y);
-		activateWindow(w, newFocusOwner, x, y, false, true);
+		activateWindow(w, newFocusOwner, x, y, false, true, CausedFocusEvent.Cause.NATIVE_SYSTEM);
 	}
 
 	public Window getVisibleWindowOnPosition(int x, int y) {
