@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Viktor Meszaros">
+        <link rel="canonical" href="http://www.webswing.org/app/browser/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+
+	<title>Embeding and URL settings - Webswing 2.4-SNAPSHOT</title>
+
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/highlight.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+            <div class="navbar navbar-inverse navbar-custom navbar-static-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="../..">Webswing 2.4-SNAPSHOT</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="../..">Introduction</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Server <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../../server/install/">Instalation guide</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../server/setup/">Startup options</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../server/auth/">Login configuration</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../server/tomcat/">Tomcat deployment</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Swing setup <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../swing/">Swing application</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../netbeans/">Netbeans Platform</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../applet/">Java Applets</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../integration/">Desktop Integration</a>
+</li>
+
+                        
+                            
+<li class="active">
+    <a href="./">Embeding and URL settings</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../jslink/">JsLink: java <-> javascript</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../dev/development/">Development</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../faq/">FAQ</a>
+                    </li>
+                
+                
+                </ul>
+            
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#webswing-url-parameters">Webswing URL parameters</a></li>
+        
+            <li><a href="#preselected-aplication-skip-app-selection-screen">Preselected aplication (skip app selection screen)</a></li>
+        
+            <li><a href="#additional-application-arguments">Additional application arguments</a></li>
+        
+            <li><a href="#anonymous-access-skip-login-screen">Anonymous access (skip login screen)</a></li>
+        
+            <li><a href="#disable-binary-socket">Disable binary socket</a></li>
+        
+            <li><a href="#session-recording">Session recording</a></li>
+        
+            <li><a href="#session-playback">Session playback</a></li>
+        
+            <li><a href="#debugging">Debugging</a></li>
+        
+    
+        <li class="main "><a href="#embeding-to-web-page">Embeding to web page</a></li>
+        
+    
+        <li class="main "><a href="#bootstraping-webswing-javascript">Bootstraping Webswing javascript</a></li>
+        
+    
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="webswing-url-parameters">Webswing URL parameters<a class="headerlink" href="#webswing-url-parameters" title="Permanent link"></a></h2>
+<p>When you start Webswing it will be available on <code>http://localhost:8080</code>. The page served on this URL (<code>index.html</code>) allows you to change some of the default behavior using URL parameters. </p>
+<p>Following configurations are available by default:</p>
+<h3 id="preselected-aplication-skip-app-selection-screen">Preselected aplication (skip app selection screen)<a class="headerlink" href="#preselected-aplication-skip-app-selection-screen" title="Permanent link"></a></h3>
+<p><a href="http://localhost:8080?app=SwingSet3">http://localhost:8080?app=SwingSet3</a> : for selecting the application to run. If this parameter is specified, dialog with list of swing applications will be skipped. <code>&lt;name&gt;</code> is the swing application name as specified in <code>webswing.config</code> file.</p>
+<h3 id="additional-application-arguments">Additional application arguments<a class="headerlink" href="#additional-application-arguments" title="Permanent link"></a></h3>
+<p><a href="http://localhost:8080?args=arg1,arg2">http://localhost:8080?args=arg1,arg2</a> : for specifying additional arguments for the swing application. Value of this parameter will be available in <code>${customArgs}</code> variable that can be used in <code>webswing.config</code> file.</p>
+<h3 id="anonymous-access-skip-login-screen">Anonymous access (skip login screen)<a class="headerlink" href="#anonymous-access-skip-login-screen" title="Permanent link"></a></h3>
+<p><a href="http://localhost:8080?anonym=true">http://localhost:8080?anonym=true</a> : tells the server to authenticate the application with anonymous user. This user has access only to applications with <code>authentication</code> and <code>authorization</code> set to <code>false</code> in <code>webswing.config</code> file. </p>
+<h3 id="disable-binary-socket">Disable binary socket<a class="headerlink" href="#disable-binary-socket" title="Permanent link"></a></h3>
+<p><a href="http://localhost:8080?binarySocket=false">http://localhost:8080?binarySocket=false</a> : Binary socket is enabled by default. If you wish to use json for transfering data through websocket, set this option to false.</p>
+<h3 id="session-recording">Session recording<a class="headerlink" href="#session-recording" title="Permanent link"></a></h3>
+<p><a href="http://localhost:8080?recording=true">http://localhost:8080?recording=true</a> : if recording is enabled, webswing will create a recording file in temp foler, which can be later used for replay of the application frame by frame just like a movie.</p>
+<h3 id="session-playback">Session playback<a class="headerlink" href="#session-playback" title="Permanent link"></a></h3>
+<p><a href="http://localhost:8080?recordingPlayback=path">http://localhost:8080?recordingPlayback=path/to/recordingFile.wss</a> : This option can be used to play the recording file. This option is internaly used in Admin console for playback of finished sessions. Only users with admin role are allowed to playback recordings.</p>
+<h3 id="debugging">Debugging<a class="headerlink" href="#debugging" title="Permanent link"></a></h3>
+<p><a href="http://localhost:8080?debugPort=8000">http://localhost:8080?debugPort=8000</a> : See <a href="../../dev/development/#debugging">debuging guide</a></p>
+<p>URL parameters can be combined together.</p>
+<p>If your deployment has other specific requirements which are not achievable by this set of parameters, you can embed Webswing's javascript snippet to your own web page, where you have full control and ability to further customize the behavior.</p>
+<h2 id="embeding-to-web-page">Embeding to web page<a class="headerlink" href="#embeding-to-web-page" title="Permanent link"></a></h2>
+<p>With Webswing it is possible to embed your swing application to your own webpage. Good example is the default Webswing page or Admin console mirror view feature, where Webswing javascript is embeded in same like in below snippet. You can copy this snippet to your webpage: </p>
+<pre><code class="html">&lt;div 
+ style=&quot;height:500px;&quot; 
+ data-webswing-instance=&quot;webswing&quot; 
+ data-webswing-options=&quot;{autoStart:true,  anonym:true,  args:'foo',  applicationName:'SwingSet3', connectionUrl:'http://&lt;webswing-host-and-port&gt;'}&quot;&gt;
+&lt;/div&gt;
+
+&lt;script data-webswing-global-var=&quot;webswingControll&quot;&gt;
+ (function (window, document) {
+  var loader = function () {
+   var script = document.createElement(&quot;script&quot;), tag = document.getElementsByTagName(&quot;script&quot;)[0];
+   script.src =  &quot;http://&lt;webswing-host-and-port&gt;/javascript/webswing-embed.js&quot;;
+   tag.parentNode.insertBefore(script, tag);
+  };
+  window.addEventListener ? window.addEventListener(&quot;load&quot;, loader, false) : window.attachEvent(&quot;onload&quot;, loader);
+ })(window, document);
+&lt;/script&gt;
+</code></pre>
+
+<p>There are few things you need to configure in the snippet. Most important is to replace the 2  <code>&lt;webswing-host-and-port&gt;</code> placeholders with the location of your webswing deployment. For example <code>localhost:8080</code> if using the default settings. </p>
+<p>The <code>data-webswing-instance="my-webswing"</code> attribute tells the javascript to use this div element as webswing instance. Name of the instance <code>"my-webswing"</code> will be used as name for global object variable with functions controlling this instance. Following functions are available in this global object: </p>
+<ul>
+<li><strong><code>configure(options)</code></strong> - configures this instance. This function read the options from <code>data-webswing-options</code> attribute if no argument is passed in. Argument <code>options</code> is object with following properties:<ul>
+<li><code>autoStart</code>  - tells webswing to execute configure() and start() right after the instance is initialized. If it is false, start() function has to be triggered manually. This option only valid if set up in <code>data-webswing-options</code> attribute</li>
+<li><code>applicationName</code> - Preselects the swing application and skips selection screen</li>
+<li><code>args</code> - additional java application arguments. Appended to those defined in configuration.</li>
+<li><code>anonym</code> - skip login for applications that allows anonymous access (default:false)</li>
+<li><code>binarySocket</code> - use binary transfer in websocket - saves bandwidth (default:true)</li>
+<li><code>recording</code> - record this application session (default:false)</li>
+<li><code>clientId</code> - set the clientId, used with mirror session or to continue running session. </li>
+<li><code>mirror</code> - for starting a mirror session. Only admin role is allowed to use this (default:false)</li>
+<li><code>connectionUrl</code> - base url for connecting to websocket service. (default: current location url) </li>
+<li><code>debugPort</code> - integer that specifies on which port should the debugger listen. See development docs for more information.</li>
+<li><code>javaCallTimeout</code> - JsLink java method invocation timeout. If java method is not returned with result, error is logged to browser console.  </li>
+<li><code>recordingPlayback</code> - File for session recording playback. Only admin role alowed to use this.</li>
+<li><code>appletParams</code> - Applet parameters. Ignored if swing application is not applet.</li>
+</ul>
+</li>
+<li><strong><code>disconnect()</code></strong> - disconnects the current webswing session, but leaving the swing application running. </li>
+<li><strong><code>kill()</code></strong> - disconnects the current webswing session with stopping the swing application. </li>
+<li><strong><code>setControl(boolean)</code></strong> - enables/disables the control of application. If set to false, no user events are sent to swing application.</li>
+<li><strong><code>start()</code></strong> - This will initiate the connection to webswing server and start the swing application. If the <code>autoStart</code> is set to false or not defined in <code>data-webswing-options</code>, start function has to be called manually, otherwise the javascript will call start function automatically. </li>
+</ul>
+<p>The <code>data-webswing-options</code> attribute is used to configure the instance. Javascirpt object notation is expected with properties listed in <code>configure(options)</code> function description. </p>
+<p>You can control the size of the div element where webswing is displayed with regular CSS . You can even change the size of the div dynamically and Webswing canavs will automatically scale. </p>
+<p>If you are embedding webswing to page on different domain, you will have to enable Cross-origin resource sharing (<code>CORS</code>), either in <code>jetty.properties</code> file or using the <code>webswing.corsOrigins</code> system property. Set <code>*</code> to allow all domains, or use comma separated list of allowed domains. </p>
+<h2 id="bootstraping-webswing-javascript">Bootstraping Webswing javascript<a class="headerlink" href="#bootstraping-webswing-javascript" title="Permanent link"></a></h2>
+<p>When the Webswing javascript is loaded it will scan the DOM for div elements with attribute <code>data-webswing-instance</code> and will initialize them automatically. For use cases when webswing instance has to be started later it is possible to export global webswing variable exposing the bootstraping API. 
+By definig attribute <code>data-webswing-global-var="webswingControl"</code> on the <code>&lt;script&gt;</code> element of embeded snippet, you tell webswing to create a global variable called <code>webswingControl</code> which has following functions: </p>
+<ul>
+<li><strong><code>scan()</code></strong> - re-runs the full DOM search for <code>data-webswing-instance</code> attribute.</li>
+<li><strong><code>bootstrap(divElement)</code></strong> - instantiate webswing in div element specified in argument. </li>
+</ul></div>
+            
+        </div>
+
+
+        <script src="../../js/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/highlight.pack.js"></script>
+        <script>var base_url = '../..';</script>
+        <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+        <script src="../../js/base.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>

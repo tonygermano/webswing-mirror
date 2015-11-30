@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Viktor Meszaros">
+        <link rel="canonical" href="http://www.webswing.org/server/install/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+
+	<title>Instalation guide - Webswing 2.4-SNAPSHOT</title>
+
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/highlight.css">
+        <link href="../../css/extra.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+            <div class="navbar navbar-inverse navbar-custom navbar-static-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="../..">Webswing 2.4-SNAPSHOT</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="../..">Introduction</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Server <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li class="active">
+    <a href="./">Instalation guide</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../setup/">Startup options</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../auth/">Login configuration</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../tomcat/">Tomcat deployment</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Swing setup <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../../app/swing/">Swing application</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../app/netbeans/">Netbeans Platform</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../app/applet/">Java Applets</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../app/integration/">Desktop Integration</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../app/browser/">Embeding and URL settings</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../app/jslink/">JsLink: java <-> javascript</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../dev/development/">Development</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../faq/">FAQ</a>
+                    </li>
+                
+                
+                </ul>
+            
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#instalation-guide">Instalation Guide</a></li>
+        
+    
+        <li class="main "><a href="#starting-on-windows">Starting on Windows</a></li>
+        
+    
+        <li class="main "><a href="#starting-on-linux">Starting on Linux</a></li>
+        
+    
+        <li class="main "><a href="#important-files">Important files</a></li>
+        
+    
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="instalation-guide">Instalation Guide<a class="headerlink" href="#instalation-guide" title="Permanent link"></a></h2>
+<p>Webswing is packaged and distributed as a fully working demo package for your convenience, so no complicated installation is needed. Just unpack the distribution zip file and you are good to go. The only prerequisite is to have a supported version of Java installed. </p>
+<p>Supported Java versions are</p>
+<ul>
+<li>Oracle Java 1.6.0_45+</li>
+<li>Oracle Java 1.7.0_60+</li>
+<li>Oracle Java 1.8.0_25+</li>
+</ul>
+<hr />
+<h2 id="starting-on-windows">Starting on Windows<a class="headerlink" href="#starting-on-windows" title="Permanent link"></a></h2>
+<p>If you are using Windows operating system, you can use the <code>start.bat</code> script, which executes the following command: </p>
+<pre><code>java -jar webswing-server.war -j jetty.properties
+</code></pre>
+
+<blockquote>
+<p>Note: Make sure <code>java</code> is pointing to a supported java version by running <code>java -version</code> from your commandline.  </p>
+</blockquote>
+<hr />
+<h2 id="starting-on-linux">Starting on Linux<a class="headerlink" href="#starting-on-linux" title="Permanent link"></a></h2>
+<p>Starting Webswing on Linux desktop (within XServer) session is as simple as running the above command - same as on Windows.</p>
+<p>In most cases however, the linux server is a headless box. In these cases we would get error running the above command, because swing framework depends on graphical environment. To overcome this we can use X virtual frame buffer (<code>Xvfb</code>) to satisfy these dependencies. </p>
+<p>Please install the following linux packages to satisfy all Swing framework dependencies (names are from ubuntu repositories - use relevant counterparts for your distribution):</p>
+<ul>
+<li><strong>xvfb</strong></li>
+<li><strong>libxext6</strong></li>
+<li><strong>libxi6</strong></li>
+<li><strong>libxtst6</strong></li>
+<li><strong>libxrender1</strong></li>
+</ul>
+<p>Webswing distribution contains a convenience linux start script - <code>start.sh</code>. Before running the script you need to adapt following variables in the script as necessary for your environment: </p>
+<pre><code class="shell">export HOME=/home/webswing
+export OPTS=&quot;-h 0.0.0.0 -j $HOME/jetty.properties -u $HOME/user.properties -c $HOME/webswing.config&quot;
+export JAVA_HOME=/opt/java8
+export JAVA_OPTS=&quot;-Xmx128M&quot; 
+</code></pre>
+
+<p>When started, this script will create two additional files in <code>HOME</code> folder.</p>
+<ul>
+<li><code>webswing.pid</code> storing the pid of current webswing process</li>
+<li><code>webswing.out</code> standard output and error is redirected to this file.</li>
+</ul>
+<p>For running the script you have following options:</p>
+<pre><code>Usage: start.sh {run|start|stop|restart|status}
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>start.sh run</td>
+<td>This command can be used to start Webswing if you are inside X session. This will block the terminal until server stops.</td>
+</tr>
+<tr>
+<td>start.sh start</td>
+<td>Start Webswing as deamon in new Xvfb session using the <code>xvfb-run</code> command</td>
+</tr>
+<tr>
+<td>start.sh stop</td>
+<td>Stops running Webswing server</td>
+</tr>
+<tr>
+<td>start.sh restart</td>
+<td>Stops and starts Webswing server</td>
+</tr>
+<tr>
+<td>start.sh status</td>
+<td>Checks if webswing server is running.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="important-files">Important files<a class="headerlink" href="#important-files" title="Permanent link"></a></h2>
+<p>Webswing distribution contains several files, but only three of them are necessary to run webswing.</p>
+<p><img alt="files.png" src="../img/files.png" /></p>
+<ol>
+<li>
+<p><code>webswing-server.war</code> file is the main executable file. This file is a regular java web application archive with embeded jetty server.</p>
+</li>
+<li>
+<p><code>webswing.config</code> file contains the configuration of swing applications. Swing application's class-path, main class, arguments and permissions are described in this file. See more details in "Application setup" section.</p>
+</li>
+<li>
+<p><code>user.properties</code> contains the users, passwords and authorization roles. This file is necessary unless you configure your own application security realm in <code>shiro.ini</code>. <a href="../setup/">(more details here)</a></p>
+</li>
+<li>
+<p>(optional)<code>jetty.properties</code> is a convenient option of configuring the built-in jetty server. Each setting can be overridden with command-line option. For more details refer to <a href="../setup/">Server start-up parameters</a> section</p>
+</li>
+</ol>
+<p><strong>Webswing generates following output files:</strong></p>
+<p><code>tmp</code> folder is created for extracting client libraries and temporary files generated by application print or file download functionality. Path for this temporary folder can be changed by defining comman-line option <code>-t &lt;path&gt;</code> . By default <code>tmp</code> folder contents are wiped when Webswing starts. If <code>-d true</code> is set, a time-stamped folder inside <code>tmp</code> is created every time Webswing server is started.</p>
+<p><code>webswing.log</code> file for storing Webswing server and swing application instance logs.</p>
+<p><code>webswing.config.backup</code> the webswing.config file content is backed up to this file after this config is changed in administration console. By default last 10 version are kept in this file.</p></div>
+            
+        </div>
+
+
+        <script src="../../js/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/highlight.pack.js"></script>
+        <script>var base_url = '../..';</script>
+        <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+        <script src="../../js/base.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>
