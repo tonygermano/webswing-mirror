@@ -26,4 +26,4 @@ markdown_extensions:
     - admonition:
 
 copyright: Copyright &copy; 2015 Viktor Meszaros
-theme: mkdocs
+theme_dir: 'webswing_theme'
