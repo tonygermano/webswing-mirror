@@ -6,6 +6,7 @@ body {
 
 body > div.container {
     min-height: 400px;
+	padding-top: 50px;
 }
 
 ul.nav li.main {

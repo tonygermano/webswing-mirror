@@ -146,7 +146,7 @@ public class WindowManager {
 	}
 
 	public void activateWindow(Window w, int x, int y) {
-		Component newFocusOwner = SwingUtilities.getDeepestComponentAt(w, x, y);
+		Component newFocusOwner = w.getFocusTraversalPolicy().getInitialComponent(w);
 		activateWindow(w, newFocusOwner, x, y, false, true, CausedFocusEvent.Cause.NATIVE_SYSTEM);
 	}
 

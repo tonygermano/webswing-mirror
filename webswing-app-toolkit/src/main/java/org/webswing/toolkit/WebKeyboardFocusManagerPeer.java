@@ -3,11 +3,9 @@ package org.webswing.toolkit;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.Window;
-import java.awt.event.FocusEvent;
 import java.awt.peer.KeyboardFocusManagerPeer;
 import java.lang.reflect.Method;
 
-import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Logger;
 
@@ -53,6 +51,7 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public static boolean deliverFocus(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
 		if (heavyweight == null) {
 			heavyweight = descendant;

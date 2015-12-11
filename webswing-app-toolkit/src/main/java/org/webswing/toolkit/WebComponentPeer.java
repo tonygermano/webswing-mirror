@@ -403,7 +403,7 @@ public class WebComponentPeer implements ComponentPeer {
 	}
 
 	public boolean isFocusable() {
-		return true;
+		return false;
 	}
 
 	public Image createImage(ImageProducer paramImageProducer) {
