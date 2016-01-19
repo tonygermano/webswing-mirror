@@ -1,5 +1,5 @@
 ## Startup options
-Start scripts `start.bat` and `start.sh` are included in Webswing distribution. These scripts may need to be adapted to point to the right java installation and to configure other custom options. 
+Start scripts `webswing.bat` and `webswing.sh` are included in Webswing distribution. These scripts may need to be adapted to point to the right java installation and to configure other custom options. 
 
 Starting webswing with option `-h` will print out help with list of all possible option. 
 ```

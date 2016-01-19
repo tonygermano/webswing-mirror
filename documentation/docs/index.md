@@ -68,9 +68,9 @@ Download the distribution from [Webswing home page](http://www.webswing.org) and
 
 ![unzipped webswing distribution](img/unzipped-distribution.png)
 
-Open the start.bat in text editor and make sure you are using the corrent java executable. (Verify by running java -version in your command line.)
+Open the webswing.bat in text editor and make sure you are using the corrent java executable. (Verify by running java -version in your command line.)
 
-Double click on `start.bat` file to start Webswing server.
+Double click on `webswing.bat` file to start Webswing server.
 
 ![started webswing server](img/webswing-running.png)
 

@@ -11,7 +11,7 @@ Supported Java versions are
 
 ## Starting on Windows 
 
-If you are using Windows operating system, you can use the `start.bat` script, which executes the following command: 
+If you are using Windows operating system, you can use the `webswing.bat` script, which executes the following command: 
 
 ```
 java -jar webswing-server.war -j jetty.properties
@@ -25,7 +25,7 @@ java -jar webswing-server.war -j jetty.properties
 
 Starting Webswing on Linux desktop (within XServer) session is as simple as running the above command - same as on Windows.
 
-In most cases however, the linux server is a headless box. In these cases we would get error running the above command, because swing framework depends on graphical environment. To overcome this we can use X virtual frame buffer (`Xvfb`) to satisfy these dependencies. 
+In most cases however, the linux server is a headless box. In these cases you would get an error when running the above command, because swing framework depends on graphical environment. To overcome this we can use X virtual frame buffer (`Xvfb`) to satisfy these dependencies. 
 
 Please install the following linux packages to satisfy all Swing framework dependencies (names are from ubuntu repositories - use relevant counterparts for your distribution):
 
@@ -36,16 +36,30 @@ Please install the following linux packages to satisfy all Swing framework depen
 * **libxrender1**
 
 
-Webswing distribution contains a convenience linux start script - `start.sh`. Before running the script you need to adapt following variables in the script as necessary for your environment: 
+Webswing distribution contains a convenience linux start script - `webswing.sh`. Script uses default startup settings. 
 
 ```shell
-export HOME=/home/webswing
+export HOME=<webswing.sh location>
 export OPTS="-h 0.0.0.0 -j $HOME/jetty.properties -u $HOME/user.properties -c $HOME/webswing.config"
-export JAVA_HOME=/opt/java8
+export JAVA_HOME=$JAVA_HOME
 export JAVA_OPTS="-Xmx128M" 
 ```
 
-When started, this script will create two additional files in `HOME` folder.
+These may be overriden by setting following environment variables: 
+
+* WEBSWING_HOME
+* WEBSWING_OPTS
+* WEBSWING_JAVA_HOME
+* WEBSWING_JAVA_OPTS
+* WEBSWING_LOG_FILE
+* WEBSWING_PID_FILE
+
+for example: 
+```shell
+WEBSWING_HOME=/home/webswing WEBSWING_JAVA_HOME=/var/share/jdk8 ./webswing.sh start
+```
+
+When started, this script will create two additional files in `HOME` folder (by default).
 
 * `webswing.pid` storing the pid of current webswing process
 * `webswing.out` standard output and error is redirected to this file.
@@ -53,16 +67,16 @@ When started, this script will create two additional files in `HOME` folder.
 For running the script you have following options:
 
 ```
-Usage: start.sh {run|start|stop|restart|status}
+Usage: webswing.sh {run|start|stop|restart|status}
 ``` 
 
 Command 	        | Description
 --------------------| ------------
-start.sh run        | This command can be used to start Webswing if you are inside X session. This will block the terminal until server stops. 
-start.sh start      | Start Webswing as deamon in new Xvfb session using the `xvfb-run` command
-start.sh stop       | Stops running Webswing server
-start.sh restart    | Stops and starts Webswing server
-start.sh status     | Checks if webswing server is running. 
+webswing.sh run        | This command can be used to start Webswing if you are inside X session. This will block the terminal until server stops. 
+webswing.sh start      | Start Webswing as deamon in new Xvfb session using the `xvfb-run` command
+webswing.sh stop       | Stops running Webswing server
+webswing.sh restart    | Stops and starts Webswing server
+webswing.sh status     | Checks if webswing server is running. 
 
 ---
 
