@@ -14,6 +14,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             registerTouch : 'touch.register',
             disposeTouch : 'touch.dispose',
             getUser : 'login.user',
+            login : 'login.login',
             getIdentity : 'identity.get',
             disposeIdentity : 'identity.dispose',
             getLocale : 'identity.getLocale',
@@ -44,7 +45,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             dispose : dispose
         };
 
-        var timer1, timer2;
+        var timer1, timer2, timer3;
         var drawingLock;
         var drawingQ = [];
 
@@ -100,8 +101,10 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             api.cfg.canPaint = false;
             clearInterval(timer1);
             clearInterval(timer2);
+            clearInterval(timer3);
             timer1 = setInterval(api.sendInput, 100);
             timer2 = setInterval(heartbeat, 10000);
+            timer3 = setInterval(servletHeartbeat, 100000);
             windowImageHolders = {};
             directDraw = new WebswingDirectDraw({});
         }
@@ -118,6 +121,11 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 
         function heartbeat() {
             sendMessageEvent('hb');
+        }
+
+        function servletHeartbeat() {
+        	//touch servlet session to avoid timeout
+        	api.login(function(){},function(){});
         }
 
         function repaint() {

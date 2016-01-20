@@ -38,7 +38,7 @@ define(['jquery', 'text!templates/login.html'], function amdFactory($, html) {
                 }
             };
         }
-        function login(successCallback) {
+        function login(successCallback,errorCallback) {
             $.ajax({
                 xhrFields: {
                     withCredentials: true
@@ -52,15 +52,21 @@ define(['jquery', 'text!templates/login.html'], function amdFactory($, html) {
                         errorMsg.html('');
                     }
                     user = data;
-                    successCallback();
+                    if(successCallback!=null){
+                    	successCallback();
+                    }
                 },
                 error: function (data) {
-                    if (!loginDialogVisible()) {
-                        api.showDialog(api.loginDialog);
-                    } else {
-                        var errorMsg = api.cfg.rootElement.find('*[data-id="loginErrorMsg"]');
-                        errorMsg.html('<div class="alert alert-danger">' + data.responseText + '</div>');
-                    }
+                	if(errorCallback!=null){
+                		errorCallback();
+                	}else{
+                		if (!loginDialogVisible()) {
+                			api.showDialog(api.loginDialog);
+                		} else {
+                			var errorMsg = api.cfg.rootElement.find('*[data-id="loginErrorMsg"]');
+                			errorMsg.html('<div class="alert alert-danger">' + data.responseText + '</div>');
+                		}
+                	}
                 }
             });
         }

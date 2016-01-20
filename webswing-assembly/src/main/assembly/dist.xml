@@ -17,8 +17,16 @@
 		<fileSet>
 			<directory>${basedir}/src/main/demo</directory>
 			<outputDirectory>/</outputDirectory>
+			<excludes>
+				<exclude>webswing.sh</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>${basedir}/src/main/demo</directory>
+			<outputDirectory>/</outputDirectory>
+			<fileMode>0774</fileMode>
 			<includes>
-				<include>*/**</include>
+				<include>webswing.sh</include>
 			</includes>
 		</fileSet>
 		<fileSet>
