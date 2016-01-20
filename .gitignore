@@ -3,6 +3,7 @@
 ###################
 target/
 dist/
+bin/
 .settings/
 .project
 .classpath

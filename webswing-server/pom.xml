@@ -351,6 +351,11 @@
 												<include name="nbplatform.jar" />
 											</fileset>
 										</copy>
+										<copy todir="${project.basedir}/../webswing-app-toolkit/target">
+											<fileset dir="${project.basedir}/../lib">
+												<include name="rt-win-shell.jar" />
+											</fileset>
+										</copy>
 									</target>
 								</configuration>
 								<goals>
