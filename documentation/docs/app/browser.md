@@ -7,7 +7,8 @@ Following configurations are available by default:
 [http://localhost:8080?app=SwingSet3](http://localhost:8080?app=SwingSet3) : for selecting the application to run. If this parameter is specified, dialog with list of swing applications will be skipped. `<name>` is the swing application name as specified in `webswing.config` file.
 
 ### Additional application arguments
-[http://localhost:8080?args=arg1,arg2](http://localhost:8080?args=arg1,arg2) : for specifying additional arguments for the swing application. Value of this parameter will be available in `${customArgs}` variable that can be used in `webswing.config` file.
+[http://localhost:8080?args=arg1 arg2 "arg3 and 4"](http://localhost:8080?args=arg1 arg2 "arg3 and 4") : for specifying additional arguments for the swing application. Value of this parameter will be available in `${customArgs}` variable that can be used in `webswing.config` file ( ie. `"args": "${customArgs}"`). 
+You can specify the arguments as you would in commandline. The example URL would resolve to 3 arguments in your main method: `arg1` ,`arg2` and `arg3 and 4`.
 
 ### Anonymous access (skip login screen)
 [http://localhost:8080?anonym=true](http://localhost:8080?anonym=true) : tells the server to authenticate the application with anonymous user. This user has access only to applications with `authentication` and `authorization` set to `false` in `webswing.config` file. 
