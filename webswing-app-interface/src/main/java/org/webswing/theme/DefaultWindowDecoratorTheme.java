@@ -235,12 +235,9 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		Rectangle menuRect = new Rectangle(x, y + (is.TITLE.getHeight() - is.MENU.getHeight()) / 2, is.MENU.getWidth(), is.MENU.getHeight());
 		g.drawImage(getIcon(window), menuRect.x, menuRect.y, menuRect.width, menuRect.height, null);
 
-		String title = getTitle(window);
+		String title = getTitle(window)==null?"":getTitle(window);
 		g.setFont(UIManager.getFont("TitledBorder.font"));
-		float lineMetricsHeight = is.TITLE.getHeight();
-		if (g.getFontMetrics() != null) {
-			lineMetricsHeight = g.getFontMetrics().getLineMetrics(title, g).getHeight();
-		}
+		float lineMetricsHeight = g.getFontMetrics().getLineMetrics(title, g).getHeight();
 
 		x += is.MENU.getWidth() + BUTTON_SPACING;
 		g.setColor(is.TEXT_COLOR);
