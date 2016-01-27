@@ -18,6 +18,7 @@
         function wsApplicationListDirectiveController($scope, $element, $attrs) {
             var vm = this;
             vm.readonly = watchBoolean('readonly', false);
+            vm.applet = watchBoolean('applet', false);
             vm.visible = [];
             vm.openApp = openApp;
             vm.toggleApp = toggleApp;

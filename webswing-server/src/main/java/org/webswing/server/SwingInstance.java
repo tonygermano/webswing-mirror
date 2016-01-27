@@ -55,6 +55,7 @@ public class SwingInstance implements WebSessionListener {
 		SimpleEventMsgIn simpleEventMsgIn = new SimpleEventMsgIn();
 		simpleEventMsgIn.setType(SimpleEventType.killSwing);
 		sendToSwing(null, simpleEventMsgIn);
+		connection.killSwingProcess(200);
 	}
 
 	public boolean registerMirroredWebSession(AtmosphereResource resource) {

@@ -8,6 +8,8 @@ public class SwingDescriptor implements Serializable {
 	private static final long serialVersionUID = 2413651075803737060L;
 	private String name;
 	private String icon;
+	private String jreExecutable="${java.home}/bin/java"; 
+	private String javaVersion="${java.version}";
 	private String vmArgs = "";
 	private List<String> classPathEntries = new ArrayList<String>();
 	private String homeDir = "${user.dir}";
@@ -180,4 +182,20 @@ public class SwingDescriptor implements Serializable {
 		this.theme = theme;
 	}
 
+	public String getJreExecutable() {
+		return jreExecutable;
+	}
+
+	public void setJreExecutable(String jreExecutable) {
+		this.jreExecutable = jreExecutable;
+	}
+
+	public String getJavaVersion() {
+		return javaVersion;
+	}
+
+	public void setJavaVersion(String javaVersion) {
+		this.javaVersion = javaVersion;
+	}
+	
 }

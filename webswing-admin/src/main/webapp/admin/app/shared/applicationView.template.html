@@ -53,27 +53,41 @@
     <tab heading="Java settings">    
         <div class="row">
             <div class="ws-config-group col-md-12">
-                <ws-string-field readonly="{{vm.readonly}}" ng-if="vm.exists(vm.app.mainClass)"
+            	<ws-string-field readonly="{{vm.readonly}}"
+                                 label="JRE Executable" 
+                                 desc="Path to java executable that will be used to spawn swing application process. Java 6,7 and 8 is supported." 
+                                 value="vm.app.jreExecutable" 
+                                 required requiredMsg="JRE executable is mandatory." 
+                                 variables="vm.variables">
+                </ws-string-field>
+                <ws-string-field readonly="{{vm.readonly}}"
+                                 label="Java Version" 
+                                 desc="Java version of the JRE executable defined above. Expected values are starting with '1.6', '1.7' or '1.8'."
+                                 value="vm.app.javaVersion" 
+                                 required requiredMsg="Java version is mandatory." 
+                                 variables="vm.variables">
+                </ws-string-field>
+                <ws-string-field readonly="{{vm.readonly}}" ng-if="!vm.applet"
                                  label="Main class" 
                                  desc="Swing application fully qualiffied class name. (ie. 'com.mypackage.Main')" 
                                  value="vm.app.mainClass" 
                                  required requiredMsg="Main class' fully qualified name is mandatory." 
                                  variables="vm.variables">
                 </ws-string-field>
-                <ws-string-field readonly="{{vm.readonly}}" ng-if="vm.exists(vm.app.mainClass)"
+                <ws-string-field readonly="{{vm.readonly}}" ng-if="!vm.applet"
                                  label="Main arguments" 
                                  desc="Swing application main method arguments. This string will be passed to the main method's (String[] args) " 
                                  value="vm.app.args"  
                                  variables="vm.variables">
                 </ws-string-field>
-                <ws-string-field readonly="{{vm.readonly}}" ng-if="!vm.exists(vm.app.mainClass)"
+                <ws-string-field readonly="{{vm.readonly}}" ng-if="vm.applet"
                                  label="Applet class" 
                                  desc="Applet's fully qualiffied main class name. Must implement the java.applet.Applet interface. (ie. 'com.mypackage.MyApplet')" 
                                  value="vm.app.appletClass" 
                                  required requiredMsg="Applet class' fully qualified name is mandatory." 
                                  variables="vm.variables">
                 </ws-string-field>
-                <ws-string-map-field readonly="{{vm.readonly}}" ng-if="!vm.exists(vm.app.mainClass)"
+                <ws-string-map-field readonly="{{vm.readonly}}" ng-if="vm.applet"
                                      label="Start parameters" 
                                      desc="Applets start parameters. Set of key-value pairs accessible to applet at startup." 
                                      value="vm.app.parameters"  

@@ -30,6 +30,8 @@ Here is a sample `webswing.config` file content with demo swing application conf
   "applications" : [{
     "name" : "SwingSet3",
     "icon" : "${user.dir}/demo/SwingSet3/icon.png",
+    "jreExecutable": "${java.home}/bin/java",
+    "javaVersion": "${java.version}",
     "mainClass" : "com.sun.swingset3.SwingSet3",
     "classPathEntries" : [ "${user.dir}/demo/SwingSet3/SwingSet3.jar", "${user.dir}/demo/SwingSet3/lib/*.jar" ],
     "vmArgs" : "-Xmx128m -DauthorizedUser=${user}",
@@ -87,6 +89,10 @@ In Admin console options with variable replacement support appears with a flash 
 
 `icon`: Path to icon displayed in application selection dialog. Absolute path or path relative to `homeDir`
 
+`jreExecutable`: Path to java executable that will be used to spawn swing application process. Java 6,7 and 8 is supported. ([More details](#custom-swing-startup-script))
+
+`javaVersion`: Java version of the JRE executable defined in `jreExecutable`. Expected values are starting with '1.6', '1.7' or '1.8'.
+
 `mainClass`: Swing application fully qualified class name. (ie. 'com.mypackage.Main')
 
 `classPathEntries`: Swing application's classpath. Absolute or relative path to jar file or classes directory. At least one classPath entry should be specified containing the main class. Allows using `?` (any single char) and `*` (everything) wildcards.
@@ -123,3 +129,56 @@ In Admin console options with variable replacement support appears with a flash 
 `allowUpload`: This options activates the 'Upload' button and drop area on the JFileChooser integration panel. If this is true, user will be allowed to upload files to folder displayed in JFileChooser dialog.
 
 `allowJsLink`: If selected, the JSLink feature will be enabled, allowing swing application to invoke javascript and vice versa. (See `netscape.javascript.JSObject`)
+
+---
+
+##Custom Swing startup script
+
+Sometimes it is necessary to prepare the environment before the Swing process is started. This may include steps like 
+changing current working directory or using sudo to run Swing as different user. This can be achieved by pointing the `jreExecutable` 
+option to custom startup script. 
+
+Custom Swing startup script must follow few rules in order to work with Websing: 
+
+1. Last step of the script should execute java with the arguments as passed in by webswing. (ie. `$JAVA_HOME/bin/java $@` )
+2. If the script has arguments of its own, they should be shifted before calling java (`shift 3` if your script uses 3 arguments)
+3. Be aware that variable resolution in `webswing.config` is done in servers context. (the evironment changes will not be reflected to variables defined in webswing.config)
+
+Here is an example of custom script that will use `sudo` to run the swing process as logged in user. We assume that users defined in `users.properties` have os level counterparts
+and the user used to start the server is properly configured in `sudoers` (needs NOPASSWD flag in sudoers - see man page). 
+
+Here is our application configuration:
+```json
+{
+    "name" : "SwingSet3",
+    "jreExecutable": "startSwingSet3.sh ${user}",
+    "javaVersion": "1.8",
+    "mainClass" : "com.sun.swingset3.SwingSet3",
+    "classPathEntries" : [ "SwingSet3.jar", "lib/*.jar" ],
+    "vmArgs" : "-Xmx128m",
+    "args" : "",
+    "homeDir" : "demo/SwingSet3"
+}
+```
+
+When Webswing will start a Swing application with above configuration, commandline will look like this:
+
+```
+startSwingSet3.sh johnDoe -Xmx128m <webswing specific configuration> -cp webswing-server.war main.Main
+```
+
+Now the custom script `demo/SwingSet3/startSwingSet3.sh` that runs the java process as logged in user will look like following:
+
+```sh
+#!/bin/sh
+#save user to temporary variable
+USER=$1
+#shift the arguments by one - the user
+shift
+#run java with sudo 
+sudo -u $USER /home/work/jdk/jdk/bin/java $@ 
+```
+
+
+
+

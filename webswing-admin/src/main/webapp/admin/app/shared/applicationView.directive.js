@@ -17,10 +17,10 @@
         function wsApplicationViewDirectiveController($scope, $element, $attrs) {
             var vm = this;
             vm.readonly = watchBoolean('readonly', false);
+            vm.applet = watchBoolean('applet', false);
             vm.json = updateJson();
             vm.aceLoaded = aceLoaded;
             vm.updateJson = updateJson;
-            vm.exists = exists;
 
             $scope.$watch('vm.json', function (value) {
                 try {
@@ -34,12 +34,7 @@
                 $scope.$broadcast('wsHelperClose', data, i);
             });
 
-            function exists(obj) {
-                if (typeof obj === 'undefined') {
-                    return false;
-                }
-                return true;
-            }
+            
             function updateJson() {
                 vm.json = angular.toJson(vm.app, true);
             }

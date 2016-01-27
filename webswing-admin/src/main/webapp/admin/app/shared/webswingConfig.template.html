@@ -5,7 +5,7 @@
             <a class="btn btn-primary btn-xs" ng-if="!vm.readonly" ng-click="vm.newApp()">New</a>
         </tab-heading>
         <div class="ws-config-group ">
-            <ws-application-list readonly="{{vm.readonly}}" variables="vm.variables" apps="vm.config.applications"></ws-application-list>
+            <ws-application-list applet="false" readonly="{{vm.readonly}}" variables="vm.variables" apps="vm.config.applications"></ws-application-list>
         </div>
     </tab>
     <tab >   
@@ -14,7 +14,7 @@
             <a class="btn btn-primary btn-xs" ng-if="!vm.readonly" ng-click="vm.newApplet()">New</a>
         </tab-heading>
         <div class="ws-config-group ">
-            <ws-application-list readonly="{{vm.readonly}}" variables="vm.variables" apps="vm.config.applets"></ws-application-list>
+            <ws-application-list applet="true" readonly="{{vm.readonly}}" variables="vm.variables" apps="vm.config.applets"></ws-application-list>
         </div>
     </tab>
     <tab select="vm.updateJson()"> 
