@@ -19,7 +19,7 @@ import javax.jms.IllegalStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SwingProcess{
+public class SwingProcess {
 	private static final Logger log = LoggerFactory.getLogger(SwingProcess.class);
 	private static final long LOG_POLLING_PERIOD = 100L;
 	private static ScheduledExecutorService processHandlerThread = Executors.newSingleThreadScheduledExecutor();
@@ -38,6 +38,7 @@ public class SwingProcess{
 	private BufferedReader out;
 	private BufferedReader err;
 	private CloseListener closeListener;
+	private boolean destroying;
 
 	public SwingProcess(String name) {
 		super();
@@ -50,10 +51,10 @@ public class SwingProcess{
 			if (verifyBaseDir()) {
 				processBuilder.directory(new File(baseDir));
 			}
-			log.info("Starting swing process ["+name+"] : " + processBuilder.command());
+			log.info("Starting swing process [" + name + "] : " + processBuilder.command());
 			process = processBuilder.start();
 			logsProcessor = processHandlerThread.scheduleAtFixedRate(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					if (process != null) {
@@ -78,8 +79,7 @@ public class SwingProcess{
 						}
 					}
 				}
-			}, LOG_POLLING_PERIOD, LOG_POLLING_PERIOD,
-					TimeUnit.MILLISECONDS);
+			}, LOG_POLLING_PERIOD, LOG_POLLING_PERIOD, TimeUnit.MILLISECONDS);
 		} else {
 			throw new IllegalStateException("Process is already running.");
 		}
@@ -108,31 +108,39 @@ public class SwingProcess{
 	}
 
 	public void destroy(int delayMs) {
-		try {
-			if(delayMs!=0){
-				log.info("Waiting "+delayMs+"ms for swing process " + name + " to end.");
-				final Thread waitingThread=Thread.currentThread();
-				processHandlerThread.schedule(new Runnable() {
-					
-					@Override
-					public void run() {
-						waitingThread.interrupt();
-					}
-				}, delayMs,TimeUnit.MILLISECONDS);
-				process.waitFor();
-			}
-		} catch (InterruptedException e) {
-			log.info("Killing Swing process " + name + ".");
-			process.destroy();
-		} finally {
-			logsProcessor.cancel(false);
-			if(closeListener!=null){
-				try {
-					log.info("["+name+"] Swing process terminated. ");
-					closeListener.onClose();
-				} catch (Exception e) {
-					log.error("Failed to call onClose on "+closeListener);
+		if (!destroying) {
+			destroying=true;
+			try {
+				if (delayMs != 0) {
+					log.info("Waiting " + delayMs + "ms for swing process " + name + " to end.");
+					final Thread waitingThread = Thread.currentThread();
+					ScheduledFuture<?> interupt = processHandlerThread.schedule(new Runnable() {
+
+						@Override
+						public void run() {
+							waitingThread.interrupt();
+						}
+					}, delayMs, TimeUnit.MILLISECONDS);
+					process.waitFor();
+					interupt.cancel(false);
+				} else {
+					log.info("Killing Swing process " + name + ".");
+					process.destroy();
 				}
+			} catch (InterruptedException e) {
+				log.info("Killing Swing process " + name + ".");
+				process.destroy();
+			} finally {
+				logsProcessor.cancel(false);
+				if (closeListener != null) {
+					try {
+						log.info("[" + name + "] Swing process terminated. ");
+						closeListener.onClose();
+					} catch (Exception e) {
+						log.error("Failed to call onClose on " + closeListener);
+					}
+				}
+				destroying=false;
 			}
 		}
 	}
@@ -155,7 +163,7 @@ public class SwingProcess{
 		if (jreExecutable == null || jreExecutable.isEmpty()) {
 			throw new IllegalArgumentException("JRE executable cannot be empty. Please specify JRE.");
 		}
-		translateAndAdd(cmd,jreExecutable,"jreExecutable");
+		translateAndAdd(cmd, jreExecutable, "jreExecutable");
 		if (jvmArgs != null) {
 			translateAndAdd(cmd, jvmArgs, "jvmArgs");
 		}
@@ -176,88 +184,86 @@ public class SwingProcess{
 		}
 		return cmd.toArray(new String[cmd.size()]);
 	}
-	
-    private void translateAndAdd(List<String> cmd, String args, String fieldName) throws Exception {
-    	try {
-			for(String s: translateCommandline(args)){
+
+	private void translateAndAdd(List<String> cmd, String args, String fieldName) throws Exception {
+		try {
+			for (String s : translateCommandline(args)) {
 				cmd.add(s);
 			}
 		} catch (Exception e) {
-			throw new Exception("Illegal value for '"+fieldName+"' field.",e);
+			throw new Exception("Illegal value for '" + fieldName + "' field.", e);
 		}
 	}
 
 	/**
-     * Copy of method from Apache Ant - Commandline class.
-     * Crack a command line.
-     * @param toProcess the command line to process.
-     * @return the command line broken into strings.
-     * An empty or null toProcess parameter results in a zero sized array.
-     * @throws Exception 
-     */
-    public static String[] translateCommandline(String toProcess) throws Exception {
-        if (toProcess == null || toProcess.length() == 0) {
-            //no command? no string
-            return new String[0];
-        }
-        // parse with a simple finite state machine
+	 * Copy of method from Apache Ant - Commandline class. Crack a command line.
+	 * 
+	 * @param toProcess
+	 *            the command line to process.
+	 * @return the command line broken into strings. An empty or null toProcess
+	 *         parameter results in a zero sized array.
+	 * @throws Exception
+	 */
+	public static String[] translateCommandline(String toProcess) throws Exception {
+		if (toProcess == null || toProcess.length() == 0) {
+			// no command? no string
+			return new String[0];
+		}
+		// parse with a simple finite state machine
 
-        final int normal = 0;
-        final int inQuote = 1;
-        final int inDoubleQuote = 2;
-        int state = normal;
-        final StringTokenizer tok = new StringTokenizer(toProcess, "\"\' ", true);
-        final ArrayList<String> result = new ArrayList<String>();
-        final StringBuilder current = new StringBuilder();
-        boolean lastTokenHasBeenQuoted = false;
+		final int normal = 0;
+		final int inQuote = 1;
+		final int inDoubleQuote = 2;
+		int state = normal;
+		final StringTokenizer tok = new StringTokenizer(toProcess, "\"\' ", true);
+		final ArrayList<String> result = new ArrayList<String>();
+		final StringBuilder current = new StringBuilder();
+		boolean lastTokenHasBeenQuoted = false;
 
-        while (tok.hasMoreTokens()) {
-            String nextTok = tok.nextToken();
-            switch (state) {
-            case inQuote:
-                if ("\'".equals(nextTok)) {
-                    lastTokenHasBeenQuoted = true;
-                    state = normal;
-                } else {
-                    current.append(nextTok);
-                }
-                break;
-            case inDoubleQuote:
-                if ("\"".equals(nextTok)) {
-                    lastTokenHasBeenQuoted = true;
-                    state = normal;
-                } else {
-                    current.append(nextTok);
-                }
-                break;
-            default:
-                if ("\'".equals(nextTok)) {
-                    state = inQuote;
-                } else if ("\"".equals(nextTok)) {
-                    state = inDoubleQuote;
-                } else if (" ".equals(nextTok)) {
-                    if (lastTokenHasBeenQuoted || current.length() != 0) {
-                        result.add(current.toString());
-                        current.setLength(0);
-                    }
-                } else {
-                    current.append(nextTok);
-                }
-                lastTokenHasBeenQuoted = false;
-                break;
-            }
-        }
-        if (lastTokenHasBeenQuoted || current.length() != 0) {
-            result.add(current.toString());
-        }
-        if (state == inQuote || state == inDoubleQuote) {
-            throw new Exception("unbalanced quotes in " + toProcess);
-        }
-        return result.toArray(new String[result.size()]);
-    }
-
-
-
+		while (tok.hasMoreTokens()) {
+			String nextTok = tok.nextToken();
+			switch (state) {
+			case inQuote:
+				if ("\'".equals(nextTok)) {
+					lastTokenHasBeenQuoted = true;
+					state = normal;
+				} else {
+					current.append(nextTok);
+				}
+				break;
+			case inDoubleQuote:
+				if ("\"".equals(nextTok)) {
+					lastTokenHasBeenQuoted = true;
+					state = normal;
+				} else {
+					current.append(nextTok);
+				}
+				break;
+			default:
+				if ("\'".equals(nextTok)) {
+					state = inQuote;
+				} else if ("\"".equals(nextTok)) {
+					state = inDoubleQuote;
+				} else if (" ".equals(nextTok)) {
+					if (lastTokenHasBeenQuoted || current.length() != 0) {
+						result.add(current.toString());
+						current.setLength(0);
+					}
+				} else {
+					current.append(nextTok);
+				}
+				lastTokenHasBeenQuoted = false;
+				break;
+			}
+		}
+		if (lastTokenHasBeenQuoted || current.length() != 0) {
+			result.add(current.toString());
+		}
+		if (state == inQuote || state == inDoubleQuote) {
+			throw new Exception("unbalanced quotes in " + toProcess);
+		}
+		return result.toArray(new String[result.size()]);
+	}
 
 	public String getName() {
 		return name;
@@ -323,7 +329,6 @@ public class SwingProcess{
 		this.args = args;
 	}
 
-	
 	public CloseListener getCloseListener() {
 		return closeListener;
 	}
@@ -331,7 +336,6 @@ public class SwingProcess{
 	public void setCloseListener(CloseListener closeListener) {
 		this.closeListener = closeListener;
 	}
-
 
 	public interface CloseListener {
 		void onClose();
