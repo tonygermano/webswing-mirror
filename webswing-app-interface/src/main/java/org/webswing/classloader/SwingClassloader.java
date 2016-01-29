@@ -182,7 +182,7 @@ public class SwingClassloader extends URLClassLoader {
 			public URL findResource(String name) {
 				// This is to prevent ClassCircularityError caused by custom jar URLStreamHandler (ie. in netbeans platform apps)
 				URL unsafe = super.findResource(name);
-				if (originalJarHandler != null && unsafe != null) {
+				if (originalJarHandler != null && unsafe != null && name.startsWith("jar")) {
 					try {
 						URL safeurl = new URL(null, unsafe.toString(), originalJarHandler);
 						return safeurl;
