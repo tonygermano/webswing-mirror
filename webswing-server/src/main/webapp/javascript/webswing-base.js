@@ -110,13 +110,11 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
         }
 
         function sendMessageEvent(message) {
-            if (api.cfg.hasControl) {
-                api.sendInput({
-                    event : {
-                        type : message
-                    }
-                });
-            }
+            api.sendInput({
+                event : {
+                    type : message
+                }
+            });
         }
 
         function heartbeat() {
@@ -137,11 +135,15 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
         }
 
         function kill() {
-            sendMessageEvent('killSwing');
+        	if (api.cfg.hasControl) {
+        		sendMessageEvent('killSwing');
+        	}
         }
 
         function unload() {
-            sendMessageEvent('unload');
+        	if(!api.cfg.mirrorMode){
+        		sendMessageEvent('unload');
+        	}
         }
 
         function handshake() {
