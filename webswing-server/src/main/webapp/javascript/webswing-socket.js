@@ -73,6 +73,7 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
                 if (response.transport !== 'websocket' && binary) {
                     console.error('Webswing: Binary encoding not supported for ' + response.transport + ' transport. Falling back to json encoding.');
                     api.cfg.binarySocket = false;
+                    binary = false;
                     dispose();
                     connect();
                 }
@@ -112,10 +113,6 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
 
             request.onError = function (response) {
                 api.showDialog(api.connectionErrorDialog);
-            };
-
-            request.onReconnect = function (request, response) {
-                api.showDialog(api.initializingDialog);
             };
 
             socket = atmosphere.subscribe(request);
