@@ -236,11 +236,11 @@ public class SwingJvmConnection implements MessageListener {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
 				throw new RuntimeException("Java version not supported. (Version starting with 1.6 , 1.7 and 1.8 are supported.)");
 			}
-			String bootCp = "-Xbootclasspath/a:" + webSwingToolkitJarPathSpecific + File.pathSeparatorChar + webSwingToolkitJarPath;
+			String bootCp = "-Xbootclasspath/a:\"" + webSwingToolkitJarPathSpecific + "\"" + File.pathSeparatorChar + "\"" + webSwingToolkitJarPath + "\"";
 
 			if (!System.getProperty("os.name", "").startsWith("Windows")) {
 				// filesystem isolation support on non windows systems:
-				bootCp += File.pathSeparatorChar + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator)) + File.separator + "rt-win-shell.jar";
+				bootCp += File.pathSeparatorChar + "\"" + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator)) + File.separator + "rt-win-shell.jar" + "\"";
 			}
 			String debug = appConfig.isDebug() && (debugPort != 0) ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=" + debugPort + ",server=y,suspend=y " : "";
 			String aaFonts = appConfig.isAntiAliasText() ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
