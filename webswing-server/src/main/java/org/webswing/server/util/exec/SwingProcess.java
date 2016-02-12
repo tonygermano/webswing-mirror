@@ -3,6 +3,7 @@ package org.webswing.server.util.exec;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +36,12 @@ public class SwingProcess {
 
 	private Process process;
 	private ScheduledFuture<?> logsProcessor;
-	private BufferedReader out;
-	private BufferedReader err;
+	private InputStream out;
+	private InputStream err;
+	private StringBuilder bufferOut = new StringBuilder();
+	private StringBuilder bufferErr = new StringBuilder();
+	private byte[] buffer = new byte[4096];
+
 	private CloseListener closeListener;
 	private boolean destroying;
 
@@ -59,19 +64,14 @@ public class SwingProcess {
 				public void run() {
 					if (process != null) {
 						if (out == null || err == null) {
-							out = new BufferedReader(new InputStreamReader(process.getInputStream()));
-							err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+							out = process.getInputStream();
+							err = process.getErrorStream();
 						}
 						try {
-							String line;
-							while ((line = out.readLine()) != null) {
-								log.info("[" + name + "] " + line);
-							}
-							while ((line = err.readLine()) != null) {
-								log.error("[" + name + "] " + line);
-							}
-						} catch (IOException e) {
-							log.error("Failed to process process logs for swing process " + name);
+							processStream(out, bufferOut, buffer, name, false);
+							processStream(err, bufferErr, buffer, name, true);
+						} catch (Exception e) {
+							log.error("Failed to process process logs for swing process " + name, e);
 							destroy(0);
 						}
 						if (!SwingProcess.this.isRunning()) {
@@ -109,7 +109,7 @@ public class SwingProcess {
 
 	public void destroy(int delayMs) {
 		if (!destroying) {
-			destroying=true;
+			destroying = true;
 			try {
 				if (delayMs != 0) {
 					log.info("Waiting " + delayMs + "ms for swing process " + name + " to end.");
@@ -140,7 +140,7 @@ public class SwingProcess {
 						log.error("Failed to call onClose on " + closeListener);
 					}
 				}
-				destroying=false;
+				destroying = false;
 			}
 		}
 	}
@@ -263,6 +263,26 @@ public class SwingProcess {
 			throw new Exception("unbalanced quotes in " + toProcess);
 		}
 		return result.toArray(new String[result.size()]);
+	}
+
+	private static void processStream(InputStream out, StringBuilder bufferOut, byte[] buffer, String name,
+			boolean isError) throws IOException {
+		while (out.available() > 0) {
+			int available = out.available();
+			int read = out.read(buffer, 0, available > buffer.length ? buffer.length : available);
+			bufferOut.append(new String(buffer, 0, read));
+			while (bufferOut.indexOf("\n") >= 0) {
+				int indexofNewLine = bufferOut.indexOf("\n");
+				boolean isCR = indexofNewLine > 0 && bufferOut.charAt(indexofNewLine - 1) == '\r';
+				String msg = "[" + name + "] " + bufferOut.subSequence(0, isCR ? indexofNewLine - 1 : indexofNewLine);
+				if (isError) {
+					log.error(msg);
+				} else {
+					log.info(msg);
+				}
+				bufferOut.delete(0, indexofNewLine + 1);
+			}
+		}
 	}
 
 	public String getName() {
