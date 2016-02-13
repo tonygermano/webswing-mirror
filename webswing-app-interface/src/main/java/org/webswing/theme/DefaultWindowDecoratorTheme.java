@@ -323,16 +323,17 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		}
 
 		// resize
-		if (e.getX() > (w.getWidth() - 10) && e.getY() > (w.getHeight() - 10)) {
-			return WindowActionType.resizeUni;
+		if((w instanceof Dialog && ((Dialog) w).isResizable()) || (w instanceof Frame) && ((Frame) w).isResizable()){
+			if (e.getX() > (w.getWidth() - 10) && e.getY() > (w.getHeight() - 10)) {
+				return WindowActionType.resizeUni;
+			}
+			if (e.getX() > (w.getWidth() - i.right)) {
+				return WindowActionType.resizeRight;
+			}
+			if (e.getY() > (w.getHeight() - i.bottom)) {
+				return WindowActionType.resizeBottom;
+			}
 		}
-		if (e.getX() > (w.getWidth() - i.right)) {
-			return WindowActionType.resizeRight;
-		}
-		if (e.getY() > (w.getHeight() - i.bottom)) {
-			return WindowActionType.resizeBottom;
-		}
-
 		if (e.getY() < i.top) {
 			// move
 			return WindowActionType.move;
