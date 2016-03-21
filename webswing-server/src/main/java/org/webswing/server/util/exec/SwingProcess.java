@@ -338,7 +338,11 @@ public class SwingProcess {
 	}
 
 	public void addProperty(String name, String value) {
-		this.properties.put(name, value);
+        if (value == null) {
+            this.properties.remove(name);
+        } else {
+            this.properties.put(name, value);
+        }
 	}
 
 	public String getArgs() {
