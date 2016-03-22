@@ -49,6 +49,9 @@ public class WindowEventHandler {
 						// move to the middle of original size
 						moveWindow(w, (o.x + (o.width / 2)) - (r.width / 2), (o.y + (o.height / 2)) - (r.height / 2));
 					}
+					if (w instanceof JFrame) {
+						((JFrame) w).setExtendedState(JFrame.NORMAL);
+					}
 					previousSize.put(w, o);
 					lockedOnEvent = false;
 				}
@@ -64,6 +67,9 @@ public class WindowEventHandler {
 							o = previousSize.get(w);
 							moveWindow(w, o.x, o.y);
 							resizeWindow(w, o.width, o.height);
+							if (w instanceof JFrame) {
+								((JFrame) w).setExtendedState(JFrame.NORMAL);
+							}
 						} else {
 							if (w instanceof JFrame) {
 								((JFrame) w).setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -95,6 +101,9 @@ public class WindowEventHandler {
 					Window w = (Window) e.getSource();
 					moveWindow(w, e.getXOnScreen() - referenceMouseLocation.x, e.getYOnScreen() - referenceMouseLocation.y);
 				}
+				if (e.getSource() instanceof JFrame) {
+					((JFrame) e.getSource()).setExtendedState(JFrame.NORMAL);
+				}
 				break;
 			case resizeUni:
 				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
@@ -105,6 +114,9 @@ public class WindowEventHandler {
 				if (MouseEvent.MOUSE_DRAGGED == e.getID() && ((MouseEvent) e).getButton() == 1) {
 					Window w = (Window) e.getSource();
 					resizeWindow(w, e.getXOnScreen() - w.getX(), e.getYOnScreen() - w.getY());
+				}
+				if (e.getSource() instanceof JFrame) {
+					((JFrame) e.getSource()).setExtendedState(JFrame.NORMAL);
 				}
 				break;
 			case resizeRight:
@@ -117,6 +129,9 @@ public class WindowEventHandler {
 					Window w = (Window) e.getSource();
 					resizeWindow(w, e.getXOnScreen() - w.getX(), w.getSize().height);
 				}
+				if (e.getSource() instanceof JFrame) {
+					((JFrame) e.getSource()).setExtendedState(JFrame.NORMAL);
+				}
 				break;
 			case resizeBottom:
 				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
@@ -127,6 +142,9 @@ public class WindowEventHandler {
 				if (MouseEvent.MOUSE_DRAGGED == e.getID() && ((MouseEvent) e).getButton() == 1) {
 					Window w = (Window) e.getSource();
 					resizeWindow(w, w.getSize().width, e.getYOnScreen() - w.getY());
+				}
+				if (e.getSource() instanceof JFrame) {
+					((JFrame) e.getSource()).setExtendedState(JFrame.NORMAL);
 				}
 				break;
 			default:

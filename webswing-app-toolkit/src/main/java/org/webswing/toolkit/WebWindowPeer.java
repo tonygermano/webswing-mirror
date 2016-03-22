@@ -3,6 +3,7 @@ package org.webswing.toolkit;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -103,6 +104,10 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
         if (x > (screen.width - 40)) {
             result.x = (screen.width - 40);
         }
+        if((target instanceof Frame) && ((Frame)target).getExtendedState()==Frame.MAXIMIZED_BOTH){
+        	result.x = 0;
+        	result.y = 0;
+        }	
         if (result.x != x || result.y != y) {
             ((Component) target).setLocation(result);
         }

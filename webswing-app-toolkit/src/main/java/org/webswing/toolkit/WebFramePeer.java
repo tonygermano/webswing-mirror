@@ -18,6 +18,7 @@ public class WebFramePeer extends WebWindowPeer implements FramePeer {
 
 	public WebFramePeer(Frame t) {
 		super(t);
+		state=t.getExtendedState();
 	}
 
 	public void setMenuBar(MenuBar paramMenuBar) {
@@ -54,6 +55,12 @@ public class WebFramePeer extends WebWindowPeer implements FramePeer {
 
 	public Rectangle getBoundsPrivate() {
 		return null;
+	}
+	
+	@Override
+	public void show() {
+		super.show();
+		setState(state);//maximize if necessary
 	}
 
 }
