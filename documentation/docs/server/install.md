@@ -1,4 +1,4 @@
-## Instalation Guide
+## Installation Guide
 Webswing is packaged and distributed as a fully working demo package for your convenience, so no complicated installation is needed. Just unpack the distribution zip file and you are good to go. The only prerequisite is to have a supported version of Java installed. 
 
 Supported Java versions are
@@ -11,7 +11,7 @@ Supported Java versions are
 
 ## Starting on Windows 
 
-If you are using Windows operating system, you can use the `webswing.bat` script, which executes the following command: 
+If you are using the Windows operating system, you can use the `start.bat` script, which executes the following command: 
 
 ```
 java -jar webswing-server.war -j jetty.properties
@@ -23,11 +23,11 @@ java -jar webswing-server.war -j jetty.properties
 
 ## Starting on Linux 
 
-Starting Webswing on Linux desktop (within XServer) session is as simple as running the above command - same as on Windows.
+Starting Webswing on a Linux desktop (within XServer) session is as simple as running the above command--the same as on Windows.
 
-In most cases however, the linux server is a headless box. In these cases you would get an error when running the above command, because swing framework depends on graphical environment. To overcome this we can use X virtual frame buffer (`Xvfb`) to satisfy these dependencies. 
+In most cases however, the linux server is a headless box. In these cases you would get an error when running the above command, because the Swing framework requires a graphical environment. To overcome this, we can use X virtual frame buffer (`Xvfb`) to satisfy these dependencies. 
 
-Please install the following linux packages to satisfy all Swing framework dependencies (names are from ubuntu repositories - use relevant counterparts for your distribution):
+Please install the following linux packages to satisfy all Swing framework dependencies (names are from Ubuntu repositories - use relevant counterparts for your distribution):
 
 * **xvfb**
 * **libxext6**
@@ -36,16 +36,16 @@ Please install the following linux packages to satisfy all Swing framework depen
 * **libxrender1**
 
 
-Webswing distribution contains a convenience linux start script - `webswing.sh`. Script uses default startup settings. 
+The Webswing distribution contains a convenience Linux startup script - `start.sh`, which uses default startup settings. 
 
 ```shell
-export HOME=<webswing.sh location>
+export HOME=<start.sh location>
 export OPTS="-h 0.0.0.0 -j $HOME/jetty.properties -u $HOME/user.properties -c $HOME/webswing.config"
 export JAVA_HOME=$JAVA_HOME
 export JAVA_OPTS="-Xmx128M" 
 ```
 
-These may be overriden by setting following environment variables: 
+These may be overriden by setting the following environment variables: 
 
 * WEBSWING_HOME
 * WEBSWING_OPTS
@@ -59,24 +59,24 @@ for example:
 WEBSWING_HOME=/home/webswing WEBSWING_JAVA_HOME=/var/share/jdk8 ./webswing.sh start
 ```
 
-When started, this script will create two additional files in `HOME` folder (by default).
+When started, this script will create two additional files in the `HOME` folder (by default).
 
 * `webswing.pid` storing the pid of current webswing process
 * `webswing.out` standard output and error is redirected to this file.
 
-For running the script you have following options:
+When running the script you have following options:
 
 ```
-Usage: webswing.sh {run|start|stop|restart|status}
+Usage: start.sh {run|start|stop|restart|status}
 ``` 
 
 Command 	        | Description
 --------------------| ------------
-webswing.sh run        | This command can be used to start Webswing if you are inside X session. This will block the terminal until server stops. 
-webswing.sh start      | Start Webswing as deamon in new Xvfb session using the `xvfb-run` command
-webswing.sh stop       | Stops running Webswing server
-webswing.sh restart    | Stops and starts Webswing server
-webswing.sh status     | Checks if webswing server is running. 
+start.sh run        | This command can be used to start Webswing if you are inside X session. This will block the terminal until server stops. 
+start.sh start      | Start Webswing as deamon in new Xvfb session using the `xvfb-run` command
+start.sh stop       | Stops running Webswing server
+start.sh restart    | Stops and starts Webswing server
+start.sh status     | Checks if webswing server is running. 
 
 ---
 
