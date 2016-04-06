@@ -11,7 +11,7 @@ Supported Java versions are
 
 ## Starting on Windows 
 
-If you are using the Windows operating system, you can use the `start.bat` script, which executes the following command: 
+If you are using the Windows operating system, you can use the `webswing.bat` script, which executes the following command: 
 
 ```
 java -jar webswing-server.war -j jetty.properties
@@ -36,10 +36,10 @@ Please install the following linux packages to satisfy all Swing framework depen
 * **libxrender1**
 
 
-The Webswing distribution contains a convenience Linux startup script - `start.sh`, which uses default startup settings. 
+The Webswing distribution contains a convenience Linux startup script - `webswing.sh`, which uses default startup settings. 
 
 ```shell
-export HOME=<start.sh location>
+export HOME=<webswing.sh location>
 export OPTS="-h 0.0.0.0 -j $HOME/jetty.properties -u $HOME/user.properties -c $HOME/webswing.config"
 export JAVA_HOME=$JAVA_HOME
 export JAVA_OPTS="-Xmx128M" 
@@ -67,16 +67,16 @@ When started, this script will create two additional files in the `HOME` folder 
 When running the script you have following options:
 
 ```
-Usage: start.sh {run|start|stop|restart|status}
+Usage: webswing.sh {run|start|stop|restart|status}
 ``` 
 
 Command 	        | Description
 --------------------| ------------
-start.sh run        | This command can be used to start Webswing if you are inside X session. This will block the terminal until server stops. 
-start.sh start      | Start Webswing as deamon in new Xvfb session using the `xvfb-run` command
-start.sh stop       | Stops running Webswing server
-start.sh restart    | Stops and starts Webswing server
-start.sh status     | Checks if webswing server is running. 
+webswing.sh run        | This command can be used to start Webswing if you are inside X session. This will block the terminal until server stops. 
+webswing.sh start      | Start Webswing as deamon in new Xvfb session using the `xvfb-run` command
+webswing.sh stop       | Stops running Webswing server
+webswing.sh restart    | Stops and starts Webswing server
+webswing.sh status     | Checks if webswing server is running. 
 
 ---
 
