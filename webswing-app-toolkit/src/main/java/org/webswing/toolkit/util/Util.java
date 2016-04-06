@@ -281,7 +281,7 @@ public class Util {
 
 	public static boolean isWindowDecorationEvent(Window w, AWTEvent e) {
 		if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID()) {
-			return isWindowDecorationPosition(w, new Point(((MouseEvent) e).getXOnScreen(), ((MouseEvent) e).getYOnScreen()));
+			return isWindowDecorationPosition((Window) w, new Point(((MouseEvent) e).getXOnScreen(), ((MouseEvent) e).getYOnScreen()));
 		}
 		return false;
 	}

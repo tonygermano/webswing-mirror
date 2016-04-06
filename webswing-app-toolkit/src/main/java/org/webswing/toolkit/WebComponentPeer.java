@@ -14,6 +14,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.SystemColor;
@@ -27,11 +28,12 @@ import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
 import java.awt.peer.ContainerPeer;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.UUID;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.GraphicsWrapper;
@@ -68,25 +70,42 @@ public class WebComponentPeer implements ComponentPeer {
 
 	public BufferedImage extractBufferedImage(Rectangle sub) {
 		BufferedImage safeImage = new BufferedImage(sub.width, sub.height, BufferedImage.TYPE_4BYTE_ABGR);
-		Graphics g = safeImage.getGraphics();
+		Graphics2D g = (Graphics2D) safeImage.getGraphics();
 		g.drawImage(image, 0, 0, sub.width, sub.height, sub.x, sub.y, sub.x + sub.width, sub.y + sub.height, null);
+		for (WebComponentPeer wcp : hwLayers) {
+			Insets i = ((Window) this.getTarget()).getInsets();
+			Rectangle b = wcp.getBounds();
+			Rectangle bt = new Rectangle(b.x + i.left, b.y + i.top, b.width, b.height);
+			if (bt.intersects(sub)) {
+				Rectangle dst = sub.intersection(bt);
+				Rectangle src = new Rectangle(dst);
+				dst.translate(-sub.x, -sub.y);
+				src.translate(-bt.x, -bt.y);
+				g.drawImage(wcp.image, dst.x, dst.y, dst.width + dst.x, dst.height + dst.y, src.x, src.y, src.width + src.x, src.height + src.y, null);
+			}
+		}
 		g.drawImage(windowDecorationImage, 0, 0, sub.width, sub.height, sub.x, sub.y, sub.x + sub.width, sub.y + sub.height, null);
 		g.dispose();
 		return safeImage;
 	}
 
 	public Image extractWebImage() {
+		Graphics g = webImage.getGraphics();
 		if (windowDecorationImage != null && Services.getDirectDrawService().isDirty(windowDecorationImage)) {
-			Graphics g = webImage.getGraphics();
 			g.drawImage(windowDecorationImage, 0, 0, null);
-			g.dispose();
 			Services.getDirectDrawService().resetImage(windowDecorationImage);
 		}
+		for (WebComponentPeer wcp : hwLayers) {
+			Point p = SwingUtilities.convertPoint((Component) wcp.getTarget(), new Point(0,0), (Component) this.getTarget());
+			g.drawImage(wcp.webImage, p.x,p.y, null);
+			Services.getDirectDrawService().resetImage(wcp.webImage);
+		}
+		g.dispose();
 		return Services.getDirectDrawService().extractWebImage(webImage);
 	}
 
 	public void updateWindowDecorationImage() {
-		if (target != null && !(target instanceof JWindow) && isInitialized()) {
+		if (target != null && (target instanceof JDialog || target instanceof JFrame) && isInitialized()) {
 			if ((target instanceof JFrame && ((JFrame) target).isUndecorated()) || (target instanceof JDialog && ((JDialog) target).isUndecorated())) {
 				// window decoration is not painted
 			} else {
@@ -114,6 +133,18 @@ public class WebComponentPeer implements ComponentPeer {
 			return image != null;
 		}
 	}
+	
+	public Component getHwComponentAt(int x,int y){
+		Component result = (Component) getTarget();
+		for(Iterator<WebComponentPeer> i=hwLayers.iterator();i.hasNext();){
+			WebComponentPeer wcp = i.next();
+			Insets insets = ((Window) this.getTarget()).getInsets();
+			if(wcp.getBounds().contains(x-getBounds().x-insets.left, y-getBounds().y-insets.top)){
+				result=(Component) wcp.getTarget();
+			}
+		}
+		return result;
+	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////
 	// /////////////////// WebComponentPeer
@@ -129,8 +160,9 @@ public class WebComponentPeer implements ComponentPeer {
 	private int oldX;
 	private int oldY;
 	private SurfaceData surfaceData;
-	private OffScreenImage image;
+	OffScreenImage image;
 	private Image windowDecorationImage;
+	private LinkedList<WebComponentPeer> hwLayers = new LinkedList<WebComponentPeer>();
 	Image webImage; // directdraw
 	private Color background;
 	private Color foreground;
@@ -211,7 +243,7 @@ public class WebComponentPeer implements ComponentPeer {
 			}
 
 			if ((validPosition.x != this.oldX) || (validPosition.y != this.oldY) || (w != this.oldWidth) || (h != this.oldHeight)) {
-				if (oldWidth != 0 && oldHeight != 0) {
+				if (oldWidth != 0 && oldHeight != 0 && target instanceof Window) {
 					WindowManager.getInstance().requestRepaintAfterMove((Window) target, new Rectangle(oldX, oldY, oldWidth, oldHeight));
 				}
 				this.oldX = validPosition.x;
@@ -278,7 +310,9 @@ public class WebComponentPeer implements ComponentPeer {
 	}
 
 	public Point getLocationOnScreen() {
-		return getBounds().getLocation();
+		Point p = new Point(0,0);
+		SwingUtilities.convertPointToScreen(p, (Component) getTarget());
+		return p;
 	}
 
 	public Dimension getPreferredSize() {
@@ -371,7 +405,7 @@ public class WebComponentPeer implements ComponentPeer {
 			Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(null, DndEventHandler.getCurrentDropTargetCursorName());
 		} else {
 			Point location = Util.getWebToolkit().getEventDispatcher().getLastMousePosition();
-			if (location != null) {
+			if (location != null && target instanceof Window) {
 				Window window = (Window) target;
 				boolean b = Util.isWindowDecorationPosition(window, location);
 				if (b) {
@@ -399,7 +433,11 @@ public class WebComponentPeer implements ComponentPeer {
 	}
 
 	public boolean requestFocus(Component paramComponent, boolean temporary, boolean focusedWindowChangeAllowed, long time, Cause paramCause) {
-		return Util.getWebToolkit().getWindowManager().activateWindow((Window) target, paramComponent, 0, 0, temporary, focusedWindowChangeAllowed, paramCause);
+		if (target instanceof Window) {
+			return Util.getWebToolkit().getWindowManager().activateWindow((Window) target, paramComponent, 0, 0, temporary, focusedWindowChangeAllowed, paramCause);
+		} else {
+			return false;
+		}
 	}
 
 	public boolean isFocusable() {
@@ -503,6 +541,14 @@ public class WebComponentPeer implements ComponentPeer {
 
 	public boolean updateGraphicsData(GraphicsConfiguration gc) {
 		return Util.getWebToolkit().webConpoenentPeerUpdateGraphicsData();
+	}
+
+	protected void removeHwLayer(WebComponentPeer peer) {
+		hwLayers.remove(peer);
+	}
+
+	protected void addHwLayer(WebComponentPeer peer) {
+		hwLayers.add(peer);
 	}
 
 }

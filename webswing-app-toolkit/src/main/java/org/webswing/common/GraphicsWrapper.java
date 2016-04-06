@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Paint;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.RenderingHints.Key;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.WebComponentPeer;
+import org.webswing.toolkit.WebPanelPeer;
 import org.webswing.toolkit.util.Util;
 
 public class GraphicsWrapper extends Graphics2D {
@@ -47,6 +49,10 @@ public class GraphicsWrapper extends Graphics2D {
 
     private void addDirtyRectangleArea(Rectangle r) {
         r.translate((int) getTransform().getTranslateX(), (int) getTransform().getTranslateY());
+        if(rootPaintComponent instanceof WebPanelPeer){
+        	Point o = ((WebPanelPeer)rootPaintComponent).getOffset();
+        	r.translate(o.x,o.y);
+        }
         Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(rootPaintComponent.getGuid(), r);
     }
 
