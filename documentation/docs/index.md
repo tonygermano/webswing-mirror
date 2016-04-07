@@ -70,7 +70,7 @@ Download the distribution from [Webswing home page](http://www.webswing.org) and
 
 Open a command prompt and make sure you are using the current java executable. (Verify by running java -version at the command prompt.)
 
-Double click on the `start.bat` file to start the Webswing server.
+Double click on the `webswing.bat` file to start the Webswing server.
 
 ![started webswing server](img/webswing-running.png)
 
