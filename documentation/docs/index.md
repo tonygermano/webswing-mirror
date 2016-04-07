@@ -12,7 +12,7 @@ Documentation sources are located in [/documentation folder](https://bitbucket.o
 
 ##Overview
 Webswing is a specialized web server for running any Swing based Java application in your browser. Webswing 
-offers unique instant solution for: 
+offers a unique and instant solution for: 
 
 * **[Swing Applications](app/swing.md)**
 * **[Java Applets](app/applet.md)**
@@ -28,7 +28,7 @@ all this with:
 
 ##Features
  
-Webswing provides many convenient integrated features which makes working with webswing application as easy as if they were running localy. 
+Webswing provides many convenient integrated features which makes working with webswing applications as easy as if they were running locally. 
 
 * **[Printing integration](app/integration.md#printing) with preview**
 * **[Filesystem integration](app/integration.md#filesystem) - download / upload / delete  files in isolated folder**
@@ -40,14 +40,14 @@ Webswing provides many convenient integrated features which makes working with w
 * **Configure your application from admin console**
 * **Configurable Swing window decoration themes**
 * **Java 6, 7 and 8 support**
-* **[DirectDraw](dev/development.md#directdraw-rendering) - renering directly from Java2d to HTML Canvas**
+* **[DirectDraw](dev/development.md#directdraw-rendering) - rendering directly from Java2d to HTML Canvas**
 
-Running your application in Webswing brings many advantages compared to standard desktop use like:
+Running your application in Webswing brings many advantages compared to standard desktop use, such as:
 
 * **Swing application codebase protection**
 * **Easy distribution of new application version**
 * **Control of Java version used for running Swing applications**
-* **No security threats from outdated Java runtime on client machines**
+* **No security threats from outdated Java runtimes on client machines**
 * **Faster connection to backend services**
 * **Centralized access management**
 
@@ -62,19 +62,19 @@ This step by step guide will help you install and start Webswing server and setu
 1. JRE 6,7 or 8 installed
 2. Modern browser installed  
 
-For the purpose of this guide we will use Windows based box. Linux installation is covered in separate page. 
+For the purpose of this guide we will use a Windows-based box. Linux installation is covered in separate page. 
 
-Download the distribution from [Webswing home page](http://www.webswing.org) and unzip it to new folder. For demonstration we will `C:\webswing`
+Download the distribution from [Webswing home page](http://www.webswing.org) and unzip it to new folder. For demonstration purposes we will use `C:\webswing`
 
 ![unzipped webswing distribution](img/unzipped-distribution.png)
 
-Open the webswing.bat in text editor and make sure you are using the corrent java executable. (Verify by running java -version in your command line.)
+Open a command prompt and make sure you are using the current java executable. (Verify by running java -version at the command prompt.)
 
-Double click on `webswing.bat` file to start Webswing server.
+Double click on the `webswing.bat` file to start the Webswing server.
 
 ![started webswing server](img/webswing-running.png)
 
-Open your borwser to address [http://localhost:8080](http://localhost:8080)
+Open your browser to address [http://localhost:8080](http://localhost:8080)
 
 ![webswing login screen](img/login-screen.png)
  
@@ -82,15 +82,15 @@ Login using the default username and password `admin` and `pwd`.
 
 ![application selector screen](img/app-selector.png)
 
-Now you can see the list of demo applications and Admin console icon in the selection. Click on the `Admin console`.
+Now you can see the list of demo applications and the Admin console icon in the selection. Click on the `Admin console`.
 
 ![admin console screen](img/admin-console.png)
 
-In Admin console navigate to `Settings` -> `Server configuration`. Here we can add new swing application to `webswing.config` json configuration file.
+In Admin console navigate to `Settings` -> `Server configuration`. Here we can add a new swing application to the `webswing.config` json configuration file.
 
 ![admin console - server configuration screen](img/server-configuration.png)
 
-Click on the `New` button on the `Swing applications` tab. And fill in the basic details as required. Hover over the question mark for setting explanation.
+Click on the `New` button on the `Swing applications` tab, and fill in the basic details as required. Hover over the question marks for setting explanations.
 
 ![admin console - new app](img/new-swing-app.png)
 
@@ -102,13 +102,13 @@ Setup security
 
 ![admin console - new app](img/new-swing-app3.png)
 
-Now click on the `Apply` button to save and apply the new configuration.
+Now click the `Apply` button to save and apply the new configuration.
 
 Load the first page again,  [http://localhost:8080](http://localhost:8080), where you should see the newly configured application. 
 
 ![admin console - new app](img/selector-screen-new.png)
 
-Click on the application to start the swing inside the browser. 
+Click on the application to start the Swing application inside the browser. 
  
 ![admin console - new app](img/swing-running.png)
 
