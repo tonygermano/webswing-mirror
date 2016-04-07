@@ -10,7 +10,7 @@
 
         function getBaseLocation() {
             var path = document.location.toString();
-            path = path.substring(0, path.lastIndexOf('#'));
+            path = path.lastIndexOf('#') > -1 ? path.substring(0, path.lastIndexOf('#')) : path;
             path = path.substring(0, path.lastIndexOf('/admin'));
             return path;
         }
