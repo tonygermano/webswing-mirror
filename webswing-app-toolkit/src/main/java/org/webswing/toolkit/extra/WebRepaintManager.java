@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Window;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,8 +15,10 @@ import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
-public class WebRepaintManager extends RepaintManager {
+import org.webswing.toolkit.util.Logger;
 
+public class WebRepaintManager extends RepaintManager {
+    
 	private RepaintManager delegate;
 	private Map<Container, Rectangle> dirty = new HashMap<Container, Rectangle>();
 

@@ -157,6 +157,16 @@ public class WindowManager {
 		}
 		return positionWin;
 	}
+	
+	@SuppressWarnings("deprecation")
+	public Component getVisibleComponentOnPosition(int x, int y) {
+		Component result = activeWindow;	
+		Window positionWin = zorder.getVisibleWindowOnPosition(x, y);
+		if(positionWin!=null){
+			result=((WebComponentPeer)positionWin.getPeer()).getHwComponentAt(x,y);
+		}
+		return result;
+	}
 
 	public Map<String, List<Rectangle>> extractNonVisibleAreas() {
 		return zorder.extractNonVisibleAreas();

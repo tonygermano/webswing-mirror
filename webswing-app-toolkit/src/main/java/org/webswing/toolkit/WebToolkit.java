@@ -22,6 +22,7 @@ import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.PageAttributes;
+import java.awt.Panel;
 import java.awt.PopupMenu;
 import java.awt.PrintJob;
 import java.awt.RenderingHints;
@@ -61,6 +62,7 @@ import java.awt.peer.MenuBarPeer;
 import java.awt.peer.MenuItemPeer;
 import java.awt.peer.MenuPeer;
 import java.awt.peer.MouseInfoPeer;
+import java.awt.peer.PanelPeer;
 import java.awt.peer.PopupMenuPeer;
 import java.awt.peer.RobotPeer;
 import java.awt.peer.ScrollPanePeer;
@@ -219,6 +221,12 @@ public abstract class WebToolkit extends SunToolkit {
 		return localwindowPeer;
 	}
 
+    public PanelPeer createPanel(Panel panel) {
+    	WebPanelPeer localpanelPeer = new WebPanelPeer(panel);
+        targetCreatedPeer(panel, localpanelPeer);
+        return localpanelPeer;
+    }
+        
 	@Override
 	protected synchronized MouseInfoPeer getMouseInfoPeer() {
 		{

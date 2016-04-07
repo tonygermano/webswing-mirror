@@ -1,5 +1,6 @@
 package org.webswing.toolkit.extra;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -30,7 +31,7 @@ public class WindowEventHandler {
 				lockedOnEvent = true;
 				lockEventType = wat;
 				referenceMouseLocation = e.getPoint();
-				window = (Window) e.getSource();
+				window = (Window) (e.getSource() instanceof Window ? e.getSource() : SwingUtilities.windowForComponent((Component) e.getSource()));
 			}
 		} else {
 			switch (lockEventType) {

@@ -185,25 +185,25 @@ public class WebEventDispatcher {
 	}
 
 	private void dispatchMouseEvent(MouseEventMsgIn event) {
-		Window w = null;
+		Component c = null;
 		if (WindowManager.getInstance().isLockedToWindowDecorationHandler()) {
-			w = WindowManager.getInstance().getLockedToWindow();
+			c = WindowManager.getInstance().getLockedToWindow();
 		} else {
-			w = WindowManager.getInstance().getVisibleWindowOnPosition(event.getX(), event.getY());
+			c = WindowManager.getInstance().getVisibleComponentOnPosition(event.getX(), event.getY());
 			if (lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButton() == 1) || (event.getType() == MouseEventType.mouseup))) {
-				w = (Window) lastMouseEvent.getSource();
+				c = (Component) lastMouseEvent.getSource();
 			}
 		}
-		if (w == null) {
+		if (c == null) {
 			if (Util.getWebToolkit().getPaintDispatcher() != null) {
 				Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 			return;
 		}
-		if (w != null) {
+		if (c != null) {
 			MouseEvent e = null;
-			int x = event.getX() - w.getX();
-			int y = event.getY() - w.getY();
+			int x = (int) (event.getX() - c.getLocationOnScreen().getX());
+			int y = (int) (event.getY() - c.getLocationOnScreen().getY());
 			lastMousePosition.x = event.getX();
 			lastMousePosition.y = event.getY();
 			long when = System.currentTimeMillis();
@@ -212,25 +212,26 @@ public class WebEventDispatcher {
 			int clickcount = 0;
 			int buttons = Util.getMouseButtonsAWTFlag(event.getButton());
 			if (buttons != 0 && event.getType() == MouseEventType.mousedown) {
+				Window w= (Window) (c instanceof Window? c:SwingUtilities.windowForComponent(c));
 				WindowManager.getInstance().activateWindow(w, null, x, y, false, true, CausedFocusEvent.Cause.MOUSE_EVENT);
 			}
 			switch (event.getType()) {
 			case mousemove:
 				id = event.getButton() == 1 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
-				e = new MouseEvent(w, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
+				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
 				lastMouseEvent = e;
-				dispatchEventInSwing(w, e);
+				dispatchEventInSwing(c, e);
 				break;
 			case mouseup:
 				id = MouseEvent.MOUSE_RELEASED;
 				boolean popupTrigger = (buttons == 3) ? true : false;
 				clickcount = computeClickCount(x, y, buttons, false);
 				modifiers = modifiers & (((1 << 6) - 1) | (~((1 << 14) - 1)) | MouseEvent.CTRL_DOWN_MASK | MouseEvent.ALT_DOWN_MASK | MouseEvent.SHIFT_DOWN_MASK | MouseEvent.META_DOWN_MASK);
-				e = new MouseEvent(w, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
-				dispatchEventInSwing(w, e);
+				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
+				dispatchEventInSwing(c, e);
 				if (lastMousePressEvent != null && lastMousePressEvent.getX() == x && lastMousePressEvent.getY() == y) {
-					e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
-					dispatchEventInSwing(w, e);
+					e = new MouseEvent(c, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
+					dispatchEventInSwing(c, e);
 					lastMouseEvent = e;
 					lastMousePressEvent = e;
 				} else {
@@ -241,8 +242,8 @@ public class WebEventDispatcher {
 			case mousedown:
 				id = MouseEvent.MOUSE_PRESSED;
 				clickcount = computeClickCount(x, y, buttons, true);
-				e = new MouseEvent(w, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
-				dispatchEventInSwing(w, e);
+				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
+				dispatchEventInSwing(c, e);
 				lastMousePressEvent = e;
 				lastMouseEvent = e;
 				break;
@@ -250,8 +251,8 @@ public class WebEventDispatcher {
 				id = MouseEvent.MOUSE_WHEEL;
 				buttons = 0;
 				modifiers = 0;
-				e = new MouseWheelEvent(w, id, when, modifiers, x, y, clickcount, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 3, event.getWheelDelta());
-				dispatchEventInSwing(w, e);
+				e = new MouseWheelEvent(c, id, when, modifiers, x, y, clickcount, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 3, event.getWheelDelta());
+				dispatchEventInSwing(c, e);
 				break;
 			case dblclick:
 				// e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when,
@@ -382,7 +383,8 @@ public class WebEventDispatcher {
 		dndHandler.dragStart(peer, transferable, actions, formats);
 	}
 
-	public static void dispatchEventInSwing(final Window w, final AWTEvent e) {
+	public static void dispatchEventInSwing(final Component c, final AWTEvent e) {
+		Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
 		if (e instanceof MouseEvent) {
 			w.setCursor(w.getCursor());// force cursor update
 		}
