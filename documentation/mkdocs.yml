@@ -6,7 +6,7 @@ repo_url: https://bitbucket.org/meszarv/webswing/src
 pages:
 - Introduction : index.md
 - Server: 
-    - 'Instalation guide' : server/install.md
+    - 'Installation guide' : server/install.md
     - 'Startup options' : server/setup.md
     - 'Login configuration' : server/auth.md
     - 'Tomcat deployment' : server/tomcat.md
@@ -15,7 +15,7 @@ pages:
     - 'Netbeans Platform' : app/netbeans.md
     - 'Java Applets' : app/applet.md
     - 'Desktop Integration' : app/integration.md
-    - 'Embeding and URL settings' : app/browser.md
+    - 'Embedding and URL settings' : app/browser.md
     - 'JsLink: java <-> javascript' : app/jslink.md
 - 'Development': dev/development.md
 - 'FAQ' : faq.md
