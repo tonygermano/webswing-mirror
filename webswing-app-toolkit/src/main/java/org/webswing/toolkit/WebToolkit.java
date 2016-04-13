@@ -77,6 +77,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.swing.JLabel;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
@@ -97,7 +98,8 @@ import sun.print.PrintJob2D;
 public abstract class WebToolkit extends SunToolkit {
 
 	public static final String BACKGROUND_WINDOW_ID = "BG";
-
+	private static Object TREELOCK = null;
+	
 	private WebEventDispatcher eventDispatcher = new WebEventDispatcher();
 	private WebPaintDispatcher paintDispatcher = new WebPaintDispatcher();
 
@@ -534,5 +536,12 @@ public abstract class WebToolkit extends SunToolkit {
 			}
 		});
 
+	}
+
+	public Object getTreeLock() {
+		if(TREELOCK==null){
+			TREELOCK=new JLabel().getTreeLock();
+		}
+		return TREELOCK;
 	}
 }

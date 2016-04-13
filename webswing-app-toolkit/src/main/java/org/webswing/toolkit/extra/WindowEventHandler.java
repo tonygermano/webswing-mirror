@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.WindowActionType;
+import org.webswing.dispatch.WebPaintDispatcher;
 
 public class WindowEventHandler {
 

@@ -66,42 +66,44 @@ public class WebPaintDispatcher {
 					Map<String, Image> windowWebImages = null;
 					Map<String, List<Rectangle>> windowNonVisibleAreas;
 					Map<String, Set<Rectangle>> currentAreasToUpdate = null;
-					synchronized (webPaintLock) {
-						if (clientReadyToReceive) {
-							if (RepaintManager.currentManager(null) instanceof WebRepaintManager) {
-								((WebRepaintManager) RepaintManager.currentManager(null)).process();
-							}
-							lastReadyStateTime = System.currentTimeMillis();
-						}
-						if ((areasToUpdate.size() == 0 && moveAction == null) || !clientReadyToReceive) {
-							if (!clientReadyToReceive && (System.currentTimeMillis() - lastReadyStateTime) > 2000) {
-								Logger.info("contentSender.readyToReceive re-enabled after timeout");
-								if (Util.isDD()) {
-									Services.getDirectDrawService().resetCache();
+					synchronized (Util.getWebToolkit().getTreeLock()) {
+						synchronized (webPaintLock) {
+							if (clientReadyToReceive) {
+								if (RepaintManager.currentManager(null) instanceof WebRepaintManager) {
+									((WebRepaintManager) RepaintManager.currentManager(null)).process();
 								}
-								clientReadyToReceive = true;
+								lastReadyStateTime = System.currentTimeMillis();
 							}
-							return;
+							if ((areasToUpdate.size() == 0 && moveAction == null) || !clientReadyToReceive) {
+								if (!clientReadyToReceive && (System.currentTimeMillis() - lastReadyStateTime) > 2000) {
+									Logger.info("contentSender.readyToReceive re-enabled after timeout");
+									if (Util.isDD()) {
+										Services.getDirectDrawService().resetCache();
+									}
+									clientReadyToReceive = true;
+								}
+								return;
+							}
+							currentAreasToUpdate = areasToUpdate;
+							areasToUpdate = Util.postponeNonShowingAreas(currentAreasToUpdate);
+							if (currentAreasToUpdate.size() == 0 && moveAction == null) {
+								return;
+							}
+							windowNonVisibleAreas = WindowManager.getInstance().extractNonVisibleAreas();
+							json = Util.fillJsonWithWindowsData(currentAreasToUpdate, windowNonVisibleAreas);
+							if (Util.isDD()) {
+								windowWebImages = new HashMap<String, Image>();
+								windowWebImages = Util.extractWindowWebImages(json, windowWebImages);
+							} else {
+								windowImages = new HashMap<String, Map<Integer, BufferedImage>>();
+								windowImages = Util.extractWindowImages(json, windowImages);
+							}
+							if (moveAction != null) {
+								json.setMoveAction(moveAction);
+								moveAction = null;
+							}
+							clientReadyToReceive = false;
 						}
-						currentAreasToUpdate = areasToUpdate;
-						areasToUpdate = Util.postponeNonShowingAreas(currentAreasToUpdate);
-						if (currentAreasToUpdate.size() == 0 && moveAction == null) {
-							return;
-						}
-						windowNonVisibleAreas = WindowManager.getInstance().extractNonVisibleAreas();
-						json = Util.fillJsonWithWindowsData(currentAreasToUpdate, windowNonVisibleAreas);
-						if (Util.isDD()) {
-							windowWebImages = new HashMap<String, Image>();
-							windowWebImages = Util.extractWindowWebImages(json, windowWebImages);
-						} else {
-							windowImages = new HashMap<String, Map<Integer, BufferedImage>>();
-							windowImages = Util.extractWindowImages(json, windowImages);
-						}
-						if (moveAction != null) {
-							json.setMoveAction(moveAction);
-							moveAction = null;
-						}
-						clientReadyToReceive = false;
 					}
 					Logger.trace("contentSender:paintJson", json);
 					if (Util.isDD()) {

@@ -19,4 +19,6 @@ public interface DirectDrawService {
 	VolatileImage createVolatileImage(int width, int height, ImageCapabilities caps, int transparency);
 
 	void resetImage(Image webImage);
+
+	void resetImageBeforeRepaint(Image webImage);
 }

@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Panel;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.lang.reflect.Field;
@@ -16,9 +17,10 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Util;
 
 public class WebRepaintManager extends RepaintManager {
-    
+
 	private RepaintManager delegate;
 	private Map<Container, Rectangle> dirty = new HashMap<Container, Rectangle>();
 
@@ -84,7 +86,14 @@ public class WebRepaintManager extends RepaintManager {
 			for (Container c : dirty.keySet()) {
 				Rectangle r = dirty.get(c);
 				if (c instanceof JComponent) {
-					delegate.addDirtyRegion((JComponent) c, r.x, r.y, r.width, r.height);
+					Panel p = Util.findHwComponentParent((JComponent) c);
+					if (p != null) {
+						for (Component chld : p.getComponents()) {
+							delegate.addDirtyRegion((JComponent) chld, 0, 0, chld.getWidth(), chld.getHeight());
+						}
+					} else {
+						delegate.addDirtyRegion((JComponent) c, r.x, r.y, r.width, r.height);
+					}
 				} else if (c instanceof Window) {
 					delegate.addDirtyRegion((Window) c, r.x, r.y, r.width, r.height);
 				} else if (c instanceof Applet) {

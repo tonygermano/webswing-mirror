@@ -2,6 +2,7 @@ package org.webswing.toolkit;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.Point;
@@ -9,6 +10,8 @@ import java.awt.Window;
 import java.awt.peer.PanelPeer;
 
 import javax.swing.SwingUtilities;
+
+import org.webswing.common.GraphicsWrapper;
 
 public class WebPanelPeer extends WebContainerPeer implements PanelPeer {
 
@@ -49,9 +52,10 @@ public class WebPanelPeer extends WebContainerPeer implements PanelPeer {
 		getParentWindowPeer().removeHwLayer(this);
 	}
 
-	public Point getOffset() {
-		Point p = new Point(0,0);
-		return SwingUtilities.convertPoint((Component) target, p, (Component) getParentWindowPeer().getTarget());
+	@Override
+	public Graphics getGraphics() {
+		GraphicsWrapper g = (GraphicsWrapper) super.getGraphics();
+		g.setOffset(SwingUtilities.convertPoint((Component) target, new Point(0, 0), (Component) getParentWindowPeer().getTarget()));
+		return g;
 	}
-	
 }

@@ -28,12 +28,12 @@ import java.util.Map;
 
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.WebComponentPeer;
-import org.webswing.toolkit.WebPanelPeer;
 import org.webswing.toolkit.util.Util;
 
 public class GraphicsWrapper extends Graphics2D {
 
     private WebComponentPeer rootPaintComponent;
+    private Point offset=new Point(0,0);
 
     private Graphics2D original;
 
@@ -42,17 +42,18 @@ public class GraphicsWrapper extends Graphics2D {
         this.rootPaintComponent = wcp;
     }
 
-    private void addDirtyClipArea() {
+    public void setOffset(Point offset) {
+		this.offset = offset;
+	}
+
+	private void addDirtyClipArea() {
         Rectangle r = new Rectangle(getClipBounds());
         addDirtyRectangleArea(r);
     }
 
     private void addDirtyRectangleArea(Rectangle r) {
         r.translate((int) getTransform().getTranslateX(), (int) getTransform().getTranslateY());
-        if(rootPaintComponent instanceof WebPanelPeer){
-        	Point o = ((WebPanelPeer)rootPaintComponent).getOffset();
-        	r.translate(o.x,o.y);
-        }
+    	r.translate(offset.x,offset.y);
         Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(rootPaintComponent.getGuid(), r);
     }
 

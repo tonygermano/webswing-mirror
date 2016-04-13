@@ -22,6 +22,7 @@ import org.webswing.directdraw.proto.Directdraw.WebImageProto;
 import org.webswing.directdraw.util.DirectDrawUtils;
 import org.webswing.directdraw.util.DrawConstantPool;
 import org.webswing.directdraw.util.RenderUtil;
+
 import sun.awt.image.SurfaceManager;
 import sun.java2d.SurfaceData;
 
@@ -34,13 +35,14 @@ public class WebImage extends Image {
 	private WebGraphics lastUsedG = null;
 	private Set<WebGraphics> usedGraphics;
 	private List<DrawInstruction> instructions;
+	private boolean resetBeforeRepaint;
 
-	@SuppressWarnings("restriction")
 	public WebImage(DirectDraw dd, int w, int h) {
 		this(dd, w, h, new ArrayList<DrawInstruction>());
 		this.usedGraphics = new HashSet<WebGraphics>();
 	}
-
+	
+	@SuppressWarnings("restriction")
 	private WebImage(DirectDraw dd, int w, int h, List<DrawInstruction> instructions) {
 		this.context = dd;
 		this.size = new Dimension(w, h);
@@ -115,6 +117,12 @@ public class WebImage extends Image {
 
 	@Override
 	public Graphics getGraphics() {
+		synchronized (this) {
+			if(resetBeforeRepaint){
+				reset();
+				resetBeforeRepaint=false;
+			}
+		}
 		return new WebGraphics(this);
 	}
 
@@ -212,6 +220,10 @@ public class WebImage extends Image {
 		webImageBuilder.setWidth(size.width);
 		webImageBuilder.setHeight(size.height);
 		return webImageBuilder.build();
+	}
+
+	public void resetBeforeRepaint() {
+		this.resetBeforeRepaint =true;
 	}
 
 	public void reset() {

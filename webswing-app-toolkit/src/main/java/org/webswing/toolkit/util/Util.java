@@ -1,10 +1,13 @@
 package org.webswing.toolkit.util;
 
+import java.applet.Applet;
 import java.awt.AWTEvent;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Panel;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -32,6 +35,7 @@ import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.RepaintManager;
@@ -514,6 +518,15 @@ public class Util {
 				}
 			}
 		}
+	}
+
+	public static Panel findHwComponentParent(JComponent c) {
+		for (Container p = c.getParent(); p != null; p = p.getParent()) {
+			if(p instanceof Panel && !(p instanceof Applet)) {
+				return (Panel) p;
+			}
+		}
+		return null;
 	}
 
 }

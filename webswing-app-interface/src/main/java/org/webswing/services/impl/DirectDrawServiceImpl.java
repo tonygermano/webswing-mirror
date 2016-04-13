@@ -80,4 +80,13 @@ public class DirectDrawServiceImpl implements DirectDrawService {
 			((VolatileWebImageWrapper) webImage).getWebImage().reset();
 		}
 	}
+
+	@Override
+	public void resetImageBeforeRepaint(Image webImage) {
+		if (webImage instanceof WebImage) {
+			((WebImage) webImage).resetBeforeRepaint();
+		} else if (webImage instanceof VolatileWebImageWrapper) {
+			((VolatileWebImageWrapper) webImage).getWebImage().resetBeforeRepaint();
+		}
+	}
 }

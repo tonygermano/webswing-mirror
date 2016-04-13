@@ -98,7 +98,7 @@ public class WebComponentPeer implements ComponentPeer {
 		for (WebComponentPeer wcp : hwLayers) {
 			Point p = SwingUtilities.convertPoint((Component) wcp.getTarget(), new Point(0,0), (Component) this.getTarget());
 			g.drawImage(wcp.webImage, p.x,p.y, null);
-			Services.getDirectDrawService().resetImage(wcp.webImage);
+			Services.getDirectDrawService().resetImageBeforeRepaint(wcp.webImage);
 		}
 		g.dispose();
 		return Services.getDirectDrawService().extractWebImage(webImage);
