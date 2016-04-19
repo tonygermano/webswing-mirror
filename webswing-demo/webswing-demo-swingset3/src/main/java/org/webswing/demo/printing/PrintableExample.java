@@ -52,7 +52,7 @@ public class PrintableExample implements Printable, ActionListener {
 		 * translate by the X and Y values in the PageFormat to avoid clipping
 		 */
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.translate(pf.getImageableX(), pf.getImageableY());
+		
 
 		/* Now print the window and its visible contents */
 		frameToPrint.printAll(g);

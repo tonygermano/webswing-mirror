@@ -34,7 +34,7 @@ public class WebPrintService implements PrintService {
 
 	static final DocFlavor[] supportedDocFlavors = { DocFlavor.SERVICE_FORMATTED.PAGEABLE, DocFlavor.SERVICE_FORMATTED.PRINTABLE };
 	private static final Class<?>[] suppAttrCats = { Chromaticity.class, Copies.class, Fidelity.class, JobName.class, Media.class, MediaPrintableArea.class, OrientationRequested.class, PageRanges.class, RequestingUserName.class, SheetCollate.class, Sides.class };
-	private static final MediaSizeName[] mediaSizes = { MediaSizeName.NA_LETTER, MediaSizeName.TABLOID, MediaSizeName.LEDGER, MediaSizeName.NA_LEGAL, MediaSizeName.EXECUTIVE, MediaSizeName.ISO_A3, MediaSizeName.ISO_A4, MediaSizeName.ISO_A5, MediaSizeName.ISO_B4, MediaSizeName.ISO_B5 };
+	public static final MediaSizeName[] mediaSizes = { MediaSizeName.ISO_A3, MediaSizeName.ISO_A4, MediaSizeName.ISO_A5, MediaSizeName.ISO_A6, MediaSizeName.NA_LETTER, MediaSizeName.NA_LEGAL, MediaSizeName.LEDGER, MediaSizeName.EXECUTIVE };
 
 	private static WebPrintService thisService = new WebPrintService();
 
@@ -132,17 +132,17 @@ public class WebPrintService implements PrintService {
 		}
 		if (category == MediaPrintableArea.class) {
 			str = Locale.getDefault().getCountry();
-			float f3 = 0.5F;
-			float f1;
-			float f2;
+			float margin = 1.0F;
+			float w;
+			float h;
 			if ((str != null) && ((str.equals("")) || (str.equals(Locale.US.getCountry())) || (str.equals(Locale.CANADA.getCountry())))) {
-				f1 = MediaSize.NA.LETTER.getX(25400) - 2.0F * f3;
-				f2 = MediaSize.NA.LETTER.getY(25400) - 2.0F * f3;
+				w = MediaSize.NA.LETTER.getX(MediaSize.INCH) - margin * 2;
+				h = MediaSize.NA.LETTER.getY(MediaSize.INCH) - margin * 2;
 			} else {
-				f1 = MediaSize.ISO.A4.getX(25400) - 2.0F * f3;
-				f2 = MediaSize.ISO.A4.getY(25400) - 2.0F * f3;
+				w = MediaSize.ISO.A4.getX(MediaSize.INCH) - margin * 2;
+				h = MediaSize.ISO.A4.getY(MediaSize.INCH) - margin * 2;
 			}
-			return new MediaPrintableArea(f3, f3, f1, f2, 25400);
+			return new MediaPrintableArea(margin, margin, w, h, MediaSize.INCH);
 		}
 		if (category == OrientationRequested.class)
 			return OrientationRequested.PORTRAIT;
@@ -158,78 +158,68 @@ public class WebPrintService implements PrintService {
 	}
 
 	@Override
-	public Object getSupportedAttributeValues(Class<? extends Attribute> paramClass, DocFlavor paramDocFlavor, AttributeSet paramAttributeSet) {
-		if (!isAttributeCategorySupported(paramClass)) {
+	public Object getSupportedAttributeValues(Class<? extends Attribute> type, DocFlavor paramDocFlavor, AttributeSet attribs) {
+		if (!isAttributeCategorySupported(type)) {
 			return null;
 		}
 		Object[] supportedValues;
-		if (paramClass == Chromaticity.class) {
+		if (type == Chromaticity.class) {
 			supportedValues = new Chromaticity[1];
 			supportedValues[0] = Chromaticity.COLOR;
 
 			return supportedValues;
 		}
-		if (paramClass == JobName.class)
+		if (type == JobName.class)
 			return new JobName("", null);
-		if (paramClass == RequestingUserName.class)
+		if (type == RequestingUserName.class)
 			return new RequestingUserName("", null);
-		if (paramClass == OrientationRequested.class) {
+		if (type == OrientationRequested.class) {
 			if ((paramDocFlavor == null) || (paramDocFlavor.equals(DocFlavor.SERVICE_FORMATTED.PAGEABLE)) || (paramDocFlavor.equals(DocFlavor.SERVICE_FORMATTED.PRINTABLE))) {
 
 				supportedValues = new OrientationRequested[3];
 				supportedValues[0] = OrientationRequested.PORTRAIT;
 				supportedValues[1] = OrientationRequested.LANDSCAPE;
-				supportedValues[2] = OrientationRequested.REVERSE_LANDSCAPE;
 				return supportedValues;
 			}
 			return null;
 		}
-		if ((paramClass == Copies.class) || (paramClass == CopiesSupported.class)) {
+		if ((type == Copies.class) || (type == CopiesSupported.class)) {
 			return new CopiesSupported(1, 1);
 		}
-		if (paramClass == Media.class) {
+		if (type == Media.class) {
 			supportedValues = new Media[mediaSizes.length];
 			System.arraycopy(mediaSizes, 0, supportedValues, 0, mediaSizes.length);
 			return supportedValues;
 		}
-		if (paramClass == Fidelity.class) {
+		if (type == Fidelity.class) {
 			supportedValues = new Fidelity[2];
 			supportedValues[0] = Fidelity.FIDELITY_FALSE;
 			supportedValues[1] = Fidelity.FIDELITY_TRUE;
 			return supportedValues;
 		}
-		if (paramClass == MediaPrintableArea.class) {
-			if (paramAttributeSet == null) {
+		if (type == MediaPrintableArea.class) {
+			if (attribs == null) {
 				return null;
 			}
-			MediaSize supportedMediaSizeValues = (MediaSize) paramAttributeSet.get(MediaSize.class);
-			if (supportedMediaSizeValues == null) {
-				Media localObject2 = (Media) paramAttributeSet.get(Media.class);
-				if ((localObject2 != null) && ((localObject2 instanceof MediaSizeName))) {
-					MediaSizeName localMediaSizeName = (MediaSizeName) localObject2;
-					supportedMediaSizeValues = MediaSize.getMediaSizeForName(localMediaSizeName);
+			MediaSize size = (MediaSize) attribs.get(MediaSize.class);
+			if (size == null) {
+				Media media = (Media) attribs.get(Media.class);
+				if ((media != null) && ((media instanceof MediaSizeName))) {
+					MediaSizeName mediaName = (MediaSizeName) media;
+					size = MediaSize.getMediaSizeForName(mediaName);
 				}
 			}
-			if (supportedMediaSizeValues == null) {
+			if (size == null) {
 				return null;
 			}
-			Object[] localObject2 = new MediaPrintableArea[1];
-			float f1 = ((MediaSize) supportedMediaSizeValues).getX(25400);
-			float f2 = ((MediaSize) supportedMediaSizeValues).getY(25400);
+			MediaPrintableArea[] result = new MediaPrintableArea[1];
+			float w = ((MediaSize) size).getX(MediaSize.INCH);
+			float h = ((MediaSize) size).getY(MediaSize.INCH);
+			result[0] = new MediaPrintableArea(0, 0, w, h, MediaSize.INCH);
 
-			float f3 = 0.5F;
-			float f4 = 0.5F;
-			if (f1 < 5.0F) {
-				f3 = f1 / 10.0F;
-			}
-			if (f2 < 5.0F) {
-				f4 = f2 / 10.0F;
-			}
-			localObject2[0] = new MediaPrintableArea(f3, f4, f1 - 2.0F * f3, f2 - 2.0F * f4, 25400);
-
-			return localObject2;
+			return result;
 		}
-		if (paramClass == PageRanges.class) {
+		if (type == PageRanges.class) {
 			if ((paramDocFlavor == null) || (paramDocFlavor.equals(DocFlavor.SERVICE_FORMATTED.PAGEABLE)) || (paramDocFlavor.equals(DocFlavor.SERVICE_FORMATTED.PRINTABLE))) {
 
 				supportedValues = new PageRanges[1];
@@ -238,7 +228,7 @@ public class WebPrintService implements PrintService {
 			}
 			return null;
 		}
-		if (paramClass == SheetCollate.class) {
+		if (type == SheetCollate.class) {
 			if ((paramDocFlavor == null) || (paramDocFlavor.equals(DocFlavor.SERVICE_FORMATTED.PAGEABLE)) || (paramDocFlavor.equals(DocFlavor.SERVICE_FORMATTED.PRINTABLE))) {
 
 				supportedValues = new SheetCollate[2];
@@ -250,13 +240,11 @@ public class WebPrintService implements PrintService {
 			supportedValues[0] = SheetCollate.UNCOLLATED;
 			return supportedValues;
 		}
-		if (paramClass == Sides.class) {
+		if (type == Sides.class) {
 			if ((paramDocFlavor == null) || (paramDocFlavor.equals(DocFlavor.SERVICE_FORMATTED.PAGEABLE)) || (paramDocFlavor.equals(DocFlavor.SERVICE_FORMATTED.PRINTABLE))) {
 
 				supportedValues = new Sides[3];
 				supportedValues[0] = Sides.ONE_SIDED;
-				supportedValues[1] = Sides.TWO_SIDED_LONG_EDGE;
-				supportedValues[2] = Sides.TWO_SIDED_SHORT_EDGE;
 				return supportedValues;
 			}
 			return null;
