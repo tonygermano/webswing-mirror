@@ -1,10 +1,8 @@
 package org.webswing.server.util.exec;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,8 +99,7 @@ public class SwingProcess {
 				} else if (!file.canRead()) {
 					error = "Directory is not accessible";
 				}
-				throw new IllegalArgumentException(
-						"Failed to start swing process with base dir:'" + baseDir + "'. " + error);
+				throw new IllegalArgumentException("Failed to start swing process with base dir:'" + baseDir + "'. " + error);
 			}
 		}
 	}
@@ -265,9 +262,10 @@ public class SwingProcess {
 		return result.toArray(new String[result.size()]);
 	}
 
-	private static void processStream(InputStream out, StringBuilder bufferOut, byte[] buffer, String name,
-			boolean isError) throws IOException {
-		while (out.available() > 0) {
+	private static void processStream(InputStream out, StringBuilder bufferOut, byte[] buffer, String name, boolean isError) throws IOException {
+		long start = System.currentTimeMillis();
+		boolean timeout = false;
+		while (out.available() > 0 && !timeout) {
 			int available = out.available();
 			int read = out.read(buffer, 0, available > buffer.length ? buffer.length : available);
 			bufferOut.append(new String(buffer, 0, read));
@@ -282,6 +280,7 @@ public class SwingProcess {
 				}
 				bufferOut.delete(0, indexofNewLine + 1);
 			}
+			timeout = System.currentTimeMillis() - start > LOG_POLLING_PERIOD ? true : false;
 		}
 	}
 
@@ -338,11 +337,11 @@ public class SwingProcess {
 	}
 
 	public void addProperty(String name, String value) {
-        if (value == null) {
-            this.properties.remove(name);
-        } else {
-            this.properties.put(name, value);
-        }
+		if (value == null) {
+			this.properties.remove(name);
+		} else {
+			this.properties.put(name, value);
+		}
 	}
 
 	public String getArgs() {
