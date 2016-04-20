@@ -11,6 +11,8 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
 
+import javax.swing.SwingUtilities;
+
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Util;
 
@@ -121,7 +123,4 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 		return Util.discoverFileChooser(this) != null;
 	}
 
-	public Point getLocationOnScreen() {
-		return getBounds().getLocation();
-	}
 }
