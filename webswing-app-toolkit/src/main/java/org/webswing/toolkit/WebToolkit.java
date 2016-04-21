@@ -77,7 +77,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
@@ -540,7 +540,7 @@ public abstract class WebToolkit extends SunToolkit {
 
 	public Object getTreeLock() {
 		if(TREELOCK==null){
-			TREELOCK=new JLabel().getTreeLock();
+			TREELOCK=new JPanel().getTreeLock();
 		}
 		return TREELOCK;
 	}

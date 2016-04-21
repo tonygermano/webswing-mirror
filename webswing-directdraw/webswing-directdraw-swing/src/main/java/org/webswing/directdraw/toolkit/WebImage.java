@@ -153,6 +153,10 @@ public class WebImage extends Image {
 			DrawInstructionFactory factory = context.getInstructionFactory();
 			if (lastUsedG != g) {
 				if (!usedGraphics.contains(g)) {
+					//if dispose is the first instruction, ignore it 
+					if(in.getInstruction().equals(InstructionProto.GRAPHICS_DISPOSE)){
+						return;
+					}
 					instructions.add(factory.createGraphics(g));
 					usedGraphics.add(g);
 					lastUsedG = g;
