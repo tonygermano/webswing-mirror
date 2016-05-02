@@ -157,12 +157,12 @@ public class ServerUtil {
 		if (icon == null) {
 			app.setBase64Icon(loadImage(null));
 		} else {
-			if (new File(icon).exists()) {
+			if (new File(icon).isFile()) {
 				app.setBase64Icon(loadImage(icon));
 			} else {
-				if (new File(homeDir + File.separator + icon).exists()) {
+				if (new File(homeDir + File.separator + icon).isFile()) {
 					app.setBase64Icon(loadImage(homeDir + File.separator + icon));
-				} else if (new File(Main.getRootDir(), homeDir + File.separator + icon).exists()) {
+				} else if (new File(Main.getRootDir(), homeDir + File.separator + icon).isFile()) {
 					app.setBase64Icon(loadImage(new File(Main.getRootDir(), homeDir + File.separator + icon).getAbsolutePath()));
 				} else {
 					log.error("Icon loading failed. File " + icon + " or " + homeDir + File.separator + icon + " does not exist.");
