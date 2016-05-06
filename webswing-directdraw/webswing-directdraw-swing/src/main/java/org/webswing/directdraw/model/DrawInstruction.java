@@ -8,25 +8,25 @@ import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
 import org.webswing.directdraw.toolkit.WebImage;
 
-public class DrawInstruction implements Iterable<DrawConstant> {
+public class DrawInstruction implements Iterable<DrawConstant<?>> {
 
 	private final InstructionProto instruction;
-	private final DrawConstant[] args;
+	private final DrawConstant<?>[] args;
 	private final WebImage image;
 
-	public DrawInstruction(InstructionProto instruction, DrawConstant... args) {
+	public DrawInstruction(InstructionProto instruction, DrawConstant<?>... args) {
 		this.instruction = instruction;
 		this.args = args;
 		this.image = null;
 	}
 
-	public DrawInstruction(WebImage image, DrawConstant... args) {
+	public DrawInstruction(WebImage image, DrawConstant<?>... args) {
 		instruction = InstructionProto.DRAW_WEBIMAGE;
 		this.image = image;
 		this.args = args;
 	}
 
-	public DrawConstant getArg(int index) {
+	public DrawConstant<?> getArg(int index) {
 		return args[index];
 	}
 
@@ -41,7 +41,7 @@ public class DrawInstruction implements Iterable<DrawConstant> {
 	public DrawInstructionProto toMessage(DirectDraw dd) {
 		DrawInstructionProto.Builder builder = DrawInstructionProto.newBuilder();
 		builder.setInst(instruction);
-		for (DrawConstant c : args) {
+		for (DrawConstant<?> c : args) {
 			builder.addArgs(c.getId());
 		}
 		if (image != null) {
@@ -51,8 +51,8 @@ public class DrawInstruction implements Iterable<DrawConstant> {
 	}
 
 	@Override
-	public Iterator<DrawConstant> iterator() {
-		return new Iterator<DrawConstant>() {
+	public Iterator<DrawConstant<?>> iterator() {
+		return new Iterator<DrawConstant<?>>() {
 			int index;
 
 			@Override
@@ -61,7 +61,7 @@ public class DrawInstruction implements Iterable<DrawConstant> {
 			}
 
 			@Override
-			public DrawConstant next() {
+			public DrawConstant<?> next() {
 				return args[index++];
 			}
 

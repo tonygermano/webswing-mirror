@@ -6,7 +6,7 @@ import org.webswing.directdraw.model.DrawConstant;
 
 public class LRUDrawConstantPoolCache {
 
-    private HashMap<DrawConstant, DoubleLinkedListNode> map = new HashMap<DrawConstant, DoubleLinkedListNode>();
+    private HashMap<DrawConstant<?>, DoubleLinkedListNode> map = new HashMap<DrawConstant<?>, DoubleLinkedListNode>();
     private DoubleLinkedListNode head;
     private DoubleLinkedListNode end;
     private int capacity;
@@ -17,11 +17,11 @@ public class LRUDrawConstantPoolCache {
         this.capacity = capacity;
     }
 
-    public synchronized boolean contains(DrawConstant constant) {
+    public synchronized boolean contains(DrawConstant<?> constant) {
         return map.containsKey(constant);
     }
 
-    public DrawConstant getOrAdd(DrawConstant constant) {
+    public DrawConstant<?> getOrAdd(DrawConstant<?> constant) {
         if (map.containsKey(constant)) {
             DoubleLinkedListNode oldNode = map.get(constant);
             oldNode.remove();
@@ -43,11 +43,11 @@ public class LRUDrawConstantPoolCache {
 
 	private class DoubleLinkedListNode {
 
-        private DrawConstant val;
+        private DrawConstant<?> val;
         private DoubleLinkedListNode pre;
         private DoubleLinkedListNode next;
 
-        public DoubleLinkedListNode(DrawConstant value) {
+        public DoubleLinkedListNode(DrawConstant<?> value) {
             val = value;
         }
 
@@ -55,7 +55,7 @@ public class LRUDrawConstantPoolCache {
             val.setId(id);
         }
 
-        public DrawConstant getVal() {
+        public DrawConstant<?> getVal() {
             return val;
         }
 

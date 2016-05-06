@@ -10,12 +10,12 @@ import java.awt.image.VolatileImage;
 import sun.awt.image.SurfaceManager;
 import sun.java2d.SurfaceData;
 
+@SuppressWarnings("restriction")
 public class VolatileWebImageWrapper extends VolatileImage {
 
 	private WebImage webImage;
 	private ImageCapabilities caps;
 
-	@SuppressWarnings("restriction")
 	public VolatileWebImageWrapper(ImageCapabilities caps, WebImage webImage) {
 		this.webImage = webImage;
 		this.caps = caps;

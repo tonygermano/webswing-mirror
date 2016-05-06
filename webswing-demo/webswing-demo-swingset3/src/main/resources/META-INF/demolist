@@ -1,4 +1,5 @@
 org.webswing.demo.printing.PrintingDemo
+org.webswing.demo.fonts.FontsDemo
 org.webswing.demo.files.FilesDemo
 org.webswing.demo.applet.AppletDemo
 org.webswing.demo.jslink.JsLinkDemo
@@ -28,3 +29,4 @@ com.sun.swingset3.demos.editorpane.EditorPaneDemo
 com.sun.swingset3.demos.colorchooser.ColorChooserDemo
 com.sun.swingset3.demos.optionpane.OptionPaneDemo
 com.sun.swingset3.demos.tooltip.ToolTipDemo
+

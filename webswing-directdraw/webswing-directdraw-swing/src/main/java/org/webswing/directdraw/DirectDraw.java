@@ -9,6 +9,8 @@ import org.webswing.directdraw.util.DrawConstantPool;
 
 public class DirectDraw {
 	private static final int DRAW_CONSTANTS_POOL_CACHE_CAPACITY = 8192;
+	
+	public static boolean useGlyphs = Boolean.parseBoolean(System.getProperty("webswing.useGlyphs","true"));
 
 	private DirectDrawServicesAdapter services = new DirectDrawServicesAdapter();
 	private DrawInstructionFactory instructionFactory = new DrawInstructionFactory(this);

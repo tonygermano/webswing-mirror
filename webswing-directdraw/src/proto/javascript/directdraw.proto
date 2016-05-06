@@ -27,6 +27,7 @@ message DrawInstructionProto {
 		SET_FONT = 11;
 		SET_STROKE = 12;
 		SET_COMPOSITE = 13;
+		DRAW_GLYPH_LIST = 14;
 	}
 }
 
@@ -48,6 +49,8 @@ message DrawConstantProto {
 	optional StrokeProto stroke = 15;
 	optional CompositeProto composite = 16;
 	optional TextureProto texture = 17;
+	optional GlyphProto glyph = 18; 
+	optional CombinedProto combined = 19;
 }
 
 message ColorProto {
@@ -65,6 +68,14 @@ message TransformProto {
 	optional float m11 = 4 [default = 1];
 	optional float m02 = 5;
 	optional float m12 = 6;
+}
+
+message CombinedProto{
+	repeated uint32 ids = 1;
+}
+
+message GlyphProto {
+	optional bytes data = 1;
 }
 
 message RectangleProto {

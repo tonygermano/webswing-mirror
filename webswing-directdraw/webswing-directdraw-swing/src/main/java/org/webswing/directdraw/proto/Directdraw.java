@@ -1568,6 +1568,10 @@ public final class Directdraw {
        * <code>SET_COMPOSITE = 13;</code>
        */
       SET_COMPOSITE(13, 13),
+      /**
+       * <code>DRAW_GLYPH_LIST = 14;</code>
+       */
+      DRAW_GLYPH_LIST(14, 14),
       ;
 
       /**
@@ -1626,6 +1630,10 @@ public final class Directdraw {
        * <code>SET_COMPOSITE = 13;</code>
        */
       public static final int SET_COMPOSITE_VALUE = 13;
+      /**
+       * <code>DRAW_GLYPH_LIST = 14;</code>
+       */
+      public static final int DRAW_GLYPH_LIST_VALUE = 14;
 
 
       public final int getNumber() { return value; }
@@ -1646,6 +1654,7 @@ public final class Directdraw {
           case 11: return SET_FONT;
           case 12: return SET_STROKE;
           case 13: return SET_COMPOSITE;
+          case 14: return DRAW_GLYPH_LIST;
           default: return null;
         }
       }
@@ -2421,6 +2430,34 @@ public final class Directdraw {
      * <code>optional .org.webswing.directdraw.proto.TextureProto texture = 17;</code>
      */
     org.webswing.directdraw.proto.Directdraw.TextureProtoOrBuilder getTextureOrBuilder();
+
+    // optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;
+    /**
+     * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+     */
+    boolean hasGlyph();
+    /**
+     * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+     */
+    org.webswing.directdraw.proto.Directdraw.GlyphProto getGlyph();
+    /**
+     * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+     */
+    org.webswing.directdraw.proto.Directdraw.GlyphProtoOrBuilder getGlyphOrBuilder();
+
+    // optional .org.webswing.directdraw.proto.CombinedProto combined = 19;
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+     */
+    boolean hasCombined();
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+     */
+    org.webswing.directdraw.proto.Directdraw.CombinedProto getCombined();
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+     */
+    org.webswing.directdraw.proto.Directdraw.CombinedProtoOrBuilder getCombinedOrBuilder();
   }
   /**
    * Protobuf type {@code org.webswing.directdraw.proto.DrawConstantProto}
@@ -2676,6 +2713,32 @@ public final class Directdraw {
                 texture_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00010000;
+              break;
+            }
+            case 146: {
+              org.webswing.directdraw.proto.Directdraw.GlyphProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00020000) == 0x00020000)) {
+                subBuilder = glyph_.toBuilder();
+              }
+              glyph_ = input.readMessage(org.webswing.directdraw.proto.Directdraw.GlyphProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(glyph_);
+                glyph_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00020000;
+              break;
+            }
+            case 154: {
+              org.webswing.directdraw.proto.Directdraw.CombinedProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00040000) == 0x00040000)) {
+                subBuilder = combined_.toBuilder();
+              }
+              combined_ = input.readMessage(org.webswing.directdraw.proto.Directdraw.CombinedProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(combined_);
+                combined_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00040000;
               break;
             }
           }
@@ -3107,6 +3170,50 @@ public final class Directdraw {
       return texture_;
     }
 
+    // optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;
+    public static final int GLYPH_FIELD_NUMBER = 18;
+    private org.webswing.directdraw.proto.Directdraw.GlyphProto glyph_;
+    /**
+     * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+     */
+    public boolean hasGlyph() {
+      return ((bitField0_ & 0x00020000) == 0x00020000);
+    }
+    /**
+     * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+     */
+    public org.webswing.directdraw.proto.Directdraw.GlyphProto getGlyph() {
+      return glyph_;
+    }
+    /**
+     * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+     */
+    public org.webswing.directdraw.proto.Directdraw.GlyphProtoOrBuilder getGlyphOrBuilder() {
+      return glyph_;
+    }
+
+    // optional .org.webswing.directdraw.proto.CombinedProto combined = 19;
+    public static final int COMBINED_FIELD_NUMBER = 19;
+    private org.webswing.directdraw.proto.Directdraw.CombinedProto combined_;
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+     */
+    public boolean hasCombined() {
+      return ((bitField0_ & 0x00040000) == 0x00040000);
+    }
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+     */
+    public org.webswing.directdraw.proto.Directdraw.CombinedProto getCombined() {
+      return combined_;
+    }
+    /**
+     * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+     */
+    public org.webswing.directdraw.proto.Directdraw.CombinedProtoOrBuilder getCombinedOrBuilder() {
+      return combined_;
+    }
+
     private void initFields() {
       id_ = 0;
       color_ = org.webswing.directdraw.proto.Directdraw.ColorProto.getDefaultInstance();
@@ -3125,6 +3232,8 @@ public final class Directdraw {
       stroke_ = org.webswing.directdraw.proto.Directdraw.StrokeProto.getDefaultInstance();
       composite_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.getDefaultInstance();
       texture_ = org.webswing.directdraw.proto.Directdraw.TextureProto.getDefaultInstance();
+      glyph_ = org.webswing.directdraw.proto.Directdraw.GlyphProto.getDefaultInstance();
+      combined_ = org.webswing.directdraw.proto.Directdraw.CombinedProto.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3271,6 +3380,12 @@ public final class Directdraw {
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
         output.writeMessage(17, texture_);
       }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        output.writeMessage(18, glyph_);
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        output.writeMessage(19, combined_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -3347,6 +3462,14 @@ public final class Directdraw {
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(17, texture_);
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(18, glyph_);
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(19, combined_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3471,6 +3594,8 @@ public final class Directdraw {
           getStrokeFieldBuilder();
           getCompositeFieldBuilder();
           getTextureFieldBuilder();
+          getGlyphFieldBuilder();
+          getCombinedFieldBuilder();
         }
       }
       private static Builder create() {
@@ -3573,6 +3698,18 @@ public final class Directdraw {
           textureBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00010000);
+        if (glyphBuilder_ == null) {
+          glyph_ = org.webswing.directdraw.proto.Directdraw.GlyphProto.getDefaultInstance();
+        } else {
+          glyphBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00020000);
+        if (combinedBuilder_ == null) {
+          combined_ = org.webswing.directdraw.proto.Directdraw.CombinedProto.getDefaultInstance();
+        } else {
+          combinedBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00040000);
         return this;
       }
 
@@ -3729,6 +3866,22 @@ public final class Directdraw {
         } else {
           result.texture_ = textureBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
+          to_bitField0_ |= 0x00020000;
+        }
+        if (glyphBuilder_ == null) {
+          result.glyph_ = glyph_;
+        } else {
+          result.glyph_ = glyphBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
+          to_bitField0_ |= 0x00040000;
+        }
+        if (combinedBuilder_ == null) {
+          result.combined_ = combined_;
+        } else {
+          result.combined_ = combinedBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3797,6 +3950,12 @@ public final class Directdraw {
         }
         if (other.hasTexture()) {
           mergeTexture(other.getTexture());
+        }
+        if (other.hasGlyph()) {
+          mergeGlyph(other.getGlyph());
+        }
+        if (other.hasCombined()) {
+          mergeCombined(other.getCombined());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -5769,6 +5928,240 @@ public final class Directdraw {
         return textureBuilder_;
       }
 
+      // optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;
+      private org.webswing.directdraw.proto.Directdraw.GlyphProto glyph_ = org.webswing.directdraw.proto.Directdraw.GlyphProto.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.directdraw.proto.Directdraw.GlyphProto, org.webswing.directdraw.proto.Directdraw.GlyphProto.Builder, org.webswing.directdraw.proto.Directdraw.GlyphProtoOrBuilder> glyphBuilder_;
+      /**
+       * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+       */
+      public boolean hasGlyph() {
+        return ((bitField0_ & 0x00020000) == 0x00020000);
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.GlyphProto getGlyph() {
+        if (glyphBuilder_ == null) {
+          return glyph_;
+        } else {
+          return glyphBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+       */
+      public Builder setGlyph(org.webswing.directdraw.proto.Directdraw.GlyphProto value) {
+        if (glyphBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          glyph_ = value;
+          onChanged();
+        } else {
+          glyphBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00020000;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+       */
+      public Builder setGlyph(
+          org.webswing.directdraw.proto.Directdraw.GlyphProto.Builder builderForValue) {
+        if (glyphBuilder_ == null) {
+          glyph_ = builderForValue.build();
+          onChanged();
+        } else {
+          glyphBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00020000;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+       */
+      public Builder mergeGlyph(org.webswing.directdraw.proto.Directdraw.GlyphProto value) {
+        if (glyphBuilder_ == null) {
+          if (((bitField0_ & 0x00020000) == 0x00020000) &&
+              glyph_ != org.webswing.directdraw.proto.Directdraw.GlyphProto.getDefaultInstance()) {
+            glyph_ =
+              org.webswing.directdraw.proto.Directdraw.GlyphProto.newBuilder(glyph_).mergeFrom(value).buildPartial();
+          } else {
+            glyph_ = value;
+          }
+          onChanged();
+        } else {
+          glyphBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00020000;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+       */
+      public Builder clearGlyph() {
+        if (glyphBuilder_ == null) {
+          glyph_ = org.webswing.directdraw.proto.Directdraw.GlyphProto.getDefaultInstance();
+          onChanged();
+        } else {
+          glyphBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00020000);
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.GlyphProto.Builder getGlyphBuilder() {
+        bitField0_ |= 0x00020000;
+        onChanged();
+        return getGlyphFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.GlyphProtoOrBuilder getGlyphOrBuilder() {
+        if (glyphBuilder_ != null) {
+          return glyphBuilder_.getMessageOrBuilder();
+        } else {
+          return glyph_;
+        }
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.GlyphProto glyph = 18;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.directdraw.proto.Directdraw.GlyphProto, org.webswing.directdraw.proto.Directdraw.GlyphProto.Builder, org.webswing.directdraw.proto.Directdraw.GlyphProtoOrBuilder> 
+          getGlyphFieldBuilder() {
+        if (glyphBuilder_ == null) {
+          glyphBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.webswing.directdraw.proto.Directdraw.GlyphProto, org.webswing.directdraw.proto.Directdraw.GlyphProto.Builder, org.webswing.directdraw.proto.Directdraw.GlyphProtoOrBuilder>(
+                  glyph_,
+                  getParentForChildren(),
+                  isClean());
+          glyph_ = null;
+        }
+        return glyphBuilder_;
+      }
+
+      // optional .org.webswing.directdraw.proto.CombinedProto combined = 19;
+      private org.webswing.directdraw.proto.Directdraw.CombinedProto combined_ = org.webswing.directdraw.proto.Directdraw.CombinedProto.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.directdraw.proto.Directdraw.CombinedProto, org.webswing.directdraw.proto.Directdraw.CombinedProto.Builder, org.webswing.directdraw.proto.Directdraw.CombinedProtoOrBuilder> combinedBuilder_;
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+       */
+      public boolean hasCombined() {
+        return ((bitField0_ & 0x00040000) == 0x00040000);
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.CombinedProto getCombined() {
+        if (combinedBuilder_ == null) {
+          return combined_;
+        } else {
+          return combinedBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+       */
+      public Builder setCombined(org.webswing.directdraw.proto.Directdraw.CombinedProto value) {
+        if (combinedBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          combined_ = value;
+          onChanged();
+        } else {
+          combinedBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00040000;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+       */
+      public Builder setCombined(
+          org.webswing.directdraw.proto.Directdraw.CombinedProto.Builder builderForValue) {
+        if (combinedBuilder_ == null) {
+          combined_ = builderForValue.build();
+          onChanged();
+        } else {
+          combinedBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00040000;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+       */
+      public Builder mergeCombined(org.webswing.directdraw.proto.Directdraw.CombinedProto value) {
+        if (combinedBuilder_ == null) {
+          if (((bitField0_ & 0x00040000) == 0x00040000) &&
+              combined_ != org.webswing.directdraw.proto.Directdraw.CombinedProto.getDefaultInstance()) {
+            combined_ =
+              org.webswing.directdraw.proto.Directdraw.CombinedProto.newBuilder(combined_).mergeFrom(value).buildPartial();
+          } else {
+            combined_ = value;
+          }
+          onChanged();
+        } else {
+          combinedBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00040000;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+       */
+      public Builder clearCombined() {
+        if (combinedBuilder_ == null) {
+          combined_ = org.webswing.directdraw.proto.Directdraw.CombinedProto.getDefaultInstance();
+          onChanged();
+        } else {
+          combinedBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00040000);
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.CombinedProto.Builder getCombinedBuilder() {
+        bitField0_ |= 0x00040000;
+        onChanged();
+        return getCombinedFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+       */
+      public org.webswing.directdraw.proto.Directdraw.CombinedProtoOrBuilder getCombinedOrBuilder() {
+        if (combinedBuilder_ != null) {
+          return combinedBuilder_.getMessageOrBuilder();
+        } else {
+          return combined_;
+        }
+      }
+      /**
+       * <code>optional .org.webswing.directdraw.proto.CombinedProto combined = 19;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.directdraw.proto.Directdraw.CombinedProto, org.webswing.directdraw.proto.Directdraw.CombinedProto.Builder, org.webswing.directdraw.proto.Directdraw.CombinedProtoOrBuilder> 
+          getCombinedFieldBuilder() {
+        if (combinedBuilder_ == null) {
+          combinedBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.webswing.directdraw.proto.Directdraw.CombinedProto, org.webswing.directdraw.proto.Directdraw.CombinedProto.Builder, org.webswing.directdraw.proto.Directdraw.CombinedProtoOrBuilder>(
+                  combined_,
+                  getParentForChildren(),
+                  isClean());
+          combined_ = null;
+        }
+        return combinedBuilder_;
+      }
+
       // @@protoc_insertion_point(builder_scope:org.webswing.directdraw.proto.DrawConstantProto)
     }
 
@@ -7390,6 +7783,874 @@ public final class Directdraw {
     }
 
     // @@protoc_insertion_point(class_scope:org.webswing.directdraw.proto.TransformProto)
+  }
+
+  public interface CombinedProtoOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // repeated uint32 ids = 1;
+    /**
+     * <code>repeated uint32 ids = 1;</code>
+     */
+    java.util.List<java.lang.Integer> getIdsList();
+    /**
+     * <code>repeated uint32 ids = 1;</code>
+     */
+    int getIdsCount();
+    /**
+     * <code>repeated uint32 ids = 1;</code>
+     */
+    int getIds(int index);
+  }
+  /**
+   * Protobuf type {@code org.webswing.directdraw.proto.CombinedProto}
+   */
+  public static final class CombinedProto extends
+      com.google.protobuf.GeneratedMessage
+      implements CombinedProtoOrBuilder {
+    // Use CombinedProto.newBuilder() to construct.
+    private CombinedProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private CombinedProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final CombinedProto defaultInstance;
+    public static CombinedProto getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public CombinedProto getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private CombinedProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                ids_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              ids_.add(input.readUInt32());
+              break;
+            }
+            case 10: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001) && input.getBytesUntilLimit() > 0) {
+                ids_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                ids_.add(input.readUInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          ids_ = java.util.Collections.unmodifiableList(ids_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_CombinedProto_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_CombinedProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.webswing.directdraw.proto.Directdraw.CombinedProto.class, org.webswing.directdraw.proto.Directdraw.CombinedProto.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<CombinedProto> PARSER =
+        new com.google.protobuf.AbstractParser<CombinedProto>() {
+      public CombinedProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new CombinedProto(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CombinedProto> getParserForType() {
+      return PARSER;
+    }
+
+    // repeated uint32 ids = 1;
+    public static final int IDS_FIELD_NUMBER = 1;
+    private java.util.List<java.lang.Integer> ids_;
+    /**
+     * <code>repeated uint32 ids = 1;</code>
+     */
+    public java.util.List<java.lang.Integer>
+        getIdsList() {
+      return ids_;
+    }
+    /**
+     * <code>repeated uint32 ids = 1;</code>
+     */
+    public int getIdsCount() {
+      return ids_.size();
+    }
+    /**
+     * <code>repeated uint32 ids = 1;</code>
+     */
+    public int getIds(int index) {
+      return ids_.get(index);
+    }
+
+    private void initFields() {
+      ids_ = java.util.Collections.emptyList();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      for (int i = 0; i < ids_.size(); i++) {
+        output.writeUInt32(1, ids_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      {
+        int dataSize = 0;
+        for (int i = 0; i < ids_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeUInt32SizeNoTag(ids_.get(i));
+        }
+        size += dataSize;
+        size += 1 * getIdsList().size();
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.webswing.directdraw.proto.Directdraw.CombinedProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CombinedProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CombinedProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CombinedProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CombinedProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CombinedProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CombinedProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CombinedProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CombinedProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.CombinedProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.webswing.directdraw.proto.Directdraw.CombinedProto prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.webswing.directdraw.proto.CombinedProto}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.webswing.directdraw.proto.Directdraw.CombinedProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_CombinedProto_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_CombinedProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.webswing.directdraw.proto.Directdraw.CombinedProto.class, org.webswing.directdraw.proto.Directdraw.CombinedProto.Builder.class);
+      }
+
+      // Construct using org.webswing.directdraw.proto.Directdraw.CombinedProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        ids_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_CombinedProto_descriptor;
+      }
+
+      public org.webswing.directdraw.proto.Directdraw.CombinedProto getDefaultInstanceForType() {
+        return org.webswing.directdraw.proto.Directdraw.CombinedProto.getDefaultInstance();
+      }
+
+      public org.webswing.directdraw.proto.Directdraw.CombinedProto build() {
+        org.webswing.directdraw.proto.Directdraw.CombinedProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.webswing.directdraw.proto.Directdraw.CombinedProto buildPartial() {
+        org.webswing.directdraw.proto.Directdraw.CombinedProto result = new org.webswing.directdraw.proto.Directdraw.CombinedProto(this);
+        int from_bitField0_ = bitField0_;
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          ids_ = java.util.Collections.unmodifiableList(ids_);
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.ids_ = ids_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.webswing.directdraw.proto.Directdraw.CombinedProto) {
+          return mergeFrom((org.webswing.directdraw.proto.Directdraw.CombinedProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.webswing.directdraw.proto.Directdraw.CombinedProto other) {
+        if (other == org.webswing.directdraw.proto.Directdraw.CombinedProto.getDefaultInstance()) return this;
+        if (!other.ids_.isEmpty()) {
+          if (ids_.isEmpty()) {
+            ids_ = other.ids_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureIdsIsMutable();
+            ids_.addAll(other.ids_);
+          }
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.webswing.directdraw.proto.Directdraw.CombinedProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.webswing.directdraw.proto.Directdraw.CombinedProto) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // repeated uint32 ids = 1;
+      private java.util.List<java.lang.Integer> ids_ = java.util.Collections.emptyList();
+      private void ensureIdsIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          ids_ = new java.util.ArrayList<java.lang.Integer>(ids_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+      /**
+       * <code>repeated uint32 ids = 1;</code>
+       */
+      public java.util.List<java.lang.Integer>
+          getIdsList() {
+        return java.util.Collections.unmodifiableList(ids_);
+      }
+      /**
+       * <code>repeated uint32 ids = 1;</code>
+       */
+      public int getIdsCount() {
+        return ids_.size();
+      }
+      /**
+       * <code>repeated uint32 ids = 1;</code>
+       */
+      public int getIds(int index) {
+        return ids_.get(index);
+      }
+      /**
+       * <code>repeated uint32 ids = 1;</code>
+       */
+      public Builder setIds(
+          int index, int value) {
+        ensureIdsIsMutable();
+        ids_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated uint32 ids = 1;</code>
+       */
+      public Builder addIds(int value) {
+        ensureIdsIsMutable();
+        ids_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated uint32 ids = 1;</code>
+       */
+      public Builder addAllIds(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureIdsIsMutable();
+        super.addAll(values, ids_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated uint32 ids = 1;</code>
+       */
+      public Builder clearIds() {
+        ids_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.webswing.directdraw.proto.CombinedProto)
+    }
+
+    static {
+      defaultInstance = new CombinedProto(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:org.webswing.directdraw.proto.CombinedProto)
+  }
+
+  public interface GlyphProtoOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // optional bytes data = 1;
+    /**
+     * <code>optional bytes data = 1;</code>
+     */
+    boolean hasData();
+    /**
+     * <code>optional bytes data = 1;</code>
+     */
+    com.google.protobuf.ByteString getData();
+  }
+  /**
+   * Protobuf type {@code org.webswing.directdraw.proto.GlyphProto}
+   */
+  public static final class GlyphProto extends
+      com.google.protobuf.GeneratedMessage
+      implements GlyphProtoOrBuilder {
+    // Use GlyphProto.newBuilder() to construct.
+    private GlyphProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private GlyphProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final GlyphProto defaultInstance;
+    public static GlyphProto getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public GlyphProto getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private GlyphProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              data_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_GlyphProto_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_GlyphProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.webswing.directdraw.proto.Directdraw.GlyphProto.class, org.webswing.directdraw.proto.Directdraw.GlyphProto.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<GlyphProto> PARSER =
+        new com.google.protobuf.AbstractParser<GlyphProto>() {
+      public GlyphProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new GlyphProto(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<GlyphProto> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // optional bytes data = 1;
+    public static final int DATA_FIELD_NUMBER = 1;
+    private com.google.protobuf.ByteString data_;
+    /**
+     * <code>optional bytes data = 1;</code>
+     */
+    public boolean hasData() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional bytes data = 1;</code>
+     */
+    public com.google.protobuf.ByteString getData() {
+      return data_;
+    }
+
+    private void initFields() {
+      data_ = com.google.protobuf.ByteString.EMPTY;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, data_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, data_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.webswing.directdraw.proto.Directdraw.GlyphProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.GlyphProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.GlyphProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.GlyphProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.GlyphProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.GlyphProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.GlyphProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.GlyphProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.GlyphProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.webswing.directdraw.proto.Directdraw.GlyphProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.webswing.directdraw.proto.Directdraw.GlyphProto prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.webswing.directdraw.proto.GlyphProto}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.webswing.directdraw.proto.Directdraw.GlyphProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_GlyphProto_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_GlyphProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.webswing.directdraw.proto.Directdraw.GlyphProto.class, org.webswing.directdraw.proto.Directdraw.GlyphProto.Builder.class);
+      }
+
+      // Construct using org.webswing.directdraw.proto.Directdraw.GlyphProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        data_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.webswing.directdraw.proto.Directdraw.internal_static_org_webswing_directdraw_proto_GlyphProto_descriptor;
+      }
+
+      public org.webswing.directdraw.proto.Directdraw.GlyphProto getDefaultInstanceForType() {
+        return org.webswing.directdraw.proto.Directdraw.GlyphProto.getDefaultInstance();
+      }
+
+      public org.webswing.directdraw.proto.Directdraw.GlyphProto build() {
+        org.webswing.directdraw.proto.Directdraw.GlyphProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.webswing.directdraw.proto.Directdraw.GlyphProto buildPartial() {
+        org.webswing.directdraw.proto.Directdraw.GlyphProto result = new org.webswing.directdraw.proto.Directdraw.GlyphProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.data_ = data_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.webswing.directdraw.proto.Directdraw.GlyphProto) {
+          return mergeFrom((org.webswing.directdraw.proto.Directdraw.GlyphProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.webswing.directdraw.proto.Directdraw.GlyphProto other) {
+        if (other == org.webswing.directdraw.proto.Directdraw.GlyphProto.getDefaultInstance()) return this;
+        if (other.hasData()) {
+          setData(other.getData());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.webswing.directdraw.proto.Directdraw.GlyphProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.webswing.directdraw.proto.Directdraw.GlyphProto) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // optional bytes data = 1;
+      private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes data = 1;</code>
+       */
+      public boolean hasData() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional bytes data = 1;</code>
+       */
+      public com.google.protobuf.ByteString getData() {
+        return data_;
+      }
+      /**
+       * <code>optional bytes data = 1;</code>
+       */
+      public Builder setData(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        data_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes data = 1;</code>
+       */
+      public Builder clearData() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        data_ = getDefaultInstance().getData();
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.webswing.directdraw.proto.GlyphProto)
+    }
+
+    static {
+      defaultInstance = new GlyphProto(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:org.webswing.directdraw.proto.GlyphProto)
   }
 
   public interface RectangleProtoOrBuilder
@@ -17589,6 +18850,16 @@ public final class Directdraw {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_webswing_directdraw_proto_TransformProto_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_webswing_directdraw_proto_CombinedProto_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_webswing_directdraw_proto_CombinedProto_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_webswing_directdraw_proto_GlyphProto_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_webswing_directdraw_proto_GlyphProto_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_org_webswing_directdraw_proto_RectangleProto_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -17663,98 +18934,103 @@ public final class Directdraw {
       "23.org.webswing.directdraw.proto.DrawIns" +
       "tructionProto\022C\n\tconstants\030\004 \003(\01320.org.w" +
       "ebswing.directdraw.proto.DrawConstantPro" +
-      "to\"\205\003\n\024DrawInstructionProto\022R\n\004inst\030\001 \002(" +
+      "to\"\232\003\n\024DrawInstructionProto\022R\n\004inst\030\001 \002(" +
       "\0162D.org.webswing.directdraw.proto.DrawIn" +
       "structionProto.InstructionProto\022\014\n\004args\030" +
-      "\002 \003(\r\022\020\n\010webImage\030\003 \001(\014\"\370\001\n\020InstructionP",
+      "\002 \003(\r\022\020\n\010webImage\030\003 \001(\014\"\215\002\n\020InstructionP",
       "roto\022\010\n\004DRAW\020\000\022\010\n\004FILL\020\001\022\016\n\nDRAW_IMAGE\020\002" +
       "\022\021\n\rDRAW_WEBIMAGE\020\003\022\017\n\013DRAW_STRING\020\004\022\r\n\t" +
       "COPY_AREA\020\005\022\024\n\020GRAPHICS_DISPOSE\020\006\022\023\n\017GRA" +
       "PHICS_SWITCH\020\007\022\023\n\017GRAPHICS_CREATE\020\010\022\r\n\tT" +
       "RANSFORM\020\t\022\r\n\tSET_PAINT\020\n\022\014\n\010SET_FONT\020\013\022" +
-      "\016\n\nSET_STROKE\020\014\022\021\n\rSET_COMPOSITE\020\r\"\337\007\n\021D" +
-      "rawConstantProto\022\n\n\002id\030\001 \002(\r\0228\n\005color\030\002 " +
-      "\001(\0132).org.webswing.directdraw.proto.Colo" +
-      "rProto\0228\n\005image\030\003 \001(\0132).org.webswing.dir" +
-      "ectdraw.proto.ImageProto\022@\n\ttransform\030\004 ",
-      "\001(\0132-.org.webswing.directdraw.proto.Tran" +
-      "sformProto\022\016\n\006string\030\005 \001(\t\0226\n\004path\030\006 \001(\013" +
-      "2(.org.webswing.directdraw.proto.PathPro" +
-      "to\0226\n\004font\030\007 \001(\0132(.org.webswing.directdr" +
-      "aw.proto.FontProto\022F\n\nlinearGrad\030\010 \001(\01322" +
-      ".org.webswing.directdraw.proto.LinearGra" +
-      "dientProto\022F\n\nradialGrad\030\t \001(\01322.org.web" +
-      "swing.directdraw.proto.RadialGradientPro" +
-      "to\022:\n\006points\030\n \001(\0132*.org.webswing.direct" +
-      "draw.proto.PointsProto\022@\n\trectangle\030\013 \001(",
-      "\0132-.org.webswing.directdraw.proto.Rectan" +
-      "gleProto\022<\n\007ellipse\030\014 \001(\0132+.org.webswing" +
-      ".directdraw.proto.EllipseProto\022J\n\016roundR" +
-      "ectangle\030\r \001(\01322.org.webswing.directdraw" +
-      ".proto.RoundRectangleProto\0224\n\003arc\030\016 \001(\0132" +
-      "\'.org.webswing.directdraw.proto.ArcProto" +
-      "\022:\n\006stroke\030\017 \001(\0132*.org.webswing.directdr" +
-      "aw.proto.StrokeProto\022@\n\tcomposite\030\020 \001(\0132" +
-      "-.org.webswing.directdraw.proto.Composit" +
-      "eProto\022<\n\007texture\030\021 \001(\0132+.org.webswing.d",
-      "irectdraw.proto.TextureProto\"\032\n\nColorPro" +
-      "to\022\014\n\004rgba\030\001 \002(\007\"\032\n\nImageProto\022\014\n\004data\030\001" +
-      " \002(\014\"d\n\016TransformProto\022\016\n\003m00\030\001 \001(\002:\0011\022\013" +
-      "\n\003m10\030\002 \001(\002\022\013\n\003m01\030\003 \001(\002\022\016\n\003m11\030\004 \001(\002:\0011" +
-      "\022\013\n\003m02\030\005 \001(\002\022\013\n\003m12\030\006 \001(\002\"<\n\016RectangleP" +
-      "roto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n" +
-      "\001h\030\004 \002(\021\":\n\014EllipseProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y" +
-      "\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\"]\n\023RoundRec" +
-      "tangleProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003" +
-      " \002(\021\022\t\n\001h\030\004 \002(\021\022\014\n\004arcW\030\005 \001(\021\022\014\n\004arcH\030\006 ",
-      "\001(\021\"\307\001\n\010ArcProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t" +
-      "\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\022\r\n\005start\030\005 \001(\021\022\016\n\006e" +
-      "xtent\030\006 \001(\021\022B\n\004type\030\007 \001(\01624.org.webswing" +
-      ".directdraw.proto.ArcProto.ArcTypeProto\"" +
-      ",\n\014ArcTypeProto\022\010\n\004OPEN\020\000\022\t\n\005CHORD\020\001\022\007\n\003" +
-      "PIE\020\002\"\300\001\n\tPathProto\022\022\n\nwindingOdd\030\001 \002(\010\022" +
-      "G\n\004type\030\002 \003(\01629.org.webswing.directdraw." +
-      "proto.PathProto.SegmentTypeProto\022\016\n\006poin" +
-      "ts\030\003 \003(\021\"F\n\020SegmentTypeProto\022\010\n\004MOVE\020\000\022\010" +
-      "\n\004LINE\020\001\022\010\n\004QUAD\020\002\022\t\n\005CUBIC\020\003\022\t\n\005CLOSE\020\004",
-      "\"\365\001\n\tFontProto\022\016\n\006family\030\001 \002(\t\022B\n\005style\030" +
-      "\002 \001(\01623.org.webswing.directdraw.proto.Fo" +
-      "ntProto.StyleProto\022\014\n\004size\030\003 \001(\r\022@\n\ttran" +
-      "sform\030\004 \001(\0132-.org.webswing.directdraw.pr" +
-      "oto.TransformProto\"D\n\nStyleProto\022\n\n\006NORM" +
-      "AL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006ITALIC\020\002\022\021\n\rBOLDAND" +
-      "ITALIC\020\003\"\346\002\n\013StrokeProto\022\r\n\005width\030\001 \002(\002\022" +
-      "\022\n\nmiterLimit\030\002 \001(\002\022H\n\004join\030\003 \001(\0162:.org." +
-      "webswing.directdraw.proto.StrokeProto.St" +
-      "rokeJoinProto\022F\n\003cap\030\004 \001(\01629.org.webswin",
-      "g.directdraw.proto.StrokeProto.StrokeCap" +
-      "Proto\022\014\n\004dash\030\005 \003(\002\022\022\n\ndashOffset\030\006 \001(\002\"" +
-      "A\n\017StrokeJoinProto\022\016\n\nJOIN_MITER\020\000\022\016\n\nJO" +
-      "IN_ROUND\020\001\022\016\n\nJOIN_BEVEL\020\002\"=\n\016StrokeCapP" +
-      "roto\022\014\n\010CAP_BUTT\020\000\022\r\n\tCAP_ROUND\020\001\022\016\n\nCAP" +
-      "_SQUARE\020\002\"\266\001\n\023LinearGradientProto\022\016\n\006xSt" +
-      "art\030\001 \002(\021\022\016\n\006yStart\030\002 \002(\021\022\014\n\004xEnd\030\003 \002(\021\022" +
-      "\014\n\004yEnd\030\004 \002(\021\022\016\n\006colors\030\005 \003(\007\022\021\n\tfractio" +
-      "ns\030\006 \003(\002\022@\n\006repeat\030\007 \002(\01620.org.webswing." +
-      "directdraw.proto.CyclicMethodProto\"\314\001\n\023R",
-      "adialGradientProto\022\017\n\007xCenter\030\001 \002(\021\022\017\n\007y" +
-      "Center\030\002 \002(\021\022\016\n\006xFocus\030\003 \002(\021\022\016\n\006yFocus\030\004" +
-      " \002(\021\022\016\n\006radius\030\005 \002(\021\022\016\n\006colors\030\006 \003(\007\022\021\n\t" +
-      "fractions\030\007 \003(\002\022@\n\006repeat\030\010 \002(\01620.org.we" +
-      "bswing.directdraw.proto.CyclicMethodProt" +
-      "o\"\035\n\013PointsProto\022\016\n\006points\030\001 \003(\021\"\231\002\n\016Com" +
-      "positeProto\022N\n\004type\030\001 \002(\0162@.org.webswing" +
-      ".directdraw.proto.CompositeProto.Composi" +
-      "teTypeProto\022\020\n\005alpha\030\002 \001(\002:\0011\"\244\001\n\022Compos" +
-      "iteTypeProto\022\t\n\005CLEAR\020\001\022\007\n\003SRC\020\002\022\007\n\003DST\020",
-      "\t\022\014\n\010SRC_OVER\020\003\022\014\n\010DST_OVER\020\004\022\n\n\006SRC_IN\020" +
-      "\005\022\n\n\006DST_IN\020\006\022\013\n\007SRC_OUT\020\007\022\013\n\007DST_OUT\020\010\022" +
-      "\014\n\010SRC_ATOP\020\n\022\014\n\010DST_ATOP\020\013\022\007\n\003XOR\020\014\"\207\001\n" +
-      "\014TextureProto\0228\n\005image\030\001 \002(\0132).org.websw" +
-      "ing.directdraw.proto.ImageProto\022=\n\006ancho" +
-      "r\030\002 \002(\0132-.org.webswing.directdraw.proto." +
-      "RectangleProto*:\n\021CyclicMethodProto\022\014\n\010N" +
-      "O_CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
+      "\016\n\nSET_STROKE\020\014\022\021\n\rSET_COMPOSITE\020\r\022\023\n\017DR" +
+      "AW_GLYPH_LIST\020\016\"\331\010\n\021DrawConstantProto\022\n\n" +
+      "\002id\030\001 \002(\r\0228\n\005color\030\002 \001(\0132).org.webswing." +
+      "directdraw.proto.ColorProto\0228\n\005image\030\003 \001" +
+      "(\0132).org.webswing.directdraw.proto.Image",
+      "Proto\022@\n\ttransform\030\004 \001(\0132-.org.webswing." +
+      "directdraw.proto.TransformProto\022\016\n\006strin" +
+      "g\030\005 \001(\t\0226\n\004path\030\006 \001(\0132(.org.webswing.dir" +
+      "ectdraw.proto.PathProto\0226\n\004font\030\007 \001(\0132(." +
+      "org.webswing.directdraw.proto.FontProto\022" +
+      "F\n\nlinearGrad\030\010 \001(\01322.org.webswing.direc" +
+      "tdraw.proto.LinearGradientProto\022F\n\nradia" +
+      "lGrad\030\t \001(\01322.org.webswing.directdraw.pr" +
+      "oto.RadialGradientProto\022:\n\006points\030\n \001(\0132" +
+      "*.org.webswing.directdraw.proto.PointsPr",
+      "oto\022@\n\trectangle\030\013 \001(\0132-.org.webswing.di" +
+      "rectdraw.proto.RectangleProto\022<\n\007ellipse" +
+      "\030\014 \001(\0132+.org.webswing.directdraw.proto.E" +
+      "llipseProto\022J\n\016roundRectangle\030\r \001(\01322.or" +
+      "g.webswing.directdraw.proto.RoundRectang" +
+      "leProto\0224\n\003arc\030\016 \001(\0132\'.org.webswing.dire" +
+      "ctdraw.proto.ArcProto\022:\n\006stroke\030\017 \001(\0132*." +
+      "org.webswing.directdraw.proto.StrokeProt" +
+      "o\022@\n\tcomposite\030\020 \001(\0132-.org.webswing.dire" +
+      "ctdraw.proto.CompositeProto\022<\n\007texture\030\021",
+      " \001(\0132+.org.webswing.directdraw.proto.Tex" +
+      "tureProto\0228\n\005glyph\030\022 \001(\0132).org.webswing." +
+      "directdraw.proto.GlyphProto\022>\n\010combined\030" +
+      "\023 \001(\0132,.org.webswing.directdraw.proto.Co" +
+      "mbinedProto\"\032\n\nColorProto\022\014\n\004rgba\030\001 \002(\007\"" +
+      "\032\n\nImageProto\022\014\n\004data\030\001 \002(\014\"d\n\016Transform" +
+      "Proto\022\016\n\003m00\030\001 \001(\002:\0011\022\013\n\003m10\030\002 \001(\002\022\013\n\003m0" +
+      "1\030\003 \001(\002\022\016\n\003m11\030\004 \001(\002:\0011\022\013\n\003m02\030\005 \001(\002\022\013\n\003" +
+      "m12\030\006 \001(\002\"\034\n\rCombinedProto\022\013\n\003ids\030\001 \003(\r\"" +
+      "\032\n\nGlyphProto\022\014\n\004data\030\001 \001(\014\"<\n\016Rectangle",
+      "Proto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t" +
+      "\n\001h\030\004 \002(\021\":\n\014EllipseProto\022\t\n\001x\030\001 \002(\021\022\t\n\001" +
+      "y\030\002 \002(\021\022\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\"]\n\023RoundRe" +
+      "ctangleProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001w\030" +
+      "\003 \002(\021\022\t\n\001h\030\004 \002(\021\022\014\n\004arcW\030\005 \001(\021\022\014\n\004arcH\030\006" +
+      " \001(\021\"\307\001\n\010ArcProto\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022" +
+      "\t\n\001w\030\003 \002(\021\022\t\n\001h\030\004 \002(\021\022\r\n\005start\030\005 \001(\021\022\016\n\006" +
+      "extent\030\006 \001(\021\022B\n\004type\030\007 \001(\01624.org.webswin" +
+      "g.directdraw.proto.ArcProto.ArcTypeProto" +
+      "\",\n\014ArcTypeProto\022\010\n\004OPEN\020\000\022\t\n\005CHORD\020\001\022\007\n",
+      "\003PIE\020\002\"\300\001\n\tPathProto\022\022\n\nwindingOdd\030\001 \002(\010" +
+      "\022G\n\004type\030\002 \003(\01629.org.webswing.directdraw" +
+      ".proto.PathProto.SegmentTypeProto\022\016\n\006poi" +
+      "nts\030\003 \003(\021\"F\n\020SegmentTypeProto\022\010\n\004MOVE\020\000\022" +
+      "\010\n\004LINE\020\001\022\010\n\004QUAD\020\002\022\t\n\005CUBIC\020\003\022\t\n\005CLOSE\020" +
+      "\004\"\365\001\n\tFontProto\022\016\n\006family\030\001 \002(\t\022B\n\005style" +
+      "\030\002 \001(\01623.org.webswing.directdraw.proto.F" +
+      "ontProto.StyleProto\022\014\n\004size\030\003 \001(\r\022@\n\ttra" +
+      "nsform\030\004 \001(\0132-.org.webswing.directdraw.p" +
+      "roto.TransformProto\"D\n\nStyleProto\022\n\n\006NOR",
+      "MAL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006ITALIC\020\002\022\021\n\rBOLDAN" +
+      "DITALIC\020\003\"\346\002\n\013StrokeProto\022\r\n\005width\030\001 \002(\002" +
+      "\022\022\n\nmiterLimit\030\002 \001(\002\022H\n\004join\030\003 \001(\0162:.org" +
+      ".webswing.directdraw.proto.StrokeProto.S" +
+      "trokeJoinProto\022F\n\003cap\030\004 \001(\01629.org.webswi" +
+      "ng.directdraw.proto.StrokeProto.StrokeCa" +
+      "pProto\022\014\n\004dash\030\005 \003(\002\022\022\n\ndashOffset\030\006 \001(\002" +
+      "\"A\n\017StrokeJoinProto\022\016\n\nJOIN_MITER\020\000\022\016\n\nJ" +
+      "OIN_ROUND\020\001\022\016\n\nJOIN_BEVEL\020\002\"=\n\016StrokeCap" +
+      "Proto\022\014\n\010CAP_BUTT\020\000\022\r\n\tCAP_ROUND\020\001\022\016\n\nCA",
+      "P_SQUARE\020\002\"\266\001\n\023LinearGradientProto\022\016\n\006xS" +
+      "tart\030\001 \002(\021\022\016\n\006yStart\030\002 \002(\021\022\014\n\004xEnd\030\003 \002(\021" +
+      "\022\014\n\004yEnd\030\004 \002(\021\022\016\n\006colors\030\005 \003(\007\022\021\n\tfracti" +
+      "ons\030\006 \003(\002\022@\n\006repeat\030\007 \002(\01620.org.webswing" +
+      ".directdraw.proto.CyclicMethodProto\"\314\001\n\023" +
+      "RadialGradientProto\022\017\n\007xCenter\030\001 \002(\021\022\017\n\007" +
+      "yCenter\030\002 \002(\021\022\016\n\006xFocus\030\003 \002(\021\022\016\n\006yFocus\030" +
+      "\004 \002(\021\022\016\n\006radius\030\005 \002(\021\022\016\n\006colors\030\006 \003(\007\022\021\n" +
+      "\tfractions\030\007 \003(\002\022@\n\006repeat\030\010 \002(\01620.org.w" +
+      "ebswing.directdraw.proto.CyclicMethodPro",
+      "to\"\035\n\013PointsProto\022\016\n\006points\030\001 \003(\021\"\231\002\n\016Co" +
+      "mpositeProto\022N\n\004type\030\001 \002(\0162@.org.webswin" +
+      "g.directdraw.proto.CompositeProto.Compos" +
+      "iteTypeProto\022\020\n\005alpha\030\002 \001(\002:\0011\"\244\001\n\022Compo" +
+      "siteTypeProto\022\t\n\005CLEAR\020\001\022\007\n\003SRC\020\002\022\007\n\003DST" +
+      "\020\t\022\014\n\010SRC_OVER\020\003\022\014\n\010DST_OVER\020\004\022\n\n\006SRC_IN" +
+      "\020\005\022\n\n\006DST_IN\020\006\022\013\n\007SRC_OUT\020\007\022\013\n\007DST_OUT\020\010" +
+      "\022\014\n\010SRC_ATOP\020\n\022\014\n\010DST_ATOP\020\013\022\007\n\003XOR\020\014\"\207\001" +
+      "\n\014TextureProto\0228\n\005image\030\001 \002(\0132).org.webs" +
+      "wing.directdraw.proto.ImageProto\022=\n\006anch",
+      "or\030\002 \002(\0132-.org.webswing.directdraw.proto" +
+      ".RectangleProto*:\n\021CyclicMethodProto\022\014\n\010" +
+      "NO_CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -17778,7 +19054,7 @@ public final class Directdraw {
           internal_static_org_webswing_directdraw_proto_DrawConstantProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_DrawConstantProto_descriptor,
-              new java.lang.String[] { "Id", "Color", "Image", "Transform", "String", "Path", "Font", "LinearGrad", "RadialGrad", "Points", "Rectangle", "Ellipse", "RoundRectangle", "Arc", "Stroke", "Composite", "Texture", });
+              new java.lang.String[] { "Id", "Color", "Image", "Transform", "String", "Path", "Font", "LinearGrad", "RadialGrad", "Points", "Rectangle", "Ellipse", "RoundRectangle", "Arc", "Stroke", "Composite", "Texture", "Glyph", "Combined", });
           internal_static_org_webswing_directdraw_proto_ColorProto_descriptor =
             getDescriptor().getMessageTypes().get(3);
           internal_static_org_webswing_directdraw_proto_ColorProto_fieldAccessorTable = new
@@ -17797,74 +19073,86 @@ public final class Directdraw {
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_TransformProto_descriptor,
               new java.lang.String[] { "M00", "M10", "M01", "M11", "M02", "M12", });
-          internal_static_org_webswing_directdraw_proto_RectangleProto_descriptor =
+          internal_static_org_webswing_directdraw_proto_CombinedProto_descriptor =
             getDescriptor().getMessageTypes().get(6);
+          internal_static_org_webswing_directdraw_proto_CombinedProto_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_org_webswing_directdraw_proto_CombinedProto_descriptor,
+              new java.lang.String[] { "Ids", });
+          internal_static_org_webswing_directdraw_proto_GlyphProto_descriptor =
+            getDescriptor().getMessageTypes().get(7);
+          internal_static_org_webswing_directdraw_proto_GlyphProto_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_org_webswing_directdraw_proto_GlyphProto_descriptor,
+              new java.lang.String[] { "Data", });
+          internal_static_org_webswing_directdraw_proto_RectangleProto_descriptor =
+            getDescriptor().getMessageTypes().get(8);
           internal_static_org_webswing_directdraw_proto_RectangleProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_RectangleProto_descriptor,
               new java.lang.String[] { "X", "Y", "W", "H", });
           internal_static_org_webswing_directdraw_proto_EllipseProto_descriptor =
-            getDescriptor().getMessageTypes().get(7);
+            getDescriptor().getMessageTypes().get(9);
           internal_static_org_webswing_directdraw_proto_EllipseProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_EllipseProto_descriptor,
               new java.lang.String[] { "X", "Y", "W", "H", });
           internal_static_org_webswing_directdraw_proto_RoundRectangleProto_descriptor =
-            getDescriptor().getMessageTypes().get(8);
+            getDescriptor().getMessageTypes().get(10);
           internal_static_org_webswing_directdraw_proto_RoundRectangleProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_RoundRectangleProto_descriptor,
               new java.lang.String[] { "X", "Y", "W", "H", "ArcW", "ArcH", });
           internal_static_org_webswing_directdraw_proto_ArcProto_descriptor =
-            getDescriptor().getMessageTypes().get(9);
+            getDescriptor().getMessageTypes().get(11);
           internal_static_org_webswing_directdraw_proto_ArcProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_ArcProto_descriptor,
               new java.lang.String[] { "X", "Y", "W", "H", "Start", "Extent", "Type", });
           internal_static_org_webswing_directdraw_proto_PathProto_descriptor =
-            getDescriptor().getMessageTypes().get(10);
+            getDescriptor().getMessageTypes().get(12);
           internal_static_org_webswing_directdraw_proto_PathProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_PathProto_descriptor,
               new java.lang.String[] { "WindingOdd", "Type", "Points", });
           internal_static_org_webswing_directdraw_proto_FontProto_descriptor =
-            getDescriptor().getMessageTypes().get(11);
+            getDescriptor().getMessageTypes().get(13);
           internal_static_org_webswing_directdraw_proto_FontProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_FontProto_descriptor,
               new java.lang.String[] { "Family", "Style", "Size", "Transform", });
           internal_static_org_webswing_directdraw_proto_StrokeProto_descriptor =
-            getDescriptor().getMessageTypes().get(12);
+            getDescriptor().getMessageTypes().get(14);
           internal_static_org_webswing_directdraw_proto_StrokeProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_StrokeProto_descriptor,
               new java.lang.String[] { "Width", "MiterLimit", "Join", "Cap", "Dash", "DashOffset", });
           internal_static_org_webswing_directdraw_proto_LinearGradientProto_descriptor =
-            getDescriptor().getMessageTypes().get(13);
+            getDescriptor().getMessageTypes().get(15);
           internal_static_org_webswing_directdraw_proto_LinearGradientProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_LinearGradientProto_descriptor,
               new java.lang.String[] { "XStart", "YStart", "XEnd", "YEnd", "Colors", "Fractions", "Repeat", });
           internal_static_org_webswing_directdraw_proto_RadialGradientProto_descriptor =
-            getDescriptor().getMessageTypes().get(14);
+            getDescriptor().getMessageTypes().get(16);
           internal_static_org_webswing_directdraw_proto_RadialGradientProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_RadialGradientProto_descriptor,
               new java.lang.String[] { "XCenter", "YCenter", "XFocus", "YFocus", "Radius", "Colors", "Fractions", "Repeat", });
           internal_static_org_webswing_directdraw_proto_PointsProto_descriptor =
-            getDescriptor().getMessageTypes().get(15);
+            getDescriptor().getMessageTypes().get(17);
           internal_static_org_webswing_directdraw_proto_PointsProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_PointsProto_descriptor,
               new java.lang.String[] { "Points", });
           internal_static_org_webswing_directdraw_proto_CompositeProto_descriptor =
-            getDescriptor().getMessageTypes().get(16);
+            getDescriptor().getMessageTypes().get(18);
           internal_static_org_webswing_directdraw_proto_CompositeProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_CompositeProto_descriptor,
               new java.lang.String[] { "Type", "Alpha", });
           internal_static_org_webswing_directdraw_proto_TextureProto_descriptor =
-            getDescriptor().getMessageTypes().get(17);
+            getDescriptor().getMessageTypes().get(19);
           internal_static_org_webswing_directdraw_proto_TextureProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_TextureProto_descriptor,

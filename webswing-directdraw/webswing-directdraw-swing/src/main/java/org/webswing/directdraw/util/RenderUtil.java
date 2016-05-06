@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import org.webswing.directdraw.model.DrawInstruction;
+import org.webswing.directdraw.model.GlyphListConst.StringConstValue;
 
 public class RenderUtil {
 
@@ -35,53 +36,57 @@ public class RenderUtil {
 		Graphics2D currentGraphics = null;
 		for (DrawInstruction di : instructions) {
 			switch (di.getInstruction()) {
-				case GRAPHICS_CREATE:
-					currentGraphics = iprtGraphicsCreate(result, di, map);
-					break;
-				case GRAPHICS_DISPOSE: {
-					Graphics2D graphics = map.remove(getValue(0, di, Integer.class));
-					if (graphics != null) {
-						graphics.dispose();
-					}
-					break;
+			case GRAPHICS_CREATE:
+				currentGraphics = iprtGraphicsCreate(result, di, map);
+				break;
+			case GRAPHICS_DISPOSE: {
+				Graphics2D graphics = map.remove(getValue(0, di, Integer.class));
+				if (graphics != null) {
+					graphics.dispose();
 				}
-				case GRAPHICS_SWITCH: {
-					currentGraphics = map.get(getValue(0, di, Integer.class));
-					break;
-				}
-				case FILL:
-					iprtFill(currentGraphics, di);
-					break;
-				case DRAW:
-					iprtDraw(currentGraphics, di);
-					break;
-				case DRAW_STRING:
-					iprtDrawString(currentGraphics, di);
-					break;
-				case DRAW_WEBIMAGE:
-					iprtDrawWebImage(currentGraphics, di);
-					break;
-				case DRAW_IMAGE:
-					iprtDrawImage(currentGraphics, di);
-					break;
-				case COPY_AREA:
-					iprtCopyArea(currentGraphics, di, result);
-					break;
-				case SET_COMPOSITE:
-					iprtSetComposite(currentGraphics, di);
-					break;
-				case SET_FONT:
-					iprtSetFont(currentGraphics, di);
-					break;
-				case SET_PAINT:
-					iprtSetPaint(currentGraphics, di);
-					break;
-				case SET_STROKE:
-					iprtSetStroke(currentGraphics, di);
-					break;
-				case TRANSFORM:
-					iprtTransform(currentGraphics, di);
-					break;
+				break;
+			}
+			case GRAPHICS_SWITCH: {
+				currentGraphics = map.get(getValue(0, di, Integer.class));
+				break;
+			}
+			case FILL:
+				iprtFill(currentGraphics, di);
+				break;
+			case DRAW:
+				iprtDraw(currentGraphics, di);
+				break;
+			case DRAW_STRING:
+				iprtDrawString(currentGraphics, di);
+				break;
+			case DRAW_WEBIMAGE:
+				iprtDrawWebImage(currentGraphics, di);
+				break;
+			case DRAW_IMAGE:
+				iprtDrawImage(currentGraphics, di);
+				break;
+			case COPY_AREA:
+				iprtCopyArea(currentGraphics, di, result);
+				break;
+			case SET_COMPOSITE:
+				iprtSetComposite(currentGraphics, di);
+				break;
+			case SET_FONT:
+				iprtSetFont(currentGraphics, di);
+				break;
+			case SET_PAINT:
+				iprtSetPaint(currentGraphics, di);
+				break;
+			case SET_STROKE:
+				iprtSetStroke(currentGraphics, di);
+				break;
+			case TRANSFORM:
+				iprtTransform(currentGraphics, di);
+				break;
+			case DRAW_GLYPH_LIST:
+				iprtDrawGlyphList(currentGraphics, di);
+			default:
+				break;
 			}
 		}
 
@@ -106,8 +111,7 @@ public class RenderUtil {
 		if (crop == null) {
 			g.drawImage(image, 0, 0, bgcolor, null);
 		} else {
-			g.drawImage(image, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(),
-				(int) crop.getX(), (int) crop.getY(), (int) crop.getMaxX(), (int) crop.getMaxY(), bgcolor, null);
+			g.drawImage(image, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(), (int) crop.getX(), (int) crop.getY(), (int) crop.getMaxX(), (int) crop.getMaxY(), bgcolor, null);
 		}
 		g.setTransform(original);
 	}
@@ -126,8 +130,7 @@ public class RenderUtil {
 		if (crop == null) {
 			g.drawImage(image, 0, 0, bgColor, null);
 		} else {
-			g.drawImage(image, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(),
-				(int) crop.getX(), (int) crop.getY(), (int) crop.getMaxX(), (int) crop.getMaxY(), bgColor, null);
+			g.drawImage(image, 0, 0, (int) crop.getWidth(), (int) crop.getHeight(), (int) crop.getX(), (int) crop.getY(), (int) crop.getMaxX(), (int) crop.getMaxY(), bgColor, null);
 		}
 		g.setTransform(original);
 	}
@@ -137,6 +140,15 @@ public class RenderUtil {
 		Shape clip = getShape(2, di);
 		g.setClip(clip);
 		g.drawString(getValue(0, di, String.class), points[0], points[1]);
+	}
+
+	private static void iprtDrawGlyphList(Graphics2D g, DrawInstruction di) {
+		StringConstValue strVal = getValue(0, di);
+		Shape clip = getShape(1, di);
+		g.setClip(clip);
+		g.setFont(strVal.getFont());
+		g.setTransform(strVal.getTransform());
+		g.drawString(strVal.getString(), (float) strVal.getX(), (float) strVal.getY());
 	}
 
 	private static void iprtCopyArea(Graphics2D g, DrawInstruction di, BufferedImage result) {
@@ -206,7 +218,7 @@ public class RenderUtil {
 		return g;
 	}
 
-	@SuppressWarnings({ "unchecked", "unused" })
+	@SuppressWarnings({ "unchecked" })
 	private static <T> T getValue(int index, DrawInstruction instruction, Class<? extends T> cls) {
 		return (T) instruction.getArg(index).getValue();
 	}

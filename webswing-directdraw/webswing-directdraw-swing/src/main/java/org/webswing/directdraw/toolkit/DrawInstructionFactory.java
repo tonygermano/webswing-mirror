@@ -25,6 +25,7 @@ import org.webswing.directdraw.model.DrawConstant;
 import org.webswing.directdraw.model.DrawInstruction;
 import org.webswing.directdraw.model.EllipseConst;
 import org.webswing.directdraw.model.FontConst;
+import org.webswing.directdraw.model.GlyphListConst;
 import org.webswing.directdraw.model.GradientConst;
 import org.webswing.directdraw.model.ImageConst;
 import org.webswing.directdraw.model.IntegerConst;
@@ -57,16 +58,16 @@ public class DrawInstructionFactory {
 	}
 
 	public DrawInstruction drawImage(BufferedImage image, AffineTransform transform, Rectangle2D crop, Color bgcolor, Shape clip) {
-		DrawConstant transformConst = transform != null ? new TransformConst(ctx, transform) : DrawConstant.nullConst;
-		DrawConstant cropConst = crop != null ? new RectangleConst(ctx, crop) : DrawConstant.nullConst;
-		DrawConstant bgConst = bgcolor != null ? new ColorConst(ctx, bgcolor) : DrawConstant.nullConst;
+		DrawConstant<?> transformConst = transform != null ? new TransformConst(ctx, transform) : DrawConstant.nullConst;
+		DrawConstant<?> cropConst = crop != null ? new RectangleConst(ctx, crop) : DrawConstant.nullConst;
+		DrawConstant<?> bgConst = bgcolor != null ? new ColorConst(ctx, bgcolor) : DrawConstant.nullConst;
 		return new DrawInstruction(InstructionProto.DRAW_IMAGE, new ImageConst(ctx, image), transformConst, cropConst, bgConst, toPathConst(clip));
 	}
 
 	public DrawInstruction drawWebImage(WebImage image, AffineTransform transform, Rectangle2D crop, Color bgcolor, Shape clip) {
-		DrawConstant transformConst = transform != null ? new TransformConst(ctx, transform) : DrawConstant.nullConst;
-		DrawConstant cropConst = crop != null ? new RectangleConst(ctx, crop) : DrawConstant.nullConst;
-		DrawConstant bgConst = bgcolor != null ? new ColorConst(ctx, bgcolor) : DrawConstant.nullConst;
+		DrawConstant<?> transformConst = transform != null ? new TransformConst(ctx, transform) : DrawConstant.nullConst;
+		DrawConstant<?> cropConst = crop != null ? new RectangleConst(ctx, crop) : DrawConstant.nullConst;
+		DrawConstant<?> bgConst = bgcolor != null ? new ColorConst(ctx, bgcolor) : DrawConstant.nullConst;
 		return new DrawInstruction(image, transformConst, cropConst, bgConst, toPathConst(clip));
 	}
 
@@ -74,21 +75,25 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(InstructionProto.DRAW_STRING, new StringConst(ctx, s), new PointsConst(ctx, (int) x, (int) y), toPathConst(clip));
 	}
 
+	public DrawInstruction drawGlyphList(String string, Font font, double x, double y, AffineTransform transform, Shape clip) {
+		return new DrawInstruction(InstructionProto.DRAW_GLYPH_LIST, new GlyphListConst(ctx, string, font, x, y, transform), toPathConst(clip));
+	}
+
 	public DrawInstruction copyArea(int destX, int destY, int width, int height, int absDx, int absDy, Shape clip) {
 		return new DrawInstruction(InstructionProto.COPY_AREA, new PointsConst(ctx, destX, destY, width, height, absDx, absDy), toPathConst(clip));
 	}
 
 	public DrawInstruction createGraphics(WebGraphics g) {
-		DrawConstant id = new IntegerConst(g.getId());
-		DrawConstant transformConst = new TransformConst(ctx, g.getTransform());
-		DrawConstant compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
-		DrawConstant strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
-		DrawConstant paintConst = getPaintConstant(g.getPaint());
-		DrawConstant fontConst = new FontConst(ctx, g.getFont());
+		DrawConstant<?> id = new IntegerConst(g.getId());
+		DrawConstant<?> transformConst = new TransformConst(ctx, g.getTransform());
+		DrawConstant<?> compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
+		DrawConstant<?> strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
+		DrawConstant<?> paintConst = getPaintConstant(g.getPaint());
+		DrawConstant<?> fontConst = new FontConst(ctx, g.getFont());
 		return createGraphics(id, transformConst, strokeConst, compositeConst, paintConst, fontConst);
 	}
 
-	public DrawInstruction createGraphics(DrawConstant id, DrawConstant transform, DrawConstant stroke, DrawConstant composite, DrawConstant paint, DrawConstant font) {
+	public DrawInstruction createGraphics(DrawConstant<?> id, DrawConstant<?> transform, DrawConstant<?> stroke, DrawConstant<?> composite, DrawConstant<?> paint, DrawConstant<?> font) {
 		return new DrawInstruction(InstructionProto.GRAPHICS_CREATE, id, transform, stroke, composite, paint, font);
 	}
 
@@ -108,7 +113,7 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(InstructionProto.SET_PAINT, getPaintConstant(p));
 	}
 
-	protected DrawConstant getPaintConstant(Paint p) {
+	protected DrawConstant<?> getPaintConstant(Paint p) {
 		if (p instanceof Color) {
 			return new ColorConst(ctx, (Color) p);
 		} else if (p instanceof GradientPaint) {
@@ -131,7 +136,7 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(InstructionProto.SET_STROKE, new StrokeConst(ctx, stroke));
 	}
 
-	private DrawConstant toPathConst(Shape s) {
+	private DrawConstant<?> toPathConst(Shape s) {
 		if (s == null) {
 			return DrawConstant.nullConst;
 		}
@@ -151,4 +156,5 @@ public class DrawInstructionFactory {
 	public DrawInstruction setComposite(AlphaComposite ac) {
 		return new DrawInstruction(InstructionProto.SET_COMPOSITE, new CompositeConst(ctx, ac));
 	}
+
 }

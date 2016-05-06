@@ -11,7 +11,7 @@
 		c = c || {};
 		var config = {
 			onErrorMessage : c.onErrorMessage || function(message) {
-				console.log(message);
+				console.log(message.stack);
 			}
 		};
 		var proto = webswingProto!=null? ProtoBuf.loadProto(webswingProto,"directdraw.proto"):ProtoBuf.loadProtoFile("/directdraw.proto");
@@ -94,6 +94,8 @@
 					images.push(constant.image);
 				} else if (constant.texture != null) {
 					images.push(constant.texture.image);
+				} else if (constant.glyph != null && constant.glyph.data != null){
+					images.push(constant.glyph);
 				}
 			});
 			return images;
@@ -148,6 +150,9 @@
 					break;
 				case InstructionProto.TRANSFORM:
 					graphicsState.transform = concatTransform(graphicsState.transform, iprtTransform(ctx, args));
+					break;
+				case InstructionProto.DRAW_GLYPH_LIST:
+					iprtDrawGlyphList(ctx, args);
 					break;
 				default:
 					console.log("instruction code: " + instruction.inst + " not recognized");
@@ -293,6 +298,34 @@
 				}
 				ctx.restore();
 			});
+		}
+		
+		function iprtDrawGlyphList(ctx, args){
+			var combinedArgs = resolveArgs(args[0].combined.ids,constantPoolCache);
+			var size= combinedArgs[0].points;
+			var points= combinedArgs[1].points;
+			var glyphs= combinedArgs.slice(2);
+			var clip = args[1];
+			ctx.save();
+			if (path(ctx, clip)) {
+				ctx.clip(fillRule(clip));
+			}
+			if(glyphs.length>0){
+				var buffer = document.createElement("canvas");
+				buffer.width = size.points[2];
+				buffer.height = size.points[3];
+				var bufctx=buffer.getContext("2d");
+				for (var i = 0; i < glyphs.length; i++) {
+					if(glyphs[i].glyph.data!=null){
+						bufctx.drawImage(glyphs[i].glyph.data,points.points[i*2],points.points[i*2+1]);
+					}
+				}
+				bufctx.fillStyle=ctx.fillStyle;
+				bufctx.globalCompositeOperation='source-in';
+				bufctx.fillRect(0,0,buffer.width,buffer.height);
+				ctx.drawImage(buffer,size.points[0],size.points[1]);
+			}
+			ctx.restore();
 		}
 
 		function iprtDrawString(ctx, args, fontTransform) {

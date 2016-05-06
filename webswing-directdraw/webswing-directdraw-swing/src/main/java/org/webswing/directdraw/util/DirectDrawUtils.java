@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -25,12 +26,20 @@ import org.webswing.directdraw.model.DrawInstruction;
 import org.webswing.directdraw.model.TransformConst;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
 
+import sun.java2d.SunGraphics2D;
+import sun.java2d.loops.FontInfo;
+
+@SuppressWarnings("restriction")
 public class DirectDrawUtils {
 
 	public static final Properties windowsFonts = new Properties();
 	public static final Properties webFonts = new Properties();
+	private static final String DELIMITER = "|";
+	private static SunGraphics2D sgHelper;
 
 	static {
+		sgHelper = (SunGraphics2D) new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).getGraphics();
+		sgHelper.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		// logical fonts
 		windowsFonts.setProperty("Dialog", "Arial");
 		windowsFonts.setProperty("DialogInput", "Courier New");
@@ -44,6 +53,12 @@ public class DirectDrawUtils {
 		webFonts.setProperty("Courier New", "Monospaced");
 	}
 
+	public static FontInfo getFontInfo(Font font,AffineTransform transform){
+		sgHelper.setFont(font);
+		sgHelper.setTransform(transform);
+		return sgHelper.getFontInfo();
+	}
+
 	/**
 	 * there is a bug in the jdk 1.6 which makes Font.getAttributes() not work correctly. The method does not return all values. What we dow here is using the old JDK 1.5 method.
 	 * 
@@ -51,7 +66,7 @@ public class DirectDrawUtils {
 	 *
 	 * @return Attributes of font
 	 */
-//	@SuppressWarnings({ "rawtypes", "unchecked" })
+	//	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Map<? extends Attribute, ?> getAttributes(Font font) {
 		Map<Attribute, Object> result = new HashMap<Attribute, Object>(7, (float) 0.9);
 		result.put(TextAttribute.TRANSFORM, font.getTransform());
@@ -105,10 +120,10 @@ public class DirectDrawUtils {
 
 		// step 1. group consequent transformations
 		AffineTransform mergedTx = null;
-		DrawConstant mergedStroke = null;
-		DrawConstant mergedComposite = null;
-		DrawConstant mergedPaint = null;
-		DrawConstant mergedFont = null;
+		DrawConstant<?> mergedStroke = null;
+		DrawConstant<?> mergedComposite = null;
+		DrawConstant<?> mergedPaint = null;
+		DrawConstant<?> mergedFont = null;
 		DrawInstruction graphicsCreate = null;
 		Map<Integer, DrawInstruction> graphicsCreateMap = new HashMap<Integer, DrawInstruction>();
 		List<DrawInstruction> newInstructions = new ArrayList<DrawInstruction>();
@@ -172,11 +187,11 @@ public class DirectDrawUtils {
 		instructions.addAll(newInstructions);
 	}
 
-	private static DrawInstruction createGraphics(DirectDraw ctx, DrawConstant id, AffineTransform transform, DrawConstant stroke, DrawConstant composite, DrawConstant paint, DrawConstant font) {
+	private static DrawInstruction createGraphics(DirectDraw ctx, DrawConstant<?> id, AffineTransform transform, DrawConstant<?> stroke, DrawConstant<?> composite, DrawConstant<?> paint, DrawConstant<?> font) {
 		return ctx.getInstructionFactory().createGraphics(id, new TransformConst(ctx, transform), stroke, composite, paint, font);
 	}
 
-	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> instructions, AffineTransform transform, DrawConstant stroke, DrawConstant composite, DrawConstant paint, DrawConstant font) {
+	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> instructions, AffineTransform transform, DrawConstant<?> stroke, DrawConstant<?> composite, DrawConstant<?> paint, DrawConstant<?> font) {
 		if (transform != null) {
 			instructions.add(ctx.getInstructionFactory().transform(transform));
 		}
@@ -205,5 +220,27 @@ public class DirectDrawUtils {
 
 	public static int hashCode(boolean value) {
 		return value ? 1231 : 1237;
+	}
+
+	public static String fontInfoDescriptor(Font f,FontInfo fi) {
+		StringBuilder sb= new StringBuilder(f.getFontName());
+		sb.append(DELIMITER).append(f.getStyle());
+		sb.append(DELIMITER).append(fi.devTx);
+		sb.append(DELIMITER).append(fi.glyphTx);
+		sb.append(DELIMITER).append(fi.pixelHeight);
+		sb.append(DELIMITER);
+		return sb.toString();
+	}
+	
+	public static byte[] toPNG(DirectDraw ctx, byte[] gray, int w, int h) {
+		int[] imagePixels = new int[w * h];
+		for (int i = 0; i < imagePixels.length; i++) {
+			imagePixels[i] = gray[i] << 24;
+		}
+		BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		image.setRGB(0, 0, w, h, imagePixels, 0, w);
+		image.getRGB(0, 0, w, h, null, 0, w);
+		return ctx.getServices().getPngImage(image);
+
 	}
 }

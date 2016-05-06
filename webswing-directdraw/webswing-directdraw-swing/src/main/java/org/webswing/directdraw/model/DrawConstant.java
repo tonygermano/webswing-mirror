@@ -1,9 +1,24 @@
 package org.webswing.directdraw.model;
 
+import java.lang.ref.WeakReference;
+import java.util.WeakHashMap;
+
 import org.webswing.directdraw.DirectDraw;
 
 public abstract class DrawConstant<T> {
 
+	private static WeakHashMap<Object, WeakReference<Object>> flyweightRegister = new WeakHashMap<Object, WeakReference<Object>>();
+
+	@SuppressWarnings("unchecked")
+	protected static <T> T get(T object) {
+		if (!flyweightRegister.containsKey(object)) {
+			flyweightRegister.put(object, new WeakReference<Object>(object));
+			return object;
+		}
+		return (T) flyweightRegister.get(object).get();
+	}
+
+	
 	public static final NullConst nullConst = new NullConst();
 
 	private DirectDraw context;
@@ -42,7 +57,7 @@ public abstract class DrawConstant<T> {
 		this.context = context;
 	}
 
-	private static final class NullConst extends DrawConstant {
+	private static final class NullConst extends DrawConstant<Object> {
 
 		private NullConst() {
 			super(null);

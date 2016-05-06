@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.webswing.directdraw.DirectDraw;
+import org.webswing.directdraw.model.CompositeDrawConstantHolder;
 import org.webswing.directdraw.model.DrawConstant;
 import org.webswing.directdraw.model.DrawInstruction;
 import org.webswing.directdraw.model.IntegerConst;
@@ -26,6 +27,7 @@ import org.webswing.directdraw.util.RenderUtil;
 import sun.awt.image.SurfaceManager;
 import sun.java2d.SurfaceData;
 
+@SuppressWarnings("restriction")
 public class WebImage extends Image {
 
 	private String id = UUID.randomUUID().toString();
@@ -42,7 +44,6 @@ public class WebImage extends Image {
 		this.usedGraphics = new HashSet<WebGraphics>();
 	}
 	
-	@SuppressWarnings("restriction")
 	private WebImage(DirectDraw dd, int w, int h, List<DrawInstruction> instructions) {
 		this.context = dd;
 		this.size = new Dimension(w, h);
@@ -203,22 +204,17 @@ public class WebImage extends Image {
 
 		// build proto message
 		for (DrawInstruction instruction : instructions) {
-			for (DrawConstant cons : instruction) {
-				if (!(cons instanceof IntegerConst) && cons != DrawConstant.nullConst) {
-					// update cache
-					if (!constantPool.isInCache(cons)) {
-						constantPool.addToCache(cons);
-						DrawConstantProto.Builder builder = DrawConstantProto.newBuilder();
-						builder.setId(cons.getId());
-						if (cons.getFieldName() != null) {
-							builder.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(cons.getFieldName()), cons.toMessage());
-						}
-						webImageBuilder.addConstants(builder.build());
-					} else {
-						cons.setId(constantPool.getCached(cons).getId());
-					}
+			List<DrawConstantProto> constProtos= new ArrayList<DrawConstantProto>();
+			for (DrawConstant<?> cons : instruction) {
+				if (cons instanceof CompositeDrawConstantHolder){
+					CompositeDrawConstantHolder<?> composite=(CompositeDrawConstantHolder<?>) cons;
+					composite.expandAndCacheConstants(constProtos,constantPool);
+				}else if (!(cons instanceof IntegerConst) && cons != DrawConstant.nullConst) {
+					int id=constantPool.addToCache(constProtos, cons);
+					cons.setId(id);
 				}
 			}
+			webImageBuilder.addAllConstants(constProtos);
 			webImageBuilder.addInstructions(instruction.toMessage(dd));
 		}
 		webImageBuilder.setWidth(size.width);

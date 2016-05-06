@@ -22,6 +22,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 
+import org.webswing.directdraw.DirectDraw;
+
 public class WebGraphics extends AbstractVectorGraphics {
 
 	WebImage thisImage;
@@ -116,7 +118,11 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected void writeString(String string, double x, double y) {
-		thisImage.addInstruction(this, dif.drawString(string, x, y, getClip()));
+		if(DirectDraw.useGlyphs){
+			thisImage.addInstruction(this, dif.drawGlyphList(string, getFont(), x, y, getTransform(), getClip()));
+		}else{
+			thisImage.addInstruction(this, dif.drawString(string, x, y, getClip()));
+		}
 	}
 
 	@Override
@@ -148,7 +154,9 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected void writeFont(Font font) {
-		thisImage.addInstruction(this, dif.setFont(font));
+		if(!DirectDraw.useGlyphs){
+			thisImage.addInstruction(this, dif.setFont(font));
+		}
 	}
 
 	@Override

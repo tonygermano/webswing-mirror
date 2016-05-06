@@ -57,6 +57,8 @@ import org.webswing.directdraw.util.DirectDrawUtils;
  */
 public abstract class AbstractVectorGraphics extends Graphics2D {
 
+	private static final Font defaultFont = new Font("Dialog", 0, 12);
+	
 	private Dimension size;
 
 	private Color backgroundColor;
@@ -179,6 +181,9 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	@Override
 	public Font getFont() {
+		if(currentFont==null){
+			return defaultFont;
+		}
 		return currentFont;
 	}
 
@@ -456,7 +461,6 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void drawString(AttributedCharacterIterator iterator, float x, float y) {
 
 		// reset to that font at the end
