@@ -127,11 +127,16 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
         }
 
         function displayCopyBar(data) { // trigered by swing app
+        	var onlyOtherData=false;
             if (copyBar != null) {
                 close();
             }
-            if (!data.other && data.html == null && data.text == null && data.img == null && (data.files == null || data.files.length === 0)) {
-                return;
+            if (data.html == null && data.text == null && data.img == null && (data.files == null || data.files.length === 0)) {
+                if(!data.other){
+                	return;
+                }else{
+                	onlyOtherData=true;
+                }
             }
             api.cfg.rootElement.append(html);
             copyBar = api.cfg.rootElement.find('div[data-id="copyBar"]');
@@ -229,10 +234,16 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                 minimize();
             });
 
-            var minimizer = setTimeout(function() {
-                minimize();
-            }, 2000);
-
+            
+            if (onlyOtherData) {
+                copyBar.find('div[data-id="contentBar"]').hide();
+                copyBar.find('div[data-id="minimizedInfoBar"]').show();
+                copyBar.minimized = true;
+            }else{
+            	var minimizer = setTimeout(function() {
+                    minimize();
+                }, 2000);
+            }
         }
 
         function minimize() {
