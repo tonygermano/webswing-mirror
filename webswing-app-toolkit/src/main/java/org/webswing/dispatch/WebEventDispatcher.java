@@ -200,7 +200,7 @@ public class WebEventDispatcher {
 			}
 			return;
 		}
-		if (c != null) {
+		if (c != null && c.isShowing()) {
 			MouseEvent e = null;
 			int x = (int) (event.getX() - c.getLocationOnScreen().getX());
 			int y = (int) (event.getY() - c.getLocationOnScreen().getY());
@@ -312,7 +312,7 @@ public class WebEventDispatcher {
 							if (file != null && file.exists() && !file.isDirectory() && file.canRead()) {
 								OpenFileResultMsgInternal f = new OpenFileResultMsgInternal();
 								f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-								f.setF(file);
+								f.setFile(file);
 								Util.getWebToolkit().getPaintDispatcher().sendObject(f);
 							} else {
 								Logger.error("Failed to download file " + copy.getFile() + " from clipboard. File is not accessible or is a directory");

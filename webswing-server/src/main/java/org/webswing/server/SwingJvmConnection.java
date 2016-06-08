@@ -151,7 +151,7 @@ public class SwingJvmConnection implements MessageListener {
 				if (o instanceof MsgInternal) {
 					if (o instanceof PrinterJobResultMsgInternal) {
 						PrinterJobResultMsgInternal pj = (PrinterJobResultMsgInternal) o;
-						FileServlet.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser());
+						FileServlet.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser(),false,null);
 						AppFrameMsgOut f = new AppFrameMsgOut();
 						LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.print, pj.getId());
 						f.setLinkAction(linkAction);
@@ -159,7 +159,7 @@ public class SwingJvmConnection implements MessageListener {
 					} else if (o instanceof OpenFileResultMsgInternal) {
 						OpenFileResultMsgInternal fr = (OpenFileResultMsgInternal) o;
 						String id = UUID.randomUUID().toString();
-						FileServlet.registerFile(fr.getF(), id, 30, TimeUnit.MINUTES, webListener.getUser());
+						FileServlet.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, webListener.getUser(), fr.isWaitForFile(), fr.getOverwriteDetails());
 						AppFrameMsgOut f = new AppFrameMsgOut();
 						LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.file, id);
 						f.setLinkAction(linkAction);
@@ -200,9 +200,9 @@ public class SwingJvmConnection implements MessageListener {
 		}
 		webListener.notifyClose();
 	}
-	
-	public void killSwingProcess(int delayMs){
-		if(app!=null){
+
+	public void killSwingProcess(int delayMs) {
+		if (app != null) {
 			app.destroy(delayMs);
 		}
 	}
@@ -222,7 +222,7 @@ public class SwingJvmConnection implements MessageListener {
 			String webSwingToolkitJarPath = getClassPathForClass(WebToolkit.class);
 			String webSwingToolkitJarPathSpecific;
 			String webToolkitClass;
-			String javaVersion=subs.replace(appConfig.getJavaVersion());
+			String javaVersion = subs.replace(appConfig.getJavaVersion());
 			if (javaVersion.startsWith("1.6")) {
 				webSwingToolkitJarPathSpecific = getClassPathForClass(WebToolkit6.class);
 				webToolkitClass = WebToolkit6.class.getCanonicalName();
@@ -246,13 +246,14 @@ public class SwingJvmConnection implements MessageListener {
 			String aaFonts = appConfig.isAntiAliasText() ? " -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true " : "";
 			swing.setJvmArgs(bootCp + debug + aaFonts + " -noverify " + subs.replace(appConfig.getVmArgs()));
 			swing.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, clientId);
-			swing.addProperty( Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(appConfig.generateClassPathString()));
-			swing.addProperty( Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
+			swing.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(appConfig.generateClassPathString()));
+			swing.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 			swing.addProperty(Constants.JMS_URL, JmsService.getUrl());
 
 			swing.addProperty(Constants.SWING_START_SYS_PROP_THEME, subs.replace(appConfig.getTheme()));
 			swing.addProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs() + "");
 			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload() + "");
+			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD, appConfig.isAllowAutoDownload() + "");
 			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload() + "");
 			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE, appConfig.isAllowDelete() + "");
 			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, appConfig.isAllowJsLink() + "");
@@ -270,35 +271,35 @@ public class SwingJvmConnection implements MessageListener {
 			if (appConfig instanceof SwingApplicationDescriptor) {
 				SwingApplicationDescriptor application = (SwingApplicationDescriptor) appConfig;
 				swing.setArgs(subs.replace(application.getArgs()));
-				swing.addProperty( Constants.SWING_START_SYS_PROP_MAIN_CLASS, subs.replace(application.getMainClass()));
+				swing.addProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS, subs.replace(application.getMainClass()));
 			} else if (appConfig instanceof SwingAppletDescriptor) {
 				SwingAppletDescriptor applet = (SwingAppletDescriptor) appConfig;
 				swing.addProperty(Constants.SWING_START_SYS_PROP_APPLET_DOCUMENT_BASE, handshake.getDocumentBase());
-				swing.addProperty( Constants.SWING_START_SYS_PROP_APPLET_CLASS, applet.getAppletClass());
+				swing.addProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS, applet.getAppletClass());
 				for (String key : applet.getParameters().keySet()) {
-					swing.addProperty( Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX + subs.replace(key), subs.replace(applet.getParameters().get(key)));
+					swing.addProperty(Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX + subs.replace(key), subs.replace(applet.getParameters().get(key)));
 				}
 				if (handshake.getParams() != null) {
 					for (ParamMsg p : handshake.getParams()) {
-						swing.addProperty( Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX + p.getName(), p.getValue());
+						swing.addProperty(Constants.SWING_START_STS_PROP_APPLET_PARAM_PREFIX + p.getName(), p.getValue());
 					}
 				}
 			}
 			swing.execute();
 			swing.setCloseListener(new SwingProcess.CloseListener() {
-				
+
 				@Override
 				public void onClose() {
 					SwingJvmConnection.this.close();
 				}
 			});
 		} catch (Exception e1) {
-			log.error("Failed to start swing process. ",e1);
+			log.error("Failed to start swing process. ", e1);
 			close();
 		}
 		return swing;
 	}
-	
+
 	private String getClassPathForClass(Class<?> clazz) throws UnsupportedEncodingException {
 		String cp = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8");
 		if (cp.endsWith(clazz.getCanonicalName().replace(".", "/") + ".class")) {
@@ -306,7 +307,7 @@ public class SwingJvmConnection implements MessageListener {
 		}
 		return cp;
 	}
-	
+
 	private File getHomeDir(final SwingDescriptor appConfig, StrSubstitutor subs) {
 		String dirString = subs.replace(appConfig.getHomeDir());
 		File homeDir;

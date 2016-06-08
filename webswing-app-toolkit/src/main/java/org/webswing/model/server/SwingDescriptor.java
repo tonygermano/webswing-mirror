@@ -24,6 +24,7 @@ public class SwingDescriptor implements Serializable {
 	private boolean directdraw = false;
 	private boolean allowDelete = true;
 	private boolean allowDownload = true;
+	private boolean allowAutoDownload =true;
 	private boolean allowUpload = true;
 	private boolean allowJsLink = true;
 
@@ -196,6 +197,14 @@ public class SwingDescriptor implements Serializable {
 
 	public void setJavaVersion(String javaVersion) {
 		this.javaVersion = javaVersion;
+	}
+
+	public boolean isAllowAutoDownload() {
+		return allowAutoDownload;
+	}
+
+	public void setAllowAutoDownload(boolean allowAutoDownload) {
+		this.allowAutoDownload = allowAutoDownload;
 	}
 	
 }

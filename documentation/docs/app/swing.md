@@ -47,6 +47,7 @@ Here is a sample `webswing.config` file content with demo swing application conf
     "directdraw" : false,
     "allowDelete" : true,
     "allowDownload" : true,
+    "allowAutoDownload" : true,
     "allowUpload" : true,
     "allowJsLink" : true 
   }]
@@ -125,6 +126,8 @@ In Admin console options with variable replacement support appears with a flash 
 `allowDelete`: This options activates the 'Delete' button on the JFileChooser integration panel. If this is true, user will be allowed to delete files displayed in JFileChooser dialog.
 
 `allowDownload`: This options activates the 'Download' button on the JFileChooser integration panel. If this is true, user will be allowed to download files displayed in JFileChooser dialog.
+
+`allowAutoDownload`: If selected, the JFileChooser dialog's save mode will trigger file download as soon as the selected file is available on filesystem.
 
 `allowUpload`: This options activates the 'Upload' button and drop area on the JFileChooser integration panel. If this is true, user will be allowed to upload files to folder displayed in JFileChooser dialog.
 

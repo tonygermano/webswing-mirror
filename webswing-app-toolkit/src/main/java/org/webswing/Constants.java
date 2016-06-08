@@ -16,6 +16,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW = "webswing.directdraw";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED = "webswing.directdraw.supported";
 	public static final String SWING_START_SYS_PROP_ALLOW_DOWNLOAD = "webswing.allowDownload";
+	public static final String SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD = "webswing.allowAutoDownload";
 	public static final String SWING_START_SYS_PROP_ALLOW_UPLOAD = "webswing.allowUpload";
 	public static final String SWING_START_SYS_PROP_ALLOW_DELETE = "webswing.allowDelete";
 	public static final String SWING_START_SYS_PROP_ALLOW_JSLINK = "webswing.allowJsLink";
@@ -51,6 +52,7 @@ public interface Constants {
 	public static final String ALLOWED_CORS_ORIGINS = "webswing.corsOrigins";
 	public static final String JMS_OVERAL_MEM_LIMIT = "webswing.jmsOveralMemoryLimit";
 	public static final String JMS_DEST_MEM_LIMIT = "webswing.jmsDestinationMemoryLimit";
+	public static final String FILE_SERVLET_WAIT_TIMEOUT = "webswing.fileServletWaitTimeout";
 
 	// swing start related properties
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";

@@ -9,6 +9,7 @@ import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -381,6 +382,30 @@ public class WebPaintDispatcher {
 		fdEvent.setEventType(FileDialogEventType.Close);
 		f.setFileDialogEvent(fdEvent);
 		Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
+
+		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD)) {
+			if (fileChooserDialog != null && fileChooserDialog.getDialogType() == JFileChooser.SAVE_DIALOG) {
+				try {
+					Field resultValueField = JFileChooser.class.getDeclaredField("returnValue");
+					resultValueField.setAccessible(true);
+					if (resultValueField.get(fileChooserDialog).equals(JFileChooser.APPROVE_OPTION)) {
+						File saveFile = fileChooserDialog.getSelectedFile();
+						if (saveFile != null) {
+							OpenFileResultMsgInternal msg = new OpenFileResultMsgInternal();
+							msg.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
+							msg.setFile(saveFile);
+							msg.setWaitForFile(true);
+							if (saveFile.exists()) {
+								msg.setOverwriteDetails(saveFile.length() + "|" + saveFile.lastModified());
+							}
+							Util.getWebToolkit().getPaintDispatcher().sendObject(msg);
+						}
+					}
+				} catch (Exception e) {
+					Logger.warn("Save file dialog's file monitoring failed: " + e.getMessage());
+				}
+			}
+		}
 		fileChooserDialog = null;
 		Services.getConnectionService().sendObject(f);
 	}
@@ -395,7 +420,7 @@ public class WebPaintDispatcher {
 			if (file != null && file.exists() && !file.isDirectory() && file.canRead()) {
 				OpenFileResultMsgInternal f = new OpenFileResultMsgInternal();
 				f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-				f.setF(file);
+				f.setFile(file);
 				Util.getWebToolkit().getPaintDispatcher().sendObject(f);
 			}
 		}

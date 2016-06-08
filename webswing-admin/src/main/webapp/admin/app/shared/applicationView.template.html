@@ -142,6 +142,11 @@
                                   value="vm.app.allowDownload" >
                 </ws-boolean-field>
                 <ws-boolean-field readonly="{{vm.readonly}}"
+                                  label="Auto-Download files" 
+                                  desc="If selected, the JFileChooser dialog's save mode will trigger file download as soon as the selected file is available on filesystem." 
+                                  value="vm.app.allowAutoDownload" >
+                </ws-boolean-field>
+                <ws-boolean-field readonly="{{vm.readonly}}"
                                   label="Upload files" 
                                   desc="If selected, the JFileChooser integration will allow users to upload files to folder opened in the file chooser dialog" 
                                   value="vm.app.allowUpload" >

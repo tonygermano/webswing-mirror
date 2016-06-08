@@ -42,13 +42,18 @@ public class FilesDemo extends JPanel {
 		smPanel.add(new JLabel("Selection mode:"));
 		smPanel.add(mode);
 
-		JPanel panel = new JPanel(new GridLayout(2, 2, 20, 0));
+		JPanel panel = new JPanel(new GridLayout(4, 2, 20, 0));
 		panel.add(msPanel);
 		panel.add(smPanel);
 		panel.add(new JPanel());
 		JButton filesBtn = new JButton("Open File Chooser");
 		filesBtn.addActionListener(new OpenFileDialog(this));
 		panel.add(filesBtn);
+		//save dialog
+		panel.add(new JPanel());
+		JButton saveBtn = new JButton("Open Save Dialog");
+		saveBtn.addActionListener(new SaveFileDialog(this));
+		panel.add(saveBtn);
 		add("South", panel);
 	}
 

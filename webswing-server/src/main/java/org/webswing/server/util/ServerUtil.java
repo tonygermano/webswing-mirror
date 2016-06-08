@@ -3,25 +3,25 @@ package org.webswing.server.util;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.http.HttpServletRequest;
 
-import main.Main;
-
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.apache.shiro.realm.text.PropertiesRealm;
 import org.apache.shiro.subject.Subject;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResource;
@@ -42,9 +42,10 @@ import org.webswing.model.server.SwingDescriptor;
 import org.webswing.model.server.admin.SwingSession;
 import org.webswing.server.ConfigurationManager;
 import org.webswing.server.SwingInstance;
-import org.webswing.server.handler.FileServlet;
 import org.webswing.server.handler.LoginServlet;
 import org.webswing.server.model.EncodedMessage;
+
+import main.Main;
 
 public class ServerUtil {
 
@@ -307,14 +308,6 @@ public class ServerUtil {
 		return false;
 	}
 
-	public static boolean validateUserFile(byte[] content) throws IOException {
-		PropertiesRealm r = new PropertiesRealm();
-		String tmpFileName = FileServlet.registerFile(content, UUID.randomUUID().toString(), 10, TimeUnit.SECONDS, "");
-		r.setResourcePath(tmpFileName);
-		r.init();
-		return true;
-	}
-
 	public static boolean isRecording(HttpServletRequest r) {
 		String recording = (String) r.getHeader(Constants.HTTP_ATTR_RECORDING_FLAG);
 		return Boolean.parseBoolean(recording);
@@ -377,6 +370,21 @@ public class ServerUtil {
 
 	public static void broadcastMessage(AtmosphereResource r, MsgOut o) {
 		broadcastMessage(r, new EncodedMessage(o));
+	}
+
+	public static boolean isFileLocked(File file) {
+		if (file.exists()) {
+			try {
+				Path source = file.toPath();
+				Path dest = file.toPath().resolveSibling(file.getName() + ".wstest");
+				Files.move(source, dest);
+				Files.move(dest, source);
+				return false;
+			} catch (IOException e) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
