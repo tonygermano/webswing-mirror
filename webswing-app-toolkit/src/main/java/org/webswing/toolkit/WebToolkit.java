@@ -5,6 +5,7 @@ import java.awt.Button;
 import java.awt.Checkbox;
 import java.awt.CheckboxMenuItem;
 import java.awt.Choice;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dialog;
@@ -185,8 +186,20 @@ public abstract class WebToolkit extends SunToolkit {
 				this.desktopProperties.put("Shell.shellFolderManager", "sun.awt.shell.Win32ShellFolderManager2");
 			}
 		}
-		this.desktopProperties.put("win.highContrast.on", Boolean.FALSE);
-		this.desktopProperties.put("win.xpstyle.themeActive", Boolean.TRUE);
+		if (System.getProperty("os.name", "").startsWith("Windows")) {
+			this.desktopProperties.put("win.highContrast.on", Boolean.FALSE);
+			this.desktopProperties.put("win.xpstyle.themeActive", Boolean.TRUE);
+			this.desktopProperties.put("win.text.grayedTextColor",new Color(109,109,109));
+			this.desktopProperties.put("win.scrollbar.backgroundColor",new Color(200,200,200));
+			this.desktopProperties.put("win.menubar.backgroundColor",new Color(240,240,240));
+			this.desktopProperties.put("win.menu.textColor",Color.black);
+			this.desktopProperties.put("win.menu.backgroundColor",new Color(240,240,240));
+			this.desktopProperties.put("win.item.highlightTextColor",Color.white);
+			this.desktopProperties.put("win.item.highlightColor",new Color(51,153,255));
+			this.desktopProperties.put("win.tooltip.textColor",Color.black);
+			this.desktopProperties.put("win.button.textColor",Color.black);
+			this.desktopProperties.put("win.tooltip.backgroundColor",Color.white);
+		}
 	}
 
 	public boolean needUpdateWindow() {
