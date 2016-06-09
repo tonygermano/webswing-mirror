@@ -10,6 +10,7 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.FileDialog;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -97,6 +98,7 @@ import sun.print.PrintJob2D;
 
 @SuppressWarnings("restriction")
 public abstract class WebToolkit extends SunToolkit {
+	public static final Font defaultFont = new Font("Dialog", 0, 12);
 
 	public static final String BACKGROUND_WINDOW_ID = "BG";
 	private static Object TREELOCK = null;
@@ -198,6 +200,19 @@ public abstract class WebToolkit extends SunToolkit {
 		this.desktopProperties.put("win.tooltip.textColor", Color.black);
 		this.desktopProperties.put("win.button.textColor", Color.black);
 		this.desktopProperties.put("win.tooltip.backgroundColor", Color.white);
+		this.desktopProperties.put("win.systemFixed.font", defaultFont);
+		this.desktopProperties.put("win.messagebox.font", defaultFont);
+		this.desktopProperties.put("win.ansiFixed.font", defaultFont);
+		this.desktopProperties.put("win.system.font", defaultFont);
+		this.desktopProperties.put("win.menu.font", defaultFont);
+		this.desktopProperties.put("win.tooltip.font", defaultFont);
+		this.desktopProperties.put("win.ansiVar.font", defaultFont);
+		this.desktopProperties.put("win.icon.font", defaultFont);
+		this.desktopProperties.put("win.deviceDefault.font", defaultFont);
+		this.desktopProperties.put("win.oemFixed.font", defaultFont);
+		this.desktopProperties.put("win.defaultGUI.font", defaultFont);
+		this.desktopProperties.put("win.status.font", defaultFont);
+
 	}
 
 	public boolean needUpdateWindow() {
