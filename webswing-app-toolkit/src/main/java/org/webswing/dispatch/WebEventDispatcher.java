@@ -16,6 +16,7 @@ import java.awt.event.MouseWheelEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,6 +58,9 @@ public class WebEventDispatcher {
 	private Point lastMousePosition = new Point();
 	private static final DndEventHandler dndHandler = new DndEventHandler();
 	private HashMap<String, String> uploadMap = new HashMap<String, String>();
+	
+	//these keycodes are assigned to different keys in browser  
+	private static final List<Integer> nonStandardKeyCodes= Arrays.asList(KeyEvent.VK_KP_DOWN,KeyEvent.VK_KP_UP,KeyEvent.VK_KP_RIGHT,KeyEvent.VK_KP_LEFT);
 
 	public void dispatchEvent(MsgIn event) {
 		Logger.debug("WebEventDispatcher.dispatchEvent:", event);
@@ -172,6 +176,8 @@ public class WebEventDispatcher {
 				} else if (event.getKeycode() == 46) {// delete keycode
 					event.setKeycode(127);
 					event.setCharacter(127);
+				}else if (nonStandardKeyCodes.contains(event.getKeycode())){
+					event.setKeycode(0);
 				}
 				AWTEvent e = new KeyEvent(src, type, when, modifiers, event.getKeycode(), (char) event.getCharacter(), KeyEvent.KEY_LOCATION_STANDARD);
 

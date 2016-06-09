@@ -140,15 +140,15 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
             });
 
             util.bindEvent(input, 'keydown', function(event) {
-                // 48-57
-                // 65-90
-                // 186-192
-                // 219-222
-                // 226
-                // FF (163, 171, 173, ) -> en layout ]\/ keys
-                var kc = event.keyCode;
-                if (!((kc >= 48 && kc <= 57) || (kc >= 65 && kc <= 90) || (kc >= 186 && kc <= 192) || (kc >= 219 && kc <= 222) || (kc == 226)
-                        || (kc == 0) || (kc == 163) || (kc == 171) || (kc == 173) || (kc >= 96 && kc <= 111) || (kc == 59) || (kc == 61))) {
+                var functionKeys=[9/*tab*/, 12/*Numpad5*/, 13/*enter*/, 16/*Shift*/, 17/*ctrl*/, 18/*alt*/, 19/*pause*/, 20/*CapsLock*/, 27/*esc*/, 
+                                  32/*space*/, 33/*pgup*/, 34/*pgdown*/, 35/*end*/, 36/*home*/, 37/*left*/, 38/*up*/, 39/*right*/, 40/*down*/, 44/*prtscr*/, 
+                                  45/*insert*/, 46/*Delete*/, 91/*OSLeft*/, 92/*OSRight*/, 93/*Context*/, 145/*scrlck*/, 225/*altGraph(Linux)*/,
+                                  112/*F1*/, 113/*F2*/, 114/*F3*/, 115/*F4*/, 116/*F5*/, 117/*F6*/, 118/*F7*/, 119/*F8*/, 120/*F9*/,
+                                  121/*F10*/, 122/*F11*/, 123/*F12*/, 124/*F13*/, 125/*F14*/, 126/*F15*/, 127/*F16*/, 128/*F17*/, 129/*F18*/, 130/*F19*/, 131/*F20*/,
+                                  132/*F21*/, 133/*F22*/, 134/*F23*/, 135/*F24*/]; 
+            	
+            	var kc = event.keyCode;
+                if (functionKeys.indexOf(kc)!=-1) {
                     if(!api.cfg.virtualKB){
                         event.preventDefault();
                         event.stopPropagation();
