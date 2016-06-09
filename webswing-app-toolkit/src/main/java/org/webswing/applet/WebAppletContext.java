@@ -102,6 +102,10 @@ public class WebAppletContext implements AppletContext {
 		// do nothing
 		return null;
 	}
+	
+	public AppletContainer getContainer(){
+		return container;
+	}
 
 	static class AppletImageRef extends Ref {
 		URL url;
