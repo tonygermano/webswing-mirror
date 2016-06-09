@@ -100,7 +100,7 @@ public abstract class WebToolkit extends SunToolkit {
 
 	public static final String BACKGROUND_WINDOW_ID = "BG";
 	private static Object TREELOCK = null;
-	
+
 	private WebEventDispatcher eventDispatcher = new WebEventDispatcher();
 	private WebPaintDispatcher paintDispatcher = new WebPaintDispatcher();
 
@@ -186,20 +186,18 @@ public abstract class WebToolkit extends SunToolkit {
 				this.desktopProperties.put("Shell.shellFolderManager", "sun.awt.shell.Win32ShellFolderManager2");
 			}
 		}
-		if (System.getProperty("os.name", "").startsWith("Windows")) {
-			this.desktopProperties.put("win.highContrast.on", Boolean.FALSE);
-			this.desktopProperties.put("win.xpstyle.themeActive", Boolean.TRUE);
-			this.desktopProperties.put("win.text.grayedTextColor",new Color(109,109,109));
-			this.desktopProperties.put("win.scrollbar.backgroundColor",new Color(200,200,200));
-			this.desktopProperties.put("win.menubar.backgroundColor",new Color(240,240,240));
-			this.desktopProperties.put("win.menu.textColor",Color.black);
-			this.desktopProperties.put("win.menu.backgroundColor",new Color(240,240,240));
-			this.desktopProperties.put("win.item.highlightTextColor",Color.white);
-			this.desktopProperties.put("win.item.highlightColor",new Color(51,153,255));
-			this.desktopProperties.put("win.tooltip.textColor",Color.black);
-			this.desktopProperties.put("win.button.textColor",Color.black);
-			this.desktopProperties.put("win.tooltip.backgroundColor",Color.white);
-		}
+		this.desktopProperties.put("win.highContrast.on", Boolean.FALSE);
+		this.desktopProperties.put("win.xpstyle.themeActive", Boolean.TRUE);
+		this.desktopProperties.put("win.text.grayedTextColor", new Color(109, 109, 109));
+		this.desktopProperties.put("win.scrollbar.backgroundColor", new Color(200, 200, 200));
+		this.desktopProperties.put("win.menubar.backgroundColor", new Color(240, 240, 240));
+		this.desktopProperties.put("win.menu.textColor", Color.black);
+		this.desktopProperties.put("win.menu.backgroundColor", new Color(240, 240, 240));
+		this.desktopProperties.put("win.item.highlightTextColor", Color.white);
+		this.desktopProperties.put("win.item.highlightColor", new Color(51, 153, 255));
+		this.desktopProperties.put("win.tooltip.textColor", Color.black);
+		this.desktopProperties.put("win.button.textColor", Color.black);
+		this.desktopProperties.put("win.tooltip.backgroundColor", Color.white);
 	}
 
 	public boolean needUpdateWindow() {
@@ -236,12 +234,12 @@ public abstract class WebToolkit extends SunToolkit {
 		return localwindowPeer;
 	}
 
-    public PanelPeer createPanel(Panel panel) {
-    	WebPanelPeer localpanelPeer = new WebPanelPeer(panel);
-        targetCreatedPeer(panel, localpanelPeer);
-        return localpanelPeer;
-    }
-        
+	public PanelPeer createPanel(Panel panel) {
+		WebPanelPeer localpanelPeer = new WebPanelPeer(panel);
+		targetCreatedPeer(panel, localpanelPeer);
+		return localpanelPeer;
+	}
+
 	@Override
 	protected synchronized MouseInfoPeer getMouseInfoPeer() {
 		{
@@ -552,8 +550,8 @@ public abstract class WebToolkit extends SunToolkit {
 	}
 
 	public Object getTreeLock() {
-		if(TREELOCK==null){
-			TREELOCK=new JPanel().getTreeLock();
+		if (TREELOCK == null) {
+			TREELOCK = new JPanel().getTreeLock();
 		}
 		return TREELOCK;
 	}
