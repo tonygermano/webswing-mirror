@@ -11,7 +11,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 class PictureTransferHandler extends TransferHandler {
-    DataFlavor pictureFlavor = DataFlavor.imageFlavor;
+    static DataFlavor pictureFlavor = DataFlavor.imageFlavor;
     DTPicture sourcePic;
     boolean shouldRemove;
 
@@ -64,7 +64,7 @@ class PictureTransferHandler extends TransferHandler {
         return false;
     }
 
-    class PictureTransferable implements Transferable {
+    public static class PictureTransferable implements Transferable {
         private Image image;
 
         PictureTransferable(DTPicture pic) {

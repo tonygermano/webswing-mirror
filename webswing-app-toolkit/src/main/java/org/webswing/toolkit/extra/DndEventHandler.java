@@ -3,7 +3,6 @@ package org.webswing.toolkit.extra;
 import java.awt.AWTEvent;
 import java.awt.Window;
 import java.awt.datatransfer.Transferable;
-import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
@@ -20,7 +19,7 @@ public class DndEventHandler {
     private int sourceActions;
     private int lastDropTargetAction = 0;
     private boolean dropped;
-    private boolean finished;
+    private boolean finished=true;
     private static String cursorName = CursorChangeEventMsg.MOVE_CURSOR;
 
     public void processMouseEvent(Window w, AWTEvent e) {
@@ -84,13 +83,8 @@ public class DndEventHandler {
         return cursorName;
     }
 
-    public static boolean isDndInProgress() {
-        try {
-            WebDragSourceContextPeer.checkDragDropInProgress();
-            return false;
-        } catch (InvalidDnDOperationException e) {
-            return true;
-        }
+    public boolean isDndInProgress() {
+    	return !finished;
     }
 
 }

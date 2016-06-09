@@ -25,7 +25,8 @@ import com.sun.swingset3.DemoProperties;
 @DemoProperties(value = "Picture DnD", category = "Webswing", description = "Demonstrates Drag and drop functionality", sourceFiles = { "org/webswing/demo/dnd/DragPictureDemo.java" })
 public class DragPictureDemo extends JPanel {
 
-	DTPicture pic1, pic2, pic3, pic4, pic5, pic6, pic7, pic8, pic9, pic10, pic11, pic12;
+	DTPicture pic1, pic2, pic3, pic4, pic5, pic6, pic7, pic8, pic9, pic10, pic11;
+	JLabel pic12;
 	static String mayaString = "1";
 	static String anyaString = "2";
 	static String laineString = "3";
@@ -33,11 +34,12 @@ public class DragPictureDemo extends JPanel {
 	static String adeleString = "5";
 	static String alexiString = "6";
 	PictureTransferHandler picHandler;
+	private TransferHandler picExportHandler;
 
 	public DragPictureDemo() {
 		super(new BorderLayout());
 		picHandler = new PictureTransferHandler();
-
+		picExportHandler = new PictureExportHandler();
 		JPanel mugshots = new JPanel(new GridLayout(4, 3));
 		pic1 = new DTPicture(createImageIcon("images/" + mayaString + ".jpg", mayaString).getImage());
 		pic1.setTransferHandler(picHandler);
@@ -75,8 +77,10 @@ public class DragPictureDemo extends JPanel {
 		pic11 = new DTPicture(null);
 		pic11.setTransferHandler(picHandler);
 		mugshots.add(pic11);
-		pic12 = new DTPicture(null);
-		pic12.setTransferHandler(picHandler);
+		pic12 = new JLabel("Export image...");
+		pic12.setBorder(BorderFactory.createRaisedBevelBorder());
+		
+		pic12.setTransferHandler(picExportHandler);
 		mugshots.add(pic12);
 
 		setPreferredSize(new Dimension(450, 630));

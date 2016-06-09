@@ -39,6 +39,7 @@ import javax.swing.SwingUtilities;
 
 import org.webswing.common.GraphicsWrapper;
 import org.webswing.common.WindowActionType;
+import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
@@ -406,7 +407,7 @@ public class WebComponentPeer implements ComponentPeer {
 	}
 
 	public void updateCursorImmediately() {
-		if (DndEventHandler.isDndInProgress()) {
+		if (WebEventDispatcher.isDndInProgress()) {
 			Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(null, DndEventHandler.getCurrentDropTargetCursorName());
 		} else {
 			Point location = Util.getWebToolkit().getEventDispatcher().getLastMousePosition();
