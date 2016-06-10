@@ -197,7 +197,7 @@ public class WebPaintDispatcher {
 
 	@SuppressWarnings("restriction")
 	public void notifyWindowRepaintAll() {
-		notifyWindowAreaRepainted(WebToolkit.BACKGROUND_WINDOW_ID, new Rectangle(Util.getWebToolkit().getScreenSize()));
+		notifyBackgroundRepainted( new Rectangle(Util.getWebToolkit().getScreenSize()));
 		for (Window w : Window.getWindows()) {
 			if (w.isShowing()) {
 				notifyWindowRepaint(w);

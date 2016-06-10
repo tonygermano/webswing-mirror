@@ -153,7 +153,6 @@ public class WebComponentPeer implements ComponentPeer {
 	// /////////////////// WebComponentPeer
 	// Implementation//////////////////////////////////////////////////
 
-	private static final Font defaultFont = new Font("Dialog", 0, 12);
 	protected long pData; // ???
 	protected boolean destroyed;
 	protected Object target;
@@ -353,7 +352,7 @@ public class WebComponentPeer implements ComponentPeer {
 		}
 		Font font = this.font;
 		if (font == null) {
-			font = defaultFont;
+			font = WebToolkit.defaultFont;
 		}
 
 		Graphics2D result = null;

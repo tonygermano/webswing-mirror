@@ -8,6 +8,7 @@ import org.webswing.model.MsgOut;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn.SimpleEventType;
+import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.model.server.SwingDescriptor;
 import org.webswing.model.server.admin.SwingJvmStats;
 import org.webswing.server.SwingJvmConnection.WebSessionListener;
@@ -18,6 +19,7 @@ import org.webswing.server.util.StatUtils;
 
 public class SwingInstance implements WebSessionListener {
 
+	private String instanceId;
 	private String user;
 	private AtmosphereResource resource;
 	private AtmosphereResource mirroredResource;
@@ -28,26 +30,38 @@ public class SwingInstance implements WebSessionListener {
 	private final Date startedAt = new Date();
 	private Date endedAt = null;
 
-	public SwingInstance(ConnectionHandshakeMsgIn h, SwingDescriptor app, AtmosphereResource resource) {
+	public SwingInstance(String instanceId, ConnectionHandshakeMsgIn h, SwingDescriptor app, AtmosphereResource resource) {
+		this.instanceId=instanceId;
 		this.application = app;
 		this.user = ServerUtil.getUserName(resource);
-		registerPrimaryWebSession(resource);
+		connectPrimaryWebSession(resource);
 		this.connection = new SwingJvmConnection(h, app, this, resource);
 		this.sessionRecorder = ServerUtil.isRecording(resource.getRequest()) ? new SessionRecorder(this) : null;
 	}
 
-	public boolean registerPrimaryWebSession(AtmosphereResource resource) {
-		if (this.resource == null) {
-			this.resource = resource;
-			this.disconnectedSince = null;
-			return true;
-		} else {
-			if (resource == null) {
-				SwingInstance.this.resource = null;
-				SwingInstance.this.disconnectedSince = new Date();
-				SwingInstanceManager.getInstance().notifySwingChangeChange();
+	public boolean connectPrimaryWebSession(AtmosphereResource resource) {
+		if (resource!=null) {
+			if(this.resource!=null && application.isAllowStealSession() ){
+				synchronized (this.resource) {
+					ServerUtil.broadcastMessage(this.resource, new EncodedMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut()));
+				}
+				this.resource = null;
 			}
-			return false;
+			if (this.resource == null) {
+				this.resource = resource;
+				this.disconnectedSince = null;
+				return true;
+			}
+		} 
+		return false;
+		
+	}
+
+	public void disconnectPrimaryWebSession() {
+		if (this.resource != null) {
+			this.resource = null;
+			this.disconnectedSince = new Date();
+			SwingInstanceManager.getInstance().notifySwingInstanceChanged();
 		}
 	}
 
@@ -58,16 +72,19 @@ public class SwingInstance implements WebSessionListener {
 		connection.killSwingProcess(200);
 	}
 
-	public boolean registerMirroredWebSession(AtmosphereResource resource) {
-		if (this.mirroredResource == null) {
-			this.mirroredResource = resource;
-			return true;
-		} else {
-			if (resource == null) {
-				SwingInstance.this.mirroredResource = null;
+	public void connectMirroredWebSession(AtmosphereResource resource) {
+		if (resource!=null) {
+			if(this.mirroredResource!=null){
+				synchronized (this.mirroredResource) {
+					ServerUtil.broadcastMessage(this.mirroredResource, new EncodedMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut()));
+				}
 			}
-			return false;
-		}
+			this.mirroredResource = resource;
+		} 
+	}
+
+	public void disconnectMirroredWebSession() {
+		SwingInstance.this.mirroredResource = null;
 	}
 
 	public void sendToWeb(MsgOut o) {
@@ -175,4 +192,9 @@ public class SwingInstance implements WebSessionListener {
 	public String getRecordingFile() {
 		return sessionRecorder != null ? sessionRecorder.getFileName() : null;
 	}
+
+	public String getInstanceId() {
+		return instanceId;
+	}
+
 }

@@ -4,7 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.webswing.model.server.SwingDescriptor.SessionMode;
+
 public class SwingDescriptor implements Serializable {
+	public enum SessionMode {
+		ALWAYS_NEW_SESSION, CONTINUE_FOR_BROWSER, CONTINUE_FOR_USER;
+	}
+
 	private static final long serialVersionUID = 2413651075803737060L;
 	private String name;
 	private String icon;
@@ -15,8 +21,10 @@ public class SwingDescriptor implements Serializable {
 	private String homeDir = "${user.dir}";
 	private String theme = "Murrine";
 	private int maxClients = 1;
-	private boolean antiAliasText = true;
+	private SessionMode sessionMode=SessionMode.CONTINUE_FOR_BROWSER;
 	private int swingSessionTimeout = 300;
+	private boolean allowStealSession = true;
+	private boolean antiAliasText = true;
 	private boolean authorization = false;
 	private boolean isolatedFs = false;
 	private boolean debug = false;
@@ -101,6 +109,14 @@ public class SwingDescriptor implements Serializable {
 
 	public void setSwingSessionTimeout(int swingSessionTimeout) {
 		this.swingSessionTimeout = swingSessionTimeout;
+	}
+	
+	public int resolveSwingSessionTimeout() {
+		if(getSessionMode().equals(SessionMode.ALWAYS_NEW_SESSION)){
+			return 0;
+		}else{
+			return getSwingSessionTimeout();
+		}
 	}
 
 	public boolean isAuthorization() {
@@ -205,6 +221,22 @@ public class SwingDescriptor implements Serializable {
 
 	public void setAllowAutoDownload(boolean allowAutoDownload) {
 		this.allowAutoDownload = allowAutoDownload;
+	}
+
+	public SessionMode getSessionMode() {
+		return sessionMode;
+	}
+
+	public void setSessionMode(SessionMode sessionMode) {
+		this.sessionMode = sessionMode;
+	}
+
+	public boolean isAllowStealSession() {
+		return allowStealSession;
+	}
+
+	public void setAllowStealSession(boolean allowStealSession) {
+		this.allowStealSession = allowStealSession;
 	}
 	
 }

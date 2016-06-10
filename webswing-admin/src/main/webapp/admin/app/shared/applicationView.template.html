@@ -36,6 +36,17 @@
                                  type="number">
                 </ws-string-field>
                 <ws-string-field readonly="{{vm.readonly}}"
+                                 label="SessionMode" 
+                                 desc="Select session behavior when user reconnects to application. 1.ALWAYS_NEW_SESSION: New swing application is started for every Webswing session. (Session timeout will be set to 0) 2.CONTINUE_FOR_BROWSER: Webswing session can be resumed in the same browser after connection is terminated (Session timeout applies). 3.CONTINUE_FOR_USER: Swing session can be resumed by the same user from any computer after the connection is terminated(Session timeout applies)." 
+                                 value="vm.app.sessionMode" 
+                                 items="['ALWAYS_NEW_SESSION','CONTINUE_FOR_BROWSER','CONTINUE_FOR_USER']">
+                </ws-string-field>
+                <ws-boolean-field readonly="{{vm.readonly}}"
+                                  label="Allow Stealing session" 
+                                  desc="If enabled, and session mode 'CONTINUE_FOR_USER' is selected, user can resume Webswing session even if the connection is open in other browser. Former browser window will be disconnected." 
+                                  value="vm.app.allowStealSession" >
+                </ws-boolean-field>
+                <ws-string-field readonly="{{vm.readonly}}"
                                  label="Theme" 
                                  desc="Select one of the default window decoration themes or a enter path to a XFWM4 theme folder." 
                                  value="vm.app.theme" 

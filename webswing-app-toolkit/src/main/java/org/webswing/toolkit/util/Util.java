@@ -513,6 +513,7 @@ public class Util {
 					final Object peer = WebToolkit.targetToPeer(w);
 					if (peer != null && peer instanceof WebWindowPeer) {
 						((WebWindowPeer) peer).updateWindowDecorationImage();
+						Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(w);
 						RepaintManager.currentManager(null).addDirtyRegion(w, 0, 0, w.getWidth(), w.getHeight());
 					}
 				}

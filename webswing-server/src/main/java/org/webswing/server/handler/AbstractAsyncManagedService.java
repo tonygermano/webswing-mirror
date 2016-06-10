@@ -41,7 +41,7 @@ abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractAsyncManagedService.class);
 
-	private Map<String, String> clientIdMap = new ConcurrentHashMap<String, String>();
+	private Map<String, String> instanceIdMap = new ConcurrentHashMap<String, String>();
 
 	public void onReady(final AtmosphereResource r) {
 		boolean includeAdminApp = ServerUtil.isUserinRole(r, Constants.ADMIN_ROLE);
@@ -61,7 +61,7 @@ abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 	}
 
 	public void onDisconnect(AtmosphereResourceEvent event) {
-		clientIdMap.remove(event.getResource().uuid());
+		instanceIdMap.remove(event.getResource().uuid());
 		SwingInstanceManager.getInstance().notifySessionDisconnected(event.getResource().uuid());
 	}
 
@@ -82,8 +82,9 @@ abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 					List<InputEventMsgIn> evts = frame.getEvents();
 					for (InputEventMsgIn evt : evts) {
 						if (evt.getHandshake() != null) {
-							clientIdMap.put(r.uuid(), evt.getHandshake().getClientId());
-							SwingInstanceManager.getInstance().connectSwingInstance(r, evt.getHandshake());
+							SwingInstanceManager instanceManager = SwingInstanceManager.getInstance();
+							instanceIdMap.put(r.uuid(), instanceManager.resolveInstanceID(r,evt.getHandshake()));
+							instanceManager.connectSwingInstance(r, evt.getHandshake());
 						} else if (evt.getKey() != null) {
 							send(r, evt.getKey());
 						} else if (evt.getMouse() != null) {
@@ -111,7 +112,7 @@ abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 			} else {
 				log.error("Unable to decode message: " + message);
 			}
-			StatUtils.logInboundData(SwingInstanceManager.getInstance().findInstance(clientIdMap.get(r.uuid())), length);
+			StatUtils.logInboundData(SwingInstanceManager.getInstance().findInstance(instanceIdMap.get(r.uuid())), length);
 		} catch (Exception e) {
 			log.error("Exception while processing websocket message.", e);
 		}
@@ -121,7 +122,7 @@ abstract public class AbstractAsyncManagedService implements AtmosphereHandler {
 	}
 
 	private void send(AtmosphereResource r, MsgIn o) {
-		SwingInstanceManager.getInstance().sendMessageToSwing(r, clientIdMap.get(r.uuid()), o);
+		SwingInstanceManager.getInstance().sendMessageToSwing(r, instanceIdMap.get(r.uuid()), o);
 	}
 
 	@Override

@@ -260,7 +260,7 @@ public class SwingJvmConnection implements MessageListener {
 
 			swing.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw() + "");
 			swing.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported() + "");
-			swing.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout() + "");
+			swing.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.resolveSwingSessionTimeout() + "");
 			swing.addProperty("awt.toolkit", webToolkitClass);
 			swing.addProperty("java.awt.headless", "false");
 			swing.addProperty("java.awt.graphicsenv", "org.webswing.toolkit.ge.WebGraphicsEnvironment");

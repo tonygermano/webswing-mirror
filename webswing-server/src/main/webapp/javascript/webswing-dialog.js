@@ -19,6 +19,7 @@ define(['jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 'te
             continueSession: 'base.continueSession',
             kill: 'base.kill',
             newSession: 'webswing.newSession',
+            reTrySession: 'webswing.reTrySession',
             logout: 'login.logout',
         };
         module.provides = {
@@ -45,13 +46,14 @@ define(['jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 'te
                 connectingDialog: {
                     content: '<p>Connecting...</p>'
                 },
+                applicationAlreadyRunning: retryMessageDialog('Application is already running in other browser window...'),
+                sessionStolenNotification: retryMessageDialog('Application was opened in other browser window. Session disconnected...'),
                 disconnectedDialog: finalMessageDialog('Disconnected...'),
                 connectionErrorDialog: finalMessageDialog('Connection error...'),
                 tooManyClientsNotification: finalMessageDialog('Too many connections. Please try again later...'),
-                applicationAlreadyRunning: finalMessageDialog('Application is already running in other browser window...'),
                 stoppedDialog: finalMessageDialog('Application stopped...'),
                 continueOldSessionDialog: {
-                    content: '<p>Continue old session?</p><button data-id="continue" class="btn btn-primary">Yes,	continue.</button><span> </span><button data-id="newsession" class="btn btn-default" >No, start new session.</button>',
+                    content: '<p>Continue existing session?</p><button data-id="continue" class="btn btn-primary">Yes,	continue.</button><span> </span><button data-id="newsession" class="btn btn-default" >No, start new session.</button>',
                     events: {
                         continue_click: function () {
                             api.continueSession();
@@ -73,6 +75,22 @@ define(['jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 'te
                 events: {
                     newsession_click: function () {
                         api.newSession();
+                    },
+                    logout_click: function () {
+                        api.logout();
+                    }
+                }
+            };
+        }
+        
+        function retryMessageDialog(msg) {
+            return {
+                content: '<p>'
+                        + msg
+                        + '</p><button data-id="retrysession" class="btn btn-primary">Try again.</button> <span> </span><button data-id="logout" class="btn btn-default">Logout.</button>',
+                events: {
+                    retrysession_click: function () {
+                        api.reTrySession();
                     },
                     logout_click: function () {
                         api.logout();

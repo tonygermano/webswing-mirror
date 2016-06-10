@@ -5,6 +5,7 @@ import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
@@ -141,6 +142,7 @@ public class WebEventDispatcher {
 			break;
 		case repaint:
 			if (Util.isDD()) {
+				Util.getWebToolkit().getPaintDispatcher().notifyBackgroundRepainted(new Rectangle(Util.getWebToolkit().getScreenSize()));
 				Services.getDirectDrawService().resetCache();
 				Util.repaintAllWindow();
 			} else {

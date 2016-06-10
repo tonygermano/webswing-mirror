@@ -103,6 +103,7 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                     config : defaultCtxConfig(),
                     start : start,
                     newSession : newSession,
+                    reTrySession : reTrySession,
                     disconnect : disconnect,
                     setControl : setControl,
                     configure : configure
@@ -158,6 +159,11 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                 function newSession() {
                     api.disconnect();
                     api.disposeIdentity();
+                    api.start();
+                }
+                
+                function reTrySession() {
+                    api.disconnect();
                     api.start();
                 }
 

@@ -23,6 +23,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             startingDialog : 'dialog.content.startingDialog',
             stoppedDialog : 'dialog.content.stoppedDialog',
             applicationAlreadyRunning : 'dialog.content.applicationAlreadyRunning',
+            sessionStolenNotification : 'dialog.content.sessionStolenNotification',
             tooManyClientsNotification : 'dialog.content.tooManyClientsNotification',
             continueOldSessionDialog : 'dialog.content.continueOldSessionDialog',
             showSelector : 'selector.show',
@@ -179,6 +180,9 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
                 } else if (data.event == "continueOldSession") {
                     api.cfg.canPaint = false;
                     api.showDialog(api.continueOldSessionDialog);
+                }else if (data.event == "sessionStolenNotification") {
+                	api.cfg.canPaint = false;
+                	api.showDialog(api.sessionStolenNotification);
                 }
                 return;
             }

@@ -40,6 +40,8 @@ Here is a sample `webswing.config` file content with demo swing application conf
     "maxClients" : 1,
     "antiAliasText" : true,
     "swingSessionTimeout" : 300,
+    "sessionMode": "CONTINUE_FOR_USER",
+    "allowStealSession": true,
     "authorization" : false,
     "isolatedFs" : true,
     "debug" : true,
@@ -49,7 +51,7 @@ Here is a sample `webswing.config` file content with demo swing application conf
     "allowDownload" : true,
     "allowAutoDownload" : true,
     "allowUpload" : true,
-    "allowJsLink" : true 
+    "allowJsLink" : true
   }]
 }
 ```
@@ -110,12 +112,17 @@ In Admin console options with variable replacement support appears with a flash 
 
 `swingSessionTimeout`: Specifies how long (seconds) will be the swing application left running after the user closes the browser. User can reconnect in this interval and continue in last session.
 
+`sessionMode`: Select session behavior when user reconnects to application. Available options: 
+
+1. `ALWAYS_NEW_SESSION`: New swing application is started for every Webswing session. (Session timeout will be set to 0)
+2. `CONTINUE_FOR_BROWSER`: Webswing session can be resumed **in the same browser** after connection is terminated (Session timeout applies).
+3. `CONTINUE_FOR_USER`: Swing session can be resumed **by the same user** from any computer after the connection is terminated(Session timeout applies).
+
 `theme`: Select one of the default window decoration themes or a enter path to a XFWM4 theme folder.
 
 `authentication`: If set to `false`, the application will be accessible for anonymous user. If `true` only authenticated user is allowed to use this application. False setting will be ignored if `authorization` option is `true`.
 
 `authorization`: Set authorized access to this application. Only users with role same as application's name can access this application.
-
 
 `isolatedFs`: If enabled, this setting will force the JFileChooser to stay inside isolated folder. The new isolated folder is created in `${homeDir}/upload` 
 
