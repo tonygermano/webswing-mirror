@@ -101,7 +101,7 @@ define(['jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'jq
                 xhrFields: {
                     withCredentials: true
                 },
-                url: api.cfg.connectionUrl + 'upload',
+                url: api.cfg.connectionUrl + 'file',
                 dataType: 'json',
                 dropZone: dropZone
             });

@@ -17,6 +17,7 @@
 
 .webswing-fileDialogButtonRow {
 	margin-right: 0 !important;
+	margin-bottom: 5px;
 }
 
 .webswing-fileUpload {
@@ -55,7 +56,7 @@ div[data-id="fileDropArea"] p {
 }
 
 .webswing-progress {
-	margin-bottom: 0px;
+	margin-bottom: 0px !important;
 }
 
 .webswing-hidden {

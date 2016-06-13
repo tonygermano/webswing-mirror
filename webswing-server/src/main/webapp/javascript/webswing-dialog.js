@@ -48,9 +48,9 @@ define(['jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 'te
                 },
                 applicationAlreadyRunning: retryMessageDialog('Application is already running in other browser window...'),
                 sessionStolenNotification: retryMessageDialog('Application was opened in other browser window. Session disconnected...'),
-                disconnectedDialog: finalMessageDialog('Disconnected...'),
-                connectionErrorDialog: finalMessageDialog('Connection error...'),
-                tooManyClientsNotification: finalMessageDialog('Too many connections. Please try again later...'),
+                disconnectedDialog: retryMessageDialog('Disconnected...'),
+                connectionErrorDialog: retryMessageDialog('Connection error...'),
+                tooManyClientsNotification: retryMessageDialog('Too many connections. Please try again later...'),
                 stoppedDialog: finalMessageDialog('Application stopped...'),
                 continueOldSessionDialog: {
                     content: '<p>Continue existing session?</p><button data-id="continue" class="btn btn-primary">Yes,	continue.</button><span> </span><button data-id="newsession" class="btn btn-default" >No, start new session.</button>',

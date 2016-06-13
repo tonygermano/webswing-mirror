@@ -14,7 +14,6 @@ import org.webswing.model.MsgIn;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.model.server.SwingDescriptor;
-import org.webswing.model.server.SwingDescriptor.SessionMode;
 import org.webswing.model.server.admin.Sessions;
 import org.webswing.model.server.admin.SwingSession;
 import org.webswing.server.util.ServerUtil;
@@ -199,6 +198,16 @@ public class SwingInstanceManager {
 
 	public boolean sendMessageToSwing(AtmosphereResource r, String clientId, MsgIn o) {
 		if (clientId != null) {
+			SwingInstance client = findInstance(clientId);
+			if (client != null) {
+				return client.sendToSwing(r, o);
+			}
+		}
+		return false;
+	}
+
+	public SwingInstance findInstance(String clientId) {
+		if (clientId != null) {
 			SwingInstance client = swingInstances.get(clientId);
 			if(client==null){
 				for (SwingInstance si : getSwingInstanceSet()) {
@@ -208,16 +217,7 @@ public class SwingInstanceManager {
 					}
 				}
 			}
-			if (client != null) {
-				return client.sendToSwing(r, o);
-			}
-		}
-		return false;
-	}
-
-	public SwingInstance findInstance(String instanceId) {
-		if (instanceId != null) {
-			return swingInstances.get(instanceId);
+			return client;
 		}
 		return null;
 	}

@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.webswing.model.server.SwingDescriptor.SessionMode;
-
 public class SwingDescriptor implements Serializable {
 	public enum SessionMode {
 		ALWAYS_NEW_SESSION, CONTINUE_FOR_BROWSER, CONTINUE_FOR_USER;
@@ -34,6 +32,7 @@ public class SwingDescriptor implements Serializable {
 	private boolean allowDownload = true;
 	private boolean allowAutoDownload =true;
 	private boolean allowUpload = true;
+	private float uploadMaxSize = 5; 
 	private boolean allowJsLink = true;
 
 	public String getName() {
@@ -238,5 +237,14 @@ public class SwingDescriptor implements Serializable {
 	public void setAllowStealSession(boolean allowStealSession) {
 		this.allowStealSession = allowStealSession;
 	}
-	
+
+	public float getUploadMaxSize() {
+		return uploadMaxSize;
+	}
+
+	public void setUploadMaxSize(float uploadMaxSize) {
+		this.uploadMaxSize = uploadMaxSize;
+	}
+
+
 }

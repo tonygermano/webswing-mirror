@@ -7,10 +7,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,15 +21,25 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.shiro.SecurityUtils;
+import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
+import org.webswing.model.c2s.UploadEventMsgIn;
+import org.webswing.server.SwingInstance;
+import org.webswing.server.SwingInstanceManager;
 import org.webswing.server.util.ServerUtil;
 
 public class FileServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 7829511263519944733L;
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
+	private static final Logger log = LoggerFactory.getLogger(AbstractAsyncManagedService.class);
+
 	private static FileServlet currentServlet = null;
 	private Map<String, FileDescriptor> fileMap = new HashMap<String, FileDescriptor>();
 	private ScheduledExecutorService validatorService = Executors.newSingleThreadScheduledExecutor();
@@ -37,11 +48,12 @@ public class FileServlet extends HttpServlet {
 		currentServlet = this;
 	}
 
+	//Handle file download
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String fileId = request.getParameter("id");
 		String userId = (String) SecurityUtils.getSubject().getPrincipal();
 
-		if (!fileMap.containsKey(fileId) || fileMap.get(fileId).file == null ) {
+		if (!fileMap.containsKey(fileId) || fileMap.get(fileId).file == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
 			return;
 		}
@@ -63,12 +75,12 @@ public class FileServlet extends HttpServlet {
 				}
 			}
 		}
-		
+
 		if (!fileMap.get(fileId).file.exists()) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
 			return;
 		}
-		
+
 		File file = fd.file;
 		response.reset();
 		response.setBufferSize(DEFAULT_BUFFER_SIZE);
@@ -93,10 +105,56 @@ public class FileServlet extends HttpServlet {
 		}
 	}
 
+	//handle file upload
+	protected void doPost(HttpServletRequest request, HttpServletResponse resp) throws ServletException, IOException {
+		try {
+			String clientId = request.getParameter("clientId");
+			if (clientId != null) {
+				SwingInstance instance = SwingInstanceManager.getInstance().findInstance(clientId);
+				if (instance != null) {
+					float maxMB = instance.getApplication().getUploadMaxSize();
+					long maxsize = (long) (maxMB * 1024 * 1024);
+					Part filePart = request.getPart("files[]"); // Retrieves <input type="file" name="file">
+					String filename = getFilename(filePart);
+					if (maxsize>0 && filePart.getSize() > maxsize) {
+						resp.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+						resp.getWriter().write(String.format("File '%s' is too large. (Max. file size is %.1fMB)", filename, maxMB));
+					} else {
+						String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
+						String tempName = UUID.randomUUID().toString();
+						InputStream filecontent = filePart.getInputStream();
+						File f = new File(URI.create(tempDir + "/" + tempName));
+						FileOutputStream output = new FileOutputStream(f);
+						IOUtils.copy(filecontent, output);
+						output.close();
+						filecontent.close();
+						UploadEventMsgIn msg = new UploadEventMsgIn();
+						msg.setFileName(filename);
+						msg.setTempFileLocation(f.getAbsolutePath());
+						boolean sent = SwingInstanceManager.getInstance().sendMessageToSwing(null, clientId, msg);
+						if (!sent) {
+							f.delete();
+						} else {
+							resp.getWriter().write("{\"files\":[{\"name\":\"" + filename + "\"}]}"); // TODO size
+						}
+					}
+				}else{
+					throw new Exception("Related Swing instance not found.("+clientId+")");
+				}
+			}else{
+				throw new Exception("clientId not specified in request");
+			}
+		} catch (Exception e) {
+			resp.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+			resp.getWriter().write("Upload finished with error...");
+			log.error("Error while uploading file: "+e.getMessage(),e);
+		}
+	}
+	
 	@Override
 	public void destroy() {
+		validatorService.shutdownNow();
 		super.destroy();
-		//TODO: delete temp files
 	}
 
 	private static void close(Closeable resource) {
@@ -107,6 +165,16 @@ public class FileServlet extends HttpServlet {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private static String getFilename(Part part) {
+		for (String cd : part.getHeader("Content-Disposition").split(";")) {
+			if (cd.trim().startsWith("filename")) {
+				String filename = cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
+				return filename.substring(filename.lastIndexOf('/') + 1).substring(filename.lastIndexOf('\\') + 1); // MSIE fix.
+			}
+		}
+		return null;
 	}
 
 	private static class FileDescriptor {
