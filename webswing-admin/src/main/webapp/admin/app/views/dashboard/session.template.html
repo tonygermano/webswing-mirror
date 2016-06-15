@@ -54,9 +54,20 @@
                     </button>
                 </div>
                 <div>
-                    <button type="button" class="btn btn-primary" ng-click="vm.kill()">
-                        <span class="glyphicon glyphicon-off"></span> Kill swing 
-                    </button>
+	                <div class="btn-group">
+	                    <button type="button" class="btn btn-primary" ng-click="vm.kill()">
+	                        <span class="glyphicon glyphicon-off"></span> Exit Swing 
+	                    </button>
+	                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+   							<span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li> Not responding?</li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="" ng-click="vm.forceKill()">Force kill!</a></li>
+                        </ul>
+	                </div>   
                 </div>
             </td>
         </tr>

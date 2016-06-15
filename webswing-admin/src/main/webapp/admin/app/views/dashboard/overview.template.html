@@ -67,6 +67,7 @@
                 <th>Application</th>
                 <th>Start time</th>
                 <th>End time</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -86,6 +87,25 @@
                 </td>
                 <td>
                     {{(session.endedAt| date:'dd MMM h:mm:ss')+ ' ('+(session.endedAt-session.startedAt | duration)+')'}}
+                </td>
+                <td>
+                    <div ng-switch on="session.status">
+                        <div ng-switch-when="NOT_STARTED" >
+                            <span class="label label-danger" ui-jq="tooltip" title="Application might be misconfigured. Please check log for more details">Not started</span>
+                        </div>
+                        <div ng-switch-when="RUNNING" >
+                            <span class="label label-danger" ui-jq="tooltip" title="This application is still running...">Running</span>
+                        </div>
+                        <div ng-switch-when="EXITING" >
+                            <span class="label label-warning" ui-jq="tooltip" title="Graceful shutdown of application initiated. Waiting for application to exti...">Exiting</span>
+                        </div>
+                        <div ng-switch-when="FORCE_KILLED" >
+                            <span class="label label-warning" ui-jq="tooltip" title="Process was forcefully killed. Either failed to stop gracefully in defined time or killed by admin.">Killed</span>
+                        </div>
+                        <div ng-switch-when="FINISHED" >
+                            <span class="label label-success" ui-jq="tooltip" title="Application finished.">Finished</span>
+                        </div>
+                    </div>
                 </td>
                 <td>
                     <button ng-if="session.recorded" type="button" class="btn btn-primary" ng-click="vm.play(session)">

@@ -17,6 +17,7 @@ public class SwingSession implements Serializable {
 	private Boolean recorded;
 	private String recordingFile;
 	private SwingJvmStats state;
+	private SwingInstanceStatus status;
 
 	public String getId() {
 		return id;
@@ -104,6 +105,14 @@ public class SwingSession implements Serializable {
 
 	public void setRecordingFile(String recordingFile) {
 		this.recordingFile = recordingFile;
+	}
+
+	public SwingInstanceStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(SwingInstanceStatus status) {
+		this.status = status;
 	}
 
 }

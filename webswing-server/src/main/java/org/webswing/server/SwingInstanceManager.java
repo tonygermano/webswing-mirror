@@ -23,7 +23,7 @@ public class SwingInstanceManager {
 	private static SwingInstanceManager instance = new SwingInstanceManager();
 	private static final Logger log = LoggerFactory.getLogger(SwingInstanceManager.class);
 
-	private List<SwingSession> closedInstances = new ArrayList<SwingSession>();
+	private List<SwingInstance> closedInstances = new ArrayList<SwingInstance>();
 	private Map<String, SwingInstance> swingInstances = new ConcurrentHashMap<String, SwingInstance>();
 	private SwingInstanceChangeListener changeListener;
 
@@ -57,9 +57,13 @@ public class SwingInstanceManager {
 			if (ServerUtil.isUserAuthorized(r, app, h)) {
 				if (!h.isMirrored()) {
 					if (!reachedMaxConnections(app)) {
-						swingInstance = new SwingInstance(resolveInstanceIdForMode(r, h, app),h, app, r);
-						synchronized (this) {
-							swingInstances.put(swingInstance.getInstanceId(), swingInstance);
+						try {
+							swingInstance = new SwingInstance(resolveInstanceIdForMode(r, h, app), h, app, r);
+							synchronized (this) {
+								swingInstances.put(swingInstance.getInstanceId(), swingInstance);
+							}
+						} catch (Exception e) {
+							log.error("Failed to create Swing instance.",e);
 						}
 						notifySwingInstanceChanged();
 					} else {
@@ -73,7 +77,7 @@ public class SwingInstanceManager {
 			}
 		} else {
 			if (h.isMirrored()) {// connect as mirror viewer
-				if (ServerUtil.isUserAuthorized(r, swingInstance.getApplication(), h)) {
+				if (ServerUtil.isUserAuthorized(r, swingInstance.getAppConfig(), h)) {
 					notifySessionDisconnected(r.uuid());// disconnect possible running mirror sessions
 					swingInstance.connectMirroredWebSession(r);
 				} else {
@@ -99,8 +103,8 @@ public class SwingInstanceManager {
 		synchronized (this) {
 			for (String instanceId : swingInstances.keySet()) {
 				SwingInstance si = swingInstances.get(instanceId);
-				String idForMode = resolveInstanceIdForMode(r, h, si.getApplication());
-				if(idForMode.equals(instanceId)){
+				String idForMode = resolveInstanceIdForMode(r, h, si.getAppConfig());
+				if (idForMode.equals(instanceId)) {
 					return si;
 				}
 			}
@@ -116,7 +120,7 @@ public class SwingInstanceManager {
 		} else {
 			int count = 0;
 			for (SwingInstance si : getSwingInstanceSet()) {
-				if (app.getName().equals(si.getApplication().getName()) && si.isRunning()) {
+				if (app.getName().equals(si.getAppConfig().getName()) && si.isRunning()) {
 					count++;
 				}
 			}
@@ -130,7 +134,9 @@ public class SwingInstanceManager {
 
 	public void notifySwingClose(SwingInstance swingInstance) {
 		synchronized (this) {
-			closedInstances.add(ServerUtil.composeSwingInstanceStatus(swingInstance));
+			if(!closedInstances.contains(swingInstance)){
+				closedInstances.add(swingInstance);
+			}
 			swingInstances.remove(swingInstance.getInstanceId());
 		}
 		notifySwingInstanceChanged();
@@ -139,25 +145,27 @@ public class SwingInstanceManager {
 	public synchronized Sessions getSessions() {
 		Sessions result = new Sessions();
 		for (SwingInstance si : getSwingInstanceSet()) {
-			result.getSessions().add(ServerUtil.composeSwingInstanceStatus(si));
+			result.getSessions().add(si.toSwingSession());
 		}
-		result.setClosedSessions(closedInstances);
+		for (SwingInstance si : closedInstances) {
+			result.getClosedSessions().add(si.toSwingSession());
+		}
 		return result;
 	}
 
 	public synchronized SwingSession getSession(String id) {
 		for (SwingInstance si : getSwingInstanceSet()) {
 			if (si.getClientId().equals(id)) {
-				return ServerUtil.composeSwingInstanceStatus(si);
+				return si.toSwingSession();
 			}
 		}
 		return null;
 	}
 
-	public void killSession(String id) {
+	public void shutdown(String id, boolean force) {
 		for (SwingInstance si : getSwingInstanceSet()) {
 			if (si.getClientId().equals(id)) {
-				si.kill();
+				si.shutdown(force);
 			}
 		}
 	}
@@ -209,10 +217,10 @@ public class SwingInstanceManager {
 	public SwingInstance findInstance(String clientId) {
 		if (clientId != null) {
 			SwingInstance client = swingInstances.get(clientId);
-			if(client==null){
+			if (client == null) {
 				for (SwingInstance si : getSwingInstanceSet()) {
-					if(si.getClientId().equals(clientId)){
-						client=si;
+					if (si.getClientId().equals(clientId)) {
+						client = si;
 						break;
 					}
 				}
@@ -236,13 +244,13 @@ public class SwingInstanceManager {
 	}
 
 	private String resolveInstanceIdForMode(AtmosphereResource r, ConnectionHandshakeMsgIn h, SwingDescriptor app) {
-		switch ( app.getSessionMode()) {
+		switch (app.getSessionMode()) {
 		case ALWAYS_NEW_SESSION:
 			return h.getClientId() + r.uuid();
 		case CONTINUE_FOR_BROWSER:
 			return h.getClientId();
 		case CONTINUE_FOR_USER:
-			return app.getName()+ServerUtil.getUserName(r);
+			return app.getName() + ServerUtil.getUserName(r);
 		default:
 			return h.getClientId();
 		}

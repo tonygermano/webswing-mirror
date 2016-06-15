@@ -12,18 +12,20 @@
             };
         }
 
-        function wsNavbarDirectiveController(navigationService, loginService) {
+        function wsNavbarDirectiveController(navigationService, loginService, baseUrl) {
             var vm = this;
             vm.locations = navigationService.getLocations();
             vm.isActive = navigationService.isActive;
             vm.isCollapsed = true;
             vm.logout = logout;
-
+            vm.baseUrl = baseUrl;
+            
             function logout() {
                 loginService.logout();
             }
+            
         }
-        wsNavbarDirectiveController.$inject = ['navigationService', 'loginService'];
+        wsNavbarDirectiveController.$inject = ['navigationService', 'loginService', 'baseUrl'];
 
         return wsNavbarDirective;
     });

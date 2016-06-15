@@ -23,6 +23,7 @@ public interface Constants {
 	public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutAfterDisconectSec";
 	public static final String SWING_START_SYS_PROP_SYNC_TIMEOUT = "webswing.syncCallTimeout";
 	public static final String SWING_START_SYS_PROP_THEME = "webswing.theme";
+	public static final String SWING_START_SYS_PROP_WAIT_FOR_EXIT = "webswing.waitForExit";
 
 	// applet startup properties
 	public static final String SWING_START_SYS_PROP_APPLET_CLASS = "webswing.appletClass";
@@ -35,6 +36,7 @@ public interface Constants {
 	public static final String SERVER2SWING_SYNC = "Server2SwingSync";
 	public static final String JMS_URL = "webswing.jmsUrl";
 	public static final String JMS_URL_DEFAULT = "nio://127.0.0.1:34455";
+	public static final String JMS_SERIALIZABLE_PACKAGES = "*";
 
 	// server startup constants
 	public static final String WAR_FILE_LOCATION = "webswing.warLocation";
@@ -75,5 +77,6 @@ public interface Constants {
 	// admin console constants
 	public static final String ADMIN_ROLE = "admin";
 	public static final String ADMIN_CONSOLE_APP_NAME = "adminConsoleApplicationName";
+
 
 }

@@ -4,7 +4,8 @@
             return {
                 getSessions: getSessions,
                 getSession: getSession,
-                killSession: killSession
+                killSession: killSession,
+                forceKillSession: forceKillSession
             };
 
             function getSessions() {
@@ -27,10 +28,20 @@
                 }
             }
 
-            function killSession(id) {
-                return $http.delete(baseUrl + '/rest/admin/session/' + id).then(success, failed);
+            function forceKillSession(id) {
+                return $http.delete(baseUrl + '/rest/admin/session/' + id +'?force=true').then(success, failed);
                 function success(data) {
-                    messageService.info('Swing application shutdown completed.');
+                    messageService.info('Swing application process has been forcefully terminated.');
+                }
+                function failed(data) {
+                    return errorHandler.handleRestError('Swing application process shutdown', data, true);
+                }
+            }
+            
+            function killSession(id) {
+                return $http.delete(baseUrl + '/rest/admin/session/' + id ).then(success, failed);
+                function success(data) {
+                    messageService.info('Swing application signalled to exit.');
                 }
                 function failed(data) {
                     return errorHandler.handleRestError('Swing application shutdown', data, true);

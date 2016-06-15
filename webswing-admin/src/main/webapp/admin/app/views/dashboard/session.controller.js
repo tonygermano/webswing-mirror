@@ -7,6 +7,7 @@
             vm.back = back;
             vm.refresh = refresh;
             vm.kill = kill;
+            vm.forceKill = forceKill;
             vm.timer = undefined;
             vm.control = false;
 
@@ -57,6 +58,12 @@
 
             function kill() {
                 return sessionsRestService.killSession($routeParams.sessionId).then(function () {
+                    back();
+                });
+            }
+            
+            function forceKill() {
+            	return sessionsRestService.forceKillSession($routeParams.sessionId).then(function () {
                     back();
                 });
             }

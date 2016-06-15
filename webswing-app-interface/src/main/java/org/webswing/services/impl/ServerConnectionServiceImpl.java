@@ -2,6 +2,8 @@ package org.webswing.services.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -29,6 +31,7 @@ import org.webswing.model.internal.JvmStatsMsgInternal;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.toolkit.jslink.WebJSObject;
+import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
 
@@ -47,7 +50,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private MessageConsumer consumer;
 	private long lastMessageTimestamp = System.currentTimeMillis();
 	private Runnable watchdog;
-	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor();
+	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
 
 	private Map<String, Object> syncCallResposeMap = new HashMap<String, Object>();
 
@@ -60,7 +63,10 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 	public ServerConnectionServiceImpl() {
 		connectionFactory = new ActiveMQConnectionFactory(System.getProperty(Constants.JMS_URL));
+		connectionFactory.setAlwaysSessionAsync(false);
+		connectionFactory.setTrustAllPackages(true);;
 		watchdog = new Runnable() {
+			private boolean terminated = false;
 
 			@Override
 			public void run() {
@@ -68,11 +74,14 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 				int timeout = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) * 1000;
 				timeout = timeout < 1000 ? 1000 : timeout;
 				if ((diff / 1000 > 10) && ((diff / 1000) % 10 == 0)) {
-					Logger.warn("Inactive for " + diff / 1000 + " seconds.");
+					Logger.warn("Inactive for " + diff / 1000 + " seconds." + (terminated ? "[waiting for application to stop]" : ""));
 				}
 				if (diff > timeout) {
-					Logger.warn("Exiting swing application due to inactivity for " + diff / 1000 + " seconds.");
-					Util.getWebToolkit().exitSwing(1);
+					if (!terminated) {//only call once
+						terminated = true;
+						Logger.warn("Exiting swing application due to inactivity for " + diff / 1000 + " seconds.");
+						Util.getWebToolkit().exitSwing(1);
+					}
 				} else {
 					sendObject(getStats());
 				}
@@ -109,7 +118,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			});
 		} catch (JMSException e) {
 			Logger.error("Exiting swing application because could not connect to JMS:" + e.getMessage(), e);
-			Util.getWebToolkit().exitSwing(1);
+			System.exit(1);
 		}
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {

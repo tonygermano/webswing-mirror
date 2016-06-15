@@ -112,7 +112,7 @@ public class FileServlet extends HttpServlet {
 			if (clientId != null) {
 				SwingInstance instance = SwingInstanceManager.getInstance().findInstance(clientId);
 				if (instance != null) {
-					float maxMB = instance.getApplication().getUploadMaxSize();
+					float maxMB = instance.getAppConfig().getUploadMaxSize();
 					long maxsize = (long) (maxMB * 1024 * 1024);
 					Part filePart = request.getPart("files[]"); // Retrieves <input type="file" name="file">
 					String filename = getFilename(filePart);

@@ -39,7 +39,7 @@ public class SessionRecorder {
 				header = new RecordHeader();
 				header.clientId = swingInstance.getClientId();
 				header.startDate = new Date();
-				header.application = swingInstance.getApplication();
+				header.application = swingInstance.getAppConfig();
 				this.lastFrame = header.startDate.getTime();
 				byte[] version = ByteBuffer.allocate(4).putInt(RecordHeader.version).array();
 				byte[] headerbytes = serializeObject(header);

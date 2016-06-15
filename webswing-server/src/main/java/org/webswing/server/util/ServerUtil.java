@@ -3,9 +3,7 @@ package org.webswing.server.util;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,7 +18,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.shiro.subject.Subject;
 import org.atmosphere.cpr.AtmosphereRequest;
@@ -265,24 +262,6 @@ public class ServerUtil {
 			return locationString;
 		}
 		return warFile;
-	}
-
-	public static SwingSession composeSwingInstanceStatus(SwingInstance si) {
-		SwingSession result = new SwingSession();
-		result.setId(si.getClientId());
-		result.setApplet(si.getApplication() instanceof SwingAppletDescriptor);
-		result.setApplication(si.getApplication().getName());
-		result.setConnected(si.getSessionId() != null);
-		if (!result.getConnected()) {
-			result.setDisconnectedSince(si.getDisconnectedSince());
-		}
-		result.setStartedAt(si.getStartedAt());
-		result.setUser(si.getUser());
-		result.setEndedAt(si.getEndedAt());
-		result.setState(si.getStats());
-		result.setRecorded(si.isRecording());
-		result.setRecordingFile(si.getRecordingFile());
-		return result;
 	}
 
 	public static String getUserName(AtmosphereResource resource) {

@@ -44,6 +44,7 @@ import java.awt.dnd.DragSource;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.dnd.MouseDragGestureRecognizer;
 import java.awt.dnd.peer.DragSourceContextPeer;
+import java.awt.event.WindowEvent;
 import java.awt.font.TextAttribute;
 import java.awt.im.InputMethodHighlight;
 import java.awt.im.spi.InputMethodDescriptor;
@@ -168,6 +169,8 @@ public abstract class WebToolkit extends SunToolkit {
 	private Hashtable<String, FontPeer> cacheFontPeer;
 	private Clipboard clipboard;
 	private Clipboard selectionClipboard;
+
+	private boolean exiting = false;
 	public static int screenWidth = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_WIDTH, Constants.SWING_SCREEN_WIDTH_MIN + ""));
 	public static int screenHeight = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_HEIGHT, Constants.SWING_SCREEN_HEIGHT_MIN + ""));
 
@@ -554,14 +557,33 @@ public abstract class WebToolkit extends SunToolkit {
 
 	abstract public SurfaceData webComponentPeerReplaceSurfaceData(SurfaceManager mgr);
 
-	public void exitSwing(final int i) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				System.exit(i);
-			}
-		});
+	public synchronized void exitSwing(final int i) {
+		if (!exiting) {
+			exiting = true;
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					//tell server to kill this application after defined time
+					getPaintDispatcher().notifyApplicationExiting();
+					
+					//first send windows closing event to all windows
+					for (Window w : Window.getWindows()) {
+						w.dispatchEvent(new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
+					}
+					SwingUtilities.invokeLater(new Runnable() {
 
+						@Override
+						public void run() {
+							//make sure we close windows created by window close listeners executed above
+							for (Window w : Window.getWindows()) {
+								w.setVisible(false);
+								w.dispose();
+							}
+						}
+					});
+				}
+			});
+		}
 	}
 
 	public Object getTreeLock() {

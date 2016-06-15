@@ -40,7 +40,7 @@ public class JmsService implements ServletContextListener {
 
 	public BrokerService startService() throws Exception {
 		// BrokerService broker= BrokerFactory.createBroker("xbean:mq.xml");
-
+		System.setProperty("org.apache.activemq.SERIALIZABLE_PACKAGES",Constants.JMS_SERIALIZABLE_PACKAGES);
 		BrokerService broker = new BrokerService();
 		broker.setUseJmx(true);
 		broker.setPersistent(false);

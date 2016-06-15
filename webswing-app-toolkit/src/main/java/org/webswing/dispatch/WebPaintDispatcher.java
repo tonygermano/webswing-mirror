@@ -27,6 +27,7 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
+import org.webswing.model.internal.ExitMsgInternal;
 import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.CopyEventMsg;
@@ -41,6 +42,7 @@ import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
@@ -55,7 +57,7 @@ public class WebPaintDispatcher {
 	private long lastReadyStateTime;
 	private JFileChooser fileChooserDialog;
 
-	private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1);
+	private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1,DeamonThreadFactory.getInstance());
 
 	public WebPaintDispatcher() {
 		Runnable sendUpdate = new Runnable() {
@@ -439,6 +441,13 @@ public class WebPaintDispatcher {
 			}
 			fileChooserDialog.rescanCurrentDirectory();
 		}
+	}
+	
+	public void notifyApplicationExiting() {
+		ExitMsgInternal f=new ExitMsgInternal();
+		f.setWaitForExit(Integer.getInteger(Constants.SWING_START_SYS_PROP_WAIT_FOR_EXIT,30000));
+		Services.getConnectionService().sendObject(f);
+		contentSender.shutdownNow();
 	}
 
 }

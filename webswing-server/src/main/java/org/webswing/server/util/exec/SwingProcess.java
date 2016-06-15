@@ -42,6 +42,8 @@ public class SwingProcess {
 
 	private CloseListener closeListener;
 	private boolean destroying;
+	private ScheduledFuture<?> delayedTermination;
+	private boolean forceKilled=false;
 
 	public SwingProcess(String name) {
 		super();
@@ -70,10 +72,10 @@ public class SwingProcess {
 							processStream(err, bufferErr, buffer, name, true);
 						} catch (Exception e) {
 							log.error("Failed to process process logs for swing process " + name, e);
-							destroy(0);
+							destroy();
 						}
 						if (!SwingProcess.this.isRunning()) {
-							destroy(0);
+							destroy();
 						}
 					}
 				}
@@ -104,34 +106,31 @@ public class SwingProcess {
 		}
 	}
 
+	public void destroy() {
+		destroy(0);
+	}
+
 	public void destroy(int delayMs) {
-		if (!destroying) {
+		if (delayMs > 0 && delayedTermination==null) {
+			log.info("Waiting " + delayMs + "ms for swing process " + name + " to end.");
+			delayedTermination = processHandlerThread.schedule(new Runnable() {
+				@Override
+				public void run() {
+					destroy(0);
+				}
+			}, delayMs, TimeUnit.MILLISECONDS);
+		} else if (!destroying) {
 			destroying = true;
 			try {
-				if (delayMs != 0) {
-					log.info("Waiting " + delayMs + "ms for swing process " + name + " to end.");
-					final Thread waitingThread = Thread.currentThread();
-					ScheduledFuture<?> interupt = processHandlerThread.schedule(new Runnable() {
-
-						@Override
-						public void run() {
-							waitingThread.interrupt();
-						}
-					}, delayMs, TimeUnit.MILLISECONDS);
-					process.waitFor();
-					interupt.cancel(false);
-				} else {
-					log.info("Killing Swing process " + name + ".");
-					process.destroy();
+				if(delayedTermination!=null){
+					delayedTermination.cancel(false);
 				}
-			} catch (InterruptedException e) {
-				log.info("Killing Swing process " + name + ".");
-				process.destroy();
+				destroyInternal();
 			} finally {
 				logsProcessor.cancel(false);
+				log.info("[" + name + "] Swing process terminated. ");
 				if (closeListener != null) {
 					try {
-						log.info("[" + name + "] Swing process terminated. ");
 						closeListener.onClose();
 					} catch (Exception e) {
 						log.error("Failed to call onClose on " + closeListener);
@@ -139,6 +138,14 @@ public class SwingProcess {
 				}
 				destroying = false;
 			}
+		}
+	}
+
+	private void destroyInternal() {
+		if (isRunning()) {
+			log.info("Killing Swing process " + name + ".");
+			process.destroy();
+			forceKilled=true;
 		}
 	}
 
@@ -359,6 +366,11 @@ public class SwingProcess {
 	public void setCloseListener(CloseListener closeListener) {
 		this.closeListener = closeListener;
 	}
+	
+	public boolean isForceKilled() {
+		return forceKilled;
+	}
+
 
 	public interface CloseListener {
 		void onClose();

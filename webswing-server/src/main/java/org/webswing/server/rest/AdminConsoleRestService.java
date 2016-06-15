@@ -9,6 +9,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.webswing.model.server.SwingDescriptor;
@@ -64,7 +65,7 @@ public interface AdminConsoleRestService {
 	@Path("session/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void killSession(@PathParam("id") String id);
+	public void shutdown(@PathParam("id") String id,@QueryParam("force")String forceKill);
 
 	@GET
 	@Path("settings")

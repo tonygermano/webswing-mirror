@@ -21,6 +21,7 @@ import org.webswing.Constants;
 import org.webswing.model.jslink.JSObjectMsg;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.JsLinkUtil;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.WeakValueHashMap;
@@ -30,7 +31,7 @@ public class WebJSObject extends JSObject {
 	private static final Map<String, WeakReference<JSObjectMsg>> jsGarbageCollectionMap = new HashMap<String, WeakReference<JSObjectMsg>>();
 	private static final WeakValueHashMap<String, Object> javaReferences = new WeakValueHashMap<String, Object>();
 	private static boolean jsLinkAllowed = Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK);
-	private static ScheduledExecutorService javaEvalThread = Executors.newSingleThreadScheduledExecutor();
+	private static ScheduledExecutorService javaEvalThread = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
 	private JSObjectMsg jsThis;
 
 	public WebJSObject(JSObjectMsg jsThis) {

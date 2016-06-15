@@ -80,9 +80,13 @@ public class AdminConsoleRestServiceImpl implements AdminConsoleRestService {
 	}
 
 	@Override
-	public void killSession(String id) {
+	public void shutdown(String id, String forceKill) {
 		checkAuthorization();
-		SwingInstanceManager.getInstance().killSession(id);
+		if(Boolean.parseBoolean(forceKill)){
+			SwingInstanceManager.getInstance().shutdown(id,true);
+		}else{
+			SwingInstanceManager.getInstance().shutdown(id,false);
+		}
 	}
 
 	@Override
