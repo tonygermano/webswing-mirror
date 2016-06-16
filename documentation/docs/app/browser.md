@@ -43,15 +43,28 @@ With Webswing it is possible to embed your swing application to your own webpage
  data-webswing-options="{autoStart:true,  anonym:true,  args:'foo',  applicationName:'SwingSet3', connectionUrl:'http://<webswing-host-and-port>'}">
 </div>
 
-<script data-webswing-global-var="webswingControll">
- (function (window, document) {
-  var loader = function () {
-   var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
-   script.src =  "http://<webswing-host-and-port>/javascript/webswing-embed.js";
-   tag.parentNode.insertBefore(script, tag);
-  };
-  window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
- })(window, document);
+<script>
+	(function (window, document) {
+	  var loader = function () {
+		//fix for ie
+		if (!window.location.origin) {
+			window.location.origin = window.location.protocol + "//" + window.location.hostname
+					+ (window.location.port ? ':' + window.location.port : '');
+		}
+		var xmlhttp = new XMLHttpRequest();
+	    xmlhttp.onreadystatechange = function() {
+	        if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
+	        	var version = xmlhttp.status == 200 ? xmlhttp.responseText : "undefined";
+	        	var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+	    	    script.src =  document.location.origin + document.location.pathname + "javascript/webswing-embed.js?version="+version;
+	    	    tag.parentNode.insertBefore(script, tag);
+	        }
+	    };
+	    xmlhttp.open("GET", document.location.origin + document.location.pathname +"rest/webswing/version", true);
+	    xmlhttp.send();
+	  };
+	  window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+	})(window, document);
 </script>
 ```
 There are few things you need to configure in the snippet. Most important is to replace the 2  `<webswing-host-and-port>` placeholders with the location of your webswing deployment. For example `localhost:8080` if using the default settings. 

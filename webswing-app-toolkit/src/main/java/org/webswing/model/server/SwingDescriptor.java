@@ -110,14 +110,6 @@ public class SwingDescriptor implements Serializable {
 		this.swingSessionTimeout = swingSessionTimeout;
 	}
 	
-	public int resolveSwingSessionTimeout() {
-		if(getSessionMode().equals(SessionMode.ALWAYS_NEW_SESSION)){
-			return 0;
-		}else{
-			return getSwingSessionTimeout();
-		}
-	}
-
 	public boolean isAuthorization() {
 		return authorization;
 	}

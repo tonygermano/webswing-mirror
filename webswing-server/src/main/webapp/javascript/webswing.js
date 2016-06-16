@@ -136,6 +136,7 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                         ieVersion : util.detectIE(),
                         /* webswing instance context */
                         clientId : null,
+                        viewId : null,
                         appName : null,
                         hasControl : false,
                         mirrorMode : false,

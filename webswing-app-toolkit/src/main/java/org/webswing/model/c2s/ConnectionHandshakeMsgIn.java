@@ -10,6 +10,7 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 
 	private String clientId;
 	private String sessionId;
+	private String viewId;
 	private Integer desktopWidth;
 	private Integer desktopHeight;
 	private String applicationName;
@@ -108,4 +109,12 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 		this.locale = locale;
 	}
 
+	public String getViewId() {
+		return viewId;
+	}
+
+	public void setViewId(String viewId) {
+		this.viewId = viewId;
+	}
+	
 }

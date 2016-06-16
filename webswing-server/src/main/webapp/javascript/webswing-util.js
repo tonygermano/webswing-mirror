@@ -6,7 +6,8 @@ define([ 'jquery' ], function Util($) {
         getImageString : getImageString,
         bindEvent : bindEvent,
         detectIE : detectIE,
-        preventGhosts : preventGhosts
+        preventGhosts : preventGhosts,
+        GUID : GUID
     }
 
     function isTouchDevice() {
@@ -96,6 +97,13 @@ define([ 'jquery' ], function Util($) {
 
         attachEvents(mouseEvents, POINTER_TYPE.MOUSE);
         attachEvents(touchEvents, POINTER_TYPE.TOUCH);
+    }
+    
+    function GUID() {
+        var S4 = function () {
+            return Math.floor(Math.random() * 0x10000).toString(16);
+        };
+        return (S4() + S4() + S4());
     }
 
 });

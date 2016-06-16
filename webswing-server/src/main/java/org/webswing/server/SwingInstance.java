@@ -184,7 +184,7 @@ public class SwingInstance implements WebSessionListener {
 
 	public SwingSession toSwingSession() {
 		SwingSession session = new SwingSession();
-		session.setId(getClientId());
+		session.setId(getInstanceId());
 		session.setApplet(getAppConfig() instanceof SwingAppletDescriptor);
 		session.setApplication(getAppConfig().getName());
 		session.setConnected(getSessionId() != null);
@@ -260,7 +260,7 @@ public class SwingInstance implements WebSessionListener {
 
 			swing.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw() + "");
 			swing.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported() + "");
-			swing.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.resolveSwingSessionTimeout() + "");
+			swing.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout() + "");
 			swing.addProperty("awt.toolkit", webToolkitClass);
 			swing.addProperty("java.awt.headless", "false");
 			swing.addProperty("java.awt.graphicsenv", "org.webswing.toolkit.ge.WebGraphicsEnvironment");

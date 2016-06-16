@@ -51,6 +51,7 @@ Here is a sample `webswing.config` file content with demo swing application conf
     "allowDownload" : true,
     "allowAutoDownload" : true,
     "allowUpload" : true,
+    "uploadMaxSize" : 5,
     "allowJsLink" : true
   }]
 }
@@ -114,7 +115,7 @@ In Admin console options with variable replacement support appears with a flash 
 
 `sessionMode`: Select session behavior when user reconnects to application. Available options: 
 
-1. `ALWAYS_NEW_SESSION`: New swing application is started for every Webswing session. (Session timeout will be set to 0)
+1. `ALWAYS_NEW_SESSION`: New Swing application is started for every Webswing session. It is recommended to increase the `maxClients` value for this setting. (Set "Session Timeout" to >0 to allow clients to reconnect on unstable connections)
 2. `CONTINUE_FOR_BROWSER`: Webswing session can be resumed **in the same browser** after connection is terminated (Session timeout applies).
 3. `CONTINUE_FOR_USER`: Swing session can be resumed **by the same user** from any computer after the connection is terminated(Session timeout applies).
 
@@ -137,6 +138,8 @@ In Admin console options with variable replacement support appears with a flash 
 `allowAutoDownload`: If selected, the JFileChooser dialog's save mode will trigger file download as soon as the selected file is available on filesystem.
 
 `allowUpload`: This options activates the 'Upload' button and drop area on the JFileChooser integration panel. If this is true, user will be allowed to upload files to folder displayed in JFileChooser dialog.
+
+`uploadMaxSize`: Maximum size of upload for single file (in MB). Set 0 for unlimited size.
 
 `allowJsLink`: If selected, the JSLink feature will be enabled, allowing swing application to invoke javascript and vice versa. (See `netscape.javascript.JSObject`)
 

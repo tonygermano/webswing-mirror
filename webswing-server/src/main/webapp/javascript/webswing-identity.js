@@ -1,4 +1,4 @@
-define([], function amdFactory() {
+define(['webswing-util'], function amdFactory(util) {
     "use strict";
     return function JsLinkModule() {
         var module = this;
@@ -14,7 +14,7 @@ define([], function amdFactory() {
             if (id != null) {
                 return id;
             } else {
-                id = GUID();
+                id = util.GUID();
                 createCookie(cookieName, id, 1);
                 return id;
             }
@@ -27,13 +27,6 @@ define([], function amdFactory() {
 
         function dispose() {
             eraseCookie(cookieName);
-        }
-
-        function GUID() {
-            var S4 = function () {
-                return Math.floor(Math.random() * 0x10000).toString(16);
-            };
-            return (S4() + S4() + S4());
         }
 
         function createCookie(name, value, days) {

@@ -96,6 +96,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 
         function resetState() {
             api.cfg.clientId = '';
+            api.cfg.viewId = util.GUID(); 
             api.cfg.appName = null;
             api.cfg.hasControl = false;
             api.cfg.mirrorMode = false;
@@ -364,6 +365,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             var handshake = {
                 applicationName : api.cfg.appName,
                 clientId : api.cfg.clientId,
+                viewId : api.cfg.viewId,
                 sessionId : api.getSocketId(),
                 locale : api.getLocale(),
                 mirrored : api.cfg.mirrorMode,

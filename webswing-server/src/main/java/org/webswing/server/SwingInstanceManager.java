@@ -244,15 +244,19 @@ public class SwingInstanceManager {
 	}
 
 	private String resolveInstanceIdForMode(AtmosphereResource r, ConnectionHandshakeMsgIn h, SwingDescriptor app) {
-		switch (app.getSessionMode()) {
-		case ALWAYS_NEW_SESSION:
-			return h.getClientId() + r.uuid();
-		case CONTINUE_FOR_BROWSER:
+		if(h.isMirrored()){
 			return h.getClientId();
-		case CONTINUE_FOR_USER:
-			return app.getName() + ServerUtil.getUserName(r);
-		default:
-			return h.getClientId();
+		}else{
+			switch (app.getSessionMode()) {
+			case ALWAYS_NEW_SESSION:
+				return h.getClientId() + h.getViewId();
+			case CONTINUE_FOR_BROWSER:
+				return h.getClientId();
+			case CONTINUE_FOR_USER:
+				return app.getName() + ServerUtil.getUserName(r);
+			default:
+				return h.getClientId();
+			}	
 		}
 	}
 

@@ -169,15 +169,16 @@ message InputEventMsgInProto{
 message ConnectionHandshakeMsgInProto{
 	optional string clientId = 1;
 	optional string sessionId = 2;
-	optional uint32 desktopWidth = 3;
-	optional uint32 desktopHeight = 4;
-	optional string applicationName = 5;
-	optional bool mirrored = 6;
-	optional bool directDrawSupported = 7;
-	optional bool applet = 8;
-	optional string documentBase = 9;
-	repeated ParamMsgProto params = 10;
-	optional string locale = 11;
+	optional string viewId = 3;
+	optional uint32 desktopWidth = 4;
+	optional uint32 desktopHeight = 5;
+	optional string applicationName = 6;
+	optional bool mirrored = 7;
+	optional bool directDrawSupported = 8;
+	optional bool applet = 9;
+	optional string documentBase = 10;
+	repeated ParamMsgProto params = 11;
+	optional string locale = 12;
 }
 
 message ParamMsgProto{
