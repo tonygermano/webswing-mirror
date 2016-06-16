@@ -157,7 +157,7 @@
 			<plugin>
 				<groupId>pl.project13.maven</groupId>
 				<artifactId>git-commit-id-plugin</artifactId>
-				<version>2.1.5</version>
+				<version>2.2.1</version>
 				<executions>
 					<execution>
 						<goals>
@@ -169,10 +169,12 @@
 					<failOnNoGitDirectory>false</failOnNoGitDirectory>
 					<failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
 					<gitDescribe>
-						<dirty>-modified</dirty>
+						<dirty>-modified-${maven.build.timestamp}</dirty>
 						<always>false</always>
 						<abbrev>7</abbrev>
 					</gitDescribe>
+				    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+    				<generateGitPropertiesFilename>${project.basedir}\src\main\resources\git.properties</generateGitPropertiesFilename>
 				</configuration>
 			</plugin>
 			<plugin>

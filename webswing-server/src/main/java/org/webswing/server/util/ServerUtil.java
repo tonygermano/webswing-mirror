@@ -36,9 +36,7 @@ import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.server.SwingAppletDescriptor;
 import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.SwingDescriptor;
-import org.webswing.model.server.admin.SwingSession;
 import org.webswing.server.ConfigurationManager;
-import org.webswing.server.SwingInstance;
 import org.webswing.server.handler.LoginServlet;
 import org.webswing.server.model.EncodedMessage;
 
