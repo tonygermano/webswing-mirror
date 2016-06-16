@@ -168,6 +168,7 @@ public class WebEventDispatcher {
 			long when = System.currentTimeMillis();
 			int modifiers = Util.getKeyModifiersAWTFlag(event);
 			int type = Util.getKeyType(event.getType());
+			char character = Util.getKeyCharacter(event);
 			Component src = w.getFocusOwner() == null ? w : w.getFocusOwner();
 			if (type == KeyEvent.KEY_TYPED) {
 				AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, 0, 0, (char) event.getCharacter());
@@ -175,15 +176,16 @@ public class WebEventDispatcher {
 			} else {
 				if (event.getKeycode() == 13) {// enter keycode
 					event.setKeycode(10);
-					event.setCharacter(10);
+					character = 10;
 				} else if (event.getKeycode() == 46) {// delete keycode
 					event.setKeycode(127);
-					event.setCharacter(127);
+					character = 127;
 				} else if (nonStandardKeyCodes.contains(event.getKeycode())) {
 					event.setKeycode(0);
 				}
-				AWTEvent e = new KeyEvent(src, type, when, modifiers, event.getKeycode(), (char) event.getCharacter(), KeyEvent.KEY_LOCATION_STANDARD);
-
+				AWTEvent e = Util.createKeyEvent(src, type, when, modifiers, event.getKeycode(), character, KeyEvent.KEY_LOCATION_STANDARD);
+				
+				
 				dispatchEventInSwing(w, e);
 				if (event.getKeycode() == 32 && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown) {// space keycode handle press
 					event.setType(KeyboardEventMsgIn.KeyEventType.keypress);

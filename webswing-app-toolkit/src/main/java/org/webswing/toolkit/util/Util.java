@@ -22,7 +22,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.text.DateFormat.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -53,6 +55,9 @@ import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 
 public class Util {
+
+	private static List<Integer> NO_CHAR_KEY_CODES = Arrays.asList(KeyEvent.VK_F1, KeyEvent.VK_F2, KeyEvent.VK_F3, KeyEvent.VK_F4, KeyEvent.VK_F5, KeyEvent.VK_F6, KeyEvent.VK_F7, KeyEvent.VK_F8, KeyEvent.VK_F9, KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12, KeyEvent.VK_PRINTSCREEN, KeyEvent.VK_SCROLL_LOCK, KeyEvent.VK_PAUSE, KeyEvent.VK_INSERT,
+			KeyEvent.VK_HOME, KeyEvent.VK_PAGE_DOWN, KeyEvent.VK_END, KeyEvent.VK_PAGE_DOWN, KeyEvent.VK_CAPS_LOCK, KeyEvent.VK_UP, KeyEvent.VK_LEFT, KeyEvent.VK_DOWN, KeyEvent.VK_RIGHT, KeyEvent.VK_SHIFT, KeyEvent.VK_CONTROL, KeyEvent.VK_ALT, KeyEvent.VK_WINDOWS, KeyEvent.VK_ALT_GRAPH);
 
 	public static int getMouseButtonsAWTFlag(int button) {
 		switch (button) {
@@ -138,6 +143,14 @@ public class Util {
 			return KeyEvent.KEY_RELEASED;
 		}
 		return 0;
+	}
+
+	public static char getKeyCharacter(KeyboardEventMsgIn event) {
+		if (NO_CHAR_KEY_CODES.contains(event.getKeycode())) {
+			return KeyEvent.CHAR_UNDEFINED;
+		} else {
+			return (char) event.getCharacter();
+		}
 	}
 
 	public static BufferedImage deepCopy(BufferedImage bi) {
@@ -384,7 +397,7 @@ public class Util {
 				current = r;
 			} else {
 				if (current.y == r.y && current.height == r.height && current.x + current.width == r.x) {// is
-																											// joinable
+																												// joinable
 																											// on
 																											// row
 					current.width += r.width;
@@ -421,7 +434,7 @@ public class Util {
 				currentX = r;
 			} else {
 				if (currentX.x == r.x && currentX.width == r.width && currentX.y + currentX.height == r.y) {// is
-																											// joinable
+																												// joinable
 																											// on
 																											// row
 					currentX.height += r.height;
@@ -523,11 +536,23 @@ public class Util {
 
 	public static Panel findHwComponentParent(JComponent c) {
 		for (Container p = c.getParent(); p != null; p = p.getParent()) {
-			if(p instanceof Panel && !(p instanceof Applet)) {
+			if (p instanceof Panel && !(p instanceof Applet)) {
 				return (Panel) p;
 			}
 		}
 		return null;
+	}
+
+	public static AWTEvent createKeyEvent(Component src, int type, long when, int modifiers, int keycode, char character, int keyLocationStandard) {
+		KeyEvent e = new KeyEvent(src, type, when, modifiers, keycode, character, KeyEvent.KEY_LOCATION_STANDARD);
+		try {
+			java.lang.reflect.Field f=KeyEvent.class.getDeclaredField("extendedKeyCode");
+			f.setAccessible(true);
+			f.set(e, keycode);
+		} catch (Exception e1) {
+			Logger.error("Failed to update extendedKeyCode of KeyEvent", e);
+		}
+		return e;
 	}
 
 }
