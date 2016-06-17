@@ -6,17 +6,19 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.peer.PanelPeer;
 
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.GraphicsWrapper;
+import org.webswing.toolkit.util.Util;
 
 public class WebPanelPeer extends WebContainerPeer implements PanelPeer {
 
 	private Insets insets;
-
+	
 	public WebPanelPeer(Container t) {
 		super(t);
 		insets = new Insets(0, 0, 0, 0);
@@ -57,5 +59,15 @@ public class WebPanelPeer extends WebContainerPeer implements PanelPeer {
 		GraphicsWrapper g = (GraphicsWrapper) super.getGraphics();
 		g.setOffset(SwingUtilities.convertPoint((Component) target, new Point(0, 0), (Component) getParentWindowPeer().getTarget()));
 		return g;
+	}
+	
+	@Override
+	protected void notifyWindowClosed() {
+		//do nothing here
+	}
+
+	@Override
+	protected void notifyWindowBoundsChanged(Rectangle rectangle) {
+		//do nothing here
 	}
 }

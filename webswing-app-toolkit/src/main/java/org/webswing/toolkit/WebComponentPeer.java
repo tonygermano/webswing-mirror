@@ -99,8 +99,8 @@ public class WebComponentPeer implements ComponentPeer {
 			Services.getDirectDrawService().resetImage(windowDecorationImage);
 		}
 		for (WebComponentPeer wcp : hwLayers) {
-			Point p = SwingUtilities.convertPoint((Component) wcp.getTarget(), new Point(0,0), (Component) this.getTarget());
-			g.drawImage(wcp.webImage, p.x,p.y, null);
+			Point p = SwingUtilities.convertPoint((Component) wcp.getTarget(), new Point(0, 0), (Component) this.getTarget());
+			g.drawImage(wcp.webImage, p.x, p.y, null);
 			Services.getDirectDrawService().resetImageBeforeRepaint(wcp.webImage);
 		}
 		g.dispose();
@@ -136,14 +136,14 @@ public class WebComponentPeer implements ComponentPeer {
 			return image != null;
 		}
 	}
-	
-	public Component getHwComponentAt(int x,int y){
+
+	public Component getHwComponentAt(int x, int y) {
 		Component result = (Component) getTarget();
-		for(Iterator<WebComponentPeer> i=hwLayers.iterator();i.hasNext();){
+		for (Iterator<WebComponentPeer> i = hwLayers.iterator(); i.hasNext();) {
 			WebComponentPeer wcp = i.next();
 			Insets insets = ((Window) this.getTarget()).getInsets();
-			if(wcp.getBounds().contains(x-getBounds().x-insets.left, y-getBounds().y-insets.top)){
-				result=(Component) wcp.getTarget();
+			if (wcp.getBounds().contains(x - getBounds().x - insets.left, y - getBounds().y - insets.top)) {
+				result = (Component) wcp.getTarget();
 			}
 		}
 		return result;
@@ -241,7 +241,7 @@ public class WebComponentPeer implements ComponentPeer {
 				} catch (InvalidPipeException e) {
 					Logger.error("WebComponentPeer:setBounds", e);
 				}
-				Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), new Rectangle(0, 0, w, h));
+				notifyWindowBoundsChanged(new Rectangle(0, 0, w, h));
 			}
 
 			if ((validPosition.x != this.oldX) || (validPosition.y != this.oldY) || (w != this.oldWidth) || (h != this.oldHeight)) {
@@ -255,6 +255,10 @@ public class WebComponentPeer implements ComponentPeer {
 			}
 
 		}
+	}
+
+	protected void notifyWindowBoundsChanged(Rectangle rectangle) {
+		Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(),rectangle);		
 	}
 
 	protected Point validate(int x, int y, int w, int h) {
@@ -312,10 +316,10 @@ public class WebComponentPeer implements ComponentPeer {
 	}
 
 	public Point getLocationOnScreen() {
-		if(getTarget() instanceof Applet || getTarget() instanceof Window){
+		if (getTarget() instanceof Applet || getTarget() instanceof Window) {
 			return getBounds().getLocation();
-		}else{
-			Point p = new Point(0,0);
+		} else {
+			Point p = new Point(0, 0);
 			SwingUtilities.convertPointToScreen(p, (Component) getTarget());
 			return p;
 		}
@@ -379,7 +383,7 @@ public class WebComponentPeer implements ComponentPeer {
 
 	public void dispose() {
 		synchronized (WebPaintDispatcher.webPaintLock) {
-			Util.getWebToolkit().getPaintDispatcher().notifyWindowClosed(getGuid());
+			notifyWindowClosed();
 			if (Util.isDD()) {
 				this.webImage = null;
 			} else {
@@ -391,6 +395,10 @@ public class WebComponentPeer implements ComponentPeer {
 			}
 			WebToolkit.targetDisposedPeer(this.target, this);
 		}
+	}
+
+	protected void notifyWindowClosed() {
+		Util.getWebToolkit().getPaintDispatcher().notifyWindowClosed(getGuid());
 	}
 
 	public void setForeground(Color paramColor) {
@@ -442,10 +450,10 @@ public class WebComponentPeer implements ComponentPeer {
 		if (target instanceof Window) {
 			return Util.getWebToolkit().getWindowManager().activateWindow((Window) target, paramComponent, 0, 0, temporary, focusedWindowChangeAllowed, paramCause);
 		} else if (target instanceof Applet) {
-			Applet applet=(Applet) target;
-			Window window=((WebAppletContext)applet.getAppletContext()).getContainer();
+			Applet applet = (Applet) target;
+			Window window = ((WebAppletContext) applet.getAppletContext()).getContainer();
 			return Util.getWebToolkit().getWindowManager().activateWindow(window, paramComponent, 0, 0, temporary, focusedWindowChangeAllowed, paramCause);
-		}else{
+		} else {
 			return false;
 		}
 	}
@@ -554,11 +562,19 @@ public class WebComponentPeer implements ComponentPeer {
 	}
 
 	protected void removeHwLayer(WebComponentPeer peer) {
-		hwLayers.remove(peer);
+		synchronized (WebPaintDispatcher.webPaintLock) {
+			hwLayers.remove(peer);
+		}
 	}
 
 	protected void addHwLayer(WebComponentPeer peer) {
-		hwLayers.add(peer);
+		synchronized (WebPaintDispatcher.webPaintLock) {
+			hwLayers.add(peer);
+		}
+	}
+
+	public void notifyWindowAreaRepainted(Rectangle r) {
+		Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(getGuid(), r);
 	}
 
 }

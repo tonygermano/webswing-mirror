@@ -191,31 +191,102 @@ public abstract class WebToolkit extends SunToolkit {
 				this.desktopProperties.put("Shell.shellFolderManager", "sun.awt.shell.Win32ShellFolderManager2");
 			}
 		}
-		this.desktopProperties.put("win.highContrast.on", Boolean.FALSE);
-		this.desktopProperties.put("win.xpstyle.themeActive", Boolean.TRUE);
-		this.desktopProperties.put("win.text.grayedTextColor", new Color(109, 109, 109));
-		this.desktopProperties.put("win.scrollbar.backgroundColor", new Color(200, 200, 200));
-		this.desktopProperties.put("win.menubar.backgroundColor", new Color(240, 240, 240));
-		this.desktopProperties.put("win.menu.textColor", Color.black);
-		this.desktopProperties.put("win.menu.backgroundColor", new Color(240, 240, 240));
-		this.desktopProperties.put("win.item.highlightTextColor", Color.white);
-		this.desktopProperties.put("win.item.highlightColor", new Color(51, 153, 255));
-		this.desktopProperties.put("win.tooltip.textColor", Color.black);
-		this.desktopProperties.put("win.button.textColor", Color.black);
-		this.desktopProperties.put("win.tooltip.backgroundColor", Color.white);
-		this.desktopProperties.put("win.systemFixed.font", defaultFont);
-		this.desktopProperties.put("win.messagebox.font", defaultFont);
-		this.desktopProperties.put("win.ansiFixed.font", defaultFont);
-		this.desktopProperties.put("win.system.font", defaultFont);
-		this.desktopProperties.put("win.menu.font", defaultFont);
-		this.desktopProperties.put("win.tooltip.font", defaultFont);
-		this.desktopProperties.put("win.ansiVar.font", defaultFont);
-		this.desktopProperties.put("win.icon.font", defaultFont);
-		this.desktopProperties.put("win.deviceDefault.font", defaultFont);
-		this.desktopProperties.put("win.oemFixed.font", defaultFont);
-		this.desktopProperties.put("win.defaultGUI.font", defaultFont);
-		this.desktopProperties.put("win.status.font", defaultFont);
 
+		this.desktopProperties.put("DnD.gestureMotionThreshold", 2);
+		this.desktopProperties.put("awt.dynamicLayoutSupported", true);
+		this.desktopProperties.put("awt.file.showAttribCol", false);
+		this.desktopProperties.put("awt.file.showHiddenFiles", false);
+		this.desktopProperties.put("awt.mouse.numButtons", 5);
+		this.desktopProperties.put("awt.multiClickInterval", 500);
+		this.desktopProperties.put("awt.wheelMousePresent", true);
+		this.desktopProperties.put("win.3d.backgroundColor", new java.awt.Color(240, 240, 240));
+		this.desktopProperties.put("win.3d.darkShadowColor", new java.awt.Color(105, 105, 105));
+		this.desktopProperties.put("win.3d.highlightColor", new java.awt.Color(255, 255, 255));
+		this.desktopProperties.put("win.3d.lightColor", new java.awt.Color(227, 227, 227));
+		this.desktopProperties.put("win.3d.shadowColor", new java.awt.Color(160, 160, 160));
+		this.desktopProperties.put("win.ansiFixed.font", Font.decode("Monospaced 0 13"));
+		this.desktopProperties.put("win.ansiFixed.font.height", 13);
+		this.desktopProperties.put("win.ansiVar.font", Font.decode("Dialog 0 11"));
+		this.desktopProperties.put("win.ansiVar.font.height", 11);
+		this.desktopProperties.put("win.button.textColor", new java.awt.Color(0, 0, 0));
+		this.desktopProperties.put("win.caret.width", 1);
+		this.desktopProperties.put("win.defaultGUI.font", Font.decode("Dialog 0 11"));
+		this.desktopProperties.put("win.defaultGUI.font.height", 11);
+		this.desktopProperties.put("win.desktop.backgroundColor", new java.awt.Color(0, 0, 0));
+		this.desktopProperties.put("win.deviceDefault.font", Font.decode("Dialog 1 13"));
+		this.desktopProperties.put("win.deviceDefault.font.height", 13);
+		this.desktopProperties.put("win.drag.height", 4);
+		this.desktopProperties.put("win.drag.width", 4);
+		this.desktopProperties.put("win.frame.activeBorderColor", new java.awt.Color(180, 180, 180));
+		this.desktopProperties.put("win.frame.activeCaptionColor", new java.awt.Color(153, 180, 209));
+		this.desktopProperties.put("win.frame.activeCaptionGradientColor", new java.awt.Color(185, 209, 234));
+		this.desktopProperties.put("win.frame.backgroundColor", new java.awt.Color(255, 255, 255));
+		this.desktopProperties.put("win.frame.captionButtonHeight", 22);
+		this.desktopProperties.put("win.frame.captionButtonWidth", 36);
+		this.desktopProperties.put("win.frame.captionFont", Font.decode("Dialog 0 12"));
+		this.desktopProperties.put("win.frame.captionFont.height", 12);
+		this.desktopProperties.put("win.frame.captionGradientsOn", true);
+		this.desktopProperties.put("win.frame.captionHeight", 22);
+		this.desktopProperties.put("win.frame.captionTextColor", new java.awt.Color(0, 0, 0));
+		this.desktopProperties.put("win.frame.color", new java.awt.Color(100, 100, 100));
+		this.desktopProperties.put("win.frame.fullWindowDragsOn", true);
+		this.desktopProperties.put("win.frame.inactiveBorderColor", new java.awt.Color(244, 247, 252));
+		this.desktopProperties.put("win.frame.inactiveCaptionColor", new java.awt.Color(191, 205, 219));
+		this.desktopProperties.put("win.frame.inactiveCaptionGradientColor", new java.awt.Color(215, 228, 242));
+		this.desktopProperties.put("win.frame.inactiveCaptionTextColor", new java.awt.Color(0, 0, 0));
+		this.desktopProperties.put("win.frame.sizingBorderWidth", 5);
+		this.desktopProperties.put("win.frame.smallCaptionButtonHeight", 22);
+		this.desktopProperties.put("win.frame.smallCaptionButtonWidth", 22);
+		this.desktopProperties.put("win.frame.smallCaptionFont", Font.decode("Dialog 0 12"));
+		this.desktopProperties.put("win.frame.smallCaptionFont.height", 12);
+		this.desktopProperties.put("win.frame.smallCaptionHeight", 22);
+		this.desktopProperties.put("win.frame.textColor", new java.awt.Color(0, 0, 0));
+		this.desktopProperties.put("win.highContrast.on", false);
+		this.desktopProperties.put("win.icon.font", Font.decode("Dialog 0 12"));
+		this.desktopProperties.put("win.icon.font.height", 12);
+		this.desktopProperties.put("win.icon.hspacing", 75);
+		this.desktopProperties.put("win.icon.titleWrappingOn", true);
+		this.desktopProperties.put("win.icon.vspacing", 75);
+		this.desktopProperties.put("win.item.highlightColor", new java.awt.Color(51, 153, 255));
+		this.desktopProperties.put("win.item.highlightTextColor", new java.awt.Color(255, 255, 255));
+		this.desktopProperties.put("win.item.hotTrackedColor", new java.awt.Color(0, 102, 204));
+		this.desktopProperties.put("win.item.hotTrackingOn", true);
+		this.desktopProperties.put("win.mdi.backgroundColor", new java.awt.Color(171, 171, 171));
+		this.desktopProperties.put("win.menu.backgroundColor", new java.awt.Color(240, 240, 240));
+		this.desktopProperties.put("win.menu.buttonWidth", 19);
+		this.desktopProperties.put("win.menu.font", Font.decode("Dialog 0 12"));
+		this.desktopProperties.put("win.menu.font.height", 12);
+		this.desktopProperties.put("win.menu.height", 19);
+		this.desktopProperties.put("win.menu.keyboardCuesOn", false);
+		this.desktopProperties.put("win.menu.textColor", new java.awt.Color(0, 0, 0));
+		this.desktopProperties.put("win.menubar.backgroundColor", new java.awt.Color(240, 240, 240));
+		this.desktopProperties.put("win.messagebox.font", Font.decode("Dialog 0 12"));
+		this.desktopProperties.put("win.messagebox.font.height", 12);
+		this.desktopProperties.put("win.oemFixed.font", Font.decode("Dialog 0 12"));
+		this.desktopProperties.put("win.oemFixed.font.height", 12);
+		this.desktopProperties.put("win.properties.version", 3);
+		this.desktopProperties.put("win.scrollbar.backgroundColor", new java.awt.Color(200, 200, 200));
+		this.desktopProperties.put("win.scrollbar.height", 17);
+		this.desktopProperties.put("win.scrollbar.width", 17);
+		this.desktopProperties.put("win.status.font", Font.decode("Dialog 0 12"));
+		this.desktopProperties.put("win.status.font.height", 12);
+		this.desktopProperties.put("win.system.font", Font.decode("Dialog 1 13"));
+		this.desktopProperties.put("win.system.font.height", 13);
+		this.desktopProperties.put("win.systemFixed.font", Font.decode("Dialog 0 12"));
+		this.desktopProperties.put("win.systemFixed.font.height", 12);
+		this.desktopProperties.put("win.text.fontSmoothingContrast", 1200);
+		this.desktopProperties.put("win.text.fontSmoothingOn", true);
+		this.desktopProperties.put("win.text.fontSmoothingOrientation", 1);
+		this.desktopProperties.put("win.text.fontSmoothingType", 2);
+		this.desktopProperties.put("win.text.grayedTextColor", new java.awt.Color(109, 109, 109));
+		this.desktopProperties.put("win.tooltip.backgroundColor", new java.awt.Color(255, 255, 225));
+		this.desktopProperties.put("win.tooltip.font", Font.decode("Dialog 0 12"));
+		this.desktopProperties.put("win.tooltip.font.height", 12);
+		this.desktopProperties.put("win.tooltip.textColor", new java.awt.Color(0, 0, 0));
+		this.desktopProperties.put("win.xpstyle.colorName", "NormalColor");
+		this.desktopProperties.put("win.xpstyle.dllName", "C:\\WINDOWS\\resources\\themes\\Aero\\Aero.msstyles");
+		this.desktopProperties.put("win.xpstyle.sizeName", "NormalSize");
+		this.desktopProperties.put("win.xpstyle.themeActive", true);
 	}
 
 	public boolean needUpdateWindow() {
@@ -565,7 +636,7 @@ public abstract class WebToolkit extends SunToolkit {
 				public void run() {
 					//tell server to kill this application after defined time
 					getPaintDispatcher().notifyApplicationExiting();
-					
+
 					//first send windows closing event to all windows
 					for (Window w : Window.getWindows()) {
 						w.dispatchEvent(new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
