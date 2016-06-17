@@ -114,19 +114,23 @@ public class SwingJvmConnection implements MessageListener {
 				if (o instanceof MsgInternal) {
 					if (o instanceof PrinterJobResultMsgInternal) {
 						PrinterJobResultMsgInternal pj = (PrinterJobResultMsgInternal) o;
-						FileServlet.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser(), false, null);
-						AppFrameMsgOut f = new AppFrameMsgOut();
-						LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.print, pj.getId());
-						f.setLinkAction(linkAction);
-						webListener.sendToWeb(f);
+						boolean success = FileServlet.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, webListener.getUser(), webListener.getInstanceId(), false, null);
+						if (success) {
+							AppFrameMsgOut f = new AppFrameMsgOut();
+							LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.print, pj.getId());
+							f.setLinkAction(linkAction);
+							webListener.sendToWeb(f);
+						}
 					} else if (o instanceof OpenFileResultMsgInternal) {
 						OpenFileResultMsgInternal fr = (OpenFileResultMsgInternal) o;
 						String id = UUID.randomUUID().toString();
-						FileServlet.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, webListener.getUser(), fr.isWaitForFile(), fr.getOverwriteDetails());
-						AppFrameMsgOut f = new AppFrameMsgOut();
-						LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.file, id);
-						f.setLinkAction(linkAction);
-						webListener.sendToWeb(f);
+						boolean success = FileServlet.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, webListener.getUser(), webListener.getInstanceId(), fr.isWaitForFile(), fr.getOverwriteDetails());
+						if (success) {
+							AppFrameMsgOut f = new AppFrameMsgOut();
+							LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.file, id);
+							f.setLinkAction(linkAction);
+							webListener.sendToWeb(f);
+						}
 					} else if (o instanceof JvmStatsMsgInternal) {
 						JvmStatsMsgInternal s = (JvmStatsMsgInternal) o;
 						latest.setHeapSize(s.getHeapSize());
@@ -173,6 +177,8 @@ public class SwingJvmConnection implements MessageListener {
 	}
 
 	public interface WebSessionListener {
+
+		String getInstanceId();
 
 		String getUser();
 

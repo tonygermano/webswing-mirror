@@ -1,6 +1,7 @@
 package org.webswing.demo.files;
 
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -14,7 +15,7 @@ public class SaveFileDialog implements ActionListener {
 
 	public SaveFileDialog(FilesDemo demo) {
 		this.demo = demo;
-	}
+	}	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -47,6 +48,9 @@ public class SaveFileDialog implements ActionListener {
 					writer.flush();
 				}
 				writer.close();
+				System.out.println("sending the file to Browser:");
+				Desktop.getDesktop().open(file);
+				
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}

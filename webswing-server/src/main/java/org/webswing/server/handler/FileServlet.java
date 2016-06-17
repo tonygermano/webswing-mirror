@@ -76,7 +76,7 @@ public class FileServlet extends HttpServlet {
 			}
 		}
 
-		if (!fileMap.get(fileId).file.exists()) {
+		if (fileMap.get(fileId) == null || !fileMap.get(fileId).file.exists()) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
 			return;
 		}
@@ -116,7 +116,7 @@ public class FileServlet extends HttpServlet {
 					long maxsize = (long) (maxMB * 1024 * 1024);
 					Part filePart = request.getPart("files[]"); // Retrieves <input type="file" name="file">
 					String filename = getFilename(filePart);
-					if (maxsize>0 && filePart.getSize() > maxsize) {
+					if (maxsize > 0 && filePart.getSize() > maxsize) {
 						resp.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
 						resp.getWriter().write(String.format("File '%s' is too large. (Max. file size is %.1fMB)", filename, maxMB));
 					} else {
@@ -138,19 +138,19 @@ public class FileServlet extends HttpServlet {
 							resp.getWriter().write("{\"files\":[{\"name\":\"" + filename + "\"}]}"); // TODO size
 						}
 					}
-				}else{
-					throw new Exception("Related Swing instance not found.("+clientId+")");
+				} else {
+					throw new Exception("Related Swing instance not found.(" + clientId + ")");
 				}
-			}else{
+			} else {
 				throw new Exception("clientId not specified in request");
 			}
 		} catch (Exception e) {
 			resp.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
 			resp.getWriter().write("Upload finished with error...");
-			log.error("Error while uploading file: "+e.getMessage(),e);
+			log.error("Error while uploading file: " + e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void destroy() {
 		validatorService.shutdownNow();
@@ -179,6 +179,7 @@ public class FileServlet extends HttpServlet {
 
 	private static class FileDescriptor {
 
+		protected String instanceId;
 		protected File file;
 		@SuppressWarnings("unused")
 		protected Future<?> invalidateScheduleTask;
@@ -196,17 +197,22 @@ public class FileServlet extends HttpServlet {
 		}
 	}
 
-	public static String registerFile(File file, final String id, long validForTime, TimeUnit timeUnit, String validForUser, boolean waitForFile, String overwriteDetails) throws IOException {
-		return registerFileInternal(file, id, validForTime, timeUnit, validForUser, false, waitForFile, overwriteDetails);
+	public static boolean registerFile(File file, final String id, long validForTime, TimeUnit timeUnit, String validForUser, String instanceId, boolean waitForFile, String overwriteDetails) throws IOException {
+		return registerFileInternal(file, id, validForTime, timeUnit, validForUser,instanceId, false, waitForFile, overwriteDetails);
 	}
 
-	private static String registerFileInternal(File file, final String id, long validForTime, TimeUnit timeUnit, String validForUser, boolean temp, boolean waitForFile, String overwriteDetails) throws IOException {
+	private static boolean registerFileInternal(File file, final String id, long validForTime, TimeUnit timeUnit, String validForUser, String instanceId, boolean temp, boolean waitForFile, String overwriteDetails) throws IOException {
 		if (currentServlet != null) {
 			final FileDescriptor fd = new FileDescriptor(file, validForUser);
 			fd.temporary = temp;
 			fd.waitForFile = waitForFile;
 			fd.overwriteDetails = overwriteDetails;
+			fd.instanceId = instanceId;
 			synchronized (currentServlet.fileMap) {
+				//if file download was triggered by Desktop.open() or similar method and there is already a autoDownload thread waiting for the same file, avoid double downloading same file by canceling the waiting thread
+				if(notifyWaitingForSameFile(fd)){
+					return false;
+				}
 				currentServlet.fileMap.put(id, fd);
 				if (validForTime > 0) {
 					Future<?> invalidateTask = currentServlet.validatorService.schedule(new Runnable() {
@@ -222,7 +228,7 @@ public class FileServlet extends HttpServlet {
 					fd.invalidateScheduleTask = invalidateTask;
 				}
 				if (waitForFile) {
-					Future<?> waitForFileTask = currentServlet.validatorService.scheduleAtFixedRate(new Runnable() {
+					fd.waitForFileTask = currentServlet.validatorService.scheduleAtFixedRate(new Runnable() {
 						@Override
 						public void run() {
 							synchronized (fd) {
@@ -243,13 +249,27 @@ public class FileServlet extends HttpServlet {
 							}
 						}
 					}, 1, 1, TimeUnit.SECONDS);
-					fd.waitForFileTask = waitForFileTask;
 				}
 			}
-			return file.getAbsolutePath();
+			return true;
 		} else {
 			throw new IOException("File servlet not yet initialized!");
 		}
+	}
+
+	private static boolean notifyWaitingForSameFile(FileDescriptor newFd) {
+		for (String id : currentServlet.fileMap.keySet()) {
+			FileDescriptor fd = currentServlet.fileMap.get(id);
+			if (fd.instanceId.equals(newFd.instanceId) && fd.userId.equals(newFd.userId) && fd.file.equals(newFd.file) && fd.waitForFile) {
+				synchronized (fd) {
+					fd.waitForFile = false;
+					fd.notifyAll();
+					fd.waitForFileTask.cancel(false);
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
