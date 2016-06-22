@@ -16,9 +16,11 @@ import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.CompositeDrawConstantHolder;
 import org.webswing.directdraw.model.DrawConstant;
 import org.webswing.directdraw.model.DrawInstruction;
+import org.webswing.directdraw.model.FontFaceConst;
 import org.webswing.directdraw.model.IntegerConst;
 import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
+import org.webswing.directdraw.proto.Directdraw.FontFaceProto;
 import org.webswing.directdraw.proto.Directdraw.WebImageProto;
 import org.webswing.directdraw.util.DirectDrawUtils;
 import org.webswing.directdraw.util.DrawConstantPool;
@@ -27,7 +29,7 @@ import org.webswing.directdraw.util.RenderUtil;
 import sun.awt.image.SurfaceManager;
 import sun.java2d.SurfaceData;
 
-@SuppressWarnings("restriction")
+@SuppressWarnings({"unused","restriction"})
 public class WebImage extends Image {
 
 	private String id = UUID.randomUUID().toString();
@@ -43,7 +45,7 @@ public class WebImage extends Image {
 		this(dd, w, h, new ArrayList<DrawInstruction>());
 		this.usedGraphics = new HashSet<WebGraphics>();
 	}
-	
+
 	private WebImage(DirectDraw dd, int w, int h, List<DrawInstruction> instructions) {
 		this.context = dd;
 		this.size = new Dimension(w, h);
@@ -51,7 +53,6 @@ public class WebImage extends Image {
 
 		SurfaceManager.setManager(this, new SurfaceManager() {
 
-			@SuppressWarnings("unused")
 			// java 1.6
 			public SurfaceData getSourceSurfaceData(sun.java2d.SurfaceData s, sun.java2d.loops.CompositeType c, java.awt.Color color, boolean b) {
 				BufferedImage snapshot = WebImage.this.getSnapshot();
@@ -64,7 +65,6 @@ public class WebImage extends Image {
 				}
 			}
 
-			@SuppressWarnings("unused")
 			// java 1.6
 			public SurfaceData getDestSurfaceData() {
 				BufferedImage snapshot = WebImage.this.getSnapshot();
@@ -119,9 +119,9 @@ public class WebImage extends Image {
 	@Override
 	public Graphics getGraphics() {
 		synchronized (this) {
-			if(resetBeforeRepaint){
+			if (resetBeforeRepaint) {
 				reset();
-				resetBeforeRepaint=false;
+				resetBeforeRepaint = false;
 			}
 		}
 		return new WebGraphics(this);
@@ -155,7 +155,7 @@ public class WebImage extends Image {
 			if (lastUsedG != g) {
 				if (!usedGraphics.contains(g)) {
 					//if dispose is the first instruction, ignore it 
-					if(in.getInstruction().equals(InstructionProto.GRAPHICS_DISPOSE)){
+					if (in.getInstruction().equals(InstructionProto.GRAPHICS_DISPOSE)) {
 						return;
 					}
 					instructions.add(factory.createGraphics(g));
@@ -184,9 +184,7 @@ public class WebImage extends Image {
 	public WebImage extractReadOnlyWebImage(boolean reset) {
 		WebImage result;
 		synchronized (this) {
-			result = reset ?
-				new ReadOnlyWebImage(context, size.width, size.height, instructions) :
-				new ReadOnlyWebImage(context, size.width, size.height, new ArrayList<DrawInstruction>(instructions));
+			result = reset ? new ReadOnlyWebImage(context, size.width, size.height, instructions) : new ReadOnlyWebImage(context, size.width, size.height, new ArrayList<DrawInstruction>(instructions));
 			result.id = id;
 			if (reset) {
 				reset();
@@ -204,16 +202,23 @@ public class WebImage extends Image {
 
 		// build proto message
 		for (DrawInstruction instruction : instructions) {
-			List<DrawConstantProto> constProtos= new ArrayList<DrawConstantProto>();
+			List<FontFaceProto> fontProtos = new ArrayList<FontFaceProto>();
+			for(FontFaceConst fontConst:constantPool.registerRequestedFonts()){
+				fontProtos.add(fontConst.toMessage());
+			}
+			
+			List<DrawConstantProto> constProtos = new ArrayList<DrawConstantProto>();
 			for (DrawConstant<?> cons : instruction) {
-				if (cons instanceof CompositeDrawConstantHolder){
-					CompositeDrawConstantHolder<?> composite=(CompositeDrawConstantHolder<?>) cons;
-					composite.expandAndCacheConstants(constProtos,constantPool);
-				}else if (!(cons instanceof IntegerConst) && cons != DrawConstant.nullConst) {
-					int id=constantPool.addToCache(constProtos, cons);
+				if (cons instanceof CompositeDrawConstantHolder) {
+					CompositeDrawConstantHolder<?> composite = (CompositeDrawConstantHolder<?>) cons;
+					composite.expandAndCacheConstants(constProtos, constantPool);
+				} else if (!(cons instanceof IntegerConst) && cons != DrawConstant.nullConst) {
+					int id = constantPool.addToCache(constProtos, cons);
 					cons.setId(id);
 				}
 			}
+			
+			webImageBuilder.addAllFontFaces(fontProtos);
 			webImageBuilder.addAllConstants(constProtos);
 			webImageBuilder.addInstructions(instruction.toMessage(dd));
 		}
@@ -223,7 +228,7 @@ public class WebImage extends Image {
 	}
 
 	public void resetBeforeRepaint() {
-		this.resetBeforeRepaint =true;
+		this.resetBeforeRepaint = true;
 	}
 
 	public void reset() {

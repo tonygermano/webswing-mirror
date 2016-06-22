@@ -42,7 +42,7 @@
                                  items="['ALWAYS_NEW_SESSION','CONTINUE_FOR_BROWSER','CONTINUE_FOR_USER']">
                 </ws-string-field>
                 <ws-boolean-field readonly="{{vm.readonly}}"
-                                  label="Allow Stealing session" 
+                                  label="Allow Session Stealing" 
                                   desc="If enabled, and session mode 'CONTINUE_FOR_USER' is selected, user can resume Webswing session even if the connection is open in other browser. Former browser window will be disconnected." 
                                   value="vm.app.allowStealSession" >
                 </ws-boolean-field>
@@ -54,10 +54,16 @@
                                  variables="vm.variables">
                 </ws-string-field>
                 <ws-boolean-field readonly="{{vm.readonly}}"
-                                  label="DirectDraw (experimental)" 
+                                  label="DirectDraw" 
                                   desc="DirectDraw rendering mode uses canvas instructions to render the swing application instead of server-rendered png images. DirectDraw improves performance but is not recomended for applications with lot of graphics content" 
                                   value="vm.app.directdraw" >
                 </ws-boolean-field>
+                <ws-string-map-field readonly="{{vm.readonly}}"
+                                     label="Font config" 
+                                     desc="Customize logical font mappings and define physical fonts available to swing application. These fonts (TTF only) will be used for DirectDraw as native fonts. Key: name of font (ie. dialog|dialoginput|sansserif|serif|monospaced), Value: path to font file." 
+                                     value="vm.app.fontConfig"  
+                                     variables="vm.variables">
+                </ws-string-map-field>
             </div>
         </div>
     </tab>

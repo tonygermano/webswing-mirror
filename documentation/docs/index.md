@@ -4,7 +4,7 @@ Bring your swing applications to web browser. Instantly.
 
 Webswing project page [Webswing.org](http://webswing.org)
 
-Documentation sources are located in [/documentation folder](https://bitbucket.org/meszarv/webswing/src/)
+Documentation sources are located in [this folder](https://bitbucket.org/meszarv/webswing/src/HEAD/documentation/)
 
 >Note: Please help us improve this documentation by sending us feedback or pull requests.  Any improvements or suggestions are appreciated.   
 

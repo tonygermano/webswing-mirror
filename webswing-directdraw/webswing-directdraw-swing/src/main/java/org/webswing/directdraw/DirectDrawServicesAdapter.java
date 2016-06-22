@@ -1,11 +1,17 @@
 package org.webswing.directdraw;
 
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
@@ -13,6 +19,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.webswing.directdraw.util.ImageConsumerAdapter;
 
 public class DirectDrawServicesAdapter {
+
+	private Map<String, String> fontFileMap;
 
 	public byte[] getPngImage(BufferedImage imageContent) {
 		try {
@@ -44,6 +52,47 @@ public class DirectDrawServicesAdapter {
 		};
 		subImage.getSource().startProduction(ic);
 		return ic.getHash();
+	}
+
+	public String getFileForFont(Font font) {
+		if (font != null) {
+			Map<String, String> map = getFontFileMap();
+			String fontName = font.getFontName().toLowerCase();
+			String file = map.get(fontName);
+			return file;
+		}
+		return null;
+	}
+
+	private Map<String, String> getFontFileMap() {
+		if (fontFileMap == null) {
+			fontFileMap = new HashMap<String, String>();
+			try {
+				String customFontConfigFile = System.getProperty("sun.awt.fontconfig");
+				if (customFontConfigFile != null && new File(customFontConfigFile).canRead()) {
+					File f = new File(customFontConfigFile);
+					Scanner s = new Scanner(f);
+					try {
+						while (s.hasNextLine()) {
+							String line = s.nextLine();
+							if (line.startsWith("#@@")) {
+								String[] values = line.substring(3).split("=");
+								if (values.length == 2) {
+									fontFileMap.put(values[0].toLowerCase(), values[1]);
+								}
+							}
+
+						}
+					} finally {
+						s.close();
+					}
+				}
+			} catch (FileNotFoundException e) {
+				System.err.println("Failed to initialize font file map for DirectDraw rendering.");
+				e.printStackTrace();
+			}
+		}
+		return fontFileMap;
 	}
 
 }

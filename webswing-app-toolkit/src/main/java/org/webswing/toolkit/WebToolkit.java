@@ -1,5 +1,6 @@
 package org.webswing.toolkit;
 
+import java.applet.Applet;
 import java.awt.AWTException;
 import java.awt.Button;
 import java.awt.Checkbox;
@@ -324,6 +325,9 @@ public abstract class WebToolkit extends SunToolkit {
 	}
 
 	public PanelPeer createPanel(Panel panel) {
+		if (panel instanceof Applet) {
+			return super.createPanel(panel);
+		}
 		WebPanelPeer localpanelPeer = new WebPanelPeer(panel);
 		targetCreatedPeer(panel, localpanelPeer);
 		return localpanelPeer;

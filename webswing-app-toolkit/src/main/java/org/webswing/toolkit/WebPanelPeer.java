@@ -13,7 +13,6 @@ import java.awt.peer.PanelPeer;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.GraphicsWrapper;
-import org.webswing.toolkit.util.Util;
 
 public class WebPanelPeer extends WebContainerPeer implements PanelPeer {
 

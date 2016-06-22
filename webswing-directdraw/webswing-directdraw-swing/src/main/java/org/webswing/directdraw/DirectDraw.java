@@ -1,16 +1,17 @@
 package org.webswing.directdraw;
 
+import java.awt.Font;
 import java.awt.ImageCapabilities;
 
+import org.webswing.directdraw.model.FontFaceConst;
 import org.webswing.directdraw.toolkit.DrawInstructionFactory;
 import org.webswing.directdraw.toolkit.VolatileWebImageWrapper;
 import org.webswing.directdraw.toolkit.WebImage;
+import org.webswing.directdraw.util.DirectDrawUtils;
 import org.webswing.directdraw.util.DrawConstantPool;
 
 public class DirectDraw {
 	private static final int DRAW_CONSTANTS_POOL_CACHE_CAPACITY = 8192;
-	
-	public static boolean useGlyphs = Boolean.parseBoolean(System.getProperty("webswing.useGlyphs","true"));
 
 	private DirectDrawServicesAdapter services = new DirectDrawServicesAdapter();
 	private DrawInstructionFactory instructionFactory = new DrawInstructionFactory(this);
@@ -48,6 +49,22 @@ public class DirectDraw {
 
 	public DrawInstructionFactory getInstructionFactory() {
 		return instructionFactory;
+	}
+
+	public boolean requestFont(Font font) {
+		String file = getServices().getFileForFont(font);
+		if (file != null) {
+			if (!getConstantPool().isFontRegistered(file)) {
+				getConstantPool().requestFont(file, new FontFaceConst(this, font));
+			}
+			return true;
+		}else{
+			//use native rendering for logical fonts even if not set up in font config
+			if(DirectDrawUtils.webFonts.containsKey(font.getFamily())){
+				return true;
+			}
+			return false;
+		}
 	}
 
 }

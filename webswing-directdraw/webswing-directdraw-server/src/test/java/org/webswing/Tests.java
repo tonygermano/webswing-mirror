@@ -4,12 +4,15 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.LinearGradientPaint;
@@ -34,6 +37,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
@@ -302,7 +306,7 @@ public class Tests {
 		scroll.setPreferredSize(new Dimension(400, 80));
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		printJComponentHelper("javax.swing.plaf.nimbus.NimbusLookAndFeel", g, scroll);
+		printJComponentHelper(g, scroll);
 		return true;
 	}
 
@@ -639,7 +643,7 @@ public class Tests {
 			return false;
 		}
 		SliderDemo sd = new SliderDemo();
-		printJComponentHelper(null, g, sd);
+		printJComponentHelper(g, sd);
 		return true;
 	}
 
@@ -861,6 +865,39 @@ public class Tests {
 		return true;
 	}
 	
+	
+	@SuppressWarnings("unused")
+	public static boolean t30FontConfigTest(Graphics2D g, int repeat) {
+		if (repeat != 0) {
+			return false;
+		}
+		JPanel p= new JPanel(new GridLayout(5, 1));
+		String text= "<html><span style=\"font-size:2em;text-decoration:underline;\">The</span> <span style=\"font-size:1.5em;\"><b>Quick</b></span> <span style=\"font-size:1em;color:white;background-color:red;\">Brown</span> <span style=\"font-size:1em\">Fox <i>Jumps</i> <span style=\"text-decoration:line-through;\"> Over </span> </span><span style=\"font-size:1em\"> <sup>The</sup> <b><i>Lazy</i></b> <sub>Dog</sub> </span>123¡¢£½¦€”©«®°±²´¨<span style=\"font-size:0.5em\">test </span></html>";
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		final String[] families = ge.getAvailableFontFamilyNames();
+		for (int i = 0; i < Math.min(families.length,5); i++) {
+			Font f = new Font(families[i], Font.PLAIN,12);
+			JLabel theLabel = new JLabel(text);
+			p.add(theLabel);
+		}
+		printJComponentHelper(g, p);
+
+		return true;
+	}
+	
+	public static boolean t31CustomPaintClassTest(Graphics2D g, int repeat) {
+		if (repeat != 0) {
+			return false;
+		}
+		g.setPaint(new CustomPaint());
+		g.fill(new RoundRectangle2D.Double(0, 0, 200, 100, 40, 40));
+		g.setStroke(new BasicStroke(17, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 2.5f, new float[] { 3, 20, 40, 20 }, 10));
+		g.drawPolyline(new int[] { 220, 270, 320, 370, 420, 470 }, new int[] { 5, 95, 5, 95, 5, 95 }, 6);
+
+		return true;
+	}
+	
+	
 	private static void filledThenStroked(Graphics2D g) {
 		g.setColor(Color.blue);
 		g.fillRect(0, 0, 15, 15);
@@ -883,12 +920,7 @@ public class Tests {
 		return copy;
 	}
 	
-	private static void printJComponentHelper(String laf, Graphics2D g, JComponent c) {
-		try {
-			UIManager.setLookAndFeel(laf == null ? "javax.swing.plaf.metal.MetalLookAndFeel" : laf);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	private static void printJComponentHelper(Graphics2D g, JComponent c) {
 		JFrame jf = new JFrame("");
 		jf.setSize(500, 100);
 		JPanel sd = new JPanel();

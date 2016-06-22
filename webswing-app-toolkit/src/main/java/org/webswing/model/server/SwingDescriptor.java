@@ -2,7 +2,9 @@ package org.webswing.model.server;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SwingDescriptor implements Serializable {
 	public enum SessionMode {
@@ -18,6 +20,7 @@ public class SwingDescriptor implements Serializable {
 	private List<String> classPathEntries = new ArrayList<String>();
 	private String homeDir = "${user.dir}";
 	private String theme = "Murrine";
+	private Map<String, String> fontConfig = new HashMap<String, String>();
 	private int maxClients = 1;
 	private SessionMode sessionMode=SessionMode.CONTINUE_FOR_BROWSER;
 	private int swingSessionTimeout = 300;
@@ -239,4 +242,11 @@ public class SwingDescriptor implements Serializable {
 	}
 
 
+	public Map<String, String> getFontConfig() {
+		return fontConfig;
+	}
+
+	public void setFontConfig(Map<String, String> fontConfig) {
+		this.fontConfig = fontConfig;
+	}
 }

@@ -1,8 +1,6 @@
 package org.webswing.directdraw.model;
 
 import java.awt.Font;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.proto.Directdraw.FontProto;
@@ -11,10 +9,8 @@ import org.webswing.directdraw.util.DirectDrawUtils;
 
 public class FontConst extends ImmutableDrawConstantHolder<Font> {
 
-	private static Map<Font, String> families = new HashMap<Font, String>();
-
 	public FontConst(DirectDraw context, Font value) {
-		super(context, value);
+		super(context, get(value));
 	}
 
 	@Override
@@ -25,8 +21,8 @@ public class FontConst extends ImmutableDrawConstantHolder<Font> {
 	@Override
 	public FontProto toMessage() {
 		FontProto.Builder model = FontProto.newBuilder();
-		String family = getFamily(value);
-		model.setFamily(DirectDrawUtils.windowsFonts.getProperty(family, family));
+		String fileName=getContext().getServices().getFileForFont(getValue());
+		model.setFamily(DirectDrawUtils.fontNameFromFile(fileName,getValue()));
 		model.setSize(value.getSize());
 		model.setStyle(StyleProto.valueOf(value.getStyle()));
 		if (value.isTransformed()) {
@@ -35,11 +31,4 @@ public class FontConst extends ImmutableDrawConstantHolder<Font> {
 		return model.build();
 	}
 
-	private static String getFamily(Font font) {
-		String family = families.get(font);
-		if (family == null) {
-			families.put(font, family = font.getFamily());
-		}
-		return family;
-	}
 }

@@ -71,8 +71,8 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(image, transformConst, cropConst, bgConst, toPathConst(clip));
 	}
 
-	public DrawInstruction drawString(String s, double x, double y, Shape clip) {
-		return new DrawInstruction(InstructionProto.DRAW_STRING, new StringConst(ctx, s), new PointsConst(ctx, (int) x, (int) y), toPathConst(clip));
+	public DrawInstruction drawString(String s, double x, double y, int width, Shape clip) {
+		return new DrawInstruction(InstructionProto.DRAW_STRING, new StringConst(ctx, s), new PointsConst(ctx, (int) x, (int) y, width), toPathConst(clip));
 	}
 
 	public DrawInstruction drawGlyphList(String string, Font font, double x, double y, AffineTransform transform, Shape clip) {
@@ -88,8 +88,13 @@ public class DrawInstructionFactory {
 		DrawConstant<?> transformConst = new TransformConst(ctx, g.getTransform());
 		DrawConstant<?> compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
 		DrawConstant<?> strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
-		DrawConstant<?> paintConst = getPaintConstant(g.getPaint());
-		DrawConstant<?> fontConst = new FontConst(ctx, g.getFont());
+		DrawConstant<?> paintConst;
+		try{
+			paintConst = getPaintConstant(g.getPaint());
+		}catch (UnsupportedOperationException e){
+			paintConst = DrawConstant.nullConst;
+		}
+		DrawConstant<?> fontConst = ctx.requestFont(g.getFont()) ? new FontConst(ctx, g.getFont()) : DrawConstant.nullConst;
 		return createGraphics(id, transformConst, strokeConst, compositeConst, paintConst, fontConst);
 	}
 

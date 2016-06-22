@@ -1,7 +1,7 @@
 (function(root, factory) {
 	if (typeof define === "function" && define.amd) {
 		// AMD
-		define([ 'ProtoBuf','text!directdraw.proto' ], factory);
+		define([ 'ProtoBuf', 'text!directdraw.proto' ], factory);
 	} else {
 		root.WebswingDirectDraw = factory(dcodeIO.ProtoBuf);
 	}
@@ -14,6 +14,7 @@
 				console.log(message.stack);
 			}
 		};
+		var ctxId = Math.floor(Math.random() * 0x10000).toString(16);
 		var proto = webswingProto!=null? ProtoBuf.loadProto(webswingProto,"directdraw.proto"):ProtoBuf.loadProtoFile("/directdraw.proto");
 		var WebImageProto = proto.build("org.webswing.directdraw.proto.WebImageProto");
 		var InstructionProto = proto.build("org.webswing.directdraw.proto.DrawInstructionProto.InstructionProto");
@@ -25,6 +26,8 @@
 		var StyleProto = proto.build("org.webswing.directdraw.proto.FontProto.StyleProto");
 		var CompositeTypeProto = proto.build("org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto");
 		var constantPoolCache = c.constantPoolCache || {};
+		var fontsArray = [];
+
 
 		function draw64(data, targetCanvas) {
 			return drawWebImage(WebImageProto.decode64(data), targetCanvas);
@@ -41,48 +44,54 @@
 		function drawWebImage(image, targetCanvas) {
 			return new Promise(function(resolve, reject) {
 				try {
-					var newCanvas;
-					if (targetCanvas != null) {
-						newCanvas = targetCanvas;
-					} else {
-						newCanvas = document.createElement("canvas");
-					}
-					if (newCanvas.width != image.width || newCanvas.height != image.height) {
-						newCanvas.width = image.width;
-						newCanvas.height = image.height;
-					}
-
-					var imageContext = {
-						canvas : newCanvas,
-						graphicsStates : {},
-						currentStateId : null
-					};
-
-					var images = populateConstantsPool(image.constants);
-					prepareImages(images).then(function() {
-						var ctx = imageContext.canvas.getContext("2d");
-						if (image.instructions != null) {
-							ctx.save();
-							image.instructions.reduce(function(seq, instruction) {
-								return seq.then(function(resolved) {
-									return interpretInstruction(ctx, instruction, imageContext);
-								});
-							}, Promise.resolve()).then(function() {
-								ctx.restore();
-								resolve(imageContext.canvas);
-							}, function(error) {
-								ctx.restore();
-								reject(error);
-								config.onErrorMessage(error);
-							});
-						}
-					}, function(error) {
-						config.onErrorMessage(error);
-					});
+					drawWebImageInternal(image, targetCanvas, resolve, reject);
 				} catch (e) {
 					config.onErrorMessage(e);
 					reject(e);
 				}
+			});
+		}
+		
+		function drawWebImageInternal(image, targetCanvas, resolve, reject){
+			var newCanvas;
+			if (targetCanvas != null) {
+				newCanvas = targetCanvas;
+			} else {
+				newCanvas = document.createElement("canvas");
+			}
+			if (newCanvas.width != image.width || newCanvas.height != image.height) {
+				newCanvas.width = image.width;
+				newCanvas.height = image.height;
+			}
+
+			var imageContext = {
+				canvas : newCanvas,
+				graphicsStates : {},
+				currentStateId : null
+			};
+
+			var images = populateConstantsPool(image.constants);
+			prepareImages(images)
+			.then(function(){return initializeFontFaces(image.fontFaces)})
+			.then(function() {
+				var ctx = imageContext.canvas.getContext("2d");
+				if (image.instructions != null) {
+					ctx.save();
+					image.instructions.reduce(function(seq, instruction) {
+						return seq.then(function(resolved) {
+							return interpretInstruction(ctx, instruction, imageContext);
+						});
+					}, Promise.resolve()).then(function() {
+						ctx.restore();
+						resolve(imageContext.canvas);
+					}, function(error) {
+						ctx.restore();
+						reject(error);
+						config.onErrorMessage(error);
+					});
+				}
+			}, function(error) {
+				config.onErrorMessage(error);
 			});
 		}
 
@@ -204,7 +213,7 @@
 				graphicsStates[id].compositeArgs = args.slice(0, 1);
 				args.shift();
 				iprtSetPaint(ctx, args);
-				graphicsStates[id].paintArgs = args;
+				graphicsStates[id].paintArgs = args.slice(0, 1);
 				args.shift();
 				graphicsStates[id].fontArgs = args;
 				graphicsStates[id].fontTransform = iprtSetFont(ctx, args);
@@ -317,13 +326,16 @@
 				var bufctx=buffer.getContext("2d");
 				for (var i = 0; i < glyphs.length; i++) {
 					if(glyphs[i].glyph.data!=null){
-						bufctx.drawImage(glyphs[i].glyph.data,points.points[i*2],points.points[i*2+1]);
+						var img=glyphs[i].glyph.data;
+						var x=points.points[i*2];
+						var y=points.points[i*2+1];
+						bufctx.drawImage(img,0,0,img.width,img.height,x,y,img.width,img.height);
 					}
 				}
 				bufctx.fillStyle=ctx.fillStyle;
 				bufctx.globalCompositeOperation='source-in';
 				bufctx.fillRect(0,0,buffer.width,buffer.height);
-				ctx.drawImage(buffer,size.points[0],size.points[1]);
+				ctx.drawImage(buffer,0,0,buffer.width,buffer.height,size.points[0],size.points[1],buffer.width,buffer.height);
 			}
 			ctx.restore();
 		}
@@ -341,12 +353,18 @@
 				ctx.transform(t.m00, t.m10, t.m01, t.m11, t.m02 + points[0], t.m12 + points[1]);
 				ctx.fillText(string, 0, 0);
 			} else {
-				ctx.fillText(string, points[0], points[1]);
+				var canvasWidth = ctx.measureText(string).width;
+				var scaleX = points[2]/canvasWidth;
+				ctx.scale(scaleX,1);
+				ctx.fillText(string, points[0]/scaleX, points[1]);
 			}
 			ctx.restore();
 		}
 		
 		function iprtSetFont(ctx, args) {
+			if(args[0] == null){
+				return ctx.font;
+			}
 			var font = args[0].font;
 			var style = '';
 			switch (font.style) {
@@ -356,14 +374,18 @@
 			case StyleProto.OBLIQUE:
 				style = 'bold';
 				break;
-			case StyleProto.OBLIQUE:
+			case StyleProto.ITALIC:
 				style = 'italic';
 				break;
 			case StyleProto.BOLDANDITALIC:
 				style = 'bold italic';
 				break;
 			}
-			ctx.font = style + " " + font.size + "px " + font.family;
+			var fontFamily = font.family;
+			if (font.family !== 'sans-serif' && font.family !== 'serif' && font.family !== 'monospace'){
+				fontFamily = "\""+ctxId + font.family+"\""; 			
+			}
+			ctx.font = style + " " + font.size + "px " + fontFamily;
 			return font.transform;
 		}
 
@@ -831,21 +853,7 @@
 		function prepareImages(images) {
 			return new Promise(function(resolve, reject) {
 				try {
-					if (images.length > 0) {
-						var loadedImages = images.map(function(image) {
-							return new Promise(function(resolve) {
-								var img = new Image();
-								img.onload = function() {
-									image.data = img;
-									resolve();
-								};
-								img.src = getImageData(image);
-							});
-						});
-						Promise.all(loadedImages).then(resolve);
-					} else {
-						resolve();
-					}
+					prepareImagesInternal(images, resolve, reject);
 				} catch (e) {
 					config.onErrorMessage(error);
 					reject(e);
@@ -853,18 +861,79 @@
 			});
 		}
 		
-		function getImageData(image) {
+		function initializeFontFaces (fontFaces){
+			return new Promise(function(resolve, reject) {
+				try {
+					if (fontFaces.length > 0) {
+						var loadedFonts = fontFaces.map(function(fontFace) {
+							return new Promise(function(resolve) {
+								if(fontsArray.indexOf(fontFace.name)>=0){
+									resolve();
+								}else{
+									fontsArray.push(fontFace.name);
+									var fontCss = document.createElement("style");
+									fontCss.type = "text/css";
+									fontCss.setAttribute("data-dd-ctx", ctxId);
+									fontCss.innerHTML = getFontFaceData(ctxId+fontFace.name, fontFace.font, fontFace.style);
+									document.body.appendChild(fontCss);
+									resolve();
+								}
+							});
+						});
+						Promise.all(loadedFonts).then(resolve);
+					} else {
+						resolve();
+					}				
+				} catch (e) {
+					config.onErrorMessage(error);
+					reject(e);
+				}
+			});
+		}
+		
+		function getFontFaceData(name, font, style) {
+			var fontFaceCss = "@font-face {";
+			fontFaceCss += "font-family: '"+name+"';";
+			fontFaceCss += "src: url(data:font/truetype;base64," + toBase64(font)+");";
+			if (style != null){
+				fontFaceCss += "font-style: "+style+";";
+			}
+			fontFaceCss += "}";
+			return fontFaceCss
+		}
+		
+		function prepareImagesInternal(images, resolve, reject){
+			if (images.length > 0) {
+				var loadedImages = images.map(function(image) {
+					return new Promise(function(resolve) {
+						var img = new Image();
+						img.onload = function() {
+							image.data = img;
+							resolve();
+						};
+						img.src = getImageData(image);
+					});
+				});
+				Promise.all(loadedImages).then(resolve);
+			} else {
+				resolve();
+			}
+		}
+		
+		function toBase64(data) {
 			var binary = '';
-			var bytes = new Uint8Array(image.data.buffer, image.data.offset, image.data.limit - image.data.offset);
+			var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
 
 			for ( var i = 0, l = bytes.byteLength; i < l; i++) {
 				binary += String.fromCharCode(bytes[i]);
 			}
-
-			return "data:image/png;base64," + window.btoa(binary);
-			// return 'data:image/png;base64,' + image.data.toBase64();
+			return  window.btoa(binary);
 		}
-
+		
+		function getImageData(image) {
+			return "data:image/png;base64," + toBase64(image.data);
+		}
+		
 		function fillRule(constant) {
 			if (constant.path != null) {
 				return constant.path.windingOdd ? 'evenodd' : 'nonzero';
@@ -895,10 +964,25 @@
 			return r;
 		}
 
+		function dispose(){
+			var styles = document.body.getElementsByTagName("style");
+			var toRemove = [];
+			for (var i = 0; i < styles.length; i++){
+				if (styles[i].getAttribute("data-dd-ctx") === ctxId){
+					toRemove.push(styles[i]);
+				}
+			}
+			toRemove.forEach(function (element){
+				document.body.removeChild(element);
+			});
+		}
+		
+		
 		return {
 			draw64 : draw64,
 			drawBin : drawBin,
 			drawProto : drawProto,
+			dispose : dispose,
 			getConstantPoolCache : function() {
 				return constantPoolCache;
 			}

@@ -108,6 +108,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             timer2 = setInterval(heartbeat, 10000);
             timer3 = setInterval(servletHeartbeat, 100000);
             windowImageHolders = {};
+            directDraw.dispose();
             directDraw = new WebswingDirectDraw({});
         }
 
@@ -161,6 +162,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             api.disposeInput();
             api.disposeTouch();
             window.removeEventListener('beforeunload', beforeUnloadEventHandler);
+            directDraw.dispose();
         }
 
         function processMessage(data) {
@@ -251,7 +253,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             for ( var i in data.windows) {
                 var win = data.windows[i];
                 if (win.id == 'BG') {
-                    if (api.cfg.mirrorMode) {
+                    if (api.cfg.mirrorMode || api.cfg.recordingPlayback) {
                         adjustCanvasSize(canvas, win.width, win.height);
                     }
                     for ( var x in win.content) {

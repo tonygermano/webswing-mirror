@@ -35,6 +35,9 @@ import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebToolkit6;
 import org.webswing.toolkit.WebToolkit7;
 import org.webswing.toolkit.WebToolkit8;
+import org.webswing.toolkit.ge.WebGraphicsEnvironment6;
+import org.webswing.toolkit.ge.WebGraphicsEnvironment7;
+import org.webswing.toolkit.ge.WebGraphicsEnvironment8;
 
 import main.Main;
 
@@ -222,16 +225,20 @@ public class SwingInstance implements WebSessionListener {
 			String webSwingToolkitJarPath = getClassPathForClass(WebToolkit.class);
 			String webSwingToolkitJarPathSpecific;
 			String webToolkitClass;
+			String webGraphicsEnvClass;
 			String javaVersion = subs.replace(appConfig.getJavaVersion());
 			if (javaVersion.startsWith("1.6")) {
 				webSwingToolkitJarPathSpecific = getClassPathForClass(WebToolkit6.class);
 				webToolkitClass = WebToolkit6.class.getCanonicalName();
+				webGraphicsEnvClass = WebGraphicsEnvironment6.class.getCanonicalName();
 			} else if (javaVersion.startsWith("1.7")) {
 				webSwingToolkitJarPathSpecific = getClassPathForClass(WebToolkit7.class);
 				webToolkitClass = WebToolkit7.class.getCanonicalName();
+				webGraphicsEnvClass = WebGraphicsEnvironment7.class.getCanonicalName();
 			} else if (javaVersion.startsWith("1.8")) {
 				webSwingToolkitJarPathSpecific = getClassPathForClass(WebToolkit8.class);
 				webToolkitClass = WebToolkit8.class.getCanonicalName();
+				webGraphicsEnvClass = WebGraphicsEnvironment8.class.getCanonicalName();
 			} else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
 				throw new RuntimeException("Java version not supported. (Version starting with 1.6 , 1.7 and 1.8 are supported.)");
@@ -263,8 +270,9 @@ public class SwingInstance implements WebSessionListener {
 			swing.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout() + "");
 			swing.addProperty("awt.toolkit", webToolkitClass);
 			swing.addProperty("java.awt.headless", "false");
-			swing.addProperty("java.awt.graphicsenv", "org.webswing.toolkit.ge.WebGraphicsEnvironment");
+			swing.addProperty("java.awt.graphicsenv", webGraphicsEnvClass);
 			swing.addProperty("java.awt.printerjob", "org.webswing.toolkit.WebPrinterJob");
+			swing.addProperty("sun.awt.fontconfig", ServerUtil.createFontConiguration(appConfig, subs));
 			swing.addProperty(Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth) + "");
 			swing.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight) + "");
 

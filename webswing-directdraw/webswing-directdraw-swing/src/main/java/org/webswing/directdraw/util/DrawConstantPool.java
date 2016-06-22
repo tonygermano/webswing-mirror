@@ -1,13 +1,24 @@
 package org.webswing.directdraw.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.webswing.directdraw.model.DrawConstant;
+import org.webswing.directdraw.model.FontFaceConst;
 import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
 
 public class DrawConstantPool {
 
     private LRUDrawConstantPoolCache pool;
+    private Set<String> registeredFonts=new HashSet<String>();
+    private Map<String,FontFaceConst> requestedFonts=new HashMap<String,FontFaceConst>();
+    
 
     public DrawConstantPool(int size) {
         pool = new LRUDrawConstantPoolCache(size);
@@ -41,4 +52,26 @@ public class DrawConstantPool {
 		}
 		return thisId;
 	}
+
+	public synchronized boolean isFontRegistered(String file) {
+		if(requestedFonts.containsKey(file) || registeredFonts.contains(file)){
+			return true;
+		}
+		return false;
+	}
+
+	public synchronized void requestFont(String file, FontFaceConst fontFaceConst) {
+		requestedFonts.put(file, fontFaceConst);		
+	}
+	
+	public synchronized Collection<FontFaceConst> registerRequestedFonts(){
+		if(requestedFonts.size()>0){
+			Collection<FontFaceConst> result = new ArrayList<FontFaceConst>(requestedFonts.values());
+			registeredFonts.addAll(requestedFonts.keySet());
+			requestedFonts.clear();
+			return result;
+		}
+		return Collections.emptyList();
+	}
+    
 }

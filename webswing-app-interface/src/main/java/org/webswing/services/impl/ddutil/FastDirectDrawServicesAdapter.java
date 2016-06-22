@@ -1,20 +1,27 @@
 package org.webswing.services.impl.ddutil;
 
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.HashSet;
+import java.util.Set;
 
-import net.jpountz.xxhash.StreamingXXHash64;
-import net.jpountz.xxhash.XXHashFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.directdraw.DirectDrawServicesAdapter;
 import org.webswing.directdraw.util.ImageConsumerAdapter;
 import org.webswing.services.impl.ImageServiceImpl;
 
-public class FastDirectDrawServicesAdapter extends DirectDrawServicesAdapter {
+import net.jpountz.xxhash.StreamingXXHash64;
+import net.jpountz.xxhash.XXHashFactory;
 
+public class FastDirectDrawServicesAdapter extends DirectDrawServicesAdapter {
+	private static final Logger log = LoggerFactory.getLogger(FastDirectDrawServicesAdapter.class);
 	XXHashFactory hashfactory = XXHashFactory.fastestInstance();
+	Set<String> missingFonts = new HashSet<String>();
 	long seed = 12345L;
 
 	@Override
@@ -44,4 +51,18 @@ public class FastDirectDrawServicesAdapter extends DirectDrawServicesAdapter {
 		return shash.getValue();
 	}
 
+	@Override
+	public String getFileForFont(Font font) {
+		String fileForFont = super.getFileForFont(font);
+		if (fileForFont == null && !missingFonts.contains(font.getFontName())) {
+			missingFonts.add(font.getFontName());
+			String fontFamily = font.getFamily();
+			if (fontFamily.startsWith("Dialog") || fontFamily.startsWith("Monospaced") || fontFamily.startsWith("Serif") || fontFamily.startsWith("SansSerif")){
+				log.warn("Logical font " + fontFamily + " not defined in font configuration. Using default browser counterpart.");
+			}else{
+				log.warn("Font " + font.getFontName() + " not defined in font configuration. Falling back to glyph rendering.");
+			}
+		}
+		return fileForFont;
+	}
 }

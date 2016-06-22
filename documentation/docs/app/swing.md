@@ -37,6 +37,12 @@ Here is a sample `webswing.config` file content with demo swing application conf
     "vmArgs" : "-Xmx128m -DauthorizedUser=${user}",
     "args" : "",
     "homeDir" : "demo/SwingSet3/${user}",
+    "theme" : "Murrine",
+    "fontConfig" : {
+      "dialog" : "${user.dir}/fonts/Roboto-Regular.ttf",
+      "dialoginput" : "${user.dir}/fonts/RobotoMono-Regular.ttf",
+      "serif" : "${user.dir}/fonts/RobotoSlab-Regular.ttf"
+    },
     "maxClients" : 1,
     "antiAliasText" : true,
     "swingSessionTimeout" : 300,
@@ -121,6 +127,10 @@ In Admin console options with variable replacement support appears with a flash 
 
 `theme`: Select one of the default window decoration themes or a enter path to a XFWM4 theme folder.
 
+`fontConfig`: Customize logical font mappings and define physical fonts available to swing application. These fonts (TTF only) will be used as native fonts in DirectDraw. Key: name of font (ie. dialog|dialoginput|sansserif|serif|monospaced), Value: path to font file. See [below](#fonts-configuration) for further details.
+
+`directdraw`: Activates the new rendering method if the clients browser supports the required technologies (typed arrays, web socket). It is recommended to configure `fontConfig` with this setting as well.    
+
 `authentication`: If set to `false`, the application will be accessible for anonymous user. If `true` only authenticated user is allowed to use this application. False setting will be ignored if `authorization` option is `true`.
 
 `authorization`: Set authorized access to this application. Only users with role same as application's name can access this application.
@@ -128,8 +138,6 @@ In Admin console options with variable replacement support appears with a flash 
 `isolatedFs`: If enabled, this setting will force the JFileChooser to stay inside isolated folder. The new isolated folder is created in `${homeDir}/upload` 
 
 `debug`: Enables remote debugging for this application. After the application is started with `?debugPort=8000` url parameter from browser, it will wait for remote debugger connection on port 8000
-
-`directdraw`: Activates the new rendering method if the clients browser supports the required technologies (typed arrays, web socket). This feature is experimental state at the moment. For more information on this method refer to Development guide. 
 
 `allowDelete`: This options activates the 'Delete' button on the JFileChooser integration panel. If this is true, user will be allowed to delete files displayed in JFileChooser dialog.
 
@@ -142,6 +150,29 @@ In Admin console options with variable replacement support appears with a flash 
 `uploadMaxSize`: Maximum size of upload for single file (in MB). Set 0 for unlimited size.
 
 `allowJsLink`: If selected, the JSLink feature will be enabled, allowing swing application to invoke javascript and vice versa. (See `netscape.javascript.JSObject`)
+
+---
+
+##Fonts configuration
+
+Selection of fonts available to any Swing application is dependent on the platform it is running on. Different set of fonts is available on Windows system and different on Linux system. To ensure the user experience is consistent, Webswing provides an option to configure which fonts will be available for each swing application.
+
+Font are configured in `webswing.config` file as described above. This is how the configuration looks like:  
+
+```
+  "fontConfig" : {
+      "dialog" : "${user.dir}/fonts/Roboto-Regular.ttf",
+      "dialoginput" : "${user.dir}/fonts/RobotoMono-Regular.ttf",
+      "serif" : "${user.dir}/fonts/RobotoSlab-Regular.ttf"
+    },
+```
+
+If you omit this setting or no fonts are defined, Webswing will use the default platform specific settings.
+
+If this setting is present, only fonts defined in this property file will be available to your swing application. 
+  
+>Note: This setting is important when DirectDraw rendering is enabled. DirectDraw will transfer configured fonts to browser (when used for the first time) and use them as native fonts. Using too many or too large fonts may result in rendering delays. 
+If fonts are not configured, Webswing will use default browser fonts for rendering logical font families ( `dialog, dialoginput, sansserif, serif, monospaced`) and less performant Glyph rendering for other fonts.
 
 ---
 

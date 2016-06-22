@@ -12,8 +12,10 @@ import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
+import java.io.File;
 import java.text.AttributedCharacterIterator.Attribute;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -32,7 +34,6 @@ import sun.java2d.loops.FontInfo;
 @SuppressWarnings("restriction")
 public class DirectDrawUtils {
 
-	public static final Properties windowsFonts = new Properties();
 	public static final Properties webFonts = new Properties();
 	private static final String DELIMITER = "|";
 	private static SunGraphics2D sgHelper;
@@ -41,19 +42,14 @@ public class DirectDrawUtils {
 		sgHelper = (SunGraphics2D) new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).getGraphics();
 		sgHelper.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		// logical fonts
-		windowsFonts.setProperty("Dialog", "Arial");
-		windowsFonts.setProperty("DialogInput", "Courier New");
-		windowsFonts.setProperty("Serif", "Times New Roman");
-		windowsFonts.setProperty("SansSerif", "Arial");
-		windowsFonts.setProperty("Monospaced", "Courier New");
-		webFonts.setProperty("Arial", "Dialog");
-		webFonts.setProperty("Courier New", "DialogInput");
-		webFonts.setProperty("Times New Roman", "Serif");
-		webFonts.setProperty("Arial", "SansSerif");
-		webFonts.setProperty("Courier New", "Monospaced");
+		webFonts.setProperty("Dialog", "sans-serif");
+		webFonts.setProperty("DialogInput", "monospace");
+		webFonts.setProperty("Serif", "serif");
+		webFonts.setProperty("SansSerif", "sans-serif");
+		webFonts.setProperty("Monospaced", "monospace");
 	}
 
-	public static FontInfo getFontInfo(Font font,AffineTransform transform){
+	public static FontInfo getFontInfo(Font font, AffineTransform transform) {
 		sgHelper.setFont(font);
 		sgHelper.setTransform(transform);
 		return sgHelper.getFontInfo();
@@ -116,69 +112,87 @@ public class DirectDrawUtils {
 		return result;
 	}
 
+	private static class GraphicsStatus {
+		AffineTransform tx;
+		DrawConstant<?> stroke;
+		DrawConstant<?> composite;
+		DrawConstant<?> paint;
+		DrawConstant<?> font;
+
+		void reset() {
+			tx = null;
+			stroke = null;
+			composite = null;
+			paint = null;
+			font = null;
+		}
+	}
+
 	public static void optimizeInstructions(DirectDraw ctx, List<DrawInstruction> instructions) {
 
 		// step 1. group consequent transformations
-		AffineTransform mergedTx = null;
-		DrawConstant<?> mergedStroke = null;
-		DrawConstant<?> mergedComposite = null;
-		DrawConstant<?> mergedPaint = null;
-		DrawConstant<?> mergedFont = null;
+		final GraphicsStatus mergedStatus = new GraphicsStatus();
 		DrawInstruction graphicsCreate = null;
 		Map<Integer, DrawInstruction> graphicsCreateMap = new HashMap<Integer, DrawInstruction>();
 		List<DrawInstruction> newInstructions = new ArrayList<DrawInstruction>();
 		for (DrawInstruction current : instructions) {
 			if (current.getInstruction().equals(InstructionProto.TRANSFORM)) {
-				if (mergedTx == null) {
-					mergedTx = ((TransformConst) current.getArg(0)).getValue();
+				if (mergedStatus.tx == null) {
+					mergedStatus.tx = ((TransformConst) current.getArg(0)).getValue();
 				} else {
-					mergedTx.concatenate(((TransformConst) current.getArg(0)).getValue());
+					mergedStatus.tx.concatenate(((TransformConst) current.getArg(0)).getValue());
 				}
 			} else if (current.getInstruction().equals(InstructionProto.SET_STROKE)) {
-				mergedStroke = current.getArg(0);
+				mergedStatus.stroke = current.getArg(0);
 			} else if (current.getInstruction().equals(InstructionProto.SET_COMPOSITE)) {
-				mergedComposite = current.getArg(0);
+				mergedStatus.composite = current.getArg(0);
 			} else if (current.getInstruction().equals(InstructionProto.SET_PAINT)) {
-				mergedPaint = current.getArg(0);
+				mergedStatus.paint = current.getArg(0);
 			} else if (current.getInstruction().equals(InstructionProto.SET_FONT)) {
-				mergedFont = current.getArg(0);
+				mergedStatus.font = current.getArg(0);
 			} else if (current.getInstruction().equals(InstructionProto.GRAPHICS_CREATE) || current.getInstruction().equals(InstructionProto.GRAPHICS_SWITCH)) {
 				boolean isGraphicsCreateInst = current.getInstruction().equals(InstructionProto.GRAPHICS_CREATE);
 				if (graphicsCreate != null) {
-					graphicsCreate = createGraphics(ctx, graphicsCreate.getArg(0), mergedTx, mergedStroke, mergedComposite, mergedPaint, mergedFont);
+					if (!equalStatus(graphicsCreate, mergedStatus)) {
+						graphicsCreate = createGraphics(ctx, graphicsCreate.getArg(0), mergedStatus);
+					}
 					graphicsCreateMap.put(graphicsCreate.getArg(0).getId(), graphicsCreate);
+				} else if (isGraphicsCreateInst) {
+					setGraphicsStatus(ctx, newInstructions, mergedStatus);
+					mergedStatus.reset();
 				}
 				graphicsCreate = isGraphicsCreateInst ? current : graphicsCreateMap.get(current.getArg(0).getId());
 				if (graphicsCreate != null) {
-					mergedTx = ((TransformConst) graphicsCreate.getArg(1)).getValue();
-					mergedStroke = graphicsCreate.getArg(2);
-					mergedComposite = graphicsCreate.getArg(3);
-					mergedPaint = graphicsCreate.getArg(4);
-					mergedFont = graphicsCreate.getArg(5);
+					mergedStatus.tx = ((TransformConst) graphicsCreate.getArg(1)).getValue();
+					mergedStatus.stroke = graphicsCreate.getArg(2);
+					mergedStatus.composite = graphicsCreate.getArg(3);
+					mergedStatus.paint = graphicsCreate.getArg(4);
+					mergedStatus.font = graphicsCreate.getArg(5);
 				} else {// if graphics switch instruction and the create instruction already in result array
 					// then add all status change for old graphics and add the switch inst
-					setGraphicsStatus(ctx, newInstructions, mergedTx, mergedStroke, mergedComposite, mergedPaint, mergedFont);
-					mergedTx = null;
-					mergedStroke = null;
-					mergedComposite = null;
-					mergedPaint = null;
-					mergedFont = null;
+					setGraphicsStatus(ctx, newInstructions, mergedStatus);
+					mergedStatus.reset();
 					newInstructions.add(current);
+				}
+			} else if (current.getInstruction().equals(InstructionProto.GRAPHICS_DISPOSE)) {
+				mergedStatus.reset();
+				if (graphicsCreate == null) {
+					newInstructions.add(current);
+				} else {
+					graphicsCreate = null;
 				}
 			} else {
 				if (graphicsCreate != null) {
-					graphicsCreate = createGraphics(ctx, graphicsCreate.getArg(0), mergedTx, mergedStroke, mergedComposite, mergedPaint, mergedFont);
+					if (!equalStatus(graphicsCreate, mergedStatus)) {
+						graphicsCreate = createGraphics(ctx, graphicsCreate.getArg(0), mergedStatus);
+					}
 					newInstructions.add(graphicsCreate);
 					graphicsCreateMap.remove(graphicsCreate.getArg(0).getId());
 					graphicsCreate = null;
 				} else {
-					setGraphicsStatus(ctx, newInstructions, mergedTx, mergedStroke, mergedComposite, mergedPaint, mergedFont);
+					setGraphicsStatus(ctx, newInstructions, mergedStatus);
 				}
-				mergedTx = null;
-				mergedStroke = null;
-				mergedComposite = null;
-				mergedPaint = null;
-				mergedFont = null;
+				mergedStatus.reset();
 				newInstructions.add(current);
 			}
 		}
@@ -187,25 +201,33 @@ public class DirectDrawUtils {
 		instructions.addAll(newInstructions);
 	}
 
-	private static DrawInstruction createGraphics(DirectDraw ctx, DrawConstant<?> id, AffineTransform transform, DrawConstant<?> stroke, DrawConstant<?> composite, DrawConstant<?> paint, DrawConstant<?> font) {
-		return ctx.getInstructionFactory().createGraphics(id, new TransformConst(ctx, transform), stroke, composite, paint, font);
+	private static boolean equalStatus(DrawInstruction graphicsCreate, GraphicsStatus status) {
+		return equals(((TransformConst) graphicsCreate.getArg(1)).getValue(), status.tx) && equals(graphicsCreate.getArg(2), status.stroke) && equals(graphicsCreate.getArg(3), status.composite) && equals(graphicsCreate.getArg(4), status.paint) && equals(graphicsCreate.getArg(5), status.font);
 	}
 
-	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> instructions, AffineTransform transform, DrawConstant<?> stroke, DrawConstant<?> composite, DrawConstant<?> paint, DrawConstant<?> font) {
-		if (transform != null) {
-			instructions.add(ctx.getInstructionFactory().transform(transform));
+	private static boolean equals(Object a, Object b) {
+		return (a == b) || (a != null && a.equals(b));
+	}
+
+	private static DrawInstruction createGraphics(DirectDraw ctx, DrawConstant<?> id, GraphicsStatus status) {
+		return ctx.getInstructionFactory().createGraphics(id, new TransformConst(ctx, status.tx), status.stroke, status.composite, status.paint, status.font);
+	}
+
+	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> instructions, GraphicsStatus status) {
+		if (status.tx != null) {
+			instructions.add(ctx.getInstructionFactory().transform(status.tx));
 		}
-		if (stroke != null) {
-			instructions.add(new DrawInstruction(InstructionProto.SET_STROKE, stroke));
+		if (status.stroke != null) {
+			instructions.add(new DrawInstruction(InstructionProto.SET_STROKE, status.stroke));
 		}
-		if (composite != null) {
-			instructions.add(new DrawInstruction(InstructionProto.SET_COMPOSITE, composite));
+		if (status.composite != null) {
+			instructions.add(new DrawInstruction(InstructionProto.SET_COMPOSITE, status.composite));
 		}
-		if (paint != null) {
-			instructions.add(new DrawInstruction(InstructionProto.SET_PAINT, paint));
+		if (status.paint != null) {
+			instructions.add(new DrawInstruction(InstructionProto.SET_PAINT, status.paint));
 		}
-		if (font != null) {
-			instructions.add(new DrawInstruction(InstructionProto.SET_FONT, font));
+		if (status.font != null) {
+			instructions.add(new DrawInstruction(InstructionProto.SET_FONT, status.font));
 		}
 	}
 
@@ -222,16 +244,16 @@ public class DirectDrawUtils {
 		return value ? 1231 : 1237;
 	}
 
-	public static String fontInfoDescriptor(Font f,FontInfo fi) {
-		StringBuilder sb= new StringBuilder(f.getFontName());
+	public static String fontInfoDescriptor(Font f, FontInfo fi) {
+		StringBuilder sb = new StringBuilder(f.getFontName());
 		sb.append(DELIMITER).append(f.getStyle());
-		sb.append(DELIMITER).append(fi.devTx);
-		sb.append(DELIMITER).append(fi.glyphTx);
+		sb.append(DELIMITER).append(Arrays.toString(fi.devTx));
+		sb.append(DELIMITER).append(Arrays.toString(fi.glyphTx));
 		sb.append(DELIMITER).append(fi.pixelHeight);
 		sb.append(DELIMITER);
 		return sb.toString();
 	}
-	
+
 	public static byte[] toPNG(DirectDraw ctx, byte[] gray, int w, int h) {
 		int[] imagePixels = new int[w * h];
 		for (int i = 0; i < imagePixels.length; i++) {
@@ -242,5 +264,18 @@ public class DirectDrawUtils {
 		image.getRGB(0, 0, w, h, null, 0, w);
 		return ctx.getServices().getPngImage(image);
 
+	}
+
+	public static String fontNameFromFile(String fileName, Font font) {
+		if (fileName != null) {
+			File f = new File(fileName);
+			if (f.exists()) {
+				return fileName.hashCode() + new File(fileName).getName();
+			} else {
+				return fileName;
+			}
+		} else {
+			return DirectDrawUtils.webFonts.getProperty(font.getFamily());
+		}
 	}
 }

@@ -156,4 +156,39 @@ public class DirectDrawUtilsTest {
 		assertEquals("Composite not expected", AlphaComposite.SrcAtop, inst.get(2).getArg(0).getValue());
 	}
 
+	@Test
+	public void testCreateAfterTransform() {
+		WebImage webImage = new WebImage(dd, 10, 10);
+		List<DrawInstruction> inst = new ArrayList<DrawInstruction>();
+
+		WebGraphics g1 = (WebGraphics) webImage.getGraphics();
+		inst.add(f.createGraphics(g1));
+		inst.add(f.draw(new Rectangle(0, 0, 1, 1), null));
+		inst.add(f.transform(new AffineTransform(1, 0, 0, 1, 5, 3)));
+
+		WebGraphics g2 = (WebGraphics) webImage.getGraphics();
+		inst.add(f.createGraphics(g2));
+		inst.add(f.draw(new Rectangle(0, 0, 1, 1), null));
+		inst.add(f.disposeGraphics(g2));
+
+		inst.add(f.switchGraphics(g1));
+		inst.add(f.transform(new AffineTransform(1, 0, 0, 1, -5, -3)));
+		inst.add(f.draw(new Rectangle(0, 0, 1, 1), null));
+
+		DirectDrawUtils.optimizeInstructions(dd, inst);
+
+		List<DrawInstruction> originalInstructions = new ArrayList<DrawInstruction>(inst);
+		assertEquals(9, inst.size());
+		assertEquals("Create graphics 1", originalInstructions.get(0), inst.get(0));
+		assertEquals("Draw rectangle 1", originalInstructions.get(1), inst.get(1));
+		assertEquals("Transform 1", new AffineTransform(1, 0, 0, 1, 5, 3), inst.get(2).getArg(0).getValue());
+
+		assertEquals("Create graphics 2", originalInstructions.get(3), inst.get(3));
+		assertEquals("Draw rectangle 2", originalInstructions.get(4), inst.get(4));
+		assertEquals("Dispose graphics 2", originalInstructions.get(5), inst.get(5));
+
+		assertEquals("Switch graphics", originalInstructions.get(6), inst.get(6));
+		assertEquals("Transform 2", new AffineTransform(1, 0, 0, 1, -5, -3), inst.get(7).getArg(0).getValue());
+		assertEquals("Draw rectangle 2", originalInstructions.get(8), inst.get(8));
+	}
 }

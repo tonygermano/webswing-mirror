@@ -9,6 +9,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
@@ -29,12 +30,12 @@ public class SessionRecorder {
 	private long lastFrame;
 
 	public SessionRecorder(SwingInstance swingInstance) {
-		URI uri = URI.create(System.getProperty(Constants.TEMP_DIR_PATH) + "/" + swingInstance.getClientId() + ".wss");
-		File file = new File(uri);
-		this.fileName = file.getPath();
-		log.info("Starting session recording for " + swingInstance.getClientId() + " into file:" + file);
-		if (out == null) {
-			try {
+		try {
+			URI uri = URI.create(System.getProperty(Constants.TEMP_DIR_PATH) + URLEncoder.encode(swingInstance.getClientId(), "UTF-8") + ".wss");
+			File file = new File(uri);
+			this.fileName = file.getCanonicalPath();
+			log.info("Starting session recording for " + swingInstance.getClientId() + " into file:" + file);
+			if (out == null) {
 				out = new FileOutputStream(file);
 				header = new RecordHeader();
 				header.clientId = swingInstance.getClientId();
@@ -45,12 +46,12 @@ public class SessionRecorder {
 				byte[] headerbytes = serializeObject(header);
 				out.write(version);
 				saveFrame(headerbytes);
-			} catch (FileNotFoundException e) {
-				log.error("Failed to create session recording file.", e);
-				failed = true;
-			} catch (IOException e) {
-				failed = true;
 			}
+		} catch (FileNotFoundException e) {
+			log.error("Failed to create session recording file.", e);
+			failed = true;
+		} catch (IOException e) {
+			failed = true;
 		}
 	}
 

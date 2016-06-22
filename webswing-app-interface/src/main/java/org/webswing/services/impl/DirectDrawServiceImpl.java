@@ -48,7 +48,6 @@ public class DirectDrawServiceImpl implements DirectDrawService {
 
 	@Override
 	public byte[] buildWebImage(Image webImage) {
-		resetCache();
 		if (webImage instanceof WebImage) {
 			return ((WebImage) webImage).toMessage(dd).toByteArray();
 		} else if (webImage instanceof VolatileWebImageWrapper) {

@@ -5,6 +5,7 @@ message WebImageProto {
 	required uint32 height = 2;
 	repeated DrawInstructionProto instructions = 3;
 	repeated DrawConstantProto constants = 4;
+	repeated FontFaceProto fontFaces = 5;
 }
 
 message DrawInstructionProto {
@@ -51,6 +52,12 @@ message DrawConstantProto {
 	optional TextureProto texture = 17;
 	optional GlyphProto glyph = 18; 
 	optional CombinedProto combined = 19;
+}
+
+message FontFaceProto {
+	required string name = 1;
+	required bytes font = 2;
+	optional string style = 3;
 }
 
 message ColorProto {

@@ -13,8 +13,10 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -22,14 +24,13 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 
-import org.webswing.directdraw.DirectDraw;
-
 public class WebGraphics extends AbstractVectorGraphics {
 
 	WebImage thisImage;
 	private DrawInstructionFactory dif;
 	private boolean disposed = false;
 	private int id;
+	private boolean onDemandTexturePaint;
 
 	public WebGraphics(WebImage webImage) {
 		super(new Dimension(webImage.getWidth(null), webImage.getHeight(null)));
@@ -48,10 +49,24 @@ public class WebGraphics extends AbstractVectorGraphics {
 	@Override
 	public void draw(Shape s) {
 		if (getStroke() instanceof BasicStroke) {
+			if (onDemandTexturePaint) {
+				thisImage.addInstruction(this, dif.setPaint(createTexture(s, getPaint())));
+			}
 			thisImage.addInstruction(this, dif.draw(s, getClip()));
 		} else {
 			fill(getStroke().createStrokedShape(s));
 		}
+	}
+
+	private Paint createTexture(Shape s, Paint paint) {
+		Rectangle bounds = s.getBounds();
+		BufferedImage img = new BufferedImage(bounds.width, bounds.height, paint.getTransparency() == Paint.OPAQUE ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = (Graphics2D) img.getGraphics();
+		g.translate(-bounds.x, -bounds.y);
+		g.setPaint(paint);
+		g.fill(s.getBounds());
+		g.dispose();
+		return new TexturePaint(img, bounds);
 	}
 
 	private BufferedImage toBufferedImage(RenderedImage image) {
@@ -80,6 +95,9 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	public void fill(Shape s) {
+		if (onDemandTexturePaint) {
+			thisImage.addInstruction(this, dif.setPaint(createTexture(s, getPaint())));
+		}
 		thisImage.addInstruction(this, dif.fill(s, getClip()));
 	}
 
@@ -118,10 +136,12 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected void writeString(String string, double x, double y) {
-		if(DirectDraw.useGlyphs){
-			thisImage.addInstruction(this, dif.drawGlyphList(string, getFont(), x, y, getTransform(), getClip()));
-		}else{
-			thisImage.addInstruction(this, dif.drawString(string, x, y, getClip()));
+		Font font = getFont();
+		if (thisImage.getContext().requestFont(font)) {
+			int width = getFontMetrics().stringWidth(string);
+			thisImage.addInstruction(this, dif.drawString(string, x, y, width, getClip()));
+		} else {
+			thisImage.addInstruction(this, dif.drawGlyphList(string, font, x, y, getTransform(), getClip()));
 		}
 	}
 
@@ -133,8 +153,12 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected void writePaint(Paint paint) {
-		thisImage.addInstruction(this, dif.setPaint(paint));
-
+		try {
+			this.onDemandTexturePaint = false;
+			thisImage.addInstruction(this, dif.setPaint(paint));
+		} catch (UnsupportedOperationException e) {
+			this.onDemandTexturePaint = true;
+		}
 	}
 
 	@Override
@@ -154,7 +178,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected void writeFont(Font font) {
-		if(!DirectDraw.useGlyphs){
+		if (thisImage.getContext().requestFont(font)) {
 			thisImage.addInstruction(this, dif.setFont(font));
 		}
 	}

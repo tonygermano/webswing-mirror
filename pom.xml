@@ -25,6 +25,7 @@
 		<module>webswing-assembly</module>
 	</modules>
 	<properties>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jersey.version>2.6</jersey.version>
 	</properties>
 	<dependencyManagement>
