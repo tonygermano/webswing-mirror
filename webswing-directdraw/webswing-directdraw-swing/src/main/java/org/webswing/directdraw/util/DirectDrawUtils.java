@@ -214,7 +214,7 @@ public class DirectDrawUtils {
 	}
 
 	private static void setGraphicsStatus(DirectDraw ctx, List<DrawInstruction> instructions, GraphicsStatus status) {
-		if (status.tx != null) {
+		if (status.tx != null && !status.tx.isIdentity()) {
 			instructions.add(ctx.getInstructionFactory().transform(status.tx));
 		}
 		if (status.stroke != null) {

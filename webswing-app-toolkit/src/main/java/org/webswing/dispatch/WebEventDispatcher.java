@@ -31,6 +31,7 @@ import org.webswing.model.MsgIn;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.CopyEventMsgIn;
 import org.webswing.model.c2s.KeyboardEventMsgIn;
+import org.webswing.model.c2s.KeyboardEventMsgIn.KeyEventType;
 import org.webswing.model.c2s.MouseEventMsgIn;
 import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
 import org.webswing.model.c2s.PasteEventMsgIn;
@@ -173,7 +174,7 @@ public class WebEventDispatcher {
 			if (event.getKeycode() == 13) {// enter keycode
 				event.setKeycode(10);
 				character = 10;
-			} else if (event.getKeycode() == 46) {// delete keycode
+			} else if (event.getKeycode() == 46 && type != KeyEvent.KEY_TYPED) {// delete keycode
 				event.setKeycode(127);
 				character = 127;
 			} else if (nonStandardKeyCodes.contains(event.getKeycode())) {
