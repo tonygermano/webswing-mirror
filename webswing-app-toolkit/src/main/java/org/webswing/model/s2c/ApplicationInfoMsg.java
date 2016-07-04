@@ -6,7 +6,6 @@ public class ApplicationInfoMsg implements Msg, Comparable<ApplicationInfoMsg> {
 	private static final long serialVersionUID = -7176092462203716782L;
 	private String name;
 	private byte[] base64Icon;
-	private boolean applet;
 	private boolean alwaysRestart;
 
 	public String getName() {
@@ -23,14 +22,6 @@ public class ApplicationInfoMsg implements Msg, Comparable<ApplicationInfoMsg> {
 
 	public void setBase64Icon(byte[] base64Icon) {
 		this.base64Icon = base64Icon;
-	}
-
-	public boolean isApplet() {
-		return applet;
-	}
-
-	public void setApplet(boolean applet) {
-		this.applet = applet;
 	}
 
 	@Override

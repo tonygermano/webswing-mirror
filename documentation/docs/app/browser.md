@@ -75,7 +75,6 @@ The `data-webswing-instance="my-webswing"` attribute tells the javascript to use
 	* `autoStart`  - tells webswing to execute configure() and start() right after the instance is initialized. If it is false, start() function has to be triggered manually. This option only valid if set up in `data-webswing-options` attribute
     * `applicationName` - Preselects the swing application and skips selection screen
     * `args` - additional java application arguments. Appended to those defined in configuration.
-    * `anonym` - skip login for applications that allows anonymous access (default:false)
     * `binarySocket` - use binary transfer in websocket - saves bandwidth (default:true)
     * `recording` - record this application session (default:false)
     * `clientId` - set the clientId, used with mirror session or to continue running session. 

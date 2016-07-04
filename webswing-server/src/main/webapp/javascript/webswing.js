@@ -123,7 +123,6 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                         autoStart : false,
                         applicationName : null,
                         args : null,
-                        anonym : false,
                         connectionUrl : location.origin + location.pathname,
                         mirror : false,
                         recordingPlayback : false,
@@ -141,7 +140,6 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                         hasControl : false,
                         mirrorMode : false,
                         canPaint : false,
-                        applet : false,
                         virtualKB :false
                     };
                 }
@@ -183,7 +181,6 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                         cfg.autoStart = options.autoStart != null ? JSON.parse(options.autoStart) : cfg.autoStart;
                         cfg.applicationName = options.applicationName != null ? options.applicationName : cfg.applicationName;
                         cfg.args = options.args != null ? options.args : cfg.args;
-                        cfg.anonym = options.anonym != null ? JSON.parse(options.anonym) : cfg.anonym;
                         cfg.binarySocket = options.binarySocket != null ? JSON.parse(options.binarySocket) : cfg.binarySocket;
                         cfg.recording = options.recording != null ? JSON.parse(options.recording) : cfg.recording;
                         cfg.clientId = options.clientId != null ? options.clientId : cfg.clientId;

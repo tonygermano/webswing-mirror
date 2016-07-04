@@ -19,10 +19,8 @@ define(['jquery','webswing-util'], function amdFactory($, util) {
 
         function show(apps) {
             var header = '';
-            if (!api.cfg.anonym) {
-                header = '<span class="pull-right"><a href="javascript:;" data-id="logout">Logout</a></span>';
-                header = header + '<h4 class="modal-title" id="myModalLabel">Hello <span>' + api.getUser() + '</span>. ';
-            }
+            header = '<span class="pull-right"><a href="javascript:;" data-id="logout">Logout</a></span>';
+            header = header + '<h4 class="modal-title" id="myModalLabel">Hello <span>' + api.getUser() + '</span>. ';
             header = header + 'Select your application:</h4>';
             var events = {
                 logout_click: function () {
@@ -30,9 +28,8 @@ define(['jquery','webswing-util'], function amdFactory($, util) {
                 },
                 application_click: function () {
                     var appName = $(this).attr('data-name');
-                    var applet = $(this).attr('data-applet');
                     var restart = $(this).attr('data-always-restart');
-                    api.startApplication(appName, 'true' === applet, 'true' === restart);
+                    api.startApplication(appName, 'true' === restart);
                 }
             };
             var content;
@@ -41,18 +38,16 @@ define(['jquery','webswing-util'], function amdFactory($, util) {
                 content = '<p>Sorry, there is no application available for you.</p>';
             } else if (api.cfg.applicationName != null) {
                 var exists = false;
-                var isApplet = false;
                 var alwaysRestart = false;
                 apps.forEach(function (app) {
                     if (app.name === api.cfg.applicationName) {
                         exists = true;
-                        isApplet = app.applet;
                         alwaysRestart = app.alwaysRestart;
                     }
                 });
                 if (exists) {
                     if (!api.cfg.mirror) {
-                        api.startApplication(api.cfg.applicationName, isApplet, alwaysRestart);
+                        api.startApplication(api.cfg.applicationName, alwaysRestart);
                     } else {
                         api.startMirrorView(api.cfg.clientId, api.cfg.applicationName);
                     }
@@ -73,8 +68,6 @@ define(['jquery','webswing-util'], function amdFactory($, util) {
                     } else {
                         content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" data-id="application" data-name="'
                                 + app.name
-                                + '" data-applet="'
-                                + app.applet
                                 + '" data-always-restart="'
                                 + app.alwaysRestart
                                 + '"><img src="'

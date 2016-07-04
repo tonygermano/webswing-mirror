@@ -3,38 +3,24 @@ package org.webswing.server.util;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.shiro.subject.Subject;
-import org.atmosphere.cpr.AtmosphereRequest;
-import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.FrameworkConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.freehep.graphicsio.font.truetype.TTFFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -43,17 +29,14 @@ import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.ApplicationInfoMsg;
-import org.webswing.model.server.SwingAppletDescriptor;
-import org.webswing.model.server.SwingApplicationDescriptor;
 import org.webswing.model.server.SwingDescriptor;
-import org.webswing.server.ConfigurationManager;
-import org.webswing.server.handler.LoginServlet;
 import org.webswing.server.model.EncodedMessage;
+import org.webswing.server.services.websocket.WebSocketConnection;
 
 import main.Main;
 
 public class ServerUtil {
-
+	public static final int bufferSize = 4 * 1024;
 	private static final String DEFAULT = "default";
 	private static final Logger log = LoggerFactory.getLogger(ServerUtil.class);
 	private static final Map<String, byte[]> iconMap = new HashMap<String, byte[]>();
@@ -119,42 +102,6 @@ public class ServerUtil {
 		}
 	}
 
-	public static List<ApplicationInfoMsg> createApplicationInfoMsg(AtmosphereResource r, boolean includeAdminApp) {
-		Map<String, SwingApplicationDescriptor> applications = ConfigurationManager.getInstance().getApplications();
-		Map<String, SwingAppletDescriptor> applets = ConfigurationManager.getInstance().getApplets();
-
-		List<ApplicationInfoMsg> apps = new ArrayList<ApplicationInfoMsg>();
-		StrSubstitutor subs = getConfigSubstitutor(getUserName(r), null, ServerUtil.getClientIp(r.getRequest()), null, null);
-		if (applications.size() == 0) {
-			return null;
-		} else {
-			for (String name : applications.keySet()) {
-				SwingApplicationDescriptor descriptor = applications.get(name);
-				if (isUserAuthorizedForApplication(r, descriptor)) {
-					ApplicationInfoMsg app = toApplicationInfoMsg(descriptor, subs);
-					app.setApplet(false);
-					apps.add(app);
-				}
-			}
-			for (String name : applets.keySet()) {
-				SwingAppletDescriptor descriptor = applets.get(name);
-				if (isUserAuthorizedForApplication(r, descriptor)) {
-					ApplicationInfoMsg app = toApplicationInfoMsg(descriptor, subs);
-					app.setApplet(true);
-					apps.add(app);
-				}
-			}
-			Collections.sort(apps);
-
-			if (includeAdminApp) {
-				ApplicationInfoMsg adminConsole = new ApplicationInfoMsg();
-				adminConsole.setName(Constants.ADMIN_CONSOLE_APP_NAME);
-				apps.add(adminConsole);
-			}
-		}
-		return apps;
-	}
-
 	public static ApplicationInfoMsg toApplicationInfoMsg(SwingDescriptor swingDesc, StrSubstitutor subs) {
 		ApplicationInfoMsg app = new ApplicationInfoMsg();
 		app.setName(swingDesc.getName());
@@ -180,7 +127,7 @@ public class ServerUtil {
 		return app;
 	}
 
-	public static boolean isUserAuthorized(AtmosphereResource r, SwingDescriptor app, ConnectionHandshakeMsgIn h) {
+	public static boolean isUserAuthorized(WebSocketConnection r, SwingDescriptor app, ConnectionHandshakeMsgIn h) {
 
 		// mirror view
 		if (h.isMirrored()) {
@@ -193,10 +140,7 @@ public class ServerUtil {
 		return isUserAuthorizedForApplication(r, app);
 	}
 
-	public static boolean isUserAuthorizedForApplication(AtmosphereResource r, SwingDescriptor app) {
-		if ((app.isAuthentication() || app.isAuthorization()) && isUserAnonymous(r)) {
-			return false;
-		}
+	public static boolean isUserAuthorizedForApplication(WebSocketConnection r, SwingDescriptor app) {
 		if (app.isAuthorization()) {
 			if (isUserinRole(r, app.getName()) || isUserinRole(r, Constants.ADMIN_ROLE)) {
 				return true;
@@ -273,25 +217,18 @@ public class ServerUtil {
 		return warFile;
 	}
 
-	public static String getUserName(AtmosphereResource resource) {
-		Subject sub = (Subject) resource.getRequest().getAttribute(FrameworkConfig.SECURITY_SUBJECT);
+	public static String getUserName(WebSocketConnection resource) {
+		Subject sub = (Subject) resource.getSecuritySubject();
 		if (sub != null) {
 			return sub.getPrincipal() + "";
 		}
 		return null;
 	}
 
-	public static boolean isUserinRole(AtmosphereResource resource, String role) {
-		Subject sub = (Subject) resource.getRequest().getAttribute(FrameworkConfig.SECURITY_SUBJECT);
+	public static boolean isUserinRole(WebSocketConnection resource, String role) {
+		Subject sub = (Subject) resource.getSecuritySubject();
 		if (sub != null) {
 			return sub.hasRole(role);
-		}
-		return false;
-	}
-
-	public static boolean isUserAnonymous(AtmosphereResource resource) {
-		if (LoginServlet.anonymUserName.equals(getUserName(resource))) {
-			return true;
 		}
 		return false;
 	}
@@ -315,8 +252,8 @@ public class ServerUtil {
 		}
 	}
 
-	public static String getClientIp(AtmosphereRequest request) {
-		return request.getRemoteAddr();
+	public static String getClientIp(WebSocketConnection r) {
+		return r.getRequest().getRemoteAddr();
 	}
 
 	public static Map<String, String> getConfigSubstitutorMap(String user, String sessionId, String clientIp, String locale, String customArgs) {
@@ -344,19 +281,19 @@ public class ServerUtil {
 		return result;
 	}
 
+	public static StrSubstitutor getConfigSubstitutor() {
+		return getConfigSubstitutor(null, null, null, null, null);
+	}
+
 	public static StrSubstitutor getConfigSubstitutor(String user, String sessionId, String clientIp, String locale, String customArgs) {
 		return new StrSubstitutor(getConfigSubstitutorMap(user, sessionId, clientIp, locale, customArgs));
 	}
 
-	public static void broadcastMessage(AtmosphereResource r, EncodedMessage o) {
-		for (AtmosphereResource resource : r.getBroadcaster().getAtmosphereResources()) {
-			if (resource.uuid().equals(r.uuid())) {
-				resource.getBroadcaster().broadcast(resource.forceBinaryWrite() ? o.getProtoMessage() : o.getJsonMessage(), resource);
-			}
-		}
+	public static void broadcastMessage(WebSocketConnection r, EncodedMessage o) {
+		r.broadcast(r.isBinary() ? o.getProtoMessage() : o.getJsonMessage());
 	}
 
-	public static void broadcastMessage(AtmosphereResource r, MsgOut o) {
+	public static void broadcastMessage(WebSocketConnection r, MsgOut o) {
 		broadcastMessage(r, new EncodedMessage(o));
 	}
 
@@ -375,134 +312,33 @@ public class ServerUtil {
 		return false;
 	}
 
-	private static List<String> logicalNames = Arrays.asList("monospaced", "serif", "sansserif", "dialoginput", "dialog");
-	private static List<String> styles = Arrays.asList("bolditalic", "italic", "bold", "plain");
-	private static String defaultChargroup = SystemUtils.IS_OS_WINDOWS ? "alpbabet" : "latin-1";
-
-	public static String createFontConiguration(SwingDescriptor appConfig, StrSubstitutor subs) throws IOException {
-		if (appConfig.getFontConfig() != null && appConfig.getFontConfig().size() > 0) {
-			StringBuilder fontConfig = new StringBuilder("version=1\n");
-			StringBuilder metadata = new StringBuilder();
-			fontConfig.append("sequence.allfonts=").append(defaultChargroup).append("\n");
-			Map<String, File> fonts = buildFontMap(appConfig.getFontConfig(), subs);
-			Map<File, String> fontNames = resolveFontNames(new HashSet<File>(fonts.values()));
-			String defaultFont = findDefaultFontKey(fonts, false);
-			String defaultMonospace = findDefaultFontKey(fonts, true);
-			for (String logicalFont : logicalNames) {
-				for (String style : styles) {
-					String key = findFont(logicalFont, style, defaultFont, defaultMonospace, fonts);
-					File file = fonts.get(key);
-					String fullName= fontNames.get(file);
-					fontConfig.append(logicalFont).append(".").append(style).append(".").append(defaultChargroup).append("=").append(fullName).append("\n");
-					//directDraw font to file mapping: 
-					metadata.append("#@@").append(logicalFont).append(".").append(style).append("=").append(file.getAbsolutePath()).append("\n");
-				}
-			}
-			for (File fontFile : fontNames.keySet()) {
-				String fontName = fontNames.get(fontFile);
-				String fontName_ = fontName.replace(' ', '_');
-				fontConfig.append("filename.").append(fontName_).append("=").append(StringEscapeUtils.escapeJava(fontFile.getCanonicalPath())).append("\n");
-				metadata.append("#@@").append(fontName).append("=").append(fontFile.getAbsolutePath()).append("\n");
-			}
-			fontConfig.append("\n").append(metadata);
-
-			String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
-			File configfile = new File(URI.create(tempDir + URLEncoder.encode(subs.replace("fontconfig-${clientId}.properties"),"UTF-8")));
-			FileUtils.writeStringToFile(configfile, fontConfig.toString());
- 
-			return configfile.getAbsolutePath();
+	public static String resolveInstanceIdForMode(WebSocketConnection r, ConnectionHandshakeMsgIn h, SwingDescriptor conf) {
+		if (h.isMirrored()) {
+			return h.getClientId();
 		} else {
-			return null;
+			switch (conf.getSessionMode()) {
+			case ALWAYS_NEW_SESSION:
+				return h.getClientId() + h.getViewId();
+			case CONTINUE_FOR_BROWSER:
+				return h.getClientId();
+			case CONTINUE_FOR_USER:
+				return ServerUtil.getUserName(r);
+			default:
+				return h.getClientId();
+			}
 		}
-	}
-	
-	private static String findFont(String logicalFont, String style, String defaultFont, String defaultMonospace, Map<String, File> fonts) {
-		if (fonts.containsKey(logicalFont + " " + style)) {//check if exact font defined
-			return logicalFont + " " + style;
-		} else if (fonts.containsKey(logicalFont + " plain")) {//check if plain font exist
-			return logicalFont + " plain";
-		} else if (isMonospaceFont(logicalFont)) {
-			return defaultMonospace;
-		}
-		return defaultFont;
 	}
 
-	private static Map<String, File> buildFontMap(Map<String, String> fontConfig, StrSubstitutor subs) {
-		Map<String, File> result = new HashMap<String, File>();
-		for (String key : fontConfig.keySet()) {
-			String keyValue = subs.replace(key).toLowerCase().trim();
-			if (isLogicalFont(keyValue) && logicalNames.contains(keyValue)) {//if no style is specified use plain
-				keyValue = keyValue + " plain";
-			}
-			File fontFile = new File(subs.replace(fontConfig.get(key)).trim());
-			if (!fontFile.exists()) {
-				throw new RuntimeException("Loading font " + keyValue + " failed . Font file " + fontFile.getAbsolutePath() + " not found.");
-			}
-			if (!fontFile.isFile()) {
-				throw new RuntimeException("Loading font " + keyValue + " failed . Font file " + fontFile.getAbsolutePath() + " is not a file.");
-			}
-			result.put(keyValue, fontFile);
+	public static void transferStreams(InputStream is, OutputStream os) throws IOException {
+		try {
+			byte[] buf = new byte[bufferSize];
+			int bytesRead;
+			while ((bytesRead = is.read(buf)) != -1)
+				os.write(buf, 0, bytesRead);
+		} finally {
+			is.close();
+			os.close();
 		}
-		return result;
-	}
-	
-	@SuppressWarnings("restriction")
-	private static Map<File, String> resolveFontNames(Set<File> fontFiles) {
-		Map<File,String> result = new HashMap<File,String>();
-		for (File file : fontFiles) {
-			try {
-				sun.font.TrueTypeFont ttfFile= new sun.font.TrueTypeFont(file.getAbsolutePath(),null,0,false);
-				String name=ttfFile.getFullName();
-				result.put(file, name);
-			} catch (Exception e) {
-				throw new RuntimeException("Loading TTF font " + file + " failed .",e);
-			}
-		}
-		return result;
-	}
-
-	private static String findDefaultFontKey(Map<String, File> fontConfig, boolean preferMonospace) {
-		String result = "";
-		for (String key : fontConfig.keySet()) {
-			if (isLogicalFont(key)) {
-				String[] logicalFont = key.split(" ");
-				String fontName = logicalFont[0];
-				String fontStyle = logicalFont.length > 1 ? logicalFont[1] : "plain";
-				String resultName = result.split(" ")[0];
-				String resultStyle = result.split(" ").length > 1 ? result.split(" ")[1] : "plain";
-				int score = logicalNames.indexOf(fontName) * 10 + styles.indexOf(fontStyle);
-				int resultScore = logicalNames.indexOf(resultName) * 10 + styles.indexOf(resultStyle);
-				if (preferMonospace) {
-					score = isMonospaceFont(key) ? score * 10 : score;
-					resultScore = isMonospaceFont(result) ? resultScore * 10 : resultScore;
-				}
-				if (score > resultScore) {
-					result = key;
-				}
-			} else if (result.isEmpty()) {
-				result = key;
-			}
-		}
-		return result.isEmpty() ? null : result;
-	}
-
-	private static boolean isLogicalFont(String keyValue) {
-		for (String logicalName : logicalNames) {
-			if (keyValue.startsWith(logicalName)) {
-				String remainder = keyValue.substring(logicalName.length()).trim();
-				if (remainder.isEmpty() || styles.contains(remainder)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	private static boolean isMonospaceFont(String keyValue) {
-		if (isLogicalFont(keyValue) && (keyValue.startsWith("monospaced") || keyValue.startsWith("dialoginput"))) {
-			return true;
-		}
-		return false;
 	}
 
 }

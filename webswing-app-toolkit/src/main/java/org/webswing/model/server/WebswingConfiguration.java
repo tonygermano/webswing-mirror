@@ -28,4 +28,10 @@ public class WebswingConfiguration implements Serializable {
 		this.applets = applets;
 	}
 
+	public List<SwingDescriptor> getAllApps() {
+		ArrayList<SwingDescriptor> all = new ArrayList<SwingDescriptor>();
+		all.addAll(applications);
+		all.addAll(applets);
+		return all;
+	}
 }

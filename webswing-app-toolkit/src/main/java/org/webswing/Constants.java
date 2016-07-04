@@ -51,9 +51,10 @@ public interface Constants {
 	public static final String SERVER_PORT = "webswing.port";
 	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";;
 	public static final String DEFAULT_USER_FILE_NAME = "user.properties";
-	public static final String ALLOWED_CORS_ORIGINS = "webswing.corsOrigins";
 	public static final String JMS_OVERAL_MEM_LIMIT = "webswing.jmsOveralMemoryLimit";
 	public static final String JMS_DEST_MEM_LIMIT = "webswing.jmsDestinationMemoryLimit";
+
+	public static final String ALLOWED_CORS_ORIGINS = "webswing.corsOrigins";
 	public static final String FILE_SERVLET_WAIT_TIMEOUT = "webswing.fileServletWaitTimeout";
 
 	// swing start related properties

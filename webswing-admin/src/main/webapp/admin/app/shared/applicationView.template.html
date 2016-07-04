@@ -2,7 +2,12 @@
     <tab heading="General settings">
         <div class="row">
             <div class="ws-config-group col-md-12">
-
+				<ws-string-field readonly="{{vm.readonly}}"
+                                 label="Context Path" 
+                                 desc="Url context path where the application will be deployed." 
+                                 value="vm.app.path" 
+                                 required requiredMsg="Application context path must not be empty.">
+                </ws-string-field>
                 <ws-string-field readonly="{{vm.readonly}}"
                                  label="Name" 
                                  desc="Swing application name." 

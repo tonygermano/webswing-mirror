@@ -21,8 +21,7 @@ message AppFrameMsgOutProto{
 message ApplicationInfoMsgProto{
 	required string name = 1;
 	optional bytes base64Icon = 2;
-	optional bool applet = 3;
-	optional bool alwaysRestart = 4;
+	optional bool alwaysRestart = 3;
 }
 
 message LinkActionMsgProto{
@@ -175,10 +174,9 @@ message ConnectionHandshakeMsgInProto{
 	optional string applicationName = 6;
 	optional bool mirrored = 7;
 	optional bool directDrawSupported = 8;
-	optional bool applet = 9;
-	optional string documentBase = 10;
-	repeated ParamMsgProto params = 11;
-	optional string locale = 12;
+	optional string documentBase = 9;
+	repeated ParamMsgProto params = 10;
+	optional string locale = 11;
 }
 
 message ParamMsgProto{

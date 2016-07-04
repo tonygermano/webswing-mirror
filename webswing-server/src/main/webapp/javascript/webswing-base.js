@@ -53,18 +53,18 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
         var windowImageHolders = {};
         var directDraw = new WebswingDirectDraw({});
 
-        function startApplication(name, applet, alwaysReset) {
+        function startApplication(name, alwaysReset) {
             if (alwaysReset===true){
                 api.disposeIdentity();
             }
-            initialize(api.getUser() + api.getIdentity() + name, name, applet, false);
+            initialize(api.getUser() + api.getIdentity() + name, name, false);
         }
 
         function startMirrorView(clientId, appName) {
             initialize(clientId, appName, null, true)
         }
 
-        function initialize(clientId, name, applet, isMirror) {
+        function initialize(clientId, name, isMirror) {
             api.registerInput();
             api.registerTouch();
             window.addEventListener('beforeunload', beforeUnloadEventHandler);
@@ -74,7 +74,6 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             api.cfg.canPaint = true;
             api.cfg.hasControl = !isMirror;
             api.cfg.mirrorMode = isMirror;
-            api.cfg.applet = applet != null ? applet : api.cfg.applet;
             handshake();
             if (isMirror) {
                 repaint();
@@ -375,7 +374,6 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             };
 
             if (!api.cfg.mirrorMode) {
-                handshake.applet = api.cfg.applet;
                 handshake.documentBase = api.cfg.documentBase;
                 handshake.params = api.cfg.params;
                 handshake.desktopWidth = canvas.offsetWidth;

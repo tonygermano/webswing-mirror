@@ -31,7 +31,6 @@ import org.webswing.model.MsgIn;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.CopyEventMsgIn;
 import org.webswing.model.c2s.KeyboardEventMsgIn;
-import org.webswing.model.c2s.KeyboardEventMsgIn.KeyEventType;
 import org.webswing.model.c2s.MouseEventMsgIn;
 import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
 import org.webswing.model.c2s.PasteEventMsgIn;
@@ -82,7 +81,7 @@ public class WebEventDispatcher {
 				if (event instanceof ConnectionHandshakeMsgIn) {
 					final ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
 					Util.getWebToolkit().initSize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
-					if (handshake.isApplet()) {
+					if (System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null) {
 						// resize and refresh the applet object exposed in javascript in case of page reload/session continue
 						Applet a = (Applet) WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
 						a.resize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
