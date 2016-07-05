@@ -1,6 +1,7 @@
 package org.webswing.server.services.swingmanager;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.files.FileTransferHandlerService;
 import org.webswing.server.services.resources.ResourceHandlerService;
+import org.webswing.server.services.rest.RestHandlerService;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
@@ -36,13 +38,14 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 	private final LoginHandlerService loginService;
 	private final FileTransferHandlerService fileService;
 	private final ResourceHandlerService resourceService;
+	private final RestHandlerService restService;
 	private SwingDescriptor config;
 	private FileTransferHandler fileHandler;
 	private SwingInstanceSet swingInstances = new SwingInstanceSet();
 	private SwingInstanceSet closedInstances = new SwingInstanceSet();
 	private WebswingSecurityModule<?> securityModule;
 
-	public SwingInstanceManagerImpl(SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileService, LoginHandlerService loginService, ResourceHandlerService resourceService, SecurityModuleService securityModuleService, UrlHandler parent, SwingDescriptor config) {
+	public SwingInstanceManagerImpl(SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileService, LoginHandlerService loginService, ResourceHandlerService resourceService, SecurityModuleService securityModuleService, RestHandlerService restService, UrlHandler parent, SwingDescriptor config) {
 		super(parent);
 		this.instanceFactory = instanceFactory;
 		this.websocket = websocket;
@@ -50,6 +53,7 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 		this.loginService = loginService;
 		this.fileService = fileService;
 		this.resourceService = resourceService;
+		this.restService = restService;
 		this.config = config;
 	}
 
@@ -59,11 +63,14 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 		if (securityModule != null) {
 			securityModule.init();
 		}
+		registerChildUrlHandler(restService.createVersionRestHandler(this));
+		registerChildUrlHandler(restService.createServerRestHandler(this));
+		registerChildUrlHandler(restService.createSessionRestHandler(this, this));
 
 		registerChildUrlHandler(loginService.createLoginHandler(this, this));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
 		registerChildUrlHandler(fileHandler = fileService.create(this));
-		registerChildUrlHandler(resourceService.create(this));
+		registerChildUrlHandler(resourceService.create(this, config.getWebFolder()));
 
 		websocket.registerBinaryWebSocketListener(getFullPathMapping() + "/async/swing-bin", new SwingWebSocketMessageListener(this));
 		websocket.registerJsonWebSocketListener(getFullPathMapping() + "/async/swing", new SwingWebSocketMessageListener(this));
@@ -185,12 +192,16 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 	@Override
 	public SwingInstance findInstanceBySessionId(String uuid) {
 		return swingInstances.findBySessionId(uuid);
-
 	}
 
 	@Override
 	public SwingInstance findInstanceByClientId(String clientId) {
 		return swingInstances.findByClientId(clientId);
+	}
+
+	@Override
+	public List<SwingInstance> getAllInstances() {
+		return swingInstances.getAllInstances();
 	}
 
 	@Override

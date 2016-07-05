@@ -1,16 +1,25 @@
 package org.webswing.server.util;
 
 import java.awt.image.BufferedImage;
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -30,6 +39,7 @@ import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.server.SwingDescriptor;
+import org.webswing.model.server.WebswingConfiguration;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
@@ -341,4 +351,54 @@ public class ServerUtil {
 		}
 	}
 
+	public static File getConfigFile(boolean backup) {
+		String configFile = System.getProperty(Constants.CONFIG_FILE_PATH);
+		if (configFile == null) {
+			String war = ServerUtil.getWarFileLocation();
+			configFile = war.substring(0, war.lastIndexOf("/") + 1) + Constants.DEFAULT_CONFIG_FILE_NAME;
+			System.setProperty(configFile, Constants.CONFIG_FILE_PATH);
+		}
+		configFile = backup ? configFile + ".backup" : configFile;
+		File config = new File(URI.create(configFile));
+		return config;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T instantiateConfig(final Map<String, Object> config, final Class<T> clazz) {
+		if (config != null) {
+			return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[] { clazz }, new InvocationHandler() {
+
+				@Override
+				@SuppressWarnings("rawtypes")
+				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+					BeanInfo info = Introspector.getBeanInfo(clazz);
+					PropertyDescriptor[] pds = info.getPropertyDescriptors();
+					for (PropertyDescriptor pd : pds) {
+						if (pd.getReadMethod().equals(method)) {
+							Object value = config.get(pd.getName());
+							if (value != null) {
+								if (method.getReturnType().isAssignableFrom(value.getClass())) {
+									return value;
+								} else if (value instanceof Map && method.getReturnType().isInterface()) {
+									return instantiateConfig((Map) value, method.getReturnType());
+								} else {
+									log.error("Invalid SecurityModule configuration. Type of " + clazz.getName() + "." + pd.getName() + " is not " + method.getReturnType());
+									return null;
+								}
+							}
+						}
+					}
+					return null;
+				}
+			});
+		}
+		return null;
+	}
+
+	public static List<SwingDescriptor> getAllApps(WebswingConfiguration config) {
+		ArrayList<SwingDescriptor> all = new ArrayList<SwingDescriptor>();
+		all.addAll(config.getApplications());
+		all.addAll(config.getApplets());
+		return all;
+	}
 }

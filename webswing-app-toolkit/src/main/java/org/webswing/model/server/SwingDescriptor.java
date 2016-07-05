@@ -39,7 +39,8 @@ public abstract class SwingDescriptor implements Serializable {
 	private float uploadMaxSize = 5;
 	private boolean allowJsLink = true;
 	private SecurityMode securityMode = SecurityMode.INHERITED;
-	private Map<String,Object> securityConfig = new HashMap<String,Object>();
+	private Map<String, Object> securityConfig = new HashMap<String, Object>();
+	private String webFolder = null;
 
 	public String getPath() {
 		return path;
@@ -276,5 +277,12 @@ public abstract class SwingDescriptor implements Serializable {
 		this.securityConfig = securityConfig;
 	}
 
+	public String getWebFolder() {
+		return webFolder;
+	}
+
+	public void setWebFolder(String webFolder) {
+		this.webFolder = webFolder;
+	}
 
 }

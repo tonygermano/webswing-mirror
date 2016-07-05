@@ -1,15 +1,20 @@
 package org.webswing.server.services.rest;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
+import org.webswing.server.base.UrlHandler;
 import org.webswing.server.util.GitRepositoryState;
 
-@Path("webswing")
-public class WebswingRestServiceImpl implements WebswingRestService {
-
+public class VersionRestUrlHandler extends AbstractRestUrlHandler {
 	private static final String default_version = "unresolved";
 
-	@Override
+	public VersionRestUrlHandler(UrlHandler parent) {
+		super(parent);
+	}
+
+	@GET
+	@Path("/version")
 	public String getVersion() {
 		String describe = GitRepositoryState.getInstance().getDescribe();
 		if (describe == null) {
@@ -17,4 +22,5 @@ public class WebswingRestServiceImpl implements WebswingRestService {
 		}
 		return describe;
 	}
+
 }

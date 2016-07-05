@@ -13,11 +13,15 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.api.WebswingCredentials;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
+import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
 import org.webswing.server.services.security.api.WebswingUser;
 import org.webswing.server.services.security.modules.AbstractSecurityModule.UserPasswordCredentials;
 
 public abstract class AbstractSecurityModule implements WebswingSecurityModule<UserPasswordCredentials> {
 
+	public AbstractSecurityModule(WebswingSecurityModuleConfig config) {
+	}
+	
 	@Override
 	public void init() {
 	}

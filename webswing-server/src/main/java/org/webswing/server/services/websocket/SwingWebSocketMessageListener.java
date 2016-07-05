@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.Constants;
 import org.webswing.model.MsgIn;
 import org.webswing.model.c2s.CopyEventMsgIn;
 import org.webswing.model.c2s.InputEventMsgIn;
@@ -16,6 +15,7 @@ import org.webswing.model.c2s.UploadedEventMsgIn;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
@@ -113,6 +113,11 @@ public class SwingWebSocketMessageListener implements WebSocketMessageListener {
 		if (instance != null) {
 			instance.sendToSwing(r, o);
 		}
+	}
+
+	@Override
+	public UrlHandler getOwner() {
+		return manager;
 	}
 
 }

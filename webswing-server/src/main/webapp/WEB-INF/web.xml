@@ -2,42 +2,4 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
 	      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	version="3.0">
-	<servlet>
-		<description>WebswingServlet</description>
-		<servlet-name>WebswingServlet</servlet-name>
-		<servlet-class>org.webswing.server.WebswingServlet</servlet-class>
-		<load-on-startup>0</load-on-startup>
-		<async-supported>true</async-supported>
-		<multipart-config>
-			<file-size-threshold>5242880</file-size-threshold>
-		</multipart-config>
-	</servlet>
-	
-	<servlet>
-		<servlet-name>jersey-serlvet</servlet-name>
-		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-		<init-param>
-			<param-name>jersey.config.server.provider.packages</param-name>
-			<param-value>org.codehaus.jackson.jaxrs,org.webswing.server.rest</param-value>
-		</init-param>
-		<init-param>
-			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
-			<param-value>true</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>jersey-serlvet</servlet-name>
-		<url-pattern>/rest/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>WebswingServlet</servlet-name>
-		<url-pattern>/*</url-pattern>
-	</servlet-mapping><!-- 
-	
-	<listener>
-		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
-	</listener>
- -->
 </web-app>

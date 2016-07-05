@@ -48,7 +48,6 @@ class WebSocketAtmosphereHandler implements AtmosphereHandler {
 
 	private WebSocketConnection getConnection(AtmosphereResourceEvent event) {
 		WebSocketConnection c = getConnection(event.getResource());
-		c.setEvent(event);
 		return c;
 	}
 
@@ -57,7 +56,7 @@ class WebSocketAtmosphereHandler implements AtmosphereHandler {
 		if (connectionMap.containsKey(r.uuid())) {
 			result = connectionMap.get(r.uuid());
 		} else {
-			result = new WebSocketConnection(r);
+			result = new WebSocketConnection(r, wsHandler.getOwner());
 			connectionMap.put(r.uuid(), result);
 		}
 		return result;

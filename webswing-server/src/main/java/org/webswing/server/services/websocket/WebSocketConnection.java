@@ -5,20 +5,19 @@ import java.io.Serializable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.AtmosphereResourceEvent;
-import org.atmosphere.cpr.FrameworkConfig;
+import org.webswing.server.base.UrlHandler;
+import org.webswing.server.services.security.SecurityManagerService;
+import org.webswing.server.services.security.api.WebswingUser;
+import org.webswing.server.util.SecurityUtil;
 
 public class WebSocketConnection {
 
 	private AtmosphereResource resource;
-	private AtmosphereResourceEvent lastEvent;
+	private UrlHandler handler;
 
-	public WebSocketConnection(AtmosphereResource r) {
-		this.resource = r;
-	}
-
-	public void setEvent(AtmosphereResourceEvent event) {
-		this.lastEvent = event;
+	public WebSocketConnection(AtmosphereResource resource, UrlHandler handler) {
+		this.resource = resource;
+		this.handler = handler;
 	}
 
 	public boolean isBinary() {
@@ -42,7 +41,11 @@ public class WebSocketConnection {
 	}
 
 	public Object getSecuritySubject() {
-		return resource.getRequest().getAttribute(FrameworkConfig.SECURITY_SUBJECT);
+		return resource.getRequest().getAttribute(SecurityManagerService.SECURITY_SUBJECT);
+	}
+
+	public WebswingUser getUser() {
+		return SecurityUtil.getUser(this);
 	}
 
 	public void broadcast(Serializable serializable) {
@@ -51,6 +54,10 @@ public class WebSocketConnection {
 				r.getBroadcaster().broadcast(serializable, r);
 			}
 		}
+	}
+
+	public UrlHandler getHandler() {
+		return handler;
 	}
 
 }

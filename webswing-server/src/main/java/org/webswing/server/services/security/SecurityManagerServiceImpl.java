@@ -45,6 +45,7 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 		final ShiroHttpServletResponse response = new ShiroHttpServletResponse(res, handler.getServletContext(), request);
 
 		final Subject subject = new WebSubject.Builder(securityManager, request, response).buildWebSubject();
+		request.setAttribute(SECURITY_SUBJECT, subject);
 
 		subject.execute(new Callable<Object>() {
 			public Object call() throws Exception {

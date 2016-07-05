@@ -18,6 +18,7 @@ import org.webswing.Constants;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.ApplicationInfoMsg;
+import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketMessageListener;
@@ -86,5 +87,11 @@ public class SessionRecordingPlaybackWebSocketMessgeListener implements WebSocke
 
 	@Override
 	public void onTimeout(WebSocketConnection connection) {
+	}
+
+	@Override
+	public UrlHandler getOwner() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

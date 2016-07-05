@@ -1,26 +1,24 @@
 package org.webswing.server.base;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.model.exception.WsException;
-import org.webswing.server.services.security.SecurityUtil;
 import org.webswing.server.services.security.api.WebswingUser;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
+import org.webswing.server.util.SecurityUtil;
 
 public abstract class AbstractUrlHandler implements UrlHandler {
 	private static final Logger log = LoggerFactory.getLogger(AbstractUrlHandler.class);
 
 	private final UrlHandler parent;
-	private final LinkedHashMap<String, UrlHandler> childHandlers = new LinkedHashMap<String, UrlHandler>();
+	private final LinkedList<UrlHandler> childHandlers = new LinkedList<UrlHandler>();
 
 	public AbstractUrlHandler(UrlHandler parent) {
 		this.parent = parent;
@@ -29,22 +27,26 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 
 	@Override
 	public void init() {
-		for (UrlHandler handler : childHandlers.values()) {
-			try {
-				handler.init();
-			} catch (Exception e) {
-				log.error("Failed to initialize child handler: " + handler.getClass().getName(), e);
+		synchronized (childHandlers) {
+			for (UrlHandler handler : childHandlers) {
+				try {
+					handler.init();
+				} catch (Exception e) {
+					log.error("Failed to initialize child handler: " + handler.getClass().getName(), e);
+				}
 			}
 		}
 	}
 
 	@Override
 	public void destroy() {
-		for (UrlHandler handler : childHandlers.values()) {
-			try {
-				handler.destroy();
-			} catch (Exception e) {
-				log.error("Failed to destroy child handler: " + handler.getClass().getName(), e);
+		synchronized (childHandlers) {
+			for (UrlHandler handler : childHandlers) {
+				try {
+					handler.destroy();
+				} catch (Exception e) {
+					log.error("Failed to destroy child handler: " + handler.getClass().getName(), e);
+				}
 			}
 		}
 	}
@@ -52,7 +54,8 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		String pathinfo = getPathInfo(req);
-		for (UrlHandler child : childHandlers.values()) {
+		List<UrlHandler> localHandlerList = new LinkedList<UrlHandler>(childHandlers);
+		for (UrlHandler child : localHandlerList) {
 			if (isSubPath(toPath(child.getPathMapping()), pathinfo)) {
 				boolean served = child.serve(req, res);
 				if (served) {
@@ -99,37 +102,22 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 		return mapping;
 	}
 
-	public UrlHandler getChildHandlerForPath(String path) {
-		return childHandlers.get(path);
-	}
-
-	public Set<String> getChildPaths() {
-		return new HashSet<String>(childHandlers.keySet());
+	public void registerFirstChildUrlHandler(UrlHandler handler) {
+		handler.init();
+		childHandlers.addFirst(handler);
 	}
 
 	@Override
 	public void registerChildUrlHandler(UrlHandler handler) {
-		String mapping = handler.getPathMapping();
-		mapping = mapping.startsWith("/") ? mapping : ("/") + mapping;
-		//check if mapping exists
-		if (childHandlers.get(mapping) != null) {
-			throw new RuntimeException("Handler registration failed. Mapping already exists. " + mapping);
-		} else {
-			handler.init();
-			childHandlers.put(mapping, handler);
-		}
+		handler.init();
+		childHandlers.add(handler);
 	}
 
 	@Override
 	public void removeChildUrlHandler(UrlHandler handler) {
-		String mapping = handler.getPathMapping();
-		mapping = mapping.startsWith("/") ? mapping : ("/") + mapping;
-		//check if mapping exists
-		if (childHandlers.get(mapping) != null) {
-			childHandlers.remove(mapping);
+		if (childHandlers.contains(handler)) {
+			childHandlers.remove(handler);
 			handler.destroy();
-		} else {
-			throw new RuntimeException("Handler can not be removed. Mapping " + mapping + " not registered.");
 		}
 	}
 
@@ -155,8 +143,17 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 	public long getLastModified(HttpServletRequest req) {
 		return -1;
 	}
-	
-	public WebswingUser getUser(){
+
+	public WebswingUser getUser() {
 		return SecurityUtil.getUser(this);
 	}
+
+	//	@SuppressWarnings("unchecked")
+	//	public <T> T findParent(Class<T> clazz) {
+	//		if (parent == null || clazz.isAssignableFrom(parent.getClass())) {
+	//			return (T) parent;
+	//		} else {
+	//			return parent.findParent(clazz);
+	//		}
+	//	}
 }

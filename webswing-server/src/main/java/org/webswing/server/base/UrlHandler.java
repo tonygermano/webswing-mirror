@@ -15,6 +15,8 @@ public interface UrlHandler {
 
 	boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException;
 
+	void registerFirstChildUrlHandler(UrlHandler handler);
+
 	void registerChildUrlHandler(UrlHandler handler);
 
 	void removeChildUrlHandler(UrlHandler Handler);
@@ -30,4 +32,6 @@ public interface UrlHandler {
 	String getSecuredPath();
 
 	WebswingUser getUser();
+
+
 }

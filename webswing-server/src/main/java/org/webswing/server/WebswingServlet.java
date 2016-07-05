@@ -3,6 +3,8 @@ package org.webswing.server;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +15,8 @@ import org.webswing.server.services.startup.StartupService;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+@WebServlet(asyncSupported = true, displayName = "WebswingServlet", urlPatterns = { "/*" })
+@MultipartConfig(fileSizeThreshold = 5242880)
 public class WebswingServlet extends HttpServlet {
 	private static final long serialVersionUID = 1962501775857788874L;
 

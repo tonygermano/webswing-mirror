@@ -10,7 +10,9 @@ import org.webswing.server.services.swingprocess.SwingProcessService;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public class SwingInstanceServiceImpl implements SwingInstanceService {
 
 	private final JvmConnectionService connectionService;

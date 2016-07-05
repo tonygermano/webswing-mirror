@@ -1,7 +1,5 @@
 package org.webswing.server.services.security.modules.property;
 
-import java.util.Map;
-
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -16,6 +14,7 @@ public class PropertySecurityModule extends AbstractSecurityModule {
 	private PropertiesRealm realm;
 
 	public PropertySecurityModule(PropertySecurityModuleConfig config) {
+		super(config);
 		realm = new PropertiesRealm();
 		StrSubstitutor configSubstitutor = ServerUtil.getConfigSubstitutor();
 		String fileName = config.getFile();

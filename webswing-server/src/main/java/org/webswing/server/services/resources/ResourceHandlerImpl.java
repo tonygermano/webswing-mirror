@@ -18,8 +18,11 @@ import org.webswing.server.util.ServerUtil;
 
 public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceHandler {
 
-	public ResourceHandlerImpl(UrlHandler parent) {
+	private String overlayPath;
+
+	public ResourceHandlerImpl(UrlHandler parent, String overlayPath) {
 		super(parent);
+		this.overlayPath = overlayPath;
 	}
 
 	@Override
@@ -31,11 +34,11 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		try {
 			if (req.getMethod().equals("GET") || req.getMethod().equals("PUT")) {
-				lookup(req).respondGet(res);
+				return lookup(req).respondGet(res);
 			} else if (req.getMethod().equals("HEAD")) {
-				lookup(req).respondHead(res);
+				return lookup(req).respondHead(res);
 			}
-			return true;
+			return false;
 		} catch (IOException e) {
 			throw new WsException("Failed to process resource.", e);
 		}
@@ -114,10 +117,10 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 	}
 
 	protected LookupResult lookup(HttpServletRequest req) {
-		LookupResult r = (LookupResult) req.getAttribute("lookupResult");
+		LookupResult r = (LookupResult) req.getAttribute("lookupResult-" + getFullPathMapping());
 		if (r == null) {
 			r = lookupNoCache(req);
-			req.setAttribute("lookupResult", r);
+			req.setAttribute("lookupResult-" + getFullPathMapping(), r);
 		}
 		return r;
 	}
@@ -178,6 +181,14 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 	protected String getMimeType(String path) {
 		String mime = getServletContext().getMimeType(path);
 		return mime != null ? mime : "application/octet-stream";
+	}
+
+	public String getOverlayPath() {
+		return overlayPath;
+	}
+
+	public void setOverlayPath(String overlayPath) {
+		this.overlayPath = overlayPath;
 	}
 
 }
