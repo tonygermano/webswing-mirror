@@ -1,8 +1,8 @@
 package org.webswing.server.services.rest;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
@@ -50,13 +50,16 @@ public abstract class AbstractRestUrlHandler extends AbstractUrlHandler {
 				Object result;
 				try {
 					result = method.invoke(this, args);
+				} catch (InvocationTargetException e1) {
+					result = e1.getTargetException();
 				} catch (Exception e) {
 					result = e;
 				}
 				try {
-					writeResponse(method, res, result);
-				} catch (IOException e) {
-					log.error("Failed to send REST response.", e);
+					writeResponse(method, req, res, result);
+					return true;
+				} catch (WsException e) {
+					throw e;
 				}
 			}
 			return false;
@@ -114,7 +117,7 @@ public abstract class AbstractRestUrlHandler extends AbstractUrlHandler {
 			} else {
 				try {
 					String content = IOUtils.toString(req.getReader());
-					mapper.readValue(content, params[i].getClass());
+					result[i] = mapper.readValue(content, params[i].getType());
 				} catch (IOException e) {
 					result[i] = null;
 				}
@@ -123,22 +126,27 @@ public abstract class AbstractRestUrlHandler extends AbstractUrlHandler {
 		return result;
 	}
 
-	private void writeResponse(Method method, HttpServletResponse res, Object result) throws IOException {
+	private void writeResponse(Method method, HttpServletRequest req, HttpServletResponse res, Object result) throws WsException {
 		if (result != null && result instanceof Throwable) {
-			log.error("Invocation of REST method failed.", (Throwable) result);
 			if (result instanceof WsException) {
-				WsException e = (WsException) result;
-				res.sendError(e.getReponseCode(), e.getMessage());
+				throw (WsException) result;
 			} else {
-				res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				log.error("Invocation of REST method failed.", (Throwable) result);
+				throw new WsException("Invocation of REST method failed.", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		} else {
 			res.setStatus(HttpServletResponse.SC_OK);
 			if (!method.getReturnType().equals(Void.TYPE) && result != null) {
-				if (method.getReturnType().equals(String.class)) {
-					new PrintStream(res.getOutputStream()).print(result.toString());
+				try {
+					if (method.getReturnType().equals(String.class)) {
+						IOUtils.write(result.toString(), res.getOutputStream());
+					} else {
+						mapper.writerWithDefaultPrettyPrinter().writeValue(res.getOutputStream(), result);
+					}
+				} catch (Exception e) {
+					log.error("Failed to serialize REST execution result." + req.getRequestURI(), e);
+					throw new WsException("Serializing of REST result failed.", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				}
-				mapper.writerWithDefaultPrettyPrinter().writeValue(res.getOutputStream(), result);
 			}
 		}
 	}

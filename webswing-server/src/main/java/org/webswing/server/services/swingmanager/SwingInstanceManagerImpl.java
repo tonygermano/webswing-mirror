@@ -18,6 +18,7 @@ import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.files.FileTransferHandlerService;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.rest.RestHandlerService;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
@@ -27,7 +28,6 @@ import org.webswing.server.services.swinginstance.SwingInstanceService;
 import org.webswing.server.services.websocket.SwingWebSocketMessageListener;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
-import org.webswing.server.util.ServerUtil;
 
 public class SwingInstanceManagerImpl extends AbstractUrlHandler implements SwingInstanceManager, WebswingSecurityProvider {
 	private static final Logger log = LoggerFactory.getLogger(SwingInstanceManagerImpl.class);
@@ -67,7 +67,7 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 		registerChildUrlHandler(restService.createServerRestHandler(this));
 		registerChildUrlHandler(restService.createSessionRestHandler(this, this));
 
-		registerChildUrlHandler(loginService.createLoginHandler(this, this));
+		registerChildUrlHandler(loginService.createLoginHandler(this, getSecurityProvider()));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
 		registerChildUrlHandler(fileHandler = fileService.create(this));
 		registerChildUrlHandler(resourceService.create(this, config.getWebFolder()));
@@ -127,7 +127,7 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 	public void connectSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h) {
 		SwingInstance swingInstance = swingInstances.findByInstanceId(h, r);
 		if (swingInstance == null) {// start new swing app
-			if (ServerUtil.isUserAuthorized(r, config, h)) {
+			if (r.hasPermission(WebswingAction.websocket_startSwingApplication)) {
 				if (!h.isMirrored()) {
 					if (!reachedMaxConnections()) {
 						try {
@@ -137,20 +137,20 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 							log.error("Failed to create Swing instance.", e);
 						}
 					} else {
-						ServerUtil.broadcastMessage(r, SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
+						r.broadcastMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
 					}
 				} else {
-					ServerUtil.broadcastMessage(r, SimpleEventMsgOut.configurationError.buildMsgOut());
+					r.broadcastMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
 				}
 			} else {
-				log.error("Authorization error: User " + ServerUtil.getUserName(r) + " is not authorized to connect to application " + config.getName() + (h.isMirrored() ? " [Mirrored view only available for admin role]" : ""));
+				log.error("Authorization error: User " + r.getUser() + " is not authorized to connect to application " + config.getName() + (h.isMirrored() ? " [Mirrored view only available for admin role]" : ""));
 			}
 		} else {
 			if (h.isMirrored()) {// connect as mirror viewer
-				if (ServerUtil.isUserAuthorized(r, swingInstance.getAppConfig(), h)) {
+				if (r.hasPermission(WebswingAction.websocket_startMirrorView)) {
 					swingInstance.connectMirroredWebSession(r);
 				} else {
-					log.error("Authorization error: User " + ServerUtil.getUserName(r) + " is not authorized. [Mirrored view only available for admin role]");
+					log.error("Authorization error: User " + r.getUser() + " is not authorized. [Mirrored view only available for admin role]");
 				}
 			} else {// continue old session?
 				if (h.getSessionId() != null && h.getSessionId().equals(swingInstance.getSessionId())) {
@@ -202,6 +202,11 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 	@Override
 	public List<SwingInstance> getAllInstances() {
 		return swingInstances.getAllInstances();
+	}
+
+	@Override
+	public List<SwingInstance> getAllClosedInstances() {
+		return closedInstances.getAllInstances();
 	}
 
 	@Override

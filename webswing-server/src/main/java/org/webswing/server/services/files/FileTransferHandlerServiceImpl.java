@@ -8,6 +8,6 @@ import com.google.inject.Singleton;
 public class FileTransferHandlerServiceImpl implements FileTransferHandlerService {
 
 	public FileTransferHandler create(SwingInstanceManager manager) {
-		return new FileServlet(manager);
+		return new FileTransferHandlerImpl(manager);
 	}
 }

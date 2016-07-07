@@ -8,12 +8,13 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.text.PropertiesRealm;
 import org.webswing.server.services.security.api.WebswingUser;
 
-public class ShiroWebswingUser implements WebswingUser {
+public class ShiroWebswingUser extends WebswingUser {
 
 	private AuthorizingRealm authzrealm;
 	private AuthenticationInfo authtInfo;
 
 	public ShiroWebswingUser(PropertiesRealm authzrealm, AuthenticationInfo authtInfo) {
+		super();
 		this.authzrealm = authzrealm;
 		this.authtInfo = authtInfo;
 	}
@@ -29,8 +30,8 @@ public class ShiroWebswingUser implements WebswingUser {
 	}
 
 	@Override
-	public boolean isPermitted(String permission) {
-		return authzrealm.isPermitted(authtInfo.getPrincipals(), permission);
+	protected boolean hasRole(String role) {
+		return authzrealm.hasRole(this.authtInfo.getPrincipals(), role);
 	}
 
 }

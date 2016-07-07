@@ -5,8 +5,11 @@ import java.io.Serializable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.atmosphere.cpr.AtmosphereResource;
+import org.webswing.model.MsgOut;
 import org.webswing.server.base.UrlHandler;
+import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.services.security.SecurityManagerService;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingUser;
 import org.webswing.server.util.SecurityUtil;
 
@@ -56,8 +59,20 @@ public class WebSocketConnection {
 		}
 	}
 
+	public void broadcastMessage(EncodedMessage o) {
+		broadcast(isBinary() ? o.getProtoMessage() : o.getJsonMessage());
+	}
+
+	public void broadcastMessage(MsgOut o) {
+		broadcastMessage(new EncodedMessage(o));
+	}
+
 	public UrlHandler getHandler() {
 		return handler;
+	}
+
+	public boolean hasPermission(WebswingAction action) {
+		return getUser().isPermitted(action);
 	}
 
 }

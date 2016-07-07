@@ -9,7 +9,7 @@
             };
 
             function getSessions() {
-                return $http.get(baseUrl + '/rest/admin/sessions').then(success, failed);
+                return $http.get(baseUrl + '/rest/session').then(success, failed);
                 function success(data) {
                     return data.data;
                 }
@@ -19,7 +19,7 @@
             }
 
             function getSession(id) {
-                return $http.get(baseUrl + '/rest/admin/session/' + id).then(success, failed);
+                return $http.get(baseUrl + '/rest/session/' + id).then(success, failed);
                 function success(data) {
                     return data.data;
                 }
@@ -29,7 +29,7 @@
             }
 
             function forceKillSession(id) {
-                return $http.delete(baseUrl + '/rest/admin/session/' + id +'?force=true').then(success, failed);
+                return $http.delete(baseUrl + '/rest/session/' + id +'?force=true').then(success, failed);
                 function success(data) {
                     messageService.info('Swing application process has been forcefully terminated.');
                 }
@@ -39,7 +39,7 @@
             }
             
             function killSession(id) {
-                return $http.delete(baseUrl + '/rest/admin/session/' + id ).then(success, failed);
+                return $http.delete(baseUrl + '/rest/session/' + id ).then(success, failed);
                 function success(data) {
                     messageService.info('Swing application signalled to exit.');
                 }

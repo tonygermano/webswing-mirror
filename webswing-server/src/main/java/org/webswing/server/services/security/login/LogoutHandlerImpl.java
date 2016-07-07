@@ -7,7 +7,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
@@ -15,6 +18,7 @@ import org.webswing.server.services.security.WebswingTokenAdapter;
 import org.webswing.server.services.security.api.WebswingUser;
 
 public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandler {
+	private static final Logger log = LoggerFactory.getLogger(LogoutHandlerImpl.class);
 
 	public LogoutHandlerImpl(UrlHandler parent) {
 		super(parent);
@@ -31,16 +35,22 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 			logout(req, res);
 			return true;
 		} catch (Exception e) {
+			log.error("Failed to logout", e);
 			throw new WsException("Failed to logout", e);
 		}
 	}
 
 	protected void logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		WebswingUser user = getUser();
-		if (user != null) {
+		if (user != null && user != WebswingUser.anonymUser) {
 			Subject subject = SecurityUtils.getSubject();
-			subject.login(new WebswingTokenAdapter(getSecuredPath(), user, null));
+			try {
+				//logout only user for the secured path (in case other users are logged in the same session)
+				subject.login(new WebswingTokenAdapter(getSecuredPath(), user, null));
+			} catch (AuthenticationException e) {
+				//there was no user left in the session, so we can do full log out.
+				subject.logout();
+			}
 		}
-
 	}
 }

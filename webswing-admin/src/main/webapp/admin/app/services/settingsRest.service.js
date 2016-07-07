@@ -6,7 +6,7 @@
             };
 
             function getSettings() {
-                return $http.get(baseUrl + '/rest/admin/settings').then(success, failed);
+                return $http.get(baseUrl + '/rest/settings').then(success, failed);
                 function success(data) {
                     return data.data;
                 }

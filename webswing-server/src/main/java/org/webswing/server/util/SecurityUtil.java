@@ -31,7 +31,7 @@ public class SecurityUtil {
 				}
 			}
 		}
-		return WebswingUser.anonym;
+		return WebswingUser.anonymUser;
 	}
 
 }

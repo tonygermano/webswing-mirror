@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.shiro.SecurityUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +30,13 @@ import org.webswing.Constants;
 import org.webswing.model.c2s.UploadEventMsgIn;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.websocket.SwingWebSocketMessageListener;
 import org.webswing.server.util.ServerUtil;
 
-public class FileServlet extends AbstractUrlHandler implements FileTransferHandler {
+public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileTransferHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(SwingWebSocketMessageListener.class);
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
@@ -45,7 +45,7 @@ public class FileServlet extends AbstractUrlHandler implements FileTransferHandl
 	private Map<String, FileDescriptor> fileMap = new ConcurrentHashMap<String, FileDescriptor>();
 	private ScheduledExecutorService validatorService = Executors.newSingleThreadScheduledExecutor();
 
-	public FileServlet(SwingInstanceManager parent) {
+	public FileTransferHandlerImpl(SwingInstanceManager parent) {
 		super(parent);
 		this.manager = parent;
 	}
@@ -66,21 +66,24 @@ public class FileServlet extends AbstractUrlHandler implements FileTransferHandl
 				return true;
 			}
 		} catch (Exception e) {
+			log.error("FileTransfer failed.",e);
 			throw new WsException("Failed to process file transfer " + req.getMethod(), e);
 		}
 		return false;
 	}
 
-	private void handleDownload(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void handleDownload(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, WsException {
 		String fileId = request.getParameter("id");
-		String userId = (String) SecurityUtils.getSubject().getPrincipal();
+		String userId = getUser().getUserId();
 
+		checkPermission(WebswingAction.file_download);
+		
 		if (!fileMap.containsKey(fileId) || fileMap.get(fileId).file == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
 			return;
 		}
 
-		if (userId == null || !userId.equals(fileMap.get(fileId).userId)) {
+		if (!userId.equals(fileMap.get(fileId).userId)) {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN); // 403.
 			return;
 		}
@@ -127,7 +130,9 @@ public class FileServlet extends AbstractUrlHandler implements FileTransferHandl
 		}
 	}
 
-	private void handleUpload(HttpServletRequest request, HttpServletResponse resp) throws ServletException, IOException {
+	private void handleUpload(HttpServletRequest request, HttpServletResponse resp) throws ServletException, IOException, WsException {
+		checkPermission(WebswingAction.file_upload);
+
 		try {
 			String clientId = request.getParameter("clientId");
 			if (clientId != null) {

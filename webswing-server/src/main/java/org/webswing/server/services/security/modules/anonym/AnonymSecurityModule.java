@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.api.WebswingCredentials;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
@@ -23,16 +24,17 @@ public class AnonymSecurityModule implements WebswingSecurityModule<WebswingCred
 	public WebswingCredentials getCredentials(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException e) {
 		return new WebswingCredentials() {
 
-			@Override
-			public boolean matchCredentials(WebswingCredentials other) {
-				return true;
-			}
 		};
 	}
 
 	@Override
 	public WebswingUser getUser(WebswingCredentials token) throws WebswingAuthenticationException {
-		return WebswingUser.anonym;
+		return new WebswingUser.AnonymWebswingUser() {
+			@Override
+			public boolean isPermitted(WebswingAction permission) {
+				return true;
+			}
+		};
 	}
 
 	@Override

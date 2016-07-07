@@ -9,7 +9,7 @@
             };
 
             function getConfig() {
-                return $http.get(baseUrl + '/rest/admin/config').then(success, failed);
+                return $http.get(baseUrl + '/rest/config').then(success, failed);
                 function success(data) {
                     return data.data;
                 }
@@ -18,7 +18,7 @@
                 }
             }
             function setConfig(config) {
-                return $http.post(baseUrl + '/rest/admin/config', config).then(success, failed);
+                return $http.post(baseUrl + '/rest/config', config).then(success, failed);
                 function success() {
                     messageService.success('Configuration saved.');
                 }
@@ -27,7 +27,7 @@
                 }
             }
             function getVariables() {
-                return $http.get(baseUrl + '/rest/admin/config/variables', {cache: true}).then(success, failed);
+                return $http.get(baseUrl + '/rest/config/variables', {cache: true}).then(success, failed);
                 function success(data) {
                     return data.data;
                 }
@@ -36,7 +36,7 @@
                 }
             }
             function getDefault(type) {
-                return $http.get(baseUrl + '/rest/admin/config/default/' + type, {cache: true}).then(success, failed);
+                return $http.get(baseUrl + '/rest/config/default/' + type, {cache: true}).then(success, failed);
                 function success(data) {
                     return data.data;
                 }

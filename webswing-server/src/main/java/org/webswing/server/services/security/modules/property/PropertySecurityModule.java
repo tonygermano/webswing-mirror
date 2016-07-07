@@ -19,7 +19,7 @@ public class PropertySecurityModule extends AbstractSecurityModule {
 		StrSubstitutor configSubstitutor = ServerUtil.getConfigSubstitutor();
 		String fileName = config.getFile();
 
-		realm.setResourcePath(fileName == null ? "users.properties" : configSubstitutor.replace(fileName));
+		realm.setResourcePath(configSubstitutor.replace(fileName == null ? "${user.dir}/user.properties" : fileName));
 		realm.onInit();
 	}
 

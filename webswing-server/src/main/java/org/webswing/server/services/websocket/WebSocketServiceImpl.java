@@ -16,7 +16,6 @@ import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
-import org.atmosphere.interceptor.ShiroInterceptor;
 import org.atmosphere.interceptor.SuspendTrackerInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,14 +85,14 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	@Override
 	public void registerBinaryWebSocketListener(String mapping, WebSocketMessageListener listener) {
 		AtmosphereHandler h = new WebSocketAtmosphereHandler(listener);
-		Class<?>[] interceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class };
+		Class<?>[] interceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, SuspendTrackerInterceptor.class };
 		framework.addAtmosphereHandler(mapping, h, instantiate(interceptors));
 	}
 
 	@Override
 	public void registerJsonWebSocketListener(String mapping, WebSocketMessageListener listener) {
 		AtmosphereHandler h = new WebSocketAtmosphereHandler(listener);
-		Class<?>[] interceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, TrackMessageSizeInterceptor.class, SuspendTrackerInterceptor.class, ShiroInterceptor.class };
+		Class<?>[] interceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, TrackMessageSizeInterceptor.class, SuspendTrackerInterceptor.class };
 		framework.addAtmosphereHandler(mapping, h, instantiate(interceptors));
 	}
 

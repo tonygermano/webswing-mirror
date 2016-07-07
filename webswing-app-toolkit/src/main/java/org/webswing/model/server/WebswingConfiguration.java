@@ -59,5 +59,5 @@ public class WebswingConfiguration implements Serializable {
 	public void setMasterWebFolder(String masterWebFolder) {
 		this.masterWebFolder = masterWebFolder;
 	}
-
+	
 }

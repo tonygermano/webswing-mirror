@@ -8,7 +8,9 @@ import java.util.Map;
 
 public abstract class SwingDescriptor implements Serializable {
 	public enum SessionMode {
-		ALWAYS_NEW_SESSION, CONTINUE_FOR_BROWSER, CONTINUE_FOR_USER;
+		ALWAYS_NEW_SESSION,
+		CONTINUE_FOR_BROWSER,
+		CONTINUE_FOR_USER;
 	}
 
 	private static final long serialVersionUID = 2413651075803737060L;
@@ -41,6 +43,11 @@ public abstract class SwingDescriptor implements Serializable {
 	private SecurityMode securityMode = SecurityMode.INHERITED;
 	private Map<String, Object> securityConfig = new HashMap<String, Object>();
 	private String webFolder = null;
+
+	@Override
+	public String toString() {
+		return "'" + getName() + "'(" + getPath() + ")";
+	}
 
 	public String getPath() {
 		return path;

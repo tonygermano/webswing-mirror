@@ -46,11 +46,12 @@ public class WebswingServerModule extends AbstractModule {
 		bind(JvmConnectionService.class).to(JvmConnectionServiceImpl.class);
 		bind(SwingProcessService.class).to(SwingProcessServiceImpl.class);
 		bind(FileTransferHandlerService.class).to(FileTransferHandlerServiceImpl.class);
+		bind(ResourceHandlerService.class).to(ResourceHandlerServiceImpl.class);
+		bind(RestHandlerService.class).to(RestHandlerServiceImpl.class);
+
 		bind(SecurityManagerService.class).to(SecurityManagerServiceImpl.class);
 		bind(SecurityModuleService.class).to(SecurityModuleServiceImpl.class);
 		bind(LoginHandlerService.class).to(LoginHandlerServiceImpl.class);
-		bind(ResourceHandlerService.class).to(ResourceHandlerServiceImpl.class);
-		bind(RestHandlerService.class).to(RestHandlerServiceImpl.class);
 	}
 
 }

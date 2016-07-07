@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.startup.StartupService;
 
@@ -18,6 +20,8 @@ import com.google.inject.Injector;
 @WebServlet(asyncSupported = true, displayName = "WebswingServlet", urlPatterns = { "/*" })
 @MultipartConfig(fileSizeThreshold = 5242880)
 public class WebswingServlet extends HttpServlet {
+	private static final Logger log = LoggerFactory.getLogger(StartupService.class);
+
 	private static final long serialVersionUID = 1962501775857788874L;
 
 	private StartupService startup;
@@ -28,12 +32,17 @@ public class WebswingServlet extends HttpServlet {
 	public void init() throws ServletException {
 		Injector injector = Guice.createInjector(new WebswingServerModule());
 		this.securityManager = injector.getInstance(SecurityManagerService.class);
-		this.securityManager.start();
-		this.startup = injector.getInstance(StartupService.class);
-		this.startup.start();
-		this.handler = injector.getInstance(GlobalUrlHandler.class);
-		this.handler.setServletContext(getServletContext());
-		this.handler.init();
+		try {
+			this.securityManager.start();
+			this.startup = injector.getInstance(StartupService.class);
+			this.startup.start();
+			this.handler = injector.getInstance(GlobalUrlHandler.class);
+			this.handler.setServletContext(getServletContext());
+			this.handler.init();
+		} catch (Exception e) {
+			log.error("Initialization of Webswing failed. ", e);
+			destroy();
+		}
 	}
 
 	public void handleRequest(HttpServletRequest req, HttpServletResponse res) {
@@ -42,9 +51,15 @@ public class WebswingServlet extends HttpServlet {
 
 	@Override
 	public void destroy() {
-		handler.destroy();
-		this.startup.stop();
-		this.securityManager.stop();
+		if (this.handler != null) {
+			this.handler.destroy();
+		}
+		if (this.startup != null) {
+			this.startup.stop();
+		}
+		if (this.securityManager != null) {
+			this.securityManager.stop();
+		}
 	}
 
 	@Override

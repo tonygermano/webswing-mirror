@@ -27,28 +27,20 @@ public class StartupServiceImpl implements StartupService {
 	public StartupServiceImpl(JmsService jms, WebSocketService websocket, ConfigurationService config) {
 		this.jms = jms;
 		this.websocket = websocket;
-		this.config=config;
+		this.config = config;
 	}
 
 	public void start() {
-		try {
-			validateConfig();
-			jms.start();
-			websocket.start();
-			config.start();
-		} catch (Exception e) {
-			log.error("Services failed to start due to following error", e);
-		}
+		validateConfig();
+		jms.start();
+		websocket.start();
+		config.start();
 	}
 
 	public void stop() {
-		try {
-			config.stop();
-			websocket.stop();
-			jms.stop();
-		} catch (Exception e) {
-			log.error("Services failed to stop due to following error", e);
-		}
+		config.stop();
+		websocket.stop();
+		jms.stop();
 	}
 
 	private void validateConfig() {
@@ -66,9 +58,6 @@ public class StartupServiceImpl implements StartupService {
 
 			// verify config file and convert to URI
 			validatePropertyFilePath(Constants.CONFIG_FILE_PATH, Constants.DEFAULT_CONFIG_FILE_NAME);
-
-			// verify users file and convert to URI
-			validatePropertyFilePath(Constants.USER_FILE_PATH, Constants.DEFAULT_USER_FILE_NAME);
 
 		}
 	}

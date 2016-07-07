@@ -27,7 +27,6 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.apache.shiro.subject.Subject;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.slf4j.Logger;
@@ -40,7 +39,6 @@ import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.server.SwingDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
-import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
 import main.Main;
@@ -137,30 +135,6 @@ public class ServerUtil {
 		return app;
 	}
 
-	public static boolean isUserAuthorized(WebSocketConnection r, SwingDescriptor app, ConnectionHandshakeMsgIn h) {
-
-		// mirror view
-		if (h.isMirrored()) {
-			if (isUserinRole(r, Constants.ADMIN_ROLE)) {
-				return true;
-			}
-			return false;
-		}
-		// regular
-		return isUserAuthorizedForApplication(r, app);
-	}
-
-	public static boolean isUserAuthorizedForApplication(WebSocketConnection r, SwingDescriptor app) {
-		if (app.isAuthorization()) {
-			if (isUserinRole(r, app.getName()) || isUserinRole(r, Constants.ADMIN_ROLE)) {
-				return true;
-			}
-			return false;
-		} else {
-			return true;
-		}
-	}
-
 	private static byte[] loadImage(String icon) {
 		try {
 			if (icon == null) {
@@ -202,16 +176,6 @@ public class ServerUtil {
 		return null;
 	}
 
-	public static String getUserPropsFileName() {
-		String userFile = System.getProperty(Constants.USER_FILE_PATH);
-		if (userFile == null) {
-			String war = ServerUtil.getWarFileLocation();
-			userFile = war.substring(0, war.lastIndexOf("/") + 1) + Constants.DEFAULT_USER_FILE_NAME;
-			System.setProperty(userFile, Constants.USER_FILE_PATH);
-		}
-		return userFile;
-	}
-
 	public static String getWarFileLocation() {
 		String warFile = System.getProperty(Constants.WAR_FILE_LOCATION);
 		if (warFile == null) {
@@ -225,22 +189,6 @@ public class ServerUtil {
 			return locationString;
 		}
 		return warFile;
-	}
-
-	public static String getUserName(WebSocketConnection resource) {
-		Subject sub = (Subject) resource.getSecuritySubject();
-		if (sub != null) {
-			return sub.getPrincipal() + "";
-		}
-		return null;
-	}
-
-	public static boolean isUserinRole(WebSocketConnection resource, String role) {
-		Subject sub = (Subject) resource.getSecuritySubject();
-		if (sub != null) {
-			return sub.hasRole(role);
-		}
-		return false;
 	}
 
 	public static boolean isRecording(HttpServletRequest r) {
@@ -299,14 +247,6 @@ public class ServerUtil {
 		return new StrSubstitutor(getConfigSubstitutorMap(user, sessionId, clientIp, locale, customArgs));
 	}
 
-	public static void broadcastMessage(WebSocketConnection r, EncodedMessage o) {
-		r.broadcast(r.isBinary() ? o.getProtoMessage() : o.getJsonMessage());
-	}
-
-	public static void broadcastMessage(WebSocketConnection r, MsgOut o) {
-		broadcastMessage(r, new EncodedMessage(o));
-	}
-
 	public static boolean isFileLocked(File file) {
 		if (file.exists()) {
 			try {
@@ -332,7 +272,7 @@ public class ServerUtil {
 			case CONTINUE_FOR_BROWSER:
 				return h.getClientId();
 			case CONTINUE_FOR_USER:
-				return ServerUtil.getUserName(r);
+				return r.getUser().getUserId();
 			default:
 				return h.getClientId();
 			}

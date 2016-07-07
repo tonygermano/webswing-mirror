@@ -20,6 +20,7 @@ import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.EncodedMessage;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketMessageListener;
 import org.webswing.server.util.ServerUtil;
@@ -35,7 +36,7 @@ public class SessionRecordingPlaybackWebSocketMessgeListener implements WebSocke
 	public void onReady(WebSocketConnection r) {
 		AppFrameMsgOut appInfo = new AppFrameMsgOut();
 		List<ApplicationInfoMsg> apps = new ArrayList<ApplicationInfoMsg>();
-		if (ServerUtil.isUserinRole(r, Constants.ADMIN_ROLE)) {
+		if (r.hasPermission(WebswingAction.websocket_startRecordingPlayback)) {
 			String file = r.getRequest().getParameter("file");
 			File recordingFile = new File(file);
 			if (recordingFile.exists() && recordingFile.canRead()) {

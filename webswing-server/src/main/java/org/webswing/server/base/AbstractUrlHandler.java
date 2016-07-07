@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingUser;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
 import org.webswing.server.util.SecurityUtil;
@@ -140,6 +141,20 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 
 	}
 
+	public WebswingSecurityProvider getSecurityProvider() {
+		if (WebswingSecurityProvider.class.isAssignableFrom(this.getClass())) {
+			WebswingSecurityProvider provider = (WebswingSecurityProvider) this;
+			if (provider.get() != null) {
+				return provider;
+			}
+		}
+		if (parent == null) {
+			return (WebswingSecurityProvider) this;
+		} else {
+			return parent.getSecurityProvider();
+		}
+	}
+
 	public long getLastModified(HttpServletRequest req) {
 		return -1;
 	}
@@ -148,12 +163,15 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 		return SecurityUtil.getUser(this);
 	}
 
-	//	@SuppressWarnings("unchecked")
-	//	public <T> T findParent(Class<T> clazz) {
-	//		if (parent == null || clazz.isAssignableFrom(parent.getClass())) {
-	//			return (T) parent;
-	//		} else {
-	//			return parent.findParent(clazz);
-	//		}
-	//	}
+	@Override
+	public void checkPermission(WebswingAction action) throws WsException {
+		WebswingUser user = getUser();
+		if (user != null) {
+			if (user.isPermitted(action)) {
+				return;
+			}
+		}
+		throw new WsException("User '" + user + "' is not allowed to execute action '" + action + "'", HttpServletResponse.SC_UNAUTHORIZED);
+	}
+
 }

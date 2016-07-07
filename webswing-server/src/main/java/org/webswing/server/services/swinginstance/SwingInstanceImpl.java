@@ -40,6 +40,7 @@ import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.jvmconnection.JvmConnection;
 import org.webswing.server.services.jvmconnection.JvmConnectionService;
 import org.webswing.server.services.jvmconnection.JvmListener;
+import org.webswing.server.services.security.api.WebswingUser;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingprocess.ProcessExitListener;
 import org.webswing.server.services.swingprocess.SwingProcess;
@@ -68,7 +69,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private SessionRecorder sessionRecorder;
 	private String instanceId;
 	private String clientId;
-	private String user;
+	private WebswingUser user;
 	private String clientIp;
 	private WebSocketConnection resource;
 	private WebSocketConnection mirroredResource;
@@ -86,7 +87,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		this.resource = resource;
 		this.instanceId = ServerUtil.resolveInstanceIdForMode(resource, h, config);
 		this.application = config;
-		this.user = ServerUtil.getUserName(resource);
+		this.user = resource.getUser();
 		this.clientId = h.getClientId();
 		this.customArgs = ServerUtil.getCustomArgs(resource.getRequest());
 		this.debugPort = ServerUtil.getDebugPort(resource.getRequest());
@@ -105,7 +106,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		if (resource != null) {
 			if (this.resource != null && application.isAllowStealSession()) {
 				synchronized (this.resource) {
-					ServerUtil.broadcastMessage(this.resource, new EncodedMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut()));
+					this.resource.broadcastMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut());
 				}
 				this.resource = null;
 			}
@@ -140,7 +141,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		if (resource != null) {
 			if (this.mirroredResource != null) {
 				synchronized (this.mirroredResource) {
-					ServerUtil.broadcastMessage(this.mirroredResource, new EncodedMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut()));
+					this.mirroredResource.broadcastMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut());
 				}
 			}
 			this.mirroredResource = resource;
@@ -158,14 +159,14 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		}
 		if (resource != null) {
 			synchronized (resource) {
-				ServerUtil.broadcastMessage(resource, serialized);
+				resource.broadcastMessage(serialized);
 				int length = resource.isBinary() ? serialized.getProtoMessage().length : serialized.getJsonMessage().getBytes().length;
 				logOutboundData(length);
 			}
 		}
 		if (mirroredResource != null) {
 			synchronized (mirroredResource) {
-				ServerUtil.broadcastMessage(mirroredResource, serialized);
+				mirroredResource.broadcastMessage(serialized);
 			}
 		}
 	}
@@ -223,15 +224,19 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				latest.setHeapSize(s.getHeapSize());
 				latest.setHeapSizeUsed(s.getHeapSizeUsed());
 			} else if (o instanceof ExitMsgInternal) {
-				sendToWeb(SimpleEventMsgOut.shutDownNotification.buildMsgOut());
-				connection.close();
-				notifyExiting();
+				close();
 				ExitMsgInternal e = (ExitMsgInternal) o;
 				kill(e.getWaitForExit());
 			}
 		} else if (o instanceof MsgOut) {
 			sendToWeb((MsgOut) o);
 		}
+	}
+
+	private void close() {
+		sendToWeb(SimpleEventMsgOut.shutDownNotification.buildMsgOut());
+		connection.close();
+		notifyExiting();
 	}
 
 	public void notifyExiting() {
@@ -273,7 +278,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private SwingProcess start(SwingProcessService processService, final SwingDescriptor appConfig, final ConnectionHandshakeMsgIn handshake) throws Exception {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final StrSubstitutor subs = ServerUtil.getConfigSubstitutor(user, clientId, clientIp, handshake.getLocale(), customArgs);
+		final StrSubstitutor subs = ServerUtil.getConfigSubstitutor(user.getUserId(), clientId, clientIp, handshake.getLocale(), customArgs);
 		SwingProcess swing = null;
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
@@ -360,11 +365,11 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 				@Override
 				public void onClose() {
-					connection.close();
+					close();
 				}
 			});
 		} catch (Exception e1) {
-			connection.close();
+			close();
 			throw new Exception(e1);
 		}
 		return swing;
@@ -421,7 +426,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	public String getUser() {
-		return user;
+		return user.getUserId();
 	}
 
 	public Date getDisconnectedSince() {

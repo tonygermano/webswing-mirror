@@ -47,7 +47,7 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 	public static interface LookupResult {
 		public boolean respondGet(HttpServletResponse resp) throws IOException;
 
-		public boolean respondHead(HttpServletResponse resp);
+		public boolean respondHead(HttpServletResponse resp) throws IOException;
 
 		public long getLastModified();
 	}
@@ -71,6 +71,29 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 
 		public boolean respondHead(HttpServletResponse resp) {
 			return false;
+		}
+	}
+
+	public static class RedirectResult implements LookupResult {
+
+		private String path;
+
+		public RedirectResult(String path) {
+			this.path = path;
+		}
+
+		public long getLastModified() {
+			return -1;
+		}
+
+		public boolean respondGet(HttpServletResponse resp) throws IOException {
+			resp.sendRedirect(path);
+			return true;
+		}
+
+		public boolean respondHead(HttpServletResponse resp) throws IOException {
+			resp.sendRedirect(path);
+			return true;
 		}
 	}
 
@@ -127,6 +150,10 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 
 	protected LookupResult lookupNoCache(HttpServletRequest req) {
 		String path = getPathInfo(req);
+		return lookupNoCache(req, path);
+	}
+
+	protected LookupResult lookupNoCache(HttpServletRequest req, String path) {
 		if (path.equals("")) {
 			path = "/index.html";
 		}
@@ -149,7 +176,11 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 			// Try as an ordinary file
 			File f = new File(realpath);
 			if (!f.isFile())
-				return new ErrorResult(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+				if (req.getPathInfo().endsWith("/")) {
+					return lookupNoCache(req, path + "/index.html");
+				} else {
+					return new RedirectResult(path + "/");
+				}
 			else
 				return new StaticFile(f.lastModified(), mimeType, (int) f.length(), url);
 		} else {
@@ -158,7 +189,11 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 				final ZipEntry ze = ((JarURLConnection) url.openConnection()).getJarEntry();
 				if (ze != null) {
 					if (ze.isDirectory())
-						return new ErrorResult(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+						if (req.getPathInfo().endsWith("/")) {
+							return lookupNoCache(req, path + "/index.html");
+						} else {
+							return new RedirectResult(path + "/");
+						}
 					else
 						return new StaticFile(ze.getTime(), mimeType, (int) ze.getSize(), url);
 				} else

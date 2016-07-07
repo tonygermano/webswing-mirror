@@ -33,7 +33,7 @@ public class SwingWebSocketMessageListener implements WebSocketMessageListener {
 
 	public void onReady(final WebSocketConnection r) {
 		AppFrameMsgOut appInfo = new AppFrameMsgOut();
-		StrSubstitutor subs = ServerUtil.getConfigSubstitutor(ServerUtil.getUserName(r), null, ServerUtil.getClientIp(r), null, null);
+		StrSubstitutor subs = ServerUtil.getConfigSubstitutor(r.getUser().getUserId(), null, ServerUtil.getClientIp(r), null, null);
 		appInfo.setApplications(Arrays.asList(ServerUtil.toApplicationInfoMsg(manager.getConfiguration(), subs)));
 		appInfo.setSessionId(r.uuid());
 		EncodedMessage encoded = new EncodedMessage(appInfo);

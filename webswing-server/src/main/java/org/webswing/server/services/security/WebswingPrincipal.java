@@ -2,6 +2,7 @@ package org.webswing.server.services.security;
 
 import java.util.Map;
 
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingUser;
 
 public class WebswingPrincipal extends WebswingPermission {
@@ -21,7 +22,7 @@ public class WebswingPrincipal extends WebswingPermission {
 	}
 
 	public boolean isPermitted(String permission) {
-		return user.isPermitted(permission);
+		return user.isPermitted(WebswingAction.valueOf(permission));
 	}
 
 	public WebswingUser getUser() {

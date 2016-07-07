@@ -11,4 +11,6 @@ public interface SwingInstanceHolder {
 	SwingInstance findInstanceByClientId(String clientId);
 
 	List<SwingInstance> getAllInstances();
+
+	List<SwingInstance> getAllClosedInstances();
 }

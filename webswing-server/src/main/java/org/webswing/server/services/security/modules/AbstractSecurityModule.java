@@ -89,11 +89,6 @@ public abstract class AbstractSecurityModule implements WebswingSecurityModule<U
 		}
 
 		@Override
-		public boolean matchCredentials(WebswingCredentials other) {
-			return this.equals(other);
-		}
-
-		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;

@@ -3,6 +3,7 @@ package org.webswing.server;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.server.SecurityMode;
@@ -85,7 +88,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 		registerChildUrlHandler(restService.createServerRestHandler(this));
 		registerChildUrlHandler(restService.createConfigRestHandler(this));
 		registerChildUrlHandler(restService.createSessionRestHandler(this, this));
-		registerChildUrlHandler(loginService.createLoginHandler(this, this));
+		registerChildUrlHandler(loginService.createLoginHandler(this, getSecurityProvider()));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
 		registerChildUrlHandler(resourceService.create(this, config.getConfiguration().getMasterWebFolder()));
 
@@ -111,6 +114,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	}
 
 	private void reloadSecurityModule(WebswingConfiguration configuration) {
+		log.info("Reloading master security module.(" + configuration.getMasterSecurityMode() + ").");
 		if (securityModule != null) {
 			securityModule.destroy();
 		}
@@ -124,14 +128,15 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	}
 
 	public void reloadConfiguration(WebswingConfiguration newConfig) {
+		log.info("Reloading configured Swing applications.");
 		synchronized (instanceManagers) {
-			Set<String> installedPathsToRemove = instanceManagers.keySet();
+			Set<String> installedPathsToRemove = new HashSet<String>(instanceManagers.keySet());
 			for (SwingDescriptor swing : ServerUtil.getAllApps(newConfig)) {
 				String pathMapping = toPath(swing.getPath());
 				SwingInstanceManager childHandler = instanceManagers.get(pathMapping);
 				if (childHandler != null) {
 					SwingDescriptor oldConfig = childHandler.getConfiguration();
-					if (!oldConfig.equals(swing)) {
+					if (!EqualsBuilder.reflectionEquals(oldConfig, swing)) {
 						updateApplication(childHandler, swing);
 					}
 				} else {
@@ -148,6 +153,8 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 
 	public void installApplication(SwingDescriptor swing) {
 		try {
+			log.info("Installing application " + swing);
+			validateConfig(swing, true);
 			SwingInstanceManager app = appFactory.createApp(this, swing);
 			registerFirstChildUrlHandler(app);
 		} catch (Exception e) {
@@ -158,6 +165,8 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 
 	public void updateApplication(SwingInstanceManager oldApp, SwingDescriptor newConfig) {
 		try {
+			log.info("Updating application " + newConfig);
+			validateConfig(newConfig, false);
 			oldApp.setConfig(newConfig);
 		} catch (WsException e) {
 			log.error("Failed to reload application '" + newConfig.getName() + "' (" + newConfig.getPath() + ").", e);
@@ -167,11 +176,21 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 
 	public void uninstallApplication(SwingInstanceManager appToRemove) {
 		try {
+			log.info("Installing application " + appToRemove.getConfiguration());
 			appToRemove.destroy();
 			removeChildUrlHandler(appToRemove);
 		} catch (Exception e) {
 			log.error("Failed to uninstall application '" + appToRemove.getConfiguration().getName() + "' (" + appToRemove.getConfiguration().getPath() + ").", e);
 			//TODO: if running, add callback to uninstall when stopped
+		}
+	}
+
+	private void validateConfig(SwingDescriptor config, boolean installing) throws WsException {
+		if (StringUtils.isEmpty(config.getPath())) {
+			throw new WsException("Application path mapping must not be empty.");
+		}
+		if (installing && instanceManagers.containsKey(config.getPath())) {
+			throw new WsException("Application with the same path already installed.");
 		}
 	}
 
@@ -273,6 +292,17 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 		synchronized (instanceManagers) {
 			for (SwingInstanceManager im : instanceManagers.values()) {
 				result.addAll(im.getAllInstances());
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public List<SwingInstance> getAllClosedInstances() {
+		ArrayList<SwingInstance> result = new ArrayList<>();
+		synchronized (instanceManagers) {
+			for (SwingInstanceManager im : instanceManagers.values()) {
+				result.addAll(im.getAllClosedInstances());
 			}
 		}
 		return result;

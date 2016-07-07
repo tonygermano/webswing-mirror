@@ -47,7 +47,7 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 	protected void login(HttpServletRequest req, HttpServletResponse resp, WebswingAuthenticationException e) throws ServletException, IOException {
 
 		WebswingUser user = getUser();
-		if (user != null) {
+		if (user != null && user != WebswingUser.anonymUser) {
 			resp.setStatus(HttpServletResponse.SC_OK);
 			resp.getWriter().write(user.getUserId());
 		} else {
@@ -59,7 +59,7 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 						Subject subject = SecurityUtils.getSubject();
 						subject.login(new WebswingTokenAdapter(getSecuredPath(), resolvedUser, credentials));
 						user = getUser();
-						if (user != null) {
+						if (user != null && user != WebswingUser.anonymUser) {
 							resp.setStatus(HttpServletResponse.SC_OK);
 							resp.getWriter().write(user.getUserId());
 							return;

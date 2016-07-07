@@ -1,5 +1,7 @@
 package org.webswing.server.services.jms;
 
+import java.nio.channels.IllegalSelectorException;
+
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
@@ -27,12 +29,15 @@ public class JmsServiceImpl implements JmsService {
 			broker = startService();
 		} catch (Exception e) {
 			log.error("Failed to start JMS service.", e);
+			throw new IllegalStateException(e);
 		}
 	}
 
 	public void stop() {
 		try {
-			broker.stop();
+			if (broker != null) {
+				broker.stop();
+			}
 		} catch (Exception e) {
 			log.error("Failed to stop JMS service.", e);
 		}
