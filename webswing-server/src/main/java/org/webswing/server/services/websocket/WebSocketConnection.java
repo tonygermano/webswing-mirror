@@ -1,10 +1,13 @@
 package org.webswing.server.services.websocket;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.atmosphere.cpr.AtmosphereResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.model.MsgOut;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.EncodedMessage;
@@ -14,6 +17,7 @@ import org.webswing.server.services.security.api.WebswingUser;
 import org.webswing.server.util.SecurityUtil;
 
 public class WebSocketConnection {
+	private static final Logger log = LoggerFactory.getLogger(WebSocketConnection.class);
 
 	private AtmosphereResource resource;
 	private UrlHandler handler;
@@ -73,6 +77,14 @@ public class WebSocketConnection {
 
 	public boolean hasPermission(WebswingAction action) {
 		return getUser().isPermitted(action);
+	}
+
+	public void disconnect() {
+		try {
+			resource.close();
+		} catch (IOException e) {
+			log.error("Failed to close websocket connection " + resource.uuid());
+		}
 	}
 
 }

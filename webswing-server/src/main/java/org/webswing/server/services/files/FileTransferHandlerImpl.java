@@ -33,12 +33,11 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
-import org.webswing.server.services.websocket.SwingWebSocketMessageListener;
 import org.webswing.server.util.ServerUtil;
 
 public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileTransferHandler {
 
-	private static final Logger log = LoggerFactory.getLogger(SwingWebSocketMessageListener.class);
+	private static final Logger log = LoggerFactory.getLogger(FileTransferHandlerImpl.class);
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
 
 	private final SwingInstanceManager manager;

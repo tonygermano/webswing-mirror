@@ -40,6 +40,7 @@ import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.jvmconnection.JvmConnection;
 import org.webswing.server.services.jvmconnection.JvmConnectionService;
 import org.webswing.server.services.jvmconnection.JvmListener;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingUser;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingprocess.ProcessExitListener;
@@ -102,7 +103,29 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		this.sessionRecorder = ServerUtil.isRecording(resource.getRequest()) ? new SessionRecorder(this) : null;
 	}
 
-	public boolean connectPrimaryWebSession(WebSocketConnection resource) {
+	public void connectSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h) {
+		if (h.isMirrored()) {// connect as mirror viewer
+			if (r.hasPermission(WebswingAction.websocket_startMirrorView)) {
+				connectMirroredWebSession(r);
+			} else {
+				log.error("Authorization error: User " + r.getUser() + " is not authorized. [Mirrored view only available for admin role]");
+			}
+		} else {// continue old session?
+			if (h.getSessionId() != null && h.getSessionId().equals(getSessionId())) {
+				sendToSwing(r, h);
+			} else {
+				boolean result = connectPrimaryWebSession(r);
+				if (result) {
+					r.broadcast(SimpleEventMsgOut.continueOldSession.buildMsgOut());
+				} else {
+					r.broadcast(SimpleEventMsgOut.applicationAlreadyRunning.buildMsgOut());
+				}
+			}
+		}
+	}
+	
+	
+	private boolean connectPrimaryWebSession(WebSocketConnection resource) {
 		if (resource != null) {
 			if (this.resource != null && application.isAllowStealSession()) {
 				synchronized (this.resource) {
@@ -120,7 +143,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	}
 
-	public void disconnectPrimaryWebSession() {
+	private void disconnectPrimaryWebSession() {
 		if (this.resource != null) {
 			this.resource = null;
 			this.disconnectedSince = new Date();
@@ -137,7 +160,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		}
 	}
 
-	public void connectMirroredWebSession(WebSocketConnection resource) {
+	private void connectMirroredWebSession(WebSocketConnection resource) {
 		if (resource != null) {
 			if (this.mirroredResource != null) {
 				synchronized (this.mirroredResource) {
@@ -148,7 +171,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		}
 	}
 
-	public void disconnectMirroredWebSession() {
+	private void disconnectMirroredWebSession() {
 		this.mirroredResource = null;
 	}
 

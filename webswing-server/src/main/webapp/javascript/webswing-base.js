@@ -22,11 +22,11 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             hideDialog : 'dialog.hide',
             startingDialog : 'dialog.content.startingDialog',
             stoppedDialog : 'dialog.content.stoppedDialog',
+            unauthorizedAccess : 'dialog.content.unauthorizedAccess',
             applicationAlreadyRunning : 'dialog.content.applicationAlreadyRunning',
             sessionStolenNotification : 'dialog.content.sessionStolenNotification',
             tooManyClientsNotification : 'dialog.content.tooManyClientsNotification',
             continueOldSessionDialog : 'dialog.content.continueOldSessionDialog',
-            showSelector : 'selector.show',
             openFileDialog : 'files.open',
             closeFileDialog : 'files.close',
             openLink : 'files.link',
@@ -61,7 +61,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
         }
 
         function startMirrorView(clientId, appName) {
-            initialize(clientId, appName, null, true)
+            initialize(clientId, appName, true)
         }
 
         function initialize(clientId, name, isMirror) {
@@ -169,7 +169,12 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
                 api.playbackInfo(data);
             }
             if (data.applications != null && data.applications.length != 0) {
-                api.showSelector(data.applications);
+            	if (api.cfg.mirror) {
+            		startMirrorView(api.cfg.clientId, api.cfg.applicationName);
+                } else if( data.applications.length === 1){
+                	startApplication(data.applications[0].name, data.applications[0].alwaysRestart);
+                }
+            	return;
             }
             if (data.event != null && !api.cfg.recordingPlayback) {
                 if (data.event == "shutDownNotification") {
@@ -185,6 +190,9 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
                 }else if (data.event == "sessionStolenNotification") {
                 	api.cfg.canPaint = false;
                 	api.showDialog(api.sessionStolenNotification);
+                }else if (data.event == "unauthorizedAccess") {
+                	api.cfg.canPaint = false;
+                	api.showDialog(api.unauthorizedAccess);
                 }
                 return;
             }

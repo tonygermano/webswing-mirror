@@ -2,9 +2,14 @@ package org.webswing.server.services.swingmanager;
 
 import java.util.List;
 
+import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.server.SwingDescriptor;
+import org.webswing.server.base.UrlHandler;
 import org.webswing.server.services.swinginstance.SwingInstance;
+import org.webswing.server.services.websocket.WebSocketConnection;
 
-public interface SwingInstanceHolder {
+public interface SwingInstanceHolder extends UrlHandler {
+	SwingInstance findByInstanceId(ConnectionHandshakeMsgIn handshake, WebSocketConnection r);
 
 	SwingInstance findInstanceBySessionId(String uuid);
 
@@ -13,4 +18,7 @@ public interface SwingInstanceHolder {
 	List<SwingInstance> getAllInstances();
 
 	List<SwingInstance> getAllClosedInstances();
+	
+	List<SwingDescriptor> getAllConfiguredApps();
+
 }

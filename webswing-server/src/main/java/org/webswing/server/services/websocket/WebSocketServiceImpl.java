@@ -19,7 +19,9 @@ import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
 import org.atmosphere.interceptor.SuspendTrackerInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.server.base.UrlHandler;
 import org.webswing.server.base.WebswingService;
+import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 
 import com.google.inject.Singleton;
 
@@ -28,6 +30,8 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	private static final Logger log = LoggerFactory.getLogger(WebSocketService.class);
 
 	AtmosphereFramework framework = new AtmosphereFramework(false, false);
+	private static final Class<?>[] jsonInterceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, TrackMessageSizeInterceptor.class, SuspendTrackerInterceptor.class };
+	private static final Class<?>[] binaryInterceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, SuspendTrackerInterceptor.class };
 
 	public void start() {
 		/*
@@ -83,26 +87,25 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	}
 
 	@Override
-	public void registerBinaryWebSocketListener(String mapping, WebSocketMessageListener listener) {
-		AtmosphereHandler h = new WebSocketAtmosphereHandler(listener);
-		Class<?>[] interceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, SuspendTrackerInterceptor.class };
-		framework.addAtmosphereHandler(mapping, h, instantiate(interceptors));
+	public WebSocketUrlHandler createBinaryWebSocketHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
+		return createWebSocketListener(parent, "/async/swing-bin", instanceHolder, binaryInterceptors);
 	}
 
 	@Override
-	public void registerJsonWebSocketListener(String mapping, WebSocketMessageListener listener) {
-		AtmosphereHandler h = new WebSocketAtmosphereHandler(listener);
-		Class<?>[] interceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, TrackMessageSizeInterceptor.class, SuspendTrackerInterceptor.class };
-		framework.addAtmosphereHandler(mapping, h, instantiate(interceptors));
+	public WebSocketUrlHandler createJsonWebSocketHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
+		return createWebSocketListener(parent, "/async/swing", instanceHolder, jsonInterceptors);
+	}
+
+	private WebSocketUrlHandler createWebSocketListener(UrlHandler parent, String url, SwingInstanceHolder instanceHolder, Class<?>[] interceptors) {
+		WebSocketUrlHandlerImpl result = new WebSocketUrlHandlerImpl(parent, url, this, instanceHolder);
+		AtmosphereHandler h = new WebSocketAtmosphereHandler(result);
+		framework.addAtmosphereHandler(result.getFullPathMapping(), h, instantiate(interceptors));
+		return result;
 	}
 
 	@Override
 	public void removeListener(String mapping) {
 		framework.removeAtmosphereHandler(mapping);
-	}
-
-	public boolean canServe(String path) {
-		return framework.getAtmosphereHandlers().containsKey(path);
 	}
 
 	public void serve(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {

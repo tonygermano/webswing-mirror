@@ -20,12 +20,12 @@ public class RestHandlerServiceImpl implements RestHandlerService {
 
 	@Override
 	public AbstractRestUrlHandler createConfigRestHandler(UrlHandler parent) {
-		return new SwingConfigRestUrlHandler(parent, configService);
+		return new ConfigRestUrlHandler(parent, configService);
 	}
 
 	@Override
-	public AbstractRestUrlHandler createVersionRestHandler(UrlHandler parent) {
-		return new VersionRestUrlHandler(parent);
+	public AbstractRestUrlHandler createSwingRestHandler(UrlHandler parent,SwingInstanceHolder instanceHolder) {
+		return new SwingRestUrlHandler(parent,instanceHolder);
 	}
 
 	@Override

@@ -48,6 +48,7 @@ define(['jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 'te
                 },
                 applicationAlreadyRunning: retryMessageDialog('Application is already running in other browser window...'),
                 sessionStolenNotification: retryMessageDialog('Application was opened in other browser window. Session disconnected...'),
+                unauthorizedAccess: finalMessageDialog('Unauthorized access...'),
                 disconnectedDialog: retryMessageDialog('Disconnected...'),
                 connectionErrorDialog: retryMessageDialog('Connection error...'),
                 tooManyClientsNotification: retryMessageDialog('Too many connections. Please try again later...'),

@@ -17,11 +17,11 @@ import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.util.ServerUtil;
 
-public class SwingConfigRestUrlHandler extends AbstractRestUrlHandler {
+public class ConfigRestUrlHandler extends AbstractRestUrlHandler {
 
 	private final ConfigurationService configService;
 
-	public SwingConfigRestUrlHandler(UrlHandler parent, ConfigurationService configService) {
+	public ConfigRestUrlHandler(UrlHandler parent, ConfigurationService configService) {
 		super(parent);
 		this.configService = configService;
 	}

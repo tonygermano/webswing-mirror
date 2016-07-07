@@ -1,7 +1,5 @@
 package org.webswing.server.services.jms;
 
-import java.nio.channels.IllegalSelectorException;
-
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;

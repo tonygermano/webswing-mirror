@@ -37,6 +37,10 @@ public final class Webswing {
      * <code>sessionStolenNotification = 5;</code>
      */
     sessionStolenNotification(5, 5),
+    /**
+     * <code>unauthorizedAccess = 6;</code>
+     */
+    unauthorizedAccess(6, 6),
     ;
 
     /**
@@ -63,6 +67,10 @@ public final class Webswing {
      * <code>sessionStolenNotification = 5;</code>
      */
     public static final int sessionStolenNotification_VALUE = 5;
+    /**
+     * <code>unauthorizedAccess = 6;</code>
+     */
+    public static final int unauthorizedAccess_VALUE = 6;
 
 
     public final int getNumber() { return value; }
@@ -75,6 +83,7 @@ public final class Webswing {
         case 3: return continueOldSession;
         case 4: return configurationError;
         case 5: return sessionStolenNotification;
+        case 6: return unauthorizedAccess;
         default: return null;
       }
     }
@@ -27945,12 +27954,12 @@ public final class Webswing {
       "kCommandMsgInProto.PlaybackCommandProto\"" +
       "X\n\024PlaybackCommandProto\022\t\n\005reset\020\000\022\010\n\004pl" +
       "ay\020\001\022\010\n\004stop\020\002\022\010\n\004step\020\003\022\n\n\006step10\020\004\022\013\n\007" +
-      "step100\020\005*\300\001\n\026SimpleEventMsgOutProto\022\035\n\031" +
+      "step100\020\005*\330\001\n\026SimpleEventMsgOutProto\022\035\n\031" +
       "applicationAlreadyRunning\020\000\022\030\n\024shutDownN" +
       "otification\020\001\022\036\n\032tooManyClientsNotificat",
       "ion\020\002\022\026\n\022continueOldSession\020\003\022\026\n\022configu" +
       "rationError\020\004\022\035\n\031sessionStolenNotificati" +
-      "on\020\005"
+      "on\020\005\022\026\n\022unauthorizedAccess\020\006"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

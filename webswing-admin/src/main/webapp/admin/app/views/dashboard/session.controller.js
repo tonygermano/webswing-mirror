@@ -70,6 +70,7 @@
 
             function back() {
                 $location.path('/dashboard/overview');
+                $timeout.cancel(vm.timer);
             }
         }
         SessionController.$inject = ['baseUrl', '$scope', '$timeout', '$location', 'sessionsRestService', '$routeParams'];

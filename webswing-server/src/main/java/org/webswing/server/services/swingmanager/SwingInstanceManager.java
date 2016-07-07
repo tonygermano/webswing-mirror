@@ -13,8 +13,8 @@ public interface SwingInstanceManager extends SwingInstanceHolder, UrlHandler {
 
 	void setConfig(SwingDescriptor newConfig) throws WsException;
 
-	void connectSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn handshake);
-
 	void notifySwingClose(SwingInstance swingAppInstance);
+
+	void startSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h);
 
 }

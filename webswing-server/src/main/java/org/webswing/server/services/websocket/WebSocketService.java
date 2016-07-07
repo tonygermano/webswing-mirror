@@ -6,17 +6,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.webswing.server.base.UrlHandler;
 import org.webswing.server.base.WebswingService;
+import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 
 public interface WebSocketService extends WebswingService {
-	void registerBinaryWebSocketListener(String mapping, WebSocketMessageListener listener);
+	WebSocketUrlHandler createBinaryWebSocketHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
 
-	void registerJsonWebSocketListener(String mapping, WebSocketMessageListener listener);
+	WebSocketUrlHandler createJsonWebSocketHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
 
 	void removeListener(String mapping);
 
-	boolean canServe(String path);
-	
 	void serve(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException;
 
 }

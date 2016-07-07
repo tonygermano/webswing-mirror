@@ -7,10 +7,10 @@ public interface RestHandlerService {
 
 	AbstractRestUrlHandler createConfigRestHandler(UrlHandler parent);
 
-	AbstractRestUrlHandler createVersionRestHandler(UrlHandler parent);
-
 	AbstractRestUrlHandler createSessionRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
 
 	AbstractRestUrlHandler createServerRestHandler(UrlHandler parent);
+
+	AbstractRestUrlHandler createSwingRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
 
 }

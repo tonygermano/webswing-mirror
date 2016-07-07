@@ -7,6 +7,7 @@
     }
 	var baseUrl = document.location.origin + document.location.pathname;
 	baseUrl = baseUrl.indexOf("/", baseUrl.length - 1) !== -1 ? baseUrl : (baseUrl + "/");
+	baseUrl = baseUrl.indexOf("admin/", baseUrl.length - 6) === -1 ? baseUrl : (baseUrl.substring(0, baseUrl.length - 6));
     var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
     script.src = baseUrl + "javascript/require.js";
     tag.parentNode.insertBefore(script, tag);

@@ -100,7 +100,7 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
                     }
                     api.processMessage(data);
                 } catch (e) {
-                    console.error(e);
+                    console.error(e.stack);
                     return;
                 }
             };

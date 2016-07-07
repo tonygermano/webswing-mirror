@@ -41,7 +41,11 @@ public class SessionRestUrlHandler extends AbstractRestUrlHandler {
 			if (id.startsWith("/")) {
 				id = id.substring(1);
 			}
-			return instanceHolder.findInstanceByClientId(id);
+			SwingInstance instance = instanceHolder.findInstanceByClientId(id);
+			if (instance != null) {
+				return instance.toSwingSession();
+			}
+			return null;
 		}
 	}
 

@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.server.SecurityMode;
 import org.webswing.model.server.SwingDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
@@ -31,11 +32,12 @@ import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
 import org.webswing.server.services.security.modules.SecurityModuleService;
-import org.webswing.server.services.startup.StartupService;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingmanager.SwingInstanceManagerService;
+import org.webswing.server.services.websocket.WebSocketConnection;
+import org.webswing.server.services.websocket.WebSocketService;
 import org.webswing.server.util.ServerUtil;
 
 import com.google.inject.Inject;
@@ -43,8 +45,9 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanceHolder, WebswingSecurityProvider {
-	private static final Logger log = LoggerFactory.getLogger(StartupService.class);
+	private static final Logger log = LoggerFactory.getLogger(GlobalUrlHandler.class);
 
+	private final WebSocketService websocket;
 	private final ConfigurationService config;
 	private final SwingInstanceManagerService appFactory;
 	private final ResourceHandlerService resourceService;
@@ -60,8 +63,9 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	private ConfigurationChangeListener changeListener;
 
 	@Inject
-	public GlobalUrlHandler(ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, RestHandlerService restService, SecurityModuleService securityService, LoginHandlerService loginService) {
+	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, RestHandlerService restService, SecurityModuleService securityService, LoginHandlerService loginService) {
 		super(null);
+		this.websocket = websocket;
 		this.config = config;
 		this.appFactory = appFactory;
 		this.resourceService = resourceService;
@@ -84,7 +88,9 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	}
 
 	public void init() {
-		registerChildUrlHandler(restService.createVersionRestHandler(this));
+		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
+		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
+		registerChildUrlHandler(restService.createSwingRestHandler(this, this));
 		registerChildUrlHandler(restService.createServerRestHandler(this));
 		registerChildUrlHandler(restService.createConfigRestHandler(this));
 		registerChildUrlHandler(restService.createSessionRestHandler(this, this));
@@ -261,6 +267,19 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	}
 
 	@Override
+	public SwingInstance findByInstanceId(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
+		synchronized (instanceManagers) {
+			for (SwingInstanceManager im : instanceManagers.values()) {
+				SwingInstance instance;
+				if ((instance = im.findByInstanceId(handshake, r)) != null) {
+					return instance;
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public SwingInstance findInstanceBySessionId(String uuid) {
 		synchronized (instanceManagers) {
 			for (SwingInstanceManager im : instanceManagers.values()) {
@@ -306,6 +325,11 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 			}
 		}
 		return result;
+	}
+	
+	@Override
+	public List<SwingDescriptor> getAllConfiguredApps() {
+		return ServerUtil.getAllApps(config.getConfiguration());
 	}
 
 	@Override

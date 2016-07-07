@@ -12,8 +12,10 @@ public enum WebswingAction {
 	rest_getConfigVariables(Role.admin),
 	rest_getDefaultApplicationConfig(Role.admin),
 	rest_getDefaultAppletConfig(Role.admin),
+	rest_getApps(Role.authenticated),
 	rest_getVersion(Role.anonym),
 	//websocket
+	websocket_connect(Role.authenticated),
 	websocket_startRecordingPlayback(Role.admin),
 	websocket_startSwingApplication(Role.authenticated),
 	websocket_startMirrorView(Role.admin),

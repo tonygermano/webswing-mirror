@@ -1,6 +1,7 @@
 package org.webswing.server.services.swingmanager;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +26,6 @@ import org.webswing.server.services.security.login.WebswingSecurityProvider;
 import org.webswing.server.services.security.modules.SecurityModuleService;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swinginstance.SwingInstanceService;
-import org.webswing.server.services.websocket.SwingWebSocketMessageListener;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
 
@@ -52,6 +52,7 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 		this.securityModuleService = securityModuleService;
 		this.loginService = loginService;
 		this.fileService = fileService;
+		this.fileHandler = fileService.create(this);
 		this.resourceService = resourceService;
 		this.restService = restService;
 		this.config = config;
@@ -63,17 +64,18 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 		if (securityModule != null) {
 			securityModule.init();
 		}
-		registerChildUrlHandler(restService.createVersionRestHandler(this));
+		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
+		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
+
+		registerChildUrlHandler(restService.createSwingRestHandler(this, this));
 		registerChildUrlHandler(restService.createServerRestHandler(this));
 		registerChildUrlHandler(restService.createSessionRestHandler(this, this));
 
 		registerChildUrlHandler(loginService.createLoginHandler(this, getSecurityProvider()));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
-		registerChildUrlHandler(fileHandler = fileService.create(this));
+		registerChildUrlHandler(fileHandler);
 		registerChildUrlHandler(resourceService.create(this, config.getWebFolder()));
 
-		websocket.registerBinaryWebSocketListener(getFullPathMapping() + "/async/swing-bin", new SwingWebSocketMessageListener(this));
-		websocket.registerJsonWebSocketListener(getFullPathMapping() + "/async/swing", new SwingWebSocketMessageListener(this));
 		super.init();
 	}
 
@@ -83,8 +85,6 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 		if (securityModule != null) {
 			securityModule.destroy();
 		}
-		websocket.removeListener(getFullPathMapping() + "/async/swing-bin");
-		websocket.removeListener(getFullPathMapping() + "/async/swing");
 	}
 
 	@Override
@@ -96,13 +96,6 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 				res.sendRedirect(getPath() + "/" + queryString);
 			} catch (IOException e) {
 				log.error("Failed to redirect.", e);
-			}
-			return true;
-		} else if (websocket.canServe(req.getPathInfo())) {
-			try {
-				websocket.serve(req, res);
-			} catch (Exception e) {
-				throw new WsException("WebSocket failed.", e);
 			}
 			return true;
 		} else {
@@ -124,46 +117,24 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 		return config.getPath();
 	}
 
-	public void connectSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h) {
-		SwingInstance swingInstance = swingInstances.findByInstanceId(h, r);
-		if (swingInstance == null) {// start new swing app
-			if (r.hasPermission(WebswingAction.websocket_startSwingApplication)) {
-				if (!h.isMirrored()) {
-					if (!reachedMaxConnections()) {
-						try {
-							swingInstance = instanceFactory.create(this, fileHandler, h, config, r);
-							swingInstances.add(swingInstance);
-						} catch (Exception e) {
-							log.error("Failed to create Swing instance.", e);
-						}
-					} else {
-						r.broadcastMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
+	public void startSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h) {
+		if (r.hasPermission(WebswingAction.websocket_startSwingApplication)) {
+			if (!h.isMirrored()) {
+				if (!reachedMaxConnections()) {
+					try {
+						SwingInstance swingInstance = instanceFactory.create(this, fileHandler, h, config, r);
+						swingInstances.add(swingInstance);
+					} catch (Exception e) {
+						log.error("Failed to create Swing instance.", e);
 					}
 				} else {
-					r.broadcastMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
+					r.broadcastMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
 				}
 			} else {
-				log.error("Authorization error: User " + r.getUser() + " is not authorized to connect to application " + config.getName() + (h.isMirrored() ? " [Mirrored view only available for admin role]" : ""));
+				r.broadcastMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
 			}
 		} else {
-			if (h.isMirrored()) {// connect as mirror viewer
-				if (r.hasPermission(WebswingAction.websocket_startMirrorView)) {
-					swingInstance.connectMirroredWebSession(r);
-				} else {
-					log.error("Authorization error: User " + r.getUser() + " is not authorized. [Mirrored view only available for admin role]");
-				}
-			} else {// continue old session?
-				if (h.getSessionId() != null && h.getSessionId().equals(swingInstance.getSessionId())) {
-					swingInstance.sendToSwing(r, h);
-				} else {
-					boolean result = swingInstance.connectPrimaryWebSession(r);
-					if (result) {
-						r.broadcast(SimpleEventMsgOut.continueOldSession.buildMsgOut());
-					} else {
-						r.broadcast(SimpleEventMsgOut.applicationAlreadyRunning.buildMsgOut());
-					}
-				}
-			}
+			log.error("Authorization error: User " + r.getUser() + " is not authorized to connect to application " + config.getName() + (h.isMirrored() ? " [Mirrored view only available for admin role]" : ""));
 		}
 	}
 
@@ -200,6 +171,11 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 	}
 
 	@Override
+	public SwingInstance findByInstanceId(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
+		return swingInstances.findByInstanceId(handshake, r);
+	}
+
+	@Override
 	public List<SwingInstance> getAllInstances() {
 		return swingInstances.getAllInstances();
 	}
@@ -207,6 +183,11 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 	@Override
 	public List<SwingInstance> getAllClosedInstances() {
 		return closedInstances.getAllInstances();
+	}
+
+	@Override
+	public List<SwingDescriptor> getAllConfiguredApps() {
+		return Arrays.asList(config);
 	}
 
 	@Override
