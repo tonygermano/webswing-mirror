@@ -11,6 +11,7 @@
 		<tag>2.3-SNAPSHOT</tag>
 	</scm>
 	<modules>
+		<module>webswing-server-api</module>
 		<module>webswing-server</module>
 		<module>webswing-admin</module>
 		<module>webswing-server-launcher</module>

@@ -1,15 +1,14 @@
 package org.webswing.server.services.security.modules;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.text.StrSubstitutor;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.api.WebswingCredentials;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
@@ -21,7 +20,7 @@ public abstract class AbstractSecurityModule implements WebswingSecurityModule<U
 
 	public AbstractSecurityModule(WebswingSecurityModuleConfig config) {
 	}
-	
+
 	@Override
 	public void init() {
 	}
@@ -45,16 +44,34 @@ public abstract class AbstractSecurityModule implements WebswingSecurityModule<U
 		if ((username == null && password == null) || e != null) {
 			URL resource = this.getClass().getClassLoader().getResource(getLoginResource());
 			if (resource != null) {
-				String template = IOUtils.toString(resource.openStream());
-				Map<String, String> map = new HashMap<String, String>();
-				map.put("errorMessage", e == null ? "" : e.getLocalizedMessage());
-				StrSubstitutor subs = new StrSubstitutor(map);
-				response.getOutputStream().print(subs.replace(template));
+				String template = toString(resource.openStream(), 4 * 1024);
+				String errorMessage = e == null ? "" : e.getLocalizedMessage();
+				response.getOutputStream().print(template.replace("${errorMessage}",errorMessage));
 			}
 			return null;
 		} else {
 			return new UserPasswordCredentials(username, password);
 		}
+	}
+
+	public static String toString(final InputStream is, final int bufferSize) throws IOException {
+		final char[] buffer = new char[bufferSize];
+		final StringBuilder out = new StringBuilder();
+		Reader in = null;
+		try {
+			in = new InputStreamReader(is, "UTF-8");
+			for (;;) {
+				int rsz = in.read(buffer, 0, buffer.length);
+				if (rsz < 0)
+					break;
+				out.append(buffer, 0, rsz);
+			}
+		} finally {
+			if (in != null) {
+				in.close();
+			}
+		}
+		return out.toString();
 	}
 
 	@Override

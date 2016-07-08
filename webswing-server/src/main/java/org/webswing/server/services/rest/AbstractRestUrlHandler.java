@@ -69,17 +69,22 @@ public abstract class AbstractRestUrlHandler extends AbstractUrlHandler {
 
 	private Method findHandlerMethod(String httpMethod, String path2) {
 		Class<? extends Annotation> methodAnnotation = httpMethod2Annotation(httpMethod);
+		Method match = null;
+		int extent = path2.length();
 		for (Method method : this.getClass().getDeclaredMethods()) {
 			if (method.getAnnotation(methodAnnotation) != null) {
 				Path pathAnnotation;
 				if ((pathAnnotation = method.getAnnotation(Path.class)) != null) {
 					if (isSubPath(pathAnnotation.value(), path2)) {
-						return method;
+						if (path2.length() - pathAnnotation.value().length() < extent) {
+							match = method;
+							extent = path2.length() - pathAnnotation.value().length();
+						}
 					}
 				}
 			}
 		}
-		return null;
+		return match;
 	}
 
 	private static Class<? extends Annotation> httpMethod2Annotation(String httpMethod) {

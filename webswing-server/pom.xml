@@ -35,6 +35,11 @@
 		<!-- include in WEB-INF/lib -->
 		<dependency>
 			<groupId>org.webswing</groupId>
+			<artifactId>webswing-server-api</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webswing</groupId>
 			<artifactId>webswing-app-launcher</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -276,7 +281,7 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/server-lib</outputDirectory>
 							<includeArtifactIds>
-								webswing-app-toolkit,webswing-server-launcher,commons-cli,jetty-webapp,jetty-security,jetty-websocket,jetty-xml,jetty-servlet,jetty-server,jetty-continuation,jetty-http,jetty-io,jetty-util,javax.servlet,jetty-jmx
+								webswing-api,webswing-app-toolkit,webswing-server-launcher,commons-cli,jetty-webapp,jetty-security,jetty-websocket,jetty-xml,jetty-servlet,jetty-server,jetty-continuation,jetty-http,jetty-io,jetty-util,javax.servlet,jetty-jmx
 							</includeArtifactIds>
 						</configuration>
 					</execution>
@@ -289,7 +294,7 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/swing-lib</outputDirectory>
 							<includeArtifactIds>
-								webswing-app-interface,webswing-app-launcher,webswing-directdraw-swing,protobuf-java,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,commons-io,commons-lang,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging,freehep-graphicsio-pdf,freehep-graphics2d,freehep-graphicsbase,freehep-graphicsio,freehep-io,lz4,jackson-mapper-asl,jackson-core-asl
+								webswing-api,webswing-app-interface,webswing-app-launcher,webswing-directdraw-swing,protobuf-java,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,commons-io,commons-lang,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging,freehep-graphicsio-pdf,freehep-graphics2d,freehep-graphicsbase,freehep-graphicsio,freehep-io,lz4,jackson-mapper-asl,jackson-core-asl
 							</includeArtifactIds>
 						</configuration>
 					</execution>
