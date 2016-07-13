@@ -18,7 +18,10 @@ import org.webswing.server.services.security.modules.AbstractSecurityModule.User
 
 public abstract class AbstractSecurityModule implements WebswingSecurityModule<UserPasswordCredentials> {
 
+	private WebswingSecurityModuleConfig config;
+
 	public AbstractSecurityModule(WebswingSecurityModuleConfig config) {
+		this.config = config;
 	}
 
 	@Override
@@ -42,7 +45,7 @@ public abstract class AbstractSecurityModule implements WebswingSecurityModule<U
 		String username = getUserName(request);
 		String password = getPassword(request);
 		if ((username == null && password == null) || e != null) {
-			URL resource = this.getClass().getClassLoader().getResource(getLoginResource());
+			URL resource = config.getContext().getWebResource(getLoginResource());
 			if (resource != null) {
 				String template = toString(resource.openStream(), 4 * 1024);
 				String errorMessage = e == null ? "" : e.getLocalizedMessage();

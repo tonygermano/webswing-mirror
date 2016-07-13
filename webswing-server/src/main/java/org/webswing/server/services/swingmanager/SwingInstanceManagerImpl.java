@@ -1,6 +1,8 @@
 package org.webswing.server.services.swingmanager;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,6 +21,7 @@ import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.files.FileTransferHandlerService;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.rest.RestHandlerService;
+import org.webswing.server.services.security.api.SecurityContext;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.login.LoginHandlerService;
@@ -28,8 +31,9 @@ import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swinginstance.SwingInstanceService;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
+import org.webswing.server.util.ServerUtil;
 
-public class SwingInstanceManagerImpl extends AbstractUrlHandler implements SwingInstanceManager, WebswingSecurityProvider {
+public class SwingInstanceManagerImpl extends AbstractUrlHandler implements SecurityContext, SwingInstanceManager, WebswingSecurityProvider {
 	private static final Logger log = LoggerFactory.getLogger(SwingInstanceManagerImpl.class);
 
 	private final SwingInstanceService instanceFactory;
@@ -44,6 +48,7 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 	private SwingInstanceSet swingInstances = new SwingInstanceSet();
 	private SwingInstanceSet closedInstances = new SwingInstanceSet();
 	private WebswingSecurityModule<?> securityModule;
+	private File webFolder;
 
 	public SwingInstanceManagerImpl(SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileService, LoginHandlerService loginService, ResourceHandlerService resourceService, SecurityModuleService securityModuleService, RestHandlerService restService, UrlHandler parent, SwingDescriptor config) {
 		super(parent);
@@ -60,10 +65,7 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 
 	@Override
 	public void init() {
-		securityModule = securityModuleService.create(config.getSecurityMode(), config.getSecurityConfig());
-		if (securityModule != null) {
-			securityModule.init();
-		}
+		loadSecurityModule();
 		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
 		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
 
@@ -74,9 +76,16 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 		registerChildUrlHandler(loginService.createLoginHandler(this, getSecurityProvider()));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
 		registerChildUrlHandler(fileHandler);
-		registerChildUrlHandler(resourceService.create(this, config.getWebFolder()));
+		registerChildUrlHandler(resourceService.create(this, this));
 
 		super.init();
+	}
+
+	private void loadSecurityModule() {
+		securityModule = securityModuleService.create(this, config.getSecurityMode(), config.getSecurityConfig());
+		if (securityModule != null) {
+			securityModule.init();
+		}
 	}
 
 	@Override
@@ -110,6 +119,11 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 	@Override
 	public void setConfig(SwingDescriptor newConfig) throws WsException {
 		this.config = newConfig;
+		if (securityModule != null) {
+			securityModule.destroy();
+			loadSecurityModule();
+		}
+		webFolder = resolveFile(config.getWebFolder());
 	}
 
 	@Override
@@ -194,6 +208,16 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Swin
 	@SuppressWarnings("unchecked")
 	public WebswingSecurityModule<?> get() {
 		return securityModule;
+	}
+
+	@Override
+	public File resolveFile(String name) {
+		return ServerUtil.resolveFile(name, config.getHomeDir(), null);
+	}
+
+	@Override
+	public URL getWebResource(String resource) {
+		return ServerUtil.getWebResource(toPath(resource), getServletContext(), webFolder);
 	}
 
 }

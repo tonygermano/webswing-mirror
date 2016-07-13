@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
@@ -24,8 +25,10 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
@@ -39,6 +42,7 @@ import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.server.SwingDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
+import org.webswing.server.services.security.api.SecurityContext;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
 import main.Main;
@@ -114,23 +118,12 @@ public class ServerUtil {
 		ApplicationInfoMsg app = new ApplicationInfoMsg();
 		app.setName(swingDesc.getName());
 		app.setAlwaysRestart(swingDesc.getSwingSessionTimeout() == 0);
-		String icon = subs != null ? subs.replace(swingDesc.getIcon()) : swingDesc.getIcon();
-		String homeDir = subs != null ? subs.replace(swingDesc.getHomeDir()) : swingDesc.getHomeDir();
-		if (icon == null) {
+		app.setUrl(swingDesc.getPath());
+		File icon = resolveFile(swingDesc.getIcon(), swingDesc.getHomeDir(), subs);
+		if (icon == null || !icon.isFile()) {
 			app.setBase64Icon(loadImage(null));
 		} else {
-			if (new File(icon).isFile()) {
-				app.setBase64Icon(loadImage(icon));
-			} else {
-				if (new File(homeDir + File.separator + icon).isFile()) {
-					app.setBase64Icon(loadImage(homeDir + File.separator + icon));
-				} else if (new File(Main.getRootDir(), homeDir + File.separator + icon).isFile()) {
-					app.setBase64Icon(loadImage(new File(Main.getRootDir(), homeDir + File.separator + icon).getAbsolutePath()));
-				} else {
-					log.error("Icon loading failed. File " + icon + " or " + homeDir + File.separator + icon + " does not exist.");
-					app.setBase64Icon(loadImage(null));
-				}
-			}
+			app.setBase64Icon(loadImage(icon.getAbsolutePath()));
 		}
 		return app;
 	}
@@ -160,6 +153,28 @@ public class ServerUtil {
 			log.error("Failed to load image " + icon, e);
 			return null;
 		}
+	}
+
+	public static File resolveFile(String name, String homeDir, StrSubstitutor external) {
+		StrSubstitutor subs = external == null ? getConfigSubstitutor() : external;
+		if (name == null) {
+			return null;
+		}
+		name = subs.replace(name);
+		homeDir = subs.replace(homeDir);
+		File relativeToHomeInRoot = new File(Main.getRootDir(), homeDir + File.separator + name);
+		if (relativeToHomeInRoot.exists()) {
+			return relativeToHomeInRoot;
+		}
+		File relativeToHome = new File(homeDir + File.separator + name);
+		if (relativeToHome.exists()) {
+			return relativeToHome;
+		}
+		File absolute = new File(name);
+		if (absolute.exists()) {
+			return absolute;
+		}
+		return null;
 	}
 
 	private static byte[] getPngImage(BufferedImage imageContent) {
@@ -304,23 +319,26 @@ public class ServerUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T instantiateConfig(final Map<String, Object> config, final Class<T> clazz) {
+	public static <T> T instantiateConfig(final Map<String, Object> config, final Class<T> clazz, final SecurityContext context) {
 		if (config != null) {
 			return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[] { clazz }, new InvocationHandler() {
 
 				@Override
 				@SuppressWarnings("rawtypes")
 				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-					BeanInfo info = Introspector.getBeanInfo(clazz);
+					BeanInfo info = Introspector.getBeanInfo(method.getDeclaringClass());
 					PropertyDescriptor[] pds = info.getPropertyDescriptors();
 					for (PropertyDescriptor pd : pds) {
 						if (pd.getReadMethod().equals(method)) {
+							if (ClassUtils.isAssignable(SecurityContext.class, method.getReturnType(), false)) {
+								return context;
+							}
 							Object value = config.get(pd.getName());
 							if (value != null) {
-								if (method.getReturnType().isAssignableFrom(value.getClass())) {
+								if (ClassUtils.isAssignable(value.getClass(), method.getReturnType(), true)) {
 									return value;
 								} else if (value instanceof Map && method.getReturnType().isInterface()) {
-									return instantiateConfig((Map) value, method.getReturnType());
+									return instantiateConfig((Map) value, method.getReturnType(), context);
 								} else {
 									log.error("Invalid SecurityModule configuration. Type of " + clazz.getName() + "." + pd.getName() + " is not " + method.getReturnType());
 									return null;
@@ -340,5 +358,27 @@ public class ServerUtil {
 		all.addAll(config.getApplications());
 		all.addAll(config.getApplets());
 		return all;
+	}
+
+	public static URL getWebResource(String resource, ServletContext servletContext, File webFolder) {
+		URL result = null;
+		if (webFolder != null && webFolder.isDirectory()) {
+			File file = new File(webFolder, resource);
+			if (file.isFile()) {
+				try {
+					result = file.toURI().toURL();
+				} catch (MalformedURLException e) {
+					log.error("Failed to get file from webFolder.", e);
+				}
+			}
+		}
+		if (result == null) {
+			try {
+				result = servletContext.getResource(resource);
+			} catch (MalformedURLException e) {
+				log.error("Failed to get file from Web context path.", e);
+			}
+		}
+		return result;
 	}
 }

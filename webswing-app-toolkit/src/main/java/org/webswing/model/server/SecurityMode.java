@@ -1,5 +1,12 @@
 package org.webswing.model.server;
 
 public enum SecurityMode {
-	INHERITED, NONE, LDAP, ACTIVE_DIRECTORY, JDBC, PROPERTY_FILE, CUSTOM
+	INHERITED,
+	NONE,
+	PROPERTY_FILE,
+	JDBC,
+	LDAP,
+	ACTIVE_DIRECTORY,
+	SAML2,
+	CUSTOM
 }

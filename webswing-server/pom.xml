@@ -108,6 +108,11 @@
 			<artifactId>javax.ws.rs-api</artifactId>
 			<version>2.0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml</artifactId>
+			<version>2.6.4</version>
+		</dependency>
 		<!-- TO BE EXCLUDED FROM WEB-INF/lib -->
 
 		<dependency>
@@ -382,6 +387,21 @@
 								</goals>
 								<phase>package</phase>
 								<configuration>
+									<connectors>
+										<connector
+											implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+											<port>8080</port>
+											<maxIdleTime>60000</maxIdleTime>
+										</connector>
+										<connector implementation="org.eclipse.jetty.server.ssl.SslSocketConnector">
+											<port>8443</port>
+											<maxIdleTime>60000</maxIdleTime>
+											<keystore>${webswingRoot}/ssl/keystore.jks</keystore>
+											<truststore>${webswingRoot}/ssl/truststore.jks</truststore>
+											<password>123123</password>
+											<keyPassword>123123</keyPassword>
+										</connector>
+									</connectors>
 									<scanIntervalSeconds>5</scanIntervalSeconds>
 									<webApp>
 										<contextPath>/</contextPath>

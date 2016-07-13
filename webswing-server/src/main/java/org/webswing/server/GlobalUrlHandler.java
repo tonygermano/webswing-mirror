@@ -1,7 +1,9 @@
 package org.webswing.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -28,6 +30,7 @@ import org.webswing.server.services.config.ConfigurationChangeListener;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.rest.RestHandlerService;
+import org.webswing.server.services.security.api.SecurityContext;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
@@ -44,7 +47,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanceHolder, WebswingSecurityProvider {
+public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanceHolder, WebswingSecurityProvider, SecurityContext {
 	private static final Logger log = LoggerFactory.getLogger(GlobalUrlHandler.class);
 
 	private final WebSocketService websocket;
@@ -61,6 +64,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	private Map<String, SwingInstanceManager> instanceManagers = new LinkedHashMap<String, SwingInstanceManager>();
 
 	private ConfigurationChangeListener changeListener;
+	private File webFolder;
 
 	@Inject
 	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, RestHandlerService restService, SecurityModuleService securityService, LoginHandlerService loginService) {
@@ -96,7 +100,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 		registerChildUrlHandler(restService.createSessionRestHandler(this, this));
 		registerChildUrlHandler(loginService.createLoginHandler(this, getSecurityProvider()));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
-		registerChildUrlHandler(resourceService.create(this, config.getConfiguration().getMasterWebFolder()));
+		registerChildUrlHandler(resourceService.create(this, this));
 
 		reloadSecurityModule(config.getConfiguration());
 		reloadConfiguration(config.getConfiguration());
@@ -129,7 +133,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 			log.error("Master security mode INHERITED is not valid. Falling back to default mode PROPERTY_FILE.");
 			mode = SecurityMode.PROPERTY_FILE;
 		}
-		securityModule = securitySecurity.create(mode, configuration.getMasterSecurityConfig());
+		securityModule = securitySecurity.create(this, mode, configuration.getMasterSecurityConfig());
 		securityModule.init();
 	}
 
@@ -155,6 +159,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 				uninstallApplication(appToRemove);
 			}
 		}
+		webFolder = resolveFile(config.getConfiguration().getMasterWebFolder());
 	}
 
 	public void installApplication(SwingDescriptor swing) {
@@ -182,7 +187,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 
 	public void uninstallApplication(SwingInstanceManager appToRemove) {
 		try {
-			log.info("Installing application " + appToRemove.getConfiguration());
+			log.info("Removing application " + appToRemove.getConfiguration());
 			appToRemove.destroy();
 			removeChildUrlHandler(appToRemove);
 		} catch (Exception e) {
@@ -326,7 +331,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 		}
 		return result;
 	}
-	
+
 	@Override
 	public List<SwingDescriptor> getAllConfiguredApps() {
 		return ServerUtil.getAllApps(config.getConfiguration());
@@ -336,6 +341,16 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	@SuppressWarnings("unchecked")
 	public WebswingSecurityModule<?> get() {
 		return securityModule;
+	}
+
+	@Override
+	public File resolveFile(String name) {
+		return ServerUtil.resolveFile(name, ".", null);
+	}
+
+	@Override
+	public URL getWebResource(String resource) {
+		return ServerUtil.getWebResource(toPath(resource), getServletContext(), webFolder);
 	}
 
 }

@@ -5,6 +5,7 @@ import org.webswing.model.Msg;
 public class ApplicationInfoMsg implements Msg, Comparable<ApplicationInfoMsg> {
 	private static final long serialVersionUID = -7176092462203716782L;
 	private String name;
+	private String url;
 	private byte[] base64Icon;
 	private boolean alwaysRestart;
 
@@ -38,6 +39,14 @@ public class ApplicationInfoMsg implements Msg, Comparable<ApplicationInfoMsg> {
 
 	public boolean isAlwaysRestart() {
 		return alwaysRestart;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 }

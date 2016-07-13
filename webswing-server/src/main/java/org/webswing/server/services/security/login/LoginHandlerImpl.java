@@ -45,12 +45,9 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 	}
 
 	protected void login(HttpServletRequest req, HttpServletResponse resp, WebswingAuthenticationException e) throws ServletException, IOException {
-
+		boolean verify = req.getParameter("verify") != null;
 		WebswingUser user = getUser();
-		if (user != null && user != WebswingUser.anonymUser) {
-			resp.setStatus(HttpServletResponse.SC_OK);
-			resp.getWriter().write(user.getUserId());
-		} else {
+		if (!verify) {
 			WebswingCredentials credentials = securityProvider.get().getCredentials(req, resp, e);
 			if (credentials != null) {
 				try {
@@ -60,16 +57,25 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 						subject.login(new WebswingTokenAdapter(getSecuredPath(), resolvedUser, credentials));
 						user = getUser();
 						if (user != null && user != WebswingUser.anonymUser) {
-							resp.setStatus(HttpServletResponse.SC_OK);
-							resp.getWriter().write(user.getUserId());
+							String fullPath=getFullPathMapping();
+							resp.sendRedirect(fullPath.substring(0, fullPath.length() - getPath().length()));
 							return;
 						}
 					}
 				} catch (WebswingAuthenticationException ex) {
 					login(req, resp, ex);
+				} catch (Exception ux) {
+					log.error("Unexpected authentication error.", ux);
+					login(req, resp, new WebswingAuthenticationException("Unexpected authentication error.", ux));
 				}
 			}
-			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		} else {
+			if (user != null && user != WebswingUser.anonymUser) {
+				resp.setStatus(HttpServletResponse.SC_OK);
+				resp.setHeader("webswingUsername", user.getUserId());
+			} else {
+				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			}
 		}
 	}
 

@@ -10,7 +10,7 @@ public class WebswingConfiguration implements Serializable {
 
 	private static final long serialVersionUID = 7439369522912189703L;
 
-	private String masterWebFolder = "${user.dir}/www";
+	private String masterWebFolder = "www";
 
 	private SecurityMode masterSecurityMode = SecurityMode.PROPERTY_FILE;
 

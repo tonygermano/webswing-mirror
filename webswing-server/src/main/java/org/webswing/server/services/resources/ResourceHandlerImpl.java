@@ -14,15 +14,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.services.security.api.SecurityContext;
 import org.webswing.server.util.ServerUtil;
 
 public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceHandler {
 
-	private String overlayPath;
+	private SecurityContext context;
 
-	public ResourceHandlerImpl(UrlHandler parent, String overlayPath) {
+	public ResourceHandlerImpl(UrlHandler parent, SecurityContext context) {
 		super(parent);
-		this.overlayPath = overlayPath;
+		this.context = context;
 	}
 
 	@Override
@@ -160,18 +161,14 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 		if (isForbidden(path))
 			return new ErrorResult(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
 
-		final URL url;
-		try {
-			url = getServletContext().getResource(path);
-		} catch (MalformedURLException e) {
-			return new ErrorResult(HttpServletResponse.SC_BAD_REQUEST, "Malformed path");
-		}
-		if (url == null)
+		final URL url = context.getWebResource(path);
+		if (url == null) {
 			return new ErrorResult(HttpServletResponse.SC_NOT_FOUND, "Not found");
+		}
 
-		final String mimeType = getMimeType(path);
+		final String mimeType = getMimeType(url.getPath());
 
-		final String realpath = getServletContext().getRealPath(path);
+		final String realpath = url.getPath();
 		if (realpath != null) {
 			// Try as an ordinary file
 			File f = new File(realpath);
@@ -216,14 +213,6 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 	protected String getMimeType(String path) {
 		String mime = getServletContext().getMimeType(path);
 		return mime != null ? mime : "application/octet-stream";
-	}
-
-	public String getOverlayPath() {
-		return overlayPath;
-	}
-
-	public void setOverlayPath(String overlayPath) {
-		this.overlayPath = overlayPath;
 	}
 
 }

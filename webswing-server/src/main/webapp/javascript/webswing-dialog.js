@@ -138,6 +138,7 @@ define(['jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 'te
             }
             backdrop.show();
             dialog.slideDown('fast');
+            return content;
         }
 
         function hide() {

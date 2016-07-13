@@ -41,20 +41,41 @@ public class CustomSecurityModule implements WebswingSecurityModule<WebswingCred
 			URL[] urls = ClasspathUtil.populateClassPath(classpath.substring(0, classpath.length() - 1));
 			customCL = new URLClassLoader(urls, this.getClass().getClassLoader());
 			Class<?> moduleClass = customCL.loadClass(config.getClassName());
-			try {
-				Constructor<?> configConstructor = moduleClass.getConstructor();
-				custom = (WebswingSecurityModule<WebswingCredentials>) configConstructor.newInstance();
-			} catch (Exception e) {
-				try {
-					Constructor<?> configConstructor = moduleClass.getConstructor(WebswingSecurityModuleConfig.class);
-					Class<?> configClass = configConstructor.getParameterTypes()[0];
-					custom = (WebswingSecurityModule<WebswingCredentials>) configConstructor.newInstance(ServerUtil.instantiateConfig(config.getConfig(), configClass));
-				} catch (Exception e1) {
-					log.error("Could not construct custom security module class (using Default constructor).", e);
-					log.error("Could not construct custom security module class (using WebswingSecurityModuleConfig constructor).", e1);
+
+			Constructor<?> defaultConstructor = null;
+			Constructor<?> configConstructor = null;
+			for (Constructor<?> constructor : moduleClass.getConstructors()) {
+				Class<?>[] parameterTypes = constructor.getParameterTypes();
+				if (parameterTypes.length == 1) {
+					if (WebswingSecurityModuleConfig.class.isAssignableFrom(parameterTypes[0])) {
+						configConstructor = constructor;
+						break;
+					}
+				} else if (parameterTypes.length == 0) {
+					defaultConstructor = constructor;
 				}
 			}
-			custom.init();
+
+			if (configConstructor != null) {
+				Class<?> configClass = configConstructor.getParameterTypes()[0];
+				try {
+					custom = (WebswingSecurityModule<WebswingCredentials>) configConstructor.newInstance(ServerUtil.instantiateConfig(config.getConfig(), configClass, config.getContext()));
+				} catch (Exception e) {
+					log.error("Could not construct custom security module class (using WebswingSecurityModuleConfig constructor).", e);
+				}
+			}
+			if (custom == null && defaultConstructor != null) {
+				try {
+					custom = (WebswingSecurityModule<WebswingCredentials>) defaultConstructor.newInstance();
+				} catch (Exception e) {
+					log.error("Could not construct custom security module class (using Default constructor).", e);
+				}
+			}
+			if (custom != null) {
+				custom.init();
+			} else {
+				log.error("Custom security module class should define a default or WebswingSecurityModuleConfig constructor!");
+			}
 		} catch (Exception e) {
 			log.error("Failed to initialize custom security module. ", e);
 		}
@@ -63,7 +84,15 @@ public class CustomSecurityModule implements WebswingSecurityModule<WebswingCred
 	@Override
 	public WebswingCredentials getCredentials(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException e) throws ServletException, IOException {
 		if (custom != null) {
-			return custom.getCredentials(request, response, e);
+			ClassLoader original = Thread.currentThread().getContextClassLoader();
+			WebswingCredentials credentials;
+			try {
+				Thread.currentThread().setContextClassLoader(customCL);
+				credentials = custom.getCredentials(request, response, e);
+			} finally {
+				Thread.currentThread().setContextClassLoader(original);
+			}
+			return credentials;
 		}
 		return null;
 	}
@@ -71,7 +100,15 @@ public class CustomSecurityModule implements WebswingSecurityModule<WebswingCred
 	@Override
 	public WebswingUser getUser(WebswingCredentials credentials) throws WebswingAuthenticationException {
 		if (custom != null) {
-			return custom.getUser(credentials);
+			ClassLoader original = Thread.currentThread().getContextClassLoader();
+			WebswingUser user;
+			try {
+				Thread.currentThread().setContextClassLoader(customCL);
+				user = custom.getUser(credentials);
+			} finally {
+				Thread.currentThread().setContextClassLoader(original);
+			}
+			return user;
 		}
 		return null;
 	}
