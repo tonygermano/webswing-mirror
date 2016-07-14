@@ -153,6 +153,12 @@
                                   desc="If true, every file chooser dialog will be restricted to access only the home directory of current application." 
                                   value="vm.app.isolatedFs" >
                 </ws-boolean-field>
+                <ws-string-field readonly="{{vm.readonly}}"
+                                 label="Upload folder" 
+                                 desc="If Isolated Filesystem is enabled. This will be the folder on the server where the user can upload and download files from." 
+                                 value="vm.app.transferDir" 
+                                 variables="vm.variables">
+                </ws-string-field>
                 <ws-boolean-field readonly="{{vm.readonly}}"
                                   label="Download files" 
                                   desc="If selected, the JFileChooser integration will allow users to download files displayed in the file chooser dialog" 

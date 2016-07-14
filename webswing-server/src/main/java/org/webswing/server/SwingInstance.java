@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.atmosphere.cpr.AtmosphereResource;
@@ -222,6 +224,7 @@ public class SwingInstance implements WebSessionListener {
 			swing.setBaseDir(homeDir.getAbsolutePath());
 			swing.setMainClass(Main.class.getName());
 			swing.setClassPath(new File(URI.create(ServerUtil.getWarFileLocation())).getAbsolutePath());
+
 			String webSwingToolkitJarPath = getClassPathForClass(WebToolkit.class);
 			String webSwingToolkitJarPathSpecific;
 			String webToolkitClass;
@@ -258,23 +261,24 @@ public class SwingInstance implements WebSessionListener {
 			swing.addProperty(Constants.JMS_URL, JmsService.getUrl());
 
 			swing.addProperty(Constants.SWING_START_SYS_PROP_THEME, subs.replace(appConfig.getTheme()));
-			swing.addProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs() + "");
-			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload() + "");
-			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD, appConfig.isAllowAutoDownload() + "");
-			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload() + "");
-			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE, appConfig.isAllowDelete() + "");
-			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, appConfig.isAllowJsLink() + "");
+			swing.addProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs());
+			swing.addProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, subs.replace(appConfig.getTransferDir()));
+			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload());
+			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD, appConfig.isAllowAutoDownload());
+			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload());
+			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE, appConfig.isAllowDelete());
+			swing.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, appConfig.isAllowJsLink());
 
-			swing.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw() + "");
-			swing.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported() + "");
-			swing.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout() + "");
+			swing.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw());
+			swing.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported());
+			swing.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout());
 			swing.addProperty("awt.toolkit", webToolkitClass);
 			swing.addProperty("java.awt.headless", "false");
 			swing.addProperty("java.awt.graphicsenv", webGraphicsEnvClass);
 			swing.addProperty("java.awt.printerjob", "org.webswing.toolkit.WebPrinterJob");
-			swing.addProperty("sun.awt.fontconfig", ServerUtil.createFontConiguration(appConfig, subs));
-			swing.addProperty(Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth) + "");
-			swing.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight) + "");
+			swing.addProperty("sun.awt.fontconfig", ServerUtil.createFontConfiguration(appConfig, subs));
+			swing.addProperty(Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth));
+			swing.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight));
 
 			if (appConfig instanceof SwingApplicationDescriptor) {
 				SwingApplicationDescriptor application = (SwingApplicationDescriptor) appConfig;

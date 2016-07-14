@@ -3,7 +3,6 @@ package org.webswing.server.util;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -18,7 +17,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -34,7 +35,6 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.FrameworkConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.freehep.graphicsio.font.truetype.TTFFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -379,7 +379,7 @@ public class ServerUtil {
 	private static List<String> styles = Arrays.asList("bolditalic", "italic", "bold", "plain");
 	private static String defaultChargroup = SystemUtils.IS_OS_WINDOWS ? "alpbabet" : "latin-1";
 
-	public static String createFontConiguration(SwingDescriptor appConfig, StrSubstitutor subs) throws IOException {
+	public static String createFontConfiguration(SwingDescriptor appConfig, StrSubstitutor subs) throws IOException {
 		if (appConfig.getFontConfig() != null && appConfig.getFontConfig().size() > 0) {
 			StringBuilder fontConfig = new StringBuilder("version=1\n");
 			StringBuilder metadata = new StringBuilder();
@@ -392,9 +392,9 @@ public class ServerUtil {
 				for (String style : styles) {
 					String key = findFont(logicalFont, style, defaultFont, defaultMonospace, fonts);
 					File file = fonts.get(key);
-					String fullName= fontNames.get(file);
+					String fullName = fontNames.get(file);
 					fontConfig.append(logicalFont).append(".").append(style).append(".").append(defaultChargroup).append("=").append(fullName).append("\n");
-					//directDraw font to file mapping: 
+					//directDraw font to file mapping:
 					metadata.append("#@@").append(logicalFont).append(".").append(style).append("=").append(file.getAbsolutePath()).append("\n");
 				}
 			}
@@ -407,15 +407,15 @@ public class ServerUtil {
 			fontConfig.append("\n").append(metadata);
 
 			String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
-			File configfile = new File(URI.create(tempDir + URLEncoder.encode(subs.replace("fontconfig-${clientId}.properties"),"UTF-8")));
+			File configfile = new File(URI.create(tempDir + URLEncoder.encode(subs.replace("fontconfig-${clientId}.properties"), "UTF-8")));
 			FileUtils.writeStringToFile(configfile, fontConfig.toString());
- 
+
 			return configfile.getAbsolutePath();
 		} else {
 			return null;
 		}
 	}
-	
+
 	private static String findFont(String logicalFont, String style, String defaultFont, String defaultMonospace, Map<String, File> fonts) {
 		if (fonts.containsKey(logicalFont + " " + style)) {//check if exact font defined
 			return logicalFont + " " + style;
@@ -445,17 +445,17 @@ public class ServerUtil {
 		}
 		return result;
 	}
-	
+
 	@SuppressWarnings("restriction")
 	private static Map<File, String> resolveFontNames(Set<File> fontFiles) {
-		Map<File,String> result = new HashMap<File,String>();
+		Map<File, String> result = new HashMap<File, String>();
 		for (File file : fontFiles) {
 			try {
-				sun.font.TrueTypeFont ttfFile= new sun.font.TrueTypeFont(file.getAbsolutePath(),null,0,false);
-				String name=ttfFile.getFullName();
+				sun.font.TrueTypeFont ttfFile = new sun.font.TrueTypeFont(file.getAbsolutePath(), null, 0, false);
+				String name = ttfFile.getFullName();
 				result.put(file, name);
 			} catch (Exception e) {
-				throw new RuntimeException("Loading TTF font " + file + " failed .",e);
+				throw new RuntimeException("Loading TTF font " + file + " failed .", e);
 			}
 		}
 		return result;

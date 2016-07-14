@@ -7,22 +7,25 @@ import java.util.List;
 import java.util.Map;
 
 public class SwingDescriptor implements Serializable {
+
 	public enum SessionMode {
-		ALWAYS_NEW_SESSION, CONTINUE_FOR_BROWSER, CONTINUE_FOR_USER;
+		ALWAYS_NEW_SESSION,
+		CONTINUE_FOR_BROWSER,
+		CONTINUE_FOR_USER;
 	}
 
 	private static final long serialVersionUID = 2413651075803737060L;
 	private String name;
 	private String icon;
-	private String jreExecutable="${java.home}/bin/java"; 
-	private String javaVersion="${java.version}";
+	private String jreExecutable = "${java.home}/bin/java";
+	private String javaVersion = "${java.version}";
 	private String vmArgs = "";
 	private List<String> classPathEntries = new ArrayList<String>();
 	private String homeDir = "${user.dir}";
 	private String theme = "Murrine";
 	private Map<String, String> fontConfig = new HashMap<String, String>();
 	private int maxClients = 1;
-	private SessionMode sessionMode=SessionMode.CONTINUE_FOR_BROWSER;
+	private SessionMode sessionMode = SessionMode.CONTINUE_FOR_BROWSER;
 	private int swingSessionTimeout = 300;
 	private boolean allowStealSession = true;
 	private boolean antiAliasText = true;
@@ -30,12 +33,13 @@ public class SwingDescriptor implements Serializable {
 	private boolean isolatedFs = false;
 	private boolean debug = false;
 	private boolean authentication = true;
-	private boolean directdraw = false;
+	private boolean directdraw = true;
 	private boolean allowDelete = true;
 	private boolean allowDownload = true;
-	private boolean allowAutoDownload =true;
+	private boolean allowAutoDownload = true;
 	private boolean allowUpload = true;
-	private float uploadMaxSize = 5; 
+	private float uploadMaxSize = 5;
+	private String transferDir = "${user.dir}/${user}/upload";
 	private boolean allowJsLink = true;
 
 	public String getName() {
@@ -112,7 +116,7 @@ public class SwingDescriptor implements Serializable {
 	public void setSwingSessionTimeout(int swingSessionTimeout) {
 		this.swingSessionTimeout = swingSessionTimeout;
 	}
-	
+
 	public boolean isAuthorization() {
 		return authorization;
 	}
@@ -241,6 +245,13 @@ public class SwingDescriptor implements Serializable {
 		this.uploadMaxSize = uploadMaxSize;
 	}
 
+	public String getTransferDir() {
+		return transferDir;
+	}
+
+	public void setTransferDir(String transferDir) {
+		this.transferDir = transferDir;
+	}
 
 	public Map<String, String> getFontConfig() {
 		return fontConfig;
@@ -249,4 +260,5 @@ public class SwingDescriptor implements Serializable {
 	public void setFontConfig(Map<String, String> fontConfig) {
 		this.fontConfig = fontConfig;
 	}
+
 }

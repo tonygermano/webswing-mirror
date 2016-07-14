@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -43,7 +44,7 @@ public class SwingProcess {
 	private CloseListener closeListener;
 	private boolean destroying;
 	private ScheduledFuture<?> delayedTermination;
-	private boolean forceKilled=false;
+	private boolean forceKilled = false;
 
 	public SwingProcess(String name) {
 		super();
@@ -111,7 +112,7 @@ public class SwingProcess {
 	}
 
 	public void destroy(int delayMs) {
-		if (delayMs > 0 && delayedTermination==null) {
+		if (delayMs > 0 && delayedTermination == null) {
 			log.info("Waiting " + delayMs + "ms for swing process " + name + " to end.");
 			delayedTermination = processHandlerThread.schedule(new Runnable() {
 				@Override
@@ -122,7 +123,7 @@ public class SwingProcess {
 		} else if (!destroying) {
 			destroying = true;
 			try {
-				if(delayedTermination!=null){
+				if (delayedTermination != null) {
 					delayedTermination.cancel(false);
 				}
 				destroyInternal();
@@ -145,7 +146,7 @@ public class SwingProcess {
 		if (isRunning()) {
 			log.info("Killing Swing process " + name + ".");
 			process.destroy();
-			forceKilled=true;
+			forceKilled = true;
 		}
 	}
 
@@ -172,8 +173,13 @@ public class SwingProcess {
 			translateAndAdd(cmd, jvmArgs, "jvmArgs");
 		}
 		if (properties.size() > 0) {
-			for (String name : properties.keySet()) {
-				cmd.add("-D" + name + "=" + properties.get(name));
+			for (Entry<String, String> entry : properties.entrySet()) {
+				String property = "-D" + entry.getKey();
+				String value = entry.getValue();
+				if (value != null && !value.isEmpty()) {
+					property += "=" + value;
+				}
+				cmd.add(property);
 			}
 		}
 		if (classPath != null) {
@@ -201,14 +207,14 @@ public class SwingProcess {
 
 	/**
 	 * Copy of method from Apache Ant - Commandline class. Crack a command line.
-	 * 
+	 *
 	 * @param toProcess
 	 *            the command line to process.
 	 * @return the command line broken into strings. An empty or null toProcess
 	 *         parameter results in a zero sized array.
-	 * @throws Exception
+	 * @throws IllegalArgumentException if the line could not be tokenized in to strings
 	 */
-	public static String[] translateCommandline(String toProcess) throws Exception {
+	public static String[] translateCommandline(String toProcess) throws IllegalArgumentException {
 		if (toProcess == null || toProcess.length() == 0) {
 			// no command? no string
 			return new String[0];
@@ -264,7 +270,7 @@ public class SwingProcess {
 			result.add(current.toString());
 		}
 		if (state == inQuote || state == inDoubleQuote) {
-			throw new Exception("unbalanced quotes in " + toProcess);
+			throw new IllegalArgumentException("Unbalanced quotes in " + toProcess);
 		}
 		return result.toArray(new String[result.size()]);
 	}
@@ -343,6 +349,18 @@ public class SwingProcess {
 		return properties;
 	}
 
+	public void addProperty(String name) {
+		this.properties.put(name, null);
+	}
+
+	public void addProperty(String name, boolean value) {
+		addProperty(name, Boolean.toString(value));
+	}
+
+	public void addProperty(String name, int value) {
+		addProperty(name, Integer.toString(value));
+	}
+
 	public void addProperty(String name, String value) {
 		if (value == null) {
 			this.properties.remove(name);
@@ -366,11 +384,10 @@ public class SwingProcess {
 	public void setCloseListener(CloseListener closeListener) {
 		this.closeListener = closeListener;
 	}
-	
+
 	public boolean isForceKilled() {
 		return forceKilled;
 	}
-
 
 	public interface CloseListener {
 		void onClose();

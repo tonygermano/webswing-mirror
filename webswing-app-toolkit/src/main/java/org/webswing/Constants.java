@@ -13,6 +13,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_MAIN_CLASS = "webswing.mainClass";
 	public static final String SWING_START_SYS_PROP_CLASS_PATH = "webswing.classPath";
 	public static final String SWING_START_SYS_PROP_ISOLATED_FS = "webswing.isolatedFs";
+	public static final String SWING_START_SYS_PROP_TRANSFER_DIR = "webswing.transfer.dir";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW = "webswing.directdraw";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED = "webswing.directdraw.supported";
 	public static final String SWING_START_SYS_PROP_ALLOW_DOWNLOAD = "webswing.allowDownload";
@@ -77,6 +78,5 @@ public interface Constants {
 	// admin console constants
 	public static final String ADMIN_ROLE = "admin";
 	public static final String ADMIN_CONSOLE_APP_NAME = "adminConsoleApplicationName";
-
 
 }
