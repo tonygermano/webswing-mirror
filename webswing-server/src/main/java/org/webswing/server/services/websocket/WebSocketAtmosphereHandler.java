@@ -77,7 +77,7 @@ class WebSocketAtmosphereHandler implements AtmosphereHandler {
 			resource.addEventListener(new OnSuspend() {
 				@Override
 				public void onSuspend(AtmosphereResourceEvent event) {
-					onReady(event.getResource());
+					WebSocketAtmosphereHandler.this.onReady(event.getResource());
 					resource.removeEventListener(this);
 				}
 			});
@@ -85,7 +85,6 @@ class WebSocketAtmosphereHandler implements AtmosphereHandler {
 			resource.addEventListener(new OnResume() {
 				@Override
 				public void onResume(AtmosphereResourceEvent event) {
-					onResume(event);
 					resource.removeEventListener(this);
 				}
 			});
@@ -93,7 +92,7 @@ class WebSocketAtmosphereHandler implements AtmosphereHandler {
 			resource.addEventListener(new OnClose() {
 				@Override
 				public void onClose(AtmosphereResourceEvent event) {
-					onDisconnect(event);
+					WebSocketAtmosphereHandler.this.onDisconnect(event);
 				}
 			});
 		}

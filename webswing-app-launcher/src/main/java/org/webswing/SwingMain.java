@@ -17,7 +17,8 @@ import org.webswing.toolkit.util.Services;
 public class SwingMain {
 
 	public static ClassLoader swingLibClassLoader;
-
+	public static ClassLoader securityClassLoader;
+	
 	public static void main(String[] args) {
 		try {
 			URL[] urls = ClasspathUtil.populateClassPath(System.getProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH));

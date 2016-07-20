@@ -65,6 +65,7 @@ public class WebEventDispatcher {
 
 	//these keycodes are assigned to different keys in browser  
 	private static final List<Integer> nonStandardKeyCodes = Arrays.asList(KeyEvent.VK_KP_DOWN, KeyEvent.VK_KP_UP, KeyEvent.VK_KP_RIGHT, KeyEvent.VK_KP_LEFT);
+	protected static final String WebswingApiImpl = null;
 
 	public void dispatchEvent(final MsgIn event) {
 		Logger.debug("WebEventDispatcher.dispatchEvent:", event);
@@ -72,54 +73,58 @@ public class WebEventDispatcher {
 
 			@Override
 			public void run() {
-				if (event instanceof MouseEventMsgIn) {
-					dispatchMouseEvent((MouseEventMsgIn) event);
-				}
-				if (event instanceof KeyboardEventMsgIn) {
-					dispatchKeyboardEvent((KeyboardEventMsgIn) event);
-				}
-				if (event instanceof ConnectionHandshakeMsgIn) {
-					final ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
-					Util.getWebToolkit().initSize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
-					if (System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null) {
-						// resize and refresh the applet object exposed in javascript in case of page reload/session continue
-						Applet a = (Applet) WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
-						a.resize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
-						JSObject root = new WebJSObject(new JSObjectMsg("instanceObject"));
-						root.setMember("applet", a);
+				try {
+					if (event instanceof MouseEventMsgIn) {
+						dispatchMouseEvent((MouseEventMsgIn) event);
 					}
-				}
-				if (event instanceof SimpleEventMsgIn) {
-					SimpleEventMsgIn msg = (SimpleEventMsgIn) event;
-					dispatchMessage(msg);
-				}
-				if (event instanceof PasteEventMsgIn) {
-					PasteEventMsgIn paste = (PasteEventMsgIn) event;
-					handlePasteEvent(paste);
-				}
-				if (event instanceof CopyEventMsgIn) {
-					CopyEventMsgIn copy = (CopyEventMsgIn) event;
-					handleCopyEvent(copy);
-				}
-				if (event instanceof UploadedEventMsgIn) {
-					handleUploadedEvent((UploadedEventMsgIn) event);
-				}
-				if (event instanceof UploadEventMsgIn) {
-					UploadEventMsgIn upload = (UploadEventMsgIn) event;
-					JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
-					if (dialog != null) {
-						File currentDir = dialog.getCurrentDirectory();
-						File tempFile = new File(upload.getTempFileLocation());
-						String validfilename = Util.resolveFilename(currentDir, upload.getFileName());
-						if (currentDir.canWrite() && tempFile.exists()) {
-							try {
-								Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
-								uploadMap.put(upload.getFileName(), validfilename);
-							} catch (IOException e) {
-								Logger.error("Error while moving uploaded file to target folder: ", e);
+					if (event instanceof KeyboardEventMsgIn) {
+						dispatchKeyboardEvent((KeyboardEventMsgIn) event);
+					}
+					if (event instanceof ConnectionHandshakeMsgIn) {
+						final ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
+						Util.getWebToolkit().initSize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
+						if (System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null) {
+							// resize and refresh the applet object exposed in javascript in case of page reload/session continue
+							Applet a = (Applet) WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
+							a.resize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
+							JSObject root = new WebJSObject(new JSObjectMsg("instanceObject"));
+							root.setMember("applet", a);
+						}
+					}
+					if (event instanceof SimpleEventMsgIn) {
+						SimpleEventMsgIn msg = (SimpleEventMsgIn) event;
+						dispatchMessage(msg);
+					}
+					if (event instanceof PasteEventMsgIn) {
+						PasteEventMsgIn paste = (PasteEventMsgIn) event;
+						handlePasteEvent(paste);
+					}
+					if (event instanceof CopyEventMsgIn) {
+						CopyEventMsgIn copy = (CopyEventMsgIn) event;
+						handleCopyEvent(copy);
+					}
+					if (event instanceof UploadedEventMsgIn) {
+						handleUploadedEvent((UploadedEventMsgIn) event);
+					}
+					if (event instanceof UploadEventMsgIn) {
+						UploadEventMsgIn upload = (UploadEventMsgIn) event;
+						JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
+						if (dialog != null) {
+							File currentDir = dialog.getCurrentDirectory();
+							File tempFile = new File(upload.getTempFileLocation());
+							String validfilename = Util.resolveFilename(currentDir, upload.getFileName());
+							if (currentDir.canWrite() && tempFile.exists()) {
+								try {
+									Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
+									uploadMap.put(upload.getFileName(), validfilename);
+								} catch (IOException e) {
+									Logger.error("Error while moving uploaded file to target folder: ", e);
+								}
 							}
 						}
 					}
+				} catch (Exception e) {
+					Logger.error("Failed to process event.", e);
 				}
 			}
 		});

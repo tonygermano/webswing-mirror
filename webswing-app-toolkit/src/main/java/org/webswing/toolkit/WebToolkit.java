@@ -6,7 +6,6 @@ import java.awt.Button;
 import java.awt.Checkbox;
 import java.awt.CheckboxMenuItem;
 import java.awt.Choice;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dialog;
@@ -88,6 +87,9 @@ import javax.swing.SwingUtilities;
 import org.webswing.Constants;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.model.internal.ApiEventMsgInternal;
+import org.webswing.toolkit.api.WebswingApi;
+import org.webswing.toolkit.api.WebswingApiProvider;
 import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Logger;
@@ -99,7 +101,7 @@ import sun.java2d.SurfaceData;
 import sun.print.PrintJob2D;
 
 @SuppressWarnings("restriction")
-public abstract class WebToolkit extends SunToolkit {
+public abstract class WebToolkit extends SunToolkit implements WebswingApiProvider {
 	public static final Font defaultFont = new Font("Dialog", 0, 12);
 
 	public static final String BACKGROUND_WINDOW_ID = "BG";
@@ -107,6 +109,7 @@ public abstract class WebToolkit extends SunToolkit {
 
 	private WebEventDispatcher eventDispatcher = new WebEventDispatcher();
 	private WebPaintDispatcher paintDispatcher = new WebPaintDispatcher();
+	private WebswingApiImpl api = new WebswingApiImpl();;
 
 	private WindowManager windowManager = WindowManager.getInstance();
 
@@ -172,6 +175,7 @@ public abstract class WebToolkit extends SunToolkit {
 	private Clipboard selectionClipboard;
 
 	private boolean exiting = false;
+
 	public static int screenWidth = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_WIDTH, Constants.SWING_SCREEN_WIDTH_MIN + ""));
 	public static int screenHeight = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_HEIGHT, Constants.SWING_SCREEN_HEIGHT_MIN + ""));
 
@@ -640,25 +644,28 @@ public abstract class WebToolkit extends SunToolkit {
 				public void run() {
 					//tell server to kill this application after defined time
 					getPaintDispatcher().notifyApplicationExiting();
-
-					//first send windows closing event to all windows
-					for (Window w : Window.getWindows()) {
-						w.dispatchEvent(new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
-					}
-					SwingUtilities.invokeLater(new Runnable() {
-
-						@Override
-						public void run() {
-							//make sure we close windows created by window close listeners executed above
-							for (Window w : Window.getWindows()) {
-								w.setVisible(false);
-								w.dispose();
-							}
-						}
-					});
+					api.fireShutdownListeners();
 				}
 			});
 		}
+	}
+	
+	public void defaultShutdownProcedure(){
+		//first send windows closing event to all windows
+		for (Window w : Window.getWindows()) {
+			w.dispatchEvent(new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
+		}
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				//make sure we close windows created by window close listeners executed above
+				for (Window w : Window.getWindows()) {
+					w.setVisible(false);
+					w.dispose();
+				}
+			}
+		});
 	}
 
 	public Object getTreeLock() {
@@ -667,4 +674,14 @@ public abstract class WebToolkit extends SunToolkit {
 		}
 		return TREELOCK;
 	}
+
+	@Override
+	public WebswingApi get() {
+		return api;
+	}
+
+	public void processApiEvent(ApiEventMsgInternal event) {
+		api.processEvent(event);
+	}
+
 }

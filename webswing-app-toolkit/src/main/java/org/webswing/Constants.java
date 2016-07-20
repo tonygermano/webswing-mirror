@@ -12,6 +12,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
 	public static final String SWING_START_SYS_PROP_MAIN_CLASS = "webswing.mainClass";
 	public static final String SWING_START_SYS_PROP_CLASS_PATH = "webswing.classPath";
+	public static final String SWING_START_SYS_PROP_SECURITY_CLASS_PATH = "webswing.securityClassPath";
 	public static final String SWING_START_SYS_PROP_ISOLATED_FS = "webswing.isolatedFs";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW = "webswing.directdraw";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED = "webswing.directdraw.supported";
@@ -53,6 +54,8 @@ public interface Constants {
 	public static final String DEFAULT_USER_FILE_NAME = "user.properties";
 	public static final String JMS_OVERAL_MEM_LIMIT = "webswing.jmsOveralMemoryLimit";
 	public static final String JMS_DEST_MEM_LIMIT = "webswing.jmsDestinationMemoryLimit";
+	public static final String WEBSOCKET_MESSAGE_SIZE = "webswing.websocketMessageSizeLimit";
+	public static final String WEBSOCKET_THREAD_POOL = "webswing.websocketThreadPoolLimit";
 
 	public static final String ALLOWED_CORS_ORIGINS = "webswing.corsOrigins";
 	public static final String FILE_SERVLET_WAIT_TIMEOUT = "webswing.fileServletWaitTimeout";
@@ -78,6 +81,8 @@ public interface Constants {
 	// admin console constants
 	public static final String ADMIN_ROLE = "admin";
 	public static final String ADMIN_CONSOLE_APP_NAME = "adminConsoleApplicationName";
+
+
 
 
 }

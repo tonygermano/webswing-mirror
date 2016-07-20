@@ -2,7 +2,7 @@ package org.webswing.server.services.security;
 
 import org.apache.shiro.authc.AuthenticationToken;
 import org.webswing.server.services.security.api.WebswingCredentials;
-import org.webswing.server.services.security.api.WebswingUser;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
 
 public class WebswingTokenAdapter implements AuthenticationToken {
 
@@ -11,7 +11,7 @@ public class WebswingTokenAdapter implements AuthenticationToken {
 	private final WebswingPrincipal user;
 	private final WebswingCredentials credentials;
 
-	public WebswingTokenAdapter(String securityPath, WebswingUser user, WebswingCredentials credentials) {
+	public WebswingTokenAdapter(String securityPath, AbstractWebswingUser user, WebswingCredentials credentials) {
 		this.user = new WebswingPrincipal(securityPath, user);
 		this.credentials = credentials;
 	}

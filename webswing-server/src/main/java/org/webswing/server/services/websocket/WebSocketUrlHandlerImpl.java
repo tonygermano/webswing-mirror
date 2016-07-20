@@ -27,7 +27,7 @@ import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.WebswingAction;
-import org.webswing.server.services.security.api.WebswingUser;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
@@ -215,7 +215,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 	}
 
 	@Override
-	public WebswingUser getUser() {
+	public AbstractWebswingUser getUser() {
 		return parent.getUser();
 	}
 

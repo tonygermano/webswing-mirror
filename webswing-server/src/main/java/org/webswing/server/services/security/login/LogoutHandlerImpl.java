@@ -15,7 +15,7 @@ import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.WebswingTokenAdapter;
-import org.webswing.server.services.security.api.WebswingUser;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
 
 public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandler {
 	private static final Logger log = LoggerFactory.getLogger(LogoutHandlerImpl.class);
@@ -33,6 +33,8 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		try {
 			logout(req, res);
+			String fullPath=getFullPathMapping();
+			res.sendRedirect(fullPath.substring(0, fullPath.length() - getPath().length()));
 			return true;
 		} catch (Exception e) {
 			log.error("Failed to logout", e);
@@ -41,8 +43,8 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 	}
 
 	protected void logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		WebswingUser user = getUser();
-		if (user != null && user != WebswingUser.anonymUser) {
+		AbstractWebswingUser user = getUser();
+		if (user != null && user != AbstractWebswingUser.anonymUser) {
 			Subject subject = SecurityUtils.getSubject();
 			try {
 				//logout only user for the secured path (in case other users are logged in the same session)

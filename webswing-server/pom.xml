@@ -35,13 +35,23 @@
 		<!-- include in WEB-INF/lib -->
 		<dependency>
 			<groupId>org.webswing</groupId>
-			<artifactId>webswing-server-api</artifactId>
-			<version>${project.parent.version}</version>
+			<artifactId>webswing-app-toolkit-java6</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webswing</groupId>
-			<artifactId>webswing-app-launcher</artifactId>
+			<artifactId>webswing-app-toolkit-java7</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webswing</groupId>
+			<artifactId>webswing-app-toolkit-java8</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webswing</groupId>
+			<artifactId>webswing-security</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
@@ -82,7 +92,6 @@
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -96,7 +105,6 @@
 		<dependency>
 			<groupId>org.apache.shiro</groupId>
 			<artifactId>shiro-web</artifactId>
-			<version>1.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
@@ -107,38 +115,6 @@
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
 			<version>2.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opensaml</groupId>
-			<artifactId>opensaml</artifactId>
-			<version>2.6.4</version>
-		</dependency>
-		<!-- TO BE EXCLUDED FROM WEB-INF/lib -->
-
-		<dependency>
-			<groupId>org.webswing</groupId>
-			<artifactId>webswing-server-launcher</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webswing</groupId>
-			<artifactId>webswing-app-interface</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webswing</groupId>
-			<artifactId>webswing-app-toolkit-java6</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webswing</groupId>
-			<artifactId>webswing-app-toolkit-java7</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webswing</groupId>
-			<artifactId>webswing-app-toolkit-java8</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -215,32 +191,9 @@
 					</execution>
 				</executions>
 				<configuration>
-					<webResources>
-						<resource>
-							<filtering>true</filtering>
-							<directory>src/main/webapp</directory>
-							<includes>
-								<include>index.html</include>
-							</includes>
-						</resource>
-					</webResources>
 					<warSourceDirectory>src/main/webapp</warSourceDirectory>
 					<packagingExcludes>
-						javascript/,
-						WEB-INF/lib/jetty-*.jar,
-						WEB-INF/lib/javax.servlet-*.jar,
-						WEB-INF/lib/commons-cli-*.jar,
-						WEB-INF/lib/bcel-*.jar,
-						WEB-INF/lib/jakarta-regexp-*.jar,
-						WEB-INF/lib/jsr305-*.jar,
-						WEB-INF/lib/pngencoder-*.jar,
-						WEB-INF/lib/webswing-app-interface-*.jar,
-						WEB-INF/lib/webswing-app-launcher-*.jar,
-						WEB-INF/lib/webswing-server-launcher-*.jar,
-						WEB-INF/lib/slf4j-simple-*.jar,
-						WEB-INF/lib/freehep-*.jar,
-						WEB-INF/lib/webswing-directdraw-swing-*.jar,
-						WEB-INF/lib/lz4-*.jar
+						javascript/
 					</packagingExcludes>
 					<archive>
 						<manifest>
@@ -277,32 +230,6 @@
 							</includeArtifactIds>
 						</configuration>
 					</execution>
-					<execution>
-						<id>copyServerlibs</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/server-lib</outputDirectory>
-							<includeArtifactIds>
-								webswing-api,webswing-app-toolkit,webswing-server-launcher,commons-cli,jetty-webapp,jetty-security,jetty-websocket,jetty-xml,jetty-servlet,jetty-server,jetty-continuation,jetty-http,jetty-io,jetty-util,javax.servlet,jetty-jmx
-							</includeArtifactIds>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copySwingClientLibs</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/swing-lib</outputDirectory>
-							<includeArtifactIds>
-								webswing-api,webswing-app-interface,webswing-app-launcher,webswing-directdraw-swing,protobuf-java,activemq-client,geronimo-jms_1.1_spec,geronimo-j2ee-management_1.1_spec,hawtbuf,commons-codec,commons-io,commons-lang,bcel,jakarta-regexp,guava,jsr305,pngencoder,slf4j-api,slf4j-simple,pdfbox,jempbox,fontbox,commons-logging,freehep-graphicsio-pdf,freehep-graphics2d,freehep-graphicsbase,freehep-graphicsio,freehep-io,lz4,jackson-mapper-asl,jackson-core-asl
-							</includeArtifactIds>
-						</configuration>
-					</execution>
 				</executions>
 			</plugin>
 		</plugins>
@@ -314,18 +241,6 @@
 			<properties>
 				<webswingRoot>${project.build.directory}/demo</webswingRoot>
 			</properties>
-			<dependencies>
-				<dependency>
-					<groupId>org.webswing</groupId>
-					<artifactId>webswing-demo-swingset3</artifactId>
-					<version>${project.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.webswing</groupId>
-					<artifactId>webswing-demo-nbplatform</artifactId>
-					<version>${project.version}</version>
-				</dependency>
-			</dependencies>
 			<build>
 				<plugins>
 					<plugin>
@@ -342,6 +257,9 @@
 												dir="${project.build.directory}/${project.build.finalName}/WEB-INF/classes">
 												<include name="main/*.class" />
 											</fileset>
+											<fileset
+												dir="${project.basedir}/../webswing-app-interface/target"
+												includes="WEB-INF/swing-lib/*.jar" />
 										</copy>
 										<copy todir="${project.build.directory}/demo">
 											<fileset
@@ -393,7 +311,8 @@
 											<port>8080</port>
 											<maxIdleTime>60000</maxIdleTime>
 										</connector>
-										<connector implementation="org.eclipse.jetty.server.ssl.SslSocketConnector">
+										<connector
+											implementation="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
 											<port>8443</port>
 											<maxIdleTime>60000</maxIdleTime>
 											<keystore>${webswingRoot}/ssl/keystore.jks</keystore>
@@ -402,7 +321,7 @@
 											<keyPassword>123123</keyPassword>
 										</connector>
 									</connectors>
-									<scanIntervalSeconds>5</scanIntervalSeconds>
+									<scanIntervalSeconds>10</scanIntervalSeconds>
 									<webApp>
 										<contextPath>/</contextPath>
 										<defaultsDescriptor>${project.basedir}/src/test/webapp/WEB-INF/jetty-maven-plugin-webdefault.xml</defaultsDescriptor>
@@ -411,6 +330,7 @@
 											<resourceBase>${project.basedir}/src/test/webapp</resourceBase>
 											<resourceBase>${project.basedir}/../webswing-admin/src/main/webapp</resourceBase>
 										</resourceBases>
+										<webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
 									</webApp>
 									<systemProperties>
 										<force>true</force>
@@ -479,10 +399,10 @@
 												dir="${project.build.directory}/${project.build.finalName}"
 												includes="WEB-INF/lib/rt-win-shell*.jar" />
 											<fileset
-												dir="${project.build.directory}/${project.build.finalName}"
+												dir="${project.basedir}/../webswing-app-interface/target"
 												includes="WEB-INF/swing-lib/*.jar" />
 											<fileset
-												dir="${project.build.directory}/${project.build.finalName}"
+												dir="${project.basedir}/../webswing-server-launcher/target"
 												includes="WEB-INF/server-lib/*.jar" />
 											<fileset
 												dir="${project.build.directory}/${project.build.finalName}/WEB-INF/classes/"

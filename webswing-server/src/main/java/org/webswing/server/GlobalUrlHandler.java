@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,10 +32,10 @@ import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.rest.RestHandlerService;
 import org.webswing.server.services.security.api.SecurityContext;
-import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
 import org.webswing.server.services.security.modules.SecurityModuleService;
+import org.webswing.server.services.security.modules.SecurityModuleWrapper;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
@@ -59,7 +60,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	private final SecurityModuleService securitySecurity;
 
 	private ServletContext servletContext;
-	private WebswingSecurityModule<?> securityModule;
+	private SecurityModuleWrapper securityModule;
 
 	private Map<String, SwingInstanceManager> instanceManagers = new LinkedHashMap<String, SwingInstanceManager>();
 
@@ -133,7 +134,14 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 			log.error("Master security mode INHERITED is not valid. Falling back to default mode PROPERTY_FILE.");
 			mode = SecurityMode.PROPERTY_FILE;
 		}
-		securityModule = securitySecurity.create(this, mode, configuration.getMasterSecurityConfig());
+		Map<String, Object> secConfig = configuration.getMasterSecurityConfig();
+		if (mode == SecurityMode.PROPERTY_FILE) {
+			if (secConfig.get("file") == null) {
+				secConfig = new HashMap<>(secConfig);
+				secConfig.put("file", "${user.dir}/user.properties");
+			}
+		}
+		securityModule = securitySecurity.create(this, mode, secConfig);
 		securityModule.init();
 	}
 
@@ -338,8 +346,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public WebswingSecurityModule<?> get() {
+	public SecurityModuleWrapper get() {
 		return securityModule;
 	}
 
@@ -351,6 +358,11 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	@Override
 	public URL getWebResource(String resource) {
 		return ServerUtil.getWebResource(toPath(resource), getServletContext(), webFolder);
+	}
+
+	@Override
+	public String replaceVariables(String string) {
+		return ServerUtil.getConfigSubstitutor().replace(string);
 	}
 
 }

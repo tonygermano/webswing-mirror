@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -142,7 +141,7 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 					Part filePart = request.getPart("files[]"); // Retrieves <input type="file" name="file">
 					String filename = getFilename(filePart);
 					if (maxsize > 0 && filePart.getSize() > maxsize) {
-						resp.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+						resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 						resp.getWriter().write(String.format("File '%s' is too large. (Max. file size is %.1fMB)", filename, maxMB));
 					} else {
 						String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
@@ -170,7 +169,7 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 				throw new Exception("clientId not specified in request");
 			}
 		} catch (Exception e) {
-			resp.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			resp.getWriter().write("Upload finished with error...");
 			log.error("Error while uploading file: " + e.getMessage(), e);
 		}

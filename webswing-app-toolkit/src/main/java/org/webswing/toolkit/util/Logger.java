@@ -13,7 +13,7 @@ public class Logger {
 	public static final int FATAL = 5;
 
 	private static Logger log = new Logger();
-	private int thresshold = 3;
+	private int thresshold = 2;
 
 	public static void trace(String message, Object... o) {
 		log(TRACE, "TRACE: " + message, o);

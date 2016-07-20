@@ -88,6 +88,7 @@ public class ServerMain {
 		webapp.setContextPath("/");
 		webapp.setWar(System.getProperty(Constants.WAR_FILE_LOCATION));
 		webapp.setTempDirectory(new File(URI.create(System.getProperty(Constants.TEMP_DIR_PATH))));
+		webapp.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern", "");
 		server.setHandler(webapp);
 		server.start();
 		server.join();

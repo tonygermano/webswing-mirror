@@ -23,10 +23,10 @@ import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.rest.RestHandlerService;
 import org.webswing.server.services.security.api.SecurityContext;
 import org.webswing.server.services.security.api.WebswingAction;
-import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
 import org.webswing.server.services.security.modules.SecurityModuleService;
+import org.webswing.server.services.security.modules.SecurityModuleWrapper;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swinginstance.SwingInstanceService;
 import org.webswing.server.services.websocket.WebSocketConnection;
@@ -47,7 +47,7 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 	private FileTransferHandler fileHandler;
 	private SwingInstanceSet swingInstances = new SwingInstanceSet();
 	private SwingInstanceSet closedInstances = new SwingInstanceSet();
-	private WebswingSecurityModule<?> securityModule;
+	private SecurityModuleWrapper securityModule;
 	private File webFolder;
 
 	public SwingInstanceManagerImpl(SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileService, LoginHandlerService loginService, ResourceHandlerService resourceService, SecurityModuleService securityModuleService, RestHandlerService restService, UrlHandler parent, SwingDescriptor config) {
@@ -205,8 +205,7 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public WebswingSecurityModule<?> get() {
+	public SecurityModuleWrapper get() {
 		return securityModule;
 	}
 
@@ -220,4 +219,8 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 		return ServerUtil.getWebResource(toPath(resource), getServletContext(), webFolder);
 	}
 
+	@Override
+	public String replaceVariables(String string) {
+		return ServerUtil.getConfigSubstitutor().replace(string);
+	}
 }

@@ -85,17 +85,6 @@ public abstract class SwingDescriptor implements Serializable {
 		return classPathEntries;
 	}
 
-	public String generateClassPathString() {
-		String result = "";
-		if (classPathEntries != null) {
-			for (String cpe : classPathEntries) {
-				result += cpe + ";";
-			}
-			result = result.substring(0, result.length() - 1);
-		}
-		return result;
-	}
-
 	public void setClassPathEntries(List<String> classPathEntries) {
 		this.classPathEntries = classPathEntries;
 	}

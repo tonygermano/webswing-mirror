@@ -115,7 +115,7 @@ public class ConfigurationImpl extends Configuration {
 			}
 			// NOTE: -d and -t are parsed in main.Main
 		} catch (ParseException exp) {
-			Logger.info(exp.getMessage());
+			Logger.debug(exp.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("webswing", options);
 		} catch (IOException e) {

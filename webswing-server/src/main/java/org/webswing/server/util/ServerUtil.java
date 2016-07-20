@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -378,6 +379,17 @@ public class ServerUtil {
 			} catch (MalformedURLException e) {
 				log.error("Failed to get file from Web context path.", e);
 			}
+		}
+		return result;
+	}
+
+	public static String generateClassPathString(Collection<String> classPathEntries) {
+		String result = "";
+		if (classPathEntries != null) {
+			for (String cpe : classPathEntries) {
+				result += cpe + ";";
+			}
+			result = result.length() > 0 ? result.substring(0, result.length() - 1) : result;
 		}
 		return result;
 	}

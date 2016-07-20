@@ -157,17 +157,16 @@ public class SessionRecordingPlayback {
 				currentFrame++;
 				int delay = readInt(fis);
 				byte[] b = readFrame(fis);
-				AppFrameMsgOut frame = ServerUtil.decodePlaybackProto(b);
+				final AppFrameMsgOut frame = ServerUtil.decodePlaybackProto(b);
 				PlaybackInfoMsg playback = new PlaybackInfoMsg();
 				playback.setCurrent(currentFrame);
 				playback.setTotal(numberOfFrames);
 				frame.setPlayback(playback);
-				final byte[] result = ServerUtil.encode2Proto(frame);
 				sender.schedule(new Runnable() {
 
 					@Override
 					public void run() {
-						conn.broadcast(result);
+						conn.broadcastMessage(frame);
 						sendNextFrame();
 					}
 				}, fastForward ? 0 : delay, TimeUnit.MILLISECONDS);

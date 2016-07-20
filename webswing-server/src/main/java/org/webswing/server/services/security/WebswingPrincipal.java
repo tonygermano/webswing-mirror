@@ -1,14 +1,14 @@
 package org.webswing.server.services.security;
 
+import java.io.Serializable;
 import java.util.Map;
 
-import org.webswing.server.services.security.api.WebswingAction;
-import org.webswing.server.services.security.api.WebswingUser;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
 
 public class WebswingPrincipal extends WebswingPermission {
-	private WebswingUser user;
+	private AbstractWebswingUser user;
 
-	public WebswingPrincipal(String securityPath, WebswingUser user) {
+	public WebswingPrincipal(String securityPath, AbstractWebswingUser user) {
 		super(securityPath, null);
 		this.user = user;
 	}
@@ -17,15 +17,15 @@ public class WebswingPrincipal extends WebswingPermission {
 		return user.getUserId();
 	}
 
-	public Map<String, String> getUserAttributes() {
+	public Map<String, Serializable> getUserAttributes() {
 		return user.getUserAttributes();
 	}
 
 	public boolean isPermitted(String permission) {
-		return user.isPermitted(WebswingAction.valueOf(permission));
+		return user.isPermitted(permission);
 	}
 
-	public WebswingUser getUser() {
+	public AbstractWebswingUser getUser() {
 		return user;
 	}
 

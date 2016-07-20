@@ -13,11 +13,13 @@ public class ClasspathUtil {
 		String[] cp = scanForFiles(classpath.split(";"));
 		Logger.debug("Swing classpath: " + Arrays.asList(cp));
 		for (String f : cp) {
-			File file = new File(f);
-			if (file.exists()) {
-				urls.add(file.toURI().toURL());
-			} else {
-				Logger.error("SwingMain:main ERROR: Required classpath file '" + f + "' does not exist!");
+			if (f.length() > 0) {
+				File file = new File(f);
+				if (file.exists()) {
+					urls.add(file.toURI().toURL());
+				} else {
+					Logger.error("SwingMain:main ERROR: Required classpath file '" + f + "' does not exist!");
+				}
 			}
 		}
 		return urls.toArray(new URL[urls.size()]);

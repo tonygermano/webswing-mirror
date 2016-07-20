@@ -1,10 +1,9 @@
 package org.webswing.server.services.security.login;
 
-import org.webswing.server.services.security.api.WebswingCredentials;
-import org.webswing.server.services.security.api.WebswingSecurityModule;
+import org.webswing.server.services.security.modules.SecurityModuleWrapper;
 
 public interface WebswingSecurityProvider {
 
-	<T extends WebswingCredentials> WebswingSecurityModule<T> get();
+	SecurityModuleWrapper get();
 
 }

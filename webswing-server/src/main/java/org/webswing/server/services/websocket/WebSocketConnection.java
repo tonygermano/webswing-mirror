@@ -13,7 +13,7 @@ import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.security.api.WebswingAction;
-import org.webswing.server.services.security.api.WebswingUser;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.util.SecurityUtil;
 
 public class WebSocketConnection {
@@ -51,16 +51,8 @@ public class WebSocketConnection {
 		return resource.getRequest().getAttribute(SecurityManagerService.SECURITY_SUBJECT);
 	}
 
-	public WebswingUser getUser() {
+	public AbstractWebswingUser getUser() {
 		return SecurityUtil.getUser(this);
-	}
-
-	public void broadcast(Serializable serializable) {
-		for (AtmosphereResource r : this.resource.getBroadcaster().getAtmosphereResources()) {
-			if (r.uuid().equals(this.resource.uuid())) {
-				r.getBroadcaster().broadcast(serializable, r);
-			}
-		}
 	}
 
 	public void broadcastMessage(EncodedMessage o) {
@@ -71,12 +63,20 @@ public class WebSocketConnection {
 		broadcastMessage(new EncodedMessage(o));
 	}
 
+	private void broadcast(Serializable serializable) {
+		for (AtmosphereResource r : this.resource.getBroadcaster().getAtmosphereResources()) {
+			if (r.uuid().equals(this.resource.uuid())) {
+				r.getBroadcaster().broadcast(serializable, r);
+			}
+		}
+	}
+
 	public UrlHandler getHandler() {
 		return handler;
 	}
 
 	public boolean hasPermission(WebswingAction action) {
-		return getUser().isPermitted(action);
+		return getUser().isPermitted(action.name());
 	}
 
 	public void disconnect() {

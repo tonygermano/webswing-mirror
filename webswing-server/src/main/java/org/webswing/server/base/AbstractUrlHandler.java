@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.WebswingAction;
-import org.webswing.server.services.security.api.WebswingUser;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
 import org.webswing.server.util.SecurityUtil;
 
@@ -159,15 +159,15 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 		return -1;
 	}
 
-	public WebswingUser getUser() {
+	public AbstractWebswingUser getUser() {
 		return SecurityUtil.getUser(this);
 	}
 
 	@Override
 	public void checkPermission(WebswingAction action) throws WsException {
-		WebswingUser user = getUser();
+		AbstractWebswingUser user = getUser();
 		if (user != null) {
-			if (user.isPermitted(action)) {
+			if (user.isPermitted(action.name())) {
 				return;
 			}
 		}

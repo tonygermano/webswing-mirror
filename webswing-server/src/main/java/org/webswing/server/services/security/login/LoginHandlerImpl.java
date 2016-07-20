@@ -17,7 +17,7 @@ import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.security.WebswingTokenAdapter;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.api.WebswingCredentials;
-import org.webswing.server.services.security.api.WebswingUser;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
 
 public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler {
 	private static final Logger log = LoggerFactory.getLogger(LoginHandlerImpl.class);
@@ -46,17 +46,17 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 
 	protected void login(HttpServletRequest req, HttpServletResponse resp, WebswingAuthenticationException e) throws ServletException, IOException {
 		boolean verify = req.getParameter("verify") != null;
-		WebswingUser user = getUser();
+		AbstractWebswingUser user = getUser();
 		if (!verify) {
 			WebswingCredentials credentials = securityProvider.get().getCredentials(req, resp, e);
 			if (credentials != null) {
 				try {
-					WebswingUser resolvedUser = securityProvider.get().getUser(credentials);
+					AbstractWebswingUser resolvedUser = securityProvider.get().getUser(credentials);
 					if (resolvedUser != null) {
 						Subject subject = SecurityUtils.getSubject();
 						subject.login(new WebswingTokenAdapter(getSecuredPath(), resolvedUser, credentials));
 						user = getUser();
-						if (user != null && user != WebswingUser.anonymUser) {
+						if (user != null && user != AbstractWebswingUser.anonymUser) {
 							String fullPath=getFullPathMapping();
 							resp.sendRedirect(fullPath.substring(0, fullPath.length() - getPath().length()));
 							return;
@@ -70,7 +70,7 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 				}
 			}
 		} else {
-			if (user != null && user != WebswingUser.anonymUser) {
+			if (user != null && user != AbstractWebswingUser.anonymUser) {
 				resp.setStatus(HttpServletResponse.SC_OK);
 				resp.setHeader("webswingUsername", user.getUserId());
 			} else {

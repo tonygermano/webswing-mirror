@@ -2,10 +2,8 @@ package org.webswing.services.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,10 +24,10 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.webswing.Constants;
 import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.model.MsgIn;
-import org.webswing.model.MsgOut;
+import org.webswing.model.SyncMsg;
+import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.model.internal.JvmStatsMsgInternal;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
-import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
@@ -52,7 +50,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private Runnable watchdog;
 	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
 
-	private Map<String, Object> syncCallResposeMap = new HashMap<String, Object>();
+	private Map<String, Object> syncCallResposeMap = new ConcurrentHashMap<String, Object>();
 
 	public static ServerConnectionServiceImpl getInstance() {
 		if (impl == null) {
@@ -64,7 +62,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	public ServerConnectionServiceImpl() {
 		connectionFactory = new ActiveMQConnectionFactory(System.getProperty(Constants.JMS_URL));
 		connectionFactory.setAlwaysSessionAsync(false);
-		connectionFactory.setTrustAllPackages(true);;
+		connectionFactory.setTrustAllPackages(true);
+		;
 		watchdog = new Runnable() {
 			private boolean terminated = false;
 
@@ -153,7 +152,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	}
 
 	@Override
-	public Object sendObjectSync(MsgOut o, String correlationId) throws TimeoutException, IOException {
+	public Object sendObjectSync(Serializable o, String correlationId) throws TimeoutException, IOException {
 		try {
 			Object syncObject = new Object();
 			syncCallResposeMap.put(correlationId, syncObject);
@@ -171,7 +170,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			result = syncCallResposeMap.get(correlationId);
 			syncCallResposeMap.remove(correlationId);
 			if (result == syncObject) {
-				throw new TimeoutException("Call timed out after " + syncTimeout + " ms");
+				throw new TimeoutException("Call timed out after " + syncTimeout + " ms. Call id " + correlationId);
 			}
 			return result;
 
@@ -186,8 +185,13 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			lastMessageTimestamp = System.currentTimeMillis();
 			if (msg instanceof ObjectMessage) {
 				ObjectMessage omsg = (ObjectMessage) msg;
-				if (omsg.getObject() instanceof JsResultMsg) {
-					JsResultMsg syncmsg = (JsResultMsg) omsg.getObject();
+				try {
+					omsg.getObject();
+				} catch (Exception jMSException) {
+					Logger.error("Failed to read message from JMS", jMSException);
+				}
+				if (omsg.getObject() instanceof SyncMsg) {
+					SyncMsg syncmsg = (SyncMsg) omsg.getObject();
 					String correlationId = syncmsg.getCorrelationId();
 					if (syncCallResposeMap.containsKey(correlationId)) {
 						Object syncObject = syncCallResposeMap.get(correlationId);
@@ -203,6 +207,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					WebJSObject.evaluateJava(javaReq);
 				} else if (omsg.getObject() instanceof MsgIn) {
 					Util.getWebToolkit().getEventDispatcher().dispatchEvent((MsgIn) omsg.getObject());
+				}else if (omsg.getObject() instanceof ApiEventMsgInternal){
+					Util.getWebToolkit().processApiEvent((ApiEventMsgInternal) omsg.getObject());
 				}
 			}
 		} catch (Exception e) {

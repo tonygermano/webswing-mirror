@@ -11,10 +11,9 @@
 		<tag>2.3-SNAPSHOT</tag>
 	</scm>
 	<modules>
-		<module>webswing-server-api</module>
-		<module>webswing-server</module>
+		<module>webswing-api</module>
+		<module>webswing-security</module>
 		<module>webswing-admin</module>
-		<module>webswing-server-launcher</module>
 		<module>webswing-app-toolkit</module>
 		<module>webswing-app-toolkit-java6</module>
 		<module>webswing-app-toolkit-java7</module>
@@ -23,10 +22,12 @@
 		<module>webswing-app-interface</module>
 		<module>webswing-directdraw</module>
 		<module>webswing-demo</module>
+		<module>webswing-server-launcher</module>
+		<module>webswing-server</module>
 		<module>webswing-assembly</module>
 	</modules>
 	<properties>
-    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jersey.version>2.6</jersey.version>
 	</properties>
 	<dependencyManagement>
@@ -41,6 +42,16 @@
 				<artifactId>commons-io</artifactId>
 				<version>2.4</version>
 			</dependency>
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>2.6</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.shiro</groupId>
+				<artifactId>shiro-web</artifactId>
+				<version>1.2.5</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
@@ -54,6 +65,16 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.6</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.0.2</version>
+				</plugin>
 				<plugin>
 					<groupId>com.github.os72</groupId>
 					<artifactId>protoc-jar-maven-plugin</artifactId>
@@ -114,7 +135,7 @@
 				<inherited>false</inherited>
 				<executions>
 					<execution>
-						<id>install-jar-lib</id>
+						<id>install-pngencoder</id>
 						<goals>
 							<goal>install-file</goal>
 						</goals>
@@ -125,6 +146,21 @@
 							<version>1</version>
 							<packaging>jar</packaging>
 							<file>${basedir}/lib/pngencoder.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-rt-win-shell</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>rt-win-shell</groupId>
+							<artifactId>rt-win-shell</artifactId>
+							<version>1</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/lib/rt-win-shell.jar</file>
 							<generatePom>true</generatePom>
 						</configuration>
 					</execution>

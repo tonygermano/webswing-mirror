@@ -57,7 +57,7 @@ public class WebPaintDispatcher {
 	private long lastReadyStateTime;
 	private JFileChooser fileChooserDialog;
 
-	private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1,DeamonThreadFactory.getInstance());
+	private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance());
 
 	public WebPaintDispatcher() {
 		Runnable sendUpdate = new Runnable() {
@@ -134,7 +134,7 @@ public class WebPaintDispatcher {
 	}
 
 	public void sendObject(Serializable object) {
-		Logger.info("WebPaintDispatcher:sendJsonObject", object);
+		Logger.debug("WebPaintDispatcher:sendJsonObject", object);
 		Services.getConnectionService().sendObject(object);
 	}
 
@@ -187,7 +187,7 @@ public class WebPaintDispatcher {
 		WindowMsg fdEvent = new WindowMsg();
 		fdEvent.setId(guid);
 		f.setClosedWindow(fdEvent);
-		Logger.info("WebPaintDispatcher:notifyWindowClosed", guid);
+		Logger.debug("WebPaintDispatcher:notifyWindowClosed", guid);
 		Services.getConnectionService().sendObject(f);
 	}
 
@@ -199,7 +199,7 @@ public class WebPaintDispatcher {
 
 	@SuppressWarnings("restriction")
 	public void notifyWindowRepaintAll() {
-		notifyBackgroundRepainted( new Rectangle(Util.getWebToolkit().getScreenSize()));
+		notifyBackgroundRepainted(new Rectangle(Util.getWebToolkit().getScreenSize()));
 		for (Window w : Window.getWindows()) {
 			if (w.isShowing()) {
 				notifyWindowRepaint(w);
@@ -442,10 +442,14 @@ public class WebPaintDispatcher {
 			fileChooserDialog.rescanCurrentDirectory();
 		}
 	}
-	
+
 	public void notifyApplicationExiting() {
-		ExitMsgInternal f=new ExitMsgInternal();
-		f.setWaitForExit(Integer.getInteger(Constants.SWING_START_SYS_PROP_WAIT_FOR_EXIT,30000));
+		notifyApplicationExiting(Integer.getInteger(Constants.SWING_START_SYS_PROP_WAIT_FOR_EXIT, 30000));
+	}
+
+	public void notifyApplicationExiting(int waitBeforeKill) {
+		ExitMsgInternal f = new ExitMsgInternal();
+		f.setWaitForExit(waitBeforeKill);
 		Services.getConnectionService().sendObject(f);
 		contentSender.shutdownNow();
 	}
