@@ -5,6 +5,7 @@ import java.util.List;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.server.SwingDescriptor;
 import org.webswing.server.base.UrlHandler;
+import org.webswing.server.services.security.login.WebswingSecurityProvider;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
@@ -20,5 +21,7 @@ public interface SwingInstanceHolder extends UrlHandler {
 	List<SwingInstance> getAllClosedInstances();
 	
 	List<SwingDescriptor> getAllConfiguredApps();
+	
+	WebswingSecurityProvider getSecurityProviderForApp(String path);
 
 }

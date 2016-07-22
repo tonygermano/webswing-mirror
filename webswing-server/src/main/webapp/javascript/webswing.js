@@ -1,6 +1,6 @@
-define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog', 'webswing-selector',
+define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog', 
         'webswing-login', 'webswing-canvas', 'webswing-identity', 'webswing-jslink', 'webswing-clipboard', 'webswing-playback', 'webswing-input', 'webswing-touch', 'webswing-inject' ],
-        function f($, css, util, polyfill, Base, Socket, Files, Dialog, Selector, Login, Canvas, Identity, JsLink, Clipboard, Playback, Input, Touch, Injector) {
+        function f($, css, util, polyfill, Base, Socket, Files, Dialog, Login, Canvas, Identity, JsLink, Clipboard, Playback, Input, Touch, Injector) {
             "use strict";
             var style = $("<style></style>", {
                 type : "text/css"
@@ -31,6 +31,9 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                     var id = $(instance).data('webswingInstance');
                     var active = $(instance).data('webswingActive');
                     if (!active) {
+                    	if (root[id]!=null && root[id].options !=null) {
+                    		$(instance).data("webswingOptions",root[id].options);
+                        }
                         var wsInstance = bootstrap($(instance));
                         $(instance).attr('data-webswing-active', 'true');
                         if (id != null) {
@@ -39,7 +42,7 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                     }
                 });
                 for ( var exportName in result) {
-                    root[exportName] = result[exportName];
+                    root[exportName] = $.extend(root[exportName],result[exportName]);
                 }
             }
 
@@ -53,7 +56,6 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                 injector.module('touch', new Touch());
                 injector.module('socket', new Socket());
                 injector.module('files', new Files());
-                injector.module('selector', new Selector());
                 injector.module('login', new Login());
                 injector.module('identity', new Identity());
                 injector.module('jslink', new JsLink());
@@ -180,6 +182,7 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                     if (options != null) {
                         cfg.autoStart = options.autoStart != null ? JSON.parse(options.autoStart) : cfg.autoStart;
                         cfg.applicationName = options.applicationName != null ? options.applicationName : cfg.applicationName;
+                        cfg.oneTimePassword = options.oneTimePassword != null ? options.oneTimePassword : cfg.oneTimePassword;
                         cfg.args = options.args != null ? options.args : cfg.args;
                         cfg.binarySocket = options.binarySocket != null ? JSON.parse(options.binarySocket) : cfg.binarySocket;
                         cfg.recording = options.recording != null ? JSON.parse(options.recording) : cfg.recording;
@@ -215,14 +218,7 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                 }
 
                 function readOptions(element) {
-                    var options = element.data('webswingOptions');
-                    if (typeof options !== 'object') {
-                        try {
-                            options = eval("(function(){return " + options + ";})()");
-                        } catch (e) {
-                            throw Error("Configuration of webswing instance is not a valid json object. " + options);
-                        }
-                    }
+                    var options = element.data("webswingOptions");;
                     return options;
                 }
 

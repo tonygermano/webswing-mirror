@@ -12,6 +12,7 @@ public enum WebswingAction {
 	rest_getConfigVariables(Role.admin),
 	rest_getDefaultApplicationConfig(Role.admin),
 	rest_getDefaultAppletConfig(Role.admin),
+	rest_getOneTimePassword(Role.admin),
 	rest_getApps(Role.authenticated),
 	rest_getVersion(Role.anonym),
 	//websocket

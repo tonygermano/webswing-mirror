@@ -41,6 +41,10 @@
 			<artifactId>opensaml</artifactId>
 			<version>2.6.4</version>
 		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>webswing-security</finalName>
@@ -48,11 +52,8 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-					<compilerArguments>
-						<bootclasspath>${basedir}/../lib/rt1.7.0_60.jar</bootclasspath>
-					</compilerArguments>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 		</plugins>

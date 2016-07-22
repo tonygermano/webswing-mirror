@@ -11,7 +11,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -337,6 +339,35 @@ public class ServerUtil {
 							Object value = config.get(pd.getName());
 							if (value != null) {
 								if (ClassUtils.isAssignable(value.getClass(), method.getReturnType(), true)) {
+									if (value instanceof Map) {
+										Type returnType = method.getGenericReturnType();
+										if (returnType instanceof ParameterizedType) {
+											Type[] generics = ((ParameterizedType) returnType).getActualTypeArguments();
+											if (generics != null && generics[1] instanceof Class && ((Class) generics[1]).isInterface()) {
+												Map valueMap = (Map) value;
+												Map resultMap = new HashMap<>();
+												for (Object key : valueMap.keySet()) {
+													Object entryValue = valueMap.get(key);
+													resultMap.put(key, instantiateConfig((Map<String, Object>) entryValue, (Class) generics[1], context));
+												}
+												return resultMap;
+											}
+										}
+									}
+									if (value instanceof List) {
+										Type returnType = method.getGenericReturnType();
+										if (returnType instanceof ParameterizedType) {
+											Type[] generics = ((ParameterizedType) returnType).getActualTypeArguments();
+											if (generics != null && generics[0] instanceof Class && ((Class) generics[0]).isInterface()) {
+												List valuelist = (List) value;
+												List resultList = new ArrayList<>();
+												for (Object item : valuelist) {
+													resultList.add(instantiateConfig((Map<String, Object>) item, (Class) generics[0], context));
+												}
+												return resultList;
+											}
+										}
+									}
 									return value;
 								} else if (value instanceof Map && method.getReturnType().isInterface()) {
 									return instantiateConfig((Map) value, method.getReturnType(), context);
@@ -393,4 +424,16 @@ public class ServerUtil {
 		}
 		return result;
 	}
+
+	public static boolean isSubPath(String subpath, String path) {
+		return path.equals(subpath) || path.startsWith(subpath + "/");
+	}
+
+	public static String toPath(String path) {
+		String mapping = path == null ? "/" : path;
+		mapping = mapping.startsWith("/") ? mapping : ("/" + mapping);
+		mapping = mapping.endsWith("/") ? mapping.substring(0, mapping.length() - 1) : mapping;
+		return mapping;
+	}
+
 }

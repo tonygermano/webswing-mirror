@@ -95,12 +95,16 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	public void init() {
 		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
 		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
+		
 		registerChildUrlHandler(restService.createSwingRestHandler(this, this));
 		registerChildUrlHandler(restService.createServerRestHandler(this));
 		registerChildUrlHandler(restService.createConfigRestHandler(this));
 		registerChildUrlHandler(restService.createSessionRestHandler(this, this));
+		registerChildUrlHandler(restService.createOtpRestHandler(this, this));
+		
 		registerChildUrlHandler(loginService.createLoginHandler(this, getSecurityProvider()));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
+		
 		registerChildUrlHandler(resourceService.create(this, this));
 
 		reloadSecurityModule(config.getConfiguration());
@@ -363,6 +367,15 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	@Override
 	public String replaceVariables(String string) {
 		return ServerUtil.getConfigSubstitutor().replace(string);
+	}
+
+	@Override
+	public WebswingSecurityProvider getSecurityProviderForApp(String path) {
+		SwingInstanceManager im = instanceManagers.get(toPath(path));
+		if (im != null) {
+			return im.getSecurityProvider();
+		}
+		return null;
 	}
 
 }

@@ -68,5 +68,4 @@ public class SessionRestUrlHandler extends AbstractRestUrlHandler {
 			instance.shutdown(force);
 		}
 	}
-
 }

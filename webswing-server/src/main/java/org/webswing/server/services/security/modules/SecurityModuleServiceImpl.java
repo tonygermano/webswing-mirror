@@ -21,11 +21,11 @@ public class SecurityModuleServiceImpl implements SecurityModuleService {
 		case INHERITED:
 			return null;
 		case NONE:
-			return new SecurityModuleWrapper(createBuilInConfig(AnonymSecurityModule.class, config, context));
+			return new SecurityModuleWrapper(createBuiltInConfig(AnonymSecurityModule.class, config, context));
 		case PROPERTY_FILE:
-			return new SecurityModuleWrapper(createBuilInConfig(PropertySecurityModule.class, config, context));
+			return new SecurityModuleWrapper(createBuiltInConfig(PropertySecurityModule.class, config, context));
 		case SAML2:
-			return new SecurityModuleWrapper(createBuilInConfig(Saml2SecurityModule.class, config, context));
+			return new SecurityModuleWrapper(createBuiltInConfig(Saml2SecurityModule.class, config, context));
 		case CUSTOM:
 			return new SecurityModuleWrapper(ServerUtil.instantiateConfig(config, SecurityModuleWrapperConfig.class, context));
 
@@ -35,7 +35,7 @@ public class SecurityModuleServiceImpl implements SecurityModuleService {
 		return null;
 	}
 
-	private SecurityModuleWrapperConfig createBuilInConfig(final Class<?> securityModule, final Map<String, Object> config, final SecurityContext context) {
+	private SecurityModuleWrapperConfig createBuiltInConfig(final Class<?> securityModule, final Map<String, Object> config, final SecurityContext context) {
 		SecurityModuleWrapperConfig wrapperConfig = new SecurityModuleWrapperConfig() {
 
 			@Override

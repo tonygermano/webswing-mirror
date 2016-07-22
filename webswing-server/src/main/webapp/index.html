@@ -7,15 +7,26 @@
 <link rel="stylesheet" href="css/webswing.css" />
 </head>
 <body>
-	<div class="webswing-element" data-webswing-instance="webswing" data-webswing-options="{autoStart:true, applicationName:getParam('app'), args:getParam('args'), anonym:getParam('anonym'), recording:getParam('recording'), binarySocket:getParam('binarySocket'), debugPort:getParam('debugPort'),recordingPlayback:getParam('recordingPlayback')}"></div>
-
+	<div class="webswing-element" data-webswing-instance="webswingInstance0"></div>
 	<script>
-	var getParam = function (name) {
-		  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-		  var results = new RegExp("[\\?&]"+name+"=([^&#]*)").exec( location.href );
-		  return results == null ? null : decodeURIComponent(results[1]);
-	}
+		var webswingInstance0 = {
+			options:{
+				autoStart:true,
+				args:getParam('args'),
+				recording:getParam('recording'),
+				binarySocket:getParam('binarySocket'),
+				debugPort:getParam('debugPort'),
+				recordingPlayback:getParam('recordingPlayback'),
+				oneTimePassword:getParam('otp')
+			}
+		}
+		function getParam(name) {
+			  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+			  var results = new RegExp("[\\?&]"+name+"=([^&#]*)").exec( location.href );
+			  return results == null ? null : decodeURIComponent(results[1]);
+		}
 	</script>
+
 	<script>
 	
 	(function (window, document) {

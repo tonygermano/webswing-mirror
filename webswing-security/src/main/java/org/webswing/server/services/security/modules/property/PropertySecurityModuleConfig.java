@@ -1,8 +1,8 @@
 package org.webswing.server.services.security.modules.property;
 
-import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
+import org.webswing.server.services.security.otp.impl.WebswingOtpSecurityModuleConfig;
 
-public interface PropertySecurityModuleConfig extends WebswingSecurityModuleConfig {
+public interface PropertySecurityModuleConfig extends WebswingOtpSecurityModuleConfig {
 
 	String getFile();
 }

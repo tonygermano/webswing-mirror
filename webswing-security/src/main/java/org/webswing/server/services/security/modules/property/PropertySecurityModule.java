@@ -5,9 +5,9 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.text.PropertiesRealm;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
-import org.webswing.server.services.security.modules.AbstractSecurityModule;
+import org.webswing.server.services.security.modules.AbstractUserPasswordSecurityModule;
 
-public class PropertySecurityModule extends AbstractSecurityModule {
+public class PropertySecurityModule extends AbstractUserPasswordSecurityModule {
 
 	private PropertiesRealm realm;
 

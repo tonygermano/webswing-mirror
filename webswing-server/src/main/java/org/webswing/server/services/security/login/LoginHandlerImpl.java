@@ -15,9 +15,10 @@ import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.security.WebswingTokenAdapter;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.api.WebswingCredentials;
-import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.otp.api.OneTimeToken;
 
 public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler {
 	private static final Logger log = LoggerFactory.getLogger(LoginHandlerImpl.class);
@@ -46,18 +47,37 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 
 	protected void login(HttpServletRequest req, HttpServletResponse resp, WebswingAuthenticationException e) throws ServletException, IOException {
 		boolean verify = req.getParameter("verify") != null;
+		String otp = req.getParameter("otp");
 		AbstractWebswingUser user = getUser();
-		if (!verify) {
+		Subject subject = SecurityUtils.getSubject();
+		if (verify) {
+			if (user != null && user != AbstractWebswingUser.anonymUser) {
+				resp.setStatus(HttpServletResponse.SC_OK);
+				resp.setHeader("webswingUsername", user.getUserId());
+			} else {
+				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			}
+		} else if (otp != null) {
+			try {
+				OneTimeToken token = securityProvider.get().verifyOneTimePassword(otp);
+				subject.login(new WebswingTokenAdapter(getSecuredPath(),token));
+				user = getUser();
+				resp.setStatus(HttpServletResponse.SC_OK);
+				resp.setHeader("webswingUsername", user.getUserId());
+			} catch (WebswingAuthenticationException e1) {
+				log.warn("Authentication failed: "+e1.getMessage());
+				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			}
+		} else {
 			WebswingCredentials credentials = securityProvider.get().getCredentials(req, resp, e);
 			if (credentials != null) {
 				try {
 					AbstractWebswingUser resolvedUser = securityProvider.get().getUser(credentials);
 					if (resolvedUser != null) {
-						Subject subject = SecurityUtils.getSubject();
 						subject.login(new WebswingTokenAdapter(getSecuredPath(), resolvedUser, credentials));
 						user = getUser();
 						if (user != null && user != AbstractWebswingUser.anonymUser) {
-							String fullPath=getFullPathMapping();
+							String fullPath = getFullPathMapping();
 							resp.sendRedirect(fullPath.substring(0, fullPath.length() - getPath().length()));
 							return;
 						}
@@ -68,13 +88,6 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 					log.error("Unexpected authentication error.", ux);
 					login(req, resp, new WebswingAuthenticationException("Unexpected authentication error.", ux));
 				}
-			}
-		} else {
-			if (user != null && user != AbstractWebswingUser.anonymUser) {
-				resp.setStatus(HttpServletResponse.SC_OK);
-				resp.setHeader("webswingUsername", user.getUserId());
-			} else {
-				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			}
 		}
 	}

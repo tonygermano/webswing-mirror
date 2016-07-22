@@ -24,8 +24,8 @@ public class RestHandlerServiceImpl implements RestHandlerService {
 	}
 
 	@Override
-	public AbstractRestUrlHandler createSwingRestHandler(UrlHandler parent,SwingInstanceHolder instanceHolder) {
-		return new SwingRestUrlHandler(parent,instanceHolder);
+	public AbstractRestUrlHandler createSwingRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
+		return new SwingRestUrlHandler(parent, instanceHolder);
 	}
 
 	@Override
@@ -36,6 +36,11 @@ public class RestHandlerServiceImpl implements RestHandlerService {
 	@Override
 	public AbstractRestUrlHandler createServerRestHandler(UrlHandler parent) {
 		return new ServerRestUrlHandler(parent);
+	}
+
+	@Override
+	public AbstractRestUrlHandler createOtpRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
+		return new OtpRestUrlHandler(parent, instanceHolder);
 	}
 
 }

@@ -13,15 +13,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.api.WebswingCredentials;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
+import org.webswing.server.services.security.otp.api.OneTimePasswordModule;
+import org.webswing.server.services.security.otp.api.OneTimeToken;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.util.ClasspathUtil;
 
-public class SecurityModuleWrapper implements WebswingSecurityModule<WebswingCredentials> {
+public class SecurityModuleWrapper implements WebswingSecurityModule<WebswingCredentials>, OneTimePasswordModule {
 	private static final Logger log = LoggerFactory.getLogger(SecurityModuleWrapper.class);
 
 	private WebswingSecurityModule<WebswingCredentials> custom;
@@ -163,6 +166,8 @@ public class SecurityModuleWrapper implements WebswingSecurityModule<WebswingCre
 			} catch (Exception e1) {
 				log.error("Destroying SecurityModule failed.", e1);
 			}
+		}
+		if (customCL != null) {
 			try {
 				customCL.close();
 			} catch (IOException e) {
@@ -175,6 +180,47 @@ public class SecurityModuleWrapper implements WebswingSecurityModule<WebswingCre
 		StrSubstitutor subs = ServerUtil.getConfigSubstitutor();
 		String cp = ServerUtil.generateClassPathString(config.getClassPath());
 		return subs.replace(cp);
+	}
+
+	public OneTimeToken verifyOneTimePassword(final String otp) throws WebswingAuthenticationException {
+		if (custom != null && custom instanceof OneTimePasswordModule) {
+			try {
+				return runWithContextClassLoader(new Callable<OneTimeToken>() {
+
+					@Override
+					public OneTimeToken call() throws Exception {
+						OneTimeToken result = ((OneTimePasswordModule) custom).verifyOneTimePassword(otp);
+						return result;
+					}
+				});
+			} catch (WebswingAuthenticationException e1) {
+				throw e1;
+			} catch (Exception e) {
+				log.error("Verifying OTP failed.", e);
+				throw new WebswingAuthenticationException("Verifying OTP failed.", e);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public String generateOneTimePassword(final String swingPath, final String requestingClient, final String user, final String[] roles, final String[] permissions) throws WebswingAuthenticationException {
+		if (custom != null && custom instanceof OneTimePasswordModule) {
+			try {
+				return runWithContextClassLoader(new Callable<String>() {
+
+					@Override
+					public String call() throws Exception {
+						String result = ((OneTimePasswordModule) custom).generateOneTimePassword(swingPath, requestingClient, user, roles, permissions);
+						return result;
+					}
+				});
+			} catch (Exception e1) {
+				log.error("Failed to generate OTP.", e1);
+				throw new WebswingAuthenticationException("Failed to generate OTP.", e1);
+			}
+		}
+		return null;
 	}
 
 }

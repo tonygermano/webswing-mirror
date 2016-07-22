@@ -72,6 +72,7 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 		registerChildUrlHandler(restService.createSwingRestHandler(this, this));
 		registerChildUrlHandler(restService.createServerRestHandler(this));
 		registerChildUrlHandler(restService.createSessionRestHandler(this, this));
+		registerChildUrlHandler(restService.createOtpRestHandler(this, this));
 
 		registerChildUrlHandler(loginService.createLoginHandler(this, getSecurityProvider()));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
@@ -222,5 +223,13 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 	@Override
 	public String replaceVariables(String string) {
 		return ServerUtil.getConfigSubstitutor().replace(string);
+	}
+
+	@Override
+	public WebswingSecurityProvider getSecurityProviderForApp(String path) {
+		if (config.getPath().equals(path)) {
+			return getSecurityProvider();
+		}
+		return null;
 	}
 }

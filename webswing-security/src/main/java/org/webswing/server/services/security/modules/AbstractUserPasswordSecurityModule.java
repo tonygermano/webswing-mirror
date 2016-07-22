@@ -9,24 +9,22 @@ import java.net.URL;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.api.WebswingCredentials;
-import org.webswing.server.services.security.api.WebswingSecurityModule;
-import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
-import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.modules.AbstractSecurityModule.UserPasswordCredentials;
+import org.webswing.server.services.security.modules.AbstractUserPasswordSecurityModule.UserPasswordCredentials;
+import org.webswing.server.services.security.otp.impl.AbstractOtpSecurityModule;
+import org.webswing.server.services.security.otp.impl.WebswingOtpSecurityModuleConfig;
 
-public abstract class AbstractSecurityModule implements WebswingSecurityModule<UserPasswordCredentials> {
+public abstract class AbstractUserPasswordSecurityModule extends AbstractOtpSecurityModule<UserPasswordCredentials> {
 
-	private WebswingSecurityModuleConfig config;
+	private WebswingOtpSecurityModuleConfig config;
 
-	public AbstractSecurityModule(WebswingSecurityModuleConfig config) {
+	public AbstractUserPasswordSecurityModule(WebswingOtpSecurityModuleConfig config) {
+		super(config);
 		this.config = config;
 	}
 
-	@Override
-	public void init() {
-	}
 
 	public String getLoginResource() {
 		return "login.html";
@@ -49,7 +47,7 @@ public abstract class AbstractSecurityModule implements WebswingSecurityModule<U
 			if (resource != null) {
 				String template = toString(resource.openStream(), 4 * 1024);
 				String errorMessage = e == null ? "" : e.getLocalizedMessage();
-				response.getOutputStream().print(template.replace("${errorMessage}",errorMessage));
+				response.getOutputStream().print(template.replace("${errorMessage}", errorMessage));
 			}
 			return null;
 		} else {

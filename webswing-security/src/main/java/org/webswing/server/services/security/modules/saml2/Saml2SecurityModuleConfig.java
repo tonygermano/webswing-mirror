@@ -1,8 +1,8 @@
 package org.webswing.server.services.security.modules.saml2;
 
-import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
+import org.webswing.server.services.security.otp.impl.WebswingOtpSecurityModuleConfig;
 
-public interface Saml2SecurityModuleConfig extends WebswingSecurityModuleConfig {
+public interface Saml2SecurityModuleConfig extends WebswingOtpSecurityModuleConfig {
 
 	public String getIdentityProviderMetadataFile();
 

@@ -34,21 +34,13 @@ define(['jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 'te
 
         function configuration() {
             return {
-                readyDialog: {
-                    content: '<p>Webswing ready...</p>'
-                },
-                initializingDialog: {
-                    content: '<p>Initializing...</p>'
-                },
-                startingDialog: {
-                    content: '<p>Starting app...</p>'
-                },
-                connectingDialog: {
-                    content: '<p>Connecting...</p>'
-                },
+                readyDialog: messageDialog('Webswing ready...'),
+                initializingDialog: messageDialog('Initializing...'),
+                startingDialog: messageDialog('Starting app...'),
+                connectingDialog: messageDialog('Connecting...'),
+                unauthorizedAccess: messageDialog('Unauthorized access...'),
                 applicationAlreadyRunning: retryMessageDialog('Application is already running in other browser window...'),
                 sessionStolenNotification: retryMessageDialog('Application was opened in other browser window. Session disconnected...'),
-                unauthorizedAccess: finalMessageDialog('Unauthorized access...'),
                 disconnectedDialog: retryMessageDialog('Disconnected...'),
                 connectionErrorDialog: retryMessageDialog('Connection error...'),
                 tooManyClientsNotification: retryMessageDialog('Too many connections. Please try again later...'),
@@ -68,6 +60,27 @@ define(['jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 'te
             };
         }
 
+        function messageDialog(msg) {
+        	return {
+        		content: '<p>' + msg + '</p>'
+        	};
+        }
+        
+        function finalMessageDialog(msg) {
+        	return {
+        		content: '<p>'
+        			+ msg
+        			+ '</p><button data-id="newsession" class="btn btn-primary">Start new session.</button> <span> </span><button data-id="logout" class="btn btn-default">Logout.</button>',
+        			events: {
+        				newsession_click: function () {
+        					api.newSession();
+        				},
+        				logout_click: function () {
+        					api.logout();
+        				}
+        			}
+        	};
+        }
         function finalMessageDialog(msg) {
             return {
                 content: '<p>'

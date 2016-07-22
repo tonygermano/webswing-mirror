@@ -14,6 +14,7 @@ import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
 import org.webswing.server.util.SecurityUtil;
+import org.webswing.server.util.ServerUtil;
 
 public abstract class AbstractUrlHandler implements UrlHandler {
 	private static final Logger log = LoggerFactory.getLogger(AbstractUrlHandler.class);
@@ -93,14 +94,11 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 	}
 
 	public static boolean isSubPath(String subpath, String path) {
-		return path.equals(subpath) || path.startsWith(subpath + "/");
+		return ServerUtil.isSubPath(subpath, path);
 	}
 
 	public static String toPath(String path) {
-		String mapping = path == null ? "/" : path;
-		mapping = mapping.startsWith("/") ? mapping : ("/" + mapping);
-		mapping = mapping.endsWith("/") ? mapping.substring(0, mapping.length() - 1) : mapping;
-		return mapping;
+		return ServerUtil.toPath(path);
 	}
 
 	public void registerFirstChildUrlHandler(UrlHandler handler) {

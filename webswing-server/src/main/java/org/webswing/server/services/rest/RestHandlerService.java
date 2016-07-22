@@ -13,4 +13,6 @@ public interface RestHandlerService {
 
 	AbstractRestUrlHandler createSwingRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
 
+	AbstractRestUrlHandler createOtpRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
+
 }

@@ -7,6 +7,8 @@ define([ 'jquery' ], function amdFactory($) {
 			cfg : 'webswing.config',
 			start : 'webswing.start',
 			disconnect : 'webswing.disconnect',
+			showDialog : 'dialog.show',
+			unauthorizedAccessMessage : 'dialog.content.unauthorizedAccess'
 		};
 		module.provides = {
 			login : login,
@@ -17,18 +19,46 @@ define([ 'jquery' ], function amdFactory($) {
 		var user;
 
 		function login(successCallback) {
-			verify(successCallback, function() {
-				window.location.href = api.cfg.connectionUrl + 'login';
+			verify('login?verify',successCallback, function() {
+				if(api.cfg.oneTimePassword!=null){
+					verify('login?otp='+api.cfg.oneTimePassword,successCallback, function() {
+						api.showDialog(api.unauthorizedAccessMessage);
+					});
+				}else{
+					window.location.href = api.cfg.connectionUrl + 'login';
+				}
 			});
 		}
 
-		function verify(successCallback, failCallback) {
+		function verify(url,successCallback, failCallback) {
 			$.ajax({
 				xhrFields : {
 					withCredentials : true
 				},
 				type : 'GET',
-				url : api.cfg.connectionUrl + 'login?verify',
+				url : api.cfg.connectionUrl + url,
+				success : function(data, textStatus, request) {
+					user = request.getResponseHeader('webswingUsername');
+					if (successCallback != null) {
+						successCallback();
+					}
+				},
+				error : function(data) {
+					if (failCallback != null) {
+						failCallback();
+					}
+				}
+			});
+		}
+		
+		
+		function verifyOtp(successCallback) {
+			$.ajax({
+				xhrFields : {
+					withCredentials : true
+				},
+				type : 'GET',
+				url : api.cfg.connectionUrl + 'login?otp='+api.cfg.oneTimePassword,
 				success : function(data, textStatus, request) {
 					user = request.getResponseHeader('webswingUsername');
 					if (successCallback != null) {
