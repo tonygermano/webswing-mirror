@@ -29,7 +29,7 @@
 	
 		function login(successCallback) {
 			verify(successCallback, function() {
-				window.location.href = 'login';
+				window.location.href = 'login?successUrl='+window.location.href;
 			});
 		}
 

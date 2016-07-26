@@ -5,9 +5,6 @@ public interface Constants {
 	// Web related constants
 	public static final String CLIENT_ID_COOKIE = "webswingID";
 
-	// JMS messages internal
-	public static final String SWING_PID_NOTIFICATION = "swingPID";
-
 	// swing startup properties
 	public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
 	public static final String SWING_START_SYS_PROP_MAIN_CLASS = "webswing.mainClass";
@@ -47,17 +44,14 @@ public interface Constants {
 	public static final String CREATE_NEW_TEMP = "webswing.createNewTemp";
 	public static final String CONFIG_FILE_PATH = "webswing.configFile";
 	public static final String DEFAULT_CONFIG_FILE_NAME = "webswing.config";
-	public static final String USER_FILE_PATH = "webswing.usersFilePath";
 	public static final String SERVER_HOST = "webswing.host";
 	public static final String SERVER_PORT = "webswing.port";
 	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";;
-	public static final String DEFAULT_USER_FILE_NAME = "user.properties";
 	public static final String JMS_OVERAL_MEM_LIMIT = "webswing.jmsOveralMemoryLimit";
 	public static final String JMS_DEST_MEM_LIMIT = "webswing.jmsDestinationMemoryLimit";
 	public static final String WEBSOCKET_MESSAGE_SIZE = "webswing.websocketMessageSizeLimit";
 	public static final String WEBSOCKET_THREAD_POOL = "webswing.websocketThreadPoolLimit";
 
-	public static final String ALLOWED_CORS_ORIGINS = "webswing.corsOrigins";
 	public static final String FILE_SERVLET_WAIT_TIMEOUT = "webswing.fileServletWaitTimeout";
 
 	// swing start related properties
@@ -77,12 +71,4 @@ public interface Constants {
 	public static final String HTTP_ATTR_RECORDING_FLAG = "X-webswing-recording";
 	public static final String HTTP_ATTR_ARGS = "X-webswing-args";
 	public static final String HTTP_ATTR_DEBUG_PORT = "X-webswing-debugPort";
-
-	// admin console constants
-	public static final String ADMIN_ROLE = "admin";
-	public static final String ADMIN_CONSOLE_APP_NAME = "adminConsoleApplicationName";
-
-
-
-
 }

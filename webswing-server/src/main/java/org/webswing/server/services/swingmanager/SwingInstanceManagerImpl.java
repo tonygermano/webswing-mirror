@@ -6,11 +6,16 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.model.server.SwingDescriptor;
@@ -99,6 +104,8 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
+		//CORS headers handling
+		handleCorsHeaders(req, res);
 		//redirect to url that ends with '/' to ensure browser queries correct resources 
 		if (req.getPathInfo().equals(getFullPathMapping())) {
 			try {
@@ -111,6 +118,35 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 		} else {
 			return super.serve(req, res);
 		}
+	}
+
+	private void handleCorsHeaders(HttpServletRequest req, HttpServletResponse res) {
+		if (isOriginAllowed(req.getHeader("Origin"))) {
+			if (req.getHeader("Origin") != null) {
+				res.addHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
+				res.addHeader("Access-Control-Allow-Credentials", "true");
+				res.addHeader("Access-Control-Expose-Headers", Constants.HTTP_ATTR_ARGS + ", " + Constants.HTTP_ATTR_RECORDING_FLAG + ", X-Cache-Date, X-Atmosphere-tracking-id, X-Requested-With");
+			}
+
+			if ("OPTIONS".equals(req.getMethod())) {
+				res.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+				res.addHeader("Access-Control-Allow-Headers", Constants.HTTP_ATTR_ARGS + ", " + Constants.HTTP_ATTR_RECORDING_FLAG + ", X-Requested-With, Origin, Content-Type, Content-Range, Content-Disposition, Content-Description, X-Atmosphere-Framework, X-Cache-Date, X-Atmosphere-tracking-id, X-Atmosphere-Transport");
+				res.addHeader("Access-Control-Max-Age", "-1");
+			}
+		}
+	}
+
+	private boolean isOriginAllowed(String header) {
+		List<String> allowedCorsOrigins = config.getAllowedCorsOrigins();
+		if (allowedCorsOrigins == null || allowedCorsOrigins.size() == 0) {
+			return false;
+		}
+		for (String s : allowedCorsOrigins) {
+			if (s.trim().equals(header) || s.trim().equals("*")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public SwingDescriptor getConfiguration() {

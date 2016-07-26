@@ -38,6 +38,7 @@ public abstract class SwingDescriptor implements Serializable {
 	private boolean allowDownload = true;
 	private boolean allowAutoDownload = true;
 	private boolean allowUpload = true;
+	private List<String> allowedCorsOrigins = new ArrayList<String>();
 	private float uploadMaxSize = 5;
 	private boolean allowJsLink = true;
 	private SecurityMode securityMode = SecurityMode.INHERITED;
@@ -279,6 +280,14 @@ public abstract class SwingDescriptor implements Serializable {
 
 	public void setWebFolder(String webFolder) {
 		this.webFolder = webFolder;
+	}
+
+	public List<String> getAllowedCorsOrigins() {
+		return allowedCorsOrigins;
+	}
+
+	public void setAllowedCorsOrigins(List<String> allowedCorsOrigins) {
+		this.allowedCorsOrigins = allowedCorsOrigins;
 	}
 
 }

@@ -182,8 +182,10 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	private void disconnectMirroredWebSession() {
-		notifyMirrorViewDisconnected();
-		this.mirroredResource = null;
+		if (this.mirroredResource != null) {
+			notifyMirrorViewDisconnected();
+			this.mirroredResource = null;
+		}
 	}
 
 	public void sendToWeb(MsgOut o) {
@@ -564,19 +566,19 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	private void notifyUserConnected() {
-		sendUserApiEventMsg(ApiEventType.UserConnected,resource);
+		sendUserApiEventMsg(ApiEventType.UserConnected, resource);
 	}
 
 	private void notifyUserDisconnected() {
-		sendUserApiEventMsg(ApiEventType.UserDisconnected,resource);
+		sendUserApiEventMsg(ApiEventType.UserDisconnected, resource);
 	}
 
 	private void notifyMirrorViewConnected() {
-		sendUserApiEventMsg(ApiEventType.MirrorViewConnected,mirroredResource);
+		sendUserApiEventMsg(ApiEventType.MirrorViewConnected, mirroredResource);
 	}
 
 	private void notifyMirrorViewDisconnected() {
-		sendUserApiEventMsg(ApiEventType.MirrorViewDisconnected,mirroredResource);
+		sendUserApiEventMsg(ApiEventType.MirrorViewDisconnected, mirroredResource);
 	}
 
 	private void sendUserApiEventMsg(ApiEventType type, WebSocketConnection r) {

@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -21,6 +22,7 @@ import org.webswing.server.services.security.api.WebswingCredentials;
 import org.webswing.server.services.security.otp.api.OneTimeToken;
 
 public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler {
+	private static final String SUCCESS_URL = "webswingSuccessUrl";
 	private static final Logger log = LoggerFactory.getLogger(LoginHandlerImpl.class);
 	private final WebswingSecurityProvider securityProvider;
 
@@ -60,15 +62,18 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 		} else if (otp != null) {
 			try {
 				OneTimeToken token = securityProvider.get().verifyOneTimePassword(otp);
-				subject.login(new WebswingTokenAdapter(getSecuredPath(),token));
+				subject.login(new WebswingTokenAdapter(getSecuredPath(), token));
 				user = getUser();
 				resp.setStatus(HttpServletResponse.SC_OK);
 				resp.setHeader("webswingUsername", user.getUserId());
 			} catch (WebswingAuthenticationException e1) {
-				log.warn("Authentication failed: "+e1.getMessage());
+				log.warn("Authentication failed: " + e1.getMessage());
 				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			}
 		} else {
+			if (req.getParameter("successUrl") != null) {
+				subject.getSession().setAttribute(SUCCESS_URL, req.getParameter("successUrl"));
+			}
 			WebswingCredentials credentials = securityProvider.get().getCredentials(req, resp, e);
 			if (credentials != null) {
 				try {
@@ -77,8 +82,14 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 						subject.login(new WebswingTokenAdapter(getSecuredPath(), resolvedUser, credentials));
 						user = getUser();
 						if (user != null && user != AbstractWebswingUser.anonymUser) {
-							String fullPath = getFullPathMapping();
-							resp.sendRedirect(fullPath.substring(0, fullPath.length() - getPath().length()));
+							String successPage = null;
+							if (subject.getSession().getAttribute(SUCCESS_URL) != null) {
+								successPage = (String) subject.getSession().getAttribute(SUCCESS_URL);
+							} else {
+								String fullPath = getFullPathMapping();
+								successPage = fullPath.substring(0, fullPath.length() - getPath().length());
+							}
+							resp.sendRedirect(successPage);
 							return;
 						}
 					}

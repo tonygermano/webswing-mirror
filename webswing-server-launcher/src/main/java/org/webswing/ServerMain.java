@@ -31,18 +31,6 @@ public class ServerMain {
 				Logger.error("Webswing configuration file " + config.getConfigFile() + " not found. Using default location.");
 			}
 		}
-		if (config.getUsersFile() != null) {
-			File usersFile = new File(config.getUsersFile());
-			if (usersFile.exists()) {
-				System.setProperty(Constants.USER_FILE_PATH, usersFile.toURI().toString());
-			} else {
-				Logger.error("Webswing users property file " + config.getUsersFile() + " not found. Using default location.");
-			}
-		}
-
-		if (config.getAllowedCorsOrigins() != null) {
-			System.setProperty(Constants.ALLOWED_CORS_ORIGINS, config.getAllowedCorsOrigins());
-		}
 
 		Server server = new Server();
 		List<Connector> connectors = new ArrayList<Connector>();

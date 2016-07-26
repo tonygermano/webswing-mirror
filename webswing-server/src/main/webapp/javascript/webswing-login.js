@@ -25,7 +25,7 @@ define([ 'jquery' ], function amdFactory($) {
 						api.showDialog(api.unauthorizedAccessMessage);
 					});
 				}else{
-					window.location.href = api.cfg.connectionUrl + 'login';
+					window.location.href = api.cfg.connectionUrl + 'login?successUrl='+window.location.href;
 				}
 			});
 		}

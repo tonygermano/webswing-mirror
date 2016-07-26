@@ -24,10 +24,6 @@ public abstract class Configuration {
 
 	public abstract String getConfigFile();
 
-	public abstract String getUsersFile();
-
-	public abstract String getAllowedCorsOrigins();
-
 	public static Configuration getInstance() {
 		return singleton;
 	}

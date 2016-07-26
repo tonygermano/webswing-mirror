@@ -40,7 +40,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule<WebswingCre
 	public void init() {
 		try {
 			URL[] urls = ClasspathUtil.populateClassPath(getClassPath());
-			customCL = new URLClassLoader(urls, this.getClass().getClassLoader());
+			customCL = new SecurityModuleClassLoader(urls, SecurityModuleWrapper.class.getClassLoader());
 			Class<?> moduleClass = customCL.loadClass(config.getClassName());
 
 			Constructor<?> defaultConstructor = null;

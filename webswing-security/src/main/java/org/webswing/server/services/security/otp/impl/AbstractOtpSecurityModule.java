@@ -27,7 +27,7 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingCredentials> i
 
 	private WebswingOtpSecurityModuleConfig config;
 	private static final ObjectMapper mapper = new ObjectMapper();
-	static{
+	static {
 		mapper.setSerializationInclusion(Inclusion.NON_NULL);
 	}
 
@@ -159,6 +159,7 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingCredentials> i
 
 	public String calculateTotpString(String crypto, String secret, String message, int intervalshift, int intervalLengthSec) {
 		long time = System.currentTimeMillis() / 1000 / intervalLengthSec;
+		time = time + intervalshift;
 		message = message + time;
 		byte[] msg = message.getBytes();
 		byte[] key = secret.getBytes();

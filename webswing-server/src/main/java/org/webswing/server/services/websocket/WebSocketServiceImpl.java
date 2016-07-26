@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.base.WebswingService;
+import org.webswing.server.services.playback.RecordingPlaybackUrlHandlerImpl;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 
 import com.google.inject.Singleton;
@@ -51,7 +52,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 		initParams.put("org.atmosphere.cpr.AtmosphereFramework.analytics", "false");
 		initParams.put("org.atmosphere.cpr.broadcasterCacheClass", "org.atmosphere.cache.UUIDBroadcasterCache");
 		try {
-			framework.init(new VoidServletConfig(initParams),false);
+			framework.init(new VoidServletConfig(initParams), false);
 		} catch (ServletException e) {
 			throw new RuntimeException("Failed to initialize Websocket framework", e);
 		}
@@ -84,6 +85,14 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	@Override
 	public WebSocketUrlHandler createJsonWebSocketHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
 		return createWebSocketListener(parent, "/async/swing", instanceHolder, jsonInterceptors);
+	}
+
+	@Override
+	public WebSocketUrlHandler createPlaybackWebSocketHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
+		RecordingPlaybackUrlHandlerImpl result = new RecordingPlaybackUrlHandlerImpl(parent, "/async/swing-play", this, instanceHolder);
+		AtmosphereHandler h = new WebSocketAtmosphereHandler(result);
+		framework.addAtmosphereHandler(result.getFullPathMapping(), h, instantiate(binaryInterceptors));
+		return result;
 	}
 
 	private WebSocketUrlHandler createWebSocketListener(UrlHandler parent, String url, SwingInstanceHolder instanceHolder, Class<?>[] interceptors) {
