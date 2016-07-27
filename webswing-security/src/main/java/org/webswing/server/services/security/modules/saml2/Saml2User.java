@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.webswing.server.services.security.api.WebswingCredentials;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
 
-public class Saml2Credentials implements WebswingCredentials, Serializable {
+public class Saml2User extends AbstractWebswingUser {
 	private static final long serialVersionUID = -4072080527374898315L;
 	private String samlToken = null;
 	private String name = null;
 	private Map<String, Serializable> attributes = new HashMap<String, Serializable>();
 
-	public Saml2Credentials(String samlToken, String name, Map<String, List<String>> map) {
+	public Saml2User(String samlToken, String name, Map<String, List<String>> map) {
 		this.samlToken = samlToken;
 		this.name = name;
 		for (Entry<String, List<String>> e : map.entrySet()) {
@@ -27,20 +27,19 @@ public class Saml2Credentials implements WebswingCredentials, Serializable {
 		}
 	}
 
-	public Object getCredentials() {
-		return samlToken;
-	}
-
-	public String getName() {
+	@Override
+	public String getUserId() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	@Override
+	public Map<String, Serializable> getUserAttributes() {
+		return attributes;
 	}
 
-	public Map<String, Serializable> getAttributes() {
-		return attributes;
+	@Override
+	public boolean hasRole(String role) {
+		return true;
 	}
 
 }

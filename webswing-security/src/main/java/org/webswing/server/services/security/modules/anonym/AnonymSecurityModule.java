@@ -1,43 +1,26 @@
 package org.webswing.server.services.security.modules.anonym;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingAuthenticationException;
-import org.webswing.server.services.security.api.WebswingCredentials;
-import org.webswing.server.services.security.api.WebswingSecurityModule;
+import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
+import org.webswing.server.services.security.modules.AbstractSecurityModule;
 
-public class AnonymSecurityModule implements WebswingSecurityModule<WebswingCredentials> {
+public class AnonymSecurityModule extends AbstractSecurityModule<WebswingSecurityModuleConfig> {
 
-	public AnonymSecurityModule(Map<String, Object> config) {
+	public AnonymSecurityModule(WebswingSecurityModuleConfig config) {
+		super(config);
 	}
 
 	@Override
-	public void init() {
-	}
-
-	@Override
-	public WebswingCredentials getCredentials(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException e) {
-		return new WebswingCredentials() {
-
-		};
-	}
-
-	@Override
-	public AbstractWebswingUser getUser(WebswingCredentials token) throws WebswingAuthenticationException {
+	public AbstractWebswingUser getUser(HttpServletRequest request, HttpServletResponse response) {
 		return new AbstractWebswingUser.AnonymWebswingUser() {
 			@Override
 			public boolean isPermitted(String permission) {
 				return true;
 			}
 		};
-	}
-
-	@Override
-	public void destroy() {
 	}
 
 }

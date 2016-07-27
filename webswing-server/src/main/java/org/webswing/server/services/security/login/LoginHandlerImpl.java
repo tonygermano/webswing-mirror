@@ -17,7 +17,6 @@ import org.webswing.server.services.security.LoginTokenAdapter;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
-import org.webswing.server.services.security.api.WebswingCredentials;
 
 public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler {
 	private static final String SUCCESS_URL = "webswingSuccessUrl";
@@ -72,31 +71,26 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 			if (req.getParameter("successUrl") != null) {
 				subject.getSession().setAttribute(SUCCESS_URL, req.getParameter("successUrl"));
 			}
-			WebswingCredentials credentials = securityProvider.get().getCredentials(req, resp, e);
-			if (credentials != null) {
-				try {
-					AbstractWebswingUser resolvedUser = securityProvider.get().getUser(credentials);
-					if (resolvedUser != null) {
-						subject.login(new LoginTokenAdapter(getSecuredPath(), resolvedUser));
-						user = getUser();
-						if (user != null && user != AbstractWebswingUser.anonymUser) {
-							String successPage = null;
-							if (subject.getSession().getAttribute(SUCCESS_URL) != null) {
-								successPage = (String) subject.getSession().getAttribute(SUCCESS_URL);
-							} else {
-								String fullPath = getFullPathMapping();
-								successPage = fullPath.substring(0, fullPath.length() - getPath().length());
-							}
-							resp.sendRedirect(successPage);
-							return;
+			try {
+				AbstractWebswingUser resolvedUser = securityProvider.get().getUser(req, resp);
+				if (resolvedUser != null) {
+					subject.login(new LoginTokenAdapter(getSecuredPath(), resolvedUser));
+					user = getUser();
+					if (user != null && user != AbstractWebswingUser.anonymUser) {
+						String successPage = null;
+						if (subject.getSession().getAttribute(SUCCESS_URL) != null) {
+							successPage = (String) subject.getSession().getAttribute(SUCCESS_URL);
+						} else {
+							String fullPath = getFullPathMapping();
+							successPage = fullPath.substring(0, fullPath.length() - getPath().length());
 						}
+						resp.sendRedirect(successPage);
+						return;
 					}
-				} catch (WebswingAuthenticationException ex) {
-					login(req, resp, ex);
-				} catch (Exception ux) {
-					log.error("Unexpected authentication error.", ux);
-					login(req, resp, new WebswingAuthenticationException("Unexpected authentication error.", ux));
 				}
+			} catch (Exception ux) {
+				log.error("Unexpected authentication error.", ux);
+				login(req, resp, new WebswingAuthenticationException("Unexpected authentication error.", ux));
 			}
 		}
 	}

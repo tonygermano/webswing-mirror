@@ -7,15 +7,15 @@ import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.modules.AbstractUserPasswordSecurityModule;
 
-public class PropertySecurityModule extends AbstractUserPasswordSecurityModule {
+public class PropertySecurityModule extends AbstractUserPasswordSecurityModule<PropertySecurityModuleConfig> {
 
 	private PropertiesRealm realm;
 
 	public PropertySecurityModule(PropertySecurityModuleConfig config) {
 		super(config);
 		realm = new PropertiesRealm();
-		String fileName = config.getFile();
-		realm.setResourcePath(config.getContext().replaceVariables(fileName));
+		String fileName = getConfig().getFile();
+		realm.setResourcePath(getConfig().getContext().replaceVariables(fileName));
 		realm.onInit();
 	}
 

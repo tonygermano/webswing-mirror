@@ -1,7 +1,6 @@
 package org.webswing.server.services.security;
 
 import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingCredentials;
 
 public class LogoutTokenAdapter extends LoginTokenAdapter {
 

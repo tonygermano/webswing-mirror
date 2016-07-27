@@ -17,26 +17,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
-import org.webswing.server.services.security.api.WebswingCredentials;
-import org.webswing.server.services.security.api.WebswingSecurityModule;
+import org.webswing.server.services.security.modules.AbstractSecurityModule;
 import org.webswing.server.services.security.otp.api.OneTimePasswordModule;
-import org.webswing.server.services.security.otp.api.OneTimeToken;
 
-public abstract class AbstractOtpSecurityModule<T extends WebswingCredentials> implements WebswingSecurityModule<T>, OneTimePasswordModule {
+public abstract class AbstractOtpSecurityModule<T extends WebswingOtpSecurityModuleConfig>  extends AbstractSecurityModule<T> implements OneTimePasswordModule
+{
 	private static final Logger log = LoggerFactory.getLogger(AbstractOtpSecurityModule.class);
 
-	private WebswingOtpSecurityModuleConfig config;
 	private static final ObjectMapper mapper = new ObjectMapper();
 	static {
 		mapper.setSerializationInclusion(Inclusion.NON_NULL);
 	}
 
-	public AbstractOtpSecurityModule(WebswingOtpSecurityModuleConfig config) {
-		this.config = config;
-	}
-
-	@Override
-	public void init() {
+	public AbstractOtpSecurityModule(T config) {
+		super(config);
 	}
 
 	@Override
@@ -93,28 +87,28 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingCredentials> i
 		if (StringUtils.isEmpty(token.getSwingPath())) {
 			throw new WebswingAuthenticationException("Swing Path must not be empty.");
 		}
-		if (config.getOtpAccessConfig() == null || config.getOtpAccessConfig().get(token.getRequestorId()) == null) {
+		if (getConfig().getOtpAccessConfig() == null || getConfig().getOtpAccessConfig().get(token.getRequestorId()) == null) {
 			throw new WebswingAuthenticationException("RequestorId not configured.");
 		}
 	}
 
 	public int getOtpValidForSec(String requestingClient) {
 		Integer result = null;
-		OtpAccessConfig c = config.getOtpAccessConfig().get(requestingClient);
+		OtpAccessConfig c = getConfig().getOtpAccessConfig().get(requestingClient);
 		result = c.getValidForSec();
 		return result == null ? 30 : result;
 	}
 
 	public String getOtpCrypto(String requestingClient) {
 		String result = null;
-		OtpAccessConfig c = config.getOtpAccessConfig().get(requestingClient);
+		OtpAccessConfig c = getConfig().getOtpAccessConfig().get(requestingClient);
 		result = c.getHMacAlgo();
 		return result == null ? "HmacSHA512" : result;
 	}
 
 	public String getOtpSecret(String requestingClient) throws WebswingAuthenticationException {
 		String result = null;
-		OtpAccessConfig c = config.getOtpAccessConfig().get(requestingClient);
+		OtpAccessConfig c = getConfig().getOtpAccessConfig().get(requestingClient);
 		result = c.getSecret();
 		if (result == null) {
 			log.error("Secret not found for requestor '" + requestingClient + "'");
@@ -180,7 +174,7 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingCredentials> i
 	}
 
 	public AbstractWebswingUser createUser(OtpTokenData token) throws WebswingAuthenticationException {
-		OtpAccessConfig c = config.getOtpAccessConfig().get(token.getRequestorId());
+		OtpAccessConfig c = getConfig().getOtpAccessConfig().get(token.getRequestorId());
 		Set<String> roles = new HashSet<>();
 		Set<String> permissions = new HashSet<>();
 		if (token.getRoles() != null) {

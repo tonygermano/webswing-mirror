@@ -13,21 +13,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
-import org.webswing.server.services.security.api.WebswingCredentials;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
 import org.webswing.server.services.security.otp.api.OneTimePasswordModule;
-import org.webswing.server.services.security.otp.api.OneTimeToken;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.util.ClasspathUtil;
 
-public class SecurityModuleWrapper implements WebswingSecurityModule<WebswingCredentials>, OneTimePasswordModule {
+public class SecurityModuleWrapper implements WebswingSecurityModule, OneTimePasswordModule {
 	private static final Logger log = LoggerFactory.getLogger(SecurityModuleWrapper.class);
 
-	private WebswingSecurityModule<WebswingCredentials> custom;
+	private WebswingSecurityModule custom;
 	private SecurityModuleWrapperConfig config;
 	private URLClassLoader customCL;
 
@@ -35,7 +32,6 @@ public class SecurityModuleWrapper implements WebswingSecurityModule<WebswingCre
 		this.config = config;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void init() {
 		try {
@@ -60,14 +56,14 @@ public class SecurityModuleWrapper implements WebswingSecurityModule<WebswingCre
 			if (configConstructor != null) {
 				Class<?> configClass = configConstructor.getParameterTypes()[0];
 				try {
-					custom = (WebswingSecurityModule<WebswingCredentials>) configConstructor.newInstance(ServerUtil.instantiateConfig(config.getConfig(), configClass, config.getContext()));
+					custom = (WebswingSecurityModule) configConstructor.newInstance(ServerUtil.instantiateConfig(config.getConfig(), configClass, config.getContext()));
 				} catch (Exception e) {
 					log.error("Could not construct custom security module class (using WebswingSecurityModuleConfig constructor).", e);
 				}
 			}
 			if (custom == null && defaultConstructor != null) {
 				try {
-					custom = (WebswingSecurityModule<WebswingCredentials>) defaultConstructor.newInstance();
+					custom = (WebswingSecurityModule) defaultConstructor.newInstance();
 				} catch (Exception e) {
 					log.error("Could not construct custom security module class (using Default constructor).", e);
 				}
@@ -91,15 +87,15 @@ public class SecurityModuleWrapper implements WebswingSecurityModule<WebswingCre
 	}
 
 	@Override
-	public WebswingCredentials getCredentials(final HttpServletRequest request, final HttpServletResponse response, final WebswingAuthenticationException e) throws ServletException, IOException {
+	public AbstractWebswingUser getUser(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 		if (custom != null) {
-			WebswingCredentials credentials;
+			AbstractWebswingUser user;
 			try {
-				credentials = runWithContextClassLoader(new Callable<WebswingCredentials>() {
+				user = runWithContextClassLoader(new Callable<AbstractWebswingUser>() {
 
 					@Override
-					public WebswingCredentials call() throws Exception {
-						return custom.getCredentials(request, response, e);
+					public AbstractWebswingUser call() throws Exception {
+						return custom.getUser(request, response);
 					}
 				});
 			} catch (Exception e1) {
@@ -108,39 +104,15 @@ public class SecurityModuleWrapper implements WebswingSecurityModule<WebswingCre
 				} else if (e1 instanceof IOException) {
 					throw (IOException) e1;
 				} else {
-					throw new IOException("Failed to get user. Unexpected exception", e);
-				}
-			}
-			return credentials;
-		}
-		return null;
-
-	}
-
-	@Override
-	public AbstractWebswingUser getUser(final WebswingCredentials credentials) throws WebswingAuthenticationException {
-		if (custom != null) {
-			AbstractWebswingUser user;
-			try {
-				user = runWithContextClassLoader(new Callable<AbstractWebswingUser>() {
-
-					@Override
-					public AbstractWebswingUser call() throws Exception {
-						return custom.getUser(credentials);
-					}
-				});
-			} catch (Exception e) {
-				if (e instanceof WebswingAuthenticationException) {
-					throw (WebswingAuthenticationException) e;
-				} else {
-					throw new WebswingAuthenticationException("Failed to get user. Unexpected exception", e);
+					throw new IOException("Failed to get user. Unexpected exception", e1);
 				}
 			}
 			return user;
 		}
 		return null;
-	}
 
+	}
+	
 	private <T> T runWithContextClassLoader(Callable<T> contextCallback) throws Exception {
 		ClassLoader original = Thread.currentThread().getContextClassLoader();
 		try {

@@ -11,20 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
-import org.webswing.server.services.security.api.WebswingCredentials;
-import org.webswing.server.services.security.modules.AbstractUserPasswordSecurityModule.UserPasswordCredentials;
 import org.webswing.server.services.security.otp.impl.AbstractOtpSecurityModule;
 import org.webswing.server.services.security.otp.impl.WebswingOtpSecurityModuleConfig;
 
-public abstract class AbstractUserPasswordSecurityModule extends AbstractOtpSecurityModule<UserPasswordCredentials> {
+public abstract class AbstractUserPasswordSecurityModule<T extends WebswingOtpSecurityModuleConfig> extends AbstractOtpSecurityModule<T> {
 
-	private WebswingOtpSecurityModuleConfig config;
-
-	public AbstractUserPasswordSecurityModule(WebswingOtpSecurityModuleConfig config) {
+	public AbstractUserPasswordSecurityModule(T config) {
 		super(config);
-		this.config = config;
 	}
-
 
 	public String getLoginResource() {
 		return "login.html";
@@ -39,20 +33,50 @@ public abstract class AbstractUserPasswordSecurityModule extends AbstractOtpSecu
 	}
 
 	@Override
-	public UserPasswordCredentials getCredentials(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException e) throws IOException {
-		String username = getUserName(request);
-		String password = getPassword(request);
-		if ((username == null && password == null) || e != null) {
-			URL resource = config.getContext().getWebResource(getLoginResource());
-			if (resource != null) {
-				String template = toString(resource.openStream(), 4 * 1024);
-				String errorMessage = e == null ? "" : e.getLocalizedMessage();
-				response.getOutputStream().print(template.replace("${errorMessage}", errorMessage));
+	public AbstractWebswingUser getUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		try {
+			String username = getUserName(request);
+			String password = getPassword(request);
+			if (username != null || password != null) {
+				AbstractWebswingUser user = verifyUserPassword(username, password);
+				if (user != null) {
+					return user;
+				}
 			}
-			return null;
-		} else {
-			return new UserPasswordCredentials(username, password);
+			onAuthenticationFailed(request, response, null);
+		} catch (WebswingAuthenticationException e) {
+			onAuthenticationFailed(request, response, e);
 		}
+		return null;
+	}
+
+	protected void onAuthenticationFailed(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
+		if (isAjax(request)) {
+			serveLoginPageAjax(request, response, exception);
+		} else {
+			serveLoginPage(request, response, exception);
+		}
+	}
+
+	private void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
+		URL resource = getConfig().getContext().getWebResource(getLoginResource());
+		if (resource != null) {
+			String template = toString(resource.openStream(), 4 * 1024);
+			String errorMessage = exception == null ? "" : exception.getLocalizedMessage();
+			response.getOutputStream().print(template.replace("${errorMessage}", errorMessage));
+		}
+	}
+
+	protected void serveLoginPageAjax(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
+		response.sendRedirect("login");
+	}
+
+	protected boolean isAjax(HttpServletRequest request) {
+		String requestedWithHeader = request.getHeader("X-Requested-With");
+		if (requestedWithHeader != null && requestedWithHeader.equals("XMLHttpRequest")) {
+			return true;
+		}
+		return false;
 	}
 
 	public static String toString(final InputStream is, final int bufferSize) throws IOException {
@@ -75,67 +99,5 @@ public abstract class AbstractUserPasswordSecurityModule extends AbstractOtpSecu
 		return out.toString();
 	}
 
-	@Override
-	public AbstractWebswingUser getUser(UserPasswordCredentials token) throws WebswingAuthenticationException {
-		UserPasswordCredentials creds = (UserPasswordCredentials) token;
-		return verifyUserPassword(creds.getUser(), creds.getPassword());
-	}
-
 	public abstract AbstractWebswingUser verifyUserPassword(String user, String password) throws WebswingAuthenticationException;
-
-	@Override
-	public void destroy() {
-	}
-
-	public static class UserPasswordCredentials implements WebswingCredentials {
-
-		private String user;
-		private String password;
-
-		public UserPasswordCredentials(String user, String password) {
-			super();
-			this.user = user;
-			this.password = password;
-		}
-
-		public String getUser() {
-			return user;
-		}
-
-		public String getPassword() {
-			return password;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((password == null) ? 0 : password.hashCode());
-			result = prime * result + ((user == null) ? 0 : user.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			UserPasswordCredentials other = (UserPasswordCredentials) obj;
-			if (password == null) {
-				if (other.password != null)
-					return false;
-			} else if (!password.equals(other.password))
-				return false;
-			if (user == null) {
-				if (other.user != null)
-					return false;
-			} else if (!user.equals(other.user))
-				return false;
-			return true;
-		}
-
-	}
 }

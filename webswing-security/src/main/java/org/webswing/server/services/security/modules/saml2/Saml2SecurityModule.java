@@ -14,7 +14,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.AttributeSet;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.IdPConfig;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAMLClient;
@@ -24,7 +23,7 @@ import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAM
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SPConfig;
 import org.webswing.server.services.security.otp.impl.AbstractOtpSecurityModule;
 
-public class Saml2SecurityModule extends AbstractOtpSecurityModule<Saml2Credentials> {
+public class Saml2SecurityModule extends AbstractOtpSecurityModule<Saml2SecurityModuleConfig> {
 	private static final Logger log = LoggerFactory.getLogger(Saml2SecurityModule.class);
 	private static boolean staticInit = false;
 	private static final String SAML_PARAMETER = "SAMLResponse";
@@ -37,13 +36,10 @@ public class Saml2SecurityModule extends AbstractOtpSecurityModule<Saml2Credenti
 		}
 	}
 
-	private Saml2SecurityModuleConfig config;
-
 	private SAMLClient client;
 
 	public Saml2SecurityModule(Saml2SecurityModuleConfig config) {
 		super(config);
-		this.config = config;
 	}
 
 	public void init() {
@@ -51,16 +47,16 @@ public class Saml2SecurityModule extends AbstractOtpSecurityModule<Saml2Credenti
 			throw new RuntimeException("SAML2 module was not initialized correctly. Not possible to configure security module. ");
 		}
 		try {
-			String idpFile = config.getIdentityProviderMetadataFile();
-			File file = config.getContext().resolveFile(idpFile);
+			String idpFile = getConfig().getIdentityProviderMetadataFile();
+			File file = getConfig().getContext().resolveFile(idpFile);
 			if (file == null || !file.isFile()) {
 				throw new SAMLException("The SAML2 Identity provider metadata file " + idpFile + " does not exist.");
 			}
-			String consumerUrl = config.getServiceProviderConsumerUrl();
+			String consumerUrl = getConfig().getServiceProviderConsumerUrl();
 			if (StringUtils.isEmpty(consumerUrl)) {
 				throw new SAMLException("The SAML2 serviceProviderConsumerUrl property must not be empty.");
 			}
-			String entityId = config.getServiceProviderEntityId();
+			String entityId = getConfig().getServiceProviderEntityId();
 			if (StringUtils.isEmpty(entityId)) {
 				throw new RuntimeException("The SAML2 Service provider entityId property must not be empty.");
 			}
@@ -79,7 +75,7 @@ public class Saml2SecurityModule extends AbstractOtpSecurityModule<Saml2Credenti
 		}
 	}
 
-	public Saml2Credentials getCredentials(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException e) throws ServletException, IOException {
+	public AbstractWebswingUser getUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String samlResponse = request.getParameter(SAML_PARAMETER);
 		if (StringUtils.isEmpty(samlResponse)) {
 			String requestId = SAMLUtils.generateRequestId();
@@ -103,18 +99,11 @@ public class Saml2SecurityModule extends AbstractOtpSecurityModule<Saml2Credenti
 			try {
 				aset = client.validateResponse(samlResponse);
 				String user = aset.getNameId();
-				return new Saml2Credentials(samlResponse, user, aset.getAttributes());
+				return new Saml2User(samlResponse, user, aset.getAttributes());
 			} catch (SAMLException e1) {
 				throw new IOException("Failed to auhenticate.", e1);
 			}
 		}
-	}
-
-	public AbstractWebswingUser getUser(Saml2Credentials credentials) throws WebswingAuthenticationException {
-		return new Saml2WebswingUser(credentials);
-	}
-
-	public void destroy() {
 	}
 
 }
