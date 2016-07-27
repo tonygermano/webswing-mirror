@@ -1,5 +1,6 @@
 package org.webswing.server.base;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,16 +56,31 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
-		String pathinfo = getPathInfo(req);
-		List<UrlHandler> localHandlerList = new LinkedList<UrlHandler>(childHandlers);
-		for (UrlHandler child : localHandlerList) {
-			if (isSubPath(toPath(child.getPathMapping()), pathinfo)) {
-				boolean served = child.serve(req, res);
-				if (served) {
-					return true;
+		//redirect to url that ends with '/' to ensure browser queries correct resources 
+		if (isPrimaryHandler() && req.getPathInfo().equals(getFullPathMapping())) {
+			try {
+				String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
+				res.sendRedirect(getPath() + "/" + queryString);
+			} catch (IOException e) {
+				log.error("Failed to redirect.", e);
+			}
+			return true;
+		} else {
+			String pathinfo = getPathInfo(req);
+			List<UrlHandler> localHandlerList = new LinkedList<UrlHandler>(childHandlers);
+			for (UrlHandler child : localHandlerList) {
+				if (isSubPath(toPath(child.getPathMapping()), pathinfo)) {
+					boolean served = child.serve(req, res);
+					if (served) {
+						return true;
+					}
 				}
 			}
 		}
+		return false;
+	}
+
+	protected boolean isPrimaryHandler(){
 		return false;
 	}
 

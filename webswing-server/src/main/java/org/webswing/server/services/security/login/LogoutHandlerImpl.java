@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
-import org.webswing.server.services.security.WebswingTokenAdapter;
+import org.webswing.server.services.security.LogoutTokenAdapter;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 
 public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandler {
@@ -48,7 +48,7 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 			Subject subject = SecurityUtils.getSubject();
 			try {
 				//logout only user for the secured path (in case other users are logged in the same session)
-				subject.login(new WebswingTokenAdapter(getSecuredPath(), user, null));
+				subject.login(new LogoutTokenAdapter(getSecuredPath(), user));
 			} catch (AuthenticationException e) {
 				//there was no user left in the session, so we can do full log out.
 				subject.logout();

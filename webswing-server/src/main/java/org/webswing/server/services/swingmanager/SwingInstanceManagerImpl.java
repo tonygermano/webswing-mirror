@@ -6,10 +6,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -87,6 +83,17 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 		super.init();
 	}
 
+	@Override
+	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
+		//CORS headers handling
+		handleCorsHeaders(req, res);
+		return super.serve(req, res);
+	}
+
+	protected boolean isPrimaryHandler() {
+		return true;
+	}
+
 	private void loadSecurityModule() {
 		securityModule = securityModuleService.create(this, config.getSecurityMode(), config.getSecurityConfig());
 		if (securityModule != null) {
@@ -99,24 +106,6 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 		super.destroy();
 		if (securityModule != null) {
 			securityModule.destroy();
-		}
-	}
-
-	@Override
-	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
-		//CORS headers handling
-		handleCorsHeaders(req, res);
-		//redirect to url that ends with '/' to ensure browser queries correct resources 
-		if (req.getPathInfo().equals(getFullPathMapping())) {
-			try {
-				String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
-				res.sendRedirect(getPath() + "/" + queryString);
-			} catch (IOException e) {
-				log.error("Failed to redirect.", e);
-			}
-			return true;
-		} else {
-			return super.serve(req, res);
 		}
 	}
 

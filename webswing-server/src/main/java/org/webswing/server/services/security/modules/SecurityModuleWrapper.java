@@ -182,14 +182,14 @@ public class SecurityModuleWrapper implements WebswingSecurityModule<WebswingCre
 		return subs.replace(cp);
 	}
 
-	public OneTimeToken verifyOneTimePassword(final String otp) throws WebswingAuthenticationException {
+	public AbstractWebswingUser verifyOneTimePassword(final String otp) throws WebswingAuthenticationException {
 		if (custom != null && custom instanceof OneTimePasswordModule) {
 			try {
-				return runWithContextClassLoader(new Callable<OneTimeToken>() {
+				return runWithContextClassLoader(new Callable<AbstractWebswingUser>() {
 
 					@Override
-					public OneTimeToken call() throws Exception {
-						OneTimeToken result = ((OneTimePasswordModule) custom).verifyOneTimePassword(otp);
+					public AbstractWebswingUser call() throws Exception {
+						AbstractWebswingUser result = ((OneTimePasswordModule) custom).verifyOneTimePassword(otp);
 						return result;
 					}
 				});

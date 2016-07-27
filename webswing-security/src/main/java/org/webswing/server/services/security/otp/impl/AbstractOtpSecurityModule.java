@@ -40,7 +40,7 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingCredentials> i
 	}
 
 	@Override
-	public OneTimeToken verifyOneTimePassword(String otp) throws WebswingAuthenticationException {
+	public AbstractWebswingUser verifyOneTimePassword(String otp) throws WebswingAuthenticationException {
 		try {
 			OtpTokenData token = parseOtpTokenString(otp);
 			verifyTokenValid(token);
@@ -51,7 +51,7 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingCredentials> i
 			for (int i = -1; i <= 1; i++) {
 				String expectedPassword = calculateTotpString(crypto, secret, message, i, validityInterval);
 				if (expectedPassword.equals(token.getOneTimePassword())) {
-					return createOneTimeToken(token);
+					return createUser(token);
 				}
 			}
 			throw new WebswingAuthenticationException("Invalid or expired OTP. ");
@@ -179,7 +179,7 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingCredentials> i
 		}
 	}
 
-	public OneTimeToken createOneTimeToken(OtpTokenData token) throws WebswingAuthenticationException {
+	public AbstractWebswingUser createUser(OtpTokenData token) throws WebswingAuthenticationException {
 		OtpAccessConfig c = config.getOtpAccessConfig().get(token.getRequestorId());
 		Set<String> roles = new HashSet<>();
 		Set<String> permissions = new HashSet<>();
@@ -201,8 +201,7 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingCredentials> i
 		}
 
 		AbstractWebswingUser user = new OtpWebswingUser(token.getUser(), roles, permissions);
-		OneTimeToken otToken = new OneTimeToken(user);
-		return otToken;
+		return user;
 	}
 
 	@Override

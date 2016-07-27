@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -14,12 +13,11 @@ import org.slf4j.LoggerFactory;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.services.security.LoginTokenAdapter;
 import org.webswing.server.services.security.SecurityManagerService;
-import org.webswing.server.services.security.WebswingTokenAdapter;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.api.WebswingCredentials;
-import org.webswing.server.services.security.otp.api.OneTimeToken;
 
 public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler {
 	private static final String SUCCESS_URL = "webswingSuccessUrl";
@@ -61,8 +59,8 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 			}
 		} else if (otp != null) {
 			try {
-				OneTimeToken token = securityProvider.get().verifyOneTimePassword(otp);
-				subject.login(new WebswingTokenAdapter(getSecuredPath(), token));
+				AbstractWebswingUser token = securityProvider.get().verifyOneTimePassword(otp);
+				subject.login(new LoginTokenAdapter(getSecuredPath(), token));
 				user = getUser();
 				resp.setStatus(HttpServletResponse.SC_OK);
 				resp.setHeader("webswingUsername", user.getUserId());
@@ -79,7 +77,7 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 				try {
 					AbstractWebswingUser resolvedUser = securityProvider.get().getUser(credentials);
 					if (resolvedUser != null) {
-						subject.login(new WebswingTokenAdapter(getSecuredPath(), resolvedUser, credentials));
+						subject.login(new LoginTokenAdapter(getSecuredPath(), resolvedUser));
 						user = getUser();
 						if (user != null && user != AbstractWebswingUser.anonymUser) {
 							String successPage = null;

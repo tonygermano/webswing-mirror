@@ -92,6 +92,10 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 		return true;
 	}
 
+	protected boolean isPrimaryHandler() {
+		return true;
+	}
+
 	public void init() {
 		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
 		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));

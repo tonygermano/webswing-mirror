@@ -80,6 +80,9 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 		private String path;
 
 		public RedirectResult(String path) {
+			if(path.startsWith("/")){
+				path=path.substring(1);
+			}
 			this.path = path;
 		}
 

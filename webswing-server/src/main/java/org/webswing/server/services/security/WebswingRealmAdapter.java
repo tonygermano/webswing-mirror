@@ -30,7 +30,7 @@ public class WebswingRealmAdapter extends AuthorizingRealm {
 
 	@Override
 	public boolean supports(AuthenticationToken token) {
-		if (token instanceof WebswingTokenAdapter) {
+		if (token instanceof LoginTokenAdapter) {
 			return true;
 		}
 		return false;
@@ -39,9 +39,9 @@ public class WebswingRealmAdapter extends AuthorizingRealm {
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 		AuthenticationInfo info = null;
-		if (token instanceof WebswingTokenAdapter) {
+		if (token instanceof LoginTokenAdapter) {
 			WebswingPrincipal user = (WebswingPrincipal) token.getPrincipal();
-			if (SecurityUtils.getSubject().getPrincipals() == null && token.getCredentials() != null) {
+			if (SecurityUtils.getSubject().getPrincipals() == null && !(token instanceof LogoutTokenAdapter)) {
 				info = new WebswingAuthenticationInfo(new SimplePrincipalCollection(user, WebswingRealmAdapter.WEBSWING_REALM), token.getCredentials());
 			} else {
 				List<WebswingPrincipal> principals = new ArrayList<WebswingPrincipal>(SecurityUtils.getSubject().getPrincipals().byType(WebswingPrincipal.class));
@@ -51,7 +51,7 @@ public class WebswingRealmAdapter extends AuthorizingRealm {
 						i.remove();
 					}
 				}
-				if (token.getCredentials() != null) {
+				if (!(token instanceof LogoutTokenAdapter)) {
 					principals.add(user);
 				}
 				if (principals.size() > 0) {
