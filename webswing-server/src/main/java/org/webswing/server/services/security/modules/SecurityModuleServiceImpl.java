@@ -1,6 +1,7 @@
 package org.webswing.server.services.security.modules;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +57,14 @@ public class SecurityModuleServiceImpl implements SecurityModuleService {
 			@Override
 			public String getClassName() {
 				return securityModule.getName();
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public <T> T getValueAs(String name, Class<T> clazz) {
+				Object o=getConfig().get(name);
+				Map<String, Object> subConfig = (Map<String, Object>) (o != null && o instanceof HashMap ? o : new HashMap<>());
+				return ServerUtil.instantiateConfig(subConfig, clazz, getContext());
 			}
 		};
 

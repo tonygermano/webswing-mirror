@@ -14,14 +14,12 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
-import org.webswing.server.services.security.otp.api.OneTimePasswordModule;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.util.ClasspathUtil;
 
-public class SecurityModuleWrapper implements WebswingSecurityModule, OneTimePasswordModule {
+public class SecurityModuleWrapper implements WebswingSecurityModule {
 	private static final Logger log = LoggerFactory.getLogger(SecurityModuleWrapper.class);
 
 	private WebswingSecurityModule custom;
@@ -87,7 +85,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule, OneTimePas
 	}
 
 	@Override
-	public AbstractWebswingUser getUser(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+	public AbstractWebswingUser doLogin(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 		if (custom != null) {
 			AbstractWebswingUser user;
 			try {
@@ -95,7 +93,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule, OneTimePas
 
 					@Override
 					public AbstractWebswingUser call() throws Exception {
-						return custom.getUser(request, response);
+						return custom.doLogin(request, response);
 					}
 				});
 			} catch (Exception e1) {
@@ -112,7 +110,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule, OneTimePas
 		return null;
 
 	}
-	
+
 	private <T> T runWithContextClassLoader(Callable<T> contextCallback) throws Exception {
 		ClassLoader original = Thread.currentThread().getContextClassLoader();
 		try {
@@ -154,45 +152,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule, OneTimePas
 		return subs.replace(cp);
 	}
 
-	public AbstractWebswingUser verifyOneTimePassword(final String otp) throws WebswingAuthenticationException {
-		if (custom != null && custom instanceof OneTimePasswordModule) {
-			try {
-				return runWithContextClassLoader(new Callable<AbstractWebswingUser>() {
-
-					@Override
-					public AbstractWebswingUser call() throws Exception {
-						AbstractWebswingUser result = ((OneTimePasswordModule) custom).verifyOneTimePassword(otp);
-						return result;
-					}
-				});
-			} catch (WebswingAuthenticationException e1) {
-				throw e1;
-			} catch (Exception e) {
-				log.error("Verifying OTP failed.", e);
-				throw new WebswingAuthenticationException("Verifying OTP failed.", e);
-			}
-		}
-		return null;
+	public SecurityModuleWrapperConfig getConfig() {
+		return config;
 	}
-
-	@Override
-	public String generateOneTimePassword(final String swingPath, final String requestingClient, final String user, final String[] roles, final String[] permissions) throws WebswingAuthenticationException {
-		if (custom != null && custom instanceof OneTimePasswordModule) {
-			try {
-				return runWithContextClassLoader(new Callable<String>() {
-
-					@Override
-					public String call() throws Exception {
-						String result = ((OneTimePasswordModule) custom).generateOneTimePassword(swingPath, requestingClient, user, roles, permissions);
-						return result;
-					}
-				});
-			} catch (Exception e1) {
-				log.error("Failed to generate OTP.", e1);
-				throw new WebswingAuthenticationException("Failed to generate OTP.", e1);
-			}
-		}
-		return null;
-	}
-
 }

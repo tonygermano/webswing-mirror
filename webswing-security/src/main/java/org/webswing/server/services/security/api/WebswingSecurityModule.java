@@ -10,7 +10,7 @@ public interface WebswingSecurityModule {
 
 	void init();
 
-	AbstractWebswingUser getUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
+	AbstractWebswingUser doLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
 
 	void destroy();
 }

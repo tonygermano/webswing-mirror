@@ -16,10 +16,8 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.LoginTokenAdapter;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingAuthenticationException;
 
 public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler {
-	private static final String SUCCESS_URL = "webswingSuccessUrl";
 	private static final Logger log = LoggerFactory.getLogger(LoginHandlerImpl.class);
 	private final WebswingSecurityProvider securityProvider;
 
@@ -45,27 +43,14 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 	}
 
 	protected void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String otp = req.getParameter("otp");
 		AbstractWebswingUser user = getUser();
 		Subject subject = SecurityUtils.getSubject();
 		if (user != null && user != AbstractWebswingUser.anonymUser) {
 			resp.setStatus(HttpServletResponse.SC_OK);
 			resp.setHeader("webswingUsername", user.getUserId());
 		} else {
-			if (otp != null) {
-				try {
-					AbstractWebswingUser token = securityProvider.get().verifyOneTimePassword(otp);
-					subject.login(new LoginTokenAdapter(getSecuredPath(), token));
-					user = getUser();
-					resp.setStatus(HttpServletResponse.SC_OK);
-					resp.setHeader("webswingUsername", user.getUserId());
-				} catch (WebswingAuthenticationException e1) {
-					log.warn("Authentication failed: " + e1.getMessage());
-					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-				}
-			}
 			try {
-				AbstractWebswingUser resolvedUser = securityProvider.get().getUser(req, resp);
+				AbstractWebswingUser resolvedUser = securityProvider.get().doLogin(req, resp);
 				if (resolvedUser != null) {
 					subject.login(new LoginTokenAdapter(getSecuredPath(), resolvedUser));
 				}

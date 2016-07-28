@@ -1,4 +1,4 @@
-package org.webswing.server.services.security.otp.impl;
+package org.webswing.server.services.security.extension.onetimeurl;
 
 import java.io.Serializable;
 

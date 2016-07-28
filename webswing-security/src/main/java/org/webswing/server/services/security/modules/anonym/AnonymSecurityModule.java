@@ -9,7 +9,7 @@ import org.webswing.server.services.security.api.WebswingSecurityModule;
 public class AnonymSecurityModule implements WebswingSecurityModule {
 
 	@Override
-	public AbstractWebswingUser getUser(HttpServletRequest request, HttpServletResponse response) {
+	public AbstractWebswingUser doLogin(HttpServletRequest request, HttpServletResponse response) {
 		return new AbstractWebswingUser.AnonymWebswingUser() {
 			@Override
 			public boolean isPermitted(String permission) {

@@ -17,6 +17,8 @@ import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
+import org.webswing.server.services.security.extension.onetimeurl.OneTimeUrlSecurityExtension;
+import org.webswing.server.services.security.extension.onetimeurl.OneTimeUrlSecurityExtensionConfig;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
 import org.webswing.server.services.security.modules.SecurityModuleWrapper;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
@@ -53,10 +55,12 @@ public class OtpRestUrlHandler extends AbstractRestUrlHandler {
 				WebswingSecurityProvider secProv = instanceHolder.getSecurityProviderForApp(app.getPath());
 				if (secProv != null) {
 					SecurityModuleWrapper module = secProv.get();
+					OneTimeUrlSecurityExtensionConfig config = module.getConfig().getValueAs(OneTimeUrlSecurityExtension.class.getName(), OneTimeUrlSecurityExtensionConfig.class);
+					OneTimeUrlSecurityExtension extension = new OneTimeUrlSecurityExtension(config); 
 					String[] rolesArray = roles != null ? roles.split(",") : null;
 					String[] permissionsArray = permissions != null ? permissions.split(",") : null;
 					try {
-						String otp = module.generateOneTimePassword(app.getPath(), requestor, user, rolesArray, permissionsArray);
+						String otp = extension.generateOneTimePassword(app.getPath(), requestor, user, rolesArray, permissionsArray);
 						return otp;
 					} catch (WebswingAuthenticationException e) {
 						throw new WsException(e);

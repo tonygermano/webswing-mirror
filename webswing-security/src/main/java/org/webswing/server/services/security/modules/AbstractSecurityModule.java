@@ -75,22 +75,40 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	}
 
 	@Override
-	public AbstractWebswingUser getUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public AbstractWebswingUser doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		try {
 			Map<String, Object> msg = getLoginRequest(request);
 			if (msg != null) {
 				config.getContext().setToSecuritySession(LOGIN_REQUEST_MSG, msg);
 			}
-			AbstractWebswingUser user = authenticate(request);
-			if (user != null) {
-				onAuthenticationSuccess(request, response);
-				return user;
+			boolean preValid = preVerify(request, response);
+			if (preValid) {
+				AbstractWebswingUser user = authenticate(request);
+				if (user != null) {
+					boolean postValid = postVerify(user, request, response);
+					if (postValid) {
+						onAuthenticationSuccess(request, response);
+						return decorateUser(user, request, response);
+					}
+				}
+				onAuthenticationFailed(request, response, null);
 			}
-			onAuthenticationFailed(request, response, null);
 		} catch (WebswingAuthenticationException e) {
 			onAuthenticationFailed(request, response, e);
 		}
 		return null;
+	}
+
+	protected AbstractWebswingUser decorateUser(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) {
+		return user;
+	}
+
+	protected boolean postVerify(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
+		return true;
+	}
+
+	protected boolean preVerify(HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
+		return true;
 	}
 
 	protected abstract AbstractWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException;
@@ -191,7 +209,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Map<String, Object> getLoginRequest(HttpServletRequest request) {
+	public Map<String, Object> getLoginRequest(HttpServletRequest request) {
 		if (isAjax(request)) {
 			try {
 				return mapper.readValue(request.getInputStream(), Map.class);
@@ -202,7 +220,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 		return (Map<String, Object>) getConfig().getContext().getFromSecuritySession(LOGIN_REQUEST_MSG);
 	}
 
-	protected ObjectMapper getMapper() {
+	public static ObjectMapper getMapper() {
 		return mapper;
 	}
 

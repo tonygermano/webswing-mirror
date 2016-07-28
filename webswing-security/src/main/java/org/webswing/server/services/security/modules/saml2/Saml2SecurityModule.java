@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
+import org.webswing.server.services.security.modules.AbstractExtendableSecurityModule;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.AttributeSet;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.IdPConfig;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAMLClient;
@@ -21,9 +22,8 @@ import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAM
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAMLInit;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAMLUtils;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SPConfig;
-import org.webswing.server.services.security.otp.impl.AbstractOtpSecurityModule;
 
-public class Saml2SecurityModule extends AbstractOtpSecurityModule<Saml2SecurityModuleConfig> {
+public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2SecurityModuleConfig> {
 	private static final Logger log = LoggerFactory.getLogger(Saml2SecurityModule.class);
 	private static boolean staticInit = false;
 	private static final String SAML_PARAMETER = "SAMLResponse";

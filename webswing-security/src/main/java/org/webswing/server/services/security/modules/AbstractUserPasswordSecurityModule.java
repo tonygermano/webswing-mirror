@@ -9,10 +9,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
-import org.webswing.server.services.security.otp.impl.AbstractOtpSecurityModule;
-import org.webswing.server.services.security.otp.impl.WebswingOtpSecurityModuleConfig;
+import org.webswing.server.services.security.extension.api.WebswingExtendableSecurityModuleConfig;
 
-public abstract class AbstractUserPasswordSecurityModule<T extends WebswingOtpSecurityModuleConfig> extends AbstractOtpSecurityModule<T> {
+public abstract class AbstractUserPasswordSecurityModule<T extends WebswingExtendableSecurityModuleConfig> extends AbstractExtendableSecurityModule<T> {
 
 	public AbstractUserPasswordSecurityModule(T config) {
 		super(config);

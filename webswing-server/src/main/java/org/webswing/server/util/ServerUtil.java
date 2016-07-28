@@ -331,6 +331,13 @@ public class ServerUtil {
 				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 					BeanInfo info = Introspector.getBeanInfo(method.getDeclaringClass());
 					PropertyDescriptor[] pds = info.getPropertyDescriptors();
+					if (method.getName().equals("getValueAs") && method.getParameters().length == 2 && args[0] instanceof String && args[1] instanceof Class) {
+						String s = (String) args[0];
+						Class c = (Class) args[1];
+						Object o = config.get(s);
+						Map<String, Object> subConfig = (Map<String, Object>) (o != null && o instanceof HashMap ? o : new HashMap<>());
+						return instantiateConfig(subConfig, c, context);
+					}
 					for (PropertyDescriptor pd : pds) {
 						if (pd.getReadMethod().equals(method)) {
 							if (ClassUtils.isAssignable(SecurityContext.class, method.getReturnType(), false)) {

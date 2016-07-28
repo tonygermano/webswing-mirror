@@ -1,13 +1,16 @@
-package org.webswing.server.services.security.otp.impl;
+package org.webswing.server.services.security.extension.onetimeurl;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -15,18 +18,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
+import org.webswing.server.services.security.extension.api.SecurityModuleExtension;
 import org.webswing.server.services.security.modules.AbstractSecurityModule;
-import org.webswing.server.services.security.otp.api.OneTimePasswordModule;
 
-public abstract class AbstractOtpSecurityModule<T extends WebswingOtpSecurityModuleConfig>  extends AbstractSecurityModule<T> implements OneTimePasswordModule
-{
-	private static final Logger log = LoggerFactory.getLogger(AbstractOtpSecurityModule.class);
+public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTimeUrlSecurityExtensionConfig> {
+	private static final String SECURITY_TOKEN = "securityToken";
+	private static final Logger log = LoggerFactory.getLogger(OneTimeUrlSecurityExtension.class);
 
-	public AbstractOtpSecurityModule(T config) {
+	public OneTimeUrlSecurityExtension(OneTimeUrlSecurityExtensionConfig config) {
 		super(config);
 	}
 
 	@Override
+	public AbstractWebswingUser doSufficientPreValidation(AbstractSecurityModule<?> m, HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
+		Map<String, Object> requestData = m.getLoginRequest(request);
+		if (requestData.containsKey(SECURITY_TOKEN)) {
+			AbstractWebswingUser result = verifyOneTimePassword((String) requestData.get(SECURITY_TOKEN));
+			return result;
+		}
+		throw new WebswingAuthenticationException("Not valid one time url request");
+	}
+
 	public AbstractWebswingUser verifyOneTimePassword(String otp) throws WebswingAuthenticationException {
 		try {
 			OtpTokenData token = parseOtpTokenString(otp);
@@ -47,7 +59,6 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingOtpSecurityMod
 		}
 	}
 
-	@Override
 	public String generateOneTimePassword(String swingPath, String requestorId, String user, String[] roles, String[] permissions) throws WebswingAuthenticationException {
 		String encoded;
 		try {
@@ -128,7 +139,7 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingOtpSecurityMod
 
 	public OtpTokenData parseOtpTokenString(String otp) throws WebswingAuthenticationException {
 		try {
-			OtpTokenData token = getMapper().readValue(Base64.decodeBase64(otp), OtpTokenData.class);
+			OtpTokenData token = AbstractSecurityModule.getMapper().readValue(Base64.decodeBase64(otp), OtpTokenData.class);
 			return token;
 		} catch (Exception e) {
 			throw new WebswingAuthenticationException("Failed to parse OTP token", e);
@@ -137,7 +148,7 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingOtpSecurityMod
 
 	public String encodeOtpToken(OtpTokenData token) throws WebswingAuthenticationException {
 		try {
-			byte[] value = getMapper().writeValueAsBytes(token);
+			byte[] value = AbstractSecurityModule.getMapper().writeValueAsBytes(token);
 			return Base64.encodeBase64String(value);
 		} catch (Exception e) {
 			throw new WebswingAuthenticationException("Failed to encode OTP token", e);
