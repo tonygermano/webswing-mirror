@@ -11,4 +11,9 @@ public interface SecurityContext {
 
 	String replaceVariables(String string);
 
+	Object getFromSecuritySession(String attributeName);
+
+	void setToSecuritySession(String attributeName, Object value);
+
+	String getSecuredPath();
 }

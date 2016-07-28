@@ -17,44 +17,55 @@
 			<div class="webswing-dialog-modal">
 				<div class="webswing-dialog-modal-content">
 					<div id="webswing-header"></div>
-					<div id="webswing-content">
-					</div>
+					<div id="webswing-content"></div>
 				</div>
 			</div>
 		</div>
 	</div>
 	<script>
 		var user;
-		login(loadApps);
-	
-		function login(successCallback) {
-			verify(successCallback, function() {
-				window.location.href = 'login?successUrl='+window.location.href;
-			});
-		}
+		webswingLogin(window.location.href, $('#webswing-content'), null, loadApps);
 
-		function verify(successCallback, failCallback) {
+		function webswingLogin(baseUrl, element, loginData, successCallback) {
 			$.ajax({
 				xhrFields : {
 					withCredentials : true
 				},
-				type : 'GET',
-				url : 'login?verify',
+				type : 'POST',
+				url : baseUrl + 'login',
+				data : loginData,
 				success : function(data, textStatus, request) {
-					user = request.getResponseHeader('webswingUsername');
 					if (successCallback != null) {
-						successCallback();
+						successCallback(data, request);
 					}
 				},
-				error : function(data) {
-					if (failCallback != null) {
-						failCallback();
+				error : function(xhr) {
+					var response = xhr.responseText;
+					if (response != null) {
+						var loginMsg = {};
+						try {
+							loginMsg = JSON.parse(response);
+						} catch (error) {
+							loginMsg.partialHtml = "<p>Login Failed.</p>";
+						}
+						if (loginMsg.redirectUrl != null) {
+							window.top.location.href = loginMsg.redirectUrl;
+						} else if (loginMsg.partialHtml != null) {
+							element.html(loginMsg.partialHtml);
+							var form = element.find('form').first();
+							form.submit(function(event) {
+								webswingLogin(baseUrl, element, form.serialize(), successCallback);
+								event.preventDefault();
+							});
+						} else {
+							loginMsg.partialHtml = "<p>Oops, something's not right.</p>";
+						}
 					}
 				}
 			});
 		}
-		
-		function loadApps(){
+
+		function loadApps() {
 			$.ajax({
 				xhrFields : {
 					withCredentials : true
@@ -71,27 +82,25 @@
 				}
 			});
 		}
-		
+
 		function show(apps) {
-            var header = '';
-            header = '<span class="pull-right"><a href="admin" id="admin">Manage</a> | <a href="logout" id="logout">Logout</a></span>';
-            header = header + '<h4 class="modal-title" id="myModalLabel">Hello <span>' + user + '</span>. ';
-            header = header + 'Select your application:</h4>';
+			var header = '';
+			header = '<span class="pull-right"><a href="admin" id="admin">Manage</a> | <a href="logout" id="logout">Logout</a></span>';
+			header = header + '<h4 class="modal-title" id="myModalLabel">Hello <span>' + user + '</span>. ';
+			header = header + 'Select your application:</h4>';
 			$('#webswing-header').html(header);
-            var content;
-            if (apps == null || apps.length === 0) {
-                header = null;
-                content = '<p>Sorry, there is no application available for you.</p>';
-            } else {
-                content = '<div class="row">';
-                for (var i in apps) {
-                    var app = apps[i];
-                    content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" onclick="window.location.href = \''
+			var content;
+			if (apps == null || apps.length === 0) {
+				header = null;
+				content = '<p>Sorry, there is no application available for you.</p>';
+			} else {
+				content = '<div class="row">';
+				for ( var i in apps) {
+					var app = apps[i];
+					content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" onclick="window.location.href = \''
 							+ app.url
-							+ '\';"><img src="'
-                            + getImageString(app.base64Icon)
-                          	+ '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>';
-                }
+							+ '\';"><img src="' + getImageString(app.base64Icon) + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>';
+				}
 			}
 			$('#webswing-content').html(content);
 		}
@@ -99,14 +108,13 @@
 			if (typeof data === 'object') {
 				var binary = '';
 				var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
-				for ( var i = 0, l = bytes.byteLength; i < l; i++) {
+				for (var i = 0, l = bytes.byteLength; i < l; i++) {
 					binary += String.fromCharCode(bytes[i]);
 				}
 				data = window.btoa(binary);
 			}
 			return 'data:image/png;base64,' + data;
 		}
-
 	</script>
 </body>
 </html>

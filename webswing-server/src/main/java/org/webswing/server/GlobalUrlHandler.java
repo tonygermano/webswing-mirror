@@ -42,6 +42,7 @@ import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingmanager.SwingInstanceManagerService;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
+import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
 
 import com.google.inject.Inject;
@@ -372,6 +373,16 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	@Override
 	public String replaceVariables(String string) {
 		return ServerUtil.getConfigSubstitutor().replace(string);
+	}
+
+	@Override
+	public Object getFromSecuritySession(String attributeName) {
+		return SecurityUtil.getFromSecuritySession(attributeName);
+	}
+
+	@Override
+	public void setToSecuritySession(String attributeName, Object value) {
+		SecurityUtil.setToSecuritySession(attributeName, value);
 	}
 
 	@Override

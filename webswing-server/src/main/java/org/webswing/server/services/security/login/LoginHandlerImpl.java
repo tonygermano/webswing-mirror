@@ -36,7 +36,7 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		try {
-			login(req, res, null);
+			login(req, res);
 			return true;
 		} catch (Exception e) {
 			log.error("Failed to process login request. " + getFullPathMapping(), e);
@@ -44,53 +44,33 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 		}
 	}
 
-	protected void login(HttpServletRequest req, HttpServletResponse resp, WebswingAuthenticationException e) throws ServletException, IOException {
-		boolean verify = req.getParameter("verify") != null;
+	protected void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String otp = req.getParameter("otp");
 		AbstractWebswingUser user = getUser();
 		Subject subject = SecurityUtils.getSubject();
-		if (verify) {
-			if (user != null && user != AbstractWebswingUser.anonymUser) {
-				resp.setStatus(HttpServletResponse.SC_OK);
-				resp.setHeader("webswingUsername", user.getUserId());
-			} else {
-				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			}
-		} else if (otp != null) {
-			try {
-				AbstractWebswingUser token = securityProvider.get().verifyOneTimePassword(otp);
-				subject.login(new LoginTokenAdapter(getSecuredPath(), token));
-				user = getUser();
-				resp.setStatus(HttpServletResponse.SC_OK);
-				resp.setHeader("webswingUsername", user.getUserId());
-			} catch (WebswingAuthenticationException e1) {
-				log.warn("Authentication failed: " + e1.getMessage());
-				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			}
+		if (user != null && user != AbstractWebswingUser.anonymUser) {
+			resp.setStatus(HttpServletResponse.SC_OK);
+			resp.setHeader("webswingUsername", user.getUserId());
 		} else {
-			if (req.getParameter("successUrl") != null) {
-				subject.getSession().setAttribute(SUCCESS_URL, req.getParameter("successUrl"));
+			if (otp != null) {
+				try {
+					AbstractWebswingUser token = securityProvider.get().verifyOneTimePassword(otp);
+					subject.login(new LoginTokenAdapter(getSecuredPath(), token));
+					user = getUser();
+					resp.setStatus(HttpServletResponse.SC_OK);
+					resp.setHeader("webswingUsername", user.getUserId());
+				} catch (WebswingAuthenticationException e1) {
+					log.warn("Authentication failed: " + e1.getMessage());
+					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				}
 			}
 			try {
 				AbstractWebswingUser resolvedUser = securityProvider.get().getUser(req, resp);
 				if (resolvedUser != null) {
 					subject.login(new LoginTokenAdapter(getSecuredPath(), resolvedUser));
-					user = getUser();
-					if (user != null && user != AbstractWebswingUser.anonymUser) {
-						String successPage = null;
-						if (subject.getSession().getAttribute(SUCCESS_URL) != null) {
-							successPage = (String) subject.getSession().getAttribute(SUCCESS_URL);
-						} else {
-							String fullPath = getFullPathMapping();
-							successPage = fullPath.substring(0, fullPath.length() - getPath().length());
-						}
-						resp.sendRedirect(successPage);
-						return;
-					}
 				}
 			} catch (Exception ux) {
 				log.error("Unexpected authentication error.", ux);
-				login(req, resp, new WebswingAuthenticationException("Unexpected authentication error.", ux));
 			}
 		}
 	}

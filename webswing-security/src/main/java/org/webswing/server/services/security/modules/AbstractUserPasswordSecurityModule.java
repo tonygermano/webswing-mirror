@@ -1,10 +1,8 @@
 package org.webswing.server.services.security.modules;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,8 +18,17 @@ public abstract class AbstractUserPasswordSecurityModule<T extends WebswingOtpSe
 		super(config);
 	}
 
-	public String getLoginResource() {
-		return "login.html";
+	@Override
+	public void init() {
+		super.init();
+	}
+
+	public String getPartialTemplateName() {
+		return "loginPartial.html";
+	}
+
+	public String getPageTemplateName() {
+		return "loginPage.html";
 	}
 
 	public String getUserName(HttpServletRequest request) {
@@ -32,71 +39,30 @@ public abstract class AbstractUserPasswordSecurityModule<T extends WebswingOtpSe
 		return request.getParameter("password");
 	}
 
-	@Override
-	public AbstractWebswingUser getUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		try {
-			String username = getUserName(request);
-			String password = getPassword(request);
-			if (username != null || password != null) {
-				AbstractWebswingUser user = verifyUserPassword(username, password);
-				if (user != null) {
-					return user;
-				}
-			}
-			onAuthenticationFailed(request, response, null);
-		} catch (WebswingAuthenticationException e) {
-			onAuthenticationFailed(request, response, e);
-		}
-		return null;
-	}
-
-	protected void onAuthenticationFailed(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		if (isAjax(request)) {
-			serveLoginPageAjax(request, response, exception);
+	protected AbstractWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException {
+		String username = getUserName(request);
+		String password = getPassword(request);
+		if (username != null || password != null) {
+			return verifyUserPassword(username, password);
 		} else {
-			serveLoginPage(request, response, exception);
+			return null;
 		}
 	}
 
-	private void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		URL resource = getConfig().getContext().getWebResource(getLoginResource());
-		if (resource != null) {
-			String template = toString(resource.openStream(), 4 * 1024);
-			String errorMessage = exception == null ? "" : exception.getLocalizedMessage();
-			response.getOutputStream().print(template.replace("${errorMessage}", errorMessage));
+	protected void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
+		Map<String, Object> variables = new HashMap<>();
+		if (exception != null) {
+			variables.put("errorMessage", exception.getLocalizedMessage());
 		}
+		sendHtml(request, response, getPageTemplateName(), variables);
 	}
 
-	protected void serveLoginPageAjax(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		response.sendRedirect("login");
-	}
-
-	protected boolean isAjax(HttpServletRequest request) {
-		String requestedWithHeader = request.getHeader("X-Requested-With");
-		if (requestedWithHeader != null && requestedWithHeader.equals("XMLHttpRequest")) {
-			return true;
+	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
+		Map<String, Object> variables = new HashMap<>();
+		if (exception != null) {
+			variables.put("errorMessage", exception.getLocalizedMessage());
 		}
-		return false;
-	}
-
-	public static String toString(final InputStream is, final int bufferSize) throws IOException {
-		final char[] buffer = new char[bufferSize];
-		final StringBuilder out = new StringBuilder();
-		Reader in = null;
-		try {
-			in = new InputStreamReader(is, "UTF-8");
-			for (;;) {
-				int rsz = in.read(buffer, 0, buffer.length);
-				if (rsz < 0)
-					break;
-				out.append(buffer, 0, rsz);
-			}
-		} finally {
-			if (in != null) {
-				in.close();
-			}
-		}
-		return out.toString();
+		sendHtml(request, response, getPartialTemplateName(), variables);
 	}
 
 	public abstract AbstractWebswingUser verifyUserPassword(String user, String password) throws WebswingAuthenticationException;

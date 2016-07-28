@@ -19,55 +19,54 @@ define([ 'jquery' ], function amdFactory($) {
 		var user;
 
 		function login(successCallback) {
-			verify('login?verify',successCallback, function() {
-				if(api.cfg.oneTimePassword!=null){
-					verify('login?otp='+api.cfg.oneTimePassword,successCallback, function() {
-						api.showDialog(api.unauthorizedAccessMessage);
-					});
-				}else{
-					window.location.href = api.cfg.connectionUrl + 'login?successUrl='+window.location.href;
+			var loginData = JSON.stringify({
+				securityToken : api.cfg.oneTimePassword,
+				successUrl : window.top.location.href
+			});
+			var dialogContent = api.showDialog(api.unauthorizedAccessMessage);
+			webswingLogin(api.cfg.connectionUrl, dialogContent, loginData, function(data, request) {
+				user = request.getResponseHeader('webswingUsername');
+				if (successCallback != null) {
+					successCallback();
 				}
 			});
 		}
 
-		function verify(url,successCallback, failCallback) {
+		function webswingLogin(baseUrl, element, loginData, successCallback) {
 			$.ajax({
 				xhrFields : {
 					withCredentials : true
 				},
-				type : 'GET',
-				url : api.cfg.connectionUrl + url,
+				type : 'POST',
+				url : baseUrl + 'login',
+				data : loginData,
 				success : function(data, textStatus, request) {
-					user = request.getResponseHeader('webswingUsername');
 					if (successCallback != null) {
-						successCallback();
+						successCallback(data, request);
 					}
 				},
-				error : function(data) {
-					if (failCallback != null) {
-						failCallback();
-					}
-				}
-			});
-		}
-		
-		
-		function verifyOtp(successCallback) {
-			$.ajax({
-				xhrFields : {
-					withCredentials : true
-				},
-				type : 'GET',
-				url : api.cfg.connectionUrl + 'login?otp='+api.cfg.oneTimePassword,
-				success : function(data, textStatus, request) {
-					user = request.getResponseHeader('webswingUsername');
-					if (successCallback != null) {
-						successCallback();
-					}
-				},
-				error : function(data) {
-					if (failCallback != null) {
-						failCallback();
+				error : function(xhr) {
+					var response = xhr.responseText;
+					if (response != null) {
+						var loginMsg = {};
+						try {
+							loginMsg = JSON.parse(response);
+						} catch (error) {
+							loginMsg.partialHtml = "<p>Login Failed.</p>";
+						}
+						if (loginMsg.redirectUrl != null) {
+							window.top.location.href = loginMsg.redirectUrl;
+						} else if (loginMsg.partialHtml != null) {
+							element.html(loginMsg.partialHtml);
+							var form = element.find('form').first();
+							form.submit(function(event) {
+								webswingLogin(baseUrl, element, form.serialize(), successCallback);
+								event.preventDefault();
+							});
+						} else {
+							loginMsg.partialHtml = "<p>Oops, something's not right.</p>";
+						}
+
 					}
 				}
 			});

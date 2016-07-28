@@ -11,8 +11,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
@@ -23,11 +21,6 @@ import org.webswing.server.services.security.otp.api.OneTimePasswordModule;
 public abstract class AbstractOtpSecurityModule<T extends WebswingOtpSecurityModuleConfig>  extends AbstractSecurityModule<T> implements OneTimePasswordModule
 {
 	private static final Logger log = LoggerFactory.getLogger(AbstractOtpSecurityModule.class);
-
-	private static final ObjectMapper mapper = new ObjectMapper();
-	static {
-		mapper.setSerializationInclusion(Inclusion.NON_NULL);
-	}
 
 	public AbstractOtpSecurityModule(T config) {
 		super(config);
@@ -135,7 +128,7 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingOtpSecurityMod
 
 	public OtpTokenData parseOtpTokenString(String otp) throws WebswingAuthenticationException {
 		try {
-			OtpTokenData token = mapper.readValue(Base64.decodeBase64(otp), OtpTokenData.class);
+			OtpTokenData token = getMapper().readValue(Base64.decodeBase64(otp), OtpTokenData.class);
 			return token;
 		} catch (Exception e) {
 			throw new WebswingAuthenticationException("Failed to parse OTP token", e);
@@ -144,7 +137,7 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingOtpSecurityMod
 
 	public String encodeOtpToken(OtpTokenData token) throws WebswingAuthenticationException {
 		try {
-			byte[] value = mapper.writeValueAsBytes(token);
+			byte[] value = getMapper().writeValueAsBytes(token);
 			return Base64.encodeBase64String(value);
 		} catch (Exception e) {
 			throw new WebswingAuthenticationException("Failed to encode OTP token", e);
@@ -196,10 +189,6 @@ public abstract class AbstractOtpSecurityModule<T extends WebswingOtpSecurityMod
 
 		AbstractWebswingUser user = new OtpWebswingUser(token.getUser(), roles, permissions);
 		return user;
-	}
-
-	@Override
-	public void destroy() {
 	}
 
 }

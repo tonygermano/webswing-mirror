@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.AttributeSet;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.IdPConfig;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAMLClient;
@@ -75,35 +75,50 @@ public class Saml2SecurityModule extends AbstractOtpSecurityModule<Saml2Security
 		}
 	}
 
-	public AbstractWebswingUser getUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String samlResponse = request.getParameter(SAML_PARAMETER);
-		if (StringUtils.isEmpty(samlResponse)) {
-			String requestId = SAMLUtils.generateRequestId();
-			String authrequest;
-			try {
-				authrequest = client.generateAuthnRequest(requestId);
-			} catch (SAMLException e1) {
-				throw new IOException("Failed to build SAML request.", e1);
-			}
-			String url = client.getIdPConfig().getLoginUrl();
-			String param = "SAMLRequest=" + URLEncoder.encode(authrequest, "UTF-8");
-			if (url.contains("?")) {
-				url = url + "&" + param;
-			} else {
-				url = url + "?" + param;
-			}
-			response.sendRedirect(url);
-			return null;
+	@Override
+	protected void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
+		String url = getSaml2RedirectUrl();
+		sendRedirect(request, response, url);
+	}
+
+	@Override
+	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
+		String url = getSaml2RedirectUrl();
+		sendRedirect(request, response, url);
+	}
+
+	private String getSaml2RedirectUrl() throws IOException {
+		String requestId = SAMLUtils.generateRequestId();
+		String authrequest;
+		try {
+			authrequest = client.generateAuthnRequest(requestId);
+		} catch (SAMLException e1) {
+			throw new IOException("Failed to build SAML request.", e1);
+		}
+		String url = client.getIdPConfig().getLoginUrl();
+		String param = "SAMLRequest=" + URLEncoder.encode(authrequest, "UTF-8");
+		if (url.contains("?")) {
+			url = url + "&" + param;
 		} else {
+			url = url + "?" + param;
+		}
+		return url;
+	}
+
+	@Override
+	protected AbstractWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException {
+		String samlResponse = request.getParameter(SAML_PARAMETER);
+		if (!StringUtils.isEmpty(samlResponse)) {
 			AttributeSet aset;
 			try {
 				aset = client.validateResponse(samlResponse);
 				String user = aset.getNameId();
 				return new Saml2User(samlResponse, user, aset.getAttributes());
 			} catch (SAMLException e1) {
-				throw new IOException("Failed to auhenticate.", e1);
+				throw new WebswingAuthenticationException("Failed to auhenticate.", e1);
 			}
 		}
+		return null;
 	}
 
 }

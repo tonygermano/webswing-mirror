@@ -2,6 +2,7 @@ package org.webswing.server.services.rest;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -33,7 +34,7 @@ public class OtpRestUrlHandler extends AbstractRestUrlHandler {
 
 	@GET
 	@Path("/otp")
-	public String getOneTimePassword(@PathParam("") String appPath, @QueryParam("requestorId") String requestor, @QueryParam("user") String user, @QueryParam("roles") String roles, @QueryParam("permissions") String permissions) throws WsException {
+	public String getOneTimePassword(HttpServletRequest request, @PathParam("") String appPath, @QueryParam("requestorId") String requestor, @QueryParam("user") String user, @QueryParam("roles") String roles, @QueryParam("permissions") String permissions) throws WsException {
 		checkPermission(WebswingAction.rest_getOneTimePassword);
 		try {
 			List<SwingDescriptor> apps = instanceHolder.getAllConfiguredApps();

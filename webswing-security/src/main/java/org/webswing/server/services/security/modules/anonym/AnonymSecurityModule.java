@@ -4,14 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
-import org.webswing.server.services.security.modules.AbstractSecurityModule;
+import org.webswing.server.services.security.api.WebswingSecurityModule;
 
-public class AnonymSecurityModule extends AbstractSecurityModule<WebswingSecurityModuleConfig> {
-
-	public AnonymSecurityModule(WebswingSecurityModuleConfig config) {
-		super(config);
-	}
+public class AnonymSecurityModule implements WebswingSecurityModule {
 
 	@Override
 	public AbstractWebswingUser getUser(HttpServletRequest request, HttpServletResponse response) {
@@ -21,6 +16,14 @@ public class AnonymSecurityModule extends AbstractSecurityModule<WebswingSecurit
 				return true;
 			}
 		};
+	}
+
+	@Override
+	public void init() {
+	}
+
+	@Override
+	public void destroy() {
 	}
 
 }

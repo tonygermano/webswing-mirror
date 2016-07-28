@@ -34,4 +34,14 @@ public class SecurityUtil {
 		return AbstractWebswingUser.anonymUser;
 	}
 
+	public static Object getFromSecuritySession(String attributeName) {
+		Subject subject = SecurityUtils.getSubject();
+		return subject.getSession().getAttribute(attributeName);
+	}
+
+	public static void setToSecuritySession(String attributeName, Object value) {
+		Subject subject = SecurityUtils.getSubject();
+		subject.getSession().setAttribute(attributeName, value);
+	}
+
 }

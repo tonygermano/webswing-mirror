@@ -32,6 +32,7 @@ import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swinginstance.SwingInstanceService;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
+import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
 
 public class SwingInstanceManagerImpl extends AbstractUrlHandler implements SecurityContext, SwingInstanceManager, WebswingSecurityProvider {
@@ -248,6 +249,16 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 	@Override
 	public String replaceVariables(String string) {
 		return ServerUtil.getConfigSubstitutor().replace(string);
+	}
+
+	@Override
+	public Object getFromSecuritySession(String attributeName) {
+		return SecurityUtil.getFromSecuritySession(attributeName);
+	}
+
+	@Override
+	public void setToSecuritySession(String attributeName, Object value) {
+		SecurityUtil.setToSecuritySession(attributeName, value);
 	}
 
 	@Override
