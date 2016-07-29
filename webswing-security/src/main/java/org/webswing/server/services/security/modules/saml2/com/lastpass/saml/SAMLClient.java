@@ -17,60 +17,53 @@
  */
 package org.webswing.server.services.security.modules.saml2.com.lastpass.saml;
 
-import org.opensaml.Configuration;
-import org.opensaml.saml2.core.Response;
-import org.opensaml.saml2.core.Subject;
-import org.opensaml.saml2.core.Conditions;
-import org.opensaml.saml2.core.AuthnStatement;
-import org.opensaml.saml2.core.AuthnRequest;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.EncryptedAssertion;
-import org.opensaml.saml2.core.Issuer;
-import org.opensaml.saml2.core.Audience;
-import org.opensaml.saml2.core.AudienceRestriction;
-import org.opensaml.saml2.core.StatusCode;
-import org.opensaml.saml2.core.SubjectConfirmation;
-import org.opensaml.saml2.core.SubjectConfirmationData;
-
-import org.opensaml.saml2.core.AttributeStatement;
-import org.opensaml.saml2.core.Attribute;
-
-import org.opensaml.saml2.encryption.Decrypter;
-
-import org.opensaml.common.SAMLObjectBuilder;
-
-import org.opensaml.xml.parse.BasicParserPool;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.security.credential.BasicCredential;
-import org.opensaml.xml.signature.SignatureValidator;
-import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.encryption.InlineEncryptedKeyResolver;
-import org.opensaml.xml.encryption.DecryptionException;
-import org.opensaml.xml.security.credential.BasicCredential;
-import org.opensaml.xml.security.keyinfo.StaticKeyInfoCredentialResolver;
-import org.opensaml.xml.validation.ValidationException;
-import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.XMLObject;
-
-import org.joda.time.DateTime;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSSerializer;
-import org.xml.sax.InputSource;
-import java.io.StringReader;
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.io.IOException;
-
-import java.util.HashMap;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.Deflater;
 
 import javax.xml.bind.DatatypeConverter;
+
+import org.joda.time.DateTime;
+import org.opensaml.Configuration;
+import org.opensaml.common.SAMLObjectBuilder;
+import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml2.core.Attribute;
+import org.opensaml.saml2.core.AttributeStatement;
+import org.opensaml.saml2.core.Audience;
+import org.opensaml.saml2.core.AudienceRestriction;
+import org.opensaml.saml2.core.AuthnRequest;
+import org.opensaml.saml2.core.AuthnStatement;
+import org.opensaml.saml2.core.Conditions;
+import org.opensaml.saml2.core.EncryptedAssertion;
+import org.opensaml.saml2.core.Issuer;
+import org.opensaml.saml2.core.Response;
+import org.opensaml.saml2.core.StatusCode;
+import org.opensaml.saml2.core.Subject;
+import org.opensaml.saml2.core.SubjectConfirmation;
+import org.opensaml.saml2.core.SubjectConfirmationData;
+import org.opensaml.saml2.encryption.Decrypter;
+import org.opensaml.xml.XMLObject;
+import org.opensaml.xml.XMLObjectBuilderFactory;
+import org.opensaml.xml.encryption.DecryptionException;
+import org.opensaml.xml.encryption.InlineEncryptedKeyResolver;
+import org.opensaml.xml.io.MarshallingException;
+import org.opensaml.xml.parse.BasicParserPool;
+import org.opensaml.xml.security.credential.BasicCredential;
+import org.opensaml.xml.security.keyinfo.StaticKeyInfoCredentialResolver;
+import org.opensaml.xml.signature.Signature;
+import org.opensaml.xml.signature.SignatureValidator;
+import org.opensaml.xml.validation.ValidationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
+import org.xml.sax.InputSource;
 
 
 /**

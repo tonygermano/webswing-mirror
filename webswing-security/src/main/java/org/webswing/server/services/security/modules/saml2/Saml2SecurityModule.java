@@ -63,7 +63,7 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 			}
 			IdPConfig idpConfig = new IdPConfig(file);
 			try {
-				String spTemplate = IOUtils.toString(this.getClass().getClassLoader().getResourceAsStream("saml2-sp-template.xml"));
+				String spTemplate = IOUtils.toString(this.getClass().getClassLoader().getResourceAsStream("saml2/saml2-sp-template.xml"));
 				spTemplate = spTemplate.replace("${entityID}", entityId);
 				spTemplate = spTemplate.replace("${consumerUrl}", consumerUrl);
 				SPConfig spConfig = new SPConfig(new ByteArrayInputStream(spTemplate.getBytes("UTF-8")));
@@ -78,14 +78,17 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 
 	@Override
 	protected void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		String url = getSaml2RedirectUrl();
-		sendRedirect(request, response, url);
+		if (exception != null) {
+			sendHtml(request, response, "saml2/errorPage.html", exception);
+		} else {
+			String url = getSaml2RedirectUrl();
+			sendRedirect(request, response, url);
+		}
 	}
 
 	@Override
 	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		String url = getSaml2RedirectUrl();
-		sendRedirect(request, response, url);
+		serveLoginPage(request, response, exception);
 	}
 
 	private String getSaml2RedirectUrl() throws IOException {
@@ -116,8 +119,8 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 				String user = aset.getNameId();
 				return new Saml2User(samlResponse, user, aset.getAttributes());
 			} catch (SAMLException e1) {
-				log.error("Failed to authenticate",e1);
-				throw new WebswingAuthenticationException("Failed to auhenticate.", e1);
+				log.error("Failed to authenticate", e1);
+				throw new WebswingAuthenticationException("Failed to auhenticate. " + e1.getMessage(), e1);
 			}
 		}
 		return null;
