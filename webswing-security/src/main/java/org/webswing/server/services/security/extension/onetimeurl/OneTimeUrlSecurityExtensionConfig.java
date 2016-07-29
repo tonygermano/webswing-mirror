@@ -6,6 +6,6 @@ import org.webswing.server.services.security.extension.api.SecurityModuleExtensi
 
 public interface OneTimeUrlSecurityExtensionConfig extends SecurityModuleExtensionConfig {
 
-	Map<String, OtpAccessConfig> getOtpAccessConfig();
+	Map<String, OtpAccessConfig> getApiKeys();
 	
 }

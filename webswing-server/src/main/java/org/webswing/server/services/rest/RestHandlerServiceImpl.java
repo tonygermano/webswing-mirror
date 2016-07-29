@@ -40,7 +40,7 @@ public class RestHandlerServiceImpl implements RestHandlerService {
 
 	@Override
 	public AbstractRestUrlHandler createOtpRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
-		return new OtpRestUrlHandler(parent, instanceHolder);
+		return new OneTimeUrlRestUrlHandler(parent, instanceHolder);
 	}
 
 }

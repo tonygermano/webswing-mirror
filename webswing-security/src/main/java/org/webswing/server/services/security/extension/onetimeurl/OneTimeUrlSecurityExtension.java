@@ -32,7 +32,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 	@Override
 	public AbstractWebswingUser doSufficientPreValidation(AbstractSecurityModule<?> m, HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
 		Map<String, Object> requestData = m.getLoginRequest(request);
-		if (requestData.containsKey(SECURITY_TOKEN)) {
+		if (requestData!=null && requestData.containsKey(SECURITY_TOKEN)) {
 			AbstractWebswingUser result = verifyOneTimePassword((String) requestData.get(SECURITY_TOKEN));
 			return result;
 		}
@@ -53,19 +53,22 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 					return createUser(token);
 				}
 			}
+			log.warn("Invalid or expired OTP. ");
 			throw new WebswingAuthenticationException("Invalid or expired OTP. ");
 		} catch (Exception e) {
+			log.error("Failed to verify OTP. " + e.getMessage(), e);
 			throw new WebswingAuthenticationException("Failed to verify OTP. " + e.getMessage(), e);
 		}
 	}
 
-	public String generateOneTimePassword(String swingPath, String requestorId, String user, String[] roles, String[] permissions) throws WebswingAuthenticationException {
+	public String generateOneTimePassword(String swingPath, String requestorId, String user, String[] roles, String[] permissions, String[][] attributes) throws WebswingAuthenticationException {
 		String encoded;
 		try {
 			OtpTokenData token = new OtpTokenData();
 			token.setUser(user);
 			token.setRequestorId(requestorId);
 			token.setSwingPath(swingPath);
+			token.setAttributes(attributes);
 			token.setRoles(roles);
 			token.setPermissions(permissions);
 			verifyTokenValid(token);
@@ -91,28 +94,28 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		if (StringUtils.isEmpty(token.getSwingPath())) {
 			throw new WebswingAuthenticationException("Swing Path must not be empty.");
 		}
-		if (getConfig().getOtpAccessConfig() == null || getConfig().getOtpAccessConfig().get(token.getRequestorId()) == null) {
+		if (getConfig().getApiKeys() == null || getConfig().getApiKeys().get(token.getRequestorId()) == null) {
 			throw new WebswingAuthenticationException("RequestorId not configured.");
 		}
 	}
 
 	public int getOtpValidForSec(String requestingClient) {
 		Integer result = null;
-		OtpAccessConfig c = getConfig().getOtpAccessConfig().get(requestingClient);
+		OtpAccessConfig c = getConfig().getApiKeys().get(requestingClient);
 		result = c.getValidForSec();
 		return result == null ? 30 : result;
 	}
 
 	public String getOtpCrypto(String requestingClient) {
 		String result = null;
-		OtpAccessConfig c = getConfig().getOtpAccessConfig().get(requestingClient);
+		OtpAccessConfig c = getConfig().getApiKeys().get(requestingClient);
 		result = c.getHMacAlgo();
 		return result == null ? "HmacSHA512" : result;
 	}
 
 	public String getOtpSecret(String requestingClient) throws WebswingAuthenticationException {
 		String result = null;
-		OtpAccessConfig c = getConfig().getOtpAccessConfig().get(requestingClient);
+		OtpAccessConfig c = getConfig().getApiKeys().get(requestingClient);
 		result = c.getSecret();
 		if (result == null) {
 			log.error("Secret not found for requestor '" + requestingClient + "'");
@@ -122,9 +125,10 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 	}
 
 	public String getOtpMessage(OtpTokenData token) {
+		String attributes = arrayToString(token.getAttributes());
 		String permissions = arrayToString(token.getPermissions());
 		String roles = arrayToString(token.getRoles());
-		return "" + token.getSwingPath() + token.getUser() + roles + permissions;
+		return "" + token.getSwingPath() + token.getUser() + attributes + roles + permissions;
 	}
 
 	private static String arrayToString(String[] array) {
@@ -132,6 +136,16 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		if (array != null) {
 			for (String item : array) {
 				result += item;
+			}
+		}
+		return result;
+	}
+
+	private static String arrayToString(String[][] array) {
+		String result = "";
+		if (array != null) {
+			for (String[] item : array) {
+				result += arrayToString(item);
 			}
 		}
 		return result;
@@ -178,7 +192,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 	}
 
 	public AbstractWebswingUser createUser(OtpTokenData token) throws WebswingAuthenticationException {
-		OtpAccessConfig c = getConfig().getOtpAccessConfig().get(token.getRequestorId());
+		OtpAccessConfig c = getConfig().getApiKeys().get(token.getRequestorId());
 		Set<String> roles = new HashSet<>();
 		Set<String> permissions = new HashSet<>();
 		if (token.getRoles() != null) {

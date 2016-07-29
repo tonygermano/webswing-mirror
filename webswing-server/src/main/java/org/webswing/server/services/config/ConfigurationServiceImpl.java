@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.server.WebswingConfiguration;
@@ -23,6 +25,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	private static final Logger log = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 	private static final ObjectMapper mapper = new ObjectMapper();
 	private static final int MAX_BACKUP_HISTORY = 10;
+	static{
+		mapper.setSerializationInclusion(Inclusion.NON_NULL);
+		mapper.disable(SerializationConfig.Feature.WRITE_EMPTY_JSON_ARRAYS);
+	}
 
 	private WebswingConfiguration liveConfiguration = new WebswingConfiguration();
 	private List<ConfigurationChangeListener> changeListeners = new ArrayList<ConfigurationChangeListener>();

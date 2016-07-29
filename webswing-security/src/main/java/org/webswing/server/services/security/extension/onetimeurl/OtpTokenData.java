@@ -10,6 +10,7 @@ public class OtpTokenData implements Serializable {
 	private String user;
 	private String[] roles;
 	private String[] permissions;
+	private String[][] attributes;
 	private String oneTimePassword;
 
 	public OtpTokenData() {
@@ -61,5 +62,13 @@ public class OtpTokenData implements Serializable {
 
 	public void setOneTimePassword(String oneTimePassword) {
 		this.oneTimePassword = oneTimePassword;
+	}
+
+	public String[][] getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(String[][] attributes) {
+		this.attributes = attributes;
 	}
 }

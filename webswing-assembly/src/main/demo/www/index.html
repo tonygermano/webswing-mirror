@@ -33,7 +33,8 @@
 				},
 				type : 'POST',
 				url : baseUrl + 'login',
-				data : loginData,
+				contentType : typeof loginData === 'object' ? 'application/json' : 'application/x-www-form-urlencoded; charset=UTF-8',
+				data : typeof loginData === 'object' ? JSON.stringify(loginData) : loginData,
 				success : function(data, textStatus, request) {
 					if (successCallback != null) {
 						successCallback(data, request);
@@ -60,10 +61,12 @@
 						} else {
 							loginMsg.partialHtml = "<p>Oops, something's not right.</p>";
 						}
+
 					}
 				}
 			});
 		}
+
 
 		function loadApps() {
 			$.ajax({

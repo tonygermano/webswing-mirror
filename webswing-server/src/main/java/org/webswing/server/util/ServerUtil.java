@@ -322,74 +322,75 @@ public class ServerUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T instantiateConfig(final Map<String, Object> config, final Class<T> clazz, final SecurityContext context) {
-		if (config != null) {
-			return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[] { clazz }, new InvocationHandler() {
+	public static <T> T instantiateConfig(Map<String, Object> c, final Class<T> clazz, final SecurityContext context) {
+		if (c == null) {
+			c = new HashMap<>();
+		}
+		final Map<String, Object> config = c;
+		return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[] { clazz }, new InvocationHandler() {
 
-				@Override
-				@SuppressWarnings("rawtypes")
-				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-					BeanInfo info = Introspector.getBeanInfo(method.getDeclaringClass());
-					PropertyDescriptor[] pds = info.getPropertyDescriptors();
-					if (method.getName().equals("getValueAs") && method.getParameters().length == 2 && args[0] instanceof String && args[1] instanceof Class) {
-						String s = (String) args[0];
-						Class c = (Class) args[1];
-						Object o = config.get(s);
-						Map<String, Object> subConfig = (Map<String, Object>) (o != null && o instanceof HashMap ? o : new HashMap<>());
-						return instantiateConfig(subConfig, c, context);
-					}
-					for (PropertyDescriptor pd : pds) {
-						if (pd.getReadMethod().equals(method)) {
-							if (ClassUtils.isAssignable(SecurityContext.class, method.getReturnType(), false)) {
-								return context;
-							}
-							Object value = config.get(pd.getName());
-							if (value != null) {
-								if (ClassUtils.isAssignable(value.getClass(), method.getReturnType(), true)) {
-									if (value instanceof Map) {
-										Type returnType = method.getGenericReturnType();
-										if (returnType instanceof ParameterizedType) {
-											Type[] generics = ((ParameterizedType) returnType).getActualTypeArguments();
-											if (generics != null && generics[1] instanceof Class && ((Class) generics[1]).isInterface()) {
-												Map valueMap = (Map) value;
-												Map resultMap = new HashMap<>();
-												for (Object key : valueMap.keySet()) {
-													Object entryValue = valueMap.get(key);
-													resultMap.put(key, instantiateConfig((Map<String, Object>) entryValue, (Class) generics[1], context));
-												}
-												return resultMap;
+			@Override
+			@SuppressWarnings("rawtypes")
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				BeanInfo info = Introspector.getBeanInfo(method.getDeclaringClass());
+				PropertyDescriptor[] pds = info.getPropertyDescriptors();
+				if (method.getName().equals("getValueAs") && method.getParameters().length == 2 && args[0] instanceof String && args[1] instanceof Class) {
+					String s = (String) args[0];
+					Class c = (Class) args[1];
+					Object o = config.get(s);
+					Map<String, Object> subConfig = (Map<String, Object>) (o != null && o instanceof HashMap ? o : new HashMap<>());
+					return instantiateConfig(subConfig, c, context);
+				}
+				for (PropertyDescriptor pd : pds) {
+					if (pd.getReadMethod().equals(method)) {
+						if (ClassUtils.isAssignable(SecurityContext.class, method.getReturnType(), false)) {
+							return context;
+						}
+						Object value = config.get(pd.getName());
+						if (value != null) {
+							if (ClassUtils.isAssignable(value.getClass(), method.getReturnType(), true)) {
+								if (value instanceof Map) {
+									Type returnType = method.getGenericReturnType();
+									if (returnType instanceof ParameterizedType) {
+										Type[] generics = ((ParameterizedType) returnType).getActualTypeArguments();
+										if (generics != null && generics[1] instanceof Class && ((Class) generics[1]).isInterface()) {
+											Map valueMap = (Map) value;
+											Map resultMap = new HashMap<>();
+											for (Object key : valueMap.keySet()) {
+												Object entryValue = valueMap.get(key);
+												resultMap.put(key, instantiateConfig((Map<String, Object>) entryValue, (Class) generics[1], context));
 											}
+											return resultMap;
 										}
 									}
-									if (value instanceof List) {
-										Type returnType = method.getGenericReturnType();
-										if (returnType instanceof ParameterizedType) {
-											Type[] generics = ((ParameterizedType) returnType).getActualTypeArguments();
-											if (generics != null && generics[0] instanceof Class && ((Class) generics[0]).isInterface()) {
-												List valuelist = (List) value;
-												List resultList = new ArrayList<>();
-												for (Object item : valuelist) {
-													resultList.add(instantiateConfig((Map<String, Object>) item, (Class) generics[0], context));
-												}
-												return resultList;
-											}
-										}
-									}
-									return value;
-								} else if (value instanceof Map && method.getReturnType().isInterface()) {
-									return instantiateConfig((Map) value, method.getReturnType(), context);
-								} else {
-									log.error("Invalid SecurityModule configuration. Type of " + clazz.getName() + "." + pd.getName() + " is not " + method.getReturnType());
-									return null;
 								}
+								if (value instanceof List) {
+									Type returnType = method.getGenericReturnType();
+									if (returnType instanceof ParameterizedType) {
+										Type[] generics = ((ParameterizedType) returnType).getActualTypeArguments();
+										if (generics != null && generics[0] instanceof Class && ((Class) generics[0]).isInterface()) {
+											List valuelist = (List) value;
+											List resultList = new ArrayList<>();
+											for (Object item : valuelist) {
+												resultList.add(instantiateConfig((Map<String, Object>) item, (Class) generics[0], context));
+											}
+											return resultList;
+										}
+									}
+								}
+								return value;
+							} else if (value instanceof Map && method.getReturnType().isInterface()) {
+								return instantiateConfig((Map) value, method.getReturnType(), context);
+							} else {
+								log.error("Invalid SecurityModule configuration. Type of " + clazz.getName() + "." + pd.getName() + " is not " + method.getReturnType());
+								return null;
 							}
 						}
 					}
-					return null;
 				}
-			});
-		}
-		return null;
+				return null;
+			}
+		});
 	}
 
 	public static List<SwingDescriptor> getAllApps(WebswingConfiguration config) {

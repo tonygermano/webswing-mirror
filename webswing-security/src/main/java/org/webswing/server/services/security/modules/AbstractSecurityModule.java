@@ -210,9 +210,9 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> getLoginRequest(HttpServletRequest request) {
-		if (isAjax(request)) {
+		if (isAjax(request) && request.getContentType().equals("application/json")) {
 			try {
-				return mapper.readValue(request.getInputStream(), Map.class);
+				return mapper.readValue(request.getReader(), Map.class);
 			} catch (Exception e) {
 				log.debug("Failed to read login request data.", e);
 			}

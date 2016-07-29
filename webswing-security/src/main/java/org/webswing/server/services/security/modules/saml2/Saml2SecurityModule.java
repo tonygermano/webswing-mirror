@@ -43,6 +43,7 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 	}
 
 	public void init() {
+		super.init();
 		if (!staticInit) {
 			throw new RuntimeException("SAML2 module was not initialized correctly. Not possible to configure security module. ");
 		}
@@ -115,6 +116,7 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 				String user = aset.getNameId();
 				return new Saml2User(samlResponse, user, aset.getAttributes());
 			} catch (SAMLException e1) {
+				log.error("Failed to authenticate",e1);
 				throw new WebswingAuthenticationException("Failed to auhenticate.", e1);
 			}
 		}

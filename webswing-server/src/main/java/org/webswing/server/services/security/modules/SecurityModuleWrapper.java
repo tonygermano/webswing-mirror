@@ -13,9 +13,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.model.server.WebswingSecurityConfig;
+import org.webswing.model.server.WebswingSecurityConfig.BuiltInModules;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.SecurityContext;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
+import org.webswing.server.services.security.modules.anonym.AnonymSecurityModule;
+import org.webswing.server.services.security.modules.property.PropertySecurityModule;
+import org.webswing.server.services.security.modules.saml2.Saml2SecurityModule;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.util.ClasspathUtil;
 
@@ -23,11 +29,33 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 	private static final Logger log = LoggerFactory.getLogger(SecurityModuleWrapper.class);
 
 	private WebswingSecurityModule custom;
-	private SecurityModuleWrapperConfig config;
+	private WebswingSecurityConfig config;
 	private URLClassLoader customCL;
+	private SecurityContext context;
 
-	public SecurityModuleWrapper(SecurityModuleWrapperConfig config) {
+	public SecurityModuleWrapper(SecurityContext context, WebswingSecurityConfig config) {
+		this.context = context;
 		this.config = config;
+	}
+
+	public static String getSecurityModuleClassName(WebswingSecurityConfig config) {
+		try {
+			BuiltInModules builtInModule = BuiltInModules.valueOf(config.getSecurityModule());
+			switch (builtInModule) {
+			case INHERITED:
+				return null;
+			case NONE:
+				return AnonymSecurityModule.class.getName();
+			case PROPERTY_FILE:
+				return PropertySecurityModule.class.getName();
+			case SAML2:
+				return Saml2SecurityModule.class.getName();
+			default:
+				return null;
+			}
+		} catch (Exception e) {
+			return config.getSecurityModule();
+		}
 	}
 
 	@Override
@@ -35,7 +63,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 		try {
 			URL[] urls = ClasspathUtil.populateClassPath(getClassPath());
 			customCL = new SecurityModuleClassLoader(urls, SecurityModuleWrapper.class.getClassLoader());
-			Class<?> moduleClass = customCL.loadClass(config.getClassName());
+			Class<?> moduleClass = customCL.loadClass(getSecurityModuleClassName(config));
 
 			Constructor<?> defaultConstructor = null;
 			Constructor<?> configConstructor = null;
@@ -54,7 +82,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 			if (configConstructor != null) {
 				Class<?> configClass = configConstructor.getParameterTypes()[0];
 				try {
-					custom = (WebswingSecurityModule) configConstructor.newInstance(ServerUtil.instantiateConfig(config.getConfig(), configClass, config.getContext()));
+					custom = (WebswingSecurityModule) configConstructor.newInstance(ServerUtil.instantiateConfig(config.getConfig(), configClass, context));
 				} catch (Exception e) {
 					log.error("Could not construct custom security module class (using WebswingSecurityModuleConfig constructor).", e);
 				}
@@ -129,7 +157,11 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 
 					@Override
 					public Object call() throws Exception {
-						custom.destroy();
+						try {
+							custom.destroy();
+						} catch (Throwable e) {
+							throw new Exception(e);
+						}
 						return null;
 					}
 				});
@@ -152,7 +184,10 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 		return subs.replace(cp);
 	}
 
-	public SecurityModuleWrapperConfig getConfig() {
-		return config;
+	public WebswingSecurityModuleConfig getModuleConfig() {
+		if (custom != null && custom instanceof AbstractSecurityModule) {
+			return ((AbstractSecurityModule<?>) custom).getConfig();
+		}
+		return null;
 	}
 }

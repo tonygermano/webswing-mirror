@@ -9,6 +9,10 @@ import org.webswing.server.services.security.modules.AbstractSecurityModule;
 
 public class SecurityModuleExtension<T extends SecurityModuleExtensionConfig> {
 
+	public static enum BuiltInModuleExtensions {
+		oneTimeUrl;
+	}
+
 	private T config;
 
 	public SecurityModuleExtension(T config) {

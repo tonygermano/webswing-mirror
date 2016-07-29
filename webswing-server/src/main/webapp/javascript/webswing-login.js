@@ -19,10 +19,10 @@ define([ 'jquery' ], function amdFactory($) {
 		var user;
 
 		function login(successCallback) {
-			var loginData = JSON.stringify({
-				securityToken : api.cfg.oneTimePassword,
+			var loginData = {
+				securityToken : api.cfg.securityToken,
 				successUrl : window.top.location.href
-			});
+			};
 			var dialogContent = api.showDialog(api.unauthorizedAccessMessage);
 			webswingLogin(api.cfg.connectionUrl, dialogContent, loginData, function(data, request) {
 				user = request.getResponseHeader('webswingUsername');
@@ -39,7 +39,8 @@ define([ 'jquery' ], function amdFactory($) {
 				},
 				type : 'POST',
 				url : baseUrl + 'login',
-				data : loginData,
+				contentType : typeof loginData === 'object' ? 'application/json' : 'application/x-www-form-urlencoded; charset=UTF-8',
+				data : typeof loginData === 'object' ? JSON.stringify(loginData) : loginData,
 				success : function(data, textStatus, request) {
 					if (successCallback != null) {
 						successCallback(data, request);

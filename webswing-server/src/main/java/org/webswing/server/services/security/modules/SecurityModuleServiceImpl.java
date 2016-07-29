@@ -1,74 +1,19 @@
 package org.webswing.server.services.security.modules;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.webswing.model.server.SecurityMode;
+import org.webswing.model.server.WebswingSecurityConfig;
 import org.webswing.server.services.security.api.SecurityContext;
-import org.webswing.server.services.security.modules.anonym.AnonymSecurityModule;
-import org.webswing.server.services.security.modules.property.PropertySecurityModule;
-import org.webswing.server.services.security.modules.saml2.Saml2SecurityModule;
-import org.webswing.server.util.ServerUtil;
 
 import com.google.inject.Singleton;
 
 @Singleton
 public class SecurityModuleServiceImpl implements SecurityModuleService {
 
-	public SecurityModuleWrapper create(SecurityContext context, SecurityMode mode, Map<String, Object> config) {
-		switch (mode) {
-		case INHERITED:
+	public SecurityModuleWrapper create(SecurityContext context, WebswingSecurityConfig config) {
+		if (SecurityModuleWrapper.getSecurityModuleClassName(config) != null) {
+			return new SecurityModuleWrapper(context, config);
+		} else {
 			return null;
-		case NONE:
-			return new SecurityModuleWrapper(createBuiltInConfig(AnonymSecurityModule.class, config, context));
-		case PROPERTY_FILE:
-			return new SecurityModuleWrapper(createBuiltInConfig(PropertySecurityModule.class, config, context));
-		case SAML2:
-			return new SecurityModuleWrapper(createBuiltInConfig(Saml2SecurityModule.class, config, context));
-		case CUSTOM:
-			return new SecurityModuleWrapper(ServerUtil.instantiateConfig(config, SecurityModuleWrapperConfig.class, context));
-
-		default:
-			break;
 		}
-		return null;
-	}
-
-	private SecurityModuleWrapperConfig createBuiltInConfig(final Class<?> securityModule, final Map<String, Object> config, final SecurityContext context) {
-		SecurityModuleWrapperConfig wrapperConfig = new SecurityModuleWrapperConfig() {
-
-			@Override
-			public SecurityContext getContext() {
-				return context;
-			}
-
-			@Override
-			public Map<String, Object> getConfig() {
-				return config;
-			}
-
-			@Override
-			public List<String> getClassPath() {
-				return Collections.emptyList();
-			}
-
-			@Override
-			public String getClassName() {
-				return securityModule.getName();
-			}
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public <T> T getValueAs(String name, Class<T> clazz) {
-				Object o=getConfig().get(name);
-				Map<String, Object> subConfig = (Map<String, Object>) (o != null && o instanceof HashMap ? o : new HashMap<>());
-				return ServerUtil.instantiateConfig(subConfig, clazz, getContext());
-			}
-		};
-
-		return wrapperConfig;
 	}
 
 }

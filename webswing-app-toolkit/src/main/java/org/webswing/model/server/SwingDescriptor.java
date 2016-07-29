@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.webswing.model.server.WebswingSecurityConfig.BuiltInModules;
+
 public abstract class SwingDescriptor implements Serializable {
 	public enum SessionMode {
 		ALWAYS_NEW_SESSION,
@@ -41,8 +43,7 @@ public abstract class SwingDescriptor implements Serializable {
 	private List<String> allowedCorsOrigins = new ArrayList<String>();
 	private float uploadMaxSize = 5;
 	private boolean allowJsLink = true;
-	private SecurityMode securityMode = SecurityMode.INHERITED;
-	private Map<String, Object> securityConfig = new HashMap<String, Object>();
+	private WebswingSecurityConfig securityConfig = new WebswingSecurityConfig(BuiltInModules.INHERITED.name());
 	private String webFolder = null;
 
 	@Override
@@ -258,19 +259,11 @@ public abstract class SwingDescriptor implements Serializable {
 		this.fontConfig = fontConfig;
 	}
 
-	public SecurityMode getSecurityMode() {
-		return securityMode;
-	}
-
-	public void setSecurityMode(SecurityMode securityMode) {
-		this.securityMode = securityMode;
-	}
-
-	public Map<String, Object> getSecurityConfig() {
+	public WebswingSecurityConfig getSecurityConfig() {
 		return securityConfig;
 	}
 
-	public void setSecurityConfig(Map<String, Object> securityConfig) {
+	public void setSecurityConfig(WebswingSecurityConfig securityConfig) {
 		this.securityConfig = securityConfig;
 	}
 

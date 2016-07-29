@@ -21,9 +21,10 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
-import org.webswing.model.server.SecurityMode;
 import org.webswing.model.server.SwingDescriptor;
 import org.webswing.model.server.WebswingConfiguration;
+import org.webswing.model.server.WebswingSecurityConfig;
+import org.webswing.model.server.WebswingSecurityConfig.BuiltInModules;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
@@ -135,23 +136,30 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	}
 
 	private void reloadSecurityModule(WebswingConfiguration configuration) {
-		log.info("Reloading master security module.(" + configuration.getMasterSecurityMode() + ").");
+		log.info("Reloading master security module.(" + configuration.getSecurityConfig() + ").");
 		if (securityModule != null) {
 			securityModule.destroy();
 		}
-		SecurityMode mode = configuration.getMasterSecurityMode();
-		if (mode.equals(SecurityMode.INHERITED)) {
-			log.error("Master security mode INHERITED is not valid. Falling back to default mode PROPERTY_FILE.");
-			mode = SecurityMode.PROPERTY_FILE;
+		WebswingSecurityConfig config = configuration.getSecurityConfig();
+		if (config == null) {
+			log.error("Master security module is not defined. Falling back to default module PROPERTY_FILE.");
+			config = new WebswingSecurityConfig(BuiltInModules.PROPERTY_FILE.name());
 		}
-		Map<String, Object> secConfig = configuration.getMasterSecurityConfig();
-		if (mode == SecurityMode.PROPERTY_FILE) {
+		if (config.getSecurityModule().equals(BuiltInModules.INHERITED.name())) {
+			log.error("Master security module INHERITED is not valid. Falling back to default module PROPERTY_FILE.");
+			config.setSecurityModule(BuiltInModules.PROPERTY_FILE.name());
+		}
+		Map<String, Object> secConfig = config.getConfig();
+		if (config.getSecurityModule().equals(BuiltInModules.PROPERTY_FILE.name())) {
+			if (secConfig == null) {
+				secConfig = new HashMap<>();
+			}
 			if (secConfig.get("file") == null) {
-				secConfig = new HashMap<>(secConfig);
 				secConfig.put("file", "${user.dir}/user.properties");
 			}
 		}
-		securityModule = securitySecurity.create(this, mode, secConfig);
+		config.setConfig(secConfig);
+		securityModule = securitySecurity.create(this, config);
 		securityModule.init();
 	}
 
@@ -177,7 +185,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 				uninstallApplication(appToRemove);
 			}
 		}
-		webFolder = resolveFile(config.getConfiguration().getMasterWebFolder());
+		webFolder = resolveFile(config.getConfiguration().getWebFolder());
 	}
 
 	public void installApplication(SwingDescriptor swing) {

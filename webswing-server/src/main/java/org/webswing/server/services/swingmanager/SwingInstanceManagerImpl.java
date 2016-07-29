@@ -15,6 +15,8 @@ import org.webswing.Constants;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.model.server.SwingDescriptor;
+import org.webswing.model.server.WebswingSecurityConfig;
+import org.webswing.model.server.WebswingSecurityConfig.BuiltInModules;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
@@ -96,7 +98,11 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 	}
 
 	private void loadSecurityModule() {
-		securityModule = securityModuleService.create(this, config.getSecurityMode(), config.getSecurityConfig());
+		WebswingSecurityConfig securityConfig = config.getSecurityConfig();
+		if (securityConfig == null) {
+			securityConfig = new WebswingSecurityConfig(BuiltInModules.INHERITED.name());
+		}
+		securityModule = securityModuleService.create(this, securityConfig);
 		if (securityModule != null) {
 			securityModule.init();
 		}

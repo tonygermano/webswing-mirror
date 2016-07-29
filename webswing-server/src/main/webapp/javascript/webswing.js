@@ -182,7 +182,7 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                     if (options != null) {
                         cfg.autoStart = options.autoStart != null ? JSON.parse(options.autoStart) : cfg.autoStart;
                         cfg.applicationName = options.applicationName != null ? options.applicationName : cfg.applicationName;
-                        cfg.oneTimePassword = options.oneTimePassword != null ? options.oneTimePassword : cfg.oneTimePassword;
+                        cfg.securityToken = options.securityToken != null ? options.securityToken : cfg.securityToken;
                         cfg.args = options.args != null ? options.args : cfg.args;
                         cfg.binarySocket = options.binarySocket != null ? JSON.parse(options.binarySocket) : cfg.binarySocket;
                         cfg.recording = options.recording != null ? JSON.parse(options.recording) : cfg.recording;
