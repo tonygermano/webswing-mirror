@@ -1,22 +1,23 @@
 package org.webswing.server.services.security.modules;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 
 public class SecurityModuleClassLoader extends URLClassLoader {
 
-	private ClassLoader webClassLoaders;
+	private ClassLoader webClassLoader;
 
 	public SecurityModuleClassLoader(URL[] urls, ClassLoader webClassLoaders) {
 		super(urls, ClassLoader.getSystemClassLoader());
-		this.webClassLoaders = webClassLoaders;
+		this.webClassLoader = webClassLoaders;
 	}
 
 	@Override
 	public Class<?> loadClass(String name) throws ClassNotFoundException {
 		try {
-			return webClassLoaders.loadClass(name);
+			return webClassLoader.loadClass(name);
 		} catch (ClassNotFoundException e) {
 			return super.loadClass(name);
 		}
@@ -24,7 +25,17 @@ public class SecurityModuleClassLoader extends URLClassLoader {
 
 	@Override
 	public void close() throws IOException {
-		webClassLoaders = null;
+		webClassLoader = null;
 		super.close();
 	}
+
+	@Override
+	public URL getResource(String name) {
+		URL url = super.getResource(name);
+		if (url == null) {
+			url = webClassLoader.getResource(name);
+		}
+		return url;
+	}
+
 }

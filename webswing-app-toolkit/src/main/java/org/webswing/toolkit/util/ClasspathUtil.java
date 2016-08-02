@@ -9,8 +9,12 @@ import java.util.List;
 
 public class ClasspathUtil {
 	public static URL[] populateClassPath(String classpath) throws MalformedURLException {
+		return populateClassPath(classpath, "");
+	}
+
+	public static URL[] populateClassPath(String classpath, String relativeBase) throws MalformedURLException {
 		List<URL> urls = new ArrayList<URL>();
-		String[] cp = scanForFiles(classpath.split(";"));
+		String[] cp = scanForFiles(classpath.split(";"), toPath(relativeBase));
 		Logger.debug("Swing classpath: " + Arrays.asList(cp));
 		for (String f : cp) {
 			if (f.length() > 0) {
@@ -25,17 +29,29 @@ public class ClasspathUtil {
 		return urls.toArray(new URL[urls.size()]);
 	}
 
-	public static String[] scanForFiles(String[] patternPaths) {
+	private static String toPath(String relativeBase) {
+		if (relativeBase == null || relativeBase.length() == 0) {
+			return "";
+		} else {
+			if (relativeBase.endsWith("/") || relativeBase.endsWith("\\")) {
+				return relativeBase;
+			} else {
+				return relativeBase + "/";
+			}
+		}
+	}
+
+	private static String[] scanForFiles(String[] patternPaths, String relativeBase) {
 		List<String> result = new ArrayList<String>();
 		for (String pattern : patternPaths) {
+			pattern = pattern.replaceAll("\\\\", "/");
+			String[] pathSegs = pattern.split("/");
+			boolean absolute = pathSegs[0].length() == 0 || pathSegs[0].contains(":");
 			if (pattern.contains("?") || pattern.contains("*")) {
-				pattern = pattern.replaceAll("\\\\", "/");
-				String[] pathSegs = pattern.split("/");
-				boolean absolute = pathSegs[0].length() == 0 || pathSegs[0].contains(":");
-				String currentBase = absolute ? "/" : "";
+				String currentBase = absolute ? "/" : relativeBase;
 				scanForPatternFiles(pathSegs, currentBase, result);
 			} else {
-				result.add(pattern);
+				result.add(absolute ? pattern : relativeBase + pattern);
 			}
 		}
 		return result.toArray(new String[result.size()]);

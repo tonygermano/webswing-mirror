@@ -61,7 +61,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 	@Override
 	public void init() {
 		try {
-			URL[] urls = ClasspathUtil.populateClassPath(getClassPath());
+			URL[] urls = ClasspathUtil.populateClassPath(getClassPath(),context.resolveFile(".").getAbsolutePath());
 			customCL = new SecurityModuleClassLoader(urls, SecurityModuleWrapper.class.getClassLoader());
 			Class<?> moduleClass = customCL.loadClass(getSecurityModuleClassName(config));
 

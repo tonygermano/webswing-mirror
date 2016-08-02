@@ -69,6 +69,7 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 
 	@Override
 	public void init() {
+		webFolder = resolveFile(config.getWebFolder());
 		loadSecurityModule();
 		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
 		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
