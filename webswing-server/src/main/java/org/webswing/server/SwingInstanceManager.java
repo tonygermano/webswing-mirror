@@ -14,6 +14,7 @@ import org.webswing.model.MsgIn;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.model.server.SwingDescriptor;
+import org.webswing.model.server.SwingDescriptor.SessionMode;
 import org.webswing.model.server.admin.Sessions;
 import org.webswing.model.server.admin.SwingSession;
 import org.webswing.server.util.ServerUtil;
@@ -89,6 +90,7 @@ public class SwingInstanceManager {
 				} else {
 					boolean result = swingInstance.connectPrimaryWebSession(r);
 					if (result) {
+						//ServerUtil.broadcastMessage(r, SimpleEventMsgOut.continueOldSessionAutomatic.buildMsgOut());
 						ServerUtil.broadcastMessage(r, SimpleEventMsgOut.continueOldSession.buildMsgOut());
 						notifySwingInstanceChanged();
 					} else {

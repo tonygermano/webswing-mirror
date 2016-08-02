@@ -183,6 +183,8 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
                 } else if (data.event == "continueOldSession") {
                     api.cfg.canPaint = false;
                     api.showDialog(api.continueOldSessionDialog);
+                }else if (data.event == "continueOldSessionAutomatic") {
+                	continueSession();
                 }else if (data.event == "sessionStolenNotification") {
                 	api.cfg.canPaint = false;
                 	api.showDialog(api.sessionStolenNotification);

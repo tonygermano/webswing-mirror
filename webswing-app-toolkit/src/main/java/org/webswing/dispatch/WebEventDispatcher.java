@@ -152,7 +152,7 @@ public class WebEventDispatcher {
 			}
 			break;
 		case unload:
-			boolean instantExit = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) <= 0;
+			boolean instantExit = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) == 0;
 			if (instantExit) {
 				Logger.warn("Exiting swing application. Client has disconnected from web session. (swingSessionTimeout setting is 0 or less)");
 				Util.getWebToolkit().exitSwing(1);

@@ -97,6 +97,7 @@ enum SimpleEventMsgOutProto{
 	continueOldSession = 3;
 	configurationError = 4;
 	sessionStolenNotification = 5;
+	continueOldSessionAutomatic = 6;
 }
 
 message JsEvalRequestMsgOutProto{

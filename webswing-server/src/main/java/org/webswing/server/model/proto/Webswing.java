@@ -37,6 +37,10 @@ public final class Webswing {
      * <code>sessionStolenNotification = 5;</code>
      */
     sessionStolenNotification(5, 5),
+    /**
+     * <code>continueOldSessionAutomatic = 6;</code>
+     */
+    continueOldSessionAutomatic(6, 6),
     ;
 
     /**
@@ -63,6 +67,10 @@ public final class Webswing {
      * <code>sessionStolenNotification = 5;</code>
      */
     public static final int sessionStolenNotification_VALUE = 5;
+    /**
+     * <code>continueOldSessionAutomatic = 6;</code>
+     */
+    public static final int continueOldSessionAutomatic_VALUE = 6;
 
 
     public final int getNumber() { return value; }
@@ -75,6 +83,7 @@ public final class Webswing {
         case 3: return continueOldSession;
         case 4: return configurationError;
         case 5: return sessionStolenNotification;
+        case 6: return continueOldSessionAutomatic;
         default: return null;
       }
     }
@@ -28108,11 +28117,12 @@ public final class Webswing {
       "MsgInProto.PlaybackCommandProto\"X\n\024Playb" +
       "ackCommandProto\022\t\n\005reset\020\000\022\010\n\004play\020\001\022\010\n\004" +
       "stop\020\002\022\010\n\004step\020\003\022\n\n\006step10\020\004\022\013\n\007step100\020" +
-      "\005*\300\001\n\026SimpleEventMsgOutProto\022\035\n\031applicat" +
+      "\005*\341\001\n\026SimpleEventMsgOutProto\022\035\n\031applicat" +
       "ionAlreadyRunning\020\000\022\030\n\024shutDownNotificat",
       "ion\020\001\022\036\n\032tooManyClientsNotification\020\002\022\026\n" +
       "\022continueOldSession\020\003\022\026\n\022configurationEr" +
-      "ror\020\004\022\035\n\031sessionStolenNotification\020\005"
+      "ror\020\004\022\035\n\031sessionStolenNotification\020\005\022\037\n\033" +
+      "continueOldSessionAutomatic\020\006"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

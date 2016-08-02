@@ -57,6 +57,7 @@ Here is a sample `webswing.config` file content with demo swing application conf
     "allowDownload" : true,
     "allowAutoDownload" : true,
     "allowUpload" : true,
+    "transferDir" : "${user.dir}/${user}/upload",
     "uploadMaxSize" : 5,
     "allowJsLink" : true
   }]
@@ -117,13 +118,13 @@ In Admin console options with variable replacement support appears with a flash 
 
 `antiAliasText`: Enables rendering of anti-aliased text. Smoothens the edges of the text.
 
-`swingSessionTimeout`: Specifies how long (seconds) will be the swing application left running after the user closes the browser. User can reconnect in this interval and continue in last session.
+`swingSessionTimeout`: Specifies how long (seconds) will be the swing application left running after the user closes the browser. User can reconnect in this interval and continue in last session. Use -1 for sessions running for unlimited time (Only suitable for CONTINUE_FOR_USER session mode).
 
 `sessionMode`: Select session behavior when user reconnects to application. Available options: 
 
 1. `ALWAYS_NEW_SESSION`: New Swing application is started for every Webswing session. It is recommended to increase the `maxClients` value for this setting. (Set "Session Timeout" to >0 to allow clients to reconnect on unstable connections)
 2. `CONTINUE_FOR_BROWSER`: Webswing session can be resumed **in the same browser** after connection is terminated (Session timeout applies).
-3. `CONTINUE_FOR_USER`: Swing session can be resumed **by the same user** from any computer after the connection is terminated(Session timeout applies).
+3. `CONTINUE_FOR_USER`: Swing session can be resumed **by the same user** from any computer after the connection is terminated(Session timeout applies). Note, that with this sessionMode the Webswing will automatically connect to running session without asking as it does with other sessionModes. 
 
 `theme`: Select one of the default window decoration themes or a enter path to a XFWM4 theme folder.
 
@@ -136,6 +137,8 @@ In Admin console options with variable replacement support appears with a flash 
 `authorization`: Set authorized access to this application. Only users with role same as application's name can access this application.
 
 `isolatedFs`: If enabled, this setting will force the JFileChooser to stay inside isolated folder. The new isolated folder is created in `${homeDir}/upload` 
+
+`transferDir`: If isolatedFs is enabled. This will be the folder on the server where the user can upload and download files from.
 
 `debug`: Enables remote debugging for this application. After the application is started with `?debugPort=8000` url parameter from browser, it will wait for remote debugger connection on port 8000
 

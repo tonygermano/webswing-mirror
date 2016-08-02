@@ -23,7 +23,7 @@
                 </ws-string-field>
                 <ws-string-field readonly="{{vm.readonly}}"
                                  label="Session timeout" 
-                                 desc="Specifies how long (seconds) will be the swing application left running after the user closes the browser. User can reconnect in this interval and continue in last session." 
+                                 desc="Specifies how long (seconds) will be the swing application left running after the user closes the browser. User can reconnect in this interval and continue in last session. Use -1 for sessions running for unlimited time (Only suitable for CONTINUE_FOR_USER session mode)." 
                                  value="vm.app.swingSessionTimeout" 
                                  required requiredMsg="Specify the timeout interval."
                                  type="number">
