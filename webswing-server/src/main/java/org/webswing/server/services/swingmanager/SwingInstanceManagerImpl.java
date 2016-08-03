@@ -1,7 +1,6 @@
 package org.webswing.server.services.swingmanager;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -44,7 +43,6 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 	private final WebSocketService websocket;
 	private final SecurityModuleService securityModuleService;
 	private final LoginHandlerService loginService;
-	private final FileTransferHandlerService fileService;
 	private final ResourceHandlerService resourceService;
 	private final RestHandlerService restService;
 	private SwingDescriptor config;
@@ -60,7 +58,6 @@ public class SwingInstanceManagerImpl extends AbstractUrlHandler implements Secu
 		this.websocket = websocket;
 		this.securityModuleService = securityModuleService;
 		this.loginService = loginService;
-		this.fileService = fileService;
 		this.fileHandler = fileService.create(this);
 		this.resourceService = resourceService;
 		this.restService = restService;

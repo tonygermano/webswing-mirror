@@ -42,9 +42,10 @@ public class SwingRestUrlHandler extends AbstractRestUrlHandler {
 	public List<ApplicationInfoMsg> getApplicationInfo(HttpServletRequest req) throws WsException{
 		checkPermission(WebswingAction.rest_getApps);
 		List<ApplicationInfoMsg> result = new ArrayList<>();
+		String pathPrefix = getServletContext().getContextPath()==null?"":getServletContext().getContextPath();
 		StrSubstitutor subs = ServerUtil.getConfigSubstitutor(getUser().getUserId(), null, null, null, null);
 		for(SwingDescriptor sd : instanceHolder.getAllConfiguredApps()){
-			result.add(ServerUtil.toApplicationInfoMsg(sd, subs));
+			result.add(ServerUtil.toApplicationInfoMsg(pathPrefix,sd, subs));
 		}
 		return result;
 	}

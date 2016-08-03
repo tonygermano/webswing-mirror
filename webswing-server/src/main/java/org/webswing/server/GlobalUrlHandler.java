@@ -70,7 +70,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 	private File webFolder;
 
 	@Inject
-	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, RestHandlerService restService, SecurityModuleService securityService, LoginHandlerService loginService) {
+	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, RestHandlerService restService, SecurityModuleService securityService, LoginHandlerService loginService, ServletContext servletContext) {
 		super(null);
 		this.websocket = websocket;
 		this.config = config;
@@ -79,7 +79,7 @@ public class GlobalUrlHandler extends AbstractUrlHandler implements SwingInstanc
 		this.restService = restService;
 		this.securitySecurity = securityService;
 		this.loginService = loginService;
-
+		this.servletContext = servletContext;
 	}
 
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) {

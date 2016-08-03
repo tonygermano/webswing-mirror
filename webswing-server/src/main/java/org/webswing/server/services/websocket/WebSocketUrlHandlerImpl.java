@@ -75,8 +75,9 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 			AppFrameMsgOut appInfo = new AppFrameMsgOut();
 			List<ApplicationInfoMsg> result = new ArrayList<>();
 			StrSubstitutor subs = ServerUtil.getConfigSubstitutor(r.getUser().getUserId(), null, null, null, null);
+			String pathPrefix = getServletContext().getContextPath() == null ? "" : getServletContext().getContextPath();
 			for (SwingDescriptor sd : instanceHolder.getAllConfiguredApps()) {
-				result.add(ServerUtil.toApplicationInfoMsg(sd, subs));
+				result.add(ServerUtil.toApplicationInfoMsg(pathPrefix, sd, subs));
 			}
 			appInfo.setApplications(result);
 			appInfo.setSessionId(r.uuid());

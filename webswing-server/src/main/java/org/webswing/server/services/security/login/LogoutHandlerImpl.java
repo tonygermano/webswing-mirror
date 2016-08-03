@@ -34,7 +34,7 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 		try {
 			logout(req, res);
 			String fullPath=getFullPathMapping();
-			res.sendRedirect(fullPath.substring(0, fullPath.length() - getPath().length()));
+			res.sendRedirect(getServletContext().getContextPath()+fullPath.substring(0, fullPath.length() - getPath().length()));
 			return true;
 		} catch (Exception e) {
 			log.error("Failed to logout", e);

@@ -2,6 +2,7 @@ package org.webswing.server;
 
 import java.io.IOException;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -14,8 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.startup.StartupService;
 
+import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 
 @WebServlet(asyncSupported = true, displayName = "WebswingServlet", urlPatterns = { "/*" })
 @MultipartConfig(fileSizeThreshold = 5242880)
@@ -30,14 +33,18 @@ public class WebswingServlet extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
-		Injector injector = Guice.createInjector(new WebswingServerModule());
+		Module servletModule = new Module() {
+			public void configure(Binder binder) {
+				binder.bind(ServletContext.class).toInstance(getServletContext());
+			}
+		};
+		Injector injector = Guice.createInjector(servletModule, new WebswingServerModule());
 		this.securityManager = injector.getInstance(SecurityManagerService.class);
 		try {
 			this.securityManager.start();
 			this.startup = injector.getInstance(StartupService.class);
 			this.startup.start();
 			this.handler = injector.getInstance(GlobalUrlHandler.class);
-			this.handler.setServletContext(getServletContext());
 			this.handler.init();
 		} catch (Exception e) {
 			log.error("Initialization of Webswing failed. ", e);

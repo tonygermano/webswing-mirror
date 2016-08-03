@@ -1,5 +1,6 @@
 package org.webswing.server.services.security.modules.property;
 
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.text.PropertiesRealm;
@@ -21,7 +22,12 @@ public class PropertySecurityModule extends AbstractUserPasswordSecurityModule<P
 
 	@Override
 	public AbstractWebswingUser verifyUserPassword(String user, String password) throws WebswingAuthenticationException {
-		AuthenticationInfo authtInfo = realm.getAuthenticationInfo(new UsernamePasswordToken(user, password));
+		AuthenticationInfo authtInfo;
+		try {
+			authtInfo = realm.getAuthenticationInfo(new UsernamePasswordToken(user, password));
+		} catch (AuthenticationException e) {
+			throw new WebswingAuthenticationException("Username or password is not valid!", e);
+		}
 		if (authtInfo == null) {
 			throw new WebswingAuthenticationException("User not found!");
 		}

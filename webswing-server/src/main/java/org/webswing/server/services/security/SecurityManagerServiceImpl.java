@@ -2,6 +2,7 @@ package org.webswing.server.services.security;
 
 import java.util.concurrent.Callable;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,8 +17,8 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.subject.WebSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.server.base.UrlHandler;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -25,6 +26,13 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 	private static final Logger log = LoggerFactory.getLogger(SecurityManagerServiceImpl.class);
 
 	private final DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+
+	private ServletContext context;
+
+	@Inject
+	public SecurityManagerServiceImpl(ServletContext context) {
+		this.context = context;
+	}
 
 	@Override
 	public void start() {
@@ -40,18 +48,16 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 	}
 
 	@Override
-	public void secure(final UrlHandler handler, HttpServletRequest req, HttpServletResponse res) {
-		final ShiroHttpServletRequest request = new ShiroHttpServletRequest(req, handler.getServletContext(), false);
-		final ShiroHttpServletResponse response = new ShiroHttpServletResponse(res, handler.getServletContext(), request);
+	public Object secure(final SecurableService handler, final HttpServletRequest req, final HttpServletResponse res) {
+		final ShiroHttpServletRequest request = new ShiroHttpServletRequest(req, context, false);
+		final ShiroHttpServletResponse response = new ShiroHttpServletResponse(res, context, request);
 
 		final Subject subject = new WebSubject.Builder(securityManager, request, response).buildWebSubject();
-		request.setAttribute(SECURITY_SUBJECT, subject);
 
-		subject.execute(new Callable<Object>() {
+		return subject.execute(new Callable<Object>() {
 			public Object call() throws Exception {
 				updateSessionLastAccessTime(request, response);
-				handler.serve(request, response);
-				return null;
+				return handler.secureServe(req, res);
 			}
 		});
 	}

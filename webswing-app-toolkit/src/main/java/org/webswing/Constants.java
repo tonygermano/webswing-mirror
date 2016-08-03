@@ -38,6 +38,7 @@ public interface Constants {
 
 	// server startup constants
 	public static final String WAR_FILE_LOCATION = "webswing.warLocation";
+	public static final String ROOT_DIR_URI = "webswing.rootDirUri";
 	public static final String ROOT_DIR_PATH = "webswing.rootDir";
 	public static final String TEMP_DIR_PATH_BASE = "webswing.tempDirBase";
 	public static final String TEMP_DIR_PATH = "webswing.tempDirPath";

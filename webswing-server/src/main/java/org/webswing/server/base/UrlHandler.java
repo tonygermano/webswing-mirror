@@ -5,8 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webswing.server.model.exception.WsException;
-import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
 
 public interface UrlHandler {

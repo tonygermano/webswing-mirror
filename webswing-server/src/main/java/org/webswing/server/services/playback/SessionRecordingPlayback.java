@@ -88,7 +88,7 @@ public class SessionRecordingPlayback {
 	}
 
 	public ApplicationInfoMsg getApplicationInfo() {
-		ApplicationInfoMsg aim = ServerUtil.toApplicationInfoMsg(header.getApplication(), null);
+		ApplicationInfoMsg aim = ServerUtil.toApplicationInfoMsg("",header.getApplication(), null);
 		aim.setName(this.recordingFile.getPath());
 		return aim;
 	}

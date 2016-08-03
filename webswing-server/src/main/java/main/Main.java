@@ -210,13 +210,16 @@ public class Main {
 	public static File getRootDir() {
 		if (System.getProperty(Constants.ROOT_DIR_PATH) == null) {
 			File defaultRoot = new File(System.getProperty("user.dir"));
-			System.setProperty(Constants.ROOT_DIR_PATH, defaultRoot.toURI().toString());
+			System.setProperty(Constants.ROOT_DIR_URI, defaultRoot.toURI().toString());
+			System.setProperty(Constants.ROOT_DIR_PATH, defaultRoot.getAbsolutePath());
 			return defaultRoot;
 		} else {
 			String pathOrUri = System.getProperty(Constants.ROOT_DIR_PATH);
 			try {
 				File file = new File(URI.create(pathOrUri));
 				if (file.exists()) {
+					System.setProperty(Constants.ROOT_DIR_URI, file.toURI().toString());
+					System.setProperty(Constants.ROOT_DIR_PATH, file.getAbsolutePath());
 					return file;
 				} else {
 					throw new IllegalArgumentException("File " + file.getAbsolutePath() + "not found.");
@@ -224,7 +227,8 @@ public class Main {
 			} catch (IllegalArgumentException e) {
 				File absoluteConfigFile = new File(pathOrUri);
 				if (absoluteConfigFile.exists()) {
-					System.setProperty(Constants.ROOT_DIR_PATH, absoluteConfigFile.toURI().toString());
+					System.setProperty(Constants.ROOT_DIR_URI, absoluteConfigFile.toURI().toString());
+					System.setProperty(Constants.ROOT_DIR_PATH, absoluteConfigFile.getAbsolutePath());
 					return absoluteConfigFile;
 				} else {
 					throw new IllegalArgumentException("File " + absoluteConfigFile.getAbsolutePath() + " not found.");

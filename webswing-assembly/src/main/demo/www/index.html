@@ -68,7 +68,8 @@
 		}
 
 
-		function loadApps() {
+		function loadApps(data, request) {
+			user = request.getResponseHeader('webswingUsername');
 			$.ajax({
 				xhrFields : {
 					withCredentials : true

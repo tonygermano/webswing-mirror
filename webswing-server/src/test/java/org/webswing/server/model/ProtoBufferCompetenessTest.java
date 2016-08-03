@@ -39,12 +39,13 @@ import org.webswing.server.model.proto.Webswing.SimpleEventMsgInProto;
 import org.webswing.server.model.proto.Webswing.SimpleEventMsgInProto.SimpleEventTypeProto;
 import org.webswing.server.util.ProtoMapper;
 
-import sun.net.www.protocol.file.FileURLConnection;
-
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor.JavaType;
 import com.google.protobuf.Message.Builder;
 
+import sun.net.www.protocol.file.FileURLConnection;
+
+@SuppressWarnings("restriction")
 public class ProtoBufferCompetenessTest {
 
 	private static final String inMsgs = "org.webswing.model.c2s";

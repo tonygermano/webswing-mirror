@@ -7,11 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.atmosphere.client.TrackMessageSizeInterceptor;
+import org.atmosphere.cpr.Action;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereHandler;
 import org.atmosphere.cpr.AtmosphereInterceptor;
@@ -26,8 +28,11 @@ import org.webswing.Constants;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.base.WebswingService;
 import org.webswing.server.services.playback.RecordingPlaybackUrlHandlerImpl;
+import org.webswing.server.services.security.SecurableService;
+import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -35,9 +40,18 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	private static final Logger log = LoggerFactory.getLogger(WebSocketService.class);
 	private static final String WEBSOCKET_MESSAGE_SIZE = System.getProperty(Constants.WEBSOCKET_MESSAGE_SIZE, "1048576");
 	private static final String WEBSOCKET_THREADPOOL_SIZE = System.getProperty(Constants.WEBSOCKET_THREAD_POOL, "10");
-	AtmosphereFramework framework = new AtmosphereFramework(false, false);
 	private static final Class<?>[] jsonInterceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, TrackMessageSizeInterceptor.class, SuspendTrackerInterceptor.class };
 	private static final Class<?>[] binaryInterceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, SuspendTrackerInterceptor.class };
+
+	private final SecuredAtmosphereFramework framework;
+	private final ServletContext context;
+
+	@Inject
+	public WebSocketServiceImpl(ServletContext context, SecurityManagerService securityManager) {
+		this.context = context;
+		this.framework = new SecuredAtmosphereFramework(securityManager);
+
+	}
 
 	public void start() {
 
@@ -51,8 +65,19 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 		initParams.put("org.atmosphere.cpr.scanClassPath", "false");
 		initParams.put("org.atmosphere.cpr.AtmosphereFramework.analytics", "false");
 		initParams.put("org.atmosphere.cpr.broadcasterCacheClass", "org.atmosphere.cache.UUIDBroadcasterCache");
+		initParams.put("org.atmosphere.container.JSR356AsyncSupport.mappingPath", "/{PATH}");
+
 		try {
-			framework.init(new VoidServletConfig(initParams), false);
+
+			framework.init(new VoidServletConfig(initParams) {
+				@Override
+				public ServletContext getServletContext() {
+					return context;
+				}
+			}, false);
+
+			initParams.put("org.atmosphere.container.JSR356AsyncSupport.mappingPath", context.getContextPath());
+
 		} catch (ServletException e) {
 			throw new RuntimeException("Failed to initialize Websocket framework", e);
 		}

@@ -12,12 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.WebswingAction;
+import org.webswing.server.services.security.SecurableService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
 import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
 
-public abstract class AbstractUrlHandler implements UrlHandler {
+public abstract class AbstractUrlHandler implements UrlHandler, SecurableService {
 	private static final Logger log = LoggerFactory.getLogger(AbstractUrlHandler.class);
 
 	private final UrlHandler parent;
@@ -57,10 +58,12 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		//redirect to url that ends with '/' to ensure browser queries correct resources 
-		if (isPrimaryHandler() && req.getPathInfo().equals(getFullPathMapping())) {
+		if (isPrimaryHandler() && (req.getPathInfo() == null || req.getPathInfo().equals(getFullPathMapping()))) {
 			try {
 				String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
-				res.sendRedirect(getPath() + "/" + queryString);
+				String path = getPath() == null ? "" : getPath();
+				String context = getServletContext().getContextPath() == null ? "" : getServletContext().getContextPath();
+				res.sendRedirect(context + path + "/" + queryString);
 			} catch (IOException e) {
 				log.error("Failed to redirect.", e);
 			}
@@ -80,7 +83,12 @@ public abstract class AbstractUrlHandler implements UrlHandler {
 		return false;
 	}
 
-	protected boolean isPrimaryHandler(){
+	@Override
+	public Object secureServe(HttpServletRequest req, HttpServletResponse res) throws WsException {
+		return serve(req, res);
+	}
+	
+	protected boolean isPrimaryHandler() {
 		return false;
 	}
 

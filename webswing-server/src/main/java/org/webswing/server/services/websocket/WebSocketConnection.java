@@ -11,9 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.webswing.model.MsgOut;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.EncodedMessage;
-import org.webswing.server.services.security.SecurityManagerService;
-import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.util.SecurityUtil;
 
 public class WebSocketConnection {
@@ -45,10 +44,6 @@ public class WebSocketConnection {
 
 	public HttpServletRequest getRequest() {
 		return resource.getRequest();
-	}
-
-	public Object getSecuritySubject() {
-		return resource.getRequest().getAttribute(SecurityManagerService.SECURITY_SUBJECT);
 	}
 
 	public AbstractWebswingUser getUser() {

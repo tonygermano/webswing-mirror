@@ -16,18 +16,20 @@ public class SecurityUtil {
 	}
 
 	public static AbstractWebswingUser getUser(WebSocketConnection connection) {
-		Subject subject = (Subject) connection.getSecuritySubject();
+		Subject subject = SecurityUtils.getSubject();
 		UrlHandler urlHandler = connection.getHandler();
 		return resolveUser(subject, urlHandler);
 	}
 
 	private static AbstractWebswingUser resolveUser(Subject subject, UrlHandler urlHandler) {
-		PrincipalCollection currentPrincipals = subject.getPrincipals();
-		String securedParentPath = urlHandler.getSecuredPath();
-		if (currentPrincipals != null && subject.isAuthenticated()) {
-			for (WebswingPrincipal webswingPrincipal : currentPrincipals.byType(WebswingPrincipal.class)) {
-				if (securedParentPath.equals(webswingPrincipal.getSecuredPath())) {
-					return webswingPrincipal.getUser();
+		if (subject != null && urlHandler != null) {
+			PrincipalCollection currentPrincipals = subject.getPrincipals();
+			String securedParentPath = urlHandler.getSecuredPath();
+			if (currentPrincipals != null && subject.isAuthenticated()) {
+				for (WebswingPrincipal webswingPrincipal : currentPrincipals.byType(WebswingPrincipal.class)) {
+					if (securedParentPath.equals(webswingPrincipal.getSecuredPath())) {
+						return webswingPrincipal.getUser();
+					}
 				}
 			}
 		}

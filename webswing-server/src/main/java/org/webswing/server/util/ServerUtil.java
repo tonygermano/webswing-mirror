@@ -117,11 +117,11 @@ public class ServerUtil {
 		}
 	}
 
-	public static ApplicationInfoMsg toApplicationInfoMsg(SwingDescriptor swingDesc, StrSubstitutor subs) {
+	public static ApplicationInfoMsg toApplicationInfoMsg(String pathPrefix, SwingDescriptor swingDesc, StrSubstitutor subs) {
 		ApplicationInfoMsg app = new ApplicationInfoMsg();
 		app.setName(swingDesc.getName());
 		app.setAlwaysRestart(swingDesc.getSwingSessionTimeout() == 0);
-		app.setUrl(swingDesc.getPath());
+		app.setUrl(pathPrefix + toPath(swingDesc.getPath()));
 		File icon = resolveFile(swingDesc.getIcon(), swingDesc.getHomeDir(), subs);
 		if (icon == null || !icon.isFile()) {
 			app.setBase64Icon(loadImage(null));
