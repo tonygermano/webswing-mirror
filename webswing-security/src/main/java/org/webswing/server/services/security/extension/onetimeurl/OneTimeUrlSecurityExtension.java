@@ -1,8 +1,10 @@
 package org.webswing.server.services.security.extension.onetimeurl;
 
+import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
@@ -32,7 +36,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 	@Override
 	public AbstractWebswingUser doSufficientPreValidation(AbstractSecurityModule<?> m, HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
 		Map<String, Object> requestData = m.getLoginRequest(request);
-		if (requestData!=null && requestData.containsKey(SECURITY_TOKEN)) {
+		if (requestData != null && requestData.containsKey(SECURITY_TOKEN)) {
 			AbstractWebswingUser result = verifyOneTimePassword((String) requestData.get(SECURITY_TOKEN));
 			return result;
 		}
@@ -124,7 +128,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		return result;
 	}
 
-	public String getOtpMessage(OtpTokenData token) {
+	public static String getOtpMessage(OtpTokenData token) {
 		String attributes = arrayToString(token.getAttributes());
 		String permissions = arrayToString(token.getPermissions());
 		String roles = arrayToString(token.getRoles());
@@ -160,7 +164,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		}
 	}
 
-	public String encodeOtpToken(OtpTokenData token) throws WebswingAuthenticationException {
+	public static String encodeOtpToken(OtpTokenData token) throws WebswingAuthenticationException {
 		try {
 			byte[] value = AbstractSecurityModule.getMapper().writeValueAsBytes(token);
 			return Base64.encodeBase64String(value);
@@ -169,7 +173,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		}
 	}
 
-	public String calculateTotpString(String crypto, String secret, String message, int intervalshift, int intervalLengthSec) {
+	public static String calculateTotpString(String crypto, String secret, String message, int intervalshift, int intervalLengthSec) {
 		long time = System.currentTimeMillis() / 1000 / intervalLengthSec;
 		time = time + intervalshift;
 		message = message + time;
@@ -193,8 +197,14 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 
 	public AbstractWebswingUser createUser(OtpTokenData token) throws WebswingAuthenticationException {
 		OtpAccessConfig c = getConfig().getApiKeys().get(token.getRequestorId());
+		Map<String, String> attributes = new HashMap<String, String>();
 		Set<String> roles = new HashSet<>();
 		Set<String> permissions = new HashSet<>();
+		if (token.getAttributes() != null) {
+			for (String[] attribute : token.getAttributes()) {
+				attributes.put(attribute[0], attribute[1]);
+			}
+		}
 		if (token.getRoles() != null) {
 			roles.addAll(Arrays.asList(token.getRoles()));
 		}
@@ -215,5 +225,80 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		AbstractWebswingUser user = new OtpWebswingUser(token.getUser(), roles, permissions);
 		return user;
 	}
+
+	public static void main(String[] args) throws WebswingAuthenticationException, JsonGenerationException, JsonMappingException, IOException {
+		OtpTokenData token = new OtpTokenData();
+		token.setUser("john");
+		token.setRequestorId("myWebPage");
+		token.setSwingPath("/swingset3");
+		String secret = "5gV4gchlFZEwmXHNLgGj";
+		String crypto = "HmacSHA512";
+		String[][] attrs = new String[][] { new String[] { "attr1", "value1" }, new String[] { "attr2", "value2" } };
+
+		String encoded;
+		token.setAttributes(attrs);
+		token.setRoles(new String[] {});
+		token.setPermissions(new String[] {});
+		String message = getOtpMessage(token);
+		String otp = calculateTotpString(crypto, secret, message, 0, 30);
+		token.setOneTimePassword(otp);
+		encoded = encodeOtpToken(token);
+		long time = System.currentTimeMillis() / 1000 / 30;
+		time = time + 0;
+		message = message + time;
+		System.out.println("message: " + message);
+		System.out.println("response: " + AbstractSecurityModule.getMapper().writeValueAsString(token));
+		System.out.println("http://localhost:8080/swingset3/?securityToken=" + encoded);
+	}
+
+	/* PHP snippet to generate One time URL
+	<?php
+	$secret =  "5gV4gchlFZEwmXHNLgGj";
+	$requestorId = 'myWebPage';
+	$swingPath="/swingset3";
+	$userName = "john";
+	$userAttributes = array(
+	array("attr1","value1"),
+	array("attr2","value2")
+	);
+	$roles = array();
+	$permissions = array();
+	
+	$intervalSec = 30;
+	
+	
+	//message = swingPath + username + attributes + roles + permissions + time
+	$message = $swingPath.$userName;
+	foreach ($userAttributes as $value) {
+	  $message = $message .$value[0].$value[1];
+	}
+	foreach ($roles as $value) {
+	  $message = $message . $value;
+	}
+	foreach ($permissions as $value) {
+	  $message = $message . $value;
+	}
+	$message = $message.round(microtime(true)/$intervalSec);
+	
+	$otp = base64_encode(hash_hmac("sha512",$message,$secret,true));
+	$response = (object)array(
+	    'swingPath' => $swingPath,
+	    'requestorId' => $requestorId,
+		'user' => $userName,
+		'attributes' => $userAttributes,
+		'roles' => $roles,
+		'permissions' => $permissions,
+		'oneTimePassword' => $otp
+	);
+	$token=json_encode($response,JSON_UNESCAPED_SLASHES);
+	$b64token=base64_encode($token);
+	$url='http://localhost:8080/swingset3/?securityToken='.$b64token;
+	echo 'message: '.$message;
+	echo '<br>';
+	echo 'response: '.$token;
+	echo '<br>';
+	echo '<a href = "'.$url.'" target="_blank">'.$url.'</a>';
+	?>
+	*/
 
 }
