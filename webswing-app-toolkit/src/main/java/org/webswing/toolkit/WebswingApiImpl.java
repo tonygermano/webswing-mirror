@@ -159,10 +159,10 @@ public class WebswingApiImpl implements WebswingApi {
 				try {
 					switch (type) {
 					case UserConnected:
-						l.onUserConnected(event);
+						l.onPrimaryUserConnected(event);
 						break;
 					case UserDisconnected:
-						l.onUserDisconnected(event);
+						l.onPrimaryUserDisconnected(event);
 						break;
 					case MirrorViewConnected:
 						l.onMirrorViewConnected(event);

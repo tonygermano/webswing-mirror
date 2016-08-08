@@ -45,7 +45,7 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 	protected void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		AbstractWebswingUser user = getUser();
 		Subject subject = SecurityUtils.getSubject();
-		if (user != null && user != AbstractWebswingUser.anonymUser) {
+		if (user != null ) {
 			resp.setStatus(HttpServletResponse.SC_OK);
 			resp.setHeader("webswingUsername", user.getUserId());
 		} else {

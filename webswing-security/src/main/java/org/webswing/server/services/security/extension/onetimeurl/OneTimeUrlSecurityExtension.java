@@ -1,6 +1,7 @@
 package org.webswing.server.services.security.extension.onetimeurl;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.extension.api.SecurityModuleExtension;
+import org.webswing.server.services.security.modules.AbstractExtendableSecurityModule;
 import org.webswing.server.services.security.modules.AbstractSecurityModule;
 
 public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTimeUrlSecurityExtensionConfig> {
@@ -34,13 +36,13 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 	}
 
 	@Override
-	public AbstractWebswingUser doSufficientPreValidation(AbstractSecurityModule<?> m, HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
+	public AbstractWebswingUser doSufficientPreValidation(AbstractExtendableSecurityModule<?> m, HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
 		Map<String, Object> requestData = m.getLoginRequest(request);
 		if (requestData != null && requestData.containsKey(SECURITY_TOKEN)) {
 			AbstractWebswingUser result = verifyOneTimePassword((String) requestData.get(SECURITY_TOKEN));
 			return result;
 		}
-		throw new WebswingAuthenticationException("Not valid one time url request");
+		return null;
 	}
 
 	public AbstractWebswingUser verifyOneTimePassword(String otp) throws WebswingAuthenticationException {
@@ -57,10 +59,8 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 					return createUser(token);
 				}
 			}
-			log.warn("Invalid or expired OTP. ");
 			throw new WebswingAuthenticationException("Invalid or expired OTP. ");
 		} catch (Exception e) {
-			log.error("Failed to verify OTP. " + e.getMessage(), e);
 			throw new WebswingAuthenticationException("Failed to verify OTP. " + e.getMessage(), e);
 		}
 	}
@@ -197,9 +197,10 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 
 	public AbstractWebswingUser createUser(OtpTokenData token) throws WebswingAuthenticationException {
 		OtpAccessConfig c = getConfig().getApiKeys().get(token.getRequestorId());
-		Map<String, String> attributes = new HashMap<String, String>();
+		Map<String, Serializable> attributes = new HashMap<String, Serializable>();
 		Set<String> roles = new HashSet<>();
 		Set<String> permissions = new HashSet<>();
+		
 		if (token.getAttributes() != null) {
 			for (String[] attribute : token.getAttributes()) {
 				attributes.put(attribute[0], attribute[1]);
@@ -222,7 +223,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 			permissions.retainAll(c.getAllowedPermissions());
 		}
 
-		AbstractWebswingUser user = new OtpWebswingUser(token.getUser(), roles, permissions);
+		AbstractWebswingUser user = new OtpWebswingUser(token.getUser(), attributes, roles, permissions);
 		return user;
 	}
 

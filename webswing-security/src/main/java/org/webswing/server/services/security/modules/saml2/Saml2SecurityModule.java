@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -124,6 +125,22 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 			}
 		}
 		return null;
+	}
+	
+	
+	@Override
+	public void doLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String logoutUrl = getConfig().getLogoutUrl();
+		if(logoutUrl!=null){
+			sendRedirect(request, response, logoutUrl);
+		}else{
+			if(isAjax(request)){
+				sendHtml(request, response, "saml2/logoutPartial.html", null);
+			}else{
+				sendHtml(request, response, "saml2/logoutPage.html", null);
+			}
+		}
+		
 	}
 
 }

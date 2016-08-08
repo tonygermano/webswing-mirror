@@ -114,13 +114,13 @@ public class ApiDemo extends JPanel {
 			WebswingUtil.getWebswingApi().addUserConnectionListener(new WebswingUserListener() {
 
 				@Override
-				public void onUserDisconnected(UserEvent evt) {
+				public void onPrimaryUserDisconnected(UserEvent evt) {
 					text.append("onUserDisconnected(" + evt.getUser() + ")\n");
 
 				}
 
 				@Override
-				public void onUserConnected(UserEvent evt) {
+				public void onPrimaryUserConnected(UserEvent evt) {
 					text.append("onUserConnected(" + evt.getUser() + ")\n");
 				}
 

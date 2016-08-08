@@ -23,12 +23,22 @@ define([ 'jquery' ], function amdFactory($) {
 				securityToken : api.cfg.securityToken,
 				successUrl : window.top.location.href
 			};
-			var dialogContent = api.showDialog(api.unauthorizedAccessMessage);
+			var dialogContent = function(){
+				return api.showDialog(api.unauthorizedAccessMessage);
+			}
 			webswingLogin(api.cfg.connectionUrl, dialogContent, loginData, function(data, request) {
 				user = request.getResponseHeader('webswingUsername');
 				if (successCallback != null) {
 					successCallback();
 				}
+			});
+		}
+
+		function logout() {
+			var dialogContent = api.showDialog(api.unauthorizedAccessMessage);
+			webswingLogout(api.cfg.connectionUrl, dialogContent, function done(data) {
+				api.disconnect();
+				api.start();
 			});
 		}
 
@@ -58,6 +68,9 @@ define([ 'jquery' ], function amdFactory($) {
 						if (loginMsg.redirectUrl != null) {
 							window.top.location.href = loginMsg.redirectUrl;
 						} else if (loginMsg.partialHtml != null) {
+							if(typeof element === 'function'){
+								element=element();
+							}
 							element.html(loginMsg.partialHtml);
 							var form = element.find('form').first();
 							form.submit(function(event) {
@@ -67,27 +80,33 @@ define([ 'jquery' ], function amdFactory($) {
 						} else {
 							loginMsg.partialHtml = "<p>Oops, something's not right.</p>";
 						}
-
 					}
 				}
 			});
 		}
 
-		function logout() {
+		function webswingLogout(baseUrl, element, doneCallback) {
 			$.ajax({
-				xhrFields : {
-					withCredentials : true
-				},
 				type : 'GET',
-				url : api.cfg.connectionUrl + 'logout',
-				data : '',
-				success : done,
-				error : done
+				url : baseUrl + 'logout',
+			}).done(function(data,status, xhr) {
+				var response = xhr.responseText;
+				if (response != null) {
+					var loginMsg = {};
+					try {
+						loginMsg = JSON.parse(response);
+					} catch (error) {
+						doneCallback();
+					}
+					if (loginMsg.redirectUrl != null) {
+						window.top.location.href = loginMsg.redirectUrl;
+					} else if (loginMsg.partialHtml != null) {
+						element.html(loginMsg.partialHtml);
+					} else {
+						doneCallback();
+					}
+				}
 			});
-			function done(data) {
-				api.disconnect();
-				api.start();
-			}
 		}
 
 		function getUser() {

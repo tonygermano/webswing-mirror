@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.atmosphere.client.TrackMessageSizeInterceptor;
-import org.atmosphere.cpr.Action;
-import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereHandler;
 import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.cpr.AtmosphereRequest;
@@ -28,7 +26,6 @@ import org.webswing.Constants;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.base.WebswingService;
 import org.webswing.server.services.playback.RecordingPlaybackUrlHandlerImpl;
-import org.webswing.server.services.security.SecurableService;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 

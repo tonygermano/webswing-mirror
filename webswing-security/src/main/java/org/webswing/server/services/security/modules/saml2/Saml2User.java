@@ -10,13 +10,10 @@ import java.util.Map.Entry;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 
 public class Saml2User extends AbstractWebswingUser {
-	private static final long serialVersionUID = -4072080527374898315L;
-	private String samlToken = null;
 	private String name = null;
 	private Map<String, Serializable> attributes = new HashMap<String, Serializable>();
 
 	public Saml2User(String samlToken, String name, Map<String, List<String>> map) {
-		this.samlToken = samlToken;
 		this.name = name;
 		for (Entry<String, List<String>> e : map.entrySet()) {
 			if (e.getValue() != null && e.getValue().size() == 1) {

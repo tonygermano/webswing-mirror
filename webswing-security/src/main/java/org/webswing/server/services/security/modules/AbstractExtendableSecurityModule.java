@@ -11,13 +11,39 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.LoginResponseClosedException;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.extension.api.SecurityModuleExtension;
 import org.webswing.server.services.security.extension.api.SecurityModuleExtension.BuiltInModuleExtensions;
 import org.webswing.server.services.security.extension.api.SecurityModuleExtensionConfig;
 import org.webswing.server.services.security.extension.api.WebswingExtendableSecurityModuleConfig;
 import org.webswing.server.services.security.extension.onetimeurl.OneTimeUrlSecurityExtension;
+import org.webswing.server.services.security.extension.permissionmap.PermissionMapSecurityExtension;
 
+/**
+ * Adds extensions support to {@link AbstractSecurityModule}. Four extension points are provided ( See {@link SecurityModuleExtension}) prototype.
+ * <p>
+ * A list of extension can be registered using 
+ * Security Module's JSON configuration. Extension must be one of the {@link BuiltInModuleExtensions} or a custom subclass of {@link SecurityModuleExtension}.
+ * </p>
+ * JSON configuration example : 
+ * <pre>
+ * "securityConfig" : {
+ *   "securityModule" : "MyExtendableModule",
+ *   "config" : {
+ *     "extensions" : [ "org.webswing.MyExtension", "oneTimeUrl" ],
+ *     "org.webswing.MyExtension" : {
+ *       "myExtensionParam1" : "value"
+ *     },
+ *     "oneTimeUrl" : {
+ *       "apiKeys" : {}
+ *     }
+ *   }
+ * },
+ * </pre>  
+ * 
+ * @param <T> configuration which extends {@link WebswingExtendableSecurityModuleConfig}
+ */
 public abstract class AbstractExtendableSecurityModule<T extends WebswingExtendableSecurityModuleConfig> extends AbstractSecurityModule<T> {
 	private static final Logger log = LoggerFactory.getLogger(AbstractExtendableSecurityModule.class);
 
@@ -27,12 +53,14 @@ public abstract class AbstractExtendableSecurityModule<T extends WebswingExtenda
 		super(config);
 	}
 
-	public static String getExtensionClassName(String name) {
+	private static String getExtensionClassName(String name) {
 		try {
 			BuiltInModuleExtensions builtInExtensions = BuiltInModuleExtensions.valueOf(name);
 			switch (builtInExtensions) {
 			case oneTimeUrl:
 				return OneTimeUrlSecurityExtension.class.getName();
+			case permissionMap:
+				return PermissionMapSecurityExtension.class.getName();
 			default:
 				return null;
 			}
@@ -96,10 +124,15 @@ public abstract class AbstractExtendableSecurityModule<T extends WebswingExtenda
 				AbstractWebswingUser result = extension.doSufficientPreValidation(this, request, response);
 				if (result != null) {
 					onAuthenticationSuccess(request, response);
+					return result;
+				} else {
+					continue;
 				}
-				return result;
 			} catch (WebswingAuthenticationException e) {
+				log.error("Extension failed to authenticate:", e);
 				continue;
+			} catch (LoginResponseClosedException e) {
+				return null;
 			}
 		}
 
@@ -107,34 +140,29 @@ public abstract class AbstractExtendableSecurityModule<T extends WebswingExtenda
 	}
 
 	@Override
-	protected boolean preVerify(HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
+	protected void preVerify(HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException, LoginResponseClosedException {
 		for (SecurityModuleExtension<?> extension : extensions) {
 			try {
-				boolean valid = extension.doRequiredPreValidation(this, request, response);
-				if (!valid) {
-					return false;
-				}
+				extension.doRequiredPreValidation(this, request, response);
 			} catch (WebswingAuthenticationException e) {
+				throw e;
+			} catch (LoginResponseClosedException e) {
 				throw e;
 			}
 		}
-		return true;
 	}
 
 	@Override
-	protected boolean postVerify(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
+	protected void postVerify(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) throws LoginResponseClosedException, WebswingAuthenticationException {
 		for (SecurityModuleExtension<?> extension : extensions) {
 			try {
-				boolean valid = extension.doRequiredPostValidation(this, user, request, response);
-				if (!valid) {
-					return false;
-				}
+				extension.doRequiredPostValidation(this, user, request, response);
 			} catch (WebswingAuthenticationException e) {
+				throw e;
+			} catch (LoginResponseClosedException e) {
 				throw e;
 			}
 		}
-		return true;
-
 	}
 
 	@Override

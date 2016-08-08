@@ -583,7 +583,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	private void sendUserApiEventMsg(ApiEventType type, WebSocketConnection r) {
 		ApiEventMsgInternal event;
-		if (r != null) {
+		if (r != null && r.getUser()!=null) {
 			AbstractWebswingUser connectedUser = r.getUser();
 			event = new ApiEventMsgInternal(type, connectedUser.getUserId(), new HashMap<String, Serializable>(connectedUser.getUserAttributes()));
 		} else {

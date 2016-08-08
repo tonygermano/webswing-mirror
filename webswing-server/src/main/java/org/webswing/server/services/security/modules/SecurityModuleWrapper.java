@@ -61,7 +61,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 	@Override
 	public void init() {
 		try {
-			URL[] urls = ClasspathUtil.populateClassPath(getClassPath(),context.resolveFile(".").getAbsolutePath());
+			URL[] urls = ClasspathUtil.populateClassPath(getClassPath(), context.resolveFile(".").getAbsolutePath());
 			customCL = new SecurityModuleClassLoader(urls, SecurityModuleWrapper.class.getClassLoader());
 			Class<?> moduleClass = customCL.loadClass(getSecurityModuleClassName(config));
 
@@ -139,13 +139,24 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 
 	}
 
-	private <T> T runWithContextClassLoader(Callable<T> contextCallback) throws Exception {
-		ClassLoader original = Thread.currentThread().getContextClassLoader();
-		try {
-			Thread.currentThread().setContextClassLoader(customCL);
-			return contextCallback.call();
-		} finally {
-			Thread.currentThread().setContextClassLoader(original);
+	public void doLogout(final HttpServletRequest req, final HttpServletResponse res) {
+		if (custom != null) {
+			try {
+				runWithContextClassLoader(new Callable<Object>() {
+
+					@Override
+					public Object call() throws Exception {
+						try {
+							custom.doLogout(req, res);
+						} catch (Throwable e) {
+							throw new Exception(e);
+						}
+						return null;
+					}
+				});
+			} catch (Exception e1) {
+				log.error("Logout by SecurityModule failed.", e1);
+			}
 		}
 	}
 
@@ -190,4 +201,15 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 		}
 		return null;
 	}
+
+	private <T> T runWithContextClassLoader(Callable<T> contextCallback) throws Exception {
+		ClassLoader original = Thread.currentThread().getContextClassLoader();
+		try {
+			Thread.currentThread().setContextClassLoader(customCL);
+			return contextCallback.call();
+		} finally {
+			Thread.currentThread().setContextClassLoader(original);
+		}
+	}
+
 }

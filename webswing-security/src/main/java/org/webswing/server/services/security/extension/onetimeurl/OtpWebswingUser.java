@@ -1,7 +1,6 @@
 package org.webswing.server.services.security.extension.onetimeurl;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,9 +11,11 @@ public class OtpWebswingUser extends AbstractWebswingUser {
 	private String userId;
 	private Set<String> roles;
 	private Set<String> permissions;
+	private Map<String, Serializable> attributes;
 
-	public OtpWebswingUser(String userId, Set<String> roles, Set<String> permissions) {
+	public OtpWebswingUser(String userId, Map<String, Serializable> attributes, Set<String> roles, Set<String> permissions) {
 		this.userId = userId;
+		this.attributes = attributes;
 		this.roles = roles;
 		this.permissions = permissions;
 	}
@@ -26,7 +27,7 @@ public class OtpWebswingUser extends AbstractWebswingUser {
 
 	@Override
 	public Map<String, Serializable> getUserAttributes() {
-		return Collections.emptyMap();
+		return attributes;
 	}
 
 	@Override

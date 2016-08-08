@@ -290,7 +290,7 @@ public class ServerUtil {
 			case CONTINUE_FOR_BROWSER:
 				return h.getClientId();
 			case CONTINUE_FOR_USER:
-				return r.getUser().getUserId();
+				return r.getUser() != null ? r.getUser().getUserId() : "null";
 			default:
 				return h.getClientId();
 			}

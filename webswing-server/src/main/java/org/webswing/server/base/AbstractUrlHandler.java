@@ -58,12 +58,10 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		//redirect to url that ends with '/' to ensure browser queries correct resources 
-		if (isPrimaryHandler() && (req.getPathInfo() == null || req.getPathInfo().equals(getFullPathMapping()))) {
+		if (isPrimaryHandler() && (req.getPathInfo() == null || (req.getContextPath() + req.getPathInfo()).equals(getFullPathMapping()))) {
 			try {
 				String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
-				String path = getPath() == null ? "" : getPath();
-				String context = getServletContext().getContextPath() == null ? "" : getServletContext().getContextPath();
-				res.sendRedirect(context + path + "/" + queryString);
+				res.sendRedirect(getFullPathMapping() + "/" + queryString);
 			} catch (IOException e) {
 				log.error("Failed to redirect.", e);
 			}
@@ -87,7 +85,7 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 	public Object secureServe(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		return serve(req, res);
 	}
-	
+
 	protected boolean isPrimaryHandler() {
 		return false;
 	}
@@ -103,7 +101,7 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 
 	public String getPathInfo(HttpServletRequest req) {
 		String fullHandlerPath = getFullPathMapping();
-		String requestPath = toPath(req.getPathInfo());
+		String requestPath = toPath(req.getContextPath() + req.getPathInfo());
 		if (isSubPath(fullHandlerPath, requestPath)) {
 			return toPath(requestPath.substring(fullHandlerPath.length()));
 		} else {
@@ -114,7 +112,14 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 	protected abstract String getPath();
 
 	public String getPathMapping() {
-		return toPath(getPath());
+		String path = toPath(getPath());
+		if (parent == null) {
+			String contextPath = getServletContext().getContextPath();
+			if (contextPath != null && !contextPath.equals("/")) {
+				path = toPath(contextPath) + path;
+			}
+		}
+		return path;
 	}
 
 	public static boolean isSubPath(String subpath, String path) {

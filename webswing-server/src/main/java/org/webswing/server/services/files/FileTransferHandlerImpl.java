@@ -64,7 +64,7 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 				return true;
 			}
 		} catch (Exception e) {
-			log.error("FileTransfer failed.",e);
+			log.error("FileTransfer failed.", e);
 			throw new WsException("Failed to process file transfer " + req.getMethod(), e);
 		}
 		return false;
@@ -72,10 +72,10 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 
 	private void handleDownload(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, WsException {
 		String fileId = request.getParameter("id");
-		String userId = getUser().getUserId();
+		String userId = getUser() != null ? getUser().getUserId() : "null";
 
 		checkPermission(WebswingAction.file_download);
-		
+
 		if (!fileMap.containsKey(fileId) || fileMap.get(fileId).file == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
 			return;

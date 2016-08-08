@@ -33,7 +33,7 @@ public class SecurityUtil {
 				}
 			}
 		}
-		return AbstractWebswingUser.anonymUser;
+		return null;
 	}
 
 	public static Object getFromSecuritySession(String attributeName) {

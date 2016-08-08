@@ -1,5 +1,10 @@
 package org.webswing.server.services.security.api;
 
+/**
+ * Actions or permissions defined within Webswing server to execute actions.
+ * Each action defines default roles mappings for each permission. These mappings can be 
+ * customized by implementing {@link RolePermissionResolver} interface.
+ */
 public enum WebswingAction {
 
 	//REST
@@ -14,7 +19,6 @@ public enum WebswingAction {
 	rest_getDefaultAppletConfig(Role.admin),
 	rest_getOneTimePassword(Role.admin),
 	rest_getApps(Role.authenticated),
-	rest_getVersion(Role.anonym),
 	//websocket
 	websocket_connect(Role.authenticated),
 	websocket_startRecordingPlayback(Role.admin),
@@ -32,8 +36,7 @@ public enum WebswingAction {
 	}
 
 	private class Role {
-		private static final String anonym = AbstractWebswingUser.anonymUserName;
-		private static final String authenticated = AbstractWebswingUser.authenticated;
+		private static final String authenticated = AbstractWebswingUser.ROLE_AUTHENTICATED;
 		private static final String admin = "admin";
 	}
 

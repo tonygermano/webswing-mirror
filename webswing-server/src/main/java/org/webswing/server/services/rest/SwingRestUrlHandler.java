@@ -21,7 +21,7 @@ public class SwingRestUrlHandler extends AbstractRestUrlHandler {
 	private static final String default_version = "unresolved";
 	private final SwingInstanceHolder instanceHolder;
 
-	public SwingRestUrlHandler(UrlHandler parent,SwingInstanceHolder instanceHolder) {
+	public SwingRestUrlHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
 		super(parent);
 		this.instanceHolder = instanceHolder;
 	}
@@ -29,23 +29,23 @@ public class SwingRestUrlHandler extends AbstractRestUrlHandler {
 	@GET
 	@Path("/version")
 	public String getVersion() throws WsException {
-		checkPermission(WebswingAction.rest_getVersion);
 		String describe = GitRepositoryState.getInstance().getDescribe();
 		if (describe == null) {
 			return default_version;
 		}
 		return describe;
 	}
-	
+
 	@GET
 	@Path("/apps")
-	public List<ApplicationInfoMsg> getApplicationInfo(HttpServletRequest req) throws WsException{
+	public List<ApplicationInfoMsg> getApplicationInfo(HttpServletRequest req) throws WsException {
 		checkPermission(WebswingAction.rest_getApps);
 		List<ApplicationInfoMsg> result = new ArrayList<>();
-		String pathPrefix = getServletContext().getContextPath()==null?"":getServletContext().getContextPath();
-		StrSubstitutor subs = ServerUtil.getConfigSubstitutor(getUser().getUserId(), null, null, null, null);
-		for(SwingDescriptor sd : instanceHolder.getAllConfiguredApps()){
-			result.add(ServerUtil.toApplicationInfoMsg(pathPrefix,sd, subs));
+		String pathPrefix = getServletContext().getContextPath() == null ? "" : getServletContext().getContextPath();
+		String userId = getUser() != null ? getUser().getUserId() : null;
+		StrSubstitutor subs = ServerUtil.getConfigSubstitutor(userId, null, null, null, null);
+		for (SwingDescriptor sd : instanceHolder.getAllConfiguredApps()) {
+			result.add(ServerUtil.toApplicationInfoMsg(pathPrefix, sd, subs));
 		}
 		return result;
 	}

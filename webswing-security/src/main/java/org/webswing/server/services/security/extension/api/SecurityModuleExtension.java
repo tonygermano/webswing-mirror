@@ -4,13 +4,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.LoginResponseClosedException;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
+import org.webswing.server.services.security.api.WebswingSecurityModule;
+import org.webswing.server.services.security.modules.AbstractExtendableSecurityModule;
 import org.webswing.server.services.security.modules.AbstractSecurityModule;
 
-public class SecurityModuleExtension<T extends SecurityModuleExtensionConfig> {
+/**
+ * Security Extension prototype used in {@link AbstractExtendableSecurityModule}. Supports four extension points:
+ * 1.{@link #doSufficientPreValidation(AbstractSecurityModule, HttpServletRequest, HttpServletResponse) doSufficientPreValidation}
+ * 2.{@link #doRequiredPreValidation(AbstractSecurityModule, HttpServletRequest, HttpServletResponse) doRequiredPreValidation}
+ * 3.{@link #doRequiredPostValidation(AbstractSecurityModule, AbstractWebswingUser, HttpServletRequest, HttpServletResponse) doRequiredPostValidation}
+ * 4.{@link #decorateUser(AbstractWebswingUser, HttpServletRequest, HttpServletResponse) decorateUser}
+ * @param <T> Interface for reading configuration settings from JSON
+ */
+public abstract class SecurityModuleExtension<T extends SecurityModuleExtensionConfig> {
 
 	public static enum BuiltInModuleExtensions {
-		oneTimeUrl;
+		oneTimeUrl,
+		permissionMap;
 	}
 
 	private T config;
@@ -23,18 +35,54 @@ public class SecurityModuleExtension<T extends SecurityModuleExtensionConfig> {
 		return config;
 	}
 
-	public AbstractWebswingUser doSufficientPreValidation(AbstractSecurityModule<?> m, HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
-		throw new WebswingAuthenticationException("Not valid");
+	/**
+	 * Perform a sufficient credentials validation before the Security modules's {@link WebswingSecurityModule#doLogin(HttpServletRequest, HttpServletResponse) doLogin} method is invoked. 
+	 * If valid user is returned, no further validation or processing is carried out. 
+	 * If extension sends a response, it have to throw {@link LoginResponseClosedException} to stop further processing. 
+	 * 
+	 * @param m security module being extended
+	 * @param request login request
+	 * @param response login response 
+	 * @return valid user or null (no credentials provided)
+	 * @throws LoginResponseClosedException throw this exception if response have been sent by this extension.
+	 * @throws WebswingAuthenticationException if the credentials are not valid
+	 */
+	public AbstractWebswingUser doSufficientPreValidation(AbstractExtendableSecurityModule<?> m, HttpServletRequest request, HttpServletResponse response) throws LoginResponseClosedException, WebswingAuthenticationException {
+		return null;
 	}
 
-	public boolean doRequiredPreValidation(AbstractSecurityModule<?> m, HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
-		return true;
+	/**
+	 * Performs a required pre-validation. If validation fails WebswingAuthenticationException should be thrown.
+	 * If extension sends a response, it have to throw {@link LoginResponseClosedException} to stop further processing. 
+	 * @param m security module being extended
+	 * @param request login request
+	 * @param response login response 
+	 * @throws LoginResponseClosedException throw this exception if response have been sent by this extension.
+	 * @throws WebswingAuthenticationException if login request is not valid
+	 */
+	public void doRequiredPreValidation(AbstractExtendableSecurityModule<?> m, HttpServletRequest request, HttpServletResponse response) throws LoginResponseClosedException, WebswingAuthenticationException {
 	}
 
-	public boolean doRequiredPostValidation(AbstractSecurityModule<?> m, AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
-		return true;
+	/**
+	 * Performs a required pre-validation. If validation fails WebswingAuthenticationException should be thrown.
+	 * If extension sends a response, it have to throw {@link LoginResponseClosedException} to stop further processing. 
+	 * @param m security module being extended
+	 * @param user user authenticated by security module
+	 * @param request login request
+	 * @param response login response 
+	 * @throws LoginResponseClosedException throw this exception if response have been sent by this extension.
+	 * @throws WebswingAuthenticationException if login request is not valid
+	 */
+	public void doRequiredPostValidation(AbstractExtendableSecurityModule<?> m, AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) throws LoginResponseClosedException, WebswingAuthenticationException {
 	}
 
+	/**
+	 * Decorate user. Implementations can use {@link WebswingUserDecorator}.
+	 * @param user authenticated user
+	 * @param request login request
+	 * @param response login response 
+	 * @return decorated user
+	 */
 	public AbstractWebswingUser decorateUser(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) {
 		return user;
 	}

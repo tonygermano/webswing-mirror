@@ -9,5 +9,7 @@ public interface Saml2SecurityModuleConfig extends WebswingExtendableSecurityMod
 	public String getServiceProviderConsumerUrl();
 
 	public String getServiceProviderEntityId();
+	
+	public String getLogoutUrl();
 
 }
