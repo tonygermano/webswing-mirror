@@ -12,7 +12,6 @@
 	</scm>
 	<modules>
 		<module>webswing-api</module>
-		<module>webswing-security</module>
 		<module>webswing-admin</module>
 		<module>webswing-app-toolkit</module>
 		<module>webswing-app-toolkit-java6</module>
@@ -22,7 +21,6 @@
 		<module>webswing-app-interface</module>
 		<module>webswing-directdraw</module>
 		<module>webswing-demo</module>
-		<module>webswing-server-launcher</module>
 		<module>webswing-server</module>
 		<module>webswing-assembly</module>
 	</modules>
@@ -43,14 +41,19 @@
 				<version>2.4</version>
 			</dependency>
 			<dependency>
-				<groupId>commons-lang</groupId>
-				<artifactId>commons-lang</artifactId>
-				<version>2.6</version>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.shiro</groupId>
 				<artifactId>shiro-web</artifactId>
 				<version>1.2.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.6.6</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

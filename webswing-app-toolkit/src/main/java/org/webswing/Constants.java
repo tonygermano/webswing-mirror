@@ -9,7 +9,6 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
 	public static final String SWING_START_SYS_PROP_MAIN_CLASS = "webswing.mainClass";
 	public static final String SWING_START_SYS_PROP_CLASS_PATH = "webswing.classPath";
-	public static final String SWING_START_SYS_PROP_SECURITY_CLASS_PATH = "webswing.securityClassPath";
 	public static final String SWING_START_SYS_PROP_ISOLATED_FS = "webswing.isolatedFs";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW = "webswing.directdraw";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED = "webswing.directdraw.supported";

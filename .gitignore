@@ -16,4 +16,6 @@ webswing-server-launcher/webswing.log
 webswing-directdraw/webswing-directdraw-server/.externalToolBuilders/
 webswing-server/.externalToolBuilders/
 webswing.log
+webswing.log.1
 documentation/site/
+git.properties
