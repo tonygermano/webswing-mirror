@@ -1,20 +1,17 @@
 package org.webswing.server.services.config;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.server.base.WsInitException;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
@@ -36,7 +33,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	private List<ConfigurationChangeListener> changeListeners = new ArrayList<ConfigurationChangeListener>();
 
 	@Override
-	public void start() {
+	public void start() throws WsInitException {
 		loadConfiguration();
 	}
 
@@ -65,7 +62,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void loadConfiguration() {
+	private void loadConfiguration() throws WsInitException {
 		try {
 			File config = getConfigFile();
 			Map<String, Object> json = mapper.readValue(config, Map.class);
@@ -82,10 +79,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 				}
 				configuration = result;
 			} else {
-				throw new WsException("Configuration file " + config.getPath() + " does not exist!");
+				throw new WsInitException("Configuration file " + config.getPath() + " does not exist!");
 			}
 		} catch (Exception e) {
 			log.error("Webswing application configuration failed to load:", e);
+			throw new WsInitException("Webswing application configuration failed to load:", e);
 		}
 	}
 
@@ -104,7 +102,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@SuppressWarnings("unchecked")
 	private SecuredPathConfig loadPath(String path, Map<String, Object> swingConfig) throws WsException {
 		SecuredPathConfig pathConfig = ConfigUtil.instantiateConfig((Map<String, Object>) swingConfig.get(path), SecuredPathConfig.class);
-		String spcPath = CommonUtil.toPath(pathConfig.getPath());
+		String spcPath = pathConfig.getPath();
 		if (!path.equals(spcPath)) {
 			throw new WsException("Invalid configuration: path '" + path + "' configuration refers to different path ('" + spcPath + "')");
 		}

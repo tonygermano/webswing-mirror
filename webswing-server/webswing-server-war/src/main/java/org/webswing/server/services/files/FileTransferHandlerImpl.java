@@ -28,11 +28,11 @@ import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.c2s.UploadEventMsgIn;
 import org.webswing.server.base.AbstractUrlHandler;
-import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
+import org.webswing.server.util.ServerUtil;
 
 public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileTransferHandler {
 
@@ -238,7 +238,7 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 							String details = fd.file.length() + "|" + fd.file.lastModified();
 							if (!details.equals(fd.overwriteDetails)) {
 								if (details.equals(fd.lastFileAttributes)) {
-									if (!CommonUtil.isFileLocked(fd.file)) {
+									if (!ServerUtil.isFileLocked(fd.file)) {
 										fd.waitForFile = false;
 										fd.notifyAll();
 										fd.waitForFileTask.cancel(false);

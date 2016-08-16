@@ -8,8 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.HashMap;
@@ -162,21 +160,6 @@ public class CommonUtil {
 
 	public static StrSubstitutor getConfigSubstitutor(String user, String sessionId, String clientIp, String locale, String customArgs) {
 		return new StrSubstitutor(getConfigSubstitutorMap(user, sessionId, clientIp, locale, customArgs));
-	}
-
-	public static boolean isFileLocked(File file) {
-		if (file.exists()) {
-			try {
-				Path source = file.toPath();
-				Path dest = file.toPath().resolveSibling(file.getName() + ".wstest");
-				Files.move(source, dest);
-				Files.move(dest, source);
-				return false;
-			} catch (IOException e) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public static void transferStreams(InputStream is, OutputStream os) throws IOException {

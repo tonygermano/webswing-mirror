@@ -39,7 +39,7 @@ public class ConfigUtil {
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				BeanInfo info = Introspector.getBeanInfo(method.getDeclaringClass());
 				PropertyDescriptor[] pds = info.getPropertyDescriptors();
-				if (method.getName().equals("getValueAs") && method.getParameters().length == 2 && args[0] instanceof String && args[1] instanceof Class) {
+				if (method.getName().equals("getValueAs") && method.getParameterTypes().length == 2 && args[0] instanceof String && args[1] instanceof Class) {
 					String s = (String) args[0];
 					Class c = (Class) args[1];
 					Object o = config.get(s);
@@ -49,8 +49,8 @@ public class ConfigUtil {
 				for (PropertyDescriptor pd : pds) {
 					if (pd.getReadMethod().equals(method)) {
 						for (Object o : context) {
-							if (o.getClass().isAssignableFrom(method.getReturnType())) {
-								return context;
+							if (method.getReturnType().isAssignableFrom(o.getClass())) {
+								return o;
 							}
 						}
 						Object value = config.get(pd.getName());

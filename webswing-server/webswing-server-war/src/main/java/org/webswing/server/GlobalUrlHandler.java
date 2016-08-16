@@ -208,7 +208,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	}
 
 	protected String getPath() {
-		return null;
+		return "/";
 	}
 
 	public void setServletContext(ServletContext servletContext) {

@@ -17,6 +17,7 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.subject.WebSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.server.base.WsInitException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -36,10 +37,14 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 
 	@Override
 	public void start() {
-		securityManager.setCacheManager(new MemoryConstrainedCacheManager());
-		securityManager.setSessionManager(new DefaultWebSessionManager());
-		securityManager.setRealm(new WebswingRealmAdapter());
-		SecurityUtils.setSecurityManager(securityManager);
+		try {
+			securityManager.setCacheManager(new MemoryConstrainedCacheManager());
+			securityManager.setSessionManager(new DefaultWebSessionManager());
+			securityManager.setRealm(new WebswingRealmAdapter());
+			SecurityUtils.setSecurityManager(securityManager);
+		} catch (Exception e) {
+			new WsInitException("Failed to start security service", e);
+		}
 	}
 
 	@Override

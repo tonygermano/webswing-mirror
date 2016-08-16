@@ -18,8 +18,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.webswing.toolkit.api.WebswingApiException;
 import org.webswing.toolkit.api.WebswingUtil;
 import org.webswing.toolkit.api.lifecycle.WebswingShutdownListener;

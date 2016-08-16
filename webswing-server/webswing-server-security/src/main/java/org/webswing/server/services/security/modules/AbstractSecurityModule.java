@@ -339,7 +339,11 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	public Map<String, Object> getLoginRequest(HttpServletRequest request) {
 		if (isAjax(request) && request.getContentType().equals("application/json")) {
 			try {
-				return mapper.readValue(request.getReader(), Map.class);
+				if (request.getAttribute(LOGIN_REQUEST_MSG) == null) {
+					Map<String, Object> loginRequest = mapper.readValue(request.getReader(), Map.class);
+					request.setAttribute(LOGIN_REQUEST_MSG, loginRequest);
+				}
+				return (Map<String, Object>) request.getAttribute(LOGIN_REQUEST_MSG);
 			} catch (Exception e) {
 				log.debug("Failed to read login request data.", e);
 			}

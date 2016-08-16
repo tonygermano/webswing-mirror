@@ -1,7 +1,7 @@
 package org.webswing.server.base;
 
 public interface WebswingService{
-	void start();
+	void start() throws WsInitException;
 
 	void stop();
 

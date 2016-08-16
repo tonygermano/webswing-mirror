@@ -1,4 +1,4 @@
-package org.webswing.server.common.util;
+package org.webswing.server.services.security.api;
 
 import java.io.IOException;
 import java.net.URL;
@@ -13,7 +13,6 @@ public class SecurityModuleClassLoader extends URLClassLoader {
 		this.webClassLoader = webClassLoaders;
 	}
 
-	@Override
 	public Class<?> loadClass(String name) throws ClassNotFoundException {
 		try {
 			return webClassLoader.loadClass(name);
@@ -22,13 +21,11 @@ public class SecurityModuleClassLoader extends URLClassLoader {
 		}
 	}
 
-	@Override
 	public void close() throws IOException {
 		webClassLoader = null;
 		super.close();
 	}
 
-	@Override
 	public URL getResource(String name) {
 		URL url = super.getResource(name);
 		if (url == null) {

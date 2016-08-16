@@ -68,6 +68,8 @@ import org.webswing.toolkit.ge.WebGraphicsEnvironment8;
 import main.Main;
 
 public class SwingInstanceImpl implements SwingInstance, JvmListener {
+	private static final String LAUNCHER_CONFIG = "launcherConfig";
+
 	private static final Logger log = LoggerFactory.getLogger(SwingInstance.class);
 
 	private final SwingInstanceManager manager;
@@ -409,7 +411,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 			switch (appConfig.getLauncherType()) {
 			case Applet:
-				AppletLauncherConfig applet = appConfig.getValueAs("launcherType", AppletLauncherConfig.class);
+				AppletLauncherConfig applet = appConfig.getValueAs(LAUNCHER_CONFIG, AppletLauncherConfig.class);
 				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APPLET_DOCUMENT_BASE, handshake.getDocumentBase());
 				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS, applet.getAppletClass());
 				for (String key : applet.getParameters().keySet()) {
@@ -422,7 +424,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				}
 				break;
 			case Desktop:
-				DesktopLauncherConfig desktop = appConfig.getValueAs("launcherType", DesktopLauncherConfig.class);
+				DesktopLauncherConfig desktop = appConfig.getValueAs(LAUNCHER_CONFIG, DesktopLauncherConfig.class);
 				swingConfig.setArgs(subs.replace(desktop.getArgs()));
 				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS, subs.replace(desktop.getMainClass()));
 				break;

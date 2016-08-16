@@ -14,7 +14,6 @@ import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 import org.webswing.server.common.model.meta.ConfigType;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.model.meta.MetadataGenerator;
-import org.webswing.server.common.util.SecurityModuleClassLoader;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.services.security.api.WebswingSecurityConfig.WebswingSecurityMetadataGenerator;
 import org.webswing.toolkit.util.ClasspathUtil;

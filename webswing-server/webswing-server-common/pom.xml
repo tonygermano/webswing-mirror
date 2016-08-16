@@ -35,7 +35,7 @@
 					<source>1.6</source>
 					<target>1.6</target>
 					<compilerArguments>
-						<bootclasspath>${basedir}/../lib/rt1.6.0_45.jar</bootclasspath>
+						<bootclasspath>${basedir}/../../lib/rt1.6.0_45.jar</bootclasspath>
 					</compilerArguments>
 				</configuration>
 			</plugin>

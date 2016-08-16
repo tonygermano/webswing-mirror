@@ -9,6 +9,7 @@ import org.apache.activemq.usage.SystemUsage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
+import org.webswing.server.base.WsInitException;
 
 import com.google.inject.Singleton;
 
@@ -22,12 +23,12 @@ public class JmsServiceImpl implements JmsService {
 
 	private BrokerService broker;
 
-	public void start() {
+	public void start() throws WsInitException {
 		try {
 			broker = startService();
 		} catch (Exception e) {
 			log.error("Failed to start JMS service.", e);
-			throw new IllegalStateException(e);
+			throw new WsInitException("Failed to start JMS service.", e);
 		}
 	}
 

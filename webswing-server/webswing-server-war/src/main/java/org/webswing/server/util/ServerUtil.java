@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -144,6 +146,21 @@ public class ServerUtil {
 			}
 		}
 		return result;
+	}
+
+	public static boolean isFileLocked(File file) {
+		if (file.exists()) {
+			try {
+				Path source = file.toPath();
+				Path dest = file.toPath().resolveSibling(file.getName() + ".wstest");
+				Files.move(source, dest);
+				Files.move(dest, source);
+				return false;
+			} catch (IOException e) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

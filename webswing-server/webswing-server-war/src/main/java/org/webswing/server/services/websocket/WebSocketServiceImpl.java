@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.base.WebswingService;
+import org.webswing.server.base.WsInitException;
 import org.webswing.server.services.playback.RecordingPlaybackUrlHandlerImpl;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
@@ -50,7 +51,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 
 	}
 
-	public void start() {
+	public void start() throws WsInitException {
 
 		Map<String, String> initParams = new HashMap<String, String>();
 		initParams.put("org.atmosphere.websocket.bufferSize", WEBSOCKET_MESSAGE_SIZE);
@@ -76,7 +77,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 			initParams.put("org.atmosphere.container.JSR356AsyncSupport.mappingPath", context.getContextPath());
 
 		} catch (ServletException e) {
-			throw new RuntimeException("Failed to initialize Websocket framework", e);
+			throw new WsInitException("Failed to initialize Websocket framework", e);
 		}
 	}
 

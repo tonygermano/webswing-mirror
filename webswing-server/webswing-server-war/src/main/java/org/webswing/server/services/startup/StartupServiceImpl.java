@@ -7,6 +7,7 @@ import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
+import org.webswing.server.base.WsInitException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.jms.JmsService;
 import org.webswing.server.services.websocket.WebSocketService;
@@ -30,11 +31,17 @@ public class StartupServiceImpl implements StartupService {
 		this.config = config;
 	}
 
-	public void start() {
-		validateConfig();
-		jms.start();
-		websocket.start();
-		config.start();
+	public void start() throws WsInitException {
+		try {
+			validateConfig();
+			jms.start();
+			websocket.start();
+			config.start();
+		} catch (WsInitException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new WsInitException("Failed to start Webswing. " + e.getMessage(), e);
+		}
 	}
 
 	public void stop() {

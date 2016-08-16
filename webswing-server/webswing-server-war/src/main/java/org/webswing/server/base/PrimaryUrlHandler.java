@@ -23,11 +23,12 @@ import org.webswing.server.util.ServerUtil;
 public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements SecurityContext, WebswingSecurityProvider {
 	private static final Logger log = LoggerFactory.getLogger(PrimaryUrlHandler.class);
 
+	private final ConfigurationService configService;
 	private SecuredPathConfig config;
 
 	public PrimaryUrlHandler(UrlHandler parent, ConfigurationService configService) {
 		super(parent);
-		config = configService.getConfiguration().get(getPathMapping());
+		this.configService = configService;
 	}
 
 	@Override
@@ -48,7 +49,10 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	public SecuredPathConfig getConfig() {
 		if (config == null) {
-			config = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class);
+			config = configService.getConfiguration().get(getPath());
+			if (config == null) {
+				config = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class);
+			}
 		}
 		return config;
 	}
