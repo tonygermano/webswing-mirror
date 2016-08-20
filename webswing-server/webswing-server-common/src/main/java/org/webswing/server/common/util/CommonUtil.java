@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 import java.security.ProtectionDomain;
@@ -13,17 +15,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
+import org.apache.commons.lang3.ClassUtils.Interfaces;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.model.s2c.ApplicationInfoMsg;
-import org.webswing.server.common.model.SecuredPathConfig;
-import org.webswing.server.common.model.SwingConfig;
 
 import main.Main;
 
@@ -33,25 +35,13 @@ public class CommonUtil {
 	private static final Logger log = LoggerFactory.getLogger(CommonUtil.class);
 	private static final Map<String, byte[]> iconMap = new HashMap<String, byte[]>();
 
-	public static ApplicationInfoMsg toApplicationInfoMsg(String pathPrefix, SecuredPathConfig pathConfig, StrSubstitutor subs) {
-		SwingConfig swingConfig = pathConfig.getSwingConfig();
-		if (swingConfig == null) {
-			return null;
-		}
-		ApplicationInfoMsg app = new ApplicationInfoMsg();
-		app.setName(swingConfig.getName());
-		app.setAlwaysRestart(swingConfig.getSwingSessionTimeout() == 0);
-		app.setUrl(pathPrefix + toPath(pathConfig.getPath()));
-		File icon = resolveFile(swingConfig.getIcon(), swingConfig.getHomeDir(), subs);
-		if (icon == null || !icon.isFile()) {
-			app.setBase64Icon(loadImage(null));
+	public static byte[] loadImage(File iconFile) {
+		String icon;
+		if (iconFile == null || !iconFile.isFile()) {
+			icon = null;
 		} else {
-			app.setBase64Icon(loadImage(icon.getAbsolutePath()));
+			icon = iconFile.getAbsolutePath();
 		}
-		return app;
-	}
-
-	private static byte[] loadImage(String icon) {
 		try {
 			if (icon == null) {
 				if (iconMap.containsKey(DEFAULT)) {
@@ -211,6 +201,22 @@ public class CommonUtil {
 		mapping = mapping.startsWith("/") ? mapping : ("/" + mapping);
 		mapping = mapping.endsWith("/") ? mapping.substring(0, mapping.length() - 1) : mapping;
 		return mapping;
+	}
+
+	public static <T extends Annotation> T findAnnotation(Method readMethod, Class<T> ann) {
+		T annotation = readMethod.getAnnotation(ann);
+		if (annotation != null) {
+			return annotation;
+		} else {
+			Set<Method> overrideHierarchy = MethodUtils.getOverrideHierarchy(readMethod, Interfaces.INCLUDE);
+			for (Method m : overrideHierarchy) {
+				annotation = m.getAnnotation(ann);
+				if (annotation != null) {
+					return annotation;
+				}
+			}
+		}
+		return null;
 	}
 
 }

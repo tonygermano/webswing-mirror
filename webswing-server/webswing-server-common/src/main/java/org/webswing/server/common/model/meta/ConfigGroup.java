@@ -3,7 +3,11 @@ package org.webswing.server.common.model.meta;
 public enum ConfigGroup {
 	General("General"),
 	Java("Java"), 
-	Extension("Extensions");
+	Extension("Extensions"), 
+	Security("Security"), 
+	Swing("Swing"), 
+	Session("Session"), 
+	Features("Features");
 
 	String label;
 

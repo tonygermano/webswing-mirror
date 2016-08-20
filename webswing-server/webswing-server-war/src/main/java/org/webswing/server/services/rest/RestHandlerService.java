@@ -5,7 +5,7 @@ import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 
 public interface RestHandlerService {
 
-	AbstractRestUrlHandler createConfigRestHandler(UrlHandler parent);
+	AbstractRestUrlHandler createConfigRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
 
 	AbstractRestUrlHandler createSessionRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
 
@@ -14,5 +14,7 @@ public interface RestHandlerService {
 	AbstractRestUrlHandler createSwingRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
 
 	AbstractRestUrlHandler createOtpRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
+
+	AbstractRestUrlHandler createAdminRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
 
 }

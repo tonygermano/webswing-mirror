@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,12 +17,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ClassUtils.Interfaces;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.common.model.Config;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
+import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
 
 public class MetadataGenerator<T> {
@@ -56,11 +59,18 @@ public class MetadataGenerator<T> {
 			String fieldName = field.getName();
 			Method readMethod = field.getReadMethod();
 			if (readMethod != null) {
-				ConfigField configField = findAnnotation(readMethod, ConfigField.class);
+				ConfigField configField = CommonUtil.findAnnotation(readMethod, ConfigField.class);
 				if (configField != null) {
 					properties.add(fieldName);
 				}
 			}
+		}
+		ConfigFieldOrder fieldOrder = findAnnotation(config.getClass(), ConfigFieldOrder.class);
+		if (fieldOrder != null) {
+			LinkedHashSet<String> order = new LinkedHashSet<String>(Arrays.asList(fieldOrder.value()));
+			properties.removeAll(order);
+			order.addAll(properties);
+			return order;
 		}
 		return properties;
 	}
@@ -73,7 +83,7 @@ public class MetadataGenerator<T> {
 			if (fieldName.equals(propertyName)) {
 				Method readMethod = field.getReadMethod();
 				if (readMethod != null) {
-					ConfigField configField = findAnnotation(readMethod, ConfigField.class);
+					ConfigField configField = CommonUtil.findAnnotation(readMethod, ConfigField.class);
 					if (configField != null) {
 						try {
 							Object value = getValue(config, cl, propertyName, readMethod);
@@ -213,7 +223,7 @@ public class MetadataGenerator<T> {
 	}
 
 	protected Class<?> getExplicitType(T config, ClassLoader cl, String propertyName, Method readMethod, Object value) throws ClassNotFoundException {
-		ConfigFieldEditorType editor = findAnnotation(readMethod, ConfigFieldEditorType.class);
+		ConfigFieldEditorType editor = CommonUtil.findAnnotation(readMethod, ConfigFieldEditorType.class);
 		Class<?> type = null;
 		if (editor != null && editor.className() != null) {
 			type = cl.loadClass(editor.className());
@@ -222,7 +232,7 @@ public class MetadataGenerator<T> {
 	}
 
 	protected EditorType getEditorType(T config, ClassLoader cl, String propertyName, Method readMethod) {
-		ConfigFieldEditorType editor = findAnnotation(readMethod, ConfigFieldEditorType.class);
+		ConfigFieldEditorType editor = CommonUtil.findAnnotation(readMethod, ConfigFieldEditorType.class);
 		if (editor != null) {
 			return editor.editor();
 		} else {
@@ -276,32 +286,40 @@ public class MetadataGenerator<T> {
 	}
 
 	protected ConfigGroup getTab(T config, ClassLoader cl, String propertyName, Method readMethod) {
-		ConfigField configField = findAnnotation(readMethod, ConfigField.class);
+		ConfigField configField = CommonUtil.findAnnotation(readMethod, ConfigField.class);
 		return configField.tab();
 	}
 
 	protected String getLabel(T config, ClassLoader cl, String propertyName, Method readMethod) {
-		ConfigField configField = findAnnotation(readMethod, ConfigField.class);
-		return configField.label();
+		ConfigField configField = CommonUtil.findAnnotation(readMethod, ConfigField.class);
+		if (!StringUtils.isEmpty(configField.label())) {
+			return configField.label();
+		} else {
+			return null;
+		}
 	}
 
 	protected String getDescription(T config, ClassLoader cl, String propertyName, Method readMethod) {
-		ConfigField configField = findAnnotation(readMethod, ConfigField.class);
-		return configField.description();
+		ConfigField configField = CommonUtil.findAnnotation(readMethod, ConfigField.class);
+		if (!StringUtils.isEmpty(configField.label())) {
+			return configField.label();
+		} else {
+			return null;
+		}
 	}
 
 	protected boolean isVariables(T config, ClassLoader cl, String propertyName, Method readMethod) {
-		ConfigFieldWithVariables variables = findAnnotation(readMethod, ConfigFieldWithVariables.class);
+		ConfigFieldWithVariables variables = CommonUtil.findAnnotation(readMethod, ConfigFieldWithVariables.class);
 		return variables != null;
 	}
 
 	protected boolean isDiscriminator(T config, ClassLoader cl, String propertyName, Method readMethod) {
-		ConfigFieldDiscriminator discriminator = findAnnotation(readMethod, ConfigFieldDiscriminator.class);
+		ConfigFieldDiscriminator discriminator = CommonUtil.findAnnotation(readMethod, ConfigFieldDiscriminator.class);
 		return discriminator != null;
 	}
 
 	protected String[] getPresets(T config, ClassLoader cl, String propertyName, Method readMethod) {
-		ConfigFieldPresets presets = findAnnotation(readMethod, ConfigFieldPresets.class);
+		ConfigFieldPresets presets = CommonUtil.findAnnotation(readMethod, ConfigFieldPresets.class);
 		if (presets != null) {
 			return presets.value();
 		} else {
@@ -319,22 +337,6 @@ public class MetadataGenerator<T> {
 					result[i] = enumConstant.name();
 				}
 				return result;
-			}
-		}
-		return null;
-	}
-
-	public static <T extends Annotation> T findAnnotation(Method readMethod, Class<T> ann) {
-		T annotation = readMethod.getAnnotation(ann);
-		if (annotation != null) {
-			return annotation;
-		} else {
-			Set<Method> overrideHierarchy = MethodUtils.getOverrideHierarchy(readMethod, Interfaces.INCLUDE);
-			for (Method m : overrideHierarchy) {
-				annotation = m.getAnnotation(ann);
-				if (annotation != null) {
-					return annotation;
-				}
 			}
 		}
 		return null;

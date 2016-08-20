@@ -7,6 +7,8 @@ package org.webswing.server.services.security.api;
  */
 public enum WebswingAction {
 
+	//ADMIN CONSOLE
+	rest_admin_getApplications(Role.admin),
 	//REST
 	rest_getServerSettings(Role.admin),
 	rest_getSession(Role.admin),

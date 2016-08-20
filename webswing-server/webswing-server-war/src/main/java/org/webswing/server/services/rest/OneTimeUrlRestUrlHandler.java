@@ -35,49 +35,49 @@ public class OneTimeUrlRestUrlHandler extends AbstractRestUrlHandler {
 		super(parent);
 		this.instanceHolder = instanceHolder;
 	}
-
-	@GET
-	@Path("/otp")
-	public String getOneTimePassword(HttpServletRequest request, @PathParam("") String appPath, @QueryParam("requestorId") String requestor, @QueryParam("user") String user, @QueryParam("roles") String roles, @QueryParam("permissions") String permissions) throws WsException {
-		checkPermission(WebswingAction.rest_getOneTimePassword);
-		try {
-			List<SecuredPathConfig> apps = instanceHolder.getAllConfiguredApps();
-			SecuredPathConfig app = null;
-			if (StringUtils.isEmpty(appPath) && apps.size() == 1) {
-				app = apps.get(0);
-			} else {
-				for (SecuredPathConfig sd : apps) {
-					if (StringUtils.equals(CommonUtil.toPath(sd.getPath()), appPath)) {
-						app = sd;
-						break;
-					}
-				}
-			}
-			if (app != null) {
-				WebswingSecurityProvider secProv = instanceHolder.getSecurityProviderForApp(app.getPath());
-				if (secProv != null) {
-					SecurityModuleWrapper module = secProv.get();
-					OneTimeUrlSecurityExtensionConfig config = module.getModuleConfig().getValueAs(BuiltInModuleExtensions.oneTimeUrl.name(), OneTimeUrlSecurityExtensionConfig.class);
-					OneTimeUrlSecurityExtension extension = new OneTimeUrlSecurityExtension(config);
-
-					String[] rolesArray = roles != null ? roles.split(",") : null;
-					String[] permissionsArray = permissions != null ? permissions.split(",") : null;
-					List<String[]> attributes = new ArrayList<>();
-					for (String paramName : request.getParameterMap().keySet()) {
-						attributes.add(new String[] { paramName, request.getParameter(paramName) });
-					}
-					String[][] attribArray = attributes.toArray(new String[attributes.size()][]);
-					try {
-						String otp = extension.generateOneTimePassword(app.getPath(), requestor, user, rolesArray, permissionsArray, attribArray);
-						return otp;
-					} catch (WebswingAuthenticationException e) {
-						throw new WsException(e);
-					}
-				}
-			}
-		} catch (Exception e) {
-			log.error("Failed to generate OTP.", e);
-		}
-		throw new WsException("Failed to generate OTP.", HttpServletResponse.SC_BAD_REQUEST);
-	}
+//
+//	@GET
+//	@Path("/otp")
+//	public String getOneTimePassword(HttpServletRequest request, @PathParam("") String appPath, @QueryParam("requestorId") String requestor, @QueryParam("user") String user, @QueryParam("roles") String roles, @QueryParam("permissions") String permissions) throws WsException {
+//		checkPermission(WebswingAction.rest_getOneTimePassword);
+//		try {
+//			List<SecuredPathConfig> apps = instanceHolder.getAllConfiguredApps();
+//			SecuredPathConfig app = null;
+//			if (StringUtils.isEmpty(appPath) && apps.size() == 1) {
+//				app = apps.get(0);
+//			} else {
+//				for (SecuredPathConfig sd : apps) {
+//					if (StringUtils.equals(CommonUtil.toPath(sd.getPath()), appPath)) {
+//						app = sd;
+//						break;
+//					}
+//				}
+//			}
+//			if (app != null) {
+//				WebswingSecurityProvider secProv = instanceHolder.getSecurityProviderForApp(app.getPath());
+//				if (secProv != null) {
+//					SecurityModuleWrapper module = secProv.get();
+//					OneTimeUrlSecurityExtensionConfig config = module.getModuleConfig().getValueAs(BuiltInModuleExtensions.oneTimeUrl.name(), OneTimeUrlSecurityExtensionConfig.class);
+//					OneTimeUrlSecurityExtension extension = new OneTimeUrlSecurityExtension(config);
+//
+//					String[] rolesArray = roles != null ? roles.split(",") : null;
+//					String[] permissionsArray = permissions != null ? permissions.split(",") : null;
+//					List<String[]> attributes = new ArrayList<>();
+//					for (String paramName : request.getParameterMap().keySet()) {
+//						attributes.add(new String[] { paramName, request.getParameter(paramName) });
+//					}
+//					String[][] attribArray = attributes.toArray(new String[attributes.size()][]);
+//					try {
+//						String otp = extension.generateOneTimePassword(app.getPath(), requestor, user, rolesArray, permissionsArray, attribArray);
+//						return otp;
+//					} catch (WebswingAuthenticationException e) {
+//						throw new WsException(e);
+//					}
+//				}
+//			}
+//		} catch (Exception e) {
+//			log.error("Failed to generate OTP.", e);
+//		}
+//		throw new WsException("Failed to generate OTP.", HttpServletResponse.SC_BAD_REQUEST);
+//	}
 }

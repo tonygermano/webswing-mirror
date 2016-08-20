@@ -6,11 +6,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.ConfigField;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
+import org.webswing.server.common.model.meta.ConfigFieldOrder;
+import org.webswing.server.common.model.meta.ConfigFieldPresets;
 import org.webswing.server.common.model.meta.ConfigType;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.model.meta.MetadataGenerator;
@@ -19,12 +21,15 @@ import org.webswing.server.services.security.api.WebswingSecurityConfig.Webswing
 import org.webswing.toolkit.util.ClasspathUtil;
 
 @ConfigType(metadataGenerator = WebswingSecurityMetadataGenerator.class)
+@ConfigFieldOrder({"module","classPath","config"})
 public interface WebswingSecurityConfig {
 
-	@ConfigField
+	@ConfigField(label="Secuirty Module")
+	@ConfigFieldPresets({"NONE","INHERITED","PROPERTY_FILE","SAML2"})
+	@ConfigFieldDefaultValueString("INHERITED")
 	public String getModule();
 
-	@ConfigField
+	@ConfigField(label = "Module Class Path")
 	public List<String> getClassPath();
 
 	@ConfigField
@@ -32,7 +37,6 @@ public interface WebswingSecurityConfig {
 	public Map<String, Object> getConfig();
 
 	public static class WebswingSecurityMetadataGenerator extends MetadataGenerator<WebswingSecurityConfig> {
-		private static final Logger log = LoggerFactory.getLogger(WebswingSecurityMetadataGenerator.class);
 
 		@Override
 		public MetaObject getMetadata(WebswingSecurityConfig config, ClassLoader cl, Object parent) throws Exception {
@@ -40,13 +44,9 @@ public interface WebswingSecurityConfig {
 				//need to create temporary classloader with configured classpath
 				//1.resolve base dir for classpath
 				String home = null;
-				if (parent != null && parent.getClass().getDeclaredMethod("getHomeDir") != null) {
-					try {
-						Method m = parent.getClass().getDeclaredMethod("getHomeDir");
-						home = (String) m.invoke(parent);
-					} catch (Exception e) {
-						log.error("Failed to get HomeDir from parent config", e);
-					}
+				if (parent != null && parent instanceof SecuredPathConfig) {
+					SecuredPathConfig spc = (SecuredPathConfig) parent;
+					home = spc.getHomeDir();
 				} else {
 					//if master
 					home = ".";

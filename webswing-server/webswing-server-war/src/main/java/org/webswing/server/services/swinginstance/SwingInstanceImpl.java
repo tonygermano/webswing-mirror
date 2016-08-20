@@ -349,7 +349,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
 			swingConfig.setName(clientId);
-			File homeDir = getHomeDir(appConfig, subs);
+			File homeDir = manager.resolveFile(".");
 			swingConfig.setJreExecutable(subs.replace(appConfig.getJreExecutable()));
 			swingConfig.setBaseDir(homeDir.getAbsolutePath());
 			swingConfig.setMainClass(Main.class.getName());
@@ -454,22 +454,6 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			cp = cp.substring(0, cp.length() - (clazz.getCanonicalName().length() + 8));
 		}
 		return cp;
-	}
-
-	private File getHomeDir(final SwingConfig appConfig, StrSubstitutor subs) {
-		String dirString = subs.replace(appConfig.getHomeDir());
-		File homeDir;
-		if (dirString.startsWith("/") || dirString.startsWith("\\") || dirString.contains(":/") || dirString.contains(":\\")) {
-			// path is absolute
-			homeDir = new File(dirString);
-		} else {
-			// path is relative
-			homeDir = new File(Main.getRootDir(), dirString);
-		}
-		if (!homeDir.exists()) {
-			homeDir.mkdirs();
-		}
-		return homeDir;
 	}
 
 	public String getClientId() {

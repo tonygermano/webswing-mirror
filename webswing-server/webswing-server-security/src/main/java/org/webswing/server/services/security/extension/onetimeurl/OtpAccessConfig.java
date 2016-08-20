@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.webswing.server.common.model.Config;
 import org.webswing.server.common.model.meta.ConfigField;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
 
 public interface OtpAccessConfig extends Config {
 	@ConfigField
+	@ConfigFieldDefaultValueNumber(30)
 	Integer getValidForSec();
 
 	//HmacSHA1, HmacSHA256, HmacSHA512

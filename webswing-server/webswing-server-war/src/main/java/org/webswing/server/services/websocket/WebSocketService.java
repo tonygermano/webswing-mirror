@@ -15,7 +15,7 @@ public interface WebSocketService extends WebswingService {
 
 	WebSocketUrlHandler createJsonWebSocketHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
 
-	WebSocketUrlHandler createPlaybackWebSocketHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
+	WebSocketUrlHandler createPlaybackWebSocketHandler(UrlHandler parent);
 
 	void removeListener(String mapping);
 

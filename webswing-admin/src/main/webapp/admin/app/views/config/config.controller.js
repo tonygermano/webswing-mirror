@@ -1,20 +1,21 @@
 (function (define) {
     define([], function f() {
-        function SettingsEditController(configRestService) {
+        function ConfigEditController(configRestService, $routeParams) {
             var vm = this;
             vm.config = {};
             vm.variables = {};
             vm.reset = reset;
             vm.apply = apply;
+            vm.path  = $routeParams.path;
 
             activate();
 
             function activate() {
-                configRestService.getConfig().then(function (data) {
-                    angular.extend(vm.config, data);
-                    return configRestService.getVariables();
-                }).then(function (data) {
-                    angular.extend(vm.variables, data);
+                configRestService.getConfig(vm.path).then(function (data) {
+                    vm.config = data;
+                });
+                configRestService.getVariables().then(function (data) {
+                    vm.variables = data;
                 });
             }
 
@@ -26,8 +27,8 @@
                 configRestService.setConfig(vm.config);
             }
         }
-        SettingsEditController.$inject = ['configRestService'];
+        ConfigEditController.$inject = ['configRestService', '$routeParams'];
 
-        return SettingsEditController;
+        return ConfigEditController;
     });
 })(adminConsole.define);

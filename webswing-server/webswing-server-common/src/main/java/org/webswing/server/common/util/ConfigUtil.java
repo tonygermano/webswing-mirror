@@ -8,6 +8,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +18,11 @@ import java.util.Map;
 import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.server.common.model.Config;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.model.meta.MetadataGenerator;
 
@@ -88,12 +95,90 @@ public class ConfigUtil {
 								log.error("Invalid configuration. Type of " + clazz.getName() + "." + pd.getName() + " is not " + method.getReturnType());
 								return null;
 							}
+						} else {
+							//value is null, check if default value is defined
+							Class<?> returnType = method.getReturnType();
+							if (ClassUtils.isAssignable(returnType, String.class)) {
+								String defaultStringValue = getDefaultStringValue(method);
+								config.put(pd.getName(), defaultStringValue);
+								return defaultStringValue;
+							}
+							if (ClassUtils.isAssignable(returnType, Enum.class)) {
+								String enumName = getDefaultStringValue(method);
+								if (enumName != null) {
+									config.put(pd.getName(), enumName);
+									return Enum.valueOf((Class<Enum>) returnType, enumName);
+								} else {
+									return null;
+								}
+							}
+							if (ClassUtils.isAssignable(returnType, Number.class)) {
+								Double number = getDefaultNumberValue(method);
+								Number converted = convertNumberToTargetClass(number, returnType);
+								config.put(pd.getName(), converted);
+								return converted;
+							}
+							if (ClassUtils.isAssignable(returnType, Boolean.class)) {
+								Boolean bool = getDefaultBooleanValue(method);
+								config.put(pd.getName(), bool);
+								return bool;
+							}
+							if (ClassUtils.isAssignable(returnType, Config.class)) {
+								ConfigFieldDefaultValueObject defaultObject = isDefaultObjectValue(method);
+								if (defaultObject != null) {
+									config.put(pd.getName(), new HashMap<String, Object>());
+									return instantiateConfig(null, returnType, context);
+								}
+							}
+							if (ClassUtils.isAssignable(returnType, Object.class)) {
+								ConfigFieldDefaultValueObject defaultObject = isDefaultObjectValue(method);
+								if (defaultObject != null) {
+									Object newInstance = null;
+									if (Void.class.equals(defaultObject.value())) {
+										newInstance = returnType.newInstance();
+									} else {
+										newInstance = defaultObject.value().newInstance();
+									}
+									config.put(pd.getName(), newInstance);
+									return newInstance;
+								}
+							}
 						}
 					}
 				}
 				return null;
 			}
+
 		});
+	}
+
+	protected static ConfigFieldDefaultValueObject isDefaultObjectValue(Method method) {
+		ConfigFieldDefaultValueObject defaultObjectAnnotation = CommonUtil.findAnnotation(method, ConfigFieldDefaultValueObject.class);
+		return defaultObjectAnnotation;
+	}
+
+	protected static Boolean getDefaultBooleanValue(Method method) {
+		ConfigFieldDefaultValueBoolean bool = CommonUtil.findAnnotation(method, ConfigFieldDefaultValueBoolean.class);
+		if (bool != null) {
+			return bool.value();
+		}
+		return null;
+	}
+
+	protected static Double getDefaultNumberValue(Method method) {
+		ConfigFieldDefaultValueNumber defaultString = CommonUtil.findAnnotation(method, ConfigFieldDefaultValueNumber.class);
+		if (defaultString != null) {
+			return defaultString.value();
+		}
+		return null;
+	}
+
+	protected static String getDefaultStringValue(Method method) {
+		ConfigFieldDefaultValueString defaultString = CommonUtil.findAnnotation(method, ConfigFieldDefaultValueString.class);
+		if (defaultString != null) {
+			return defaultString.value();
+		}
+		return null;
 	}
 
 	private static Class<?> getGenericClass(Type genericType, int index) {
@@ -104,5 +189,42 @@ public class ConfigUtil {
 			}
 		}
 		return null;
+	}
+
+	public static Number convertNumberToTargetClass(Number number, Class targetClass) throws IllegalArgumentException {
+		if (number == null) {
+			return null;
+		}
+		if (targetClass.isInstance(number)) {
+			return number;
+		} else if (targetClass.equals(Short.class) || targetClass.equals(Short.TYPE)) {
+			long value = number.longValue();
+			if (value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
+				raiseOverflowException(number, targetClass);
+			}
+			return number.shortValue();
+		} else if (targetClass.equals(Integer.class) || targetClass.equals(Integer.TYPE)) {
+			long value = number.longValue();
+			if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
+				raiseOverflowException(number, targetClass);
+			}
+			return number.intValue();
+		} else if (targetClass.equals(Long.class) || targetClass.equals(Long.TYPE)) {
+			return number.longValue();
+		} else if (targetClass.equals(Float.class) || targetClass.equals(Float.TYPE)) {
+			return number.floatValue();
+		} else if (targetClass.equals(Double.class) || targetClass.equals(Double.TYPE)) {
+			return number.doubleValue();
+		} else if (targetClass.equals(BigInteger.class)) {
+			return BigInteger.valueOf(number.longValue());
+		} else if (targetClass.equals(BigDecimal.class)) {
+			return new BigDecimal(number.toString());
+		} else {
+			throw new IllegalArgumentException("Could not convert number [" + number + "] of type [" + number.getClass().getName() + "] to unknown target class [" + targetClass.getName() + "]");
+		}
+	}
+
+	private static void raiseOverflowException(Number number, Class targetClass) {
+		throw new IllegalArgumentException("Could not convert number [" + number + "] of type [" + number.getClass().getName() + "] to target class [" + targetClass.getName() + "]: overflow");
 	}
 }

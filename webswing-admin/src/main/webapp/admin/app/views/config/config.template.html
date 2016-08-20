@@ -1,4 +1,4 @@
-<h1 class="page-header">Server Configuration</h1>
+<h1 class="page-header">Configuration</h1>
 <div class="form-horizontal">
     <div class="row">
         <div class="col-md-12">
@@ -8,7 +8,12 @@
             </button>
         </div>
         <div class="ws-tabs col-md-12 ">
-            <ws-webswing-config variables="vm.variables" config="vm.config"></ws-webswing-config>
+            <ws-config-view label="Server Configuration" 
+            desc="Configure the global security module and overlay web folder" 
+            variables="vm.variables" 
+            value="vm.config"
+            hide="['path','swingConfig']">
+            </ws-config-view>
         </div>
     </div>
 </div>

@@ -1,6 +1,6 @@
 (function (define) {
     define([], function f() {
-        function OverviewController($scope, $timeout, $location, sessionsRestService) {
+        function OverviewController($scope, $timeout, $location, sessionsRestService,$routeParams) {
             var vm = this;
             vm.sessions = [];
             vm.closedSessions = [];
@@ -9,6 +9,7 @@
             vm.refresh = refresh;
             vm.timer = undefined;
             vm.play = play;
+            vm.back = back;
 
             refresh();
 
@@ -17,7 +18,7 @@
             });
 
             function refresh() {
-                return sessionsRestService.getSessions().then(function (data) {
+                return sessionsRestService.getSessions($routeParams.path).then(function (data) {
                     $timeout.cancel(vm.timer);
                     vm.sessions = data.sessions;
                     vm.closedSessions = data.closedSessions;
@@ -38,8 +39,13 @@
             function play(session){
                 $location.url('/dashboard/playback?playback='+session.recordingFile);
             }
+            
+            function back() {
+                $location.path('/dashboard');
+                $timeout.cancel(vm.timer);
+            }
         }
-        OverviewController.$inject = ['$scope', '$timeout', '$location', 'sessionsRestService'];
+        OverviewController.$inject = ['$scope', '$timeout', '$location', 'sessionsRestService', '$routeParams'];
 
         return OverviewController;
     });

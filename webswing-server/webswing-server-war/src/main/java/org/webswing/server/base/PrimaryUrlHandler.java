@@ -67,7 +67,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	@Override
 	public File resolveFile(String name) {
-		return CommonUtil.resolveFile(name, getSwingConfig().getHomeDir(), null);
+		return CommonUtil.resolveFile(name, getConfig().getHomeDir(), null);
 	}
 
 	@Override

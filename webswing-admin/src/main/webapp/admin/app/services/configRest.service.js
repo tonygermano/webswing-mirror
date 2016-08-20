@@ -8,13 +8,13 @@
                 getDefault: getDefault
             };
 
-            function getConfig() {
-                return $http.get(baseUrl + '/rest/config').then(success, failed);
+            function getConfig(path) {
+                return $http.get(baseUrl + '/rest/config/'+path).then(success, failed);
                 function success(data) {
                     return data.data;
                 }
                 function failed(data) {
-                    return errorHandler.handleRestError('load server configuration', data, true);
+                    return errorHandler.handleRestError('load configuration', data, true);
                 }
             }
             function setConfig(config) {

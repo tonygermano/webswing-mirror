@@ -7,7 +7,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.MsgIn;
@@ -23,8 +22,6 @@ import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
-import org.webswing.server.common.model.SecuredPathConfig;
-import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
@@ -75,11 +72,8 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 		if (r.hasPermission(WebswingAction.websocket_connect)) {
 			AppFrameMsgOut appInfo = new AppFrameMsgOut();
 			List<ApplicationInfoMsg> result = new ArrayList<>();
-			String userId = r.getUser() != null ? r.getUser().getUserId() : null;
-			StrSubstitutor subs = CommonUtil.getConfigSubstitutor(userId, null, null, null, null);
-			String pathPrefix = getServletContext().getContextPath() == null ? "" : getServletContext().getContextPath();
-			for (SecuredPathConfig sd : instanceHolder.getAllConfiguredApps()) {
-				ApplicationInfoMsg applicationInfoMsg = CommonUtil.toApplicationInfoMsg(pathPrefix, sd, subs);
+			for (SwingInstanceManager mgr : instanceHolder.getApplications()) {
+				ApplicationInfoMsg applicationInfoMsg = mgr.getApplicationInfoMsg();
 				if (applicationInfoMsg != null) {
 					result.add(applicationInfoMsg);
 				}
@@ -180,7 +174,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 
 	@Override
 	public UrlHandler getOwner() {
-		return instanceHolder;
+		return parent;
 	}
 
 	@Override
@@ -193,11 +187,6 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 
 	@Override
 	public void removeChildUrlHandler(UrlHandler Handler) {
-	}
-
-	@Override
-	public ServletContext getServletContext() {
-		return instanceHolder.getServletContext();
 	}
 
 	@Override
@@ -233,5 +222,10 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 	@Override
 	public WebswingSecurityProvider getSecurityProvider() {
 		return parent.getSecurityProvider();
+	}
+
+	@Override
+	public ServletContext getServletContext() {
+		return parent.getServletContext();
 	}
 }

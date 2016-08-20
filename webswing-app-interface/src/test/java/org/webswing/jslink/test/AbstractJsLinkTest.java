@@ -67,9 +67,9 @@ public abstract class AbstractJsLinkTest {
 
 		engine.eval("var define =function(array,f){ this['JsLink']=f()}");
 		engine.eval("self=this; this.setTimeout=function(f,t){f()}");
-		engine.eval(new FileReader("../webswing-server/src/main/webapp/javascript/es6promise.js"));
+		engine.eval(new FileReader("../webswing-server/webswing-server-war/src/main/webapp/javascript/es6promise.js"));
 		engine.eval("ES6Promise.polyfill()");
-		engine.eval(new FileReader("../webswing-server/src/main/webapp/javascript/webswing-jslink.js"));
+		engine.eval(new FileReader("../webswing-server/webswing-server-war/src/main/webapp/javascript/webswing-jslink.js"));
 		engine.put("sendJava", this);
 		engine.eval("var result=null;var window={test:'test'};");
 		engine.eval("var cfg={javaCallTimeout:0}");

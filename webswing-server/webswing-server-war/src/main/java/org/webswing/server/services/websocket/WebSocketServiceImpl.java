@@ -111,8 +111,8 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	}
 
 	@Override
-	public WebSocketUrlHandler createPlaybackWebSocketHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
-		RecordingPlaybackUrlHandlerImpl result = new RecordingPlaybackUrlHandlerImpl(parent, "/async/swing-play", this, instanceHolder);
+	public WebSocketUrlHandler createPlaybackWebSocketHandler(UrlHandler parent) {
+		RecordingPlaybackUrlHandlerImpl result = new RecordingPlaybackUrlHandlerImpl(parent, "/async/swing-play", this);
 		AtmosphereHandler h = new WebSocketAtmosphereHandler(result);
 		framework.addAtmosphereHandler(result.getFullPathMapping(), h, instantiate(binaryInterceptors));
 		return result;

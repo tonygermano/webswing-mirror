@@ -92,7 +92,7 @@ public class SessionRecordingPlayback {
 
 	public ApplicationInfoMsg getApplicationInfo() {
 		SecuredPathConfig configWrapper = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class, header.getApplication());
-		ApplicationInfoMsg aim = CommonUtil.toApplicationInfoMsg("", configWrapper, null);
+		ApplicationInfoMsg aim = new ApplicationInfoMsg();
 		aim.setName(this.recordingFile.getPath());
 		return aim;
 	}

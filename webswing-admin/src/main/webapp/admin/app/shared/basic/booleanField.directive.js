@@ -1,5 +1,5 @@
 (function (define) {
-    define(['text!shared/booleanField.template.html'], function f(htmlTemplate) {
+    define(['text!shared/basic/booleanField.template.html'], function f(htmlTemplate) {
         function wsBooleanFieldDirective() {
             return {
                 restrict: 'E',

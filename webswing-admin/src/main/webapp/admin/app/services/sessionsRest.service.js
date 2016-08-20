@@ -2,14 +2,25 @@
     define([], function f() {
         function sessionsRestService(baseUrl, $http, errorHandler, messageService) {
             return {
+            	getApps: getApps,
                 getSessions: getSessions,
                 getSession: getSession,
                 killSession: killSession,
                 forceKillSession: forceKillSession
             };
 
-            function getSessions() {
-                return $http.get(baseUrl + '/rest/session').then(success, failed);
+            function getApps(){
+            	 return $http.get(baseUrl + '/rest/admin/apps').then(success, failed);
+                 function success(data) {
+                     return data.data;
+                 }
+                 function failed(data) {
+                     return errorHandler.handleRestError('load installed swing apps', data, true);
+                 }
+            }
+            
+            function getSessions(path) {
+                return $http.get(baseUrl + '/rest/sessions/'+path).then(success, failed);
                 function success(data) {
                     return data.data;
                 }

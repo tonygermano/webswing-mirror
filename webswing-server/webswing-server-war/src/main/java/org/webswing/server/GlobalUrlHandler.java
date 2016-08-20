@@ -71,13 +71,14 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	public void init() {
 		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
 		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
-		registerChildUrlHandler(websocket.createPlaybackWebSocketHandler(this, this));
+		registerChildUrlHandler(websocket.createPlaybackWebSocketHandler(this));
 
 		registerChildUrlHandler(restService.createSwingRestHandler(this, this));
 		registerChildUrlHandler(restService.createServerRestHandler(this));
-		registerChildUrlHandler(restService.createConfigRestHandler(this));
+		registerChildUrlHandler(restService.createConfigRestHandler(this, this));
 		registerChildUrlHandler(restService.createSessionRestHandler(this, this));
 		registerChildUrlHandler(restService.createOtpRestHandler(this, this));
+		registerChildUrlHandler(restService.createAdminRestHandler(this, this));
 
 		registerChildUrlHandler(loginService.createLoginHandler(this, getSecurityProvider()));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
@@ -110,7 +111,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	}
 
 	private void loadSecurityModule() {
-		log.info("Reloading master security module.(" + getConfig().getSecurity() + ").");
+		log.info("Loading master security module.(" + getConfig().getSecurity() + ").");
 		if (securityModule != null) {
 			securityModule.destroy();
 		}
@@ -281,8 +282,12 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	}
 
 	@Override
-	public List<SecuredPathConfig> getAllConfiguredApps() {
-		return new ArrayList<SecuredPathConfig>(config.getConfiguration().values());
+	public List<SwingInstanceManager> getApplications() {
+		ArrayList<SwingInstanceManager> result = new ArrayList<>();
+		synchronized (instanceManagers) {
+			result.addAll(instanceManagers.values());
+		}
+		return result;
 	}
 
 	@Override

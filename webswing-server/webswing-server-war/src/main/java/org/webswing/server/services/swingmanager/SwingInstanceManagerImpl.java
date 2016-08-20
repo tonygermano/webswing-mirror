@@ -1,5 +1,9 @@
 package org.webswing.server.services.swingmanager;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,10 +14,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
-import org.webswing.server.common.model.SecuredPathConfig;
+import org.webswing.server.common.model.admin.ApplicationInfo;
+import org.webswing.server.common.model.admin.InstanceManagerStatus;
+import org.webswing.server.common.model.admin.InstanceManagerStatus.Status;
+import org.webswing.server.common.util.CommonUtil;
+import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.files.FileTransferHandler;
@@ -47,6 +56,8 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Secur
 	private SwingInstanceSet closedInstances = new SwingInstanceSet();
 	private SecurityModuleWrapper securityModule;
 
+	private InstanceManagerStatus status = new InstanceManagerStatus();
+
 	public SwingInstanceManagerImpl(UrlHandler parent, String path, SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileService, LoginHandlerService loginService, ResourceHandlerService resourceService, SecurityModuleService securityModuleService, RestHandlerService restService,
 			ConfigurationService config) {
 		super(parent, config);
@@ -62,28 +73,54 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Secur
 
 	@Override
 	public void init() {
-		loadSecurityModule();
-		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
-		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
+		try {
+			status.setStatus(Status.Starting);
+			loadSecurityModule();
+			registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
+			registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
 
-		registerChildUrlHandler(restService.createSwingRestHandler(this, this));
-		registerChildUrlHandler(restService.createServerRestHandler(this));
-		registerChildUrlHandler(restService.createSessionRestHandler(this, this));
-		registerChildUrlHandler(restService.createOtpRestHandler(this, this));
+			registerChildUrlHandler(restService.createSwingRestHandler(this, this));
+			registerChildUrlHandler(restService.createServerRestHandler(this));
+			registerChildUrlHandler(restService.createSessionRestHandler(this, this));
+			registerChildUrlHandler(restService.createOtpRestHandler(this, this));
 
-		registerChildUrlHandler(loginService.createLoginHandler(this, getSecurityProvider()));
-		registerChildUrlHandler(loginService.createLogoutHandler(this));
-		registerChildUrlHandler(fileHandler);
-		registerChildUrlHandler(resourceService.create(this, this));
+			registerChildUrlHandler(loginService.createLoginHandler(this, getSecurityProvider()));
+			registerChildUrlHandler(loginService.createLogoutHandler(this));
+			registerChildUrlHandler(fileHandler);
+			registerChildUrlHandler(resourceService.create(this, this));
 
-		super.init();
+			super.init();
+			status.setStatus(Status.Running);
+		} catch (Throwable e) {
+			log.error("Failed to start '" + path + "'.", e);
+			try {
+				destroy();
+			} catch (Throwable e1) {
+				//do nothing
+			}
+			status.setStatus(Status.Error);
+			status.setError(e.getMessage());
+			StringWriter out = new StringWriter();
+			PrintWriter stacktrace = new PrintWriter(out);
+			e.printStackTrace(stacktrace);
+			status.setErrorDetails(out.toString());
+		}
 	}
 
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		//CORS headers handling
-		handleCorsHeaders(req, res);
-		return super.serve(req, res);
+		if (status.getStatus().equals(Status.Running)) {
+			handleCorsHeaders(req, res);
+			return super.serve(req, res);
+		} else {
+			try {
+				res.sendRedirect(getFullPathMapping() + "/error.html");
+				return true;
+			} catch (IOException e) {
+				throw new WsException(e);
+			}
+		}
 	}
 
 	private void loadSecurityModule() {
@@ -100,6 +137,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Secur
 		if (securityModule != null) {
 			securityModule.destroy();
 		}
+		status.setStatus(Status.Stopped);
 	}
 
 	@Override
@@ -205,8 +243,8 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Secur
 	}
 
 	@Override
-	public List<SecuredPathConfig> getAllConfiguredApps() {
-		return Arrays.asList(getConfig());
+	public List<SwingInstanceManager> getApplications() {
+		return Arrays.asList(this);
 	}
 
 	@Override
@@ -220,6 +258,45 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Secur
 			return getSecurityProvider();
 		}
 		return null;
+	}
+
+	@Override
+	public ApplicationInfoMsg getApplicationInfoMsg() {
+		if (getConfig().getSwingConfig() == null) {
+			return null;
+		}
+		ApplicationInfoMsg app = new ApplicationInfoMsg();
+		app.setName(getSwingConfig().getName());
+		app.setAlwaysRestart(getSwingConfig().getSwingSessionTimeout() == 0);
+		app.setUrl(getFullPathMapping());
+		File icon = resolveFile(getSwingConfig().getIcon());
+		app.setBase64Icon(CommonUtil.loadImage(icon));
+		return app;
+	}
+
+	@Override
+	public ApplicationInfo getApplicationInfo() {
+		ApplicationInfo app = new ApplicationInfo();
+		app.setPath(getPathMapping());
+		app.setUrl(getFullPathMapping());
+		app.setName(getSwingConfig().getName());
+		File icon = resolveFile(getSwingConfig().getIcon());
+		app.setIcon(CommonUtil.loadImage(icon));
+		app.setConfig(getConfig());
+		app.setRunningInstances(swingInstances.size());
+
+		int connected = 0;
+		for (SwingInstance si : swingInstances.getAllInstances()) {
+			if (si.getSessionId() != null) {
+				connected++;
+			}
+		}
+		app.setConnectedInstances(connected);
+		app.setFinishedInstances(closedInstances.size());
+		int maxRunningInstances = getSwingConfig().getMaxClients();
+		app.setMaxRunningInstances(maxRunningInstances);
+		app.setStatus(status);
+		return app;
 	}
 
 }

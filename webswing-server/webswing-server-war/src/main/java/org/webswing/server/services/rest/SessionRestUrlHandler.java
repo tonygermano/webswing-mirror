@@ -13,6 +13,7 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
+import org.webswing.server.services.swingmanager.SwingInstanceManager;
 
 public class SessionRestUrlHandler extends AbstractRestUrlHandler {
 
@@ -21,6 +22,28 @@ public class SessionRestUrlHandler extends AbstractRestUrlHandler {
 	public SessionRestUrlHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
 		super(parent);
 		this.instanceHolder = instanceHolder;
+	}
+
+	@GET
+	@Path("/sessions")
+	public Object getSessions(@PathParam("") String path) throws WsException {
+		checkPermission(WebswingAction.rest_getSession);
+
+		if (!StringUtils.isEmpty(path)) {
+			Sessions result = new Sessions();
+			for (SwingInstanceManager sim : instanceHolder.getApplications()) {
+				if (sim.getPathMapping().equals(path)) {
+					for (SwingInstance si : sim.getAllInstances()) {
+						result.getSessions().add(si.toSwingSession());
+					}
+					for (SwingInstance si : sim.getAllClosedInstances()) {
+						result.getClosedSessions().add(si.toSwingSession());
+					}
+				}
+			}
+			return result;
+		}
+		return null;
 	}
 
 	@GET

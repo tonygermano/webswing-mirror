@@ -1,0 +1,7 @@
+<h2 class="sub-header">
+	Swing Applications
+	<div class="ws-update" ng-click="vm.refresh()">
+		<span ng-class="{'glyphicon':true,'glyphicon-repeat':vm.timer != null,'glyphicon-refresh':vm.timer == null} "> </span> {{vm.lastUpdated| date:'h:mm:ss'}}
+	</div>
+</h2>
+<ws-app-view value="app" ng-repeat="app in vm.apps"></ws-app-view>

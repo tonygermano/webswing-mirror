@@ -1,5 +1,5 @@
 (function (define) {
-    define(['text!shared/stringField.template.html'], function f(htmlTemplate) {
+    define(['text!shared/basic/stringField.template.html'], function f(htmlTemplate) {
         function wsStringFieldDirective() {
             return {
                 restrict: 'E',

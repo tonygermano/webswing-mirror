@@ -33,15 +33,15 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.General, label = "Name", description = "Application name")
 	public String getName();
 
-	@ConfigField(tab = ConfigGroup.General, label = "Home", description = "Application home folder")
-	@ConfigFieldWithVariables
-	@ConfigFieldDefaultValueString("${user.dir}")
-	public String getHomeDir();
-
 	@ConfigField(tab = ConfigGroup.General, label = "Icon", description = "Application icon file")
 	@ConfigFieldWithVariables
 	public String getIcon();
 
+	@ConfigField(tab = ConfigGroup.General, label = "VM args", description = "")
+	@ConfigFieldDefaultValueString("Murrine")
+	@ConfigFieldPresets()
+	public String getTheme();
+	
 	@ConfigField(tab = ConfigGroup.Java, label = "Launcher type", description = "Select the application launcher type")
 	@ConfigFieldDiscriminator
 	public LauncherType getLauncherType();
@@ -60,37 +60,33 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueString("${java.version}")
 	public String getJavaVersion();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Java, label = "VM args", description = "")
 	public String getVmArgs();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Java, label = "VM args", description = "")
 	public List<String> getClassPathEntries();
 
-	@ConfigField
-	@ConfigFieldDefaultValueString("Murrine")
-	@ConfigFieldPresets()
-	public String getTheme();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.General, label = "Fonts", description = "")
 	public Map<String, String> getFontConfig();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Session, label = "Max Connections", description = "")
 	@ConfigFieldDefaultValueNumber(1)
 	public int getMaxClients();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Session, label = "Session Mode", description = "")
 	@ConfigFieldDefaultValueString("CONTINUE_FOR_BROWSER")
 	public SessionMode getSessionMode();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Session, label = "Session timeout", description = "")
 	@ConfigFieldDefaultValueNumber(300)
 	public int getSwingSessionTimeout();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Session, label = "Session stealing", description = "")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowStealSession();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.General, label = "Text Anti-alias", description = "")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAntiAliasText();
 
@@ -98,11 +94,11 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isAuthorization();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Features, label = "Isolated Filesystem", description = "")
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isIsolatedFs();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Java, label = "Enable Debug Mode", description = "")
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isDebug();
 
@@ -110,34 +106,34 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAuthentication();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.General, label = "DirectDraw Rendering", description = "")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isDirectdraw();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Features, label = "Allow Deleting Files ", description = "")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowDelete();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Features, label = "Allow Downloading Files ", description = "")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowDownload();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Features, label = "Allow Auto-Downloading Files ", description = "")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowAutoDownload();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Features, label = "Allow Uploading Files ", description = "")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowUpload();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Features, label = "Allow CORS origins", description = "")
 	public List<String> getAllowedCorsOrigins();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Features, label = "Upload size limit ", description = "")
 	@ConfigFieldDefaultValueNumber(5)
 	public double getUploadMaxSize();
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Features, label = "Allow JsLink", description = "")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowJsLink();
 

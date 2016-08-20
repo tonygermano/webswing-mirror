@@ -1,4 +1,9 @@
-<h1 class="page-header">Configure users</h1>
+<div class="modal-header mirror-view-dialog-header">
+    <button type="button" class="ws-button-gap btn btn-primary" ng-click="vm.back()">
+        <span class="glyphicon glyphicon-arrow-left"></span> Back
+    </button>
+</div>
+<h1 class="page-header">Swing Configuration</h1>
 <div class="form-horizontal">
     <div class="row">
         <div class="col-md-12">
@@ -8,7 +13,13 @@
             </button>
         </div>
         <div class="ws-tabs col-md-12 ">
-            <div ui-ace="{ mode: 'properties'}" ng-model="vm.users"></div>
+            <ws-config-view label="{{vm.path}} " 
+            desc="Configuration for Swing application" 
+            variables="vm.variables" 
+            value="vm.config"
+            hide="['path']">
+            </ws-config-view>
         </div>
     </div>
 </div>
+

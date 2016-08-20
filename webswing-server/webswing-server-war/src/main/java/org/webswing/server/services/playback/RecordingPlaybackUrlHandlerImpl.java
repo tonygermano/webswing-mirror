@@ -23,7 +23,6 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.login.WebswingSecurityProvider;
-import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
 import org.webswing.server.services.websocket.WebSocketUrlHandler;
@@ -35,14 +34,12 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 	private static Map<String, SessionRecordingPlayback> playbackMap = new HashMap<String, SessionRecordingPlayback>();
 	private final UrlHandler parent;
 	private final WebSocketService websocket;
-	private final SwingInstanceHolder instanceHolder;
 	private final String path;
 
-	public RecordingPlaybackUrlHandlerImpl(UrlHandler parent, String path, WebSocketService websocket, SwingInstanceHolder instanceHolder) {
+	public RecordingPlaybackUrlHandlerImpl(UrlHandler parent, String path, WebSocketService websocket) {
 		this.parent = parent;
 		this.path = path;
 		this.websocket = websocket;
-		this.instanceHolder = instanceHolder;
 	}
 
 	@Override
@@ -126,7 +123,7 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 
 	@Override
 	public UrlHandler getOwner() {
-		return instanceHolder;
+		return this;
 	}
 
 	@Override
@@ -143,7 +140,7 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 
 	@Override
 	public ServletContext getServletContext() {
-		return instanceHolder.getServletContext();
+		return parent.getServletContext();
 	}
 
 	@Override

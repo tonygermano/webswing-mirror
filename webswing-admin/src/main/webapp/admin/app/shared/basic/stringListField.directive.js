@@ -1,6 +1,6 @@
 (function (define) {
-    define(['text!shared/stringMapField.template.html'], function f(htmlTemplate) {
-        function wsStringMapFieldDirective() {
+    define(['text!shared/basic/stringListField.template.html'], function f(htmlTemplate) {
+        function wsStringListFieldDirective() {
             return {
                 restrict: 'E',
                 template: htmlTemplate,
@@ -11,45 +11,23 @@
                 },
                 controllerAs: 'vm',
                 bindToController: true,
-                controller: wsStringMapFieldDirectiveController
+                controller: wsStringListFieldDirectiveController
             };
         }
 
-        function wsStringMapFieldDirectiveController($scope, $attrs) {
+        function wsStringListFieldDirectiveController($scope, $attrs) {
             var vm = this;
-            vm.model = [];
             vm.label = watch('label', '');
             vm.desc = watch('desc', null);
             vm.readonly = watchBoolean('readonly', false);
-            vm.addPair = addPair;
-            vm.deletePair = deletePair;
+            vm.addString = addString;
+            vm.deleteString = deleteString;
             vm.helpVisible = [];
             vm.openHelper = openHelper;
             vm.toggleHelper = toggleHelper;
-
-            $scope.$watch("vm.value", function (value) {
-                vm.model.splice(0, vm.model.length);
-                angular.forEach(value, function (value, key) {
-                    vm.model.push({key: key, value: value});
-                });
-            }, true);
-
-            $scope.$watch("vm.model", function (model) {
-                var newValue = {};
-                var valid = true;
-                for (var i = 0; i < model.length; i++) {
-                    if (!newValue.hasOwnProperty(model[i].key)) {
-                        newValue[model[i].key] = model[i].value;
-                    } else {
-                        valid = false;
-                        model[i].error = 'Duplicate keys are not allowed! This field is ignored in output json.';
-                    }
-                }
-                if (valid) {
-                    vm.value = newValue;
-                }
-            }, true);
-
+            if (vm.value == null) {
+                vm.value = [''];
+            }
 
             $scope.$on('wsHelperClose', function (evt, ctrl, index) {
                 for (var i = 0; i < vm.helpVisible.length; i++) {
@@ -75,12 +53,12 @@
                 }
             }
 
-            function addPair() {
-                vm.model.push({key: '', value: ''});
+            function addString() {
+                vm.value.push('');
             }
 
-            function deletePair(index) {
-                vm.model.splice(index, 1);
+            function deleteString(index) {
+                vm.value.splice(index, 1);
             }
 
             function watchBoolean(name, defaultVal) {
@@ -111,8 +89,8 @@
             }
         }
 
-        wsStringMapFieldDirectiveController.$inject = ['$scope', '$attrs'];
+        wsStringListFieldDirectiveController.$inject = ['$scope', '$attrs'];
 
-        return wsStringMapFieldDirective;
+        return wsStringListFieldDirective;
     });
 })(adminConsole.define);

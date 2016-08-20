@@ -1,23 +1,23 @@
 (function (define) {
     define([
-        'shared/stringField.directive',
-        'shared/stringListField.directive',
-        'shared/booleanField.directive',
-        'shared/applicationView.directive',
-        'shared/applicationList.directive',
-        'shared/webswingConfig.directive',
-        'shared/stringMapField.directive',
-        'shared/substitutorHelper.directive',
-        'shared/substitutor.filter'
-    ], function f(stringField, stringListField, booleanField, applicationView, applicationList, webswingConfig, wsStringMapField, substitutorHelper, substitutorFilter) {
+        'shared/appView.directive',
+        'shared/configView.directive',
+        'shared/fieldView.directive',
+        'shared/basic/stringField.directive',
+        'shared/basic/stringListField.directive',
+        'shared/basic/booleanField.directive',
+        'shared/basic/stringMapField.directive',
+        'shared/basic/substitutorHelper.directive',
+        'shared/basic/substitutor.filter'
+    ], function f(appView, configView, fieldView, stringField, stringListField, booleanField,wsStringMapField, substitutorHelper, substitutorFilter) {
         var module = angular.module('wsShared', []);
 
+        module.directive('wsAppView',appView)
+        module.directive('wsConfigView',configView)
+        module.directive('wsFieldView',fieldView)
         module.directive('wsStringField', stringField);
         module.directive('wsStringListField', stringListField);
         module.directive('wsBooleanField', booleanField);
-        module.directive('wsApplicationView', applicationView);
-        module.directive('wsApplicationList', applicationList);
-        module.directive('wsWebswingConfig', webswingConfig);
         module.directive('wsStringMapField', wsStringMapField);
         module.directive('wsSubstitutorHelper', substitutorHelper);
         module.filter('substitutor', substitutorFilter);

@@ -108,15 +108,8 @@
 			}
 			$('#webswing-content').html(content);
 		}
+		
 		function getImageString(data) {
-			if (typeof data === 'object') {
-				var binary = '';
-				var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
-				for (var i = 0, l = bytes.byteLength; i < l; i++) {
-					binary += String.fromCharCode(bytes[i]);
-				}
-				data = window.btoa(binary);
-			}
 			return 'data:image/png;base64,' + data;
 		}
 	</script>
