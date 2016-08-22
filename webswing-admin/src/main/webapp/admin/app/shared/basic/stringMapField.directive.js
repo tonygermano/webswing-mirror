@@ -7,6 +7,7 @@
 				scope : {
 					config : '=',
 					value : '=',
+					items : '=',
 					variables : '=',
 					readonly : '=',
 					label : '@',
@@ -26,6 +27,7 @@
 			vm.helpVisible = [];
 			vm.openHelper = openHelper;
 			vm.toggleHelper = toggleHelper;
+			vm.setChoice = setChoice;
 
 			$scope.$watch("vm.value", function(value) {
 				vm.model.splice(0, vm.model.length);
@@ -86,6 +88,10 @@
 
 			function deletePair(index) {
 				vm.model.splice(index, 1);
+			}
+			
+			function setChoice(index, value) {
+				vm.model[index].key = value;
 			}
 
 		}

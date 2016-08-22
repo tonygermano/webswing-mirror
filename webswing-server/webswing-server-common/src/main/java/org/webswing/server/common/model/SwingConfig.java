@@ -44,6 +44,7 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.General, label = "Fonts", description = "Customize logical font mappings and define physical fonts available to swing application. These fonts (TTF only) will be used for DirectDraw as native fonts. Key: name of font (ie. dialog|dialoginput|sansserif|serif|monospaced), Value: path to font file.")
 	@ConfigFieldVariables
+	@ConfigFieldPresets({"dialog","dialoginput","sansserif","serif","monospaced"})
 	public Map<String, String> getFontConfig();
 
 	@ConfigField(tab = ConfigGroup.General, label = "DirectDraw Rendering", description = "DirectDraw rendering mode uses canvas instructions to render the swing application instead of server-rendered png images. DirectDraw improves performance but is not recomended for applications with lot of graphics content.")

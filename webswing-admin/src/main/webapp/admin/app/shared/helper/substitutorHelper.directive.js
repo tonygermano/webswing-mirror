@@ -1,5 +1,5 @@
 (function (define) {
-    define(['text!shared/basic/substitutorHelper.template.html'], function f(htmlTemplate) {
+    define(['text!shared/helper/substitutorHelper.template.html'], function f(htmlTemplate) {
         function wsSubstitutorHelperDirective() {
             return {
                 restrict: 'E',

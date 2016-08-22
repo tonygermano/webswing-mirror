@@ -6,6 +6,7 @@
             vm.variables = {};
             vm.reset = reset;
             vm.apply = apply;
+			vm.hide = ['path','icon','swingConfig'];
 
             activate();
 

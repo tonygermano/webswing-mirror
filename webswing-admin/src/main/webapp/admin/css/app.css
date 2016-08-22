@@ -271,3 +271,7 @@ body {
 .ws-json-field .ace_editor {
 	height: 100px;
 }
+
+.ws-config-table tr td:not(:first-child) {
+	word-break: break-all;
+}

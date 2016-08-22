@@ -9,6 +9,7 @@
 			vm.back = back;
 			vm.path = $routeParams.path;
 			vm.readonly = false;
+			vm.hide = ['path'];
 			activate();
 
 			function activate() {

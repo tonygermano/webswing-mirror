@@ -1,25 +1,13 @@
-<div class="modal-header mirror-view-dialog-header">
+<div class="mirror-view-dialog-header">
     <button type="button" class="ws-button-gap btn btn-primary" ng-click="vm.back()">
         <span class="glyphicon glyphicon-arrow-left"></span> Back
     </button>
 </div>
 <h1 class="page-header">Swing Configuration for /{{vm.path}}</h1>
-<div class="form-horizontal">
-    <div class="row">
-        <div class="col-md-12">
-            <button type="button" class="btn btn-primary btn-sm" title="Reset to current live configuration." ui-jq="tooltip" ng-click="vm.reset()"><span class="glyphicon glyphicon-repeat"></span> Reset
-            </button>
-            <button type="button" class="btn btn-primary btn-sm" title="Use this configuration in server runtime." ui-jq="tooltip" ng-click="vm.apply()"><span class="glyphicon glyphicon-ok"></span> Apply
-            </button>
-        </div>
-        <div class="ws-tabs col-md-12">
-            <ws-object-field
-            variables="vm.variables" 
+<ws-config-view variables="vm.variables" 
             value="vm.config"
-            hide="['path']"
-            readonly="vm.readonly">
-            </ws-object-field>
-        </div>
-    </div>
-</div>
-
+            hide="vm.hide"
+            readonly="vm.readonly"
+            reset="vm.reset"
+            apply="vm.apply">
+</ws-config-view>

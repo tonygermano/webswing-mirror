@@ -1,6 +1,7 @@
 (function (define) {
     define([
         'shared/appView.directive',
+        'shared/configView.directive',
         'shared/field.directive',
         'shared/objectField.directive',
         'shared/objectListField.directive',
@@ -10,12 +11,13 @@
         'shared/basic/stringListField.directive',
         'shared/basic/booleanField.directive',
         'shared/basic/stringMapField.directive',
-        'shared/basic/substitutorHelper.directive',
-        'shared/basic/substitutor.filter'
-    ], function f(appView, field, objectField, objectListField, objectMapField, jsonField, stringField, stringListField, booleanField,wsStringMapField, substitutorHelper, substitutorFilter) {
+        'shared/helper/substitutorHelper.directive',
+        'shared/helper/substitutor.filter'
+    ], function f(appView,configView, field, objectField, objectListField, objectMapField, jsonField, stringField, stringListField, booleanField,wsStringMapField, substitutorHelper, substitutorFilter) {
         var module = angular.module('wsShared', []);
 
         module.directive('wsAppView',appView)
+        module.directive('wsConfigView',configView)
         module.directive('wsField',field)
         module.directive('wsObjectField',objectField)
         module.directive('wsObjectListField',objectListField)

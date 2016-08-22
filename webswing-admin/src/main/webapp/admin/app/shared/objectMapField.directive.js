@@ -8,6 +8,7 @@
 				scope : {
 					value : '=',
 					variables : '=',
+					items : "=",
 					readonly : '=',
 					desc : '@',
 					label : '@'

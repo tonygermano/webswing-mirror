@@ -7,6 +7,7 @@
 				scope : {
 					config : '=',
 					value : '=',
+					items : '=',
 					variables : '=',
 					readonly : '=',
 					label : '@',
@@ -25,8 +26,10 @@
 			vm.helpVisible = [];
 			vm.openHelper = openHelper;
 			vm.toggleHelper = toggleHelper;
+			vm.setChoice = setChoice;
+
 			if (vm.value == null) {
-				vm.value = [  ];
+				vm.value = [];
 			}
 
 			$scope.$on('wsHelperClose', function(evt, ctrl, index) {
@@ -53,12 +56,16 @@
 				}
 			}
 
-			function addString() {
-				vm.value.push('');
+			function addString(index) {
+				vm.value.splice(index + 1, 0, '');
 			}
 
 			function deleteString(index) {
 				vm.value.splice(index, 1);
+			}
+
+			function setChoice(index, value) {
+				vm.value[index] = value;
 			}
 		}
 

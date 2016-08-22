@@ -5,10 +5,20 @@
         </label>
         <div ng-class="{'col-sm-offset-5': !$first,'col-md-offset-4':!$first,'col-lg-offset-3':!$first,'col-sm-7':true,'col-md-8':true,'col-lg-9':true, 'edit-app-list-entry':true} " ng-repeat="s in vm.value track by $index">
             <div class="input-group">
-                <div class="input-group-addon" ng-click="vm.toggleHelper($index)"><span ng-if="vm.variables != null" ng-class="{'glyphicon':true, 'glyphicon-flash':!vm.helpVisible[$index],'glyphicon-chevron-up':vm.helpVisible[$index]}" ></span></div>
+                <div class="input-group-addon" ng-click="vm.toggleHelper($index)">
+                	<span ng-if="vm.variables != null" ng-class="{'glyphicon':true, 'glyphicon-flash':!vm.helpVisible[$index],'glyphicon-chevron-up':vm.helpVisible[$index]}" ></span>
+               	</div>
                 <input type="text" ng-readonly="vm.readonly" class="form-control" ng-model="vm.value[$index]" ng-click="vm.openHelper($index)">
+                <div class="input-group-addon" ng-if="vm.items != null && !vm.readonly" dropdown dropdown-toggle>
+                    <span class="glyphicon glyphicon-chevron-down" ></span>
+                    <ul class="dropdown-menu pull-right">
+                        <li ng-repeat="choice in vm.items">
+                            <a href ng-click="vm.setChoice($parent.$index,choice)">{{choice}}</a>
+                        </li>
+                    </ul>
+                </div>
                 <div class="input-group-btn" ng-if="!vm.readonly">
-                    <button class="btn btn-default" ng-if="$last" type="button" ng-click="vm.addString()">
+                    <button class="btn btn-default" type="button" ng-click="vm.addString($index)">
                         <span class="glyphicon glyphicon-plus"></span>
                     </button>
                     <button class="btn btn-default" type="button" ng-click="vm.deleteString($index)">
