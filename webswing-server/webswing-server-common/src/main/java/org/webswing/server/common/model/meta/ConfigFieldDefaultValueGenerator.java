@@ -9,9 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.METHOD })
 @Inherited
-@SuppressWarnings("rawtypes")
-public @interface ConfigFieldPresets {
-
-	String[] value() default {};
-	Class<? extends Enum> enumClass() default Enum.class;
+public @interface ConfigFieldDefaultValueGenerator {
+	String value();
 }

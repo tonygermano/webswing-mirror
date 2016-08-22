@@ -186,14 +186,6 @@ body {
 	color: #dddddd;
 }
 
-.ws-config-group {
-	
-}
-
-.ws-config-group .ace_editor {
-	height: 400px;
-}
-
 .ws-helper {
 	border-top-left-radius: 0px;
 	border-top-right-radius: 0px;
@@ -265,4 +257,17 @@ body {
 .ws-app-name {
 	float: left;
 	margin-left: 10px;
+}
+
+.ws-order-number-start {
+	counter-reset: section;
+}
+
+.ws-order-number-start .ws-order-number::before {
+	counter-increment: section;
+	content: counters(section, ".") ". ";
+}
+
+.ws-json-field .ace_editor {
+	height: 100px;
 }

@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.common.model.Config;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueGenerator;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
@@ -98,6 +99,10 @@ public class ConfigUtil {
 						} else {
 							//value is null, check if default value is defined
 							Class<?> returnType = method.getReturnType();
+							Object generated = getDefaultGeneratedValue(method, clazz, proxy);
+							if (generated != null && ClassUtils.isAssignable(generated.getClass(), returnType)) {
+								return (T) generated;
+							}
 							if (ClassUtils.isAssignable(returnType, String.class)) {
 								String defaultStringValue = getDefaultStringValue(method);
 								config.put(pd.getName(), defaultStringValue);
@@ -150,6 +155,21 @@ public class ConfigUtil {
 			}
 
 		});
+	}
+
+	protected static <T> Object getDefaultGeneratedValue(Method method, Class<?> currentConfigType, Object currentConfig) {
+		ConfigFieldDefaultValueGenerator defaultGeneratorAnnotation = CommonUtil.findAnnotation(method, ConfigFieldDefaultValueGenerator.class);
+		if (defaultGeneratorAnnotation != null) {
+			String methodName = defaultGeneratorAnnotation.value();
+			try {
+				Method m = method.getDeclaringClass().getDeclaredMethod(methodName, currentConfigType);
+				Object value = m.invoke(null, currentConfig);
+				return value;
+			} catch (Exception e) {
+				log.error("Default Value Generator method '" + methodName + "' is not valid.", e);
+			}
+		}
+		return null;
 	}
 
 	protected static ConfigFieldDefaultValueObject isDefaultObjectValue(Method method) {

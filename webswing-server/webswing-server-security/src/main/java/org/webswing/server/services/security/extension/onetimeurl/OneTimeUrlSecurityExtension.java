@@ -98,28 +98,39 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		if (StringUtils.isEmpty(token.getSwingPath())) {
 			throw new WebswingAuthenticationException("Swing Path must not be empty.");
 		}
-		if (getConfig().getApiKeys() == null || getConfig().getApiKeys().get(token.getRequestorId()) == null) {
+		if (getConfig().getApiKeys() == null || getConfigForRequestor(getConfig(), token.getRequestorId()) == null) {
 			throw new WebswingAuthenticationException("RequestorId not configured.");
 		}
 	}
 
+	public static OtpAccessConfig getConfigForRequestor(OneTimeUrlSecurityExtensionConfig config, String requestorId) {
+		if (config != null) {
+			for (OtpAccessConfig oac : config.getApiKeys()) {
+				if (StringUtils.equals(requestorId, oac.getRequestorId())) {
+					return oac;
+				}
+			}
+		}
+		return null;
+	}
+
 	public int getOtpValidForSec(String requestingClient) {
 		Integer result = null;
-		OtpAccessConfig c = getConfig().getApiKeys().get(requestingClient);
+		OtpAccessConfig c = getConfigForRequestor(getConfig(), requestingClient);
 		result = c.getValidForSec();
 		return result == null ? 30 : result;
 	}
 
 	public String getOtpCrypto(String requestingClient) {
 		String result = null;
-		OtpAccessConfig c = getConfig().getApiKeys().get(requestingClient);
+		OtpAccessConfig c = getConfigForRequestor(getConfig(), requestingClient);
 		result = c.getHMacAlgo();
 		return result == null ? "HmacSHA512" : result;
 	}
 
 	public String getOtpSecret(String requestingClient) throws WebswingAuthenticationException {
 		String result = null;
-		OtpAccessConfig c = getConfig().getApiKeys().get(requestingClient);
+		OtpAccessConfig c = getConfigForRequestor(getConfig(), requestingClient);
 		result = c.getSecret();
 		if (result == null) {
 			log.error("Secret not found for requestor '" + requestingClient + "'");
@@ -196,11 +207,11 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 	}
 
 	public AbstractWebswingUser createUser(OtpTokenData token) throws WebswingAuthenticationException {
-		OtpAccessConfig c = getConfig().getApiKeys().get(token.getRequestorId());
+		OtpAccessConfig c = getConfigForRequestor(getConfig(), token.getRequestorId());
 		Map<String, Serializable> attributes = new HashMap<String, Serializable>();
 		Set<String> roles = new HashSet<>();
 		Set<String> permissions = new HashSet<>();
-		
+
 		if (token.getAttributes() != null) {
 			for (String[] attribute : token.getAttributes()) {
 				attributes.put(attribute[0], attribute[1]);

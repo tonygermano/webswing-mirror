@@ -1,17 +1,16 @@
 (function (define) {
     define([], function f() {
-        function SwingConfigController($scope, $timeout, $location, configRestService, $routeParams) {
+        function ConfigEditController(configRestService) {
             var vm = this;
             vm.config = {};
             vm.variables = {};
             vm.reset = reset;
             vm.apply = apply;
-            vm.back = back;
-            vm.path = $routeParams.path;
+
             activate();
 
             function activate() {
-                configRestService.getConfig(vm.path).then(function (data) {
+                configRestService.getConfig("/").then(function (data) {
                     vm.config = data;
                 });
                 configRestService.getVariables().then(function (data) {
@@ -26,13 +25,9 @@
             function apply() {
                 configRestService.setConfig(vm.config);
             }
-
-            function back() {
-                $location.path('/dashboard');
-            }
         }
-        SwingConfigController.$inject = ['$scope', '$timeout', '$location', 'configRestService', '$routeParams'];
+        ConfigEditController.$inject = ['configRestService'];
 
-        return SwingConfigController;
+        return ConfigEditController;
     });
 })(adminConsole.define);

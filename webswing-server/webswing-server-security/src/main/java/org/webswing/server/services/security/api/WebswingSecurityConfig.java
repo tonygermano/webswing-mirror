@@ -13,6 +13,7 @@ import org.webswing.server.common.model.meta.ConfigFieldEditorType;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 import org.webswing.server.common.model.meta.ConfigFieldOrder;
 import org.webswing.server.common.model.meta.ConfigFieldPresets;
+import org.webswing.server.common.model.meta.ConfigFieldVariables;
 import org.webswing.server.common.model.meta.ConfigType;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.model.meta.MetadataGenerator;
@@ -24,15 +25,16 @@ import org.webswing.toolkit.util.ClasspathUtil;
 @ConfigFieldOrder({"module","classPath","config"})
 public interface WebswingSecurityConfig {
 
-	@ConfigField(label="Secuirty Module")
-	@ConfigFieldPresets({"NONE","INHERITED","PROPERTY_FILE","SAML2"})
+	@ConfigField(label="Secuirty Module Name")
+	@ConfigFieldPresets(enumClass=BuiltInModules.class)
 	@ConfigFieldDefaultValueString("INHERITED")
 	public String getModule();
 
-	@ConfigField(label = "Module Class Path")
+	@ConfigField(label = "Secuirty Module Class Path")
+	@ConfigFieldVariables
 	public List<String> getClassPath();
 
-	@ConfigField
+	@ConfigField(label="Secuirty Module Config")
 	@ConfigFieldEditorType(editor = EditorType.Object)
 	public Map<String, Object> getConfig();
 

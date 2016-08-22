@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ClassUtils.Interfaces;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -225,7 +225,7 @@ public class MetadataGenerator<T> {
 	protected Class<?> getExplicitType(T config, ClassLoader cl, String propertyName, Method readMethod, Object value) throws ClassNotFoundException {
 		ConfigFieldEditorType editor = CommonUtil.findAnnotation(readMethod, ConfigFieldEditorType.class);
 		Class<?> type = null;
-		if (editor != null && editor.className() != null) {
+		if (editor != null && !StringUtils.isEmpty(editor.className())) {
 			type = cl.loadClass(editor.className());
 		}
 		return type;
@@ -295,22 +295,34 @@ public class MetadataGenerator<T> {
 		if (!StringUtils.isEmpty(configField.label())) {
 			return configField.label();
 		} else {
-			return null;
+			return propertyName;
 		}
 	}
 
 	protected String getDescription(T config, ClassLoader cl, String propertyName, Method readMethod) {
 		ConfigField configField = CommonUtil.findAnnotation(readMethod, ConfigField.class);
-		if (!StringUtils.isEmpty(configField.label())) {
-			return configField.label();
+		if (!StringUtils.isEmpty(configField.description())) {
+			return configField.description();
 		} else {
 			return null;
 		}
 	}
 
 	protected boolean isVariables(T config, ClassLoader cl, String propertyName, Method readMethod) {
-		ConfigFieldWithVariables variables = CommonUtil.findAnnotation(readMethod, ConfigFieldWithVariables.class);
-		return variables != null;
+		ConfigFieldVariables variables = CommonUtil.findAnnotation(readMethod, ConfigFieldVariables.class);
+		if (variables != null) {
+			return true;
+		} else {
+			EditorType editorType = getEditorType(config, cl, propertyName, readMethod);
+			switch (editorType) {
+			case Object:
+			case ObjectList:
+			case ObjectMap:
+				return true;
+			default:
+				return false;
+			}
+		}
 	}
 
 	protected boolean isDiscriminator(T config, ClassLoader cl, String propertyName, Method readMethod) {
@@ -318,10 +330,19 @@ public class MetadataGenerator<T> {
 		return discriminator != null;
 	}
 
+	@SuppressWarnings("rawtypes")
 	protected String[] getPresets(T config, ClassLoader cl, String propertyName, Method readMethod) {
 		ConfigFieldPresets presets = CommonUtil.findAnnotation(readMethod, ConfigFieldPresets.class);
 		if (presets != null) {
-			return presets.value();
+			List<String> values = new ArrayList<String>(Arrays.asList(presets.value()));
+			Class<? extends Enum> enumClass = presets.enumClass();
+			Enum[] constants = enumClass.getEnumConstants();
+			if (constants != null) {
+				for (Enum c : constants) {
+					values.add(c.name());
+				}
+			}
+			return values.toArray(new String[values.size()]);
 		} else {
 			return guessPresets(config, cl, propertyName, readMethod);
 		}

@@ -7,31 +7,35 @@ import org.webswing.server.common.model.meta.ConfigField;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType;
-import org.webswing.server.common.model.meta.ConfigFieldWithVariables;
-import org.webswing.server.common.model.meta.ConfigGroup;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 import org.webswing.server.common.model.meta.ConfigFieldOrder;
+import org.webswing.server.common.model.meta.ConfigFieldVariables;
 
-@ConfigFieldOrder({ "path", "homeDir", "webFolder", "security", "swingConfig" })
+@ConfigFieldOrder({ "path", "homeDir", "webFolder", "icon", "security", "swingConfig" })
 public interface SecuredPathConfig extends Config {
 
-	@ConfigField(tab = ConfigGroup.General, label = "Path", description = "Application path")
+	@ConfigField(label = "Context Path", description = "Url context path where the application will be deployed.")
 	public String getPath();
 
-	@ConfigField(tab = ConfigGroup.General, label = "Home", description = "Application home folder")
-	@ConfigFieldWithVariables
+	@ConfigField(label = "Home Folder", description = "Swing application's home directory. Swing application instances will be executed from this directory. This will also be the base directory of any relative classpath entries specified.")
+	@ConfigFieldVariables
 	@ConfigFieldDefaultValueString("${user.dir}")
 	public String getHomeDir();
 
-	@ConfigField(tab = ConfigGroup.General, label = "Web Folder", description = "Folder to be used to store customized static web files like HTML, CSS or Javascritp.")
+	@ConfigField(label = "Web Folder", description = "Folder to be used to store customized static web files like HTML, CSS or Javascript.")
+	@ConfigFieldVariables
 	@ConfigFieldDefaultValueString("www")
 	public String getWebFolder();
 
-	@ConfigField(tab = ConfigGroup.Security)
+	@ConfigField(label = "Icon", description = "Path to icon displayed in application selection dialog.")
+	@ConfigFieldVariables
+	public String getIcon();
+
+	@ConfigField(label = "Security")
 	@ConfigFieldEditorType(editor = EditorType.Object, className = "org.webswing.server.services.security.api.WebswingSecurityConfig")
 	@ConfigFieldDefaultValueObject(HashMap.class)
 	public Map<String, Object> getSecurity();
 
-	@ConfigField(tab = ConfigGroup.Swing)
+	@ConfigField(label = "Swing App")
 	SwingConfig getSwingConfig();
 }

@@ -22,7 +22,6 @@ import org.webswing.server.common.model.admin.ApplicationInfo;
 import org.webswing.server.common.model.admin.InstanceManagerStatus;
 import org.webswing.server.common.model.admin.InstanceManagerStatus.Status;
 import org.webswing.server.common.util.CommonUtil;
-import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.files.FileTransferHandler;
@@ -269,7 +268,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Secur
 		app.setName(getSwingConfig().getName());
 		app.setAlwaysRestart(getSwingConfig().getSwingSessionTimeout() == 0);
 		app.setUrl(getFullPathMapping());
-		File icon = resolveFile(getSwingConfig().getIcon());
+		File icon = resolveFile(getConfig().getIcon());
 		app.setBase64Icon(CommonUtil.loadImage(icon));
 		return app;
 	}
@@ -280,7 +279,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Secur
 		app.setPath(getPathMapping());
 		app.setUrl(getFullPathMapping());
 		app.setName(getSwingConfig().getName());
-		File icon = resolveFile(getSwingConfig().getIcon());
+		File icon = resolveFile(getConfig().getIcon());
 		app.setIcon(CommonUtil.loadImage(icon));
 		app.setConfig(getConfig());
 		app.setRunningInstances(swingInstances.size());

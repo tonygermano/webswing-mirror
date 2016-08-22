@@ -16,13 +16,12 @@ import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
-import org.webswing.server.common.model.meta.ConfigFieldEditorType;
-import org.webswing.server.common.model.meta.ConfigFieldOrder;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 import org.webswing.server.common.model.meta.MetaField;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.services.security.api.BuiltInModules;
+import org.webswing.server.services.security.extension.onetimeurl.OtpAccessConfig;
 
 @SuppressWarnings("unchecked")
 public class ConfigurationMetadataTest {
@@ -61,11 +60,11 @@ public class ConfigurationMetadataTest {
 			}
 		}
 		
-		//@ConfigFieldOrder({ "path", "homeDir", "webFolder", "security", "swingConfig" })
+		//@ConfigFieldOrder({ "path", "homeDir", "webFolder", "icon", "security", "swingConfig"})
 		assertTrue(configMetadata.getFields().get(0).getName().equals("path"));
 		assertTrue(configMetadata.getFields().get(1).getName().equals("homeDir"));
 		assertTrue(configMetadata.getFields().get(2).getName().equals("webFolder"));
-		assertTrue(configMetadata.getFields().get(3).getName().equals("security"));
+		assertTrue(configMetadata.getFields().get(4).getName().equals("security"));
 		
 	}
 
@@ -88,8 +87,15 @@ public class ConfigurationMetadataTest {
 		assertTrue(c.getConfigNull() == null);
 		assertTrue(c.getMapNull() == null);
 		assertTrue(c.getObjectNull() == null);
-
 	}
+	
+	@Test
+	public void testDefaultValueGenerator() throws Exception {
+		OtpAccessConfig c = ConfigUtil.instantiateConfig(null, OtpAccessConfig.class);
+		assertTrue(c.getSecret()!=null);
+	}
+	
+	
 
 	public static interface TestDefaultConfig extends Config {
 		@ConfigFieldDefaultValueString("defaultValue")

@@ -17,7 +17,7 @@
                         <button class="btn btn-default" ng-if="$last" type="button" ng-click="vm.addPair()">
                             <span class="glyphicon glyphicon-plus"></span>
                         </button>
-                        <button class="btn btn-default" ng-hide="vm.value.length == 1" type="button" ng-click="vm.deletePair($index)">
+                        <button class="btn btn-default"  type="button" ng-click="vm.deletePair($index)">
                             <span class="glyphicon glyphicon-remove"></span>
                         </button>
                     </div>
@@ -33,7 +33,7 @@
                 <span class="label label-danger">{{p.error}}</span>
             </div>
         </div>
-        <div ng-if="vm.model.length === 0" class="col-lg-10 col-md-9 col-sm-8">
+        <div ng-if="!vm.readonly && vm.model.length === 0" class="col-lg-9 col-md-8 col-sm-7">
             <button class="btn btn-default" type="button" ng-click="vm.addPair()">
                 <span class="glyphicon glyphicon-plus"></span>
             </button>

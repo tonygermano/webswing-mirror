@@ -4,6 +4,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.webswing.server.common.model.meta.ConfigField;
+import org.webswing.server.common.model.meta.ConfigFieldDiscriminator;
+import org.webswing.server.common.model.meta.ConfigFieldPresets;
 import org.webswing.server.common.model.meta.ConfigGroup;
 import org.webswing.server.common.model.meta.ConfigType;
 import org.webswing.server.common.model.meta.MetaField;
@@ -15,7 +17,9 @@ import org.webswing.server.services.security.extension.api.WebswingExtendableSec
 @ConfigType(metadataGenerator = ExtensionMetadataGenerator.class)
 public interface WebswingExtendableSecurityModuleConfig extends WebswingSecurityModuleConfig {
 
-	@ConfigField
+	@ConfigField(tab = ConfigGroup.Extension, label = "Extensions", description = "List of security extensions enabled. Use one of build in names or custom class name.")
+	@ConfigFieldDiscriminator
+	@ConfigFieldPresets(enumClass = BuiltInModuleExtensions.class)
 	List<String> getExtensions();
 
 	public static class ExtensionMetadataGenerator<T extends WebswingExtendableSecurityModuleConfig> extends MetadataGenerator<T> {

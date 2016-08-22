@@ -3,7 +3,7 @@
         <span class="glyphicon glyphicon-arrow-left"></span> Back
     </button>
 </div>
-<h1 class="page-header">Swing Configuration</h1>
+<h1 class="page-header">Swing Configuration for /{{vm.path}}</h1>
 <div class="form-horizontal">
     <div class="row">
         <div class="col-md-12">
@@ -12,13 +12,13 @@
             <button type="button" class="btn btn-primary btn-sm" title="Use this configuration in server runtime." ui-jq="tooltip" ng-click="vm.apply()"><span class="glyphicon glyphicon-ok"></span> Apply
             </button>
         </div>
-        <div class="ws-tabs col-md-12 ">
-            <ws-config-view label="{{vm.path}} " 
-            desc="Configuration for Swing application" 
+        <div class="ws-tabs col-md-12">
+            <ws-object-field
             variables="vm.variables" 
             value="vm.config"
-            hide="['path']">
-            </ws-config-view>
+            hide="['path']"
+            readonly="vm.readonly">
+            </ws-object-field>
         </div>
     </div>
 </div>

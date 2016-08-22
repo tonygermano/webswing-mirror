@@ -4,7 +4,7 @@ public enum ConfigGroup {
 	General("General"),
 	Java("Java"), 
 	Extension("Extensions"), 
-	Security("Security"), 
+	Server("Server"), 
 	Swing("Swing"), 
 	Session("Session"), 
 	Features("Features");
