@@ -32,10 +32,13 @@
 			},
 			'libs/pie-chart' : {
 				deps : [ 'libs/angular', 'libs/d3']
+			},
+			'libs/ng-textcomplete': {
+				deps : [ 'libs/angular']
 			}
 		}
 	});
-	require([ 'libs/jquery', 'angular', 'libs/bootstrap', 'libs/angular-route', 'libs/ui-ace', 'libs/ui-bootstrap', 'libs/ui-utils', 'libs/d3', 'libs/pie-chart' ], function() {
+	require([ 'libs/jquery', 'angular', 'libs/bootstrap', 'libs/angular-route', 'libs/ui-ace', 'libs/ui-bootstrap', 'libs/ui-utils', 'libs/d3', 'libs/pie-chart','libs/ng-textcomplete' ], function() {
 		require([ 'app.module' ], function() {
 			angular.bootstrap(root, [ 'wsAdmin' ]);
 		}, errorHandler);

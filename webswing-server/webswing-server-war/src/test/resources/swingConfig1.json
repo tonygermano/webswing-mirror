@@ -11,11 +11,14 @@
         "serviceProviderConsumerUrl" : "https://localhost:8443/ss3/login",
         "serviceProviderEntityId" : "webswing",
         "oneTimeUrl" : {
-          "apiKeys" : {
-            "eLearning" : {
-              "secret" : "thisIsSecret"
-            }
-          }
+          "apiKeys" : [{
+				"requestorId":"eLearning",
+				"secret" : "thisIsSecret"
+            },
+			{
+				"requestorId":"eLearning2",
+				"secret" : "thisIsSecret2"
+            }]
         }
       }
     },

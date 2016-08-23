@@ -6,6 +6,7 @@ import java.util.Map;
 import org.webswing.server.common.model.meta.ConfigField;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
+import org.webswing.server.common.model.meta.ConfigFieldDiscriminator;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 import org.webswing.server.common.model.meta.ConfigFieldOrder;
@@ -19,6 +20,7 @@ public interface SecuredPathConfig extends Config {
 
 	@ConfigField(label = "Home Folder", description = "Swing application's home directory. Swing application instances will be executed from this directory. This will also be the base directory of any relative classpath entries specified.")
 	@ConfigFieldVariables
+	@ConfigFieldDiscriminator
 	@ConfigFieldDefaultValueString("${user.dir}")
 	public String getHomeDir();
 

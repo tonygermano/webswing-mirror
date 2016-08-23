@@ -6,6 +6,7 @@
 				restrict : 'E',
 				template : htmlTemplate,
 				scope : {
+					field : '=',
 					value : '=',
 					variables : '=',
 					hide : '=',
@@ -23,13 +24,13 @@
 			var vm = this;
 			vm.tabs = {};
 			vm.needTabs = false;
-			vm.addObject = vm.addObject;
+			vm.addObject = addObject;
 
 			$scope.$watch('vm.value', function(newValue) {
 				vm.tabs = createTabs(newValue);
 				vm.needTabs = Object.keys(vm.tabs).length > 1;
 			});
-			
+
 			function createTabs(meta) {
 				var result = {};
 				var field;
@@ -56,7 +57,14 @@
 			}
 
 			function addObject() {
-				vm.value = {};
+				vm.field.value = {
+					fields : []
+				};
+				requestFormUpdate();
+			}
+
+			function requestFormUpdate() {
+				$scope.$emit('wsRequestFormUpdate', vm);
 			}
 
 		}

@@ -3,6 +3,7 @@ package org.webswing.server.services.rest;
 import java.util.Map;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
-import org.webswing.server.common.model.admin.InstanceManagerStatus;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
@@ -44,6 +44,20 @@ public class ConfigRestUrlHandler extends AbstractRestUrlHandler {
 		if (securedPathConfig == null) {
 			securedPathConfig = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class);
 		}
+		try {
+			return ConfigUtil.getConfigMetadata(securedPathConfig, getClass().getClassLoader());
+		} catch (Exception e) {
+			log.error("Failed to generate configuration descriptor.", e);
+			throw new WsException("Failed to generate configuration descriptor.");
+		}
+	}
+	
+
+	@POST
+	@Path("/configMeta")
+	public MetaObject getMeta(Map<String,Object> json) throws WsException {
+		checkPermission(WebswingAction.rest_getMeta);
+		SecuredPathConfig securedPathConfig = ConfigUtil.instantiateConfig(json, SecuredPathConfig.class);
 		try {
 			return ConfigUtil.getConfigMetadata(securedPathConfig, getClass().getClassLoader());
 		} catch (Exception e) {

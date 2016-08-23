@@ -6,6 +6,7 @@
 				restrict : 'E',
 				template : htmlTemplate,
 				scope : {
+					field : '=',
 					value : '=',
 					variables : '=',
 					items : "=",
@@ -24,6 +25,11 @@
 			vm.model = [];
 			vm.addPair = addPair;
 			vm.removePair = removePair;
+			
+			if(vm.value ==null){
+				vm.field.value = {};
+			}
+			
 			$scope.$watch("vm.value", function(value) {
 				vm.model.splice(0, vm.model.length);
 				angular.forEach(value, function(value, key) {
@@ -50,18 +56,23 @@
 				}
 			}, true);
 
-
 			function addPair(index) {
-				vm.model.splice(index+1,0,{
+				vm.model.splice(index + 1, 0, {
 					key : '',
-					value : {}
+					value : {
+						fields : []
+					}
 				});
+				requestFormUpdate()
 			}
 
 			function removePair(index) {
 				vm.model.splice(index, 1);
 			}
-
+			
+			function requestFormUpdate() {
+				$scope.$emit('wsRequestFormUpdate', vm);
+			}
 		}
 
 		wsObjectMapFieldDirectiveController.$inject = [ '$scope', '$element', '$attrs' ];

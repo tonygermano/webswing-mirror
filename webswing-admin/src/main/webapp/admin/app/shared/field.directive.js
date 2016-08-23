@@ -19,7 +19,9 @@
 						label : vm.field.label,
 						desc : vm.field.description,
 						variables : vm.field.variables ? 'vm.variables' : null,
+						discriminator : 'vm.field.discriminator',
 						items : 'vm.field.presets',
+						field : 'vm.field',
 						value : 'vm.field.value'
 					};
 

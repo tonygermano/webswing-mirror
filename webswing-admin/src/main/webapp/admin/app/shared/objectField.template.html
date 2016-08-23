@@ -6,9 +6,6 @@
 		<span ng-if="vm.label != null && vm.needTabs"> - </span>
 		<span ng-if="vm.needTabs">{{::key}}</span>
 		<span class="ws-tooltip glyphicon glyphicon-question-sign" ng-if="vm.desc != null" ui-jq="tooltip" title="{{::vm.desc}}"></span>
-        <button ng-if="vm.value == null" class="btn btn-xs btn-default pull-right" type="button" ng-click="vm.addObject()">
-            <span class="glyphicon glyphicon-plus"></span>
-        </button>
 	</h4>
 	
 	<div class="row" collapse="value.collapsed" >
@@ -27,3 +24,11 @@
 	</div>
 </div>
 
+<div ng-if="vm.value==null">
+	<h4>
+		<span >{{::vm.label}}</span>
+		<button class="btn btn-sm btn-default" type="button" ng-click="vm.addObject()">
+		    <span class="glyphicon glyphicon-plus"></span>
+		</button>
+	</h4>
+</div>

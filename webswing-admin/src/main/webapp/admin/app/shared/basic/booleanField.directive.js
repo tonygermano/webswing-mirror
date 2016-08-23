@@ -1,27 +1,39 @@
-(function (define) {
-    define(['text!shared/basic/booleanField.template.html'], function f(htmlTemplate) {
-        function wsBooleanFieldDirective() {
-            return {
-                restrict: 'E',
-                template: htmlTemplate,
-                scope: {
-                    value: '=',
-                    readonly: '=',
-                    label: '@',
-                    desc: '@'
-                },
-                controllerAs: 'vm',
-                bindToController: true,
-                controller: wsBooleanFieldDirectiveController
-            };
-        }
+(function(define) {
+	define([ 'text!shared/basic/booleanField.template.html' ], function f(htmlTemplate) {
+		function wsBooleanFieldDirective() {
+			return {
+				restrict : 'E',
+				template : htmlTemplate,
+				scope : {
+					value : '=',
+					readonly : '=',
+					discriminator : '=',
+					label : '@',
+					desc : '@'
+				},
+				controllerAs : 'vm',
+				bindToController : true,
+				controller : wsBooleanFieldDirectiveController
+			};
+		}
 
-        function wsBooleanFieldDirectiveController($scope, $attrs) {
-            var vm = this;
-        }
+		function wsBooleanFieldDirectiveController($scope, $attrs) {
+			var vm = this;
+			vm.onChange = onChange;
 
-        wsBooleanFieldDirectiveController.$inject = ['$scope', '$attrs'];
+			function onChange(){
+				if(vm.discriminator){
+					requestFormUpdate();
+				}
+			}
+			
+			function requestFormUpdate() {
+				$scope.$emit('wsRequestFormUpdate', vm);
+			}
+		}
 
-        return wsBooleanFieldDirective;
-    });
+		wsBooleanFieldDirectiveController.$inject = [ '$scope', '$attrs' ];
+
+		return wsBooleanFieldDirective;
+	});
 })(adminConsole.define);

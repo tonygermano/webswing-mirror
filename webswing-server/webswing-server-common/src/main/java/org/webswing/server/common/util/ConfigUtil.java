@@ -87,11 +87,18 @@ public class ConfigUtil {
 										return resultList;
 									}
 								}
+								if(value instanceof Number){
+									return convertNumberToTargetClass((Number) value, method.getReturnType());
+								}
 								return value;
 							} else if (value instanceof Map && method.getReturnType().isInterface()) {
 								return instantiateConfig((Map) value, method.getReturnType(), context);
 							} else if (value instanceof String && method.getReturnType().isEnum()) {
-								return Enum.valueOf((Class<Enum>) method.getReturnType(), (String) value);
+								try {
+									return Enum.valueOf((Class<Enum>) method.getReturnType(), (String) value);
+								} catch (Exception e) {
+									return null;
+								}
 							} else {
 								log.error("Invalid configuration. Type of " + clazz.getName() + "." + pd.getName() + " is not " + method.getReturnType());
 								return null;

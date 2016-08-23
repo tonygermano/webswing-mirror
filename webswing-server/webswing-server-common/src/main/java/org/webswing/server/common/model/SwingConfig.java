@@ -1,6 +1,7 @@
 package org.webswing.server.common.model;
 
 import java.lang.reflect.Method;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,8 @@ import org.webswing.server.common.model.meta.MetadataGenerator;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme","fontConfig","directdraw","debug","jreExecutable","javaVersion","classPathEntries","vmArgs","launcherType","launcherConfig","maxClients","sessionMode","swingSessionTimeout","allowStealSession","isolatedFs","allowDelete","allowDownload","allowAutoDownload","allowUpload","uploadMaxSize","allowedCorsOrigins","allowJsLink" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "isolatedFs", "allowDelete", "allowDownload", "allowAutoDownload", "allowUpload", "uploadMaxSize",
+		"allowedCorsOrigins", "allowJsLink" })
 public interface SwingConfig extends Config {
 	public enum SessionMode {
 		ALWAYS_NEW_SESSION,
@@ -39,12 +41,12 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.General, label = "Theme", description = "Select one of the default window decoration themes or a enter path to a XFWM4 theme folder.")
 	@ConfigFieldVariables
 	@ConfigFieldDefaultValueString("Murrine")
-	@ConfigFieldPresets({"Murrine","Agualemon","Sassandra","Therapy","Totem","Vertex","Vertex-Light"})
+	@ConfigFieldPresets({ "Murrine", "Agualemon", "Sassandra", "Therapy", "Totem", "Vertex", "Vertex-Light" })
 	public String getTheme();
 
 	@ConfigField(tab = ConfigGroup.General, label = "Fonts", description = "Customize logical font mappings and define physical fonts available to swing application. These fonts (TTF only) will be used for DirectDraw as native fonts. Key: name of font (ie. dialog|dialoginput|sansserif|serif|monospaced), Value: path to font file.")
 	@ConfigFieldVariables
-	@ConfigFieldPresets({"dialog","dialoginput","sansserif","serif","monospaced"})
+	@ConfigFieldPresets({ "dialog", "dialoginput", "sansserif", "serif", "monospaced" })
 	public Map<String, String> getFontConfig();
 
 	@ConfigField(tab = ConfigGroup.General, label = "DirectDraw Rendering", description = "DirectDraw rendering mode uses canvas instructions to render the swing application instead of server-rendered png images. DirectDraw improves performance but is not recomended for applications with lot of graphics content.")
@@ -115,6 +117,7 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow Uploading Files ", description = "If selected, the JFileChooser integration will allow users to upload files to folder opened in the file chooser dialog")
 	@ConfigFieldDefaultValueBoolean(true)
+	@ConfigFieldDiscriminator
 	public boolean isAllowUpload();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Upload Size Limit", description = "Maximum size of upload for single file (in MB). Set 0 for unlimited size.")
@@ -132,17 +135,30 @@ public interface SwingConfig extends Config {
 		@Override
 		public Class<?> getExplicitType(SwingConfig config, ClassLoader cl, String propertyName, Method readMethod, Object value) throws ClassNotFoundException {
 			if (propertyName.equals("launcherConfig")) {
-				switch (config.getLauncherType()) {
-				case Applet:
-					return AppletLauncherConfig.class;
-				case Desktop:
-					return DesktopLauncherConfig.class;
-				default:
+				if (config.getLauncherType() != null) {
+					switch (config.getLauncherType()) {
+					case Applet:
+						return AppletLauncherConfig.class;
+					case Desktop:
+						return DesktopLauncherConfig.class;
+					default:
+						return null;
+					}
+				} else {
 					return null;
 				}
 			} else {
 				return super.getExplicitType(config, cl, propertyName, readMethod, value);
 			}
+		}
+
+		@Override
+		protected LinkedHashSet<String> getPropertyNames(SwingConfig config, ClassLoader cl) throws Exception {
+			LinkedHashSet<String> names = super.getPropertyNames(config, cl);
+			if (!config.isAllowUpload()) {
+				names.remove("uploadMaxSize");
+			}
+			return names;
 		}
 
 	}

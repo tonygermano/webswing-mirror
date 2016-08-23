@@ -27,7 +27,7 @@
                 configRestService.setConfig(vm.config);
             }
         }
-        ConfigEditController.$inject = ['configRestService'];
+        ConfigEditController.$inject = ['configRestService',];
 
         return ConfigEditController;
     });

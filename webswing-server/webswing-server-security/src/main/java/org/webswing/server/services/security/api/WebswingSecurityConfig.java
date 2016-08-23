@@ -3,12 +3,15 @@ package org.webswing.server.services.security.api;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.ConfigField;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
+import org.webswing.server.common.model.meta.ConfigFieldDiscriminator;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 import org.webswing.server.common.model.meta.ConfigFieldOrder;
@@ -22,20 +25,22 @@ import org.webswing.server.services.security.api.WebswingSecurityConfig.Webswing
 import org.webswing.toolkit.util.ClasspathUtil;
 
 @ConfigType(metadataGenerator = WebswingSecurityMetadataGenerator.class)
-@ConfigFieldOrder({"module","classPath","config"})
+@ConfigFieldOrder({ "module", "classPath", "config" })
 public interface WebswingSecurityConfig {
 
-	@ConfigField(label="Secuirty Module Name")
-	@ConfigFieldPresets(enumClass=BuiltInModules.class)
+	@ConfigField(label = "Secuirty Module Name")
+	@ConfigFieldPresets(enumClass = BuiltInModules.class)
 	@ConfigFieldDefaultValueString("INHERITED")
+	@ConfigFieldDiscriminator
 	public String getModule();
 
 	@ConfigField(label = "Secuirty Module Class Path")
 	@ConfigFieldVariables
 	public List<String> getClassPath();
 
-	@ConfigField(label="Secuirty Module Config")
+	@ConfigField(label = "Secuirty Module Config")
 	@ConfigFieldEditorType(editor = EditorType.Object)
+	@ConfigFieldDefaultValueObject(HashMap.class)
 	public Map<String, Object> getConfig();
 
 	public static class WebswingSecurityMetadataGenerator extends MetadataGenerator<WebswingSecurityConfig> {
@@ -76,10 +81,15 @@ public interface WebswingSecurityConfig {
 			if (propertyName.equals("config")) {
 				String securityModuleClassName = BuiltInModules.getSecurityModuleClassName(config.getModule());
 				if (securityModuleClassName != null) {
-					Class<?> moduleClass = cl.loadClass(securityModuleClassName);
-					Class<?> configClass = getConfigTypeFromConstructor(moduleClass);
-					if (configClass != null) {
-						return configClass;
+					Class<?> configClass;
+					try {
+						Class<?> moduleClass = cl.loadClass(securityModuleClassName);
+						configClass = getConfigTypeFromConstructor(moduleClass);
+						if (configClass != null) {
+							return configClass;
+						}
+					} catch (Throwable e) {
+						return null;
 					}
 				}
 			}

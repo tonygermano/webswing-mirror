@@ -5,7 +5,7 @@
 				getConfig : getConfig,
 				setConfig : setConfig,
 				getVariables : getVariables,
-				getDefault : getDefault
+				getMeta : getMeta
 			};
 
 			function getConfig(path) {
@@ -37,15 +37,13 @@
 					return errorHandler.handleRestError('load available configuration variables', data, true);
 				}
 			}
-			function getDefault(type) {
-				return $http.get(baseUrl + '/rest/config/default/' + type, {
-					cache : true
-				}).then(success, failed);
+			function getMeta(config) {
+				return $http.post(baseUrl + '/rest/configMeta', config).then(success, failed);
 				function success(data) {
 					return data.data;
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('load default application settings', data, true);
+					return errorHandler.handleRestError('reload settings view', data, true);
 				}
 			}
 		}

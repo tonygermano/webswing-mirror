@@ -37,16 +37,20 @@ public interface WebswingExtendableSecurityModuleConfig extends WebswingSecurity
 		protected MetaField getPropertyMetadata(T config, ClassLoader cl, String propertyName) throws Exception {
 			if (config.getExtensions() != null && config.getExtensions().contains(propertyName)) {
 				String extensionType = BuiltInModuleExtensions.getExtensionClassName(propertyName);
-				Class<?> extensionClass = cl.loadClass(extensionType);
-				Class<?> configType = getConfigTypeFromConstructor(extensionClass);
-				Object value = config.getValueAs(propertyName, configType);
-				MetaField metadata = new MetaField();
-				metadata.setName(propertyName);
-				metadata.setTab(ConfigGroup.Extension);
-				metadata.setLabel(propertyName);
-				metadata.setType(EditorType.Object);
-				metadata.setValue(toMetaObject(config, cl, value, configType));
-				return metadata;
+				try {
+					Class<?> extensionClass = cl.loadClass(extensionType);
+					Class<?> configType = getConfigTypeFromConstructor(extensionClass);
+					Object value = config.getValueAs(propertyName, configType);
+					MetaField metadata = new MetaField();
+					metadata.setName(propertyName);
+					metadata.setTab(ConfigGroup.Extension);
+					metadata.setLabel(propertyName);
+					metadata.setType(EditorType.Object);
+					metadata.setValue(toMetaObject(config, cl, value, configType));
+					return metadata;
+				} catch (Throwable e) {
+					return null;
+				}
 			} else {
 				return super.getPropertyMetadata(config, cl, propertyName);
 			}

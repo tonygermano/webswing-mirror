@@ -6,7 +6,9 @@
         <div class="col-lg-9 col-md-8 col-sm-7 ">
             <div class="input-group">
                 <div class="input-group-addon" ng-click="vm.toggleHelper()"><span ng-if="vm.variables != null" ng-class="{'glyphicon':true, 'glyphicon-flash':!vm.helpVisible,'glyphicon-chevron-up':vm.helpVisible}" ></span></div>
-                <input  ng-readonly="vm.readonly" type="{{::vm.type}}" class="form-control" name="input" ng-model="vm.value" ng-required="vm.required" ng-click="vm.openHelper()">
+                <input class="form-control" name="input" type="{{::vm.type}}"
+                		ng-readonly="vm.readonly" ng-model="vm.value" ng-required="vm.required" ng-click="vm.openHelper()" ng-blur="vm.onBlur()"
+                		ws-substitutor-helper variables="vm.variables" message="vm.value" >
                 <div class="input-group-addon" ng-if="vm.items != null && !vm.readonly" dropdown dropdown-toggle>
                     <span class="glyphicon glyphicon-chevron-down" ></span>
                     <ul class="dropdown-menu pull-right">
@@ -18,7 +20,7 @@
             </div>
             <div ng-if="vm.variables != null" collapse="!vm.helpVisible">
                 <div class="ws-helper alert alert-info" >
-                    <small><span class="glyphicon glyphicon-flash" ></span>This field supports variable replacement</small>
+                    <small><span class="glyphicon glyphicon-flash" ></span>This field supports variable replacement. Start typing '${' </small>
                     <br/>
                     <strong>Resolve to: </strong>{{vm.value|substitutor:vm.variables }}
                 </div>

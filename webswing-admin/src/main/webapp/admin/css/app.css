@@ -275,3 +275,15 @@ body {
 .ws-config-table tr td:not(:first-child) {
 	word-break: break-all;
 }
+
+.ws-subs-key {
+ 	display: inline;
+	font-weight: 700;
+}
+
+.ws-subs-value {
+   display: inline;
+   color: lightgray;
+   margin-left: 5px;
+}
+

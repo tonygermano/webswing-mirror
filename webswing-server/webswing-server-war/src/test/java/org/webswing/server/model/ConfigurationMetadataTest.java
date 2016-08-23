@@ -95,6 +95,14 @@ public class ConfigurationMetadataTest {
 		assertTrue(c.getSecret()!=null);
 	}
 	
+
+	@Test
+	public void testNumberTypeGenerator() throws Exception {
+		Map<String, Object> map=new HashMap<String, Object>();
+		map.put("uploadMaxSize", new Integer(1));
+		SwingConfig c = ConfigUtil.instantiateConfig(map, SwingConfig.class);
+		assertTrue(c.getUploadMaxSize()==1);
+	}
 	
 
 	public static interface TestDefaultConfig extends Config {

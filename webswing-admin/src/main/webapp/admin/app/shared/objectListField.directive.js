@@ -6,6 +6,7 @@
 				restrict : 'E',
 				template : htmlTemplate,
 				scope : {
+					field : '=',
 					value : '=',
 					variables : '=',
 					readonly : '=',
@@ -25,15 +26,25 @@
 			vm.addFirstObject = addFirstObject;
 
 			function addObject(index) {
-				vm.value.splice(index + 1, 0, {});
+				vm.value.splice(index + 1, 0, {
+					fields : []
+				});
+				requestFormUpdate();
 			}
 
 			function addFirstObject() {
-				vm.value = [ {} ];
+				vm.field.value = [ {
+					fields : []
+				} ];
+				requestFormUpdate();
 			}
 
 			function removeObject(index) {
 				vm.value.splice(index, 1);
+			}
+
+			function requestFormUpdate() {
+				$scope.$emit('wsRequestFormUpdate', vm);
 			}
 
 		}

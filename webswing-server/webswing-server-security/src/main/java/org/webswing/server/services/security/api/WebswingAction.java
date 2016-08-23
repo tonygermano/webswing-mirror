@@ -14,6 +14,7 @@ public enum WebswingAction {
 	rest_getSession(Role.admin),
 	rest_sessionShutdown(Role.admin),
 	rest_sessionShutdownForce(Role.admin),
+	rest_getMeta(Role.admin),
 	rest_getConfig(Role.admin),
 	rest_setConfig(Role.admin),
 	rest_getConfigVariables(Role.admin),

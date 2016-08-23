@@ -5,11 +5,12 @@
 				restrict : 'E',
 				template : htmlTemplate,
 				scope : {
-					config : '=',
+					field : '=',
 					value : '=',
 					items : '=',
 					variables : '=',
 					readonly : '=',
+					discriminator : '=',
 					label : '@',
 					desc : '@'
 				},
@@ -28,8 +29,10 @@
 			vm.toggleHelper = toggleHelper;
 			vm.setChoice = setChoice;
 
+			vm.onBlur = onBlur;
+
 			if (vm.value == null) {
-				vm.value = [];
+				vm.field.value = [];
 			}
 
 			$scope.$on('wsHelperClose', function(evt, ctrl, index) {
@@ -62,10 +65,28 @@
 
 			function deleteString(index) {
 				vm.value.splice(index, 1);
+				if(vm.discriminator){
+					requestFormUpdate();
+				}
 			}
 
 			function setChoice(index, value) {
-				vm.value[index] = value;
+				if(vm.value[index]!==value){
+					vm.value[index] = value;
+					if(vm.discriminator){
+						requestFormUpdate();
+					}
+				}
+			}
+			
+			function onBlur(){
+				if(vm.discriminator){
+					requestFormUpdate();
+				}
+			}
+
+			function requestFormUpdate() {
+				$scope.$emit('wsRequestFormUpdate', vm);
 			}
 		}
 

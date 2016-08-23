@@ -7,7 +7,7 @@
             <div class="ws-string-map-field-inner col-xs-6">
                 <div class="input-group">
                     <div class="input-group-addon" ng-click="vm.toggleHelper($index)"><span ng-if="vm.variables != null" ng-class="{'glyphicon':true, 'glyphicon-flash':!vm.helpVisible[$index],'glyphicon-chevron-up':vm.helpVisible[$index]}" ></span></div>
-                    <input type="text" ng-readonly="vm.readonly" class="form-control" ng-model="p.key" ng-click="vm.openHelper($index)">
+                    <input ws-substitutor-helper variables="vm.variables" message="p.key" type="text" ng-readonly="vm.readonly" class="form-control" ng-model="p.key" ng-click="vm.openHelper($index)">
                     <div class="input-group-addon" ng-if="vm.items != null && !vm.readonly" dropdown dropdown-toggle>
 	                    <span class="glyphicon glyphicon-chevron-down" ></span>
 	                    <ul class="dropdown-menu pull-right">
@@ -20,7 +20,7 @@
             </div>
             <div class="ws-string-map-field-inner col-xs-6">
                 <div class="input-group">
-                    <input type="text" ng-readonly="vm.readonly" class="form-control" ng-model="p.value" ng-click="vm.openHelper($index)">
+                    <input ws-substitutor-helper variables="vm.variables" message="p.value" type="text" ng-readonly="vm.readonly" class="form-control" ng-model="p.value" ng-click="vm.openHelper($index)">
                     <div class="input-group-btn" ng-if="!vm.readonly">
                         <button class="btn btn-default" ng-if="$last" type="button" ng-click="vm.addPair()">
                             <span class="glyphicon glyphicon-plus"></span>

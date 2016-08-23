@@ -11,7 +11,7 @@
                 </button>
             </div>
             <div ng-if="!vm.readonly">
-                <button type="button" ng-class="{'btn': true ,'btn-danger':!vm.value, 'btn-success':vm.value ,'btn-sm': true}" ng-model="vm.value" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
+                <button ng-click="vm.onChange()" type="button" ng-class="{'btn': true ,'btn-danger':!vm.value, 'btn-success':vm.value ,'btn-sm': true}" ng-model="vm.value" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
                     <span ng-class="{'glyphicon': true ,'glyphicon-unchecked':!vm.value, 'glyphicon-check':vm.value}"></span>
                     {{vm.value?'ON':'OFF'}}
                 </button>

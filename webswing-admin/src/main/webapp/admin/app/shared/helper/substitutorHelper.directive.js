@@ -1,43 +1,57 @@
-(function (define) {
-    define(['text!shared/helper/substitutorHelper.template.html'], function f(htmlTemplate) {
-        function wsSubstitutorHelperDirective() {
-            return {
-                restrict: 'E',
-                template: htmlTemplate,
-                scope: {
-                    variables: '='
-                },
-                link: function ($scope, elem, attrs, parentCtrl) {
-                    $scope.$watch(function () {
-                        return $scope.variables;
-                    }, function (val) {
-                        $scope.vm.data = formatData(val);
-                    }, true);
+(function(define) {
+	define([], function f(htmlTemplate) {
+		function wsSubstitutorHelperDirective(Textcomplete) {
+			return {
+				restrict : 'A',
+				scope : {
+					variables : '=',
+					message : '='
+				},
+				link : function(scope, iElement, iAttrs) {
+					if (scope.variables != null) {
+						var mentions = Object.keys(scope.variables);
+						var textcomplete = new Textcomplete(iElement, [ {
+							match : /\$\{([.\w]*)$/,
+							search : function(term, callback) {
+								callback($.map(mentions, function(mention) {
+									return mention.toLowerCase().indexOf(term.toLowerCase()) !== -1 ? mention : null;
+								}));
+							},
+							index : 1,
+							replace : function(mention) {
+								return '${' + mention + '}';
+							},
+							template:  function (value) {
+					            return '<div class="ws-subs-key">${'+ value + '}</div><div class="ws-subs-value">'+scope.variables[value]+'</div>';
+					        }
+						} ]);
 
-                },
-                controller: wsSubstitutorHelperDirectiveController
-            };
-        }
+						$(textcomplete).on({
+							'textComplete:select' : function(e, value) {
+								scope.$apply(function() {
+									scope.message = value
+								})
+							},
+							'textComplete:show' : function(e) {
+								$(this).data('autocompleting', true);
+							},
+							'textComplete:hide' : function(e) {
+								$(this).data('autocompleting', false);
+							}
+						});
+					}
+				},
+				controller : wsSubstitutorHelperDirectiveController
+			}
+		}
 
-        function wsSubstitutorHelperDirectiveController($scope) {
-            var vm = $scope.vm = {};
-            vm.filter = '';
-        }
+		function wsSubstitutorHelperDirectiveController($scope) {
+			var vm = $scope.vm = {};
+		}
 
-        function formatData(obj) {
-            var result = [];
-            for (key in obj) {
-                var val = obj[key];
-                result.push({
-                    'variable': '${' + key + '}',
-                    'value': val
-                });
-            }
-            return result;
-        }
+		wsSubstitutorHelperDirectiveController.$inject = [ '$scope' ];
+		wsSubstitutorHelperDirective.$inject = [ 'Textcomplete' ];
 
-        wsSubstitutorHelperDirectiveController.$inject = ['$scope'];
-
-        return wsSubstitutorHelperDirective;
-    });
+		return wsSubstitutorHelperDirective;
+	});
 })(adminConsole.define);
