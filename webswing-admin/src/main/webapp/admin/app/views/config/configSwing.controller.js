@@ -1,20 +1,28 @@
 (function(define) {
 	define([], function f() {
-		function SwingConfigController($scope, $timeout, $location, configRestService, $routeParams) {
+		function SwingConfigController($scope, $timeout, $location, configRestService, $routeParams, wsUtils) {
 			var vm = this;
-			vm.config = {};
+			vm.config = {
+				hide : [ 'path' ],
+				enable : ['swingConfig']
+			};
 			vm.variables = {};
 			vm.reset = reset;
 			vm.apply = apply;
 			vm.back = back;
 			vm.path = $routeParams.path;
 			vm.readonly = false;
-			vm.hide = ['path'];
 			activate();
+
+			$scope.$on('wsStatusChanged', function(evt, ctl) {
+				vm.stopped = ctl.startable;
+				vm.config.enable = vm.stopped ? null : ['swingConfig'];
+				activate();
+			});
 
 			function activate() {
 				configRestService.getConfig(vm.path).then(function(data) {
-					vm.config = data;
+					vm.config = angular.extend({}, vm.config, data);
 				});
 				configRestService.getVariables().then(function(data) {
 					vm.variables = data;
@@ -26,14 +34,18 @@
 			}
 
 			function apply() {
-				configRestService.setConfig(vm.config);
+				if(vm.stopped){
+					configRestService.setConfig(vm.path, wsUtils.extractValues(vm.config)).then(activate);
+				}else{
+					configRestService.setSwingConfig(vm.path, wsUtils.extractValues(vm.config)).then(activate);
+				}
 			}
 
 			function back() {
 				$location.path('/dashboard');
 			}
 		}
-		SwingConfigController.$inject = [ '$scope', '$timeout', '$location', 'configRestService', '$routeParams' ];
+		SwingConfigController.$inject = [ '$scope', '$timeout', '$location', 'configRestService', '$routeParams', 'wsUtils' ];
 
 		return SwingConfigController;
 	});

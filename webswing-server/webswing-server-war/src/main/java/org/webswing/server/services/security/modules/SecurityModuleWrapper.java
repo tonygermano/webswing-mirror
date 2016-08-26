@@ -140,6 +140,27 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 		}
 	}
 
+	public void doServeAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse resp) {
+		if (custom != null) {
+			try {
+				runWithContextClassLoader(new Callable<Object>() {
+
+					@Override
+					public Object call() throws Exception {
+						try {
+							custom.doServeAuthenticated(user, path, req, resp);
+						} catch (Throwable e) {
+							throw new Exception(e);
+						}
+						return null;
+					}
+				});
+			} catch (Exception e1) {
+				log.error("Authenticated request processing by SecurityModule failed.", e1);
+			}
+		}
+	}
+
 	@Override
 	public void destroy() {
 		if (custom != null) {

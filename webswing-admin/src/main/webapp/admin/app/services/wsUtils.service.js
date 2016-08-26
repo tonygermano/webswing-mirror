@@ -31,6 +31,9 @@
 							result[field.name] = field.value;
 						}
 					}
+					if (config.data != null) {
+						result = angular.merge({}, config.data, result);
+					}
 					return result;
 				} else {
 					return null;

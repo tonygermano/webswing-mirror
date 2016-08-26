@@ -1,5 +1,7 @@
 package org.webswing.server.common.model;
 
+import java.util.Map;
+
 import org.webswing.server.common.model.meta.ConfigType;
 
 @ConfigType
@@ -13,4 +15,9 @@ public interface Config {
 	 * @return instance of <code>clazz</code>
 	 */
 	<T> T getValueAs(String name, Class<T> clazz);
+	
+	/**
+	 * @return the source json object map
+	 */
+	Map<String,Object> asMap();
 }

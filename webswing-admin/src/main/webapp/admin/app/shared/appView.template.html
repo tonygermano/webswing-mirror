@@ -1,4 +1,4 @@
-<div class="panel panel-default">
+<div ng-if="vm.value!=null" class="panel panel-default">
 	<div class="panel-heading">
 		<div class="row ws-app-header">
 			<img ng-src="{{vm.b64img}}" alt="{{vm.value.name}}" class="ws-app-img img-circle"></img>
@@ -16,12 +16,12 @@
 			</div>
 		</div>
 	</div>
-	<div class="panel-body">
+	<div ng-if="vm.detail ==='true'" class="panel-body">
 		<div class="row">
 			<div class="ol-xs-6 col-sm-6 col-md-3">
 				<h4>Sessions:
 					<button ng-if="vm.stoppable" class="btn btn-xs btn-default pull-right" type="button" ng-click="vm.viewSessions()">
-				    	<span class="glyphicon glyphicon-search"></span>  View
+				    	<span class="glyphicon glyphicon-search"></span>  Show sessions
 					</button>
 				</h4>
 				<div class="ws-pie-chart">
@@ -39,9 +39,11 @@
 			</div>
 			<div class="col-xs-12 col-sm-12 col-md-6">
 				<h4>Config:
-					<button ng-if="vm.stoppable" class="btn btn-xs btn-default pull-right" type="button" ng-click="vm.viewConfig()">
-				    	<span class="glyphicon glyphicon-search"></span>  View
-					</button>
+					<div class="pull-right">
+						<button class="btn btn-xs btn-default" type="button" ng-click="vm.viewConfig()">
+					    	<span class="glyphicon glyphicon-edit"></span>  Show Config
+						</button>
+					</div>
 				</h4>
 				<table class="table ws-config-table">
 					<tr ng-repeat="(key,value) in vm.configOptions">

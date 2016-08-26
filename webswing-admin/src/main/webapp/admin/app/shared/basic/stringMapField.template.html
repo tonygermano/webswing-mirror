@@ -7,8 +7,8 @@
             <div class="ws-string-map-field-inner col-xs-6">
                 <div class="input-group">
                     <div class="input-group-addon" ng-click="vm.toggleHelper($index)"><span ng-if="vm.variables != null" ng-class="{'glyphicon':true, 'glyphicon-flash':!vm.helpVisible[$index],'glyphicon-chevron-up':vm.helpVisible[$index]}" ></span></div>
-                    <input ws-substitutor-helper variables="vm.variables" message="p.key" type="text" ng-readonly="vm.readonly" class="form-control" ng-model="p.key" ng-click="vm.openHelper($index)">
-                    <div class="input-group-addon" ng-if="vm.items != null && !vm.readonly" dropdown dropdown-toggle>
+                    <input ws-substitutor-helper variables="vm.variables" message="p.key" type="text" ng-readonly="vm.readonly" class="form-control" ng-model="p.key" ng-click="vm.openHelper($index)" ng-disabled="vm.restricted==='true'">
+                    <div class="input-group-addon" ng-if="vm.items != null && !vm.readonly && vm.restricted!=='true'" dropdown dropdown-toggle>
 	                    <span class="glyphicon glyphicon-chevron-down" ></span>
 	                    <ul class="dropdown-menu pull-right">
 	                        <li ng-repeat="choice in vm.items">
@@ -20,12 +20,12 @@
             </div>
             <div class="ws-string-map-field-inner col-xs-6">
                 <div class="input-group">
-                    <input ws-substitutor-helper variables="vm.variables" message="p.value" type="text" ng-readonly="vm.readonly" class="form-control" ng-model="p.value" ng-click="vm.openHelper($index)">
+                    <input ws-substitutor-helper variables="vm.variables" message="p.value" type="text" ng-readonly="vm.readonly" class="form-control" ng-model="p.value" ng-click="vm.openHelper($index)" ng-disabled="vm.restricted==='true'">
                     <div class="input-group-btn" ng-if="!vm.readonly">
-                        <button class="btn btn-default" ng-if="$last" type="button" ng-click="vm.addPair()">
+                        <button class="btn btn-default" ng-if="$last" type="button" ng-click="vm.addPair()" ng-disabled="vm.restricted==='true'">
                             <span class="glyphicon glyphicon-plus"></span>
                         </button>
-                        <button class="btn btn-default"  type="button" ng-click="vm.deletePair($index)">
+                        <button class="btn btn-default"  type="button" ng-click="vm.deletePair($index)" ng-disabled="vm.restricted==='true'">
                             <span class="glyphicon glyphicon-remove"></span>
                         </button>
                     </div>
@@ -42,7 +42,7 @@
             </div>
         </div>
         <div ng-if="!vm.readonly && vm.model.length === 0" class="col-lg-9 col-md-8 col-sm-7">
-            <button class="btn btn-default" type="button" ng-click="vm.addPair()">
+            <button class="btn btn-default" type="button" ng-click="vm.addPair()" ng-disabled="vm.restricted==='true'">
                 <span class="glyphicon glyphicon-plus"></span>
             </button>
         </div>

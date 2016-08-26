@@ -16,9 +16,6 @@ import org.webswing.model.c2s.PlaybackCommandMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.PlaybackInfoMsg;
-import org.webswing.server.common.model.SecuredPathConfig;
-import org.webswing.server.common.util.CommonUtil;
-import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.model.SessionRecordingHeader;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.util.ServerUtil;
@@ -91,7 +88,6 @@ public class SessionRecordingPlayback {
 	}
 
 	public ApplicationInfoMsg getApplicationInfo() {
-		SecuredPathConfig configWrapper = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class, header.getApplication());
 		ApplicationInfoMsg aim = new ApplicationInfoMsg();
 		aim.setName(this.recordingFile.getPath());
 		return aim;

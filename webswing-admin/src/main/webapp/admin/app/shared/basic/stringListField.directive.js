@@ -11,6 +11,7 @@
 					variables : '=',
 					readonly : '=',
 					discriminator : '=',
+					restricted : '@',
 					label : '@',
 					desc : '@'
 				},
@@ -65,22 +66,22 @@
 
 			function deleteString(index) {
 				vm.value.splice(index, 1);
-				if(vm.discriminator){
+				if (vm.discriminator) {
 					requestFormUpdate();
 				}
 			}
 
 			function setChoice(index, value) {
-				if(vm.value[index]!==value){
+				if (vm.value[index] !== value) {
 					vm.value[index] = value;
-					if(vm.discriminator){
+					if (vm.discriminator) {
 						requestFormUpdate();
 					}
 				}
 			}
-			
-			function onBlur(){
-				if(vm.discriminator){
+
+			function onBlur() {
+				if (vm.discriminator) {
 					requestFormUpdate();
 				}
 			}

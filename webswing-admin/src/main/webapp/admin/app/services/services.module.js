@@ -2,14 +2,12 @@
     define([
         'services/errorHandler.service',
         'services/sessionsRest.service',
-        'services/settingsRest.service',
         'services/configRest.service',
         'services/wsUtils.service',
-    ], function f(errorHandlerService, sessionsRestService, settingsRestService, configRestService,wsUtils) {
+    ], function f(errorHandlerService, sessionsRestService, configRestService, wsUtils) {
         var module = angular.module('wsServices', []);
         module.service('errorHandler', errorHandlerService);
         module.service('sessionsRestService', sessionsRestService);
-        module.service('settingsRestService', settingsRestService);
         module.service('configRestService', configRestService);
         module.service('wsUtils', wsUtils);
     });

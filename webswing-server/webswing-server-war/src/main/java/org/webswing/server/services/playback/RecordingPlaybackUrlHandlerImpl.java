@@ -22,7 +22,7 @@ import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
-import org.webswing.server.services.security.login.WebswingSecurityProvider;
+import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
 import org.webswing.server.services.websocket.WebSocketUrlHandler;
@@ -174,7 +174,12 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 	}
 
 	@Override
-	public WebswingSecurityProvider getSecurityProvider() {
+	public SecuredPathHandler getSecurityProvider() {
 		return parent.getSecurityProvider();
+	}
+
+	@Override
+	public void checkMasterPermission(WebswingAction action) throws WsException {
+		parent.checkMasterPermission(action);
 	}
 }

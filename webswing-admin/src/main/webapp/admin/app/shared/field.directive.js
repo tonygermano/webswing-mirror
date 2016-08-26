@@ -24,6 +24,9 @@
 						field : 'vm.field',
 						value : 'vm.field.value'
 					};
+					if (vm.field.restricted==='true') {
+						commonAttrs.restricted = 'true';
+					}
 
 					if (vm.field.type === 'String') {
 						var template = angular.element(stringTemplate);

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
@@ -16,6 +17,7 @@ import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.services.security.api.WebswingSecurityConfig;
 
 import com.google.inject.Singleton;
 
@@ -34,7 +36,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	@Override
 	public void start() throws WsInitException {
-		loadConfiguration();
+		configuration = loadConfiguration();
 	}
 
 	@Override
@@ -51,39 +53,104 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	}
 
 	@Override
-	public void setConfiguration(Map<String, Object> content) throws Exception {
-		//TODO: validate, notify, save
+	public void setConfiguration(Map<String, Object> securedPathConfig) throws Exception {
+		SecuredPathConfig config = ConfigUtil.instantiateConfig(securedPathConfig, SecuredPathConfig.class);
+		validateConfiguration(config);
+		SecuredPathConfig oldConfig = configuration.get(config.getPath());
+		configuration.put(config.getPath(), config);
+		saveConfiguration(securedPathConfig);
+		notifyChange(config.getPath(), oldConfig, config);
 	}
 
 	@Override
-	public void setSwingConfiguration(String path, Map<String, Object> content) throws Exception {
-		//TODO: set, save
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void setSwingConfiguration(Map<String, Object> securedPathConfig) throws Exception {
+		SecuredPathConfig config = ConfigUtil.instantiateConfig(securedPathConfig, SecuredPathConfig.class);
+		validateConfiguration(config);
 
+		SecuredPathConfig oldConfig = configuration.get(config.getPath());
+		if (oldConfig != null) {
+			Map newValue = config.getSwingConfig().asMap();
+			Map oldSwingMap = oldConfig.getSwingConfig().asMap();
+			oldSwingMap.clear();
+			oldSwingMap.putAll(newValue);
+			saveSwingConfiguration(config.getPath(), newValue);
+		} else {
+			throw new WsException("No Application found for path '" + config.getPath() + "'");
+		}
+	}
+
+	public void saveMasterConfiguration(Map<String, Object> securedPathConfig) throws Exception {
+		SecuredPathConfig config = ConfigUtil.instantiateConfig(securedPathConfig, SecuredPathConfig.class);
+		validateConfiguration(config);
+		saveConfiguration(securedPathConfig);
+	}
+
+	private void validateConfiguration(SecuredPathConfig c) throws Exception {
+		validateObject(c);
+		validateObject(c.getValueAs("security", WebswingSecurityConfig.class));
+	}
+	
+	private void validateObject(Object o) throws Exception {
+		//test getters
+		try {
+			mapper.writeValueAsString(o);
+		} catch (Exception e) {
+			throw new WsException("Configuration Json is not valid.", e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void loadConfiguration() throws WsInitException {
+	private Map<String, SecuredPathConfig> loadConfiguration() throws WsInitException {
 		try {
-			File config = getConfigFile();
-			Map<String, Object> json = mapper.readValue(config, Map.class);
 			Map<String, SecuredPathConfig> result = new HashMap<String, SecuredPathConfig>();
+			File config = getConfigFile();
 			if (config.exists()) {
+				Map<String, Object> json = mapper.readValue(config, Map.class);
 				for (String path : json.keySet()) {
 					try {
 						SecuredPathConfig pathConfig = loadPath(path, json);
+						validateConfiguration(pathConfig);
 						result.put(path, pathConfig);
 					} catch (WsException e) {
 						result.put(path, null);
 						log.error("Failed to load configuration for path '" + path + "':", e);
 					}
 				}
-				configuration = result;
+				return result;
 			} else {
 				throw new WsInitException("Configuration file " + config.getPath() + " does not exist!");
 			}
 		} catch (Exception e) {
 			log.error("Webswing application configuration failed to load:", e);
 			throw new WsInitException("Webswing application configuration failed to load:", e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void saveConfiguration(Map<String, Object> configuration) throws Exception {
+		try {
+			File configFile = getConfigFile();
+			Map<String, Object> json = mapper.readValue(configFile, Map.class);
+			json.put((String) configuration.get("path"), configuration);
+			mapper.writerWithDefaultPrettyPrinter().writeValue(configFile, json);
+		} catch (Exception e) {
+			log.error("Failed to save Webswing configuration :", e);
+			throw new Exception("Failed to save Webswing configuration :", e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void saveSwingConfiguration(String path, Map<String, Object> newValue) throws Exception {
+		try {
+			File configFile = getConfigFile();
+			Map<String, Object> json = mapper.readValue(configFile, Map.class);
+			Map<String, Object> pathJson = (Map<String, Object>) json.get(path);
+			pathJson.put("swingConfig", newValue);
+			mapper.writerWithDefaultPrettyPrinter().writeValue(configFile, json);
+		} catch (Exception e) {
+			log.error("Failed to save Swing configuration for '" + path + "':", e);
+			throw new Exception("Failed to save Swing configuration for '" + path + "':", e);
 		}
 	}
 

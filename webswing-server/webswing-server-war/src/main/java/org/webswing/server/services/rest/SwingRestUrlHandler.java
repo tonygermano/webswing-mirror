@@ -8,15 +8,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import org.webswing.model.s2c.ApplicationInfoMsg;
+import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
-import org.webswing.server.util.GitRepositoryState;
 
-public class SwingRestUrlHandler extends AbstractRestUrlHandler {
-	private static final String default_version = "unresolved";
+public class SwingRestUrlHandler extends AbstractUrlHandler {
 	private final SwingInstanceHolder instanceHolder;
 
 	public SwingRestUrlHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
@@ -24,14 +23,9 @@ public class SwingRestUrlHandler extends AbstractRestUrlHandler {
 		this.instanceHolder = instanceHolder;
 	}
 
-	@GET
-	@Path("/version")
-	public String getVersion() throws WsException {
-		String describe = GitRepositoryState.getInstance().getDescribe();
-		if (describe == null) {
-			return default_version;
-		}
-		return describe;
+	@Override
+	protected String getPath() {
+		return "/rest";
 	}
 
 	@GET
@@ -47,5 +41,4 @@ public class SwingRestUrlHandler extends AbstractRestUrlHandler {
 		}
 		return result;
 	}
-
 }

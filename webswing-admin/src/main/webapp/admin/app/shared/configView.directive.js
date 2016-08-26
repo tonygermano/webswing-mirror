@@ -8,7 +8,6 @@
 				scope : {
 					value : '=',
 					variables : '=',
-					hide : '=',
 					readonly : '=',
 					apply : '=',
 					reset : '='
@@ -40,7 +39,7 @@
 			function refreshForm(config) {
 				var e = $element.find('.ws-panel-heading').first();
 				configRestService.getMeta(config).then(function(data) {
-					vm.value = data;
+					vm.value = angular.extend({},vm.value,data);
 					vm.isForm = true;
 					$timeout(function() {
 						e.height('auto');

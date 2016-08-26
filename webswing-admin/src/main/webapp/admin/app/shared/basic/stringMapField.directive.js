@@ -10,6 +10,7 @@
 					items : '=',
 					variables : '=',
 					readonly : '=',
+					restricted : '@',
 					label : '@',
 					desc : '@'
 				},
@@ -29,10 +30,10 @@
 			vm.toggleHelper = toggleHelper;
 			vm.setChoice = setChoice;
 
-			if(vm.value==null){
+			if (vm.value == null) {
 				vm.field.value = {};
 			}
-			
+
 			$scope.$watch("vm.value", function(value) {
 				vm.model.splice(0, vm.model.length);
 				angular.forEach(value, function(value, key) {
@@ -93,7 +94,7 @@
 			function deletePair(index) {
 				vm.model.splice(index, 1);
 			}
-			
+
 			function setChoice(index, value) {
 				vm.model[index].key = value;
 			}

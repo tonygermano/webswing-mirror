@@ -155,4 +155,13 @@ public abstract class AbstractExtendableSecurityModule<T extends WebswingExtenda
 		return user;
 	}
 
+	@Override
+	protected void serveAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse res) {
+		for (SecurityModuleExtension<?> extension : extensions) {
+			boolean served = extension.serveAuthenticated(user, path, req, res);
+			if (served) {
+				break;
+			}
+		}
+	}
 }

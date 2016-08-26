@@ -1,5 +1,8 @@
 <div class="form-horizontal">
     <div class="row">
+    	<div ng-if="vm.value.message!=null" class="col-md-12">
+    		<div class="alert alert-warning" role="alert">{{vm.value.message}}</div>
+    	</div>
         <div class="col-md-12">
             <button type="button" class="btn btn-primary btn-sm" title="Reset to current live configuration." ui-jq="tooltip" ng-click="vm.reset()">
 				<span class="glyphicon glyphicon-repeat"></span> Reset
@@ -17,8 +20,7 @@
         <div ng-if="vm.isForm" class="ws-tabs col-md-12 ">
             <ws-object-field
             variables="vm.variables" 
-            value="vm.value"
-            hide="vm.hide">
+            value="vm.value">
             </ws-object-field>
         </div>
         

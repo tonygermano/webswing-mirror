@@ -2,54 +2,185 @@ package org.webswing.server.base;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.SwingConfig;
+import org.webswing.server.common.model.admin.InstanceManagerStatus;
+import org.webswing.server.common.model.admin.InstanceManagerStatus.Status;
+import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.services.config.ConfigurationChangeEvent;
+import org.webswing.server.services.config.ConfigurationChangeListener;
 import org.webswing.server.services.config.ConfigurationService;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.SecurityContext;
-import org.webswing.server.services.security.login.WebswingSecurityProvider;
+import org.webswing.server.services.security.api.WebswingAction;
+import org.webswing.server.services.security.api.WebswingSecurityConfig;
+import org.webswing.server.services.security.login.SecuredPathHandler;
+import org.webswing.server.services.security.modules.SecurityModuleService;
+import org.webswing.server.services.security.modules.SecurityModuleWrapper;
+import org.webswing.server.util.GitRepositoryState;
 import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
 
-public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements SecurityContext, WebswingSecurityProvider {
+public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements SecuredPathHandler, SecurityContext {
 	private static final Logger log = LoggerFactory.getLogger(PrimaryUrlHandler.class);
+	private static final String default_version = "unresolved";
 
 	private final ConfigurationService configService;
-	private SecuredPathConfig config;
+	private final SecurityModuleService securityModuleService;
 
-	public PrimaryUrlHandler(UrlHandler parent, ConfigurationService configService) {
+	private SecuredPathConfig config;
+	private SecurityModuleWrapper securityModule;
+	private InstanceManagerStatus status = new InstanceManagerStatus();
+
+	public PrimaryUrlHandler(UrlHandler parent, SecurityModuleService securityModuleService, ConfigurationService configService) {
 		super(parent);
+		this.securityModuleService = securityModuleService;
 		this.configService = configService;
+
+		this.configService.registerChangeListener(new ConfigurationChangeListener() {
+
+			@Override
+			public void notifyChange(ConfigurationChangeEvent e) {
+				if (StringUtils.isNotEmpty(e.getPath()) && !"/".equals(e.getPath())) {
+					if (StringUtils.equals(e.getPath(), getPathMapping())) {
+						if (StringUtils.equals(e.getNewConfig().getPath(), getPathMapping())) {
+							config = e.getNewConfig();
+						}
+					}
+				}
+			}
+		});
+	}
+
+	@Override
+	public void init() {
+		try {
+			status.setStatus(Status.Starting);
+			loadSecurityModule();
+			super.init();
+			status.setStatus(Status.Running);
+		} catch (Throwable e) {
+			log.error("Failed to start '" + getPathMapping() + "'.", e);
+			try {
+				destroy();
+			} catch (Throwable e1) {
+				//do nothing
+			}
+			status.setStatus(Status.Error);
+			status.setError(e.getMessage());
+			StringWriter out = new StringWriter();
+			PrintWriter stacktrace = new PrintWriter(out);
+			e.printStackTrace(stacktrace);
+			status.setErrorDetails(out.toString());
+		}
+	}
+
+	protected void loadSecurityModule() {
+		WebswingSecurityConfig securityConfig = getSecurityConfig();
+		securityModule = securityModuleService.create(this, securityConfig);
+		if (securityModule != null) {
+			securityModule.init();
+		}
+	}
+
+	protected WebswingSecurityConfig getSecurityConfig() {
+		WebswingSecurityConfig securityConfig = getConfig().getValueAs("security", WebswingSecurityConfig.class);
+		return securityConfig;
+	}
+
+	@Override
+	public void destroy() {
+		status.setStatus(Status.Stopping);
+		super.destroy();
+		if (securityModule != null) {
+			try {
+				securityModule.destroy();
+			} finally {
+				securityModule = null;
+			}
+		}
+		status.setStatus(Status.Stopped);
 	}
 
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
-		//redirect to url that ends with '/' to ensure browser queries correct resources 
-		if (req.getPathInfo() == null || (req.getContextPath() + req.getPathInfo()).equals(getFullPathMapping())) {
-			try {
-				String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
-				res.sendRedirect(getFullPathMapping() + "/" + queryString);
-			} catch (IOException e) {
-				log.error("Failed to redirect.", e);
+		handleCorsHeaders(req, res);
+		if (status.getStatus().equals(Status.Running)) {
+			//redirect to url that ends with '/' to ensure browser queries correct resources 
+			if (req.getPathInfo() == null || (req.getContextPath() + req.getPathInfo()).equals(getFullPathMapping())) {
+				try {
+					String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
+					res.sendRedirect(getFullPathMapping() + "/" + queryString);
+				} catch (IOException e) {
+					log.error("Failed to redirect.", e);
+				}
+				return true;
+			} else {
+				return super.serve(req, res);
 			}
-			return true;
 		} else {
-			return super.serve(req, res);
+			try {
+				boolean served = serveRestMethod(req, res);
+				if (!served) {
+					res.sendRedirect(getFullPathMapping() + "/status");
+				}
+				return true;
+			} catch (IOException e) {
+				throw new WsException(e);
+			}
 		}
+	}
+
+	private void handleCorsHeaders(HttpServletRequest req, HttpServletResponse res) {
+		if (isOriginAllowed(req.getHeader("Origin"))) {
+			if (req.getHeader("Origin") != null) {
+				res.addHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
+				res.addHeader("Access-Control-Allow-Credentials", "true");
+				res.addHeader("Access-Control-Expose-Headers", Constants.HTTP_ATTR_ARGS + ", " + Constants.HTTP_ATTR_RECORDING_FLAG + ", X-Cache-Date, X-Atmosphere-tracking-id, X-Requested-With");
+			}
+
+			if ("OPTIONS".equals(req.getMethod())) {
+				res.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+				res.addHeader("Access-Control-Allow-Headers", Constants.HTTP_ATTR_ARGS + ", " + Constants.HTTP_ATTR_RECORDING_FLAG + ", X-Requested-With, Origin, Content-Type, Content-Range, Content-Disposition, Content-Description, X-Atmosphere-Framework, X-Cache-Date, X-Atmosphere-tracking-id, X-Atmosphere-Transport");
+				res.addHeader("Access-Control-Max-Age", "-1");
+			}
+		}
+	}
+
+	private boolean isOriginAllowed(String header) {
+		List<String> allowedCorsOrigins = getSwingConfig().getAllowedCorsOrigins();
+		if (allowedCorsOrigins == null || allowedCorsOrigins.size() == 0) {
+			return false;
+		}
+		for (String s : allowedCorsOrigins) {
+			if (s.trim().equals(header) || s.trim().equals("*")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public SecuredPathConfig getConfig() {
 		if (config == null) {
-			config = configService.getConfiguration().get(getPath());
+			String path = StringUtils.isEmpty(getPathMapping()) ? "/" : getPathMapping();
+			config = configService.getConfiguration().get(path);
 			if (config == null) {
 				config = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class);
 			}
@@ -63,6 +194,81 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		} else {
 			return getConfig().getSwingConfig();
 		}
+	}
+
+	public InstanceManagerStatus getStatus() {
+		return status;
+	}
+
+	@Override
+	public boolean isStarted() {
+		return Status.Running.equals(status.getStatus()) || Status.Starting.equals(status.getStatus());
+	}
+
+	public void start() throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_startApp);
+		if (!isStarted()) {
+			this.init();
+		}
+	}
+
+	public void stop() throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_stopApp);
+		if (this.isStarted()) {
+			this.destroy();
+		}
+	}
+
+	public String getVersion() throws WsException {
+		String describe = GitRepositoryState.getInstance().getDescribe();
+		if (describe == null) {
+			return default_version;
+		}
+		return describe;
+	}
+
+	public MetaObject getConfigMeta() throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
+		SecuredPathConfig config = getConfig();
+		if (config == null) {
+			config = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class);
+		}
+		try {
+			MetaObject result = ConfigUtil.getConfigMetadata(config, getClass().getClassLoader());
+			result.setData(config.asMap());
+			return result;
+		} catch (Exception e) {
+			log.error("Failed to generate configuration descriptor.", e);
+			throw new WsException("Failed to generate configuration descriptor.");
+		}
+	}
+
+	public void setConfig(Map<String, Object> config) throws Exception {
+		checkMasterPermission(WebswingAction.rest_setConfig);
+		if (!isStarted()) {
+			config.put("path", getPathMapping());
+			configService.setConfiguration(config);
+		} else {
+			throw new WsException("Can not set configuration to running handler.");
+		}
+	}
+
+	public void setSwingConfig(Map<String, Object> config) throws Exception {
+		checkMasterPermission(WebswingAction.rest_setSwingConfig);
+		config.put("path", getPathMapping());
+		configService.setSwingConfiguration(config);
+	}
+
+	protected Map<String, Boolean> getPermissions() throws Exception {
+		AbstractWebswingUser user = getUser();
+		AbstractWebswingUser masterUser = getMasterUser();
+		Map<String, Boolean> permissions = new HashMap<>();
+		return permissions;
+	}
+
+	@Override
+	public SecurityModuleWrapper get() {
+		return securityModule;
 	}
 
 	@Override

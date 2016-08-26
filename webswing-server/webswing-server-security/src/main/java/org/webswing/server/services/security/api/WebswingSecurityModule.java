@@ -64,6 +64,17 @@ public interface WebswingSecurityModule {
 	void doLogout(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException;
 
 	/**
+	 * This method is triggered by Webswing when a HTTP request is received on URL <blockquote>/{app_path}/login</blockquote> and user is authenticated.
+	 * It is expected to return status 200 with response header 'webswingUsername' with value stating current user name, if the path is empty. 
+	 * For non-empty path the behavior is defined by the security module implementation.
+	 * @param user current logged in user
+	 * @param path path after '/login' (ie. if request path is '/app/login/custom', path will be '/custom') 
+	 * @param request The HTTP request from servlet container
+	 * @param response The HTTP response from servlet container
+	 */
+	void doServeAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest request, HttpServletResponse response);
+
+	/**
 	 * Tear down of this module. Invoked when Webserver is shutting down or application is being reloaded/uninstalled.
 	 */
 	void destroy();

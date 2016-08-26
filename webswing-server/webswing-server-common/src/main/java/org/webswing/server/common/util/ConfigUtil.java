@@ -54,6 +54,9 @@ public class ConfigUtil {
 					Map<String, Object> subConfig = (Map<String, Object>) (o != null && o instanceof HashMap ? o : new HashMap());
 					return instantiateConfig(subConfig, c, context);
 				}
+				if (method.getName().equals("asMap") && method.getParameterTypes().length == 0) {
+					return config;
+				}
 				for (PropertyDescriptor pd : pds) {
 					if (pd.getReadMethod().equals(method)) {
 						for (Object o : context) {

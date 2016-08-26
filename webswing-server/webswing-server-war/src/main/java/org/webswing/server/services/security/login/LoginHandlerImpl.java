@@ -14,16 +14,13 @@ import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.LoginTokenAdapter;
-import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 
 public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler {
 	private static final Logger log = LoggerFactory.getLogger(LoginHandlerImpl.class);
-	private final WebswingSecurityProvider securityProvider;
 
-	public LoginHandlerImpl(UrlHandler parent, SecurityManagerService securityManger, WebswingSecurityProvider securityProvider) {
+	public LoginHandlerImpl(UrlHandler parent) {
 		super(parent);
-		this.securityProvider = securityProvider;
 	}
 
 	@Override
@@ -46,11 +43,11 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 		AbstractWebswingUser user = getUser();
 		Subject subject = SecurityUtils.getSubject();
 		if (user != null) {
-			resp.setStatus(HttpServletResponse.SC_OK);
-			resp.setHeader("webswingUsername", user.getUserId());
+			String path = getPathInfo(req);
+			getSecurityProvider().get().doServeAuthenticated(user, path, req, resp);
 		} else {
 			try {
-				AbstractWebswingUser resolvedUser = securityProvider.get().doLogin(req, resp);
+				AbstractWebswingUser resolvedUser = getSecurityProvider().get().doLogin(req, resp);
 				if (resolvedUser != null) {
 					subject.login(new LoginTokenAdapter(getSecuredPath(), resolvedUser));
 				}

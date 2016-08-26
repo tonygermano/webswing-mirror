@@ -5,7 +5,6 @@ import java.io.Serializable;
 public class OtpTokenData implements Serializable {
 	private static final long serialVersionUID = -4871408167327762993L;
 
-	private String swingPath;
 	private String requestorId;
 	private String user;
 	private String[] roles;
@@ -14,14 +13,6 @@ public class OtpTokenData implements Serializable {
 	private String oneTimePassword;
 
 	public OtpTokenData() {
-	}
-
-	public String getSwingPath() {
-		return swingPath;
-	}
-
-	public void setSwingPath(String swingPath) {
-		this.swingPath = swingPath;
 	}
 
 	public String getRequestorId() {

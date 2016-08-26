@@ -11,6 +11,7 @@
 					variables : '=',
 					readonly : '=',
 					discriminator : '=',
+					restricted : '@',
 					label : '@',
 					desc : '@',
 					type : '@'

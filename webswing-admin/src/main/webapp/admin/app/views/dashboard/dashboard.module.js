@@ -4,7 +4,7 @@
 	         'views/dashboard/session.controller', 
 	         'views/dashboard/playback.controller' 
 	         ],
-	         function f(DashboardController, DashboardOverviewController,DashboardSwingController, DashboardSessionController, DashboardPlaybackController) {
+	         function f(DashboardController, DashboardOverviewController, DashboardSessionController, DashboardPlaybackController) {
 		var module = angular.module('wsDashboard', []);
 
 		module.controller('DashboardController', DashboardController);

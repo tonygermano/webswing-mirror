@@ -10,6 +10,9 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,17 +20,17 @@ import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
+import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.rest.RestHandlerService;
 import org.webswing.server.services.security.api.BuiltInModules;
-import org.webswing.server.services.security.api.SecurityContext;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingSecurityConfig;
 import org.webswing.server.services.security.login.LoginHandlerService;
-import org.webswing.server.services.security.login.WebswingSecurityProvider;
+import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.security.modules.SecurityModuleService;
-import org.webswing.server.services.security.modules.SecurityModuleWrapper;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
@@ -39,31 +42,29 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstanceHolder, WebswingSecurityProvider, SecurityContext {
+public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstanceHolder, SecuredPathHandler {
 	private static final Logger log = LoggerFactory.getLogger(GlobalUrlHandler.class);
 
 	private final WebSocketService websocket;
-	private final ConfigurationService config;
+	private final ConfigurationService configService;
 	private final SwingInstanceManagerService appFactory;
 	private final ResourceHandlerService resourceService;
 	private final RestHandlerService restService;
 	private final LoginHandlerService loginService;
-	private final SecurityModuleService securitySecurity;
 
 	private ServletContext servletContext;
-	private SecurityModuleWrapper securityModule;
 
 	private Map<String, SwingInstanceManager> instanceManagers = new LinkedHashMap<String, SwingInstanceManager>();
+	private boolean restartNeeded;
 
 	@Inject
 	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, RestHandlerService restService, SecurityModuleService securityService, LoginHandlerService loginService, ServletContext servletContext) {
-		super(null, config);
+		super(null, securityService, config);
 		this.websocket = websocket;
-		this.config = config;
+		this.configService = config;
 		this.appFactory = appFactory;
 		this.resourceService = resourceService;
 		this.restService = restService;
-		this.securitySecurity = securityService;
 		this.loginService = loginService;
 		this.servletContext = servletContext;
 	}
@@ -74,26 +75,18 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		registerChildUrlHandler(websocket.createPlaybackWebSocketHandler(this));
 
 		registerChildUrlHandler(restService.createSwingRestHandler(this, this));
-		registerChildUrlHandler(restService.createServerRestHandler(this));
-		registerChildUrlHandler(restService.createConfigRestHandler(this, this));
-		registerChildUrlHandler(restService.createSessionRestHandler(this, this));
-		registerChildUrlHandler(restService.createOtpRestHandler(this, this));
 		registerChildUrlHandler(restService.createAdminRestHandler(this, this));
 
-		registerChildUrlHandler(loginService.createLoginHandler(this, getSecurityProvider()));
+		registerChildUrlHandler(loginService.createLoginHandler(this));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
 
 		registerChildUrlHandler(resourceService.create(this, this));
 
-		loadSecurityModule();
-		loadConfiguration(config.getConfiguration());
+		loadConfiguration(configService.getConfiguration());
 		super.init();
 	}
 
 	public void destroy() {
-		if (securityModule != null) {
-			securityModule.destroy();
-		}
 		instanceManagers.clear();
 		super.destroy();
 	}
@@ -110,19 +103,16 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		return true;
 	}
 
-	private void loadSecurityModule() {
+	@Override
+	protected WebswingSecurityConfig getSecurityConfig() {
 		log.info("Loading master security module.(" + getConfig().getSecurity() + ").");
-		if (securityModule != null) {
-			securityModule.destroy();
-		}
-		WebswingSecurityConfig config = getConfig().getValueAs("security", WebswingSecurityConfig.class);
-		if (BuiltInModules.INHERITED.name().equals(config.getModule())) {
+		WebswingSecurityConfig secConfig = super.getSecurityConfig();
+		if (BuiltInModules.INHERITED.name().equals(secConfig.getModule())) {
 			log.error("Master security module INHERITED is not valid. Falling back to default module PROPERTY_FILE.");
 			getConfig().getSecurity().put("module", BuiltInModules.PROPERTY_FILE.name());
-			config = getConfig().getValueAs("security", WebswingSecurityConfig.class);
+			secConfig = getConfig().getValueAs("security", WebswingSecurityConfig.class);
 		}
-		securityModule = securitySecurity.create(this, config);
-		securityModule.init();
+		return secConfig;
 	}
 
 	public void loadConfiguration(Map<String, SecuredPathConfig> newConfig) {
@@ -290,18 +280,45 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		return result;
 	}
 
-	@Override
-	public SecurityModuleWrapper get() {
-		return securityModule;
-	}
-
-	@Override
-	public WebswingSecurityProvider getSecurityProviderForApp(String path) {
-		SwingInstanceManager im = instanceManagers.get(toPath(path));
-		if (im != null) {
-			return im.getSecurityProvider();
+	@GET
+	@Path("/rest/paths")
+	public List<String> getApplications(HttpServletRequest req) throws WsException {
+		checkPermission(WebswingAction.rest_admin_getApplications);
+		List<String> result = new ArrayList<>();
+		for (SwingInstanceManager appManager : getApplications()) {
+			result.add(appManager.getFullPathMapping());
 		}
-		return null;
+		return result;
 	}
 
+	@GET
+	@Path("/rest/version")
+	public String getVersion() throws WsException {
+		return super.getVersion();
+	}
+
+	@GET
+	@Path("/rest/config")
+	public MetaObject getConfigMeta() throws WsException {
+		MetaObject meta = super.getConfigMeta();
+		if (restartNeeded) {
+			meta.setMessage("Configuration has been changed. Please restart Webswing server to apply the changes. Note: Displaying current runtime configuration.");
+		}
+		return meta;
+	}
+
+	@POST
+	@Path("/rest/config")
+	public void setConfig(Map<String, Object> config) throws Exception {
+		checkMasterPermission(WebswingAction.rest_setConfig);
+		config.put("path", "/");
+		configService.saveMasterConfiguration(config);
+		restartNeeded = true;
+	}
+
+	@GET
+	@Path("/rest/permissions")
+	public Map<String, Boolean> getPermissions() throws Exception {
+		return super.getPermissions();
+	}
 }

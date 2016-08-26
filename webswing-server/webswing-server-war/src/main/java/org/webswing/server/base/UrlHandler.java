@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
-import org.webswing.server.services.security.login.WebswingSecurityProvider;
+import org.webswing.server.services.security.login.SecuredPathHandler;
 
 public interface UrlHandler {
 
@@ -34,9 +34,11 @@ public interface UrlHandler {
 	String getSecuredPath();
 
 	AbstractWebswingUser getUser();
-	
+
 	void checkPermission(WebswingAction action) throws WsException;
 
-	WebswingSecurityProvider getSecurityProvider();
+	void checkMasterPermission(WebswingAction action) throws WsException;
+
+	SecuredPathHandler getSecurityProvider();
 
 }

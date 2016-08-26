@@ -8,8 +8,8 @@
                 <div class="input-group-addon" ng-click="vm.toggleHelper()"><span ng-if="vm.variables != null" ng-class="{'glyphicon':true, 'glyphicon-flash':!vm.helpVisible,'glyphicon-chevron-up':vm.helpVisible}" ></span></div>
                 <input class="form-control" name="input" type="{{::vm.type}}"
                 		ng-readonly="vm.readonly" ng-model="vm.value" ng-required="vm.required" ng-click="vm.openHelper()" ng-blur="vm.onBlur()"
-                		ws-substitutor-helper variables="vm.variables" message="vm.value" >
-                <div class="input-group-addon" ng-if="vm.items != null && !vm.readonly" dropdown dropdown-toggle>
+                		ws-substitutor-helper variables="vm.variables" message="vm.value" ng-disabled="vm.restricted==='true'">
+                <div class="input-group-addon" ng-if="vm.items != null && !vm.readonly && vm.restricted!=='true'" dropdown dropdown-toggle>
                     <span class="glyphicon glyphicon-chevron-down" ></span>
                     <ul class="dropdown-menu pull-right">
                         <li ng-repeat="choice in vm.items">

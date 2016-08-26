@@ -8,6 +8,7 @@
 					value : '=',
 					readonly : '=',
 					discriminator : '=',
+					restricted : '@',
 					label : '@',
 					desc : '@'
 				},

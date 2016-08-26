@@ -2,25 +2,14 @@
     define([], function f() {
         function sessionsRestService(baseUrl, $http, errorHandler, messageService) {
             return {
-            	getApps: getApps,
                 getSessions: getSessions,
                 getSession: getSession,
                 killSession: killSession,
                 forceKillSession: forceKillSession
             };
 
-            function getApps(){
-            	 return $http.get(baseUrl + '/rest/admin/apps').then(success, failed);
-                 function success(data) {
-                     return data.data;
-                 }
-                 function failed(data) {
-                     return errorHandler.handleRestError('load installed swing apps', data, true);
-                 }
-            }
-            
             function getSessions(path) {
-                return $http.get(baseUrl + '/rest/sessions/'+path).then(success, failed);
+                return $http.get(baseUrl + '/rest/admin/sessions/'+path).then(success, failed);
                 function success(data) {
                     return data.data;
                 }
@@ -30,7 +19,7 @@
             }
 
             function getSession(id) {
-                return $http.get(baseUrl + '/rest/session/' + id).then(success, failed);
+                return $http.get(baseUrl + '/rest/admin/session/' + id).then(success, failed);
                 function success(data) {
                     return data.data;
                 }
@@ -40,7 +29,7 @@
             }
 
             function forceKillSession(id) {
-                return $http.delete(baseUrl + '/rest/session/' + id +'?force=true').then(success, failed);
+                return $http.delete(baseUrl + '/rest/admin/session/' + id +'?force=true').then(success, failed);
                 function success(data) {
                     messageService.info('Swing application process has been forcefully terminated.');
                 }
@@ -50,7 +39,7 @@
             }
             
             function killSession(id) {
-                return $http.delete(baseUrl + '/rest/session/' + id ).then(success, failed);
+                return $http.delete(baseUrl + '/rest/admin/session/' + id ).then(success, failed);
                 function success(data) {
                     messageService.info('Swing application signalled to exit.');
                 }

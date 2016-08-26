@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +24,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.extension.api.SecurityModuleExtension;
 import org.webswing.server.services.security.modules.AbstractExtendableSecurityModule;
@@ -45,6 +48,38 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		return null;
 	}
 
+	@Override
+	public boolean serveAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse res) {
+		if (path.equals("/oneTimeUrl") && user.isPermitted(WebswingAction.rest_getOneTimePassword.name())) {
+			String requestor = req.getParameter("requestorId");
+			String userName = req.getParameter("user");
+			String roles = req.getParameter("roles");
+			String permissions = req.getParameter("permissions");
+			String[] rolesArray = roles != null ? roles.split(",") : null;
+			String[] permissionsArray = permissions != null ? permissions.split(",") : null;
+			List<String[]> attributes = new ArrayList<>();
+			for (String paramName : req.getParameterMap().keySet()) {
+				attributes.add(new String[] { paramName, req.getParameter(paramName) });
+			}
+			String[][] attribArray = attributes.toArray(new String[attributes.size()][]);
+			try {
+				String otp = generateOneTimePassword(requestor, userName, rolesArray, permissionsArray, attribArray);
+				res.getWriter().print(otp);
+				res.flushBuffer();
+				res.getWriter().close();
+			} catch (Exception e) {
+				log.error("Failed to generate OneTimeUrl", e);
+				try {
+					res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+				} catch (IOException e1) {
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public AbstractWebswingUser verifyOneTimePassword(String otp) throws WebswingAuthenticationException {
 		try {
 			OtpTokenData token = parseOtpTokenString(otp);
@@ -65,13 +100,12 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		}
 	}
 
-	public String generateOneTimePassword(String swingPath, String requestorId, String user, String[] roles, String[] permissions, String[][] attributes) throws WebswingAuthenticationException {
+	public String generateOneTimePassword(String requestorId, String user, String[] roles, String[] permissions, String[][] attributes) throws WebswingAuthenticationException {
 		String encoded;
 		try {
 			OtpTokenData token = new OtpTokenData();
 			token.setUser(user);
 			token.setRequestorId(requestorId);
-			token.setSwingPath(swingPath);
 			token.setAttributes(attributes);
 			token.setRoles(roles);
 			token.setPermissions(permissions);
@@ -94,9 +128,6 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		}
 		if (StringUtils.isEmpty(token.getRequestorId())) {
 			throw new WebswingAuthenticationException("Requestor Id must not be empty.");
-		}
-		if (StringUtils.isEmpty(token.getSwingPath())) {
-			throw new WebswingAuthenticationException("Swing Path must not be empty.");
 		}
 		if (getConfig().getApiKeys() == null || getConfigForRequestor(getConfig(), token.getRequestorId()) == null) {
 			throw new WebswingAuthenticationException("RequestorId not configured.");
@@ -143,7 +174,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		String attributes = arrayToString(token.getAttributes());
 		String permissions = arrayToString(token.getPermissions());
 		String roles = arrayToString(token.getRoles());
-		return "" + token.getSwingPath() + token.getUser() + attributes + roles + permissions;
+		return "" + token.getUser() + attributes + roles + permissions;
 	}
 
 	private static String arrayToString(String[] array) {
@@ -242,7 +273,6 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		OtpTokenData token = new OtpTokenData();
 		token.setUser("john");
 		token.setRequestorId("myWebPage");
-		token.setSwingPath("/swingset3");
 		String secret = "5gV4gchlFZEwmXHNLgGj";
 		String crypto = "HmacSHA512";
 		String[][] attrs = new String[][] { new String[] { "attr1", "value1" }, new String[] { "attr2", "value2" } };

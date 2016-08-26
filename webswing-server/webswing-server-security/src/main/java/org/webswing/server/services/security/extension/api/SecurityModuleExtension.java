@@ -81,4 +81,18 @@ public abstract class SecurityModuleExtension<T extends SecurityModuleExtensionC
 	public AbstractWebswingUser decorateUser(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) {
 		return user;
 	}
+
+	/**
+	 * Serve request made after successful authentication. This can be used for additional services, like password reset, profile page
+	 * or other functionality.
+	 * 
+	 * @param user current logged in user
+ 	 * @param path path after '/login' (ie. if request path is '/app/login/custom', path will be '/custom') 
+	 * @param request The HTTP request from servlet container
+	 * @param response The HTTP response from servlet container
+	 * @return true if request was served.
+	 */
+	public boolean serveAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse res) {
+		return false;
+	}
 }

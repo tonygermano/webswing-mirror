@@ -138,6 +138,17 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 		sendRedirect(req, res, fullPath);
 	}
 
+	
+	@Override
+	public void doServeAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse res) {
+		res.setStatus(HttpServletResponse.SC_OK);
+		res.setHeader("webswingUsername", user.getUserId());
+		serveAuthenticated(user,path,req,res);
+	}
+	
+	protected void serveAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse res) {
+	}
+
 	/**
 	 * See {@link AbstractExtendableSecurityModule}
 	 */

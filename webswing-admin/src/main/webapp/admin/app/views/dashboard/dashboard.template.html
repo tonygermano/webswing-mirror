@@ -4,4 +4,4 @@
 		<span ng-class="{'glyphicon':true,'glyphicon-repeat':vm.timer != null,'glyphicon-refresh':vm.timer == null} "> </span> {{vm.lastUpdated| date:'h:mm:ss'}}
 	</div>
 </h2>
-<ws-app-view value="app" ng-repeat="app in vm.apps"></ws-app-view>
+<ws-app-view path="path" detail="true" ng-repeat="path in vm.paths"></ws-app-view>

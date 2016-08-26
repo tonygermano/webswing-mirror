@@ -1,10 +1,12 @@
 package org.webswing.server.common.model;
 
 import org.webswing.server.common.model.meta.ConfigField;
+import org.webswing.server.common.model.meta.ConfigFieldOrder;
 import org.webswing.server.common.model.meta.ConfigFieldVariables;
 import org.webswing.server.common.model.meta.ConfigType;
 
 @ConfigType
+@ConfigFieldOrder({"mainClass","args"})
 public interface DesktopLauncherConfig {
 
 	@ConfigField(label = "Main Class", description = "Swing application fully qualiffied class name. (ie. 'com.mypackage.Main')")

@@ -11,23 +11,26 @@ import org.webswing.server.services.websocket.WebSocketConnection;
 public class SecurityUtil {
 
 	public static AbstractWebswingUser getUser(UrlHandler urlHandler) {
+		return getUser(urlHandler.getSecuredPath());
+	}
+
+	public static AbstractWebswingUser getUser(String path) {
 		Subject subject = SecurityUtils.getSubject();
-		return resolveUser(subject, urlHandler);
+		return resolveUser(subject, path);
 	}
 
 	public static AbstractWebswingUser getUser(WebSocketConnection connection) {
 		Subject subject = SecurityUtils.getSubject();
 		UrlHandler urlHandler = connection.getHandler();
-		return resolveUser(subject, urlHandler);
+		return resolveUser(subject, urlHandler.getSecuredPath());
 	}
 
-	private static AbstractWebswingUser resolveUser(Subject subject, UrlHandler urlHandler) {
-		if (subject != null && urlHandler != null) {
+	private static AbstractWebswingUser resolveUser(Subject subject, String securedPath) {
+		if (subject != null && securedPath != null) {
 			PrincipalCollection currentPrincipals = subject.getPrincipals();
-			String securedParentPath = urlHandler.getSecuredPath();
 			if (currentPrincipals != null && subject.isAuthenticated()) {
 				for (WebswingPrincipal webswingPrincipal : currentPrincipals.byType(WebswingPrincipal.class)) {
-					if (securedParentPath.equals(webswingPrincipal.getSecuredPath())) {
+					if (securedPath.equals(webswingPrincipal.getSecuredPath())) {
 						return webswingPrincipal.getUser();
 					}
 				}

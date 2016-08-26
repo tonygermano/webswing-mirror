@@ -26,7 +26,7 @@ import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
-import org.webswing.server.services.security.login.WebswingSecurityProvider;
+import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
@@ -220,12 +220,17 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 	}
 
 	@Override
-	public WebswingSecurityProvider getSecurityProvider() {
+	public SecuredPathHandler getSecurityProvider() {
 		return parent.getSecurityProvider();
 	}
 
 	@Override
 	public ServletContext getServletContext() {
 		return parent.getServletContext();
+	}
+
+	@Override
+	public void checkMasterPermission(WebswingAction action) throws WsException {
+		parent.checkMasterPermission(action);
 	}
 }

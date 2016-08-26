@@ -9,10 +9,10 @@
 					field : '=',
 					value : '=',
 					variables : '=',
-					hide : '=',
 					readonly : '=',
 					desc : '@',
-					label : '@'
+					label : '@',
+					restricted : '@'
 				},
 				controllerAs : 'vm',
 				bindToController : true,
@@ -37,14 +37,15 @@
 				if (meta != null && meta.fields != null) {
 					for (var int = 0; int < meta.fields.length; int++) {
 						field = meta.fields[int];
-						if (vm.hide == null || vm.hide.indexOf(field.name) === -1) {
+						if (meta.hide == null || meta.hide.indexOf(field.name) === -1) {
 							if (result[field.tab] == null) {
 								result[field.tab] = {
 									fields : [],
 									objects : [],
-									collapsed : false
+									collapsed : vm.restricted === 'true' ? true : false
 								};
 							}
+							setDisabled(meta.enable, field);
 							if (field.type.indexOf("Object") === 0) {
 								result[field.tab].objects.push(field);
 							} else {
@@ -54,6 +55,12 @@
 					}
 				}
 				return result;
+			}
+
+			function setDisabled(enableArray, field) {
+				if (vm.restricted === 'true' || (enableArray != null && enableArray.indexOf(field.name) === -1)) {
+					field.restricted = 'true';
+				}
 			}
 
 			function addObject() {

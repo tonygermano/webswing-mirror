@@ -10,6 +10,7 @@ public class InstanceManagerStatus implements Serializable {
 		Starting,
 		Running,
 		Stopped,
+		Stopping,
 		Error;
 	}
 
