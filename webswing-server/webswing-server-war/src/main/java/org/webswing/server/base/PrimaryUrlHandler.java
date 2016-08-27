@@ -27,7 +27,6 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationChangeEvent;
 import org.webswing.server.services.config.ConfigurationChangeListener;
 import org.webswing.server.services.config.ConfigurationService;
-import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.SecurityContext;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingSecurityConfig;
@@ -206,14 +205,14 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	}
 
 	public void start() throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_startApp);
+		checkMasterPermission(WebswingAction.rest_startApp);
 		if (!isStarted()) {
 			this.init();
 		}
 	}
 
 	public void stop() throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_stopApp);
+		checkMasterPermission(WebswingAction.rest_stopApp);
 		if (this.isStarted()) {
 			this.destroy();
 		}
@@ -254,16 +253,43 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	}
 
 	public void setSwingConfig(Map<String, Object> config) throws Exception {
-		checkMasterPermission(WebswingAction.rest_setSwingConfig);
+		checkMasterPermission(WebswingAction.rest_setConfig);
 		config.put("path", getPathMapping());
 		configService.setSwingConfiguration(config);
 	}
 
 	protected Map<String, Boolean> getPermissions() throws Exception {
-		AbstractWebswingUser user = getUser();
-		AbstractWebswingUser masterUser = getMasterUser();
 		Map<String, Boolean> permissions = new HashMap<>();
+		permissions.put("dashboard", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo));
+		permissions.put("configView", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig));
+		permissions.put("configEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
+		permissions.put("start", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_startApp));
+		permissions.put("stop", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_stopApp));
+		permissions.put("sessions", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getSession));
 		return permissions;
+	}
+
+	private boolean isPermited(WebswingAction... actions) {
+		for (WebswingAction action : actions) {
+			boolean local = getUser() != null && getUser().isPermitted(action.name());
+			if (!local) {
+				boolean master = isMasterPermited(actions);
+				if (!master) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean isMasterPermited(WebswingAction... actions) {
+		for (WebswingAction action : actions) {
+			boolean master = getMasterUser() != null && getMasterUser().isPermitted(action.name());
+			if (!master) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 (function (define) {
     define([], function f() {
-        function loginService(baseUrl, $rootScope, messageService, $http, $log) {
+        function loginService(baseUrl, $rootScope, messageService, $http, $log, permissions) {
 
             return {
                 login: login,
@@ -26,6 +26,7 @@
                             }
                         }).then(success, failed);
                         function success(data) {
+                        	permissions.reload();
                             resolve(data);
                             return data;
                         }
@@ -52,7 +53,7 @@
                 });
             }
         }
-        loginService.$inject = ['baseUrl', '$rootScope', 'messageService', '$http', '$log'];
+        loginService.$inject = ['baseUrl', '$rootScope', 'messageService', '$http', '$log','permissions'];
         return loginService;
     });
 })(adminConsole.define);

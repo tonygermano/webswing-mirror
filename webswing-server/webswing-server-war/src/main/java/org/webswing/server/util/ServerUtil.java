@@ -10,8 +10,6 @@ import java.nio.file.Path;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -20,20 +18,16 @@ import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.server.common.model.SwingConfig;
+import org.webswing.server.common.util.WebswingObjectMapper;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
 public class ServerUtil {
 	private static final Logger log = LoggerFactory.getLogger(ServerUtil.class);
-	private static final ObjectMapper mapper = new ObjectMapper();
 	private static final ProtoMapper protoMapper = new ProtoMapper();
-
-	static {
-		mapper.setSerializationInclusion(Inclusion.NON_NULL);
-	}
 
 	public static String encode2Json(MsgOut m) {
 		try {
-			return mapper.writeValueAsString(m);
+			return WebswingObjectMapper.get().writeValueAsString(m);
 		} catch (IOException e) {
 			log.error("Json encoding object failed: " + m, e);
 			return null;
@@ -54,7 +48,7 @@ public class ServerUtil {
 		Class<?>[] classes = new Class<?>[] { InputEventsFrameMsgIn.class };
 		for (Class<?> c : classes) {
 			try {
-				o = mapper.readValue(s, c);
+				o = WebswingObjectMapper.get().readValue(s, c);
 				break;
 			} catch (IOException e) {
 				log.error("Failed to decode json message:", e);

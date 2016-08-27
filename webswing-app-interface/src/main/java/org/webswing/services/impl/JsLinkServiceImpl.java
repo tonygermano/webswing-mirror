@@ -10,13 +10,14 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.webswing.ext.services.JsLinkService;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JavaObjectRefMsg;
 import org.webswing.model.jslink.JsParamMsg;
 import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.toolkit.jslink.WebJSObject;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import netscape.javascript.JSException;
 

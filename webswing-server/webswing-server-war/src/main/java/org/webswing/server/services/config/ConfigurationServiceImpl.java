@@ -6,16 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.base.WsInitException;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
+import org.webswing.server.common.util.WebswingObjectMapper;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.WebswingSecurityConfig;
 
@@ -25,11 +22,6 @@ import com.google.inject.Singleton;
 public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private static final Logger log = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
-	private static final ObjectMapper mapper = new ObjectMapper();
-	static {
-		mapper.setSerializationInclusion(Inclusion.NON_NULL);
-		mapper.disable(SerializationConfig.Feature.WRITE_EMPTY_JSON_ARRAYS);
-	}
 
 	private Map<String, SecuredPathConfig> configuration = new HashMap<String, SecuredPathConfig>();
 	private List<ConfigurationChangeListener> changeListeners = new ArrayList<ConfigurationChangeListener>();
@@ -94,7 +86,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	private void validateObject(Object o) throws Exception {
 		//test getters
 		try {
-			mapper.writeValueAsString(o);
+			WebswingObjectMapper.get().writeValueAsString(o);
 		} catch (Exception e) {
 			throw new WsException("Configuration Json is not valid.", e);
 		}
@@ -106,7 +98,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 			Map<String, SecuredPathConfig> result = new HashMap<String, SecuredPathConfig>();
 			File config = getConfigFile();
 			if (config.exists()) {
-				Map<String, Object> json = mapper.readValue(config, Map.class);
+				Map<String, Object> json = WebswingObjectMapper.get().readValue(config, Map.class);
 				for (String path : json.keySet()) {
 					try {
 						SecuredPathConfig pathConfig = loadPath(path, json);
@@ -131,9 +123,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	private void saveConfiguration(Map<String, Object> configuration) throws Exception {
 		try {
 			File configFile = getConfigFile();
-			Map<String, Object> json = mapper.readValue(configFile, Map.class);
+			Map<String, Object> json = WebswingObjectMapper.get().readValue(configFile, Map.class);
 			json.put((String) configuration.get("path"), configuration);
-			mapper.writerWithDefaultPrettyPrinter().writeValue(configFile, json);
+			WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
 		} catch (Exception e) {
 			log.error("Failed to save Webswing configuration :", e);
 			throw new Exception("Failed to save Webswing configuration :", e);
@@ -144,10 +136,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	private void saveSwingConfiguration(String path, Map<String, Object> newValue) throws Exception {
 		try {
 			File configFile = getConfigFile();
-			Map<String, Object> json = mapper.readValue(configFile, Map.class);
+			Map<String, Object> json = WebswingObjectMapper.get().readValue(configFile, Map.class);
 			Map<String, Object> pathJson = (Map<String, Object>) json.get(path);
 			pathJson.put("swingConfig", newValue);
-			mapper.writerWithDefaultPrettyPrinter().writeValue(configFile, json);
+			WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
 		} catch (Exception e) {
 			log.error("Failed to save Swing configuration for '" + path + "':", e);
 			throw new Exception("Failed to save Swing configuration for '" + path + "':", e);

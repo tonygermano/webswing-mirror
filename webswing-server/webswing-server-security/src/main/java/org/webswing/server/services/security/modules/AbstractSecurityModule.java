@@ -15,10 +15,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.server.common.util.WebswingObjectMapper;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.LoginResponseClosedException;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
@@ -67,10 +66,6 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractSecurityModule.class);
 	private static final String LOGIN_REQUEST_MSG = "LoginRequestMsg";
-	private static final ObjectMapper mapper = new ObjectMapper();
-	static {
-		mapper.setSerializationInclusion(Inclusion.NON_NULL);
-	}
 
 	private final T config;
 	private final DefaultMustacheFactory mf;
@@ -260,7 +255,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 			Map<String, Object> message = new HashMap<>();
 			message.put(REDIRECT_URL, url);
 			try {
-				mapper.writeValue(response.getOutputStream(), message);
+				WebswingObjectMapper.get().writeValue(response.getOutputStream(), message);
 			} catch (Exception e) {
 				throw new IOException("Failed to send login redirect message", e);
 			}
@@ -285,7 +280,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 				Writer w = new StringWriter();
 				processTemplate(w, template, variables);
 				message.put("partialHtml", w.toString());
-				mapper.writeValue(response.getOutputStream(), message);
+				WebswingObjectMapper.get().writeValue(response.getOutputStream(), message);
 			} catch (Exception e) {
 				throw new IOException("Failed to send login template message", e);
 			}
@@ -351,7 +346,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 		if (isAjax(request) && request.getContentType().equals("application/json")) {
 			try {
 				if (request.getAttribute(LOGIN_REQUEST_MSG) == null) {
-					Map<String, Object> loginRequest = mapper.readValue(request.getReader(), Map.class);
+					Map<String, Object> loginRequest = WebswingObjectMapper.get().readValue(request.getReader(), Map.class);
 					request.setAttribute(LOGIN_REQUEST_MSG, loginRequest);
 				}
 				return (Map<String, Object>) request.getAttribute(LOGIN_REQUEST_MSG);
@@ -365,8 +360,8 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	/**
 	 * @return JSON serializer.
 	 */
-	public static ObjectMapper getMapper() {
-		return mapper;
+	public static WebswingObjectMapper getMapper() {
+		return WebswingObjectMapper.get();
 	}
 
 }

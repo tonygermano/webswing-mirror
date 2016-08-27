@@ -1,7 +1,11 @@
-<h2 class="sub-header">
-	Swing Applications
-	<div class="ws-update" ng-click="vm.refresh()">
-		<span ng-class="{'glyphicon':true,'glyphicon-repeat':vm.timer != null,'glyphicon-refresh':vm.timer == null} "> </span> {{vm.lastUpdated| date:'h:mm:ss'}}
-	</div>
-</h2>
-<ws-app-view path="path" detail="true" ng-repeat="path in vm.paths"></ws-app-view>
+<div ng-if="vm.permissions.dashboard">
+	<h2 class="sub-header">
+		Swing Applications
+		<div class="ws-update" ng-click="vm.refresh()">
+			<span ng-class="{'glyphicon':true,'glyphicon-repeat':vm.timer != null,'glyphicon-refresh':vm.timer == null} "> </span> {{vm.lastUpdated| date:'h:mm:ss'}}
+		</div>
+	</h2>
+	<ws-app-view path="path" detail="true" ng-repeat="path in vm.paths"></ws-app-view>
+</div>
+
+<div ng-if="!vm.permissions.dashboard" class="alert alert-danger" role="alert">Sorry, you are not authorized access this area.</div>

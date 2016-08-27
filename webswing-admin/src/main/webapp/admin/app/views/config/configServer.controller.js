@@ -1,7 +1,8 @@
 (function(define) {
 	define([], function f() {
-		function ConfigEditController(baseUrl, configRestService, wsUtils) {
+		function ConfigEditController(baseUrl, configRestService, wsUtils, permissions) {
 			var vm = this;
+			vm.permissions = permissions;
 			vm.config = {
 				hide : [ 'path', 'icon', 'swingConfig' ],
 				enable : null
@@ -30,7 +31,7 @@
 				configRestService.setConfig(baseUrl, wsUtils.extractValues(vm.config)).then(activate);
 			}
 		}
-		ConfigEditController.$inject = [ 'baseUrl', 'configRestService', 'wsUtils' ];
+		ConfigEditController.$inject = [ 'baseUrl', 'configRestService', 'wsUtils', 'permissions' ];
 
 		return ConfigEditController;
 	});

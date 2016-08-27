@@ -4,10 +4,10 @@
 		<span class="glyphicon glyphicon-chevron-down ws-tooltip" ng-if="!item.collapsed" ng-click="item.collapsed = !item.collapsed"></span>
 		<span class="ws-order-number" >{{::vm.label}} {{$index + 1}}</span>
 		<div class="btn-group" role="group">
-			<button class="btn btn-sm btn-default" type="button" ng-click="vm.addObject($index)">
+			<button class="btn btn-sm btn-default" type="button" ng-click="vm.addObject($index)" ng-disabled="vm.restricted==='true'">
 		    	<span class="glyphicon glyphicon-plus"></span>
 			</button>
-			<button class="btn btn-sm btn-default" type="button" ng-click="vm.removeObject($index)">
+			<button class="btn btn-sm btn-default" type="button" ng-click="vm.removeObject($index)" ng-disabled="vm.restricted==='true'">
 		    	<span class="glyphicon glyphicon-remove"></span>
 			</button>
 		</div>
@@ -18,7 +18,8 @@
 	        <ws-object-field 
 	                  value="item"  
 	                  variables="vm.variables"
-	                  readonly="vm.readonly">
+	                  readonly="vm.readonly"
+	                  restricted="{{vm.restricted}}">
 	        </ws-object-field>
 	    </div>
 	</div>
@@ -28,7 +29,7 @@
 <div ng-if="vm.value==null || vm.value.length == 0">
 	<h4>
 		<span >{{::vm.label}}</span>
-		<button class="btn btn-sm btn-default" type="button" ng-click="vm.addFirstObject()">
+		<button class="btn btn-sm btn-default" type="button" ng-click="vm.addFirstObject()" ng-disabled="vm.restricted==='true'">
 		    <span class="glyphicon glyphicon-plus"></span>
 		</button>
 	</h4>

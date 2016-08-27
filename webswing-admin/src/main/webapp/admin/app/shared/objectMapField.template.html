@@ -4,10 +4,10 @@
 		<span class="glyphicon glyphicon-chevron-down ws-tooltip" ng-if="!item.collapsed" ng-click="item.collapsed = !item.collapsed"></span>
 		<span class="ws-order-number" >{{::vm.label}} {{item.key}}</span>
 		<div class="btn-group" role="group">
-			<button class="btn btn-sm btn-default" type="button" ng-click="vm.addPair($index)">
+			<button class="btn btn-sm btn-default" type="button" ng-click="vm.addPair($index)" ng-disabled="vm.restricted==='true'">
 		    	<span class="glyphicon glyphicon-plus"></span>
 			</button>
-			<button class="btn btn-sm btn-default" type="button" ng-click="vm.removePair($index)">
+			<button class="btn btn-sm btn-default" type="button" ng-click="vm.removePair($index)" ng-disabled="vm.restricted==='true'">
 		    	<span class="glyphicon glyphicon-remove"></span>
 			</button>
 		</div>
@@ -18,12 +18,14 @@
 			<ws-string-field readonly="vm.readonly"
 			                 label="{{vm.label}}" 
 			                 value="item.key" 
-			                 items="vm.items">
+			                 items="vm.items"
+			                 restricted="{{vm.restricted}}">
 			</ws-string-field>
 	        <ws-object-field 
 	                  value="item.value"  
 	                  variables="vm.variables"
-	                  readonly="vm.readonly">
+	                  readonly="vm.readonly"
+	                  restricted="{{vm.restricted}}">
 	        </ws-object-field>
 	    </div>
 	</div>
@@ -33,7 +35,7 @@
 <div ng-if="vm.model.length == 0">
 	<h4>
 		<span >{{::vm.label}}</span>
-		<button class="btn btn-sm btn-default" type="button" ng-click="vm.addPair(0)">
+		<button class="btn btn-sm btn-default" type="button" ng-click="vm.addPair(0)" ng-disabled="vm.restricted==='true'">
 		    <span class="glyphicon glyphicon-plus"></span>
 		</button>
 	</h4>

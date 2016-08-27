@@ -43,7 +43,7 @@ public class AdminRestUrlHandler extends AbstractUrlHandler {
 	@POST
 	@Path("/admin/metaObject")
 	public MetaObject getMeta(Map<String, Object> json) throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getMeta);
+		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
 		SecuredPathConfig securedPathConfig = ConfigUtil.instantiateConfig(json, SecuredPathConfig.class);
 		try {
 			MetaObject result = ConfigUtil.getConfigMetadata(securedPathConfig, getClass().getClassLoader());
@@ -58,7 +58,7 @@ public class AdminRestUrlHandler extends AbstractUrlHandler {
 	@GET
 	@Path("/admin/variables")
 	public Map<String, String> getVariables() throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getConfigVariables);
+		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
 
 		String userName = getUser() == null ? "<webswing user>" : getUser().getUserId();
 		Map<String, String> vars = CommonUtil.getConfigSubstitutorMap(userName, "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing custom args>");

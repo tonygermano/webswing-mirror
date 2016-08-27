@@ -1,12 +1,11 @@
 (function(define) {
-	define([ 'views/config/configServer.controller',
-	         'views/config/configSwing.controller', ], function f(serverCtrl, swingCtrl) {
+	define([ 'views/config/configServer.controller', 'views/config/configSwing.controller', ], function f(serverCtrl, swingCtrl) {
 		var module = angular.module('wsConfig', []);
-		
+
 		module.controller('ConfigServerController', serverCtrl);
 		module.controller('ConfigSwingController', swingCtrl);
 
-		module.run([ 'navigationService', function(navigationService) {
+		module.run([ 'navigationService', 'permissions', function(navigationService, permissions) {
 			var primary = navigationService.addLocation('Configuration', '#/config/server');
 		} ]);
 

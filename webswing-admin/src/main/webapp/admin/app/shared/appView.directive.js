@@ -15,8 +15,9 @@
 			};
 		}
 
-		function wsAppViewDirectiveController($scope, $element, $attrs, $location, $timeout, configRestService) {
+		function wsAppViewDirectiveController($scope, $element, $attrs, $location, $timeout, configRestService, permissions) {
 			var vm = this;
+			vm.permissions = permissions;
 			vm.b64img = '';
 			vm.start = start;
 			vm.stop = stop;
@@ -145,7 +146,7 @@
 			}
 		}
 
-		wsAppViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$location','$timeout', 'configRestService' ];
+		wsAppViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$location', '$timeout', 'configRestService', 'permissions' ];
 
 		return wsAppViewDirective;
 	});

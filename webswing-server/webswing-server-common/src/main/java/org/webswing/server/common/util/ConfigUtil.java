@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +95,7 @@ public class ConfigUtil {
 									return convertNumberToTargetClass((Number) value, method.getReturnType());
 								}
 								return value;
-							} else if (value instanceof Map && method.getReturnType().isInterface()) {
+							} else if (value instanceof Map && method.getReturnType().isInterface() && !Collection.class.isAssignableFrom(method.getReturnType())) {
 								return instantiateConfig((Map) value, method.getReturnType(), context);
 							} else if (value instanceof String && method.getReturnType().isEnum()) {
 								try {

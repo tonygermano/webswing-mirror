@@ -19,8 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
@@ -29,6 +27,9 @@ import org.webswing.server.services.security.api.WebswingAuthenticationException
 import org.webswing.server.services.security.extension.api.SecurityModuleExtension;
 import org.webswing.server.services.security.modules.AbstractExtendableSecurityModule;
 import org.webswing.server.services.security.modules.AbstractSecurityModule;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTimeUrlSecurityExtensionConfig> {
 	private static final String SECURITY_TOKEN = "securityToken";

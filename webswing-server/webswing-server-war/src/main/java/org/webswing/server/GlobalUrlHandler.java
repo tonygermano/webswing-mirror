@@ -282,8 +282,8 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 	@GET
 	@Path("/rest/paths")
-	public List<String> getApplications(HttpServletRequest req) throws WsException {
-		checkPermission(WebswingAction.rest_admin_getApplications);
+	public List<String> getPaths(HttpServletRequest req) throws WsException {
+		checkPermission(WebswingAction.rest_getPaths);
 		List<String> result = new ArrayList<>();
 		for (SwingInstanceManager appManager : getApplications()) {
 			result.add(appManager.getFullPathMapping());

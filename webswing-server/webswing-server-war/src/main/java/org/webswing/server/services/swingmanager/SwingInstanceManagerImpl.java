@@ -172,7 +172,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@GET
 	@Path("/rest/paths")
 	public List<String> getApplications(HttpServletRequest req) throws WsException {
-		checkPermission(WebswingAction.rest_admin_getApplications);
+		checkPermissionLocalOrMaster(WebswingAction.rest_getPaths);
 		return Arrays.asList(getFullPathMapping());
 	}
 
@@ -236,10 +236,10 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		super.stop();
 	}
 
-	@Override
 	@GET
 	@Path("/info")
-	public ApplicationInfo getApplicationInfo() {
+	public ApplicationInfo getApplicationInfo() throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getAppInfo);
 		ApplicationInfo app = new ApplicationInfo();
 		app.setPath(getPathMapping());
 		app.setUrl(getFullPathMapping());

@@ -15,10 +15,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.common.util.CommonUtil;
+import org.webswing.server.common.util.WebswingObjectMapper;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.SecurableService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
@@ -28,7 +28,6 @@ import org.webswing.server.util.SecurityUtil;
 
 public abstract class AbstractUrlHandler implements UrlHandler, SecurableService {
 	private static final Logger log = LoggerFactory.getLogger(AbstractUrlHandler.class);
-	private static final ObjectMapper mapper = new ObjectMapper();
 
 	private static final String GET = "GET";
 	private static final String PUT = "PUT";
@@ -301,7 +300,7 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 			} else {
 				try {
 					String content = IOUtils.toString(req.getReader());
-					result[i] = mapper.readValue(content, params[i].getType());
+					result[i] = WebswingObjectMapper.get().readValue(content, params[i].getType());
 				} catch (IOException e) {
 					result[i] = null;
 				}
@@ -325,7 +324,7 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 					if (method.getReturnType().equals(String.class)) {
 						IOUtils.write(result.toString(), res.getOutputStream());
 					} else {
-						mapper.writerWithDefaultPrettyPrinter().writeValue(res.getOutputStream(), result);
+						WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(res.getOutputStream(), result);
 					}
 				} catch (Exception e) {
 					log.error("Failed to serialize REST execution result." + req.getRequestURI(), e);

@@ -12,8 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.server.common.util.ConfigUtil;
+import org.webswing.server.base.WsInitException;
 import org.webswing.server.common.util.CommonUtil;
+import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.BuiltInModules;
 import org.webswing.server.services.security.api.SecurityContext;
@@ -58,20 +59,22 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 					defaultConstructor = constructor;
 				}
 			}
-
+			Exception ex = null;
 			if (configConstructor != null) {
 				Class<?> configClass = configConstructor.getParameterTypes()[0];
 				try {
 					custom = (WebswingSecurityModule) configConstructor.newInstance(ConfigUtil.instantiateConfig(config.getConfig(), configClass, context));
 				} catch (Exception e) {
-					log.error("Could not construct custom security module class (using WebswingSecurityModuleConfig constructor).", e);
+					ex = new WsInitException("Could not construct custom security module class (using WebswingSecurityModuleConfig constructor).",e);
+					log.error("Initialization failed.",ex);
 				}
 			}
 			if (custom == null && defaultConstructor != null) {
 				try {
 					custom = (WebswingSecurityModule) defaultConstructor.newInstance();
 				} catch (Exception e) {
-					log.error("Could not construct custom security module class (using Default constructor).", e);
+					ex =  new WsInitException("Could not construct custom security module class (using Default constructor).",e);
+					log.error("Initialization failed.",ex);
 				}
 			}
 			if (custom != null) {
@@ -85,6 +88,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 				});
 			} else {
 				log.error("Custom security module class should define a default or WebswingSecurityModuleConfig constructor!");
+				throw ex;
 			}
 		} catch (Exception e) {
 			log.error("Failed to initialize security module. ", e);

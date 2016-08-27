@@ -24,7 +24,7 @@
 						field : 'vm.field',
 						value : 'vm.field.value'
 					};
-					if (vm.field.restricted==='true') {
+					if (vm.field.restricted === 'true') {
 						commonAttrs.restricted = 'true';
 					}
 
@@ -83,7 +83,8 @@
 				link : linker,
 				scope : {
 					field : '=',
-					variables : '='
+					variables : '=',
+					readonly : '='
 				},
 				controllerAs : 'vm',
 				bindToController : true,

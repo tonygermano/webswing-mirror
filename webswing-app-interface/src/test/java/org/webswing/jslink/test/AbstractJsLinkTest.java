@@ -8,9 +8,6 @@ import java.util.concurrent.ExecutionException;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.webswing.Constants;
 import org.webswing.ext.services.JsLinkService;
@@ -20,6 +17,10 @@ import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.services.impl.JsLinkServiceImpl;
 import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.Services;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import netscape.javascript.JSObject;
 

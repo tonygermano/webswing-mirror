@@ -11,6 +11,7 @@
 					variables : '=',
 					items : "=",
 					readonly : '=',
+					restricted : '@',
 					desc : '@',
 					label : '@'
 				},
@@ -25,11 +26,11 @@
 			vm.model = [];
 			vm.addPair = addPair;
 			vm.removePair = removePair;
-			
-			if(vm.value ==null){
+
+			if (vm.value == null) {
 				vm.field.value = {};
 			}
-			
+
 			$scope.$watch("vm.value", function(value) {
 				vm.model.splice(0, vm.model.length);
 				angular.forEach(value, function(value, key) {
@@ -69,7 +70,7 @@
 			function removePair(index) {
 				vm.model.splice(index, 1);
 			}
-			
+
 			function requestFormUpdate() {
 				$scope.$emit('wsRequestFormUpdate', vm);
 			}

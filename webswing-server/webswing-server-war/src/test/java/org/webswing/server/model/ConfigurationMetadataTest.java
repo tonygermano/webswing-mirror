@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.webswing.server.common.model.Config;
@@ -20,13 +19,12 @@ import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 import org.webswing.server.common.model.meta.MetaField;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.ConfigUtil;
+import org.webswing.server.common.util.WebswingObjectMapper;
 import org.webswing.server.services.security.api.BuiltInModules;
 import org.webswing.server.services.security.extension.onetimeurl.OtpAccessConfig;
 
 @SuppressWarnings("unchecked")
 public class ConfigurationMetadataTest {
-
-	private static final ObjectMapper mapper = new ObjectMapper();
 
 	@Before
 	public void setUp() throws Exception {
@@ -34,7 +32,7 @@ public class ConfigurationMetadataTest {
 
 	@Test
 	public void testConfigurationLoad() throws Exception {
-		Map<String, Object> readValue = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream("swingConfig1.json"), Map.class);
+		Map<String, Object> readValue = WebswingObjectMapper.get().readValue(this.getClass().getClassLoader().getResourceAsStream("swingConfig1.json"), Map.class);
 		SecuredPathConfig spc = ConfigUtil.instantiateConfig(readValue, SecuredPathConfig.class);
 		SwingConfig c = spc.getSwingConfig();
 		assertTrue(spc.getPath(), "/ss3".equals(spc.getPath()));
@@ -48,10 +46,10 @@ public class ConfigurationMetadataTest {
 
 	@Test
 	public void testMetadataGenerator() throws Exception {
-		Map<String, Object> readValue = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream("swingConfig1.json"), Map.class);
+		Map<String, Object> readValue = WebswingObjectMapper.get().readValue(this.getClass().getClassLoader().getResourceAsStream("swingConfig1.json"), Map.class);
 		SecuredPathConfig c = ConfigUtil.instantiateConfig(readValue, SecuredPathConfig.class);
 		MetaObject configMetadata = ConfigUtil.getConfigMetadata(c, this.getClass().getClassLoader());
-		
+
 		//@ConfigFieldEditorType(editor = EditorType.Object, className = "org.webswing.server.services.security.api.WebswingSecurityConfig")
 		for (MetaField f : configMetadata.getFields()) {
 			if (f.getName().equals("security")) {
@@ -59,13 +57,13 @@ public class ConfigurationMetadataTest {
 				assertTrue(f.getValue() instanceof MetaObject);
 			}
 		}
-		
+
 		//@ConfigFieldOrder({ "path", "homeDir", "webFolder", "icon", "security", "swingConfig"})
 		assertTrue(configMetadata.getFields().get(0).getName().equals("path"));
 		assertTrue(configMetadata.getFields().get(1).getName().equals("homeDir"));
 		assertTrue(configMetadata.getFields().get(2).getName().equals("webFolder"));
 		assertTrue(configMetadata.getFields().get(4).getName().equals("security"));
-		
+
 	}
 
 	@Test
@@ -88,22 +86,20 @@ public class ConfigurationMetadataTest {
 		assertTrue(c.getMapNull() == null);
 		assertTrue(c.getObjectNull() == null);
 	}
-	
+
 	@Test
 	public void testDefaultValueGenerator() throws Exception {
 		OtpAccessConfig c = ConfigUtil.instantiateConfig(null, OtpAccessConfig.class);
-		assertTrue(c.getSecret()!=null);
+		assertTrue(c.getSecret() != null);
 	}
-	
 
 	@Test
 	public void testNumberTypeGenerator() throws Exception {
-		Map<String, Object> map=new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("uploadMaxSize", new Integer(1));
 		SwingConfig c = ConfigUtil.instantiateConfig(map, SwingConfig.class);
-		assertTrue(c.getUploadMaxSize()==1);
+		assertTrue(c.getUploadMaxSize() == 1);
 	}
-	
 
 	public static interface TestDefaultConfig extends Config {
 		@ConfigFieldDefaultValueString("defaultValue")

@@ -10,6 +10,7 @@
 					value : '=',
 					variables : '=',
 					readonly : '=',
+					restricted : '@',
 					desc : '@',
 					label : '@'
 				},

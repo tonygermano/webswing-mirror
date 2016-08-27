@@ -8,23 +8,18 @@ package org.webswing.server.services.security.api;
 public enum WebswingAction {
 
 	//ADMIN CONSOLE
-	rest_admin_getApplications(Role.admin),
-	//REST
-	rest_getServerSettings(Role.admin),
+	rest_getPaths(Role.admin),
+	rest_getAppInfo(Role.admin),
 	rest_getSession(Role.admin),
 	rest_sessionShutdown(Role.admin),
 	rest_sessionShutdownForce(Role.admin),
-	rest_getMeta(Role.admin),
 	rest_getConfig(Role.admin),
 	rest_setConfig(Role.admin),
-	rest_setSwingConfig(Role.admin),
-	rest_getConfigVariables(Role.admin),
-	rest_getDefaultApplicationConfig(Role.admin),
-	rest_getDefaultAppletConfig(Role.admin),
-	rest_getOneTimePassword(Role.admin),
-	rest_getApps(Role.authenticated),
 	rest_startApp(Role.admin),
 	rest_stopApp(Role.admin),
+	rest_getApps(Role.authenticated),
+	//Security 
+	rest_getOneTimePassword(Role.admin),
 	//websocket
 	websocket_connect(Role.authenticated),
 	websocket_startRecordingPlayback(Role.admin),

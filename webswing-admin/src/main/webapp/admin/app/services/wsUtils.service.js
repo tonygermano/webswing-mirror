@@ -6,15 +6,16 @@
 				toJson : toJson
 			};
 
-			function extractValues(config) {
+			function extractValues(config, data) {
+				data = config.data || data;
 				if (config != null && config.fields != null) {
-					var result = {};
+					var result = data || {};
 					for ( var index in config.fields) {
 						var field = config.fields[index];
 						if (field.value == null) {
 							result[field.name] = null;
 						} else if (field.type === 'Object') {
-							result[field.name] = extractValues(field.value);
+							result[field.name] = extractValues(field.value, result[field.name]);
 						} else if (field.type === 'ObjectList') {
 							var list = [];
 							for ( var listIndex in field.value) {
@@ -30,9 +31,6 @@
 						} else {
 							result[field.name] = field.value;
 						}
-					}
-					if (config.data != null) {
-						result = angular.merge({}, config.data, result);
 					}
 					return result;
 				} else {
