@@ -12,7 +12,15 @@
 			vm.back = back;
 			vm.path = $routeParams.path;
 			vm.permissions = permissions;
+			vm.readonly = !vm.permissions.configEdit;
 			activate();
+
+			$scope.$on('vm.permissions.configEdit', function(evt, ctl) {
+				vm.readonly = !vm.permissions.configEdit;
+			});
+			$scope.$watch("vm.readonly", function(value) {
+				console.log('');
+			});
 
 			$scope.$on('wsStatusChanged', function(evt, ctl) {
 				vm.stopped = ctl.startable;

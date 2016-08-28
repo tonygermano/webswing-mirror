@@ -94,24 +94,6 @@
 
 		function wsFieldDirectiveController($scope, $element, $attrs) {
 			var vm = this;
-			watchBoolean('readonly', false);
-
-			function watchBoolean(name, defaultVal) {
-				$scope.$watch(function() {
-					var val = resolve(name, defaultVal);
-					return val !== false && val !== 'false';
-				}, function(newValue) {
-					vm[name] = newValue;
-				});
-			}
-
-			function resolve(name, defaultVal) {
-				if ($attrs[name] != null) {
-					return $attrs[name];
-				} else {
-					return defaultVal;
-				}
-			}
 		}
 
 		wsFieldDirectiveController.$inject = [ '$scope', '$element', '$attrs' ];

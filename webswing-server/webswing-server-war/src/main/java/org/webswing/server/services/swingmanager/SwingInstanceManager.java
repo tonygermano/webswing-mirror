@@ -6,10 +6,11 @@ import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
+import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
-public interface SwingInstanceManager extends SwingInstanceHolder, UrlHandler {
+public interface SwingInstanceManager extends SecuredPathHandler,SwingInstanceHolder, UrlHandler {
 
 	File resolveFile(String name);
 

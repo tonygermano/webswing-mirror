@@ -82,7 +82,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		validateObject(c);
 		validateObject(c.getValueAs("security", WebswingSecurityConfig.class));
 	}
-	
+
 	private void validateObject(Object o) throws Exception {
 		//test getters
 		try {
@@ -119,12 +119,27 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		}
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
-	private void saveConfiguration(Map<String, Object> configuration) throws Exception {
+	public void removeConfiguration(String path) throws Exception {
+		try {
+			configuration.remove(path);
+			File configFile = getConfigFile();
+			Map<String, Object> json = WebswingObjectMapper.get().readValue(configFile, Map.class);
+			json.remove(path);
+			WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
+		} catch (Exception e) {
+			log.error("Failed to save Webswing configuration :", e);
+			throw new Exception("Failed to save Webswing configuration :", e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void saveConfiguration(Map<String, Object> conf) throws Exception {
 		try {
 			File configFile = getConfigFile();
 			Map<String, Object> json = WebswingObjectMapper.get().readValue(configFile, Map.class);
-			json.put((String) configuration.get("path"), configuration);
+			json.put((String) conf.get("path"), conf);
 			WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
 		} catch (Exception e) {
 			log.error("Failed to save Webswing configuration :", e);

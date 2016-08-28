@@ -7,6 +7,7 @@
 				template : htmlTemplate,
 				scope : {
 					path : '=',
+					reload : '=',
 					detail : '@'
 				},
 				controllerAs : 'vm',
@@ -21,6 +22,7 @@
 			vm.b64img = '';
 			vm.start = start;
 			vm.stop = stop;
+			vm.remove = remove;
 			vm.viewSessions = viewSessions;
 			vm.viewConfig = viewConfig;
 			vm.panelStatusClass = panelStatusClass;
@@ -81,6 +83,20 @@
 			function stop() {
 				configRestService.stop(vm.value.path);
 				vm.value.status.status = 'Requesting Stop';
+				vm.stoppable=false;
+				vm.startable=false;
+			}
+			
+			function remove() {
+				configRestService.remove(vm.value.path).then(function(){
+					if(vm.refresh!=null){
+						$location.path('/dashboard');
+						if(vm.reload!=null){
+							vm.reload();
+						}
+					}
+				});
+				vm.value.status.status = 'Uninstalling Application';
 				vm.stoppable=false;
 				vm.startable=false;
 			}

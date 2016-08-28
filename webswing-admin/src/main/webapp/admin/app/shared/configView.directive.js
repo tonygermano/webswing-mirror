@@ -18,7 +18,7 @@
 			};
 		}
 
-		function wsConfigViewDirectiveController($scope, $element, $attrs, $timeout, messageService, wsUtils, configRestService) {
+		function wsConfigViewDirectiveController($scope, $element, $attrs, $timeout, $location, messageService, wsUtils, configRestService) {
 			var vm = this;
 			vm.showJson = showJson;
 			vm.showForm = showForm;
@@ -39,7 +39,7 @@
 			function refreshForm(config) {
 				var e = $element.find('.ws-panel-heading').first();
 				configRestService.getMeta(config).then(function(data) {
-					vm.value = angular.extend({},vm.value,data);
+					vm.value = angular.extend({}, vm.value, data);
 					vm.isForm = true;
 					$timeout(function() {
 						e.height('auto');
@@ -77,7 +77,7 @@
 			}
 		}
 
-		wsConfigViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$timeout', 'messageService', 'wsUtils', 'configRestService' ];
+		wsConfigViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$timeout', '$location', 'messageService', 'wsUtils', 'configRestService' ];
 
 		return wsConfigViewDirective;
 	});

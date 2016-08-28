@@ -13,10 +13,13 @@ public interface ConfigurationService extends WebswingService {
 
 	void setSwingConfiguration(Map<String, Object> securedPathConfig) throws Exception;
 
+	void removeConfiguration(String path) throws Exception;
+
 	void saveMasterConfiguration(Map<String, Object> securedPathConfig) throws Exception;
 
 	void registerChangeListener(ConfigurationChangeListener listener);
 
 	void removeChangeListener(ConfigurationChangeListener listener);
+
 
 }

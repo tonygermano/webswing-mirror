@@ -1,8 +1,9 @@
 (function(define) {
 	define([], function f() {
-		function ConfigEditController(baseUrl, configRestService, wsUtils, permissions) {
+		function ConfigEditController($scope, baseUrl, configRestService, wsUtils, permissions) {
 			var vm = this;
 			vm.permissions = permissions;
+			vm.readonly = !vm.permissions.configEdit;
 			vm.config = {
 				hide : [ 'path', 'icon', 'swingConfig' ],
 				enable : null
@@ -13,6 +14,10 @@
 			vm.hide = [ 'path', 'icon', 'swingConfig' ];
 
 			activate();
+
+			$scope.$on('vm.permissions.configEdit', function(evt, ctl) {
+				vm.readonly = !vm.permissions.configEdit;
+			});
 
 			function activate() {
 				configRestService.getConfig(baseUrl).then(function(data) {
@@ -31,7 +36,7 @@
 				configRestService.setConfig(baseUrl, wsUtils.extractValues(vm.config)).then(activate);
 			}
 		}
-		ConfigEditController.$inject = [ 'baseUrl', 'configRestService', 'wsUtils', 'permissions' ];
+		ConfigEditController.$inject = [ '$scope', 'baseUrl', 'configRestService', 'wsUtils', 'permissions' ];
 
 		return ConfigEditController;
 	});

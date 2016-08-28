@@ -3,6 +3,7 @@ package org.webswing.server;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,14 +14,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.MetaObject;
+import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.resources.ResourceHandlerService;
@@ -74,7 +79,6 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
 		registerChildUrlHandler(websocket.createPlaybackWebSocketHandler(this));
 
-		registerChildUrlHandler(restService.createSwingRestHandler(this, this));
 		registerChildUrlHandler(restService.createAdminRestHandler(this, this));
 
 		registerChildUrlHandler(loginService.createLoginHandler(this));
@@ -281,6 +285,20 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	}
 
 	@GET
+	@Path("/apps")
+	public List<ApplicationInfoMsg> getApplicationInfo(HttpServletRequest req) throws WsException {
+		checkMasterPermission(WebswingAction.rest_getApps);
+		List<ApplicationInfoMsg> result = new ArrayList<>();
+		for (SwingInstanceManager mgr : getApplications()) {
+			ApplicationInfoMsg applicationInfoMsg = mgr.getApplicationInfoMsg();
+			if (applicationInfoMsg != null) {
+				result.add(applicationInfoMsg);
+			}
+		}
+		return result;
+	}
+
+	@GET
 	@Path("/rest/paths")
 	public List<String> getPaths(HttpServletRequest req) throws WsException {
 		checkPermission(WebswingAction.rest_getPaths);
@@ -307,6 +325,45 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		return meta;
 	}
 
+	@GET
+	@Path("/rest/remove")
+	public void getRemoveSwingApp(@PathParam("") String path) throws Exception {
+		checkMasterPermission(WebswingAction.rest_removeApp);
+		if (!StringUtils.isEmpty(path)) {
+			SwingInstanceManager swingManager = instanceManagers.get(path);
+			if (swingManager != null) {
+				if (!swingManager.isStarted()) {
+					configService.removeConfiguration(path);
+					uninstallApplication(swingManager);
+					return;
+				} else {
+					throw new WsException("Unable to Remove Swing app '" + path + "' while running. Stop the app first");
+				}
+			}
+		}
+		throw new WsException("Unable to remove Swing app '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
+	}
+
+	@GET
+	@Path("/rest/create")
+	public void getCreateSwingApp(@PathParam("") String path) throws Exception {
+		checkMasterPermission(WebswingAction.rest_createApp);
+		if (!StringUtils.isEmpty(path)) {
+			SwingInstanceManager swingManager = instanceManagers.get(path);
+			if (swingManager == null) {
+				Map<String, Object> config = new HashMap<>();
+				config.put("path", path);
+				configService.setConfiguration(config);
+				installApplication(ConfigUtil.instantiateConfig(config, SecuredPathConfig.class));
+				return;
+			} else {
+				throw new WsException("Unable to Create Swing app '" + path + "'. Application already exits.");
+
+			}
+		}
+		throw new WsException("Unable to create Swing app '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
+	}
+
 	@POST
 	@Path("/rest/config")
 	public void setConfig(Map<String, Object> config) throws Exception {
@@ -319,6 +376,9 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	@GET
 	@Path("/rest/permissions")
 	public Map<String, Boolean> getPermissions() throws Exception {
-		return super.getPermissions();
+		Map<String, Boolean> perm = super.getPermissions();
+		perm.put("remove", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_removeApp));
+		perm.put("create", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_createApp));
+		return perm;
 	}
 }

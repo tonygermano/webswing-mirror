@@ -5,17 +5,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
+import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.model.admin.InstanceManagerStatus;
@@ -33,6 +37,7 @@ import org.webswing.server.services.security.api.WebswingSecurityConfig;
 import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.security.modules.SecurityModuleService;
 import org.webswing.server.services.security.modules.SecurityModuleWrapper;
+import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.util.GitRepositoryState;
 import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
@@ -265,11 +270,12 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		permissions.put("configEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
 		permissions.put("start", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_startApp));
 		permissions.put("stop", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_stopApp));
+		permissions.put("remove", false);
 		permissions.put("sessions", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getSession));
 		return permissions;
 	}
 
-	private boolean isPermited(WebswingAction... actions) {
+	protected boolean isPermited(WebswingAction... actions) {
 		for (WebswingAction action : actions) {
 			boolean local = getUser() != null && getUser().isPermitted(action.name());
 			if (!local) {
@@ -282,7 +288,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		return true;
 	}
 
-	private boolean isMasterPermited(WebswingAction... actions) {
+	protected boolean isMasterPermited(WebswingAction... actions) {
 		for (WebswingAction action : actions) {
 			boolean master = getMasterUser() != null && getMasterUser().isPermitted(action.name());
 			if (!master) {

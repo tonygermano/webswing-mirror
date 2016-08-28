@@ -67,7 +67,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
 		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
 
-		registerChildUrlHandler(restService.createSwingRestHandler(this, this));
 		registerChildUrlHandler(restService.createAdminRestHandler(this, this));
 
 		registerChildUrlHandler(loginService.createLoginHandler(this));
@@ -167,6 +166,12 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		File icon = resolveFile(getConfig().getIcon());
 		app.setBase64Icon(CommonUtil.loadImage(icon));
 		return app;
+	}
+	@GET
+	@Path("/apps")
+	public List<ApplicationInfoMsg> getApplicationInfo(HttpServletRequest req) throws WsException {
+		checkPermission(WebswingAction.rest_getApps);
+		return Arrays.asList(getApplicationInfoMsg());
 	}
 
 	@GET

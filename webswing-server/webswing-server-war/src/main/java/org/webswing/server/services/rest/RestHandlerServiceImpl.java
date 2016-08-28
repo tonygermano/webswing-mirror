@@ -15,11 +15,6 @@ public class RestHandlerServiceImpl implements RestHandlerService {
 	}
 
 	@Override
-	public AbstractUrlHandler createSwingRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
-		return new SwingRestUrlHandler(parent, instanceHolder);
-	}
-
-	@Override
 	public AbstractUrlHandler createAdminRestHandler(UrlHandler parent, SwingInstanceHolder instanceHolder) {
 		return new AdminRestUrlHandler(parent, instanceHolder);
 	}

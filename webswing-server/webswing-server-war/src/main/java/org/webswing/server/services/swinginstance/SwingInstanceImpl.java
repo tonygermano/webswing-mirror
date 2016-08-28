@@ -383,7 +383,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				bootCp += File.pathSeparatorChar + "\"" + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator)) + File.separator + "rt-win-shell.jar" + "\"";
 			}
 			String debug = appConfig.isDebug() && (debugPort != 0) ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=" + debugPort + ",server=y,suspend=y " : "";
-			swingConfig.setJvmArgs(bootCp + debug + " -noverify " + subs.replace(appConfig.getVmArgs()));
+			String vmArgs = appConfig.getVmArgs() == null ? "" : subs.replace(appConfig.getVmArgs());
+			swingConfig.setJvmArgs(bootCp + debug + " -noverify " + vmArgs);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, clientId);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
 			swingConfig.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
