@@ -1,11 +1,12 @@
-<div class="modal-header mirror-view-dialog-header">
+<div class="mirror-view-dialog-header">
     <button type="button" class="ws-button-gap btn btn-primary" ng-click="vm.back()">
         <span class="glyphicon glyphicon-arrow-left"></span> Back
     </button>
 </div>
+<ws-app-view path="vm.path"></ws-app-view>
 <div>
 	<h2 class="sub-header">Running sessions 
-	    <div class="ws-update" ng-click="vm.refresh()">
+	    <div class="ws-update pull-right" ng-click="vm.refresh()">
 	        <span ng-class="{'glyphicon':true,'glyphicon-repeat':vm.timer != null,'glyphicon-refresh':vm.timer == null} "> </span>
 	        {{vm.lastUpdated| date:'h:mm:ss'}}
 	    </div>
@@ -16,10 +17,9 @@
 	            <tr>
 	                <th>No. (Id)</th>
 	                <th>User</th>
-	                <th>Application</th>
 	                <th>Start time</th>
 	                <th>Client status</th>
-	                <th>Used memory</th>
+	                <th>Metrics</th>
 	                <th>Actions</th>
 	            </tr>
 	        </thead>
@@ -30,9 +30,6 @@
 	                </td>
 	                <td>
 	                    {{session.user}}
-	                </td>
-	                <td>
-	                    {{session.application}}
 	                </td>
 	                <td>
 	                    {{session.startedAt| date:'dd MMM h:mm:ss'}}
@@ -51,14 +48,27 @@
 	                    </div>
 	                </td>
 	                <td>
-	        <progressbar  animate="false" max="session.state.heapSize" value="session.state.heapSizeUsed"><span style="color:black; white-space:nowrap;">{{(session.state.heapSizeUsed / session.state.heapSize * 100|number:1) +'%  '+(session.state.heapSizeUsed|number:1)+'MB/'+(session.state.heapSize|number:0)+'MB'}}</span></progressbar>
-	        </td>
-	        <td>
-	            <button type="button" class="btn btn-primary" ng-click="vm.view(session)">
-	                <span class="glyphicon glyphicon-camera"></span> View
-	            </button>
-	        </td>
-	        </tr>
+	                	<div class="ws-session-gauge-panel">
+	                		<div class="ws-session-gauge">
+								<pie-chart data="session.gauge.memory.data" options="session.gauge.memory.options"></pie-chart>
+							</div>
+	                		<div class="ws-session-gauge">
+								<pie-chart data="session.gauge.inbound.data" options="session.gauge.inbound.options"></pie-chart>
+							</div>
+	                		<div class="ws-session-gauge">
+								<pie-chart data="session.gauge.outbound.data" options="session.gauge.outbound.options"></pie-chart>
+							</div>
+	                		<div class="ws-session-gauge">
+								<pie-chart data="session.gauge.latency.data" options="session.gauge.latency.options"></pie-chart>
+							</div>
+						</div>
+			        </td>
+			        <td>
+			            <button type="button" class="btn btn-primary" ng-click="vm.view(session)">
+			                <span class="glyphicon glyphicon-camera"></span> View
+			            </button>
+			        </td>
+	        	</tr>
 	        </tbody>
 	    </table>
 	</div>

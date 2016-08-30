@@ -7,9 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -21,6 +24,8 @@ import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.admin.ApplicationInfo;
 import org.webswing.server.common.model.admin.InstanceManagerStatus;
+import org.webswing.server.common.model.admin.Sessions;
+import org.webswing.server.common.model.admin.SwingSession;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.model.exception.WsException;
@@ -173,10 +178,63 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@GET
+	@Path("/start")
+	public void start() throws WsException {
+		super.start();
+	}
+
+	@GET
+	@Path("/stop")
+	public void stop() throws WsException {
+		if (runningInstances.size() > 0) {
+			throw new WsException("Can not Stop if swing sessions are running. Please stop sessions first.");
+		}
+		super.stop();
+	}
+
+	@GET
+	@Path("/info")
+	public ApplicationInfo getApplicationInfo() throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getAppInfo);
+		ApplicationInfo app = new ApplicationInfo();
+		app.setPath(getPathMapping());
+		app.setUrl(getFullPathMapping());
+		app.setName(getSwingConfig().getName());
+		File icon = resolveFile(getConfig().getIcon());
+		app.setIcon(CommonUtil.loadImage(icon));
+		app.setConfig(getConfig());
+		app.setRunningInstances(runningInstances.size());
+		int connected = 0;
+		for (SwingInstance si : runningInstances.getAllInstances()) {
+			if (si.getSessionId() != null) {
+				connected++;
+			}
+		}
+		app.setConnectedInstances(connected);
+		app.setFinishedInstances(closedInstances.size());
+		int maxRunningInstances = getSwingConfig().getMaxClients();
+		app.setMaxRunningInstances(maxRunningInstances);
+		app.setStatus(getStatus());
+		app.setStats(statsLogger.getSummaryStats());
+		return app;
+	}
+
+	@GET
 	@Path("/apps")
 	public List<ApplicationInfoMsg> getApplicationInfo(HttpServletRequest req) throws WsException {
 		checkPermission(WebswingAction.rest_getApps);
 		return Arrays.asList(getApplicationInfoMsg());
+	}
+
+	@GET
+	@Path("/status")
+	public String getStatusPage() throws Exception {
+		InstanceManagerStatus status = getStatus();
+		URL webResource = getWebResource(status.getStatus().name() + ".html");
+		if (webResource != null) {
+			return IOUtils.toString(webResource);
+		}
+		return null;
 	}
 
 	@GET
@@ -221,56 +279,49 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@GET
-	@Path("/status")
-	public String getStatusPage() throws Exception {
-		InstanceManagerStatus status = getStatus();
-		URL webResource = getWebResource(status.getStatus().name() + ".html");
-		if (webResource != null) {
-			return IOUtils.toString(webResource);
+	@Path("/rest/sessions")
+	public Sessions getSessions() throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
+		Sessions result = new Sessions();
+		for (SwingInstance si : getAllInstances()) {
+			result.getSessions().add(si.toSwingSession(false));
+		}
+		for (SwingInstance si : getAllClosedInstances()) {
+			result.getClosedSessions().add(si.toSwingSession(false));
+		}
+		return result;
+	}
+
+	@GET
+	@Path("/rest/session")
+	public SwingSession getSession(@PathParam("") String id) throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
+		if (id.startsWith("/")) {
+			id = id.substring(1);
+		}
+		SwingInstance instance = findInstanceByClientId(id);
+		if (instance != null) {
+			return instance.toSwingSession(true);
 		}
 		return null;
 	}
 
-	@GET
-	@Path("/start")
-	public void start() throws WsException {
-		super.start();
-	}
-
-	@GET
-	@Path("/stop")
-	public void stop() throws WsException {
-		if (runningInstances.size() > 0) {
-			throw new WsException("Can not Stop if swing sessions are running. Please stop sessions first.");
+	@DELETE
+	@Path("/rest/session")
+	public void shutdown(@PathParam("") String id, @QueryParam("force") String forceKill) throws WsException {
+		boolean force = Boolean.parseBoolean(forceKill);
+		if (force) {
+			checkPermissionLocalOrMaster(WebswingAction.rest_sessionShutdown);
+		} else {
+			checkPermissionLocalOrMaster(WebswingAction.rest_sessionShutdownForce);
 		}
-		super.stop();
-	}
-
-	@GET
-	@Path("/info")
-	public ApplicationInfo getApplicationInfo() throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getAppInfo);
-		ApplicationInfo app = new ApplicationInfo();
-		app.setPath(getPathMapping());
-		app.setUrl(getFullPathMapping());
-		app.setName(getSwingConfig().getName());
-		File icon = resolveFile(getConfig().getIcon());
-		app.setIcon(CommonUtil.loadImage(icon));
-		app.setConfig(getConfig());
-		app.setRunningInstances(runningInstances.size());
-		int connected = 0;
-		for (SwingInstance si : runningInstances.getAllInstances()) {
-			if (si.getSessionId() != null) {
-				connected++;
-			}
+		if (id.startsWith("/")) {
+			id = id.substring(1);
 		}
-		app.setConnectedInstances(connected);
-		app.setFinishedInstances(closedInstances.size());
-		int maxRunningInstances = getSwingConfig().getMaxClients();
-		app.setMaxRunningInstances(maxRunningInstances);
-		app.setStatus(getStatus());
-		app.setStats(statsLogger.getSummaryStats());
-		return app;
+		SwingInstance instance = findInstanceByClientId(id);
+		if (instance != null) {
+			instance.shutdown(force);
+		}
 	}
 
 	@Override
@@ -283,4 +334,8 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		return statsLogger.getInstanceStats(instance);
 	}
 
+	@Override
+	public Map<String, Number> getInstanceMetrics(String clientId) {
+		return statsLogger.getInstanceMetrics(clientId);
+	}
 }

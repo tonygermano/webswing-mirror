@@ -28,7 +28,7 @@
 				controllerAs : 'vm',
 				templateUrl : 'app/views/dashboard/overview.template.html'
 			});
-			$routeProvider.when('/dashboard/session/:sessionId', {
+			$routeProvider.when('/dashboard/session/:path', {
 				controller : 'DashboardSessionController',
 				controllerAs : 'vm',
 				templateUrl : 'app/views/dashboard/session.template.html'

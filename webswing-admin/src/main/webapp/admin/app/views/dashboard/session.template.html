@@ -1,78 +1,67 @@
 <div class="modal-header mirror-view-dialog-header">
-    <button type="button" class="ws-button-gap btn btn-primary" ng-click="vm.back()">
-        <span class="glyphicon glyphicon-arrow-left"></span> Back
-    </button>
-    <div class="ws-update" ng-click="vm.refresh()">
-        <span ng-class="{'glyphicon':true,'glyphicon-repeat':vm.timer != null,'glyphicon-refresh':vm.timer == null} "> </span>
-        {{vm.lastUpdated| date:'h:mm:ss'}}
-    </div>
-    <table class="table mirror-view-dialog-header-table">
-        <tr>
-            <td>
-                <small>User:</small>
-                <div>
-                    {{vm.session.user}}
-                </div>
-            </td>
-            <td>
-                <small>Application:</small>
-                <div>
-                    {{vm.session.application}}
-                </div>
-            </td>
-            <td>
-                <small>Start time:</small>
-                <div>
-                    {{vm.session.startedAt| date:'dd MMM h:mm:ss'}}
-                </div>
-            </td>
-            <td>
-                <small>User connection status:</small>
-                <div ng-switch on="vm.session.connected">
-                    <div ng-switch-when="true" >
-                        <span  class="label label-success">Connected</span>
-                    </div>
-                    <div ng-switch-when="false" >
-                        <span class="label label-danger" ui-jq="tooltip" title="Disconnected at {{vm.session.disconnectedSince| date:'dd MMM h:mm:ss'}}">Disconnected</span>
-                    </div>
-                </div>
-            </td>
-            <td>
-                <small>Memory:</small>
-                <div>
-                    <progressbar  animate="false" max="vm.session.state.heapSize" value="vm.session.state.heapSizeUsed">
-                        <span style="color:black; white-space:nowrap;">{{(vm.session.state.heapSizeUsed / vm.session.state.heapSize * 100|number:1) +'%  '+(vm.session.state.heapSizeUsed|number:1)+'MB/'+(vm.session.state.heapSize|number:0)+'MB'}}
-                        </span>
-                    </progressbar>
-                </div>
-            </td>
-            <td>
-                <div>
-                    <button type="button" ng-class="{'ws-button-gap':true,'btn': true ,'btn-danger':!vm.control, 'btn-success':vm.control}" ng-model="vm.control" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
-                        <span ng-class="{'glyphicon': true ,'glyphicon-unchecked':!vm.control, 'glyphicon-check':vm.control}"></span>
-                        Control: {{vm.control?'ON':'OFF'}}
-                    </button>
-                </div>
-                <div>
-	                <div class="btn-group">
-	                    <button type="button" class="btn btn-primary" ng-click="vm.kill()">
-	                        <span class="glyphicon glyphicon-off"></span> Exit Swing 
-	                    </button>
-	                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                            <span class="caret"></span>
-   							<span class="sr-only">Toggle Dropdown</span>
-                        </button>
-                        <ul class="dropdown-menu" role="menu">
-                            <li> Not responding?</li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="" ng-click="vm.forceKill()">Force kill!</a></li>
-                        </ul>
-	                </div>   
-                </div>
-            </td>
-        </tr>
-    </table>
+	<button type="button" class="ws-button-gap btn btn-primary" ng-click="vm.back()">
+		<span class="glyphicon glyphicon-arrow-left"></span> Back
+	</button>
+	<div class="ws-update pull-right" ng-click="vm.refresh()">
+		<span ng-class="{'glyphicon':true,'glyphicon-repeat':vm.timer != null,'glyphicon-refresh':vm.timer == null} "> </span> {{vm.lastUpdated| date:'h:mm:ss'}}
+	</div>
+	<table class="table mirror-view-dialog-header-table">
+		<tr>
+			<td><small>User:</small>
+				<div>{{vm.session.user}}</div></td>
+			<td><small>Application:</small>
+				<div>{{vm.session.application}}</div></td>
+			<td><small>Start time:</small>
+				<div>{{vm.session.startedAt| date:'dd MMM h:mm:ss'}}</div></td>
+			<td><small>User connection status:</small>
+				<div ng-switch on="vm.session.connected">
+					<div ng-switch-when="true">
+						<span class="label label-success">Connected</span>
+					</div>
+					<div ng-switch-when="false">
+						<span class="label label-danger" ui-jq="tooltip" title="Disconnected at {{vm.session.disconnectedSince| date:'dd MMM h:mm:ss'}}">Disconnected</span>
+					</div>
+				</div></td>
+			<td>
+				<div>
+					<button type="button" ng-class="{'ws-button-gap':true,'btn': true ,'btn-danger':!vm.control, 'btn-success':vm.control}" ng-model="vm.control" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
+						<span ng-class="{'glyphicon': true ,'glyphicon-unchecked':!vm.control, 'glyphicon-check':vm.control}"></span> Control: {{vm.control?'ON':'OFF'}}
+					</button>
+				</div>
+				<div>
+					<div class="btn-group">
+						<button type="button" class="btn btn-primary" ng-click="vm.kill()">
+							<span class="glyphicon glyphicon-off"></span> Exit Swing
+						</button>
+						<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span> <span class="sr-only">Toggle Dropdown</span>
+						</button>
+						<ul class="dropdown-menu" role="menu">
+							<li>Not responding?</li>
+							<li role="separator" class="divider"></li>
+							<li><a href="" ng-click="vm.forceKill()">Force kill!</a></li>
+						</ul>
+					</div>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="5"></td>
+		</tr>
+	</table>
+	<div class="row">
+		<div class="col-xs-12 col-sm-4">
+			<h4>Memory</h4>
+			<ws-line-graph value="vm.memoryStats"></ws-line-graph>
+		</div>
+		<div class="col-xs-12 col-sm-4">
+			<h4>Bandwidth</h4>
+			<ws-line-graph value="vm.bandwidthStats"></ws-line-graph>
+		</div>
+		<div class="col-xs-12 col-sm-4">
+			<h4>Latency</h4>
+			<ws-line-graph value="vm.latencyStats"></ws-line-graph>
+		</div>
+	</div>
 </div>
-<div class="modal-body mirror-view-dialog-body" data-webswing-instance="webswingmirrorview">
-
-</div>
+<div class="modal-body mirror-view-dialog-body" data-webswing-instance="webswingmirrorview"></div>

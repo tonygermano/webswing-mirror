@@ -66,11 +66,20 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 				stats.aggregate(instanceMap, name, aggregation);
 			}
 		}
-		return stats.getMetrics();
+		return stats.getStatistics();
 	}
 
 	@Override
 	public Map<String, Map<Long, Number>> getInstanceStats(String instance) {
+		InstanceStats stats = instanceMap.get(instance);
+		if (stats != null) {
+			return stats.getStatistics();
+		}
+		return null;
+	}
+
+	@Override
+	public Map<String, Number> getInstanceMetrics(String instance) {
 		InstanceStats stats = instanceMap.get(instance);
 		if (stats != null) {
 			return stats.getMetrics();
@@ -81,4 +90,5 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 	public void removeInstance(String instance) {
 		instanceMap.remove(instance);
 	}
+
 }

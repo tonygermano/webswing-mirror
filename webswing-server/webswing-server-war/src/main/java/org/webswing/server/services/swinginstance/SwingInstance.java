@@ -37,6 +37,6 @@ public interface SwingInstance {
 
 	void logStatValue(String name, Number value);
 
-	SwingSession toSwingSession();
+	SwingSession toSwingSession(boolean stats);
 
 }

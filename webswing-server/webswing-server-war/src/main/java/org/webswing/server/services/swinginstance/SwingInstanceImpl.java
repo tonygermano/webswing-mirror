@@ -250,6 +250,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			logStatValue(StatisticsLogger.LATENCY_SERVER_RENDERING, sendTime - startTime);
 			logStatValue(StatisticsLogger.LATENCY_NETWORK, currentTime - sendTime - renderingTime);
 			logStatValue(StatisticsLogger.LATENCY_CLIENT_RENDERING, renderingTime);
+			logStatValue(StatisticsLogger.LATENCY, currentTime-startTime);
+			
 		}
 	}
 
@@ -332,7 +334,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		manager.notifySwingClose(this);
 	}
 
-	public SwingSession toSwingSession() {
+	public SwingSession toSwingSession(boolean stats) {
 		SwingSession session = new SwingSession();
 		session.setId(getInstanceId());
 		session.setApplet(LauncherType.Applet.equals(getAppConfig().getLauncherType()));
@@ -345,7 +347,10 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		session.setUser(getUser());
 		session.setEndedAt(getEndedAt());
 		session.setStatus(getStatus());
-		session.setStats(manager.getInstanceStats(getClientId()));
+		if (stats) {
+			session.setStats(manager.getInstanceStats(getClientId()));
+		}
+		session.setMetrics(manager.getInstanceMetrics(getClientId()));
 		session.setRecorded(isRecording());
 		session.setRecordingFile(getRecordingFile());
 		return session;

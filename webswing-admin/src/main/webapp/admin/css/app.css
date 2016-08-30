@@ -232,7 +232,6 @@ body {
 	display: inline;
 	font-size: 15px;
 	position: relative;
-	
 }
 
 .ws-panel-heading {
@@ -242,9 +241,11 @@ body {
 .ws-pie-chart {
 	min-height: 250px;
 }
+
 .ws-line-chart {
 	height: 100px;
 }
+
 .ws-line-chart .chart-legend {
 	display: none;
 }
@@ -279,18 +280,60 @@ body {
 	height: 100px;
 }
 
-.ws-config-table tr td:not(:first-child) {
-	word-break: break-all;
-}
+.ws-config-table
 
+ 
+
+tr
+
+ 
+
+td
+
+
+:not
+
+ 
+
+(
+:first-child
+
+ 
+
+)
+{
+word-break
+
+
+:
+
+ 
+
+break-all
+
+
+;
+}
 .ws-subs-key {
- 	display: inline;
+	display: inline;
 	font-weight: 700;
 }
 
 .ws-subs-value {
-   display: inline;
-   color: lightgray;
-   margin-left: 5px;
+	display: inline;
+	color: lightgray;
+	margin-left: 5px;
 }
 
+.ws-session-gauge-panel {
+	height: 70px;
+	width: 300px;
+	display: table-right;
+	float: left;
+}
+
+.ws-session-gauge {
+	height: 70px;
+	width: 70px;
+	display: inline-table;
+}

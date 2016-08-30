@@ -27,7 +27,7 @@
 					},
 					y : {
 						min : 0,
-						ticks: 2
+						ticks : 2
 					}
 				}
 			};
@@ -38,22 +38,24 @@
 
 			function processValue(value) {
 				vm.series.splice(0, vm.series.length);
-				for (var int = 0; int < value.names.length; int++) {
-					var serie = value.names[int];
-					var key = value.keys[int]
-					vm.series.push({
-						dataset : 'dataset',
-						key : key,
-						label : serie,
-						type : [ 'line', 'area' ],
-						defined : function(v) {
-							return v != null
-						},
-						color : colors[int],
-					});
-				}
-				if(value.tickFormat!=null){
-					vm.options.axes.y.tickFormat=value.tickFormat;
+				if (value != null) {
+					for (var int = 0; int < value.names.length; int++) {
+						var serie = value.names[int];
+						var key = value.keys[int]
+						vm.series.push({
+							dataset : 'dataset',
+							key : key,
+							label : serie,
+							type : [ 'line', 'area' ],
+							defined : function(v) {
+								return v != null
+							},
+							color : colors[int],
+						});
+					}
+					if (value.tickFormat != null) {
+						vm.options.axes.y.tickFormat = value.tickFormat;
+					}
 				}
 				return value;
 			}

@@ -16,7 +16,7 @@
 			};
 		}
 
-		function wsAppViewDirectiveController($scope, $element, $attrs, $location, $timeout, configRestService, permissions) {
+		function wsAppViewDirectiveController($scope, $element, $attrs, $location, $timeout, configRestService, permissions, wsUtils) {
 			var vm = this;
 			vm.permissions = permissions;
 			vm.b64img = '';
@@ -125,7 +125,7 @@
 				return {
 					names : [ 'Total Allocated Memory', 'Total Used Memory' ],
 					keys: ['memoryAllocated.SUM',  'memoryUsed.SUM' ],
-					dataset : getDataset(stats, ['memoryAllocated.SUM',  'memoryUsed.SUM' ]),
+					dataset : wsUtils.getStatsDataset(stats, ['memoryAllocated.SUM',  'memoryUsed.SUM' ]),
 					tickFormat: function (value,index){
 						return (value)+'MB';
 					}
@@ -136,7 +136,7 @@
 				return {
 					names : [ 'Total Inbound trafic', 'Total Outbound trafic' ],
 					keys : [ 'inboundSize.SUM', 'outboundSize.SUM' ],
-					dataset : getDataset(stats, [ 'inboundSize.SUM', 'outboundSize.SUM' ]),
+					dataset :  wsUtils.getStatsDataset(stats, [ 'inboundSize.SUM', 'outboundSize.SUM' ]),
 					tickFormat: function (value,index){
 						return Math.floor(value/1024)+'k';
 					}
@@ -147,50 +147,11 @@
 				return {
 					names : [ 'Avg Network latency', 'Avg Server rendering latency','Avg Client rendering latency' ],
 					keys : [ 'latencyNetwork.AVG', 'latencyServerRendering.AVG','latencyClientRendering.AVG' ],
-					dataset : getDataset(stats, [ 'latencyNetwork.AVG', 'latencyServerRendering.AVG','latencyClientRendering.AVG' ]),
+					dataset :  wsUtils.getStatsDataset(stats, [ 'latencyNetwork.AVG', 'latencyServerRendering.AVG','latencyClientRendering.AVG' ]),
 					tickFormat: function (value,index){
 						return value+'ms';
 					}
 				};
-			}
-
-			function getDataset(stats, names) {
-				var result = [];
-				var keysObj = {}
-				for (var n = 0; n < names.length; n++) {
-					if (stats[names[n]] != null) {
-						for ( var item in stats[names[n]]) {
-							keysObj[item] = null;
-						}
-					}
-				}
-				var keys = getKeys(keysObj).sort();
-				for (var int = 0; int < keys.length; int++) {
-					var key = keys[int];
-					var entry = {
-						x : new Date(parseInt(key))
-					}
-					for (var n = 0; n < names.length; n++) {
-						var name = names[n];
-						var dataset1 = stats[name];
-						var value = dataset1 != null && dataset1[key] != null ? dataset1[key] : 0;
-						entry[name] = value;
-					}
-					result.push(entry);
-				}
-				return result;
-			}
-
-			function getKeys(obj) {
-				var keys = [];
-				if (obj !== null) {
-					for ( var key in obj) {
-						if (obj.hasOwnProperty(key)) {
-							keys.push(key);
-						}
-					}
-				}
-				return keys;
 			}
 
 			function panelStatusClass(className) {
@@ -235,7 +196,7 @@
 			}
 		}
 
-		wsAppViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$location', '$timeout', 'configRestService', 'permissions' ];
+		wsAppViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$location', '$timeout', 'configRestService', 'permissions','wsUtils' ];
 
 		return wsAppViewDirective;
 	});

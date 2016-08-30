@@ -8,16 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 public class InstanceStats {
-	private Map<String, Map<Long, Number>> metricsLog = new HashMap<>();
+	private Map<String, Map<Long, Number>> statisticsLog = new HashMap<>();
 	private Map<String, Long> lastTimestampMap = new HashMap<String, Long>();
 	private Map<String, List<Number>> lastTimestampNumbers = new HashMap<String, List<Number>>();
+	private Map<String, Number> lastMetrics= new HashMap<>();
 
 	public void processMetric(MetricRule rule, String name, Number value) {
 		//round timestamp to interval milis
 		long timestamp = (System.currentTimeMillis() / rule.getInterval()) * rule.getInterval();
 
 		//create map if null
-		Map<Long, Number> valueMap = metricsLog.get(name);
+		Map<Long, Number> valueMap = statisticsLog.get(name);
 		if (valueMap == null) {
 			valueMap = new LinkedHashMap<Long, Number>() {
 				private static final long serialVersionUID = 3552039647099141391L;
@@ -29,7 +30,7 @@ public class InstanceStats {
 					return eldest.getKey() < (current - maxAge);
 				}
 			};
-			metricsLog.put(name, valueMap);
+			statisticsLog.put(name, valueMap);
 		}
 
 		//flush last timestamp entry if interval passed
@@ -38,6 +39,7 @@ public class InstanceStats {
 			List<Number> list = lastTimestampNumbers.remove(name);
 			Number aggregated = calculateValue(rule, list);
 			valueMap.put(last, aggregated);
+			lastMetrics.put(name, aggregated);
 		}
 
 		//store current value to temp map
@@ -78,7 +80,11 @@ public class InstanceStats {
 		return result;
 	}
 
-	public Map<String, Map<Long, Number>> getMetrics() {
-		return metricsLog;
+	public Map<String, Number> getMetrics() {
+		return lastMetrics;
+	}
+
+	public Map<String, Map<Long, Number>> getStatistics() {
+		return statisticsLog;
 	}
 }

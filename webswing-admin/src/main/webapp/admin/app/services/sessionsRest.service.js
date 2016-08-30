@@ -9,7 +9,7 @@
             };
 
             function getSessions(path) {
-                return $http.get(baseUrl + '/rest/admin/sessions/'+path).then(success, failed);
+                return $http.get(toPath(path) + '/rest/sessions/').then(success, failed);
                 function success(data) {
                     return data.data;
                 }
@@ -18,8 +18,8 @@
                 }
             }
 
-            function getSession(id) {
-                return $http.get(baseUrl + '/rest/admin/session/' + id).then(success, failed);
+            function getSession(path,id) {
+                return $http.get(toPath(path) + '/rest/session/' + id).then(success, failed);
                 function success(data) {
                     return data.data;
                 }
@@ -29,7 +29,7 @@
             }
 
             function forceKillSession(id) {
-                return $http.delete(baseUrl + '/rest/admin/session/' + id +'?force=true').then(success, failed);
+                return $http.delete(toPath(path) + '/rest/session/' + id +'?force=true').then(success, failed);
                 function success(data) {
                     messageService.info('Swing application process has been forcefully terminated.');
                 }
@@ -39,7 +39,7 @@
             }
             
             function killSession(id) {
-                return $http.delete(baseUrl + '/rest/admin/session/' + id ).then(success, failed);
+                return $http.delete(toPath(path) + '/rest/session/' + id ).then(success, failed);
                 function success(data) {
                     messageService.info('Swing application signalled to exit.');
                 }
@@ -47,6 +47,19 @@
                     return errorHandler.handleRestError('Swing application shutdown', data, true);
                 }
             }
+            
+			function toPath(path) {
+				if (path.substr(0, 4) === 'http') {
+					return path;
+				}
+				if (path.substr(0, 1) !== '/') {
+					path = '/' + path
+				}
+				if (path.length === 1) {
+					path = '';
+				}
+				return path;
+			}
         }
 
         sessionsRestService.$inject = ['baseUrl', '$http', 'errorHandler', 'messageService'];

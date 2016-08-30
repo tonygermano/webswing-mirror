@@ -16,7 +16,7 @@ public class SummaryStats {
 		Set<Long> timestamps = new HashSet<>();
 		Map<Long,Number> metric = new LinkedHashMap<>();
 		for (InstanceStats instance : instanceMap.values()) {
-			Map<Long, Number> valueMap = instance.getMetrics().get(name);
+			Map<Long, Number> valueMap = instance.getStatistics().get(name);
 			if (valueMap != null) {
 				timestamps.addAll(valueMap.keySet());
 			}
@@ -24,7 +24,7 @@ public class SummaryStats {
 		for (Long key : timestamps) {
 			List<Number> values = new ArrayList<>();
 			for (InstanceStats instance : instanceMap.values()) {
-				Map<Long, Number> valueMap = instance.getMetrics().get(name);
+				Map<Long, Number> valueMap = instance.getStatistics().get(name);
 				if (valueMap != null && valueMap.get(key)!=null) {
 					values.add(valueMap.get(key));
 				}
@@ -61,7 +61,7 @@ public class SummaryStats {
 		return result;
 	}
 
-	public Map<String, Map<Long, Number>> getMetrics() {
+	public Map<String, Map<Long, Number>> getStatistics() {
 		return metricsLog;
 	}
 

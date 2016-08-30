@@ -29,5 +29,10 @@ public interface SwingInstanceManager extends SecuredPathHandler,SwingInstanceHo
 	 * @return Map<name_of_metric, Map<timestamp, value>>
 	 */
 	Map<String, Map<Long, Number>> getInstanceStats(String instance);
+	
+	/**
+	 * @return Map<name_of_metric, value>
+	 */
+	Map<String, Number> getInstanceMetrics(String clientId);
 
 }

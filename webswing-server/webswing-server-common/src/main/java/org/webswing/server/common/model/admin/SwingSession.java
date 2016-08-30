@@ -18,6 +18,7 @@ public class SwingSession implements Serializable {
 	private Boolean recorded;
 	private String recordingFile;
 	private Map<String, Map<Long,Number>> stats;
+	private Map<String, Number> metrics;
 	private SwingInstanceStatus status;
 
 	public String getId() {
@@ -114,6 +115,14 @@ public class SwingSession implements Serializable {
 
 	public void setStatus(SwingInstanceStatus status) {
 		this.status = status;
+	}
+
+	public Map<String, Number> getMetrics() {
+		return metrics;
+	}
+
+	public void setMetrics(Map<String, Number> metrics) {
+		this.metrics = metrics;
 	}
 
 }

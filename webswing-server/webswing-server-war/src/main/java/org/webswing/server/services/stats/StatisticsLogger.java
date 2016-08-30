@@ -11,12 +11,15 @@ public interface StatisticsLogger {
 	public static final String LATENCY_SERVER_RENDERING = "latencyServerRendering";
 	public static final String LATENCY_CLIENT_RENDERING = "latencyClientRendering";
 	public static final String LATENCY_NETWORK = "latencyNetwork";
+	public static final String LATENCY= "latency";
 
 	void log(String instance, String name, Number value);
 
 	Map<String, Map<Long, Number>> getSummaryStats();
 
 	Map<String, Map<Long, Number>> getInstanceStats(String instance);
+
+	Map<String, Number> getInstanceMetrics(String clientId);
 
 	void removeInstance(String instance);
 
