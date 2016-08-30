@@ -2,6 +2,7 @@ package org.webswing.server.common.model.admin;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 public class SwingSession implements Serializable {
 
@@ -16,7 +17,7 @@ public class SwingSession implements Serializable {
 	private Date disconnectedSince;
 	private Boolean recorded;
 	private String recordingFile;
-	private SwingJvmStats state;
+	private Map<String, Map<Long,Number>> stats;
 	private SwingInstanceStatus status;
 
 	public String getId() {
@@ -67,12 +68,12 @@ public class SwingSession implements Serializable {
 		this.disconnectedSince = disconnectedSince;
 	}
 
-	public SwingJvmStats getState() {
-		return state;
+	public Map<String,Map<Long,Number>> getStats() {
+		return stats;
 	}
 
-	public void setState(SwingJvmStats state) {
-		this.state = state;
+	public void setStats(Map<String,Map<Long,Number>> state) {
+		this.stats = state;
 	}
 
 	public Date getEndedAt() {

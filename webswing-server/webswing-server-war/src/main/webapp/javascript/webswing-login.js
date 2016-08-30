@@ -101,6 +101,9 @@ define([ 'jquery' ], function amdFactory($) {
 					if (loginMsg.redirectUrl != null) {
 						window.top.location.href = loginMsg.redirectUrl;
 					} else if (loginMsg.partialHtml != null) {
+						if(typeof element === 'function'){
+							element=element();
+						}
 						element.html(loginMsg.partialHtml);
 					} else {
 						doneCallback();

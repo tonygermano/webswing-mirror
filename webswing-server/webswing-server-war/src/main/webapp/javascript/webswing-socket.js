@@ -84,6 +84,7 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
             };
 
             request.onMessage = function (response) {
+            	var receivedTimestamp=new Date().getTime();
                 try {
                     var data = decodeResponse(response);
                     if (data.sessionId != null) {
@@ -98,6 +99,7 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
                             callback(data.javaResponse);
                         }
                     }
+                    data.receivedTimestamp = receivedTimestamp;
                     api.processMessage(data);
                 } catch (e) {
                     console.error(e.stack);

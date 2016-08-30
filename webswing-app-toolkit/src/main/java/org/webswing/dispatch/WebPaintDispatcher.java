@@ -118,6 +118,7 @@ public class WebPaintDispatcher {
 						Util.encodeWindowImages(windowImages, json);
 						Logger.trace("contentSender:pngEncodingDone", json.hashCode());
 					}
+					json.setSendTimestamp("" + System.currentTimeMillis());
 					Services.getConnectionService().sendObject(json);
 				} catch (Exception e) {
 					Logger.error("contentSender:error", e);

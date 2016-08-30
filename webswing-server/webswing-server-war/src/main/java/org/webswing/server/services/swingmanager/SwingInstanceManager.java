@@ -1,6 +1,7 @@
 package org.webswing.server.services.swingmanager;
 
 import java.io.File;
+import java.util.Map;
 
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
@@ -21,5 +22,12 @@ public interface SwingInstanceManager extends SecuredPathHandler,SwingInstanceHo
 	void notifySwingClose(SwingInstance swingAppInstance);
 
 	void startSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h);
+
+	void logStatValue(String instance, String name, Number value);
+
+	/**
+	 * @return Map<name_of_metric, Map<timestamp, value>>
+	 */
+	Map<String, Map<Long, Number>> getInstanceStats(String instance);
 
 }

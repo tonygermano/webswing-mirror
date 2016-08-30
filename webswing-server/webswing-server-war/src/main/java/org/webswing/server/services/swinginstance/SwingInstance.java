@@ -35,7 +35,7 @@ public interface SwingInstance {
 
 	void webSessionDisconnected(String connectionId);
 
-	void logInboundData(int length);
+	void logStatValue(String name, Number value);
 
 	SwingSession toSwingSession();
 

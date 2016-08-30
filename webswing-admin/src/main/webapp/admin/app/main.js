@@ -26,19 +26,22 @@
 			'libs/ui-utils' : {
 				deps : [ 'libs/angular' ]
 			},
-			'libs/d3': {
+			'libs/d3' : {
 				exports : 'd3',
 				deps : [ 'libs/jquery' ]
 			},
 			'libs/pie-chart' : {
-				deps : [ 'libs/angular', 'libs/d3']
+				deps : [ 'libs/angular', 'libs/d3' ]
 			},
-			'libs/ng-textcomplete': {
-				deps : [ 'libs/angular']
+			'libs/line-chart' : {
+				deps : [ 'libs/angular', 'libs/d3' ]
+			},
+			'libs/ng-textcomplete' : {
+				deps : [ 'libs/angular' ]
 			}
 		}
 	});
-	require([ 'libs/jquery', 'angular', 'libs/bootstrap', 'libs/angular-route', 'libs/ui-ace', 'libs/ui-bootstrap', 'libs/ui-utils', 'libs/d3', 'libs/pie-chart','libs/ng-textcomplete' ], function() {
+	require([ 'libs/jquery', 'angular', 'libs/bootstrap', 'libs/angular-route', 'libs/ui-ace', 'libs/ui-bootstrap', 'libs/ui-utils', 'libs/d3', 'libs/pie-chart', 'libs/line-chart', 'libs/ng-textcomplete' ], function() {
 		require([ 'app.module' ], function() {
 			angular.bootstrap(root, [ 'wsAdmin' ]);
 		}, errorHandler);

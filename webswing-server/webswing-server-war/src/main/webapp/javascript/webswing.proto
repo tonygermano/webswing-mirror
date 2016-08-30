@@ -16,6 +16,8 @@ message AppFrameMsgOutProto{
 	optional JsResultMsgProto javaResponse = 11;
 	optional PlaybackInfoMsgProto playback = 12;
 	optional string sessionId = 13;
+	optional string startTimestamp = 14;
+	optional string sendTimestamp = 15;
 }
 
 message ApplicationInfoMsgProto{
@@ -165,6 +167,13 @@ message InputEventMsgInProto{
 	optional KeyboardEventMsgInProto key = 2;
 	optional MouseEventMsgInProto mouse = 3;
 	optional SimpleEventMsgInProto event = 4;
+	optional TimestampsMsgInProto timestamps = 5;
+}
+
+message TimestampsMsgInProto{
+	optional string startTimestamp = 1;
+	optional string sendTimestamp = 2;
+	optional string renderingTime = 3; 
 }
 
 message ConnectionHandshakeMsgInProto{

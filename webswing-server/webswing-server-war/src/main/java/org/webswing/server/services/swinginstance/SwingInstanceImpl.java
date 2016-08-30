@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.ParamMsg;
 import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn.SimpleEventType;
+import org.webswing.model.c2s.TimestampsMsgIn;
 import org.webswing.model.internal.ApiCallMsgInternal;
 import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.model.internal.ApiEventMsgInternal.ApiEventType;
@@ -37,7 +39,6 @@ import org.webswing.server.common.model.DesktopLauncherConfig;
 import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.model.SwingConfig.LauncherType;
 import org.webswing.server.common.model.admin.SwingInstanceStatus;
-import org.webswing.server.common.model.admin.SwingJvmStats;
 import org.webswing.server.common.model.admin.SwingSession;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.model.EncodedMessage;
@@ -48,6 +49,7 @@ import org.webswing.server.services.jvmconnection.JvmConnectionService;
 import org.webswing.server.services.jvmconnection.JvmListener;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
+import org.webswing.server.services.stats.StatisticsLogger;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingprocess.ProcessExitListener;
 import org.webswing.server.services.swingprocess.SwingProcess;
@@ -74,11 +76,11 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	private final SwingInstanceManager manager;
 	private final FileTransferHandler fileHandler;
+	private final String instanceId;
+	private final String clientId;
 	private SwingProcess app;
 	private JvmConnection connection;
 	private SessionRecorder sessionRecorder;
-	private String instanceId;
-	private String clientId;
 	private AbstractWebswingUser user;
 	private String clientIp;
 	private WebSocketConnection resource;
@@ -89,7 +91,6 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private Date endedAt = null;
 	private String customArgs = "";
 	private int debugPort = 0;
-	private SwingJvmStats latest = new SwingJvmStats();
 
 	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection resource) throws WsException {
 		this.manager = manager;
@@ -201,7 +202,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			synchronized (resource) {
 				resource.broadcastMessage(serialized);
 				int length = resource.isBinary() ? serialized.getProtoMessage().length : serialized.getJsonMessage().getBytes().length;
-				logOutboundData(length);
+				logStatValue(StatisticsLogger.OUTBOUND_SIZE_METRIC, length);
 			}
 		}
 		if (mirroredResource != null) {
@@ -228,12 +229,27 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				} else {
 					connection.send(h);
 				}
+			} else if (h instanceof TimestampsMsgIn) {
+				processTimestampMessage((TimestampsMsgIn) h);
 			} else {
 				connection.send(h);
 			}
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	private void processTimestampMessage(TimestampsMsgIn h) {
+		if (StringUtils.isNotEmpty(h.getRenderingTime()) && StringUtils.isNotEmpty(h.getSendTimestamp()) && StringUtils.isNotEmpty(h.getSendTimestamp())) {
+			long currentTime = System.currentTimeMillis();
+			long renderingTime = Long.parseLong(h.getRenderingTime());
+			long sendTime = Long.parseLong(h.getSendTimestamp());
+			long startTime = Long.parseLong(h.getStartTimestamp());
+
+			logStatValue(StatisticsLogger.LATENCY_SERVER_RENDERING, sendTime - startTime);
+			logStatValue(StatisticsLogger.LATENCY_NETWORK, currentTime - sendTime - renderingTime);
+			logStatValue(StatisticsLogger.LATENCY_CLIENT_RENDERING, renderingTime);
 		}
 	}
 
@@ -287,8 +303,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				}
 			} else if (o instanceof JvmStatsMsgInternal) {
 				JvmStatsMsgInternal s = (JvmStatsMsgInternal) o;
-				latest.setHeapSize(s.getHeapSize());
-				latest.setHeapSizeUsed(s.getHeapSizeUsed());
+				logStatValue(StatisticsLogger.MEMORY_ALLOCATED_METRIC, s.getHeapSize());
+				logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
 			} else if (o instanceof ExitMsgInternal) {
 				close();
 				ExitMsgInternal e = (ExitMsgInternal) o;
@@ -329,7 +345,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		session.setUser(getUser());
 		session.setEndedAt(getEndedAt());
 		session.setStatus(getStatus());
-		session.setState(getStats());
+		session.setStats(manager.getInstanceStats(getClientId()));
 		session.setRecorded(isRecording());
 		session.setRecordingFile(getRecordingFile());
 		return session;
@@ -344,11 +360,11 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private SwingProcess start(SwingProcessService processService, final SwingConfig appConfig, final ConnectionHandshakeMsgIn handshake) throws Exception {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final StrSubstitutor subs = CommonUtil.getConfigSubstitutor(user.getUserId(), clientId, clientIp, handshake.getLocale(), customArgs);
+		final StrSubstitutor subs = CommonUtil.getConfigSubstitutor(user.getUserId(), getClientId(), clientIp, handshake.getLocale(), customArgs);
 		SwingProcess swing = null;
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
-			swingConfig.setName(clientId);
+			swingConfig.setName(getClientId());
 			File homeDir = manager.resolveFile(".");
 			swingConfig.setJreExecutable(subs.replace(appConfig.getJreExecutable()));
 			swingConfig.setBaseDir(homeDir.getAbsolutePath());
@@ -385,7 +401,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			String debug = appConfig.isDebug() && (debugPort != 0) ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=" + debugPort + ",server=y,suspend=y " : "";
 			String vmArgs = appConfig.getVmArgs() == null ? "" : subs.replace(appConfig.getVmArgs());
 			swingConfig.setJvmArgs(bootCp + debug + " -noverify " + vmArgs);
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, clientId);
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, getClientId());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
 			swingConfig.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 			swingConfig.addProperty(Constants.JMS_URL, System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT));
@@ -498,10 +514,6 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		return endedAt;
 	}
 
-	public SwingJvmStats getStats() {
-		return latest;
-	}
-
 	public Boolean isRecording() {
 		return sessionRecorder != null && !sessionRecorder.isFailed();
 	}
@@ -548,14 +560,10 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		return mirroredResource != null ? mirroredResource.uuid() : null;
 	}
 
-	public void logInboundData(int length) {
-		latest.setInboundMsgCount(latest.getInboundMsgCount() + 1);
-		latest.setInboundDataSizeSum(latest.getInboundDataSizeSum() + length);
-	}
-
-	private void logOutboundData(int length) {
-		latest.setOutboundMsgCount(latest.getOutboundMsgCount() + 1);
-		latest.setOutboundDataSizeSum(latest.getOutboundDataSizeSum() + length);
+	public void logStatValue(String name, Number value) {
+		if (StringUtils.isNotEmpty(name)) {
+			manager.logStatValue(getClientId(), name, value);
+		}
 	}
 
 	private void notifyUserConnected() {

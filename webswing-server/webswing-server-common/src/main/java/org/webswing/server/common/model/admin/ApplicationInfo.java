@@ -1,9 +1,9 @@
 package org.webswing.server.common.model.admin;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.webswing.server.common.model.SecuredPathConfig;
-import org.webswing.server.common.model.meta.MetaObject;
 
 public class ApplicationInfo implements Serializable {
 	private static final long serialVersionUID = 7847135426884331742L;
@@ -17,8 +17,7 @@ public class ApplicationInfo implements Serializable {
 	private int runningInstances;
 	private int maxRunningInstances;
 	private int finishedInstances;
-	private SwingJvmStats avgStats;
-	private SwingJvmStats maxStats;
+	private Map<String, Map<Long, Number>> stats;
 
 	public String getPath() {
 		return path;
@@ -68,22 +67,6 @@ public class ApplicationInfo implements Serializable {
 		this.maxRunningInstances = maxRunningInstances;
 	}
 
-	public SwingJvmStats getAvgStats() {
-		return avgStats;
-	}
-
-	public void setAvgStats(SwingJvmStats avgStats) {
-		this.avgStats = avgStats;
-	}
-
-	public SwingJvmStats getMaxStats() {
-		return maxStats;
-	}
-
-	public void setMaxStats(SwingJvmStats maxStats) {
-		this.maxStats = maxStats;
-	}
-
 	public String getUrl() {
 		return url;
 	}
@@ -114,6 +97,14 @@ public class ApplicationInfo implements Serializable {
 
 	public void setStatus(InstanceManagerStatus status) {
 		this.status = status;
+	}
+
+	public Map<String, Map<Long, Number>> getStats() {
+		return stats;
+	}
+
+	public void setStats(Map<String, Map<Long, Number>> stats) {
+		this.stats = stats;
 	}
 
 }

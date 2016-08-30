@@ -14,6 +14,7 @@ import org.webswing.model.c2s.CopyEventMsgIn;
 import org.webswing.model.c2s.InputEventMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.c2s.PasteEventMsgIn;
+import org.webswing.model.c2s.TimestampsMsgIn;
 import org.webswing.model.c2s.UploadedEventMsgIn;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JsResultMsg;
@@ -27,6 +28,7 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.login.SecuredPathHandler;
+import org.webswing.server.services.stats.StatisticsLogger;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
@@ -132,6 +134,8 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 							send(r, evt.getMouse());
 						} else if (evt.getEvent() != null) {
 							send(r, evt.getEvent());
+						} else if (evt.getTimestamps() != null) {
+							send(r, evt.getTimestamps());
 						}
 					}
 				} else if (frame.getPaste() != null) {
@@ -155,7 +159,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 			}
 			SwingInstance instance = instanceHolder.findInstanceBySessionId(r.uuid());
 			if (instance != null) {
-				instance.logInboundData(length);
+				instance.logStatValue(StatisticsLogger.INBOUND_SIZE_METRIC, length);
 			}
 		} catch (Exception e) {
 			log.error("Exception while processing websocket message.", e);

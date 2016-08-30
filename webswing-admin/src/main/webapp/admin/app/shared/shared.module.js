@@ -12,8 +12,9 @@
         'shared/basic/booleanField.directive',
         'shared/basic/stringMapField.directive',
         'shared/helper/substitutorHelper.directive',
+        'shared/helper/statLineGraph.directive',
         'shared/helper/substitutor.filter'
-    ], function f(appView,configView, field, objectField, objectListField, objectMapField, jsonField, stringField, stringListField, booleanField,wsStringMapField, substitutorHelper, substitutorFilter) {
+    ], function f(appView,configView, field, objectField, objectListField, objectMapField, jsonField, stringField, stringListField, booleanField,wsStringMapField, substitutorHelper, statLineGraph, substitutorFilter) {
         var module = angular.module('wsShared', []);
 
         module.directive('wsAppView',appView)
@@ -28,6 +29,7 @@
         module.directive('wsBooleanField', booleanField);
         module.directive('wsStringMapField', wsStringMapField);
         module.directive('wsSubstitutorHelper', substitutorHelper);
+        module.directive('wsLineGraph', statLineGraph);
         module.filter('substitutor', substitutorFilter);
 
     });

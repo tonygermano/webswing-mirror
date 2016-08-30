@@ -242,6 +242,12 @@ body {
 .ws-pie-chart {
 	min-height: 250px;
 }
+.ws-line-chart {
+	height: 100px;
+}
+.ws-line-chart .chart-legend {
+	display: none;
+}
 
 .ws-app-header {
 	position: relative;

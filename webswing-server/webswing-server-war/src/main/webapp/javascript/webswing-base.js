@@ -132,8 +132,17 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             sendMessageEvent('repaint');
         }
 
-        function ack() {
+		function ack(data) {
             sendMessageEvent('paintAck');
+			if (data != null) {
+				api.sendInput({
+					timestamps : {
+						startTimestamp : data.startTimestamp,
+						sendTimestamp : data.sendTimestamp,
+						renderingTime : "" + (new Date().getTime() - data.receivedTimestamp)
+					}
+				});
+			}
         }
 
         function kill() {
@@ -280,7 +289,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
                         return renderWindow(window, context);
                     }, errorHandler);
                 }, Promise.resolve()).then(function() {
-                    ack();
+					ack(data);
                     processNextQueuedFrame();
                 }, errorHandler);
             } else {

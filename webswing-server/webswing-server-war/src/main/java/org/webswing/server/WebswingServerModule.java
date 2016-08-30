@@ -20,6 +20,8 @@ import org.webswing.server.services.security.modules.SecurityModuleService;
 import org.webswing.server.services.security.modules.SecurityModuleServiceImpl;
 import org.webswing.server.services.startup.StartupService;
 import org.webswing.server.services.startup.StartupServiceImpl;
+import org.webswing.server.services.stats.StatisticsLoggerService;
+import org.webswing.server.services.stats.StatisticsLoggerServiceImpl;
 import org.webswing.server.services.swinginstance.SwingInstanceService;
 import org.webswing.server.services.swinginstance.SwingInstanceServiceImpl;
 import org.webswing.server.services.swingmanager.SwingInstanceManagerService;
@@ -48,6 +50,7 @@ public class WebswingServerModule extends AbstractModule {
 		bind(FileTransferHandlerService.class).to(FileTransferHandlerServiceImpl.class);
 		bind(ResourceHandlerService.class).to(ResourceHandlerServiceImpl.class);
 		bind(RestHandlerService.class).to(RestHandlerServiceImpl.class);
+		bind(StatisticsLoggerService.class).to(StatisticsLoggerServiceImpl.class);
 
 		bind(SecurityManagerService.class).to(SecurityManagerServiceImpl.class);
 		bind(SecurityModuleService.class).to(SecurityModuleServiceImpl.class);

@@ -63,7 +63,6 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		connectionFactory = new ActiveMQConnectionFactory(System.getProperty(Constants.JMS_URL));
 		connectionFactory.setAlwaysSessionAsync(false);
 		connectionFactory.setTrustAllPackages(true);
-		;
 		watchdog = new Runnable() {
 			private boolean terminated = false;
 
