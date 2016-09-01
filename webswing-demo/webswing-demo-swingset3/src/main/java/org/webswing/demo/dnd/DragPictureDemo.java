@@ -13,12 +13,15 @@ package org.webswing.demo.dnd;
  *     images/Alexi.jpg
  */
 import java.io.*;
+import java.net.MalformedURLException;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
 import java.awt.dnd.*;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.sun.swingset3.DemoProperties;
 
@@ -77,9 +80,36 @@ public class DragPictureDemo extends JPanel {
 		pic11 = new DTPicture(null);
 		pic11.setTransferHandler(picHandler);
 		mugshots.add(pic11);
-		pic12 = new JLabel("Export image...");
+		pic12 = new JLabel("Import/Export image...");
 		pic12.setBorder(BorderFactory.createRaisedBevelBorder());
-		
+		pic12.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JFileChooser fileChooser= new JFileChooser();
+				fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fileChooser.setMultiSelectionEnabled(true);
+				fileChooser.setFileFilter(new FileNameExtensionFilter("My Images","png","jpg"));
+				int result = fileChooser.showOpenDialog(null);
+				if(result == JFileChooser.APPROVE_OPTION){
+					File[] files = fileChooser.getSelectedFiles();
+					for (int i = 0; i < files.length; i++) {
+						File file = files[i];
+						try {
+							ImageIcon importImageIcon = importImageIcon(file, "import "+i);
+							if(i<11){
+								DTPicture pic=(DTPicture) DragPictureDemo.class.getDeclaredField("pic"+(i+1)).get(DragPictureDemo.this);
+								pic.setImage(importImageIcon.getImage());
+							}
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				}else{
+					JOptionPane.showConfirmDialog(null, "Import cancelled.");
+				}
+				
+			}
+		});
 		pic12.setTransferHandler(picExportHandler);
 		mugshots.add(pic12);
 
@@ -91,6 +121,18 @@ public class DragPictureDemo extends JPanel {
 	/** Returns an ImageIcon, or null if the path was invalid. */
 	protected static ImageIcon createImageIcon(String path, String description) {
 		java.net.URL imageURL = DragPictureDemo.class.getResource("resources/" + path);
+		if (imageURL == null) {
+			System.err.println("Resource not found: " + path);
+			return null;
+		} else {
+			return new ImageIcon(imageURL, description);
+		}
+	}
+	
+	/** Returns an ImageIcon, or null if the path was invalid. 
+	 * @throws MalformedURLException */
+	protected static ImageIcon importImageIcon(File path, String description) throws MalformedURLException {
+		java.net.URL imageURL = path.toURI().toURL();
 		if (imageURL == null) {
 			System.err.println("Resource not found: " + path);
 			return null;

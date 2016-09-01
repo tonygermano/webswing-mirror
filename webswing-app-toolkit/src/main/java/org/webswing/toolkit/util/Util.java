@@ -48,6 +48,7 @@ import org.webswing.model.c2s.KeyboardEventMsgIn;
 import org.webswing.model.c2s.KeyboardEventMsgIn.KeyEventType;
 import org.webswing.model.c2s.MouseEventMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
 import org.webswing.model.s2c.WindowMsg;
 import org.webswing.model.s2c.WindowPartialContentMsg;
 import org.webswing.toolkit.WebToolkit;
@@ -545,13 +546,22 @@ public class Util {
 	public static AWTEvent createKeyEvent(Component src, int type, long when, int modifiers, int keycode, char character, int keyLocationStandard) {
 		KeyEvent e = new KeyEvent(src, type, when, modifiers, keycode, character, KeyEvent.KEY_LOCATION_STANDARD);
 		try {
-			java.lang.reflect.Field f=KeyEvent.class.getDeclaredField("extendedKeyCode");
+			java.lang.reflect.Field f = KeyEvent.class.getDeclaredField("extendedKeyCode");
 			f.setAccessible(true);
 			f.set(e, keycode);
 		} catch (Exception e1) {
 			Logger.error("Failed to update extendedKeyCode of KeyEvent", e);
 		}
 		return e;
+	}
+
+	public static FileDialogEventType getFileChooserEventType(JFileChooser fileChooserDialog) {
+		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_UPLOAD)) {
+			if (fileChooserDialog.getFileSelectionMode() == JFileChooser.FILES_ONLY && fileChooserDialog.getDialogType() == JFileChooser.OPEN_DIALOG) {
+				return FileDialogEventType.AutoUpload;
+			}
+		}
+		return FileDialogEventType.Open;
 	}
 
 }

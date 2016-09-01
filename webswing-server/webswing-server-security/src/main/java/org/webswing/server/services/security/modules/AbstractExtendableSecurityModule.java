@@ -105,7 +105,7 @@ public abstract class AbstractExtendableSecurityModule<T extends WebswingExtenda
 			try {
 				AbstractWebswingUser result = extension.doSufficientPreValidation(this, request, response);
 				if (result != null) {
-					onAuthenticationSuccess(request, response);
+					onAuthenticationSuccess(result, request, response);
 					return result;
 				} else {
 					continue;

@@ -15,6 +15,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_ALLOW_DOWNLOAD = "webswing.allowDownload";
 	public static final String SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD = "webswing.allowAutoDownload";
 	public static final String SWING_START_SYS_PROP_ALLOW_UPLOAD = "webswing.allowUpload";
+	public static final String SWING_START_SYS_PROP_ALLOW_AUTO_UPLOAD = "webswing.allowAutoUpload";
 	public static final String SWING_START_SYS_PROP_ALLOW_DELETE = "webswing.allowDelete";
 	public static final String SWING_START_SYS_PROP_ALLOW_JSLINK = "webswing.allowJsLink";
 	public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutAfterDisconectSec";
@@ -71,4 +72,5 @@ public interface Constants {
 	public static final String HTTP_ATTR_RECORDING_FLAG = "X-webswing-recording";
 	public static final String HTTP_ATTR_ARGS = "X-webswing-args";
 	public static final String HTTP_ATTR_DEBUG_PORT = "X-webswing-debugPort";
+
 }

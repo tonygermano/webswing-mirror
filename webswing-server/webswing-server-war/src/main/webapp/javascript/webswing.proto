@@ -70,6 +70,7 @@ message FileDialogEventMsgProto{
 	enum FileDialogEventTypeProto {
 		Open = 0;
 		Close = 1;
+		AutoUpload = 2;
 	}
 }
 
@@ -258,6 +259,7 @@ message SimpleEventMsgInProto{
 		downloadFile = 4;
 		deleteFile = 5;
 		hb = 6;
+		cancelAutoUpload = 7;
 	}
 }
 

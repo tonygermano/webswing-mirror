@@ -11,7 +11,7 @@ public class FileDialogEventMsg implements Msg {
 	private static final long serialVersionUID = -7470385173647106699L;
 
 	public enum FileDialogEventType {
-		Open, Close;
+		AutoUpload, Open, Close;
 	}
 
 	private FileDialogEventType eventType;
@@ -27,17 +27,14 @@ public class FileDialogEventMsg implements Msg {
 		allowDelete = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE));
 	}
 
-	private void addFilter(String arr[]) {
-		for (String s : arr) {
-			filter += "." + s + ", ";
-		}
-	}
 
 	public void addFilter(FileFilter filterArr[]) {
 		for (FileFilter ff : filterArr) {
 			if (ff instanceof FileNameExtensionFilter) {
 				FileNameExtensionFilter fe = (FileNameExtensionFilter) ff;
-				addFilter(fe.getExtensions());
+				for (String s : fe.getExtensions()) {
+					filter += "." + s + ", ";
+				}
 			}
 		}
 		if (filter.length() > 2)

@@ -27,7 +27,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             sessionStolenNotification : 'dialog.content.sessionStolenNotification',
             tooManyClientsNotification : 'dialog.content.tooManyClientsNotification',
             continueOldSessionDialog : 'dialog.content.continueOldSessionDialog',
-            openFileDialog : 'files.open',
+            processFileDialogEvent : 'files.process',
             closeFileDialog : 'files.close',
             openLink : 'files.link',
             print : 'files.print',
@@ -169,6 +169,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             resetState();
             api.disposeInput();
             api.disposeTouch();
+            api.closeFileDialog();
             window.removeEventListener('beforeunload', beforeUnloadEventHandler);
             directDraw.dispose();
         }
@@ -256,11 +257,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
                 api.displayCopyBar(data.copyEvent);
             }
             if (data.fileDialogEvent != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
-                if (data.fileDialogEvent.eventType === 'Open') {
-                    api.openFileDialog(data.fileDialogEvent, api.cfg.clientId);
-                } else if (data.fileDialogEvent.eventType === 'Close') {
-                    api.closeFileDialog();
-                }
+                api.processFileDialogEvent(data.fileDialogEvent);
             }
             if (data.closedWindow != null) {
                 delete windowImageHolders[data.closedWindow];

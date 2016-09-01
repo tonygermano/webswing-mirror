@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.RepaintManager;
@@ -368,15 +369,29 @@ public class WebPaintDispatcher {
 	}
 
 	public void notifyFileDialogActive(WebWindowPeer webWindowPeer) {
-		AppFrameMsgOut f = new AppFrameMsgOut();
-		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
-		fdEvent.setEventType(FileDialogEventType.Open);
-		f.setFileDialogEvent(fdEvent);
-		Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
 		fileChooserDialog = Util.discoverFileChooser(webWindowPeer);
-		fdEvent.addFilter(fileChooserDialog.getChoosableFileFilters());
-		fdEvent.setMultiSelection(fileChooserDialog.isMultiSelectionEnabled());
-		Services.getConnectionService().sendObject(f);
+		notifyFileDialogActive();
+	}
+
+	public void notifyFileDialogActive() {
+		if (fileChooserDialog != null) {
+			AppFrameMsgOut f = new AppFrameMsgOut();
+			FileDialogEventMsg fdEvent = new FileDialogEventMsg();
+			f.setFileDialogEvent(fdEvent);
+			FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fileChooserDialog);
+			fdEvent.setEventType(fileChooserEventType);
+			if (FileDialogEventType.AutoUpload.equals(fileChooserEventType)) {
+				fdEvent.setAllowDelete(false);
+				fdEvent.setAllowDownload(false);
+				fdEvent.setAllowUpload(false);
+				Window d = SwingUtilities.getWindowAncestor(fileChooserDialog);
+				d.setBounds(0, 0, 1, 1);
+			}
+			fdEvent.addFilter(fileChooserDialog.getChoosableFileFilters());
+			fdEvent.setMultiSelection(fileChooserDialog.isMultiSelectionEnabled());
+			Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", fileChooserEventType.name());
+			Services.getConnectionService().sendObject(f);
+		}
 	}
 
 	public void notifyFileDialogHidden(WebWindowPeer webWindowPeer) {
@@ -384,7 +399,7 @@ public class WebPaintDispatcher {
 		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
 		fdEvent.setEventType(FileDialogEventType.Close);
 		f.setFileDialogEvent(fdEvent);
-		Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", f);
+		Logger.info("WebPaintDispatcher:notifyFileTransferBarHidden", FileDialogEventType.Close);
 
 		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD)) {
 			if (fileChooserDialog != null && fileChooserDialog.getDialogType() == JFileChooser.SAVE_DIALOG) {

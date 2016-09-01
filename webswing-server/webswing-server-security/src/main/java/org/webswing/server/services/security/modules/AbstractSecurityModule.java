@@ -115,7 +115,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 			AbstractWebswingUser user = authenticate(request);
 			if (user != null) {
 				postVerify(user, request, response);
-				onAuthenticationSuccess(request, response);
+				onAuthenticationSuccess(user, request, response);
 				return decorateUser(user, request, response);
 			}
 			onAuthenticationFailed(request, response, null);
@@ -177,12 +177,14 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	/**
 	 * If the login request is not Ajax call and a {@link #SUCCESS_URL} was sent with first request, 
 	 * send redirect to this url. 
+	 * @param user authenticated user
 	 * @param request login request
 	 * @param response login response
 	 * @throws IOException if fails to respond
 	 */
-	protected void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	protected void onAuthenticationSuccess(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setStatus(HttpServletResponse.SC_OK);
+		response.setHeader("webswingUsername", user.getUserId());
 		if (!isAjax(request)) {
 			Map<String, Object> msg = getLoginRequest(request);
 			if (msg != null && msg.containsKey(SUCCESS_URL)) {

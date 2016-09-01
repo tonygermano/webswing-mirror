@@ -109,6 +109,7 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow Downloading Files ", description = "If selected, the JFileChooser integration will allow users to download files displayed in the file chooser dialog")
 	@ConfigFieldDefaultValueBoolean(true)
+	@ConfigFieldDiscriminator
 	public boolean isAllowDownload();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow Auto-Downloading Files ", description = "If selected, the JFileChooser dialog's save mode will trigger file download as soon as the selected file is available on filesystem.")
@@ -119,6 +120,10 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(true)
 	@ConfigFieldDiscriminator
 	public boolean isAllowUpload();
+	
+	@ConfigField(tab = ConfigGroup.Features, label = "Allow Auto-Uploading Files ", description = "If selected, the JFileChooser dialog's open mode will open a client side file browser and transparently upload selected files and triggers selection.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isAllowAutoUpload();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Upload Size Limit", description = "Maximum size of upload for single file (in MB). Set 0 for unlimited size.")
 	@ConfigFieldDefaultValueNumber(5)
@@ -157,6 +162,10 @@ public interface SwingConfig extends Config {
 			LinkedHashSet<String> names = super.getPropertyNames(config, cl);
 			if (!config.isAllowUpload()) {
 				names.remove("uploadMaxSize");
+				names.remove("allowAutoUpload");
+			}
+			if (!config.isAllowDownload()) {
+				names.remove("allowAutoDownload");
 			}
 			return names;
 		}

@@ -1,65 +1,19 @@
 package org.webswing.server.services.security.extension.onetimeurl;
 
-import java.io.Serializable;
+import java.util.List;
 
-public class OtpTokenData implements Serializable {
-	private static final long serialVersionUID = -4871408167327762993L;
+public interface OtpTokenData {
 
-	private String requestorId;
-	private String user;
-	private String[] roles;
-	private String[] permissions;
-	private String[][] attributes;
-	private String oneTimePassword;
+	public String getRequestorId();
 
-	public OtpTokenData() {
-	}
+	public String getUser();
 
-	public String getRequestorId() {
-		return requestorId;
-	}
+	public List<String> getRoles();
 
-	public void setRequestorId(String requestorId) {
-		this.requestorId = requestorId;
-	}
+	public List<String> getPermissions();
 
-	public String getUser() {
-		return user;
-	}
+	public List<Object> getAttributes();
 
-	public void setUser(String user) {
-		this.user = user;
-	}
+	public String getOneTimePassword();
 
-	public String[] getRoles() {
-		return roles;
-	}
-
-	public void setRoles(String[] roles) {
-		this.roles = roles;
-	}
-
-	public String[] getPermissions() {
-		return permissions;
-	}
-
-	public void setPermissions(String[] permissions) {
-		this.permissions = permissions;
-	}
-
-	public String getOneTimePassword() {
-		return oneTimePassword;
-	}
-
-	public void setOneTimePassword(String oneTimePassword) {
-		this.oneTimePassword = oneTimePassword;
-	}
-
-	public String[][] getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(String[][] attributes) {
-		this.attributes = attributes;
-	}
 }

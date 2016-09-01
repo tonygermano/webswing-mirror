@@ -39,6 +39,7 @@ import org.webswing.model.c2s.UploadEventMsgIn;
 import org.webswing.model.c2s.UploadedEventMsgIn;
 import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.model.jslink.JSObjectMsg;
+import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
 import org.webswing.toolkit.WebClipboard;
 import org.webswing.toolkit.WebClipboardTransferable;
 import org.webswing.toolkit.WebDragSourceContextPeer;
@@ -83,6 +84,7 @@ public class WebEventDispatcher {
 					if (event instanceof ConnectionHandshakeMsgIn) {
 						final ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
 						Util.getWebToolkit().initSize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
+						Util.getWebToolkit().getPaintDispatcher().notifyFileDialogActive();
 						if (System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null) {
 							// resize and refresh the applet object exposed in javascript in case of page reload/session continue
 							Applet a = (Applet) WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
@@ -142,6 +144,9 @@ public class WebEventDispatcher {
 			break;
 		case downloadFile:
 			Util.getWebToolkit().getPaintDispatcher().notifyDownloadSelectedFile();
+			break;
+		case cancelAutoUpload:
+			handleAutoUploadCancelled();;
 			break;
 		case paintAck:
 			Util.getWebToolkit().getPaintDispatcher().clientReadyToReceive();
@@ -434,14 +439,22 @@ public class WebEventDispatcher {
 							fc.setSelectedFile(f);
 						}
 					}
-					// fc.approveSelection();
-				} else {
-					fc.cancelSelection();
-				}
+					if(FileDialogEventType.AutoUpload.equals(Util.getFileChooserEventType(fc))){
+						fc.approveSelection();
+					}
+				} 
 			}
 			uploadMap.clear();
 		}
 	}
+	
+	public void handleAutoUploadCancelled() {
+		JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
+		if (dialog != null) {
+			dialog.cancelSelection();
+		}
+	}
+
 
 	public static boolean isDndInProgress() {
 		return dndHandler.isDndInProgress();
