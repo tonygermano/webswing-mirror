@@ -20,8 +20,8 @@ import org.webswing.server.common.model.meta.MetadataGenerator;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "isolatedFs", "allowDelete", "allowDownload", "allowAutoDownload", "allowUpload", "uploadMaxSize",
-		"allowedCorsOrigins", "allowJsLink" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "isolatedFs", "allowDelete", "allowDownload", "allowAutoDownload", "allowUpload", "allowAutoUpload",
+		"uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
 public interface SwingConfig extends Config {
 	public enum SessionMode {
 		ALWAYS_NEW_SESSION,
@@ -120,7 +120,7 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(true)
 	@ConfigFieldDiscriminator
 	public boolean isAllowUpload();
-	
+
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow Auto-Uploading Files ", description = "If selected, the JFileChooser dialog's open mode will open a client side file browser and transparently upload selected files and triggers selection.")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowAutoUpload();

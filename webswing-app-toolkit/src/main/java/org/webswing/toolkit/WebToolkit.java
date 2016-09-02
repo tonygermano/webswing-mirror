@@ -75,6 +75,7 @@ import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.TrayIconPeer;
 import java.awt.peer.WindowPeer;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Map;
@@ -292,6 +293,15 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		this.desktopProperties.put("win.xpstyle.dllName", "C:\\WINDOWS\\resources\\themes\\Aero\\Aero.msstyles");
 		this.desktopProperties.put("win.xpstyle.sizeName", "NormalSize");
 		this.desktopProperties.put("win.xpstyle.themeActive", true);
+		if (System.getProperty("os.name", "").startsWith("Windows")) {
+			try {
+				Field xpStyleEnabledField = sun.awt.windows.ThemeReader.class.getDeclaredField("xpStyleEnabled");
+				xpStyleEnabledField.setAccessible(true);
+				xpStyleEnabledField.setBoolean(null, true);
+			} catch (Exception e) {
+				Logger.debug("Failed to set xpStyleEnabled to true", e);
+			}
+		}
 	}
 
 	public boolean needUpdateWindow() {
@@ -649,8 +659,8 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 			});
 		}
 	}
-	
-	public void defaultShutdownProcedure(){
+
+	public void defaultShutdownProcedure() {
 		//first send windows closing event to all windows
 		for (Window w : Window.getWindows()) {
 			w.dispatchEvent(new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
