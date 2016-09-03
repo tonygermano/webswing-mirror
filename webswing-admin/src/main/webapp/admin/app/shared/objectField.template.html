@@ -8,7 +8,7 @@
 		<span class="ws-tooltip glyphicon glyphicon-question-sign" ng-if="vm.desc != null" ui-jq="tooltip" title="{{::vm.desc}}"></span>
 	</h4>
 	
-	<div class="row" collapse="value.collapsed" >
+	<div class="row" collapse="vm.label != null && value.collapsed" >
 		<div class="ws-config-group col-md-12 ws-order-number-start" >
 	        <ws-field ng-repeat="field in value.fields"
 	                  field="field"  

@@ -28,7 +28,7 @@
                 }
             }
 
-            function forceKillSession(id) {
+            function forceKillSession(path, id) {
                 return $http.delete(toPath(path) + '/rest/session/' + id +'?force=true').then(success, failed);
                 function success(data) {
                     messageService.info('Swing application process has been forcefully terminated.');
@@ -38,7 +38,7 @@
                 }
             }
             
-            function killSession(id) {
+            function killSession(path, id) {
                 return $http.delete(toPath(path) + '/rest/session/' + id ).then(success, failed);
                 function success(data) {
                     messageService.info('Swing application signalled to exit.');

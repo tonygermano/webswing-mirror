@@ -36,6 +36,7 @@ public interface WebswingSecurityConfig {
 
 	@ConfigField(label = "Secuirty Module Class Path")
 	@ConfigFieldVariables
+	@ConfigFieldDiscriminator
 	public List<String> getClassPath();
 
 	@ConfigField(label = "Secuirty Module Config")

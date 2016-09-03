@@ -36,6 +36,7 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.General, label = "Name", description = "Swing application name.")
 	@ConfigFieldVariables
+	@ConfigFieldDefaultValueString("Swing app")
 	public String getName();
 
 	@ConfigField(tab = ConfigGroup.General, label = "Theme", description = "Select one of the default window decoration themes or a enter path to a XFWM4 theme folder.")

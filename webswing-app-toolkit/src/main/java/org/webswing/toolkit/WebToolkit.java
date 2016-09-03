@@ -130,6 +130,15 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	}
 
 	public void initSize(final Integer desktopWidth, final Integer desktopHeight) {
+		if (!SwingUtilities.isEventDispatchThread()) {
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					initSize(desktopWidth, desktopHeight);
+				}
+			});
+		}
 		int oldWidht = screenWidth;
 		int oldHeight = screenHeight;
 		screenWidth = desktopWidth;

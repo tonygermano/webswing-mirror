@@ -21,6 +21,7 @@ import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.ComponentEvent;
 import java.awt.event.PaintEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -235,6 +236,17 @@ public class WebComponentPeer implements ComponentPeer {
 	public void setBounds(int x, int y, int w, int h, int paramInt5) {
 		synchronized (WebPaintDispatcher.webPaintLock) {
 			Point validPosition = validate(x, y, w, h);
+			boolean resized = (w != this.oldWidth) || (h != this.oldHeight);
+			boolean moved = (validPosition.x != this.oldX) || (validPosition.y != this.oldY);
+			if (resized) {
+				ComponentEvent e = new ComponentEvent((Component) target, ComponentEvent.COMPONENT_RESIZED);
+				postEvent(e);
+			}
+			if (moved) {
+				ComponentEvent e = new ComponentEvent((Component) target, ComponentEvent.COMPONENT_MOVED);
+				postEvent(e);
+			}
+
 			if ((w != this.oldWidth) || (h != this.oldHeight)) {
 				try {
 					replaceSurfaceData(validPosition.x, validPosition.y, w, h);
@@ -258,7 +270,7 @@ public class WebComponentPeer implements ComponentPeer {
 	}
 
 	protected void notifyWindowBoundsChanged(Rectangle rectangle) {
-		Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(),rectangle);		
+		Util.getWebToolkit().getPaintDispatcher().notifyWindowBoundsChanged(getGuid(), rectangle);
 	}
 
 	protected Point validate(int x, int y, int w, int h) {

@@ -1,6 +1,6 @@
 (function(define) {
 	define([], function f() {
-		function ConfigEditController($scope, baseUrl, configRestService, wsUtils, permissions) {
+		function ConfigEditController($scope, baseUrl, configRestService, permissions) {
 			var vm = this;
 			vm.permissions = permissions;
 			vm.readonly = !vm.permissions.configEdit;
@@ -20,23 +20,23 @@
 			});
 
 			function activate() {
-				configRestService.getConfig(baseUrl).then(function(data) {
+				return configRestService.getConfig(baseUrl).then(function(data) {
 					vm.config = angular.extend({}, vm.config, data);
-				});
-				configRestService.getVariables().then(function(data) {
+				})
+				.then(configRestService.getVariables).then(function(data) {
 					vm.variables = data;
 				});
 			}
 
 			function reset() {
-				activate();
+				return activate();
 			}
 
-			function apply() {
-				configRestService.setConfig(baseUrl, wsUtils.extractValues(vm.config)).then(activate);
+			function apply(config) {
+				return configRestService.setConfig(baseUrl, config).then(activate);
 			}
 		}
-		ConfigEditController.$inject = [ '$scope', 'baseUrl', 'configRestService', 'wsUtils', 'permissions' ];
+		ConfigEditController.$inject = [ '$scope', 'baseUrl', 'configRestService', 'permissions' ];
 
 		return ConfigEditController;
 	});

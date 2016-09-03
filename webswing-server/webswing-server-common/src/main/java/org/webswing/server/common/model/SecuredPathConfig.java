@@ -26,7 +26,7 @@ public interface SecuredPathConfig extends Config {
 
 	@ConfigField(label = "Web Folder", description = "Folder to be used to store customized static web files like HTML, CSS or Javascript.")
 	@ConfigFieldVariables
-	@ConfigFieldDefaultValueString("www")
+	@ConfigFieldDefaultValueString("")
 	public String getWebFolder();
 
 	@ConfigField(label = "Icon", description = "Path to icon displayed in application selection dialog.")

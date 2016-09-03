@@ -41,7 +41,7 @@
 			}
 
 			function updateJson() {
-				vm.json = angular.toJson(vm.app, true);
+				vm.json = angular.toJson(vm.value, true);
 			}
 		}
 

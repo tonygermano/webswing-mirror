@@ -27,21 +27,23 @@
 				  </div>
 				</div>
 			</div>
-			<div class="pull-right">
+			<div class="pull-right" ng-if="vm.detail ==='true'" >
 				<button ng-if="vm.stoppable && vm.permissions.stop" class="btn btn-primary" type="button" ng-click="vm.stop()">
 			    	<span class="glyphicon glyphicon-stop"></span> Stop
 				</button>
 				<button ng-if="vm.startable && vm.permissions.start" class="btn btn-primary" type="button" ng-click="vm.start()">
 				    <span class="glyphicon glyphicon-play"></span> Start
 				</button>
-		        <button ng-if="vm.startable && vm.permissions.remove" type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" >
-				    Remove <span class="caret"></span>
-				</button>
-				<ul class="dropdown-menu">
-				    <li>Are you sure?</li>
-				    <li role="separator" class="divider"></li>
-				    <li><a ng-click="vm.remove()">Yes, please!</a></li>
-				</ul>
+				<div ng-if="vm.startable && vm.permissions.remove" class="btn-group">
+			        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" >
+					    Remove <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-right">
+					    <li>Are you sure?</li>
+					    <li role="separator" class="divider"></li>
+					    <li><a ng-click="vm.remove()">Yes, please!</a></li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>

@@ -95,13 +95,13 @@
 			}
 
 			function kill() {
-				return sessionsRestService.killSession($routeParams.sessionId).then(function() {
+				return sessionsRestService.killSession(vm.path, vm.sessionId).then(function() {
 					back();
 				});
 			}
 
 			function forceKill() {
-				return sessionsRestService.forceKillSession($routeParams.sessionId).then(function() {
+				return sessionsRestService.forceKillSession(vm.path, vm.sessionId).then(function() {
 					back();
 				});
 			}

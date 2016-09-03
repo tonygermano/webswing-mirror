@@ -25,6 +25,8 @@
 			vm.isForm = true;
 			vm.json = {};
 			vm.aceLoaded = aceLoaded;
+			vm.applyConfig = applyConfig;
+			vm.resetConfig = resetConfig;
 
 			$scope.$on('wsHelperOpened', function(evt, data, i) {
 				$scope.$broadcast('wsHelperClose', data, i);
@@ -59,12 +61,15 @@
 				$scope.$watch("vm.readonly", function(value) {
 					editor.setReadOnly(value);
 				});
-				$scope.$watch('vm.value', function() {
+				vm.updateJson=function(){
 					if (!vm.isForm) {
-						vm.json = wsUtils.toJson(vm.value);
-						editor.resize(true);
+						editor.setValue(wsUtils.toJson(vm.value));
+						editor.gotoLine(0);
 					}
-				}, true);
+				}
+				$scope.$watch('vm.value', vm.updateJson, true);
+				
+				
 			}
 
 			function showForm() {
@@ -75,6 +80,19 @@
 					messageService.error('Failed to parse JSON. Back to last valid version.');
 				}
 			}
+			
+			function applyConfig(){
+				if(!vm.isForm){
+					vm.apply(JSON.parse(vm.json)).then(vm.updateJson);
+				}else{
+					vm.apply(wsUtils.extractValues(vm.value));
+				}
+			}
+			
+			function resetConfig(){
+				vm.reset().then(vm.updateJson);
+			}
+			
 		}
 
 		wsConfigViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$timeout', '$location', 'messageService', 'wsUtils', 'configRestService' ];
