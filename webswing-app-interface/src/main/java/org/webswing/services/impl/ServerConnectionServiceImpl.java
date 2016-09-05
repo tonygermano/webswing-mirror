@@ -189,7 +189,10 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 				} catch (Exception jMSException) {
 					Logger.error("Failed to read message from JMS", jMSException);
 				}
-				if (omsg.getObject() instanceof SyncMsg) {
+				if (omsg.getObject() instanceof JavaEvalRequestMsgIn) {
+					JavaEvalRequestMsgIn javaReq = (JavaEvalRequestMsgIn) omsg.getObject();
+					WebJSObject.evaluateJava(javaReq);
+				} else if (omsg.getObject() instanceof SyncMsg) {
 					SyncMsg syncmsg = (SyncMsg) omsg.getObject();
 					String correlationId = syncmsg.getCorrelationId();
 					if (syncCallResposeMap.containsKey(correlationId)) {
@@ -201,12 +204,9 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					} else {
 						Logger.warn("No thread waiting for sync-ed message with id ", correlationId);
 					}
-				} else if (omsg.getObject() instanceof JavaEvalRequestMsgIn) {
-					JavaEvalRequestMsgIn javaReq = (JavaEvalRequestMsgIn) omsg.getObject();
-					WebJSObject.evaluateJava(javaReq);
 				} else if (omsg.getObject() instanceof MsgIn) {
 					Util.getWebToolkit().getEventDispatcher().dispatchEvent((MsgIn) omsg.getObject());
-				}else if (omsg.getObject() instanceof ApiEventMsgInternal){
+				} else if (omsg.getObject() instanceof ApiEventMsgInternal) {
 					Util.getWebToolkit().processApiEvent((ApiEventMsgInternal) omsg.getObject());
 				}
 			}

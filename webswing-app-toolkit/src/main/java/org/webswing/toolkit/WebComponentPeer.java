@@ -46,6 +46,7 @@ import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.ge.WebGraphicsConfig;
+import org.webswing.toolkit.util.DummyGraphics2D;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
@@ -74,22 +75,24 @@ public class WebComponentPeer implements ComponentPeer {
 
 	public BufferedImage extractBufferedImage(Rectangle sub) {
 		BufferedImage safeImage = new BufferedImage(sub.width, sub.height, BufferedImage.TYPE_4BYTE_ABGR);
-		Graphics2D g = (Graphics2D) safeImage.getGraphics();
-		g.drawImage(image, 0, 0, sub.width, sub.height, sub.x, sub.y, sub.x + sub.width, sub.y + sub.height, null);
-		for (WebComponentPeer wcp : hwLayers) {
-			Insets i = ((Window) this.getTarget()).getInsets();
-			Rectangle b = wcp.getBounds();
-			Rectangle bt = new Rectangle(b.x + i.left, b.y + i.top, b.width, b.height);
-			if (bt.intersects(sub)) {
-				Rectangle dst = sub.intersection(bt);
-				Rectangle src = new Rectangle(dst);
-				dst.translate(-sub.x, -sub.y);
-				src.translate(-bt.x, -bt.y);
-				g.drawImage(wcp.image, dst.x, dst.y, dst.width + dst.x, dst.height + dst.y, src.x, src.y, src.width + src.x, src.height + src.y, null);
+		if (isInitialized()) {
+			Graphics2D g = (Graphics2D) safeImage.getGraphics();
+			g.drawImage(image, 0, 0, sub.width, sub.height, sub.x, sub.y, sub.x + sub.width, sub.y + sub.height, null);
+			for (WebComponentPeer wcp : hwLayers) {
+				Insets i = ((Window) this.getTarget()).getInsets();
+				Rectangle b = wcp.getBounds();
+				Rectangle bt = new Rectangle(b.x + i.left, b.y + i.top, b.width, b.height);
+				if (bt.intersects(sub)) {
+					Rectangle dst = sub.intersection(bt);
+					Rectangle src = new Rectangle(dst);
+					dst.translate(-sub.x, -sub.y);
+					src.translate(-bt.x, -bt.y);
+					g.drawImage(wcp.image, dst.x, dst.y, dst.width + dst.x, dst.height + dst.y, src.x, src.y, src.width + src.x, src.height + src.y, null);
+				}
 			}
+			g.drawImage(windowDecorationImage, 0, 0, sub.width, sub.height, sub.x, sub.y, sub.x + sub.width, sub.y + sub.height, null);
+			g.dispose();
 		}
-		g.drawImage(windowDecorationImage, 0, 0, sub.width, sub.height, sub.x, sub.y, sub.x + sub.width, sub.y + sub.height, null);
-		g.dispose();
 		return safeImage;
 	}
 
@@ -285,13 +288,15 @@ public class WebComponentPeer implements ComponentPeer {
 				if (Util.isDD()) {
 					this.webImage = Services.getDirectDrawService().createImage(w, h);
 				} else {
-					WebGraphicsConfig localWebGraphicsConfig = (WebGraphicsConfig) getGraphicsConfiguration();
-					this.image = (OffScreenImage) localWebGraphicsConfig.createAcceleratedImage((Component) this.target, w, h);
-					localSurfaceData = this.surfaceData;
-					this.surfaceData = Util.getWebToolkit().webComponentPeerReplaceSurfaceData(SurfaceManager.getManager(this.image));// java6
-																																		// vs
-																																		// java7
-																																		// difference
+					if (w > 0 && h > 0) {
+						WebGraphicsConfig localWebGraphicsConfig = (WebGraphicsConfig) getGraphicsConfiguration();
+						this.image = (OffScreenImage) localWebGraphicsConfig.createAcceleratedImage((Component) this.target, w, h);
+						localSurfaceData = this.surfaceData;
+						this.surfaceData = Util.getWebToolkit().webComponentPeerReplaceSurfaceData(SurfaceManager.getManager(this.image));// java6 vs java7 difference
+					} else {
+						this.image = null;
+						this.surfaceData = null;
+					}
 
 					if (localSurfaceData != null) {
 						localSurfaceData.invalidate();
@@ -384,6 +389,8 @@ public class WebComponentPeer implements ComponentPeer {
 			SurfaceData surface = this.surfaceData;
 			if (surface != null) {
 				result = new GraphicsWrapper(new SunGraphics2D(surface, foreground, background, font), this);
+			} else {
+				return new DummyGraphics2D();
 			}
 		}
 		return result;
