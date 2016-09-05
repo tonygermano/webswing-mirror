@@ -68,8 +68,6 @@
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<pushChanges>false</pushChanges>
-					<!-- REMOVE allowTimestampedSnapshots WHEN BCEL 6 released -->
-					<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
 					<scmCommentPrefix>
 					</scmCommentPrefix>
 					<tagNameFormat>${project.version}</tagNameFormat>
