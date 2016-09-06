@@ -20,7 +20,7 @@
                         }
                     });
                 } else {
-                    messageService.error('Failed to ' + operation + '.');
+                    messageService.error('Failed to ' + operation + '. '+data.statusText);
                     $log.error('Failed to ' + operation + ' with status ' + data.status + ' and message :' + data.data);
                     return Promise.reject(new Error());
                 }

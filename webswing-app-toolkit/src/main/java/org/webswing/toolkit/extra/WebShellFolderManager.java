@@ -24,7 +24,7 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 	public WebShellFolderManager() {
 		String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
 		root = new IsolatedRootFile(path);
-		if(!root.getAbsoluteFile().exists()) {
+		if (!root.getAbsoluteFile().exists()) {
 			root.mkdirs();
 		}
 		System.setProperty("user.home", root.getAbsolutePath());
@@ -80,11 +80,15 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 					}
 				}
 			} else {
-				return null;
+				throw new FileNotFoundException("Path is outside the allowed Webswing Filesystem isolation folder.");
 			}
 		} catch (IOException e) {
 			System.err.println("Error while creating ShellFolder. " + e.getMessage());
-			return null;
+			if (e instanceof FileNotFoundException) {
+				throw (FileNotFoundException) e;
+			} else {
+				throw new FileNotFoundException("Error while creating ShellFolder. " + e.getMessage());
+			}
 		}
 	}
 

@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.TimeoutException;
 
-import org.webswing.model.MsgOut;
-
 public interface ServerConnectionService {
 
 	void sendObject(Serializable jsonPaintRequest);
 
-	Object sendObjectSync(MsgOut o, String correlationId) throws TimeoutException, IOException;
+	Object sendObjectSync(Serializable o, String correlationId) throws TimeoutException, IOException;
 }

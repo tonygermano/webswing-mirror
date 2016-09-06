@@ -7,12 +7,11 @@
 	<url>http://www.webswing.org</url>
 	<scm>
 		<developerConnection>scm:git:https://bitbucket.org/meszarv/webswing.git</developerConnection>
-		<tag>2.3-SNAPSHOT</tag>
+		<tag>2.5-SNAPSHOT</tag>
 	</scm>
 	<modules>
-		<module>webswing-server</module>
+		<module>webswing-api</module>
 		<module>webswing-admin</module>
-		<module>webswing-server-launcher</module>
 		<module>webswing-app-toolkit</module>
 		<module>webswing-app-toolkit-java6</module>
 		<module>webswing-app-toolkit-java7</module>
@@ -21,23 +20,39 @@
 		<module>webswing-app-interface</module>
 		<module>webswing-directdraw</module>
 		<module>webswing-demo</module>
+		<module>webswing-server</module>
 		<module>webswing-assembly</module>
 	</modules>
 	<properties>
-    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jersey.version>2.6</jersey.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.codehaus.jackson</groupId>
-				<artifactId>jackson-mapper-asl</artifactId>
-				<version>1.9.13</version>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>2.6.3</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>2.4</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.4</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.shiro</groupId>
+				<artifactId>shiro-web</artifactId>
+				<version>1.2.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.6.6</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -52,6 +67,16 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.6</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.0.2</version>
+				</plugin>
 				<plugin>
 					<groupId>com.github.os72</groupId>
 					<artifactId>protoc-jar-maven-plugin</artifactId>
@@ -75,13 +100,6 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<compilerArguments>
-						<bootclasspath>${basedir}/../lib/rt1.6.0_45.jar</bootclasspath>
-					</compilerArguments>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -110,7 +128,7 @@
 				<inherited>false</inherited>
 				<executions>
 					<execution>
-						<id>install-jar-lib</id>
+						<id>install-pngencoder</id>
 						<goals>
 							<goal>install-file</goal>
 						</goals>
@@ -121,6 +139,21 @@
 							<version>1</version>
 							<packaging>jar</packaging>
 							<file>${basedir}/lib/pngencoder.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-rt-win-shell</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>rt-win-shell</groupId>
+							<artifactId>rt-win-shell</artifactId>
+							<version>1</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/lib/rt-win-shell.jar</file>
 							<generatePom>true</generatePom>
 						</configuration>
 					</execution>

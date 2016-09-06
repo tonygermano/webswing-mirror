@@ -59,4 +59,5 @@ public class ImageConst extends ImmutableDrawConstantHolder<byte[]> {
 		}
 		return null;
 	}
+
 }

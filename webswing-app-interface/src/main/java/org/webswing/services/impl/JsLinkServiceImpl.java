@@ -8,17 +8,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import netscape.javascript.JSException;
-
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.webswing.ext.services.JsLinkService;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JavaObjectRefMsg;
 import org.webswing.model.jslink.JsParamMsg;
 import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.toolkit.jslink.WebJSObject;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import netscape.javascript.JSException;
 
 public class JsLinkServiceImpl implements JsLinkService {
 	private static final ObjectMapper mapper = new ObjectMapper();

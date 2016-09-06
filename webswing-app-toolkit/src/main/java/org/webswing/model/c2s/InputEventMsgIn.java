@@ -9,6 +9,7 @@ public class InputEventMsgIn implements MsgIn {
 	private KeyboardEventMsgIn key;
 	private MouseEventMsgIn mouse;
 	private SimpleEventMsgIn event;
+	private TimestampsMsgIn timestamps;
 
 	public ConnectionHandshakeMsgIn getHandshake() {
 		return handshake;
@@ -40,6 +41,14 @@ public class InputEventMsgIn implements MsgIn {
 
 	public void setEvent(SimpleEventMsgIn event) {
 		this.event = event;
+	}
+
+	public TimestampsMsgIn getTimestamps() {
+		return timestamps;
+	}
+
+	public void setTimestamps(TimestampsMsgIn timestamps) {
+		this.timestamps = timestamps;
 	}
 
 }

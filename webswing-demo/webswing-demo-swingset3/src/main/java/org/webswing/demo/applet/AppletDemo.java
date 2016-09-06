@@ -2,7 +2,6 @@ package org.webswing.demo.applet;
 
 import java.applet.Applet;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
@@ -13,6 +12,7 @@ import com.sun.swingset3.DemoProperties;
 
 @DemoProperties(value = "Applet info", category = "Webswing", description = "Demonstrates applets.", sourceFiles = { "org/webswing/demo/applet/AppletDemo.java", "org/webswing/demo/applet/SwingSet3Applet.java" })
 public class AppletDemo extends JPanel {
+	private static final long serialVersionUID = 8121827449962804404L;
 	Applet a = SwingSet3Applet.applet;
 
 	public AppletDemo() {

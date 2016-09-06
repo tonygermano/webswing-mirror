@@ -23,6 +23,8 @@ public class AppFrameMsgOut implements MsgOut {
 	private JsResultMsg javaResponse;
 	private PlaybackInfoMsg playback;
 	private String sessionId;
+	private String startTimestamp = "" + System.currentTimeMillis();
+	private String sendTimestamp;
 
 	public WindowMsg getOrCreateWindowById(String guid) {
 		if (windows != null) {
@@ -142,6 +144,22 @@ public class AppFrameMsgOut implements MsgOut {
 
 	public void setPlayback(PlaybackInfoMsg playback) {
 		this.playback = playback;
+	}
+
+	public String getStartTimestamp() {
+		return startTimestamp;
+	}
+
+	public void setStartTimestamp(String startTimestamp) {
+		this.startTimestamp = startTimestamp;
+	}
+
+	public String getSendTimestamp() {
+		return sendTimestamp;
+	}
+
+	public void setSendTimestamp(String sendTimestamp) {
+		this.sendTimestamp = sendTimestamp;
 	}
 
 }

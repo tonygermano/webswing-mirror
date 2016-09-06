@@ -8,21 +8,21 @@ import java.util.concurrent.ExecutionException;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import netscape.javascript.JSObject;
-
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.webswing.Constants;
 import org.webswing.ext.services.JsLinkService;
 import org.webswing.ext.services.ServerConnectionService;
-import org.webswing.model.MsgOut;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.services.impl.JsLinkServiceImpl;
 import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.Services;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import netscape.javascript.JSObject;
 
 public abstract class AbstractJsLinkTest {
 	static {
@@ -43,7 +43,7 @@ public abstract class AbstractJsLinkTest {
 		ServerConnectionService serverServiceImpl = new ServerConnectionService() {
 
 			@Override
-			public Object sendObjectSync(MsgOut o, String correlationId) throws IOException {
+			public Object sendObjectSync(Serializable o, String correlationId) throws IOException {
 				try {
 					engine.put("data", mapper.writeValueAsString(o));
 					engine.eval("data=JSON.parse(data)");
@@ -68,9 +68,9 @@ public abstract class AbstractJsLinkTest {
 
 		engine.eval("var define =function(array,f){ this['JsLink']=f()}");
 		engine.eval("self=this; this.setTimeout=function(f,t){f()}");
-		engine.eval(new FileReader("../webswing-server/src/main/webapp/javascript/es6promise.js"));
+		engine.eval(new FileReader("../webswing-server/webswing-server-war/src/main/webapp/javascript/es6promise.js"));
 		engine.eval("ES6Promise.polyfill()");
-		engine.eval(new FileReader("../webswing-server/src/main/webapp/javascript/webswing-jslink.js"));
+		engine.eval(new FileReader("../webswing-server/webswing-server-war/src/main/webapp/javascript/webswing-jslink.js"));
 		engine.put("sendJava", this);
 		engine.eval("var result=null;var window={test:'test'};");
 		engine.eval("var cfg={javaCallTimeout:0}");

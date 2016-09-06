@@ -21,11 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.swing.RepaintManager;
 
 import org.apache.commons.codec.binary.Base64;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.toolkit.VolatileWebImageWrapper;
 import org.webswing.directdraw.toolkit.WebImage;
 import org.webswing.services.impl.ddutil.FastDirectDrawServicesAdapter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DrawServlet extends HttpServlet {
 

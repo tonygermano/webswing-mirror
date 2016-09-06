@@ -1,0 +1,69 @@
+<div data-id="autoUploadBar" class="webswing-autoUpload-dialog webswing-hidden" >
+	<div class="webswing-dialog">
+		<div class="webswing-dialog-modal">
+			<div class="webswing-autoUpload-content">
+				<div class="webswing-fileDialogButtonRow row">
+					<div class="col-xs-12">
+						<h4>Open file</h4>
+					</div>
+					<div class="col-xs-offset-4 col-xs-8 col-md-offset-4 col-md-4">
+						<form data-id="autoFileupload">
+							<input data-id="autoUploadfileDialogTransferBarClientId" name="clientId" type="hidden">
+							<div class="webswing-fileUpload btn btn-success btn-block">
+								<span>Select...</span>
+								<input accept="" data-id="autoFileInput" name="files[]" class="upload" type="file">
+							</div>
+						</form>
+					</div>
+					<div class="col-xs-offset-4 col-xs-8  col-md-offset-0 col-md-4">
+						<button class="btn btn-danger btn-block pull-right" data-id="cancelAutoUploadButton">Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div data-id="uploadBar" class="webswing-fileDialogBar">
+	<div class="container-fluid">
+		<div class="webswing-fileDialogButtonRow row ">
+			<div data-id="fileDropArea" class="webswing-hidden">
+				<p class="upload-dropH1">Drag and drop files here</p>
+			</div>
+		</div>
+		<div class="webswing-fileDialogButtonRow row ">
+			<div class="col-xs-4" data-id="fileDownloadBtn" class="webswing-hidden">
+				<button class="btn btn-success btn-sm btn-block" data-id="downloadSelectedButton">Download selected</button>
+			</div>
+			<div class="col-xs-4" data-id="fileUploadBtn" class="webswing-hidden">
+				<form data-id="fileupload">
+					<input data-id="fileDialogTransferBarClientId" name="clientId" type="hidden">
+					<div class="webswing-fileUpload btn btn-success btn-sm btn-block">
+						<span>Upload files</span>
+						<input accept="" data-id="fileInput" name="files[]" class="upload" type="file">
+					</div>
+				</form>
+			</div>
+			<div class="col-xs-4" data-id="fileDeleteBtn" class="webswing-hidden">
+				<!-- Single button -->
+				<button class="btn btn-success btn-sm btn-block" data-id="deleteSelectedButton">Delete selected</button>
+			</div>
+		</div>
+		<div data-id="fileDialogTransferProgressBar" class="webswing-fileDialogButtonRow row" class="webswing-hidden">
+			<div style="padding-right: 0px;" class="col-xs-8">
+				<div data-id="progress" class="progress webswing-progress">
+					<div style="width: 0%;" class="progress-bar progress-bar-success"></div>
+				</div>
+			</div>
+			<div class="col-xs-4">
+				<div data-id="cancelBtn" class="btn btn-danger btn-xs btn-block">
+					<span> Cancel</span>
+				</div>
+			</div>
+		</div>
+		<div data-id="fileDialogErrorMessage" class="webswing-fileDialogButtonRow row webswing-hidden">
+			<div class="col-md-12">
+				<div data-id="fileDialogErrorMessageContent" class="alert alert-danger"></div>
+			</div>
+		</div>
+	</div>
+</div>

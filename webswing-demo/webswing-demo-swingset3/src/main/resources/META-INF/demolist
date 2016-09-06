@@ -1,3 +1,4 @@
+org.webswing.demo.api.ApiDemo
 org.webswing.demo.printing.PrintingDemo
 org.webswing.demo.fonts.FontsDemo
 org.webswing.demo.files.FilesDemo

@@ -8,18 +8,16 @@
         <title>Webswing.org console</title>
         <link rel="stylesheet" href="css/bootstrap.css" />
         <link rel="stylesheet" href="css/app.css" />
+        <link rel="stylesheet" href="css/line-chart.css" />
 
     </head>
     <body>
     <ws-login></ws-login>
     <ws-navbar></ws-navbar>
-    <div class="container-fluid">
-        <div class="row">
-            <ws-sidebar></ws-sidebar>
-            <div ng-view class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main"></div>
-            <ws-messages></ws-messages>
-        </div>
-    </div>
+    <ws-sidebar>
+    	<div ng-view></div>
+    </ws-sidebar>
+    <ws-messages></ws-messages>
     <script data-webswing-global-var="webswingadmin">
 		var xmlhttp = new XMLHttpRequest();
 	    xmlhttp.onreadystatechange = function() {
@@ -37,7 +35,7 @@
 	    var path = document.location.toString();
         path = path.lastIndexOf('#') > -1 ? path.substring(0, path.lastIndexOf('#')) : path;
         path = path.substring(0, path.lastIndexOf('/admin'));
-	    xmlhttp.open("GET", path + "/rest/webswing/version", true);
+	    xmlhttp.open("GET", path + "/rest/version", true);
 	    xmlhttp.send();
     </script>
 </body>

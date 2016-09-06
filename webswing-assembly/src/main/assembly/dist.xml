@@ -8,7 +8,7 @@
 	</formats>
 	<fileSets>
 		<fileSet>
-			<directory>../webswing-server/target</directory>
+			<directory>../webswing-server/webswing-server-war/target</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>webswing-server.war</include>

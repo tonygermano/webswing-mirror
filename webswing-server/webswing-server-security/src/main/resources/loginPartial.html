@@ -1,0 +1,17 @@
+<form id="webswingLginForm" accept-charset="UTF-8" role="form" style="max-width: 400px;">
+	<h2>Please sign in</h2>
+	<div class="form-group">
+		<input id="nameInput" type="text" class="form-control"
+			placeholder="User name" name="username" required autofocus>
+	</div>
+	<div class="form-group">
+		<input id="passwordInput" type="password" class="form-control"
+			placeholder="Password" name="password" required>
+	</div>
+	<div id="loginErrorMsg">
+		{{#errorMessage}}
+			<div class="alert alert-danger">{{errorMessage}}</div>
+		{{/errorMessage}}
+	</div>
+</form>
+<button type="submit" form="webswingLginForm" value="Submit" class="btn btn-lg btn-primary">Sign in</button>

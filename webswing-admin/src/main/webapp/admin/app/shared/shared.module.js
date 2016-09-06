@@ -1,25 +1,35 @@
 (function (define) {
     define([
-        'shared/stringField.directive',
-        'shared/stringListField.directive',
-        'shared/booleanField.directive',
-        'shared/applicationView.directive',
-        'shared/applicationList.directive',
-        'shared/webswingConfig.directive',
-        'shared/stringMapField.directive',
-        'shared/substitutorHelper.directive',
-        'shared/substitutor.filter'
-    ], function f(stringField, stringListField, booleanField, applicationView, applicationList, webswingConfig, wsStringMapField, substitutorHelper, substitutorFilter) {
+        'shared/appView.directive',
+        'shared/configView.directive',
+        'shared/field.directive',
+        'shared/objectField.directive',
+        'shared/objectListField.directive',
+        'shared/objectMapField.directive',
+        'shared/basic/jsonField.directive',
+        'shared/basic/stringField.directive',
+        'shared/basic/stringListField.directive',
+        'shared/basic/booleanField.directive',
+        'shared/basic/stringMapField.directive',
+        'shared/helper/substitutorHelper.directive',
+        'shared/helper/statLineGraph.directive',
+        'shared/helper/substitutor.filter'
+    ], function f(appView,configView, field, objectField, objectListField, objectMapField, jsonField, stringField, stringListField, booleanField,wsStringMapField, substitutorHelper, statLineGraph, substitutorFilter) {
         var module = angular.module('wsShared', []);
 
+        module.directive('wsAppView',appView)
+        module.directive('wsConfigView',configView)
+        module.directive('wsField',field)
+        module.directive('wsObjectField',objectField)
+        module.directive('wsObjectListField',objectListField)
+        module.directive('wsObjectMapField',objectMapField)
+        module.directive('wsJsonField', jsonField);
         module.directive('wsStringField', stringField);
         module.directive('wsStringListField', stringListField);
         module.directive('wsBooleanField', booleanField);
-        module.directive('wsApplicationView', applicationView);
-        module.directive('wsApplicationList', applicationList);
-        module.directive('wsWebswingConfig', webswingConfig);
         module.directive('wsStringMapField', wsStringMapField);
         module.directive('wsSubstitutorHelper', substitutorHelper);
+        module.directive('wsLineGraph', statLineGraph);
         module.filter('substitutor', substitutorFilter);
 
     });

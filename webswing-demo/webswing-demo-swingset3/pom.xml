@@ -9,6 +9,11 @@
 	</parent>
 	<dependencies>
 		<dependency>
+			<groupId>org.webswing</groupId>
+			<artifactId>webswing-api</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.jdesktop</groupId>
 			<artifactId>appframework</artifactId>
 			<version>1.0.3</version>
@@ -41,6 +46,10 @@
 			<groupId>net.java.dev.timingframework</groupId>
 			<artifactId>timingframework</artifactId>
 			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>

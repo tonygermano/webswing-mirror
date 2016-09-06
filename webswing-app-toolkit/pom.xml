@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>webswing-app-toolkit</artifactId>
 	<parent>
@@ -9,18 +10,29 @@
 	</parent>
 	<dependencies>
 		<dependency>
-			<groupId>com.oracle.java</groupId>
+			<groupId>rt-win-shell</groupId>
 			<artifactId>rt-win-shell</artifactId>
-			<version>1.6.0_45</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/../lib/rt-win-shell.jar</systemPath>
+			<version>1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webswing</groupId>
+			<artifactId>webswing-api</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
 		<finalName>webswing-app-toolkit</finalName>
-		<!-- <plugins> <plugin> <artifactId>maven-compiler-plugin</artifactId>
-			<version>3.1</version> <configuration> <source>1.7</source> <target>1.7</target>
-			</configuration> <compilerArguments> <bootclasspath>${basedir}/../lib/rt1.7.0_60.jar</bootclasspath>
-			</compilerArguments> </plugin> </plugins> -->
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<compilerArguments>
+						<bootclasspath>${basedir}/../lib/rt1.6.0_45.jar</bootclasspath>
+					</compilerArguments>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 </project>

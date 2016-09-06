@@ -58,7 +58,6 @@
                 }
                 return findLocation(locations);
             }
-            ;
 
             function getLocationPath() {
                 function getPath(location) {

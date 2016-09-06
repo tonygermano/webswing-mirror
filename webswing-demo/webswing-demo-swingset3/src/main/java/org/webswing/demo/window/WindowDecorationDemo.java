@@ -1,6 +1,7 @@
 package org.webswing.demo.window;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.Window;
@@ -8,7 +9,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeListener;
 
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -107,7 +110,19 @@ public class WindowDecorationDemo extends JPanel {
 		JLabel context = new JLabel("Right click for context menu");
 		context.setBorder(BorderFactory.createLineBorder(Color.black));
 		JPopupMenu menu = new JPopupMenu("test");
-		menu.add(new JMenuItem("test"));
+		JMenuItem win00 = menu.add(new JMenuItem("create window with size (0,0)"));
+		win00.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+			
+				JWindow frame = new JWindow();
+				frame.add(new JLabel("test"));
+				frame.pack();
+				frame.setVisible(true);
+				frame.setBounds(0, 0, 0, 0);
+			}
+		});
 		menu.add(new JMenuItem("test"));
 		menu.add(new JMenuItem("test"));
 		menu.add(new JMenuItem("test"));

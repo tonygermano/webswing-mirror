@@ -15,27 +15,28 @@ import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
 
 public class DrawConstantPool {
 
-	private LRUDrawConstantPoolCache pool;
-	private Set<String> registeredFonts = new HashSet<String>();
-	private Map<String, FontFaceConst> requestedFonts = new HashMap<String, FontFaceConst>();
+    private LRUDrawConstantPoolCache pool;
+    private Set<String> registeredFonts=new HashSet<String>();
+    private Map<String,FontFaceConst> requestedFonts=new HashMap<String,FontFaceConst>();
+    
 
-	public DrawConstantPool(int size) {
-		pool = new LRUDrawConstantPoolCache(size);
-	}
+    public DrawConstantPool(int size) {
+        pool = new LRUDrawConstantPoolCache(size);
+    }
 
-	public DrawConstant<?> getCached(DrawConstant<?> constant) {
-		return pool.getOrAdd(constant);
-	}
+    public DrawConstant<?> getCached(DrawConstant<?> constant) {
+        return pool.getOrAdd(constant);
+    }
 
-	private void addToCache(DrawConstant<?> constant) {
-		pool.getOrAdd(constant);
-	}
+    private void addToCache(DrawConstant<?> constant) {
+        pool.getOrAdd(constant);
+    }
 
-	private boolean isInCache(DrawConstant<?> constant) {
-		return pool.contains(constant);
-	}
-
-	public int addToCache(List<DrawConstantProto> protos, DrawConstant<?> cons) {
+    private boolean isInCache(DrawConstant<?> constant) {
+        return pool.contains(constant);
+    }
+    
+    public int addToCache(List<DrawConstantProto> protos, DrawConstant<?> cons) {
 		int thisId;
 		if (!isInCache(cons)) {
 			DrawConstant<?> cacheEntry = cons.toCacheEntry();
@@ -46,26 +47,26 @@ public class DrawConstantPool {
 			}
 			proto.setId(cacheEntry.getId());
 			protos.add(proto.build());
-			thisId = cacheEntry.getId();
+			thisId=cacheEntry.getId();
 		} else {
-			thisId = getCached(cons).getId();
+			thisId=getCached(cons).getId();
 		}
 		return thisId;
 	}
 
 	public synchronized boolean isFontRegistered(String file) {
-		if (requestedFonts.containsKey(file) || registeredFonts.contains(file)) {
+		if(requestedFonts.containsKey(file) || registeredFonts.contains(file)){
 			return true;
 		}
 		return false;
 	}
 
 	public synchronized void requestFont(String file, FontFaceConst fontFaceConst) {
-		requestedFonts.put(file, fontFaceConst);
+		requestedFonts.put(file, fontFaceConst);		
 	}
-
-	public synchronized Collection<FontFaceConst> registerRequestedFonts() {
-		if (requestedFonts.size() > 0) {
+	
+	public synchronized Collection<FontFaceConst> registerRequestedFonts(){
+		if(requestedFonts.size()>0){
 			Collection<FontFaceConst> result = new ArrayList<FontFaceConst>(requestedFonts.values());
 			registeredFonts.addAll(requestedFonts.keySet());
 			requestedFonts.clear();
@@ -73,5 +74,5 @@ public class DrawConstantPool {
 		}
 		return Collections.emptyList();
 	}
-
+    
 }

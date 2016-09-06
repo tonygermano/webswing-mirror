@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Webswing</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta charset="utf-8" />
+<link rel="stylesheet" href="css/webswing.css" />
+<link rel="stylesheet" href="javascript/templates/dialog.css" />
+<link rel="stylesheet" href="javascript/templates/bootstrap.css" />
+<link rel="stylesheet" href="javascript/templates/base.css" />
+<script src="js/jquery.js"></script>
+</head>
+<body>
+	<div id="commonDialog" class="webswing-dialog-container">
+		<div class="webswing-dialog-backdrop"></div>
+		<div class="webswing-dialog">
+			<div class="webswing-dialog-modal">
+				<div class="webswing-dialog-modal-content">
+					<div id="webswing-header"></div>
+					<div id="webswing-content"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		var user;
+		webswingLogin(window.location.href, $('#webswing-content'), null, loadApps);
+
+		function webswingLogin(baseUrl, element, loginData, successCallback) {
+			$.ajax({
+				xhrFields : {
+					withCredentials : true
+				},
+				type : 'POST',
+				url : baseUrl + 'login',
+				contentType : typeof loginData === 'object' ? 'application/json' : 'application/x-www-form-urlencoded; charset=UTF-8',
+				data : typeof loginData === 'object' ? JSON.stringify(loginData) : loginData,
+				success : function(data, textStatus, request) {
+					if (successCallback != null) {
+						successCallback(data, request);
+					}
+				},
+				error : function(xhr) {
+					var response = xhr.responseText;
+					if (response != null) {
+						var loginMsg = {};
+						try {
+							loginMsg = JSON.parse(response);
+						} catch (error) {
+							loginMsg.partialHtml = "<p>Login Failed.</p>";
+						}
+						if (loginMsg.redirectUrl != null) {
+							window.top.location.href = loginMsg.redirectUrl;
+						} else if (loginMsg.partialHtml != null) {
+							element.html(loginMsg.partialHtml);
+							var form = element.find('form').first();
+							form.submit(function(event) {
+								webswingLogin(baseUrl, element, form.serialize(), successCallback);
+								event.preventDefault();
+							});
+						} else {
+							loginMsg.partialHtml = "<p>Oops, something's not right.</p>";
+						}
+
+					}
+				}
+			});
+		}
+
+
+		function loadApps(data, request) {
+			user = request.getResponseHeader('webswingUsername');
+			$.ajax({
+				xhrFields : {
+					withCredentials : true
+				},
+				type : 'GET',
+				url : 'apps',
+				success : function(data, textStatus, request) {
+					show(JSON.parse(data));
+				},
+				error : function(data) {
+					if (failCallback != null) {
+						failCallback();
+					}
+				}
+			});
+		}
+
+		function show(apps) {
+			var header = '';
+			header = '<span class="pull-right"><a href="admin" id="admin">Manage</a> | <a href="logout" id="logout">Logout</a></span>';
+			header = header + '<h4 class="modal-title" id="myModalLabel">Hello <span>' + user + '</span>. ';
+			header = header + 'Select your application:</h4>';
+			$('#webswing-header').html(header);
+			var content;
+			if (apps == null || apps.length === 0) {
+				header = null;
+				content = '<p>Sorry, there is no application available for you.</p>';
+			} else {
+				content = '<div class="row">';
+				for ( var i in apps) {
+					var app = apps[i];
+					content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" onclick="window.location.href = \''
+							+ app.url
+							+ '\';"><img src="' + getImageString(app.base64Icon) + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>';
+				}
+			}
+			$('#webswing-content').html(content);
+		}
+		
+		function getImageString(data) {
+			return 'data:image/png;base64,' + data;
+		}
+	</script>
+</body>
+</html>

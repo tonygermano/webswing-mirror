@@ -8,6 +8,7 @@
             </goals>
             <properties>
                 <skipTests>true</skipTests>
+                <webswingRoot>c:\Data\sources\webswing\webswing-assembly\dist\webswing-2.4-SNAPSHOT</webswingRoot>
             </properties>
             <activatedProfiles>
                 <activatedProfile>dev</activatedProfile>
@@ -26,6 +27,21 @@
             <activatedProfiles>
                 <activatedProfile>build</activatedProfile>
                 <activatedProfile>release</activatedProfile>
+            </activatedProfiles>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+            </goals>
+            <properties>
+                <skipTests>true</skipTests>
+                <jpda.listen>maven</jpda.listen>
+                <webswingRoot>c:\Data\sources\webswing\webswing-assembly\dist\webswing-2.4-SNAPSHOT</webswingRoot>
+            </properties>
+            <activatedProfiles>
+                <activatedProfile>dev</activatedProfile>
             </activatedProfiles>
         </action>
     </actions>
