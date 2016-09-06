@@ -39,14 +39,15 @@ public class DrawConstantPool {
     public int addToCache(List<DrawConstantProto> protos, DrawConstant<?> cons) {
 		int thisId;
 		if (!isInCache(cons)) {
-			addToCache(cons);
+			DrawConstant<?> cacheEntry = cons.toCacheEntry();
+			addToCache(cacheEntry);
 			DrawConstantProto.Builder proto = DrawConstantProto.newBuilder();
 			if (cons.getFieldName() != null) {
 				proto.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(cons.getFieldName()), cons.toMessage());
 			}
-			proto.setId(cons.getId());
+			proto.setId(cacheEntry.getId());
 			protos.add(proto.build());
-			thisId=cons.getId();
+			thisId=cacheEntry.getId();
 		} else {
 			thisId=getCached(cons).getId();
 		}

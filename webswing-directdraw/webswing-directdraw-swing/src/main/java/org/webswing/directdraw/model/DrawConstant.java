@@ -18,7 +18,6 @@ public abstract class DrawConstant<T> {
 		return (T) flyweightRegister.get(object).get();
 	}
 
-	
 	public static final NullConst nullConst = new NullConst();
 
 	private DirectDraw context;
@@ -55,6 +54,10 @@ public abstract class DrawConstant<T> {
 
 	public void setContext(DirectDraw context) {
 		this.context = context;
+	}
+
+	public DrawConstant<T> toCacheEntry() {
+		return this;
 	}
 
 	private static final class NullConst extends DrawConstant<Object> {
@@ -94,4 +97,5 @@ public abstract class DrawConstant<T> {
 			return o == this;
 		}
 	}
+
 }

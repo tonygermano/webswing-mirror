@@ -345,7 +345,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> getLoginRequest(HttpServletRequest request) {
-		if (isAjax(request) && request.getContentType().equals("application/json")) {
+		if (isAjax(request) && "application/json".equals(request.getContentType())) {
 			try {
 				if (request.getAttribute(LOGIN_REQUEST_MSG) == null) {
 					Map<String, Object> loginRequest = WebswingObjectMapper.get().readValue(request.getReader(), Map.class);

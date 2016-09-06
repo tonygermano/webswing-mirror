@@ -2,13 +2,13 @@ package org.webswing.directdraw.model;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
-import com.google.protobuf.ByteString;
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.proto.Directdraw.ImageProto;
+
+import com.google.protobuf.ByteString;
 
 public class ImageConst extends ImmutableDrawConstantHolder<byte[]> {
 
@@ -17,6 +17,11 @@ public class ImageConst extends ImmutableDrawConstantHolder<byte[]> {
 	public ImageConst(DirectDraw context, BufferedImage value) {
 		super(context, context.getServices().getPngImage(value));
 		this.hash = context.getServices().computeHash(value);
+	}
+
+	private ImageConst(DirectDraw context, long hash) {
+		super(context, null);
+		this.hash = hash;
 	}
 
 	@Override
@@ -38,8 +43,12 @@ public class ImageConst extends ImmutableDrawConstantHolder<byte[]> {
 
 	@Override
 	public boolean equals(Object o) {
-		return o == this ||
-			o instanceof ImageConst && Arrays.equals(value, ((ImageConst) o).value);
+		return o == this || o instanceof ImageConst && this.hash == ((ImageConst) o).hash;
+	}
+
+	@Override
+	public DrawConstant<byte[]> toCacheEntry() {
+		return new ImageConst(getContext(), this.hash);
 	}
 
 	public static BufferedImage getValue(ImageProto proto) {
@@ -50,4 +59,5 @@ public class ImageConst extends ImmutableDrawConstantHolder<byte[]> {
 		}
 		return null;
 	}
+
 }
