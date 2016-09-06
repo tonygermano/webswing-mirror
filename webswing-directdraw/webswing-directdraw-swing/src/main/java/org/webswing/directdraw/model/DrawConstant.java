@@ -57,6 +57,10 @@ public abstract class DrawConstant<T> {
 		this.context = context;
 	}
 
+	public DrawConstant<T> toCacheEntry() {
+		return this;
+	}
+
 	private static final class NullConst extends DrawConstant<Object> {
 
 		private NullConst() {
