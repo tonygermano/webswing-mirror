@@ -24,7 +24,7 @@ public class FontUtils {
 	private static List<String> styles = Arrays.asList("bolditalic", "italic", "bold", "plain");
 	private static String defaultChargroup = SystemUtils.IS_OS_WINDOWS ? "alpbabet" : "latin-1";
 
-	public static String createFontConiguration(SwingConfig appConfig, StrSubstitutor subs) throws IOException {
+	public static String createFontConfiguration(SwingConfig appConfig, StrSubstitutor subs) throws IOException {
 		if (appConfig.getFontConfig() != null && appConfig.getFontConfig().size() > 0) {
 			StringBuilder fontConfig = new StringBuilder("version=1\n");
 			StringBuilder metadata = new StringBuilder();

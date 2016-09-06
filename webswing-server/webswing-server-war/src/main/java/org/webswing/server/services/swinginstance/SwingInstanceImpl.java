@@ -250,8 +250,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			logStatValue(StatisticsLogger.LATENCY_SERVER_RENDERING, sendTime - startTime);
 			logStatValue(StatisticsLogger.LATENCY_NETWORK, currentTime - sendTime - renderingTime);
 			logStatValue(StatisticsLogger.LATENCY_CLIENT_RENDERING, renderingTime);
-			logStatValue(StatisticsLogger.LATENCY, currentTime-startTime);
-			
+			logStatValue(StatisticsLogger.LATENCY, currentTime - startTime);
+
 		}
 	}
 
@@ -412,24 +412,25 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.addProperty(Constants.JMS_URL, System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT));
 
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_THEME, subs.replace(appConfig.getTheme()));
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs() + "");
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload() + "");
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD, appConfig.isAllowAutoDownload() + "");
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload() + "");
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_UPLOAD, appConfig.isAllowAutoUpload() + "");
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE, appConfig.isAllowDelete() + "");
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, appConfig.isAllowJsLink() + "");
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, subs.replace(appConfig.getTransferDir()));
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD, appConfig.isAllowAutoDownload());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_UPLOAD, appConfig.isAllowAutoUpload());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE, appConfig.isAllowDelete());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, appConfig.isAllowJsLink());
 
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw() + "");
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported() + "");
-			swingConfig.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout() + "");
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported());
+			swingConfig.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout());
 			swingConfig.addProperty("awt.toolkit", webToolkitClass);
 			swingConfig.addProperty("java.awt.headless", "false");
 			swingConfig.addProperty("java.awt.graphicsenv", webGraphicsEnvClass);
 			swingConfig.addProperty("java.awt.printerjob", "org.webswing.toolkit.WebPrinterJob");
-			swingConfig.addProperty("sun.awt.fontconfig", FontUtils.createFontConiguration(appConfig, subs));
-			swingConfig.addProperty(Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth) + "");
-			swingConfig.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight) + "");
+			swingConfig.addProperty("sun.awt.fontconfig", FontUtils.createFontConfiguration(appConfig, subs));
+			swingConfig.addProperty(Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth));
+			swingConfig.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight));
 
 			switch (appConfig.getLauncherType()) {
 			case Applet:

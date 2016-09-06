@@ -146,7 +146,7 @@ public class WebEventDispatcher {
 			Util.getWebToolkit().getPaintDispatcher().notifyDownloadSelectedFile();
 			break;
 		case cancelAutoUpload:
-			handleAutoUploadCancelled();;
+			handleAutoUploadCancelled();
 			break;
 		case paintAck:
 			Util.getWebToolkit().getPaintDispatcher().clientReadyToReceive();
@@ -161,7 +161,7 @@ public class WebEventDispatcher {
 			}
 			break;
 		case unload:
-			boolean instantExit = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) <= 0;
+			boolean instantExit = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) == 0;
 			if (instantExit) {
 				Logger.warn("Exiting swing application. Client has disconnected from web session. (swingSessionTimeout setting is 0 or less)");
 				Util.getWebToolkit().exitSwing(1);
@@ -439,22 +439,21 @@ public class WebEventDispatcher {
 							fc.setSelectedFile(f);
 						}
 					}
-					if(FileDialogEventType.AutoUpload.equals(Util.getFileChooserEventType(fc))){
+					if (FileDialogEventType.AutoUpload.equals(Util.getFileChooserEventType(fc))) {
 						fc.approveSelection();
 					}
-				} 
+				}
 			}
 			uploadMap.clear();
 		}
 	}
-	
+
 	public void handleAutoUploadCancelled() {
 		JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
 		if (dialog != null) {
 			dialog.cancelSelection();
 		}
 	}
-
 
 	public static boolean isDndInProgress() {
 		return dndHandler.isDndInProgress();

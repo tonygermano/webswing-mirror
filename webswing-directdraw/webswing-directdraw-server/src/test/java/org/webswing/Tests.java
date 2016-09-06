@@ -4,7 +4,6 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -37,8 +36,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import org.webswing.directdraw.toolkit.WebGraphics;
@@ -872,7 +869,7 @@ public class Tests {
 			return false;
 		}
 		JPanel p= new JPanel(new GridLayout(5, 1));
-		String text= "<html><span style=\"font-size:2em;text-decoration:underline;\">The</span> <span style=\"font-size:1.5em;\"><b>Quick</b></span> <span style=\"font-size:1em;color:white;background-color:red;\">Brown</span> <span style=\"font-size:1em\">Fox <i>Jumps</i> <span style=\"text-decoration:line-through;\"> Over </span> </span><span style=\"font-size:1em\"> <sup>The</sup> <b><i>Lazy</i></b> <sub>Dog</sub> </span>123¡¢£½¦€”©«®°±²´¨<span style=\"font-size:0.5em\">test </span></html>";
+		String text= "<html><span style=\"font-size:2em;text-decoration:underline;\">The</span> <span style=\"font-size:1.5em;\"><b>Quick</b></span> <span style=\"font-size:1em;color:white;background-color:red;\">Brown</span> <span style=\"font-size:1em\">Fox <i>Jumps</i> <span style=\"text-decoration:line-through;\"> Over </span> </span><span style=\"font-size:1em\"> <sup>The</sup> <b><i>Lazy</i></b> <sub>Dog</sub> </span>123ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½<span style=\"font-size:0.5em\">test </span></html>";
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		final String[] families = ge.getAvailableFontFamilyNames();
 		for (int i = 0; i < Math.min(families.length,5); i++) {
@@ -940,11 +937,9 @@ public class Tests {
 		int y = 0;
 		for (String m : DrawServlet.getTestMethods()) {
 			Image image = getImage(m, true);
-			content.add(new JLabel(new ImageIcon(image)), new GridBagConstraints(0, y, 1, 1, 0, 0,
-				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+			content.add(new JLabel(new ImageIcon(image)), new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 			image = getImage(m, false);
-			content.add(new JLabel(new ImageIcon(image)), new GridBagConstraints(1, y++, 1, 1, 0, 0,
-				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+			content.add(new JLabel(new ImageIcon(image)), new GridBagConstraints(1, y++, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 		}
 		frame.getContentPane().add(new JScrollPane(content));
 		frame.pack();

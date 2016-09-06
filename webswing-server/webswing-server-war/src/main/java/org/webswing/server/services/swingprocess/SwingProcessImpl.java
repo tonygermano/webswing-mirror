@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -162,8 +163,13 @@ public class SwingProcessImpl implements SwingProcess {
 			translateAndAdd(cmd, config.getJvmArgs(), "jvmArgs");
 		}
 		if (config.getProperties().size() > 0) {
-			for (String name : config.getProperties().keySet()) {
-				cmd.add("-D" + name + "=" + config.getProperties().get(name));
+			for (Entry<String, String> entry : config.getProperties().entrySet()) {
+				String property = "-D" + entry.getKey();
+				String value = entry.getValue();
+				if (value != null && !value.isEmpty()) {
+					property += "=" + value;
+				}
+				cmd.add(property);
 			}
 		}
 		if (config.getClassPath() != null) {

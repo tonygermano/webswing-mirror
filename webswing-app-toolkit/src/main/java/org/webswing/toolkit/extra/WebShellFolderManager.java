@@ -7,6 +7,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import org.webswing.Constants;
+
 import sun.awt.shell.ShellFolder;
 import sun.awt.shell.ShellFolder.Invoker;
 import sun.awt.shell.Win32ShellFolderManager2;
@@ -20,14 +22,15 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 	private File root;
 
 	public WebShellFolderManager() {
-		root = new IsolatedRootFile(System.getProperty("user.dir") + "/upload");
+		String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
+		root = new IsolatedRootFile(path);
 		if (!root.getAbsoluteFile().exists()) {
 			root.mkdirs();
 		}
 		System.setProperty("user.home", root.getAbsolutePath());
-		if (System.getProperty("os.name", "").startsWith("Windows")) {
-			windows = true;
-		}
+
+		windows = System.getProperty("os.name", "").startsWith("Windows");
+
 		try {
 			Class<?> managerClass = ClassLoader.getSystemClassLoader().loadClass("sun.awt.shell.ShellFolderManager");
 			Constructor<?> c = managerClass.getDeclaredConstructor();

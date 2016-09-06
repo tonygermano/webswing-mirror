@@ -81,4 +81,15 @@ public class SwingProcessConfig {
 		this.args = args;
 	}
 
+	public void addProperty(String name) {
+		this.properties.put(name, null);
+	}
+
+	public void addProperty(String name, boolean value) {
+		addProperty(name, Boolean.toString(value));
+	}
+
+	public void addProperty(String name, int value) {
+		addProperty(name, Integer.toString(value));
+	}
 }

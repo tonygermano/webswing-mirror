@@ -20,8 +20,8 @@ import org.webswing.server.common.model.meta.MetadataGenerator;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "isolatedFs", "allowDelete", "allowDownload", "allowAutoDownload", "allowUpload", "allowAutoUpload",
-		"uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "isolatedFs", "transferDir", "allowDelete", "allowDownload", "allowAutoDownload", "allowUpload",
+		"allowAutoUpload", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
 public interface SwingConfig extends Config {
 	public enum SessionMode {
 		ALWAYS_NEW_SESSION,
@@ -103,6 +103,11 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.Features, label = "Isolated Filesystem", description = "If true, every file chooser dialog will be restricted to access only the home directory of current application.")
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isIsolatedFs();
+
+	@ConfigField(tab = ConfigGroup.Features, label = "Upload folder", description = "If Isolated Filesystem is enabled. This will be the folder on the server where the user can upload and download files from.")
+	@ConfigFieldVariables
+	@ConfigFieldDefaultValueString("${user.dir}/${user}/upload")
+	public String getTransferDir();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow Deleting Files ", description = "If selected, the JFileChooser integration will allow users to delete files displayed in the file chooser dialog")
 	@ConfigFieldDefaultValueBoolean(true)

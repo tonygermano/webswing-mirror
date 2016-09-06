@@ -68,19 +68,23 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 			@Override
 			public void run() {
-				long diff = System.currentTimeMillis() - lastMessageTimestamp - 10000; /*-10000 is to compensate for 10s js heartbeat interval*/
-				int timeout = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) * 1000;
-				timeout = timeout < 1000 ? 1000 : timeout;
-				if ((diff / 1000 > 10) && ((diff / 1000) % 10 == 0)) {
-					Logger.warn("Inactive for " + diff / 1000 + " seconds." + (terminated ? "[waiting for application to stop]" : ""));
-				}
-				if (diff > timeout) {
-					if (!terminated) {//only call once
-						terminated = true;
-						Logger.warn("Exiting swing application due to inactivity for " + diff / 1000 + " seconds.");
-						Util.getWebToolkit().exitSwing(1);
+				int timeoutSec = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300"));
+				if (timeoutSec >= 0) {
+					long diff = System.currentTimeMillis() - lastMessageTimestamp - 10000; /*-10000 is to compensate for 10s js heartbeat interval*/
+					int timeoutMs = timeoutSec * 1000;
+					timeoutMs = timeoutMs < 1000 ? 1000 : timeoutMs;
+					if ((diff / 1000 > 10) && ((diff / 1000) % 10 == 0)) {
+						Logger.warn("Inactive for " + diff / 1000 + " seconds." + (terminated ? "[waiting for application to stop]" : ""));
 					}
-				} else {
+					if (diff > timeoutMs) {
+						if (!terminated) {//only call once
+							terminated = true;
+							Logger.warn("Exiting swing application due to inactivity for " + diff / 1000 + " seconds.");
+							Util.getWebToolkit().exitSwing(1);
+						}
+					}
+				}
+				if (!terminated) {
 					sendObject(getStats());
 				}
 			}

@@ -45,25 +45,27 @@ public class WindowManager {
 	}
 
 	public void bringToFront(Window w) {
-		synchronized (WebPaintDispatcher.webPaintLock) {
-			if ((w == null || w.isFocusableWindow()) && activeWindow != w) {
-				Window oldActiveWindow = activeWindow;
-				activeWindow = w;
-				if (activeWindow != null) {
-					WindowEvent gainedFocusWindowEvent = new WindowEvent(activeWindow, WindowEvent.WINDOW_GAINED_FOCUS, activeWindow, 0, 0);
-					WebEventDispatcher.dispatchEventInSwing(activeWindow, gainedFocusWindowEvent);
-					WebComponentPeer activeWindowPeer = (WebComponentPeer) WebToolkit.targetToPeer(activeWindow);
-					activeWindowPeer.updateWindowDecorationImage();
-					Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(activeWindow);
+		synchronized (Util.getWebToolkit().getTreeLock()) {
+			synchronized (WebPaintDispatcher.webPaintLock) {
+				if ((w == null || w.isFocusableWindow()) && activeWindow != w) {
+					Window oldActiveWindow = activeWindow;
+					activeWindow = w;
+					if (activeWindow != null) {
+						WindowEvent gainedFocusWindowEvent = new WindowEvent(activeWindow, WindowEvent.WINDOW_GAINED_FOCUS, activeWindow, 0, 0);
+						WebEventDispatcher.dispatchEventInSwing(activeWindow, gainedFocusWindowEvent);
+						WebComponentPeer activeWindowPeer = (WebComponentPeer) WebToolkit.targetToPeer(activeWindow);
+						activeWindowPeer.updateWindowDecorationImage();
+						Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(activeWindow);
+					}
+					if (oldActiveWindow != null) {
+						WebComponentPeer oldActiveWindowPeer = (WebComponentPeer) WebToolkit.targetToPeer(oldActiveWindow);
+						oldActiveWindowPeer.updateWindowDecorationImage();
+						Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(oldActiveWindow);
+					}
 				}
-				if (oldActiveWindow != null) {
-					WebComponentPeer oldActiveWindowPeer = (WebComponentPeer) WebToolkit.targetToPeer(oldActiveWindow);
-					oldActiveWindowPeer.updateWindowDecorationImage();
-					Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(oldActiveWindow);
+				if (w != null) {
+					zorder.bringToFront(w);
 				}
-			}
-			if (w != null) {
-				zorder.bringToFront(w);
 			}
 		}
 	}
@@ -157,13 +159,13 @@ public class WindowManager {
 		}
 		return positionWin;
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public Component getVisibleComponentOnPosition(int x, int y) {
-		Component result = activeWindow;	
+		Component result = activeWindow;
 		Window positionWin = zorder.getVisibleWindowOnPosition(x, y);
-		if(positionWin!=null){
-			result=((WebComponentPeer)positionWin.getPeer()).getHwComponentAt(x,y);
+		if (positionWin != null) {
+			result = ((WebComponentPeer) positionWin.getPeer()).getHwComponentAt(x, y);
 		}
 		return result;
 	}
