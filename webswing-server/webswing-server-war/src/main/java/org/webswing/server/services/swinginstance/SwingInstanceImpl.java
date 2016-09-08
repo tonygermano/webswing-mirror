@@ -78,40 +78,40 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private final FileTransferHandler fileHandler;
 	private final String instanceId;
 	private final String clientId;
-	private SwingProcess app;
-	private JvmConnection connection;
-	private SessionRecorder sessionRecorder;
-	private AbstractWebswingUser user;
 	private String clientIp;
-	private WebSocketConnection resource;
-	private WebSocketConnection mirroredResource;
-	private SwingConfig application;
+	private AbstractWebswingUser user;
+	private SwingProcess process;
+	private JvmConnection jvmConnection;
+	private SessionRecorder sessionRecorder;
+	private WebSocketConnection webConnection;
+	private WebSocketConnection mirroredWebConnection;
+	private SwingConfig config;
 	private Date disconnectedSince;
 	private final Date startedAt = new Date();
 	private Date endedAt = null;
 	private String customArgs = "";
 	private int debugPort = 0;
 
-	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection resource) throws WsException {
+	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection websocket) throws WsException {
 		this.manager = manager;
 		this.fileHandler = fileHandler;
-		this.resource = resource;
-		this.instanceId = ServerUtil.resolveInstanceIdForMode(resource, h, config);
-		this.application = config;
-		this.user = resource.getUser();
+		this.webConnection = websocket;
+		this.instanceId = ServerUtil.resolveInstanceIdForMode(websocket, h, config);
+		this.config = config;
+		this.user = websocket.getUser();
 		this.clientId = h.getClientId();
-		this.customArgs = ServerUtil.getCustomArgs(resource.getRequest());
-		this.debugPort = ServerUtil.getDebugPort(resource.getRequest());
-		this.clientIp = ServerUtil.getClientIp(resource);
+		this.customArgs = ServerUtil.getCustomArgs(websocket.getRequest());
+		this.debugPort = ServerUtil.getDebugPort(websocket.getRequest());
+		this.clientIp = ServerUtil.getClientIp(websocket);
 		try {
-			this.connection = connectionService.connect(clientId, this);
-			app = start(processService, config, h);
+			this.jvmConnection = connectionService.connect(clientId, this);
+			process = start(processService, config, h);
 			notifyUserConnected();
 		} catch (Exception e) {
 			notifyExiting();
 			throw new WsException("Failed to create Swing instance.", e);
 		}
-		this.sessionRecorder = ServerUtil.isRecording(resource.getRequest()) ? new SessionRecorder(this) : null;
+		this.sessionRecorder = ServerUtil.isRecording(websocket.getRequest()) ? new SessionRecorder(this) : null;
 	}
 
 	public void connectSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h) {
@@ -137,15 +137,15 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	private boolean connectPrimaryWebSession(WebSocketConnection resource) {
 		if (resource != null) {
-			if (this.resource != null && application.isAllowStealSession()) {
-				synchronized (this.resource) {
-					this.resource.broadcastMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut());
+			if (this.webConnection != null && config.isAllowStealSession()) {
+				synchronized (this.webConnection) {
+					this.webConnection.broadcastMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut());
 				}
 				notifyUserDisconnected();
-				this.resource = null;
+				this.webConnection = null;
 			}
-			if (this.resource == null) {
-				this.resource = resource;
+			if (this.webConnection == null) {
+				this.webConnection = resource;
 				this.disconnectedSince = null;
 				notifyUserConnected();
 				return true;
@@ -156,9 +156,9 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	private void disconnectPrimaryWebSession() {
-		if (this.resource != null) {
+		if (this.webConnection != null) {
 			notifyUserDisconnected();
-			this.resource = null;
+			this.webConnection = null;
 			this.disconnectedSince = new Date();
 		}
 	}
@@ -175,21 +175,21 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	private void connectMirroredWebSession(WebSocketConnection resource) {
 		if (resource != null) {
-			if (this.mirroredResource != null) {
-				synchronized (this.mirroredResource) {
-					this.mirroredResource.broadcastMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut());
+			if (this.mirroredWebConnection != null) {
+				synchronized (this.mirroredWebConnection) {
+					this.mirroredWebConnection.broadcastMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut());
 				}
 				notifyMirrorViewDisconnected();
 			}
-			this.mirroredResource = resource;
+			this.mirroredWebConnection = resource;
 			notifyMirrorViewConnected();
 		}
 	}
 
 	private void disconnectMirroredWebSession() {
-		if (this.mirroredResource != null) {
+		if (this.mirroredWebConnection != null) {
 			notifyMirrorViewDisconnected();
-			this.mirroredResource = null;
+			this.mirroredWebConnection = null;
 		}
 	}
 
@@ -198,16 +198,16 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		if (sessionRecorder != null) {
 			sessionRecorder.saveFrame(serialized.getProtoMessage());
 		}
-		if (resource != null) {
-			synchronized (resource) {
-				resource.broadcastMessage(serialized);
-				int length = resource.isBinary() ? serialized.getProtoMessage().length : serialized.getJsonMessage().getBytes().length;
+		if (webConnection != null) {
+			synchronized (webConnection) {
+				webConnection.broadcastMessage(serialized);
+				int length = webConnection.isBinary() ? serialized.getProtoMessage().length : serialized.getJsonMessage().getBytes().length;
 				logStatValue(StatisticsLogger.OUTBOUND_SIZE_METRIC, length);
 			}
 		}
-		if (mirroredResource != null) {
-			synchronized (mirroredResource) {
-				mirroredResource.broadcastMessage(serialized);
+		if (mirroredWebConnection != null) {
+			synchronized (mirroredWebConnection) {
+				mirroredWebConnection.broadcastMessage(serialized);
 			}
 		}
 	}
@@ -217,22 +217,22 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			if (h instanceof SimpleEventMsgIn) {
 				SimpleEventMsgIn m = (SimpleEventMsgIn) h;
 				if (m.getType().equals(SimpleEventMsgIn.SimpleEventType.paintAck)) {
-					if (((resource != null && r.uuid().equals(resource.uuid())) || (resource == null && mirroredResource != null && r.uuid().equals(mirroredResource.uuid())))) {
-						connection.send(h);
+					if (((webConnection != null && r.uuid().equals(webConnection.uuid())) || (webConnection == null && mirroredWebConnection != null && r.uuid().equals(mirroredWebConnection.uuid())))) {
+						jvmConnection.send(h);
 					}
 				} else if (m.getType().equals(SimpleEventMsgIn.SimpleEventType.unload)) {
-					if (resource != null && r.uuid().equals(resource.uuid())) {
-						connection.send(h);
+					if (webConnection != null && r.uuid().equals(webConnection.uuid())) {
+						jvmConnection.send(h);
 					}
 					disconnectPrimaryWebSession();
 					disconnectMirroredWebSession();
 				} else {
-					connection.send(h);
+					jvmConnection.send(h);
 				}
 			} else if (h instanceof TimestampsMsgIn) {
 				processTimestampMessage((TimestampsMsgIn) h);
 			} else {
-				connection.send(h);
+				jvmConnection.send(h);
 			}
 			return true;
 		} else {
@@ -260,7 +260,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		if (o instanceof MsgInternal) {
 			if (o instanceof ApiCallMsgInternal) {
 				ApiCallMsgInternal query = (ApiCallMsgInternal) o;
-				AbstractWebswingUser currentUser = resource != null ? resource.getUser() : null;
+				AbstractWebswingUser currentUser = webConnection != null ? webConnection.getUser() : null;
 				Serializable result;
 				switch (query.getMethod()) {
 				case HasRole:
@@ -270,7 +270,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 						result = currentUser.hasRole((String) query.getArgs()[0]);
 						query.setResult(result);
 					}
-					connection.send(query);
+					jvmConnection.send(query);
 					break;
 				case IsPermitted:
 					if (currentUser == null) {
@@ -279,7 +279,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 						result = currentUser.isPermitted((String) query.getArgs()[0]);
 						query.setResult(result);
 					}
-					connection.send(query);
+					jvmConnection.send(query);
 					break;
 				default:
 					break;
@@ -318,15 +318,19 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	private void close() {
-		sendToWeb(SimpleEventMsgOut.shutDownNotification.buildMsgOut());
-		connection.close();
+		if(config.isAutoLogout()){
+			sendToWeb(SimpleEventMsgOut.shutDownAutoLogoutNotification.buildMsgOut());
+		}else{
+			sendToWeb(SimpleEventMsgOut.shutDownNotification.buildMsgOut());
+		}
+		jvmConnection.close();
 		notifyExiting();
 	}
 
 	public void notifyExiting() {
 		endedAt = new Date();
 		if (isRunning()) {
-			app.setProcessExitListener(null);
+			process.setProcessExitListener(null);
 		}
 		if (sessionRecorder != null) {
 			sessionRecorder.close();
@@ -357,8 +361,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	public void kill(int delayMs) {
-		if (app != null) {
-			app.destroy(delayMs);
+		if (process != null) {
+			process.destroy(delayMs);
 		}
 	}
 
@@ -484,25 +488,25 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	public SwingConfig getAppConfig() {
-		return application;
+		return config;
 	}
 
 	public String getSessionId() {
-		if (resource != null) {
-			return resource.uuid();
+		if (webConnection != null) {
+			return webConnection.uuid();
 		}
 		return null;
 	}
 
 	public String getMirroredSessionId() {
-		if (mirroredResource != null) {
-			return mirroredResource.uuid();
+		if (mirroredWebConnection != null) {
+			return mirroredWebConnection.uuid();
 		}
 		return null;
 	}
 
 	public boolean isRunning() {
-		return (app != null && app.isRunning());
+		return (process != null && process.isRunning());
 	}
 
 	public String getUser() {
@@ -534,7 +538,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	public SwingInstanceStatus getStatus() {
-		if (app == null) {
+		if (process == null) {
 			return SwingInstanceStatus.NOT_STARTED;
 		} else {
 			if (isRunning()) {
@@ -544,7 +548,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 					return SwingInstanceStatus.EXITING;
 				}
 			} else {
-				if (app.isForceKilled()) {
+				if (process.isForceKilled()) {
 					return SwingInstanceStatus.FORCE_KILLED;
 				} else {
 					return SwingInstanceStatus.FINISHED;
@@ -564,7 +568,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	@Override
 	public String getMirrorSessionId() {
-		return mirroredResource != null ? mirroredResource.uuid() : null;
+		return mirroredWebConnection != null ? mirroredWebConnection.uuid() : null;
 	}
 
 	public void logStatValue(String name, Number value) {
@@ -574,19 +578,19 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	private void notifyUserConnected() {
-		sendUserApiEventMsg(ApiEventType.UserConnected, resource);
+		sendUserApiEventMsg(ApiEventType.UserConnected, webConnection);
 	}
 
 	private void notifyUserDisconnected() {
-		sendUserApiEventMsg(ApiEventType.UserDisconnected, resource);
+		sendUserApiEventMsg(ApiEventType.UserDisconnected, webConnection);
 	}
 
 	private void notifyMirrorViewConnected() {
-		sendUserApiEventMsg(ApiEventType.MirrorViewConnected, mirroredResource);
+		sendUserApiEventMsg(ApiEventType.MirrorViewConnected, mirroredWebConnection);
 	}
 
 	private void notifyMirrorViewDisconnected() {
-		sendUserApiEventMsg(ApiEventType.MirrorViewDisconnected, mirroredResource);
+		sendUserApiEventMsg(ApiEventType.MirrorViewDisconnected, mirroredWebConnection);
 	}
 
 	private void sendUserApiEventMsg(ApiEventType type, WebSocketConnection r) {
@@ -597,7 +601,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		} else {
 			event = new ApiEventMsgInternal(type, null, null);
 		}
-		connection.send(event);
+		jvmConnection.send(event);
 	}
 
 }

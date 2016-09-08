@@ -15,6 +15,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             disposeTouch : 'touch.dispose',
             getUser : 'login.user',
             login : 'login.login',
+            logout : 'login.logout',
             getIdentity : 'identity.get',
             disposeIdentity : 'identity.dispose',
             getLocale : 'identity.getLocale',
@@ -187,7 +188,10 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             	return;
             }
             if (data.event != null && !api.cfg.recordingPlayback) {
-                if (data.event == "shutDownNotification") {
+            	if (data.event == "shutDownAutoLogoutNotification") {
+            		api.disconnect();
+            		api.logout();
+            	} else if (data.event == "shutDownNotification") {
                     api.showDialog(api.stoppedDialog);
                     api.disconnect();
                 } else if (data.event == "applicationAlreadyRunning") {

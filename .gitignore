@@ -19,3 +19,5 @@ webswing.log
 webswing.log.1
 documentation/site/
 git.properties
+webswing-admin/.externalToolBuilders/
+webswing-server/webswing-server-war/.externalToolBuilders/org.eclipse.wst.jsdt.core.javascriptValidator (1).launch

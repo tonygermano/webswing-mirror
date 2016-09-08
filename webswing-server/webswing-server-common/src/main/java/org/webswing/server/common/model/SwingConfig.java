@@ -100,6 +100,10 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowStealSession();
 
+	@ConfigField(tab = ConfigGroup.Session, label = "Auto Logout", description = "If enabled, user is automatically logged out after the swing application finished.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isAutoLogout();
+
 	@ConfigField(tab = ConfigGroup.Features, label = "Isolated Filesystem", description = "If true, every file chooser dialog will be restricted to access only the home directory of current application.")
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isIsolatedFs();

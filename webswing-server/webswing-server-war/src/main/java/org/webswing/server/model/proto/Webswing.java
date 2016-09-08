@@ -41,6 +41,10 @@ public final class Webswing {
      * <code>unauthorizedAccess = 6;</code>
      */
     unauthorizedAccess(6, 6),
+    /**
+     * <code>shutDownAutoLogoutNotification = 7;</code>
+     */
+    shutDownAutoLogoutNotification(7, 7),
     ;
 
     /**
@@ -71,6 +75,10 @@ public final class Webswing {
      * <code>unauthorizedAccess = 6;</code>
      */
     public static final int unauthorizedAccess_VALUE = 6;
+    /**
+     * <code>shutDownAutoLogoutNotification = 7;</code>
+     */
+    public static final int shutDownAutoLogoutNotification_VALUE = 7;
 
 
     public final int getNumber() { return value; }
@@ -84,6 +92,7 @@ public final class Webswing {
         case 4: return configurationError;
         case 5: return sessionStolenNotification;
         case 6: return unauthorizedAccess;
+        case 7: return shutDownAutoLogoutNotification;
         default: return null;
       }
     }
@@ -29426,13 +29435,14 @@ public final class Webswing {
       "g.server.model.proto.PlaybackCommandMsgI" +
       "nProto.PlaybackCommandProto\"X\n\024PlaybackC" +
       "ommandProto\022\t\n\005reset\020\000\022\010\n\004play\020\001\022\010\n\004stop" +
-      "\020\002\022\010\n\004step\020\003\022\n\n\006step10\020\004\022\013\n\007step100\020\005*\330\001" +
+      "\020\002\022\010\n\004step\020\003\022\n\n\006step10\020\004\022\013\n\007step100\020\005*\374\001" +
       "\n\026SimpleEventMsgOutProto\022\035\n\031applicationA" +
       "lreadyRunning\020\000\022\030\n\024shutDownNotification\020" +
       "\001\022\036\n\032tooManyClientsNotification\020\002\022\026\n\022con" +
       "tinueOldSession\020\003\022\026\n\022configurationError\020" +
       "\004\022\035\n\031sessionStolenNotification\020\005\022\026\n\022unau" +
-      "thorizedAccess\020\006"
+      "thorizedAccess\020\006\022\"\n\036shutDownAutoLogoutNo",
+      "tification\020\007"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
