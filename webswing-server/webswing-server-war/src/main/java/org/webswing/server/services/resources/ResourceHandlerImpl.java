@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.zip.ZipEntry;
 
@@ -79,8 +80,8 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 		private String path;
 
 		public RedirectResult(String path) {
-			if(path.startsWith("/")){
-				path=path.substring(1);
+			if (path.startsWith("/")) {
+				path = path.substring(1);
 			}
 			this.path = path;
 		}
@@ -173,31 +174,39 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 		final String realpath = url.getPath();
 		if (realpath != null) {
 			// Try as an ordinary file
-			File f = new File(realpath);
-			if (!f.isFile())
+			File f;
+			try {
+				f = new File(url.toURI());
+			} catch (URISyntaxException e) {
+				f = new File(realpath);
+			}
+			if (!f.isFile()) {
 				if (req.getPathInfo().endsWith("/")) {
 					return lookupNoCache(req, path + "/index.html");
 				} else {
 					return new RedirectResult(path + "/");
 				}
-			else
+			} else {
 				return new StaticFile(f.lastModified(), mimeType, (int) f.length(), url);
+			}
 		} else {
 			try {
 				// Try as a JAR Entry
 				final ZipEntry ze = ((JarURLConnection) url.openConnection()).getJarEntry();
 				if (ze != null) {
-					if (ze.isDirectory())
+					if (ze.isDirectory()) {
 						if (req.getPathInfo().endsWith("/")) {
 							return lookupNoCache(req, path + "/index.html");
 						} else {
 							return new RedirectResult(path + "/");
 						}
-					else
+					} else {
 						return new StaticFile(ze.getTime(), mimeType, (int) ze.getSize(), url);
-				} else
+					}
+				} else {
 					// Unexpected?
 					return new StaticFile(-1, mimeType, -1, url);
+				}
 			} catch (ClassCastException e) {
 				// Unknown resource type
 				return new StaticFile(-1, mimeType, -1, url);

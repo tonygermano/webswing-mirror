@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
@@ -117,7 +118,12 @@ public class Main {
 				}
 			}
 		} else {
-			File dir = new File(r.getPath());
+			File dir;
+			try {
+				dir = new File(r.toURI());
+			} catch (URISyntaxException e) {
+				dir = new File(r.getPath());
+			}
 			if (dir.isDirectory()) {
 				for (File f : dir.listFiles()) {
 					if (f.isFile() && f.getName().endsWith(".jar")) {
