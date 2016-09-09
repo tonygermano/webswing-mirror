@@ -75,8 +75,6 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	}
 
 	public void init() {
-		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
-		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
 		registerChildUrlHandler(websocket.createPlaybackWebSocketHandler(this));
 
 		registerChildUrlHandler(restService.createAdminRestHandler(this, this));
@@ -124,7 +122,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		synchronized (instanceManagers) {
 			for (SecuredPathConfig configPath : newConfig.values()) {
 				String pathMapping = toPath(configPath.getPath());
-				if (!getPathMapping().equals(pathMapping)) {
+				if (!toPath("/").equals(pathMapping)) {
 					SwingInstanceManager childHandler = instanceManagers.get(pathMapping);
 					if (childHandler == null) {
 						installApplication(configPath);
@@ -203,7 +201,12 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	}
 
 	protected String getPath() {
-		return "/";
+		return "";
+	}
+	
+	@Override
+	public String getSecuredPath() {
+		return getPath();
 	}
 
 	public void setServletContext(ServletContext servletContext) {

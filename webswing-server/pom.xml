@@ -15,4 +15,7 @@
 		<module>webswing-server-launcher</module>
 		<module>webswing-server-war</module>
 	</modules>
+	<properties>
+		<jetty.version>9.3.11.v20160721</jetty.version>
+	</properties>
 </project>

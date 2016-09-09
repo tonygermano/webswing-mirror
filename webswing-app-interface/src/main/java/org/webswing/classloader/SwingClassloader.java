@@ -103,7 +103,7 @@ public class SwingClassloader extends URLClassLoader {
 		methodReplacementBuilder.put("javax.swing.RepaintManager setCurrentManager (Ljavax/swing/RepaintManager;)V", "org.webswing.special.RedirectedMethods setCurrentManager (Ljavax/swing/RepaintManager;)V");
 		methodReplacementBuilder.put("java.lang.System setErr (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods setErr (Ljava/io/PrintStream;)V");
 		methodReplacementBuilder.put("java.lang.System setOut (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods setOut (Ljava/io/PrintStream;)V");
-		methodReplacementBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
+		//methodReplacementBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
 		methodReplacementBuilder.put("netscape.javascript.JSObject getWindow (Ljava/applet/Applet;)Lnetscape/javascript/JSObject;", "org.webswing.toolkit.jslink.WebJSObject getWindow (Ljava/applet/Applet;)Lnetscape/javascript/JSObject;");
 		// ignore outline drag mode for JDesktopPane
 		methodReplacementBuilder.put("javax.swing.JDesktopPane putClientProperty (Ljava/lang/Object;Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods putClientProperty (Ljavax/swing/JDesktopPane;Ljava/lang/Object;Ljava/lang/Object;)V");

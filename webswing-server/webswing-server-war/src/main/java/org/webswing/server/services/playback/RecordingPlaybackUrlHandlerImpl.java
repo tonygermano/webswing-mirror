@@ -1,9 +1,8 @@
 package org.webswing.server.services.playback;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
-import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
@@ -35,6 +33,7 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 	private final UrlHandler parent;
 	private final WebSocketService websocket;
 	private final String path;
+	private boolean ready;
 
 	public RecordingPlaybackUrlHandlerImpl(UrlHandler parent, String path, WebSocketService websocket) {
 		this.parent = parent;
@@ -44,17 +43,18 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 
 	@Override
 	public void init() {
+		ready = true;
 	}
 
 	@Override
 	public void destroy() {
-		websocket.removeListener(getFullPathMapping());
+		ready = false;
 	}
 
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		try {
-			websocket.serve(req, res);
+			websocket.serve(this, req, res);
 			return true;
 		} catch (Exception e) {
 			log.error("WebSocket failed.", e);
@@ -65,19 +65,17 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 	public void onReady(final WebSocketConnection r) {
 		if (r.hasPermission(WebswingAction.websocket_connect)) {
 			AppFrameMsgOut appInfo = new AppFrameMsgOut();
-			List<ApplicationInfoMsg> apps = new ArrayList<ApplicationInfoMsg>();
 			if (r.hasPermission(WebswingAction.websocket_startRecordingPlayback)) {
 				String file = r.getRequest().getParameter("file");
 				File recordingFile = new File(file);
 				if (recordingFile.exists() && recordingFile.canRead()) {
 					SessionRecordingPlayback playback = new SessionRecordingPlayback(r, recordingFile);
 					playbackMap.put(r.uuid(), playback);
-					apps.add(playback.getApplicationInfo());
+					appInfo.setApplications(Arrays.asList(playback.getApplicationInfo()));
 				} else {
 					log.error("Could not open recording file: " + recordingFile.getAbsolutePath());
 				}
 			}
-			appInfo.setApplications(apps);
 			appInfo.setSessionId(r.uuid());
 			EncodedMessage encoded = new EncodedMessage(appInfo);
 			if (r.isBinary()) {
@@ -181,5 +179,10 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 	@Override
 	public void checkMasterPermission(WebswingAction action) throws WsException {
 		parent.checkMasterPermission(action);
+	}
+
+	@Override
+	public boolean isReady() {
+		return ready;
 	}
 }

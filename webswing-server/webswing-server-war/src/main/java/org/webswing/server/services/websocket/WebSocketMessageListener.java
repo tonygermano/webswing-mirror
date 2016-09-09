@@ -14,4 +14,6 @@ public interface WebSocketMessageListener {
 
 	UrlHandler getOwner();
 
+	boolean isReady();
+
 }

@@ -190,12 +190,7 @@ public class Util {
 		for (WindowMsg window : json.getWindows()) {
 			WebWindowPeer w = findWindowPeerById(window.getId());
 			if (window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
-				windowImages.put(window.getId(), new HashMap<Integer, BufferedImage>());// background
-																						// image
-																						// is
-																						// handled
-																						// on
-																						// client
+				windowImages.put(window.getId(), new HashMap<Integer, BufferedImage>());// background image is handled on client
 			} else {
 				Map<Integer, BufferedImage> imageMap = new HashMap<Integer, BufferedImage>();
 				for (int i = 0; i < window.getContent().size(); i++) {
@@ -433,10 +428,7 @@ public class Util {
 			if (currentX == null) {
 				currentX = r;
 			} else {
-				if (currentX.x == r.x && currentX.width == r.width && currentX.y + currentX.height == r.y) {// is
-																												// joinable
-																											// on
-																											// row
+				if (currentX.x == r.x && currentX.width == r.width && currentX.y + currentX.height == r.y) {// is joinable on row
 					currentX.height += r.height;
 				} else {
 					result.add(currentX);
@@ -451,7 +443,8 @@ public class Util {
 	}
 
 	public static void resetWindowsGC(int width, int height) {
-		for (Window w : Window.getWindows()) {
+		List<Window> windows = new ArrayList<Window>(Arrays.asList(Window.getWindows()));//to avoid concurent-modification-exception
+		for (Window w : windows) {
 			try {
 				Class<?> windowClazz = w.getClass();
 				while (windowClazz != Window.class && windowClazz != null) {

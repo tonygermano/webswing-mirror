@@ -1,6 +1,6 @@
 package org.webswing.server.services.websocket;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -14,7 +14,6 @@ import org.webswing.model.c2s.CopyEventMsgIn;
 import org.webswing.model.c2s.InputEventMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.c2s.PasteEventMsgIn;
-import org.webswing.model.c2s.TimestampsMsgIn;
 import org.webswing.model.c2s.UploadedEventMsgIn;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JsResultMsg;
@@ -30,39 +29,40 @@ import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.stats.StatisticsLogger;
 import org.webswing.server.services.swinginstance.SwingInstance;
-import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.util.ServerUtil;
 
 public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
-
 	private static final Logger log = LoggerFactory.getLogger(WebSocketUrlHandlerImpl.class);
 
 	private final UrlHandler parent;
 	private final WebSocketService websocket;
-	private final SwingInstanceHolder instanceHolder;
+	private final SwingInstanceManager instanceManager;
 	private final String path;
 
-	public WebSocketUrlHandlerImpl(UrlHandler parent, String path, WebSocketService websocket, SwingInstanceHolder instanceHolder) {
+	private boolean ready;
+
+	public WebSocketUrlHandlerImpl(UrlHandler parent, String path, WebSocketService websocket, SwingInstanceManager instanceManager) {
 		this.parent = parent;
 		this.path = path;
 		this.websocket = websocket;
-		this.instanceHolder = instanceHolder;
+		this.instanceManager = instanceManager;
 	}
 
 	@Override
 	public void init() {
+		ready = true;
 	}
 
 	@Override
 	public void destroy() {
-		websocket.removeListener(getFullPathMapping());
+		ready = false;
 	}
 
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		try {
-			websocket.serve(req, res);
+			websocket.serve(this, req, res);
 			return true;
 		} catch (Exception e) {
 			log.error("WebSocket failed.", e);
@@ -73,14 +73,10 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 	public void onReady(final WebSocketConnection r) {
 		if (r.hasPermission(WebswingAction.websocket_connect)) {
 			AppFrameMsgOut appInfo = new AppFrameMsgOut();
-			List<ApplicationInfoMsg> result = new ArrayList<>();
-			for (SwingInstanceManager mgr : instanceHolder.getApplications()) {
-				ApplicationInfoMsg applicationInfoMsg = mgr.getApplicationInfoMsg();
-				if (applicationInfoMsg != null) {
-					result.add(applicationInfoMsg);
-				}
+			ApplicationInfoMsg applicationInfoMsg = instanceManager.getApplicationInfoMsg();
+			if (applicationInfoMsg != null) {
+				appInfo.setApplications(Arrays.asList(applicationInfoMsg));
 			}
-			appInfo.setApplications(result);
 			appInfo.setSessionId(r.uuid());
 			EncodedMessage encoded = new EncodedMessage(appInfo);
 			if (r.isBinary()) {
@@ -95,7 +91,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 	}
 
 	public void onDisconnect(WebSocketConnection r) {
-		SwingInstance instance = instanceHolder.findInstanceBySessionId(r.uuid());
+		SwingInstance instance = instanceManager.findInstanceBySessionId(r.uuid());
 		if (instance != null) {
 			instance.webSessionDisconnected(r.uuid());
 		}
@@ -118,15 +114,11 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 					List<InputEventMsgIn> evts = frame.getEvents();
 					for (InputEventMsgIn evt : evts) {
 						if (evt.getHandshake() != null) {
-							SwingInstance existing = instanceHolder.findByInstanceId(evt.getHandshake(), r);
+							SwingInstance existing = instanceManager.findByInstanceId(evt.getHandshake(), r);
 							if (existing != null) {
 								existing.connectSwingInstance(r, evt.getHandshake());
 							} else {
-								if (instanceHolder instanceof SwingInstanceManager) {
-									((SwingInstanceManager) instanceHolder).startSwingInstance(r, evt.getHandshake());
-								} else {
-									r.disconnect();
-								}
+								instanceManager.startSwingInstance(r, evt.getHandshake());
 							}
 						} else if (evt.getKey() != null) {
 							send(r, evt.getKey());
@@ -157,7 +149,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 			} else {
 				log.error("Unable to decode message: " + message);
 			}
-			SwingInstance instance = instanceHolder.findInstanceBySessionId(r.uuid());
+			SwingInstance instance = instanceManager.findInstanceBySessionId(r.uuid());
 			if (instance != null) {
 				instance.logStatValue(StatisticsLogger.INBOUND_SIZE_METRIC, length);
 			}
@@ -170,7 +162,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 	}
 
 	private void send(WebSocketConnection r, MsgIn o) {
-		SwingInstance instance = instanceHolder.findInstanceBySessionId(r.uuid());
+		SwingInstance instance = instanceManager.findInstanceBySessionId(r.uuid());
 		if (instance != null) {
 			instance.sendToSwing(r, o);
 		}
@@ -236,5 +228,10 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 	@Override
 	public void checkMasterPermission(WebswingAction action) throws WsException {
 		parent.checkMasterPermission(action);
+	}
+
+	@Override
+	public boolean isReady() {
+		return ready;
 	}
 }

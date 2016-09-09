@@ -8,9 +8,11 @@ import java.util.List;
 
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.webswing.toolkit.util.Logger;
@@ -33,12 +35,17 @@ public class ServerMain {
 		}
 
 		Server server = new Server();
+
 		List<Connector> connectors = new ArrayList<Connector>();
 		if (config.isHttp()) {
-			Connector conHttp = new SelectChannelConnector();
-			conHttp.setPort(Integer.parseInt(config.getHttpPort()));
-			conHttp.setHost(config.getHost());
-			connectors.add(conHttp);
+			HttpConfiguration http_config = new HttpConfiguration();
+			if (config.isHttps()) {
+				http_config.setSecurePort(Integer.parseInt(config.getHttpsPort()));
+			}
+			ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
+			http.setPort(Integer.parseInt(config.getHttpPort()));
+			http.setHost(config.getHost());
+			connectors.add(http);
 		}
 		if (config.isHttps()) {
 			if (config.isHttps() && config.getTruststore() != null && !config.getTruststore().isEmpty() && config.getKeystore() != null && config.getKeystore().isEmpty()) {
@@ -49,16 +56,22 @@ public class ServerMain {
 				} else if (!new File(config.getKeystore()).exists()) {
 					Logger.error("SSL configuration is invalid. Keystore file " + new File(config.getKeystore()).getAbsolutePath() + " does not exist.");
 				} else {
-					SslContextFactory sslContextFactory = new SslContextFactory(config.getKeystore());
+					SslContextFactory sslContextFactory = new SslContextFactory();
+					sslContextFactory.setKeyStorePath(config.getKeystore());
 					sslContextFactory.setKeyStorePassword(config.getKeystorePassword());
-					sslContextFactory.setTrustStore(config.getTruststore());
+					sslContextFactory.setTrustStorePath(config.getTruststore());
 					sslContextFactory.setTrustStorePassword(config.getTruststorePassword());
 					sslContextFactory.setNeedClientAuth(false);
 					sslContextFactory.addExcludeProtocols("SSLv3", "SSLv2Hello");
-					SslSelectChannelConnector conSSL = new SslSelectChannelConnector(sslContextFactory);
-					conSSL.setPort(Integer.parseInt(config.getHttpsPort()));
-					conSSL.setHost(config.getHost());
-					connectors.add(conSSL);
+
+					HttpConfiguration https_config = new HttpConfiguration();
+					SecureRequestCustomizer src = new SecureRequestCustomizer();
+					https_config.addCustomizer(src);
+
+					ServerConnector https = new ServerConnector(server, sslContextFactory, new HttpConnectionFactory(https_config));
+					https.setPort(Integer.parseInt(config.getHttpsPort()));
+					https.setHost(config.getHost());
+					connectors.add(https);
 				}
 			}
 		}
@@ -66,16 +79,15 @@ public class ServerMain {
 		server.setConnectors(connectors.toArray(new Connector[connectors.size()]));
 
 		// enable jmx
-		MBeanContainer mbcontainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
-		server.getContainer().addEventListener(mbcontainer);
-		server.addBean(mbcontainer);
-
-		// mbcontainer.addBean(Log.getLog());
+		MBeanContainer mbContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
+		server.addEventListener(mbContainer);
+		server.addBean(mbContainer);
 
 		WebAppContext webapp = new WebAppContext();
 		webapp.setContextPath("/");
 		webapp.setWar(System.getProperty(Constants.WAR_FILE_LOCATION));
 		webapp.setTempDirectory(new File(URI.create(System.getProperty(Constants.TEMP_DIR_PATH))));
+		webapp.setPersistTempDirectory(true);
 		webapp.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern", "");
 		server.setHandler(webapp);
 		server.start();

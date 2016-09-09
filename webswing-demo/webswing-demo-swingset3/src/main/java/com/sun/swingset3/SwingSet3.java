@@ -308,7 +308,7 @@ public class SwingSet3 extends SingleFrameApplication {
 
 		// application framework should handle this
 		getMainFrame().setIconImage(resourceMap.getImageIcon("Application.icon").getImage());
-
+		
 		show(view);
 	}
 

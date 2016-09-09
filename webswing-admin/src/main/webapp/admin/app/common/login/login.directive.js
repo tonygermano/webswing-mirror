@@ -19,14 +19,14 @@
 
 			function displayLoginDialog(evt, doLoginCallback) {
 				if (vm.loginDialog != null) {
-					vm.loginDialog.dismiss();
+					return;
 				}
 				vm.loginDialog = $modal.open({
 					template : htmlTemplate,
 					scope : $scope,
 					backdrop : 'static'
 				});
-				vm.loginDialog.rendered.then(function(){
+				vm.loginDialog.rendered.then(function() {
 					var element = $('#webswingLoginDialogContent')
 					var loginData = {
 						securityToken : $location.search().securityToken,
@@ -34,8 +34,12 @@
 					};
 					doLoginCallback(element, loginData, function() {
 						vm.loginDialog.dismiss();
+						vm.loginDialog = null;
 					});
-				})
+				});
+				vm.loginDialog.result.then(function() {
+					vm.loginDialog = null;
+				});
 			}
 
 		}

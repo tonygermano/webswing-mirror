@@ -120,6 +120,11 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 		if (this.parent != null) {
 			String parentMapping = parent.getFullPathMapping();
 			handlerPath = parentMapping + handlerPath;
+		}else{
+			String contextPath = getServletContext().getContextPath();
+			if (contextPath != null && !contextPath.equals("/")) {
+				handlerPath = toPath(contextPath) + handlerPath;
+			}
 		}
 		return handlerPath;
 	}
@@ -138,12 +143,6 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 
 	public String getPathMapping() {
 		String path = toPath(getPath());
-		if (parent == null) {
-			String contextPath = getServletContext().getContextPath();
-			if (contextPath != null && !contextPath.equals("/")) {
-				path = toPath(contextPath) + path;
-			}
-		}
 		return path;
 	}
 
@@ -184,7 +183,7 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 			}
 		}
 		if (parent == null) {
-			return "/";
+			return "";
 		} else {
 			return parent.getSecuredPath();
 		}

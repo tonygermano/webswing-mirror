@@ -181,6 +181,12 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 		super.destroy();
 	}
 
+	@Override
+	public void init() {
+		validatorService = Executors.newSingleThreadScheduledExecutor();
+		super.init();
+	}
+
 	private void close(Closeable resource) {
 		if (resource != null) {
 			try {

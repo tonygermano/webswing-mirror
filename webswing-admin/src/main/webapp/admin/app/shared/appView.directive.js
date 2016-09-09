@@ -75,14 +75,14 @@
 			}
 
 			function start() {
-				configRestService.start(vm.value.path);
+				configRestService.start(vm.path);
 				vm.value.status.status = 'Requesting Start';
 				vm.stoppable = false;
 				vm.startable = false;
 			}
 
 			function stop() {
-				configRestService.stop(vm.value.path);
+				configRestService.stop(vm.path);
 				vm.value.status.status = 'Requesting Stop';
 				vm.stoppable = false;
 				vm.startable = false;

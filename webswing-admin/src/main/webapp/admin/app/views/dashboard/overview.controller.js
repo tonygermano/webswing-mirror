@@ -17,15 +17,17 @@
 			$scope.$on('$destroy', function() {
 				$timeout.cancel(vm.timer);
 			});
-			
+
 			$scope.$watch('vm.sessions', function(value) {
-				for (var i = 0; i < value.length; i++) {
-					var session= value[i];
-					session.gauge={};
-					session.gauge.memory=wsUtils.getGaugeData(session.metrics,'Mem','MB','memoryUsed','memoryAllocated',null,1);
-					session.gauge.inbound=wsUtils.getGaugeData(session.metrics,'In','k/s','inboundSize',null,360,1024);
-					session.gauge.outbound=wsUtils.getGaugeData(session.metrics,'Out','k/s','outboundSize',null,360,1024);
-					session.gauge.latency=wsUtils.getGaugeData(session.metrics,'Lat','ms','latency',null,200,1);
+				if (value != null) {
+					for (var i = 0; i < value.length; i++) {
+						var session = value[i];
+						session.gauge = {};
+						session.gauge.memory = wsUtils.getGaugeData(session.metrics, 'Mem', 'MB', 'memoryUsed', 'memoryAllocated', null, 1);
+						session.gauge.inbound = wsUtils.getGaugeData(session.metrics, 'In', 'k/s', 'inboundSize', null, 360, 1024);
+						session.gauge.outbound = wsUtils.getGaugeData(session.metrics, 'Out', 'k/s', 'outboundSize', null, 360, 1024);
+						session.gauge.latency = wsUtils.getGaugeData(session.metrics, 'Lat', 'ms', 'latency', null, 200, 1);
+					}
 				}
 			});
 
@@ -45,8 +47,8 @@
 			}
 
 			function view(session) {
-				$location.search('id',session.id);
-				$location.path('/dashboard/session/' + vm.path );
+				$location.search('id', session.id);
+				$location.path('/dashboard/session/' + vm.path);
 			}
 
 			function play(session) {

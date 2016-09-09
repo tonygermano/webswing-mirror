@@ -15,7 +15,7 @@
 				controllerAs : 'vm',
 				templateUrl : 'app/views/config/configServer.template.html'
 			});
-			$routeProvider.when('/config/swing/:path', {
+			$routeProvider.when('/config/swing/:path*', {
 				controller : 'ConfigSwingController',
 				controllerAs : 'vm',
 				templateUrl : 'app/views/config/configSwing.template.html'

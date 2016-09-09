@@ -21,7 +21,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.RepaintManager;
@@ -80,7 +79,7 @@ public class WebPaintDispatcher {
 							}
 							if ((areasToUpdate.size() == 0 && moveAction == null) || !clientReadyToReceive) {
 								if (!clientReadyToReceive && (System.currentTimeMillis() - lastReadyStateTime) > 2000) {
-									Logger.info("contentSender.readyToReceive re-enabled after timeout");
+									Logger.debug("contentSender.readyToReceive re-enabled after timeout");
 									if (Util.isDD()) {
 										Services.getDirectDrawService().resetCache();
 									}

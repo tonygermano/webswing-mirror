@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.atmosphere.cpr.AtmosphereHandler;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResource;
@@ -19,31 +21,43 @@ import org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnSuspend;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.util.IOUtils;
 import org.atmosphere.util.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.webswing.server.base.UrlHandler;
 
 class WebSocketAtmosphereHandler implements AtmosphereHandler {
 
-	private WebSocketMessageListener wsHandler;
-	Map<String, WebSocketConnection> connectionMap = new HashMap<String, WebSocketConnection>();
+	private static final Logger log = LoggerFactory.getLogger(WebSocketAtmosphereHandler.class);
 
-	public WebSocketAtmosphereHandler(WebSocketMessageListener handler) {
-		this.wsHandler = handler;
+	private Map<String, WebSocketMessageListener> wsHandler = new HashMap<>();
+	private Map<String, WebSocketConnection> connectionMap = new HashMap<String, WebSocketConnection>();
+
+	public WebSocketAtmosphereHandler() {
+	}
+
+	public void addHandler(HttpServletRequest req, WebSocketMessageListener h) {
+		wsHandler.put(req.getRequestURI(), h);
+	}
+
+	public void addHandler(String path, WebSocketMessageListener h) {
+		wsHandler.put(path, h);
 	}
 
 	public void onReady(final AtmosphereResource r) {
-		wsHandler.onReady(getConnection(r));
+		findHandler(r).onReady(getConnection(r));
 	}
 
 	public void onDisconnect(AtmosphereResourceEvent event) {
-		wsHandler.onDisconnect(getConnection(event));
+		findHandler(event.getResource(), false).onDisconnect(getConnection(event));
 	}
 
 	public void onMessage(AtmosphereResource r, Object message) {
-		wsHandler.onMessage(getConnection(r), message);
+		findHandler(r).onMessage(getConnection(r), message);
 
 	}
 
 	public void onTimeout(AtmosphereResourceEvent event) {
-		wsHandler.onTimeout(getConnection(event));
+		findHandler(event.getResource()).onTimeout(getConnection(event));
 	}
 
 	private WebSocketConnection getConnection(AtmosphereResourceEvent event) {
@@ -56,10 +70,37 @@ class WebSocketAtmosphereHandler implements AtmosphereHandler {
 		if (connectionMap.containsKey(r.uuid())) {
 			result = connectionMap.get(r.uuid());
 		} else {
-			result = new WebSocketConnection(r, wsHandler.getOwner());
+			result = new WebSocketConnection(r, findHandler(r, false).getOwner());
 			connectionMap.put(r.uuid(), result);
 		}
 		return result;
+	}
+
+	private WebSocketMessageListener findHandler(AtmosphereResource r) {
+		return findHandler(r, true);
+	}
+
+	private WebSocketMessageListener findHandler(AtmosphereResource r, boolean close) {
+		WebSocketMessageListener h = wsHandler.get(r.getRequest().getRequestURI());
+		try {
+			if (h != null) {
+				if (h.isReady()) {
+					return h;
+				} else {
+					if (!r.isCancelled() && close) {
+						r.close();
+					}
+				}
+			} else {
+				log.error("No websocket handler found for URI " + r.getRequest().getRequestURI(), new IllegalStateException());
+				if (!r.isCancelled() && close) {
+					r.close();
+				}
+			}
+		} catch (IOException e) {
+			log.error("Failed to close websocket connection", e);
+		}
+		return new DummyWebSocketMessageListener();
 	}
 
 	@Override
@@ -154,6 +195,36 @@ class WebSocketAtmosphereHandler implements AtmosphereHandler {
 				break;
 			default:
 			}
+		}
+
+	}
+
+	public class DummyWebSocketMessageListener implements WebSocketMessageListener {
+
+		@Override
+		public void onReady(WebSocketConnection c) {
+		}
+
+		@Override
+		public void onMessage(WebSocketConnection connection, Object message) {
+		}
+
+		@Override
+		public void onDisconnect(WebSocketConnection connection) {
+		}
+
+		@Override
+		public void onTimeout(WebSocketConnection connection) {
+		}
+
+		@Override
+		public UrlHandler getOwner() {
+			return null;
+		}
+
+		@Override
+		public boolean isReady() {
+			return false;
 		}
 
 	}

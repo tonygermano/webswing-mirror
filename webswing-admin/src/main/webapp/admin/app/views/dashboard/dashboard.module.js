@@ -23,12 +23,12 @@
 				controllerAs : 'vm',
 				templateUrl : 'app/views/dashboard/dashboard.template.html'
 			});
-			$routeProvider.when('/dashboard/overview/:path', {
+			$routeProvider.when('/dashboard/overview/:path*', {
 				controller : 'DashboardOverviewController',
 				controllerAs : 'vm',
 				templateUrl : 'app/views/dashboard/overview.template.html'
 			});
-			$routeProvider.when('/dashboard/session/:path', {
+			$routeProvider.when('/dashboard/session/:path*', {
 				controller : 'DashboardSessionController',
 				controllerAs : 'vm',
 				templateUrl : 'app/views/dashboard/session.template.html'

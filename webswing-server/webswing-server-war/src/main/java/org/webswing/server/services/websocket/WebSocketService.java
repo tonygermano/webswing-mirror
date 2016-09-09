@@ -8,18 +8,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.base.WebswingService;
-import org.webswing.server.services.swingmanager.SwingInstanceHolder;
+import org.webswing.server.services.swingmanager.SwingInstanceManager;
 
 public interface WebSocketService extends WebswingService {
-	WebSocketUrlHandler createBinaryWebSocketHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
+	
+	WebSocketUrlHandler createBinaryWebSocketHandler(UrlHandler parent, SwingInstanceManager instanceHolder);
 
-	WebSocketUrlHandler createJsonWebSocketHandler(UrlHandler parent, SwingInstanceHolder instanceHolder);
+	WebSocketUrlHandler createJsonWebSocketHandler(UrlHandler parent, SwingInstanceManager instanceHolder);
 
 	WebSocketUrlHandler createPlaybackWebSocketHandler(UrlHandler parent);
 
-	void removeListener(String mapping);
-
-	void serve(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException;
-
-
+	void serve(WebSocketUrlHandler handler, HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException;
 }

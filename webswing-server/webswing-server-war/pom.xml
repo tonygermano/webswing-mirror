@@ -165,7 +165,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>2.1.1</version>
 				<executions>
 					<execution>
 						<id>prepare-war</id>
@@ -280,9 +279,9 @@
 						</executions>
 					</plugin>
 					<plugin>
-						<groupId>org.mortbay.jetty</groupId>
+						<groupId>org.eclipse.jetty</groupId>
 						<artifactId>jetty-maven-plugin</artifactId>
-						<version>8.1.14.v20131031</version>
+						<version>${jetty.version}</version>
 						<executions>
 							<execution>
 								<goals>
@@ -290,26 +289,10 @@
 								</goals>
 								<phase>package</phase>
 								<configuration>
-									<connectors>
-										<connector
-											implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
-											<port>8080</port>
-											<maxIdleTime>60000</maxIdleTime>
-										</connector>
-										<connector
-											implementation="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
-											<port>8443</port>
-											<maxIdleTime>60000</maxIdleTime>
-											<keystore>${webswingRoot}/ssl/keystore.jks</keystore>
-											<truststore>${webswingRoot}/ssl/truststore.jks</truststore>
-											<password>123123</password>
-											<keyPassword>123123</keyPassword>
-										</connector>
-									</connectors>
-									<scanIntervalSeconds>10</scanIntervalSeconds>
+									<jettyXml>${project.basedir}/src/test/resources/jetty.xml</jettyXml>
+									<reload>manual</reload>
 									<webApp>
-										<contextPath>/</contextPath>
-										<defaultsDescriptor>${project.basedir}/src/test/webapp/WEB-INF/jetty-maven-plugin-webdefault.xml</defaultsDescriptor>
+										<contextPath>/webswing-server</contextPath>
 										<resourceBases>
 											<resourceBase>${project.basedir}/src/main/webapp</resourceBase>
 											<resourceBase>${project.basedir}/src/test/webapp</resourceBase>
@@ -319,6 +302,14 @@
 									</webApp>
 									<systemProperties>
 										<force>true</force>
+										<systemProperty>
+											<name>jetty.KeyStorePath</name>
+											<value>${webswingRoot}/ssl/keystore.jks</value>
+										</systemProperty>
+										<systemProperty>
+											<name>jetty.TrustStorePath</name>
+											<value>${webswingRoot}/ssl/truststore.jks</value>
+										</systemProperty>
 										<systemProperty>
 											<name>webswing.warLocation</name>
 											<value>${project.build.directory}/${project.build.finalName}</value>

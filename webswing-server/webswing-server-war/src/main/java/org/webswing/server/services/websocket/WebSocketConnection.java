@@ -71,7 +71,7 @@ public class WebSocketConnection {
 	}
 
 	public boolean hasPermission(WebswingAction action) {
-		return getUser().isPermitted(action.name());
+		return getUser() == null ? false : getUser().isPermitted(action.name());
 	}
 
 	public void disconnect() {

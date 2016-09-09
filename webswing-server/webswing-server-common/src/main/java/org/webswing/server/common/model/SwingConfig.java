@@ -1,6 +1,7 @@
 package org.webswing.server.common.model;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Map;
 import org.webswing.server.common.model.meta.ConfigField;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
 import org.webswing.server.common.model.meta.ConfigFieldDiscriminator;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType;
@@ -77,10 +79,12 @@ public interface SwingConfig extends Config {
 	public String getVmArgs();
 
 	@ConfigField(tab = ConfigGroup.Java, label = "Launcher Type", description = "Select the application type. Applet or regular Desktop swing application.")
+	@ConfigFieldDefaultValueString("Desktop")
 	@ConfigFieldDiscriminator
 	public LauncherType getLauncherType();
 
 	@ConfigField(tab = ConfigGroup.Java, label = "Launcher Configuration", description = "Launcher type specific configuration options")
+	@ConfigFieldDefaultValueObject(HashMap.class)
 	@ConfigFieldEditorType(editor = EditorType.Object)
 	public Map<String, Object> getLauncherConfig();
 

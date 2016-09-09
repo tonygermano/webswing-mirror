@@ -49,7 +49,7 @@
 			function view() {
 				var config = {
 					autoStart : false,
-					connectionUrl : baseUrl,
+					connectionUrl : "/"+vm.path,
 					clientId : vm.session.id,
 					applicationName : vm.session.application,
 					control : vm.control,
