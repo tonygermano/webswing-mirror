@@ -46,6 +46,10 @@ public class FastDirectDrawServicesAdapter extends DirectDrawServicesAdapter {
 				intBuffer.put(pixels, off, scansize);
 				shash.update(byteBuffer.array(), 0, scansize * 4);
 			}
+
+			public void setPixels(int x, int y, int w, int h, ColorModel model, byte[] pixels, int off, int scansize) {
+				shash.update(pixels, 0, scansize);
+			}
 		};
 		subImage.getSource().startProduction(ic);
 		return shash.getValue();
@@ -57,9 +61,9 @@ public class FastDirectDrawServicesAdapter extends DirectDrawServicesAdapter {
 		if (fileForFont == null && !missingFonts.contains(font.getFontName())) {
 			missingFonts.add(font.getFontName());
 			String fontFamily = font.getFamily();
-			if (fontFamily.startsWith("Dialog") || fontFamily.startsWith("Monospaced") || fontFamily.startsWith("Serif") || fontFamily.startsWith("SansSerif")){
+			if (fontFamily.startsWith("Dialog") || fontFamily.startsWith("Monospaced") || fontFamily.startsWith("Serif") || fontFamily.startsWith("SansSerif")) {
 				log.warn("Logical font " + fontFamily + " not defined in font configuration. Using default browser counterpart.");
-			}else{
+			} else {
 				log.warn("Font " + font.getFontName() + " not defined in font configuration. Falling back to glyph rendering.");
 			}
 		}

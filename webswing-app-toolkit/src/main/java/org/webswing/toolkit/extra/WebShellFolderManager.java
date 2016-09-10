@@ -80,7 +80,7 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 					}
 				}
 			} else {
-				throw new FileNotFoundException("Path is outside the allowed Webswing Filesystem isolation folder.");
+				throw new FileNotFoundException("Path is outside the allowed Webswing Filesystem isolation folder. (" + paramFile.getCanonicalPath() + ")");
 			}
 		} catch (IOException e) {
 			System.err.println("Error while creating ShellFolder. " + e.getMessage());

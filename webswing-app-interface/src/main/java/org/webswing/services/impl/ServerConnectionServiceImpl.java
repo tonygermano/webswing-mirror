@@ -51,6 +51,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
 
 	private Map<String, Object> syncCallResposeMap = new ConcurrentHashMap<String, Object>();
+	private boolean closed;
 
 	public static ServerConnectionServiceImpl getInstance() {
 		if (impl == null) {
@@ -138,6 +139,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			consumer.close();
 			session.close();
 			connection.close();
+			closed = true;
 		} catch (JMSException e) {
 			Logger.info("Disconnecting from JMS server failed.", e.getMessage());
 		}
@@ -145,41 +147,47 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 	@Override
 	public void sendObject(Serializable o) {
-		try {
-			synchronized (this) {
-				producer.send(session.createObjectMessage(o));
+		if (!closed) {
+			try {
+				synchronized (this) {
+					producer.send(session.createObjectMessage(o));
+				}
+			} catch (JMSException e) {
+				Logger.error("ServerConnectionService.sendJsonObject", e);
 			}
-		} catch (JMSException e) {
-			Logger.error("ServerConnectionService.sendJsonObject", e);
 		}
 	}
 
 	@Override
 	public Object sendObjectSync(Serializable o, String correlationId) throws TimeoutException, IOException {
-		try {
-			Object syncObject = new Object();
-			syncCallResposeMap.put(correlationId, syncObject);
-			synchronized (this) {
-				producer.send(session.createObjectMessage(o));
-			}
-			Object result = null;
+		if (!closed) {
 			try {
-				synchronized (syncObject) {
-					syncObject.wait(syncTimeout);
+				Object syncObject = new Object();
+				syncCallResposeMap.put(correlationId, syncObject);
+				synchronized (this) {
+					producer.send(session.createObjectMessage(o));
 				}
-			} catch (InterruptedException e) {
-			}
+				Object result = null;
+				try {
+					synchronized (syncObject) {
+						syncObject.wait(syncTimeout);
+					}
+				} catch (InterruptedException e) {
+				}
 
-			result = syncCallResposeMap.get(correlationId);
-			syncCallResposeMap.remove(correlationId);
-			if (result == syncObject) {
-				throw new TimeoutException("Call timed out after " + syncTimeout + " ms. Call id " + correlationId);
-			}
-			return result;
+				result = syncCallResposeMap.get(correlationId);
+				syncCallResposeMap.remove(correlationId);
+				if (result == syncObject) {
+					throw new TimeoutException("Call timed out after " + syncTimeout + " ms. Call id " + correlationId);
+				}
+				return result;
 
-		} catch (JMSException e) {
-			Logger.error("ServerConnectionService.sendJsonObject", e);
-			throw new IOException(e.getMessage());
+			} catch (JMSException e) {
+				Logger.error("ServerConnectionService.sendJsonObject", e);
+				throw new IOException(e.getMessage());
+			}
+		}else{
+			throw new IOException("Failed to send request. JMS was disconnected.");
 		}
 	}
 

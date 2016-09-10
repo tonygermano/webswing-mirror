@@ -49,6 +49,12 @@ public class DirectDrawServicesAdapter {
 					hash = hash * 31 + pixels[i];
 				}
 			}
+			@Override
+			public void setPixels(int x, int y, int w, int h, ColorModel model, byte[] pixels, int off, int scansize) {
+				for (int i = off; i < off + scansize; i++) {
+					hash = hash * 31 + pixels[i];
+				}
+			}
 		};
 		subImage.getSource().startProduction(ic);
 		return ic.getHash();

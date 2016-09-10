@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
+import org.webswing.directdraw.DirectDrawServicesAdapter;
 import org.webswing.directdraw.toolkit.WebGraphics;
 
 public class Tests {
@@ -423,13 +424,22 @@ public class Tests {
 			return false;
 		}
 		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("ws.png"));
-
+		BufferedImage a = ImageIO.read(Tests.class.getClassLoader().getResource("rollover_c.gif"));
+		BufferedImage b = ImageIO.read(Tests.class.getClassLoader().getResource("rollover.gif"));
+		DirectDrawServicesAdapter sa = new DirectDrawServicesAdapter();
+		long h1 = sa.computeHash(a);
+		long h2 = sa.computeHash(b);
+		assert h1 != h2;
 		switch (repeat) {
 		case 0:
 			g.drawImage(image, 0, 0, null);
+			g.drawImage(b, 100, 0, null);
+			g.drawImage(a, 150, 0, null);
 			break;
 		case 1:
 			g.drawImage(image, 200, 0, null);
+			g.drawImage(a, 300, 0, null);
+			g.drawImage(b, 350, 0, null);
 			break;
 		}
 		return true;
@@ -462,7 +472,7 @@ public class Tests {
 		compositeTestOp(g, 150, 0, AlphaComposite.SrcOut);
 		compositeTestOp(g, 200, 0, AlphaComposite.SrcAtop);
 		compositeTestOp(g, 250, 0, AlphaComposite.Xor);
-		
+
 		compositeTestOp(g, 0, 50, AlphaComposite.Dst);
 		compositeTestOp(g, 50, 50, AlphaComposite.DstOver);
 		compositeTestOp(g, 100, 50, AlphaComposite.DstIn);
@@ -526,7 +536,7 @@ public class Tests {
 	private static void compositeTestOp(Graphics2D g, int x, int y, AlphaComposite c) {
 		g.setPaint(new GradientPaint(new Point(x, y), Color.yellow, new Point(x + 50, y + 50), Color.green));
 		g.fillRect(x, y, 50, 50);
-		
+
 		Image img = DrawServlet.getImage(g instanceof WebGraphics, 50, 50);
 		Graphics2D imgGraphics = (Graphics2D) img.getGraphics();
 		imgGraphics.setColor(new Color(0, 0, 255));
@@ -534,7 +544,7 @@ public class Tests {
 		imgGraphics.setComposite(c);
 		imgGraphics.setColor(new Color(255, 0, 0));
 		imgGraphics.fillOval(10, 10, 25, 25);
-		
+
 		g.drawImage(img, x, y, null);
 		g.setColor(Color.black);
 		g.drawString("" + c.getRule(), x + 30, y + 40);
@@ -616,7 +626,7 @@ public class Tests {
 	private static void compositeImagesTestOp(Graphics2D g, int x, int y, AlphaComposite c) {
 		g.setPaint(new GradientPaint(new Point(x, y), Color.yellow, new Point(x + 50, y + 50), Color.green));
 		g.fillRect(x, y, 50, 50);
-		
+
 		Image oval = DrawServlet.getImage(g instanceof WebGraphics);
 		Graphics2D ovalGraphics = (Graphics2D) oval.getGraphics();
 		ovalGraphics.setColor(new Color(255, 0, 0));
@@ -628,7 +638,7 @@ public class Tests {
 		imgGraphics.fillRect(0, 0, 25, 25);
 		imgGraphics.setComposite(c);
 		imgGraphics.drawImage(oval, 0, 0, null);
-		
+
 		g.drawImage(img, x, y, null);
 		g.setColor(Color.black);
 		g.drawString("" + c.getRule(), x + 30, y + 40);
@@ -669,11 +679,11 @@ public class Tests {
 		}
 		BufferedImage image = ImageIO.read(Tests.class.getClassLoader().getResource("ws.png"));
 		g.drawImage(image, 0, 0, null);
-		
+
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
 		g.setColor(Color.yellow);
 		g.fillRect(0, 0, image.getWidth(), image.getHeight());
-		
+
 		return true;
 	}
 
@@ -705,7 +715,7 @@ public class Tests {
 		imgGraphics.dispose();
 
 		drawImagesWithBackground(g, img);
-		
+
 		return true;
 	}
 
@@ -721,7 +731,7 @@ public class Tests {
 		imgGraphics.dispose();
 
 		drawImagesWithBackground(g, img);
-		
+
 		return true;
 	}
 
@@ -775,7 +785,7 @@ public class Tests {
 		g.drawImage(copyImage(image, BufferedImage.TYPE_BYTE_INDEXED), 250, 50, 50, 50, null);
 		return true;
 	}
-	
+
 	@SuppressWarnings("unused")
 	public static boolean t29BiasedLinesTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
@@ -818,12 +828,12 @@ public class Tests {
 		 */
 		g.setTransform(new AffineTransform());
 		g.setComposite(AlphaComposite.Xor);
-		
+
 		g.setStroke(new BasicStroke(1f));
 		g.drawRect(175, 5, 40, 40);
 		g.setStroke(new BasicStroke(0.1f));
 		g.drawRect(175, 5, 40, 40);
-		
+
 		g.setStroke(new BasicStroke(1f));
 		g.drawRect(225, 5, 40, 40);
 		g.setStroke(new BasicStroke(0.5f));
@@ -846,14 +856,14 @@ public class Tests {
 		g.drawRect(0, 0, 20, 20);
 
 		g.setStroke(new BasicStroke(12f));
-		g.setTransform(new AffineTransform(1d/3, 0, 0, 1d/4, 275, 55));
+		g.setTransform(new AffineTransform(1d / 3, 0, 0, 1d / 4, 275, 55));
 		g.drawRect(0, 0, 180, 160);
 		g.setTransform(new AffineTransform(3, 0, 0, 2, 275, 55));
 		g.setStroke(new BasicStroke(1.5f));
 		g.drawRect(0, 0, 20, 20);
 
 		g.setStroke(new BasicStroke(12f));
-		g.setTransform(new AffineTransform(1d/4, 0, 0, 1d/3, 345, 5));
+		g.setTransform(new AffineTransform(1d / 4, 0, 0, 1d / 3, 345, 5));
 		g.drawRect(0, 0, 160, 180);
 		g.setTransform(new AffineTransform(2, 0, 0, 3, 345, 5));
 		g.setStroke(new BasicStroke(1.45f));
@@ -861,19 +871,18 @@ public class Tests {
 
 		return true;
 	}
-	
-	
+
 	@SuppressWarnings("unused")
 	public static boolean t30FontConfigTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
 			return false;
 		}
-		JPanel p= new JPanel(new GridLayout(5, 1));
-		String text= "<html><span style=\"font-size:2em;text-decoration:underline;\">The</span> <span style=\"font-size:1.5em;\"><b>Quick</b></span> <span style=\"font-size:1em;color:white;background-color:red;\">Brown</span> <span style=\"font-size:1em\">Fox <i>Jumps</i> <span style=\"text-decoration:line-through;\"> Over </span> </span><span style=\"font-size:1em\"> <sup>The</sup> <b><i>Lazy</i></b> <sub>Dog</sub> </span>123���������������<span style=\"font-size:0.5em\">test </span></html>";
+		JPanel p = new JPanel(new GridLayout(5, 1));
+		String text = "<html><span style=\"font-size:2em;text-decoration:underline;\">The</span> <span style=\"font-size:1.5em;\"><b>Quick</b></span> <span style=\"font-size:1em;color:white;background-color:red;\">Brown</span> <span style=\"font-size:1em\">Fox <i>Jumps</i> <span style=\"text-decoration:line-through;\"> Over </span> </span><span style=\"font-size:1em\"> <sup>The</sup> <b><i>Lazy</i></b> <sub>Dog</sub> </span>123���������������<span style=\"font-size:0.5em\">test </span></html>";
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		final String[] families = ge.getAvailableFontFamilyNames();
-		for (int i = 0; i < Math.min(families.length,5); i++) {
-			Font f = new Font(families[i], Font.PLAIN,12);
+		for (int i = 0; i < Math.min(families.length, 5); i++) {
+			Font f = new Font(families[i], Font.PLAIN, 12);
 			JLabel theLabel = new JLabel(text);
 			p.add(theLabel);
 		}
@@ -881,7 +890,7 @@ public class Tests {
 
 		return true;
 	}
-	
+
 	public static boolean t31CustomPaintClassTest(Graphics2D g, int repeat) {
 		if (repeat != 0) {
 			return false;
@@ -893,8 +902,7 @@ public class Tests {
 
 		return true;
 	}
-	
-	
+
 	private static void filledThenStroked(Graphics2D g) {
 		g.setColor(Color.blue);
 		g.fillRect(0, 0, 15, 15);
@@ -916,7 +924,7 @@ public class Tests {
 		g.dispose();
 		return copy;
 	}
-	
+
 	private static void printJComponentHelper(Graphics2D g, JComponent c) {
 		JFrame jf = new JFrame("");
 		jf.setSize(500, 100);
