@@ -13,7 +13,6 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.servlet.ShiroHttpServletResponse;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.subject.WebSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,7 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 	public void start() {
 		try {
 			securityManager.setCacheManager(new MemoryConstrainedCacheManager());
-			securityManager.setSessionManager(new DefaultWebSessionManager());
+			securityManager.setSessionManager(new WebswingWebSessionManager());
 			securityManager.setRealm(new WebswingRealmAdapter());
 			SecurityUtils.setSecurityManager(securityManager);
 		} catch (Exception e) {

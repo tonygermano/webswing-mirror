@@ -88,6 +88,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private SwingConfig config;
 	private Date disconnectedSince;
 	private final Date startedAt = new Date();
+	private final String queueId;
 	private Date endedAt = null;
 	private String customArgs = "";
 	private int debugPort = 0;
@@ -103,8 +104,9 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		this.customArgs = ServerUtil.getCustomArgs(websocket.getRequest());
 		this.debugPort = ServerUtil.getDebugPort(websocket.getRequest());
 		this.clientIp = ServerUtil.getClientIp(websocket);
+		this.queueId = user.getUserId() + "-" + config.getName() + "-" + startedAt.getTime();
 		try {
-			this.jvmConnection = connectionService.connect(clientId, this);
+			this.jvmConnection = connectionService.connect(this.queueId, this);
 			process = start(processService, config, h);
 			notifyUserConnected();
 		} catch (Exception e) {
@@ -318,9 +320,9 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	private void close() {
-		if(config.isAutoLogout()){
+		if (config.isAutoLogout()) {
 			sendToWeb(SimpleEventMsgOut.shutDownAutoLogoutNotification.buildMsgOut());
-		}else{
+		} else {
 			sendToWeb(SimpleEventMsgOut.shutDownNotification.buildMsgOut());
 		}
 		jvmConnection.close();
@@ -411,6 +413,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			String vmArgs = appConfig.getVmArgs() == null ? "" : subs.replace(appConfig.getVmArgs());
 			swingConfig.setJvmArgs(bootCp + debug + " -noverify " + vmArgs);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, getClientId());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.queueId);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
 			swingConfig.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 			swingConfig.addProperty(Constants.JMS_URL, System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT));

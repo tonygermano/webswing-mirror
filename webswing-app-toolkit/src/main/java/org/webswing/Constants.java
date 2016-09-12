@@ -7,6 +7,7 @@ public interface Constants {
 
 	// swing startup properties
 	public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
+	public static final String SWING_START_SYS_PROP_JMS_ID = "webswing.jmsQueueId";
 	public static final String SWING_START_SYS_PROP_MAIN_CLASS = "webswing.mainClass";
 	public static final String SWING_START_SYS_PROP_CLASS_PATH = "webswing.classPath";
 	public static final String SWING_START_SYS_PROP_ISOLATED_FS = "webswing.isolatedFs";

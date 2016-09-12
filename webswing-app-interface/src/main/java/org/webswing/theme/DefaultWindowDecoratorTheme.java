@@ -133,6 +133,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 			}
 
 		};
+		insets = new Insets(active.TITLE.getHeight(), active.LEFT.getWidth(), active.BOTTOM.getHeight(), active.RIGHT.getWidth());
 	}
 
 	protected Properties readProperties() throws IOException {

@@ -94,12 +94,12 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 	public void initialize() {
 		try {
-			String clientId = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID);
+			String jmsQueueId = System.getProperty(Constants.SWING_START_SYS_PROP_JMS_ID);
 			connection = connectionFactory.createConnection();
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			Queue consumerDest = session.createQueue(clientId + Constants.SERVER2SWING);
-			Queue producerDest = session.createQueue(clientId + Constants.SWING2SERVER);
+			Queue consumerDest = session.createQueue(jmsQueueId + Constants.SERVER2SWING);
+			Queue producerDest = session.createQueue(jmsQueueId + Constants.SWING2SERVER);
 			producer = session.createProducer(producerDest);
 			consumer = session.createConsumer(consumerDest);
 			consumer.setMessageListener(this);
@@ -133,27 +133,28 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		exitScheduler.scheduleWithFixedDelay(watchdog, 1, 1, TimeUnit.SECONDS);
 	}
 
-	public void disconnect() {
+	public synchronized void disconnect() {
 		try {
 			producer.close();
 			consumer.close();
 			session.close();
 			connection.close();
-			closed = true;
 		} catch (JMSException e) {
 			Logger.info("Disconnecting from JMS server failed.", e.getMessage());
+		} finally {
+			closed = true;
 		}
 	}
 
 	@Override
 	public void sendObject(Serializable o) {
-		if (!closed) {
-			try {
-				synchronized (this) {
+		synchronized (this) {
+			if (!closed) {
+				try {
 					producer.send(session.createObjectMessage(o));
+				} catch (JMSException e) {
+					Logger.error("ServerConnectionService.sendJsonObject", e);
 				}
-			} catch (JMSException e) {
-				Logger.error("ServerConnectionService.sendJsonObject", e);
 			}
 		}
 	}
@@ -186,7 +187,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 				Logger.error("ServerConnectionService.sendJsonObject", e);
 				throw new IOException(e.getMessage());
 			}
-		}else{
+		} else {
 			throw new IOException("Failed to send request. JMS was disconnected.");
 		}
 	}

@@ -236,7 +236,7 @@ public class WebComponentPeer implements ComponentPeer {
 		((Component) this.target).print(paramGraphics);
 	}
 
-	public void setBounds(int x, int y, int w, int h, int paramInt5) {
+	public void setBounds(int x, int y, int w, int h, int op) {
 		synchronized (WebPaintDispatcher.webPaintLock) {
 			Point validPosition = validate(x, y, w, h);
 			boolean resized = (w != this.oldWidth) || (h != this.oldHeight);

@@ -125,6 +125,7 @@ public class JvmConnectionImpl implements MessageListener, JvmConnection {
 			}
 		} catch (Exception e) {
 			log.error("SwingJvmConnection:close", e);
+			jmsOpen = false;
 		}
 	}
 }

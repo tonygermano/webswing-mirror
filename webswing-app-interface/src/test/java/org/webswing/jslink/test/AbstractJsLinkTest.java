@@ -63,6 +63,11 @@ public abstract class AbstractJsLinkTest {
 					throw new RuntimeException(e);
 				}
 			}
+
+			@Override
+			public void disconnect() {
+				
+			}
 		};
 		Services.initialize(null, null, serverServiceImpl, null, null, jsLinkServiceImpl);
 

@@ -466,6 +466,7 @@ public class WebPaintDispatcher {
 		ExitMsgInternal f = new ExitMsgInternal();
 		f.setWaitForExit(waitBeforeKill);
 		Services.getConnectionService().sendObject(f);
+		Services.getConnectionService().disconnect();
 		contentSender.shutdownNow();
 	}
 
