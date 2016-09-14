@@ -9,6 +9,10 @@ body {
 	height: 500px;
 }
 
+.progress {
+    margin-bottom: 5px;
+}
+
 .sub-header {
 	padding-bottom: 10px;
 	border-bottom: 1px solid #eee;
@@ -243,7 +247,8 @@ body {
 }
 
 .ws-line-chart {
-	height: 100px;
+    height: 90px;
+    margin-bottom: -15px;
 }
 
 .ws-line-chart .chart-legend {
@@ -325,15 +330,6 @@ break-all
 	margin-left: 5px;
 }
 
-.ws-session-gauge-panel {
-	height: 70px;
-	width: 300px;
-	display: table-right;
-	float: left;
-}
-
-.ws-session-gauge {
-	height: 70px;
-	width: 70px;
-	display: inline-table;
+.ws-table-header th a{
+	color:black; 
 }

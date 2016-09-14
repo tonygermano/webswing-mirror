@@ -2,6 +2,9 @@ package org.webswing.services.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -76,6 +79,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					timeoutMs = timeoutMs < 1000 ? 1000 : timeoutMs;
 					if ((diff / 1000 > 10) && ((diff / 1000) % 10 == 0)) {
 						Logger.warn("Inactive for " + diff / 1000 + " seconds." + (terminated ? "[waiting for application to stop]" : ""));
+						//TODO check for deadlock once
 					}
 					if (diff > timeoutMs) {
 						if (!terminated) {//only call once
@@ -234,7 +238,41 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		Runtime runtime = Runtime.getRuntime();
 		result.setHeapSize(runtime.totalMemory() / mb);
 		result.setHeapSizeUsed((runtime.totalMemory() - runtime.freeMemory()) / mb);
+		result.setCpuUsage(CpuMonitor.getCpuUtilization());
 		return result;
+	}
+
+	private static class CpuMonitor {
+		static long previousCPUTime = 0;
+		static long previousTime = 0;
+		static {
+			getCpuUtilization();
+		}
+
+		static double getCpuUtilization() {
+			long currentCpuTime = 0;
+			ThreadMXBean tmbean = ManagementFactory.getThreadMXBean();
+			long[] tids = tmbean.getAllThreadIds();
+			ThreadInfo[] tinfos = tmbean.getThreadInfo(tids);
+
+			for (int i = 0; i < tids.length; i++) {
+				long cpuTime = tmbean.getThreadCpuTime(tids[i]);
+				if (cpuTime != -1 && tinfos[i] != null) {
+					currentCpuTime += cpuTime;
+				}
+			}
+			long cpuTimeDelta = currentCpuTime - previousCPUTime;
+			long timeDelta = System.currentTimeMillis() - previousTime;
+			previousCPUTime = currentCpuTime;
+			previousTime = System.currentTimeMillis();
+			int processors = Runtime.getRuntime().availableProcessors();
+			if (timeDelta == 0 || processors == 0) {
+				return 0;
+			}
+			double cpuUsage = (double) TimeUnit.NANOSECONDS.toMillis(cpuTimeDelta) / (double) timeDelta;
+			cpuUsage = cpuUsage / processors;
+			return Math.max(0, cpuUsage) * 100;
+		}
 	}
 
 }

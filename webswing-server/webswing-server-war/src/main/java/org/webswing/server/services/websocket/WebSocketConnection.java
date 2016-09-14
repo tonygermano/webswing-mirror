@@ -6,6 +6,7 @@ import java.io.Serializable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResource.TRANSPORT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.MsgOut;
@@ -80,6 +81,10 @@ public class WebSocketConnection {
 		} catch (IOException e) {
 			log.error("Failed to close websocket connection " + resource.uuid());
 		}
+	}
+	
+	public boolean isWebsocketTransport(){
+		return TRANSPORT.WEBSOCKET.equals(resource.transport());
 	}
 
 }

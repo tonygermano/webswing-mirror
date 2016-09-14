@@ -309,6 +309,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				JvmStatsMsgInternal s = (JvmStatsMsgInternal) o;
 				logStatValue(StatisticsLogger.MEMORY_ALLOCATED_METRIC, s.getHeapSize());
 				logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
+				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, s.getCpuUsage());
 			} else if (o instanceof ExitMsgInternal) {
 				close();
 				ExitMsgInternal e = (ExitMsgInternal) o;

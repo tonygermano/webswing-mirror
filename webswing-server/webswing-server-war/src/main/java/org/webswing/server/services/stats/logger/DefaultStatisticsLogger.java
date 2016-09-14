@@ -26,9 +26,11 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 		summaryRulesMap.put(MEMORY_USED_METRIC, Arrays.asList(Aggregation.SUM));
 		summaryRulesMap.put(INBOUND_SIZE_METRIC, Arrays.asList(Aggregation.SUM));
 		summaryRulesMap.put(OUTBOUND_SIZE_METRIC, Arrays.asList(Aggregation.SUM));
+		summaryRulesMap.put(CPU_UTIL_METRIC, Arrays.asList(Aggregation.SUM));
 		summaryRulesMap.put(LATENCY_NETWORK, Arrays.asList(Aggregation.AVG));
 		summaryRulesMap.put(LATENCY_CLIENT_RENDERING, Arrays.asList(Aggregation.AVG));
 		summaryRulesMap.put(LATENCY_SERVER_RENDERING, Arrays.asList(Aggregation.AVG));
+		summaryRulesMap.put(LATENCY, Arrays.asList(Aggregation.MAX));
 	}
 
 	Map<String, InstanceStats> instanceMap = new HashMap<>();

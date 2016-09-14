@@ -53,6 +53,7 @@
 					vm.startable = data.status.status === 'Stopped' | data.status.status === 'Error';
 					vm.usageData = getUsageData(data);
 					vm.memoryStats = getMemoryStats(data.stats);
+					vm.cpuStats = getCpuStats(data.stats);
 					vm.bandwidthStats = getBandwidthStats(data.stats);
 					vm.latencyStats = getLatencyStats(data.stats);
 					vm.configOptions = getConfigOptions(data);
@@ -124,10 +125,10 @@
 			function getMemoryStats(stats) {
 				return {
 					names : [ 'Total Allocated Memory', 'Total Used Memory' ],
-					keys: ['memoryAllocated.SUM',  'memoryUsed.SUM' ],
-					dataset : wsUtils.getStatsDataset(stats, ['memoryAllocated.SUM',  'memoryUsed.SUM' ]),
-					tickFormat: function (value,index){
-						return (value)+'MB';
+					keys : [ 'memoryAllocated.SUM', 'memoryUsed.SUM' ],
+					dataset : wsUtils.getStatsDataset(stats, [ 'memoryAllocated.SUM', 'memoryUsed.SUM' ]),
+					tickFormat : function(value, index) {
+						return (value) + 'MB';
 					}
 				};
 			}
@@ -136,20 +137,31 @@
 				return {
 					names : [ 'Total Inbound trafic', 'Total Outbound trafic' ],
 					keys : [ 'inboundSize.SUM', 'outboundSize.SUM' ],
-					dataset :  wsUtils.getStatsDataset(stats, [ 'inboundSize.SUM', 'outboundSize.SUM' ]),
-					tickFormat: function (value,index){
-						return Math.floor(value/1024)+'k';
+					dataset : wsUtils.getStatsDataset(stats, [ 'inboundSize.SUM', 'outboundSize.SUM' ]),
+					tickFormat : function(value, index) {
+						return Math.floor(value / 1024) + 'k';
 					}
 				};
 			}
-			
-			function getLatencyStats(stats){
+
+			function getLatencyStats(stats) {
 				return {
-					names : [ 'Avg Network latency', 'Avg Server rendering latency','Avg Client rendering latency' ],
-					keys : [ 'latencyNetwork.AVG', 'latencyServerRendering.AVG','latencyClientRendering.AVG' ],
-					dataset :  wsUtils.getStatsDataset(stats, [ 'latencyNetwork.AVG', 'latencyServerRendering.AVG','latencyClientRendering.AVG' ]),
-					tickFormat: function (value,index){
-						return value+'ms';
+					names : [ 'Avg Network latency', 'Avg Server rendering latency', 'Avg Client rendering latency', 'Max End-to-End Latency' ],
+					keys : [ 'latencyNetwork.AVG', 'latencyServerRendering.AVG', 'latencyClientRendering.AVG', 'latency.MAX' ],
+					dataset : wsUtils.getStatsDataset(stats, [ 'latencyNetwork.AVG', 'latencyServerRendering.AVG', 'latencyClientRendering.AVG', 'latency.MAX' ]),
+					tickFormat : function(value, index) {
+						return value + 'ms';
+					}
+				};
+			}
+
+			function getCpuStats(stats) {
+				return {
+					names : [ 'Total CPU Utilization' ],
+					keys : [ 'cpuUtilization.SUM' ],
+					dataset : wsUtils.getStatsDataset(stats, [ 'cpuUtilization.SUM' ]),
+					tickFormat : function(value, index) {
+						return Math.floor(value) + '%';
 					}
 				};
 			}
@@ -196,7 +208,7 @@
 			}
 		}
 
-		wsAppViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$location', '$timeout', 'configRestService', 'permissions','wsUtils' ];
+		wsAppViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$location', '$timeout', 'configRestService', 'permissions', 'wsUtils' ];
 
 		return wsAppViewDirective;
 	});

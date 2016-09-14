@@ -11,7 +11,16 @@
 			vm.timer = undefined;
 			vm.play = play;
 			vm.back = back;
-
+			vm.sortExp = 'startedAt';
+			vm.sortReverse = false;
+			vm.sortBy = sortBy;
+			vm.sortByMetrics = sortByMetrics;
+			vm.sortByBandwidth = sortByBandwidth;
+			vm.sortByLatency = sortByLatency;
+			vm.sortFinishedExp = 'endedAt';
+			vm.sortFinishedReverse = false;
+			vm.sortFinishedBy=sortFinishedBy;
+			
 			refresh();
 
 			$scope.$on('$destroy', function() {
@@ -23,10 +32,7 @@
 					for (var i = 0; i < value.length; i++) {
 						var session = value[i];
 						session.gauge = {};
-						session.gauge.memory = wsUtils.getGaugeData(session.metrics, 'Mem', 'MB', 'memoryUsed', 'memoryAllocated', null, 1);
-						session.gauge.inbound = wsUtils.getGaugeData(session.metrics, 'In', 'k/s', 'inboundSize', null, 360, 1024);
-						session.gauge.outbound = wsUtils.getGaugeData(session.metrics, 'Out', 'k/s', 'outboundSize', null, 360, 1024);
-						session.gauge.latency = wsUtils.getGaugeData(session.metrics, 'Lat', 'ms', 'latency', null, 200, 1);
+						session.gauge.cpu = wsUtils.getGaugeData(session.metrics, 'Cpu', '%', 'cpuUtilization', null, 100, 1);
 					}
 				}
 			});
@@ -44,6 +50,48 @@
 					$timeout.cancel(vm.timer);
 					vm.timer = undefined;
 				});
+			}
+
+			function sortBy(exp) {
+				if (vm.sortExp === exp) {
+					vm.sortReverse = !vm.sortReverse;
+				} else {
+					vm.sortExp = exp;
+					vm.sortReverse = false;
+				}
+			}
+
+			function sortByMetrics(aggreg) {
+				var exp = 'metrics.memoryUsed';
+				if (aggreg != null) {
+					exp = "metrics['memoryUsed." + aggreg + "']";
+				}
+				sortBy(exp);
+			}
+
+			function sortByLatency(aggreg) {
+				var exp = 'metrics.latency';
+				if (aggreg != null) {
+					exp = "metrics['latency." + aggreg + "']";
+				}
+				sortBy(exp);
+			}
+
+			function sortByBandwidth(aggreg) {
+				var exp = 'metrics.inboundSize + metrics.outboundSize';
+				if (aggreg != null) {
+					exp = "metrics['inboundSize." + aggreg + "'] + metrics['outboundSize." + aggreg + "']";
+				}
+				sortBy(exp);
+			}
+			
+			function sortFinishedBy(exp){
+				if (vm.sortFinishedExp === exp) {
+					vm.sortFinishedReverse = !vm.sortFinishedReverse;
+				} else {
+					vm.sortFinishedExp = exp;
+					vm.sortFinishedReverse = false;
+				}
 			}
 
 			function view(session) {

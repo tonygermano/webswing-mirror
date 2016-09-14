@@ -1,6 +1,7 @@
 package org.webswing.server.services.stats.logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -11,7 +12,8 @@ public class InstanceStats {
 	private Map<String, Map<Long, Number>> statisticsLog = new HashMap<>();
 	private Map<String, Long> lastTimestampMap = new HashMap<String, Long>();
 	private Map<String, List<Number>> lastTimestampNumbers = new HashMap<String, List<Number>>();
-	private Map<String, Number> lastMetrics= new HashMap<>();
+	private Map<String, Number> lastMetrics = new HashMap<>();
+	private Map<String, String> warnings = new HashMap<>();
 
 	public void processMetric(MetricRule rule, String name, Number value) {
 		//round timestamp to interval milis
@@ -56,7 +58,7 @@ public class InstanceStats {
 		if (list != null && list.size() > 0) {
 			for (Iterator<Number> iterator = list.iterator(); iterator.hasNext();) {
 				Number number = iterator.next();
-				switch (rule.aggregation) {
+				switch (rule.getAggregation()) {
 				case MIN:
 					result = Math.min(number.doubleValue(), result.doubleValue());
 					break;
@@ -81,7 +83,17 @@ public class InstanceStats {
 	}
 
 	public Map<String, Number> getMetrics() {
-		return lastMetrics;
+		List<Aggregation> aggregations = Arrays.asList(Aggregation.MIN, Aggregation.MAX, Aggregation.AVG);
+		Map<String, Number> metrics = new HashMap<>(lastMetrics);
+		MetricRule rule = new MetricRule(Aggregation.MIN, 0, 0);
+		for (String name : statisticsLog.keySet()) {
+			List<Number> valueList = new ArrayList<>(statisticsLog.get(name).values());
+			for (Aggregation a : aggregations) {
+				rule.setAggregation(a);
+				metrics.put(name + "." + a, calculateValue(rule, valueList));
+			}
+		}
+		return metrics;
 	}
 
 	public Map<String, Map<Long, Number>> getStatistics() {

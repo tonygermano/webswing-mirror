@@ -31,6 +31,7 @@
 					$timeout.cancel(vm.timer);
 					vm.session = data;
 					vm.memoryStats = getMemoryStats(data);
+					vm.cpuStats = getCpuStats(data);
 					vm.bandwidthStats = getBandwidthStats(data);
 					vm.latencyStats = getLatencyStats(data);
 					vm.lastUpdated = new Date();
@@ -68,6 +69,17 @@
 					dataset : wsUtils.getStatsDataset(session.stats, [ 'memoryAllocated', 'memoryUsed' ]),
 					tickFormat : function(value, index) {
 						return (value) + 'MB';
+					}
+				};
+			}
+			
+			function getCpuStats(session) {
+				return {
+					names : [ 'CPU Utilization' ],
+					keys : [ 'cpuUtilization' ],
+					dataset : wsUtils.getStatsDataset(session.stats, [ 'cpuUtilization' ]),
+					tickFormat : function(value, index) {
+						return Math.floor(value) + '%';
 					}
 				};
 			}
