@@ -1,6 +1,7 @@
 package org.webswing.server.services.swingmanager;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
@@ -34,5 +35,7 @@ public interface SwingInstanceManager extends SecuredPathHandler,SwingInstanceHo
 	 * @return Map<name_of_metric, value>
 	 */
 	Map<String, Number> getInstanceMetrics(String clientId);
+
+	List<String> getInstanceWarnings(String instance);
 
 }

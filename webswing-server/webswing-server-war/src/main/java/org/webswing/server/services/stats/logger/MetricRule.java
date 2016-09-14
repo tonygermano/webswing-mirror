@@ -1,9 +1,9 @@
 package org.webswing.server.services.stats.logger;
 
 public class MetricRule {
-	Aggregation aggregation;
+	private Aggregation aggregation;
 	private long interval;
-	int metricHistoryLimit;
+	private int metricHistoryLimit;
 
 	public MetricRule(Aggregation aggregation, long interval, int metricHistoryLimit) {
 		super();

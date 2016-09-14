@@ -251,6 +251,10 @@ body {
     margin-bottom: -15px;
 }
 
+.ws-line-chart svg{
+    padding-top: 5px;
+}
+
 .ws-line-chart .chart-legend {
 	display: none;
 }

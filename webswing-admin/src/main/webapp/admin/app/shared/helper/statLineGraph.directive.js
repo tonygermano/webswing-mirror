@@ -23,7 +23,7 @@
 					x : {
 						key : 'x',
 						type : 'date',
-						ticks : 3
+						ticks : 2
 					},
 					y : {
 						min : 0,

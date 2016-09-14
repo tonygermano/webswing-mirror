@@ -15,12 +15,19 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 	private static final Logger log = LoggerFactory.getLogger(DefaultStatisticsLogger.class);
 	private static final MetricRule DEFAULT_RULE_AVG = new MetricRule(Aggregation.AVG, TimeUnit.SECONDS.toMillis(10), 60);
 	private static final MetricRule DEFAULT_RULE_AVG_PER_SEC = new MetricRule(Aggregation.AVG_PER_SEC, TimeUnit.SECONDS.toMillis(10), 60);
+	private static final MetricRule DEFAULT_RULE_FLAG = new MetricRule(Aggregation.AVG_PER_SEC, 0, 1);
 	private static final Map<String, MetricRule> rules = new HashMap<>();
 	private static final Map<String, List<Aggregation>> summaryRulesMap = new HashMap<>();
+	private static final Map<String, WarningRule> warningRules = new HashMap<>();
 
 	static {
 		rules.put(INBOUND_SIZE_METRIC, DEFAULT_RULE_AVG_PER_SEC);
 		rules.put(OUTBOUND_SIZE_METRIC, DEFAULT_RULE_AVG_PER_SEC);
+		rules.put(WEBSOCKET_CONNECTED, DEFAULT_RULE_FLAG);
+
+		warningRules.put(MEMORY_USED_METRIC, WarningRule.memoryUtilizationRule(90));
+		warningRules.put(LATENCY, WarningRule.thresholdRule(LATENCY, 200));
+		warningRules.put(WEBSOCKET_CONNECTED, WarningRule.thresholdRule(WEBSOCKET_CONNECTED, 2, "WebSocket connection failed. Falling back to long-polling."));
 
 		summaryRulesMap.put(MEMORY_ALLOCATED_METRIC, Arrays.asList(Aggregation.SUM));
 		summaryRulesMap.put(MEMORY_USED_METRIC, Arrays.asList(Aggregation.SUM));
@@ -48,7 +55,8 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 			instanceMap.put(instance, instanceStats);
 		}
 		MetricRule rule = findRule(name);
-		instanceStats.processMetric(rule, name, value);
+		WarningRule warn = warningRules.get(name);
+		instanceStats.processMetric(rule, name, value, warn);
 	}
 
 	private MetricRule findRule(String name) {
@@ -72,6 +80,18 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 	}
 
 	@Override
+	public Map<String, List<String>> getSummaryWarnings() {
+		Map<String, List<String>> summary = new HashMap<>();
+		for (String instanceId : instanceMap.keySet()) {
+			List<String> warnings = instanceMap.get(instanceId).getWarnings();
+			if (warnings != null && warnings.size() > 0) {
+				summary.put(instanceId, warnings);
+			}
+		}
+		return summary;
+	}
+
+	@Override
 	public Map<String, Map<Long, Number>> getInstanceStats(String instance) {
 		InstanceStats stats = instanceMap.get(instance);
 		if (stats != null) {
@@ -85,6 +105,15 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 		InstanceStats stats = instanceMap.get(instance);
 		if (stats != null) {
 			return stats.getMetrics();
+		}
+		return null;
+	}
+
+	@Override
+	public List<String> getInstanceWarnings(String instance) {
+		InstanceStats stats = instanceMap.get(instance);
+		if (stats != null) {
+			return stats.getWarnings();
 		}
 		return null;
 	}

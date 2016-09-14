@@ -33,6 +33,7 @@
 			vm.lastUpdated = null;
 			vm.refresh = refresh;
 			vm.timer = undefined;
+			vm.viewSession = viewSession;
 
 			refresh();
 
@@ -51,6 +52,7 @@
 					vm.b64img = 'data:image/png;base64,' + data.icon;
 					vm.stoppable = data.status.status === 'Running';
 					vm.startable = data.status.status === 'Stopped' | data.status.status === 'Error';
+					vm.hasWarnings = wsUtils.getKeys(data.warnings).length > 0;
 					vm.usageData = getUsageData(data);
 					vm.memoryStats = getMemoryStats(data.stats);
 					vm.cpuStats = getCpuStats(data.stats);
@@ -73,6 +75,13 @@
 
 			function viewConfig() {
 				$location.path('/config/swing' + vm.path);
+			}
+
+			function viewSession(id) {
+				$timeout(function() {
+					$location.search('id', id);
+					$location.path('/dashboard/session' + vm.path);
+				}, 500);
 			}
 
 			function start() {

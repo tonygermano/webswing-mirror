@@ -15,9 +15,9 @@ public class InstanceStats {
 	private Map<String, Number> lastMetrics = new HashMap<>();
 	private Map<String, String> warnings = new HashMap<>();
 
-	public void processMetric(MetricRule rule, String name, Number value) {
+	public void processMetric(MetricRule rule, String name, Number value, WarningRule warnRule) {
 		//round timestamp to interval milis
-		long timestamp = (System.currentTimeMillis() / rule.getInterval()) * rule.getInterval();
+		long timestamp = rule.getInterval() == 0 ? System.currentTimeMillis() : ((System.currentTimeMillis() / rule.getInterval()) * rule.getInterval());
 
 		//create map if null
 		Map<Long, Number> valueMap = statisticsLog.get(name);
@@ -27,29 +27,50 @@ public class InstanceStats {
 
 				@Override
 				protected boolean removeEldestEntry(Map.Entry<Long, Number> eldest) {
+					if (rule.getInterval() == 0) {
+						return this.size() > rule.getMetricHistoryLimit();
+					}
 					long current = (System.currentTimeMillis() / rule.getInterval()) * rule.getInterval();
-					long maxAge = rule.metricHistoryLimit * rule.getInterval();
+					long maxAge = rule.getMetricHistoryLimit() * rule.getInterval();
 					return eldest.getKey() < (current - maxAge);
 				}
 			};
 			statisticsLog.put(name, valueMap);
 		}
 
-		//flush last timestamp entry if interval passed
-		Long last = lastTimestampMap.get(name);
-		if (last != null && last != timestamp && lastTimestampNumbers.get(name) != null) {
-			List<Number> list = lastTimestampNumbers.remove(name);
-			Number aggregated = calculateValue(rule, list);
-			valueMap.put(last, aggregated);
-			lastMetrics.put(name, aggregated);
-		}
+		if(rule.getInterval()==0){
+			valueMap.put(timestamp, value);
+			lastMetrics.put(name, value);
+			processWarningRule(name, warnRule);
+		}else{
+			//flush last timestamp entry if interval passed
+			Long last = lastTimestampMap.get(name);
+			if (last != null && last != timestamp && lastTimestampNumbers.get(name) != null) {
+				List<Number> list = lastTimestampNumbers.remove(name);
+				Number aggregated = calculateValue(rule, list);
+				valueMap.put(last, aggregated);
+				lastMetrics.put(name, aggregated);
+				processWarningRule(name, warnRule);
+			}
 
-		//store current value to temp map
-		lastTimestampMap.put(name, timestamp);
-		if (lastTimestampNumbers.get(name) == null) {
-			lastTimestampNumbers.put(name, new ArrayList<Number>());
+			//store current value to temp map
+			lastTimestampMap.put(name, timestamp);
+			if (lastTimestampNumbers.get(name) == null) {
+				lastTimestampNumbers.put(name, new ArrayList<Number>());
+			}
+			lastTimestampNumbers.get(name).add(value);
 		}
-		lastTimestampNumbers.get(name).add(value);
+	}
+
+	private void processWarningRule(String name, WarningRule warnRule) {
+		if (warnRule != null) {
+			String warning = warnRule.checkWarning(lastMetrics);
+			if(warning==null){
+				warnings.remove(name);
+			}else{
+				warnings.put(name, warning);
+			}
+		}
 	}
 
 	private Number calculateValue(MetricRule rule, List<Number> list) {
@@ -94,6 +115,10 @@ public class InstanceStats {
 			}
 		}
 		return metrics;
+	}
+
+	public List<String> getWarnings() {
+		return new ArrayList<>(warnings.values());
 	}
 
 	public Map<String, Map<Long, Number>> getStatistics() {

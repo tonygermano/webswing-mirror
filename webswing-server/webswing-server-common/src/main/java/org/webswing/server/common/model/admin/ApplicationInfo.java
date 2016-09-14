@@ -1,6 +1,7 @@
 package org.webswing.server.common.model.admin;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.webswing.server.common.model.SecuredPathConfig;
@@ -18,6 +19,7 @@ public class ApplicationInfo implements Serializable {
 	private int maxRunningInstances;
 	private int finishedInstances;
 	private Map<String, Map<Long, Number>> stats;
+	private Map<String, List<String>> warnings;
 
 	public String getPath() {
 		return path;
@@ -105,6 +107,14 @@ public class ApplicationInfo implements Serializable {
 
 	public void setStats(Map<String, Map<Long, Number>> stats) {
 		this.stats = stats;
+	}
+
+	public void setWarnings(Map<String, List<String>> summaryWarnings) {
+		this.warnings = summaryWarnings;
+	}
+
+	public Map<String, List<String>> getWarnings() {
+		return warnings;
 	}
 
 }

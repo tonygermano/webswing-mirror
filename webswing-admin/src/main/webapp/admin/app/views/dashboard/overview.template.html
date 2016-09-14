@@ -77,6 +77,9 @@
 	                    <div ng-if="session.recording" >
 	                        <span class="glyphicon glyphicon-facetime-video" ui-jq="tooltip" title="Recording to {{session.recordingFile}}"></span> Recording...
 	                    </div>
+                        <div ng-if="session.warnings!=null" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
+				  			<span class="label label-warning"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{session.warnings.length}} Warnings </span>
+						</div>
 	                </td>
 	                <td>
                	        <progressbar  animate="false" max="session.metrics.memoryAllocated" value="session.metrics.memoryUsed"><span style="color:black; white-space:nowrap;">{{'MEM: '+(session.metrics.memoryUsed|number:0)+'MB   '}}<small>({{session.metrics['memoryUsed.MIN']|number:0}}|{{session.metrics['memoryUsed.AVG']|number:0}}|{{session.metrics['memoryUsed.MAX']|number:0}})</small></span></progressbar>
@@ -98,7 +101,7 @@
 	        </tbody>
 	    </table>
 	</div>
-	
+
 	<h2 class="sub-header">Finished sessions</h2>
 	<div class="table-responsive">
 	    <table class="table table-striped">
@@ -153,6 +156,35 @@
 	            </tr>
 	        </tbody>
 	    </table>
+    	<!-- WarningModal -->
+		<div class="modal fade" id="warnModal" tabindex="-1" role="dialog" >
+		  <div class="modal-dialog modal-lg" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h4 class="modal-title">Warnings for session {{vm.warningSession.id}}:</h4>
+		      </div>
+		      <div class="modal-body">
+		   	    <table class="table table-striped">
+			        <thead>
+			            <tr class="ws-table-header">
+			                <th>Warning Message</th>
+			            </tr>
+			        </thead>
+			        <tbody>
+			            <tr ng-repeat="msg in vm.warningSession.warnings">
+			                <td>
+		                    	{{msg}}
+			                </td>
+			            </tr>
+			        </tbody>
+			    </table>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
 	</div>
 </div>
 

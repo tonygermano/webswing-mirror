@@ -1,5 +1,6 @@
 package org.webswing.server.services.stats;
 
+import java.util.List;
 import java.util.Map;
 
 public interface StatisticsLogger {
@@ -13,15 +14,22 @@ public interface StatisticsLogger {
 	public static final String LATENCY_NETWORK = "latencyNetwork";
 	public static final String LATENCY= "latency";
 	public static final String CPU_UTIL_METRIC = "cpuUtilization";
+	public static final String WEBSOCKET_CONNECTED = "webSocketConnected";
 
+	
 	void log(String instance, String name, Number value);
 
 	Map<String, Map<Long, Number>> getSummaryStats();
+	
+	Map<String,List<String>> getSummaryWarnings();
 
 	Map<String, Map<Long, Number>> getInstanceStats(String instance);
 
 	Map<String, Number> getInstanceMetrics(String clientId);
 
+	List<String> getInstanceWarnings(String instance);
+
 	void removeInstance(String instance);
+
 
 }

@@ -5,7 +5,8 @@
 				extractValues : extractValues,
 				toJson : toJson,
 				getStatsDataset : getStatsDataset,
-				getGaugeData : getGaugeData
+				getGaugeData : getGaugeData,
+				getKeys : getKeys
 			};
 
 			function extractValues(config, data) {
@@ -82,6 +83,7 @@
 				}
 				return keys;
 			}
+
 			function getGaugeData(metrics, label, suffix, name, maxName, maxValue, div) {
 				var gaugeOptions = {
 					thickness : 3,

@@ -114,6 +114,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			throw new WsException("Failed to create Swing instance.", e);
 		}
 		this.sessionRecorder = ServerUtil.isRecording(websocket.getRequest()) ? new SessionRecorder(this) : null;
+		logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, websocket.isWebsocketTransport() ? 1 : 2);
 	}
 
 	public void connectSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h) {
@@ -148,6 +149,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			}
 			if (this.webConnection == null) {
 				this.webConnection = resource;
+				logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, resource.isWebsocketTransport() ? 1 : 2);
 				this.disconnectedSince = null;
 				notifyUserConnected();
 				return true;
@@ -162,6 +164,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			notifyUserDisconnected();
 			this.webConnection = null;
 			this.disconnectedSince = new Date();
+			logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, 0);
 		}
 	}
 
@@ -358,6 +361,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			session.setStats(manager.getInstanceStats(getClientId()));
 		}
 		session.setMetrics(manager.getInstanceMetrics(getClientId()));
+		session.setWarnings(manager.getInstanceWarnings(getClientId()));
 		session.setRecorded(isRecording());
 		session.setRecordingFile(getRecordingFile());
 		return session;

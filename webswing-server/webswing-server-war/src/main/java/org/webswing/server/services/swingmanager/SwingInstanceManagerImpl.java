@@ -216,6 +216,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		app.setMaxRunningInstances(maxRunningInstances);
 		app.setStatus(getStatus());
 		app.setStats(statsLogger.getSummaryStats());
+		app.setWarnings(statsLogger.getSummaryWarnings());
 		return app;
 	}
 
@@ -338,4 +339,11 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	public Map<String, Number> getInstanceMetrics(String clientId) {
 		return statsLogger.getInstanceMetrics(clientId);
 	}
+	
+	@Override
+	public List<String> getInstanceWarnings(String instance) {
+		return statsLogger.getInstanceWarnings(instance);
+	}
+	
+	
 }

@@ -66,7 +66,46 @@
 				</table>
 			</div>
 			<div class="col-xs-6 col-sm-6 col-md-3">
-				<h4>Stats:</h4>
+				<h4>Stats:
+					<button ng-if="vm.hasWarnings" type="button" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#warnModal">
+					  	<span class="glyphicon glyphicon-exclamation-sign"></span> Warnings
+					</button>
+				</h4>
+				<!-- WarningModal -->
+				<div ng-if="vm.hasWarnings" class="modal fade" id="warnModal" tabindex="-1" role="dialog" >
+				  <div class="modal-dialog modal-lg" role="document">
+				    <div class="modal-content">
+				      <div class="modal-header">
+				        <h4 class="modal-title">Warnings:</h4>
+				      </div>
+				      <div class="modal-body">
+				   	    <table class="table table-striped">
+					        <thead>
+					            <tr class="ws-table-header">
+					                <th>Warning Message</th>
+					                <th>Action</th>
+					            </tr>
+					        </thead>
+					        <tbody>
+					            <tr ng-repeat="(key, value) in vm.value.warnings">
+					                <td>
+					                    <p ng-repeat="msg in value">
+					                    	{{msg}}
+					                    </p>
+					                </td>
+					                <td>
+				                    	<button ng-click="vm.viewSession(key)" type="button" class="btn btn-primary btn-sm" data-dismiss="modal">View</button>
+					                </td>
+					            </tr>
+					        </tbody>
+					    </table>
+				      </div>
+				      <div class="modal-footer">
+				        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				      </div>
+				    </div>
+				  </div>
+				</div>
 				<ws-line-graph value="vm.memoryStats"></ws-line-graph>
 				<ws-line-graph value="vm.cpuStats"></ws-line-graph>
 				<ws-line-graph value="vm.bandwidthStats"></ws-line-graph>

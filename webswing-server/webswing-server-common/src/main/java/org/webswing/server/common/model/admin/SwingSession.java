@@ -2,6 +2,7 @@ package org.webswing.server.common.model.admin;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class SwingSession implements Serializable {
@@ -17,9 +18,10 @@ public class SwingSession implements Serializable {
 	private Date disconnectedSince;
 	private Boolean recorded;
 	private String recordingFile;
-	private Map<String, Map<Long,Number>> stats;
+	private Map<String, Map<Long, Number>> stats;
 	private Map<String, Number> metrics;
 	private SwingInstanceStatus status;
+	private List<String> warnings;
 
 	public String getId() {
 		return id;
@@ -69,11 +71,11 @@ public class SwingSession implements Serializable {
 		this.disconnectedSince = disconnectedSince;
 	}
 
-	public Map<String,Map<Long,Number>> getStats() {
+	public Map<String, Map<Long, Number>> getStats() {
 		return stats;
 	}
 
-	public void setStats(Map<String,Map<Long,Number>> state) {
+	public void setStats(Map<String, Map<Long, Number>> state) {
 		this.stats = state;
 	}
 
@@ -123,6 +125,14 @@ public class SwingSession implements Serializable {
 
 	public void setMetrics(Map<String, Number> metrics) {
 		this.metrics = metrics;
+	}
+
+	public void setWarnings(List<String> instanceWarnings) {
+		this.warnings = instanceWarnings;
+	}
+
+	public List<String> getWarnings() {
+		return warnings;
 	}
 
 }

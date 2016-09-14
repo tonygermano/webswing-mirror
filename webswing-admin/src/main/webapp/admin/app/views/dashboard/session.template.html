@@ -21,7 +21,11 @@
 					<div ng-switch-when="false">
 						<span class="label label-danger" ui-jq="tooltip" title="Disconnected at {{vm.session.disconnectedSince| date:'dd MMM h:mm:ss'}}">Disconnected</span>
 					</div>
-				</div></td>
+				</div>
+				<div ng-if="vm.session.warnings.length!=null" data-toggle="modal" data-target="#warnModal">
+		  			<span class="label label-warning"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{vm.session.warnings.length}} Warnings </span>
+				</div>
+			</td>
 			<td>
 				<div>
 					<button type="button" ng-class="{'ws-button-gap':true,'btn': true ,'btn-danger':!vm.control, 'btn-success':vm.control}" ng-model="vm.control" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
@@ -68,4 +72,34 @@
 		</div>
 	</div>
 </div>
+<!-- WarningModal -->
+<div class="modal fade" id="warnModal" tabindex="-1" role="dialog" >
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Warnings:</h4>
+      </div>
+      <div class="modal-body">
+   	    <table class="table table-striped">
+	        <thead>
+	            <tr class="ws-table-header">
+	                <th>Warning Message</th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	            <tr ng-repeat="msg in vm.session.warnings">
+	                <td>
+                    	{{msg}}
+	                </td>
+	            </tr>
+	        </tbody>
+	    </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-body mirror-view-dialog-body" data-webswing-instance="webswingmirrorview"></div>
