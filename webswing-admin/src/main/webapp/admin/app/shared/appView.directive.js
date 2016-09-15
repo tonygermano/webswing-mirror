@@ -155,9 +155,9 @@
 
 			function getLatencyStats(stats) {
 				return {
-					names : [ 'Avg Network latency', 'Avg Server rendering latency', 'Avg Client rendering latency', 'Max End-to-End Latency' ],
-					keys : [ 'latencyNetwork.AVG', 'latencyServerRendering.AVG', 'latencyClientRendering.AVG', 'latency.MAX' ],
-					dataset : wsUtils.getStatsDataset(stats, [ 'latencyNetwork.AVG', 'latencyServerRendering.AVG', 'latencyClientRendering.AVG', 'latency.MAX' ]),
+					names : [ 'Avg Ping latency', 'Avg Server rendering latency', 'Avg Client rendering latency', 'Max End-to-End Latency' ],
+					keys : [ 'latencyPing.AVG', 'latencyServerRendering.AVG', 'latencyClientRendering.AVG', 'latency.MAX' ],
+					dataset : wsUtils.getStatsDataset(stats, [ 'latencyPing.AVG', 'latencyServerRendering.AVG', 'latencyClientRendering.AVG', 'latency.MAX' ]),
 					tickFormat : function(value, index) {
 						return value + 'ms';
 					}

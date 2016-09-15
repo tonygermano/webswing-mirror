@@ -9,7 +9,7 @@ import org.webswing.server.services.stats.StatisticsLogger;
 
 public abstract class WarningRule {
 
-	private static final DateFormat format =new SimpleDateFormat("dd MMM HH:mm:ss");
+	private static final DateFormat format = new SimpleDateFormat("dd MMM HH:mm:ss");
 
 	public abstract String checkWarning(Map<String, Number> lastMetrics);
 
@@ -20,7 +20,7 @@ public abstract class WarningRule {
 				Number allocated = lastMetrics.get(StatisticsLogger.MEMORY_ALLOCATED_METRIC);
 				Number used = lastMetrics.get(StatisticsLogger.MEMORY_USED_METRIC);
 				if (allocated != null && allocated.doubleValue() != 0 && used != null) {
-					double utilization = allocated.doubleValue() / used.doubleValue();
+					double utilization = used.doubleValue() / allocated.doubleValue();
 					if (utilization >= threshold) {
 						return warning(StatisticsLogger.MEMORY_USED_METRIC, "Utilization is too high!");
 					}

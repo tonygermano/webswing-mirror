@@ -18,6 +18,7 @@ message AppFrameMsgOutProto{
 	optional string sessionId = 13;
 	optional string startTimestamp = 14;
 	optional string sendTimestamp = 15;
+	optional string ping = 16;
 }
 
 message ApplicationInfoMsgProto{

@@ -11,7 +11,8 @@ public interface StatisticsLogger {
 	public static final String MEMORY_USED_METRIC = "memoryUsed";
 	public static final String LATENCY_SERVER_RENDERING = "latencyServerRendering";
 	public static final String LATENCY_CLIENT_RENDERING = "latencyClientRendering";
-	public static final String LATENCY_NETWORK = "latencyNetwork";
+	public static final String LATENCY_NETWORK_TRANSFER = "latencyNetworkTransfer";
+	public static final String LATENCY_PING = "latencyPing";
 	public static final String LATENCY= "latency";
 	public static final String CPU_UTIL_METRIC = "cpuUtilization";
 	public static final String WEBSOCKET_CONNECTED = "webSocketConnected";

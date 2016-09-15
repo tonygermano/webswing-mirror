@@ -246,17 +246,20 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	private void processTimestampMessage(TimestampsMsgIn h) {
-		if (StringUtils.isNotEmpty(h.getRenderingTime()) && StringUtils.isNotEmpty(h.getSendTimestamp()) && StringUtils.isNotEmpty(h.getSendTimestamp())) {
+		if (StringUtils.isNotEmpty(h.getSendTimestamp())) {
 			long currentTime = System.currentTimeMillis();
-			long renderingTime = Long.parseLong(h.getRenderingTime());
 			long sendTime = Long.parseLong(h.getSendTimestamp());
-			long startTime = Long.parseLong(h.getStartTimestamp());
 
-			logStatValue(StatisticsLogger.LATENCY_SERVER_RENDERING, sendTime - startTime);
-			logStatValue(StatisticsLogger.LATENCY_NETWORK, currentTime - sendTime - renderingTime);
-			logStatValue(StatisticsLogger.LATENCY_CLIENT_RENDERING, renderingTime);
-			logStatValue(StatisticsLogger.LATENCY, currentTime - startTime);
-
+			if (StringUtils.isNotEmpty(h.getRenderingTime()) && StringUtils.isNotEmpty(h.getSendTimestamp())) {
+				long renderingTime = Long.parseLong(h.getRenderingTime());
+				long startTime = Long.parseLong(h.getStartTimestamp());
+				logStatValue(StatisticsLogger.LATENCY_SERVER_RENDERING, sendTime - startTime);
+				logStatValue(StatisticsLogger.LATENCY_CLIENT_RENDERING, renderingTime);
+				logStatValue(StatisticsLogger.LATENCY, currentTime - startTime);
+				logStatValue(StatisticsLogger.LATENCY_NETWORK_TRANSFER, currentTime - sendTime - renderingTime);
+			} else {
+				logStatValue(StatisticsLogger.LATENCY_PING, currentTime - sendTime);
+			}
 		}
 	}
 
@@ -313,6 +316,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				logStatValue(StatisticsLogger.MEMORY_ALLOCATED_METRIC, s.getHeapSize());
 				logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
 				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, s.getCpuUsage());
+				//we use this event as trigger to sample websocket latency (simple ping):
+				sendToWeb(AppFrameMsgOut.ping());
 			} else if (o instanceof ExitMsgInternal) {
 				close();
 				ExitMsgInternal e = (ExitMsgInternal) o;

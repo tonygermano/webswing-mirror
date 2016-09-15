@@ -97,9 +97,9 @@
 
 			function getLatencyStats(session) {
 				return {
-					names : [ 'Network latency', 'Server rendering latency', 'Client rendering latency' ],
-					keys : [ 'latencyNetwork', 'latencyServerRendering', 'latencyClientRendering' ],
-					dataset : wsUtils.getStatsDataset(session.stats, [ 'latencyNetwork', 'latencyServerRendering', 'latencyClientRendering' ]),
+					names : [ 'Network ping latency','Network transfer latency', 'Server rendering latency', 'Client rendering latency' ],
+					keys : [ 'latencyPing', 'latencyNetworkTransfer', 'latencyServerRendering', 'latencyClientRendering' ],
+					dataset : wsUtils.getStatsDataset(session.stats, ['latencyPing', 'latencyNetworkTransfer', 'latencyServerRendering', 'latencyClientRendering' ]),
 					tickFormat : function(value, index) {
 						return value + 'ms';
 					}

@@ -47,7 +47,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             dispose : dispose
         };
 
-        var timer1, timer2, timer3;
+        var timer1, timer3;
         var drawingLock;
         var drawingQ = [];
 
@@ -102,10 +102,8 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             api.cfg.mirrorMode = false;
             api.cfg.canPaint = false;
             clearInterval(timer1);
-            clearInterval(timer2);
             clearInterval(timer3);
             timer1 = setInterval(api.sendInput, 100);
-            timer2 = setInterval(heartbeat, 10000);
             timer3 = setInterval(servletHeartbeat, 100000);
             windowImageHolders = {};
             directDraw.dispose();
@@ -118,10 +116,6 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
                     type : message
                 }
             });
-        }
-
-        function heartbeat() {
-            sendMessageEvent('hb');
         }
 
         function servletHeartbeat() {
@@ -164,7 +158,6 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 
         function dispose() {
             clearInterval(timer1);
-            clearInterval(timer2);
             unload();
             api.sendInput();
             resetState();
@@ -176,7 +169,14 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
         }
 
         function processMessage(data) {
-            if (data.playback != null) {
+        	if(data.ping !=null){
+        		api.sendInput({
+					timestamps : {
+						sendTimestamp : data.ping
+					}
+				});
+        	}
+        	if (data.playback != null) {
                 api.playbackInfo(data);
             }
             if (data.applications != null && data.applications.length != 0) {

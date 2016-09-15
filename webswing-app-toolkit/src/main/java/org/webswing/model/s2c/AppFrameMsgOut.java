@@ -25,6 +25,17 @@ public class AppFrameMsgOut implements MsgOut {
 	private String sessionId;
 	private String startTimestamp = "" + System.currentTimeMillis();
 	private String sendTimestamp;
+	private String ping;
+
+	public AppFrameMsgOut() {
+	}
+	
+	public static AppFrameMsgOut ping(){
+		AppFrameMsgOut appFrameMsgOut = new AppFrameMsgOut();
+		appFrameMsgOut.setPing("" + System.currentTimeMillis());
+		appFrameMsgOut.startTimestamp=null;
+		return appFrameMsgOut;
+	}
 
 	public WindowMsg getOrCreateWindowById(String guid) {
 		if (windows != null) {
@@ -160,6 +171,14 @@ public class AppFrameMsgOut implements MsgOut {
 
 	public void setSendTimestamp(String sendTimestamp) {
 		this.sendTimestamp = sendTimestamp;
+	}
+
+	public String getPing() {
+		return ping;
+	}
+
+	public void setPing(String ping) {
+		this.ping = ping;
 	}
 
 }
