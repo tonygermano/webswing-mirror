@@ -138,17 +138,18 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 					initSize(desktopWidth, desktopHeight);
 				}
 			});
+		} else {
+			int oldWidht = screenWidth;
+			int oldHeight = screenHeight;
+			screenWidth = desktopWidth;
+			screenHeight = desktopHeight;
+			displayChanged();
+			resetGC();
+			Util.resetWindowsGC(screenWidth, screenHeight);
+			getPaintDispatcher().clientReadyToReceive();
+			getPaintDispatcher().resetWindowsPosition(oldWidht, oldHeight);// in case windows moved out of screen by resizing screen.
+			getPaintDispatcher().notifyWindowRepaintAll();
 		}
-		int oldWidht = screenWidth;
-		int oldHeight = screenHeight;
-		screenWidth = desktopWidth;
-		screenHeight = desktopHeight;
-		displayChanged();
-		resetGC();
-		Util.resetWindowsGC(screenWidth, screenHeight);
-		getPaintDispatcher().clientReadyToReceive();
-		getPaintDispatcher().resetWindowsPosition(oldWidht, oldHeight);// in case windows moved out of screen by resizing screen.
-		getPaintDispatcher().notifyWindowRepaintAll();
 	}
 
 	protected WindowManager getWindowManager() {

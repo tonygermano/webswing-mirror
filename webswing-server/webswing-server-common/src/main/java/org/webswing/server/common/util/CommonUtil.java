@@ -13,7 +13,6 @@ import java.net.URL;
 import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,7 +21,6 @@ import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.lang3.ClassUtils.Interfaces;
 import org.apache.commons.lang3.reflect.MethodUtils;
-import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -68,8 +66,7 @@ public class CommonUtil {
 		}
 	}
 
-	public static File resolveFile(String name, String homeDir, StrSubstitutor external) {
-		StrSubstitutor subs = external == null ? getConfigSubstitutor() : external;
+	public static File resolveFile(String name, String homeDir, VariableSubstitutor subs) {
 		if (name == null) {
 			return null;
 		}
@@ -119,38 +116,6 @@ public class CommonUtil {
 		return warFile;
 	}
 
-	public static Map<String, String> getConfigSubstitutorMap(String user, String sessionId, String clientIp, String locale, String customArgs) {
-
-		Map<String, String> result = new HashMap<String, String>();
-		result.putAll(System.getenv());
-		for (final String name : System.getProperties().stringPropertyNames()) {
-			result.put(name, System.getProperties().getProperty(name));
-		}
-		if (user != null) {
-			result.put(Constants.USER_NAME_SUBSTITUTE, user);
-		}
-		if (sessionId != null) {
-			result.put(Constants.SESSION_ID_SUBSTITUTE, sessionId);
-		}
-		if (clientIp != null) {
-			result.put(Constants.SESSION_IP_SUBSTITUTE, clientIp);
-		}
-		if (locale != null) {
-			result.put(Constants.SESSION_LOCALE_SUBSTITUTE, locale);
-		}
-		if (customArgs != null) {
-			result.put(Constants.SESSION_CUSTOMARGS_SUBSTITUTE, customArgs);
-		}
-		return result;
-	}
-
-	public static StrSubstitutor getConfigSubstitutor() {
-		return getConfigSubstitutor(null, null, null, null, null);
-	}
-
-	public static StrSubstitutor getConfigSubstitutor(String user, String sessionId, String clientIp, String locale, String customArgs) {
-		return new StrSubstitutor(getConfigSubstitutorMap(user, sessionId, clientIp, locale, customArgs));
-	}
 
 	public static void transferStreams(InputStream is, OutputStream os) throws IOException {
 		try {
@@ -173,12 +138,6 @@ public class CommonUtil {
 		}
 		File config = new File(URI.create(configFile));
 		return config;
-	}
-
-	public static String getClassPath(List<String> classpath) {
-		StrSubstitutor subs = CommonUtil.getConfigSubstitutor();
-		String cp = CommonUtil.generateClassPathString(classpath);
-		return subs.replace(cp);
 	}
 
 	public static String generateClassPathString(Collection<String> classPathEntries) {

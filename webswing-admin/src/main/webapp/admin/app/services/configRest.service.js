@@ -105,10 +105,8 @@
 				}
 			}
 
-			function getVariables() {
-				return $http.get(baseUrl + '/rest/admin/variables', {
-					cache : true
-				}).then(success, failed);
+			function getVariables(path,type) {
+				return $http.get(toPath(path) + '/rest/variables/'+type).then(success, failed);
 				function success(data) {
 					return data.data;
 				}
@@ -117,8 +115,8 @@
 				}
 			}
 
-			function getMeta(config) {
-				return $http.post(baseUrl + '/rest/admin/metaObject', config).then(success, failed);
+			function getMeta(path,config) {
+				return $http.post(toPath(path) + '/rest/metaConfig', config).then(success, failed);
 				function success(data) {
 					return data.data;
 				}

@@ -6,6 +6,7 @@
 				restrict : 'E',
 				template : htmlTemplate,
 				scope : {
+					path : '=',
 					value : '=',
 					variables : '=',
 					readonly : '=',
@@ -40,7 +41,7 @@
 
 			function refreshForm(config) {
 				var e = $element.find('.ws-panel-heading').first();
-				configRestService.getMeta(config).then(function(data) {
+				configRestService.getMeta(vm.path, config).then(function(data) {
 					vm.value = angular.extend({}, vm.value, data);
 					vm.isForm = true;
 					$timeout(function() {
@@ -61,15 +62,14 @@
 				$scope.$watch("vm.readonly", function(value) {
 					editor.setReadOnly(value);
 				});
-				vm.updateJson=function(){
+				vm.updateJson = function() {
 					if (!vm.isForm) {
 						editor.setValue(wsUtils.toJson(vm.value));
 						editor.gotoLine(0);
 					}
 				}
 				$scope.$watch('vm.value', vm.updateJson, true);
-				
-				
+
 			}
 
 			function showForm() {
@@ -80,19 +80,19 @@
 					messageService.error('Failed to parse JSON. Back to last valid version.');
 				}
 			}
-			
-			function applyConfig(){
-				if(!vm.isForm){
+
+			function applyConfig() {
+				if (!vm.isForm) {
 					vm.apply(JSON.parse(vm.json)).then(vm.updateJson);
-				}else{
+				} else {
 					vm.apply(wsUtils.extractValues(vm.value));
 				}
 			}
-			
-			function resetConfig(){
+
+			function resetConfig() {
 				vm.reset().then(vm.updateJson);
 			}
-			
+
 		}
 
 		wsConfigViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$timeout', '$location', 'messageService', 'wsUtils', 'configRestService' ];

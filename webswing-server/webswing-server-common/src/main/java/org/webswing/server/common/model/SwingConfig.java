@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.webswing.Constants;
 import org.webswing.server.common.model.meta.ConfigField;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
@@ -19,10 +20,11 @@ import org.webswing.server.common.model.meta.ConfigFieldVariables;
 import org.webswing.server.common.model.meta.ConfigGroup;
 import org.webswing.server.common.model.meta.ConfigType;
 import org.webswing.server.common.model.meta.MetadataGenerator;
+import org.webswing.server.common.model.meta.VariableSetName;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "isolatedFs", "transferDir", "allowDelete", "allowDownload", "allowAutoDownload", "allowUpload",
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "isolatedFs", "transferDir", "allowDelete", "allowDownload", "allowAutoDownload", "allowUpload",
 		"allowAutoUpload", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
 public interface SwingConfig extends Config {
 	public enum SessionMode {
@@ -37,18 +39,18 @@ public interface SwingConfig extends Config {
 	}
 
 	@ConfigField(tab = ConfigGroup.General, label = "Name", description = "Swing application name.")
-	@ConfigFieldVariables
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("Swing app")
 	public String getName();
 
 	@ConfigField(tab = ConfigGroup.General, label = "Theme", description = "Select one of the default window decoration themes or a enter path to a XFWM4 theme folder.")
-	@ConfigFieldVariables
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("Murrine")
 	@ConfigFieldPresets({ "Murrine", "Agualemon", "Sassandra", "Therapy", "Totem", "Vertex", "Vertex-Light" })
 	public String getTheme();
 
 	@ConfigField(tab = ConfigGroup.General, label = "Fonts", description = "Customize logical font mappings and define physical fonts available to swing application. These fonts (TTF only) will be used for DirectDraw as native fonts. Key: name of font (ie. dialog|dialoginput|sansserif|serif|monospaced), Value: path to font file.")
-	@ConfigFieldVariables
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldPresets({ "dialog", "dialoginput", "sansserif", "serif", "monospaced" })
 	public Map<String, String> getFontConfig();
 
@@ -60,22 +62,27 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isDebug();
 
+	@ConfigField(tab = ConfigGroup.Java, label = "User Folder", description = "The User working directory. Path from which the swing process will be started. (See the Java System Property: 'user.dir')")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("${"+Constants.HOME_FOLDER_SUBSTITUTE+"}")
+	public String getUserDir();
+
 	@ConfigField(tab = ConfigGroup.Java, label = "JRE Executable", description = "Path to java executable that will be used to spawn swing application process. Java 6,7 and 8 is supported.")
-	@ConfigFieldVariables
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("${java.home}/bin/java")
 	public String getJreExecutable();
 
 	@ConfigField(tab = ConfigGroup.Java, label = "Java Version", description = "Java version of the JRE executable defined above. Expected values are starting with '1.6', '1.7' or '1.8'.")
-	@ConfigFieldVariables
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("${java.version}")
 	public String getJavaVersion();
 
 	@ConfigField(tab = ConfigGroup.Java, label = "Class Path", description = "Swing application's classpath. Absolute or relative path to jar file or classes directory. At least one classPath entry should be specified containing the main class. Supports ? and * wildcards.")
-	@ConfigFieldVariables
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	public List<String> getClassPathEntries();
 
 	@ConfigField(tab = ConfigGroup.Java, label = "JVM Arguments", description = "Commandline arguments processed by Oracle's Java Virtual Machine. (ie. '-Xmx128m')")
-	@ConfigFieldVariables
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	public String getVmArgs();
 
 	@ConfigField(tab = ConfigGroup.Java, label = "Launcher Type", description = "Select the application type. Applet or regular Desktop swing application.")
@@ -113,7 +120,7 @@ public interface SwingConfig extends Config {
 	public boolean isIsolatedFs();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Upload folder", description = "If Isolated Filesystem is enabled. This will be the folder on the server where the user can upload and download files from.")
-	@ConfigFieldVariables
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("${user.dir}/${user}/upload")
 	public String getTransferDir();
 

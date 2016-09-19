@@ -11,4 +11,6 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface ConfigFieldVariables {
 
+	VariableSetName value() default VariableSetName.Basic;
+
 }

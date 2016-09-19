@@ -14,9 +14,9 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.SystemUtils;
-import org.apache.commons.lang3.text.StrSubstitutor;
 import org.webswing.Constants;
 import org.webswing.server.common.model.SwingConfig;
+import org.webswing.server.common.util.VariableSubstitutor;
 
 public class FontUtils {
 
@@ -24,7 +24,7 @@ public class FontUtils {
 	private static List<String> styles = Arrays.asList("bolditalic", "italic", "bold", "plain");
 	private static String defaultChargroup = SystemUtils.IS_OS_WINDOWS ? "alpbabet" : "latin-1";
 
-	public static String createFontConfiguration(SwingConfig appConfig, StrSubstitutor subs) throws IOException {
+	public static String createFontConfiguration(SwingConfig appConfig, VariableSubstitutor subs) throws IOException {
 		if (appConfig.getFontConfig() != null && appConfig.getFontConfig().size() > 0) {
 			StringBuilder fontConfig = new StringBuilder("version=1\n");
 			StringBuilder metadata = new StringBuilder();
@@ -72,7 +72,7 @@ public class FontUtils {
 		return defaultFont;
 	}
 
-	private static Map<String, File> buildFontMap(Map<String, String> fontConfig, StrSubstitutor subs) {
+	private static Map<String, File> buildFontMap(Map<String, String> fontConfig, VariableSubstitutor subs) {
 		Map<String, File> result = new HashMap<String, File>();
 		for (String key : fontConfig.keySet()) {
 			String keyValue = subs.replace(key).toLowerCase().trim();

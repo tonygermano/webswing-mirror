@@ -12,6 +12,7 @@
 			vm.reset = reset;
 			vm.apply = apply;
 			vm.hide = [ 'path', 'icon', 'swingConfig' ];
+			vm.baseUrl = baseUrl;
 
 			activate();
 
@@ -22,9 +23,14 @@
 			function activate() {
 				return configRestService.getConfig(baseUrl).then(function(data) {
 					vm.config = angular.extend({}, vm.config, data);
-				})
-				.then(configRestService.getVariables).then(function(data) {
-					vm.variables = data;
+				}).then(function() {
+					return configRestService.getVariables(baseUrl, 'Basic');
+				}).then(function(data) {
+					vm.variables['Basic'] = data;
+				}).then(function() {
+					return configRestService.getVariables(baseUrl, 'SwingApp');
+				}).then(function(data) {
+					vm.variables['SwingApp'] = data;
 				});
 			}
 

@@ -11,7 +11,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -41,6 +40,7 @@ import org.webswing.server.common.model.SwingConfig.LauncherType;
 import org.webswing.server.common.model.admin.SwingInstanceStatus;
 import org.webswing.server.common.model.admin.SwingSession;
 import org.webswing.server.common.util.CommonUtil;
+import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.files.FileTransferHandler;
@@ -381,14 +381,14 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private SwingProcess start(SwingProcessService processService, final SwingConfig appConfig, final ConnectionHandshakeMsgIn handshake) throws Exception {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final StrSubstitutor subs = CommonUtil.getConfigSubstitutor(user.getUserId(), getClientId(), clientIp, handshake.getLocale(), customArgs);
+		final VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), getClientId(), clientIp, handshake.getLocale(), customArgs);
 		SwingProcess swing = null;
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
 			swingConfig.setName(getClientId());
-			File homeDir = manager.resolveFile(".");
+			File homeDir = manager.resolveFile(subs.replace(appConfig.getUserDir()));
 			swingConfig.setJreExecutable(subs.replace(appConfig.getJreExecutable()));
-			swingConfig.setBaseDir(homeDir.getAbsolutePath());
+			swingConfig.setBaseDir(homeDir == null ? "." : homeDir.getAbsolutePath());
 			swingConfig.setMainClass(Main.class.getName());
 			swingConfig.setClassPath(new File(URI.create(CommonUtil.getWarFileLocation())).getAbsolutePath());
 			String webSwingToolkitApiJarPath = getClassPathForClass(WebswingApi.class);

@@ -11,6 +11,7 @@ import org.webswing.server.common.model.meta.ConfigFieldEditorType;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 import org.webswing.server.common.model.meta.ConfigFieldOrder;
 import org.webswing.server.common.model.meta.ConfigFieldVariables;
+import org.webswing.server.common.model.meta.VariableSetName;
 
 @ConfigFieldOrder({ "path", "homeDir", "webFolder", "icon", "security", "swingConfig" })
 public interface SecuredPathConfig extends Config {
@@ -25,12 +26,12 @@ public interface SecuredPathConfig extends Config {
 	public String getHomeDir();
 
 	@ConfigField(label = "Web Folder", description = "Folder to be used to store customized static web files like HTML, CSS or Javascript.")
-	@ConfigFieldVariables
+	@ConfigFieldVariables(VariableSetName.SwingApp)
 	@ConfigFieldDefaultValueString("")
 	public String getWebFolder();
 
 	@ConfigField(label = "Icon", description = "Path to icon displayed in application selection dialog.")
-	@ConfigFieldVariables
+	@ConfigFieldVariables(VariableSetName.SwingApp)
 	public String getIcon();
 
 	@ConfigField(label = "Security")

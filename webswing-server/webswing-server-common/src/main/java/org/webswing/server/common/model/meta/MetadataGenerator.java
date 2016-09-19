@@ -29,6 +29,7 @@ import org.webswing.server.common.util.ConfigUtil;
 
 public class MetadataGenerator<T> {
 	private static final Logger log = LoggerFactory.getLogger(MetadataGenerator.class);
+	private ConfigContext context;
 
 	public MetaObject getMetadata(T config, ClassLoader cl) throws Exception {
 		MetadataGenerator<T> generator = findGenerator(config);
@@ -208,18 +209,19 @@ public class MetadataGenerator<T> {
 
 	@SuppressWarnings({ "unchecked" })
 	protected MetadataGenerator<T> findGenerator(Object obj) {
+		MetadataGenerator<T> result =  new MetadataGenerator<T>();
 		try {
 			if (obj != null) {
 				ConfigType configType = findAnnotation(obj.getClass(), ConfigType.class);
 				if (configType != null && configType.metadataGenerator() != null) {
-					return configType.metadataGenerator().newInstance();
+					result = configType.metadataGenerator().newInstance();
 				}
-			}
-			return new MetadataGenerator<T>();
+			} 
 		} catch (Exception e) {
 			log.error("Failed to initialize Metadata generator", e);
-			return new MetadataGenerator<T>();
 		}
+		result.setContext(context);
+		return result;
 	}
 
 	protected Class<?> getExplicitType(T config, ClassLoader cl, String propertyName, Method readMethod, Object value) throws ClassNotFoundException {
@@ -308,20 +310,12 @@ public class MetadataGenerator<T> {
 		}
 	}
 
-	protected boolean isVariables(T config, ClassLoader cl, String propertyName, Method readMethod) {
+	protected VariableSetName isVariables(T config, ClassLoader cl, String propertyName, Method readMethod) {
 		ConfigFieldVariables variables = CommonUtil.findAnnotation(readMethod, ConfigFieldVariables.class);
 		if (variables != null) {
-			return true;
+			return variables.value();
 		} else {
-			EditorType editorType = getEditorType(config, cl, propertyName, readMethod);
-			switch (editorType) {
-			case Object:
-			case ObjectList:
-			case ObjectMap:
-				return true;
-			default:
-				return false;
-			}
+			return null;
 		}
 	}
 
@@ -417,6 +411,14 @@ public class MetadataGenerator<T> {
 			}
 		}
 		return configClass;
+	}
+
+	public ConfigContext getContext() {
+		return context;
+	}
+
+	public void setContext(ConfigContext context) {
+		this.context = context;
 	}
 
 }

@@ -2,6 +2,8 @@ package org.webswing.server.model;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +13,7 @@ import org.webswing.server.common.model.Config;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.model.SwingConfig.SessionMode;
+import org.webswing.server.common.model.meta.ConfigContext;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
@@ -48,7 +51,23 @@ public class ConfigurationMetadataTest {
 	public void testMetadataGenerator() throws Exception {
 		Map<String, Object> readValue = WebswingObjectMapper.get().readValue(this.getClass().getClassLoader().getResourceAsStream("swingConfig1.json"), Map.class);
 		SecuredPathConfig c = ConfigUtil.instantiateConfig(readValue, SecuredPathConfig.class);
-		MetaObject configMetadata = ConfigUtil.getConfigMetadata(c, this.getClass().getClassLoader());
+		MetaObject configMetadata = ConfigUtil.getConfigMetadata(c, this.getClass().getClassLoader(),new ConfigContext() {
+			
+			@Override
+			public File resolveFile(String name) {
+				return null;
+			}
+			
+			@Override
+			public String replaceVariables(String string) {
+				return null;
+			}
+			
+			@Override
+			public URL getWebResource(String resource) {
+				return null;
+			}
+		});
 
 		//@ConfigFieldEditorType(editor = EditorType.Object, className = "org.webswing.server.services.security.api.WebswingSecurityConfig")
 		for (MetaField f : configMetadata.getFields()) {

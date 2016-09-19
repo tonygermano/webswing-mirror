@@ -33,7 +33,6 @@ import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.files.FileTransferHandlerService;
 import org.webswing.server.services.resources.ResourceHandlerService;
-import org.webswing.server.services.rest.RestHandlerService;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.modules.SecurityModuleService;
@@ -52,21 +51,19 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	private final WebSocketService websocket;
 	private final LoginHandlerService loginService;
 	private final ResourceHandlerService resourceService;
-	private final RestHandlerService restService;
 	private StatisticsLogger statsLogger;
 	private FileTransferHandler fileHandler;
 	private SwingInstanceSet runningInstances = new SwingInstanceSet();
 	private SwingInstanceSet closedInstances = new SwingInstanceSet();
 
-	public SwingInstanceManagerImpl(UrlHandler parent, String path, SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileService, LoginHandlerService loginService, ResourceHandlerService resourceService, SecurityModuleService securityModuleService, RestHandlerService restService,
-			ConfigurationService configService, StatisticsLoggerService loggerService) {
+	public SwingInstanceManagerImpl(UrlHandler parent, String path, SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileService, LoginHandlerService loginService, ResourceHandlerService resourceService, SecurityModuleService securityModuleService, ConfigurationService configService,
+			StatisticsLoggerService loggerService) {
 		super(parent, securityModuleService, configService);
 		this.path = path;
 		this.instanceFactory = instanceFactory;
 		this.websocket = websocket;
 		this.loginService = loginService;
 		this.resourceService = resourceService;
-		this.restService = restService;
 		this.statsLogger = loggerService.createLogger();
 		this.fileHandler = fileService.create(this);
 
@@ -76,7 +73,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	public void init() {
 		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
 		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
-		registerChildUrlHandler(restService.createAdminRestHandler(this, this));
 		registerChildUrlHandler(loginService.createLoginHandler(this));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
 		registerChildUrlHandler(fileHandler);
@@ -325,6 +321,18 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		}
 	}
 
+	@POST
+	@Path("/rest/metaConfig")
+	public MetaObject getMeta(Map<String, Object> json) throws WsException {
+		return super.getMeta(json);
+	}
+
+	@GET
+	@Path("/rest/variables")
+	public Map<String, String> getVariables(@PathParam("") String type) throws WsException {
+		return super.getVariables(type);
+	}
+
 	@Override
 	public void logStatValue(String instance, String name, Number value) {
 		statsLogger.log(instance, name, value);
@@ -339,11 +347,10 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	public Map<String, Number> getInstanceMetrics(String clientId) {
 		return statsLogger.getInstanceMetrics(clientId);
 	}
-	
+
 	@Override
 	public List<String> getInstanceWarnings(String instance) {
 		return statsLogger.getInstanceWarnings(instance);
 	}
-	
-	
+
 }

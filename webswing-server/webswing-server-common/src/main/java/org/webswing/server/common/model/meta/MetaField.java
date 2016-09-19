@@ -9,7 +9,7 @@ public class MetaField {
 	private String label;
 	private String description;
 	private boolean discriminator;
-	private boolean variables;
+	private VariableSetName variables;
 	private String[] presets;
 	private EditorType type;
 	private Object value;
@@ -54,11 +54,11 @@ public class MetaField {
 		this.discriminator = discriminator;
 	}
 
-	public boolean isVariables() {
+	public VariableSetName getVariables() {
 		return variables;
 	}
 
-	public void setVariables(boolean variables) {
+	public void setVariables(VariableSetName variables) {
 		this.variables = variables;
 	}
 

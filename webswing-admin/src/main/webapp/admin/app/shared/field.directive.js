@@ -18,7 +18,6 @@
 						readonly : 'vm.readonly',
 						label : vm.field.label,
 						desc : vm.field.description,
-						variables : vm.field.variables ? 'vm.variables' : null,
 						discriminator : 'vm.field.discriminator',
 						items : 'vm.field.presets',
 						field : 'vm.field',
@@ -27,9 +26,10 @@
 					if (vm.field.restricted === 'true') {
 						commonAttrs.restricted = 'true';
 					}
-
+					
 					if (vm.field.type === 'String') {
 						var template = angular.element(stringTemplate);
+						commonAttrs.variables='vm.variables[\''+vm.field.variables+'\']';
 						template.attr(commonAttrs);
 						element.append(template).show();
 					}
@@ -46,26 +46,31 @@
 					}
 					if (vm.field.type === 'StringList') {
 						var template = angular.element(stringListTemplate);
+						commonAttrs.variables='vm.variables[\''+vm.field.variables+'\']';
 						template.attr(commonAttrs);
 						element.append(template).show();
 					}
 					if (vm.field.type === 'StringMap') {
 						var template = angular.element(stringMapTemplate);
+						commonAttrs.variables='vm.variables[\''+vm.field.variables+'\']';
 						template.attr(commonAttrs);
 						element.append(template).show();
 					}
 					if (vm.field.type === 'Object') {
 						var template = angular.element(objectTemplate);
+						commonAttrs.variables = 'vm.variables';
 						template.attr(commonAttrs);
 						element.append(template).show();
 					}
 					if (vm.field.type === 'ObjectList') {
 						var template = angular.element(objectListTemplate);
+						commonAttrs.variables = 'vm.variables';
 						template.attr(commonAttrs);
 						element.append(template).show();
 					}
 					if (vm.field.type === 'ObjectMap') {
 						var template = angular.element(objectMapTemplate);
+						commonAttrs.variables = 'vm.variables';
 						template.attr(commonAttrs);
 						element.append(template).show();
 					}

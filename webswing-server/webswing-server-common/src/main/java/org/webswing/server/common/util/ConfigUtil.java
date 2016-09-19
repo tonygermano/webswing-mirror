@@ -20,6 +20,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.common.model.Config;
+import org.webswing.server.common.model.meta.ConfigContext;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueGenerator;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
@@ -32,8 +33,9 @@ import org.webswing.server.common.model.meta.MetadataGenerator;
 public class ConfigUtil {
 	private static final Logger log = LoggerFactory.getLogger(ConfigUtil.class);
 
-	public static MetaObject getConfigMetadata(Object o, ClassLoader cl) throws Exception {
+	public static MetaObject getConfigMetadata(Object o, ClassLoader cl, ConfigContext ctx) throws Exception {
 		MetadataGenerator<Object> generator = new MetadataGenerator<Object>();
+		generator.setContext(ctx);
 		return generator.getMetadata(o, cl);
 	}
 
@@ -91,7 +93,7 @@ public class ConfigUtil {
 										return resultList;
 									}
 								}
-								if(value instanceof Number){
+								if (value instanceof Number) {
 									return convertNumberToTargetClass((Number) value, method.getReturnType());
 								}
 								return value;

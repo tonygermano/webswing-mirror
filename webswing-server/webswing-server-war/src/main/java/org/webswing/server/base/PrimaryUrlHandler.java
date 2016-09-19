@@ -21,8 +21,10 @@ import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.model.admin.InstanceManagerStatus;
 import org.webswing.server.common.model.admin.InstanceManagerStatus.Status;
 import org.webswing.server.common.model.meta.MetaObject;
+import org.webswing.server.common.model.meta.VariableSetName;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
+import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationChangeEvent;
 import org.webswing.server.services.config.ConfigurationChangeListener;
@@ -47,6 +49,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	private SecuredPathConfig config;
 	private SecurityModuleWrapper securityModule;
 	private InstanceManagerStatus status = new InstanceManagerStatus();
+	VariableSubstitutor varSubs;
 
 	public PrimaryUrlHandler(UrlHandler parent, SecurityModuleService securityModuleService, ConfigurationService configService) {
 		super(parent);
@@ -61,6 +64,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 					if (StringUtils.equals(e.getPath(), getPathMapping())) {
 						if (StringUtils.equals(e.getNewConfig().getPath(), getPathMapping())) {
 							config = e.getNewConfig();
+							varSubs = VariableSubstitutor.forSwingApp(getConfig());
 						}
 					}
 				}
@@ -72,6 +76,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	public void init() {
 		try {
 			status.setStatus(Status.Starting);
+			varSubs = VariableSubstitutor.forSwingApp(getConfig());
 			loadSecurityModule();
 			super.init();
 			status.setStatus(Status.Running);
@@ -233,7 +238,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 			config = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class);
 		}
 		try {
-			MetaObject result = ConfigUtil.getConfigMetadata(config, getClass().getClassLoader());
+			MetaObject result = ConfigUtil.getConfigMetadata(config, getClass().getClassLoader(), this);
 			result.setData(config.asMap());
 			return result;
 		} catch (Exception e) {
@@ -270,6 +275,43 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		return permissions;
 	}
 
+	public MetaObject getMeta(Map<String, Object> json) throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
+		SecuredPathConfig securedPathConfig = ConfigUtil.instantiateConfig(json, SecuredPathConfig.class);
+		try {
+			MetaObject result = ConfigUtil.getConfigMetadata(securedPathConfig, getClass().getClassLoader(), this);
+			result.setData(json);
+			return result;
+		} catch (Exception e) {
+			log.error("Failed to generate configuration descriptor.", e);
+			throw new WsException("Failed to generate configuration descriptor.");
+		}
+	}
+
+	public Map<String, String> getVariables(String type) throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
+		VariableSetName key;
+		try {
+			key = VariableSetName.valueOf(type.substring(1));
+		} catch (Exception e) {
+			key = VariableSetName.Basic;
+		}
+		VariableSubstitutor vs;
+		switch (key) {
+		case SwingInstance:
+			String userName = getUser() == null ? "<webswing user>" : getUser().getUserId();
+			vs = VariableSubstitutor.forSwingInstance(getConfig(), userName, "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing custom args>");
+			return vs.getVariableMap();
+		case SwingApp:
+			vs = VariableSubstitutor.forSwingApp(getConfig());
+			return vs.getVariableMap();
+		case Basic:
+		default:
+			vs = VariableSubstitutor.basic();
+			return vs.getVariableMap();
+		}
+	}
+
 	protected boolean isPermited(WebswingAction... actions) {
 		for (WebswingAction action : actions) {
 			boolean local = getUser() != null && getUser().isPermitted(action.name());
@@ -300,7 +342,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	@Override
 	public File resolveFile(String name) {
-		return CommonUtil.resolveFile(name, getConfig().getHomeDir(), null);
+		return CommonUtil.resolveFile(name, getConfig().getHomeDir(), varSubs);
 	}
 
 	@Override
@@ -311,7 +353,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	@Override
 	public String replaceVariables(String string) {
-		return CommonUtil.getConfigSubstitutor().replace(string);
+		return varSubs.replace(string);
 	}
 
 	@Override

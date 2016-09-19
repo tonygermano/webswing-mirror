@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.ConfigField;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
@@ -20,6 +19,7 @@ import org.webswing.server.common.model.meta.ConfigFieldVariables;
 import org.webswing.server.common.model.meta.ConfigType;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.model.meta.MetadataGenerator;
+import org.webswing.server.common.model.meta.VariableSetName;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.services.security.api.WebswingSecurityConfig.WebswingSecurityMetadataGenerator;
 import org.webswing.toolkit.util.ClasspathUtil;
@@ -35,7 +35,7 @@ public interface WebswingSecurityConfig {
 	public String getModule();
 
 	@ConfigField(label = "Secuirty Module Class Path")
-	@ConfigFieldVariables
+	@ConfigFieldVariables(VariableSetName.SwingApp)
 	@ConfigFieldDiscriminator
 	public List<String> getClassPath();
 
@@ -51,20 +51,11 @@ public interface WebswingSecurityConfig {
 			if (config.getClassPath() != null && config.getClassPath().size() > 0) {
 				//need to create temporary classloader with configured classpath
 				//1.resolve base dir for classpath
-				String home = null;
-				if (parent != null && parent instanceof SecuredPathConfig) {
-					SecuredPathConfig spc = (SecuredPathConfig) parent;
-					home = spc.getHomeDir();
-				} else {
-					//if master
-					home = ".";
-				}
-				File f = CommonUtil.resolveFile(".", home, null);
-				if (f != null) {
-					home = f.getAbsolutePath();
-				}
+				File homeFile = getContext().resolveFile(".");
+				String home = homeFile == null ? "." : homeFile.getAbsolutePath();
 				//2. construct the class loader 
-				String classPath = CommonUtil.getClassPath(config.getClassPath());
+				String classPath = CommonUtil.generateClassPathString(config.getClassPath());
+				classPath = getContext().replaceVariables(classPath);
 				URL[] urls = ClasspathUtil.populateClassPath(classPath, home);
 				SecurityModuleClassLoader customCL = new SecurityModuleClassLoader(urls, cl);
 				try {

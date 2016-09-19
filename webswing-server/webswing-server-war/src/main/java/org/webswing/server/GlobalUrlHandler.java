@@ -29,7 +29,6 @@ import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.resources.ResourceHandlerService;
-import org.webswing.server.services.rest.RestHandlerService;
 import org.webswing.server.services.security.api.BuiltInModules;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingSecurityConfig;
@@ -54,7 +53,6 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	private final ConfigurationService configService;
 	private final SwingInstanceManagerService appFactory;
 	private final ResourceHandlerService resourceService;
-	private final RestHandlerService restService;
 	private final LoginHandlerService loginService;
 
 	private ServletContext servletContext;
@@ -63,21 +61,18 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	private boolean restartNeeded;
 
 	@Inject
-	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, RestHandlerService restService, SecurityModuleService securityService, LoginHandlerService loginService, ServletContext servletContext) {
+	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, SecurityModuleService securityService, LoginHandlerService loginService, ServletContext servletContext) {
 		super(null, securityService, config);
 		this.websocket = websocket;
 		this.configService = config;
 		this.appFactory = appFactory;
 		this.resourceService = resourceService;
-		this.restService = restService;
 		this.loginService = loginService;
 		this.servletContext = servletContext;
 	}
 
 	public void init() {
 		registerChildUrlHandler(websocket.createPlaybackWebSocketHandler(this));
-
-		registerChildUrlHandler(restService.createAdminRestHandler(this, this));
 
 		registerChildUrlHandler(loginService.createLoginHandler(this));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
@@ -203,7 +198,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	protected String getPath() {
 		return "";
 	}
-	
+
 	@Override
 	public String getSecuredPath() {
 		return getPath();
@@ -383,5 +378,17 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		perm.put("remove", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_removeApp));
 		perm.put("create", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_createApp));
 		return perm;
+	}
+
+	@POST
+	@Path("/rest/metaConfig")
+	public MetaObject getMeta(Map<String, Object> json) throws WsException {
+		return super.getMeta(json);
+	}
+
+	@GET
+	@Path("/rest/variables")
+	public Map<String, String> getVariables(@PathParam("") String type) throws WsException {
+		return super.getVariables(type);
 	}
 }
