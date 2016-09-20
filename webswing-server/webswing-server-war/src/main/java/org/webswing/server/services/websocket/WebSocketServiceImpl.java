@@ -40,8 +40,9 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	private static final Class<?>[] jsonInterceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, TrackMessageSizeInterceptor.class, SuspendTrackerInterceptor.class };
 	private static final Class<?>[] binaryInterceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, SuspendTrackerInterceptor.class };
 	private static final String BINARY_HANDLER_PATH = "/async/swing-bin";
-	private static final String PLAYBACK_HANDLER_PATH = "/async/swing-play";
 	private static final String JSON_HANDLER_PATH = "/async/swing";
+	private static final String PLAYBACK_HANDLER_WS_PATH = "/async/swing-play";
+	private static final String PLAYBACK_HANDLER_PATH = "/playback" + PLAYBACK_HANDLER_WS_PATH;
 
 	private final SecuredAtmosphereFramework framework;
 	private final ServletContext context;
@@ -85,7 +86,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 			websocketEndpoints.put(PLAYBACK_HANDLER_PATH, new WebSocketAtmosphereHandler());
 			framework.addAtmosphereHandler("*" + JSON_HANDLER_PATH, websocketEndpoints.get(JSON_HANDLER_PATH), instantiate(jsonInterceptors));
 			framework.addAtmosphereHandler("*" + BINARY_HANDLER_PATH, websocketEndpoints.get(BINARY_HANDLER_PATH), instantiate(binaryInterceptors));
-			framework.addAtmosphereHandler("*" + PLAYBACK_HANDLER_PATH, websocketEndpoints.get(PLAYBACK_HANDLER_PATH), instantiate(binaryInterceptors));
+			framework.addAtmosphereHandler("*" + PLAYBACK_HANDLER_WS_PATH, websocketEndpoints.get(PLAYBACK_HANDLER_PATH), instantiate(binaryInterceptors));
 
 		} catch (ServletException e) {
 			throw new WsInitException("Failed to initialize Websocket framework", e);

@@ -55,7 +55,7 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
             }
 
             if (api.cfg.recordingPlayback) {
-                request.url =  api.cfg.connectionUrl + 'async/swing-play';
+                request.url =  api.cfg.connectionUrl + 'playback/async/swing-play';
                 request.headers['file'] = api.cfg.recordingPlayback;
             }
 

@@ -1,6 +1,8 @@
 package org.webswing.server.services.playback;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,6 +70,12 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 			if (r.hasPermission(WebswingAction.websocket_startRecordingPlayback)) {
 				String file = r.getRequest().getParameter("file");
 				File recordingFile = new File(file);
+				try {
+					recordingFile = new File(recordingFile.getParentFile(), URLEncoder.encode(recordingFile.getName(), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					log.error("Could not open recording file: " + recordingFile.getAbsolutePath(), e);
+
+				}
 				if (recordingFile.exists() && recordingFile.canRead()) {
 					SessionRecordingPlayback playback = new SessionRecordingPlayback(r, recordingFile);
 					playbackMap.put(r.uuid(), playback);

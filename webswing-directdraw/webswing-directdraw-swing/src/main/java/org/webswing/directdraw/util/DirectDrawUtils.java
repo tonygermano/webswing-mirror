@@ -155,6 +155,7 @@ public class DirectDrawUtils {
 				if (graphicsCreate != null) {
 					if (!equalStatus(graphicsCreate, mergedStatus)) {
 						graphicsCreate = createGraphics(ctx, graphicsCreate.getArg(0), mergedStatus);
+						mergedStatus.reset();
 					}
 					graphicsCreateMap.put(graphicsCreate.getArg(0).getId(), graphicsCreate);
 				} else if (isGraphicsCreateInst) {

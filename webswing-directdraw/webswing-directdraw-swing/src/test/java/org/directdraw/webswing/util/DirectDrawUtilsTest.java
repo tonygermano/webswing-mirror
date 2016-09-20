@@ -191,4 +191,34 @@ public class DirectDrawUtilsTest {
 		assertEquals("Transform 2", new AffineTransform(1, 0, 0, 1, -5, -3), inst.get(7).getArg(0).getValue());
 		assertEquals("Draw rectangle 2", originalInstructions.get(8), inst.get(8));
 	}
+	
+	@Test
+	public void testCreateGraphicsWithSingleTransform() {
+		WebImage webImage = new WebImage(dd, 10, 10);
+		List<DrawInstruction> inst = new ArrayList<DrawInstruction>();
+
+		WebGraphics g1 = (WebGraphics) webImage.getGraphics();
+		inst.add(f.createGraphics(g1));
+		inst.add(f.draw(new Rectangle(0, 0, 1, 1), null));
+
+		WebGraphics g2 = (WebGraphics) webImage.getGraphics();
+		inst.add(f.createGraphics(g2));
+		inst.add(f.transform(new AffineTransform(1, 0, 0, 1, -11, -11)));
+
+		inst.add(f.switchGraphics(g1));
+		inst.add(f.draw(new Rectangle(0, 0, 1, 1), null));
+
+		inst.add(f.switchGraphics(g2));
+		inst.add(f.disposeGraphics(g2));
+		
+		DirectDrawUtils.optimizeInstructions(dd, inst);
+
+		List<DrawInstruction> originalInstructions = new ArrayList<DrawInstruction>(inst);
+		assertEquals(4, inst.size());
+		assertEquals("Create graphics 1", originalInstructions.get(0), inst.get(0));
+		assertEquals("Draw rectangle 1", originalInstructions.get(1), inst.get(1));
+
+		assertEquals("Switch graphics", originalInstructions.get(2), inst.get(2));
+		assertEquals("Draw rectangle 2", originalInstructions.get(3), inst.get(3));
+	}
 }
