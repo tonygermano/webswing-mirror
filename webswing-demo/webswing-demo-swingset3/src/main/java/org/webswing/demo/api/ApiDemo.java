@@ -43,7 +43,7 @@ public class ApiDemo extends JPanel {
 			setLayout(new BorderLayout());
 			JPanel infopanel = new JPanel(new GridLayout(7, 1));
 			infopanel.add(new JLabel("isWebswing:" + WebswingUtil.isWebswing()));
-			JButton getUserButton = new JButton("getConnectedUser()");
+			JButton getUserButton = new JButton("getPrimaryUser()");
 			getUserButton.addActionListener(new ActionListener() {
 
 				@Override
@@ -108,6 +108,20 @@ public class ApiDemo extends JPanel {
 				}
 			});
 			infopanel.add(exitButton);
+			JButton versionButton = new JButton("getWebswingVersion()");
+			versionButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String version = WebswingUtil.getWebswingApi().getWebswingVersion();
+					if (version == null) {
+						displayMessage("No version information available");
+					} else {
+						displayMessage(version);
+					}
+				}
+			});
+			infopanel.add(versionButton);
 			infopanel.setBorder(BorderFactory.createTitledBorder("Webswing API Demonstration."));
 			add(BorderLayout.EAST, infopanel);
 			final JTextArea text = new JTextArea(50, 20);

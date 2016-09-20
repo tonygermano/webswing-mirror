@@ -35,9 +35,9 @@ import org.webswing.server.services.security.api.WebswingSecurityConfig;
 import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.security.modules.SecurityModuleService;
 import org.webswing.server.services.security.modules.SecurityModuleWrapper;
-import org.webswing.server.util.GitRepositoryState;
 import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
+import org.webswing.toolkit.util.GitRepositoryState;
 
 public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements SecuredPathHandler, SecurityContext {
 	private static final Logger log = LoggerFactory.getLogger(PrimaryUrlHandler.class);

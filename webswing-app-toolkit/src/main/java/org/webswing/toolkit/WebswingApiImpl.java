@@ -20,6 +20,7 @@ import org.webswing.toolkit.api.security.UserEvent;
 import org.webswing.toolkit.api.security.WebswingUser;
 import org.webswing.toolkit.api.security.WebswingUserListener;
 import org.webswing.toolkit.util.DeamonThreadFactory;
+import org.webswing.toolkit.util.GitRepositoryState;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
@@ -205,6 +206,11 @@ public class WebswingApiImpl implements WebswingApi {
 		public String toString() {
 			return getUserId();
 		}
+	}
+
+	@Override
+	public String getWebswingVersion() {
+		return GitRepositoryState.getInstance().getDescribe();
 	}
 
 }

@@ -76,5 +76,11 @@ public interface WebswingApi {
 	 * @param listener listener to remove
 	 */
 	public void removeShutdownListener(WebswingShutdownListener listener);
+	
+	
+	/**
+	 * @return the Webswing version in 'git describe' format
+	 */
+	public String getWebswingVersion();
 
 }

@@ -1,13 +1,9 @@
-package org.webswing.server.util;
+package org.webswing.toolkit.util;
 
 import java.io.IOException;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class GitRepositoryState {
-	private static final Logger log = LoggerFactory.getLogger(GitRepositoryState.class);
 
 	private static GitRepositoryState instance;
 
@@ -63,9 +59,13 @@ public class GitRepositoryState {
 		if (instance == null) {
 			Properties properties = new Properties();
 			try {
-				properties.load(GitRepositoryState.class.getClassLoader().getResourceAsStream("git.properties"));
+				ClassLoader cl = GitRepositoryState.class.getClassLoader();
+				if(cl==null){
+					cl=ClassLoader.getSystemClassLoader();
+				}
+				properties.load(cl.getResourceAsStream("git.properties"));
 			} catch (IOException e) {
-				log.warn("Failed to load git.properties");
+				Logger.warn("Failed to load git.properties");
 			}
 			instance = new GitRepositoryState(properties);
 		}
