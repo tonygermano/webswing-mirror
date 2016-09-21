@@ -52,7 +52,7 @@ public interface WebswingSecurityConfig {
 				//need to create temporary classloader with configured classpath
 				//1.resolve base dir for classpath
 				File homeFile = getContext().resolveFile(".");
-				String home = homeFile == null ? "." : homeFile.getAbsolutePath();
+				String home = homeFile == null ? "." : homeFile.getCanonicalPath();
 				//2. construct the class loader 
 				String classPath = CommonUtil.generateClassPathString(config.getClassPath());
 				classPath = getContext().replaceVariables(classPath);

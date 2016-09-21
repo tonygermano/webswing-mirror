@@ -243,7 +243,9 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
         }
 
         function processRequest(canvas, data) {
-            api.hideDialog();
+        	if(data.windows!=null && data.windows.length > 0){
+        		api.hideDialog();
+        	}
             var context = canvas.getContext("2d");
             if (data.linkAction != null && !api.cfg.recordingPlayback) {
                 if (data.linkAction.action == 'url') {

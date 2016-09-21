@@ -15,6 +15,21 @@
 			</includes>
 		</fileSet>
 		<fileSet>
+			<directory>../webswing-server/webswing-server-security/target</directory>
+			<outputDirectory>/api</outputDirectory>
+			<includes>
+				<include>webswing-security.jar</include>
+				<include>webswing-security-full.jar</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>../webswing-api/target</directory>
+			<outputDirectory>/api</outputDirectory>
+			<includes>
+				<include>webswing-api.jar</include>
+			</includes>
+		</fileSet>
+		<fileSet>
 			<directory>${basedir}/src/main/demo</directory>
 			<outputDirectory>/</outputDirectory>
 			<excludes>
