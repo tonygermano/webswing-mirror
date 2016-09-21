@@ -31,10 +31,14 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                     var id = $(instance).data('webswingInstance');
                     var active = $(instance).data('webswingActive');
                     if (!active) {
+                    	var customization;
                     	if (root[id]!=null && root[id].options !=null) {
                     		$(instance).data("webswingOptions",root[id].options);
+                    		if(root[id].options.customization!=null && typeof root[id].options.customization === 'function'){
+                    			customization=root[id].options.customization;
+                    		}
                         }
-                        var wsInstance = bootstrap($(instance));
+                        var wsInstance = bootstrap($(instance),customization);
                         $(instance).attr('data-webswing-active', 'true');
                         if (id != null) {
                             result[id] = wsInstance;
