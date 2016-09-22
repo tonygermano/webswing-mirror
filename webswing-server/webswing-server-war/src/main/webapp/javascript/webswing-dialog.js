@@ -30,7 +30,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 		};
 
 		var currentContent;
-		var dialog, content, header, backdrop;
+		var dialog, content, header, backdrop,spinner;
 
 		function configuration() {
 			return {
@@ -109,6 +109,16 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			dialog = api.cfg.rootElement.find('div[data-id="commonDialog"]');
 			content = dialog.find('div[data-id="content"]');
 			header = dialog.find('div[data-id="header"]');
+			spinner = $('<div class="spinner"><div class="dot1"></div> <div class="dot2"></div></div>');
+			$(document).ajaxStart(function() {
+				if (dialog.is(":visible")){
+					$('#ajaxProgress').show();
+					$('#ajaxProgress').append(spinner.clone(true));
+				}
+			}).ajaxComplete(function() {
+				$('#ajaxProgress').html('');
+				$('#ajaxProgress').hide();
+			});
 		}
 
 		function show(msg) {
