@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.realm.text.PropertiesRealm;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 
 public class ShiroWebswingUser extends AbstractWebswingUser {
@@ -14,7 +13,7 @@ public class ShiroWebswingUser extends AbstractWebswingUser {
 	private AuthorizingRealm authzrealm;
 	private AuthenticationInfo authtInfo;
 
-	public ShiroWebswingUser(PropertiesRealm authzrealm, AuthenticationInfo authtInfo) {
+	public ShiroWebswingUser(AuthorizingRealm authzrealm, AuthenticationInfo authtInfo) {
 		super();
 		this.authzrealm = authzrealm;
 		this.authtInfo = authtInfo;
