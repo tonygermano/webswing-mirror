@@ -1,6 +1,6 @@
 (function(define) {
 	define([], function f() {
-		function SwingConfigController($scope, $timeout, $location, configRestService, $routeParams, permissions) {
+		function SwingConfigController($scope, $timeout, $location, configRestService, $routeParams, permissions, loading) {
 			var vm = this;
 			vm.config = {
 				hide : [ 'path' ],
@@ -27,21 +27,26 @@
 			});
 
 			function activate() {
-				return configRestService.getConfig(vm.path).then(function(data) {
-					vm.config = angular.extend({}, vm.config, data);
-				}).then(function(){
-					return configRestService.getVariables(vm.path,'Basic');
-				}).then(function(data) {
-					vm.variables['Basic'] = data;
-				}).then(function(){
-					return configRestService.getVariables(vm.path,'SwingApp');
-				}).then(function(data) {
-					vm.variables['SwingApp'] = data;
-				}).then(function(){
-					return configRestService.getVariables(vm.path,'SwingInstance');
-				}).then(function(data) {
-					vm.variables['SwingInstance'] = data;
-				});
+				if (!loading.isLoading()) {
+					loading.startLoading();
+					return configRestService.getConfig(vm.path).then(function(data) {
+						vm.config = angular.extend({}, vm.config, data);
+					}).then(function() {
+						return configRestService.getVariables(vm.path, 'Basic');
+					}).then(function(data) {
+						vm.variables['Basic'] = data;
+					}).then(function() {
+						return configRestService.getVariables(vm.path, 'SwingApp');
+					}).then(function(data) {
+						vm.variables['SwingApp'] = data;
+					}).then(function() {
+						return configRestService.getVariables(vm.path, 'SwingInstance');
+					}).then(function(data) {
+						vm.variables['SwingInstance'] = data;
+					}).then(function() {
+						loading.stopLoading();
+					});
+				}
 			}
 
 			function reset() {
@@ -60,7 +65,7 @@
 				$location.path('/dashboard');
 			}
 		}
-		SwingConfigController.$inject = [ '$scope', '$timeout', '$location', 'configRestService', '$routeParams', 'permissions' ];
+		SwingConfigController.$inject = [ '$scope', '$timeout', '$location', 'configRestService', '$routeParams', 'permissions', 'loading' ];
 
 		return SwingConfigController;
 	});

@@ -27,7 +27,7 @@
 			vm.addObject = addObject;
 
 			$scope.$watch('vm.value', function(newValue) {
-				vm.tabs = createTabs(newValue);
+				updateTabs(vm.tabs, createTabs(newValue));
 				vm.needTabs = Object.keys(vm.tabs).length > 1;
 			});
 
@@ -55,6 +55,58 @@
 					}
 				}
 				return result;
+			}
+
+			function updateTabs(tabs, newTabs) {
+				for ( var tabName in tabs) {
+					var tab = tabs[tabName];
+					var newTab = newTabs[tabName];
+					if (newTab == null) {
+						delete tabs[tabName];
+					} else {
+						updateFields(tab.fields, newTab.fields);
+						updateFields(tab.objects, newTab.objects);
+						delete newTabs[tabName];
+					}
+				}
+				angular.extend(tabs, newTabs);
+			}
+
+			function updateFields(fields, newFields) {
+				var i = fields.length;
+				while (i--) {
+					var field = fields[i];
+					var newIndex = findFieldByName(field.name, newFields);
+					if (newIndex == -1) {
+						fields.splice(i, 1);
+					}
+				}
+				for (var int = 0; int < newFields.length; int++) {
+					var newField = newFields[int];
+					oldIndex = findFieldByName(newField.name, fields);
+					if (oldIndex == -1) {
+						fields.splice(int, 0, newField);
+					} else {
+						if (oldIndex !== int) {
+							fields.splice(int, 0, fields.splice(oldIndex, 1)[0]);
+						}
+						if (newField.type === 'Object') {
+							angular.extend(fields[int], newField);
+						} else {
+							fields[int] = newField;
+						}
+					}
+				}
+			}
+
+			function findFieldByName(name, fieldArray) {
+				for (var int = 0; int < fieldArray.length; int++) {
+					var f = fieldArray[int];
+					if (f.name === name) {
+						return int;
+					}
+				}
+				return -1;
 			}
 
 			function setDisabled(enableArray, field) {
