@@ -1,33 +1,33 @@
 // Main file that imports all partials
 
-@charset "UTF-8";
+@charset 'UTF-8';
 
 // CSS Reset    
-@import "compass/reset";
+@import 'compass/reset';
 
 // Document-wide base styles
-@import "_base/_config"; // Variables for typography; colors; etc
-@import "_base/_base";   // Sets all initial styles after the reset
-@import "_base/_grid";   // Susy grid framework
+@import '_base/_config'; // Variables for typography; colors; etc
+@import '_base/_base';   // Sets all initial styles after the reset
+@import '_base/_grid';   // Susy grid framework
 
 // Utilities
-@import "_utilities/_mappy-breakpoints";
-@import "_utilities/_mixins";
-@import "_utilities/_utilities";
+@import '_utilities/_mappy-breakpoints';
+@import '_utilities/_mixins';
+@import '_utilities/_utilities';
 
 // Layouts
-@import "_layouts/_containers";
-@import "_layouts/_footer";
-@import "_layouts/_header";
- 
+@import '_layouts/_containers';
+@import '_layouts/_footer';
+@import '_layouts/_header';
+
 // Components
-@import "_components/_animations";
-@import "_components/_buttons";
-@import "_components/_forms";
-@import "_components/_media";
-@import "_components/_modals";
-@import "_components/_nav";
+@import '_components/_animations';
+@import '_components/_buttons';
+@import '_components/_forms';
+@import '_components/_media';
+@import '_components/_modals';
+@import '_components/_nav';
 
 // States
-@import "_states/_hover";
+@import '_states/_hover';
 

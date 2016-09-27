@@ -1,31 +1,41 @@
-* {
-	margin: 0;
-	padding: 0;
+*
+{
+    margin: 0;
+    padding: 0;
 } /* to remove the top and left whitespace */
-body {
-	background-image: url("../img/crossword.png");
+body
+{
+    background-image: url('../img/crossword.png');
 }
 
-html,body {
-	width: 100%;
-	height: 100%;
+html,
+body
+{
+    width: 100%;
+    height: 100%;
 } /* just to be sure these are full screen*/
-.webswing-element {
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
+.webswing-element
+{
+    overflow: hidden;
+
+    width: 100%;
+    height: 100%;
 }
 
-.webswing-version {
-	position: fixed;
-	right: 20px;
-	bottom: 0px;
-	color: lightgray;
-	z-index: -1;
-	font-family: monospace;
-	font-size: small;
+.webswing-version
+{
+    font-family: monospace;
+    font-size: small;
+
+    position: fixed;
+    z-index: -1;
+    right: 20px;
+    bottom: 0;
+
+    color: lightgray;
 }
 
-.webswing-version a{
-	color: lightgray;
+.webswing-version a
+{
+    color: lightgray;
 }

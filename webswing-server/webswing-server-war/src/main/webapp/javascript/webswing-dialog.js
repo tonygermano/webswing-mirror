@@ -111,7 +111,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			header = dialog.find('div[data-id="header"]');
 			spinner = $('<div class="c-spinner"><div class="c-spinner__dot-1"></div> <div class="c-spinner__dot-2"></div></div>');
 			$(document).ajaxStart(function() {
-				if (dialog.is(":visible")){
+				if (dialog.is(":visible")){s
 					$('#ajaxProgress').show();
 					$('#ajaxProgress').append(spinner.clone(true));
 				}
@@ -151,7 +151,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 
 			for ( var b in msg.buttons) {
 				var btn = msg.buttons[b];
-				var button = $('<button class="c-button">' + btn.label + '</button><span> </span>');
+				var button = $('<button class="c-button c-button--dialog">' + btn.label + '</button><span> </span>');
 				button.on('click', btn.action);
 				content.append(button);
 			}

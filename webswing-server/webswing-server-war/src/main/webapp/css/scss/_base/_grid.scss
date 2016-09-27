@@ -1,11 +1,10 @@
 // Grid section
 // ============
-
 // http://susy.oddbird.net/
-@import "susy";
+@import 'susy';
 
 $susy: (
-  columns: 12,
-  gutters: 1/4,
-  global-box-sizing: border-box,
+        columns: 12,
+        gutters: 1/4,
+        global-box-sizing: border-box,
 );
