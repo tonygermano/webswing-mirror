@@ -7,7 +7,7 @@
 	@include rem('padding', 20px);
 	margin-left: auto;
 	margin-right: auto;
-
+	text-align: center;
 	background-color: $white;
 	
 	@include border-radius(3px);
@@ -18,7 +18,8 @@
 	@include rem('padding-bottom', 15px);
 	border-bottom: 1px solid #eee;
 	@include rem('margin-bottom', 15px);
-	font-size: $medium;
+	font-size: $regular;
+	text-transform: uppercase;
 }
 
 .c-modal__instructions {

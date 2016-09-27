@@ -11,14 +11,10 @@
 @import '_base/_grid';   // Susy grid framework
 
 // Utilities
-@import '_utilities/_mappy-breakpoints';
 @import '_utilities/_mixins';
-@import '_utilities/_utilities';
 
 // Layouts
 @import '_layouts/_containers';
-@import '_layouts/_footer';
-@import '_layouts/_header';
 
 // Components
 @import '_components/_animations';
@@ -26,8 +22,4 @@
 @import '_components/_forms';
 @import '_components/_media';
 @import '_components/_modals';
-@import '_components/_nav';
-
-// States
-@import '_states/_hover';
 

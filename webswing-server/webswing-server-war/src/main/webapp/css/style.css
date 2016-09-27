@@ -282,7 +282,7 @@ input[type='submit'],
 .c-button--dialog:hover {
   color: #fff;
   background-color: #ff5c00;
-  border-color: #086788; }
+  border-color: #ff5c00; }
 
 .c-button--login {
   font-size: 1rem;
@@ -460,6 +460,7 @@ video {
   padding: 1.25rem;
   margin-left: auto;
   margin-right: auto;
+  text-align: center;
   background-color: #fff;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -473,7 +474,8 @@ video {
   border-bottom: 1px solid #eee;
   margin-bottom: 15px;
   margin-bottom: 0.9375rem;
-  font-size: 1.333rem; }
+  font-size: 1rem;
+  text-transform: uppercase; }
 
 .c-modal__instructions {
   padding-bottom: 15px;

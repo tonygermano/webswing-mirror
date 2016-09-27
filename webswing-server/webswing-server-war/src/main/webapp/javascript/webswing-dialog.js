@@ -111,7 +111,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			header = dialog.find('div[data-id="header"]');
 			spinner = $('<div class="c-spinner"><div class="c-spinner__dot-1"></div> <div class="c-spinner__dot-2"></div></div>');
 			$(document).ajaxStart(function() {
-				if (dialog.is(":visible")){s
+				if (dialog.is(":visible")){
 					$('#ajaxProgress').show();
 					$('#ajaxProgress').append(spinner.clone(true));
 				}
@@ -133,7 +133,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			if (msg.header != null) {
 				header.html(msg.header);
 				if (dialog.is(":visible")) {
-					header.fadeIn('fast');
+					header.fadeIn(200);
 				} else {
 					header.show();
 				}
@@ -174,5 +174,18 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 		function current() {
 			return currentContent;
 		}
+
+
+
+		$.fn.extend({
+			animateCss: function (animationName) {
+				var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+				this.addClass('u-animated ' + animationName).one(animationEnd, function() {
+					$(this).removeClass('u-animated ' + animationName);
+				});
+			}
+		});
+
 	};
 });
+

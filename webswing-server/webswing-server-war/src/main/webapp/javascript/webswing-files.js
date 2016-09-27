@@ -51,7 +51,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			autoUploadfileDialogTransferBarClientId.val(clientId);
 			autoFileInput.prop("multiple", data.isMultiSelection);
 			autoFileInput.attr("accept", data.filter);
-			autoUploadBar.show("fast");
+setup
 			open(data, clientId);
 		}
 
@@ -71,21 +71,31 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			fileInput.prop("multiple", data.isMultiSelection);
 			fileInput.attr("accept", data.filter);
 			setProgressBarVisible(false);
-			uploadBar.show("fast");
+			autoUploadBar.show().animate({
+				"top":"0px",
+				"opacity":"1"
+			}, 200);
 		}
 
 		function close() {
 				if (uploadBar != null && uploadBar.closest(api.cfg.rootElement).length !== 0) {
 					if (!errorTimeout) {
-						uploadBar.hide("fast");
+						autoUploadBar.animate({
+							"top":"50px",
+							"opacity":"0"
+						}, 200);
 						uploadBar.detach();
 					}else{
 						closeAfterErrorTimeout=true;
 					}
 				}
 				if (autoUploadBar != null && autoUploadBar.closest(api.cfg.rootElement).length !== 0) {
-					autoUploadBar.hide("fast");
-					autoUploadBar.detach();
+					autoUploadBar.animate({
+						"top":"50px",
+						"opacity":"0"
+					}, 200).hide( 0, function(){
+						autoUploadBar.detach();
+					} );
 				}
 			
 		}
@@ -148,7 +158,10 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			function fileuploadfail(e, data) {
 				if (!errorTimeout) {
 					fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
-					fileDialogErrorMessage.show("fast");
+					fileDialogErrorMessage.show().animate({
+						"top":"0px",
+						"opacity":"1"
+					}, 200);
 				} else {
 					fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
 					clearTimeout(errorTimeout);
@@ -160,7 +173,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				errorTimeout = setTimeout(function() {
 					errorTimeout = null;
 					fileDialogErrorMessageContent.html("");
-					fileDialogErrorMessage.hide("fast");
+					fileDialogErrorMessage.fadeOut( 200 );
 					if(closeAfterErrorTimeout){
 						close();
 					}
@@ -223,18 +236,24 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 
 		function showOrHide(element, bool) {
 			if (bool) {
-				element.show();
+				element.show().animate({
+					"top":"0px",
+					"opacity":"1"
+				}, 200);
 			} else {
-				element.hide();
+				element.animate({
+					"top":"50px",
+					"opacity":"0"
+				}, 200).hide();
 			}
 		}
 
 		function setProgressBarVisible(bool) {
 			if (bool) {
 				uploadProgress.css('width', '0%');
-				uploadProgressBar.show("fast");
+				uploadProgressBar.fadeIn( 200 );
 			} else {
-				uploadProgressBar.hide("fast");
+				uploadProgressBar.fadeOut( 200 );
 				uploadProgress.css('width', '0%');
 			}
 		}
