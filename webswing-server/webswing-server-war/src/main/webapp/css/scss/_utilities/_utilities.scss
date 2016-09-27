@@ -1,0 +1,9 @@
+// Utility classes
+
+.u-darken-background {
+	background: rgba(darken($primary,40%), 0.85);
+}
+
+.u-hidden {
+	display: none;
+}

@@ -151,7 +151,8 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                 }
 
                 function setupRootElement(rootElement) {
-                   return rootElement.addClass('webswing-root');
+                   return rootElement.addClass('webswing-root l-webswing-container');
+
                 }
 
                 function start() {

@@ -1,0 +1,25 @@
+
+.l-webswing-container {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+
+	background-image: radial-gradient(circle, $white, $bg-light-2);
+}
+
+.l-modal-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	
+	width: 100%;
+	height: 100%;
+	@include rem('padding', 20px);
+}
+
+.l-modal-container--login {
+	background-image: radial-gradient(circle, $white, $bg-light-2);
+}

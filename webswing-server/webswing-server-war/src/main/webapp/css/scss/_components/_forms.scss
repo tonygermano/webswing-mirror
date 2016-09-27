@@ -1,0 +1,59 @@
+input {
+	 color: $secondary-text;
+}
+
+input:focus {
+	 color: $secondary-text;
+}
+
+// Hack to disable yellow autofill bg for form fields
+input:-webkit-autofill, input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 50px $white inset;
+    -webkit-text-fill-color: $secondary-text;
+}
+
+.c-form{
+	
+}
+
+.c-form--login {
+	@include rem('margin-bottom', 60px);
+}
+
+.c-login-icon {
+	position: absolute;
+	left: 0;
+	@include rem('margin-top', -45px);
+	color: #fff;
+	font-size: 1em;
+	opacity: 0;	
+	transition: all 0.1s ease-in;
+}
+
+input:focus + .c-login-icon {
+	@include rem('left', 32px);
+	opacity: 1;
+	transition: all 0.25s ease-out;
+}
+
+.c-login-field {
+	display: block;
+
+	width: 100%;
+	@include rem('padding', 15px 10px);
+	border: 1px solid #ddd;
+	@include border-radius(2px);
+	@include rem('margin-bottom', 10px);
+
+	font-size: $regular;
+
+	@include transition;
+}
+
+.c-login-field:focus {
+	border-color: $primary;
+	border-left-width: 35px;
+	outline: none;
+	
+	@include transition;
+}

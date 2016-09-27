@@ -1,0 +1,54 @@
+// Colors
+$white:                #fff;
+$black:                #000;
+
+$primary:           #ff5c00; // Brand color
+$primary-darker:    #ed500d;
+$primary-lighter:   #ff6d01;
+
+$secondary:         #2e2f33; // Secondary brand color
+$secondary-darker:  #292a2e;
+$secondary-lighter: #333438;
+
+$primary-text:  	#212121; // For regular text
+$secondary-text:    #757575; // For faded text
+
+$bg-light:          #fafafa; // Lightest background
+$bg-light-2:        #f4f4f4; // Slightly darker shade
+$bg-light-3:        #eeeeee; // Darker shade
+
+$divider-color:     #f2f0ed; // Dividers and borders
+
+$danger:            #d62020; // Button and alert colors
+$neutral:           #086788;
+$success:           #6bb21a;
+$warning:           #ffb219;
+
+// Font families
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700);
+@import url(https://fonts.googleapis.com/css?family=Fira+Sans:700);
+@import url(https://fonts.googleapis.com/icon?family=Material+Icons);
+
+$body-font:    'open sans', sans-serif;
+$heading-font: 'open sans', sans-serif;
+
+// Font sizes
+$base-size:     16px; // Used to calculate all rem values
+
+$largest:   3.157rem;
+$larger:    2.369rem;
+$large:     1.777rem;
+$medium:    1.333rem;
+$regular:       1rem;
+$small:    0.9375rem;
+$smaller:    0.75rem;
+
+$lh-body:        1.4; // Line height for body text
+$lh-headings:    1.2; // Line height for headings
+
+// Breakpoints
+// Usage: @include mappy-bp(small) { }
+$breakpoints: ( 
+  'small': 640px,
+  'large': 1280px
+);

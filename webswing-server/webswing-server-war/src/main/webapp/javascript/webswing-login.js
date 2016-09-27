@@ -63,7 +63,7 @@ define([ 'jquery' ], function amdFactory($) {
 						try {
 							loginMsg = JSON.parse(response);
 						} catch (error) {
-							loginMsg.partialHtml = "<p>Login Failed.</p>";
+							loginMsg.partialHtml = "<p>Login failed</p>";
 						}
 						if (loginMsg.redirectUrl != null) {
 							window.top.location.href = loginMsg.redirectUrl;
@@ -78,7 +78,7 @@ define([ 'jquery' ], function amdFactory($) {
 								event.preventDefault();
 							});
 						} else {
-							loginMsg.partialHtml = "<p>Oops, something's not right.</p>";
+							loginMsg.partialHtml = "<p>Oops, something's not right</p>";
 						}
 					}
 				}
