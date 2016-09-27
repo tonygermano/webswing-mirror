@@ -8,6 +8,7 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -378,14 +379,30 @@ public class WebPaintDispatcher {
 			FileDialogEventMsg fdEvent = new FileDialogEventMsg();
 			f.setFileDialogEvent(fdEvent);
 			FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fileChooserDialog);
+			if (fileChooserEventType == FileDialogEventType.AutoUpload && fileChooserDialog.getFileSelectionMode() == JFileChooser.DIRECTORIES_ONLY) {
+				//open dialog with auto upload enabled will automatically select the transfer folder
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							fileChooserDialog.setSelectedFile(new File(fileChooserDialog.getCurrentDirectory().getCanonicalPath()));
+							fileChooserDialog.approveSelection();
+						} catch (IOException e) {
+							fileChooserDialog.cancelSelection();
+						}
+					}
+				});
+				return;
+			}
 			fdEvent.setEventType(fileChooserEventType);
-			if (FileDialogEventType.AutoUpload.equals(fileChooserEventType)) {
+			if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
 				fdEvent.setAllowDelete(false);
 				fdEvent.setAllowDownload(false);
 				fdEvent.setAllowUpload(false);
 				Window d = SwingUtilities.getWindowAncestor(fileChooserDialog);
 				d.setBounds(0, 0, 1, 1);
 			}
+			fdEvent.setSelection(Util.getFileChooserSelection(fileChooserDialog));
 			fdEvent.addFilter(fileChooserDialog.getChoosableFileFilters());
 			fdEvent.setMultiSelection(fileChooserDialog.isMultiSelectionEnabled());
 			Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", fileChooserEventType.name());

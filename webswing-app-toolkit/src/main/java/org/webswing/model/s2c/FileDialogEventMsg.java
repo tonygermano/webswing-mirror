@@ -11,13 +11,17 @@ public class FileDialogEventMsg implements Msg {
 	private static final long serialVersionUID = -7470385173647106699L;
 
 	public enum FileDialogEventType {
-		AutoUpload, Open, Close;
+		AutoUpload,
+		AutoSave,
+		Open,
+		Close;
 	}
 
 	private FileDialogEventType eventType;
 	private boolean allowDownload;
 	private boolean allowUpload;
 	private boolean allowDelete;
+	private String selection;
 	private String filter = "";
 	private boolean isMultiSelection;
 
@@ -26,7 +30,6 @@ public class FileDialogEventMsg implements Msg {
 		allowUpload = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD));
 		allowDelete = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE));
 	}
-
 
 	public void addFilter(FileFilter filterArr[]) {
 		for (FileFilter ff : filterArr) {
@@ -87,5 +90,13 @@ public class FileDialogEventMsg implements Msg {
 
 	public void setMultiSelection(boolean isMultiSelection) {
 		this.isMultiSelection = isMultiSelection;
+	}
+
+	public String getSelection() {
+		return selection;
+	}
+
+	public void setSelection(String selection) {
+		this.selection = selection;
 	}
 }

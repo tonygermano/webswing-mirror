@@ -30,10 +30,13 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 		var fileDialogErrorMessageContent, deleteSelectedButton, downloadSelectedButton;
 		var dropZone, fileUpload, uploadProgressBar, uploadProgress, cancelBtn, downloadBtn, uploadBtn, deleteBtn, fileInput;
 		var autoUploadBar, autoFileupload, autoFileInput, cancelAutoUploadButton, autoUploadfileDialogTransferBarClientId;
+		var autoSaveBar, autoSaveInput, cancelAutoSaveButton, autoSaveButton;
 
 		function process(event) {
 			if (event.eventType === 'AutoUpload') {
 				autoUpload(event, api.cfg.clientId);
+			}else if (event.eventType === 'AutoSave') {
+				autoSave(event, api.cfg.clientId);
 			} else if (event.eventType === 'Open') {
 				open(event, api.cfg.clientId);
 			} else if (event.eventType === 'Close') {
@@ -55,8 +58,19 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			open(data, clientId);
 		}
 
+		function autoSave(data, clientId) {
+			if (autoSaveBar == null) {
+				setup(api);
+			}
+			if (autoSaveBar.closest(api.cfg.rootElement).length === 0) {
+				api.cfg.rootElement.append(autoSaveBar);
+			}
+			autoSaveInput.val(data.selection);
+			autoSaveBar.show("fast");
+		}
+
 		function open(data, clientId) {
-			closeAfterErrorTimeout=false;
+			closeAfterErrorTimeout = false;
 			if (uploadBar == null) {
 				setup(api);
 			}
@@ -75,19 +89,23 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 		}
 
 		function close() {
-				if (uploadBar != null && uploadBar.closest(api.cfg.rootElement).length !== 0) {
-					if (!errorTimeout) {
-						uploadBar.hide("fast");
-						uploadBar.detach();
-					}else{
-						closeAfterErrorTimeout=true;
-					}
+			if (uploadBar != null && uploadBar.closest(api.cfg.rootElement).length !== 0) {
+				if (!errorTimeout) {
+					uploadBar.hide("fast");
+					uploadBar.detach();
+				} else {
+					closeAfterErrorTimeout = true;
 				}
-				if (autoUploadBar != null && autoUploadBar.closest(api.cfg.rootElement).length !== 0) {
-					autoUploadBar.hide("fast");
-					autoUploadBar.detach();
-				}
-			
+			}
+			if (autoUploadBar != null && autoUploadBar.closest(api.cfg.rootElement).length !== 0) {
+				autoUploadBar.hide("fast");
+				autoUploadBar.detach();
+			}
+			if (autoSaveBar != null && autoSaveBar.closest(api.cfg.rootElement).length !== 0) {
+				autoSaveBar.hide("fast");
+				autoSaveBar.detach();
+			}
+
 		}
 
 		function setup() {
@@ -113,6 +131,11 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			cancelAutoUploadButton = autoUploadBar.find('button[data-id="cancelAutoUploadButton"]');
 			autoFileInput = autoUploadBar.find('input[data-id="autoFileInput"]');
 			autoUploadfileDialogTransferBarClientId = autoUploadBar.find('input[data-id="autoUploadfileDialogTransferBarClientId"]');
+
+			autoSaveBar = api.cfg.rootElement.find('div[data-id="autoSaveBar"]');
+			autoSaveInput = autoSaveBar.find('input[data-id="autoSaveInput"]');
+			autoSaveButton = autoSaveBar.find('button[data-id="autoSaveButton"]');
+			cancelAutoSaveButton = autoSaveBar.find('button[data-id="cancelAutoSaveButton"]');
 
 			var autoJqUpload = autoFileupload.fileupload({
 				xhrFields : {
@@ -161,7 +184,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 					errorTimeout = null;
 					fileDialogErrorMessageContent.html("");
 					fileDialogErrorMessage.hide("fast");
-					if(closeAfterErrorTimeout){
+					if (closeAfterErrorTimeout) {
 						close();
 					}
 				}, 5000);
@@ -172,17 +195,19 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				uploadProgress.css('width', progress + '%');
 				if (progress === 100) {
 					setTimeout(function() {
-						filesUploaded(doneFileList);
+						filesSelected(doneFileList);
 						doneFileList = [];
 					}, 1000);
 					setProgressBarVisible(false);
 					jqXHR_fileupload = [];
 				}
 			}
-
-			cancelAutoUploadButton.bind('click', function(e) {
-				sendMessageEvent('cancelAutoUpload');
-			});
+			
+			function cancelFileSelection(e) {
+				sendMessageEvent('cancelFileSelection');
+			}
+			cancelAutoSaveButton.bind('click', cancelFileSelection);
+			cancelAutoUploadButton.bind('click', cancelFileSelection);
 
 			deleteSelectedButton.bind('click', function(e) {
 				sendMessageEvent('deleteFile');
@@ -194,6 +219,11 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 
 			api.cfg.rootElement.bind('drop', function(e) {
 				e.preventDefault();
+			});
+
+			autoSaveButton.bind('click', function(e) {
+				var fileString = autoSaveInput.val();
+				filesSelected([fileString]);
 			});
 
 			api.cfg.rootElement.bind('dragover', function(e) {
@@ -210,7 +240,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			});
 
 			cancelBtn.click(function() {
-				filesUploaded([]);
+				filesSelected([]);
 				jqXHR_fileupload.forEach(function(el) {
 					el.abort();
 				});
@@ -239,9 +269,9 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			}
 		}
 
-		function filesUploaded(files) {
+		function filesSelected(files) {
 			api.send({
-				uploaded : {
+				selected : {
 					files : files
 				}
 			});

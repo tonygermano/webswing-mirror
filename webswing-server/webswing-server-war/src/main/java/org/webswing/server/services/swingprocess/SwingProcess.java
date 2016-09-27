@@ -12,4 +12,6 @@ public interface SwingProcess {
 
 	void setProcessExitListener(ProcessExitListener object);
 
+	SwingProcessConfig getConfig();
+
 }

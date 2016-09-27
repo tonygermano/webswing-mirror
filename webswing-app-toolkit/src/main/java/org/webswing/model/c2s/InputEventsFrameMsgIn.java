@@ -12,7 +12,7 @@ public class InputEventsFrameMsgIn implements MsgIn {
 	private List<InputEventMsgIn> events;
 	private CopyEventMsgIn copy;
 	private PasteEventMsgIn paste;
-	private UploadedEventMsgIn uploaded;
+	private FilesSelectedEventMsgIn selected;
 	private PlaybackCommandMsgIn playback;
 
 	private JsResultMsg jsResponse;// java2js call return value
@@ -42,12 +42,12 @@ public class InputEventsFrameMsgIn implements MsgIn {
 		this.paste = paste;
 	}
 
-	public UploadedEventMsgIn getUploaded() {
-		return uploaded;
+	public FilesSelectedEventMsgIn getSelected() {
+		return selected;
 	}
 
-	public void setUploaded(UploadedEventMsgIn uploaded) {
-		this.uploaded = uploaded;
+	public void setSelected(FilesSelectedEventMsgIn selected) {
+		this.selected = selected;
 	}
 
 	public JsResultMsg getJsResponse() {
