@@ -1,26 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<title>Login</title>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta charset="utf-8" />
-<link rel="stylesheet" href="../css/webswing.css" />
-<link rel="stylesheet" href="../javascript/templates/bootstrap.css" />
-<link rel="stylesheet" href="../javascript/templates/dialog.css" />
+	<title>Sign in to your account</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="../css/style.css" />
 </head>
+
 <body>
-	<div data-id="commonDialog" class="webswing-dialog-container">
-		<div class="webswing-dialog-backdrop"></div>
-		<div class="webswing-dialog">
-			<div class="webswing-dialog-modal">
-				<div class="webswing-dialog-modal-content">
-					<div data-id="header"></div>
-					<div data-id="content">
-						{{>loginPartial.html}}
-					</div>
-				</div>
+	<div data-id="commonDialogBackDrop" class="l-modal-container l-modal-container--login">
+		<div data-id="commonDialog dialogModal" class="c-modal c-modal--login">
+			<div data-id="content" class="c-modal__body">
+				{{>loginPartial.html}}
 			</div>
 		</div>
 	</div>
 </body>
+
 </html>

@@ -1,9 +1,3 @@
-.webswing-root {
-	position: relative;
-	width: 100%;
-	overflow: hidden;
-}
-
 .webswing-iframe {
 	border: 0px;
 }

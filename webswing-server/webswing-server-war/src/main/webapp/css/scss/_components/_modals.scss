@@ -1,0 +1,74 @@
+// Dialog modals
+.c-modal {
+    @include rem('max-width', 320px);
+    @include rem('padding', 20px);
+    @include border-radius(3px);
+    @include dropshadow-5;
+
+    position: relative;
+    top: -5%;
+
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    background-color: $white;
+
+    text-align: center;
+
+    &--upload {
+        @include rem('padding', 0px);
+    }
+
+    // Modal header (contains title)
+    &__header {
+        &--upload {
+            @include rem('padding', 20px);
+            @include rem('margin', 0px);
+            @include border-radius(3px 3px 0 0);
+
+            background-color: $secondary;
+        }
+    }
+
+    // Modal title text
+    &__title {
+        @include rem('padding-bottom', 15px);
+        @include rem('margin-bottom', 15px);
+
+        border-bottom: 1px solid #eeeeee;
+
+        font-size: $regular;
+        text-transform: uppercase;
+
+        &--upload {
+            padding: 0;
+            margin: 0;
+            border: 0;
+
+            color: $white;
+        }
+    }
+
+    // Modal instruction text
+    &__instructions {
+        @include rem('padding-bottom', 15px);
+
+        color: $secondary-text;
+        font-size: $small;
+
+        &--upload {
+            @include rem('padding', 20px);
+        }
+    }
+
+    // Modal error messages
+    &__message {
+        &--error {
+            @include rem('margin-top', 15px);
+            @include rem('margin-bottom', 15px);
+
+            color: $danger;
+            font-size: $small;
+        }
+    }
+}

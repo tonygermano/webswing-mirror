@@ -1,0 +1,25 @@
+// Main file that imports all partials
+
+@charset 'UTF-8';
+
+// Utilities
+@import '_utilities/_normalize';
+@import '_utilities/_mixins';
+@import '_utilities/_utility';
+
+// Document-wide base styles
+@import '_base/_config'; // Variables for typography; colors; etc
+@import '_base/_base';   // Sets all initial styles after the reset
+@import '_base/_grid';   // Susy grid framework
+
+// Layouts
+@import '_layouts/_containers';
+
+// Components
+@import '_components/_animations';
+@import '_components/_buttons';
+@import '_components/_forms';
+@import '_components/_media';
+@import '_components/_modals';
+@import '_components/_progressbar';
+

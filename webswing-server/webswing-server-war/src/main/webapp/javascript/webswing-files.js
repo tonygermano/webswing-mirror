@@ -54,7 +54,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			autoUploadfileDialogTransferBarClientId.val(clientId);
 			autoFileInput.prop("multiple", data.isMultiSelection);
 			autoFileInput.attr("accept", data.filter);
-			autoUploadBar.show("fast");
+			setup
 			open(data, clientId);
 		}
 
@@ -85,7 +85,10 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			fileInput.prop("multiple", data.isMultiSelection);
 			fileInput.attr("accept", data.filter);
 			setProgressBarVisible(false);
-			uploadBar.show("fast");
+			autoUploadBar.show().animate({
+				"top":"0px",
+				"opacity":"1"
+			}, 200);
 		}
 
 		function close() {
@@ -119,7 +122,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			dropZone = uploadBar.find('div[data-id="fileDropArea"]');
 			fileUpload = uploadBar.find('form[data-id="fileupload"]');
 			uploadProgressBar = uploadBar.find('div[data-id="fileDialogTransferProgressBar"]');
-			uploadProgress = uploadBar.find('div[data-id="progress"] .progress-bar');
+			uploadProgress = uploadBar.find('div[data-id="progress"] .js-progress__bar');
 			cancelBtn = uploadBar.find('div[data-id="cancelBtn"]');
 			downloadBtn = uploadBar.find('div[data-id="fileDownloadBtn"]');
 			uploadBtn = uploadBar.find('div[data-id="fileUploadBtn"]');
@@ -171,7 +174,10 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			function fileuploadfail(e, data) {
 				if (!errorTimeout) {
 					fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
-					fileDialogErrorMessage.show("fast");
+					fileDialogErrorMessage.show().animate({
+						"top":"0px",
+						"opacity":"1"
+					}, 200);
 				} else {
 					fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
 					clearTimeout(errorTimeout);
@@ -190,17 +196,51 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				}, 5000);
 			}
 
+// Changes the looks of the progress bar based on the percentage of data loaded
 			function fileuploadprogressall(e, data) {
-				var progress = parseInt(data.loaded / data.total * 100, 10);
-				uploadProgress.css('width', progress + '%');
-				if (progress === 100) {
-					setTimeout(function() {
+				var progress = parseInt(data.loaded / data.total * 100, 10),
+					$jsProgress = $(".js-progress"),
+					$jsProgressBar = $(".js-progress__bar"),
+					$jsProgressText = $(".js-progress__text"),
+					resetColors,
+					orange = 30,
+					yellow = 55,
+					green = 85;
+
+				// Resets the progress bar colors by removing the classes
+				resetColors = function() {
+					$jsProgressBar
+						.removeClass("js-progress__bar--part-1")
+						.removeClass("js-progress__bar--part-2")
+						.removeClass("js-progress__bar--part-3")
+						.removeClass("js-progress__bar--done");
+					$jsProgress
+						.removeClass("progress--complete");
+				};
+				$jsProgressBar.css('width', progress + '%');
+				$jsProgressText.find("em").text( progress + "%" );
+				$jsProgressBar.addClass("js-progress__bar--active");
+				if (progress >= green) {
+					$jsProgressBar.addClass("js-progress__bar--part-3");
+				}
+				else if (progress >= yellow) {
+					$jsProgressBar.addClass("js-progress__bar--part-2");
+				}
+				else if (progress >= orange) {
+					$jsProgressBar.addClass("js-progress__bar--part-1");
+				}
+				else if (progress === 100) {
+					$jsProgress.addClass("js-progress--complete");
+					$jsProgressBar.addClass("js-progress__bar--done");
+					$jsProgressText.find("em").text("Complete");
+					setTimeout(function () {
 						filesSelected(doneFileList);
 						doneFileList = [];
 					}, 1000);
 					setProgressBarVisible(false);
 					jqXHR_fileupload = [];
-				}
+					resetColors();
+				};
 			}
 			
 			function cancelFileSelection(e) {
@@ -253,18 +293,24 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 
 		function showOrHide(element, bool) {
 			if (bool) {
-				element.show();
+				element.show().animate({
+					"top":"0px",
+					"opacity":"1"
+				}, 200);
 			} else {
-				element.hide();
+				element.animate({
+					"top":"50px",
+					"opacity":"0"
+				}, 200).hide();
 			}
 		}
 
 		function setProgressBarVisible(bool) {
 			if (bool) {
 				uploadProgress.css('width', '0%');
-				uploadProgressBar.show("fast");
+				uploadProgressBar.fadeIn( 200 );
 			} else {
-				uploadProgressBar.hide("fast");
+				uploadProgressBar.fadeOut( 200 );
 				uploadProgress.css('width', '0%');
 			}
 		}

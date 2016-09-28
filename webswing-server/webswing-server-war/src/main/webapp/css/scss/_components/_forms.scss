@@ -1,0 +1,82 @@
+input {
+    color: $secondary-text;
+
+    &:focus + .c-login-icon {
+        @include rem('left', 32px);
+
+        opacity: 1;
+
+        transition: all 0.25s ease-out;
+    }
+
+    // Hack to disable yellow autofill bg for form fields
+    &:-webkit-autofill,
+    &:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0 50px $white inset;
+
+        -webkit-text-fill-color: $secondary-text;
+    }
+}
+
+.c-login-field {
+    @include rem('padding', 15px 10px);
+    @include border-radius(2px);
+    @include rem('margin-bottom', 10px);
+    @include transition-duration(0.2s);
+
+    display: block;
+    width: 100%;
+    border: 1px solid #dddddd;
+
+    font-size: $regular;
+
+    &:focus {
+        @include transition-duration(0.2s);
+
+        border-color: $primary;
+        border-left-width: 35px;
+        outline: none;
+    }
+}
+
+.c-form__save-file {
+    @include rem('padding', 0 20px 20px 20px);
+}
+
+.c-form-field {
+    @include rem('padding', 15px 10px);
+    @include border-radius(2px);
+    @include transition-duration(0.2s);
+
+    display: block;
+    width: 100%;
+    border: 1px solid #dddddd;
+
+    font-size: $regular;
+
+    &:focus {
+        @include transition-duration(0.2s);
+
+        border-color: $primary;
+        outline: none;
+    }
+}
+
+.c-form--login {
+    @include rem('padding', 0px 0px 20px 0px);
+    @include rem('margin-bottom', 60px);
+}
+
+.c-login-icon {
+    @include rem('margin-top', -45px);
+
+    position: absolute;
+    left: 0;
+
+    opacity: 0;
+
+    color: #ffffff;
+    font-size: 1em;
+
+    transition: all 0.1s ease-in;
+}

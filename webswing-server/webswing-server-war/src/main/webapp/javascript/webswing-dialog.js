@@ -30,30 +30,30 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 		};
 
 		var currentContent;
-		var dialog, content, header, backdrop,spinner;
+		var dialog, content, header, backdrop, spinner;
 
 		function configuration() {
 			return {
-				readyDialog : messageDialog('Webswing ready...'),
-				initializingDialog : messageDialog('Initializing...'),
-				startingDialog : messageDialog('Starting app...'),
-				connectingDialog : messageDialog('Connecting...'),
-				unauthorizedAccess : messageDialog('Unauthorized access...'),
-				applicationAlreadyRunning : retryMessageDialog('Application is already running in other browser window...'),
-				sessionStolenNotification : retryMessageDialog('Application was opened in other browser window. Session disconnected...'),
-				disconnectedDialog : retryMessageDialog('Disconnected...'),
-				connectionErrorDialog : retryMessageDialog('Connection error...'),
-				tooManyClientsNotification : retryMessageDialog('Too many connections. Please try again later...'),
-				stoppedDialog : finalMessageDialog('Application stopped...'),
+				readyDialog : messageDialog('Ready to start your session'),
+				initializingDialog : messageDialog('Your session is being initialized'),
+				startingDialog : messageDialog('Starting your application'),
+				connectingDialog : messageDialog('Connecting to the server'),
+				unauthorizedAccess : messageDialog('Unable to authorize your request'),
+				applicationAlreadyRunning : retryMessageDialog('There is already a session in progress in another window.'),
+				sessionStolenNotification : retryMessageDialog('A new session was started in another window. This session has been closed.'),
+				disconnectedDialog : retryMessageDialog('You have been disconnected from the server. Please reconnect to continue.'),
+				connectionErrorDialog : retryMessageDialog('A connection error has occurred. Please reconnect to continue.'),
+				tooManyClientsNotification : retryMessageDialog('There are too many active connections right now, please try again later'),
+				stoppedDialog : finalMessageDialog('The application has been closed.'),
 				continueOldSessionDialog : {
 					content : '<p>Continue existing session?</p>',
 					buttons : [ {
-						label : 'Yes, continue.',
+						label : 'Continue',
 						action : function() {
 							api.continueSession();
 						}
 					}, {
-						label : 'No, start new session.',
+						label : 'New session',
 						action : function() {
 							api.kill();
 							api.newSession();
@@ -73,12 +73,12 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			return {
 				content : '<p>' + msg + '</p>',
 				buttons : [ {
-					label : 'Start new session.',
+					label : 'New session',
 					action : function() {
 						api.newSession();
 					}
 				}, {
-					label : 'Logout.',
+					label : 'Sign out',
 					action : function() {
 						api.logout();
 					}
@@ -90,12 +90,12 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			return {
 				content : '<p>' + msg + '</p>',
 				buttons : [ {
-					label : 'Try again.',
+					label : 'Reconnect',
 					action : function() {
 						api.reTrySession();
 					}
 				}, {
-					label : 'Logout.',
+					label : 'Sign out',
 					action : function() {
 						api.logout();
 					}
@@ -109,7 +109,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			dialog = api.cfg.rootElement.find('div[data-id="commonDialog"]');
 			content = dialog.find('div[data-id="content"]');
 			header = dialog.find('div[data-id="header"]');
-			spinner = $('<div class="spinner"><div class="dot1"></div> <div class="dot2"></div></div>');
+			spinner = $('<div class="c-spinner"><div class="c-spinner__dot-1"></div> <div class="c-spinner__dot-2"></div></div>');
 			$(document).ajaxStart(function() {
 				if (dialog.is(":visible")){
 					$('#ajaxProgress').show();
@@ -133,7 +133,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			if (msg.header != null) {
 				header.html(msg.header);
 				if (dialog.is(":visible")) {
-					header.fadeIn('fast');
+					header.fadeIn(200);
 				} else {
 					header.show();
 				}
@@ -151,7 +151,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 
 			for ( var b in msg.buttons) {
 				var btn = msg.buttons[b];
-				var button = $('<button class="btn btn-primary">' + btn.label + '</button><span> </span>');
+				var button = $('<button class="c-button c-button--dialog">' + btn.label + '</button><span> </span>');
 				button.on('click', btn.action);
 				content.append(button);
 			}
@@ -174,5 +174,18 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 		function current() {
 			return currentContent;
 		}
+
+
+
+		$.fn.extend({
+			animateCss: function (animationName) {
+				var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+				this.addClass('u-animated ' + animationName).one(animationEnd, function() {
+					$(this).removeClass('u-animated ' + animationName);
+				});
+			}
+		});
+
 	};
 });
+

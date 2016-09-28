@@ -1,60 +1,106 @@
-<div data-id="autoSaveBar" class="webswing-autoUpload-dialog webswing-hidden" >
-	<div class="webswing-dialog">
-		<div class="webswing-dialog-modal">
-			<div class="webswing-autoUpload-content">
-				<div class="webswing-fileDialogButtonRow row">
-					<div class="col-xs-12">
-						<h4>Save file</h4>
+<div data-id="autoSaveBar" class="l-modal-container l-modal-container--upload" >
+	<div class="c-modal c-modal--upload">
+		<div class="c-modal__body">
+			<div class="c-modal__header c-modal__header--upload">
+				<h2 class="c-modal__title c-modal__title--upload">Save file</h2>
+			</div>
+
+			<div class="c-modal__content">
+				<p class="c-modal__instructions c-modal__instructions--upload">
+					Please enter a name for the file.
+				</p>
+
+				<div class="c-form__save-file">
+					<input data-id="autoSaveInput" class="c-form-field" placeholder="File name" type="text">
+				</div>
+
+				<ul class="l-button-grid">
+					<li class="l-button-grid__item l-button-grid__item--first">
+						<div class="c-upload-button">
+							<button data-id="autoSaveButton" class="c-upload-button__cancel">
+								<img src="../img/icon-save.png" class="c-button-grid-icon"/>
+								<span>Save</span>
+							</button>
+						</div>
+					</li>
+					<li class="l-button-grid__item">
+						<div class="c-upload-button">
+							<button data-id="cancelAutoSaveButton" class="c-upload-button__cancel">
+								<img src="../img/icon-cancel.png" class="c-button-grid-icon"/>
+								<span>Cancel</span>
+							</button>
+						</div>
+					</li>
+					</ul>
 					</div>
-					<div class="col-xs-12 ">
-						<div class="form-group">
-							<input data-id="autoSaveInput" class="form-control" placeholder="File name" type="text">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div data-id="autoUploadBar" class="l-modal-container l-modal-container--upload">
+	<div  class="c-modal c-modal--upload">
+		<div class="c-modal__body">
+			<div class="c-modal__header c-modal__header--upload">
+				<h2 class="c-modal__title c-modal__title--upload">Open file</h2>
+			</div>
+
+			<div class="c-modal__content">
+				<p class="c-modal__instructions c-modal__instructions--upload">
+					Please select a file to import.
+				</p>
+
+				<div data-id="fileDialogTransferProgressBar" class="l-progressbar-container">
+					<div data-id="progress" class="js-progress">
+						<div style="width: 0%;" class="js-progress__bar">
+							<span class="js-progress__text">Progress: <em>0%</em></span>
 						</div>
 					</div>
-					<div class="col-xs-offset-4 col-xs-8">
-						<button class="btn btn-success btn-block pull-right" data-id="autoSaveButton">Save</button>
-						<button class="btn btn-danger btn-block pull-right" data-id="cancelAutoSaveButton">Cancel</button>
-					</div>
 				</div>
+
+				<input data-id="autoUploadfileDialogTransferBarClientId" name="clientId" type="hidden">
+
+				<ul class="l-button-grid">
+					<li class="l-button-grid__item l-button-grid__item--first">
+						<div class="c-upload-button">
+							<form data-id="autoFileupload" class="c-form">
+								<input data-id="autoFileInput" id="webswingUploadBrowse" name="files[]" accept=""
+								       type="file" class=" c-upload-button__browse-hidden"/>
+								<label for="webswingUploadBrowse" class="c-upload-button__browse-overlay">
+									<img src="../img/icon-import.png" class="c-button-grid-icon"/>
+									<span>Browse</span>
+								</label>
+							</form>
+						</div>
+					</li>
+
+					<li class="l-button-grid__item">
+						<div class="c-upload-button">
+
+							<button data-id="cancelAutoUploadButton" class="c-upload-button__cancel"><img
+									src="../img/icon-cancel.png" class="c-button-grid-icon"/>
+								<span>Cancel</span></button>
+
+						</div>
+					</li>
+				</ul>
+
 			</div>
 		</div>
 	</div>
 </div>
-<div data-id="autoUploadBar" class="webswing-autoUpload-dialog webswing-hidden" >
-	<div class="webswing-dialog">
-		<div class="webswing-dialog-modal">
-			<div class="webswing-autoUpload-content">
-				<div class="webswing-fileDialogButtonRow row">
-					<div class="col-xs-12">
-						<h4>Open file</h4>
-					</div>
-					<div class="col-xs-offset-4 col-xs-8 col-md-offset-4 col-md-4">
-						<form data-id="autoFileupload">
-							<input data-id="autoUploadfileDialogTransferBarClientId" name="clientId" type="hidden">
-							<div class="webswing-fileUpload btn btn-success btn-block">
-								<span>Select...</span>
-								<input accept="" data-id="autoFileInput" name="files[]" class="upload" type="file">
-							</div>
-						</form>
-					</div>
-					<div class="col-xs-offset-4 col-xs-8  col-md-offset-0 col-md-4">
-						<button class="btn btn-danger btn-block pull-right" data-id="cancelAutoUploadButton">Cancel</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+
 <div data-id="uploadBar" class="webswing-fileDialogBar">
 	<div class="container-fluid">
 		<div class="webswing-fileDialogButtonRow row ">
-			<div data-id="fileDropArea" class="webswing-hidden">
+			<div data-id="fileDropArea" class="u-hidden">
 				<p class="upload-dropH1">Drag and drop files here</p>
 			</div>
 		</div>
 		<div class="webswing-fileDialogButtonRow row ">
 			<div class="col-xs-4" data-id="fileDownloadBtn" class="webswing-hidden">
-				<button class="btn btn-success btn-sm btn-block" data-id="downloadSelectedButton">Download selected</button>
+				<button class="btn btn-success btn-sm btn-block" data-id="downloadSelectedButton">Download selected
+				</button>
 			</div>
 			<div class="col-xs-4" data-id="fileUploadBtn" class="webswing-hidden">
 				<form data-id="fileupload">
@@ -72,8 +118,12 @@
 		</div>
 		<div data-id="fileDialogTransferProgressBar" class="webswing-fileDialogButtonRow row" class="webswing-hidden">
 			<div style="padding-right: 0px;" class="col-xs-8">
-				<div data-id="progress" class="progress webswing-progress">
-					<div style="width: 0%;" class="progress-bar progress-bar-success"></div>
+				<div data-id="progress" class="js-progress">
+					<div style="width: 0%;" class="js-progress__bar">
+						<span class="js-progress__text">
+							Progress: <em>0%</em>
+						</span>
+					</div>
 				</div>
 			</div>
 			<div class="col-xs-4">
@@ -82,7 +132,7 @@
 				</div>
 			</div>
 		</div>
-		<div data-id="fileDialogErrorMessage" class="webswing-fileDialogButtonRow row webswing-hidden">
+		<div data-id="fileDialogErrorMessage" class="webswing-fileDialogButtonRow row u-hidden">
 			<div class="col-md-12">
 				<div data-id="fileDialogErrorMessageContent" class="alert alert-danger"></div>
 			</div>
