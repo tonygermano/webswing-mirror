@@ -1,34 +1,29 @@
 html,
-body
-{
-    width: 100%;
-    height: 100%;
+body {
+  width: 100%;
+  height: 100%;
 }
 
-html
-{
-    font-size: $base-size;
+html {
+  font-size: $base-size;
 }
 
-body
-{
-    font-family: $body-font;
-    font-weight: normal;
-    line-height: $lh-body;
+body {
+  background-color: $white;
 
-    color: $primary-text;
-    background-color: $white;
+  color: $primary-text;
+  font-family: $body-font;
+  font-weight: normal;
+  line-height: $lh-body;
 }
 
-*
-{
-    box-sizing: border-box;
+* {
+  box-sizing: border-box;
 }
 
 // Typography
-p
-{
-    font-size: $regular;
+p {
+  font-size: $regular;
 }
 
 h1,
@@ -37,60 +32,52 @@ h3,
 h4,
 h5,
 h6,
-legend
-{
-    font-family: $heading-font;
-    font-weight: bold;
-    line-height: $lh-headings;
+legend {
+  font-family: $heading-font;
+  font-weight: bold;
+  line-height: $lh-headings;
 }
 
-h1
-{
-    font-size: $largest;
+h1 {
+  font-size: $largest;
 }
 
 h2,
-legend
-{
-    font-size: $larger;
+legend {
+  font-size: $larger;
 }
 
 h3,
-big
-{
-    font-size: $large;
+big {
+  font-size: $large;
 }
 
-h4
-{
-    font-size: $medium;
+h4 {
+  font-size: $medium;
 }
 
-h5
-{
-    font-size: $regular;
+h5 {
+  font-size: $regular;
 }
 
-h6
-{
-    font-size: $small;
+h6 {
+  font-size: $small;
 }
 
 // Emphasis
 blockquote,
 cite,
 em,
-i
-{
-    font-style: italic;
+i {
+  font-style: italic;
 }
 
 // Selected text
 ::-moz-selection,
-::selection
-{
-    color: $white;
-    background-color: $primary;
+::selection {
+  background-color: $primary;
+
+  color: $white;
 }
 
 // Links
@@ -98,10 +85,8 @@ a:link,
 a:visited,
 a:hover,
 a:active,
-a:focus
-{
-    text-decoration: none;
-
-    color: $primary;
+a:focus {
+  color: $primary;
+  text-decoration: none;
 }
 

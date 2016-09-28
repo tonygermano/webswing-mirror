@@ -1,7 +1,6 @@
 // Mixins
 // Transitions
-@import "compass/css3/transition";
-
+@import 'compass/css3/transition';
 $default-transition-property: all;
 $default-transition-duration: 0.2s;
 $default-transition-function: ease-in-out;
@@ -28,43 +27,12 @@ $default-transition-delay: false;
   box-shadow: 0 19px 38px rgba($black, 0.30), 0 15px 12px rgba($black, 0.22);
 }
 
+
 // Border Radius
 @mixin border-radius($radius) {
   -webkit-border-radius: $radius;
-  -moz-border-radius: $radius;
-  -ms-border-radius: $radius;
-  border-radius: $radius;
-}
+     -moz-border-radius: $radius;
+          border-radius: $radius;
 
-// rem calculator with px fallback
-// usage: @include rem('padding',10px 0 2px 5px); 
-// usage #2: @include rem('border', 1px solid red);
-@mixin rem($property, $px-values) {
-
-  // Convert the base font size from _config.scss into rems
-  $baseline-rem: $base-size / 1rem;
-
-  // Print the first line in pixel values
-  #{$property}: $px-values;
-
-  // If there is only one (numeric) value, return the property/value line for it.
-  @if type-of($px-values) == "number" {
-    #{$property}: $px-values / $baseline-rem;
-  } @else {
-
-    // Create an empty list that we can dump values into
-    $rem-values: unquote("");
-    @each $value in $px-values {
-
-      // If the value is zero or a string or a color, return unchanged input
-      @if $value == 0 or type-of($value) == "string" or type-of($value) == "color" {
-        $rem-values: append($rem-values, $value);
-      } @else {
-        $rem-values: append($rem-values, $value / $baseline-rem);
-      }
-    }
-
-    // Return the property and its list of converted values
-    #{$property}: $rem-values;
-  }
+      -ms-border-radius: $radius;
 }
