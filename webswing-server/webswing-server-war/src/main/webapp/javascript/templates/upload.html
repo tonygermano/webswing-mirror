@@ -1,19 +1,37 @@
-<div data-id="autoSaveBar" class="webswing-autoUpload-dialog webswing-hidden" >
-	<div class="webswing-dialog">
-		<div class="webswing-dialog-modal">
-			<div class="webswing-autoUpload-content">
-				<div class="webswing-fileDialogButtonRow row">
-					<div class="col-xs-12">
-						<h4>Save file</h4>
-					</div>
-					<div class="col-xs-12 ">
-						<div class="form-group">
-							<input data-id="autoSaveInput" class="form-control" placeholder="File name" type="text">
+<div data-id="autoSaveBar" class="l-modal-container l-modal-container--upload" >
+	<div class="c-modal c-modal--upload">
+		<div class="c-modal__body">
+			<div class="c-modal__header c-modal__header--upload">
+				<h2 class="c-modal__title c-modal__title--upload">Save file</h2>
+			</div>
+
+			<div class="c-modal__content">
+				<p class="c-modal__instructions c-modal__instructions--upload">
+					Please enter a name for the file.
+				</p>
+
+				<div class="c-form__save-file">
+					<input data-id="autoSaveInput" class="c-form-field" placeholder="File name" type="text">
+				</div>
+
+				<ul class="l-button-grid">
+					<li class="l-button-grid__item l-button-grid__item--first">
+						<div class="c-upload-button">
+							<button data-id="autoSaveButton" class="c-upload-button__cancel">
+								<img src="../img/icon-save.png" class="c-button-grid-icon"/>
+								<span>Save</span>
+							</button>
 						</div>
-					</div>
-					<div class="col-xs-offset-4 col-xs-8">
-						<button class="btn btn-success btn-block pull-right" data-id="autoSaveButton">Save</button>
-						<button class="btn btn-danger btn-block pull-right" data-id="cancelAutoSaveButton">Cancel</button>
+					</li>
+					<li class="l-button-grid__item">
+						<div class="c-upload-button">
+							<button data-id="cancelAutoSaveButton" class="c-upload-button__cancel">
+								<img src="../img/icon-cancel.png" class="c-button-grid-icon"/>
+								<span>Cancel</span>
+							</button>
+						</div>
+					</li>
+					</ul>
 					</div>
 				</div>
 			</div>

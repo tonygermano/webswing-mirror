@@ -26,7 +26,6 @@ $warning: #ffb219;
 // Font families
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700);
 @import url(https://fonts.googleapis.com/css?family=Fira+Sans:700);
-@import url(https://fonts.googleapis.com/icon?family=Material+Icons);
 $body-font: 'open sans', sans-serif;
 $heading-font: 'open sans', sans-serif;
 
@@ -51,5 +50,5 @@ input[type='button'],
 input[type='reset'],
 input[type='submit'],
 .btn {
-  @include transition-duration(0.2s);
+    @include transition-duration(0.2s);
 }

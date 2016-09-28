@@ -2,11 +2,13 @@
 .c-modal {
     @include rem('max-width', 320px);
     @include rem('padding', 20px);
-    @include rem('top', 100px);
     @include border-radius(3px);
     @include dropshadow-5;
 
-    width: 90%;
+    position: relative;
+    top: -5%;
+
+    width: 100%;
     margin-right: auto;
     margin-left: auto;
     background-color: $white;
@@ -39,9 +41,8 @@
         text-transform: uppercase;
 
         &--upload {
-            padding: 0px;
-            margin: 0px;
-
+            padding: 0;
+            margin: 0;
             border: 0;
 
             color: $white;

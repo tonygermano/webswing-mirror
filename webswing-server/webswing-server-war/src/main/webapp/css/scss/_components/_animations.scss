@@ -80,10 +80,10 @@
     vertical-align: middle;
 
     -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
+            backface-visibility: hidden;
     -moz-osx-font-smoothing: grayscale;
     -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+            transform: translateZ(0);
 
     &:before {
         @include rem('height', 4px);
@@ -100,11 +100,11 @@
         border-radius: 0 0 6px 6px;
 
         -webkit-transition-duration: 0.2s;
-        transition-duration: 0.2s;
+                transition-duration: 0.2s;
         -webkit-transition-property: left, right;
-        transition-property: left, right;
+                transition-property: left, right;
         -webkit-transition-timing-function: ease-out;
-        transition-timing-function: ease-out;
+                transition-timing-function: ease-out;
     }
 
     &:hover:before,
