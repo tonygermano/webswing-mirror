@@ -1,69 +1,73 @@
+// Dialog modals
 .c-modal {
-  @include rem('max-width', 320px);
-  @include rem('padding', 20px);
-  @include border-radius(3px);
-  @include dropshadow-5;
+    @include rem('max-width', 320px);
+    @include rem('padding', 20px);
+    @include rem('top', 100px);
+    @include border-radius(3px);
+    @include dropshadow-5;
 
-  position: relative;
-  top: -20%;
+    width: 90%;
+    margin-right: auto;
+    margin-left: auto;
+    background-color: $white;
 
-  width: 90%;
-  margin-right: auto;
-  margin-left: auto;
-  background-color: $white;
+    text-align: center;
 
-  text-align: center;
+    &--upload {
+        @include rem('padding', 0px);
+    }
+
+    // Modal header (contains title)
+    &__header {
+        &--upload {
+            @include rem('padding', 20px);
+            @include rem('margin', 0px);
+            @include border-radius(3px 3px 0 0);
+
+            background-color: $secondary;
+        }
+    }
+
+    // Modal title text
+    &__title {
+        @include rem('padding-bottom', 15px);
+        @include rem('margin-bottom', 15px);
+
+        border-bottom: 1px solid #eeeeee;
+
+        font-size: $regular;
+        text-transform: uppercase;
+
+        &--upload {
+            padding: 0px;
+            margin: 0px;
+
+            border: 0;
+
+            color: $white;
+        }
+    }
+
+    // Modal instruction text
+    &__instructions {
+        @include rem('padding-bottom', 15px);
+
+        color: $secondary-text;
+        font-size: $small;
+
+        &--upload {
+            @include rem('padding', 20px);
+        }
+    }
+
+    // Modal error messages
+    &__message {
+        &--error {
+            @include rem('margin-top', 15px);
+            @include rem('margin-bottom', 15px);
+
+            color: $danger;
+            font-size: $small;
+        }
+    }
 }
-
-.c-modal__title {
-  @include rem('padding-bottom', 15px);
-  @include rem('margin-bottom', 15px);
-
-  border-bottom: 1px solid #eeeeee;
-
-  font-size: $regular;
-  text-transform: uppercase;
-}
-
-.c-modal__instructions {
-  @include rem('padding-bottom', 15px);
-
-  color: $secondary-text;
-  font-size: $small;
-}
-
-.c-modal__message--error {
-  @include rem('margin-top', 15px);
-  @include rem('margin-bottom', 15px);
-
-  color: $danger;
-  font-size: $small;
-}
-
-.c-modal--upload {
-  @include rem('padding', 0px);
-}
-
-.c-modal__header--upload {
-  @include rem('padding', 20px);
-  @include rem('margin', 0px);
-  @include border-radius(3px 3px 0 0);
-
-  background-color: $secondary;
-}
-
-.c-modal__title--upload {
-  @include rem('padding', 0px);
-  @include rem('margin', 0px);
-
-  border: 0;
-
-  color: $white;
-}
-
-.c-modal__instructions--upload {
-  @include rem('padding', 20px);
-
-  border-bottom: 1px solid #eeeeee;
-}
-

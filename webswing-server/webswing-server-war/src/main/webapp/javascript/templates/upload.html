@@ -10,6 +10,13 @@
 					Please select a file to import.
 				</p>
 
+				<div data-id="fileDialogTransferProgressBar" class="l-progressbar-container">
+					<div data-id="progress" class="js-progress">
+						<div style="width: 0%;" class="js-progress__bar">
+							<span class="js-progress__text">Progress: <em>0%</em></span>
+						</div>
+					</div>
+				</div>
 
 				<input data-id="autoUploadfileDialogTransferBarClientId" name="clientId" type="hidden">
 
@@ -46,7 +53,7 @@
 <div data-id="uploadBar" class="webswing-fileDialogBar">
 	<div class="container-fluid">
 		<div class="webswing-fileDialogButtonRow row ">
-			<div data-id="fileDropArea" class="webswing-hidden">
+			<div data-id="fileDropArea" class="u-hidden">
 				<p class="upload-dropH1">Drag and drop files here</p>
 			</div>
 		</div>
@@ -71,8 +78,12 @@
 		</div>
 		<div data-id="fileDialogTransferProgressBar" class="webswing-fileDialogButtonRow row" class="webswing-hidden">
 			<div style="padding-right: 0px;" class="col-xs-8">
-				<div data-id="progress" class="progress webswing-progress">
-					<div style="width: 0%;" class="progress-bar progress-bar-success"></div>
+				<div data-id="progress" class="js-progress">
+					<div style="width: 0%;" class="js-progress__bar">
+						<span class="js-progress__text">
+							Progress: <em>0%</em>
+						</span>
+					</div>
 				</div>
 			</div>
 			<div class="col-xs-4">
@@ -81,7 +92,7 @@
 				</div>
 			</div>
 		</div>
-		<div data-id="fileDialogErrorMessage" class="webswing-fileDialogButtonRow row webswing-hidden">
+		<div data-id="fileDialogErrorMessage" class="webswing-fileDialogButtonRow row u-hidden">
 			<div class="col-md-12">
 				<div data-id="fileDialogErrorMessageContent" class="alert alert-danger"></div>
 			</div>

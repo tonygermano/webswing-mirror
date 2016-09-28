@@ -18,6 +18,7 @@ $light-grey-4: #e2e2e2; // Darker shade
 $divider-color: #f2f0ed; // Dividers and borders
 
 $danger: #d62020; // Button and alert colors
+$notice: #ff5c00;
 $neutral: #086788;
 $success: #6bb21a;
 $warning: #ffb219;
@@ -42,9 +43,13 @@ $smaller: 0.75rem;
 $lh-body: 1.4; // Line height for body text
 $lh-headings: 1.2; // Line height for headings
 
-// Breakpoints
-// Usage: @include mappy-bp(small) { }
-$breakpoints: (
-        'small': 640px,
-        'large': 1280px
-);
+// Adds transitions
+a,
+button,
+input:focus,
+input[type='button'],
+input[type='reset'],
+input[type='submit'],
+.btn {
+  @include transition-duration(0.2s);
+}

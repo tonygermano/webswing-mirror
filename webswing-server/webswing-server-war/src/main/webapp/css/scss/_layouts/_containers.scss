@@ -1,25 +1,29 @@
 .l-webswing-container {
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  background-image: radial-gradient(circle, $white, $light-grey-2);
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle, $white, $light-grey-2);
 }
 
 .l-modal-container {
-  @include rem('padding', 20px);
+    @include rem('padding', 20px);
 
-  position: absolute;
-  top: 0;
-  left: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
 
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
 
-  justify-content: center;
+    justify-content: center;
+
+    &--login {
+        background-image: radial-gradient(circle, $white, $light-grey-2);
+    }
 }
 
-.l-modal-container--login {
-  background-image: radial-gradient(circle, $white, $light-grey-2);
+.l-progressbar-container {
+
 }

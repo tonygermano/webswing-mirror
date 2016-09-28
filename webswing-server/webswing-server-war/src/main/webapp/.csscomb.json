@@ -4,15 +4,15 @@
 		"node_modules/**",
 		"bower_components/**",
 		"style.cs.map",
-		"scss_utilities_mixins.scss",
 		".gitignore",
 		"config.rb",
-		"webswing.css"
+		"webswing.css",
+		"**/_mixins.scss"
 	],
 	"remove-empty-rulesets": true,
 	"always-semicolon": true,
 	"color-case": "lower",
-	"block-indent": "  ",
+	"block-indent": "    ",
 	"color-shorthand": false,
 	"element-case": "lower",
 	"eof-newline": true,

@@ -51,7 +51,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			autoUploadfileDialogTransferBarClientId.val(clientId);
 			autoFileInput.prop("multiple", data.isMultiSelection);
 			autoFileInput.attr("accept", data.filter);
-setup
+			setup
 			open(data, clientId);
 		}
 
@@ -78,26 +78,26 @@ setup
 		}
 
 		function close() {
-				if (uploadBar != null && uploadBar.closest(api.cfg.rootElement).length !== 0) {
-					if (!errorTimeout) {
-						autoUploadBar.animate({
-							"top":"50px",
-							"opacity":"0"
-						}, 200);
-						uploadBar.detach();
-					}else{
-						closeAfterErrorTimeout=true;
-					}
-				}
-				if (autoUploadBar != null && autoUploadBar.closest(api.cfg.rootElement).length !== 0) {
+			if (uploadBar != null && uploadBar.closest(api.cfg.rootElement).length !== 0) {
+				if (!errorTimeout) {
 					autoUploadBar.animate({
 						"top":"50px",
 						"opacity":"0"
-					}, 200).hide( 0, function(){
-						autoUploadBar.detach();
-					} );
+					}, 200);
+					uploadBar.detach();
+				}else{
+					closeAfterErrorTimeout=true;
 				}
-			
+			}
+			if (autoUploadBar != null && autoUploadBar.closest(api.cfg.rootElement).length !== 0) {
+				autoUploadBar.animate({
+					"top":"50px",
+					"opacity":"0"
+				}, 200).hide( 0, function(){
+					autoUploadBar.detach();
+				} );
+			}
+
 		}
 
 		function setup() {
@@ -111,7 +111,7 @@ setup
 			dropZone = uploadBar.find('div[data-id="fileDropArea"]');
 			fileUpload = uploadBar.find('form[data-id="fileupload"]');
 			uploadProgressBar = uploadBar.find('div[data-id="fileDialogTransferProgressBar"]');
-			uploadProgress = uploadBar.find('div[data-id="progress"] .progress-bar');
+			uploadProgress = uploadBar.find('div[data-id="progress"] .js-progress__bar');
 			cancelBtn = uploadBar.find('div[data-id="cancelBtn"]');
 			downloadBtn = uploadBar.find('div[data-id="fileDownloadBtn"]');
 			uploadBtn = uploadBar.find('div[data-id="fileUploadBtn"]');
@@ -180,17 +180,51 @@ setup
 				}, 5000);
 			}
 
+// Changes the looks of the progress bar based on the percentage of data loaded
 			function fileuploadprogressall(e, data) {
-				var progress = parseInt(data.loaded / data.total * 100, 10);
-				uploadProgress.css('width', progress + '%');
-				if (progress === 100) {
-					setTimeout(function() {
+				var progress = parseInt(data.loaded / data.total * 100, 10),
+					$jsProgress = $(".js-progress"),
+					$jsProgressBar = $(".js-progress__bar"),
+					$jsProgressText = $(".js-progress__text"),
+					resetColors,
+					orange = 30,
+					yellow = 55,
+					green = 85;
+
+				// Resets the progress bar colors by removing the classes
+				resetColors = function() {
+					$jsProgressBar
+						.removeClass("js-progress__bar--part-1")
+						.removeClass("js-progress__bar--part-2")
+						.removeClass("js-progress__bar--part-3")
+						.removeClass("js-progress__bar--done");
+					$jsProgress
+						.removeClass("progress--complete");
+				};
+				$jsProgressBar.css('width', progress + '%');
+				$jsProgressText.find("em").text( progress + "%" );
+				$jsProgressBar.addClass("js-progress__bar--active");
+				if (progress >= green) {
+					$jsProgressBar.addClass("js-progress__bar--part-3");
+				}
+				else if (progress >= yellow) {
+					$jsProgressBar.addClass("js-progress__bar--part-2");
+				}
+				else if (progress >= orange) {
+					$jsProgressBar.addClass("js-progress__bar--part-1");
+				}
+				else if (progress === 100) {
+					$jsProgress.addClass("js-progress--complete");
+					$jsProgressBar.addClass("js-progress__bar--done");
+					$jsProgressText.find("em").text("Complete");
+					setTimeout(function () {
 						filesUploaded(doneFileList);
 						doneFileList = [];
 					}, 1000);
 					setProgressBarVisible(false);
 					jqXHR_fileupload = [];
-				}
+					resetColors();
+				};
 			}
 
 			cancelAutoUploadButton.bind('click', function(e) {
