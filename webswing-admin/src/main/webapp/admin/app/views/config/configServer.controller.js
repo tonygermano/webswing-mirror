@@ -1,6 +1,6 @@
 (function(define) {
 	define([], function f() {
-		function ConfigEditController($scope, baseUrl, configRestService, permissions) {
+		function ConfigEditController($scope, baseUrl, configRestService, permissions, loading) {
 			var vm = this;
 			vm.permissions = permissions;
 			vm.readonly = !vm.permissions.configEdit;
@@ -21,17 +21,22 @@
 			});
 
 			function activate() {
-				return configRestService.getConfig(baseUrl).then(function(data) {
-					vm.config = angular.extend({}, vm.config, data);
-				}).then(function() {
-					return configRestService.getVariables(baseUrl, 'Basic');
-				}).then(function(data) {
-					vm.variables['Basic'] = data;
-				}).then(function() {
-					return configRestService.getVariables(baseUrl, 'SwingApp');
-				}).then(function(data) {
-					vm.variables['SwingApp'] = data;
-				});
+				if(!loading.isLoading()){
+					loading.startLoading();
+					return configRestService.getConfig(baseUrl).then(function(data) {
+						vm.config = angular.extend({}, vm.config, data);
+					}).then(function() {
+						return configRestService.getVariables(baseUrl, 'Basic');
+					}).then(function(data) {
+						vm.variables['Basic'] = data;
+					}).then(function() {
+						return configRestService.getVariables(baseUrl, 'SwingApp');
+					}).then(function(data) {
+						vm.variables['SwingApp'] = data;
+					}).then(function(){
+						loading.stopLoading();
+					});
+				}
 			}
 
 			function reset() {
@@ -42,7 +47,7 @@
 				return configRestService.setConfig(baseUrl, config).then(activate);
 			}
 		}
-		ConfigEditController.$inject = [ '$scope', 'baseUrl', 'configRestService', 'permissions' ];
+		ConfigEditController.$inject = [ '$scope', 'baseUrl', 'configRestService', 'permissions', 'loading' ];
 
 		return ConfigEditController;
 	});

@@ -5,12 +5,14 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.webswing.server.common.model.meta.ConfigField;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
 import org.webswing.server.common.model.meta.ConfigFieldDiscriminator;
 import org.webswing.server.common.model.meta.ConfigFieldOrder;
@@ -32,6 +34,7 @@ public interface DatabaseSecurityModuleConfig extends WebswingExtendableSecurity
 	String getDataSourceClass();
 
 	@ConfigField(label = "DataSource Settings", description = "Java bean property names and value pairs for the DataSource class specified.")
+	@ConfigFieldDefaultValueObject(HashMap.class)
 	Map<String, String> getDataSourceProperties();
 
 	@ConfigField(label = "Authentication Query")

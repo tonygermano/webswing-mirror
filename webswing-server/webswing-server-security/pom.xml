@@ -65,11 +65,10 @@
 							<descriptorRefs>
 								<descriptorRef>jar-with-dependencies</descriptorRef>
 							</descriptorRefs>
-							<finalName>${project.build.finalName}-full</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
 						</configuration>
 						<executions>
 							<execution>
+								<id>full</id>
 								<phase>package</phase>
 								<goals>
 									<goal>single</goal>

@@ -298,4 +298,9 @@ public class SwingProcessImpl implements SwingProcess {
 	public void setProcessExitListener(ProcessExitListener closeListener) {
 		this.closeListener = closeListener;
 	}
+
+	@Override
+	public SwingProcessConfig getConfig() {
+		return config;
+	}
 }

@@ -273,6 +273,7 @@
 										<resourceBases>
 											<resourceBase>${project.basedir}/src/main/webapp</resourceBase>
 											<resourceBase>${project.basedir}/src/test/webapp</resourceBase>
+											<resourceBase>${project.basedir}/../../webswing-directdraw/webswing-directdraw-server/src/main/webapp</resourceBase>
 											<resourceBase>${project.basedir}/../../webswing-admin/src/main/webapp</resourceBase>
 										</resourceBases>
 										<webInfIncludeJarPattern>^$</webInfIncludeJarPattern>

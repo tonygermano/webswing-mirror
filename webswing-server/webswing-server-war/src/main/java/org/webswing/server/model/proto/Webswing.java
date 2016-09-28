@@ -7489,6 +7489,21 @@ public final class Webswing {
      * <code>optional bool isMultiSelection = 6;</code>
      */
     boolean getIsMultiSelection();
+
+    // optional string selection = 7;
+    /**
+     * <code>optional string selection = 7;</code>
+     */
+    boolean hasSelection();
+    /**
+     * <code>optional string selection = 7;</code>
+     */
+    java.lang.String getSelection();
+    /**
+     * <code>optional string selection = 7;</code>
+     */
+    com.google.protobuf.ByteString
+        getSelectionBytes();
   }
   /**
    * Protobuf type {@code org.webswing.server.model.proto.FileDialogEventMsgProto}
@@ -7577,6 +7592,11 @@ public final class Webswing {
               isMultiSelection_ = input.readBool();
               break;
             }
+            case 58: {
+              bitField0_ |= 0x00000040;
+              selection_ = input.readBytes();
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -7633,6 +7653,10 @@ public final class Webswing {
        * <code>AutoUpload = 2;</code>
        */
       AutoUpload(2, 2),
+      /**
+       * <code>AutoSave = 3;</code>
+       */
+      AutoSave(3, 3),
       ;
 
       /**
@@ -7647,6 +7671,10 @@ public final class Webswing {
        * <code>AutoUpload = 2;</code>
        */
       public static final int AutoUpload_VALUE = 2;
+      /**
+       * <code>AutoSave = 3;</code>
+       */
+      public static final int AutoSave_VALUE = 3;
 
 
       public final int getNumber() { return value; }
@@ -7656,6 +7684,7 @@ public final class Webswing {
           case 0: return Open;
           case 1: return Close;
           case 2: return AutoUpload;
+          case 3: return AutoSave;
           default: return null;
         }
       }
@@ -7831,6 +7860,49 @@ public final class Webswing {
       return isMultiSelection_;
     }
 
+    // optional string selection = 7;
+    public static final int SELECTION_FIELD_NUMBER = 7;
+    private java.lang.Object selection_;
+    /**
+     * <code>optional string selection = 7;</code>
+     */
+    public boolean hasSelection() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional string selection = 7;</code>
+     */
+    public java.lang.String getSelection() {
+      java.lang.Object ref = selection_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          selection_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string selection = 7;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSelectionBytes() {
+      java.lang.Object ref = selection_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        selection_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       eventType_ = org.webswing.server.model.proto.Webswing.FileDialogEventMsgProto.FileDialogEventTypeProto.Open;
       allowDownload_ = false;
@@ -7838,6 +7910,7 @@ public final class Webswing {
       allowDelete_ = false;
       filter_ = "";
       isMultiSelection_ = false;
+      selection_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -7873,6 +7946,9 @@ public final class Webswing {
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeBool(6, isMultiSelection_);
       }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeBytes(7, getSelectionBytes());
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -7905,6 +7981,10 @@ public final class Webswing {
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(6, isMultiSelection_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(7, getSelectionBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -8034,6 +8114,8 @@ public final class Webswing {
         bitField0_ = (bitField0_ & ~0x00000010);
         isMultiSelection_ = false;
         bitField0_ = (bitField0_ & ~0x00000020);
+        selection_ = "";
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
 
@@ -8086,6 +8168,10 @@ public final class Webswing {
           to_bitField0_ |= 0x00000020;
         }
         result.isMultiSelection_ = isMultiSelection_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.selection_ = selection_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -8121,6 +8207,11 @@ public final class Webswing {
         }
         if (other.hasIsMultiSelection()) {
           setIsMultiSelection(other.getIsMultiSelection());
+        }
+        if (other.hasSelection()) {
+          bitField0_ |= 0x00000040;
+          selection_ = other.selection_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -8391,6 +8482,80 @@ public final class Webswing {
       public Builder clearIsMultiSelection() {
         bitField0_ = (bitField0_ & ~0x00000020);
         isMultiSelection_ = false;
+        onChanged();
+        return this;
+      }
+
+      // optional string selection = 7;
+      private java.lang.Object selection_ = "";
+      /**
+       * <code>optional string selection = 7;</code>
+       */
+      public boolean hasSelection() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional string selection = 7;</code>
+       */
+      public java.lang.String getSelection() {
+        java.lang.Object ref = selection_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          selection_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string selection = 7;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSelectionBytes() {
+        java.lang.Object ref = selection_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          selection_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string selection = 7;</code>
+       */
+      public Builder setSelection(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+        selection_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string selection = 7;</code>
+       */
+      public Builder clearSelection() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        selection_ = getDefaultInstance().getSelection();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string selection = 7;</code>
+       */
+      public Builder setSelectionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+        selection_ = value;
         onChanged();
         return this;
       }
@@ -15791,19 +15956,19 @@ public final class Webswing {
      */
     org.webswing.server.model.proto.Webswing.UploadEventMsgInProtoOrBuilder getUploadOrBuilder();
 
-    // optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;
+    // optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;
     /**
-     * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+     * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
      */
-    boolean hasUploaded();
+    boolean hasSelected();
     /**
-     * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+     * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
      */
-    org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto getUploaded();
+    org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto getSelected();
     /**
-     * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+     * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
      */
-    org.webswing.server.model.proto.Webswing.UploadedEventMsgInProtoOrBuilder getUploadedOrBuilder();
+    org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProtoOrBuilder getSelectedOrBuilder();
 
     // optional .org.webswing.server.model.proto.JsResultMsgProto jsResponse = 6;
     /**
@@ -15950,14 +16115,14 @@ public final class Webswing {
               break;
             }
             case 42: {
-              org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.Builder subBuilder = null;
+              org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00000008) == 0x00000008)) {
-                subBuilder = uploaded_.toBuilder();
+                subBuilder = selected_.toBuilder();
               }
-              uploaded_ = input.readMessage(org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.PARSER, extensionRegistry);
+              selected_ = input.readMessage(org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.PARSER, extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(uploaded_);
-                uploaded_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(selected_);
+                selected_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000008;
               break;
@@ -16146,26 +16311,26 @@ public final class Webswing {
       return upload_;
     }
 
-    // optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;
-    public static final int UPLOADED_FIELD_NUMBER = 5;
-    private org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto uploaded_;
+    // optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;
+    public static final int SELECTED_FIELD_NUMBER = 5;
+    private org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto selected_;
     /**
-     * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+     * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
      */
-    public boolean hasUploaded() {
+    public boolean hasSelected() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+     * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
      */
-    public org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto getUploaded() {
-      return uploaded_;
+    public org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto getSelected() {
+      return selected_;
     }
     /**
-     * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+     * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
      */
-    public org.webswing.server.model.proto.Webswing.UploadedEventMsgInProtoOrBuilder getUploadedOrBuilder() {
-      return uploaded_;
+    public org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProtoOrBuilder getSelectedOrBuilder() {
+      return selected_;
     }
 
     // optional .org.webswing.server.model.proto.JsResultMsgProto jsResponse = 6;
@@ -16239,7 +16404,7 @@ public final class Webswing {
       paste_ = org.webswing.server.model.proto.Webswing.PasteEventMsgInProto.getDefaultInstance();
       copy_ = org.webswing.server.model.proto.Webswing.CopyEventMsgInProto.getDefaultInstance();
       upload_ = org.webswing.server.model.proto.Webswing.UploadEventMsgInProto.getDefaultInstance();
-      uploaded_ = org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.getDefaultInstance();
+      selected_ = org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.getDefaultInstance();
       jsResponse_ = org.webswing.server.model.proto.Webswing.JsResultMsgProto.getDefaultInstance();
       javaRequest_ = org.webswing.server.model.proto.Webswing.JavaEvalRequestMsgInProto.getDefaultInstance();
       playback_ = org.webswing.server.model.proto.Webswing.PlaybackCommandMsgInProto.getDefaultInstance();
@@ -16269,7 +16434,7 @@ public final class Webswing {
         output.writeMessage(4, upload_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeMessage(5, uploaded_);
+        output.writeMessage(5, selected_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeMessage(6, jsResponse_);
@@ -16307,7 +16472,7 @@ public final class Webswing {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, uploaded_);
+          .computeMessageSize(5, selected_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
@@ -16437,7 +16602,7 @@ public final class Webswing {
           getPasteFieldBuilder();
           getCopyFieldBuilder();
           getUploadFieldBuilder();
-          getUploadedFieldBuilder();
+          getSelectedFieldBuilder();
           getJsResponseFieldBuilder();
           getJavaRequestFieldBuilder();
           getPlaybackFieldBuilder();
@@ -16473,10 +16638,10 @@ public final class Webswing {
           uploadBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000008);
-        if (uploadedBuilder_ == null) {
-          uploaded_ = org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.getDefaultInstance();
+        if (selectedBuilder_ == null) {
+          selected_ = org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.getDefaultInstance();
         } else {
-          uploadedBuilder_.clear();
+          selectedBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000010);
         if (jsResponseBuilder_ == null) {
@@ -16561,10 +16726,10 @@ public final class Webswing {
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000008;
         }
-        if (uploadedBuilder_ == null) {
-          result.uploaded_ = uploaded_;
+        if (selectedBuilder_ == null) {
+          result.selected_ = selected_;
         } else {
-          result.uploaded_ = uploadedBuilder_.build();
+          result.selected_ = selectedBuilder_.build();
         }
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000010;
@@ -16641,8 +16806,8 @@ public final class Webswing {
         if (other.hasUpload()) {
           mergeUpload(other.getUpload());
         }
-        if (other.hasUploaded()) {
-          mergeUploaded(other.getUploaded());
+        if (other.hasSelected()) {
+          mergeSelected(other.getSelected());
         }
         if (other.hasJsResponse()) {
           mergeJsResponse(other.getJsResponse());
@@ -17271,121 +17436,121 @@ public final class Webswing {
         return uploadBuilder_;
       }
 
-      // optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;
-      private org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto uploaded_ = org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.getDefaultInstance();
+      // optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;
+      private org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto selected_ = org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto, org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.Builder, org.webswing.server.model.proto.Webswing.UploadedEventMsgInProtoOrBuilder> uploadedBuilder_;
+          org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto, org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.Builder, org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProtoOrBuilder> selectedBuilder_;
       /**
-       * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+       * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
        */
-      public boolean hasUploaded() {
+      public boolean hasSelected() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+       * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
        */
-      public org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto getUploaded() {
-        if (uploadedBuilder_ == null) {
-          return uploaded_;
+      public org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto getSelected() {
+        if (selectedBuilder_ == null) {
+          return selected_;
         } else {
-          return uploadedBuilder_.getMessage();
+          return selectedBuilder_.getMessage();
         }
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+       * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
        */
-      public Builder setUploaded(org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto value) {
-        if (uploadedBuilder_ == null) {
+      public Builder setSelected(org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto value) {
+        if (selectedBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          uploaded_ = value;
+          selected_ = value;
           onChanged();
         } else {
-          uploadedBuilder_.setMessage(value);
+          selectedBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00000010;
         return this;
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+       * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
        */
-      public Builder setUploaded(
-          org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.Builder builderForValue) {
-        if (uploadedBuilder_ == null) {
-          uploaded_ = builderForValue.build();
+      public Builder setSelected(
+          org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.Builder builderForValue) {
+        if (selectedBuilder_ == null) {
+          selected_ = builderForValue.build();
           onChanged();
         } else {
-          uploadedBuilder_.setMessage(builderForValue.build());
+          selectedBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000010;
         return this;
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+       * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
        */
-      public Builder mergeUploaded(org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto value) {
-        if (uploadedBuilder_ == null) {
+      public Builder mergeSelected(org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto value) {
+        if (selectedBuilder_ == null) {
           if (((bitField0_ & 0x00000010) == 0x00000010) &&
-              uploaded_ != org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.getDefaultInstance()) {
-            uploaded_ =
-              org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.newBuilder(uploaded_).mergeFrom(value).buildPartial();
+              selected_ != org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.getDefaultInstance()) {
+            selected_ =
+              org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.newBuilder(selected_).mergeFrom(value).buildPartial();
           } else {
-            uploaded_ = value;
+            selected_ = value;
           }
           onChanged();
         } else {
-          uploadedBuilder_.mergeFrom(value);
+          selectedBuilder_.mergeFrom(value);
         }
         bitField0_ |= 0x00000010;
         return this;
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+       * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
        */
-      public Builder clearUploaded() {
-        if (uploadedBuilder_ == null) {
-          uploaded_ = org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.getDefaultInstance();
+      public Builder clearSelected() {
+        if (selectedBuilder_ == null) {
+          selected_ = org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.getDefaultInstance();
           onChanged();
         } else {
-          uploadedBuilder_.clear();
+          selectedBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+       * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
        */
-      public org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.Builder getUploadedBuilder() {
+      public org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.Builder getSelectedBuilder() {
         bitField0_ |= 0x00000010;
         onChanged();
-        return getUploadedFieldBuilder().getBuilder();
+        return getSelectedFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+       * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
        */
-      public org.webswing.server.model.proto.Webswing.UploadedEventMsgInProtoOrBuilder getUploadedOrBuilder() {
-        if (uploadedBuilder_ != null) {
-          return uploadedBuilder_.getMessageOrBuilder();
+      public org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProtoOrBuilder getSelectedOrBuilder() {
+        if (selectedBuilder_ != null) {
+          return selectedBuilder_.getMessageOrBuilder();
         } else {
-          return uploaded_;
+          return selected_;
         }
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.UploadedEventMsgInProto uploaded = 5;</code>
+       * <code>optional .org.webswing.server.model.proto.FilesSelectedEventMsgInProto selected = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto, org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.Builder, org.webswing.server.model.proto.Webswing.UploadedEventMsgInProtoOrBuilder> 
-          getUploadedFieldBuilder() {
-        if (uploadedBuilder_ == null) {
-          uploadedBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto, org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.Builder, org.webswing.server.model.proto.Webswing.UploadedEventMsgInProtoOrBuilder>(
-                  uploaded_,
+          org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto, org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.Builder, org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProtoOrBuilder> 
+          getSelectedFieldBuilder() {
+        if (selectedBuilder_ == null) {
+          selectedBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto, org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.Builder, org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProtoOrBuilder>(
+                  selected_,
                   getParentForChildren(),
                   isClean());
-          uploaded_ = null;
+          selected_ = null;
         }
-        return uploadedBuilder_;
+        return selectedBuilder_;
       }
 
       // optional .org.webswing.server.model.proto.JsResultMsgProto jsResponse = 6;
@@ -26099,9 +26264,9 @@ public final class Webswing {
        */
       hb(6, 6),
       /**
-       * <code>cancelAutoUpload = 7;</code>
+       * <code>cancelFileSelection = 7;</code>
        */
-      cancelAutoUpload(7, 7),
+      cancelFileSelection(7, 7),
       ;
 
       /**
@@ -26133,9 +26298,9 @@ public final class Webswing {
        */
       public static final int hb_VALUE = 6;
       /**
-       * <code>cancelAutoUpload = 7;</code>
+       * <code>cancelFileSelection = 7;</code>
        */
-      public static final int cancelAutoUpload_VALUE = 7;
+      public static final int cancelFileSelection_VALUE = 7;
 
 
       public final int getNumber() { return value; }
@@ -26149,7 +26314,7 @@ public final class Webswing {
           case 4: return downloadFile;
           case 5: return deleteFile;
           case 6: return hb;
-          case 7: return cancelAutoUpload;
+          case 7: return cancelFileSelection;
           default: return null;
         }
       }
@@ -26492,7 +26657,7 @@ public final class Webswing {
     // @@protoc_insertion_point(class_scope:org.webswing.server.model.proto.SimpleEventMsgInProto)
   }
 
-  public interface UploadedEventMsgInProtoOrBuilder
+  public interface FilesSelectedEventMsgInProtoOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
     // repeated string files = 1;
@@ -26516,24 +26681,24 @@ public final class Webswing {
         getFilesBytes(int index);
   }
   /**
-   * Protobuf type {@code org.webswing.server.model.proto.UploadedEventMsgInProto}
+   * Protobuf type {@code org.webswing.server.model.proto.FilesSelectedEventMsgInProto}
    */
-  public static final class UploadedEventMsgInProto extends
+  public static final class FilesSelectedEventMsgInProto extends
       com.google.protobuf.GeneratedMessage
-      implements UploadedEventMsgInProtoOrBuilder {
-    // Use UploadedEventMsgInProto.newBuilder() to construct.
-    private UploadedEventMsgInProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      implements FilesSelectedEventMsgInProtoOrBuilder {
+    // Use FilesSelectedEventMsgInProto.newBuilder() to construct.
+    private FilesSelectedEventMsgInProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private UploadedEventMsgInProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+    private FilesSelectedEventMsgInProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
 
-    private static final UploadedEventMsgInProto defaultInstance;
-    public static UploadedEventMsgInProto getDefaultInstance() {
+    private static final FilesSelectedEventMsgInProto defaultInstance;
+    public static FilesSelectedEventMsgInProto getDefaultInstance() {
       return defaultInstance;
     }
 
-    public UploadedEventMsgInProto getDefaultInstanceForType() {
+    public FilesSelectedEventMsgInProto getDefaultInstanceForType() {
       return defaultInstance;
     }
 
@@ -26543,7 +26708,7 @@ public final class Webswing {
         getUnknownFields() {
       return this.unknownFields;
     }
-    private UploadedEventMsgInProto(
+    private FilesSelectedEventMsgInProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -26591,28 +26756,28 @@ public final class Webswing {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_UploadedEventMsgInProto_descriptor;
+      return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_UploadedEventMsgInProto_fieldAccessorTable
+      return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.class, org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.Builder.class);
+              org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.class, org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<UploadedEventMsgInProto> PARSER =
-        new com.google.protobuf.AbstractParser<UploadedEventMsgInProto>() {
-      public UploadedEventMsgInProto parsePartialFrom(
+    public static com.google.protobuf.Parser<FilesSelectedEventMsgInProto> PARSER =
+        new com.google.protobuf.AbstractParser<FilesSelectedEventMsgInProto>() {
+      public FilesSelectedEventMsgInProto parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new UploadedEventMsgInProto(input, extensionRegistry);
+        return new FilesSelectedEventMsgInProto(input, extensionRegistry);
       }
     };
 
     @java.lang.Override
-    public com.google.protobuf.Parser<UploadedEventMsgInProto> getParserForType() {
+    public com.google.protobuf.Parser<FilesSelectedEventMsgInProto> getParserForType() {
       return PARSER;
     }
 
@@ -26694,53 +26859,53 @@ public final class Webswing {
       return super.writeReplace();
     }
 
-    public static org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto parseFrom(
+    public static org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto parseFrom(
+    public static org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto parseFrom(byte[] data)
+    public static org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto parseFrom(
+    public static org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto parseFrom(java.io.InputStream input)
+    public static org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto parseFrom(
+    public static org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
-    public static org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto parseDelimitedFrom(java.io.InputStream input)
+    public static org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input);
     }
-    public static org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto parseDelimitedFrom(
+    public static org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
-    public static org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto parseFrom(
+    public static org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto parseFrom(
+    public static org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -26749,7 +26914,7 @@ public final class Webswing {
 
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto prototype) {
+    public static Builder newBuilder(org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -26761,24 +26926,24 @@ public final class Webswing {
       return builder;
     }
     /**
-     * Protobuf type {@code org.webswing.server.model.proto.UploadedEventMsgInProto}
+     * Protobuf type {@code org.webswing.server.model.proto.FilesSelectedEventMsgInProto}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.webswing.server.model.proto.Webswing.UploadedEventMsgInProtoOrBuilder {
+       implements org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProtoOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_UploadedEventMsgInProto_descriptor;
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_UploadedEventMsgInProto_fieldAccessorTable
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.class, org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.Builder.class);
+                org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.class, org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.Builder.class);
       }
 
-      // Construct using org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.newBuilder()
+      // Construct using org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -26809,23 +26974,23 @@ public final class Webswing {
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_UploadedEventMsgInProto_descriptor;
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_descriptor;
       }
 
-      public org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto getDefaultInstanceForType() {
-        return org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.getDefaultInstance();
+      public org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto getDefaultInstanceForType() {
+        return org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.getDefaultInstance();
       }
 
-      public org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto build() {
-        org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto result = buildPartial();
+      public org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto build() {
+        org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto buildPartial() {
-        org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto result = new org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto(this);
+      public org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto buildPartial() {
+        org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto result = new org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto(this);
         int from_bitField0_ = bitField0_;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           files_ = new com.google.protobuf.UnmodifiableLazyStringList(
@@ -26838,16 +27003,16 @@ public final class Webswing {
       }
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto) {
-          return mergeFrom((org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto)other);
+        if (other instanceof org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto) {
+          return mergeFrom((org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto other) {
-        if (other == org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto.getDefaultInstance()) return this;
+      public Builder mergeFrom(org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto other) {
+        if (other == org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto.getDefaultInstance()) return this;
         if (!other.files_.isEmpty()) {
           if (files_.isEmpty()) {
             files_ = other.files_;
@@ -26870,11 +27035,11 @@ public final class Webswing {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto parsedMessage = null;
+        org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (org.webswing.server.model.proto.Webswing.UploadedEventMsgInProto) e.getUnfinishedMessage();
+          parsedMessage = (org.webswing.server.model.proto.Webswing.FilesSelectedEventMsgInProto) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -26978,15 +27143,15 @@ public final class Webswing {
         return this;
       }
 
-      // @@protoc_insertion_point(builder_scope:org.webswing.server.model.proto.UploadedEventMsgInProto)
+      // @@protoc_insertion_point(builder_scope:org.webswing.server.model.proto.FilesSelectedEventMsgInProto)
     }
 
     static {
-      defaultInstance = new UploadedEventMsgInProto(true);
+      defaultInstance = new FilesSelectedEventMsgInProto(true);
       defaultInstance.initFields();
     }
 
-    // @@protoc_insertion_point(class_scope:org.webswing.server.model.proto.UploadedEventMsgInProto)
+    // @@protoc_insertion_point(class_scope:org.webswing.server.model.proto.FilesSelectedEventMsgInProto)
   }
 
   public interface UploadEventMsgInProtoOrBuilder
@@ -29410,10 +29575,10 @@ public final class Webswing {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_webswing_server_model_proto_SimpleEventMsgInProto_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_org_webswing_server_model_proto_UploadedEventMsgInProto_descriptor;
+    internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_org_webswing_server_model_proto_UploadedEventMsgInProto_fieldAccessorTable;
+      internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_org_webswing_server_model_proto_UploadEventMsgInProto_descriptor;
   private static
@@ -29477,128 +29642,129 @@ public final class Webswing {
       "CursorChangeEventMsgProto\022\016\n\006cursor\030\001 \002(" +
       "\t\"Z\n\021CopyEventMsgProto\022\014\n\004text\030\001 \001(\t\022\014\n\004" +
       "html\030\002 \001(\t\022\013\n\003img\030\003 \001(\014\022\r\n\005files\030\004 \003(\t\022\r" +
-      "\n\005other\030\005 \001(\010\"\253\002\n\027FileDialogEventMsgProt",
+      "\n\005other\030\005 \001(\010\"\314\002\n\027FileDialogEventMsgProt",
       "o\022d\n\teventType\030\001 \002(\0162Q.org.webswing.serv" +
       "er.model.proto.FileDialogEventMsgProto.F" +
       "ileDialogEventTypeProto\022\025\n\rallowDownload" +
       "\030\002 \001(\010\022\023\n\013allowUpload\030\003 \001(\010\022\023\n\013allowDele" +
       "te\030\004 \001(\010\022\016\n\006filter\030\005 \001(\t\022\030\n\020isMultiSelec" +
-      "tion\030\006 \001(\010\"?\n\030FileDialogEventTypeProto\022\010" +
-      "\n\004Open\020\000\022\t\n\005Close\020\001\022\016\n\nAutoUpload\020\002\"\312\001\n\016" +
-      "WindowMsgProto\022\n\n\002id\030\001 \002(\t\022N\n\007content\030\002 " +
-      "\003(\0132=.org.webswing.server.model.proto.Wi" +
-      "ndowPartialContentMsgProto\022\022\n\ndirectDraw",
-      "\030\003 \001(\014\022\r\n\005title\030\004 \001(\t\022\014\n\004posX\030\005 \001(\021\022\014\n\004p" +
-      "osY\030\006 \001(\021\022\r\n\005width\030\007 \001(\r\022\016\n\006height\030\010 \001(\r" +
-      "\"z\n\034WindowPartialContentMsgProto\022\021\n\tposi" +
-      "tionX\030\001 \001(\021\022\021\n\tpositionY\030\002 \001(\021\022\r\n\005width\030" +
-      "\003 \001(\r\022\016\n\006height\030\004 \001(\r\022\025\n\rbase64Content\030\005" +
-      " \001(\014\"\211\003\n\030JsEvalRequestMsgOutProto\022\025\n\rcor" +
-      "relationId\030\001 \001(\t\022\024\n\014thisObjectId\030\002 \001(\t\022^" +
-      "\n\004type\030\003 \001(\0162P.org.webswing.server.model" +
-      ".proto.JsEvalRequestMsgOutProto.JsEvalRe" +
-      "questTypeProto\022\022\n\nevalString\030\004 \001(\t\022@\n\006pa",
-      "rams\030\005 \003(\01320.org.webswing.server.model.p" +
-      "roto.JsParamMsgProto\022\022\n\ngarbageIds\030\006 \003(\t" +
-      "\"v\n\026JsEvalRequestTypeProto\022\010\n\004eval\020\000\022\010\n\004" +
-      "call\020\001\022\r\n\tsetMember\020\002\022\r\n\tgetMember\020\003\022\020\n\014" +
-      "deleteMember\020\004\022\013\n\007setSlot\020\005\022\013\n\007getSlot\020\006" +
-      "\"\366\001\n\017JsParamMsgProto\022\021\n\tprimitive\030\001 \001(\t\022" +
-      "C\n\010jsObject\030\002 \001(\01321.org.webswing.server." +
-      "model.proto.JSObjectMsgProto\022J\n\njavaObje" +
-      "ct\030\003 \001(\01326.org.webswing.server.model.pro" +
-      "to.JavaObjectRefMsgProto\022?\n\005array\030\004 \003(\0132",
-      "0.org.webswing.server.model.proto.JsPara" +
-      "mMsgProto\"\036\n\020JSObjectMsgProto\022\n\n\002id\030\001 \001(" +
-      "\t\"4\n\025JavaObjectRefMsgProto\022\n\n\002id\030\001 \001(\t\022\017" +
-      "\n\007methods\030\002 \003(\t\"y\n\020JsResultMsgProto\022\025\n\rc" +
-      "orrelationId\030\001 \001(\t\022\r\n\005error\030\002 \001(\t\022?\n\005val" +
-      "ue\030\003 \001(\01320.org.webswing.server.model.pro" +
-      "to.JsParamMsgProto\"6\n\024PlaybackInfoMsgPro" +
-      "to\022\017\n\007current\030\001 \001(\r\022\r\n\005total\030\002 \001(\r\"\347\004\n\032I" +
-      "nputEventsFrameMsgInProto\022E\n\006events\030\001 \003(" +
-      "\01325.org.webswing.server.model.proto.Inpu",
-      "tEventMsgInProto\022D\n\005paste\030\002 \001(\01325.org.we" +
-      "bswing.server.model.proto.PasteEventMsgI" +
-      "nProto\022B\n\004copy\030\003 \001(\01324.org.webswing.serv" +
-      "er.model.proto.CopyEventMsgInProto\022F\n\006up" +
-      "load\030\004 \001(\01326.org.webswing.server.model.p" +
-      "roto.UploadEventMsgInProto\022J\n\010uploaded\030\005" +
-      " \001(\01328.org.webswing.server.model.proto.U" +
-      "ploadedEventMsgInProto\022E\n\njsResponse\030\006 \001" +
-      "(\01321.org.webswing.server.model.proto.JsR" +
-      "esultMsgProto\022O\n\013javaRequest\030\007 \001(\0132:.org",
-      ".webswing.server.model.proto.JavaEvalReq" +
-      "uestMsgInProto\022L\n\010playback\030\010 \001(\0132:.org.w" +
-      "ebswing.server.model.proto.PlaybackComma" +
-      "ndMsgInProto\"\210\003\n\024InputEventMsgInProto\022Q\n" +
-      "\thandshake\030\001 \001(\0132>.org.webswing.server.m" +
-      "odel.proto.ConnectionHandshakeMsgInProto" +
-      "\022E\n\003key\030\002 \001(\01328.org.webswing.server.mode" +
-      "l.proto.KeyboardEventMsgInProto\022D\n\005mouse" +
-      "\030\003 \001(\01325.org.webswing.server.model.proto" +
-      ".MouseEventMsgInProto\022E\n\005event\030\004 \001(\01326.o",
-      "rg.webswing.server.model.proto.SimpleEve" +
-      "ntMsgInProto\022I\n\ntimestamps\030\005 \001(\01325.org.w" +
-      "ebswing.server.model.proto.TimestampsMsg" +
-      "InProto\"\\\n\024TimestampsMsgInProto\022\026\n\016start" +
-      "Timestamp\030\001 \001(\t\022\025\n\rsendTimestamp\030\002 \001(\t\022\025" +
-      "\n\rrenderingTime\030\003 \001(\t\"\257\002\n\035ConnectionHand" +
-      "shakeMsgInProto\022\020\n\010clientId\030\001 \001(\t\022\021\n\tses" +
-      "sionId\030\002 \001(\t\022\016\n\006viewId\030\003 \001(\t\022\024\n\014desktopW" +
-      "idth\030\004 \001(\r\022\025\n\rdesktopHeight\030\005 \001(\r\022\027\n\017app" +
-      "licationName\030\006 \001(\t\022\020\n\010mirrored\030\007 \001(\010\022\033\n\023",
-      "directDrawSupported\030\010 \001(\010\022\024\n\014documentBas" +
-      "e\030\t \001(\t\022>\n\006params\030\n \003(\0132..org.webswing.s" +
-      "erver.model.proto.ParamMsgProto\022\016\n\006local" +
-      "e\030\013 \001(\t\",\n\rParamMsgProto\022\014\n\004name\030\001 \001(\t\022\r" +
-      "\n\005value\030\002 \001(\t\"\212\002\n\027KeyboardEventMsgInProt" +
-      "o\022X\n\004type\030\001 \001(\0162J.org.webswing.server.mo" +
-      "del.proto.KeyboardEventMsgInProto.KeyEve" +
-      "ntTypeProto\022\021\n\tcharacter\030\002 \001(\021\022\017\n\007keycod" +
-      "e\030\003 \001(\021\022\013\n\003alt\030\004 \001(\010\022\014\n\004ctrl\030\005 \001(\010\022\r\n\005sh" +
-      "ift\030\006 \001(\010\022\014\n\004meta\030\007 \001(\010\"9\n\021KeyEventTypeP",
-      "roto\022\014\n\010keypress\020\000\022\013\n\007keydown\020\001\022\t\n\005keyup" +
-      "\020\002\"\301\002\n\024MouseEventMsgInProto\022W\n\004type\030\001 \001(" +
-      "\0162I.org.webswing.server.model.proto.Mous" +
-      "eEventMsgInProto.MouseEventTypeProto\022\t\n\001" +
-      "x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\022\n\nwheelDelta\030\004 \001(\021\022\016" +
-      "\n\006button\030\005 \001(\021\022\014\n\004ctrl\030\006 \001(\010\022\013\n\003alt\030\007 \001(" +
-      "\010\022\r\n\005shift\030\010 \001(\010\022\014\n\004meta\030\t \001(\010\"^\n\023MouseE" +
-      "ventTypeProto\022\r\n\tmousemove\020\000\022\r\n\tmousedow" +
-      "n\020\001\022\013\n\007mouseup\020\002\022\016\n\nmousewheel\020\003\022\014\n\010dblc" +
-      "lick\020\004\"\303\001\n\023CopyEventMsgInProto\022X\n\004type\030\001",
-      " \001(\0162J.org.webswing.server.model.proto.C" +
-      "opyEventMsgInProto.CopyEventMsgTypeProto" +
-      "\022\014\n\004file\030\002 \001(\t\"D\n\025CopyEventMsgTypeProto\022" +
-      "\010\n\004copy\020\000\022\007\n\003cut\020\001\022\030\n\024getFileFromClipboa" +
-      "rd\020\002\"?\n\024PasteEventMsgInProto\022\014\n\004text\030\001 \001" +
-      "(\t\022\014\n\004html\030\002 \001(\t\022\013\n\003img\030\003 \001(\t\"\201\002\n\025Simple" +
-      "EventMsgInProto\022Y\n\004type\030\001 \001(\0162K.org.webs" +
-      "wing.server.model.proto.SimpleEventMsgIn" +
-      "Proto.SimpleEventTypeProto\"\214\001\n\024SimpleEve" +
-      "ntTypeProto\022\n\n\006unload\020\000\022\r\n\tkillSwing\020\001\022\014",
-      "\n\010paintAck\020\002\022\013\n\007repaint\020\003\022\020\n\014downloadFil" +
-      "e\020\004\022\016\n\ndeleteFile\020\005\022\006\n\002hb\020\006\022\024\n\020cancelAut" +
-      "oUpload\020\007\"(\n\027UploadedEventMsgInProto\022\r\n\005" +
-      "files\030\001 \003(\t\"C\n\025UploadEventMsgInProto\022\020\n\010" +
-      "fileName\030\002 \001(\t\022\030\n\020tempFileLocation\030\003 \001(\t" +
-      "\"\226\001\n\031JavaEvalRequestMsgInProto\022\025\n\rcorrel" +
-      "ationId\030\001 \001(\t\022\020\n\010objectId\030\002 \001(\t\022\016\n\006metho" +
-      "d\030\003 \001(\t\022@\n\006params\030\004 \003(\01320.org.webswing.s" +
-      "erver.model.proto.JsParamMsgProto\"\327\001\n\031Pl" +
-      "aybackCommandMsgInProto\022`\n\007command\030\001 \001(\016",
-      "2O.org.webswing.server.model.proto.Playb" +
-      "ackCommandMsgInProto.PlaybackCommandProt" +
-      "o\"X\n\024PlaybackCommandProto\022\t\n\005reset\020\000\022\010\n\004" +
-      "play\020\001\022\010\n\004stop\020\002\022\010\n\004step\020\003\022\n\n\006step10\020\004\022\013" +
-      "\n\007step100\020\005*\374\001\n\026SimpleEventMsgOutProto\022\035" +
-      "\n\031applicationAlreadyRunning\020\000\022\030\n\024shutDow" +
-      "nNotification\020\001\022\036\n\032tooManyClientsNotific" +
-      "ation\020\002\022\026\n\022continueOldSession\020\003\022\026\n\022confi" +
-      "gurationError\020\004\022\035\n\031sessionStolenNotifica" +
-      "tion\020\005\022\026\n\022unauthorizedAccess\020\006\022\"\n\036shutDo",
-      "wnAutoLogoutNotification\020\007"
+      "tion\030\006 \001(\010\022\021\n\tselection\030\007 \001(\t\"M\n\030FileDia" +
+      "logEventTypeProto\022\010\n\004Open\020\000\022\t\n\005Close\020\001\022\016" +
+      "\n\nAutoUpload\020\002\022\014\n\010AutoSave\020\003\"\312\001\n\016WindowM" +
+      "sgProto\022\n\n\002id\030\001 \002(\t\022N\n\007content\030\002 \003(\0132=.o" +
+      "rg.webswing.server.model.proto.WindowPar",
+      "tialContentMsgProto\022\022\n\ndirectDraw\030\003 \001(\014\022" +
+      "\r\n\005title\030\004 \001(\t\022\014\n\004posX\030\005 \001(\021\022\014\n\004posY\030\006 \001" +
+      "(\021\022\r\n\005width\030\007 \001(\r\022\016\n\006height\030\010 \001(\r\"z\n\034Win" +
+      "dowPartialContentMsgProto\022\021\n\tpositionX\030\001" +
+      " \001(\021\022\021\n\tpositionY\030\002 \001(\021\022\r\n\005width\030\003 \001(\r\022\016" +
+      "\n\006height\030\004 \001(\r\022\025\n\rbase64Content\030\005 \001(\014\"\211\003" +
+      "\n\030JsEvalRequestMsgOutProto\022\025\n\rcorrelatio" +
+      "nId\030\001 \001(\t\022\024\n\014thisObjectId\030\002 \001(\t\022^\n\004type\030" +
+      "\003 \001(\0162P.org.webswing.server.model.proto." +
+      "JsEvalRequestMsgOutProto.JsEvalRequestTy",
+      "peProto\022\022\n\nevalString\030\004 \001(\t\022@\n\006params\030\005 " +
+      "\003(\01320.org.webswing.server.model.proto.Js" +
+      "ParamMsgProto\022\022\n\ngarbageIds\030\006 \003(\t\"v\n\026JsE" +
+      "valRequestTypeProto\022\010\n\004eval\020\000\022\010\n\004call\020\001\022" +
+      "\r\n\tsetMember\020\002\022\r\n\tgetMember\020\003\022\020\n\014deleteM" +
+      "ember\020\004\022\013\n\007setSlot\020\005\022\013\n\007getSlot\020\006\"\366\001\n\017Js" +
+      "ParamMsgProto\022\021\n\tprimitive\030\001 \001(\t\022C\n\010jsOb" +
+      "ject\030\002 \001(\01321.org.webswing.server.model.p" +
+      "roto.JSObjectMsgProto\022J\n\njavaObject\030\003 \001(" +
+      "\01326.org.webswing.server.model.proto.Java",
+      "ObjectRefMsgProto\022?\n\005array\030\004 \003(\01320.org.w" +
+      "ebswing.server.model.proto.JsParamMsgPro" +
+      "to\"\036\n\020JSObjectMsgProto\022\n\n\002id\030\001 \001(\t\"4\n\025Ja" +
+      "vaObjectRefMsgProto\022\n\n\002id\030\001 \001(\t\022\017\n\007metho" +
+      "ds\030\002 \003(\t\"y\n\020JsResultMsgProto\022\025\n\rcorrelat" +
+      "ionId\030\001 \001(\t\022\r\n\005error\030\002 \001(\t\022?\n\005value\030\003 \001(" +
+      "\01320.org.webswing.server.model.proto.JsPa" +
+      "ramMsgProto\"6\n\024PlaybackInfoMsgProto\022\017\n\007c" +
+      "urrent\030\001 \001(\r\022\r\n\005total\030\002 \001(\r\"\354\004\n\032InputEve" +
+      "ntsFrameMsgInProto\022E\n\006events\030\001 \003(\01325.org",
+      ".webswing.server.model.proto.InputEventM" +
+      "sgInProto\022D\n\005paste\030\002 \001(\01325.org.webswing." +
+      "server.model.proto.PasteEventMsgInProto\022" +
+      "B\n\004copy\030\003 \001(\01324.org.webswing.server.mode" +
+      "l.proto.CopyEventMsgInProto\022F\n\006upload\030\004 " +
+      "\001(\01326.org.webswing.server.model.proto.Up" +
+      "loadEventMsgInProto\022O\n\010selected\030\005 \001(\0132=." +
+      "org.webswing.server.model.proto.FilesSel" +
+      "ectedEventMsgInProto\022E\n\njsResponse\030\006 \001(\013" +
+      "21.org.webswing.server.model.proto.JsRes",
+      "ultMsgProto\022O\n\013javaRequest\030\007 \001(\0132:.org.w" +
+      "ebswing.server.model.proto.JavaEvalReque" +
+      "stMsgInProto\022L\n\010playback\030\010 \001(\0132:.org.web" +
+      "swing.server.model.proto.PlaybackCommand" +
+      "MsgInProto\"\210\003\n\024InputEventMsgInProto\022Q\n\th" +
+      "andshake\030\001 \001(\0132>.org.webswing.server.mod" +
+      "el.proto.ConnectionHandshakeMsgInProto\022E" +
+      "\n\003key\030\002 \001(\01328.org.webswing.server.model." +
+      "proto.KeyboardEventMsgInProto\022D\n\005mouse\030\003" +
+      " \001(\01325.org.webswing.server.model.proto.M",
+      "ouseEventMsgInProto\022E\n\005event\030\004 \001(\01326.org" +
+      ".webswing.server.model.proto.SimpleEvent" +
+      "MsgInProto\022I\n\ntimestamps\030\005 \001(\01325.org.web" +
+      "swing.server.model.proto.TimestampsMsgIn" +
+      "Proto\"\\\n\024TimestampsMsgInProto\022\026\n\016startTi" +
+      "mestamp\030\001 \001(\t\022\025\n\rsendTimestamp\030\002 \001(\t\022\025\n\r" +
+      "renderingTime\030\003 \001(\t\"\257\002\n\035ConnectionHandsh" +
+      "akeMsgInProto\022\020\n\010clientId\030\001 \001(\t\022\021\n\tsessi" +
+      "onId\030\002 \001(\t\022\016\n\006viewId\030\003 \001(\t\022\024\n\014desktopWid" +
+      "th\030\004 \001(\r\022\025\n\rdesktopHeight\030\005 \001(\r\022\027\n\017appli",
+      "cationName\030\006 \001(\t\022\020\n\010mirrored\030\007 \001(\010\022\033\n\023di" +
+      "rectDrawSupported\030\010 \001(\010\022\024\n\014documentBase\030" +
+      "\t \001(\t\022>\n\006params\030\n \003(\0132..org.webswing.ser" +
+      "ver.model.proto.ParamMsgProto\022\016\n\006locale\030" +
+      "\013 \001(\t\",\n\rParamMsgProto\022\014\n\004name\030\001 \001(\t\022\r\n\005" +
+      "value\030\002 \001(\t\"\212\002\n\027KeyboardEventMsgInProto\022" +
+      "X\n\004type\030\001 \001(\0162J.org.webswing.server.mode" +
+      "l.proto.KeyboardEventMsgInProto.KeyEvent" +
+      "TypeProto\022\021\n\tcharacter\030\002 \001(\021\022\017\n\007keycode\030" +
+      "\003 \001(\021\022\013\n\003alt\030\004 \001(\010\022\014\n\004ctrl\030\005 \001(\010\022\r\n\005shif",
+      "t\030\006 \001(\010\022\014\n\004meta\030\007 \001(\010\"9\n\021KeyEventTypePro" +
+      "to\022\014\n\010keypress\020\000\022\013\n\007keydown\020\001\022\t\n\005keyup\020\002" +
+      "\"\301\002\n\024MouseEventMsgInProto\022W\n\004type\030\001 \001(\0162" +
+      "I.org.webswing.server.model.proto.MouseE" +
+      "ventMsgInProto.MouseEventTypeProto\022\t\n\001x\030" +
+      "\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\022\n\nwheelDelta\030\004 \001(\021\022\016\n\006" +
+      "button\030\005 \001(\021\022\014\n\004ctrl\030\006 \001(\010\022\013\n\003alt\030\007 \001(\010\022" +
+      "\r\n\005shift\030\010 \001(\010\022\014\n\004meta\030\t \001(\010\"^\n\023MouseEve" +
+      "ntTypeProto\022\r\n\tmousemove\020\000\022\r\n\tmousedown\020" +
+      "\001\022\013\n\007mouseup\020\002\022\016\n\nmousewheel\020\003\022\014\n\010dblcli",
+      "ck\020\004\"\303\001\n\023CopyEventMsgInProto\022X\n\004type\030\001 \001" +
+      "(\0162J.org.webswing.server.model.proto.Cop" +
+      "yEventMsgInProto.CopyEventMsgTypeProto\022\014" +
+      "\n\004file\030\002 \001(\t\"D\n\025CopyEventMsgTypeProto\022\010\n" +
+      "\004copy\020\000\022\007\n\003cut\020\001\022\030\n\024getFileFromClipboard" +
+      "\020\002\"?\n\024PasteEventMsgInProto\022\014\n\004text\030\001 \001(\t" +
+      "\022\014\n\004html\030\002 \001(\t\022\013\n\003img\030\003 \001(\t\"\204\002\n\025SimpleEv" +
+      "entMsgInProto\022Y\n\004type\030\001 \001(\0162K.org.webswi" +
+      "ng.server.model.proto.SimpleEventMsgInPr" +
+      "oto.SimpleEventTypeProto\"\217\001\n\024SimpleEvent",
+      "TypeProto\022\n\n\006unload\020\000\022\r\n\tkillSwing\020\001\022\014\n\010" +
+      "paintAck\020\002\022\013\n\007repaint\020\003\022\020\n\014downloadFile\020" +
+      "\004\022\016\n\ndeleteFile\020\005\022\006\n\002hb\020\006\022\027\n\023cancelFileS" +
+      "election\020\007\"-\n\034FilesSelectedEventMsgInPro" +
+      "to\022\r\n\005files\030\001 \003(\t\"C\n\025UploadEventMsgInPro" +
+      "to\022\020\n\010fileName\030\002 \001(\t\022\030\n\020tempFileLocation" +
+      "\030\003 \001(\t\"\226\001\n\031JavaEvalRequestMsgInProto\022\025\n\r" +
+      "correlationId\030\001 \001(\t\022\020\n\010objectId\030\002 \001(\t\022\016\n" +
+      "\006method\030\003 \001(\t\022@\n\006params\030\004 \003(\01320.org.webs" +
+      "wing.server.model.proto.JsParamMsgProto\"",
+      "\327\001\n\031PlaybackCommandMsgInProto\022`\n\007command" +
+      "\030\001 \001(\0162O.org.webswing.server.model.proto" +
+      ".PlaybackCommandMsgInProto.PlaybackComma" +
+      "ndProto\"X\n\024PlaybackCommandProto\022\t\n\005reset" +
+      "\020\000\022\010\n\004play\020\001\022\010\n\004stop\020\002\022\010\n\004step\020\003\022\n\n\006step" +
+      "10\020\004\022\013\n\007step100\020\005*\374\001\n\026SimpleEventMsgOutP" +
+      "roto\022\035\n\031applicationAlreadyRunning\020\000\022\030\n\024s" +
+      "hutDownNotification\020\001\022\036\n\032tooManyClientsN" +
+      "otification\020\002\022\026\n\022continueOldSession\020\003\022\026\n" +
+      "\022configurationError\020\004\022\035\n\031sessionStolenNo",
+      "tification\020\005\022\026\n\022unauthorizedAccess\020\006\022\"\n\036" +
+      "shutDownAutoLogoutNotification\020\007"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -29646,7 +29812,7 @@ public final class Webswing {
           internal_static_org_webswing_server_model_proto_FileDialogEventMsgProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_FileDialogEventMsgProto_descriptor,
-              new java.lang.String[] { "EventType", "AllowDownload", "AllowUpload", "AllowDelete", "Filter", "IsMultiSelection", });
+              new java.lang.String[] { "EventType", "AllowDownload", "AllowUpload", "AllowDelete", "Filter", "IsMultiSelection", "Selection", });
           internal_static_org_webswing_server_model_proto_WindowMsgProto_descriptor =
             getDescriptor().getMessageTypes().get(7);
           internal_static_org_webswing_server_model_proto_WindowMsgProto_fieldAccessorTable = new
@@ -29700,7 +29866,7 @@ public final class Webswing {
           internal_static_org_webswing_server_model_proto_InputEventsFrameMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_InputEventsFrameMsgInProto_descriptor,
-              new java.lang.String[] { "Events", "Paste", "Copy", "Upload", "Uploaded", "JsResponse", "JavaRequest", "Playback", });
+              new java.lang.String[] { "Events", "Paste", "Copy", "Upload", "Selected", "JsResponse", "JavaRequest", "Playback", });
           internal_static_org_webswing_server_model_proto_InputEventMsgInProto_descriptor =
             getDescriptor().getMessageTypes().get(16);
           internal_static_org_webswing_server_model_proto_InputEventMsgInProto_fieldAccessorTable = new
@@ -29755,11 +29921,11 @@ public final class Webswing {
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_SimpleEventMsgInProto_descriptor,
               new java.lang.String[] { "Type", });
-          internal_static_org_webswing_server_model_proto_UploadedEventMsgInProto_descriptor =
+          internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_descriptor =
             getDescriptor().getMessageTypes().get(25);
-          internal_static_org_webswing_server_model_proto_UploadedEventMsgInProto_fieldAccessorTable = new
+          internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_org_webswing_server_model_proto_UploadedEventMsgInProto_descriptor,
+              internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_descriptor,
               new java.lang.String[] { "Files", });
           internal_static_org_webswing_server_model_proto_UploadEventMsgInProto_descriptor =
             getDescriptor().getMessageTypes().get(26);

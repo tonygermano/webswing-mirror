@@ -36,7 +36,7 @@ import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
 import org.webswing.model.c2s.PasteEventMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.c2s.UploadEventMsgIn;
-import org.webswing.model.c2s.UploadedEventMsgIn;
+import org.webswing.model.c2s.FilesSelectedEventMsgIn;
 import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.model.jslink.JSObjectMsg;
 import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
@@ -105,8 +105,8 @@ public class WebEventDispatcher {
 						CopyEventMsgIn copy = (CopyEventMsgIn) event;
 						handleCopyEvent(copy);
 					}
-					if (event instanceof UploadedEventMsgIn) {
-						handleUploadedEvent((UploadedEventMsgIn) event);
+					if (event instanceof FilesSelectedEventMsgIn) {
+						handleFileSelectionEvent((FilesSelectedEventMsgIn) event);
 					}
 					if (event instanceof UploadEventMsgIn) {
 						UploadEventMsgIn upload = (UploadEventMsgIn) event;
@@ -145,7 +145,7 @@ public class WebEventDispatcher {
 		case downloadFile:
 			Util.getWebToolkit().getPaintDispatcher().notifyDownloadSelectedFile();
 			break;
-		case cancelAutoUpload:
+		case cancelFileSelection:
 			handleAutoUploadCancelled();
 			break;
 		case paintAck:
@@ -418,34 +418,42 @@ public class WebEventDispatcher {
 		}
 	}
 
-	private void handleUploadedEvent(UploadedEventMsgIn e) {
-		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD)) {
-			JFileChooser fc = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
-			UploadedEventMsgIn event = (UploadedEventMsgIn) e;
-			if (fc != null) {
-				fc.rescanCurrentDirectory();
-				if (event.getFiles().size() > 0) {
-					if (fc.isMultiSelectionEnabled()) {
-						List<File> arr = new ArrayList<File>();
-						for (int i = 0; i < event.getFiles().size(); i++) {
-							if (uploadMap.get(event.getFiles().get(i)) != null) {
-								arr.add(new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i))));
-							}
-						}
-						fc.setSelectedFiles(arr.toArray(new File[arr.size()]));
-					} else {
-						if (uploadMap.get(event.getFiles().get(0)) != null) {
-							File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
-							fc.setSelectedFile(f);
+	private void handleFileSelectionEvent(FilesSelectedEventMsgIn e) {
+		JFileChooser fc = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
+		FilesSelectedEventMsgIn event = (FilesSelectedEventMsgIn) e;
+		if (fc != null) {
+			FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fc);
+			boolean saveMode = FileDialogEventType.AutoSave == fileChooserEventType;
+			fc.rescanCurrentDirectory();
+			if (event.getFiles().size() > 0) {
+				if (fc.isMultiSelectionEnabled()) {
+					List<File> arr = new ArrayList<File>();
+					for (int i = 0; i < event.getFiles().size(); i++) {
+						if (uploadMap.get(event.getFiles().get(i)) != null) {
+							arr.add(new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i))));
+						} else if (saveMode) {
+							arr.add(new File(fc.getCurrentDirectory(), event.getFiles().get(i)));
 						}
 					}
-					if (FileDialogEventType.AutoUpload.equals(Util.getFileChooserEventType(fc))) {
-						fc.approveSelection();
+					fc.setSelectedFiles(arr.toArray(new File[arr.size()]));
+				} else {
+					if (uploadMap.get(event.getFiles().get(0)) != null) {
+						File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
+						fc.setSelectedFile(f);
+					} else if (saveMode) {
+						fc.setSelectedFile(new File(fc.getCurrentDirectory(), event.getFiles().get(0)));
 					}
 				}
+				if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
+					fc.approveSelection();
+				}
+			} else {
+				if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
+					fc.cancelSelection();
+				}
 			}
-			uploadMap.clear();
 		}
+		uploadMap.clear();
 	}
 
 	public void handleAutoUploadCancelled() {
