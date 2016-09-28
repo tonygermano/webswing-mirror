@@ -159,7 +159,7 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueNumber(5)
 	public double getUploadMaxSize();
 
-	@ConfigField(tab = ConfigGroup.Features, label = "Allowed Embedding Domains", description = "If you are embedding webswing to page on different domain, you have to enable Cross-origin resource sharing (CORS) by adding the domain in this list. Use * to allow all domains.")
+	@ConfigField(tab = ConfigGroup.Features, label = "Domains Allowed to Embed", description = "If you are embedding webswing to page on different domain, you have to enable Cross-origin resource sharing (CORS) by adding the domain in this list. Use * to allow all domains.")
 	public List<String> getAllowedCorsOrigins();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow JsLink", description = "If selected, the JSLink feature will be enabled, allowing swing application to invoke javascript and vice versa. (See netscape.javascript.JSObject)")
@@ -201,6 +201,7 @@ public interface SwingConfig extends Config {
 				names.remove("transferDir");
 				names.remove("transparentFileSave");
 				names.remove("transparentFileOpen");
+				names.remove("clearTransferDir");
 			}
 			return names;
 		}
