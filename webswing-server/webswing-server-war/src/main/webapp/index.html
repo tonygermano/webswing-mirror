@@ -18,7 +18,13 @@
 				binarySocket:getParam('binarySocket'),
 				debugPort:getParam('debugPort'),
 				recordingPlayback:getParam('recordingPlayback'),
-				securityToken:getParam('securityToken')
+				securityToken:getParam('securityToken'),
+				customization:function(injector){
+					injector.services.dialog.content.startingDialog.content = '<p>Starting Cleopatra Enterprise...</p>';
+					injector.services.dialog.content.sessionStolenNotification.content = '<p>Cleopatra Enterprise session was opened in other browser window. Session disconnected...</p>';
+					//injector.services.dialog.content.continueOldSessionDialog.buttons[0].label = 'Yes';
+					//injector.services.dialog.content.continueOldSessionDialog.buttons[1].label = 'No';
+				}
 			}
 		}
 		function getParam(name) {

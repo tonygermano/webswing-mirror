@@ -67,11 +67,13 @@ message FileDialogEventMsgProto{
 	optional bool allowDelete = 4;
 	optional string filter = 5;
 	optional bool isMultiSelection = 6;
+	optional string selection = 7;
 
 	enum FileDialogEventTypeProto {
 		Open = 0;
 		Close = 1;
 		AutoUpload = 2;
+		AutoSave = 3;
 	}
 }
 
@@ -159,7 +161,7 @@ message InputEventsFrameMsgInProto{
 	optional PasteEventMsgInProto paste = 2;
 	optional CopyEventMsgInProto copy = 3;
 	optional UploadEventMsgInProto upload = 4;
-	optional UploadedEventMsgInProto uploaded = 5;
+	optional FilesSelectedEventMsgInProto selected = 5;
 	optional JsResultMsgProto jsResponse = 6;
 	optional JavaEvalRequestMsgInProto javaRequest = 7;
 	optional PlaybackCommandMsgInProto playback = 8;
@@ -261,11 +263,11 @@ message SimpleEventMsgInProto{
 		downloadFile = 4;
 		deleteFile = 5;
 		hb = 6;
-		cancelAutoUpload = 7;
+		cancelFileSelection = 7;
 	}
 }
 
-message UploadedEventMsgInProto{
+message FilesSelectedEventMsgInProto{
 	repeated string files = 1;
 }
 

@@ -14,7 +14,7 @@ public class SimpleEventMsgIn implements MsgIn {
 		downloadFile,
 		deleteFile,
 		hb,
-		cancelAutoUpload;
+		cancelFileSelection;
 	}
 
 	private SimpleEventType type;

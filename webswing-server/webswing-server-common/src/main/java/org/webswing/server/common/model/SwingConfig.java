@@ -24,8 +24,8 @@ import org.webswing.server.common.model.meta.VariableSetName;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "isolatedFs", "transferDir", "allowDelete", "allowDownload", "allowAutoDownload", "allowUpload",
-		"allowAutoUpload", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload",
+		"transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
 public interface SwingConfig extends Config {
 	public enum SessionMode {
 		ALWAYS_NEW_SESSION,
@@ -64,7 +64,7 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.Java, label = "User Folder", description = "The User working directory. Path from which the swing process will be started. (See the Java System Property: 'user.dir')")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
-	@ConfigFieldDefaultValueString("${"+Constants.HOME_FOLDER_SUBSTITUTE+"}")
+	@ConfigFieldDefaultValueString("${" + Constants.HOME_FOLDER_SUBSTITUTE + "}")
 	public String getUserDir();
 
 	@ConfigField(tab = ConfigGroup.Java, label = "JRE Executable", description = "Path to java executable that will be used to spawn swing application process. Java 6,7 and 8 is supported.")
@@ -117,40 +117,49 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Isolated Filesystem", description = "If true, every file chooser dialog will be restricted to access only the home directory of current application.")
 	@ConfigFieldDefaultValueBoolean(false)
+	@ConfigFieldDiscriminator
 	public boolean isIsolatedFs();
 
-	@ConfigField(tab = ConfigGroup.Features, label = "Upload folder", description = "If Isolated Filesystem is enabled. This will be the folder on the server where the user can upload and download files from.")
-	@ConfigFieldVariables(VariableSetName.SwingInstance)
-	@ConfigFieldDefaultValueString("${user.dir}/${user}/upload")
-	public String getTransferDir();
-
-	@ConfigField(tab = ConfigGroup.Features, label = "Allow Deleting Files ", description = "If selected, the JFileChooser integration will allow users to delete files displayed in the file chooser dialog")
-	@ConfigFieldDefaultValueBoolean(true)
-	public boolean isAllowDelete();
-
-	@ConfigField(tab = ConfigGroup.Features, label = "Allow Downloading Files ", description = "If selected, the JFileChooser integration will allow users to download files displayed in the file chooser dialog")
-	@ConfigFieldDefaultValueBoolean(true)
-	@ConfigFieldDiscriminator
-	public boolean isAllowDownload();
-
-	@ConfigField(tab = ConfigGroup.Features, label = "Allow Auto-Downloading Files ", description = "If selected, the JFileChooser dialog's save mode will trigger file download as soon as the selected file is available on filesystem.")
-	@ConfigFieldDefaultValueBoolean(true)
-	public boolean isAllowAutoDownload();
-
-	@ConfigField(tab = ConfigGroup.Features, label = "Allow Uploading Files ", description = "If selected, the JFileChooser integration will allow users to upload files to folder opened in the file chooser dialog")
+	@ConfigField(tab = ConfigGroup.Features, label = "Uploading Files", description = "If selected, the JFileChooser integration will allow users to upload files to folder opened in the file chooser dialog")
 	@ConfigFieldDefaultValueBoolean(true)
 	@ConfigFieldDiscriminator
 	public boolean isAllowUpload();
 
-	@ConfigField(tab = ConfigGroup.Features, label = "Allow Auto-Uploading Files ", description = "If selected, the JFileChooser dialog's open mode will open a client side file browser and transparently upload selected files and triggers selection.")
+	@ConfigField(tab = ConfigGroup.Features, label = "Deleting Files", description = "If selected, the JFileChooser integration will allow users to delete files displayed in the file chooser dialog")
 	@ConfigFieldDefaultValueBoolean(true)
-	public boolean isAllowAutoUpload();
+	public boolean isAllowDelete();
+
+	@ConfigField(tab = ConfigGroup.Features, label = "Downloading Files", description = "If selected, the JFileChooser integration will allow users to download files displayed in the file chooser dialog")
+	@ConfigFieldDefaultValueBoolean(true)
+	@ConfigFieldDiscriminator
+	public boolean isAllowDownload();
+
+	@ConfigField(tab = ConfigGroup.Features, label = "Auto-Download from Save Dialog", description = "If selected, the JFileChooser dialog's save mode will trigger file download as soon as the selected file is available on filesystem.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isAllowAutoDownload();
+
+	@ConfigField(tab = ConfigGroup.Features, label = "Transparent Open File Dialog", description = "If selected, the JFileChooser dialog's open mode will open a client side file browser and transparently upload selected files and triggers selection.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isTransparentFileOpen();
+
+	@ConfigField(tab = ConfigGroup.Features, label = "Transparent Save File Dialog", description = "If selected, the JFileChooser dialog's save mode will open a client side dialog to enter the file name to be saved.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isTransparentFileSave();
+
+	@ConfigField(tab = ConfigGroup.Features, label = "Upload Folder", description = "If Isolated Filesystem is enabled. This will be the folder on the server where the user can upload and download files from.")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("${user.dir}/${user}/upload")
+	public String getTransferDir();
+
+	@ConfigField(tab = ConfigGroup.Features, label = "Clear Upload Folder", description = "If enabled, all files in the transfer folder will be deleted when the swing process is terminated.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isClearTransferDir();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Upload Size Limit", description = "Maximum size of upload for single file (in MB). Set 0 for unlimited size.")
 	@ConfigFieldDefaultValueNumber(5)
 	public double getUploadMaxSize();
 
-	@ConfigField(tab = ConfigGroup.Features, label = "Allow CORS Origins", description = "If you are embedding webswing to page on different domain, you have to enable Cross-origin resource sharing (CORS) by adding the domain in this list. Use * to allow all domains.")
+	@ConfigField(tab = ConfigGroup.Features, label = "Domains Allowed to Embed", description = "If you are embedding webswing to page on different domain, you have to enable Cross-origin resource sharing (CORS) by adding the domain in this list. Use * to allow all domains.")
 	public List<String> getAllowedCorsOrigins();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow JsLink", description = "If selected, the JSLink feature will be enabled, allowing swing application to invoke javascript and vice versa. (See netscape.javascript.JSObject)")
@@ -187,6 +196,12 @@ public interface SwingConfig extends Config {
 			}
 			if (!config.isAllowDownload()) {
 				names.remove("allowAutoDownload");
+			}
+			if (!config.isIsolatedFs()) {
+				names.remove("transferDir");
+				names.remove("transparentFileSave");
+				names.remove("transparentFileOpen");
+				names.remove("clearTransferDir");
 			}
 			return names;
 		}

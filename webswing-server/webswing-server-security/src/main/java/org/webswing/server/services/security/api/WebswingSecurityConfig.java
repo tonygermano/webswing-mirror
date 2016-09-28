@@ -28,18 +28,18 @@ import org.webswing.toolkit.util.ClasspathUtil;
 @ConfigFieldOrder({ "module", "classPath", "config" })
 public interface WebswingSecurityConfig {
 
-	@ConfigField(label = "Secuirty Module Name")
+	@ConfigField(label = "Secuirty Module Name", description="Select one of built-in modules or enter full class name of custom security module (has to implement org.webswing.server.services.security.api.WebswingSecurityModule interface). Note the class and its dependencies has to be on classpath defined below.")
 	@ConfigFieldPresets(enumClass = BuiltInModules.class)
 	@ConfigFieldDefaultValueString("INHERITED")
 	@ConfigFieldDiscriminator
 	public String getModule();
 
-	@ConfigField(label = "Secuirty Module Class Path")
+	@ConfigField(label = "Secuirty Module Class Path",description="Additional classpath for built-in Security module or for defining custom security module. ")
 	@ConfigFieldVariables(VariableSetName.SwingApp)
 	@ConfigFieldDiscriminator
 	public List<String> getClassPath();
 
-	@ConfigField(label = "Secuirty Module Config")
+	@ConfigField(label = "Secuirty Module Config", description="Security module specific configuration.")
 	@ConfigFieldEditorType(editor = EditorType.Object)
 	@ConfigFieldDefaultValueObject(HashMap.class)
 	public Map<String, Object> getConfig();

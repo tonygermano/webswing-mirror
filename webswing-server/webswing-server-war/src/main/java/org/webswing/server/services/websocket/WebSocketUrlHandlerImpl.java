@@ -14,7 +14,7 @@ import org.webswing.model.c2s.CopyEventMsgIn;
 import org.webswing.model.c2s.InputEventMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.c2s.PasteEventMsgIn;
-import org.webswing.model.c2s.UploadedEventMsgIn;
+import org.webswing.model.c2s.FilesSelectedEventMsgIn;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.model.s2c.AppFrameMsgOut;
@@ -136,8 +136,8 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 				} else if (frame.getCopy() != null) {
 					CopyEventMsgIn p = frame.getCopy();
 					send(r, p);
-				} else if (frame.getUploaded() != null) {
-					UploadedEventMsgIn p = frame.getUploaded();
+				} else if (frame.getSelected() != null) {
+					FilesSelectedEventMsgIn p = frame.getSelected();
 					send(r, p);
 				} else if (frame.getJsResponse() != null) {
 					JsResultMsg p = frame.getJsResponse();

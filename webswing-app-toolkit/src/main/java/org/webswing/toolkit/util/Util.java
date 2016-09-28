@@ -549,12 +549,32 @@ public class Util {
 	}
 
 	public static FileDialogEventType getFileChooserEventType(JFileChooser fileChooserDialog) {
-		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_UPLOAD)) {
-			if (fileChooserDialog.getFileSelectionMode() == JFileChooser.FILES_ONLY && fileChooserDialog.getDialogType() == JFileChooser.OPEN_DIALOG) {
+		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ISOLATED_FS)) {
+			if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_TRANSPARENT_FILE_OPEN) && fileChooserDialog.getDialogType() == JFileChooser.OPEN_DIALOG) {
 				return FileDialogEventType.AutoUpload;
+			}
+			if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_TRANSPARENT_FILE_SAVE) && fileChooserDialog.getDialogType() == JFileChooser.SAVE_DIALOG) {
+				return FileDialogEventType.AutoSave;
 			}
 		}
 		return FileDialogEventType.Open;
+	}
+
+	public static String getFileChooserSelection(JFileChooser fileChooserDialog) {
+		StringBuilder sb = new StringBuilder();
+		if (fileChooserDialog.isMultiSelectionEnabled()) {
+			if (fileChooserDialog.getSelectedFiles() != null) {
+				for (File f : fileChooserDialog.getSelectedFiles()) {
+					sb.append(f.getName()).append(",");
+				}
+				return sb.length() > 0 ? sb.substring(0, sb.length() - 1) : "";
+			}
+		} else {
+			if (fileChooserDialog.getSelectedFile() != null) {
+				return fileChooserDialog.getSelectedFile().getName();
+			}
+		}
+		return "";
 	}
 
 }

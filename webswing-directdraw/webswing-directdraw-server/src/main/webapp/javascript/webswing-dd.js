@@ -874,9 +874,14 @@
 									var fontCss = document.createElement("style");
 									fontCss.type = "text/css";
 									fontCss.setAttribute("data-dd-ctx", ctxId);
-									fontCss.innerHTML = getFontFaceData(ctxId+fontFace.name, fontFace.font, fontFace.style);
+									var fontName= ctxId+fontFace.name;
+									fontCss.innerHTML = getFontFaceData(fontName, fontFace.font, fontFace.style);
 									document.body.appendChild(fontCss);
-									resolve();
+									if(isFontAvailable(fontName)){
+										resolve();
+									}else{
+										setTimeout(resolve,5);
+									}
 								}
 							});
 						});
@@ -889,6 +894,21 @@
 					reject(e);
 				}
 			});
+		}
+		
+		function isFontAvailable(fontName) {
+		    var canvas = document.createElement("canvas");
+		    var context = canvas.getContext("2d");
+		    var text = "abcdefghijklmnopqrstuvwxyz0123456789";
+		    context.font = "72px monospace";
+		    var baselineSize = context.measureText(text).width;
+		    context.font = "72px '" + fontName + "', monospace";
+		    var newSize = context.measureText(text).width;
+		    if (newSize == baselineSize) {
+		        return false;
+		    } else {
+		        return true;
+		    }
 		}
 		
 		function getFontFaceData(name, font, style) {

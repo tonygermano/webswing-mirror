@@ -1,6 +1,7 @@
 package org.webswing.server.services.swinginstance;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -9,7 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -336,6 +337,17 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		}
 		jvmConnection.close();
 		notifyExiting();
+
+		if (config.isIsolatedFs() && config.isClearTransferDir()) {
+			String transferDir = process.getConfig().getProperties().get(Constants.SWING_START_SYS_PROP_TRANSFER_DIR);
+			try {
+				if (transferDir != null) {
+					FileUtils.deleteDirectory(new File(transferDir));
+				}
+			} catch (IOException e) {
+				log.error("Failed to delete transfer dir " + transferDir, e);
+			}
+		}
 	}
 
 	public void notifyExiting() {
@@ -434,7 +446,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD, appConfig.isAllowAutoDownload());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload());
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_UPLOAD, appConfig.isAllowAutoUpload());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TRANSPARENT_FILE_OPEN, appConfig.isTransparentFileOpen());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TRANSPARENT_FILE_SAVE, appConfig.isTransparentFileSave());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE, appConfig.isAllowDelete());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, appConfig.isAllowJsLink());
 

@@ -19,7 +19,7 @@
 			<outputDirectory>/api</outputDirectory>
 			<includes>
 				<include>webswing-security.jar</include>
-				<include>webswing-security-full.jar</include>
+				<include>webswing-security-jar-with-dependencies.jar</include>
 			</includes>
 		</fileSet>
 		<fileSet>
