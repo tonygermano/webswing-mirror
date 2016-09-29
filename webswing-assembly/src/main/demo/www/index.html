@@ -5,23 +5,15 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta charset="utf-8" />
 <link rel="stylesheet" href="css/style.css" />
-<link rel="stylesheet" href="css/webswing.css" />
-<link rel="stylesheet" href="javascript/templates/dialog.css" />
-<link rel="stylesheet" href="javascript/templates/bootstrap.css" />
-<link rel="stylesheet" href="javascript/templates/base.css" />
 <link rel="icon" href="favicon.ico" />
 <script src="js/jquery.js"></script>
 </head>
 <body>
-	<div id="commonDialog" class="webswing-dialog-container">
-		<div class="webswing-dialog-backdrop"></div>
-		<div class="webswing-dialog">
-			<div class="webswing-dialog-modal">
-				<div class="webswing-dialog-modal-content">
-					<div id="webswing-header"></div>
-					<div id="webswing-content"></div>
-				</div>
-			</div>
+	<div class="l-modal-container l-modal-container--login">
+		<div id="commonDialog" class="c-modal">
+			<div id="webswing-header" class="c-modal__header"></div>
+			<div id="webswing-links" class="c-modal__header"></div>
+			<div id="webswing-content" class="c-modal__body"></div>
 		</div>
 	</div>
 	<script>
@@ -90,23 +82,22 @@
 		}
 
 		function show(apps) {
-			var header = '';
-			header = '<span class="pull-right"><a href="admin" id="admin">Manage</a> | <a href="logout" id="logout">Logout</a></span>';
-			header = header + '<h4 class="modal-title" id="myModalLabel">Hello <span>' + user + '</span>. ';
-			header = header + 'Select your application:</h4>';
-			$('#webswing-header').html(header);
+			$('#webswing-header').html('<h1 class="c-modal__title">Hello <span>' + user + '</span>. Select your application</h1>');
+			$('#webswing-links').html('<a href="admin" id="admin">Manage</a> | <a href="logout" id="logout">Logout</a>');
+			$('#commonDialog').addClass('c-modal--selector')
 			var content;
 			if (apps == null || apps.length === 0) {
 				header = null;
 				content = '<p>Sorry, there is no application available for you.</p>';
 			} else {
-				content = '<div class="row">';
+				content = '<div class="l-selector-container">';
 				for ( var i in apps) {
 					var app = apps[i];
-					content += '<div class="col-xs-4 col-sm-3 col-md-2"><div class="thumbnail" style="max-width: 155px" onclick="window.location.href = \''
+					content += '<div class="c-selector-button"><div class="c-selector-button-thumb" onclick="window.location.href = \''
 							+ app.url
-							+ '\';"><img src="' + getImageString(app.base64Icon) + '" class="img-thumbnail"/><div class="caption">' + app.name + '</div></div></div>';
+							+ '\';"><img src="' + getImageString(app.base64Icon) + '" class="c-selector-button-thumb-img"/><div class="c-selector-button-caption">' + app.name + '</div></div></div>';
 				}
+				content += '</div>';
 			}
 			$('#webswing-content').html(content);
 		}

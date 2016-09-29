@@ -142,3 +142,26 @@
     top: 15px;
     left: 57px;
 }
+
+
+.c-selector-button{
+	width: 27%;
+	margin-left: 3%;
+	margin-right: 3%;
+	background: none;
+    border: 1px solid;
+    border-color: $light-grey-4;
+    border-radius: 3px;
+ 
+}
+
+.c-selector-button-thumb{
+	max-width: 150px;
+}
+
+.c-selector-button-thumb-img{
+}
+
+.c-selector-button-caption{
+	word-wrap: break-word;
+}

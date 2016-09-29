@@ -2,6 +2,9 @@
 
 @charset 'UTF-8';
 
+@import 'susy/sass/susy';  //Susy grid framework
+@import 'fonts/font-awesome'; //fonts
+
 // Utilities
 @import '_utilities/_normalize';
 @import '_utilities/_mixins';
@@ -9,7 +12,6 @@
 // Document-wide base styles
 @import '_base/_config'; // Variables for typography; colors; etc
 @import '_base/_base';   // Sets all initial styles after the reset
-@import 'susy/sass/susy';  //Susy grid framework
 @import '_base/_grid';   // Susy grid framework
 
 // Layouts

@@ -30,14 +30,14 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 		};
 
 		var currentContent;
-		var dialog, content, header, backdrop, spinner;
+		var dialog, content, header, backdrop, spinnerTimer;
 
 		function configuration() {
 			return {
 				readyDialog : messageDialog('Ready to start your session'),
-				initializingDialog : messageDialog('Your session is being initialized'),
-				startingDialog : messageDialog('Starting your application'),
-				connectingDialog : messageDialog('Connecting to the server'),
+				initializingDialog : messageDialog('Your session is being initialized', true),
+				startingDialog : messageDialog('Starting your application', true),
+				connectingDialog : messageDialog('Connecting to the server', true),
 				unauthorizedAccess : messageDialog('Unable to authorize your request'),
 				applicationAlreadyRunning : retryMessageDialog('There is already a session in progress in another window.'),
 				sessionStolenNotification : retryMessageDialog('A new session was started in another window. This session has been closed.'),
@@ -63,9 +63,13 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			};
 		}
 
-		function messageDialog(msg) {
+		function messageDialog(msg, withSpinner) {
+			var content = '<p>' + msg + '</p>';
+			if (withSpinner) {
+				content = '<div class="c-spinner"><div class="c-spinner__dot-1"></div> <div class="c-spinner__dot-2"></div></div>' + content;
+			}
 			return {
-				content : '<p>' + msg + '</p>'
+				content : content
 			};
 		}
 
@@ -109,14 +113,14 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			dialog = api.cfg.rootElement.find('div[data-id="commonDialog"]');
 			content = dialog.find('div[data-id="content"]');
 			header = dialog.find('div[data-id="header"]');
-			spinner = $('<div class="c-spinner"><div class="c-spinner__dot-1"></div> <div class="c-spinner__dot-2"></div></div>');
 			$(document).ajaxStart(function() {
-				if (dialog.is(":visible")){
-					$('#ajaxProgress').show();
-					$('#ajaxProgress').append(spinner.clone(true));
-				}
+				spinnerTimer = setTimeout(function() {
+					if (dialog.is(":visible")) {
+						$('#ajaxProgress').slideDown('fast');
+					}
+				}, 200);
 			}).ajaxComplete(function() {
-				$('#ajaxProgress').html('');
+				clearTimeout(spinnerTimer);
 				$('#ajaxProgress').hide();
 			});
 		}
@@ -175,17 +179,5 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			return currentContent;
 		}
 
-
-
-		$.fn.extend({
-			animateCss: function (animationName) {
-				var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-				this.addClass('u-animated ' + animationName).one(animationEnd, function() {
-					$(this).removeClass('u-animated ' + animationName);
-				});
-			}
-		});
-
 	};
 });
-
