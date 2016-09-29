@@ -1,7 +1,7 @@
 .c-spinner {
     @include rem('width', 40px);
     @include rem('height', 40px);
-    @include rem('margin', 100px auto);
+    @include rem('margin', 10px auto);
 
     position: relative;
 
@@ -11,8 +11,7 @@
             animation: sk-rotate 2.0s infinite linear;
 }
 
-.c-spinner__dot-1,
-.c-spinner__dot-2 {
+.c-spinner__dot-1 {
     position: absolute;
     top: 0;
 
@@ -26,7 +25,8 @@
             animation: sk-bounce 2.0s infinite ease-in-out;
 }
 
-.c-spinner__dot2 {
+.c-spinner__dot-2 {
+	@extend .c-spinner__dot-1;
     top: auto;
     bottom: 0;
 

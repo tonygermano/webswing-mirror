@@ -5,11 +5,11 @@
 // Utilities
 @import '_utilities/_normalize';
 @import '_utilities/_mixins';
-@import '_utilities/_utility';
 
 // Document-wide base styles
 @import '_base/_config'; // Variables for typography; colors; etc
 @import '_base/_base';   // Sets all initial styles after the reset
+@import 'susy/sass/susy';  //Susy grid framework
 @import '_base/_grid';   // Susy grid framework
 
 // Layouts
@@ -22,4 +22,6 @@
 @import '_components/_media';
 @import '_components/_modals';
 @import '_components/_progressbar';
+
+@import '_utilities/_utility';
 

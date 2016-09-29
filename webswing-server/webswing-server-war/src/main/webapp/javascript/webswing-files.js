@@ -35,7 +35,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 		function process(event) {
 			if (event.eventType === 'AutoUpload') {
 				autoUpload(event, api.cfg.clientId);
-			}else if (event.eventType === 'AutoSave') {
+			} else if (event.eventType === 'AutoSave') {
 				autoSave(event, api.cfg.clientId);
 			} else if (event.eventType === 'Open') {
 				open(event, api.cfg.clientId);
@@ -54,8 +54,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			autoUploadfileDialogTransferBarClientId.val(clientId);
 			autoFileInput.prop("multiple", data.isMultiSelection);
 			autoFileInput.attr("accept", data.filter);
-			setup
-			open(data, clientId);
+			animateShow(autoUploadBar);
 		}
 
 		function autoSave(data, clientId) {
@@ -66,7 +65,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				api.cfg.rootElement.append(autoSaveBar);
 			}
 			autoSaveInput.val(data.selection);
-			autoSaveBar.show("fast");
+			animateShow(autoSaveBar);
 		}
 
 		function open(data, clientId) {
@@ -85,10 +84,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			fileInput.prop("multiple", data.isMultiSelection);
 			fileInput.attr("accept", data.filter);
 			setProgressBarVisible(false);
-			autoUploadBar.show().animate({
-				"top":"0px",
-				"opacity":"1"
-			}, 200);
+			animateShow(uploadBar);
 		}
 
 		function close() {
@@ -108,27 +104,28 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				autoSaveBar.hide("fast");
 				autoSaveBar.detach();
 			}
-
 		}
 
 		function setup() {
 			api.cfg.rootElement.append(html);
+
 			uploadBar = api.cfg.rootElement.find('div[data-id="uploadBar"]');
 			fileDialogTransferBarClientId = uploadBar.find('input[data-id="fileDialogTransferBarClientId"]');
-			fileDialogErrorMessage = uploadBar.find('div[data-id="fileDialogErrorMessage"]');
-			fileDialogErrorMessageContent = uploadBar.find('div[data-id="fileDialogErrorMessageContent"]');
 			deleteSelectedButton = uploadBar.find('button[data-id="deleteSelectedButton"]');
 			downloadSelectedButton = uploadBar.find('button[data-id="downloadSelectedButton"]');
 			dropZone = uploadBar.find('div[data-id="fileDropArea"]');
 			fileUpload = uploadBar.find('form[data-id="fileupload"]');
-			uploadProgressBar = uploadBar.find('div[data-id="fileDialogTransferProgressBar"]');
-			uploadProgress = uploadBar.find('div[data-id="progress"] .js-progress__bar');
 			cancelBtn = uploadBar.find('div[data-id="cancelBtn"]');
 			downloadBtn = uploadBar.find('div[data-id="fileDownloadBtn"]');
 			uploadBtn = uploadBar.find('div[data-id="fileUploadBtn"]');
 			deleteBtn = uploadBar.find('div[data-id="fileDeleteBtn"]');
 			fileInput = uploadBar.find('input[data-id="fileInput"]');
 
+			uploadProgressBar = api.cfg.rootElement.find('div[data-id="fileDialogTransferProgressBar"]');
+			uploadProgress = api.cfg.rootElement.find('div[data-id="progress"] .js-progress__bar');
+			fileDialogErrorMessage = api.cfg.rootElement.find('div[data-id="fileDialogErrorMessage"]');
+			fileDialogErrorMessageContent = api.cfg.rootElement.find('div[data-id="fileDialogErrorMessageContent"]');
+			
 			autoUploadBar = api.cfg.rootElement.find('div[data-id="autoUploadBar"]');
 			autoFileupload = autoUploadBar.find('form[data-id="autoFileupload"]');
 			cancelAutoUploadButton = autoUploadBar.find('button[data-id="cancelAutoUploadButton"]');
@@ -139,6 +136,15 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			autoSaveInput = autoSaveBar.find('input[data-id="autoSaveInput"]');
 			autoSaveButton = autoSaveBar.find('button[data-id="autoSaveButton"]');
 			cancelAutoSaveButton = autoSaveBar.find('button[data-id="cancelAutoSaveButton"]');
+
+			// hide all
+			uploadProgressBar.hide();
+			autoUploadBar.hide();
+			autoUploadBar.detach();
+			autoSaveBar.hide();
+			autoSaveBar.detach();
+			uploadBar.hide();
+			uploadBar.detach();
 
 			var autoJqUpload = autoFileupload.fileupload({
 				xhrFields : {
@@ -172,12 +178,10 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			}
 
 			function fileuploadfail(e, data) {
+				setProgressBarVisible(false);
 				if (!errorTimeout) {
 					fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
-					fileDialogErrorMessage.show().animate({
-						"top":"0px",
-						"opacity":"1"
-					}, 200);
+					animateShow(fileDialogErrorMessage);
 				} else {
 					fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
 					clearTimeout(errorTimeout);
@@ -193,61 +197,44 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 					if (closeAfterErrorTimeout) {
 						close();
 					}
-				}, 5000);
+				}, 7000);
 			}
 
-// Changes the looks of the progress bar based on the percentage of data loaded
+			// Changes the looks of the progress bar based on the percentage of
+			// data loaded
 			function fileuploadprogressall(e, data) {
-				var progress = parseInt(data.loaded / data.total * 100, 10),
-					$jsProgress = $(".js-progress"),
-					$jsProgressBar = $(".js-progress__bar"),
-					$jsProgressText = $(".js-progress__text"),
-					resetColors,
-					orange = 30,
-					yellow = 55,
-					green = 85;
-
-				// Resets the progress bar colors by removing the classes
-				resetColors = function() {
-					$jsProgressBar
-						.removeClass("js-progress__bar--part-1")
-						.removeClass("js-progress__bar--part-2")
-						.removeClass("js-progress__bar--part-3")
-						.removeClass("js-progress__bar--done");
-					$jsProgress
-						.removeClass("progress--complete");
-				};
+				var progress = parseInt(data.loaded / data.total * 100, 10);
+				var $jsProgressBar = $(".js-progress__bar");
+				var $jsProgressText = $(".js-progress__text");
 				$jsProgressBar.css('width', progress + '%');
-				$jsProgressText.find("em").text( progress + "%" );
-				$jsProgressBar.addClass("js-progress__bar--active");
-				if (progress >= green) {
-					$jsProgressBar.addClass("js-progress__bar--part-3");
-				}
-				else if (progress >= yellow) {
-					$jsProgressBar.addClass("js-progress__bar--part-2");
-				}
-				else if (progress >= orange) {
-					$jsProgressBar.addClass("js-progress__bar--part-1");
-				}
-				else if (progress === 100) {
-					$jsProgress.addClass("js-progress--complete");
-					$jsProgressBar.addClass("js-progress__bar--done");
+				$jsProgressText.find("em").text(progress + "%");
+				if (progress === 100) {
 					$jsProgressText.find("em").text("Complete");
-					setTimeout(function () {
+					setTimeout(function() {
 						filesSelected(doneFileList);
 						doneFileList = [];
+						setProgressBarVisible(false);
 					}, 1000);
-					setProgressBarVisible(false);
 					jqXHR_fileupload = [];
-					resetColors();
-				};
+				}
 			}
-			
+
 			function cancelFileSelection(e) {
 				sendMessageEvent('cancelFileSelection');
+				cancelUpload();
 			}
+
+			function cancelUpload() {
+				filesSelected([]);
+				jqXHR_fileupload.forEach(function(el) {
+					el.abort();
+				});
+				setProgressBarVisible(false);
+			}
+
 			cancelAutoSaveButton.bind('click', cancelFileSelection);
 			cancelAutoUploadButton.bind('click', cancelFileSelection);
+			cancelBtn.bind('click', cancelUpload);
 
 			deleteSelectedButton.bind('click', function(e) {
 				sendMessageEvent('deleteFile');
@@ -263,7 +250,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 
 			autoSaveButton.bind('click', function(e) {
 				var fileString = autoSaveInput.val();
-				filesSelected([fileString]);
+				filesSelected([ fileString ]);
 			});
 
 			api.cfg.rootElement.bind('dragover', function(e) {
@@ -279,38 +266,37 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				}, 100);
 			});
 
-			cancelBtn.click(function() {
-				filesSelected([]);
-				jqXHR_fileupload.forEach(function(el) {
-					el.abort();
-				});
-				setProgressBarVisible(false);
-			});
-
 			uploadBar.detach();
 			autoUploadBar.detach();
 		}
 
+		function animateShow(element) {
+			element.show().animate({
+				"top" : "0px",
+				"opacity" : "1"
+			}, 200);
+		}
+		function animateHide(element) {
+			element.animate({
+				"top" : "50px",
+				"opacity" : "0"
+			}, 200).hide();
+		}
+
 		function showOrHide(element, bool) {
 			if (bool) {
-				element.show().animate({
-					"top":"0px",
-					"opacity":"1"
-				}, 200);
+				animateShow(element);
 			} else {
-				element.animate({
-					"top":"50px",
-					"opacity":"0"
-				}, 200).hide();
+				animateHide(element);
 			}
 		}
 
 		function setProgressBarVisible(bool) {
 			if (bool) {
 				uploadProgress.css('width', '0%');
-				uploadProgressBar.fadeIn( 200 );
+				uploadProgressBar.fadeIn(200);
 			} else {
-				uploadProgressBar.fadeOut( 200 );
+				uploadProgressBar.fadeOut(200);
 				uploadProgress.css('width', '0%');
 			}
 		}

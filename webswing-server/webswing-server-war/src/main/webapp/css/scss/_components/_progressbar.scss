@@ -43,13 +43,12 @@
     }
 
     &__bar {
-        @include innerColor($danger);
+        @include innerColor($success);
         @include border-radius(3px);
 
         position: relative;
-
+        opacity: 1;
         display: block;
-        opacity: 0;
         width: 0;
         height: 100%;
         background-repeat: no-repeat, no-repeat, no-repeat;
@@ -67,26 +66,6 @@
         background-color 1s ease,
         border-color 0.3s ease,
         box-shadow 1s ease;
-
-        &--active {
-            opacity: 1;
-        }
-
-        &--part-1 {
-            @include innerColor($notice);
-        }
-
-        &--part-2 {
-            @include innerColor($warning);
-        }
-
-        &--part-3 {
-            @include innerColor($success);
-        }
-
-        &--done {
-            @include innerColor($neutral);
-        }
 
         &:before,
         &:after {
@@ -118,19 +97,6 @@
             rgba(255,255,255,0.3) 75%,
             rgba(255,255,255,0) 100%
             );
-        }
-    }
-
-    &--complete {
-        .progress__bar {
-            border-radius: 2px;
-
-            animation: none;
-
-            &:after,
-            &:before {
-                opacity: 0;
-            }
         }
     }
 }
