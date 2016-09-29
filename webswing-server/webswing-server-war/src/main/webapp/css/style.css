@@ -920,13 +920,18 @@ video {
   padding: 20px;
   padding: 1.25rem;
 }
-.c-modal__message--error {
+.c-modal__message {
   margin-top: 15px;
   margin-top: 0.9375rem;
   margin-bottom: 15px;
   margin-bottom: 0.9375rem;
-  color: #d62020;
   font-size: 0.9375rem;
+}
+.c-modal__message--error {
+  color: #d62020;
+}
+.c-modal__message--error {
+  color: #6bb21a;
 }
 
 .js-progress {

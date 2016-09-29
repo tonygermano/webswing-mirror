@@ -63,12 +63,16 @@
 
     // Modal error messages
     &__message {
+        @include rem('margin-top', 15px);
+        @include rem('margin-bottom', 15px);
+        font-size: $small;
+        
         &--error {
-            @include rem('margin-top', 15px);
-            @include rem('margin-bottom', 15px);
-
             color: $danger;
-            font-size: $small;
+        }
+        
+        &--error {
+            color: $success;
         }
     }
 }
