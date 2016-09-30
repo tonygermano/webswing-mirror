@@ -2,10 +2,12 @@
 
 @charset 'UTF-8';
 
+@import 'susy/sass/susy';  //Susy grid framework
+@import 'fonts/font-awesome'; //fonts
+
 // Utilities
 @import '_utilities/_normalize';
 @import '_utilities/_mixins';
-@import '_utilities/_utility';
 
 // Document-wide base styles
 @import '_base/_config'; // Variables for typography; colors; etc
@@ -22,4 +24,6 @@
 @import '_components/_media';
 @import '_components/_modals';
 @import '_components/_progressbar';
+
+@import '_utilities/_utility';
 

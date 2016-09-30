@@ -425,7 +425,7 @@ public class WebEventDispatcher {
 			FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fc);
 			boolean saveMode = FileDialogEventType.AutoSave == fileChooserEventType;
 			fc.rescanCurrentDirectory();
-			if (event.getFiles().size() > 0) {
+			if (event.getFiles()!=null && event.getFiles().size() > 0) {
 				if (fc.isMultiSelectionEnabled()) {
 					List<File> arr = new ArrayList<File>();
 					for (int i = 0; i < event.getFiles().size(); i++) {

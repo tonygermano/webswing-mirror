@@ -59,11 +59,23 @@ $baseline-px: 16px;
     $rem-values: ();
     @each $value in $px-values {
       // If the value is zero or not a number, return it
-      @if $value == 0 or type-of( $value ) != "number" {
+      @if is-equal( $value , 0 ) or type-of( $value ) != "number" {
         $rem-values: append($rem-values, $value); }
       @else {
         $rem-values: append($rem-values, $value / $baseline-rem); } }
     // Return the property and its list of converted values
     #{$property}: $rem-values;
+  }
+}
+
+@function is-equal($one, $two) {
+  @if type-of($one) == number and type-of($two) == number {
+    @if unit($one) == unit($two) {
+      @return $one == $two;
+    } @else {
+      @return false;
+    }
+  } @else {
+    @return $one == $two;
   }
 }
