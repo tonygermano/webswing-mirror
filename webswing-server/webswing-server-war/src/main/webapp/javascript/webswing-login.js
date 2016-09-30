@@ -8,7 +8,8 @@ define([ 'jquery' ], function amdFactory($) {
 			start : 'webswing.start',
 			disconnect : 'webswing.disconnect',
 			showDialog : 'dialog.show',
-			unauthorizedAccessMessage : 'dialog.content.unauthorizedAccess'
+			unauthorizedAccessMessage : 'dialog.content.unauthorizedAccess',
+			emptyMessage : 'dialog.content.emptyMessage'
 		};
 		module.provides = {
 			login : login,
@@ -24,7 +25,7 @@ define([ 'jquery' ], function amdFactory($) {
 				successUrl : window.top.location.href
 			};
 			var dialogContent = function(){
-				return api.showDialog(api.unauthorizedAccessMessage);
+				return api.showDialog(api.emptyMessage);
 			}
 			webswingLogin(api.cfg.connectionUrl, dialogContent, loginData, function(data, request) {
 				user = request.getResponseHeader('webswingUsername');
@@ -35,7 +36,7 @@ define([ 'jquery' ], function amdFactory($) {
 		}
 
 		function logout() {
-			var dialogContent = api.showDialog(api.unauthorizedAccessMessage);
+			var dialogContent = api.showDialog(api.emptyMessage);
 			webswingLogout(api.cfg.connectionUrl, dialogContent, function done(data) {
 				api.disconnect();
 				api.start();
