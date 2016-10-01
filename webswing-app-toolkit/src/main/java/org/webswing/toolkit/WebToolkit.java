@@ -82,7 +82,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.JPanel;
-import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
@@ -91,7 +90,6 @@ import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingApiProvider;
-import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
@@ -115,8 +113,6 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	private WindowManager windowManager = WindowManager.getInstance();
 
 	public void init() {
-		RepaintManager.setCurrentManager(new WebRepaintManager(RepaintManager.currentManager(null)));
-
 		try {
 			if (!System.getProperty("os.name", "").startsWith("Windows") && !System.getProperty("os.name", "").startsWith("Mac")) {
 				Class<?> c = ClassLoader.getSystemClassLoader().loadClass("sun.awt.X11GraphicsEnvironment");

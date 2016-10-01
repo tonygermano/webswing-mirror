@@ -8,12 +8,13 @@ define([ 'jquery' ], function amdFactory($) {
 			start : 'webswing.start',
 			disconnect : 'webswing.disconnect',
 			showDialog : 'dialog.show',
-			unauthorizedAccessMessage : 'dialog.content.unauthorizedAccess',
+			logingOut : 'dialog.content.logingOut',
 			emptyMessage : 'dialog.content.emptyMessage'
 		};
 		module.provides = {
 			login : login,
 			logout : logout,
+			touchSession : touchSession,
 			user : getUser
 		};
 
@@ -36,7 +37,7 @@ define([ 'jquery' ], function amdFactory($) {
 		}
 
 		function logout() {
-			var dialogContent = api.showDialog(api.emptyMessage);
+			var dialogContent = api.showDialog(api.logingOut);
 			webswingLogout(api.cfg.connectionUrl, dialogContent, function done(data) {
 				api.disconnect();
 				api.start();
@@ -81,6 +82,8 @@ define([ 'jquery' ], function amdFactory($) {
 						} else {
 							loginMsg.partialHtml = "<p>Oops, something's not right</p>";
 						}
+					}else{
+						loginMsg.partialHtml = "<p>Sorry, server is not available.</p>";
 					}
 				}
 			});
@@ -109,10 +112,18 @@ define([ 'jquery' ], function amdFactory($) {
 					} else {
 						doneCallback();
 					}
+				}else{
+					element.html('<p>Sorry, server is not available.</p>');
 				}
 			});
 		}
 
+		function touchSession() {
+			$.ajax({
+				url : baseUrl + 'login',
+			});
+		}
+		
 		function getUser() {
 			return user;
 		}

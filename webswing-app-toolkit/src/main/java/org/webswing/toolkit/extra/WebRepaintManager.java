@@ -8,7 +8,6 @@ import java.awt.Image;
 import java.awt.Panel;
 import java.awt.Rectangle;
 import java.awt.Window;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +15,6 @@ import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
 
 public class WebRepaintManager extends RepaintManager {
@@ -79,6 +77,19 @@ public class WebRepaintManager extends RepaintManager {
 		synchronized (delegate) {
 			dirty.remove(component);
 		}
+	}
+
+	public static void processDirtyComponents() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if (RepaintManager.currentManager(null) instanceof WebRepaintManager) {
+					((WebRepaintManager) RepaintManager.currentManager(null)).process();
+				} else {
+					RepaintManager.setCurrentManager(new WebRepaintManager(RepaintManager.currentManager(null)));
+				}
+			}
+		});
 	}
 
 	public void process() {

@@ -35,6 +35,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 		function configuration() {
 			return {
 				emptyMessage : messageDialog('',true),
+				logingOut : messageDialog('Signing out'),
 				readyDialog : messageDialog('Ready to start your session'),
 				initializingDialog : messageDialog('Your session is being initialized', true),
 				startingDialog : messageDialog('Starting your application', true),
