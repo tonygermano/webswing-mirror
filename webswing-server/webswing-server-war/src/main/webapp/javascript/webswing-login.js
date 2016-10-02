@@ -120,7 +120,7 @@ define([ 'jquery' ], function amdFactory($) {
 
 		function touchSession() {
 			$.ajax({
-				url : baseUrl + 'login',
+				url : api.cfg.connectionUrl + 'login',
 			});
 		}
 		

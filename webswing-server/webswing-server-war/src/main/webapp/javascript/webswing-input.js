@@ -121,6 +121,8 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                     mousePos.mouse.wheelDelta += latestMouseWheelEvent.mouse.wheelDelta;
                 }
                 latestMouseWheelEvent = mousePos;
+                evt.preventDefault();
+                evt.stopPropagation();
                 return false;
             }, false);
             // firefox
@@ -131,6 +133,8 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                     mousePos.mouse.wheelDelta += latestMouseWheelEvent.mouse.wheelDelta;
                 }
                 latestMouseWheelEvent = mousePos;
+                evt.preventDefault();
+                evt.stopPropagation();
                 return false;
             }, false);
             util.bindEvent(canvas, 'contextmenu', function(event) {
