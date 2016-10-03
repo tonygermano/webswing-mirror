@@ -1,32 +1,32 @@
-<div data-id="autoSaveBar" class="l-modal-container l-modal-container--upload" >
-	<div class="c-modal c-modal--upload">
-		<div class="c-modal__body">
-			<div class="c-modal__header c-modal__header--upload">
-				<h2 class="c-modal__title c-modal__title--upload">Save file</h2>
+<div data-id="autoSaveBar" class="l-modal-container" >
+	<div class="c-files-modal">
+		<div class="">
+			<div class="c-files-modal__header">
+				<h2 class="c-files-modal__header-title">Save file</h2>
 			</div>
 
-			<div class="c-modal__content">
-				<p class="c-modal__instructions c-modal__instructions--upload">
+			<div class="c-files-modal__content">
+				<p class="c-files-modal__content-instructions">
 					Please enter a name for the file.
 				</p>
 
-				<div class="c-form__save-file">
+				<div class="">
 					<input data-id="autoSaveInput" class="c-form-field" placeholder="File name" type="text">
 				</div>
 
-				<ul class="l-button-grid">
-					<li class="l-button-grid__item l-button-grid__item--first">
-						<div class="c-upload-button">
-							<button data-id="autoSaveButton" class="c-upload-button__cancel">
-								<img src="../img/icon-save.png" class="c-button-grid-icon"/>
+				<ul class="c-file-button-container">
+					<li class="c-file-button-container__item">
+						<div class="c-file-button">
+							<button data-id="autoSaveButton" class="c-file-button__icon">
+								<img src="../img/icon-save.png"/>
 								<span>Save</span>
 							</button>
 						</div>
 					</li>
-					<li class="l-button-grid__item">
-						<div class="c-upload-button">
-							<button data-id="cancelAutoSaveButton" class="c-upload-button__cancel">
-								<img src="../img/icon-cancel.png" class="c-button-grid-icon"/>
+					<li class="c-file-button-container__item--last">
+						<div class="c-file-button">
+							<button data-id="cancelAutoSaveButton" class="c-file-button__icon">
+								<img src="../img/icon-cancel.png"/>
 								<span>Cancel</span>
 							</button>
 						</div>
@@ -36,15 +36,16 @@
 		</div>
 	</div>
 </div>
-<div data-id="autoUploadBar" class="l-modal-container l-modal-container--upload">
-	<div  class="c-modal c-modal--upload">
-		<div class="c-modal__body">
-			<div class="c-modal__header c-modal__header--upload">
-				<h2 class="c-modal__title c-modal__title--upload">Open file</h2>
+
+<div data-id="autoUploadBar" class="l-modal-container">
+	<div  class="c-files-modal">
+		<div class="">
+			<div class="c-files-modal__header">
+				<h2 class="c-files-modal__header-title">Open file</h2>
 			</div>
 
-			<div class="c-modal__content">
-				<p class="c-modal__instructions c-modal__instructions--upload">
+			<div class="c-files-modal__content">
+				<p class="c-files-modal__content-instructions">
 					Please select a file to import.
 				</p>
 
@@ -60,29 +61,28 @@
 					<div data-id="fileDialogErrorMessageContent" class="c-modal__message c-modal__message--error"></div>
 				</div>
 
-				<ul class="l-button-grid">
-					<li class="l-button-grid__item l-button-grid__item--first">
-						<div class="c-upload-button">
-							<form data-id="autoFileupload" class="c-form">
+				<ul class="c-file-button-container">
+					<li class="c-file-button-container__item">
+							<form data-id="autoFileupload" class="">
 								<input data-id="autoUploadfileDialogTransferBarClientId" name="clientId" type="hidden">
+
 								<input data-id="autoFileInput" id="webswingUploadBrowse" name="files[]" accept=""
-								       type="file" class=" c-upload-button__browse-hidden"/>
-								<label for="webswingUploadBrowse" class="c-upload-button__browse-overlay">
-									<img src="../img/icon-import.png" class="c-button-grid-icon"/>
+								       type="file" class="c-file-button--is-hidden"/>
+
+								<label for="webswingUploadBrowse" class="c-file-button">
+									<img src="../img/icon-import.png" class="c-file-button__icon"/>
 									<span>Browse</span>
 								</label>
+
 							</form>
-						</div>
 					</li>
 
-					<li class="l-button-grid__item">
-						<div class="c-upload-button">
+					<li class="c-file-button-container__item--last">
 
-							<button data-id="cancelAutoUploadButton" class="c-upload-button__cancel"><img
-									src="../img/icon-cancel.png" class="c-button-grid-icon"/>
+							<button data-id="cancelAutoUploadButton" class="c-file-button"><img
+									src="../img/icon-cancel.png" class="c-file-button__icon"/>
 								<span>Cancel</span></button>
 
-						</div>
 					</li>
 				</ul>
 

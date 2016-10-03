@@ -1,29 +1,40 @@
-// Main file that imports all partials
+/*
+ * Project: Webswing server style v2.0.1
+ * Author: Stephen Niemans - github.com/stephenniemans/webswing-server-styles
+ *
+ * Filename: style.scss
+ * Original author: Stephen Niemans (30-9-2016)
+ * Last modified by: Stephen Niemans (30-9-2016)
+ *
+ * Description:
+ * 1. Imports all SASS Partials
+ * 2. Compiles into style.css stylesheet in Webswing's "webapp/css" folder
+ * 3. Also refers to "webapp/fonts" and "webapp/img"
+ */
 
 @charset 'UTF-8';
 
-@import 'susy/sass/susy';  //Susy grid framework
-@import 'fonts/font-awesome'; //fonts
+/* _utilities: Mixins, variables, and third party code */
+@import '_utilities/_normalize';  // Normalize.css, makes default styles more predictable
+@import '_utilities/_mixins';     // SASS mixins, mostly for convenience
+@import '_utilities/_fonts';      // Declares font families
+@import '_utilities/_utility';    // Custom utility classes for Webswing
 
-// Utilities
-@import '_utilities/_normalize';
-@import '_utilities/_mixins';
 
-// Document-wide base styles
-@import '_base/_config'; // Variables for typography; colors; etc
-@import '_base/_base';   // Sets all initial styles after the reset
-@import '_base/_grid';   // Susy grid framework
+/* _base: Document-wide base styles */
+@import '_base/_config';  // Variables for typography, colors, etc
+@import '_base/_base';   // Sets all HTML element styles after the reset
 
-// Layouts
-@import '_layouts/_containers';
 
-// Components
-@import '_components/_animations';
-@import '_components/_buttons';
-@import '_components/_forms';
-@import '_components/_media';
-@import '_components/_modals';
-@import '_components/_progressbar';
+/* _layouts: Containers to hold components as required */
+@import '_layouts/_containers';  // Containers that hold the other elements
 
-@import '_utilities/_utility';
-
+/* _components: Various components that make up the application */
+@import '_components/_buttons';             // Button styles
+@import '_components/_forms';               // Form fields etc
+@import '_components/_modals';              // Modal base styling
+@import '_components/_modals/_dialog';     // Modal base styling
+@import '_components/_modals/_files';      // Modal base styling
+@import '_components/_modals/_login';      // Modal base styling
+@import '_components/_progress-bar';         // A progress bar for file up- and downloads
+@import '_components/_spinner';             // CSS loading animation

@@ -1,0 +1,116 @@
+/**
+ * Filename: _files.scss
+ * Original author: Stephen Niemans (30-9-2016)
+ * Last modified by: Stephen Niemans (30-9-2016)
+ *
+ * Description: File save/upload modal component. Default modal styles found in scss/modals.scss
+ * Related files: upload.html, webswing-files.js
+ */
+
+.c-files-modal {
+    @include modal;
+    // No padding to accomodate the button style. Other elements adjusted accordingly.
+    @include rem('padding', 0px);
+
+    &__header {
+        @include modal__header;
+        @include rem('padding', 10px 0px);
+        @include rem('margin', 0px);
+        @include border-radius(3px 3px 0 0);
+
+        background-color: $secondary;
+
+        &-title {
+            @include modal__header-title;
+            color: $white;
+        }
+    }
+
+    &__content {
+        @include rem('margin', 0px);
+
+        &-instructions {
+            @include modal__content-instructions;
+            @include rem('padding', 20px);
+
+            margin: 0;
+        }
+
+        &-message {
+            @include modal__content-message;
+            @include rem('padding', 20px);
+        }
+    }
+}
+
+// Upload dialog buttons
+.c-file-button-container {
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid #eeeeee;
+
+    list-style: none;
+
+    &__item {
+        @include rem('height', 100px);
+        @include rem('padding', 5px);
+
+        float: left;
+        width: 50%;
+        border-right: 1px solid $light-grey-2;
+
+        text-align: center;
+
+        &--last {
+            @include rem('height', 100px);
+            @include rem('padding', 5px);
+
+            float: left;
+            width: 50%;
+            border: none;
+
+            text-align: center;
+        }
+    }
+}
+
+.c-file-button {
+    @include rem('height', 90px);
+    @include rem('padding', 55px 0px 14px 0px);
+    @include border-radius(2px);
+
+
+    position: relative;
+    width: 100%;
+
+    display: block;
+    background: none;
+    border: 0;
+
+    color: $secondary-text;
+    font-size: $small;
+    font-weight: normal;
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: $light-grey-1;
+    }
+
+    &__icon {
+        position: absolute;
+        top: 15px;
+        left: 57px;
+    }
+
+    // Used to hide the default file input as it cannot be styled normally
+    &--is-hidden {
+        position: absolute;
+        z-index: -1;
+
+        opacity: 0;
+        overflow: hidden;
+        width: 0.1px;
+        height: 0.1px;
+    }
+}

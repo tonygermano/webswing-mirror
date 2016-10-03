@@ -1,0 +1,32 @@
+/**
+ * Filename: _dialog.scss
+ * Original author: Stephen Niemans (30-9-2016)
+ * Last modified by: Stephen Niemans (30-9-2016)
+ *
+ * Description: Dialog modal component. Default modal styles found in scss/modals.scss
+ */
+
+.c-dialog-modal {
+    @include modal;
+
+    &__header {
+        @include modal__header;
+
+        &-title {
+            @include modal__header-title;
+        }
+    }
+
+    &__content {
+        @include rem('padding-bottom', 20px);
+        @include rem('margin', 0px);
+
+        &-instructions {
+            @include modal__content-instructions;
+        }
+
+        &-message {
+            @include modal__content-message;
+        }
+    }
+}
