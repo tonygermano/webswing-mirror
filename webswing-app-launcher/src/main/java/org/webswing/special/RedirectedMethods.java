@@ -11,13 +11,10 @@ import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.attribute.AttributeSet;
 import javax.swing.JDesktopPane;
-import javax.swing.RepaintManager;
 
 import org.webswing.SwingMain;
 import org.webswing.toolkit.WebPrintService;
-import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Util;
 
 public class RedirectedMethods {
 
@@ -52,15 +49,6 @@ public class RedirectedMethods {
 
 	public static Enumeration<URL> getSystemResources(String name) throws IOException {
 		return SwingMain.swingLibClassLoader.getResources(name);
-	}
-
-	public static void setCurrentManager(RepaintManager manager) {
-		RepaintManager rm = RepaintManager.currentManager(null);
-		if (rm instanceof WebRepaintManager) {
-			((WebRepaintManager) rm).setDelegate(manager);
-		} else {
-			RepaintManager.setCurrentManager(new WebRepaintManager(manager));
-		}
 	}
 
 	@SuppressWarnings("restriction")

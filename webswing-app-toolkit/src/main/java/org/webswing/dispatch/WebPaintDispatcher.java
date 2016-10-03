@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
@@ -73,9 +72,7 @@ public class WebPaintDispatcher {
 					synchronized (Util.getWebToolkit().getTreeLock()) {
 						synchronized (webPaintLock) {
 							if (clientReadyToReceive) {
-								if (RepaintManager.currentManager(null) instanceof WebRepaintManager) {
-									((WebRepaintManager) RepaintManager.currentManager(null)).process();
-								}
+								WebRepaintManager.processDirtyComponents();
 								lastReadyStateTime = System.currentTimeMillis();
 							}
 							if ((areasToUpdate.size() == 0 && moveAction == null) || !clientReadyToReceive) {
