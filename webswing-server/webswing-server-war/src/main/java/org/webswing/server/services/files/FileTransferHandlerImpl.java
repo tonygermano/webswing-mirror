@@ -3,6 +3,7 @@ package org.webswing.server.services.files;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -169,9 +170,13 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 				throw new Exception("clientId not specified in request");
 			}
 		} catch (Exception e) {
-			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			resp.getWriter().write("Upload finished with error...");
-			log.error("Error while uploading file: " + e.getMessage(), e);
+			if (e.getCause() instanceof EOFException) {
+				log.warn("File upload canceled by user: " + e.getMessage());
+			} else {
+				resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				resp.getWriter().write("Upload finished with error...");
+				log.error("Error while uploading file: " + e.getMessage(), e);
+			}
 		}
 	}
 

@@ -16,6 +16,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
             getUser : 'login.user',
             login : 'login.login',
             logout : 'login.logout',
+            touchSession : 'login.touchSession',
             getIdentity : 'identity.get',
             disposeIdentity : 'identity.dispose',
             getLocale : 'identity.getLocale',
@@ -120,7 +121,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 
         function servletHeartbeat() {
         	//touch servlet session to avoid timeout
-        	api.login(function(){},function(){});
+        	api.touchSession();
         }
 
         function repaint() {

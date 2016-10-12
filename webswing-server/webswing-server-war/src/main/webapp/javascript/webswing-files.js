@@ -125,7 +125,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			uploadProgress = api.cfg.rootElement.find('div[data-id="progress"] .js-progress__bar');
 			fileDialogErrorMessage = api.cfg.rootElement.find('div[data-id="fileDialogErrorMessage"]');
 			fileDialogErrorMessageContent = api.cfg.rootElement.find('div[data-id="fileDialogErrorMessageContent"]');
-			
+
 			autoUploadBar = api.cfg.rootElement.find('div[data-id="autoUploadBar"]');
 			autoFileupload = autoUploadBar.find('form[data-id="autoFileupload"]');
 			cancelAutoUploadButton = autoUploadBar.find('button[data-id="cancelAutoUploadButton"]');
@@ -179,25 +179,27 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 
 			function fileuploadfail(e, data) {
 				setProgressBarVisible(false);
-				if (!errorTimeout) {
-					fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
-					animateShow(fileDialogErrorMessage);
-				} else {
-					fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
-					clearTimeout(errorTimeout);
-				}
-				data.files.forEach(function(file) {
-					var index = doneFileList.indexOf(file.name);
-					doneFileList.splice(index, 1);
-				});
-				errorTimeout = setTimeout(function() {
-					errorTimeout = null;
-					fileDialogErrorMessageContent.html("");
-					fileDialogErrorMessage.hide("fast");
-					if (closeAfterErrorTimeout) {
-						close();
+				if (data.jqXHR.statusText != 'abort') {
+					if (!errorTimeout) {
+						fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
+						animateShow(fileDialogErrorMessage);
+					} else {
+						fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
+						clearTimeout(errorTimeout);
 					}
-				}, 7000);
+					data.files.forEach(function(file) {
+						var index = doneFileList.indexOf(file.name);
+						doneFileList.splice(index, 1);
+					});
+					errorTimeout = setTimeout(function() {
+						errorTimeout = null;
+						fileDialogErrorMessageContent.html("");
+						fileDialogErrorMessage.hide("fast");
+						if (closeAfterErrorTimeout) {
+							close();
+						}
+					}, 7000);
+				}
 			}
 
 			// Changes the looks of the progress bar based on the percentage of
@@ -211,7 +213,9 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				if (progress === 100) {
 					$jsProgressText.find("em").text("Complete");
 					setTimeout(function() {
-						filesSelected(doneFileList);
+						if (!errorTimeout) {
+							filesSelected(doneFileList);
+						}
 						doneFileList = [];
 						setProgressBarVisible(false);
 					}, 1000);
@@ -266,8 +270,6 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				}, 100);
 			});
 
-			uploadBar.detach();
-			autoUploadBar.detach();
 		}
 
 		function animateShow(element) {
