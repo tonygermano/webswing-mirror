@@ -12,7 +12,7 @@ import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
-public interface SwingInstanceManager extends SecuredPathHandler,SwingInstanceHolder, UrlHandler {
+public interface SwingInstanceManager extends SecuredPathHandler, SwingInstanceHolder, UrlHandler {
 
 	File resolveFile(String name);
 
@@ -20,9 +20,9 @@ public interface SwingInstanceManager extends SecuredPathHandler,SwingInstanceHo
 
 	ApplicationInfoMsg getApplicationInfoMsg();
 
-	void notifySwingClose(SwingInstance swingAppInstance);
+	void connectView(ConnectionHandshakeMsgIn handshake, WebSocketConnection r);
 
-	void startSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h);
+	void notifySwingClose(SwingInstance swingAppInstance);
 
 	void logStatValue(String instance, String name, Number value);
 
@@ -30,12 +30,11 @@ public interface SwingInstanceManager extends SecuredPathHandler,SwingInstanceHo
 	 * @return Map<name_of_metric, Map<timestamp, value>>
 	 */
 	Map<String, Map<Long, Number>> getInstanceStats(String instance);
-	
+
 	/**
 	 * @return Map<name_of_metric, value>
 	 */
 	Map<String, Number> getInstanceMetrics(String clientId);
 
 	List<String> getInstanceWarnings(String instance);
-
 }

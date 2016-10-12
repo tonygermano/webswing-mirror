@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -49,7 +50,6 @@ import org.webswing.server.services.jvmconnection.JvmConnection;
 import org.webswing.server.services.jvmconnection.JvmConnectionService;
 import org.webswing.server.services.jvmconnection.JvmListener;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.stats.StatisticsLogger;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingprocess.ProcessExitListener;
@@ -120,11 +120,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	public void connectSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h) {
 		if (h.isMirrored()) {// connect as mirror viewer
-			if (r.hasPermission(WebswingAction.websocket_startMirrorView)) {
-				connectMirroredWebSession(r);
-			} else {
-				log.error("Authorization error: User " + r.getUser() + " is not authorized. [Mirrored view only available for admin role]");
-			}
+			connectMirroredWebSession(r);
 		} else {// continue old session?
 			if (h.getSessionId() != null && h.getSessionId().equals(getSessionId())) {
 				sendToSwing(r, h);

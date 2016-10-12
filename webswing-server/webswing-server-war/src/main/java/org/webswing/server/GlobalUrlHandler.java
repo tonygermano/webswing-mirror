@@ -19,7 +19,6 @@ import javax.ws.rs.PathParam;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
@@ -39,7 +38,6 @@ import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingmanager.SwingInstanceManagerService;
-import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
 
 import com.google.inject.Inject;
@@ -210,19 +208,6 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 	public ServletContext getServletContext() {
 		return servletContext;
-	}
-
-	@Override
-	public SwingInstance findByInstanceId(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
-		synchronized (instanceManagers) {
-			for (SwingInstanceManager im : instanceManagers.values()) {
-				SwingInstance instance;
-				if ((instance = im.findByInstanceId(handshake, r)) != null) {
-					return instance;
-				}
-			}
-		}
-		return null;
 	}
 
 	@Override

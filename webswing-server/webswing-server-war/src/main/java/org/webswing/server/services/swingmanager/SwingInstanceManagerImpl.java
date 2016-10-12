@@ -106,6 +106,31 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		}
 	}
 
+	@Override
+	public void connectView(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
+		try {
+			SwingInstance instance;
+			if (handshake.isMirrored()) {
+				checkPermissionLocalOrMaster(WebswingAction.websocket_startMirrorView);
+				instance = runningInstances.findByInstanceId(handshake.getClientId());
+			} else {
+				instance = runningInstances.findByInstanceId(handshake, r);
+			}
+			if (instance != null) {
+				instance.connectSwingInstance(r, handshake);
+			} else {
+				if (handshake.isMirrored()) {
+					throw new WsException("Instance not found!");
+				} else {
+					startSwingInstance(r, handshake);
+				}
+			}
+		} catch (WsException e) {
+			log.error("Failed to connect to instance. ",e);
+			r.broadcastMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
+		}
+	}
+
 	public void shutdown(String id, boolean force) {
 		SwingInstance si = runningInstances.findByClientId(id);
 		si.shutdown(force);
@@ -137,11 +162,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Override
 	public SwingInstance findInstanceByClientId(String clientId) {
 		return runningInstances.findByClientId(clientId);
-	}
-
-	@Override
-	public SwingInstance findByInstanceId(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
-		return runningInstances.findByInstanceId(handshake, r);
 	}
 
 	@Override
@@ -296,7 +316,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		if (id.startsWith("/")) {
 			id = id.substring(1);
 		}
-		SwingInstance instance = findInstanceByClientId(id);
+		SwingInstance instance = runningInstances.findByInstanceId(id);
 		if (instance != null) {
 			return instance.toSwingSession(true);
 		}

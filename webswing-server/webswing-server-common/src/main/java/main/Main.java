@@ -48,7 +48,7 @@ public class Main {
 			initTempDirPath(args);
 			populateClasspathFromDir("WEB-INF/server-lib", urls);
 		}
-		ClassLoader defaultCL = new URLClassLoader(urls.toArray(new URL[urls.size()]), null);
+		ClassLoader defaultCL = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
 		Thread.currentThread().setContextClassLoader(defaultCL);
 		Class<?> mainClass;
 		if (client) {

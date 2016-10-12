@@ -174,7 +174,7 @@ public class SwingClassloader extends URLClassLoader {
 
 	public SwingClassloader(URL[] classpath, ClassLoader parent) {
 		super(new URL[] {}, parent);
-		this.ignored_packages = new String[] { "java.", "javax.", "com.sun.", "sun.", "org.xml.sax.", "org.omg.CORBA.", "org.w3c.dom.", "org.webswing.special.", "org.webswing.model.", "org.webswing.toolkit.", "netscape.javascript." };
+		this.ignored_packages = new String[] { "java.", "javax.", "com.sun.", "javafx.", "sun.", "org.xml.sax.", "org.omg.CORBA.", "org.w3c.dom.", "org.webswing.special.", "org.webswing.model.", "org.webswing.toolkit.", "netscape.javascript." };
 		this.repoClassLoader = new URLClassLoader(classpath) {
 
 			@Override

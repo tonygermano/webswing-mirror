@@ -34,7 +34,7 @@ public interface WebswingSecurityConfig {
 	@ConfigFieldDiscriminator
 	public String getModule();
 
-	@ConfigField(label = "Secuirty Module Class Path",description="Additional classpath for built-in Security module or for defining custom security module. ")
+	@ConfigField(label = "Security Module Class Path",description="Additional classpath for built-in Security module or for defining custom security module. ")
 	@ConfigFieldVariables(VariableSetName.SwingApp)
 	@ConfigFieldDiscriminator
 	public List<String> getClassPath();

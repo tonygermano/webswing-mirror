@@ -11,10 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.MsgIn;
 import org.webswing.model.c2s.CopyEventMsgIn;
+import org.webswing.model.c2s.FilesSelectedEventMsgIn;
 import org.webswing.model.c2s.InputEventMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.c2s.PasteEventMsgIn;
-import org.webswing.model.c2s.FilesSelectedEventMsgIn;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.model.s2c.AppFrameMsgOut;
@@ -114,12 +114,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 					List<InputEventMsgIn> evts = frame.getEvents();
 					for (InputEventMsgIn evt : evts) {
 						if (evt.getHandshake() != null) {
-							SwingInstance existing = instanceManager.findByInstanceId(evt.getHandshake(), r);
-							if (existing != null) {
-								existing.connectSwingInstance(r, evt.getHandshake());
-							} else {
-								instanceManager.startSwingInstance(r, evt.getHandshake());
-							}
+							instanceManager.connectView(evt.getHandshake(), r);
 						} else if (evt.getKey() != null) {
 							send(r, evt.getKey());
 						} else if (evt.getMouse() != null) {
