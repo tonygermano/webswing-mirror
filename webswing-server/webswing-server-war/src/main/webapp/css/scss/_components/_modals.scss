@@ -1,82 +1,60 @@
-// Dialog modals
-.c-modal {
+// Filename: _modals.scss
+// Description: Mixins that can be used to construct the default modal
+
+// The frame that holds the rest
+@mixin modal {
     @include rem('max-width', 320px);
     @include rem('padding', 20px);
     @include border-radius(3px);
     @include dropshadow-5;
 
     position: relative;
-    top: -5%;
+    top: -10%;
 
-    width: 100%;
+    width: 100%; // Note: max width is set to 320px
     margin-right: auto;
     margin-left: auto;
     background-color: $white;
 
     text-align: center;
+}
 
-	&--selector {
-		@include rem('max-width', 600px);
-	}
+// Header, the frame that holds the title. Avoid styling text here.
+@mixin modal__header {
+    @include rem('padding-bottom', 20px);
 
-    &--upload {
-        @include rem('padding', 0px);
+    border-bottom: 1px solid $light-grey-3;
+}
+
+// The title text itself
+@mixin modal__header-title {
+    font-size: $regular;
+    text-transform: uppercase;
+}
+
+// Instruction text below title and above the main content
+@mixin modal__content-instructions {
+    @include rem('padding-top', 10px);
+
+    color: $secondary-text;
+    font-size: $small;
+}
+
+// Error and success messages
+@mixin modal__content-message {
+    @include rem('margin:', 20px 0px);
+
+    font-size: $small;
+
+    &--error {
+        color: $danger;
     }
 
-    // Modal header (contains title)
-    &__header {
-        &--upload {
-            @include rem('padding', 20px);
-            @include rem('margin', 0px);
-            @include border-radius(3px 3px 0 0);
-
-            background-color: $secondary;
-        }
+    &--neutral {
+        color: $neutral;
     }
 
-    // Modal title text
-    &__title {
-        @include rem('padding-bottom', 15px);
-        @include rem('margin-bottom', 15px);
-
-        border-bottom: 1px solid #eeeeee;
-
-        font-size: $regular;
-        text-transform: uppercase;
-
-        &--upload {
-            padding: 0;
-            margin: 0;
-            border: 0;
-
-            color: $white;
-        }
-    }
-
-    // Modal instruction text
-    &__instructions {
-        @include rem('padding-bottom', 15px);
-
-        color: $secondary-text;
-        font-size: $small;
-
-        &--upload {
-            @include rem('padding', 20px);
-        }
-    }
-
-    // Modal error messages
-    &__message {
-        @include rem('margin-top', 15px);
-        @include rem('margin-bottom', 15px);
-        font-size: $small;
-        
-        &--error {
-            color: $danger;
-        }
-        
-        &--success {
-            color: $success;
-        }
+    &--success {
+        color: $success;
     }
 }

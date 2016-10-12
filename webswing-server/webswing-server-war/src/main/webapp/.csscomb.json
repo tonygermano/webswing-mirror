@@ -7,6 +7,7 @@
 		".gitignore",
 		"config.rb",
 		"webswing.css",
+        "**/_font-awesome/**",
 		"**/_mixins.scss"
 	],
 	"remove-empty-rulesets": true,

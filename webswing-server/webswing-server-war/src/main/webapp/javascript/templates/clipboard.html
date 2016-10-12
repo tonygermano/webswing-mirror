@@ -1,64 +1,61 @@
+<div data-id="copyBar" class="c-clipboard-modal">
+	<div data-id="contentBar" class="c-clipboard-body">
 
-<div data-id="copyBar" class="webswing-copyBar">
-	<div class="container-fluid">
-		<div data-id="contentBar">
-			<div class="webswing-contentBar row">
-				<div class="col-xs-1">
-					<span class="webswing-minimize-symbol"></span>
+
+		<div class="c-tab-content">
+			<div class="c-tab-labels">
+				<button id="textTab" data-tab="text" class="c-tab-label">Text</button>
+				<button id="htmlTab" data-tab="html" class="c-tab-label">HTML</button>
+				<button id="imageTab" data-tab="image" class="c-tab-label">Image</button>
+				<button id="filesTab" data-tab="files" class="c-tab-label">Files</button>
+				<button id="otherTab" data-tab="other" class="c-tab-label">Other</button>
+				<button class="c-tab-labels__minimize-button"></button>
+			</div>
+
+			<div class="c-tab-content__item" id="text">
+				<div>
+					<textarea data-id="textarea" class="c-tab-content__text-area" readonly rows="4"></textarea>
+					<div data-id="ie-clipboard" class="input-hidden" contenteditable="true"></div>
+					<p class="c-tab-content__instructions">Press CTRL+C to copy.</p>
 				</div>
-				<div class="col-xs-11">
-					<ul class="nav nav-tabs">
-						<li id="textTab" data-tab="text"><span>Text</span></li>
-						<li id="htmlTab" data-tab="html"><span>HTML</span></li>
-						<li id="imageTab" data-tab="image"><span>Image</span></li>
-						<li id="filesTab" data-tab="files"><span>Files</span></li>
-						<li id="otherTab" data-tab="other"><span>Other</span></li>
-					</ul>
+			</div>
+
+			<div class="c-tab-content__item" id="html">
+				<div>
+					<textarea data-id="htmlarea" class="c-tab-content__text-area" readonly rows="4"></textarea>
+					<p class="c-tab-content__instructions">Press CTRL+C to copy.</p>
 				</div>
-				<div class="col-xs-12 tab-content">
-					<div class="tab-pane" id="text">
-						<div>
-							<p>Press CTRL+C to copy.</p>
-							<textarea data-id="textarea" class="webswing-copyBarTextArea" readonly rows="4"></textarea>
-							<div data-id="ie-clipboard" class="input-hidden" contenteditable="true"></div>
-						</div>
-					</div>
-					<div class="tab-pane" id="html">
-						<div>
-							<p>Press CTRL+C to copy.</p>
-							<textarea data-id="htmlarea" class="webswing-copyBarTextArea" readonly rows="4"></textarea>
-						</div>
-					</div>
-					<div class="tab-pane" id="image">
-						<div>
-							<p>Right click on image and select 'Copy image'.</p>
-						</div>
-					</div>
-					<div class="tab-pane" id="files">
-						<div>
-							<p>Click on a link to download file from clipboard.</p>
-							<div class="webswing-copyFileList" id="wsFileList"></div>
-						</div>
-					</div>
-					<div class="tab-pane" id="other">
-						<div>
-							<p>Clipboard contains data, which may only be used within this application.</p>
-						</div>
-					</div>
+			</div>
+
+			<div id="image" class="c-tab-content__item">
+				<div>
+					<p class="c-tab-content__instructions">Right click on the image and select 'Copy image'.</p>
+				</div>
+			</div>
+
+			<div class="c-tab-content__item" id="files">
+				<div>
+					<div id="wsFileList" class="c-tab-content__file-list"></div>
+					<p class="c-tab-content__instructions">Click on a clipboard link to download the file.</p>
+				</div>
+			</div>
+
+			<div class="c-tab-content__item" id="other">
+				<div>
+					<p class="c-tab-content__instructions">The clipboard contains data which may only be used within this application.</p>
 				</div>
 			</div>
 		</div>
-		<div class="webswing-copyBarButtonRow row ">
-			<div class="col-xs-8">
-				<div data-id="minimizedInfoBar">
-					<span data-id="plaintext" class="webswing-copy-content-inactive">Plain-text</span> | <span data-id="html" class="webswing-copy-content-inactive">HTML</span>
-					| <span data-id="image" class="webswing-copy-content-inactive">Image</span> | <span data-id="files" class="webswing-copy-content-inactive">Files</span>
-					| <span data-id="other" class="webswing-copy-content-inactive">Other</span>
-				</div>
-			</div>
-			<div class="col-xs-4">
-				<button class="btn btn-success btn-xs btn-block" data-id="closeBtn">Discard Clipboard</button>
-			</div>
+	</div>
+	<div class="c-clipboard-sticky-container">
+		<div data-id="minimizedInfoBar" class="c-minimized-tab-container">
+			<button data-id="plaintext" class="c-minimized-tab c-minimized-tab--is-inactive">Plain-text</button>
+			<button data-id="html" class="c-minimized-tab c-minimized-tab--is-inactive">HTML</button>
+			<button data-id="image" class="c-minimized-tab c-minimized-tab--is-inactive">Image</button>
+			<button data-id="files" class="c-minimized-tab c-minimized-tab--is-inactive">Files</button>
+			<button data-id="other" class="c-minimized-tab c-minimized-tab--is-inactive">Other</button>
 		</div>
+
+		<button data-id="closeBtn" class="c-clipboard-clear-button">Clear all</button>
 	</div>
 </div>

@@ -158,7 +158,7 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
             } else {
                 var textarea = copyBar.find('textarea[data-id="textarea"]');
                 textarea.val(data.text);
-                copyBar.find('span[data-id="plaintext"]').removeClass("webswing-copy-content-inactive").addClass("webswing-copy-content-active");
+                copyBar.find('button[data-id="plaintext"]').removeClass("c-minimized-tab--is-inactive").addClass("c-minimized-tab--is-active");
             }
             /* HTML TAB */
             if (data.html == null || data.html.length === 0) {
@@ -167,15 +167,15 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
             } else {
                 var htmlarea = copyBar.find('textarea[data-id="htmlarea"]');
                 htmlarea.val(data.html);
-                copyBar.find('span[data-id="html"]').removeClass("webswing-copy-content-inactive").addClass("webswing-copy-content-active");
+                copyBar.find('button[data-id="html"]').removeClass("c-minimized-tab--is-inactive").addClass("c-minimized-tab--is-active");
             }
             /* IMAGE TAB */
             if (data.img == null) {
                 copyBar.find('#image').remove();
                 copyBar.find('#imageTab').remove();
             } else {
-                copyBar.find('#image>div').append('<img src="' + util.getImageString(data.img) + '" id="wsCopyImage" class="img-thumbnail">');
-                copyBar.find('span[data-id="image"]').removeClass("webswing-copy-content-inactive").addClass("webswing-copy-content-active");
+                copyBar.find('#image>div').append('<img src="' + util.getImageString(data.img) + '" id="wsCopyImage" class="c-tab-content__img-thumb">');
+                copyBar.find('button[data-id="image"]').removeClass("c-minimized-tab--is-inactive").addClass("c-minimized-tab--is-active");
             }
             /* FILES TAB */
             if (data.files == null || data.files.length === 0) {
@@ -203,25 +203,25 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                     fileListElement.append(link);
                     fileListElement.append("<br/>");
                 }
-                copyBar.find('span[data-id="files"]').removeClass("webswing-copy-content-inactive").addClass("webswing-copy-content-active");
+                copyBar.find('button[data-id="files"]').removeClass("c-minimized-tab--is-inactive").addClass("c-minimized-tab--is-active");
             }
             /* OTHER TAB */
             if (!data.other) {
                 copyBar.find('#other').remove();
                 copyBar.find('#otherTab').remove();
             } else {
-                copyBar.find('span[data-id="other"]').removeClass("webswing-copy-content-inactive").addClass("webswing-copy-content-active");
+                copyBar.find('button[data-id="other"]').removeClass("c-minimized-tab--is-inactive").addClass("c-minimized-tab--is-active");
             }
 
             /* TAB Activation */
-            var tabs = copyBar.find('.nav-tabs>li');
-            tabs.first().addClass('active');
-            copyBar.find('.tab-pane').first().addClass('active');
+            var tabs = copyBar.find('.c-tab-label');
+            tabs.first().addClass('c-tab-label--is-active');
+            copyBar.find('.c-tab-content__item').first().addClass('c-tab-content__item--is-active');
             tabs.on('click', function(event) {
-                tabs.removeClass('active');
-                copyBar.find('.tab-pane').removeClass('active');
-                $(event.currentTarget).addClass('active');
-                copyBar.find('#' + $(event.currentTarget).data('tab')).addClass('active');
+                tabs.removeClass('c-tab-label--is-active');
+                copyBar.find('.c-tab-content__item').removeClass('c-tab-content__item--is-active');
+                $(event.currentTarget).addClass('c-tab-label--is-active');
+                copyBar.find('#' + $(event.currentTarget).data('tab')).addClass('c-tab-content__item--is-active');
             });
 
             var infoBar = copyBar.find('div[data-id="minimizedInfoBar"]');
@@ -229,7 +229,7 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
                 maximize();
             });
 
-            var minimizeBtn = copyBar.find('.webswing-minimize-symbol');
+            var minimizeBtn = copyBar.find('.c-tab-labels__minimize-button');
             minimizeBtn.on('click', function(event) {// minimize
                 minimize();
             });

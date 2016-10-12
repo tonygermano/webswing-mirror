@@ -1,3 +1,6 @@
+// Filename: _config.scss
+// Description: Sets variables used throughout the project
+
 // Colors
 $white: #ffffff;
 $black: #000000;
@@ -10,10 +13,11 @@ $secondary-lighter: #333438;
 $primary-text: #212121; // For regular text
 $secondary-text: #757575; // For faded text
 
-$light-grey: #fafafa; // Lightest background
-$light-grey-2: #f4f4f4; // Slightly darker shade
-$light-grey-3: #eeeeee; // Darker shade
-$light-grey-4: #e2e2e2; // Darker shade
+$light-grey-0: #fafafa; // Lightest background
+$light-grey-1: #fafafa; // Lighter background
+$light-grey-2: #f4f4f4; // Light background
+$light-grey-3: #eeeeee; // Less light background
+$light-grey-4: #e2e2e2; // Even less light background
 
 $divider-color: #f2f0ed; // Dividers and borders
 
@@ -24,8 +28,6 @@ $success: #6bb21a;
 $warning: #ffb219;
 
 // Font families
-@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700);
-@import url(https://fonts.googleapis.com/css?family=Fira+Sans:700);
 $body-font: 'open sans', sans-serif;
 $heading-font: 'open sans', sans-serif;
 
@@ -38,17 +40,7 @@ $large: 1.777rem;
 $medium: 1.333rem;
 $regular: 1rem;
 $small: 0.9375rem;
-$smaller: 0.75rem;
+$smaller: 0.875rem;
+$smallest: 0.8125rem;
 $lh-body: 1.4; // Line height for body text
 $lh-headings: 1.2; // Line height for headings
-
-// Adds transitions
-a,
-button,
-input:focus,
-input[type='button'],
-input[type='reset'],
-input[type='submit'],
-.btn {
-    @include transition-duration(0.2s);
-}
