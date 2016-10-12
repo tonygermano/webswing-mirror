@@ -25,12 +25,14 @@
 @import '_layouts/_containers';  // Containers that hold the other elements
 
 // _components: Various components that make up the application
-@import '_components/_clipboard';                  // Clipboard manager
-@import '_components/_forms';                      // Form fields etc
-@import '_components/_modals';                     // Modal base styling
-@import '_components/_modals/_dialog';            // Common dialogs
-@import '_components/_modals/_files';             // File up/download dialog
-@import '_components/_modals/_login';             // Login modal
-@import '_components/_modals/_app-selection';    // Webswing app selection
-@import '_components/_progress-bar';              // A progress bar for file import and export
-@import '_components/_spinner';                    // CSS loading animation
+@import '_components/_forms';                   // Form fields etc
+@import '_components/_modals';                  // Modal base styling
+@import '_components/_modals/_dialog';          // Common dialogs
+@import '_components/_modals/_files';           // File up/download dialog
+@import '_components/_modals/_login';           // Login modal
+@import '_components/_modals/_app-selection';   // Webswing app selection
+@import '_components/_progress-bar';            // A progress bar for file import and export
+@import '_components/_toolbars';              	// Toolbar base styling
+@import '_components/_toolbars/_clipboard';     // Clipboard integration toolbar
+@import '_components/_toolbars/_files';     	// File dialog integration toolbar
+@import '_components/_spinner';                 // CSS loading animation

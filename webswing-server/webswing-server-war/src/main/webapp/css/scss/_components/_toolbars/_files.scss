@@ -1,0 +1,14 @@
+// Filename: _files.scss
+// Description: File dialog integration toolbar.
+
+// The bottom-right panel
+.c-files-toolbar {
+    @include toolbar();
+}
+
+// The part of the panel that slides down
+.c-files-toolbar-body {
+    @include rem('height', 160px);
+
+    margin-right: 0;
+}

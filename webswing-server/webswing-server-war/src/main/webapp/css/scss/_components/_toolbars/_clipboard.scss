@@ -2,58 +2,31 @@
 // Description: Clipboard component. Allows the user to manage clipboard contents.
 
 // The bottom-right panel
-.c-clipboard-modal {
-    @include rem('max-width', 520px);
-    @include rem('padding', 15px);
-    @include border-radius(3px);
-    @include dropshadow-3;
-
-    position: absolute;
-    right: 0;
-    bottom: 0;
-
-    width: 100%;
-    background: $white;
-
-    font-size: $smaller;
+.c-clipboard-toolbar {
+    @include toolbar();
 }
 
 // The part of the panel that slides down
 .c-clipboard-body {
-    @include rem('min-height', 160px);
+    @include rem('height', 160px);
 
     margin-right: 0;
 }
 
 // Container for the tab labels
 .c-tab-labels {
+	@include rem('height', 20px);	
     clear: both;
 }
-
 // Individual tab label
 .c-tab-label {
-    @include rem('margin', 0px 25px 10px 0px);
+    @include rem('margin', 0px 25px 0px 0px);
 
     float: left;
     padding: 0;
     background: none;
-    border: none;
-
-    color: $secondary-text;
-
-    cursor: pointer;
-
-    &:hover {
-        color: $primary;
-    }
-
-    &:active {
-        outline: none;
-    }
-
-    &--is-active {
-        color: $primary;
-    }
+  	font-size: $regular;
+    text-transform: uppercase;
 }
 
 // The contents of the tabs associated with the labels
@@ -63,7 +36,6 @@
         @include rem('min-height', 100px);
         @include rem('top', 10px);
         @include rem('margin-bottom', 10px);
-
         position: relative;
 
         display: none;
@@ -93,7 +65,6 @@
     // Fields with clipboard text content
     &__text-area {
         @include rem('padding', 10px);
-
         width: 100%;
     }
 
@@ -102,6 +73,7 @@
         @include border-radius(3px);
         @include rem('padding', 10px);
         @include rem('margin', 0px 10px 10px 0px);
+        @include rem('max-height', 100px);
 
         display: block;
         clear: both;
@@ -118,7 +90,8 @@
 
         clear: both;
         border: 1px solid $light-grey-2;
-
+		max-height: 100px;
+		overflow: auto;
         color: $neutral;
         font-size: $smallest;
 
@@ -139,22 +112,32 @@
 .c-minimized-tab-container {
     display: block;
     float: left;
+    
+    .c-minimized-tab:first-child{
+		border-bottom-left-radius: 3px;
+		border-top-left-radius: 3px;
+    }  
+    .c-minimized-tab:last-child{
+    	border-bottom-right-radius: 3px;
+		border-top-right-radius: 3px;
+    }
+    .c-minimized-tab:not(:first-child){
+		border-left: 0;
+    }
 }
 
 // Individual tabs to indicate what content is available in the clipboard
 .c-minimized-tab {
     @include rem('padding', 6px 10px);
-    @include rem('margin-right', 5px);
-    @include border-radius(3px);
 
     background: none;
     border: 1px solid;
     border-color: $light-grey-4;
-
+	float: left;
     font-size: $smallest;
 
     cursor: pointer;
-
+	
     &--is-active {
         color: $primary-text;
 
@@ -165,7 +148,11 @@
             color: $white;
         }
     }
-
+    
+  	&--is-selected {
+        color: $primary;
+    }
+    
     &--is-inactive {
         border-color: $light-grey-4;
 
@@ -173,6 +160,11 @@
 
         cursor: default;
     }
+    
+    
+
+    
+    
 }
 
 // Button that clears the clipboard content
