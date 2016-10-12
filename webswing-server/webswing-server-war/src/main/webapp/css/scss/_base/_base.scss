@@ -1,7 +1,5 @@
 /**
  * Filename: _base.scss
- * Original author: Stephen Niemans (30-9-2016)
- * Last modified by: Stephen Niemans (30-9-2016)
  *
  * Description:
  * Sets all base styles for the application
@@ -35,7 +33,7 @@ body {
 
 // Typography
 p {
-    font-size: $regular;
+    font-size: $small;
 }
 
 h1,
@@ -123,5 +121,6 @@ a,
 button,
 input {
     @include transition-duration(0.2s);
+
     cursor: auto;
 }

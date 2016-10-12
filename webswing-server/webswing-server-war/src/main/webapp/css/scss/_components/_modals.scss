@@ -1,6 +1,7 @@
+// Filename: _modals.scss
+// Description: Mixins that can be used to construct the default modal
 
-
-// Modal, the frame that holds the rest
+// The container that holds the rest
 @mixin modal {
     @include rem('max-width', 320px);
     @include rem('padding', 20px);
@@ -8,6 +9,7 @@
     @include dropshadow-5;
 
     position: relative;
+    top: -10%;
 
     width: 100%; // Note: max width is set to 320px
     margin-right: auto;
@@ -17,10 +19,10 @@
     text-align: center;
 }
 
-// Header, the frame that holds the title text. Avoid styling text here.
+// Header, the frame that holds the title. Avoid styling text here.
 @mixin modal__header {
     @include rem('padding-bottom', 20px);
-    @include rem('margin-bottom', 20px);
+
     border-bottom: 1px solid $light-grey-3;
 }
 
@@ -32,6 +34,8 @@
 
 // Instruction text below title and above the main content
 @mixin modal__content-instructions {
+    @include rem('padding-top', 10px);
+
     color: $secondary-text;
     font-size: $small;
 }

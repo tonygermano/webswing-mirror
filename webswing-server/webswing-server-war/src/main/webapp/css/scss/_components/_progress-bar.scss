@@ -1,11 +1,5 @@
-/**
- * Filename: _progress-bar.scss
- * Original author: Stephen Niemans (30-9-2016)
- * Last modified by: Stephen Niemans (30-9-2016)
- *
- * Description:
- * Style for a progress bar with a pulsing animation
- */
+// Filename: _progress-bar.scss
+// Description: Style for a progress bar with a pulsing animation
 
 // Gradient transition used for pulsing effect
 @mixin innerColor( $color: $neutral ) {
@@ -34,20 +28,22 @@
 // Container for the progress bar
 .js-progress {
     @include rem('height', 30px);
-    @include rem('margin', 0px 20px 20px 20px);
+    @include rem('margin', 15px 0px 5px 0px);
     @include border-radius(3px);
 
-    background-color: $light-grey-2;
+    background-color: #a9c0d0;
 
-    // Progress text TODO: improve readability on light background
+    // Progress text
     &__text {
-        @include rem('width', 320px);
-        @include rem('top', 6px);
-        @include rem('left', -30px);
+        @include rem('width', 280px);
+        @include rem('top', 7px);
+        @include rem('left', 0px);
 
         position: absolute;
 
         padding: 0 1rem;
+
+        font-size: 0.75rem;
 
         em {
             font-style: normal;
@@ -55,7 +51,6 @@
     }
 
     // Progress bar, the width starts at 0 but is increased as the file download progresses.
-    // Related: javascript/webswing-files.js
     &__bar {
         @include innerColor($success);
         @include border-radius(3px);

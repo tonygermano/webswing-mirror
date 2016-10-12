@@ -6,32 +6,30 @@
 			</div>
 
 			<div class="c-files-modal__content">
-				<p class="c-files-modal__content-instructions">
-					Please enter a name for the file.
-				</p>
+				<div class="c-files-modal__content--inner">
+					<p class="c-files-modal__content-instructions">
+						Please enter a name for the file.
+					</p>
 
-				<div class="">
-					<input data-id="autoSaveInput" class="c-form-field" placeholder="File name" type="text">
+					<input data-id="autoSaveInput" class="c-form__field c-form__field--files" placeholder="Enter a file name here" type="text">
 				</div>
 
 				<ul class="c-file-button-container">
 					<li class="c-file-button-container__item">
-						<div class="c-file-button">
-							<button data-id="autoSaveButton" class="c-file-button__icon">
-								<img src="../img/icon-save.png"/>
-								<span>Save</span>
-							</button>
-						</div>
+						<button data-id="autoSaveButton" class="c-file-button">
+							<img src="../img/icon-save.png" class="c-file-button__icon"/>
+							<span>Save</span>
+						</button>
 					</li>
+
 					<li class="c-file-button-container__item--last">
-						<div class="c-file-button">
-							<button data-id="cancelAutoSaveButton" class="c-file-button__icon">
-								<img src="../img/icon-cancel.png"/>
-								<span>Cancel</span>
-							</button>
-						</div>
+						<button data-id="cancelAutoSaveButton" class="c-file-button">
+							<img src="../img/icon-cancel.png" class="c-file-button__icon"/>
+							<span>Cancel</span>
+						</button>
 					</li>
 				</ul>
+
 			</div>
 		</div>
 	</div>
@@ -45,43 +43,45 @@
 			</div>
 
 			<div class="c-files-modal__content">
-				<p class="c-files-modal__content-instructions">
-					Please select a file to import.
-				</p>
+				<div class="c-files-modal__content--inner">
+					<p class="c-files-modal__content-instructions">
+						Please select a file to import.
+					</p>
 
-				<div data-id="fileDialogTransferProgressBar" class="l-progressbar-container">
-					<div data-id="progress" class="js-progress">
-						<div style="width: 0%;" class="js-progress__bar">
-							<span class="js-progress__text">Progress: <em>0%</em></span>
+					<div data-id="fileDialogTransferProgressBar" class="l-progressbar-container">
+						<div data-id="progress" class="js-progress">
+							<div style="width: 0%;" class="js-progress__bar">
+								<span class="js-progress__text">Progress: <em>0%</em></span>
+							</div>
 						</div>
 					</div>
-				</div>
-				
-				<div data-id="fileDialogErrorMessage" >
-					<div data-id="fileDialogErrorMessageContent" class="c-modal__message c-modal__message--error"></div>
+
+					<div data-id="fileDialogErrorMessage" >
+						<div data-id="fileDialogErrorMessageContent" class="c-modal__message c-modal__message--error"></div>
+					</div>
 				</div>
 
 				<ul class="c-file-button-container">
 					<li class="c-file-button-container__item">
-							<form data-id="autoFileupload" class="">
-								<input data-id="autoUploadfileDialogTransferBarClientId" name="clientId" type="hidden">
+						<form data-id="autoFileupload" class="">
+							<input data-id="autoUploadfileDialogTransferBarClientId" name="clientId" type="hidden">
 
-								<input data-id="autoFileInput" id="webswingUploadBrowse" name="files[]" accept=""
-								       type="file" class="c-file-button--is-hidden"/>
+							<input data-id="autoFileInput" id="webswingUploadBrowse" name="files[]" accept=""
+							       type="file" class="c-file-button--is-hidden"/>
 
-								<label for="webswingUploadBrowse" class="c-file-button">
-									<img src="../img/icon-import.png" class="c-file-button__icon"/>
-									<span>Browse</span>
-								</label>
+							<label for="webswingUploadBrowse" class="c-file-button">
+								<img src="../img/icon-import.png" class="c-file-button__icon"/>
+								<span>Browse</span>
+							</label>
 
-							</form>
+						</form>
 					</li>
 
 					<li class="c-file-button-container__item--last">
 
-							<button data-id="cancelAutoUploadButton" class="c-file-button"><img
-									src="../img/icon-cancel.png" class="c-file-button__icon"/>
-								<span>Cancel</span></button>
+						<button data-id="cancelAutoUploadButton" class="c-file-button"><img
+								src="../img/icon-cancel.png" class="c-file-button__icon"/>
+							<span>Cancel</span></button>
 
 					</li>
 				</ul>

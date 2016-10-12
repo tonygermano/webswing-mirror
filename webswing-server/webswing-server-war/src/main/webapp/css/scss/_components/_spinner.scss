@@ -1,23 +1,17 @@
-/**
- * Filename: _spinner.scss
- * Original author: Stephen Niemans (30-9-2016)
- * Last modified by: Stephen Niemans (30-9-2016)
- *
- * Description:
- * Animation with two spinning circles for loading screens
- */
+// Filename: _spinner.scss
+// Description: Animation with two spinning circles for loading screens
 
 .c-spinner {
     @include rem('width', 40px);
     @include rem('height', 40px);
-    @include rem('margin', 10px auto);
+    @include rem('margin', 20px auto);
 
     position: relative;
 
     text-align: center;
 
     -webkit-animation: sk-rotate 2.0s infinite linear;
-    animation: sk-rotate 2.0s infinite linear;
+            animation: sk-rotate 2.0s infinite linear;
 }
 
 .c-spinner__dot-1 {
@@ -31,7 +25,7 @@
     border-radius: 100%;
 
     -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
-    animation: sk-bounce 2.0s infinite ease-in-out;
+            animation: sk-bounce 2.0s infinite ease-in-out;
 }
 
 .c-spinner__dot-2 {
@@ -41,7 +35,7 @@
     bottom: 0;
 
     -webkit-animation-delay: -1.0s;
-    animation-delay: -1.0s;
+            animation-delay: -1.0s;
 }
 
 @-webkit-keyframes sk-rotate {
@@ -53,7 +47,7 @@
 @keyframes sk-rotate {
     100% {
         -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
+                transform: rotate(360deg);
     }
 }
 

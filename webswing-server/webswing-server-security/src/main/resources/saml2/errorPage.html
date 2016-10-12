@@ -9,14 +9,14 @@
 </head>
 
 <body>
-	<div data-id="commonDialog" class="l-modal-container l-modal-container--login">
-		<div class="c-modal c-modal--login u-animate u-fadeInUp">
+	<div data-id="commonDialog" class="l-modal-container">
+		<div class="c-dialog-modal">
 			<div data-id="content" class="c-modal__body">
-				<div class="c-modal__header">
-					<h2 class="c-modal__title">Single Sign-On authentication failed</h2>
+				<div class="c-dialog-modal__header">
+					<h2 class="c-dialog-modal__header-title">Single Sign-On authentication failed</h2>
 				</div>
 
-				<div class="c-modal__content">
+				<div class="c-dialog-modal__content">
 					<p>Error message:<pre>{{message}}</pre></p>
 					<button type="button" onClick=" window.location.href=window.location.href;" class="c-button--retry">Try again</button>
 				</div>

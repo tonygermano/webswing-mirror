@@ -1,11 +1,5 @@
-/**
- * Filename: _config.scss
- * Original author: Stephen Niemans (30-9-2016)
- * Last modified by: Stephen Niemans (30-9-2016)
- *
- * Description:
- * Sets variables used throughout the project
- */
+// Filename: _config.scss
+// Description: Sets variables used throughout the project
 
 // Colors
 $white: #ffffff;
@@ -46,9 +40,7 @@ $large: 1.777rem;
 $medium: 1.333rem;
 $regular: 1rem;
 $small: 0.9375rem;
-$smaller: 0.75rem;
-
+$smaller: 0.875rem;
+$smallest: 0.8125rem;
 $lh-body: 1.4; // Line height for body text
 $lh-headings: 1.2; // Line height for headings
-
-// Adds transitions

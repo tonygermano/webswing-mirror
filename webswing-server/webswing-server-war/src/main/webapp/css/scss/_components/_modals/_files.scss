@@ -1,15 +1,9 @@
-/**
- * Filename: _files.scss
- * Original author: Stephen Niemans (30-9-2016)
- * Last modified by: Stephen Niemans (30-9-2016)
- *
- * Description: File save/upload modal component. Default modal styles found in scss/modals.scss
- * Related files: upload.html, webswing-files.js
- */
+// Filename: _files.scss
+// Description: File save/upload modal component. Default modal styles found in scss/modals.scss
 
 .c-files-modal {
     @include modal;
-    // No padding to accomodate the button style. Other elements adjusted accordingly.
+    // Zero padding, to accomodate the button style. Other elements adjusted accordingly.
     @include rem('padding', 0px);
 
     &__header {
@@ -22,6 +16,8 @@
 
         &-title {
             @include modal__header-title;
+            @include rem('margin', 12px 0px);
+
             color: $white;
         }
     }
@@ -29,10 +25,14 @@
     &__content {
         @include rem('margin', 0px);
 
+        &--inner {
+            @include rem('padding', 20px);
+        }
+
         &-instructions {
             @include modal__content-instructions;
-            @include rem('padding', 20px);
 
+            padding: 0;
             margin: 0;
         }
 
@@ -79,16 +79,15 @@
     @include rem('padding', 55px 0px 14px 0px);
     @include border-radius(2px);
 
-
     position: relative;
-    width: 100%;
 
     display: block;
+    width: 100%;
     background: none;
     border: 0;
 
     color: $secondary-text;
-    font-size: $small;
+    font-size: $smaller;
     font-weight: normal;
 
     cursor: pointer;
@@ -98,9 +97,10 @@
     }
 
     &__icon {
+        @include rem('top', 15px);
+        @include rem('left', 57px);
+
         position: absolute;
-        top: 15px;
-        left: 57px;
     }
 
     // Used to hide the default file input as it cannot be styled normally
