@@ -1,82 +1,94 @@
-input {
-    color: $secondary-text;
+// Filename: _forms.scss
+// Description: Form and input elements
 
-    &:focus + .c-login-icon {
-        @include rem('left', 32px);
+.c-form {
+    &__field {
+        @include rem('padding', 12px 15px);
+        @include border-radius(3px);
+        @include rem('margin-bottom', 15px);
+        @include transition-duration(0.3s);
 
-        opacity: 1;
-
-        transition: all 0.25s ease-out;
-    }
-
-    // Hack to disable yellow autofill bg for form fields
-    &:-webkit-autofill,
-    &:-webkit-autofill:focus {
-        -webkit-box-shadow: 0 0 0 50px $white inset;
-
-        -webkit-text-fill-color: $secondary-text;
-    }
-}
-
-.c-login-field {
-    @include rem('padding', 15px 10px);
-    @include border-radius(2px);
-    @include rem('margin-bottom', 10px);
-    @include transition-duration(0.2s);
-
-    display: block;
-    width: 100%;
-    border: 1px solid #dddddd;
-
-    font-size: $regular;
-
-    &:focus {
-        @include transition-duration(0.2s);
-
-        border-color: $primary;
-        border-left-width: 35px;
+        display: block;
+        width: 100%;
+        border: 1px solid #dddddd;
         outline: none;
+
+        color: $secondary-text;
+        font-size: $small;
+
+        &--files {
+            @include rem('margin', 15px auto 5px auto);
+            @include border-radius(0);
+
+            width: 80%;
+            border-width: 0 0 2px 0;
+
+            font-size: $smaller;
+            text-align: center;
+        }
+
+        &--login {
+            font-size: $regular;
+
+            // The border widens to allow for the icon to appear in it
+            &:focus {
+                border-color: $primary;
+                border-left-width: 35px;
+            }
+
+            // Slides icon of selected fields into view
+            &:focus + .c-form__field-icon {
+                @include rem('left', 32px);
+
+                opacity: 1;
+
+                transition: all 0.25s ease-out;
+            }
+        }
+
+        &:focus {
+            border-color: $primary;
+        }
+
+        &:hover {
+            border-color: $primary;
+        }
+
+        // Form field icons, start out hidden and to the left
+        &-icon {
+            @include font-awesome;
+            @include rem('margin-top', -45px);
+            @include transition-duration(0.1s);
+
+            position: absolute;
+            left: 0;
+
+            opacity: 0;
+
+            color: $white;
+
+            // User icon
+            &--username {
+                &:before {
+                    content: '\f007';
+                }
+            }
+
+            // Lock icon
+            &--password {
+                &:before {
+                    content: '\f023';
+                }
+            }
+        }
     }
 }
 
-.c-form__save-file {
-    @include rem('padding', 0 20px 20px 20px);
-}
 
-.c-form-field {
-    @include rem('padding', 15px 10px);
-    @include border-radius(2px);
-    @include transition-duration(0.2s);
+// Hack to disable yellow autofill bg for form fields in Chrome
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 50px $white inset;
 
-    display: block;
-    width: 100%;
-    border: 1px solid #dddddd;
-
-    font-size: $regular;
-
-    &:focus {
-        @include transition-duration(0.2s);
-
-        border-color: $primary;
-        outline: none;
-    }
-}
-
-.c-form--login {
-    @include rem('padding', 0px 0px 20px 0px);
-    @include rem('margin-bottom', 60px);
-}
-
-.c-login-icon {
-    @include rem('margin-top', -45px);
-
-    position: absolute;
-    left: 0;
-
-    opacity: 0;
-
-    color: #ffffff;
-    font-size: 1em;
-
-    transition: all 0.1s ease-in;
+    -webkit-text-fill-color: $secondary-text;
 }

@@ -1,3 +1,7 @@
+// Filename: _containers.scss
+// Description: Defines layout containers that hold the other elements
+
+//Fullscreen container that holds webswing
 .l-webswing-container {
     overflow: hidden;
     width: 100%;
@@ -5,9 +9,8 @@
     background-image: radial-gradient(circle, $white, $light-grey-2);
 }
 
+//Fullscreen container that holds modals such as dialogs and the sign in form
 .l-modal-container {
-    @include rem('padding', 20px);
-
     position: absolute;
     top: 0;
     left: 0;
@@ -18,16 +21,19 @@
     height: 100%;
 
     justify-content: center;
-
-    &--login {
-        background-image: radial-gradient(circle, $white, $light-grey-2);
-    }
 }
 
-.l-selector-container{
-	max-width: 100%;
-	margin-left: auto;
-	margin-right: auto;
-	margin-top:20px;
-	display: inline-flex;
+// Container that holds the webswing app selection menu
+.l-app-selection-container {
+    display: inline-flex;
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+// Container that holds the clipboard modal
+.l-clipboard-container {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
 }

@@ -1,0 +1,68 @@
+// Filename: _app-selection.scss
+// Description: App selection modal component. Shows the apps currently available in Webswing.
+
+.c-app-selection-modal {
+    @include modal;
+
+    width: auto;
+    max-width: 80%;
+
+    &__header {
+        text-align: center;
+
+        &-title {
+            @include modal__header-title;
+            @include rem('padding', 0px);
+            @include rem('margin', 0px 0px 15px 0px);
+
+            font-size: $medium;
+            text-transform: none;
+        }
+    }
+
+    &__admin-nav {
+        @include rem('margin', 0px 0px 20px 0px);
+
+        font-size: $small;
+    }
+
+    &__content {
+        &-instructions {
+            @include modal__content-instructions;
+        }
+
+        &-message {
+            @include modal__content-message;
+        }
+    }
+}
+
+// Buttons for the apps users may select
+.c-app-selection-button {
+    @include transition-duration(0.3s);
+    @include border-radius(3px);
+    @include rem('padding', 10px);
+    @include rem('margin', 10px);
+
+    background: none;
+    border: 1px solid;
+    border-color: $light-grey-3;
+
+    cursor: pointer;
+
+
+    &:hover {
+        @include dropshadow-3;
+
+        border-color: $white;
+    }
+
+    &__thumb {
+        max-width: 150px;
+    }
+
+    &__label {
+        font-size: $smaller;
+        word-wrap: break-word;
+    }
+}
