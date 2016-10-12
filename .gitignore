@@ -22,4 +22,4 @@ git.properties
 webswing-admin/.externalToolBuilders/
 webswing-server/webswing-server-war/.externalToolBuilders/org.eclipse.wst.jsdt.core.javascriptValidator (1).launch
 .gitignore
-*.log*
+stats.log*
