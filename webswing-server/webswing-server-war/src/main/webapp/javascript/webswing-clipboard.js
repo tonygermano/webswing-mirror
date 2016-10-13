@@ -158,7 +158,6 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				otherTab.on('click', function() {
 					showContent(otherTab, 'other');
 				});
-				showContent(otherTab, 'other');
 			}
 			/* FILES TAB */
 			if (data.files != null && data.files.length !== 0) {
@@ -188,7 +187,6 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				filesTab.on('click', function() {
 					showContent(filesTab, 'files');
 				});
-				showContent(filesTab, 'files');
 			}
 			/* IMAGE TAB */
 			if (data.img != null) {
@@ -198,7 +196,6 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				imageTab.on('click', function() {
 					showContent(imageTab, 'image');
 				});
-				showContent(imageTab, 'image');
 			}
 			/* HTML TAB */
 			if (data.html != null && data.html.length !== 0) {
@@ -209,7 +206,6 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				htmlTab.on('click', function() {
 					showContent(htmlTab, 'html');
 				});
-				showContent(htmlTab, 'html');
 			}
 			/* TEXT TAB */
 			if (data.text != null && data.text.length !== 0) {
@@ -220,7 +216,6 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				textTab.on('click', function() {
 					showContent(textTab, 'text');
 				});
-				showContent(textTab, 'text');
 			}
 
 			function showContent(tab, type) {
@@ -236,14 +231,10 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				minimize();
 			});
 
-			if (onlyOtherData) {
-				copyBar.find('div[data-id="contentBar"]').hide();
-				copyBar.minimized = true;
-			} else {
-				var minimizer = setTimeout(function() {
-					minimize();
-				}, 2000);
-			}
+			//minimize	
+			copyBar.find('div[data-id="contentBar"]').hide();
+			copyBar.minimized = true;
+			
 		}
 
 		function minimize() {
