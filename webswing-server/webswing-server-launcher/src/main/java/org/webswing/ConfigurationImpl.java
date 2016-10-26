@@ -16,6 +16,8 @@ import org.webswing.toolkit.util.Logger;
 
 public class ConfigurationImpl extends Configuration {
 
+	private static final String PREFIX = System.getProperty(Constants.BRANDING_PREFIX, "org.webswing");
+
 	private String host = "localhost";
 
 	private boolean http = true;
@@ -46,11 +48,11 @@ public class ConfigurationImpl extends Configuration {
 		options.addOption("ks", "keystore", true, "Keystore file location for ssl configuration");
 		options.addOption("kp", "keystorepwd", true, "Keystore password");
 
-		options.addOption("t", "temp", true, "The folder where temp folder will be created for the webswing server. (./tmp)");
-		options.addOption("d", true, "Create new temp folder for every webswing instance (false)");
+		options.addOption("t", "temp", true, "The folder where temp folder will be created for the server. (./tmp)");
+		options.addOption("d", true, "Create new temp folder for every instance (false)");
 
-		options.addOption("c", "config", true, "Configuration file name. (<webswing-server.war path>/webswing.config)");
 		options.addOption("j", "jetty", true, "Jetty startup configuration file. (./jetty.properties)");
+		options.addOption("c", "config", true, "Configuration file name. (<webswing-server.war path>/webswing.config)");
 
 		try {
 			// parse the command line arguments
@@ -105,7 +107,7 @@ public class ConfigurationImpl extends Configuration {
 		} catch (ParseException exp) {
 			Logger.debug(exp.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("webswing", options);
+			formatter.printHelp(PREFIX, options);
 		} catch (IOException e) {
 			Logger.error("Server configuration failed.", e);
 		}
@@ -116,17 +118,17 @@ public class ConfigurationImpl extends Configuration {
 		Properties prop = new Properties();
 		InputStream inputStream = new FileInputStream(new File(filename));
 		prop.load(inputStream);
-		setHost(prop.getProperty("org.webswing.server.host"));
+		setHost(prop.getProperty(PREFIX + ".server.host"));
 
-		setHttp(Boolean.parseBoolean(prop.getProperty("org.webswing.server.http")));
-		setHttpPort(prop.getProperty("org.webswing.server.http.port"));
+		setHttp(Boolean.parseBoolean(prop.getProperty(PREFIX + ".server.http")));
+		setHttpPort(prop.getProperty(PREFIX + ".server.http.port"));
 
-		setHttps(Boolean.parseBoolean(prop.getProperty("org.webswing.server.https")));
-		setHttpsPort(prop.getProperty("org.webswing.server.https.port"));
-		setTruststore(prop.getProperty("org.webswing.server.https.truststore"));
-		setTruststorePassword(prop.getProperty("org.webswing.server.https.truststore.password"));
-		setKeystore(prop.getProperty("org.webswing.server.https.keystore"));
-		setKeystorePassword(prop.getProperty("org.webswing.server.https.keystore.password"));
+		setHttps(Boolean.parseBoolean(prop.getProperty(PREFIX + ".server.https")));
+		setHttpsPort(prop.getProperty(PREFIX + ".server.https.port"));
+		setTruststore(prop.getProperty(PREFIX + ".server.https.truststore"));
+		setTruststorePassword(prop.getProperty(PREFIX + ".server.https.truststore.password"));
+		setKeystore(prop.getProperty(PREFIX + ".server.https.keystore"));
+		setKeystorePassword(prop.getProperty(PREFIX + ".server.https.keystore.password"));
 	}
 
 	public String getHost() {

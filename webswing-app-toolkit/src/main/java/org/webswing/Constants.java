@@ -48,9 +48,9 @@ public interface Constants {
 	public static final String CREATE_NEW_TEMP = "webswing.createNewTemp";
 	public static final String CONFIG_FILE_PATH = "webswing.configFile";
 	public static final String DEFAULT_CONFIG_FILE_NAME = "webswing.config";
-	public static final String SERVER_HOST = "webswing.host";
-	public static final String SERVER_PORT = "webswing.port";
-	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";;
+	public static final String SERVER_HOST = "webswing.server.host";
+	public static final String SERVER_PORT = "webswing.server.port";
+	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";
 	public static final String JMS_OVERAL_MEM_LIMIT = "webswing.jmsOveralMemoryLimit";
 	public static final String JMS_DEST_MEM_LIMIT = "webswing.jmsDestinationMemoryLimit";
 	public static final String WEBSOCKET_MESSAGE_SIZE = "webswing.websocketMessageSizeLimit";
@@ -77,6 +77,10 @@ public interface Constants {
 	public static final String HTTP_ATTR_ARGS = "X-webswing-args";
 	public static final String HTTP_ATTR_DEBUG_PORT = "X-webswing-debugPort";
 
+	//integration-branding
+	public static final String BRANDING_PREFIX = "webswing.brandingPrefix";
+	public static final String CONFIG_PROVIDER = "webswing.configProvider";
+	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
 
 
 }

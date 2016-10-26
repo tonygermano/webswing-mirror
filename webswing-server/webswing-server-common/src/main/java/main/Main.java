@@ -3,6 +3,8 @@ package main;
 import java.awt.Toolkit;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +21,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -29,6 +32,8 @@ public class Main {
 
 	@SuppressWarnings("restriction")
 	public static void main(String[] args) throws Exception {
+		initializeDefaultSystemProperties();
+
 		boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
 		System.setProperty(Constants.CREATE_NEW_TEMP, getCreateNewTemp(args));
 
@@ -67,6 +72,19 @@ public class Main {
 		}
 	}
 
+	private static void initializeDefaultSystemProperties() {
+		try {
+			InputStream propFile = Main.class.getClassLoader().getResourceAsStream("WEB-INF/classes/webswing.properties");
+			Properties p = new Properties(System.getProperties());
+			p.load(propFile);
+			// set the system properties
+			System.setProperties(p);
+		} catch (Exception e) {
+			//file does not exist, do nothing
+		}
+
+	}
+
 	public static String getCreateNewTemp(String[] args) {
 		// create the command line parser
 		for (int i = 0; i < args.length; i += 2) {
@@ -79,7 +97,7 @@ public class Main {
 	}
 
 	private static void retainOnlyLauncherUrl(List<URL> urls) {
-		for (Iterator<URL> i = urls.iterator(); i.hasNext(); ) {
+		for (Iterator<URL> i = urls.iterator(); i.hasNext();) {
 			if (!i.next().getFile().contains("webswing-app-launcher")) {
 				i.remove();
 			}

@@ -12,13 +12,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.server.base.WsInitException;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
+import org.webswing.server.model.exception.WsInitException;
+import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.BuiltInModules;
 import org.webswing.server.services.security.api.SecurityContext;
-import org.webswing.server.services.security.api.SecurityModuleClassLoader;
 import org.webswing.server.services.security.api.WebswingSecurityConfig;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
@@ -27,14 +27,16 @@ import org.webswing.toolkit.util.ClasspathUtil;
 public class SecurityModuleWrapper implements WebswingSecurityModule {
 	private static final Logger log = LoggerFactory.getLogger(SecurityModuleWrapper.class);
 
+	private final ConfigurationService configService;
 	private WebswingSecurityModule custom;
 	private WebswingSecurityConfig config;
 	private URLClassLoader customCL;
 	private SecurityContext context;
 
-	public SecurityModuleWrapper(SecurityContext context, WebswingSecurityConfig config) {
+	public SecurityModuleWrapper(SecurityContext context, WebswingSecurityConfig config, ConfigurationService configService) {
 		this.context = context;
 		this.config = config;
+		this.configService = configService;
 	}
 
 	@Override
@@ -43,7 +45,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 			String classPath = CommonUtil.generateClassPathString(config.getClassPath());
 			classPath = context.replaceVariables(classPath);
 			URL[] urls = ClasspathUtil.populateClassPath(classPath, context.resolveFile(".").getAbsolutePath());
-			customCL = new SecurityModuleClassLoader(urls, SecurityModuleWrapper.class.getClassLoader());
+			customCL = new URLClassLoader(urls, configService.getExtensionClassLoader());
 			String securityModuleClassName = BuiltInModules.getSecurityModuleClassName(config.getModule());
 			Class<?> moduleClass = customCL.loadClass(securityModuleClassName);
 
@@ -66,16 +68,16 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 				try {
 					custom = (WebswingSecurityModule) configConstructor.newInstance(ConfigUtil.instantiateConfig(config.getConfig(), configClass, context));
 				} catch (Exception e) {
-					ex = new WsInitException("Could not construct custom security module class (using WebswingSecurityModuleConfig constructor).",e);
-					log.error("Initialization failed.",ex);
+					ex = new WsInitException("Could not construct custom security module class (using WebswingSecurityModuleConfig constructor).", e);
+					log.error("Initialization failed.", ex);
 				}
 			}
 			if (custom == null && defaultConstructor != null) {
 				try {
 					custom = (WebswingSecurityModule) defaultConstructor.newInstance();
 				} catch (Exception e) {
-					ex =  new WsInitException("Could not construct custom security module class (using Default constructor).",e);
-					log.error("Initialization failed.",ex);
+					ex = new WsInitException("Could not construct custom security module class (using Default constructor).", e);
+					log.error("Initialization failed.", ex);
 				}
 			}
 			if (custom != null) {

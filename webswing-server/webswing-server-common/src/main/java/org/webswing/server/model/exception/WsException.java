@@ -1,10 +1,8 @@
 package org.webswing.server.model.exception;
 
-import javax.servlet.http.HttpServletResponse;
-
 public class WsException extends Exception {
 	private static final long serialVersionUID = -6339066097142624126L;
-	private int reponseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+	private int reponseCode = 500;
 
 	public WsException(String e) {
 		super(e);

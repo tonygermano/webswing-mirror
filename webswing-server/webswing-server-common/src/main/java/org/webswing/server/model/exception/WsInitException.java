@@ -1,4 +1,4 @@
-package org.webswing.server.base;
+package org.webswing.server.model.exception;
 
 public class WsInitException extends Exception {
 

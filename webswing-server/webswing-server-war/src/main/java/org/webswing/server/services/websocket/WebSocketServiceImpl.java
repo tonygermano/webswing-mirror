@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.base.WebswingService;
-import org.webswing.server.base.WsInitException;
+import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.playback.RecordingPlaybackUrlHandlerImpl;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;

@@ -2,6 +2,7 @@ package org.webswing.server;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -77,7 +78,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 		registerChildUrlHandler(resourceService.create(this, this));
 
-		loadConfiguration(configService.getConfiguration());
+		loadApplications();
 		super.init();
 	}
 
@@ -110,11 +111,12 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		return secConfig;
 	}
 
-	public void loadConfiguration(Map<String, SecuredPathConfig> newConfig) {
+	public void loadApplications() {
 		log.info("Loading configured Swing applications.");
 		synchronized (instanceManagers) {
-			for (SecuredPathConfig configPath : newConfig.values()) {
-				String pathMapping = toPath(configPath.getPath());
+			for (String path : configService.getPaths()) {
+				SecuredPathConfig configPath = configService.getConfiguration(path);
+				String pathMapping = toPath(path);
 				if (!toPath("/").equals(pathMapping)) {
 					SwingInstanceManager childHandler = instanceManagers.get(pathMapping);
 					if (childHandler == null) {
@@ -267,6 +269,14 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		return result;
 	}
 
+	@Override
+	public URL getWebResource(String resource) {
+		if (StringUtils.isBlank(getConfig().getWebFolder()) && StringUtils.equals("/index.html", toPath(resource))) {
+			resource = "/selector/index.html";
+		}
+		return super.getWebResource(resource);
+	}
+
 	@GET
 	@Path("/apps")
 	public List<ApplicationInfoMsg> getApplicationInfo(HttpServletRequest req) throws WsException {
@@ -336,7 +346,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 			if (swingManager == null) {
 				Map<String, Object> config = new HashMap<>();
 				config.put("path", path);
-				configService.setConfiguration(config);
+				configService.setConfiguration(path, config);
 				installApplication(ConfigUtil.instantiateConfig(config, SecuredPathConfig.class));
 				return;
 			} else {
@@ -352,7 +362,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	public void setConfig(Map<String, Object> config) throws Exception {
 		checkMasterPermission(WebswingAction.rest_setConfig);
 		config.put("path", "/");
-		configService.saveMasterConfiguration(config);
+		configService.setConfiguration("/", config);
 		restartNeeded = true;
 	}
 

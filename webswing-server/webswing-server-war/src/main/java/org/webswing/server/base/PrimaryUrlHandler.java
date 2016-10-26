@@ -184,10 +184,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	public SecuredPathConfig getConfig() {
 		if (config == null) {
 			String path = StringUtils.isEmpty(getPathMapping()) ? "/" : getPathMapping();
-			config = configService.getConfiguration().get(path);
-			if (config == null) {
-				config = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class);
-			}
+			config = configService.getConfiguration(path);
 		}
 		return config;
 	}
@@ -231,27 +228,20 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		return describe;
 	}
 
+	public MetaObject getMeta(Map<String, Object> json) throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
+		return configService.describeConfiguration(getPathMapping(), json, this);
+	}
+
 	public MetaObject getConfigMeta() throws WsException {
 		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
-		SecuredPathConfig config = getConfig();
-		if (config == null) {
-			config = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class);
-		}
-		try {
-			MetaObject result = ConfigUtil.getConfigMetadata(config, getClass().getClassLoader(), this);
-			result.setData(config.asMap());
-			return result;
-		} catch (Exception e) {
-			log.error("Failed to generate configuration descriptor.", e);
-			throw new WsException("Failed to generate configuration descriptor.");
-		}
+		return configService.describeConfiguration(getPathMapping(), null, this);
 	}
 
 	public void setConfig(Map<String, Object> config) throws Exception {
 		checkMasterPermission(WebswingAction.rest_setConfig);
 		if (!isStarted()) {
-			config.put("path", getPathMapping());
-			configService.setConfiguration(config);
+			configService.setConfiguration(getPathMapping(), config);
 		} else {
 			throw new WsException("Can not set configuration to running handler.");
 		}
@@ -259,8 +249,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	public void setSwingConfig(Map<String, Object> config) throws Exception {
 		checkMasterPermission(WebswingAction.rest_setConfig);
-		config.put("path", getPathMapping());
-		configService.setSwingConfiguration(config);
+		configService.setSwingConfiguration(getPathMapping(), config);
 	}
 
 	protected Map<String, Boolean> getPermissions() throws Exception {
@@ -273,19 +262,6 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		permissions.put("remove", false);
 		permissions.put("sessions", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getSession));
 		return permissions;
-	}
-
-	public MetaObject getMeta(Map<String, Object> json) throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
-		SecuredPathConfig securedPathConfig = ConfigUtil.instantiateConfig(json, SecuredPathConfig.class);
-		try {
-			MetaObject result = ConfigUtil.getConfigMetadata(securedPathConfig, getClass().getClassLoader(), this);
-			result.setData(json);
-			return result;
-		} catch (Exception e) {
-			log.error("Failed to generate configuration descriptor.", e);
-			throw new WsException("Failed to generate configuration descriptor.");
-		}
 	}
 
 	public Map<String, String> getVariables(String type) throws WsException {

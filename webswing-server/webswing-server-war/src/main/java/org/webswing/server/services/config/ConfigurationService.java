@@ -1,25 +1,31 @@
 package org.webswing.server.services.config;
 
+import java.util.List;
 import java.util.Map;
 
 import org.webswing.server.base.WebswingService;
 import org.webswing.server.common.model.SecuredPathConfig;
+import org.webswing.server.common.model.meta.ConfigContext;
+import org.webswing.server.common.model.meta.MetaObject;
+import org.webswing.server.model.exception.WsException;
 
 public interface ConfigurationService extends WebswingService {
 
-	Map<String, SecuredPathConfig> getConfiguration();
+	SecuredPathConfig getConfiguration(String path);
 
-	void setConfiguration(Map<String, Object> securedPathConfig) throws Exception;
+	List<String> getPaths();
 
-	void setSwingConfiguration(Map<String, Object> securedPathConfig) throws Exception;
+	void setConfiguration(String path, Map<String, Object> securedPathConfig) throws Exception;
+
+	void setSwingConfiguration(String path, Map<String, Object> securedPathConfig) throws Exception;
 
 	void removeConfiguration(String path) throws Exception;
-
-	void saveMasterConfiguration(Map<String, Object> securedPathConfig) throws Exception;
 
 	void registerChangeListener(ConfigurationChangeListener listener);
 
 	void removeChangeListener(ConfigurationChangeListener listener);
 
+	MetaObject describeConfiguration(String string, Map<String, Object> json, ConfigContext ctx) throws WsException;
 
+	ClassLoader getExtensionClassLoader(); 
 }

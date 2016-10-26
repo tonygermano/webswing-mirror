@@ -7,7 +7,7 @@ import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.server.base.WsInitException;
+import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.jms.JmsService;
 import org.webswing.server.services.websocket.WebSocketService;
@@ -65,7 +65,6 @@ public class StartupServiceImpl implements StartupService {
 
 			// verify config file and convert to URI
 			validatePropertyFilePath(Constants.CONFIG_FILE_PATH, Constants.DEFAULT_CONFIG_FILE_NAME);
-
 		}
 	}
 
