@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,6 @@ import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.MetaObject;
-import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.resources.ResourceHandlerService;
@@ -313,7 +311,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	public MetaObject getConfigMeta() throws WsException {
 		MetaObject meta = super.getConfigMeta();
 		if (restartNeeded) {
-			meta.setMessage("Configuration has been changed. Please restart Webswing server to apply the changes. Note: Displaying current runtime configuration.");
+			meta.setMessage("Configuration has been changed. Please restart the server to apply the changes. Note: Displaying current runtime configuration.");
 		}
 		return meta;
 	}
@@ -344,10 +342,8 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		if (!StringUtils.isEmpty(path)) {
 			SwingInstanceManager swingManager = instanceManagers.get(path);
 			if (swingManager == null) {
-				Map<String, Object> config = new HashMap<>();
-				config.put("path", path);
-				configService.setConfiguration(path, config);
-				installApplication(ConfigUtil.instantiateConfig(config, SecuredPathConfig.class));
+				configService.setConfiguration(path, null);
+				installApplication(configService.getConfiguration(path));
 				return;
 			} else {
 				throw new WsException("Unable to Create Swing app '" + path + "'. Application already exits.");
@@ -370,8 +366,9 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	@Path("/rest/permissions")
 	public Map<String, Boolean> getPermissions() throws Exception {
 		Map<String, Boolean> perm = super.getPermissions();
-		perm.put("remove", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_removeApp));
-		perm.put("create", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_createApp));
+		boolean multiApplicationMode= configService.isMultiApplicationMode();
+		perm.put("remove", multiApplicationMode && isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_removeApp));
+		perm.put("create", multiApplicationMode && isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_createApp));
 		return perm;
 	}
 

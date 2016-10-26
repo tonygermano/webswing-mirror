@@ -115,6 +115,9 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 		try {
 			MetaObject result = ConfigUtil.getConfigMetadata(securedPathConfig, cl, ctx);
 			result.setData(json);
+			if (ctx.isStarted() && !path.equals("/")) {
+				result.setMessage("Note: Only Swing configuration can be modified while the application is running. Stop the application to edit the Security configuration.");
+			}
 			return result;
 		} catch (Exception e) {
 			log.error("Failed to generate configuration descriptor.", e);
@@ -139,5 +142,17 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 
 	protected File getConfigFile() throws WsInitException {
 		return CommonUtil.getConfigFile();
+	}
+
+	@Override
+	public Map<String, Object> createDefaultConfiguration(String path) {
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		result.put("path", path);
+		return result;
+	}
+	
+	@Override
+	public boolean isMultiApplicationMode() {
+		return true;
 	}
 }

@@ -271,9 +271,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Path("/rest/config")
 	public MetaObject getConfigMeta() throws WsException {
 		MetaObject meta = super.getConfigMeta();
-		if (isStarted()) {
-			meta.setMessage("Note: Only Swing configuration can be modified while the application is running. Stop the application to edit the Security configuration.");
-		}
 		return meta;
 	}
 

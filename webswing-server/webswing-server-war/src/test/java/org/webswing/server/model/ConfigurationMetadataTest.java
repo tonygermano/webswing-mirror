@@ -67,6 +67,11 @@ public class ConfigurationMetadataTest {
 			public URL getWebResource(String resource) {
 				return null;
 			}
+
+			@Override
+			public boolean isStarted() {
+				return true;
+			}
 		});
 
 		//@ConfigFieldEditorType(editor = EditorType.Object, className = "org.webswing.server.services.security.api.WebswingSecurityConfig")

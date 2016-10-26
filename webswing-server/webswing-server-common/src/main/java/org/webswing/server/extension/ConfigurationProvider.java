@@ -26,4 +26,7 @@ public interface ConfigurationProvider {
 
 	MetaObject describeConfiguration(String path, Map<String, Object> json, ConfigContext ctx, ClassLoader cl) throws WsException;
 
+	Map<String, Object> createDefaultConfiguration(String path);
+
+	boolean isMultiApplicationMode();
 }

@@ -106,8 +106,8 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	public static final String BACKGROUND_WINDOW_ID = "BG";
 	private static Object TREELOCK = null;
 
-	private WebEventDispatcher eventDispatcher = new WebEventDispatcher();
-	private WebPaintDispatcher paintDispatcher = new WebPaintDispatcher();
+	private WebEventDispatcher eventDispatcher;
+	private WebPaintDispatcher paintDispatcher;
 	private WebswingApiImpl api = new WebswingApiImpl();;
 
 	private WindowManager windowManager = WindowManager.getInstance();
@@ -123,6 +123,11 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		} catch (Exception e) {
 			Logger.error("Failed to init X11 display: ", e.getMessage());
 		}
+	}
+
+	public void startDispatchers() {
+		eventDispatcher = new WebEventDispatcher();
+		paintDispatcher = new WebPaintDispatcher();
 	}
 
 	public void initSize(final Integer desktopWidth, final Integer desktopHeight) {

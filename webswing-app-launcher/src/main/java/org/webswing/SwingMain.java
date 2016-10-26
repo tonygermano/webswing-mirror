@@ -13,12 +13,13 @@ import org.webswing.applet.AppletContainer;
 import org.webswing.toolkit.util.ClasspathUtil;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
 
 public class SwingMain {
 
 	public static ClassLoader swingLibClassLoader;
 	public static ClassLoader securityClassLoader;
-	
+
 	public static void main(String[] args) {
 		try {
 			URL[] urls = ClasspathUtil.populateClassPath(System.getProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH));
@@ -46,6 +47,7 @@ public class SwingMain {
 		Class<?> mainArgType[] = { (new String[0]).getClass() };
 		java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
 		setupContextClassLoader(swingLibClassLoader);
+		Util.getWebToolkit().startDispatchers();
 		Object argsArray[] = { args };
 		main.invoke(null, argsArray);
 	}
@@ -54,6 +56,7 @@ public class SwingMain {
 		Class<?> appletClazz = swingLibClassLoader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
 		Map<String, String> props = resolveProps();
 		setupContextClassLoader(swingLibClassLoader);
+		Util.getWebToolkit().startDispatchers();
 		if (Applet.class.isAssignableFrom(appletClazz)) {
 			AppletContainer ac = new AppletContainer(appletClazz, props);
 			ac.start();

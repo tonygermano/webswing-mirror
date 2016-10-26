@@ -4,7 +4,7 @@
 			var vm = this;
 			vm.config = {
 				hide : [ 'path' ],
-				enable : [ 'swingConfig' ]
+				enable : window.onlineUpdatableConfigFields
 			};
 			vm.variables = {};
 			vm.reset = reset;
@@ -22,7 +22,7 @@
 			$scope.$on('wsStatusChanged', function(evt, ctl) {
 				vm.stopped = ctl.startable;
 				vm.config.message = null;
-				vm.config.enable = vm.stopped ? null : [ 'swingConfig' ];
+				vm.config.enable = vm.stopped ? null : window.onlineUpdatableConfigFields;
 				activate();
 			});
 

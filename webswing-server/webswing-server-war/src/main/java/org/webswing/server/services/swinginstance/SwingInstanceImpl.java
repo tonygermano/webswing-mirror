@@ -394,7 +394,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
 			swingConfig.setName(getClientId());
-			File homeDir = manager.resolveFile(subs.replace(appConfig.getUserDir()));
+			File homeDir = getHomeDir(subs.replace(appConfig.getUserDir()));
 			swingConfig.setJreExecutable(subs.replace(appConfig.getJreExecutable()));
 			swingConfig.setBaseDir(homeDir == null ? "." : homeDir.getAbsolutePath());
 			swingConfig.setMainClass(Main.class.getName());
@@ -495,6 +495,21 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			throw new Exception(e1);
 		}
 		return swing;
+	}
+
+	private File getHomeDir(String filename) throws IOException {
+		File f = manager.resolveFile(filename);
+		if (f == null || !f.exists()) {
+			File newFolder = new File(filename);
+			boolean created = newFolder.mkdirs();
+			if (!created) {
+				throw new IOException("User home folder '" + filename + "' does not exist and can not be created.");
+			} else {
+				return newFolder;
+			}
+		} else {
+			return f;
+		}
 	}
 
 	private String getClassPathForClass(Class<?> clazz) throws UnsupportedEncodingException {

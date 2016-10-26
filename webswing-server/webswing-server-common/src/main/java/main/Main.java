@@ -3,8 +3,6 @@ package main;
 import java.awt.Toolkit;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,6 +81,15 @@ public class Main {
 			//file does not exist, do nothing
 		}
 
+		//try to create java.io.tmpdir if does not exist
+		try {
+			File f = new File(System.getProperty("java.io.tmpdir","."));
+			if (!f.exists()) {
+				f.mkdirs();
+			}
+		} catch (Exception e) {
+			//ignore if not possible to create
+		}
 	}
 
 	public static String getCreateNewTemp(String[] args) {

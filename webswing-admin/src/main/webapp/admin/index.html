@@ -20,7 +20,9 @@
     </ws-sidebar>
     <ws-messages></ws-messages>
     <script data-webswing-global-var="webswingadmin">
-		var xmlhttp = new XMLHttpRequest();
+    	window.onlineUpdatableConfigFields= [ 'swingConfig' ];
+    
+    	var xmlhttp = new XMLHttpRequest();
 	    xmlhttp.onreadystatechange = function() {
 	        if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
 	        	var version = xmlhttp.status == 200 ? xmlhttp.responseText : "undefined";

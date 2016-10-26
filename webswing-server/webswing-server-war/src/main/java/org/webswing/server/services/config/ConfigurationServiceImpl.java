@@ -69,6 +69,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public void setConfiguration(String path, Map<String, Object> configuration) throws Exception {
 		path = asPath(path);
+		if(configuration==null){
+			provider.createDefaultConfiguration(path);
+		}
 		provider.validateConfiguration(path, configuration);
 		Map<String, Object> old = provider.getConfiguration(path);
 		SecuredPathConfig oldConfig = provider.toSecuredPathConfig(path, old);
@@ -84,9 +87,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 		Map<String, Object> old = provider.getConfiguration(path);
 		SecuredPathConfig oldConfig = provider.toSecuredPathConfig(path, old);
-		SecuredPathConfig newConfig = provider.toSecuredPathConfig(path, configuration);
 		if (oldConfig != null) {
 			provider.saveSwingConfiguration(path, configuration);
+			SecuredPathConfig newConfig = provider.toSecuredPathConfig(path, provider.getConfiguration(path));
 			notifyChange(path, oldConfig, newConfig);
 		} else {
 			throw new WsException("No Application found for path '" + path + "'");
@@ -136,5 +139,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public ClassLoader getExtensionClassLoader() {
 		return extensionLoader;
+	}
+
+	@Override
+	public boolean isMultiApplicationMode() {
+		return provider.isMultiApplicationMode();
 	}
 }
