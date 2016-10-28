@@ -27,7 +27,5 @@ public interface ConfigurationService extends WebswingService {
 
 	MetaObject describeConfiguration(String string, Map<String, Object> json, ConfigContext ctx) throws WsException;
 
-	ClassLoader getExtensionClassLoader();
-
 	boolean isMultiApplicationMode(); 
 }

@@ -9,6 +9,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
 	public static final String SWING_START_SYS_PROP_JMS_ID = "webswing.jmsQueueId";
 	public static final String SWING_START_SYS_PROP_MAIN_CLASS = "webswing.mainClass";
+	public static final String SWING_START_SYS_PROP_APP_HOME = "webswing.applicationHome";
 	public static final String SWING_START_SYS_PROP_CLASS_PATH = "webswing.classPath";
 	public static final String SWING_START_SYS_PROP_ISOLATED_FS = "webswing.isolatedFs";
 	public static final String SWING_START_SYS_PROP_TRANSFER_DIR = "webswing.transfer.dir";
@@ -79,8 +80,11 @@ public interface Constants {
 
 	//integration-branding
 	public static final String BRANDING_PREFIX = "webswing.brandingPrefix";
-	public static final String CONFIG_PROVIDER = "webswing.configProvider";
+	public static final String EXTENSTION_INITIALIZER = "webswing.extensionInitializer";
 	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
+	public static final String CONFIG_PROVIDER = "webswing.configProvider";
+
+
 
 
 }

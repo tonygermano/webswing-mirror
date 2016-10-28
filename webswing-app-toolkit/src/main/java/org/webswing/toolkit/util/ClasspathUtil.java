@@ -8,9 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ClasspathUtil {
-	public static URL[] populateClassPath(String classpath) throws MalformedURLException {
-		return populateClassPath(classpath, "");
-	}
 
 	public static URL[] populateClassPath(String classpath, String relativeBase) throws MalformedURLException {
 		List<URL> urls = new ArrayList<URL>();
@@ -18,7 +15,7 @@ public class ClasspathUtil {
 		Logger.debug("Swing classpath: " + Arrays.asList(cp));
 		for (String f : cp) {
 			if (f.length() > 0) {
-				File file = new File(f);
+				File file = new File(f).getAbsoluteFile();
 				if (file.exists()) {
 					urls.add(file.toURI().toURL());
 				} else {
@@ -61,7 +58,7 @@ public class ClasspathUtil {
 		String pathSeg = pathSegs[0];
 		if (pathSegs.length > 1) {
 			if (pathSeg.contains("?") || pathSeg.contains("*")) {
-				File currentBaseFolder = new File(currentBase.isEmpty() ? "." : currentBase);
+				File currentBaseFolder = new File(currentBase.isEmpty() ? "." : currentBase).getAbsoluteFile();
 				if (currentBaseFolder.exists() && currentBaseFolder.isDirectory()) {
 					for (String name : currentBaseFolder.list()) {
 						if (matches(pathSeg, name)) {
@@ -74,7 +71,7 @@ public class ClasspathUtil {
 				scanForPatternFiles(Arrays.copyOfRange(pathSegs, 1, pathSegs.length), currentBase, result);
 			}
 		} else {
-			File currentBaseFolder = new File(currentBase.isEmpty() ? "." : currentBase);
+			File currentBaseFolder = new File(currentBase.isEmpty() ? "." : currentBase).getAbsoluteFile();
 			if (currentBaseFolder.exists() && currentBaseFolder.isDirectory()) {
 				for (String name : currentBaseFolder.list()) {
 					if (matches(pathSeg, name)) {

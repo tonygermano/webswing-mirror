@@ -18,4 +18,21 @@
     font-size: $smaller;
 }
 
+@mixin toolbar-message {
+    @include rem('margin:', 20px 0px);
+
+    font-size: $small;
+
+    &--error {
+        color: $danger;
+    }
+
+    &--neutral {
+        color: $neutral;
+    }
+
+    &--success {
+        color: $success;
+    }
+}
 

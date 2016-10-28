@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
+import org.webswing.server.extension.ExtensionClassLoader;
 import org.webswing.server.model.exception.WsInitException;
-import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.BuiltInModules;
 import org.webswing.server.services.security.api.SecurityContext;
@@ -27,16 +27,16 @@ import org.webswing.toolkit.util.ClasspathUtil;
 public class SecurityModuleWrapper implements WebswingSecurityModule {
 	private static final Logger log = LoggerFactory.getLogger(SecurityModuleWrapper.class);
 
-	private final ConfigurationService configService;
+	private final ExtensionClassLoader extensionLoader;
 	private WebswingSecurityModule custom;
 	private WebswingSecurityConfig config;
 	private URLClassLoader customCL;
 	private SecurityContext context;
 
-	public SecurityModuleWrapper(SecurityContext context, WebswingSecurityConfig config, ConfigurationService configService) {
+	public SecurityModuleWrapper(SecurityContext context, WebswingSecurityConfig config, ExtensionClassLoader extensionLoader) {
 		this.context = context;
 		this.config = config;
-		this.configService = configService;
+		this.extensionLoader = extensionLoader;
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 			String classPath = CommonUtil.generateClassPathString(config.getClassPath());
 			classPath = context.replaceVariables(classPath);
 			URL[] urls = ClasspathUtil.populateClassPath(classPath, context.resolveFile(".").getAbsolutePath());
-			customCL = new URLClassLoader(urls, configService.getExtensionClassLoader());
+			customCL = new URLClassLoader(urls, extensionLoader);
 			String securityModuleClassName = BuiltInModules.getSecurityModuleClassName(config.getModule());
 			Class<?> moduleClass = customCL.loadClass(securityModuleClassName);
 

@@ -7,8 +7,90 @@
 }
 
 // The part of the panel that slides down
-.c-files-toolbar-body {
-    @include rem('height', 160px);
+.c-files-toolbar-dropArea {
+    @include rem('height', 30px);
+    @include rem('margin-bottom', 5px);
+	border-style: dashed;
+	border-color: $divider-color;
+	overflow: auto;
+	
+	&__label {
+	    @include rem('margin', 0 0 2px);
+	    @include rem('padding-left', 10px);
+		text-align: center;
+	}
+	
+	&--ondrag {
+       @include rem('height', 200px);
+    }
+}
 
-    margin-right: 0;
+.c-files-sticky-container {
+    display: block;
+    clear: both;
+    width: 100%;
+}
+
+.c-files-toolbar-actions {
+    display: block;
+    float: left;
+    
+    .c-files-toolbar-action {
+    	&:first-child{
+			border-bottom-left-radius: 3px;
+			border-top-left-radius: 3px;
+    	}  
+        &:last-child{
+    		border-bottom-right-radius: 3px;
+			border-top-right-radius: 3px;
+		}
+    	&:not(:first-child){
+			border-left: 0;
+		}
+		&__upload{
+			position: relative;
+			overflow: hidden;
+		}
+    }
+}
+
+.c-files-toolbar-button {
+    @include rem('padding', 6px 10px);
+	line-height: 1;
+	font-family: "open sans", sans-serif;
+    float: left;
+    background: none;
+    border: 1px solid;
+    border-color: $light-grey-4;
+    outline: none;
+    font-size: $smallest;
+
+    &:hover {
+        background-color: $primary;
+        border-color: $primary;
+
+        color: $white;
+    }
+    
+	input.upload {
+	    @include rem('font-size', 20px);
+		position: absolute;
+		top: 0;
+		right: 0;
+		margin: 0;
+		padding: 0;
+		cursor: pointer;
+		opacity: 0;
+		filter: alpha(opacity = 0);
+	}
+	
+	&--right {
+		@extend .c-files-toolbar-button;
+	    @include border-radius(3px);
+		float: right;
+	}
+}
+
+.c-files-toolbar-message{
+	@include toolbar-message;
 }

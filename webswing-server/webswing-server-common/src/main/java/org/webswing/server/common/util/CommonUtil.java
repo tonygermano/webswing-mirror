@@ -71,16 +71,15 @@ public class CommonUtil {
 			return null;
 		}
 		name = subs.replace(name);
-		homeDir = subs.replace(homeDir);
-		File relativeToHomeInRoot = new File(Main.getRootDir(), homeDir + File.separator + name);
+		File relativeToHomeInRoot = new File(Main.getRootDir(), homeDir + File.separator + name).getAbsoluteFile();
 		if (relativeToHomeInRoot.exists()) {
 			return relativeToHomeInRoot;
 		}
-		File relativeToHome = new File(homeDir + File.separator + name);
+		File relativeToHome = new File(homeDir + File.separator + name).getAbsoluteFile();
 		if (relativeToHome.exists()) {
 			return relativeToHome;
 		}
-		File absolute = new File(name);
+		File absolute = new File(name).getAbsoluteFile();
 		if (absolute.exists()) {
 			return absolute;
 		}
@@ -115,7 +114,6 @@ public class CommonUtil {
 		}
 		return warFile;
 	}
-
 
 	public static void transferStreams(InputStream is, OutputStream os) throws IOException {
 		try {

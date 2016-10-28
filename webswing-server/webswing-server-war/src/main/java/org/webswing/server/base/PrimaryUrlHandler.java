@@ -26,6 +26,7 @@ import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.config.ConfigurationChangeEvent;
 import org.webswing.server.services.config.ConfigurationChangeListener;
 import org.webswing.server.services.config.ConfigurationService;
@@ -77,6 +78,9 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		try {
 			status.setStatus(Status.Starting);
 			varSubs = VariableSubstitutor.forSwingApp(getConfig());
+			if (!new File(getHome()).getAbsoluteFile().isDirectory()) {//check if home dir exists
+				throw new WsInitException("Home Folder '" + new File(getHome()).getAbsolutePath() + "'does not exist!");
+			}
 			loadSecurityModule();
 			super.init();
 			status.setStatus(Status.Running);
@@ -318,7 +322,12 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	@Override
 	public File resolveFile(String name) {
-		return CommonUtil.resolveFile(name, getConfig().getHomeDir(), varSubs);
+		String home = getHome();
+		return CommonUtil.resolveFile(name, home, varSubs);
+	}
+
+	private String getHome() {
+		return VariableSubstitutor.basic().replace(getConfig().getHomeDir());
 	}
 
 	@Override

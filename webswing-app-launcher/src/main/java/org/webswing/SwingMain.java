@@ -3,6 +3,7 @@ package org.webswing;
 import java.applet.Applet;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -22,7 +23,10 @@ public class SwingMain {
 
 	public static void main(String[] args) {
 		try {
-			URL[] urls = ClasspathUtil.populateClassPath(System.getProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH));
+
+			String relativeBase = System.getProperty(Constants.SWING_START_SYS_PROP_APP_HOME);
+			String cp = System.getProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH);
+			URL[] urls = ClasspathUtil.populateClassPath(cp, relativeBase);
 			/*
 			 * wrap into additional URLClassLoader with class path urls because
 			 * some resources may contain classes from packages that should be loaded
@@ -30,7 +34,7 @@ public class SwingMain {
 			 */
 			ClassLoader wrapper = new URLClassLoader(urls, SwingMain.class.getClassLoader());
 			swingLibClassLoader = Services.getClassLoaderService().createSwingClassLoader(urls, wrapper);
-
+			initTempFolder();
 			if (isApplet()) {
 				startApplet();
 			} else {
@@ -92,5 +96,17 @@ public class SwingMain {
 
 	private static boolean isApplet() {
 		return System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null;
+	}
+
+	private static void initTempFolder() {
+		//try to create java.io.tmpdir if does not exist
+		try {
+			File f = new File(System.getProperty("java.io.tmpdir", ".")).getAbsoluteFile();
+			if (!f.exists()) {
+				f.mkdirs();
+			}
+		} catch (Exception e) {
+			//ignore if not possible to create
+		}
 	}
 }

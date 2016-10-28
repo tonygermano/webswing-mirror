@@ -70,7 +70,7 @@ public class Main {
 		}
 	}
 
-	private static void initializeDefaultSystemProperties() {
+	public static void initializeDefaultSystemProperties() {
 		try {
 			InputStream propFile = Main.class.getClassLoader().getResourceAsStream("WEB-INF/classes/webswing.properties");
 			Properties p = new Properties(System.getProperties());
@@ -79,16 +79,6 @@ public class Main {
 			System.setProperties(p);
 		} catch (Exception e) {
 			//file does not exist, do nothing
-		}
-
-		//try to create java.io.tmpdir if does not exist
-		try {
-			File f = new File(System.getProperty("java.io.tmpdir","."));
-			if (!f.exists()) {
-				f.mkdirs();
-			}
-		} catch (Exception e) {
-			//ignore if not possible to create
 		}
 	}
 
@@ -171,7 +161,7 @@ public class Main {
 				String extension = i > -1 ? name.substring(i) : "";
 				name = name.substring(0, name.length() - extension.length()) + extension;
 			}
-			File file = new File(tempDirPath + File.separator + name);
+			File file = new File(tempDirPath + File.separator + name).getAbsoluteFile();
 			if (!file.exists()) {
 				file.createNewFile();
 				file.deleteOnExit();
@@ -202,7 +192,7 @@ public class Main {
 
 	public static File getTempDir() {
 		if (System.getProperty(Constants.TEMP_DIR_PATH) == null) {
-			File baseDir = new File(System.getProperty(Constants.TEMP_DIR_PATH_BASE, System.getProperty("java.io.tmpdir")));
+			File baseDir = new File(System.getProperty(Constants.TEMP_DIR_PATH_BASE, System.getProperty("java.io.tmpdir"))).getAbsoluteFile();
 			if (!baseDir.exists()) {
 				baseDir.mkdirs();
 			}
@@ -219,7 +209,7 @@ public class Main {
 				}
 			} else {
 				baseName = "release";
-				File tempDir = new File(baseDir, baseName);
+				File tempDir = new File(baseDir, baseName).getAbsoluteFile();
 				if (!tempDir.exists()) {
 					tempDir.mkdir();
 				} else {
@@ -256,7 +246,7 @@ public class Main {
 					throw new IllegalArgumentException("File " + file.getAbsolutePath() + "not found.");
 				}
 			} catch (IllegalArgumentException e) {
-				File absoluteConfigFile = new File(pathOrUri);
+				File absoluteConfigFile = new File(pathOrUri).getAbsoluteFile();
 				if (absoluteConfigFile.exists()) {
 					System.setProperty(Constants.ROOT_DIR_URI, absoluteConfigFile.toURI().toString());
 					System.setProperty(Constants.ROOT_DIR_PATH, absoluteConfigFile.getAbsolutePath());

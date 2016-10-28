@@ -16,29 +16,23 @@ import org.webswing.server.extension.ExtensionClassLoader;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.model.exception.WsInitException;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class ConfigurationServiceImpl implements ConfigurationService {
 
+	private final ExtensionClassLoader extensionLoader;
 	private ConfigurationProvider provider;
-	private ExtensionClassLoader extensionLoader;
 	private List<ConfigurationChangeListener> changeListeners = new ArrayList<ConfigurationChangeListener>();
+
+	@Inject
+	public ConfigurationServiceImpl( ExtensionClassLoader extensionLoader) {
+		this.extensionLoader = extensionLoader;
+	}
 
 	@Override
 	public void start() throws WsInitException {
-
-		String extClassLoader = System.getProperty(Constants.EXTENSTION_CLASSLOADER);
-		try {
-			if (extClassLoader == null) {
-				extensionLoader = new ExtensionClassLoader();
-			} else {
-				extensionLoader = (ExtensionClassLoader) getClass().getClassLoader().loadClass(extClassLoader).newInstance();
-			}
-		} catch (Exception ex) {
-			throw new WsInitException("Could not initialize Extension classloader " + extClassLoader, ex);
-		}
-
 		String providerClassName = System.getProperty(Constants.CONFIG_PROVIDER, DefaultConfigurationProvider.class.getName());
 		try {
 			Class<?> providerClass = extensionLoader.loadClass(providerClassName);
@@ -69,7 +63,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public void setConfiguration(String path, Map<String, Object> configuration) throws Exception {
 		path = asPath(path);
-		if(configuration==null){
+		if (configuration == null) {
 			provider.createDefaultConfiguration(path);
 		}
 		provider.validateConfiguration(path, configuration);
@@ -125,7 +119,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	@Override
 	public MetaObject describeConfiguration(String path, Map<String, Object> json, ConfigContext ctx) throws WsException {
-		return provider.describeConfiguration(asPath(path), json, ctx, getExtensionClassLoader());
+		return provider.describeConfiguration(asPath(path), json, ctx, extensionLoader);
 	}
 
 	private String asPath(String path) {
@@ -134,11 +128,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 			p = "/";
 		}
 		return p;
-	}
-
-	@Override
-	public ClassLoader getExtensionClassLoader() {
-		return extensionLoader;
 	}
 
 	@Override

@@ -59,6 +59,7 @@ import org.webswing.server.services.swingprocess.SwingProcessService;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.util.FontUtils;
 import org.webswing.server.util.ServerUtil;
+import org.webswing.toolkit.WebPrinterJob;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebToolkit6;
 import org.webswing.toolkit.WebToolkit7;
@@ -334,7 +335,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		jvmConnection.close();
 		notifyExiting();
 
-		if (config.isIsolatedFs() && config.isClearTransferDir()) {
+		if (process != null && config.isIsolatedFs() && config.isClearTransferDir()) {
 			String transferDir = process.getConfig().getProperties().get(Constants.SWING_START_SYS_PROP_TRANSFER_DIR);
 			try {
 				if (transferDir != null) {
@@ -394,9 +395,10 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
 			swingConfig.setName(getClientId());
-			File homeDir = getHomeDir(subs.replace(appConfig.getUserDir()));
-			swingConfig.setJreExecutable(subs.replace(appConfig.getJreExecutable()));
-			swingConfig.setBaseDir(homeDir == null ? "." : homeDir.getAbsolutePath());
+			String java = getAbsolutePath(subs.replace(appConfig.getJreExecutable()), false);
+			swingConfig.setJreExecutable(java);
+			String homeDir = getAbsolutePath(subs.replace(appConfig.getUserDir()), true);
+			swingConfig.setBaseDir(homeDir);
 			swingConfig.setMainClass(Main.class.getName());
 			swingConfig.setClassPath(new File(URI.create(CommonUtil.getWarFileLocation())).getAbsolutePath());
 			String webSwingToolkitApiJarPath = getClassPathForClass(WebswingApi.class);
@@ -432,13 +434,14 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.setJvmArgs(bootCp + debug + " -noverify " + vmArgs);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, getClientId());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.queueId);
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_HOME, getAbsolutePath(".", false));
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
 			swingConfig.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 			swingConfig.addProperty(Constants.JMS_URL, System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT));
 
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_THEME, subs.replace(appConfig.getTheme()));
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs());
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, subs.replace(appConfig.getTransferDir()));
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, getAbsolutePath(subs.replace(appConfig.getTransferDir()), false));
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD, appConfig.isAllowAutoDownload());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload());
@@ -451,9 +454,9 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported());
 			swingConfig.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout());
 			swingConfig.addProperty("awt.toolkit", webToolkitClass);
-			swingConfig.addProperty("java.awt.headless", "false");
+			swingConfig.addProperty("java.awt.headless", false);
 			swingConfig.addProperty("java.awt.graphicsenv", webGraphicsEnvClass);
-			swingConfig.addProperty("java.awt.printerjob", "org.webswing.toolkit.WebPrinterJob");
+			swingConfig.addProperty("java.awt.printerjob", WebPrinterJob.class.getName());
 			swingConfig.addProperty("sun.awt.fontconfig", FontUtils.createFontConfiguration(appConfig, subs));
 			swingConfig.addProperty(Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth));
 			swingConfig.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight));
@@ -497,19 +500,29 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		return swing;
 	}
 
-	private File getHomeDir(String filename) throws IOException {
-		File f = manager.resolveFile(filename);
-		if (f == null || !f.exists()) {
-			File newFolder = new File(filename);
-			boolean created = newFolder.mkdirs();
-			if (!created) {
-				throw new IOException("User home folder '" + filename + "' does not exist and can not be created.");
-			} else {
-				return newFolder;
-			}
-		} else {
-			return f;
+	private String getAbsolutePath(String path, boolean create) throws IOException {
+		if (StringUtils.isBlank(path)) {
+			path = ".";
 		}
+		File f = manager.resolveFile(path);
+		if (f == null || !f.exists()) {
+			path = path.replaceAll("\\\\", "/");
+			String[] pathSegs = path.split("/");
+			boolean absolute = pathSegs[0].length() == 0 || pathSegs[0].contains(":");
+			if (!absolute) {
+				File home = manager.resolveFile(".");
+				f = new File(home, path);
+			} else {
+				f = new File(path);
+			}
+			if (create) {
+				boolean done = f.mkdirs();
+				if (!done) {
+					throw new IOException("Unable to create path. " + f.getAbsolutePath());
+				}
+			}
+		}
+		return f.getCanonicalPath();
 	}
 
 	private String getClassPathForClass(Class<?> clazz) throws UnsupportedEncodingException {

@@ -311,7 +311,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	public MetaObject getConfigMeta() throws WsException {
 		MetaObject meta = super.getConfigMeta();
 		if (restartNeeded) {
-			meta.setMessage("Configuration has been changed. Please restart the server to apply the changes. Note: Displaying current runtime configuration.");
+			meta.setMessage("Configuration has been changed. Please restart the server to apply the changes.");
 		}
 		return meta;
 	}

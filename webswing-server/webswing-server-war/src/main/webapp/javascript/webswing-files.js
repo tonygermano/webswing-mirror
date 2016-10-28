@@ -27,8 +27,8 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 		var errorTimeout;
 		var closeAfterErrorTimeout;
 		var uploadBar, fileDialogTransferBarClientId, fileDialogErrorMessage;
-		var fileDialogErrorMessageContent, deleteSelectedButton, downloadSelectedButton;
-		var dropZone, fileUpload, uploadProgressBar, uploadProgress, cancelBtn, downloadBtn, uploadBtn, deleteBtn, fileInput;
+		var fileActionButtonGroup, fileDialogErrorMessageContent, deleteSelectedButton, downloadSelectedButton;
+		var dropZone, fileUpload, uploadProgressBar, uploadProgress, cancelBtn, uploadBtn, fileInput;
 		var autoUploadBar, autoFileupload, autoFileInput, cancelAutoUploadButton, autoUploadfileDialogTransferBarClientId;
 		var autoSaveBar, autoSaveInput, cancelAutoSaveButton, autoSaveButton;
 
@@ -77,14 +77,17 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				api.cfg.rootElement.append(uploadBar);
 			}
 			fileDialogTransferBarClientId.val(clientId);
-			showOrHide(downloadBtn, data.allowDownload);
-			showOrHide(uploadBtn, data.allowUpload);
+
+			appendOrDetach(downloadSelectedButton, fileActionButtonGroup, data.allowDownload);
+			appendOrDetach(uploadBtn, fileActionButtonGroup, data.allowUpload);
+			appendOrDetach(deleteSelectedButton, fileActionButtonGroup, data.allowDelete);
+
 			showOrHide(dropZone, data.allowUpload);
-			showOrHide(deleteBtn, data.allowDelete);
+			showOrHide(cancelBtn, data.allowDownload || data.allowUpload || data.allowDelete);
 			fileInput.prop("multiple", data.isMultiSelection);
 			fileInput.attr("accept", data.filter);
 			setProgressBarVisible(false);
-			animateShow(uploadBar);
+			showOrHide(uploadBar, data.allowDownload || data.allowUpload || data.allowDelete);
 		}
 
 		function close() {
@@ -111,14 +114,15 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 
 			uploadBar = api.cfg.rootElement.find('div[data-id="uploadBar"]');
 			fileDialogTransferBarClientId = uploadBar.find('input[data-id="fileDialogTransferBarClientId"]');
+
+			fileActionButtonGroup = uploadBar.find('div[data-id="fileActionButtonGroup"]');
 			deleteSelectedButton = uploadBar.find('button[data-id="deleteSelectedButton"]');
 			downloadSelectedButton = uploadBar.find('button[data-id="downloadSelectedButton"]');
+			uploadBtn = uploadBar.find('div[data-id="fileUploadBtn"]');
+
 			dropZone = uploadBar.find('div[data-id="fileDropArea"]');
 			fileUpload = uploadBar.find('form[data-id="fileupload"]');
-			cancelBtn = uploadBar.find('div[data-id="cancelBtn"]');
-			downloadBtn = uploadBar.find('div[data-id="fileDownloadBtn"]');
-			uploadBtn = uploadBar.find('div[data-id="fileUploadBtn"]');
-			deleteBtn = uploadBar.find('div[data-id="fileDeleteBtn"]');
+			cancelBtn = uploadBar.find('button[data-id="cancelBtn"]');
 			fileInput = uploadBar.find('input[data-id="fileInput"]');
 
 			uploadProgressBar = api.cfg.rootElement.find('div[data-id="fileDialogTransferProgressBar"]');
@@ -151,10 +155,11 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 					withCredentials : true
 				},
 				url : api.cfg.connectionUrl + 'file',
-				dataType : 'json'
+				dataType : 'json',
+				dropZone : null
 			});
 			autoJqUpload.bind('fileuploadfail', fileuploadfail);
-			autoJqUpload.bind("fileuploadprogressall", fileuploadprogressall);
+			autoJqUpload.bind('fileuploadprogressall', fileuploadprogressall);
 			autoJqUpload.bind('fileuploadadd', fileuploadadd);
 
 			var jqUpload = fileUpload.fileupload({
@@ -166,7 +171,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				dropZone : dropZone
 			});
 			jqUpload.bind('fileuploadfail', fileuploadfail);
-			jqUpload.bind("fileuploadprogressall", fileuploadprogressall);
+			jqUpload.bind('fileuploadprogressall', fileuploadprogressall);
 			jqUpload.bind('fileuploadadd', fileuploadadd);
 
 			function fileuploadadd(e, data) {
@@ -238,7 +243,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 
 			cancelAutoSaveButton.bind('click', cancelFileSelection);
 			cancelAutoUploadButton.bind('click', cancelFileSelection);
-			cancelBtn.bind('click', cancelUpload);
+			cancelBtn.bind('click', cancelFileSelection);
 
 			deleteSelectedButton.bind('click', function(e) {
 				sendMessageEvent('deleteFile');
@@ -259,30 +264,24 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 
 			api.cfg.rootElement.bind('dragover', function(e) {
 				if (!timeout) {
-					dropZone.addClass('in');
+					dropZone.addClass('c-files-toolbar-dropArea--ondrag');
 				} else {
 					clearTimeout(timeout);
 				}
 
 				timeout = setTimeout(function() {
 					timeout = null;
-					dropZone.removeClass('in');
+					dropZone.removeClass('c-files-toolbar-dropArea--ondrag');
 				}, 100);
 			});
 
 		}
 
 		function animateShow(element) {
-			element.show().animate({
-				"top" : "0px",
-				"opacity" : "1"
-			}, 200);
+			element.show('fast');
 		}
 		function animateHide(element) {
-			element.animate({
-				"top" : "50px",
-				"opacity" : "0"
-			}, 200).hide();
+			element.hide('fast');
 		}
 
 		function showOrHide(element, bool) {
@@ -291,6 +290,13 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			} else {
 				animateHide(element);
 			}
+		}
+
+		function appendOrDetach(element, parent, bool) {
+			element.detach();
+			if (bool) {
+				parent.append(element);
+			} 
 		}
 
 		function setProgressBarVisible(bool) {

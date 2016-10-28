@@ -156,8 +156,9 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				var otherTab = copyBar.find('button[data-id="other"]');
 				otherTab.removeClass("c-minimized-tab--is-inactive").addClass("c-minimized-tab--is-active");
 				otherTab.on('click', function() {
-					showContent(otherTab, 'other');
+					toggleContent(otherTab, 'other');
 				});
+				showTab(otherTab, 'other');
 			}
 			/* FILES TAB */
 			if (data.files != null && data.files.length !== 0) {
@@ -185,8 +186,9 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				var filesTab = copyBar.find('button[data-id="files"]');
 				filesTab.removeClass("c-minimized-tab--is-inactive").addClass("c-minimized-tab--is-active");
 				filesTab.on('click', function() {
-					showContent(filesTab, 'files');
+					toggleContent(filesTab, 'files');
 				});
+				showTab(filesTab, 'files');
 			}
 			/* IMAGE TAB */
 			if (data.img != null) {
@@ -194,8 +196,9 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				var imageTab = copyBar.find('button[data-id="image"]');
 				imageTab.removeClass("c-minimized-tab--is-inactive").addClass("c-minimized-tab--is-active")
 				imageTab.on('click', function() {
-					showContent(imageTab, 'image');
+					toggleContent(imageTab, 'image');
 				});
+				showTab(imageTab, 'image');
 			}
 			/* HTML TAB */
 			if (data.html != null && data.html.length !== 0) {
@@ -204,8 +207,9 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				htmlarea.val(data.html);
 				htmlTab.removeClass("c-minimized-tab--is-inactive").addClass("c-minimized-tab--is-active");
 				htmlTab.on('click', function() {
-					showContent(htmlTab, 'html');
+					toggleContent(htmlTab, 'html');
 				});
+				showTab(htmlTab, 'html');
 			}
 			/* TEXT TAB */
 			if (data.text != null && data.text.length !== 0) {
@@ -214,16 +218,28 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				textarea.val(data.text);
 				textTab.removeClass("c-minimized-tab--is-inactive").addClass("c-minimized-tab--is-active");
 				textTab.on('click', function() {
-					showContent(textTab, 'text');
+					toggleContent(textTab, 'text');
 				});
+				showTab(textTab, 'text');
 			}
 
-			function showContent(tab, type) {
+			function showTab(tab, type) {
 				copyBar.find('.c-minimized-tab--is-selected').removeClass('c-minimized-tab--is-selected');
 				copyBar.find('.c-tab-content__item').removeClass('c-tab-content__item--is-active');
 				$(tab).addClass('c-minimized-tab--is-selected');
 				copyBar.find('#' + type).addClass('c-tab-content__item--is-active');
-				maximize();
+			}
+
+			function toggleContent(tab, type) {
+				var isSelected = $(tab).hasClass('c-minimized-tab--is-selected');
+				showTab(tab, type);
+				if (copyBar.minimized) {
+					maximize();
+				} else {
+					if (isSelected) {
+						minimize();
+					}
+				}
 			}
 
 			var minimizeBtn = copyBar.find('.c-tab-labels__minimize-button');
@@ -231,10 +247,15 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				minimize();
 			});
 
-			//minimize	
-			copyBar.find('div[data-id="contentBar"]').hide();
-			copyBar.minimized = true;
-			
+			if (onlyOtherData) {
+				copyBar.find('div[data-id="contentBar"]').hide();
+				copyBar.minimized = true;
+			} else {
+				maximize()
+				var minimizer = setTimeout(function() {
+					minimize();
+				}, 2000);
+			}
 		}
 
 		function minimize() {

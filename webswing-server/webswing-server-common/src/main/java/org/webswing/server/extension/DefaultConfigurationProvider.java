@@ -23,7 +23,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 	protected Map<String, Object> configuration = new HashMap<String, Object>();
 
 	public DefaultConfigurationProvider() throws WsInitException {
-		configuration = loadConfiguration();
+		loadConfiguration();
 	}
 
 	@Override
@@ -54,6 +54,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 			configuration.put("path", path);
 			json.put(path, configuration);
 			WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
+			loadConfiguration();
 		} catch (Exception e) {
 			log.error("Failed to save Webswing configuration :", e);
 			throw new Exception("Failed to save Webswing configuration :", e);
@@ -71,6 +72,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 			Map<String, Object> newValue = newConfig.getSwingConfig().asMap();
 			pathJson.put("swingConfig", newValue);
 			WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
+			loadConfiguration();
 		} catch (Exception e) {
 			log.error("Failed to save Swing configuration for '" + path + "':", e);
 			throw new Exception("Failed to save Swing configuration for '" + path + "':", e);
@@ -86,6 +88,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 			Map<String, Object> json = WebswingObjectMapper.get().readValue(configFile, Map.class);
 			json.remove(path);
 			WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
+			loadConfiguration();
 		} catch (Exception e) {
 			log.error("Failed to save Webswing configuration :", e);
 			throw new Exception("Failed to save Webswing configuration :", e);
@@ -131,6 +134,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 			File config = getConfigFile();
 			if (config.exists()) {
 				Map<String, Object> json = WebswingObjectMapper.get().readValue(config, Map.class);
+				configuration = json;
 				return json;
 			} else {
 				throw new WsInitException("Configuration file " + config.getPath() + " does not exist!");
@@ -150,7 +154,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 		result.put("path", path);
 		return result;
 	}
-	
+
 	@Override
 	public boolean isMultiApplicationMode() {
 		return true;
