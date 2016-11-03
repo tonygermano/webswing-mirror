@@ -48,8 +48,8 @@ public class WebswingServerModule extends AbstractModule {
 		initializeDefaultSystemProperties();
 
 		//extendables
-		bindExtension(ExtensionClassLoader.class, Constants.EXTENSTION_CLASSLOADER, ExtensionClassLoader.class);
-		bindExtension(Initializer.class, Constants.EXTENSTION_INITIALIZER, DefaultInitializer.class);
+		bindSingletonExtension(Initializer.class, Constants.EXTENSTION_INITIALIZER, DefaultInitializer.class);
+		bindSingletonExtension(ExtensionClassLoader.class, Constants.EXTENSTION_CLASSLOADER, ExtensionClassLoader.class);
 
 		bind(GlobalUrlHandler.class);
 
@@ -83,7 +83,7 @@ public class WebswingServerModule extends AbstractModule {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> void bindExtension(Class<T> target, String extensionClassProp, Class<? extends T> defaultClass) {
+	private <T> void bindSingletonExtension(Class<T> target, String extensionClassProp, Class<? extends T> defaultClass) {
 		Class<? extends T> result = defaultClass;
 		String extensionClassName = System.getProperty(extensionClassProp);
 		if (extensionClassName != null) {
@@ -96,7 +96,7 @@ public class WebswingServerModule extends AbstractModule {
 		}
 
 		if (result != target) {
-			bind(target).to(result);
+			bind(target).to(result).asEagerSingleton();
 		}
 	}
 

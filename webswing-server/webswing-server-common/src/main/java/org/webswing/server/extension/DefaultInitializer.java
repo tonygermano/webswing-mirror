@@ -14,12 +14,16 @@ import main.Main;
 public class DefaultInitializer implements Initializer {
 	private static final Logger log = LoggerFactory.getLogger(DefaultInitializer.class);
 
-	@Override
-	public void start() throws WsInitException {
-		setup();
+	public DefaultInitializer() {
+		try {
+			start();
+		} catch (WsInitException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
-	private void setup() throws WsInitException {
+	@Override
+	public void start() throws WsInitException {
 		// initialize temp folder (create/delete old content)
 		File tempDir = Main.getTempDir();
 		log.info("Using Temp folder:" + tempDir.getAbsolutePath());

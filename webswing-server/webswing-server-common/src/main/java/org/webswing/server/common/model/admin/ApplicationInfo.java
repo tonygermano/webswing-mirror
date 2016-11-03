@@ -14,6 +14,7 @@ public class ApplicationInfo implements Serializable {
 	private String name;
 	private InstanceManagerStatus status;
 	private SecuredPathConfig config;
+	private Map<String, String> variables;
 	private int connectedInstances;
 	private int runningInstances;
 	private int maxRunningInstances;
@@ -91,6 +92,14 @@ public class ApplicationInfo implements Serializable {
 
 	public void setConfig(SecuredPathConfig config) {
 		this.config = config;
+	}
+
+	public Map<String, String> getVariables() {
+		return variables;
+	}
+
+	public void setVariables(Map<String, String> variables) {
+		this.variables = variables;
 	}
 
 	public InstanceManagerStatus getStatus() {

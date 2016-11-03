@@ -367,8 +367,11 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	public Map<String, Boolean> getPermissions() throws Exception {
 		Map<String, Boolean> perm = super.getPermissions();
 		boolean multiApplicationMode= configService.isMultiApplicationMode();
+		perm.put("start", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_startApp));
+		perm.put("stop", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_stopApp));
 		perm.put("remove", multiApplicationMode && isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_removeApp));
 		perm.put("create", multiApplicationMode && isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_createApp));
+		perm.put("configEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
 		return perm;
 	}
 

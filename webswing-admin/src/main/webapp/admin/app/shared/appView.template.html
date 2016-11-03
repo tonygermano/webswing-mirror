@@ -59,10 +59,14 @@
 					<pie-chart data="vm.usageData" options="vm.usageOptions"></pie-chart>
 				</div>
 				<table class="table">
-					<th>
+					<tr>
+						<td><strong>Running sessions:</strong></td>
+						<td>{{vm.value.runningInstances}}</td>
+					</tr>
+					<tr>
 						<td><strong>Finished sessions:</strong></td>
 						<td>{{vm.value.finishedInstances}}</td>
-					</th>
+					</tr>
 				</table>
 			</div>
 			<div class="col-xs-6 col-sm-6 col-md-3">
@@ -114,7 +118,7 @@
 			<div class="col-xs-12 col-sm-12 col-md-6">
 				<h4>Config:
 					<div class="pull-right">
-						<button ng-if="vm.permissions.configView" class="btn btn-xs btn-primary" type="button" ng-click="vm.viewConfig()">
+						<button ng-if="vm.permissions.configView && vm.showConfigButton" class="btn btn-xs btn-primary" type="button" ng-click="vm.viewConfig()">
 					    	<span class="glyphicon glyphicon-edit"></span>  Show Config
 						</button>
 					</div>

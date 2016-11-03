@@ -219,6 +219,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		File icon = resolveFile(getConfig().getIcon());
 		app.setIcon(CommonUtil.loadImage(icon));
 		app.setConfig(getConfig());
+		app.setVariables(varSubs.getVariableMap());
 		app.setRunningInstances(runningInstances.size());
 		int connected = 0;
 		for (SwingInstance si : runningInstances.getAllInstances()) {
@@ -332,9 +333,11 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		if (id.startsWith("/")) {
 			id = id.substring(1);
 		}
-		SwingInstance instance = findInstanceByClientId(id);
+		SwingInstance instance = runningInstances.findByInstanceId(id);
 		if (instance != null) {
 			instance.shutdown(force);
+		}else{
+			throw new WsException("Instance with id "+id +" not found.");
 		}
 	}
 

@@ -14,11 +14,11 @@ public class StartupServiceImpl implements StartupService {
 	private final JmsService jms;
 	private final WebSocketService websocket;
 	private final ConfigurationService config;
-	private final Initializer initializer;
 
 	@Inject
 	public StartupServiceImpl(Initializer ini, JmsService jms, WebSocketService websocket, ConfigurationService config) {
-		this.initializer = ini;
+		//Initializer setup invoked in constructor 
+		//this.ini = ini;
 		this.jms = jms;
 		this.websocket = websocket;
 		this.config = config;
@@ -26,7 +26,6 @@ public class StartupServiceImpl implements StartupService {
 
 	public void start() throws WsInitException {
 		try {
-			initializer.start();
 			jms.start();
 			websocket.start();
 			config.start();

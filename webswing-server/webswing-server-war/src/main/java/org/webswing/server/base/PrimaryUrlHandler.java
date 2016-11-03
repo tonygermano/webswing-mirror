@@ -44,13 +44,13 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	private static final Logger log = LoggerFactory.getLogger(PrimaryUrlHandler.class);
 	private static final String default_version = "unresolved";
 
-	private final ConfigurationService configService;
-	private final SecurityModuleService securityModuleService;
+	protected final ConfigurationService configService;
+	protected final SecurityModuleService securityModuleService;
 
 	private SecuredPathConfig config;
 	private SecurityModuleWrapper securityModule;
 	private InstanceManagerStatus status = new InstanceManagerStatus();
-	VariableSubstitutor varSubs;
+	protected VariableSubstitutor varSubs;
 
 	public PrimaryUrlHandler(UrlHandler parent, SecurityModuleService securityModuleService, ConfigurationService configService) {
 		super(parent);
@@ -260,9 +260,10 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		Map<String, Boolean> permissions = new HashMap<>();
 		permissions.put("dashboard", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo));
 		permissions.put("configView", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig));
-		permissions.put("configEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
-		permissions.put("start", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_startApp));
-		permissions.put("stop", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_stopApp));
+		permissions.put("configSwingEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
+		permissions.put("configEdit", false);
+		permissions.put("start", false);
+		permissions.put("stop", false);
 		permissions.put("remove", false);
 		permissions.put("sessions", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getSession));
 		return permissions;

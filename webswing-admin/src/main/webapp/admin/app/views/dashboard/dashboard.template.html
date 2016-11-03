@@ -1,6 +1,6 @@
 <div ng-if="vm.permissions.dashboard">
-	<h2 class="sub-header">
-		Applications
+	<h2 class="sub-header" style="min-height:33px;">
+		<span ng-show="vm.paths.length > 1">Applications</span> 
 		<div class="pull-right">
 			<div class="ws-update" ng-click="vm.refresh()">
 				<span ng-class="{'glyphicon':true,'glyphicon-repeat':vm.timer != null,'glyphicon-refresh':vm.timer == null} "> </span> {{vm.lastUpdated| date:'h:mm:ss'}}

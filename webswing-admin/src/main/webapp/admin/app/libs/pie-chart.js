@@ -332,6 +332,9 @@ onMouseOut: function(svg) {
 },
 
 getLegendLabel: function(label, value, totalLength) {
+  if(label==null){
+	  return "";
+  }
   var dots = [];
   for (var i = 0; i < totalLength; i++) {
     dots.push(".");

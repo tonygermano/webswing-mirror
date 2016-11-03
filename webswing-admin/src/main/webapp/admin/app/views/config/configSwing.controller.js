@@ -1,10 +1,10 @@
 (function(define) {
 	define([], function f() {
-		function SwingConfigController($scope, $timeout, $location, configRestService, $routeParams, permissions, loading) {
+		function SwingConfigController($scope, $timeout, $location, configRestService, $routeParams, permissions, loading, extValue) {
 			var vm = this;
 			vm.config = {
 				hide : [ 'path' ],
-				enable : window.onlineUpdatableConfigFields
+				enable : extValue.onlineUpdatableConfigFields
 			};
 			vm.variables = {};
 			vm.reset = reset;
@@ -12,17 +12,13 @@
 			vm.back = back;
 			vm.path = $routeParams.path;
 			vm.permissions = permissions;
-			vm.readonly = !vm.permissions.configEdit;
+			vm.readonly = !vm.permissions.configSwingEdit;
 			activate();
-
-			$scope.$on('vm.permissions.configEdit', function(evt, ctl) {
-				vm.readonly = !vm.permissions.configEdit;
-			});
 
 			$scope.$on('wsStatusChanged', function(evt, ctl) {
 				vm.stopped = ctl.startable;
 				vm.config.message = null;
-				vm.config.enable = vm.stopped ? null : window.onlineUpdatableConfigFields;
+				vm.config.enable = vm.stopped ? null : extValue.onlineUpdatableConfigFields;
 				activate();
 			});
 
@@ -65,7 +61,7 @@
 				$location.path('/dashboard');
 			}
 		}
-		SwingConfigController.$inject = [ '$scope', '$timeout', '$location', 'configRestService', '$routeParams', 'permissions', 'loading' ];
+		SwingConfigController.$inject = [ '$scope', '$timeout', '$location', 'configRestService', '$routeParams', 'permissions', 'loading', 'extValue' ];
 
 		return SwingConfigController;
 	});

@@ -6,7 +6,7 @@
 		module.controller('ConfigSwingController', swingCtrl);
 
 		module.run([ 'navigationService', 'permissions', function(navigationService, permissions) {
-			var primary = navigationService.addLocation('Configuration', '#/config/server');
+			var primary = navigationService.addLocation('Configuration', '#/config/server', 'configEdit');
 		} ]);
 
 		module.config([ '$routeProvider', function($routeProvider) {

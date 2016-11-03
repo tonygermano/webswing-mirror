@@ -15,20 +15,31 @@
 			};
 		}
 
-		function wsNavbarDirectiveController(navigationService, loginService, baseUrl) {
+		function wsNavbarDirectiveController($scope, navigationService, loginService, baseUrl, permissions) {
 			var vm = this;
-			vm.locations = navigationService.getLocations();
 			vm.isActive = navigationService.isActive;
 			vm.isCollapsed = true;
 			vm.logout = logout;
 			vm.baseUrl = baseUrl;
+
+			$scope.$on('wsPermissionsReloaded', loadLocations);
+
+			function loadLocations() {
+				var locations = navigationService.getLocations();
+				for (var i = locations.length - 1; i >= 0; i--) {
+					if (locations[i].permission != null && !permissions[locations[i].permission]) {
+						locations.splice(i, 1);
+					}
+				}
+				vm.locations = locations;
+			}
 
 			function logout() {
 				loginService.logout();
 			}
 
 		}
-		wsNavbarDirectiveController.$inject = [ 'navigationService', 'loginService', 'baseUrl' ];
+		wsNavbarDirectiveController.$inject = [ '$scope', 'navigationService', 'loginService', 'baseUrl', 'permissions' ];
 
 		return wsNavbarDirective;
 	});
