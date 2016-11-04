@@ -64,7 +64,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	public void setConfiguration(String path, Map<String, Object> configuration) throws Exception {
 		path = asPath(path);
 		if (configuration == null) {
-			provider.createDefaultConfiguration(path);
+			configuration = provider.createDefaultConfiguration(path);
 		}
 		provider.validateConfiguration(path, configuration);
 		Map<String, Object> old = provider.getConfiguration(path);

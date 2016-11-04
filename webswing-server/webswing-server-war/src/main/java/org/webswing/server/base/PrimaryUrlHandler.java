@@ -56,6 +56,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		super(parent);
 		this.securityModuleService = securityModuleService;
 		this.configService = configService;
+		this.varSubs = VariableSubstitutor.basic();
 
 		this.configService.registerChangeListener(new ConfigurationChangeListener() {
 

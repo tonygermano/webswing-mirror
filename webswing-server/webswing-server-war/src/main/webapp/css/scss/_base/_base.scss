@@ -121,6 +121,5 @@ a,
 button,
 input {
     @include transition-duration(0.2s);
-
-    cursor: auto;
+	cursor: default;
 }

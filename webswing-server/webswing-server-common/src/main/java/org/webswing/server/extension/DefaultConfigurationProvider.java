@@ -39,7 +39,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 
 	@Override
 	public SecuredPathConfig toSecuredPathConfig(String path, Map<String, Object> configuration) {
-		HashMap<String, Object> copy = new HashMap<String, Object>(configuration);
+		HashMap<String, Object> copy = configuration == null ? new HashMap<String, Object>() : new HashMap<String, Object>(configuration);
 		copy.put("path", path);
 		SecuredPathConfig pathConfig = ConfigUtil.instantiateConfig(copy, SecuredPathConfig.class);
 		return pathConfig;
