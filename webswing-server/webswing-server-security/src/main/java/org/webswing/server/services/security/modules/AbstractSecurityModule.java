@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.common.util.WebswingObjectMapper;
@@ -55,6 +56,8 @@ import com.github.mustachejava.MustacheResolver;
  * @param <T>
  */
 public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleConfig> implements WebswingSecurityModule {
+	private static final Logger auditLog = LoggerFactory.getLogger(WebswingSecurityModule.class);
+
 	/**
 	 * Login response message parameter to indicate url redirect.(for Ajax calls)
 	 */
@@ -133,14 +136,13 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 		sendRedirect(req, res, fullPath);
 	}
 
-	
 	@Override
 	public void doServeAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse res) {
 		res.setStatus(HttpServletResponse.SC_OK);
 		res.setHeader("webswingUsername", user.getUserId());
-		serveAuthenticated(user,path,req,res);
+		serveAuthenticated(user, path, req, res);
 	}
-	
+
 	protected void serveAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse res) {
 	}
 
@@ -366,4 +368,27 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 		return WebswingObjectMapper.get();
 	}
 
+	public void logSuccess(HttpServletRequest r, String user) {
+		String path = getConfig().getContext().getSecuredPath();
+		path = StringUtils.isEmpty(path) ? "/" : path;
+		String module = this.getClass().getName();
+		auditLog("SUCCESS", r, path, module, user, "");
+	}
+
+	public void logFailure(HttpServletRequest r, String user, String reason) {
+		String path = getConfig().getContext().getSecuredPath();
+		path = StringUtils.isEmpty(path) ? "/" : path;
+		String module = this.getClass().getName();
+		auditLog("FAILED", r, path, module, user, reason);
+	}
+
+	public static void auditLog(String status, HttpServletRequest r, String path, String module, String username, String reason) {
+
+		String protocol = r.getScheme();
+		String ipAddress = r.getHeader("X-FORWARDED-FOR");
+		if (ipAddress == null) {
+			ipAddress = r.getRemoteAddr();
+		}
+		auditLog.info("{} | {} | {} | {} | {} | {} | {}", new Object[] { status, module, protocol, ipAddress, path, username, reason });
+	}
 }

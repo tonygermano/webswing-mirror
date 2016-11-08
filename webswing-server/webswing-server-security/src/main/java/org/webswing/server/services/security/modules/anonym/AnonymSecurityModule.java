@@ -17,6 +17,7 @@ public class AnonymSecurityModule extends AbstractSecurityModule<WebswingSecurit
 
 	@Override
 	protected AbstractWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException {
+		logSuccess(request, AnonymWebswingUser.anonymUserName);
 		return new AnonymWebswingUser();
 	}
 

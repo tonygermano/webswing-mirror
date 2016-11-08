@@ -14,7 +14,7 @@
 			var result = {
 				"Home Folder" : c.homeDir,
 				"Web Folder" : c.webFolder,
-				"Security Module" : c.security.module,
+				"Security Module" : c.security == null ? null : c.security.module,
 			}
 			if (c.swingConfig != null) {
 				result["Type"] = c.swingConfig.launcherType;

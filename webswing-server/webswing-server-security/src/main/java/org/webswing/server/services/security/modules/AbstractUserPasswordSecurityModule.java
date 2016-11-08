@@ -48,7 +48,16 @@ public abstract class AbstractUserPasswordSecurityModule<T extends WebswingExten
 		String username = getUserName(request);
 		String password = getPassword(request);
 		if (username != null || password != null) {
-			return verifyUserPassword(username, password);
+			try {
+				AbstractWebswingUser user = verifyUserPassword(username, password);
+				if (user != null) {
+					logSuccess(request, user.getUserId());
+				}
+				return user;
+			} catch (WebswingAuthenticationException e) {
+				logFailure(request, username, e.getMessage());
+				throw e;
+			}
 		} else {
 			return null;
 		}
