@@ -117,7 +117,7 @@ public class Main {
 		}
 	}
 
-	private static List<URL> getFilesFromPath(URL r) throws IOException {
+	public static List<URL> getFilesFromPath(URL r) throws IOException {
 		List<URL> urls = new ArrayList<URL>();
 		String tempDirPath = getTempDir().getAbsolutePath();
 		if (r.getPath().contains("!")) {

@@ -27,14 +27,14 @@
 				  </div>
 				</div>
 			</div>
-			<div class="pull-right" ng-if="vm.detail ==='true'" >
+			<div class="pull-right">
 				<button ng-if="vm.stoppable && vm.permissions.stop" class="btn btn-primary" type="button" ng-click="vm.stop()">
 			    	<span class="glyphicon glyphicon-stop"></span> Disable
 				</button>
 				<button ng-if="vm.startable && vm.permissions.start" class="btn btn-primary" type="button" ng-click="vm.start()">
 				    <span class="glyphicon glyphicon-play"></span> Enable
 				</button>
-				<div ng-if="vm.startable && vm.permissions.remove" class="btn-group">
+				<div ng-if="vm.startable && vm.permissions.remove && vm.detail ==='true'" class="btn-group">
 			        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" >
 					    Remove <span class="caret"></span>
 					</button>

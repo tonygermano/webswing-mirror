@@ -334,7 +334,8 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	@Override
 	public URL getWebResource(String resource) {
-		File webFolder = resolveFile(getConfig().getWebFolder());
+		String webFolderPath = getConfig().getWebFolder();
+		File webFolder = StringUtils.isEmpty(webFolderPath) ? null : resolveFile(webFolderPath);
 		return ServerUtil.getWebResource(toPath(resource), getServletContext(), webFolder);
 	}
 

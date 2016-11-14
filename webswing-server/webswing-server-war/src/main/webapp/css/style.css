@@ -403,7 +403,7 @@ input {
   -ms-transition-duration: 0.2s;
   -o-transition-duration: 0.2s;
   transition-duration: 0.2s;
-  cursor: auto;
+  cursor: default;
 }
 
 .l-webswing-container {

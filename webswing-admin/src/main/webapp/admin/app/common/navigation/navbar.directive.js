@@ -21,17 +21,17 @@
 			vm.isCollapsed = true;
 			vm.logout = logout;
 			vm.baseUrl = baseUrl;
-
+			vm.locations = [];
 			$scope.$on('wsPermissionsReloaded', loadLocations);
 
 			function loadLocations() {
+				vm.locations.length = 0;// clean array
 				var locations = navigationService.getLocations();
-				for (var i = locations.length - 1; i >= 0; i--) {
-					if (locations[i].permission != null && !permissions[locations[i].permission]) {
-						locations.splice(i, 1);
+				for (var i = 0; i < locations.length; i++) {
+					if (locations[i].permission == null || permissions[locations[i].permission]) {
+						vm.locations.push(locations[i]);
 					}
 				}
-				vm.locations = locations;
 			}
 
 			function logout() {

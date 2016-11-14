@@ -77,6 +77,10 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 				public ServletContext getServletContext() {
 					return context;
 				}
+				@Override
+				public String getServletName() {
+					return "WebswingServlet";
+				}
 			}, false);
 
 			initParams.put("org.atmosphere.container.JSR356AsyncSupport.mappingPath", context.getContextPath());
