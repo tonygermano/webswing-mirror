@@ -23,6 +23,11 @@
 				controllerAs : 'vm',
 				templateUrl : 'app/views/dashboard/dashboard.template.html'
 			});
+			$routeProvider.when('/dashboard/single/:path*', {
+				controller : 'DashboardController',
+				controllerAs : 'vm',
+				templateUrl : 'app/views/dashboard/dashboard.template.html'
+			});
 			$routeProvider.when('/dashboard/overview/:path*', {
 				controller : 'DashboardOverviewController',
 				controllerAs : 'vm',

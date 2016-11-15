@@ -262,11 +262,12 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		permissions.put("dashboard", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo));
 		permissions.put("configView", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig));
 		permissions.put("configSwingEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
+		permissions.put("sessions", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getSession));
 		permissions.put("configEdit", false);
 		permissions.put("start", false);
 		permissions.put("stop", false);
 		permissions.put("remove", false);
-		permissions.put("sessions", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getSession));
+		permissions.put("logsView", false);
 		return permissions;
 	}
 

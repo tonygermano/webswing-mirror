@@ -24,6 +24,8 @@ import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.MetaObject;
+import org.webswing.server.common.model.rest.LogRequest;
+import org.webswing.server.common.model.rest.LogResponse;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.resources.ResourceHandlerService;
@@ -38,6 +40,7 @@ import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingmanager.SwingInstanceManagerService;
 import org.webswing.server.services.websocket.WebSocketService;
+import org.webswing.server.util.LogReaderUtil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -366,12 +369,13 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	@Path("/rest/permissions")
 	public Map<String, Boolean> getPermissions() throws Exception {
 		Map<String, Boolean> perm = super.getPermissions();
-		boolean multiApplicationMode= configService.isMultiApplicationMode();
+		boolean multiApplicationMode = configService.isMultiApplicationMode();
 		perm.put("start", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_startApp));
 		perm.put("stop", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_stopApp));
 		perm.put("remove", multiApplicationMode && isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_removeApp));
 		perm.put("create", multiApplicationMode && isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_createApp));
 		perm.put("configEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
+		perm.put("logsView", isMasterPermited(WebswingAction.rest_viewLogs));
 		return perm;
 	}
 
@@ -385,5 +389,15 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	@Path("/rest/variables")
 	public Map<String, String> getVariables(@PathParam("") String type) throws WsException {
 		return super.getVariables(type);
+	}
+
+	@POST
+	@Path("/rest/logs")
+	public LogResponse getLogs(@PathParam("") String type, LogRequest request) throws WsException {
+		checkMasterPermission(WebswingAction.rest_viewLogs);
+		if (type.startsWith("/")) {
+			type = type.substring(1);
+		}
+		return LogReaderUtil.readLog(type, request);
 	}
 }

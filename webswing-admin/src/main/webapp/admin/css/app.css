@@ -308,6 +308,27 @@ body {
 	color:black; 
 }
 
+.ws-log-update{
+	margin-bottom:10px;
+    text-align: end;
+}
+
+.ws-log-search{
+	margin-bottom:10px;
+}
+
+.ws-log-table pre{
+	margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.ws-log-long{
+	min-width: 200px;
+	word-break:break-all;
+}
+
 .loadingAnimationPanel{
     height: 40px;
     background: transparent;

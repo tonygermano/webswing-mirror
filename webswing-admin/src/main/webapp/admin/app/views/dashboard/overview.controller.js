@@ -11,6 +11,8 @@
 			vm.timer = undefined;
 			vm.play = play;
 			vm.back = back;
+			vm.kill = kill;
+			vm.toConfig = toConfig;
 			vm.sortExp = 'startedAt';
 			vm.sortReverse = false;
 			vm.sortBy = sortBy;
@@ -19,8 +21,8 @@
 			vm.sortByLatency = sortByLatency;
 			vm.sortFinishedExp = 'endedAt';
 			vm.sortFinishedReverse = false;
-			vm.sortFinishedBy=sortFinishedBy;
-			
+			vm.sortFinishedBy = sortFinishedBy;
+
 			refresh();
 
 			$scope.$on('$destroy', function() {
@@ -84,14 +86,20 @@
 				}
 				sortBy(exp);
 			}
-			
-			function sortFinishedBy(exp){
+
+			function sortFinishedBy(exp) {
 				if (vm.sortFinishedExp === exp) {
 					vm.sortFinishedReverse = !vm.sortFinishedReverse;
 				} else {
 					vm.sortFinishedExp = exp;
 					vm.sortFinishedReverse = false;
 				}
+			}
+
+			function kill(session) {
+				return sessionsRestService.killSession(vm.path, session.id).then(function() {
+					refresh();
+				});
 			}
 
 			function view(session) {
@@ -104,7 +112,12 @@
 			}
 
 			function back() {
-				$location.path('/dashboard');
+				$location.path('/dashboard/single/' + vm.path);
+				$timeout.cancel(vm.timer);
+			}
+
+			function toConfig() {
+				$location.path('/config/swing/' + vm.path);
 				$timeout.cancel(vm.timer);
 			}
 		}

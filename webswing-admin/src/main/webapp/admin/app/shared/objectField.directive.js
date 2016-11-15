@@ -66,6 +66,7 @@
 					} else {
 						updateFields(tab.fields, newTab.fields);
 						updateFields(tab.objects, newTab.objects);
+						tab.collapsed = newTab.collapsed;
 						delete newTabs[tabName];
 					}
 				}
@@ -93,6 +94,7 @@
 						if (newField.type === 'Object') {
 							angular.extend(fields[int], newField);
 						} else {
+							newField.enable
 							fields[int] = newField;
 						}
 					}
