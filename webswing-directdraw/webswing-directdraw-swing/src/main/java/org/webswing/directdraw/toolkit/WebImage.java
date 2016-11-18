@@ -148,7 +148,7 @@ public class WebImage extends Image {
 
 	public void addInstruction(WebGraphics g, DrawInstruction in) {
 		if (g != null && g.isDisposed()) {
-			throw new RuntimeException("Drawing to disposed graphics.");
+			return;
 		}
 		synchronized (this) {
 			DrawInstructionFactory factory = context.getInstructionFactory();

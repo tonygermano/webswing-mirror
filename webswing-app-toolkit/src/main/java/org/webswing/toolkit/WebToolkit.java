@@ -7,6 +7,7 @@ import java.awt.Checkbox;
 import java.awt.CheckboxMenuItem;
 import java.awt.Choice;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.FileDialog;
@@ -16,6 +17,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
+import java.awt.Image;
 import java.awt.JobAttributes;
 import java.awt.KeyboardFocusManager;
 import java.awt.Label;
@@ -25,6 +27,7 @@ import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.PageAttributes;
 import java.awt.Panel;
+import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.PrintJob;
 import java.awt.RenderingHints;
@@ -705,4 +708,8 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		api.processEvent(event);
 	}
 
+	@Override
+	public Cursor createCustomCursor(Image cursor, Point hotSpot, String name) throws IndexOutOfBoundsException, HeadlessException {
+		return new WebCursor(cursor, hotSpot, name);
+	}
 }

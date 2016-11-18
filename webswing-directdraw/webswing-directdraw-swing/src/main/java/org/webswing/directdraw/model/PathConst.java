@@ -32,7 +32,7 @@ public class PathConst extends MutableDrawConstantHolder<Shape, PathProto> {
 				int pointCount = getPointCount(type);
 				model.addType(SegmentTypeProto.valueOf(type));
 				for (int i = 0; i < pointCount; i++) {
-					model.addPoints((int) points[i]);
+					model.addPoints((float) points[i]);
 				}
 				iterator.next();
 			}
@@ -58,7 +58,7 @@ public class PathConst extends MutableDrawConstantHolder<Shape, PathProto> {
 	@Override
 	public Shape getValue() {
 		Path2D.Float path = new Path2D.Float(message.getWindingOdd() ? PathIterator.WIND_EVEN_ODD : PathIterator.WIND_NON_ZERO);
-		List<Integer> pts = message.getPointsList();
+		List<Float> pts = message.getPointsList();
 		int offset = 0;
 		for (SegmentTypeProto type : message.getTypeList()) {
 			int pointCount = type == SegmentTypeProto.CLOSE ? 0 : type == SegmentTypeProto.MOVE || type == SegmentTypeProto.LINE ? 2 : type == SegmentTypeProto.QUAD ? 4 : type == SegmentTypeProto.CUBIC ? 6 : 0;
