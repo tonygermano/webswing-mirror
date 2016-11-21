@@ -15,7 +15,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.Window;
-import java.awt.font.LineMetrics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -325,15 +324,31 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 
 		// resize
 		if((w instanceof Dialog && ((Dialog) w).isResizable()) || (w instanceof Frame) && ((Frame) w).isResizable()){
+			if (e.getX() < 10 && e.getY() < 10) {
+				return WindowActionType.resizeUniTopLeft;
+			}
+			if (e.getX() > (w.getWidth() - 10)  && e.getY() < 10) {
+				return WindowActionType.resizeUniTopRight;
+			}
+			if (e.getX() < 10 && e.getY() > (w.getHeight() - 10)) {
+				return WindowActionType.resizeUniBottomLeft;
+			}
 			if (e.getX() > (w.getWidth() - 10) && e.getY() > (w.getHeight() - 10)) {
-				return WindowActionType.resizeUni;
+				return WindowActionType.resizeUniBottomRight;
 			}
 			if (e.getX() > (w.getWidth() - i.right)) {
 				return WindowActionType.resizeRight;
 			}
+			if (e.getX() < i.left) {
+				return WindowActionType.resizeLeft;
+			}
 			if (e.getY() > (w.getHeight() - i.bottom)) {
 				return WindowActionType.resizeBottom;
 			}
+			if (e.getY() < i.bottom) {
+				return WindowActionType.resizeTop;
+			}
+			
 		}
 		if (e.getY() < i.top) {
 			// move
