@@ -157,6 +157,10 @@ public class CommonUtil {
 		return path.equals(subpath) || path.startsWith(subpath + "/");
 	}
 
+	public static boolean isSubPathIgnoreCase(String subpath, String path) {
+		return path.equalsIgnoreCase(subpath) || path.toLowerCase().startsWith(subpath.toLowerCase() + "/");
+	}
+
 	public static String toPath(String path) {
 		String mapping = path == null ? "/" : path;
 		mapping = mapping.startsWith("/") ? mapping : ("/" + mapping);

@@ -56,7 +56,7 @@ public interface Constants {
 	public static final String JMS_DEST_MEM_LIMIT = "webswing.jmsDestinationMemoryLimit";
 	public static final String WEBSOCKET_MESSAGE_SIZE = "webswing.websocketMessageSizeLimit";
 	public static final String WEBSOCKET_THREAD_POOL = "webswing.websocketThreadPoolLimit";
-
+	public static final String DEFAULT_WELCOME_PAGE = "webswing.defaultWelcomePage";
 	public static final String FILE_SERVLET_WAIT_TIMEOUT = "webswing.fileServletWaitTimeout";
 
 	// swing start related properties

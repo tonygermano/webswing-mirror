@@ -389,6 +389,6 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 		if (ipAddress == null) {
 			ipAddress = r.getRemoteAddr();
 		}
-		auditLog.info("{} | {} | {} | {} | {} | {} | {}", new Object[] { status, module, protocol, ipAddress, path, username, reason });
+		auditLog.info("{} | {} | {} | {} | {} | {} | {}", new Object[] { status, username, reason, path, protocol, ipAddress, module });
 	}
 }

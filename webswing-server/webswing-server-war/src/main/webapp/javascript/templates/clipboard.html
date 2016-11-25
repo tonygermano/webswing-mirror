@@ -4,54 +4,33 @@
 
 		<div class="c-tab-content">
 			<div class="c-tab-labels">
-				<h4 class="c-tab-label">Clipboard</h4>
-				<button class="c-tab-labels__minimize-button"></button>
+				<h4 class="c-tab-label">Content</h4>
 			</div>
 
-			<div class="c-tab-content__item" id="text">
+			<div class="c-tab-content__item" data-id="text">
 				<div>
-					<textarea data-id="textarea" class="c-tab-content__text-area" readonly rows="4"></textarea>
+					<div data-id="textarea" class="c-tab-content__text-area"></div>
 					<div data-id="ie-clipboard" class="input-hidden" contenteditable="true"></div>
-					<p class="c-tab-content__instructions">Press CTRL+C to copy.</p>
 				</div>
 			</div>
 
-			<div class="c-tab-content__item" id="html">
-				<div>
-					<textarea data-id="htmlarea" class="c-tab-content__text-area" readonly rows="4"></textarea>
-					<p class="c-tab-content__instructions">Press CTRL+C to copy.</p>
+			<div class="c-tab-content__item" data-id="more">
+				<div data-id="image">
+					<b>Image:</b>
 				</div>
-			</div>
-
-			<div id="image" class="c-tab-content__item">
-				<div>
-					<p class="c-tab-content__instructions">Right click on the image and select 'Copy image'.</p>
-				</div>
-			</div>
-
-			<div class="c-tab-content__item" id="files">
-				<div>
+				<div data-id="files">
+					<b>Files:</b>
 					<div id="wsFileList" class="c-tab-content__file-list"></div>
-					<p class="c-tab-content__instructions">Click on a clipboard link to download the file.</p>
-				</div>
-			</div>
-
-			<div class="c-tab-content__item" id="other">
-				<div>
-					<p class="c-tab-content__instructions">The clipboard contains data which may only be used within this application.</p>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div class="c-clipboard-sticky-container">
 		<div data-id="minimizedInfoBar" class="c-minimized-tab-container">
-			<button data-id="plaintext" class="c-minimized-tab c-minimized-tab--is-inactive">Plain-text</button>
-			<button data-id="html" class="c-minimized-tab c-minimized-tab--is-inactive">HTML</button>
-			<button data-id="image" class="c-minimized-tab c-minimized-tab--is-inactive">Image</button>
-			<button data-id="files" class="c-minimized-tab c-minimized-tab--is-inactive">Files</button>
-			<button data-id="other" class="c-minimized-tab c-minimized-tab--is-inactive">Other</button>
+			<button data-id="text" class="c-minimized-tab c-minimized-tab--is-active c-minimized-tab--is-selected">Copy to Clipboard (CTRL+C)</button>
+			<button data-id="more" class="c-minimized-tab c-minimized-tab--is-active">More...</button>
 		</div>
 
-		<button data-id="closeBtn" class="c-clipboard-clear-button">Clear Clipboard</button>
+		<button data-id="closeBtn" class="c-clipboard-clear-button">Discard</button>
 	</div>
 </div>

@@ -3,7 +3,7 @@
 
 // The frame that holds the rest
 @mixin toolbar {
-    @include rem('max-width', 480px);
+    @include rem('width', 480px);
     @include rem('padding', 15px);
     @include border-radius(3px);
     @include dropshadow-3;
@@ -12,7 +12,6 @@
     right: 0;
     bottom: 0;
 
-    width: 100%;
     background: $white;
 
     font-size: $smaller;

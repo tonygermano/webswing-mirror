@@ -48,7 +48,10 @@ public class WebClipboard extends Clipboard {
 
 	@Override
 	public synchronized void setContents(Transferable contents, ClipboardOwner owner) {
-		super.setContents(contents, owner);
+		//skip setting the content if browser sends the same text content as already stored in clipboard - to preserve non-string mime types
+		if (!(contents instanceof WebClipboardTransferable && !contents.isDataFlavorSupported(DataFlavor.imageFlavor) && stringFlavorsEquals(this.contents, contents))) {
+			super.setContents(contents, owner);
+		}
 		if (isSystemClipboard) {
 			String html = null;
 			String text = null;
@@ -117,6 +120,22 @@ public class WebClipboard extends Clipboard {
 				other = true;
 			}
 			Util.getWebToolkit().getPaintDispatcher().notifyCopyEvent(text, html, img, files, other);
+		}
+	}
+
+	private boolean stringFlavorsEquals(Transferable a, Transferable b) {
+		try {
+			if (!a.isDataFlavorSupported(DataFlavor.stringFlavor) && !b.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+				return true;
+			}
+			if (a.isDataFlavorSupported(DataFlavor.stringFlavor) && b.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+				String valA = (String) a.getTransferData(DataFlavor.stringFlavor);
+				String valB = (String) b.getTransferData(DataFlavor.stringFlavor);
+				return valA != null && valA.equals(valB);
+			}
+			return false;
+		} catch (Exception e) {
+			return false;
 		}
 	}
 }

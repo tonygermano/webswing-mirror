@@ -8,7 +8,7 @@
 
 // The part of the panel that slides down
 .c-clipboard-body {
-    @include rem('height', 160px);
+    @include rem('min-height', 100px);
 
     margin-right: 0;
 }
@@ -36,7 +36,6 @@
         @include rem('min-height', 100px);
         @include rem('top', 10px);
         @include rem('margin-bottom', 10px);
-        position: relative;
 
         display: none;
         clear: both;
@@ -67,7 +66,20 @@
         @include rem('padding', 10px);
         width: 100%;
     }
+    
+    &__text-iframe {
+        background-color: #f5f5f5;
+		border: 1px solid #cccccc;
+		border-radius: 4px;
+		width: 100%;
+		max-height: 160px;
+    }
 
+	&__text-pre {
+		width: 100%;
+		max-height: 160px;
+    }
+    
     // Thumbnails of clipboard images
     &__img-thumb {
         @include border-radius(3px);
@@ -187,39 +199,3 @@
     }
 }
 
-// Collapses the clipboard panel to the minimized state
-.c-tab-labels__minimize-button {
-    @include font-awesome;
-    @include rem('top', 15px);
-    @include rem('right', 15px);
-    @include rem('width', 27px);
-    @include rem('height', 27px);
-    @include border-radius(50px);
-
-    position: absolute;
-
-    background: none;
-    border: 1px solid $light-grey-2;
-
-    color: #b3b3b3;
-    font-size: $smallest;
-
-    cursor: pointer;
-
-    &:active {
-        outline: none;
-    }
-
-    &:hover {
-        @include dropshadow-2;
-
-        border-color: $white;
-
-        color: $primary;
-    }
-
-    // Chevron down icon from Font Awesome
-    &:before {
-        content: '\f078';
-    }
-}

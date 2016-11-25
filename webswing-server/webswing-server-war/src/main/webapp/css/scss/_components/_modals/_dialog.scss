@@ -16,6 +16,10 @@
         @include rem('padding-bottom', 20px);
         @include rem('margin', 0px);
 
+		&-form {
+            @include rem('padding-bottom', 64px);
+        }
+
         &-instructions {
             @include modal__content-instructions;
         }
@@ -26,29 +30,6 @@
     }
 }
 
-.c-button {
-    cursor: pointer;
-
-    &--dialog {
-        @include rem('padding', 8px 15px);
-        @include rem('margin', 15px 10px 0px 0px);
-
-        background: none;
-        border: 1px solid;
-        border-color: $light-grey-4;
-        border-radius: 3px;
-
-        font-size: $smaller;
-
-        &:last-of-type {
-            margin-right: 0;
-        }
-
-        &:hover {
-            background-color: $primary;
-            border-color: $primary;
-
-            color: $white;
-        }
-    }
+.c-dialog-button {
+	@include modal__content-submit;
 }

@@ -384,7 +384,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private SwingProcess start(SwingProcessService processService, final SwingConfig appConfig, final ConnectionHandshakeMsgIn handshake) throws Exception {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), getClientId(), clientIp, handshake.getLocale(), customArgs);
+		final VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), getClientId(), clientIp, handshake.getLocale(), customArgs);
 		SwingProcess swing = null;
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();

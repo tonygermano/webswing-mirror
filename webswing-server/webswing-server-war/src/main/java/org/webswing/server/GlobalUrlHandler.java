@@ -19,6 +19,7 @@ import javax.ws.rs.PathParam;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
@@ -273,7 +274,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	@Override
 	public URL getWebResource(String resource) {
 		if (StringUtils.isBlank(getConfig().getWebFolder()) && StringUtils.equals("/index.html", toPath(resource))) {
-			resource = "/selector/index.html";
+			resource = System.getProperty(Constants.DEFAULT_WELCOME_PAGE, "/selector/index.html");
 		}
 		return super.getWebResource(resource);
 	}

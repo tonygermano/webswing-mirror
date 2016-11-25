@@ -132,11 +132,13 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		handleCorsHeaders(req, res);
 		if (status.getStatus().equals(Status.Running)) {
-			//redirect to url that ends with '/' to ensure browser queries correct resources 
-			if (req.getPathInfo() == null || (req.getContextPath() + req.getPathInfo()).equals(getFullPathMapping())) {
+			//redirect to url that is correct case and ends with '/' to ensure browser queries correct resources 
+			if (isWrongUrlCase(req) || isRootPathWithoutSlash(req)) {
 				try {
+					String redirectUrl = getFullPathMapping() + (req.getContextPath() + req.getPathInfo()).substring(getFullPathMapping().length());
+					redirectUrl = isRootPathWithoutSlash(req) ? (redirectUrl + "/") : redirectUrl;
 					String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
-					res.sendRedirect(getFullPathMapping() + "/" + queryString);
+					res.sendRedirect(redirectUrl + queryString);
 				} catch (IOException e) {
 					log.error("Failed to redirect.", e);
 				}
@@ -155,6 +157,25 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 				throw new WsException(e);
 			}
 		}
+	}
+
+	@Override
+	public boolean isSubPath(String subpath, String path) {
+		return CommonUtil.isSubPathIgnoreCase(subpath, path);
+	}
+
+	private boolean isWrongUrlCase(HttpServletRequest req) {
+		if (req.getPathInfo() == null) {
+			return false;
+		}
+		String relevantUrlPart = toPath(req.getPathInfo()).substring(0, getPathMapping().length());
+		boolean isWrongCase = !relevantUrlPart.equals(getPathMapping()) && relevantUrlPart.equalsIgnoreCase(getPathMapping()); // if this handler path is not correct case
+		return isWrongCase;
+	}
+
+	private boolean isRootPathWithoutSlash(HttpServletRequest req) {
+		boolean isRootPathWithoutSlash = (req.getContextPath() + req.getPathInfo()).equals(getFullPathMapping());//path has to end with '/' 
+		return req.getPathInfo() == null || isRootPathWithoutSlash;
 	}
 
 	private void handleCorsHeaders(HttpServletRequest req, HttpServletResponse res) {
@@ -283,7 +304,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		switch (key) {
 		case SwingInstance:
 			String userName = getUser() == null ? "<webswing user>" : getUser().getUserId();
-			vs = VariableSubstitutor.forSwingInstance(getConfig(), userName, "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing custom args>");
+			vs = VariableSubstitutor.forSwingInstance(getConfig(), userName, null, "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing custom args>");
 			return vs.getVariableMap();
 		case SwingApp:
 			vs = VariableSubstitutor.forSwingApp(getConfig());

@@ -1,7 +1,9 @@
 package org.webswing.server.common.util;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.text.StrLookup;
 import org.apache.commons.lang3.text.StrSubstitutor;
@@ -17,10 +19,19 @@ public class VariableSubstitutor {
 		return new VariableSubstitutor(new HashMap<String, String>());
 	}
 
-	public static VariableSubstitutor forSwingInstance(SecuredPathConfig config, String user, String sessionId, String clientIp, String locale, String customArgs) {
+	public static VariableSubstitutor forSwingInstance(SecuredPathConfig config, String user, Map<String, Serializable> userAttributes, String sessionId, String clientIp, String locale, String customArgs) {
 		Map<String, String> result = new HashMap<String, String>();
 		if (user != null) {
 			result.put(Constants.USER_NAME_SUBSTITUTE, user);
+		}
+		if (userAttributes != null) {
+			for (Entry<String, Serializable> e : userAttributes.entrySet()) {
+				try {
+					result.put(Constants.USER_NAME_SUBSTITUTE + "." + e.getKey(), e.getValue().toString());
+				} catch (Exception e1) {
+					//ignore
+				}
+			}
 		}
 		if (sessionId != null) {
 			result.put(Constants.SESSION_ID_SUBSTITUTE, sessionId);

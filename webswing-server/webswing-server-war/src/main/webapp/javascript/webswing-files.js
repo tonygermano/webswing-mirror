@@ -257,10 +257,27 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 				e.preventDefault();
 			});
 
+			autoSaveInput.bind('input', validateFilename);
+
 			autoSaveButton.bind('click', function(e) {
 				var fileString = autoSaveInput.val();
-				filesSelected([ fileString ]);
+				if (validateFilename() && fileString.length > 0) {
+					filesSelected([ fileString ]);
+				}
 			});
+
+			function validateFilename() {
+				var fileString = autoSaveInput.val();
+				if (fileString.match(/^[a-zA-Z0-9. _-]*$/)) {
+					fileDialogErrorMessageContent.html("");
+					fileDialogErrorMessage.hide("fast");
+					return true;
+				} else {
+					fileDialogErrorMessageContent.html('<p>File name is invalid. Please use only alphanumeric characters, space, hyphen, dot or underscore.</p>');
+					animateShow(fileDialogErrorMessage);
+					return false;
+				}
+			}
 
 			api.cfg.rootElement.bind('dragover', function(e) {
 				if (!timeout) {
@@ -296,7 +313,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			element.detach();
 			if (bool) {
 				parent.append(element);
-			} 
+			}
 		}
 
 		function setProgressBarVisible(bool) {

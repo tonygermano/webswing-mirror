@@ -8,7 +8,7 @@
 				url : 'audit',
 				delimiter : '|',
 				lineDelimiter : '\n',
-				headers : [ 'Timestamp', 'Result', 'Module', 'Protocol', 'Source IP', 'Secured path', 'User', 'Detail' ]
+				headers : [ 'Timestamp', 'Result', 'User', 'Detail', 'Secured path', 'Protocol', 'Source IP', 'Module' ]
 			}, {
 				label : 'Server',
 				url : 'server',
