@@ -35,6 +35,36 @@
 							<generatePom>true</generatePom>
 						</configuration>
 					</execution>
+					<execution>
+						<id>install-javaws</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>javax.jnlp</groupId>
+							<artifactId>jnlp-api</artifactId>
+							<version>8.0</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/lib/javaws.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-plugin</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+						<configuration>
+							<groupId>javax.plugin</groupId>
+							<artifactId>plugin</artifactId>
+							<version>8.0</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/lib/plugin.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -48,6 +78,7 @@
 					</compilerArguments>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 </project>

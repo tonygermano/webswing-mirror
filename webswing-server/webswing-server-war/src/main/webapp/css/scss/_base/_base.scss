@@ -6,26 +6,6 @@
  */
 
 // Set to 100% because Webswing will behave quirky otherwise
-html,
-body {
-    width: 100%;
-    height: 100%;
-}
-
-// This value in _config.scss is used for all REM scaling
-html {
-    font-size: $base-size;
-}
-
-
-body {
-    background-color: $white;
-
-    color: $primary-text;
-    font-family: $body-font;
-    font-weight: normal;
-    line-height: $lh-body;
-}
 
 * {
     box-sizing: border-box;
@@ -106,16 +86,6 @@ a {
     }
 }
 
-// Media
-embed,
-iframe,
-img,
-object,
-video {
-    max-width: 100%;
-    height: auto;
-}
-
 // Interactive elements
 a,
 button,
@@ -123,3 +93,13 @@ input {
     @include transition-duration(0.2s);
 	cursor: default;
 }
+
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: inherit;
+    line-height: inherit;
+}
+

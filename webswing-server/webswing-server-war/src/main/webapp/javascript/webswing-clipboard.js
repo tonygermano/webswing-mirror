@@ -1,10 +1,5 @@
-define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.css', 'webswing-util' ], function amdFactory($, html, css, util) {
+define([ 'jquery', 'text!templates/clipboard.html','webswing-util' ], function amdFactory($, html, util) {
 	"use strict";
-	var style = $("<style></style>", {
-		type : "text/css"
-	});
-	style.text(css);
-	$("head").prepend(style);
 
 	return function ClipboardModule() {
 		var module = this;
@@ -152,19 +147,18 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 			if ((data.text != null && data.text.length !== 0) || (data.html != null && data.html.length !== 0)) {
 				var textarea = copyBar.find('div[data-id="textarea"]');
 				if (data.text != null && data.text.length !== 0) {
-					textarea.append($('<pre class="c-tab-content__text-pre"></pre>').text(data.text));
+					textarea.append($('<pre class="ws-clipboard-text-pre"></pre>').text(data.text));
 				} else {
-					textarea.html('<iframe class="c-tab-content__text-iframe" src="data:text/html;charset=utf-8,' + encodeURIComponent(data.html) + '"></iframe>');
+					textarea.html('<iframe class="ws-clipboard-text-iframe" src="data:text/html;charset=utf-8,' + encodeURIComponent(data.html) + '"></iframe>');
 				}
 				copyBtn.on('mouseenter', function() {
-					showTab(filesTab, 'text');
+					showTab(copyBtn, 'text');
 					maximize();
 				});
 			}
 			copyBtn.on('click', function(e) {
 				document.execCommand("copy");
 			});
-			copyBtn.removeClass("c-minimized-tab--is-inactive").addClass("c-minimized-tab--is-active");
 			showTab(copyBtn, 'text');
 
 			/* More TAB */
@@ -196,26 +190,26 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 				}
 				if (data.img != null) {
 					var clipImgDataUrl = util.getImageString(data.img);
-					copyBar.find('div[data-id="image"]').append('<a target="_blank" download="clipboard.png" href="' + clipImgDataUrl + '"><img src="' + clipImgDataUrl + '" id="wsCopyImage" class="c-tab-content__img-thumb"></a>');
+					copyBar.find('div[data-id="image"]').append('<a target="_blank" download="clipboard.png" href="' + clipImgDataUrl + '"><img src="' + clipImgDataUrl + '" id="wsCopyImage" class="ws-clipboard-img-thumb"></a>');
 				} else {
 					copyBar.find('div[data-id="image"]').remove();
 				}
 
-				var filesTab = copyBar.find('button[data-id="more"]');
-				filesTab.on('mouseenter', function() {
-					showTab(filesTab, 'more');
+				var moreBtn = copyBar.find('button[data-id="more"]');
+				moreBtn.on('mouseenter', function() {
+					showTab(moreBtn, 'more');
 					maximize();
 				});
 			} else {
-				var filesTab = copyBar.find('button[data-id="more"]');
-				filesTab.remove();
+				var moreBtn = copyBar.find('button[data-id="more"]');
+				moreBtn.remove();
 			}
 
 			function showTab(tab, type) {
-				copyBar.find('.c-minimized-tab--is-selected').removeClass('c-minimized-tab--is-selected');
-				copyBar.find('.c-tab-content__item').removeClass('c-tab-content__item--is-active');
-				$(tab).addClass('c-minimized-tab--is-selected');
-				copyBar.find('div[data-id="' + type + '"]').addClass('c-tab-content__item--is-active');
+				copyBar.find('.ws-btn--selected').removeClass('ws-btn--selected');
+				copyBar.find('.ws-clipboard-item--active').removeClass('ws-clipboard-item--active');
+				$(tab).addClass('ws-btn--selected');
+				copyBar.find('div[data-id="' + type + '"]').addClass('ws-clipboard-item--active');
 			}
 
 			copyBar.find('div[data-id="contentBar"]').hide();
@@ -223,7 +217,7 @@ define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.cs
 
 		function minimize() {
 			if (copyBar != null) {
-				copyBar.find('.c-minimized-tab--is-selected').removeClass('c-minimized-tab--is-selected');
+				copyBar.find('.ws-btn--selected').removeClass('ws-btn--selected');
 				copyBar.find('div[data-id="contentBar"]').slideUp('fast');
 				copyBar.minimized = true;
 			}

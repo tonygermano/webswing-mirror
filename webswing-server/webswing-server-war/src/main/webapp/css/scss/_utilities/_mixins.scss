@@ -46,30 +46,21 @@
               transition-duration: $args;
 }
 
-
-
-// Calculate REM values with PX fallback
-// Usage: @include rem('margin-top', 15px);
-$baseline-px: 16px;  // This value should match the html font size in _config
-
-@mixin rem($property, $px-values) {
-    $baseline-rem: $baseline-px / 1rem * 1;  // Convert the baseline into rems
-    #{$property}: $px-values;  // Print the first line in pixel values
-
+@mixin rel($property, $px-values) {
     // If there is only one (numeric) value, return the property/value line for it.
     @if type-of($px-values) == "number" {
-        #{$property}: $px-values / $baseline-rem;
+        #{$property}: $px-values * $scale;
     } @else {
         // Create an empty list that we can dump values into
-        $rem-values: ();
+        $rel-values: ();
         @each $value in $px-values {
             // If the value is zero or not a number, return it
             @if is-equal( $value , 0 ) or type-of( $value ) != "number" {
-                $rem-values: append($rem-values, $value); }
+                $rel-values: append($rel-values, $value); }
             @else {
-                $rem-values: append($rem-values, $value / $baseline-rem); } }
+                $rel-values: append($rel-values, $value * $scale); } }
         // Return the property and its list of converted values
-        #{$property}: $rem-values;
+        #{$property}: $rel-values;
     }
 }
 
@@ -89,7 +80,7 @@ $baseline-px: 16px;  // This value should match the html font size in _config
 // Used for the login button
 @mixin animation-underline-center {
     &:before {
-        @include rem('height', 4px);
+        @include rel('height', 4px);
 
         content: '';
         position: absolute;

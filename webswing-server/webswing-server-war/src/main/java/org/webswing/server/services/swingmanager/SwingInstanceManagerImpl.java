@@ -126,7 +126,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 				}
 			}
 		} catch (WsException e) {
-			log.error("Failed to connect to instance. ",e);
+			log.error("Failed to connect to instance. ", e);
 			r.broadcastMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
 		}
 	}
@@ -248,7 +248,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Path("/status")
 	public String getStatusPage() throws Exception {
 		InstanceManagerStatus status = getStatus();
-		URL webResource = getWebResource(status.getStatus().name() + ".html");
+		URL webResource = getWebResource("status/" + status.getStatus().name() + ".html");
 		if (webResource != null) {
 			return IOUtils.toString(webResource);
 		}
@@ -336,8 +336,8 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		SwingInstance instance = runningInstances.findByInstanceId(id);
 		if (instance != null) {
 			instance.shutdown(force);
-		}else{
-			throw new WsException("Instance with id "+id +" not found.");
+		} else {
+			throw new WsException("Instance with id " + id + " not found.");
 		}
 	}
 

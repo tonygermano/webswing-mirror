@@ -1,15 +1,5 @@
-define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 'text!templates/bootstrap.css' ], function amdFactory($, html, css, cssBootstrap) {
+define([ 'jquery', 'text!templates/dialog.html'], function amdFactory($, html, cssBootstrap) {
 	"use strict";
-	var style = $("<style></style>", {
-		type : "text/css"
-	});
-	style.text(css);
-	var style0 = $("<style></style>", {
-		type : "text/css"
-	});
-	style0.text(cssBootstrap);
-	$("head").prepend(style0);
-	$("head").prepend(style);
 
 	return function DialogModule() {
 		var module = this;
@@ -50,12 +40,12 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 				continueOldSessionDialog : {
 					content : '<p>Continue existing session?</p>',
 					buttons : [ {
-						label : 'Continue',
+						label : '<span class="ws-icon-angle-double-right"></class> Continue',
 						action : function() {
 							api.continueSession();
 						}
 					}, {
-						label : 'New session',
+						label : '<span class="ws-icon-certificate"></class> New session',
 						action : function() {
 							api.kill();
 							api.newSession();
@@ -68,7 +58,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 		function messageDialog(msg, withSpinner) {
 			var content = '<p>' + msg + '</p>';
 			if (withSpinner) {
-				content = '<div class="c-spinner"><div class="c-spinner__dot-1"></div> <div class="c-spinner__dot-2"></div></div>' + content;
+				content = '<div class="ws-spinner"><div class="ws-spinner-dot-1"></div> <div class="ws-spinner-dot-2"></div></div>' + content;
 			}
 			return {
 				content : content
@@ -79,12 +69,12 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			return {
 				content : '<p>' + msg + '</p>',
 				buttons : [ {
-					label : 'New session',
+					label : '<span class="ws-icon-certificate"></class> New session',
 					action : function() {
 						api.newSession();
 					}
 				}, {
-					label : 'Sign out',
+					label : '<span class="ws-icon-logout"></class> Sign out',
 					action : function() {
 						api.logout();
 					}
@@ -96,12 +86,12 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 			return {
 				content : '<p>' + msg + '</p>',
 				buttons : [ {
-					label : 'Reconnect',
+					label : '<span class="ws-icon-arrows-cw"></class> Reconnect',
 					action : function() {
 						api.reTrySession();
 					}
 				}, {
-					label : 'Sign out',
+					label : '<span class="ws-icon-logout"></class> Sign out',
 					action : function() {
 						api.logout();
 					}
@@ -153,7 +143,7 @@ define([ 'jquery', 'text!templates/dialog.html', 'text!templates/dialog.css', 't
 
 			for ( var b in msg.buttons) {
 				var btn = msg.buttons[b];
-				var button = $('<button class="c-button c-button--dialog">' + btn.label + '</button><span> </span>');
+				var button = $('<button class="ws-btn">' + btn.label + '</button><span> </span>');
 				button.on('click', btn.action);
 				content.append(button);
 			}

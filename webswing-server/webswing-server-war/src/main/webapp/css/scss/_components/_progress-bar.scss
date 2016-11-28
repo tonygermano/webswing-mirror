@@ -26,24 +26,21 @@
 }
 
 // Container for the progress bar
-.js-progress {
-    @include rem('height', 30px);
-    @include rem('margin', 15px 0px 5px 0px);
+.ws-progress {
+    @include rel('height', 30px);
+    @include rel('margin', 15px 0px 5px 0px);
     @include border-radius(3px);
 
-    background-color: #a9c0d0;
-
     // Progress text
-    &__text {
-        @include rem('width', 280px);
-        @include rem('top', 7px);
-        @include rem('left', 0px);
+    &-text {
+        @include rel('width', 280px);
+        @include rel('top', 7px);
+        @include rel('left', 0px);
 
         position: absolute;
 
-        padding: 0 1rem;
-
-        font-size: 0.75rem;
+        @include rel('padding', 0px 16px);
+        @include rel('font-size', 12px);
 
         em {
             font-style: normal;
@@ -51,7 +48,7 @@
     }
 
     // Progress bar, the width starts at 0 but is increased as the file download progresses.
-    &__bar {
+    &-bar {
         @include innerColor($success);
         @include border-radius(3px);
 
@@ -63,7 +60,7 @@
         height: 100%;
         background-repeat: no-repeat, no-repeat, no-repeat;
         background-position: -20% center, right center, left center;
-        background-size: 6.25rem 1.875rem, 8.125rem 1.875rem, 130px 1.875rem;
+        @include rel('background-size', 100px 30px 130px 30px 130px 30px);
 
         color: $white;
         font-size: $smaller;
@@ -79,18 +76,18 @@
 
         &:before,
         &:after {
-            @include rem('top', -10px);
-            @include rem('right', -1px);
-            @include rem('width', 1px);
-            @include rem('height', 40px);
+            @include rel('top', -10px);
+            @include rel('right', -1px);
+            @include rel('width', 1px);
+            @include rel('height', 40px);
 
             content: '';
             position: absolute;
         }
 
         &:before {
-            @include rem('right', -4px);
-            @include rem('width', 7px);
+            @include rel('right', -4px);
+            @include rel('width', 7px);
 
             background: radial-gradient(
             ellipse at center,

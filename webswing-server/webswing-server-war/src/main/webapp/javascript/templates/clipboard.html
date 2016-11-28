@@ -1,36 +1,32 @@
-<div data-id="copyBar" class="c-clipboard-toolbar">
-	<div data-id="contentBar" class="c-clipboard-body">
+<div data-id="copyBar" class="ws-clipboard">
+	<div data-id="contentBar" class="ws-clipboard-body">
+		<div class="ws-clipboard-header">
+			<h1 class="ws-clipboard-title">Content</h1>
+		</div>
 
-
-		<div class="c-tab-content">
-			<div class="c-tab-labels">
-				<h4 class="c-tab-label">Content</h4>
+		<div class="ws-clipboard-item" data-id="text">
+			<div>
+				<div data-id="textarea" class="ws-clipboard-text-area"></div>
+				<div data-id="ie-clipboard" class="ws-input-hidden" contenteditable="true"></div>
 			</div>
+		</div>
 
-			<div class="c-tab-content__item" data-id="text">
-				<div>
-					<div data-id="textarea" class="c-tab-content__text-area"></div>
-					<div data-id="ie-clipboard" class="input-hidden" contenteditable="true"></div>
-				</div>
+		<div class="ws-clipboard-item" data-id="more">
+			<div data-id="image">
+				<b>Image:</b>
 			</div>
-
-			<div class="c-tab-content__item" data-id="more">
-				<div data-id="image">
-					<b>Image:</b>
-				</div>
-				<div data-id="files">
-					<b>Files:</b>
-					<div id="wsFileList" class="c-tab-content__file-list"></div>
-				</div>
+			<div data-id="files">
+				<b>Files:</b>
+				<div id="wsFileList" class="ws-clipboard-file-list"></div>
 			</div>
 		</div>
 	</div>
-	<div class="c-clipboard-sticky-container">
-		<div data-id="minimizedInfoBar" class="c-minimized-tab-container">
-			<button data-id="text" class="c-minimized-tab c-minimized-tab--is-active c-minimized-tab--is-selected">Copy to Clipboard (CTRL+C)</button>
-			<button data-id="more" class="c-minimized-tab c-minimized-tab--is-active">More...</button>
+	<div class="ws-clipboard-control">
+		<div data-id="minimizedInfoBar" class="ws-btn-group">
+			<button data-id="text" class="ws-btn ws-btn--xs ws-btn--selected ws-icon-docs"> Copy to Clipboard (CTRL+C)</button>
+			<button data-id="more" class="ws-btn ws-btn--xs ">More...</button>
 		</div>
 
-		<button data-id="closeBtn" class="c-clipboard-clear-button">Discard</button>
+		<button data-id="closeBtn" class="ws-btn ws-btn--xs ws-right ws-icon-cancel-circled">Discard</button>
 	</div>
 </div>

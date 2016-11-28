@@ -10,12 +10,12 @@
 </head>
 <body>
 
-<div class="l-webswing-container">
-	<div class="l-modal-container">
-		<div id="commonDialog" class="c-login-modal">
-			<div id="webswing-header" class="c-app-selection-modal__header"></div>
-			<div id="webswing-links" class="c-app-selection-modal__admin-nav"></div>
-			<div id="webswing-content" class="c-login-modal__content"></div>
+<div class="webswing-element">
+	<div class="ws-modal-container">
+		<div id="commonDialog" class="ws-modal">
+			<div id="webswing-header" class="ws-selector-header"></div>
+			<div id="webswing-links" class="ws-selector-admin"></div>
+			<div id="webswing-content" class="ws-selector-content"></div>
 		</div>
 	</div>
 </div>
@@ -86,20 +86,20 @@
 	}
 
 	function show(apps) {
-		$('#webswing-header').html('<h1 class="c-app-selection-modal__header-title">Welcome, <span>' + user + '</span>. Please select an application.</h1>');
+		$('#webswing-header').html('<h1 class="ws-selector-title">Welcome, <span>' + user + '</span>. Please select an application.</h1>');
 		$('#webswing-links').html('<a href="admin" id="admin">Manage</a> | <a href="logout" id="logout">Logout</a>');
-		$('#commonDialog').addClass('c-app-selection-modal')
+		$('#commonDialog').addClass('ws-selector')
 		var content;
 		if (apps == null || apps.length === 0) {
 			header = null;
 			content = '<p>There are currently no available applications.</p>';
 		} else {
-			content = '<div class="l-app-selection-container">';
+			content = '<div class="ws-selector-container">';
 			for ( var i in apps) {
 				var app = apps[i];
-				content += '<div class="c-app-selection-button"><div onclick="window.location.href = \''
+				content += '<div class="ws-selector-btn"><div onclick="window.location.href = \''
 						+ app.url
-						+ '\';"><img src="' + getImageString(app.base64Icon) + '" class="c-app-selection-button__thumb"/><div class="c-app-selection-button__label">' + app.name + '</div></div></div>';
+						+ '\';"><img src="' + getImageString(app.base64Icon) + '" class="ws-selector-btn-thumb"/><div class="ws-selector-btn-label">' + app.name + '</div></div></div>';
 			}
 			content += '</div>';
 		}

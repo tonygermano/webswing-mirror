@@ -2,6 +2,18 @@
 // Description: Contains utility classes that can be used individually and applied freely
 
 // Hides the element in it's initial state
-.u-hidden {
+.ws-hidden {
     display: none;
+}
+
+.ws-right {
+	float: right;
+}
+
+.ws-left {
+	float: left;
+}
+
+.ws-margin {
+    @include rel('margin-bottom', 15px);
 }

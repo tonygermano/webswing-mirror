@@ -1,11 +1,11 @@
 // Filename: _forms.scss
 // Description: Form and input elements
 
-.c-form {
-    &__field {
-        @include rem('padding', 12px 15px);
+.ws-form {
+    &-field {
+        @include rel('padding', 12px 15px);
         @include border-radius(3px);
-        @include rem('margin-bottom', 15px);
+        @include rel('margin-bottom', 15px);
         @include transition-duration(0.3s);
 
         display: block;
@@ -16,36 +16,6 @@
         color: $secondary-text;
         font-size: $small;
 
-        &--files {
-            @include rem('margin', 15px auto 5px auto);
-            @include border-radius(0);
-
-            width: 80%;
-            border-width: 0 0 2px 0;
-
-            font-size: $smaller;
-            text-align: center;
-        }
-
-        &--login {
-            font-size: $regular;
-
-            // The border widens to allow for the icon to appear in it
-            &:focus {
-                border-color: $primary;
-                border-left-width: 35px;
-            }
-
-            // Slides icon of selected fields into view
-            &:focus + .c-form__field-icon {
-                @include rem('left', 32px);
-
-                opacity: 1;
-
-                transition: all 0.25s ease-out;
-            }
-        }
-
         &:focus {
             border-color: $primary;
         }
@@ -53,60 +23,61 @@
         &:hover {
             border-color: $primary;
         }
-
-        // Form field icons, start out hidden and to the left
-        &-icon {
-            @include font-awesome;
-            @include rem('margin-top', -45px);
-            @include transition-duration(0.1s);
-
-            position: absolute;
-            left: 0;
-
-            opacity: 0;
-
-            color: $white;
-
-            // User icon
-            &--username {
-                &:before {
-                    content: '\f007';
-                }
-            }
-
-            // Lock icon
-            &--password {
-                &:before {
-                    content: '\f023';
-                }
-            }
-        }
     }
-}
+    
+    &-underscore {
+        @include rel('margin', 15px auto 5px auto);
+        @include border-radius(0);
 
-.c-button {
-    cursor: pointer;
-
-    &--dialog {
-        @include rem('padding', 8px 15px);
-        @include rem('margin', 15px 10px 0px 0px);
-
-        background: none;
-        border: 1px solid;
-        border-color: $light-grey-4;
-        border-radius: 3px;
+        width: 80%;
+        border-width: 0 0 2px 0;
 
         font-size: $smaller;
+        text-align: center;
+    }
 
-        &:last-of-type {
-            margin-right: 0;
+    &-addon {
+        font-size: $regular;
+
+        // The border widens to allow for the icon to appear in it
+        &:focus {
+            border-color: $primary;
+            border-left-width: 35px;
         }
 
-        &:hover {
-            background-color: $primary;
-            border-color: $primary;
+        // Slides icon of selected fields into view
+        &:focus + .ws-form-icon {
+            @include rel('left', 32px);
 
-            color: $white;
+            opacity: 1;
+
+            transition: all 0.25s ease-out;
+        }
+    }
+    
+    // Form field icons, start out hidden and to the left
+    &-icon {
+        @include font-awesome;
+        @include rel('margin-top', -45px);
+        @include transition-duration(0.1s);
+
+        position: absolute;
+        left: 0;
+
+        opacity: 0;
+
+        color: $white;
+
+        &--username {
+            @extend .ws-icon-user;
+        }
+
+        &--password {
+            @extend .ws-icon-lock;
+        }
+        
+        &--company {
+            @extend .ws-icon-building-filled;
         }
     }
 }

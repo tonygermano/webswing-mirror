@@ -1,10 +1,5 @@
-define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'jquery.iframe-transport', 'jquery.fileupload' ], function amdFactory($, html, css) {
+define([ 'jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jquery.fileupload' ], function amdFactory($, html) {
 	"use strict";
-	var style = $("<style></style>", {
-		type : "text/css"
-	});
-	style.text(css);
-	$("head").prepend(style);
 
 	return function FilesModule() {
 		var module = this;
@@ -126,7 +121,7 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			fileInput = uploadBar.find('input[data-id="fileInput"]');
 
 			uploadProgressBar = api.cfg.rootElement.find('div[data-id="fileDialogTransferProgressBar"]');
-			uploadProgress = api.cfg.rootElement.find('div[data-id="progress"] .js-progress__bar');
+			uploadProgress = api.cfg.rootElement.find('div[data-id="progress"] .ws-progress-bar');
 			fileDialogErrorMessage = api.cfg.rootElement.find('div[data-id="fileDialogErrorMessage"]');
 			fileDialogErrorMessageContent = api.cfg.rootElement.find('div[data-id="fileDialogErrorMessageContent"]');
 
@@ -211,8 +206,8 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 			// data loaded
 			function fileuploadprogressall(e, data) {
 				var progress = parseInt(data.loaded / data.total * 100, 10);
-				var $jsProgressBar = $(".js-progress__bar");
-				var $jsProgressText = $(".js-progress__text");
+				var $jsProgressBar = $(".ws-progress-bar");
+				var $jsProgressText = $(".ws-progress-text");
 				$jsProgressBar.css('width', progress + '%');
 				$jsProgressText.find("em").text(progress + "%");
 				if (progress === 100) {
@@ -281,14 +276,14 @@ define([ 'jquery', 'text!templates/upload.html', 'text!templates/upload.css', 'j
 
 			api.cfg.rootElement.bind('dragover', function(e) {
 				if (!timeout) {
-					dropZone.addClass('c-files-toolbar-dropArea--ondrag');
+					dropZone.addClass('ws-filebar-dropArea--ondrag');
 				} else {
 					clearTimeout(timeout);
 				}
 
 				timeout = setTimeout(function() {
 					timeout = null;
-					dropZone.removeClass('c-files-toolbar-dropArea--ondrag');
+					dropZone.removeClass('ws-filebar-dropArea--ondrag');
 				}, 100);
 			});
 

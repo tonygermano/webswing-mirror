@@ -43,15 +43,15 @@ public class WebClipboard extends Clipboard {
 	}
 
 	public void setContents(Transferable contents) {
-		super.setContents(contents, owner);
-	}
-
-	@Override
-	public synchronized void setContents(Transferable contents, ClipboardOwner owner) {
 		//skip setting the content if browser sends the same text content as already stored in clipboard - to preserve non-string mime types
 		if (!(contents instanceof WebClipboardTransferable && !contents.isDataFlavorSupported(DataFlavor.imageFlavor) && stringFlavorsEquals(this.contents, contents))) {
 			super.setContents(contents, owner);
 		}
+	}
+
+	@Override
+	public synchronized void setContents(Transferable contents, ClipboardOwner owner) {
+		super.setContents(contents, owner);
 		if (isSystemClipboard) {
 			String html = null;
 			String text = null;

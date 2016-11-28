@@ -1,48 +1,46 @@
 // Filename: _login.scss
 // Description: Login modal component. Default modal styles found in scss/modals.scss
 
-.c-login-modal {
-    @include modal;
+.ws-login {
+	@extend .ws-modal;
 
-    &__header {
-        @include modal__header;
+    &-header {
+        @extend .ws-header;
+        text-align: left;
+    }
+    
+    &-title {
+        @extend .ws-title;
+        @include rel('margin', 15px 0 5px 0);
+    }
+
+    &-content {
+        @include rel('margin', 0px);
+    }
+    
+    &-form {
+        @include rel('padding-bottom', 64px);
+    }
+
+    &-instructions {
+        @extend .ws-text;
+        @include rel('padding', 0px);
+        @include rel('margin', 20px 0px 20px 0px);
 
         text-align: left;
-
-        &-title {
-            @include modal__header-title;
-            @include rem('margin', 15px 0 5px 0);
-        }
     }
 
-    &__content {
-        @include rem('margin', 0px);
-
-        &-form {
-            @include rem('padding-bottom', 64px);
-        }
-
-        &-instructions {
-            @include modal__content-instructions;
-            @include rem('padding', 0px);
-            @include rem('margin', 20px 0px 20px 0px);
-
-            text-align: left;
-        }
-
-        &-message {
-            @include modal__content-message;
-
-            text-align: left;
-        }
-
-        &-password-reset {
-            font-size: $small;
-            text-align: right;
-        }
+    &-message {
+        @extend .ws-message;
+        text-align: left;
+     
+        &--error {
+		    color: $danger;
+		}
     }
-}
 
-.c-login-button {
-	@include modal__content-submit;
+    &-password-reset {
+        font-size: $small;
+        text-align: right;
+    }
 }
