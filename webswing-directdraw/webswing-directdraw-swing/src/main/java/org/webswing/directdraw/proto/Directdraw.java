@@ -12970,19 +12970,19 @@ public final class Directdraw {
      */
     org.webswing.directdraw.proto.Directdraw.PathProto.SegmentTypeProto getType(int index);
 
-    // repeated sint32 points = 3;
+    // repeated float points = 3;
     /**
-     * <code>repeated sint32 points = 3;</code>
+     * <code>repeated float points = 3;</code>
      */
-    java.util.List<java.lang.Integer> getPointsList();
+    java.util.List<java.lang.Float> getPointsList();
     /**
-     * <code>repeated sint32 points = 3;</code>
+     * <code>repeated float points = 3;</code>
      */
     int getPointsCount();
     /**
-     * <code>repeated sint32 points = 3;</code>
+     * <code>repeated float points = 3;</code>
      */
-    int getPoints(int index);
+    float getPoints(int index);
   }
   /**
    * Protobuf type {@code org.webswing.directdraw.proto.PathProto}
@@ -13073,23 +13073,23 @@ public final class Directdraw {
               input.popLimit(oldLimit);
               break;
             }
-            case 24: {
+            case 29: {
               if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
-                points_ = new java.util.ArrayList<java.lang.Integer>();
+                points_ = new java.util.ArrayList<java.lang.Float>();
                 mutable_bitField0_ |= 0x00000004;
               }
-              points_.add(input.readSInt32());
+              points_.add(input.readFloat());
               break;
             }
             case 26: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000004) == 0x00000004) && input.getBytesUntilLimit() > 0) {
-                points_ = new java.util.ArrayList<java.lang.Integer>();
+                points_ = new java.util.ArrayList<java.lang.Float>();
                 mutable_bitField0_ |= 0x00000004;
               }
               while (input.getBytesUntilLimit() > 0) {
-                points_.add(input.readSInt32());
+                points_.add(input.readFloat());
               }
               input.popLimit(limit);
               break;
@@ -13287,26 +13287,26 @@ public final class Directdraw {
       return type_.get(index);
     }
 
-    // repeated sint32 points = 3;
+    // repeated float points = 3;
     public static final int POINTS_FIELD_NUMBER = 3;
-    private java.util.List<java.lang.Integer> points_;
+    private java.util.List<java.lang.Float> points_;
     /**
-     * <code>repeated sint32 points = 3;</code>
+     * <code>repeated float points = 3;</code>
      */
-    public java.util.List<java.lang.Integer>
+    public java.util.List<java.lang.Float>
         getPointsList() {
       return points_;
     }
     /**
-     * <code>repeated sint32 points = 3;</code>
+     * <code>repeated float points = 3;</code>
      */
     public int getPointsCount() {
       return points_.size();
     }
     /**
-     * <code>repeated sint32 points = 3;</code>
+     * <code>repeated float points = 3;</code>
      */
-    public int getPoints(int index) {
+    public float getPoints(int index) {
       return points_.get(index);
     }
 
@@ -13338,7 +13338,7 @@ public final class Directdraw {
         output.writeEnum(2, type_.get(i).getNumber());
       }
       for (int i = 0; i < points_.size(); i++) {
-        output.writeSInt32(3, points_.get(i));
+        output.writeFloat(3, points_.get(i));
       }
       getUnknownFields().writeTo(output);
     }
@@ -13364,10 +13364,7 @@ public final class Directdraw {
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < points_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeSInt32SizeNoTag(points_.get(i));
-        }
+        dataSize = 4 * getPointsList().size();
         size += dataSize;
         size += 1 * getPointsList().size();
       }
@@ -13710,64 +13707,64 @@ public final class Directdraw {
         return this;
       }
 
-      // repeated sint32 points = 3;
-      private java.util.List<java.lang.Integer> points_ = java.util.Collections.emptyList();
+      // repeated float points = 3;
+      private java.util.List<java.lang.Float> points_ = java.util.Collections.emptyList();
       private void ensurePointsIsMutable() {
         if (!((bitField0_ & 0x00000004) == 0x00000004)) {
-          points_ = new java.util.ArrayList<java.lang.Integer>(points_);
+          points_ = new java.util.ArrayList<java.lang.Float>(points_);
           bitField0_ |= 0x00000004;
          }
       }
       /**
-       * <code>repeated sint32 points = 3;</code>
+       * <code>repeated float points = 3;</code>
        */
-      public java.util.List<java.lang.Integer>
+      public java.util.List<java.lang.Float>
           getPointsList() {
         return java.util.Collections.unmodifiableList(points_);
       }
       /**
-       * <code>repeated sint32 points = 3;</code>
+       * <code>repeated float points = 3;</code>
        */
       public int getPointsCount() {
         return points_.size();
       }
       /**
-       * <code>repeated sint32 points = 3;</code>
+       * <code>repeated float points = 3;</code>
        */
-      public int getPoints(int index) {
+      public float getPoints(int index) {
         return points_.get(index);
       }
       /**
-       * <code>repeated sint32 points = 3;</code>
+       * <code>repeated float points = 3;</code>
        */
       public Builder setPoints(
-          int index, int value) {
+          int index, float value) {
         ensurePointsIsMutable();
         points_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated sint32 points = 3;</code>
+       * <code>repeated float points = 3;</code>
        */
-      public Builder addPoints(int value) {
+      public Builder addPoints(float value) {
         ensurePointsIsMutable();
         points_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated sint32 points = 3;</code>
+       * <code>repeated float points = 3;</code>
        */
       public Builder addAllPoints(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
+          java.lang.Iterable<? extends java.lang.Float> values) {
         ensurePointsIsMutable();
         super.addAll(values, points_);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated sint32 points = 3;</code>
+       * <code>repeated float points = 3;</code>
        */
       public Builder clearPoints() {
         points_ = java.util.Collections.emptyList();
@@ -20100,7 +20097,7 @@ public final class Directdraw {
       "\020\001\022\007\n\003PIE\020\002\"\300\001\n\tPathProto\022\022\n\nwindingOdd\030" +
       "\001 \002(\010\022G\n\004type\030\002 \003(\01629.org.webswing.direc" +
       "tdraw.proto.PathProto.SegmentTypeProto\022\016" +
-      "\n\006points\030\003 \003(\021\"F\n\020SegmentTypeProto\022\010\n\004MO" +
+      "\n\006points\030\003 \003(\002\"F\n\020SegmentTypeProto\022\010\n\004MO" +
       "VE\020\000\022\010\n\004LINE\020\001\022\010\n\004QUAD\020\002\022\t\n\005CUBIC\020\003\022\t\n\005C" +
       "LOSE\020\004\"\365\001\n\tFontProto\022\016\n\006family\030\001 \002(\t\022B\n\005" +
       "style\030\002 \001(\01623.org.webswing.directdraw.pr",

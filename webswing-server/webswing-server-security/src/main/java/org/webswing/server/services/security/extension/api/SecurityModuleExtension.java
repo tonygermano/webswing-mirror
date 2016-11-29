@@ -3,6 +3,7 @@ package org.webswing.server.services.security.extension.api;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.LoginResponseClosedException;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
@@ -87,12 +88,26 @@ public abstract class SecurityModuleExtension<T extends SecurityModuleExtensionC
 	 * or other functionality.
 	 * 
 	 * @param user current logged in user
- 	 * @param path path after '/login' (ie. if request path is '/app/login/custom', path will be '/custom') 
+	 * @param path path after '/login' (ie. if request path is '/app/login/custom', path will be '/custom') 
 	 * @param request The HTTP request from servlet container
 	 * @param response The HTTP response from servlet container
 	 * @return true if request was served.
 	 */
 	public boolean serveAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse res) {
 		return false;
+	}
+
+	public void logSuccess(HttpServletRequest r, String user) {
+		String path = getConfig().getContext().getSecuredPath();
+		path = StringUtils.isEmpty(path) ? "/" : path;
+		String module = this.getClass().getName();
+		AbstractSecurityModule.auditLog("SUCCESS", r, path, module, user, "");
+	}
+
+	public void logFailure(HttpServletRequest r, String user, String reason) {
+		String path = getConfig().getContext().getSecuredPath();
+		path = StringUtils.isEmpty(path) ? "/" : path;
+		String module = this.getClass().getName();
+		AbstractSecurityModule.auditLog("FAILED", r, path, module, user, reason);
 	}
 }

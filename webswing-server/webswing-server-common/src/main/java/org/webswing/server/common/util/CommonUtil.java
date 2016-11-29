@@ -10,9 +10,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +35,7 @@ public class CommonUtil {
 	private static final String DEFAULT = "default";
 	private static final Logger log = LoggerFactory.getLogger(CommonUtil.class);
 	private static final Map<String, byte[]> iconMap = new HashMap<String, byte[]>();
+	private static URLClassLoader swingBootClassLoader;
 
 	public static byte[] loadImage(File iconFile) {
 		String icon;
@@ -71,16 +75,15 @@ public class CommonUtil {
 			return null;
 		}
 		name = subs.replace(name);
-		homeDir = subs.replace(homeDir);
-		File relativeToHomeInRoot = new File(Main.getRootDir(), homeDir + File.separator + name);
+		File relativeToHomeInRoot = new File(Main.getRootDir(), homeDir + File.separator + name).getAbsoluteFile();
 		if (relativeToHomeInRoot.exists()) {
 			return relativeToHomeInRoot;
 		}
-		File relativeToHome = new File(homeDir + File.separator + name);
+		File relativeToHome = new File(homeDir + File.separator + name).getAbsoluteFile();
 		if (relativeToHome.exists()) {
 			return relativeToHome;
 		}
-		File absolute = new File(name);
+		File absolute = new File(name).getAbsoluteFile();
 		if (absolute.exists()) {
 			return absolute;
 		}
@@ -115,7 +118,6 @@ public class CommonUtil {
 		}
 		return warFile;
 	}
-
 
 	public static void transferStreams(InputStream is, OutputStream os) throws IOException {
 		try {
@@ -155,6 +157,10 @@ public class CommonUtil {
 		return path.equals(subpath) || path.startsWith(subpath + "/");
 	}
 
+	public static boolean isSubPathIgnoreCase(String subpath, String path) {
+		return path.equalsIgnoreCase(subpath) || path.toLowerCase().startsWith(subpath.toLowerCase() + "/");
+	}
+
 	public static String toPath(String path) {
 		String mapping = path == null ? "/" : path;
 		mapping = mapping.startsWith("/") ? mapping : ("/" + mapping);
@@ -178,4 +184,26 @@ public class CommonUtil {
 		return null;
 	}
 
+	private static URLClassLoader getSwingBootClassLoader() throws IOException {
+		if (swingBootClassLoader == null) {
+			URL swingBootFolder = null;
+			if (new File(URI.create(getWarFileLocation())).isFile()) {
+				swingBootFolder = new URL("jar:" + getWarFileLocation() + "!/WEB-INF/swing-boot");
+			} else if (new File(URI.create(getWarFileLocation())).isDirectory()) {
+				swingBootFolder = new URL(getWarFileLocation() + "WEB-INF/swing-boot");
+			}
+			List<URL> filesFromPath = Main.getFilesFromPath(swingBootFolder);
+			swingBootClassLoader = new URLClassLoader(filesFromPath.toArray(new URL[filesFromPath.size()]));
+		}
+		return swingBootClassLoader;
+	}
+
+	public static String getBootClassPathForClass(String className) throws Exception {
+		Class<?> theClass = getSwingBootClassLoader().loadClass(className);
+		String cp = URLDecoder.decode(theClass.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8");
+		if (cp.endsWith(className.replace(".", "/") + ".class")) {
+			cp = cp.substring(0, cp.length() - (className.length() + 8));
+		}
+		return "\"" + cp + "\"";
+	}
 }

@@ -187,7 +187,7 @@ public class ProtoMapper {
 
 	private Class<?> resolveProtoCounterpartClass(Class<?> c) throws ClassNotFoundException {
 		if (!classProtoMap.containsKey(c)) {
-			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			ClassLoader cl = c.getClassLoader();
 			String className = c.getName().substring(c.getName().lastIndexOf(".") + 1);
 			String protoClassName = basicProtoPackage + "$" + (className.replaceAll("\\$", "Proto\\$")) + "Proto";
 			Class<?> protoClass = cl.loadClass(protoClassName);

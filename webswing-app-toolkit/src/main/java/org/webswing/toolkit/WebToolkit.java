@@ -7,6 +7,7 @@ import java.awt.Checkbox;
 import java.awt.CheckboxMenuItem;
 import java.awt.Choice;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.FileDialog;
@@ -16,6 +17,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
+import java.awt.Image;
 import java.awt.JobAttributes;
 import java.awt.KeyboardFocusManager;
 import java.awt.Label;
@@ -25,6 +27,7 @@ import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.PageAttributes;
 import java.awt.Panel;
+import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.PrintJob;
 import java.awt.RenderingHints;
@@ -82,7 +85,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.JPanel;
-import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
@@ -91,7 +93,6 @@ import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingApiProvider;
-import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
@@ -108,15 +109,13 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	public static final String BACKGROUND_WINDOW_ID = "BG";
 	private static Object TREELOCK = null;
 
-	private WebEventDispatcher eventDispatcher = new WebEventDispatcher();
-	private WebPaintDispatcher paintDispatcher = new WebPaintDispatcher();
+	private WebEventDispatcher eventDispatcher;
+	private WebPaintDispatcher paintDispatcher;
 	private WebswingApiImpl api = new WebswingApiImpl();;
 
 	private WindowManager windowManager = WindowManager.getInstance();
 
 	public void init() {
-		RepaintManager.setCurrentManager(new WebRepaintManager(RepaintManager.currentManager(null)));
-
 		try {
 			if (!System.getProperty("os.name", "").startsWith("Windows") && !System.getProperty("os.name", "").startsWith("Mac")) {
 				Class<?> c = ClassLoader.getSystemClassLoader().loadClass("sun.awt.X11GraphicsEnvironment");
@@ -127,6 +126,11 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		} catch (Exception e) {
 			Logger.error("Failed to init X11 display: ", e.getMessage());
 		}
+	}
+
+	public void startDispatchers() {
+		eventDispatcher = new WebEventDispatcher();
+		paintDispatcher = new WebPaintDispatcher();
 	}
 
 	public void initSize(final Integer desktopWidth, final Integer desktopHeight) {
@@ -704,4 +708,8 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		api.processEvent(event);
 	}
 
+	@Override
+	public Cursor createCustomCursor(Image cursor, Point hotSpot, String name) throws IndexOutOfBoundsException, HeadlessException {
+		return new WebCursor(cursor, hotSpot, name);
+	}
 }

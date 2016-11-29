@@ -1,280 +1,244 @@
-define([ 'jquery', 'text!templates/clipboard.html', 'text!templates/clipboard.css', 'webswing-util' ], function amdFactory($, html, css, util) {
-    "use strict";
-    var style = $("<style></style>", {
-        type : "text/css"
-    });
-    style.text(css);
-    $("head").prepend(style);
+define([ 'jquery', 'text!templates/clipboard.html','webswing-util' ], function amdFactory($, html, util) {
+	"use strict";
 
-    return function ClipboardModule() {
-        var module = this;
-        var api;
-        module.injects = api = {
-            cfg : 'webswing.config',
-            send : 'socket.send',
-            getInput : 'canvas.getInput'
-        };
-        module.provides = {
-            cut : cut,
-            copy : copy,
-            paste : paste,
-            displayCopyBar : displayCopyBar,
-            dispose : close
-        };
+	return function ClipboardModule() {
+		var module = this;
+		var api;
+		module.injects = api = {
+			cfg : 'webswing.config',
+			send : 'socket.send',
+			getInput : 'canvas.getInput'
+		};
+		module.provides = {
+			cut : cut,
+			copy : copy,
+			paste : paste,
+			displayCopyBar : displayCopyBar,
+			dispose : close
+		};
+		module.ready = function() {
+			document.addEventListener("copy",copy);
+		};
 
-        var copyBar;
+		var copyBar;
 
-        function cut(event) {
-            copy(event, true);
-        }
+		function cut(event) {
+			copy(event, true);
+		}
 
-        function copy(event, cut) {
-            if (copyBar == null || copyBar.minimized === true) {
-                api.send({
-                    copy : {
-                        type : cut === true ? 'cut' : 'copy'
-                    }
-                });
-            } else {
-                var data = copyBar.wsEventData;
-                if (api.cfg.ieVersion) {
-                    // handling of copy events only for IE
-                    var ieClipboardDiv = copyBar.find('div[data-id="ie-clipboard"]');
-                    var clipboardData = window.clipboardData;
-                    if (data.html != null) {
-                        ieClipboardDiv.html(data.html);
-                        focusIeClipboardDiv();
-                        setTimeout(function() {
-                            close();
-                        }, 0);
-                    } else {
-                        event.preventDefault();
-                        clipboardData.setData('Text', data.text);
-                        close();
-                    }
+		function copy(event, cut) {
+			if (copyBar == null) {
+				if (api.cfg.ieVersion) {
+					window.clipboardData.setData('Text', '');
+				} else {
+					event.clipboardData.setData('text/plain', '');
+				}
+				api.send({
+					copy : {
+						type : cut === true ? 'cut' : 'copy'
+					}
+				});
+			} else {
+				var data = copyBar.wsEventData;
+				if (api.cfg.ieVersion) {
+					// handling of copy events only for IE
+					var ieClipboardDiv = copyBar.find('div[data-id="ie-clipboard"]');
+					var clipboardData = window.clipboardData;
+					if (data.html != null) {
+						ieClipboardDiv.html(data.html);
+						focusIeClipboardDiv();
+						setTimeout(function() {
+							close();
+						}, 0);
+					} else {
+						event.preventDefault();
+						clipboardData.setData('Text', data.text);
+						close();
+					}
 
-                } else {
-                    // handling of copy events for rest of browsers
-                    event = event.originalEvent || event;
-                    event.preventDefault();
-                    if (data.text != null) {
-                        event.clipboardData.setData('text/plain', data.text);
-                    }
-                    if (data.html != null) {
-                        event.clipboardData.setData('text/html', data.html);
-                    }
-                    close();
-                }
-            }
-        }
+				} else {
+					// handling of copy events for rest of browsers
+					event = event.originalEvent || event;
+					event.preventDefault();
+					if (data.text != null) {
+						event.clipboardData.setData('text/plain', data.text);
+					}
+					if (data.html != null) {
+						event.clipboardData.setData('text/html', data.html);
+					}
+					close();
+				}
+			}
+		}
 
-        function focusIeClipboardDiv() {
-            ieClipboardDiv.focus();
-            var range = document.createRange();
-            range.selectNodeContents((ieClipboardDiv.get(0)));
-            var selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
+		function focusIeClipboardDiv() {
+			ieClipboardDiv.focus();
+			var range = document.createRange();
+			range.selectNodeContents((ieClipboardDiv.get(0)));
+			var selection = window.getSelection();
+			selection.removeAllRanges();
+			selection.addRange(range);
+		}
 
-        function paste(event) {
-            if (api.cfg.hasControl) {
-                if (useLocalClipboard()) {
-                    var text = '';
-                    var html = '';
-                    if (api.cfg.ieVersion) {
-                        text = window.clipboardData.getData('Text');
-                        html = text;
-                    } else {
-                        var data = event.clipboardData || event.originalEvent.clipboardData;
-                        text = data.getData('text/plain');
-                        html = data.getData('text/html');
-                        if (data.items != null) {
-                            for ( var i = 0; i < data.items.length; i++) {
-                                if (data.items[i].type.indexOf('image') === 0) {
-                                    var img = data.items[i];
-                                    var reader = new FileReader();
-                                    reader.onload = function(event) {
-                                        sendPasteEvent(text, html, event.target.result);
-                                    };
-                                    reader.readAsDataURL(img.getAsFile());
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                    sendPasteEvent(text, html);
-                } else {
-                    sendPasteEvent();
-                }
-            }
-        }
+		function paste(event) {
+			if (api.cfg.hasControl) {
+				var text = '';
+				var html = '';
+				if (api.cfg.ieVersion) {
+					text = window.clipboardData.getData('Text');
+					html = text;
+				} else {
+					var data = event.clipboardData || event.originalEvent.clipboardData;
+					text = data.getData('text/plain');
+					html = data.getData('text/html');
+					if (data.items != null) {
+						for (var i = 0; i < data.items.length; i++) {
+							if (data.items[i].type.indexOf('image') === 0) {
+								var img = data.items[i];
+								var reader = new FileReader();
+								reader.onload = function(event) {
+									sendPasteEvent(text, html, event.target.result);
+								};
+								reader.readAsDataURL(img.getAsFile());
+								return;
+							}
+						}
+					}
+				}
+				sendPasteEvent(text, html);
+			}
+		}
 
-        function sendPasteEvent(text, html, img) {
-            var pasteObj = {};
-            if (text != null) {
-                pasteObj.text = text;
-            }
-            if (html != null) {
-                pasteObj.html = html;
-            }
-            if (img != null) {
-                pasteObj.img = img;
-            }
-            api.send({
-                paste : pasteObj
-            });
-        }
+		function sendPasteEvent(text, html, img) {
+			var pasteObj = {};
+			if (text != null && text.length !== 0) {
+				pasteObj.text = text;
+			}
+			if (html != null && html.length !== 0) {
+				pasteObj.html = html;
+			}
+			if (img != null) {
+				pasteObj.img = img;
+			}
 
-        function displayCopyBar(data) { // trigered by swing app
-        	var onlyOtherData=false;
-            if (copyBar != null) {
-                close();
-            }
-            if (data.html == null && data.text == null && data.img == null && (data.files == null || data.files.length === 0)) {
-                if(!data.other){
-                	return;
-                }else{
-                	onlyOtherData=true;
-                }
-            }
-            api.cfg.rootElement.append(html);
-            copyBar = api.cfg.rootElement.find('div[data-id="copyBar"]');
-            copyBar.on('click', function(event) {
-                clearTimeout(minimizer);
-                api.getInput().focus();
-            });
-            copyBar.wsEventData = data;
-            copyBar.minimized = false;
-            var closeBtn = copyBar.find('button[data-id="closeBtn"]');
-            closeBtn.click(function() {
-                close();
-            });
-            copyBar.show("fast");
-            /* TEXT TAB */
-            if (data.text == null || data.text.length === 0) {
-                copyBar.find('#text').remove();
-                copyBar.find('#textTab').remove();
-            } else {
-                var textarea = copyBar.find('textarea[data-id="textarea"]');
-                textarea.val(data.text);
-                copyBar.find('span[data-id="plaintext"]').removeClass("webswing-copy-content-inactive").addClass("webswing-copy-content-active");
-            }
-            /* HTML TAB */
-            if (data.html == null || data.html.length === 0) {
-                copyBar.find('#html').remove();
-                copyBar.find('#htmlTab').remove();
-            } else {
-                var htmlarea = copyBar.find('textarea[data-id="htmlarea"]');
-                htmlarea.val(data.html);
-                copyBar.find('span[data-id="html"]').removeClass("webswing-copy-content-inactive").addClass("webswing-copy-content-active");
-            }
-            /* IMAGE TAB */
-            if (data.img == null) {
-                copyBar.find('#image').remove();
-                copyBar.find('#imageTab').remove();
-            } else {
-                copyBar.find('#image>div').append('<img src="' + util.getImageString(data.img) + '" id="wsCopyImage" class="img-thumbnail">');
-                copyBar.find('span[data-id="image"]').removeClass("webswing-copy-content-inactive").addClass("webswing-copy-content-active");
-            }
-            /* FILES TAB */
-            if (data.files == null || data.files.length === 0) {
-                copyBar.find('#files').remove();
-                copyBar.find('#filesTab').remove();
-            } else {
-                var fileListElement = copyBar.find('#wsFileList');
-                for ( var i = 0; i < data.files.length; i++) {
-                    var fileName = data.files[i];
-                    var link = $('<a>');
-                    if (fileName.indexOf("#") === 0) {
-                        link = $('<span>');
-                        link.html(data.files[i].substring(1));
-                    } else {
-                        link.html(data.files[i]);
-                        link.on('click', function(event) {
-                            api.send({
-                                copy : {
-                                    type : 'getFileFromClipboard',
-                                    file : $(event.currentTarget).html()
-                                }
-                            });
-                        });
-                    }
-                    fileListElement.append(link);
-                    fileListElement.append("<br/>");
-                }
-                copyBar.find('span[data-id="files"]').removeClass("webswing-copy-content-inactive").addClass("webswing-copy-content-active");
-            }
-            /* OTHER TAB */
-            if (!data.other) {
-                copyBar.find('#other').remove();
-                copyBar.find('#otherTab').remove();
-            } else {
-                copyBar.find('span[data-id="other"]').removeClass("webswing-copy-content-inactive").addClass("webswing-copy-content-active");
-            }
+			api.send({
+				paste : pasteObj
+			});
+		}
 
-            /* TAB Activation */
-            var tabs = copyBar.find('.nav-tabs>li');
-            tabs.first().addClass('active');
-            copyBar.find('.tab-pane').first().addClass('active');
-            tabs.on('click', function(event) {
-                tabs.removeClass('active');
-                copyBar.find('.tab-pane').removeClass('active');
-                $(event.currentTarget).addClass('active');
-                copyBar.find('#' + $(event.currentTarget).data('tab')).addClass('active');
-            });
+		function displayCopyBar(data) { // trigered by swing app
+			if (copyBar != null) {
+				close();
+			}
+			api.cfg.rootElement.append(html);
+			copyBar = api.cfg.rootElement.find('div[data-id="copyBar"]');
+			copyBar.on('mouseleave', function(event) {
+				minimize();
+			});
+			copyBar.wsEventData = data;
+			var closeBtn = copyBar.find('button[data-id="closeBtn"]');
+			closeBtn.click(function() {
+				close();
+			});
+			copyBar.show("fast");
 
-            var infoBar = copyBar.find('div[data-id="minimizedInfoBar"]');
-            infoBar.on('click', function(event) {// maximize
-                maximize();
-            });
+			/* TEXT TAB */
+			var copyBtn = copyBar.find('button[data-id="text"]');
+			if ((data.text != null && data.text.length !== 0) || (data.html != null && data.html.length !== 0)) {
+				var textarea = copyBar.find('div[data-id="textarea"]');
+				if (data.text != null && data.text.length !== 0) {
+					textarea.append($('<pre class="ws-clipboard-text-pre"></pre>').text(data.text));
+				} else {
+					textarea.html('<iframe class="ws-clipboard-text-iframe" src="data:text/html;charset=utf-8,' + encodeURIComponent(data.html) + '"></iframe>');
+				}
+				copyBtn.on('mouseenter', function() {
+					showTab(copyBtn, 'text');
+					maximize();
+				});
+			}
+			copyBtn.on('click', function(e) {
+				document.execCommand("copy");
+			});
+			showTab(copyBtn, 'text');
 
-            var minimizeBtn = copyBar.find('.webswing-minimize-symbol');
-            minimizeBtn.on('click', function(event) {// minimize
-                minimize();
-            });
+			/* More TAB */
+			if ((data.files != null && data.files.length !== 0) || data.img != null) {
+				if (data.files != null && data.files.length !== 0) {
+					var fileListElement = copyBar.find('#wsFileList');
+					for (var i = 0; i < data.files.length; i++) {
+						var fileName = data.files[i];
+						var link = $('<a>');
+						if (fileName.indexOf("#") === 0) {
+							link = $('<span>');
+							link.html(data.files[i].substring(1));
+						} else {
+							link.html(data.files[i]);
+							link.on('click', function(event) {
+								api.send({
+									copy : {
+										type : 'getFileFromClipboard',
+										file : $(event.currentTarget).html()
+									}
+								});
+							});
+						}
+						fileListElement.append(link);
+						fileListElement.append("<br/>");
+					}
+				} else {
+					copyBar.find('div[data-id="files"]').remove();
+				}
+				if (data.img != null) {
+					var clipImgDataUrl = util.getImageString(data.img);
+					copyBar.find('div[data-id="image"]').append('<a target="_blank" download="clipboard.png" href="' + clipImgDataUrl + '"><img src="' + clipImgDataUrl + '" id="wsCopyImage" class="ws-clipboard-img-thumb"></a>');
+				} else {
+					copyBar.find('div[data-id="image"]').remove();
+				}
 
-            
-            if (onlyOtherData) {
-                copyBar.find('div[data-id="contentBar"]').hide();
-                copyBar.find('div[data-id="minimizedInfoBar"]').show();
-                copyBar.minimized = true;
-            }else{
-            	var minimizer = setTimeout(function() {
-                    minimize();
-                }, 2000);
-            }
-        }
+				var moreBtn = copyBar.find('button[data-id="more"]');
+				moreBtn.on('mouseenter', function() {
+					showTab(moreBtn, 'more');
+					maximize();
+				});
+			} else {
+				var moreBtn = copyBar.find('button[data-id="more"]');
+				moreBtn.remove();
+			}
 
-        function minimize() {
-            if (copyBar != null) {
-                copyBar.find('div[data-id="contentBar"]').slideUp('fast');
-                copyBar.find('div[data-id="minimizedInfoBar"]').fadeIn('fast');
-                copyBar.minimized = true;
-            }
-        }
+			function showTab(tab, type) {
+				copyBar.find('.ws-btn--selected').removeClass('ws-btn--selected');
+				copyBar.find('.ws-clipboard-item--active').removeClass('ws-clipboard-item--active');
+				$(tab).addClass('ws-btn--selected');
+				copyBar.find('div[data-id="' + type + '"]').addClass('ws-clipboard-item--active');
+			}
 
-        function maximize() {
-            if (copyBar != null) {
-                copyBar.find('div[data-id="contentBar"]').slideDown('fast');
-                copyBar.find('div[data-id="minimizedInfoBar"]').fadeOut('fast');
-                copyBar.minimized = false;
-            }
-        }
+			copyBar.find('div[data-id="contentBar"]').hide();
+		}
 
-        function close() {
-            if (copyBar != null) {
-                copyBar.hide("fast");
-                copyBar.remove();
-                copyBar = null;
-            }
-        }
+		function minimize() {
+			if (copyBar != null) {
+				copyBar.find('.ws-btn--selected').removeClass('ws-btn--selected');
+				copyBar.find('div[data-id="contentBar"]').slideUp('fast');
+				copyBar.minimized = true;
+			}
+			api.getInput().focus();
+		}
 
-        function useLocalClipboard() {
-            if (copyBar == null) {
-                return true;
-            }
-        }
+		function maximize() {
+			if (copyBar != null) {
+				copyBar.find('div[data-id="contentBar"]').slideDown('fast');
+				copyBar.minimized = false;
+			}
+		}
 
-    };
+		function close() {
+			if (copyBar != null) {
+				copyBar.hide("fast");
+				copyBar.remove();
+				copyBar = null;
+			}
+			api.getInput().focus();
+		}
+
+	};
 });

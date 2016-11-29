@@ -118,29 +118,30 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 			try {
 				aset = client.validateResponse(samlResponse);
 				String user = aset.getNameId();
+				logSuccess(request, user);
 				return new Saml2User(samlResponse, user, aset.getAttributes());
 			} catch (SAMLException e1) {
+				logFailure(request, null, "Failed to authenticate." + e1.getMessage());
 				log.error("Failed to authenticate", e1);
 				throw new WebswingAuthenticationException("Failed to auhenticate. " + e1.getMessage(), e1);
 			}
 		}
 		return null;
 	}
-	
-	
+
 	@Override
 	public void doLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String logoutUrl = getConfig().getLogoutUrl();
-		if(logoutUrl!=null){
+		if (logoutUrl != null) {
 			sendRedirect(request, response, logoutUrl);
-		}else{
-			if(isAjax(request)){
+		} else {
+			if (isAjax(request)) {
 				sendHtml(request, response, "saml2/logoutPartial.html", null);
-			}else{
+			} else {
 				sendHtml(request, response, "saml2/logoutPage.html", null);
 			}
 		}
-		
+
 	}
 
 }

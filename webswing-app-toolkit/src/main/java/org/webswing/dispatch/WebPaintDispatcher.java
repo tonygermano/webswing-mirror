@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
@@ -39,6 +38,7 @@ import org.webswing.model.s2c.LinkActionMsg;
 import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
 import org.webswing.model.s2c.WindowMoveActionMsg;
 import org.webswing.model.s2c.WindowMsg;
+import org.webswing.toolkit.WebCursor;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.extra.WebRepaintManager;
@@ -73,9 +73,7 @@ public class WebPaintDispatcher {
 					synchronized (Util.getWebToolkit().getTreeLock()) {
 						synchronized (webPaintLock) {
 							if (clientReadyToReceive) {
-								if (RepaintManager.currentManager(null) instanceof WebRepaintManager) {
-									((WebRepaintManager) RepaintManager.currentManager(null)).process();
-								}
+								WebRepaintManager.processDirtyComponents();
 								lastReadyStateTime = System.currentTimeMillis();
 							}
 							if ((areasToUpdate.size() == 0 && moveAction == null) || !clientReadyToReceive) {
@@ -305,8 +303,9 @@ public class WebPaintDispatcher {
 		notifyCursorUpdate(cursor, null);
 	}
 
-	public void notifyCursorUpdate(Cursor cursor, String overridenCursorName) {
+	public void notifyCursorUpdate(Cursor cursor, Cursor overridenCursorName) {
 		String webcursorName = null;
+		Cursor webcursor = null;
 		if (overridenCursorName == null) {
 			switch (cursor.getType()) {
 			case Cursor.DEFAULT_CURSOR:
@@ -343,15 +342,27 @@ public class WebPaintDispatcher {
 			case Cursor.SW_RESIZE_CURSOR:
 				webcursorName = CursorChangeEventMsg.SLASH_RESIZE_CURSOR;
 				break;
+			case Cursor.CUSTOM_CURSOR:
+				webcursorName = cursor.getName();
+				break;
 			default:
 				webcursorName = CursorChangeEventMsg.DEFAULT_CURSOR;
 			}
+			webcursor = cursor;
 		} else {
-			webcursorName = overridenCursorName;
+			webcursor = overridenCursorName;
+			webcursorName = overridenCursorName.getName();
 		}
 		if (!WindowManager.getInstance().getCurrentCursor().equals(webcursorName)) {
 			AppFrameMsgOut f = new AppFrameMsgOut();
 			CursorChangeEventMsg cursorChange = new CursorChangeEventMsg(webcursorName);
+			if (webcursor instanceof WebCursor) {
+				WebCursor c = (WebCursor) webcursor;
+				BufferedImage img = c.getImage();
+				cursorChange.setB64img(Services.getImageService().getPngImage(img));
+				cursorChange.setX(c.getHotSpot() != null ? c.getHotSpot().x : 0);
+				cursorChange.setY(c.getHotSpot() != null ? c.getHotSpot().y : 0);
+			}
 			f.setCursorChange(cursorChange);
 			WindowManager.getInstance().setCurrentCursor(webcursorName);
 			Logger.debug("WebPaintDispatcher:notifyCursorUpdate", f);

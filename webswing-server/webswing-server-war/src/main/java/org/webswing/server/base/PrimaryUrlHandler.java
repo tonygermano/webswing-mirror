@@ -26,6 +26,7 @@ import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.config.ConfigurationChangeEvent;
 import org.webswing.server.services.config.ConfigurationChangeListener;
 import org.webswing.server.services.config.ConfigurationService;
@@ -43,18 +44,19 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	private static final Logger log = LoggerFactory.getLogger(PrimaryUrlHandler.class);
 	private static final String default_version = "unresolved";
 
-	private final ConfigurationService configService;
-	private final SecurityModuleService securityModuleService;
+	protected final ConfigurationService configService;
+	protected final SecurityModuleService securityModuleService;
 
 	private SecuredPathConfig config;
 	private SecurityModuleWrapper securityModule;
 	private InstanceManagerStatus status = new InstanceManagerStatus();
-	VariableSubstitutor varSubs;
+	protected VariableSubstitutor varSubs;
 
 	public PrimaryUrlHandler(UrlHandler parent, SecurityModuleService securityModuleService, ConfigurationService configService) {
 		super(parent);
 		this.securityModuleService = securityModuleService;
 		this.configService = configService;
+		this.varSubs = VariableSubstitutor.basic();
 
 		this.configService.registerChangeListener(new ConfigurationChangeListener() {
 
@@ -77,6 +79,9 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		try {
 			status.setStatus(Status.Starting);
 			varSubs = VariableSubstitutor.forSwingApp(getConfig());
+			if (!new File(getHome()).getAbsoluteFile().isDirectory()) {//check if home dir exists
+				throw new WsInitException("Home Folder '" + new File(getHome()).getAbsolutePath() + "'does not exist!");
+			}
 			loadSecurityModule();
 			super.init();
 			status.setStatus(Status.Running);
@@ -127,11 +132,13 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		handleCorsHeaders(req, res);
 		if (status.getStatus().equals(Status.Running)) {
-			//redirect to url that ends with '/' to ensure browser queries correct resources 
-			if (req.getPathInfo() == null || (req.getContextPath() + req.getPathInfo()).equals(getFullPathMapping())) {
+			//redirect to url that is correct case and ends with '/' to ensure browser queries correct resources 
+			if (isWrongUrlCase(req) || isRootPathWithoutSlash(req)) {
 				try {
+					String redirectUrl = getFullPathMapping() + (req.getContextPath() + req.getPathInfo()).substring(getFullPathMapping().length());
+					redirectUrl = isRootPathWithoutSlash(req) ? (redirectUrl + "/") : redirectUrl;
 					String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
-					res.sendRedirect(getFullPathMapping() + "/" + queryString);
+					res.sendRedirect(redirectUrl + queryString);
 				} catch (IOException e) {
 					log.error("Failed to redirect.", e);
 				}
@@ -150,6 +157,25 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 				throw new WsException(e);
 			}
 		}
+	}
+
+	@Override
+	public boolean isSubPath(String subpath, String path) {
+		return CommonUtil.isSubPathIgnoreCase(subpath, path);
+	}
+
+	private boolean isWrongUrlCase(HttpServletRequest req) {
+		if (req.getPathInfo() == null) {
+			return false;
+		}
+		String relevantUrlPart = toPath(req.getPathInfo()).substring(0, getPathMapping().length());
+		boolean isWrongCase = !relevantUrlPart.equals(getPathMapping()) && relevantUrlPart.equalsIgnoreCase(getPathMapping()); // if this handler path is not correct case
+		return isWrongCase;
+	}
+
+	private boolean isRootPathWithoutSlash(HttpServletRequest req) {
+		boolean isRootPathWithoutSlash = (req.getContextPath() + req.getPathInfo()).equals(getFullPathMapping());//path has to end with '/' 
+		return req.getPathInfo() == null || isRootPathWithoutSlash;
 	}
 
 	private void handleCorsHeaders(HttpServletRequest req, HttpServletResponse res) {
@@ -184,10 +210,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	public SecuredPathConfig getConfig() {
 		if (config == null) {
 			String path = StringUtils.isEmpty(getPathMapping()) ? "/" : getPathMapping();
-			config = configService.getConfiguration().get(path);
-			if (config == null) {
-				config = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class);
-			}
+			config = configService.getConfiguration(path);
 		}
 		return config;
 	}
@@ -231,27 +254,20 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		return describe;
 	}
 
+	public MetaObject getMeta(Map<String, Object> json) throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
+		return configService.describeConfiguration(getPathMapping(), json, this);
+	}
+
 	public MetaObject getConfigMeta() throws WsException {
 		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
-		SecuredPathConfig config = getConfig();
-		if (config == null) {
-			config = ConfigUtil.instantiateConfig(null, SecuredPathConfig.class);
-		}
-		try {
-			MetaObject result = ConfigUtil.getConfigMetadata(config, getClass().getClassLoader(), this);
-			result.setData(config.asMap());
-			return result;
-		} catch (Exception e) {
-			log.error("Failed to generate configuration descriptor.", e);
-			throw new WsException("Failed to generate configuration descriptor.");
-		}
+		return configService.describeConfiguration(getPathMapping(), null, this);
 	}
 
 	public void setConfig(Map<String, Object> config) throws Exception {
 		checkMasterPermission(WebswingAction.rest_setConfig);
 		if (!isStarted()) {
-			config.put("path", getPathMapping());
-			configService.setConfiguration(config);
+			configService.setConfiguration(getPathMapping(), config);
 		} else {
 			throw new WsException("Can not set configuration to running handler.");
 		}
@@ -259,33 +275,21 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	public void setSwingConfig(Map<String, Object> config) throws Exception {
 		checkMasterPermission(WebswingAction.rest_setConfig);
-		config.put("path", getPathMapping());
-		configService.setSwingConfiguration(config);
+		configService.setSwingConfiguration(getPathMapping(), config);
 	}
 
 	protected Map<String, Boolean> getPermissions() throws Exception {
 		Map<String, Boolean> permissions = new HashMap<>();
 		permissions.put("dashboard", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo));
 		permissions.put("configView", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig));
-		permissions.put("configEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
-		permissions.put("start", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_startApp));
-		permissions.put("stop", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_stopApp));
-		permissions.put("remove", false);
+		permissions.put("configSwingEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
 		permissions.put("sessions", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getSession));
+		permissions.put("configEdit", false);
+		permissions.put("start", false);
+		permissions.put("stop", false);
+		permissions.put("remove", false);
+		permissions.put("logsView", false);
 		return permissions;
-	}
-
-	public MetaObject getMeta(Map<String, Object> json) throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
-		SecuredPathConfig securedPathConfig = ConfigUtil.instantiateConfig(json, SecuredPathConfig.class);
-		try {
-			MetaObject result = ConfigUtil.getConfigMetadata(securedPathConfig, getClass().getClassLoader(), this);
-			result.setData(json);
-			return result;
-		} catch (Exception e) {
-			log.error("Failed to generate configuration descriptor.", e);
-			throw new WsException("Failed to generate configuration descriptor.");
-		}
 	}
 
 	public Map<String, String> getVariables(String type) throws WsException {
@@ -300,7 +304,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		switch (key) {
 		case SwingInstance:
 			String userName = getUser() == null ? "<webswing user>" : getUser().getUserId();
-			vs = VariableSubstitutor.forSwingInstance(getConfig(), userName, "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing custom args>");
+			vs = VariableSubstitutor.forSwingInstance(getConfig(), userName, null, "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing custom args>");
 			return vs.getVariableMap();
 		case SwingApp:
 			vs = VariableSubstitutor.forSwingApp(getConfig());
@@ -342,12 +346,18 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	@Override
 	public File resolveFile(String name) {
-		return CommonUtil.resolveFile(name, getConfig().getHomeDir(), varSubs);
+		String home = getHome();
+		return CommonUtil.resolveFile(name, home, varSubs);
+	}
+
+	private String getHome() {
+		return VariableSubstitutor.basic().replace(getConfig().getHomeDir());
 	}
 
 	@Override
 	public URL getWebResource(String resource) {
-		File webFolder = resolveFile(getConfig().getWebFolder());
+		String webFolderPath = getConfig().getWebFolder();
+		File webFolder = StringUtils.isEmpty(webFolderPath) ? null : resolveFile(webFolderPath);
 		return ServerUtil.getWebResource(toPath(resource), getServletContext(), webFolder);
 	}
 

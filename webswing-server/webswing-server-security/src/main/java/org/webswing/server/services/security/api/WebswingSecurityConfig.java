@@ -3,6 +3,7 @@ package org.webswing.server.services.security.api;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public interface WebswingSecurityConfig {
 	@ConfigFieldDiscriminator
 	public String getModule();
 
-	@ConfigField(label = "Secuirty Module Class Path",description="Additional classpath for built-in Security module or for defining custom security module. ")
+	@ConfigField(label = "Security Module Class Path",description="Additional classpath for built-in Security module or for defining custom security module. ")
 	@ConfigFieldVariables(VariableSetName.SwingApp)
 	@ConfigFieldDiscriminator
 	public List<String> getClassPath();
@@ -57,7 +58,7 @@ public interface WebswingSecurityConfig {
 				String classPath = CommonUtil.generateClassPathString(config.getClassPath());
 				classPath = getContext().replaceVariables(classPath);
 				URL[] urls = ClasspathUtil.populateClassPath(classPath, home);
-				SecurityModuleClassLoader customCL = new SecurityModuleClassLoader(urls, cl);
+				URLClassLoader customCL = new URLClassLoader(urls, cl);
 				try {
 					return super.getMetadata(config, customCL, parent);
 				} finally {

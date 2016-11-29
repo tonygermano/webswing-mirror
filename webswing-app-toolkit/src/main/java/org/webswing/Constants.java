@@ -9,6 +9,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
 	public static final String SWING_START_SYS_PROP_JMS_ID = "webswing.jmsQueueId";
 	public static final String SWING_START_SYS_PROP_MAIN_CLASS = "webswing.mainClass";
+	public static final String SWING_START_SYS_PROP_APP_HOME = "webswing.applicationHome";
 	public static final String SWING_START_SYS_PROP_CLASS_PATH = "webswing.classPath";
 	public static final String SWING_START_SYS_PROP_ISOLATED_FS = "webswing.isolatedFs";
 	public static final String SWING_START_SYS_PROP_TRANSFER_DIR = "webswing.transfer.dir";
@@ -48,14 +49,14 @@ public interface Constants {
 	public static final String CREATE_NEW_TEMP = "webswing.createNewTemp";
 	public static final String CONFIG_FILE_PATH = "webswing.configFile";
 	public static final String DEFAULT_CONFIG_FILE_NAME = "webswing.config";
-	public static final String SERVER_HOST = "webswing.host";
-	public static final String SERVER_PORT = "webswing.port";
-	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";;
+	public static final String SERVER_HOST = "webswing.server.host";
+	public static final String SERVER_PORT = "webswing.server.port";
+	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";
 	public static final String JMS_OVERAL_MEM_LIMIT = "webswing.jmsOveralMemoryLimit";
 	public static final String JMS_DEST_MEM_LIMIT = "webswing.jmsDestinationMemoryLimit";
 	public static final String WEBSOCKET_MESSAGE_SIZE = "webswing.websocketMessageSizeLimit";
 	public static final String WEBSOCKET_THREAD_POOL = "webswing.websocketThreadPoolLimit";
-
+	public static final String DEFAULT_WELCOME_PAGE = "webswing.defaultWelcomePage";
 	public static final String FILE_SERVLET_WAIT_TIMEOUT = "webswing.fileServletWaitTimeout";
 
 	// swing start related properties
@@ -76,6 +77,13 @@ public interface Constants {
 	public static final String HTTP_ATTR_RECORDING_FLAG = "X-webswing-recording";
 	public static final String HTTP_ATTR_ARGS = "X-webswing-args";
 	public static final String HTTP_ATTR_DEBUG_PORT = "X-webswing-debugPort";
+
+	//integration-branding
+	public static final String BRANDING_PREFIX = "webswing.brandingPrefix";
+	public static final String EXTENSTION_INITIALIZER = "webswing.extensionInitializer";
+	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
+	public static final String CONFIG_PROVIDER = "webswing.configProvider";
+
 
 
 

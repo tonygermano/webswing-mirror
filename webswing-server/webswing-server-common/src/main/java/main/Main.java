@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -29,6 +30,8 @@ public class Main {
 
 	@SuppressWarnings("restriction")
 	public static void main(String[] args) throws Exception {
+		initializeDefaultSystemProperties();
+
 		boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
 		System.setProperty(Constants.CREATE_NEW_TEMP, getCreateNewTemp(args));
 
@@ -48,7 +51,7 @@ public class Main {
 			initTempDirPath(args);
 			populateClasspathFromDir("WEB-INF/server-lib", urls);
 		}
-		ClassLoader defaultCL = new URLClassLoader(urls.toArray(new URL[urls.size()]), null);
+		ClassLoader defaultCL = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
 		Thread.currentThread().setContextClassLoader(defaultCL);
 		Class<?> mainClass;
 		if (client) {
@@ -67,6 +70,18 @@ public class Main {
 		}
 	}
 
+	public static void initializeDefaultSystemProperties() {
+		try {
+			InputStream propFile = Main.class.getClassLoader().getResourceAsStream("WEB-INF/classes/webswing.properties");
+			Properties p = new Properties(System.getProperties());
+			p.load(propFile);
+			// set the system properties
+			System.setProperties(p);
+		} catch (Exception e) {
+			//file does not exist, do nothing
+		}
+	}
+
 	public static String getCreateNewTemp(String[] args) {
 		// create the command line parser
 		for (int i = 0; i < args.length; i += 2) {
@@ -79,7 +94,7 @@ public class Main {
 	}
 
 	private static void retainOnlyLauncherUrl(List<URL> urls) {
-		for (Iterator<URL> i = urls.iterator(); i.hasNext(); ) {
+		for (Iterator<URL> i = urls.iterator(); i.hasNext();) {
 			if (!i.next().getFile().contains("webswing-app-launcher")) {
 				i.remove();
 			}
@@ -102,7 +117,7 @@ public class Main {
 		}
 	}
 
-	private static List<URL> getFilesFromPath(URL r) throws IOException {
+	public static List<URL> getFilesFromPath(URL r) throws IOException {
 		List<URL> urls = new ArrayList<URL>();
 		String tempDirPath = getTempDir().getAbsolutePath();
 		if (r.getPath().contains("!")) {
@@ -146,7 +161,7 @@ public class Main {
 				String extension = i > -1 ? name.substring(i) : "";
 				name = name.substring(0, name.length() - extension.length()) + extension;
 			}
-			File file = new File(tempDirPath + File.separator + name);
+			File file = new File(tempDirPath + File.separator + name).getAbsoluteFile();
 			if (!file.exists()) {
 				file.createNewFile();
 				file.deleteOnExit();
@@ -177,7 +192,7 @@ public class Main {
 
 	public static File getTempDir() {
 		if (System.getProperty(Constants.TEMP_DIR_PATH) == null) {
-			File baseDir = new File(System.getProperty(Constants.TEMP_DIR_PATH_BASE, System.getProperty("java.io.tmpdir")));
+			File baseDir = new File(System.getProperty(Constants.TEMP_DIR_PATH_BASE, System.getProperty("java.io.tmpdir"))).getAbsoluteFile();
 			if (!baseDir.exists()) {
 				baseDir.mkdirs();
 			}
@@ -194,7 +209,7 @@ public class Main {
 				}
 			} else {
 				baseName = "release";
-				File tempDir = new File(baseDir, baseName);
+				File tempDir = new File(baseDir, baseName).getAbsoluteFile();
 				if (!tempDir.exists()) {
 					tempDir.mkdir();
 				} else {
@@ -231,7 +246,7 @@ public class Main {
 					throw new IllegalArgumentException("File " + file.getAbsolutePath() + "not found.");
 				}
 			} catch (IllegalArgumentException e) {
-				File absoluteConfigFile = new File(pathOrUri);
+				File absoluteConfigFile = new File(pathOrUri).getAbsoluteFile();
 				if (absoluteConfigFile.exists()) {
 					System.setProperty(Constants.ROOT_DIR_URI, absoluteConfigFile.toURI().toString());
 					System.setProperty(Constants.ROOT_DIR_PATH, absoluteConfigFile.getAbsolutePath());

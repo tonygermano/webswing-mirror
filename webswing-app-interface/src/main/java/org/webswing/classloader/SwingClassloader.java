@@ -1,6 +1,7 @@
 package org.webswing.classloader;
 
 import java.io.IOException;
+
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
@@ -41,11 +42,11 @@ import org.apache.bcel.util.ClassLoaderRepository;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.util.ClassLoaderUtil;
 
-import sun.security.util.SecurityConstants;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableBiMap.Builder;
+
+import sun.security.util.SecurityConstants;
 
 @SuppressWarnings("restriction")
 public class SwingClassloader extends URLClassLoader {
@@ -100,7 +101,6 @@ public class SwingClassloader extends URLClassLoader {
 		methodReplacementBuilder.put("java.lang.ClassLoader getSystemResource (Ljava/lang/String;)Ljava/net/URL;", "org.webswing.special.RedirectedMethods getSystemResource (Ljava/lang/String;)Ljava/net/URL;");
 		methodReplacementBuilder.put("java.lang.ClassLoader getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;", "org.webswing.special.RedirectedMethods getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;");
 		methodReplacementBuilder.put("java.lang.ClassLoader getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;", "org.webswing.special.RedirectedMethods getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;");
-		methodReplacementBuilder.put("javax.swing.RepaintManager setCurrentManager (Ljavax/swing/RepaintManager;)V", "org.webswing.special.RedirectedMethods setCurrentManager (Ljavax/swing/RepaintManager;)V");
 		methodReplacementBuilder.put("java.lang.System setErr (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods setErr (Ljava/io/PrintStream;)V");
 		methodReplacementBuilder.put("java.lang.System setOut (Ljava/io/PrintStream;)V", "org.webswing.special.RedirectedMethods setOut (Ljava/io/PrintStream;)V");
 		//methodReplacementBuilder.put("java.beans.XMLEncoder writeObject (Ljava/lang/Object;)V", "org.webswing.special.RedirectedMethods writeObject (Ljava/lang/Object;)V");
@@ -175,7 +175,7 @@ public class SwingClassloader extends URLClassLoader {
 
 	public SwingClassloader(URL[] classpath, ClassLoader parent) {
 		super(new URL[] {}, parent);
-		this.ignored_packages = new String[] { "java.", "javax.", "com.sun.", "sun.", "org.xml.sax.", "org.omg.CORBA.", "org.w3c.dom.", "org.webswing.special.", "org.webswing.model.", "org.webswing.toolkit.", "netscape.javascript." };
+		this.ignored_packages = new String[] { "org.webswing.special.", "org.webswing.model.", "org.webswing.toolkit.", "netscape.javascript." };
 		this.repoClassLoader = new URLClassLoader(classpath) {
 
 			@Override
@@ -206,20 +206,30 @@ public class SwingClassloader extends URLClassLoader {
 			/*
 			 * Second try: Load system class using system class loader. You better don't mess around with them.
 			 */
-			for (int i = 0; i < ignored_packages.length; i++) {
-				if (class_name.startsWith(ignored_packages[i])) {
-					cl = getParent().loadClass(class_name);
-					break;
+			try {
+				cl = getSystemClassLoader().loadClass(class_name);
+			} catch (ClassNotFoundException e) {
+				// not found in system classloader
+			}
+			/*
+			 * Third try: Load ignored packages outside SwingClassloader
+			 */
+			if (cl == null) {
+				for (int i = 0; i < ignored_packages.length; i++) {
+					if (class_name.startsWith(ignored_packages[i])) {
+						cl = getParent().loadClass(class_name);
+						break;
+					}
 				}
 			}
 			if (cl == null) {
 				JavaClass clazz = null;
 				/*
-				 * Third try: Special request?
+				 * Fourth try: Special request?
 				 */
 				if (class_name.indexOf("$$BCEL$$") >= 0) {
 					clazz = createClass(class_name);
-				} else { // Fourth try: Load classes via repository
+				} else { // Fifth try: Load classes via repository
 					try {
 						clazz = repository.loadClass(class_name);
 						clazz = modifyClass(clazz);

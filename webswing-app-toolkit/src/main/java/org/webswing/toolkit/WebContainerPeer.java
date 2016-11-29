@@ -26,16 +26,6 @@ public class WebContainerPeer extends WebComponentPeer implements ContainerPeer 
 		}
 	}
 
-	@Override
-	public void setBounds(int x, int y, int w, int h, int op) {
-		if (op == SET_CLIENT_SIZE) {
-			Insets insets = getInsets();
-			w = w + insets.left + insets.right;
-			h = h + insets.top + insets.bottom;
-		}
-		super.setBounds(x, y, w, h, op);
-	}
-
 	public void beginValidate() {
 	}
 

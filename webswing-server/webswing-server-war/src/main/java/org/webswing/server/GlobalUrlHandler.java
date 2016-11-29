@@ -2,8 +2,8 @@ package org.webswing.server;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,13 +19,14 @@ import javax.ws.rs.PathParam;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.Constants;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.MetaObject;
-import org.webswing.server.common.util.ConfigUtil;
+import org.webswing.server.common.model.rest.LogRequest;
+import org.webswing.server.common.model.rest.LogResponse;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.resources.ResourceHandlerService;
@@ -39,8 +40,8 @@ import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingmanager.SwingInstanceManagerService;
-import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
+import org.webswing.server.util.LogReaderUtil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -79,7 +80,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 		registerChildUrlHandler(resourceService.create(this, this));
 
-		loadConfiguration(configService.getConfiguration());
+		loadApplications();
 		super.init();
 	}
 
@@ -112,11 +113,12 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		return secConfig;
 	}
 
-	public void loadConfiguration(Map<String, SecuredPathConfig> newConfig) {
+	public void loadApplications() {
 		log.info("Loading configured Swing applications.");
 		synchronized (instanceManagers) {
-			for (SecuredPathConfig configPath : newConfig.values()) {
-				String pathMapping = toPath(configPath.getPath());
+			for (String path : configService.getPaths()) {
+				SecuredPathConfig configPath = configService.getConfiguration(path);
+				String pathMapping = toPath(path);
 				if (!toPath("/").equals(pathMapping)) {
 					SwingInstanceManager childHandler = instanceManagers.get(pathMapping);
 					if (childHandler == null) {
@@ -213,19 +215,6 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	}
 
 	@Override
-	public SwingInstance findByInstanceId(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
-		synchronized (instanceManagers) {
-			for (SwingInstanceManager im : instanceManagers.values()) {
-				SwingInstance instance;
-				if ((instance = im.findByInstanceId(handshake, r)) != null) {
-					return instance;
-				}
-			}
-		}
-		return null;
-	}
-
-	@Override
 	public SwingInstance findInstanceBySessionId(String uuid) {
 		synchronized (instanceManagers) {
 			for (SwingInstanceManager im : instanceManagers.values()) {
@@ -282,6 +271,14 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		return result;
 	}
 
+	@Override
+	public URL getWebResource(String resource) {
+		if (StringUtils.isBlank(getConfig().getWebFolder()) && StringUtils.equals("/index.html", toPath(resource))) {
+			resource = System.getProperty(Constants.DEFAULT_WELCOME_PAGE, "/selector/index.html");
+		}
+		return super.getWebResource(resource);
+	}
+
 	@GET
 	@Path("/apps")
 	public List<ApplicationInfoMsg> getApplicationInfo(HttpServletRequest req) throws WsException {
@@ -318,7 +315,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	public MetaObject getConfigMeta() throws WsException {
 		MetaObject meta = super.getConfigMeta();
 		if (restartNeeded) {
-			meta.setMessage("Configuration has been changed. Please restart Webswing server to apply the changes. Note: Displaying current runtime configuration.");
+			meta.setMessage("Configuration has been changed. Please restart the server to apply the changes.");
 		}
 		return meta;
 	}
@@ -349,10 +346,8 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		if (!StringUtils.isEmpty(path)) {
 			SwingInstanceManager swingManager = instanceManagers.get(path);
 			if (swingManager == null) {
-				Map<String, Object> config = new HashMap<>();
-				config.put("path", path);
-				configService.setConfiguration(config);
-				installApplication(ConfigUtil.instantiateConfig(config, SecuredPathConfig.class));
+				configService.setConfiguration(path, null);
+				installApplication(configService.getConfiguration(path));
 				return;
 			} else {
 				throw new WsException("Unable to Create Swing app '" + path + "'. Application already exits.");
@@ -367,7 +362,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	public void setConfig(Map<String, Object> config) throws Exception {
 		checkMasterPermission(WebswingAction.rest_setConfig);
 		config.put("path", "/");
-		configService.saveMasterConfiguration(config);
+		configService.setConfiguration("/", config);
 		restartNeeded = true;
 	}
 
@@ -375,8 +370,13 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	@Path("/rest/permissions")
 	public Map<String, Boolean> getPermissions() throws Exception {
 		Map<String, Boolean> perm = super.getPermissions();
-		perm.put("remove", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_removeApp));
-		perm.put("create", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_createApp));
+		boolean multiApplicationMode = configService.isMultiApplicationMode();
+		perm.put("start", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_startApp));
+		perm.put("stop", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_stopApp));
+		perm.put("remove", multiApplicationMode && isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_removeApp));
+		perm.put("create", multiApplicationMode && isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_createApp));
+		perm.put("configEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
+		perm.put("logsView", isMasterPermited(WebswingAction.rest_viewLogs));
 		return perm;
 	}
 
@@ -390,5 +390,15 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	@Path("/rest/variables")
 	public Map<String, String> getVariables(@PathParam("") String type) throws WsException {
 		return super.getVariables(type);
+	}
+
+	@POST
+	@Path("/rest/logs")
+	public LogResponse getLogs(@PathParam("") String type, LogRequest request) throws WsException {
+		checkMasterPermission(WebswingAction.rest_viewLogs);
+		if (type.startsWith("/")) {
+			type = type.substring(1);
+		}
+		return LogReaderUtil.readLog(type, request);
 	}
 }

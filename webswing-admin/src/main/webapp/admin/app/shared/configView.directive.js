@@ -36,7 +36,7 @@
 			$scope.$on('wsRequestFormUpdate', function(evt, data, i) {
 				$timeout(function() {
 					refreshForm(wsUtils.extractValues(vm.value));
-				}, 0);
+				}, 10);
 			});
 
 			function refreshForm(config) {

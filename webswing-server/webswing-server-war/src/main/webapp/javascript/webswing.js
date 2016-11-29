@@ -1,12 +1,7 @@
-define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog', 
+define([ 'jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog', 
         'webswing-login', 'webswing-canvas', 'webswing-identity', 'webswing-jslink', 'webswing-clipboard', 'webswing-playback', 'webswing-input', 'webswing-touch', 'webswing-inject' ],
-        function f($, css, util, polyfill, Base, Socket, Files, Dialog, Login, Canvas, Identity, JsLink, Clipboard, Playback, Input, Touch, Injector) {
+        function f($, util, polyfill, Base, Socket, Files, Dialog, Login, Canvas, Identity, JsLink, Clipboard, Playback, Input, Touch, Injector) {
             "use strict";
-            var style = $("<style></style>", {
-                type : "text/css"
-            });
-            style.text(css);
-            $("head").prepend(style);
 
             var globalName = $('[data-webswing-global-var]');
             var global = {};
@@ -151,7 +146,8 @@ define([ 'jquery', 'text!templates/base.css', 'webswing-util', 'webswing-polyfil
                 }
 
                 function setupRootElement(rootElement) {
-                   return rootElement.addClass('webswing-root');
+                   return rootElement.addClass('webswing-element');
+
                 }
 
                 function start() {

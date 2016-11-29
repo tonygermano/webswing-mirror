@@ -47,7 +47,7 @@ public class SwingProcessImpl implements SwingProcess {
 			if (verifyBaseDir()) {
 				processBuilder.directory(new File(config.getBaseDir()));
 			}
-			log.info("Starting swing process [" + config.getName() + "] : " + processBuilder.command());
+			log.info("Starting swing process [" + config.getName() + "] from [" + config.getBaseDir() + "] :" + processBuilder.command());
 			process = processBuilder.start();
 			logsProcessor = processHandlerThread.scheduleAtFixedRate(new Runnable() {
 

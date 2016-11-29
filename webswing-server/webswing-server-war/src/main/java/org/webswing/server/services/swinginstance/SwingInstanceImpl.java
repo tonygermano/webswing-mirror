@@ -3,13 +3,12 @@ package org.webswing.server.services.swinginstance;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -49,7 +48,6 @@ import org.webswing.server.services.jvmconnection.JvmConnection;
 import org.webswing.server.services.jvmconnection.JvmConnectionService;
 import org.webswing.server.services.jvmconnection.JvmListener;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.stats.StatisticsLogger;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingprocess.ProcessExitListener;
@@ -59,19 +57,16 @@ import org.webswing.server.services.swingprocess.SwingProcessService;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.util.FontUtils;
 import org.webswing.server.util.ServerUtil;
-import org.webswing.toolkit.WebToolkit;
-import org.webswing.toolkit.WebToolkit6;
-import org.webswing.toolkit.WebToolkit7;
-import org.webswing.toolkit.WebToolkit8;
 import org.webswing.toolkit.api.WebswingApi;
-import org.webswing.toolkit.ge.WebGraphicsEnvironment6;
-import org.webswing.toolkit.ge.WebGraphicsEnvironment7;
-import org.webswing.toolkit.ge.WebGraphicsEnvironment8;
 
 import main.Main;
 
 public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private static final String LAUNCHER_CONFIG = "launcherConfig";
+	private static final String WEB_TOOLKIT_CLASS_NAME = "org.webswing.toolkit.WebToolkit";
+	private static final String WEB_GRAPHICS_ENV_CLASS_NAME = "org.webswing.toolkit.ge.WebGraphicsEnvironment";
+	private static final String WEB_PRINTER_JOB_CLASS_NAME = "org.webswing.toolkit.WebPrinterJob";
+	private static final String WIN_SHELL_FOLDER_MANAGER = "sun.awt.shell.Win32ShellFolderManager2";
 
 	private static final Logger log = LoggerFactory.getLogger(SwingInstance.class);
 
@@ -120,11 +115,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	public void connectSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h) {
 		if (h.isMirrored()) {// connect as mirror viewer
-			if (r.hasPermission(WebswingAction.websocket_startMirrorView)) {
-				connectMirroredWebSession(r);
-			} else {
-				log.error("Authorization error: User " + r.getUser() + " is not authorized. [Mirrored view only available for admin role]");
-			}
+			connectMirroredWebSession(r);
 		} else {// continue old session?
 			if (h.getSessionId() != null && h.getSessionId().equals(getSessionId())) {
 				sendToSwing(r, h);
@@ -338,7 +329,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		jvmConnection.close();
 		notifyExiting();
 
-		if (config.isIsolatedFs() && config.isClearTransferDir()) {
+		if (process != null && config.isIsolatedFs() && config.isClearTransferDir()) {
 			String transferDir = process.getConfig().getProperties().get(Constants.SWING_START_SYS_PROP_TRANSFER_DIR);
 			try {
 				if (transferDir != null) {
@@ -393,56 +384,53 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private SwingProcess start(SwingProcessService processService, final SwingConfig appConfig, final ConnectionHandshakeMsgIn handshake) throws Exception {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), getClientId(), clientIp, handshake.getLocale(), customArgs);
+		final VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), getClientId(), clientIp, handshake.getLocale(), customArgs);
 		SwingProcess swing = null;
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
 			swingConfig.setName(getClientId());
-			File homeDir = manager.resolveFile(subs.replace(appConfig.getUserDir()));
-			swingConfig.setJreExecutable(subs.replace(appConfig.getJreExecutable()));
-			swingConfig.setBaseDir(homeDir == null ? "." : homeDir.getAbsolutePath());
+			String java = getAbsolutePath(subs.replace(appConfig.getJreExecutable()), false);
+			swingConfig.setJreExecutable(java);
+			String homeDir = getAbsolutePath(subs.replace(appConfig.getUserDir()), true);
+			swingConfig.setBaseDir(homeDir);
 			swingConfig.setMainClass(Main.class.getName());
 			swingConfig.setClassPath(new File(URI.create(CommonUtil.getWarFileLocation())).getAbsolutePath());
-			String webSwingToolkitApiJarPath = getClassPathForClass(WebswingApi.class);
-			String webSwingToolkitJarPath = getClassPathForClass(WebToolkit.class);
-			String webSwingToolkitJarPathSpecific;
-			String webToolkitClass;
-			String webGraphicsEnvClass;
 			String javaVersion = subs.replace(appConfig.getJavaVersion());
+			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;
+			String webGraphicsEnvClass = WEB_GRAPHICS_ENV_CLASS_NAME;
 			if (javaVersion.startsWith("1.6")) {
-				webSwingToolkitJarPathSpecific = getClassPathForClass(WebToolkit6.class);
-				webToolkitClass = WebToolkit6.class.getCanonicalName();
-				webGraphicsEnvClass = WebGraphicsEnvironment6.class.getCanonicalName();
+				webToolkitClass += "6";
+				webGraphicsEnvClass += "6";
 			} else if (javaVersion.startsWith("1.7")) {
-				webSwingToolkitJarPathSpecific = getClassPathForClass(WebToolkit7.class);
-				webToolkitClass = WebToolkit7.class.getCanonicalName();
-				webGraphicsEnvClass = WebGraphicsEnvironment7.class.getCanonicalName();
+				webToolkitClass += "7";
+				webGraphicsEnvClass += "7";
 			} else if (javaVersion.startsWith("1.8")) {
-				webSwingToolkitJarPathSpecific = getClassPathForClass(WebToolkit8.class);
-				webToolkitClass = WebToolkit8.class.getCanonicalName();
-				webGraphicsEnvClass = WebGraphicsEnvironment8.class.getCanonicalName();
+				webToolkitClass += "8";
+				webGraphicsEnvClass += "8";
 			} else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
 				throw new RuntimeException("Java version not supported. (Version starting with 1.6 , 1.7 and 1.8 are supported.)");
 			}
-			String bootCp = "-Xbootclasspath/a:\"" + webSwingToolkitApiJarPath + "\"" + File.pathSeparatorChar + "\"" + webSwingToolkitJarPathSpecific + "\"" + File.pathSeparatorChar + "\"" + webSwingToolkitJarPath + "\"";
+			String webSwingToolkitApiJarPath = CommonUtil.getBootClassPathForClass(WebswingApi.class.getName());
+			String webSwingToolkitJarPath = CommonUtil.getBootClassPathForClass(WEB_TOOLKIT_CLASS_NAME);
+			String webSwingToolkitJarPathSpecific = CommonUtil.getBootClassPathForClass(webToolkitClass);
+			String rtWinShellJarPath = System.getProperty("os.name", "").startsWith("Windows") ? "" : CommonUtil.getBootClassPathForClass(WIN_SHELL_FOLDER_MANAGER);
 
-			if (!System.getProperty("os.name", "").startsWith("Windows")) {
-				// filesystem isolation support on non windows systems:
-				bootCp += File.pathSeparatorChar + "\"" + webSwingToolkitJarPath.substring(0, webSwingToolkitJarPath.lastIndexOf(File.separator)) + File.separator + "rt-win-shell.jar" + "\"";
-			}
+			String bootCp = "-Xbootclasspath/a:" + webSwingToolkitApiJarPath + File.pathSeparatorChar + webSwingToolkitJarPathSpecific + File.pathSeparatorChar + webSwingToolkitJarPath + File.pathSeparator + rtWinShellJarPath;
+
 			String debug = appConfig.isDebug() && (debugPort != 0) ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=" + debugPort + ",server=y,suspend=y " : "";
 			String vmArgs = appConfig.getVmArgs() == null ? "" : subs.replace(appConfig.getVmArgs());
 			swingConfig.setJvmArgs(bootCp + debug + " -noverify " + vmArgs);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, getClientId());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.queueId);
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_HOME, getAbsolutePath(".", false));
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
 			swingConfig.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 			swingConfig.addProperty(Constants.JMS_URL, System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT));
 
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_THEME, subs.replace(appConfig.getTheme()));
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs());
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, subs.replace(appConfig.getTransferDir()));
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, getAbsolutePath(subs.replace(appConfig.getTransferDir()), false));
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD, appConfig.isAllowAutoDownload());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload());
@@ -455,9 +443,9 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported());
 			swingConfig.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout());
 			swingConfig.addProperty("awt.toolkit", webToolkitClass);
-			swingConfig.addProperty("java.awt.headless", "false");
+			swingConfig.addProperty("java.awt.headless", false);
 			swingConfig.addProperty("java.awt.graphicsenv", webGraphicsEnvClass);
-			swingConfig.addProperty("java.awt.printerjob", "org.webswing.toolkit.WebPrinterJob");
+			swingConfig.addProperty("java.awt.printerjob", WEB_PRINTER_JOB_CLASS_NAME);
 			swingConfig.addProperty("sun.awt.fontconfig", FontUtils.createFontConfiguration(appConfig, subs));
 			swingConfig.addProperty(Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth));
 			swingConfig.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight));
@@ -501,12 +489,29 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		return swing;
 	}
 
-	private String getClassPathForClass(Class<?> clazz) throws UnsupportedEncodingException {
-		String cp = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8");
-		if (cp.endsWith(clazz.getCanonicalName().replace(".", "/") + ".class")) {
-			cp = cp.substring(0, cp.length() - (clazz.getCanonicalName().length() + 8));
+	private String getAbsolutePath(String path, boolean create) throws IOException {
+		if (StringUtils.isBlank(path)) {
+			path = ".";
 		}
-		return cp;
+		File f = manager.resolveFile(path);
+		if (f == null || !f.exists()) {
+			path = path.replaceAll("\\\\", "/");
+			String[] pathSegs = path.split("/");
+			boolean absolute = pathSegs[0].length() == 0 || pathSegs[0].contains(":");
+			if (!absolute) {
+				File home = manager.resolveFile(".");
+				f = new File(home, path);
+			} else {
+				f = new File(path);
+			}
+			if (create) {
+				boolean done = f.mkdirs();
+				if (!done) {
+					throw new IOException("Unable to create path. " + f.getAbsolutePath());
+				}
+			}
+		}
+		return f.getCanonicalPath();
 	}
 
 	public String getClientId() {

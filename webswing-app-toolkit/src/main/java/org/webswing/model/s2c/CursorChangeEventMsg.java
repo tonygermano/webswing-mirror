@@ -16,6 +16,9 @@ public class CursorChangeEventMsg implements Msg {
 	public static final String BACKSLASH_RESIZE_CURSOR = "se-resize";
 	public static final String NOT_ALLOWED_CURSOR = "not-allowed";
 	private String cursor;
+	private byte[] b64img;
+	private int x;
+	private int y;
 
 	public CursorChangeEventMsg() {
 	}
@@ -31,6 +34,30 @@ public class CursorChangeEventMsg implements Msg {
 
 	public void setCursor(String cursor) {
 		this.cursor = cursor;
+	}
+
+	public byte[] getB64img() {
+		return b64img;
+	}
+
+	public void setB64img(byte[] b64img) {
+		this.b64img = b64img;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
 	}
 
 }

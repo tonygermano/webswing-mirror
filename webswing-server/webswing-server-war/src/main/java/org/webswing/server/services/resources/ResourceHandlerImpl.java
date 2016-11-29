@@ -1,16 +1,15 @@
 package org.webswing.server.services.resources;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.JarURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.zip.ZipEntry;
+import java.net.URLConnection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.util.CommonUtil;
@@ -18,6 +17,7 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.SecurityContext;
 
 public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceHandler {
+	private static final Logger log = LoggerFactory.getLogger(ResourceHandlerImpl.class);
 
 	private SecurityContext context;
 
@@ -101,34 +101,30 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 		}
 	}
 
-	public static class StaticFile implements LookupResult {
-		protected final long lastModified;
-		protected final String mimeType;
-		protected final int contentLength;
-		protected final URL url;
+	public static class ResourceUrl implements LookupResult {
+		protected final URLConnection url;
+		private String mime;
 
-		public StaticFile(long lastModified, String mimeType, int contentLength, URL url) {
-			this.lastModified = lastModified;
-			this.mimeType = mimeType;
-			this.contentLength = contentLength;
+		public ResourceUrl(String mime, URLConnection url) {
+			this.mime = mime;
 			this.url = url;
 		}
 
 		public long getLastModified() {
-			return lastModified;
+			return this.url.getLastModified();
 		}
 
 		protected void setHeaders(HttpServletResponse resp) {
 			resp.setStatus(HttpServletResponse.SC_OK);
-			resp.setContentType(mimeType);
-			if (contentLength >= 0)
-				resp.setContentLength(contentLength);
+			resp.setContentType(mime);
+			if (url.getContentLength() >= 0)
+				resp.setContentLength(url.getContentLength());
 		}
 
 		public boolean respondGet(HttpServletResponse resp) throws IOException {
 			setHeaders(resp);
 			final OutputStream os = resp.getOutputStream();
-			CommonUtil.transferStreams(url.openStream(), os);
+			CommonUtil.transferStreams(url.getInputStream(), os);
 			return true;
 		}
 
@@ -164,55 +160,23 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 		if (isForbidden(path))
 			return new ErrorResult(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
 
-		final URL url = context.getWebResource(path);
+		URL url = context.getWebResource(path + "/index.html");//check if this is folder with default index
+		if (url != null && !req.getPathInfo().endsWith("/")) {
+			return new RedirectResult(path + "/");
+		}
+		if (url == null) {
+			url = context.getWebResource(path);
+		}
 		if (url == null) {
 			return new ErrorResult(HttpServletResponse.SC_NOT_FOUND, "Not found");
 		}
 
-		final String mimeType = getMimeType(url.getPath());
-
-		final String realpath = url.getPath();
-		if (realpath != null) {
-			// Try as an ordinary file
-			File f;
-			try {
-				f = new File(url.toURI());
-			} catch (URISyntaxException e) {
-				f = new File(realpath);
-			}
-			if (!f.isFile()) {
-				if (req.getPathInfo().endsWith("/")) {
-					return lookupNoCache(req, path + "/index.html");
-				} else {
-					return new RedirectResult(path + "/");
-				}
-			} else {
-				return new StaticFile(f.lastModified(), mimeType, (int) f.length(), url);
-			}
-		} else {
-			try {
-				// Try as a JAR Entry
-				final ZipEntry ze = ((JarURLConnection) url.openConnection()).getJarEntry();
-				if (ze != null) {
-					if (ze.isDirectory()) {
-						if (req.getPathInfo().endsWith("/")) {
-							return lookupNoCache(req, path + "/index.html");
-						} else {
-							return new RedirectResult(path + "/");
-						}
-					} else {
-						return new StaticFile(ze.getTime(), mimeType, (int) ze.getSize(), url);
-					}
-				} else {
-					// Unexpected?
-					return new StaticFile(-1, mimeType, -1, url);
-				}
-			} catch (ClassCastException e) {
-				// Unknown resource type
-				return new StaticFile(-1, mimeType, -1, url);
-			} catch (IOException e) {
-				return new ErrorResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error");
-			}
+		String mimeType = getMimeType(url.getPath());
+		try {
+			return new ResourceUrl(mimeType, url.openConnection());
+		} catch (IOException e) {
+			log.error("Failed to serve path " + path + " with resource " + url.toString(), e);
+			return new ErrorResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 

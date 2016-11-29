@@ -443,25 +443,13 @@ public class WebComponentPeer implements ComponentPeer {
 				boolean b = Util.isWindowDecorationPosition(window, location);
 				if (b) {
 					WindowActionType wat = Services.getImageService().getWindowDecorationTheme().getAction(window, new Point(location.x - window.getX(), location.y - window.getY()));
-					Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(mapActionToCursor(wat));
+					Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(wat.getCursor());
 				} else {
 					Component component = SwingUtilities.getDeepestComponentAt(window, location.x - window.getX(), location.y - window.getY());
 					component = component == null ? window : component;
 					Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(component.getCursor());
 				}
 			}
-		}
-	}
-
-	private Cursor mapActionToCursor(WindowActionType wat) {
-		if (wat.equals(WindowActionType.resizeRight)) {
-			return Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR);
-		} else if (wat.equals(WindowActionType.resizeBottom)) {
-			return Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR);
-		} else if (wat.equals(WindowActionType.resizeUni)) {
-			return Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR);
-		} else {
-			return Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 		}
 	}
 

@@ -16,7 +16,7 @@
 			};
 		}
 
-		function wsAppViewDirectiveController($scope, $element, $attrs, $location, $timeout, configRestService, permissions, wsUtils) {
+		function wsAppViewDirectiveController($scope, $element, $attrs, $location, $timeout, configRestService, permissions, wsUtils, extValue) {
 			var vm = this;
 			vm.permissions = permissions;
 			vm.b64img = '';
@@ -58,7 +58,8 @@
 					vm.cpuStats = getCpuStats(data.stats);
 					vm.bandwidthStats = getBandwidthStats(data.stats);
 					vm.latencyStats = getLatencyStats(data.stats);
-					vm.configOptions = getConfigOptions(data);
+					vm.configOptions = extValue.getConfigInfo(data);
+					vm.showConfigButton = extValue.showConfigButton;
 					vm.lastUpdated = new Date();
 				}).then(function() {
 					vm.timer = $timeout(refresh, 5000);
@@ -116,19 +117,34 @@
 				var connected = newValue.connectedInstances;
 				var disconnected = newValue.runningInstances - connected;
 				var available = newValue.maxRunningInstances - connected - disconnected;
-				return [ {
+				var sum = connected + disconnected;
+				var data = [];
+				data.push({
 					label : 'Connected',
 					value : connected,
 					color : '#5cb85c'
-				}, {
+				});
+				data.push({
 					label : 'Disconnected',
 					value : disconnected,
 					color : '#f0ad4e'
-				}, {
-					label : 'Available',
-					value : available,
-					color : '#777'
-				} ];
+				});
+				if (newValue.maxRunningInstances >= 0) {
+					data.push({
+						label : 'Available',
+						value : available,
+						color : '#777'
+					});
+					sum += available;
+				}
+				if (sum == 0) {
+					data.push({
+						label : null,
+						value : 1,
+						color : '#777',
+					});
+				}
+				return data;
 			}
 
 			function getMemoryStats(stats) {
@@ -191,23 +207,6 @@
 				}
 			}
 
-			function getConfigOptions(newValue) {
-				var c = newValue.config;
-				var result = {
-					"Home Folder" : c.homeDir,
-					"Web Folder" : c.webFolder,
-					"Security Module" : c.security.module,
-				}
-				if (c.swingConfig != null) {
-					result["Type"] = c.swingConfig.launcherType;
-					result["DirectDraw"] = c.swingConfig.directdraw;
-					result["Theme"] = c.swingConfig.theme;
-					result["Session mode"] = c.swingConfig.sessionMode;
-					result["Session timeout"] = c.swingConfig.swingSessionTimeout;
-				}
-				return result
-			}
-
 			function resolve(name, defaultVal) {
 				if ($attrs[name] != null) {
 					return $attrs[name];
@@ -217,7 +216,7 @@
 			}
 		}
 
-		wsAppViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$location', '$timeout', 'configRestService', 'permissions', 'wsUtils' ];
+		wsAppViewDirectiveController.$inject = [ '$scope', '$element', '$attrs', '$location', '$timeout', 'configRestService', 'permissions', 'wsUtils', 'extValue' ];
 
 		return wsAppViewDirective;
 	});

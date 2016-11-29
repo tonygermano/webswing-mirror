@@ -219,9 +219,11 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	public void dispose() {
-		thisImage.addInstruction(this, dif.disposeGraphics(this));
-		thisImage.dispose(this);
-		disposed = true;
+		if (!disposed) {
+			thisImage.addInstruction(this, dif.disposeGraphics(this));
+			thisImage.dispose(this);
+			disposed = true;
+		}
 	}
 
 	public int getId() {

@@ -1,17 +1,22 @@
-<form id="webswingLginForm" accept-charset="UTF-8" role="form" style="max-width: 400px;">
-	<h2>Please sign in</h2>
-	<div class="form-group">
-		<input id="nameInput" type="text" class="form-control"
-			placeholder="User name" name="username" required autofocus>
+<form id="webswingLginForm" accept-charset="UTF-8" role="form" class="ws-login-form">
+	<div data-id="header" class="ws-login-header">
+		<h1 class="ws-login-title">Sign in to your account</h1>
 	</div>
-	<div class="form-group">
-		<input id="passwordInput" type="password" class="form-control"
-			placeholder="Password" name="password" required>
-	</div>
+
+	<p class="ws-login-instructions">Please enter your credentials:</p>
+	<input id="nameInput" type="text" class="ws-form-field ws-form-addon" placeholder="Username" name="username" required autofocus autocomplete="off">
+	<i class="ws-form-icon ws-form-icon--username" aria-hidden="true"></i>
+
+	<input id="passwordInput" type="password" class="ws-form-field ws-form-addon" placeholder="Password" name="password" required autocomplete="off">
+	<i class="ws-form-icon ws-form-icon--password" aria-hidden="true"></i>
+
 	<div id="loginErrorMsg">
 		{{#errorMessage}}
-			<div class="alert alert-danger">{{errorMessage}}</div>
+		<div class="ws-login-message ws-login-message--error">
+			{{errorMessage}}
+		</div>
 		{{/errorMessage}}
 	</div>
+
+	<button type="submit" form="webswingLginForm" value="Submit" class="ws-btn-submit">Sign in</button>
 </form>
-<button type="submit" form="webswingLginForm" value="Submit" class="btn btn-lg btn-primary">Sign in</button>

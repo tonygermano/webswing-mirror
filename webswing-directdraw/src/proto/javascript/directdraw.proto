@@ -127,7 +127,7 @@ message ArcProto {
 message PathProto {
 	required bool windingOdd = 1;
 	repeated SegmentTypeProto type = 2;
-	repeated sint32 points = 3;
+	repeated float points = 3;
 
 	enum SegmentTypeProto {
 		MOVE = 0;

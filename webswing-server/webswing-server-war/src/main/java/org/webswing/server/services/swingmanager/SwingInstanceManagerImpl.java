@@ -106,6 +106,31 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		}
 	}
 
+	@Override
+	public void connectView(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
+		try {
+			SwingInstance instance;
+			if (handshake.isMirrored()) {
+				checkPermissionLocalOrMaster(WebswingAction.websocket_startMirrorView);
+				instance = runningInstances.findByInstanceId(handshake.getClientId());
+			} else {
+				instance = runningInstances.findByInstanceId(handshake, r);
+			}
+			if (instance != null) {
+				instance.connectSwingInstance(r, handshake);
+			} else {
+				if (handshake.isMirrored()) {
+					throw new WsException("Instance not found!");
+				} else {
+					startSwingInstance(r, handshake);
+				}
+			}
+		} catch (WsException e) {
+			log.error("Failed to connect to instance. ", e);
+			r.broadcastMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
+		}
+	}
+
 	public void shutdown(String id, boolean force) {
 		SwingInstance si = runningInstances.findByClientId(id);
 		si.shutdown(force);
@@ -137,11 +162,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Override
 	public SwingInstance findInstanceByClientId(String clientId) {
 		return runningInstances.findByClientId(clientId);
-	}
-
-	@Override
-	public SwingInstance findByInstanceId(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
-		return runningInstances.findByInstanceId(handshake, r);
 	}
 
 	@Override
@@ -199,6 +219,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		File icon = resolveFile(getConfig().getIcon());
 		app.setIcon(CommonUtil.loadImage(icon));
 		app.setConfig(getConfig());
+		app.setVariables(varSubs.getVariableMap());
 		app.setRunningInstances(runningInstances.size());
 		int connected = 0;
 		for (SwingInstance si : runningInstances.getAllInstances()) {
@@ -227,7 +248,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Path("/status")
 	public String getStatusPage() throws Exception {
 		InstanceManagerStatus status = getStatus();
-		URL webResource = getWebResource(status.getStatus().name() + ".html");
+		URL webResource = getWebResource("status/" + status.getStatus().name() + ".html");
 		if (webResource != null) {
 			return IOUtils.toString(webResource);
 		}
@@ -251,9 +272,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Path("/rest/config")
 	public MetaObject getConfigMeta() throws WsException {
 		MetaObject meta = super.getConfigMeta();
-		if (isStarted()) {
-			meta.setMessage("Note: Only Swing configuration can be modified while the application is running. Stop the application to edit the Security configuration.");
-		}
 		return meta;
 	}
 
@@ -296,7 +314,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		if (id.startsWith("/")) {
 			id = id.substring(1);
 		}
-		SwingInstance instance = findInstanceByClientId(id);
+		SwingInstance instance = runningInstances.findByInstanceId(id);
 		if (instance != null) {
 			return instance.toSwingSession(true);
 		}
@@ -315,9 +333,11 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		if (id.startsWith("/")) {
 			id = id.substring(1);
 		}
-		SwingInstance instance = findInstanceByClientId(id);
+		SwingInstance instance = runningInstances.findByInstanceId(id);
 		if (instance != null) {
 			instance.shutdown(force);
+		} else {
+			throw new WsException("Instance with id " + id + " not found.");
 		}
 	}
 

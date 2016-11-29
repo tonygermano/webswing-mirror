@@ -44,7 +44,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 	public AbstractWebswingUser doSufficientPreValidation(AbstractExtendableSecurityModule<?> m, HttpServletRequest request, HttpServletResponse response) throws WebswingAuthenticationException {
 		Map<String, Object> requestData = m.getLoginRequest(request);
 		if (requestData != null && requestData.containsKey(SECURITY_TOKEN)) {
-			AbstractWebswingUser result = verifyOneTimePassword((String) requestData.get(SECURITY_TOKEN));
+			AbstractWebswingUser result = verifyOneTimePassword(request, (String) requestData.get(SECURITY_TOKEN));
 			return result;
 		}
 		return null;
@@ -81,7 +81,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		}
 	}
 
-	public AbstractWebswingUser verifyOneTimePassword(String otp) throws WebswingAuthenticationException {
+	public AbstractWebswingUser verifyOneTimePassword(HttpServletRequest request, String otp) throws WebswingAuthenticationException {
 		try {
 			OtpTokenData token = parseOtpTokenString(otp);
 			verifyTokenValid(token);
@@ -92,11 +92,13 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 			for (int i = -1; i <= 1; i++) {
 				String expectedPassword = calculateTotpString(crypto, secret, message, i, validityInterval);
 				if (expectedPassword.equals(token.getOneTimePassword())) {
-					return createUser(token);
+					return createUser(request, token);
 				}
 			}
+			logFailure(request, null, "Invalid or expired OTP. ");
 			throw new WebswingAuthenticationException("Invalid or expired OTP. ");
 		} catch (Exception e) {
+			logFailure(request, null, "Failed to verify OTP. " + e.getMessage());
 			throw new WebswingAuthenticationException("Failed to verify OTP. " + e.getMessage(), e);
 		}
 	}
@@ -237,7 +239,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 	}
 
 	@SuppressWarnings("rawtypes")
-	public AbstractWebswingUser createUser(OtpTokenData token) throws WebswingAuthenticationException {
+	public AbstractWebswingUser createUser(HttpServletRequest req, OtpTokenData token) throws WebswingAuthenticationException {
 		OtpAccessConfig c = getConfigForRequestor(getConfig(), token.getRequestorId());
 		Map<String, Serializable> attributes = new HashMap<String, Serializable>();
 		Set<String> roles = new HashSet<>();
@@ -259,6 +261,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		}
 
 		if (c.getAllowedUsers() != null && c.getAllowedUsers().size() > 0 && !c.getAllowedUsers().contains(token.getUser())) {
+			logFailure(req, token.getUser(), "User is not allowed to use OTP.");
 			throw new WebswingAuthenticationException("User '" + token.getUser() + "' is not allowed to use OTP.");
 		}
 		if (c.getAllowedRoles() != null) {
@@ -269,6 +272,7 @@ public class OneTimeUrlSecurityExtension extends SecurityModuleExtension<OneTime
 		}
 
 		AbstractWebswingUser user = new OtpWebswingUser(token.getUser(), attributes, roles, permissions);
+		logSuccess(req, token.getUser());
 		return user;
 	}
 

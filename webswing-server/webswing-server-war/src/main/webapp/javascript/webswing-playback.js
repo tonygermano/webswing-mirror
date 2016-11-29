@@ -1,10 +1,5 @@
-define([ 'jquery', 'text!templates/playback.html', 'text!templates/playback.css' ], function amdFactory($, html, css) {
+define([ 'jquery', 'text!templates/playback.html' ], function amdFactory($, html) {
     "use strict";
-    var style = $("<style></style>", {
-        type : "text/css"
-    });
-    style.text(css);
-    $("head").prepend(style);
 
     return function PlaybackModule() {
         var module = this;
@@ -29,7 +24,7 @@ define([ 'jquery', 'text!templates/playback.html', 'text!templates/playback.css'
             if (playbackBar != null && data.playback != null) {
                 data = data.playback;
                 var progress = parseInt(data.current / data.total * 100, 10);
-                playbackBar.find('.webswing-playback-progress-bar').css('width', progress + '%');
+                playbackBar.find('.ws-progress-bar').css('width', progress + '%');
                 playbackBar.find('span[data-id="current"]').html(data.current);
                 playbackBar.find('span[data-id="total"]').html(data.total)
             }

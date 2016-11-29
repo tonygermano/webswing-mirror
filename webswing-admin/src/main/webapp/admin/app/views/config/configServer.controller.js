@@ -1,24 +1,19 @@
 (function(define) {
 	define([], function f() {
-		function ConfigEditController($scope, baseUrl, configRestService, permissions, loading) {
+		function ConfigEditController($scope, baseUrl, configRestService, permissions, loading,extValue) {
 			var vm = this;
 			vm.permissions = permissions;
 			vm.readonly = !vm.permissions.configEdit;
 			vm.config = {
-				hide : [ 'path', 'icon', 'swingConfig' ],
+				hide : extValue.hiddenServerConfigFields,
 				enable : null
 			};
 			vm.variables = {};
 			vm.reset = reset;
 			vm.apply = apply;
-			vm.hide = [ 'path', 'icon', 'swingConfig' ];
 			vm.baseUrl = baseUrl;
 
 			activate();
-
-			$scope.$on('vm.permissions.configEdit', function(evt, ctl) {
-				vm.readonly = !vm.permissions.configEdit;
-			});
 
 			function activate() {
 				if(!loading.isLoading()){
@@ -47,7 +42,7 @@
 				return configRestService.setConfig(baseUrl, config).then(activate);
 			}
 		}
-		ConfigEditController.$inject = [ '$scope', 'baseUrl', 'configRestService', 'permissions', 'loading' ];
+		ConfigEditController.$inject = [ '$scope', 'baseUrl', 'configRestService', 'permissions', 'loading','extValue' ];
 
 		return ConfigEditController;
 	});

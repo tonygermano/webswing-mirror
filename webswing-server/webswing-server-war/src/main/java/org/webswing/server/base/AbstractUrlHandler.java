@@ -146,7 +146,7 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 		return path;
 	}
 
-	public static boolean isSubPath(String subpath, String path) {
+	public boolean isSubPath(String subpath, String path) {
 		return CommonUtil.isSubPath(subpath, path);
 	}
 

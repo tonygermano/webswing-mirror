@@ -19,6 +19,7 @@ public enum WebswingAction {
 	rest_stopApp(Role.admin),
 	rest_createApp(Role.admin),
 	rest_removeApp(Role.admin),
+	rest_viewLogs(Role.admin),
 	rest_getApps(Role.authenticated),
 	//Security 
 	rest_getOneTimePassword(Role.admin),

@@ -16,7 +16,7 @@ import org.apache.shiro.web.servlet.ShiroHttpServletResponse;
 import org.apache.shiro.web.subject.WebSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.server.base.WsInitException;
+import org.webswing.server.model.exception.WsInitException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

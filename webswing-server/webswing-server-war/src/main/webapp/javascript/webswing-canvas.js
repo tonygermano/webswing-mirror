@@ -20,7 +20,7 @@ define(['jquery'], function amdFactory() {
         function create() {
             if (canvas == null) {
                 api.cfg.rootElement.append('<canvas data-id="canvas" style="display:block" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
-                api.cfg.rootElement.append('<input data-id="input-handler" class="input-hidden" type="text" value="" />');
+                api.cfg.rootElement.append('<input data-id="input-handler" class="ws-input-hidden" type="text" value="" />');
                 canvas = api.cfg.rootElement.find('canvas[data-id="canvas"]');
                 inputHandler = api.cfg.rootElement.find('input[data-id="input-handler"]');
             }

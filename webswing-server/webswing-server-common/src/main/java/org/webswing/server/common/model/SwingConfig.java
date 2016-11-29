@@ -6,7 +6,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.webswing.Constants;
 import org.webswing.server.common.model.meta.ConfigField;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
@@ -14,6 +13,7 @@ import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
 import org.webswing.server.common.model.meta.ConfigFieldDiscriminator;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType;
+import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 import org.webswing.server.common.model.meta.ConfigFieldOrder;
 import org.webswing.server.common.model.meta.ConfigFieldPresets;
 import org.webswing.server.common.model.meta.ConfigFieldVariables;
@@ -21,7 +21,6 @@ import org.webswing.server.common.model.meta.ConfigGroup;
 import org.webswing.server.common.model.meta.ConfigType;
 import org.webswing.server.common.model.meta.MetadataGenerator;
 import org.webswing.server.common.model.meta.VariableSetName;
-import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
 @ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload",
@@ -62,9 +61,9 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isDebug();
 
-	@ConfigField(tab = ConfigGroup.Java, label = "User Folder", description = "The User working directory. Path from which the swing process will be started. (See the Java System Property: 'user.dir')")
+	@ConfigField(tab = ConfigGroup.Java, label = "Working directory", description = "The User working directory. Path from which the swing process will be started. (See the Java System Property: 'user.dir')")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
-	@ConfigFieldDefaultValueString("${" + Constants.HOME_FOLDER_SUBSTITUTE + "}")
+	@ConfigFieldDefaultValueString("")
 	public String getUserDir();
 
 	@ConfigField(tab = ConfigGroup.Java, label = "JRE Executable", description = "Path to java executable that will be used to spawn swing application process. Java 6,7 and 8 is supported.")
@@ -148,7 +147,7 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Upload Folder", description = "If Isolated Filesystem is enabled. This will be the folder on the server where the user can upload and download files from.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
-	@ConfigFieldDefaultValueString("${user.dir}/${user}/upload")
+	@ConfigFieldDefaultValueString("${user}/upload")
 	public String getTransferDir();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Clear Upload Folder", description = "If enabled, all files in the transfer folder will be deleted when the swing process is terminated.")

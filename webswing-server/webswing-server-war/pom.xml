@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>webswing-server-war</artifactId>
 	<packaging>war</packaging>
@@ -33,21 +32,6 @@
 
 
 		<!-- include in WEB-INF/lib -->
-		<dependency>
-			<groupId>org.webswing</groupId>
-			<artifactId>webswing-app-toolkit-java6</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webswing</groupId>
-			<artifactId>webswing-app-toolkit-java7</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webswing</groupId>
-			<artifactId>webswing-app-toolkit-java8</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.webswing</groupId>
 			<artifactId>webswing-server-security</artifactId>
@@ -174,24 +158,13 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.1</version><!-- version 2.8 appends version to artifact names -->
-				<executions>
-					<execution>
-						<id>copyWarlibs</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
-							<includeArtifactIds>
-								rt-win-shell
-							</includeArtifactIds>
-						</configuration>
-					</execution>
-				</executions>
+				<groupId>nl.geodienstencentrum.maven</groupId>
+				<artifactId>sass-maven-plugin</artifactId>
+				<version>2.21</version>
+				<configuration>
+					<sassSourceDirectory>${project.basedir}/src/main/webapp/css/scss</sassSourceDirectory>
+					<destination>${project.basedir}/src/main/webapp/css</destination>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -214,37 +187,27 @@
 								<configuration>
 									<target>
 										<copy todir="${project.build.directory}/${project.build.finalName}">
-											<fileset
-												dir="${project.basedir}/../webswing-server-common/target/classes/">
+											<fileset dir="${project.basedir}/../webswing-server-common/target/classes/">
 												<include name="main/*.class" />
 											</fileset>
-											<fileset
-												dir="${project.basedir}/../../webswing-app-interface/target"
-												includes="WEB-INF/swing-lib/*.jar" />
+											<fileset dir="${project.basedir}/../../webswing-app-interface/target" includes="WEB-INF/swing-lib/*.jar" />
+											<fileset dir="${project.basedir}/../../webswing-app-launcher/target" includes="WEB-INF/swing-boot/*.jar" />
 										</copy>
 										<copy todir="${project.build.directory}/demo">
-											<fileset
-												dir="${project.basedir}/../../webswing-assembly/src/main/demo">
+											<fileset dir="${project.basedir}/../../webswing-assembly/src/main/demo">
 												<include name="**/*" />
 											</fileset>
 										</copy>
 										<copy todir="${project.build.directory}/demo/demo/SwingSet3">
-											<fileset
-												dir="${project.basedir}/../../webswing-demo/webswing-demo-swingset3/target">
+											<fileset dir="${project.basedir}/../../webswing-demo/webswing-demo-swingset3/target">
 												<include name="lib/*.jar" />
 												<include name="SwingSet3.jar" />
 											</fileset>
 										</copy>
 										<copy todir="${project.build.directory}/demo/demo/nbmin">
-											<fileset
-												dir="${project.basedir}/../../webswing-demo/webswing-demo-nbplatform/target">
+											<fileset dir="${project.basedir}/../../webswing-demo/webswing-demo-nbplatform/target">
 												<include name="lib/*.jar" />
 												<include name="nbplatform.jar" />
-											</fileset>
-										</copy>
-										<copy todir="${project.basedir}/../../webswing-app-toolkit/target">
-											<fileset dir="${project.basedir}/../../lib">
-												<include name="rt-win-shell.jar" />
 											</fileset>
 										</copy>
 									</target>
@@ -346,28 +309,28 @@
 								<phase>package</phase>
 								<configuration>
 									<target>
-										<war
-											destfile="${project.build.directory}/${project.build.finalName}.war"
-											update="true">
-											<fileset
-												dir="${project.build.directory}/${project.build.finalName}"
-												includes="WEB-INF/lib/rt-win-shell*.jar" />
-											<fileset
-												dir="${project.basedir}/../../webswing-app-interface/target"
-												includes="WEB-INF/swing-lib/*.jar" />
-											<fileset
-												dir="${project.basedir}/../webswing-server-launcher/target"
-												includes="WEB-INF/server-lib/*.jar" />
-											<fileset
-												dir="${project.basedir}/../webswing-server-common/target/classes/"
-												includes="main/*.class" />
-											<fileset dir="${project.build.directory}/require-build/"
-												includes="javascript/**" />
+										<war destfile="${project.build.directory}/${project.build.finalName}.war" update="true">
+											<fileset dir="${project.basedir}/../../webswing-app-launcher/target" includes="WEB-INF/swing-boot/*.jar" />
+											<fileset dir="${project.basedir}/../../webswing-app-interface/target" includes="WEB-INF/swing-lib/*.jar" />
+											<fileset dir="${project.basedir}/../webswing-server-launcher/target" includes="WEB-INF/server-lib/*.jar" />
+											<fileset dir="${project.basedir}/../webswing-server-common/target/classes/" includes="main/*.class" />
+											<fileset dir="${project.build.directory}/require-build/" includes="javascript/**" />
 										</war>
 									</target>
 								</configuration>
 								<goals>
 									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>nl.geodienstencentrum.maven</groupId>
+						<artifactId>sass-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>update-stylesheets</goal>
 								</goals>
 							</execution>
 						</executions>
