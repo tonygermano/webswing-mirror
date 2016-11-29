@@ -42,7 +42,7 @@ public class DirectDrawUtils {
 		sgHelper = (SunGraphics2D) new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).getGraphics();
 		sgHelper.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		// logical fonts
-		webFonts.setProperty("Dialog", "sans-serif");
+		webFonts.setProperty("Dialog", "serif");
 		webFonts.setProperty("DialogInput", "monospace");
 		webFonts.setProperty("Serif", "serif");
 		webFonts.setProperty("SansSerif", "sans-serif");
@@ -271,7 +271,9 @@ public class DirectDrawUtils {
 		if (fileName != null) {
 			File f = new File(fileName);
 			if (f.exists()) {
-				return fileName.hashCode() + new File(fileName).getName();
+				String name = fileName.hashCode() + new File(fileName).getName();
+				name = name.length() > 20 ? name.substring(0, 20) : name; //IE will ignore the font if name is longer than 31 chars 
+				return name;
 			} else {
 				return fileName;
 			}

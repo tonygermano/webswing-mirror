@@ -19,10 +19,12 @@
 .ws-icon-angle-double-right:before { content: '\f101'; }
 .ws-icon-certificate:before { content: '\f0a3'; }
 
+$awesome: "wsFontAwesome";
+
 @mixin font-awesome {
     display: inline-block;
 
-    font-family: 'wsFontAwesome';
+    font-family: $awesome;
     font-size: inherit;
     font-weight: normal;
     font-style: normal;
@@ -35,7 +37,7 @@
 
 
 [class^="ws-icon-"]:before, [class*=" ws-icon-"]:before {
-  font-family: "wsFontAwesome";
+  font-family: $awesome;
   font-style: normal;
   font-weight: normal;
   speak: none;
@@ -60,7 +62,7 @@
 // Font Awesome, used for icons
 // Font Awesome by Dave Gandy - http://fontawesome.io
 @font-face {
-    font-family: 'wsFontAwesome';
+    font-family: $awesome;
     font-weight: normal;
     font-style: normal;
 
