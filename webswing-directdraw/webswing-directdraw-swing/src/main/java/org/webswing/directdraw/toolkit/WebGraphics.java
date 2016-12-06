@@ -24,6 +24,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 
+import org.webswing.directdraw.util.WaitingImageObserver;
+
 public class WebGraphics extends AbstractVectorGraphics {
 
 	WebImage thisImage;
@@ -124,6 +126,11 @@ public class WebGraphics extends AbstractVectorGraphics {
 	private ImageConvertResult toBufferedImage(Image image, ImageObserver observer) {
 		if (image instanceof BufferedImage) {
 			return new ImageConvertResult(true, (BufferedImage) image);
+		}
+		try {
+			new WaitingImageObserver(image).waitImageLoaded();//magic
+		} catch (Exception e) {
+			//ignore
 		}
 		BufferedImage bufferedImage = new BufferedImage(image.getWidth(observer), image.getHeight(observer), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = bufferedImage.createGraphics();

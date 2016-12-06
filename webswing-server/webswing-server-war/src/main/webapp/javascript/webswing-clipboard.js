@@ -1,5 +1,5 @@
 define([ 'jquery', 'text!templates/clipboard.html','webswing-util' ], function amdFactory($, html, util) {
-	"use strict";
+    "use strict";
 
 	return function ClipboardModule() {
 		var module = this;
@@ -28,7 +28,7 @@ define([ 'jquery', 'text!templates/clipboard.html','webswing-util' ], function a
 
 		function copy(event, cut) {
 			if (copyBar == null) {
-				if (api.cfg.ieVersion) {
+				if (api.cfg.ieVersion && api.cfg.ieVersion<=11) {
 					window.clipboardData.setData('Text', '');
 				} else {
 					event.clipboardData.setData('text/plain', '');
@@ -40,22 +40,15 @@ define([ 'jquery', 'text!templates/clipboard.html','webswing-util' ], function a
 				});
 			} else {
 				var data = copyBar.wsEventData;
-				if (api.cfg.ieVersion) {
+				if (api.cfg.ieVersion && api.cfg.ieVersion<=11) {
 					// handling of copy events only for IE
 					var ieClipboardDiv = copyBar.find('div[data-id="ie-clipboard"]');
 					var clipboardData = window.clipboardData;
-					if (data.html != null) {
-						ieClipboardDiv.html(data.html);
-						focusIeClipboardDiv();
-						setTimeout(function() {
-							close();
-						}, 0);
-					} else {
+					if (data.text != null) {
 						event.preventDefault();
 						clipboardData.setData('Text', data.text);
-						close();
 					}
-
+					close();
 				} else {
 					// handling of copy events for rest of browsers
 					event = event.originalEvent || event;
@@ -63,7 +56,7 @@ define([ 'jquery', 'text!templates/clipboard.html','webswing-util' ], function a
 					if (data.text != null) {
 						event.clipboardData.setData('text/plain', data.text);
 					}
-					if (data.html != null) {
+					if (data.html != null && !api.cfg.ieVersion ) {
 						event.clipboardData.setData('text/html', data.html);
 					}
 					close();
@@ -71,20 +64,11 @@ define([ 'jquery', 'text!templates/clipboard.html','webswing-util' ], function a
 			}
 		}
 
-		function focusIeClipboardDiv() {
-			ieClipboardDiv.focus();
-			var range = document.createRange();
-			range.selectNodeContents((ieClipboardDiv.get(0)));
-			var selection = window.getSelection();
-			selection.removeAllRanges();
-			selection.addRange(range);
-		}
-
 		function paste(event) {
 			if (api.cfg.hasControl) {
 				var text = '';
 				var html = '';
-				if (api.cfg.ieVersion) {
+				if (api.cfg.ieVersion && api.cfg.ieVersion<=11) {
 					text = window.clipboardData.getData('Text');
 					html = text;
 				} else {
