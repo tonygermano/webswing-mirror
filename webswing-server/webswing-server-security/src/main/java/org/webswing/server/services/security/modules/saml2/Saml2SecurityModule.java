@@ -136,9 +136,9 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 			sendRedirect(request, response, logoutUrl);
 		} else {
 			if (isAjax(request)) {
-				sendHtml(request, response, "saml2/logoutPartial.html", null);
+				sendHtml(request, response, "logoutPartial.html", null);
 			} else {
-				sendHtml(request, response, "saml2/logoutPage.html", null);
+				sendHtml(request, response, "logoutPage.html", null);
 			}
 		}
 

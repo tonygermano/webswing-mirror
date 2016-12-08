@@ -2,6 +2,7 @@ package org.webswing.server.services.security.modules.anonym;
 
 import java.io.IOException;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,4 +30,12 @@ public class AnonymSecurityModule extends AbstractSecurityModule<WebswingSecurit
 	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
 	}
 
+	@Override
+	public void doLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if (isAjax(request)) {
+			sendHtml(request, response, "logoutPartial.html", null);
+		} else {
+			sendHtml(request, response, "logoutPage.html", null);
+		}
+	}
 }
