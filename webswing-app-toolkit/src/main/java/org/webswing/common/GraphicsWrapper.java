@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.WebComponentPeer;
-import org.webswing.toolkit.util.Util;
 
 public class GraphicsWrapper extends Graphics2D {
 
@@ -52,9 +51,12 @@ public class GraphicsWrapper extends Graphics2D {
 	}
 
 	private void addDirtyRectangleArea(Rectangle r) {
-		r.translate((int) getTransform().getTranslateX(), (int) getTransform().getTranslateY());
-		r.translate(offset.x, offset.y);
-		rootPaintComponent.notifyWindowAreaRepainted(r);
+		r = getClipBounds().intersection(r);
+		if (r.width > 0 && r.height > 0) {
+			r.translate((int) getTransform().getTranslateX(), (int) getTransform().getTranslateY());
+			r.translate(offset.x, offset.y);
+			rootPaintComponent.notifyWindowAreaRepainted(r);
+		}
 	}
 
 	public WebComponentPeer getRootPaintComponent() {
