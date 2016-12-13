@@ -27,16 +27,14 @@ import org.webswing.toolkit.util.ClasspathUtil;
 public class SecurityModuleWrapper implements WebswingSecurityModule {
 	private static final Logger log = LoggerFactory.getLogger(SecurityModuleWrapper.class);
 
-	private final ExtensionClassLoader extensionLoader;
 	private WebswingSecurityModule custom;
 	private WebswingSecurityConfig config;
 	private URLClassLoader customCL;
 	private SecurityContext context;
 
-	public SecurityModuleWrapper(SecurityContext context, WebswingSecurityConfig config, ExtensionClassLoader extensionLoader) {
+	public SecurityModuleWrapper(SecurityContext context, WebswingSecurityConfig config) {
 		this.context = context;
 		this.config = config;
-		this.extensionLoader = extensionLoader;
 	}
 
 	@Override
@@ -45,7 +43,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 			String classPath = CommonUtil.generateClassPathString(config.getClassPath());
 			classPath = context.replaceVariables(classPath);
 			URL[] urls = ClasspathUtil.populateClassPath(classPath, context.resolveFile(".").getAbsolutePath());
-			customCL = new URLClassLoader(urls, extensionLoader);
+			customCL = new URLClassLoader(urls, new ExtensionClassLoader());
 			String securityModuleClassName = BuiltInModules.getSecurityModuleClassName(config.getModule());
 			Class<?> moduleClass = customCL.loadClass(securityModuleClassName);
 
