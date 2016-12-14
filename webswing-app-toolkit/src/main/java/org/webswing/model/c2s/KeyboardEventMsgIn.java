@@ -75,7 +75,7 @@ public class KeyboardEventMsgIn implements MsgIn {
 	}
 
 	public boolean isAltgr() {
-		return alt && ctrl;
+		return false; //not supported by browsers
 	}
 
 }
