@@ -16,7 +16,8 @@ define([ 'jquery' ], function Util($) {
         bindEvent : bindEvent,
         detectIE : detectIE,
         preventGhosts : preventGhosts,
-        GUID : GUID
+        GUID : GUID,
+        detectMac : detectMac
     }
 
     function isTouchDevice() {
@@ -115,4 +116,7 @@ define([ 'jquery' ], function Util($) {
         return (S4() + S4() + S4());
     }
 
+    function detectMac(){
+    	return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    }
 });

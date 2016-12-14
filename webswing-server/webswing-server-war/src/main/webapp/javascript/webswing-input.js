@@ -162,9 +162,10 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                 }
                 var keyevt = getKBKey('keydown', canvas, event);
                 // hanle paste event
-                if (!(keyevt.key.ctrl && !keyevt.key.alt && !keyevt.key.altgr && !keyevt.key.shift &&(keyevt.key.character == 88 || keyevt.key.character == 67 || keyevt.key.character == 86))) { // cut copy
+                var ctrlCmd = api.cfg.isMac ? keyevt.key.meta : keyevt.key.ctrl;
+                if (!(ctrlCmd && !keyevt.key.alt && !keyevt.key.altgr && !keyevt.key.shift && (keyevt.key.character == 88 || keyevt.key.character == 67 || keyevt.key.character == 86))) { // cut copy
                     // default action prevented
-                    if (keyevt.key.ctrl && !keyevt.key.alt && !keyevt.key.altgr) {
+                    if (ctrlCmd  && !keyevt.key.alt && !keyevt.key.altgr ) {
                         event.preventDefault();
                     }
                     enqueueInputEvent(keyevt);
@@ -176,7 +177,8 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
             util.bindEvent(canvas, 'keypress', keyPressHandler, false);
             function keyPressHandler(event) {
                 var keyevt = getKBKey('keypress', canvas, event);
-                if (!(keyevt.key.ctrl && !keyevt.key.alt && !keyevt.key.altgr && !keyevt.key.shift && (keyevt.key.character == 120 || keyevt.key.character == 24 || keyevt.key.character == 99
+                var ctrlCmd = api.cfg.isMac ? keyevt.key.meta : keyevt.key.ctrl;
+                if (!(ctrlCmd && !keyevt.key.alt && !keyevt.key.altgr && !keyevt.key.shift && (keyevt.key.character == 120 || keyevt.key.character == 24 || keyevt.key.character == 99
                         || keyevt.key.character == 118 || keyevt.key.character == 22))) { // cut copy paste handled separately
                     event.preventDefault();
                     event.stopPropagation();
@@ -189,7 +191,8 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
             util.bindEvent(canvas, 'keyup', keyUpHandler, false);
             function keyUpHandler(event) {
                 var keyevt = getKBKey('keyup', canvas, event);
-                if (!(keyevt.key.ctrl && !keyevt.key.alt && !keyevt.key.altgr && !keyevt.key.shift && (keyevt.key.character == 88 || keyevt.key.character == 67 || keyevt.key.character == 86))) { // cut copy
+                var ctrlCmd = api.cfg.isMac ? keyevt.key.meta : keyevt.key.ctrl;
+                if (!(ctrlCmd && !keyevt.key.alt && !keyevt.key.altgr && !keyevt.key.shift && (keyevt.key.character == 88 || keyevt.key.character == 67 || keyevt.key.character == 86))) { // cut copy
                     event.preventDefault();
                     event.stopPropagation();
                     enqueueInputEvent(keyevt);

@@ -134,7 +134,8 @@ define([ 'jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'websw
                         javaCallTimeout : 3000,
                         documentBase : document.location.origin + document.location.pathname,
                         ieVersion : util.detectIE(),
-                        /* webswing instance context */
+                        isMac : util.detectMac(),
+                    	/* webswing instance context */
                         clientId : null,
                         viewId : null,
                         appName : null,

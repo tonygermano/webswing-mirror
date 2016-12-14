@@ -128,6 +128,12 @@ define([ 'jquery', 'text!templates/clipboard.html','webswing-util' ], function a
 
 			/* TEXT TAB */
 			var copyBtn = copyBar.find('button[data-id="text"]');
+			if(api.cfg.isMac){
+				var macCopyMsg=$('<p>Copy to clipboard with CMD+C</p>');
+				copyBtn.after(macCopyMsg);
+				copyBtn.remove();
+				copyBtn=macCopyMsg;
+			}
 			if ((data.text != null && data.text.length !== 0) || (data.html != null && data.html.length !== 0)) {
 				var textarea = copyBar.find('div[data-id="textarea"]');
 				if (data.text != null && data.text.length !== 0) {
