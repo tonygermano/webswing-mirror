@@ -26,6 +26,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_SYNC_TIMEOUT = "webswing.syncCallTimeout";
 	public static final String SWING_START_SYS_PROP_THEME = "webswing.theme";
 	public static final String SWING_START_SYS_PROP_WAIT_FOR_EXIT = "webswing.waitForExit";
+	public static final String SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY = "webswing.doubleClickMaxDelay";
 
 	// applet startup properties
 	public static final String SWING_START_SYS_PROP_APPLET_CLASS = "webswing.appletClass";

@@ -67,6 +67,7 @@ public class WebEventDispatcher {
 	//these keycodes are assigned to different keys in browser  
 	private static final List<Integer> nonStandardKeyCodes = Arrays.asList(KeyEvent.VK_KP_DOWN, KeyEvent.VK_KP_UP, KeyEvent.VK_KP_RIGHT, KeyEvent.VK_KP_LEFT);
 	protected static final String WebswingApiImpl = null;
+	private static final long doubleClickMaxDelay = Long.getLong(Constants.SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY, 750);
 
 	public void dispatchEvent(final MsgIn event) {
 		Logger.debug("WebEventDispatcher.dispatchEvent:", event);
@@ -288,7 +289,9 @@ public class WebEventDispatcher {
 	private int computeClickCount(int x, int y, int buttons, boolean isPressed) {
 		if (isPressed) {
 			if (lastMousePressEvent != null && lastMousePressEvent.getID() == MouseEvent.MOUSE_CLICKED && lastMousePressEvent.getButton() == buttons && lastMousePressEvent.getX() == x && lastMousePressEvent.getY() == y) {
-				return lastMousePressEvent.getClickCount() + 1;
+				if (System.currentTimeMillis() - lastMousePressEvent.getWhen() < doubleClickMaxDelay) {
+					return lastMousePressEvent.getClickCount() + 1;
+				}
 			}
 		} else {
 			if (lastMousePressEvent != null && lastMousePressEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMousePressEvent.getButton() == buttons) {
@@ -425,7 +428,7 @@ public class WebEventDispatcher {
 			FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fc);
 			boolean saveMode = FileDialogEventType.AutoSave == fileChooserEventType;
 			fc.rescanCurrentDirectory();
-			if (event.getFiles()!=null && event.getFiles().size() > 0) {
+			if (event.getFiles() != null && event.getFiles().size() > 0) {
 				if (fc.isMultiSelectionEnabled()) {
 					List<File> arr = new ArrayList<File>();
 					for (int i = 0; i < event.getFiles().size(); i++) {

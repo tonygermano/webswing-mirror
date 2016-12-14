@@ -8,6 +8,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Insets;
 import java.awt.geom.AffineTransform;
 import java.awt.print.PageFormat;
+import java.awt.print.Paper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -60,7 +61,7 @@ public class PdfServiceImpl implements PdfService {
 	private Dimension getPageDimension(UserProperties props) {
 		Dimension d = PageConstants.getSize(props.getProperty(PDFGraphics2D.PAGE_SIZE), props.getProperty(PDFGraphics2D.ORIENTATION));
 		Insets m = PageConstants.getMargins(props.getPropertyInsets(PDFGraphics2D.PAGE_MARGINS), props.getProperty(PDFGraphics2D.ORIENTATION));
-		Dimension result= new Dimension();
+		Dimension result = new Dimension();
 		result.setSize(d.getWidth() - m.left - m.right, d.getHeight() - m.top - m.bottom);
 		return result;
 	}
@@ -90,7 +91,8 @@ public class PdfServiceImpl implements PdfService {
 	}
 
 	private String resolveSize(PageFormat format) {
-		MediaSizeName size = WebPrinterJob.findMedia(format.getWidth(), format.getHeight());
+		Paper p = format.getPaper();
+		MediaSizeName size = WebPrinterJob.findMedia(p.getWidth(), p.getHeight());
 		if (size == MediaSizeName.ISO_A3) {
 			return PageConstants.A3;
 		} else if (size == MediaSizeName.ISO_A4) {
