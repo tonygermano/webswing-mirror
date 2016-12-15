@@ -124,7 +124,8 @@ public class WebPaintDispatcher {
 				}
 			}
 		};
-		contentSender.scheduleWithFixedDelay(sendUpdate, 33, 33, TimeUnit.MILLISECONDS);
+		Integer delay = Integer.getInteger("webswing.drawDelayMs", 33);
+		contentSender.scheduleWithFixedDelay(sendUpdate, delay, delay, TimeUnit.MILLISECONDS);
 	}
 
 	public void clientReadyToReceive() {
