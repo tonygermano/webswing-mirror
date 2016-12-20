@@ -14,13 +14,13 @@
 			vm.kill = kill;
 			vm.toConfig = toConfig;
 			vm.sortExp = 'startedAt';
-			vm.sortReverse = false;
+			vm.sortReverse = true;
 			vm.sortBy = sortBy;
 			vm.sortByMetrics = sortByMetrics;
 			vm.sortByBandwidth = sortByBandwidth;
 			vm.sortByLatency = sortByLatency;
 			vm.sortFinishedExp = 'endedAt';
-			vm.sortFinishedReverse = false;
+			vm.sortFinishedReverse = true;
 			vm.sortFinishedBy = sortFinishedBy;
 
 			refresh();

@@ -131,10 +131,10 @@
 	                    {{session.user}}
 	                </td>
 	                <td>
-	                    {{session.startedAt| date:'dd MMM h:mm:ss'}}
+	                    {{session.startedAt| date:'dd MMM HH:mm:ss'}}
 	                </td>
 	                <td>
-	                    {{(session.endedAt| date:'dd MMM h:mm:ss')+ ' ('+(session.endedAt-session.startedAt | duration)+')'}}
+	                    {{(session.endedAt| date:'dd MMM HH:mm:ss')+ ' ('+(session.endedAt-session.startedAt | duration)+')'}}
 	                </td>
 	                <td>
 	                    <div ng-switch on="session.status">
