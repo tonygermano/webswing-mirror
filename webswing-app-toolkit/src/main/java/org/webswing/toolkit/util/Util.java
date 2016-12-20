@@ -477,7 +477,7 @@ public class Util {
 		return null;
 	}
 
-	public static String resolveFilename(File currentDir, String fileName) {
+	public static String resolveUploadFilename(File currentDir, String fileName) {
 		if (!existsFilename(currentDir, fileName)) {
 			return fileName;
 		} else {

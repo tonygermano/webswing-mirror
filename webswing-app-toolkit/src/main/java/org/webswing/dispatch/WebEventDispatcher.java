@@ -115,7 +115,7 @@ public class WebEventDispatcher {
 						if (dialog != null) {
 							File currentDir = dialog.getCurrentDirectory();
 							File tempFile = new File(upload.getTempFileLocation());
-							String validfilename = Util.resolveFilename(currentDir, upload.getFileName());
+							String validfilename = Util.resolveUploadFilename(currentDir, upload.getFileName());
 							if (currentDir.canWrite() && tempFile.exists()) {
 								try {
 									Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));

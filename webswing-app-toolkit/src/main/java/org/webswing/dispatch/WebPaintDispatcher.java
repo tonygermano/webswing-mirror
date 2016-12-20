@@ -411,6 +411,12 @@ public class WebPaintDispatcher {
 				fdEvent.setAllowDelete(false);
 				fdEvent.setAllowDownload(false);
 				fdEvent.setAllowUpload(false);
+				if(FileDialogEventType.AutoUpload == fileChooserEventType){
+						String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
+						File timestampFoleder = new File(path, "" + System.currentTimeMillis());
+						timestampFoleder.mkdirs();
+						fileChooserDialog.setCurrentDirectory(timestampFoleder);
+				}
 				Window d = SwingUtilities.getWindowAncestor(fileChooserDialog);
 				d.setBounds(0, 0, 1, 1);
 			}
