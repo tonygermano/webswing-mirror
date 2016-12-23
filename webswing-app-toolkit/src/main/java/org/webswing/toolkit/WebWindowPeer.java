@@ -11,8 +11,6 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
 
-import javax.swing.SwingUtilities;
-
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Util;
 
@@ -77,6 +75,7 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 			Util.getWebToolkit().getPaintDispatcher().notifyFileDialogHidden(this);
 		}
 		Util.getWebToolkit().getWindowManager().removeWindow((Window) target);
+		notifyWindowClosed();
 	}
 
 	public void setTitle(String title) {

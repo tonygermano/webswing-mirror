@@ -199,11 +199,20 @@ public class CommonUtil {
 	}
 
 	public static String getBootClassPathForClass(String className) throws Exception {
-		Class<?> theClass = getSwingBootClassLoader().loadClass(className);
-		String cp = URLDecoder.decode(theClass.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8");
-		if (cp.endsWith(className.replace(".", "/") + ".class")) {
-			cp = cp.substring(0, cp.length() - (className.length() + 8));
+		String classfile=className.replace(".", "/") + ".class";
+		URL url= getSwingBootClassLoader().getResource(classfile);
+		if(url!=null){
+			String cp =  URLDecoder.decode(url.getPath(),"UTF-8");
+			if (cp.endsWith(classfile)) {
+				cp = cp.substring(0, cp.length() - (classfile.length() + 2));
+				if(cp.startsWith("file:")){
+					cp=cp.substring(5);
+				}
+			}
+			return "\"" + cp + "\"";
+			
+		}else{
+			throw new IllegalStateException("Class "+className+" not found in bootclasspath folder of webswing-server.war. ");
 		}
-		return "\"" + cp + "\"";
 	}
 }

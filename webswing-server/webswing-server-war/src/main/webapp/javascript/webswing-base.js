@@ -270,7 +270,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 				api.processFileDialogEvent(data.fileDialogEvent);
 			}
 			if (data.closedWindow != null) {
-				delete windowImageHolders[data.closedWindow];
+				delete windowImageHolders[data.closedWindow.id];
 			}
 			// first is always the background
 			for ( var i in data.windows) {
