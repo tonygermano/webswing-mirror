@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -85,9 +86,15 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private Date disconnectedSince;
 	private final Date startedAt = new Date();
 	private final String queueId;
-	private Date endedAt = null;
 	private String customArgs = "";
 	private int debugPort = 0;
+	private String userIp = null;
+	private String userOs = null;
+	private String userBrowser = null;
+
+	//finished instances only
+	private Date endedAt = null;
+	private List<String> warningHistoryLog;
 
 	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection websocket) throws WsException {
 		this.manager = manager;
@@ -101,6 +108,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		this.debugPort = ServerUtil.getDebugPort(websocket.getRequest());
 		this.clientIp = ServerUtil.getClientIp(websocket);
 		this.queueId = user.getUserId() + "-" + config.getName() + "-" + startedAt.getTime();
+		updateUser(websocket);
 		try {
 			this.jvmConnection = connectionService.connect(this.queueId, this);
 			process = start(processService, config, h);
@@ -141,6 +149,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			}
 			if (this.webConnection == null) {
 				this.webConnection = resource;
+				updateUser(resource);
 				logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, resource.isWebsocketTransport() ? 1 : 2);
 				this.disconnectedSince = null;
 				notifyUserConnected();
@@ -149,6 +158,12 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		}
 		return false;
 
+	}
+
+	private void updateUser(WebSocketConnection resource) {
+		userIp = ServerUtil.getClientIp(webConnection);
+		userOs = ServerUtil.getClientOs(webConnection);
+		userBrowser = ServerUtil.getClientBrowser(webConnection);
 	}
 
 	private void disconnectPrimaryWebSession() {
@@ -363,6 +378,9 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		}
 		session.setStartedAt(getStartedAt());
 		session.setUser(getUser());
+		session.setUserIp(userIp);
+		session.setUserOs(userOs);
+		session.setUserBrowser(userBrowser);
 		session.setEndedAt(getEndedAt());
 		session.setStatus(getStatus());
 		if (stats) {
@@ -370,6 +388,11 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		}
 		session.setMetrics(manager.getInstanceMetrics(getClientId()));
 		session.setWarnings(manager.getInstanceWarnings(getClientId()));
+		if (isRunning()) {
+			session.setWarningHistory(manager.getInstanceWarningHistory(getClientId()));
+		} else {
+			session.setWarningHistory(warningHistoryLog);
+		}
 		session.setRecorded(isRecording());
 		session.setRecordingFile(getRecordingFile());
 		return session;
@@ -606,6 +629,13 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		if (StringUtils.isNotEmpty(name)) {
 			manager.logStatValue(getClientId(), name, value);
 		}
+	}
+
+	@Override
+	public void logWarningHistory() {
+		List<String> current = manager.getInstanceWarnings(getClientId());
+		current.addAll(manager.getInstanceWarningHistory(getClientId()));
+		warningHistoryLog = current;
 	}
 
 	private void notifyUserConnected() {

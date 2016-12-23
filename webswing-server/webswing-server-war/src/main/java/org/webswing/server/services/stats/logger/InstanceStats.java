@@ -1,7 +1,10 @@
 package org.webswing.server.services.stats.logger;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -9,11 +12,13 @@ import java.util.List;
 import java.util.Map;
 
 public class InstanceStats {
+	private DateFormat format = new SimpleDateFormat("HH:mm:ss");
 	private Map<String, Map<Long, Number>> statisticsLog = new HashMap<>();
 	private Map<String, Long> lastTimestampMap = new HashMap<String, Long>();
 	private Map<String, List<Number>> lastTimestampNumbers = new HashMap<String, List<Number>>();
 	private Map<String, Number> lastMetrics = new HashMap<>();
 	private Map<String, String> warnings = new HashMap<>();
+	private Map<String, String> warningHistory = new HashMap<>();
 
 	public void processMetric(MetricRule rule, String name, Number value, WarningRule warnRule) {
 		//round timestamp to interval milis
@@ -38,11 +43,11 @@ public class InstanceStats {
 			statisticsLog.put(name, valueMap);
 		}
 
-		if(rule.getInterval()==0){
+		if (rule.getInterval() == 0) {
 			valueMap.put(timestamp, value);
 			lastMetrics.put(name, value);
 			processWarningRule(name, warnRule);
-		}else{
+		} else {
 			//flush last timestamp entry if interval passed
 			Long last = lastTimestampMap.get(name);
 			if (last != null && last != timestamp && lastTimestampNumbers.get(name) != null) {
@@ -65,9 +70,14 @@ public class InstanceStats {
 	private void processWarningRule(String name, WarningRule warnRule) {
 		if (warnRule != null) {
 			String warning = warnRule.checkWarning(lastMetrics);
-			if(warning==null){
-				warnings.remove(name);
-			}else{
+			
+			if (warning == null && warnings.containsKey(name)) {
+				String value = warnings.remove(name);
+				String date = format.format(new Date());
+				warningHistory.put(name, value + " (until " + date + ")");
+			}
+			
+			if (warning != null) {
 				warnings.put(name, warning);
 			}
 		}
@@ -123,5 +133,9 @@ public class InstanceStats {
 
 	public Map<String, Map<Long, Number>> getStatistics() {
 		return statisticsLog;
+	}
+
+	public List<String> getWarningHistory() {
+		return new ArrayList<>(warningHistory.values());
 	}
 }

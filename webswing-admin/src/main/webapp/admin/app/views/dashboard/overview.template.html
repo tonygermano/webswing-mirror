@@ -25,6 +25,9 @@
 						<a ng-click="vm.sortBy('user')">User</a>
 					</th>
 	                <th>
+						IP
+					</th>
+	                <th>
 	                	<a ng-click="vm.sortBy('startedAt')">Start time</a>
 	                </th>
 	                <th>
@@ -64,6 +67,11 @@
 	                </td>
 	                <td>
 	                    {{session.user}}
+	                    <span class="{{vm.getOsIcon(session.userOs)}}" title="Operating system:{{session.userOs}}"></span>
+	                    <span class="{{vm.getBrowserIcon(session.userBrowser)}}" title="Browser: {{session.userBrowser}}"></span>
+	                </td>
+	                <td>
+	                    {{session.userIp}}
 	                </td>
 	                <td>
 	                    {{session.startedAt| date:'dd MMM h:mm:ss'}}
@@ -80,8 +88,8 @@
 	                    <div ng-if="session.recording" >
 	                        <span class="glyphicon glyphicon-facetime-video" ui-jq="tooltip" title="Recording to {{session.recordingFile}}"></span> Recording...
 	                    </div>
-                        <div ng-if="session.warnings!=null" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
-				  			<span class="label label-warning"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{session.warnings.length}} Warnings </span>
+                        <div ng-if="session.warnings!=null || session.warningHistory!=null" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
+				  			<span ng-class="{'label':true, 'label-warning':session.warnings != null, 'label-default':session.warnings == null}"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{session.warnings.length}} Warnings </span>
 						</div>
 	                </td>
 	                <td>
@@ -116,6 +124,7 @@
 	            <tr class="ws-table-header">
 	                <th>No. (Id)</th>
 	                <th><a ng-click="vm.sortFinishedBy('user')">User</a> </th>
+	                <th>IP</th>
 	                <th><a ng-click="vm.sortFinishedBy('startedAt')">Start time</a> </th>
 	                <th><a ng-click="vm.sortFinishedBy('endedAt')">End time</a></th>
 	                <th><a ng-click="vm.sortFinishedBy('status')">Status</a></th>
@@ -129,6 +138,11 @@
 	                </td>
 	                <td>
 	                    {{session.user}}
+	                    <span class="{{vm.getOsIcon(session.userOs)}}" title="Operating system:{{session.userOs}}"></span>
+	                    <span class="{{vm.getBrowserIcon(session.userBrowser)}}" title="Browser: {{session.userBrowser}}"></span>
+	                </td>
+	                <td>
+	                    {{session.userIp}}
 	                </td>
 	                <td>
 	                    {{session.startedAt| date:'dd MMM HH:mm:ss'}}
@@ -154,6 +168,9 @@
 	                            <span class="label label-success" ui-jq="tooltip" title="Application finished.">Finished</span>
 	                        </div>
 	                    </div>
+	                    <div ng-if="session.warningHistory!=null" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
+				  			<span class="label label-default"> <span class="glyphicon glyphicon-exclamation-sign"></span> Warnings </span>
+						</div>
 	                </td>
 	                <td>
 	                    <button ng-if="session.recorded" type="button" class="btn btn-primary" ng-click="vm.play(session)">
@@ -181,6 +198,20 @@
 			            <tr ng-repeat="msg in vm.warningSession.warnings">
 			                <td>
 		                    	{{msg}}
+			                </td>
+			            </tr>
+			        </tbody>
+			    </table>
+		   	    <table class="table table-striped">
+			        <thead>
+			            <tr class="ws-table-header">
+			                <th>Historic Warning Messages</th>
+			            </tr>
+			        </thead>
+			        <tbody>
+			            <tr ng-repeat="historyMsg in vm.warningSession.warningHistory">
+			                <td>
+		                    	{{historyMsg}}
 			                </td>
 			            </tr>
 			        </tbody>

@@ -22,8 +22,8 @@
 						<span class="label label-danger" ui-jq="tooltip" title="Disconnected at {{vm.session.disconnectedSince| date:'dd MMM h:mm:ss'}}">Disconnected</span>
 					</div>
 				</div>
-				<div ng-if="vm.session.warnings.length!=null" data-toggle="modal" data-target="#warnModal">
-		  			<span class="label label-warning"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{vm.session.warnings.length}} Warnings </span>
+				<div ng-if="vm.session.warnings.length!=null || vm.session.warningHistory!=null" data-toggle="modal" data-target="#warnModal">
+		  			<span ng-class="{'label':true, 'label-warning':vm.session.warnings != null, 'label-default':vm.session.warnings == null}"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{vm.session.warnings.length}} Warnings </span>
 				</div>
 			</td>
 			<td>
@@ -90,6 +90,20 @@
 	            <tr ng-repeat="msg in vm.session.warnings">
 	                <td>
                     	{{msg}}
+	                </td>
+	            </tr>
+	        </tbody>
+	    </table>
+  	    <table class="table table-striped">
+	        <thead>
+	            <tr class="ws-table-header">
+	                <th>Historic Warning Messages</th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	            <tr ng-repeat="historyMsg in vm.session.warningHistory">
+	                <td>
+	                   	{{historyMsg}}
 	                </td>
 	            </tr>
 	        </tbody>

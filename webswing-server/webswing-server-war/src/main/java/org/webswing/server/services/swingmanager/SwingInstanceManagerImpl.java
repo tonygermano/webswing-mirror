@@ -151,6 +151,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 			closedInstances.add(swingInstance);
 		}
 		runningInstances.remove(swingInstance.getInstanceId());
+		swingInstance.logWarningHistory();
 		statsLogger.removeInstance(swingInstance.getClientId());
 	}
 
@@ -371,6 +372,11 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Override
 	public List<String> getInstanceWarnings(String instance) {
 		return statsLogger.getInstanceWarnings(instance);
+	}
+	
+	@Override
+	public List<String> getInstanceWarningHistory(String instance) {
+		return statsLogger.getInstanceWarningHistory(instance);
 	}
 
 }

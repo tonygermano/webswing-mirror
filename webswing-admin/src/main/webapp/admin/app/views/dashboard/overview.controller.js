@@ -22,6 +22,8 @@
 			vm.sortFinishedExp = 'endedAt';
 			vm.sortFinishedReverse = true;
 			vm.sortFinishedBy = sortFinishedBy;
+			vm.getOsIcon = getOsIcon;
+			vm.getBrowserIcon = getBrowserIcon;
 
 			refresh();
 
@@ -93,6 +95,45 @@
 				} else {
 					vm.sortFinishedExp = exp;
 					vm.sortFinishedReverse = false;
+				}
+			}
+
+			function getOsIcon(os) {
+				if (os != null) {
+					if (os === 'Windows') {
+						return 'wsa-icon-windows';
+					}
+					if (os === 'Mac' || os === 'IPhone') {
+						return 'wsa-icon-apple';
+					}
+					if (os === 'Linux') {
+						return 'wsa-icon-linux';
+					}
+					if (os === 'Android') {
+						return 'wsa-icon-android';
+					}
+					return 'wsa-icon-unknown';
+				}
+			}
+
+			function getBrowserIcon(b) {
+				if (b != null) {
+					if (b.indexOf('IE') >= 0) {
+						return 'wsa-icon-ie';
+					}
+					if (b.indexOf('Safari') >= 0) {
+						return 'wsa-icon-safari';
+					}
+					if (b.indexOf('Opera') >= 0) {
+						return 'wsa-icon-opera';
+					}
+					if (b.indexOf('Chrome') >= 0) {
+						return 'wsa-icon-chrome';
+					}
+					if (b.indexOf('Firefox') >= 0) {
+						return 'wsa-icon-firefox';
+					}
+					return 'wsa-icon-unknown';
 				}
 			}
 

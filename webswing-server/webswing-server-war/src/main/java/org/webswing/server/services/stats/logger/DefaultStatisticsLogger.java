@@ -118,6 +118,15 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 		}
 		return null;
 	}
+	
+	@Override
+	public List<String> getInstanceWarningHistory(String instance) {
+		InstanceStats stats = instanceMap.get(instance);
+		if (stats != null) {
+			return stats.getWarningHistory();
+		}
+		return null;
+	}
 
 	public void removeInstance(String instance) {
 		instanceMap.remove(instance);

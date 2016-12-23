@@ -39,4 +39,6 @@ public interface SwingInstance {
 
 	SwingSession toSwingSession(boolean stats);
 
+	void logWarningHistory();
+
 }

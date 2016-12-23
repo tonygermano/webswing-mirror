@@ -30,6 +30,8 @@ public interface StatisticsLogger {
 
 	List<String> getInstanceWarnings(String instance);
 
+	List<String> getInstanceWarningHistory(String instance);
+	
 	void removeInstance(String instance);
 
 

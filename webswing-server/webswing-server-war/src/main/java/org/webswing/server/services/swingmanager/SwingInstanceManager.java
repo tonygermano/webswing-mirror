@@ -37,4 +37,6 @@ public interface SwingInstanceManager extends SecuredPathHandler, SwingInstanceH
 	Map<String, Number> getInstanceMetrics(String clientId);
 
 	List<String> getInstanceWarnings(String instance);
+
+	List<String> getInstanceWarningHistory(String clientId);
 }

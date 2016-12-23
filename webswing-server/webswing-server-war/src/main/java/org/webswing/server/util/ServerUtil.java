@@ -81,7 +81,53 @@ public class ServerUtil {
 	}
 
 	public static String getClientIp(WebSocketConnection r) {
-		return r.getRequest().getRemoteAddr();
+		return r == null ? null : r.getRequest().getRemoteAddr();
+	}
+
+	public static String getClientOs(WebSocketConnection r) {
+		if (r != null) {
+			String userAgent = r.getRequest().getHeader("User-Agent");
+			if (userAgent.toLowerCase().indexOf("windows") >= 0) {
+				return "Windows";
+			} else if (userAgent.toLowerCase().indexOf("mac") >= 0) {
+				return "Mac";
+			} else if (userAgent.toLowerCase().indexOf("x11") >= 0) {
+				return "Linux";
+			} else if (userAgent.toLowerCase().indexOf("android") >= 0) {
+				return "Android";
+			} else if (userAgent.toLowerCase().indexOf("iphone") >= 0) {
+				return "IPhone";
+			} else {
+				return "Unknown";
+			}
+		}
+		return null;
+	}
+
+	public static String getClientBrowser(WebSocketConnection r) {
+		if (r != null) {
+
+			String userAgent = r.getRequest().getHeader("User-Agent");
+			String user = userAgent.toLowerCase();
+			String browser = "Unknown";
+			if (user.contains("msie")) {
+				String substring = userAgent.substring(userAgent.indexOf("MSIE")).split(";")[0];
+				browser = substring.split(" ")[0].replace("MSIE", "IE") + "-" + substring.split(" ")[1];
+			} else if (user.contains("safari") && user.contains("version")) {
+				browser = (userAgent.substring(userAgent.indexOf("Safari")).split(" ")[0]).split("/")[0] + "-" + (userAgent.substring(userAgent.indexOf("Version")).split(" ")[0]).split("/")[1];
+			} else if (user.contains("opr") || user.contains("opera")) {
+				if (user.contains("opera"))
+					browser = (userAgent.substring(userAgent.indexOf("Opera")).split(" ")[0]).split("/")[0] + "-" + (userAgent.substring(userAgent.indexOf("Version")).split(" ")[0]).split("/")[1];
+				else if (user.contains("opr"))
+					browser = ((userAgent.substring(userAgent.indexOf("OPR")).split(" ")[0]).replace("/", "-")).replace("OPR", "Opera");
+			} else if (user.contains("chrome")) {
+				browser = (userAgent.substring(userAgent.indexOf("Chrome")).split(" ")[0]).replace("/", "-");
+			} else if (user.contains("firefox")) {
+				browser = (userAgent.substring(userAgent.indexOf("Firefox")).split(" ")[0]).replace("/", "-");
+			}
+			return browser;
+		}
+		return null;
 	}
 
 	public static String resolveInstanceIdForMode(WebSocketConnection r, ConnectionHandshakeMsgIn h, SwingConfig conf) {
@@ -156,5 +202,4 @@ public class ServerUtil {
 		}
 		return false;
 	}
-
 }

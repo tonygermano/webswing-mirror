@@ -10,6 +10,9 @@ public class SwingSession implements Serializable {
 	private static final long serialVersionUID = 147477596803123012L;
 	private String id;
 	private String user;
+	private String userIp;
+	private String userOs;
+	private String userBrowser;
 	private String application;
 	private Date startedAt;
 	private Date endedAt;
@@ -22,6 +25,7 @@ public class SwingSession implements Serializable {
 	private Map<String, Number> metrics;
 	private SwingInstanceStatus status;
 	private List<String> warnings;
+	private List<String> warningHistory;
 
 	public String getId() {
 		return id;
@@ -133,6 +137,38 @@ public class SwingSession implements Serializable {
 
 	public List<String> getWarnings() {
 		return warnings;
+	}
+
+	public String getUserIp() {
+		return userIp;
+	}
+
+	public void setUserIp(String userIp) {
+		this.userIp = userIp;
+	}
+
+	public String getUserOs() {
+		return userOs;
+	}
+
+	public void setUserOs(String userOs) {
+		this.userOs = userOs;
+	}
+
+	public String getUserBrowser() {
+		return userBrowser;
+	}
+
+	public void setUserBrowser(String userBrowser) {
+		this.userBrowser = userBrowser;
+	}
+
+	public List<String> getWarningHistory() {
+		return warningHistory;
+	}
+
+	public void setWarningHistory(List<String> warningHistory) {
+		this.warningHistory = warningHistory;
 	}
 
 }
