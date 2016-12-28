@@ -634,7 +634,9 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	@Override
 	public void logWarningHistory() {
 		List<String> current = manager.getInstanceWarnings(getClientId());
-		current.addAll(manager.getInstanceWarningHistory(getClientId()));
+		if(current!=null){
+			current.addAll(manager.getInstanceWarningHistory(getClientId()));
+		}
 		warningHistoryLog = current;
 	}
 

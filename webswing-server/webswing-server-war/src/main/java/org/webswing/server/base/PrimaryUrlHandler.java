@@ -135,8 +135,11 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 			//redirect to url that is correct case and ends with '/' to ensure browser queries correct resources 
 			if (isWrongUrlCase(req) || isRootPathWithoutSlash(req)) {
 				try {
-					String redirectUrl = getFullPathMapping() + (req.getContextPath() + req.getPathInfo()).substring(getFullPathMapping().length());
+					String redirectUrl = getFullPathMapping() + (ServerUtil.getContextPath(getServletContext()) + req.getPathInfo()).substring(getFullPathMapping().length());
 					redirectUrl = isRootPathWithoutSlash(req) ? (redirectUrl + "/") : redirectUrl;
+					if (System.getProperty(Constants.REVERSE_PROXY_CONTEXT_PATH) != null) { //reverse proxy will add the context path to redirect url so we need to remove it to avoid duplicate.
+						redirectUrl = redirectUrl.substring(ServerUtil.getContextPath(getServletContext()).length());
+					}
 					String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
 					res.sendRedirect(redirectUrl + queryString);
 				} catch (IOException e) {
@@ -174,7 +177,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	}
 
 	private boolean isRootPathWithoutSlash(HttpServletRequest req) {
-		boolean isRootPathWithoutSlash = (req.getContextPath() + req.getPathInfo()).equals(getFullPathMapping());//path has to end with '/' 
+		boolean isRootPathWithoutSlash = (ServerUtil.getContextPath(getServletContext()) + req.getPathInfo()).equals(getFullPathMapping());//path has to end with '/' 
 		return req.getPathInfo() == null || isRootPathWithoutSlash;
 	}
 

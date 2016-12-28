@@ -1,6 +1,7 @@
 package org.webswing.server;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -400,5 +401,15 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 			type = type.substring(1);
 		}
 		return LogReaderUtil.readLog(type, request);
+	}
+	
+	@GET
+	@Path("/rest/logs")
+	public InputStream downloadLog(@PathParam("") String type) throws WsException {
+		checkMasterPermission(WebswingAction.rest_viewLogs);
+		if (type.startsWith("/")) {
+			type = type.substring(1);
+		}
+		return LogReaderUtil.getZippedLog(type);
 	}
 }

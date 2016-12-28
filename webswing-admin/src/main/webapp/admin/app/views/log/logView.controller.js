@@ -1,6 +1,6 @@
 (function(define) {
 	define([], function f() {
-		function LogViewController($scope, $timeout, $location, $routeParams, $anchorScroll, logRestService) {
+		function LogViewController($scope, $timeout, $location, $routeParams, $anchorScroll, logRestService, baseUrl) {
 			var vm = this;
 			vm.path = $routeParams.path;
 			vm.types = [ {
@@ -23,14 +23,14 @@
 			vm.filter = '';
 			vm.endOffset = -1;
 			vm.log = [];
+			vm.download = download;
 
-			
 			vm.type = findType();
-			load(100 * 1024, -1, true).then(function(){
-				$timeout(function(){
+			load(100 * 1024, -1, true).then(function() {
+				$timeout(function() {
 					$location.hash('endOfPageAnchor');
 					$anchorScroll();
-				},100);
+				}, 100);
 			}).then(loadDelta);
 
 			$scope.$on('$destroy', function() {
@@ -98,8 +98,13 @@
 				return vm.type.label === type.label;
 			}
 
+			function download(type, event) {
+				window.open(baseUrl + '/rest/logs/' + type.url, '_blank');
+				event.stopPropagation();
+			}
+
 		}
-		LogViewController.$inject = [ '$scope', '$timeout', '$location', '$routeParams', '$anchorScroll', 'logRestService' ];
+		LogViewController.$inject = [ '$scope', '$timeout', '$location', '$routeParams', '$anchorScroll', 'logRestService', 'baseUrl' ];
 
 		return LogViewController;
 	});

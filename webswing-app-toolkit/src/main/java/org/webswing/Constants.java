@@ -59,6 +59,8 @@ public interface Constants {
 	public static final String WEBSOCKET_THREAD_POOL = "webswing.websocketThreadPoolLimit";
 	public static final String DEFAULT_WELCOME_PAGE = "webswing.defaultWelcomePage";
 	public static final String FILE_SERVLET_WAIT_TIMEOUT = "webswing.fileServletWaitTimeout";
+	public static final String REVERSE_PROXY_CONTEXT_PATH = "webswing.proxyContextPath";
+	
 
 	// swing start related properties
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";

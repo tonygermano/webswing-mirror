@@ -265,7 +265,7 @@
 										</systemProperty>
 										<systemProperty>
 											<name>webswing.tempDirBase</name>
-											<value>${project.build.directory}/tmp</value>
+											<value>${project.build.directory}/wsTmp</value>
 										</systemProperty>
 									</systemProperties>
 								</configuration>

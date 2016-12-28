@@ -28,6 +28,7 @@ import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.playback.RecordingPlaybackUrlHandlerImpl;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
+import org.webswing.server.util.ServerUtil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -83,7 +84,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 				}
 			}, false);
 
-			initParams.put("org.atmosphere.container.JSR356AsyncSupport.mappingPath", context.getContextPath());
+			initParams.put("org.atmosphere.container.JSR356AsyncSupport.mappingPath", ServerUtil.getContextPath(context));
 
 			websocketEndpoints.put(JSON_HANDLER_PATH, new WebSocketAtmosphereHandler());
 			websocketEndpoints.put(BINARY_HANDLER_PATH, new WebSocketAtmosphereHandler());

@@ -1,6 +1,7 @@
 package org.webswing.server.base;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,6 +26,7 @@ import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.util.SecurityUtil;
+import org.webswing.server.util.ServerUtil;
 
 public abstract class AbstractUrlHandler implements UrlHandler, SecurableService {
 	private static final Logger log = LoggerFactory.getLogger(AbstractUrlHandler.class);
@@ -120,18 +122,15 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 		if (this.parent != null) {
 			String parentMapping = parent.getFullPathMapping();
 			handlerPath = parentMapping + handlerPath;
-		}else{
-			String contextPath = getServletContext().getContextPath();
-			if (contextPath != null && !contextPath.equals("/")) {
-				handlerPath = toPath(contextPath) + handlerPath;
-			}
+		} else {
+			handlerPath = ServerUtil.getContextPath(getServletContext()) + handlerPath;
 		}
 		return handlerPath;
 	}
 
 	public String getPathInfo(HttpServletRequest req) {
 		String fullHandlerPath = getFullPathMapping();
-		String requestPath = toPath(req.getContextPath() + req.getPathInfo());
+		String requestPath = toPath(ServerUtil.getContextPath(getServletContext()) + req.getPathInfo());
 		if (isSubPath(fullHandlerPath, requestPath)) {
 			return toPath(requestPath.substring(fullHandlerPath.length()));
 		} else {
@@ -322,6 +321,8 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 				try {
 					if (method.getReturnType().equals(String.class)) {
 						IOUtils.write(result.toString(), res.getOutputStream());
+					} else if (method.getReturnType().equals(InputStream.class)) {
+						IOUtils.copy((InputStream) result, res.getOutputStream());
 					} else {
 						WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(res.getOutputStream(), result);
 					}
