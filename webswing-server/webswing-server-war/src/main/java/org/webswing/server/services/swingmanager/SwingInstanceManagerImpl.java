@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -33,6 +34,8 @@ import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.files.FileTransferHandlerService;
 import org.webswing.server.services.resources.ResourceHandlerService;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.AuthorizationConfig;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.modules.SecurityModuleService;
@@ -85,29 +88,15 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		return path;
 	}
 
-	public void startSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h) {
-		if (r.hasPermission(WebswingAction.websocket_startSwingApplication)) {
-			if (!h.isMirrored()) {
-				if (!reachedMaxConnections()) {
-					try {
-						SwingInstance swingInstance = instanceFactory.create(this, fileHandler, h, getSwingConfig(), r);
-						runningInstances.add(swingInstance);
-					} catch (Exception e) {
-						log.error("Failed to create Swing instance.", e);
-					}
-				} else {
-					r.broadcastMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
-				}
-			} else {
-				r.broadcastMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
-			}
-		} else {
-			log.error("Authorization error: User " + r.getUser() + " is not authorized to connect to application " + getSwingConfig().getName() + (h.isMirrored() ? " [Mirrored view only available for admin role]" : ""));
-		}
-	}
-
 	@Override
 	public void connectView(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
+		try {
+			checkAuthorization();
+		} catch (WsException e1) {
+			log.error("User authorization failed. {}", e1.getMessage());
+			r.broadcastMessage(SimpleEventMsgOut.unauthorizedAccess.buildMsgOut());
+			return;
+		}
 		try {
 			SwingInstance instance;
 			if (handshake.isMirrored()) {
@@ -128,6 +117,27 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		} catch (WsException e) {
 			log.error("Failed to connect to instance. ", e);
 			r.broadcastMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
+		}
+	}
+
+	private void startSwingInstance(WebSocketConnection r, ConnectionHandshakeMsgIn h) {
+		if (r.hasPermission(WebswingAction.websocket_startSwingApplication)) {
+			if (!h.isMirrored()) {
+				if (!reachedMaxConnections()) {
+					try {
+						SwingInstance swingInstance = instanceFactory.create(this, fileHandler, h, getSwingConfig(), r);
+						runningInstances.add(swingInstance);
+					} catch (Exception e) {
+						log.error("Failed to create Swing instance.", e);
+					}
+				} else {
+					r.broadcastMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
+				}
+			} else {
+				r.broadcastMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
+			}
+		} else {
+			log.error("Authorization error: User " + r.getUser() + " is not authorized to connect to application " + getSwingConfig().getName() + (h.isMirrored() ? " [Mirrored view only available for admin role]" : ""));
 		}
 	}
 
@@ -249,7 +259,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Path("/status")
 	public String getStatusPage() throws Exception {
 		InstanceManagerStatus status = getStatus();
-		URL webResource = getWebResource("status/" + status.getStatus().name() + ".html");
+		URL webResource = getWebResource("statusPages/" + status.getStatus().name() + ".html");
 		if (webResource != null) {
 			return IOUtils.toString(webResource);
 		}
@@ -373,10 +383,39 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	public List<String> getInstanceWarnings(String instance) {
 		return statsLogger.getInstanceWarnings(instance);
 	}
-	
+
 	@Override
 	public List<String> getInstanceWarningHistory(String instance) {
 		return statsLogger.getInstanceWarningHistory(instance);
+	}
+
+	private void checkAuthorization() throws WsException {
+		if (!isUserAuthorized()) {
+			throw new WsException("User '" + getUser() + "' is not authorized to access application "+getPathMapping(), HttpServletResponse.SC_UNAUTHORIZED);
+		}
+	}
+
+	public boolean isUserAuthorized() {
+		AbstractWebswingUser user = getUser();
+		if (user == null) {
+			return false;
+		}
+		AuthorizationConfig authorizationConfig = getSecurityConfig().getAuthorizationConfig();
+		if (authorizationConfig == null || authorizationConfig.getRoles().size() == 0 || authorizationConfig.getRoles().size() == 0) {
+			return true;
+		} else {
+			for (String role : authorizationConfig.getRoles()) {
+				if (user.hasRole(role)) {
+					return true;
+				}
+			}
+			for (String u : authorizationConfig.getUsers()) {
+				if (user.getUserId().equals(u)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

@@ -286,9 +286,11 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		checkMasterPermission(WebswingAction.rest_getApps);
 		List<ApplicationInfoMsg> result = new ArrayList<>();
 		for (SwingInstanceManager mgr : getApplications()) {
-			ApplicationInfoMsg applicationInfoMsg = mgr.getApplicationInfoMsg();
-			if (applicationInfoMsg != null) {
-				result.add(applicationInfoMsg);
+			if (mgr.isUserAuthorized()) {
+				ApplicationInfoMsg applicationInfoMsg = mgr.getApplicationInfoMsg();
+				if (applicationInfoMsg != null) {
+					result.add(applicationInfoMsg);
+				}
 			}
 		}
 		return result;
@@ -402,7 +404,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		}
 		return LogReaderUtil.readLog(type, request);
 	}
-	
+
 	@GET
 	@Path("/rest/logs")
 	public InputStream downloadLog(@PathParam("") String type) throws WsException {

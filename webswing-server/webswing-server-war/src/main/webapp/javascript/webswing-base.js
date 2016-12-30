@@ -191,7 +191,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 			if (data.event != null && !api.cfg.recordingPlayback) {
 				if (data.event == "shutDownAutoLogoutNotification") {
 					api.disconnect();
-					if (api.cfg.mirrorMode == false) {
+					if (api.cfg.mirror == false) {
 						api.logout();
 					}
 				} else if (data.event == "shutDownNotification") {
