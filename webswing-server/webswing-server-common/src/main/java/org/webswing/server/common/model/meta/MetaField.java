@@ -1,5 +1,7 @@
 package org.webswing.server.common.model.meta;
 
+import java.util.List;
+
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
 public class MetaField {
@@ -12,6 +14,7 @@ public class MetaField {
 	private VariableSetName variables;
 	private String[] presets;
 	private EditorType type;
+	private List<MetaField> tableColumns;
 	private Object value;
 
 	public String getName() {
@@ -84,6 +87,14 @@ public class MetaField {
 
 	public void setValue(Object value) {
 		this.value = value;
+	}
+
+	public List<MetaField> getTableColumns() {
+		return tableColumns;
+	}
+
+	public void setTableColumns(List<MetaField> tableColumns) {
+		this.tableColumns = tableColumns;
 	}
 
 	@Override

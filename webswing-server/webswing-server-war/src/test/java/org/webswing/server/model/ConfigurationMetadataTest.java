@@ -4,7 +4,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -14,10 +16,13 @@ import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.model.SwingConfig.SessionMode;
 import org.webswing.server.common.model.meta.ConfigContext;
+import org.webswing.server.common.model.meta.ConfigField;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
+import org.webswing.server.common.model.meta.ConfigFieldEditorType;
+import org.webswing.server.common.model.meta.ConfigFieldOrder;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 import org.webswing.server.common.model.meta.MetaField;
 import org.webswing.server.common.model.meta.MetaObject;
@@ -51,28 +56,7 @@ public class ConfigurationMetadataTest {
 	public void testMetadataGenerator() throws Exception {
 		Map<String, Object> readValue = WebswingObjectMapper.get().readValue(this.getClass().getClassLoader().getResourceAsStream("swingConfig1.json"), Map.class);
 		SecuredPathConfig c = ConfigUtil.instantiateConfig(readValue, SecuredPathConfig.class);
-		MetaObject configMetadata = ConfigUtil.getConfigMetadata(c, this.getClass().getClassLoader(),new ConfigContext() {
-			
-			@Override
-			public File resolveFile(String name) {
-				return null;
-			}
-			
-			@Override
-			public String replaceVariables(String string) {
-				return null;
-			}
-			
-			@Override
-			public URL getWebResource(String resource) {
-				return null;
-			}
-
-			@Override
-			public boolean isStarted() {
-				return true;
-			}
-		});
+		MetaObject configMetadata = ConfigUtil.getConfigMetadata(c, this.getClass().getClassLoader(), new MockConfigContext());
 
 		//@ConfigFieldEditorType(editor = EditorType.Object, className = "org.webswing.server.services.security.api.WebswingSecurityConfig")
 		for (MetaField f : configMetadata.getFields()) {
@@ -88,6 +72,15 @@ public class ConfigurationMetadataTest {
 		assertTrue(configMetadata.getFields().get(2).getName().equals("webFolder"));
 		assertTrue(configMetadata.getFields().get(4).getName().equals("security"));
 
+	}
+
+	@Test
+	public void testTableMetadataGenerator() throws Exception {
+		TestDefaultConfig c = ConfigUtil.instantiateConfig(null, TestDefaultConfig.class);
+		MetaObject m = ConfigUtil.getConfigMetadata(c, this.getClass().getClassLoader(), new MockConfigContext());
+		assertTrue(m.getFields().get(0).getType().equals(EditorType.ObjectListAsTable));
+		MetaField tf = m.getFields().get(0);
+		assertTrue(tf.getTableColumns().get(0).getName().equals("string"));
 	}
 
 	@Test
@@ -125,7 +118,13 @@ public class ConfigurationMetadataTest {
 		assertTrue(c.getUploadMaxSize() == 1);
 	}
 
+	@ConfigFieldOrder({ "table", "string" })
 	public static interface TestDefaultConfig extends Config {
+		@ConfigField
+		@ConfigFieldEditorType(editor = EditorType.ObjectListAsTable)
+		@ConfigFieldDefaultValueObject(ArrayList.class)
+		List<EmbededConfig> getTable();
+
 		@ConfigFieldDefaultValueString("defaultValue")
 		String getString();
 
@@ -170,5 +169,39 @@ public class ConfigurationMetadataTest {
 		Map<String, Object> getMapNull();
 
 		Object getObjectNull();
+
+	}
+	
+	@ConfigFieldOrder({ "object", "string" })
+	public static interface EmbededConfig extends Config {
+		@ConfigField
+		Object getObject();
+		
+		@ConfigField
+		String getString();
+
+	}
+
+	public class MockConfigContext implements ConfigContext {
+
+		@Override
+		public File resolveFile(String name) {
+			return null;
+		}
+
+		@Override
+		public String replaceVariables(String string) {
+			return null;
+		}
+
+		@Override
+		public URL getWebResource(String resource) {
+			return null;
+		}
+
+		@Override
+		public boolean isStarted() {
+			return true;
+		}
 	}
 }

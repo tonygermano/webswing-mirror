@@ -8,6 +8,7 @@
 			var stringMapTemplate = '<ws-string-map-field></ws-string-map-field>';
 			var objectTemplate = '<ws-object-field></ws-object-field>';
 			var objectListTemplate = '<ws-object-list-field></ws-object-list-field>';
+			var objectListAsTableTemplate = '<ws-object-list-as-table-field></ws-object-list-as-table-field>';
 			var objectMapTemplate = '<ws-object-map-field></ws-object-map-field>';
 			var jsonTemplate = '<ws-json-field></ws-json-field>';
 			function linker(scope, element, attrs, ctrl) {
@@ -64,6 +65,12 @@
 					}
 					if (vm.field.type === 'ObjectList') {
 						var template = angular.element(objectListTemplate);
+						commonAttrs.variables = 'vm.variables';
+						template.attr(commonAttrs);
+						element.append(template).show();
+					}
+					if (vm.field.type === 'ObjectListAsTable') {
+						var template = angular.element(objectListAsTableTemplate);
 						commonAttrs.variables = 'vm.variables';
 						template.attr(commonAttrs);
 						element.append(template).show();

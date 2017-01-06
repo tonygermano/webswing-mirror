@@ -18,6 +18,7 @@ public @interface ConfigFieldEditorType {
 		StringList,
 		StringMap,
 		ObjectList,
+		ObjectListAsTable,
 		ObjectMap,
 		Generic;
 	}

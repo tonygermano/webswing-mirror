@@ -5,8 +5,12 @@
 .ws-selector {
     @extend .ws-modal;
 
-    width: auto;
+    text-align: left;
     max-width: 80%;
+
+	&-content {
+        @include rel('margin-top', 40px);
+	}
 
 	&-container {
         display: block;

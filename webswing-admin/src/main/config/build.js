@@ -16,7 +16,11 @@
 		name : "admin",
 		include : [ 'main', 'text' ],
 		create : true
-	} ],
+	},{
+		name : "shared",
+		include : [ 'text', 'common/common.module', 'shared/shared.module', 'services/services.module' ],
+		create : true
+	}],
 	wrap : {
 		start : "(function(require,define,requirejs) {",
 		end : "}(adminConsole.require,adminConsole.define,adminConsole.requirejs));"

@@ -42,7 +42,7 @@
 		}
 	});
 	require([ 'libs/jquery', 'angular', 'libs/bootstrap', 'libs/angular-route', 'libs/ui-ace', 'libs/ui-bootstrap', 'libs/ui-utils', 'libs/d3', 'libs/pie-chart', 'libs/line-chart', 'libs/ng-textcomplete' ], function() {
-		require([ 'app.external', 'app.module' ], function() {
+		require([ 'app.external','app.module' ], function() {
 			angular.bootstrap(root, [ 'wsAdmin' ]);
 		}, errorHandler);
 	}, errorHandler);

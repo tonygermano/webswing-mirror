@@ -15,6 +15,10 @@
 		name : "admin",
 		include : [ 'main', 'text', 'app.module' ],
 		create : true
+	},{
+		name : "shared",
+		include : [ 'text', 'common/common.module', 'shared/shared.module', 'services/services.module' ],
+		create : true
 	} ],
 	wrap : {
 		start : "(function(require,define,requirejs) {",

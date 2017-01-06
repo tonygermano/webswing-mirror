@@ -29,6 +29,7 @@ import org.webswing.server.common.util.ConfigUtil;
 
 public class MetadataGenerator<T> {
 	private static final Logger log = LoggerFactory.getLogger(MetadataGenerator.class);
+	private static final List<EditorType> TABLE_COMPATIBLE_TYPES = Arrays.asList(EditorType.String, EditorType.Number, EditorType.Boolean, EditorType.StringList);
 	private ConfigContext context;
 
 	public MetaObject getMetadata(T config, ClassLoader cl) throws Exception {
@@ -97,6 +98,9 @@ public class MetadataGenerator<T> {
 							metadata.setDiscriminator(isDiscriminator(config, cl, propertyName, readMethod));
 							metadata.setPresets(getPresets(config, cl, propertyName, readMethod));
 							metadata.setType(getEditorType(config, cl, propertyName, readMethod));
+							if (EditorType.ObjectListAsTable.equals(metadata.getType())) {
+								metadata.setTableColumns(getColumnsDefinitions(config, cl, propertyName, readMethod));
+							}
 							metadata.setValue(value);
 							return metadata;
 						} catch (Exception e) {
@@ -118,6 +122,19 @@ public class MetadataGenerator<T> {
 			}
 		}
 		return null;
+	}
+
+	protected List<MetaField> getColumnsDefinitions(T config, ClassLoader cl, String propertyName, Method readMethod) throws Exception {
+		Class<?> type = getReturnTypeGeneric(readMethod, 0);
+		Object instance = ConfigUtil.instantiateConfig(null, type);
+		MetaObject metaobject = toMetaObject(config, cl, instance, type);
+		List<MetaField> result = new ArrayList<MetaField>();
+		for (MetaField field : metaobject.getFields()) {
+			if (TABLE_COMPATIBLE_TYPES.contains(field.getType())) {
+				result.add(field);
+			}
+		}
+		return result;
 	}
 
 	protected Object getSafeValue(T config, Method readMethod) {
@@ -154,6 +171,8 @@ public class MetadataGenerator<T> {
 			return getMetaObject(config, cl, propertyName, readMethod, value);
 		case ObjectList:
 			return getMetaObjectList(config, cl, propertyName, readMethod, (List<?>) value);
+		case ObjectListAsTable:
+			return (List<Object>) value;
 		case ObjectMap:
 			return getMetaObjectMap(config, cl, propertyName, readMethod, (Map<String, ?>) value);
 		default:
@@ -209,14 +228,14 @@ public class MetadataGenerator<T> {
 
 	@SuppressWarnings({ "unchecked" })
 	protected MetadataGenerator<T> findGenerator(Object obj) {
-		MetadataGenerator<T> result =  new MetadataGenerator<T>();
+		MetadataGenerator<T> result = new MetadataGenerator<T>();
 		try {
 			if (obj != null) {
 				ConfigType configType = findAnnotation(obj.getClass(), ConfigType.class);
 				if (configType != null && configType.metadataGenerator() != null) {
 					result = configType.metadataGenerator().newInstance();
 				}
-			} 
+			}
 		} catch (Exception e) {
 			log.error("Failed to initialize Metadata generator", e);
 		}

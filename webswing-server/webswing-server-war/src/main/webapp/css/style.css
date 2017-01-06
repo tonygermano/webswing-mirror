@@ -411,7 +411,6 @@ html.ws-fullscreen body {
   -ms-transition-duration: 0.2s;
   -o-transition-duration: 0.2s;
   transition-duration: 0.2s;
-  cursor: default;
 }
 .webswing-element button,
 .webswing-element input,
@@ -440,7 +439,7 @@ html.ws-fullscreen body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   justify-content: center;
 }
 .webswing-element .ws-modal, .webswing-element .ws-dialog, .webswing-element .ws-files, .webswing-element .ws-login, .webswing-element .ws-selector {
@@ -920,8 +919,11 @@ html.ws-fullscreen body {
   text-align: right;
 }
 .webswing-element .ws-selector {
-  width: auto;
+  text-align: left;
   max-width: 80%;
+}
+.webswing-element .ws-selector-content {
+  margin-top: 40px;
 }
 .webswing-element .ws-selector-container {
   display: block;
