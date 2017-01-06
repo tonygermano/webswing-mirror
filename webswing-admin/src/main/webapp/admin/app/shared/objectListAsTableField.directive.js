@@ -26,7 +26,10 @@
 			vm.removeObject = removeObject;
 			vm.addString = addString;
 			vm.deleteString = deleteString;
-			
+			vm.edit = edit;
+
+			vm.editingIndex = null;
+
 			function addObject(index) {
 				if (vm.value == null) {
 					vm.value = [];
@@ -46,13 +49,17 @@
 				}
 				return result;
 			}
-			
-			function addString(val,index) {
+
+			function addString(val, index) {
 				val.splice(index + 1, 0, '');
 			}
 
-			function deleteString(val,index) {
+			function deleteString(val, index) {
 				val.splice(index, 1);
+			}
+
+			function edit(i) {
+				vm.editingIndex = i;
 			}
 		}
 

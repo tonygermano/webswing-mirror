@@ -5,7 +5,7 @@
 		<span class="ws-order-number" >{{::vm.label}}</span>
 	</h4>
 	
-	<div class="row" collapse="item.collapsed" >
+	<div class="row" collapse="vm.collapsed" >
 		<div class="col-md-12">
 			<div class="table-responsive">
 			    <table class="table table-striped">
@@ -18,7 +18,7 @@
 			                	<span >{{::col.label}}</span>
                 	            <span class="ws-tooltip glyphicon glyphicon-question-sign" ng-if="col.description != null" ui-jq="tooltip" title="{{::col.description}}"></span>
 			                </th>
-			                <th>
+			                <th style="width:120px">
 			                	<div ng-if="vm.value==null || vm.value.length == 0" class="btn-group" role="group">
 									<button class="btn btn-sm btn-default" type="button" ng-click="vm.addObject($index)" ng-disabled="vm.restricted==='true'">
 								    	<span class="glyphicon glyphicon-plus"></span>
@@ -28,32 +28,35 @@
 			            </tr>
 			        </thead>
 			        <tbody>
-			            <tr ng-repeat="item in vm.value track by $index">
+			            <tr ng-click="vm.edit($index)" ng-repeat="item in vm.value track by $index">
 			            	<td>
 			            		<span >{{::$index+1}}</span>
 			            	</td>
 			                <td ng-repeat="col in vm.field.tableColumns track by $index">
-			                	<div ng-if="!vm.readonly && vm.restricted !=='true'">
+			                	<div ng-if="!vm.readonly && restricted !== 'true' && (vm.value.length < 11 || $parent.$index === vm.editingIndex)">
 				                	<button ng-if="col.type==='Boolean'" type="button" ng-class="{'btn btn-sm': true ,'btn-danger':!item[col.name], 'btn-success':item[col.name]}" ng-model="item[col.name]" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false">
 										<span ng-class="{'glyphicon': true ,'glyphicon-unchecked':!item[col.name], 'glyphicon-check':item[col.name]}"></span>
 										{{item[col.name]?'ON':'OFF'}}
 									</button>
-									
-									<div ng-if="col.type==='String' || col.type==='Number' " class="input-group">
-						                <input  class="form-control" name="input" type="{{::col.type}}"	ng-model="item[col.name]" 
-												ws-substitutor-helper variables="vm.variables[col.variables]" message="item[col.name]">
-						                <div class="input-group-addon" ng-if="col.presets != null" dropdown dropdown-toggle>
-						                    <span class="glyphicon glyphicon-chevron-down" ></span>
-						                    <ul class="dropdown-menu pull-right">
-						                        <li ng-repeat="choice in col.presets">
-						                            <a href ng-click="item[col.name]=choice">{{choice}}</a>
-						                        </li>
-						                    </ul>
-						                </div>
+				                    
+				                    <div ng-if="col.type==='String' || col.type==='Number'" class="edit-app-list-entry" >
+										<div class="input-group" style="width:100%">
+							                <input  class="form-control" name="input" type="{{::col.type}}"	ng-model="item[col.name]" 
+													ws-substitutor-helper variables="vm.variables[col.variables]" message="item[col.name]">
+							                <div class="input-group-addon" ng-if="col.presets != null" dropdown dropdown-toggle>
+							                    <span class="glyphicon glyphicon-chevron-down" ></span>
+							                    <ul class="dropdown-menu pull-right">
+							                        <li ng-repeat="choice in col.presets">
+							                            <a href ng-click="item[col.name]=choice">{{choice}}</a>
+							                        </li>
+							                    </ul>
+							                </div>
+							            </div>
 						            </div>
+				                    
 				                    <div ng-if="col.type==='StringList' " class="edit-app-list-entry" ng-repeat="s in item[col.name] track by $index">
 				                    	<div class="input-group">
-							                <input type="text" class="form-control" ws-substitutor-helper variables="vm.variables[col.variables]" message="s" ng-model="s" > 
+							                <input type="text" class="form-control" ws-substitutor-helper variables="vm.variables[col.variables]" message="item[col.name][$index]" ng-model="item[col.name][$index]" > 
 							                <div class="input-group-addon" ng-if="col.presets != null " dropdown dropdown-toggle>
 							                    <span class="glyphicon glyphicon-chevron-down" ></span>
 							                    <ul class="dropdown-menu pull-right">
@@ -76,12 +79,15 @@
 				                        <span class="glyphicon glyphicon-plus"></span>
 				                    </button>
 			                	</div>
-			                	<div ng-if="vm.readonly || vm.restricted ==='true'">
+			                	<div ng-if="vm.readonly || restricted === 'true' || (vm.value.length > 11 && $parent.$index !== vm.editingIndex)">
 			                		{{::item[col.name]}}
 			                	</div>
 			                </td>
 			                <td>
 								<div class="btn-group" role="group">
+									<button class="btn btn-sm btn-default" type="button" ng-click="vm.edit($index)" ng-if="vm.value.length>10 && !vm.readonly && vm.restricted !=='true'">
+								    	<span class="glyphicon glyphicon-edit"></span>
+									</button>
 									<button class="btn btn-sm btn-default" type="button" ng-click="vm.addObject($index)" ng-disabled="vm.restricted==='true'">
 								    	<span class="glyphicon glyphicon-plus"></span>
 									</button>
