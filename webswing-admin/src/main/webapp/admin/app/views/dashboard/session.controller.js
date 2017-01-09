@@ -64,11 +64,15 @@
 
 			function getMemoryStats(session) {
 				return {
-					names : [ 'Allocated Memory', 'Used Memory' ],
+					names : [ 'Max Memory', 'Used Memory' ],
 					keys : [ 'memoryAllocated', 'memoryUsed' ],
 					dataset : wsUtils.getStatsDataset(session.stats, [ 'memoryAllocated', 'memoryUsed' ]),
 					tickFormat : function(value, index) {
-						return (value) + 'MB';
+						if(value>999){
+							return (value/1024).toFixed(1) + 'GB';
+						}else{
+							return (value) + 'MB';
+						}
 					}
 				};
 			}

@@ -149,11 +149,15 @@
 
 			function getMemoryStats(stats) {
 				return {
-					names : [ 'Total Allocated Memory', 'Total Used Memory' ],
+					names : [ 'Total Max Memory', 'Total Used Memory' ],
 					keys : [ 'memoryAllocated.SUM', 'memoryUsed.SUM' ],
 					dataset : wsUtils.getStatsDataset(stats, [ 'memoryAllocated.SUM', 'memoryUsed.SUM' ]),
 					tickFormat : function(value, index) {
-						return (value) + 'MB';
+						if(value>999){
+							return (value/1024).toFixed(1) + 'GB';
+						}else{
+							return (value) + 'MB';
+						}
 					}
 				};
 			}
@@ -164,7 +168,11 @@
 					keys : [ 'inboundSize.SUM', 'outboundSize.SUM' ],
 					dataset : wsUtils.getStatsDataset(stats, [ 'inboundSize.SUM', 'outboundSize.SUM' ]),
 					tickFormat : function(value, index) {
-						return Math.floor(value / 1024) + 'k';
+						if(value>(999*1024)){
+							return (value/1024/1024).toFixed(1) + 'm';
+						}else{
+							return Math.floor(value / 1024) + 'k';
+						}
 					}
 				};
 			}

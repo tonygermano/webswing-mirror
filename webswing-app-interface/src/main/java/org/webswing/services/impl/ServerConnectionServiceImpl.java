@@ -236,7 +236,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		JvmStatsMsgInternal result = new JvmStatsMsgInternal();
 		int mb = 1024 * 1024;
 		Runtime runtime = Runtime.getRuntime();
-		result.setHeapSize(runtime.totalMemory() / mb);
+		result.setHeapSize(runtime.maxMemory() / mb);
 		result.setHeapSizeUsed((runtime.totalMemory() - runtime.freeMemory()) / mb);
 		result.setCpuUsage(CpuMonitor.getCpuUtilization());
 		return result;
