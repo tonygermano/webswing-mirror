@@ -72,11 +72,7 @@ i {
 
 // Links
 a {
-    &:link {
-        color: $neutral;
-        text-decoration: none;
-    }
-
+    &:link,
     &:visited,
     &:hover,
     &:active,

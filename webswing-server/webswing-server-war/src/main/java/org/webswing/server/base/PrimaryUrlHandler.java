@@ -137,9 +137,10 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 				try {
 					String redirectUrl = getFullPathMapping() + (ServerUtil.getContextPath(getServletContext()) + req.getPathInfo()).substring(getFullPathMapping().length());
 					redirectUrl = isRootPathWithoutSlash(req) ? (redirectUrl + "/") : redirectUrl;
-					if (System.getProperty(Constants.REVERSE_PROXY_CONTEXT_PATH) != null) { //reverse proxy will add the context path to redirect url so we need to remove it to avoid duplicate.
-						redirectUrl = redirectUrl.substring(ServerUtil.getContextPath(getServletContext()).length());
-					}
+					//use apache flag instead: 	ProxyPreserveHost on
+					//if (System.getProperty(Constants.REVERSE_PROXY_CONTEXT_PATH) != null) { //reverse proxy will add the context path to redirect url so we need to remove it to avoid duplicate. see ProxyPassReverse apache directive
+					//	redirectUrl = redirectUrl.substring(ServerUtil.getContextPath(getServletContext()).length());
+					//}
 					String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
 					res.sendRedirect(redirectUrl + queryString);
 				} catch (IOException e) {
