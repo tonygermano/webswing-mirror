@@ -15,6 +15,7 @@ import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.SecurityContext;
+import org.webswing.server.util.ServerUtil;
 
 public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceHandler {
 	private static final Logger log = LoggerFactory.getLogger(ResourceHandlerImpl.class);
@@ -35,9 +36,9 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		try {
 			if (req.getMethod().equals("GET") || req.getMethod().equals("PUT")) {
-				return lookup(req).respondGet(res);
+				return lookup(req).respondGet(req, res);
 			} else if (req.getMethod().equals("HEAD")) {
-				return lookup(req).respondHead(res);
+				return lookup(req).respondHead(req, res);
 			}
 			return false;
 		} catch (IOException e) {
@@ -46,9 +47,9 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 	}
 
 	public static interface LookupResult {
-		public boolean respondGet(HttpServletResponse resp) throws IOException;
+		public boolean respondGet(HttpServletRequest req, HttpServletResponse resp) throws IOException;
 
-		public boolean respondHead(HttpServletResponse resp) throws IOException;
+		public boolean respondHead(HttpServletRequest req, HttpServletResponse resp) throws IOException;
 
 		public long getLastModified();
 	}
@@ -66,11 +67,11 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 			return -1;
 		}
 
-		public boolean respondGet(HttpServletResponse resp) throws IOException {
+		public boolean respondGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 			return false;
 		}
 
-		public boolean respondHead(HttpServletResponse resp) {
+		public boolean respondHead(HttpServletRequest req, HttpServletResponse resp) {
 			return false;
 		}
 	}
@@ -90,13 +91,13 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 			return -1;
 		}
 
-		public boolean respondGet(HttpServletResponse resp) throws IOException {
-			resp.sendRedirect(path);
+		public boolean respondGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+			ServerUtil.sendHttpRedirect(req, resp, path);
 			return true;
 		}
 
-		public boolean respondHead(HttpServletResponse resp) throws IOException {
-			resp.sendRedirect(path);
+		public boolean respondHead(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+			ServerUtil.sendHttpRedirect(req, resp, path);
 			return true;
 		}
 	}
@@ -121,14 +122,14 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 				resp.setContentLength(url.getContentLength());
 		}
 
-		public boolean respondGet(HttpServletResponse resp) throws IOException {
+		public boolean respondGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 			setHeaders(resp);
 			final OutputStream os = resp.getOutputStream();
 			CommonUtil.transferStreams(url.getInputStream(), os);
 			return true;
 		}
 
-		public boolean respondHead(HttpServletResponse resp) {
+		public boolean respondHead(HttpServletRequest req, HttpServletResponse resp) {
 			setHeaders(resp);
 			return true;
 		}

@@ -3,12 +3,16 @@ package org.webswing.server.services.security.modules.saml2;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -23,6 +27,8 @@ import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAM
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAMLInit;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAMLUtils;
 import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SPConfig;
+
+import main.Main;
 
 public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2SecurityModuleConfig> {
 	private static final Logger log = LoggerFactory.getLogger(Saml2SecurityModule.class);
@@ -50,7 +56,7 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 		}
 		try {
 			String idpFile = getConfig().getIdentityProviderMetadataFile();
-			File file = getConfig().getContext().resolveFile(idpFile);
+			File file = getMetadataFile(idpFile);
 			if (file == null || !file.isFile()) {
 				throw new SAMLException("The SAML2 Identity provider metadata file " + idpFile + " does not exist.");
 			}
@@ -77,12 +83,29 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 		}
 	}
 
+	private File getMetadataFile(String idpFile) throws SAMLException {
+		File metadata = getConfig().getContext().resolveFile(idpFile);
+		if (metadata != null) {
+			return metadata;
+		} else {
+			try {
+				File tempFile = new File(Main.getTempDir(), Base64.encodeBase64URLSafeString(idpFile.getBytes()));
+				FileUtils.copyURLToFile(new URL(idpFile), tempFile);
+				return tempFile;
+			} catch (MalformedURLException e) {
+				return null;
+			} catch (IOException e) {
+				throw new SAMLException("Failed to load SAML2 Identity provider metadata.", e);
+			}
+		}
+	}
+
 	@Override
 	protected void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
 		if (exception != null) {
 			sendHtml(request, response, "saml2/errorPage.html", exception);
 		} else {
-			String url = getSaml2RedirectUrl();
+			String url = getSaml2RedirectUrl(request);
 			sendRedirect(request, response, url);
 		}
 	}
@@ -92,7 +115,7 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 		serveLoginPage(request, response, exception);
 	}
 
-	private String getSaml2RedirectUrl() throws IOException {
+	private String getSaml2RedirectUrl(HttpServletRequest request) throws IOException {
 		String requestId = SAMLUtils.generateRequestId();
 		String authrequest;
 		try {
@@ -101,7 +124,16 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 			throw new IOException("Failed to build SAML request.", e1);
 		}
 		String url = client.getIdPConfig().getLoginUrl();
+		String searchQuery= request.getQueryString();
+		if(StringUtils.isNotBlank(searchQuery)){
+			url = addParam(url, searchQuery);
+		}
 		String param = "SAMLRequest=" + URLEncoder.encode(authrequest, "UTF-8");
+		url = addParam(url, param);
+		return url;
+	}
+
+	private String addParam(String url, String param) {
 		if (url.contains("?")) {
 			url = url + "&" + param;
 		} else {

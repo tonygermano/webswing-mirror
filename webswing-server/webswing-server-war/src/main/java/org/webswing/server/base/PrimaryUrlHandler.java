@@ -142,7 +142,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 					//	redirectUrl = redirectUrl.substring(ServerUtil.getContextPath(getServletContext()).length());
 					//}
 					String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
-					res.sendRedirect(redirectUrl + queryString);
+					ServerUtil.sendHttpRedirect(req, res, redirectUrl + queryString);
 				} catch (IOException e) {
 					log.error("Failed to redirect.", e);
 				}
@@ -154,7 +154,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 			try {
 				boolean served = serveRestMethod(req, res);
 				if (!served) {
-					res.sendRedirect(getFullPathMapping() + "/status");
+					ServerUtil.sendHttpRedirect(req, res, getFullPathMapping() + "/status");
 				}
 				return true;
 			} catch (IOException e) {

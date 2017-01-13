@@ -9,6 +9,7 @@ import java.nio.file.Path;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +19,8 @@ import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.server.common.model.SwingConfig;
-import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.WebswingObjectMapper;
+import org.webswing.server.services.security.modules.AbstractSecurityModule;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
 public class ServerUtil {
@@ -205,14 +206,11 @@ public class ServerUtil {
 	}
 
 	public static String getContextPath(ServletContext ctx) {
-		String contextPath = ctx.getContextPath();
-		String contextPathExplicit = System.getProperty(Constants.REVERSE_PROXY_CONTEXT_PATH);
-		if (contextPathExplicit != null) {
-			return CommonUtil.toPath(contextPathExplicit);
-		} else if (contextPath != null && !contextPath.equals("/") && !contextPath.equals("")) {
-			return CommonUtil.toPath(contextPath);
-		} else {
-			return "";
-		}
+		return AbstractSecurityModule.getContextPath(ctx);
+	}
+	
+	
+	public static void sendHttpRedirect(HttpServletRequest req, HttpServletResponse resp, String relativeUrl) throws IOException{
+		AbstractSecurityModule.sendHttpRedirect(req, resp, relativeUrl);
 	}
 }

@@ -14,9 +14,9 @@
 # WEBSWING_HOME=/home/webswing WEBSWING_JAVA_HOME=/var/share/jdk8 ./webswing.sh start
 
 export HOME=`dirname $0`
-export OPTS="-h 0.0.0.0 -j $HOME/jetty.properties -u $HOME/user.properties -c $HOME/webswing.config"
+export OPTS="-h 0.0.0.0 -j $HOME/jetty.properties -c $HOME/webswing.config"
 export JAVA_HOME=$JAVA_HOME
-export JAVA_OPTS="-Xmx128M"
+export JAVA_OPTS=-Xmx128M
 export LOG=$HOME/webswing.out
 export PID_PATH_NAME=$HOME/webswing.pid
 

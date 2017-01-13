@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
+import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.WebswingObjectMapper;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.LoginResponseClosedException;
@@ -192,7 +195,9 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 			if (msg != null && msg.containsKey(SUCCESS_URL)) {
 				sendRedirect(request, response, (String) msg.get(SUCCESS_URL));
 			} else {
-				sendRedirect(request, response, config.getContext().getSecuredPath());
+				String defaultPath = config.getContext().getSecuredPath();
+				String contextPath = getContextPath(request.getServletContext());
+				sendRedirect(request, response, contextPath + defaultPath);
 			}
 		}
 	}
@@ -264,7 +269,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 				throw new IOException("Failed to send login redirect message", e);
 			}
 		} else {
-			response.sendRedirect(url);
+			sendHttpRedirect(request, response, url);
 		}
 	}
 
@@ -390,5 +395,35 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 			ipAddress = r.getRemoteAddr();
 		}
 		auditLog.info("{} | {} | {} | {} | {} | {} | {}", new Object[] { status, username, reason, path, protocol, ipAddress, module });
+	}
+
+	public static void sendHttpRedirect(HttpServletRequest req, HttpServletResponse resp, String relativeUrl) throws IOException {
+		String proto = req.getHeader("X-Forwarded-Proto");
+		String host = req.getHeader("X-Forwarded-Host");
+		if (StringUtils.startsWithIgnoreCase(relativeUrl, "http://") || StringUtils.startsWithIgnoreCase(relativeUrl, "https://")) {
+			resp.sendRedirect(relativeUrl);
+		} else if (StringUtils.isNotEmpty(proto) && StringUtils.isNotEmpty(host)) {
+			if (!StringUtils.startsWith(relativeUrl, "/")) {
+				String requestPath = getContextPath(req.getServletContext()) + CommonUtil.toPath(req.getPathInfo());
+				String requestPathBase = requestPath.startsWith("/") ? requestPath : "/" + requestPath;
+				requestPathBase = requestPath.substring(0, requestPath.lastIndexOf("/") + 1);
+				relativeUrl = requestPathBase + relativeUrl;
+			}
+			resp.sendRedirect(proto + "://" + host + relativeUrl);
+		} else {
+			resp.sendRedirect(relativeUrl);
+		}
+	}
+
+	public static String getContextPath(ServletContext ctx) {
+		String contextPath = ctx.getContextPath();
+		String contextPathExplicit = System.getProperty(Constants.REVERSE_PROXY_CONTEXT_PATH);
+		if (contextPathExplicit != null) {
+			return CommonUtil.toPath(contextPathExplicit);
+		} else if (contextPath != null && !contextPath.equals("/") && !contextPath.equals("")) {
+			return CommonUtil.toPath(contextPath);
+		} else {
+			return "";
+		}
 	}
 }

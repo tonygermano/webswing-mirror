@@ -28,7 +28,9 @@ import java.io.InputStream;
 
 import org.opensaml.Configuration;
 import org.opensaml.xml.parse.BasicParserPool;
+import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.io.UnmarshallerFactory;
+import org.opensaml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.saml2.metadata.SingleSignOnService;
@@ -120,9 +122,15 @@ public class IdPConfig
             UnmarshallerFactory unmarshallerFactory =
                 Configuration.getUnmarshallerFactory();
 
-            edesc = (EntityDescriptor) unmarshallerFactory
-                .getUnmarshaller(root)
-                .unmarshall(root);
+            XMLObject object = unmarshallerFactory
+            .getUnmarshaller(root)
+            .unmarshall(root);
+            
+            if(object instanceof EntitiesDescriptor){
+            	edesc = ((EntitiesDescriptor) object).getEntityDescriptors().get(0);
+            }else{
+            	edesc = (EntityDescriptor) object;
+            }
         }
         catch (org.opensaml.xml.parse.XMLParserException e) {
             throw new SAMLException(e);

@@ -395,11 +395,7 @@ html.ws-fullscreen body {
   background-color: #ff5c00;
   color: #ffffff;
 }
-.webswing-element a:link {
-  color: #086788;
-  text-decoration: none;
-}
-.webswing-element a:visited, .webswing-element a:hover, .webswing-element a:active, .webswing-element a:focus {
+.webswing-element a:link, .webswing-element a:visited, .webswing-element a:hover, .webswing-element a:active, .webswing-element a:focus {
   color: #ff5c00;
   text-decoration: none;
 }
