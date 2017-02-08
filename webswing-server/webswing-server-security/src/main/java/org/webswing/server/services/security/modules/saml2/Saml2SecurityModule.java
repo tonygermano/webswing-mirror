@@ -1,5 +1,21 @@
 package org.webswing.server.services.security.modules.saml2;
 
+import main.Main;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.webswing.server.common.util.CommonUtil;
+import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.WebswingAuthenticationException;
+import org.webswing.server.services.security.modules.AbstractExtendableSecurityModule;
+import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -7,33 +23,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingAuthenticationException;
-import org.webswing.server.services.security.modules.AbstractExtendableSecurityModule;
-import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.AttributeSet;
-import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.IdPConfig;
-import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAMLClient;
-import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAMLException;
-import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAMLInit;
-import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SAMLUtils;
-import org.webswing.server.services.security.modules.saml2.com.lastpass.saml.SPConfig;
-
-import main.Main;
-
 public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2SecurityModuleConfig> {
 	private static final Logger log = LoggerFactory.getLogger(Saml2SecurityModule.class);
 	private static boolean staticInit = false;
 	private static final String SAML_PARAMETER = "SAMLResponse";
+
 	static {
 		try {
 			SAMLInit.initialize();
@@ -124,21 +118,12 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 			throw new IOException("Failed to build SAML request.", e1);
 		}
 		String url = client.getIdPConfig().getLoginUrl();
-		String searchQuery= request.getQueryString();
-		if(StringUtils.isNotBlank(searchQuery)){
-			url = addParam(url, searchQuery);
+		String searchQuery = request.getQueryString();
+		if (StringUtils.isNotBlank(searchQuery)) {
+			url = CommonUtil.addParam(url, searchQuery);
 		}
 		String param = "SAMLRequest=" + URLEncoder.encode(authrequest, "UTF-8");
-		url = addParam(url, param);
-		return url;
-	}
-
-	private String addParam(String url, String param) {
-		if (url.contains("?")) {
-			url = url + "&" + param;
-		} else {
-			url = url + "?" + param;
-		}
+		url = CommonUtil.addParam(url, param);
 		return url;
 	}
 
@@ -164,16 +149,7 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 	@Override
 	public void doLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String logoutUrl = getConfig().getLogoutUrl();
-		if (logoutUrl != null) {
-			sendRedirect(request, response, logoutUrl);
-		} else {
-			if (isAjax(request)) {
-				sendHtml(request, response, "logoutPartial.html", null);
-			} else {
-				sendHtml(request, response, "logoutPage.html", null);
-			}
-		}
-
+		logoutRedirect(request, response, logoutUrl);
 	}
 
 }

@@ -1,20 +1,10 @@
 package org.webswing.common;
 
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.Image;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.toolkit.WebComponentPeer;
+
+import java.awt.*;
 import java.awt.RenderingHints.Key;
-import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
@@ -25,9 +15,6 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
-
-import org.webswing.dispatch.WebPaintDispatcher;
-import org.webswing.toolkit.WebComponentPeer;
 
 public class GraphicsWrapper extends Graphics2D {
 
@@ -119,7 +106,8 @@ public class GraphicsWrapper extends Graphics2D {
 
 	@Override
 	public Rectangle getClipBounds() {
-		return original.getClipBounds();
+		Rectangle r = original.getClipBounds();
+		return r == null ? new Rectangle() : r;
 	}
 
 	@Override

@@ -1,11 +1,16 @@
 package org.webswing.server.common.util;
 
+import main.Main;
+import org.apache.commons.lang3.ClassUtils.Interfaces;
+import org.apache.commons.lang3.reflect.MethodUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -13,22 +18,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.security.ProtectionDomain;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
-
-import org.apache.commons.lang3.ClassUtils.Interfaces;
-import org.apache.commons.lang3.reflect.MethodUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.webswing.Constants;
-
-import main.Main;
+import java.util.*;
 
 public class CommonUtil {
 	public static final int bufferSize = 4 * 1024;
@@ -199,20 +189,29 @@ public class CommonUtil {
 	}
 
 	public static String getBootClassPathForClass(String className) throws Exception {
-		String classfile=className.replace(".", "/") + ".class";
-		URL url= getSwingBootClassLoader().getResource(classfile);
-		if(url!=null){
-			String cp =  URLDecoder.decode(url.getPath(),"UTF-8");
+		String classfile = className.replace(".", "/") + ".class";
+		URL url = getSwingBootClassLoader().getResource(classfile);
+		if (url != null) {
+			String cp = URLDecoder.decode(url.getPath(), "UTF-8");
 			if (cp.endsWith(classfile)) {
 				cp = cp.substring(0, cp.length() - (classfile.length() + 2));
-				if(cp.startsWith("file:")){
-					cp=cp.substring(5);
+				if (cp.startsWith("file:")) {
+					cp = cp.substring(5);
 				}
 			}
 			return "\"" + cp + "\"";
-			
-		}else{
-			throw new IllegalStateException("Class "+className+" not found in bootclasspath folder of webswing-server.war. ");
+
+		} else {
+			throw new IllegalStateException("Class " + className + " not found in bootclasspath folder of webswing-server.war. ");
 		}
+	}
+
+	public static String addParam(String url, String param) {
+		if (url.contains("?")) {
+			url = url + "&" + param;
+		} else {
+			url = url + "?" + param;
+		}
+		return url;
 	}
 }

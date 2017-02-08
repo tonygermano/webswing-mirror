@@ -1,41 +1,27 @@
 package org.webswing.demo.jslink;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.UIManager;
-
-import netscape.javascript.JSException;
-import netscape.javascript.JSObject;
-
 import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.utilities.RoundedBorder;
 import com.sun.swingset3.utilities.RoundedPanel;
 import com.sun.swingset3.utilities.Utilities;
+import netscape.javascript.JSException;
+import netscape.javascript.JSObject;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @DemoProperties(value = "JsLink", category = "Webswing", description = "Demonstrates javascritp interface.", sourceFiles = { "org/webswing/demo/jslink/JsLinkDemo.java", "org/webswing/demo/jslink/resources/hello.js", "org/webswing/demo/jslink/resources/echo.js", "org/webswing/demo/jslink/resources/callback.js",
 		"org/webswing/demo/jslink/resources/javaReference.js" })
 public class JsLinkDemo extends JPanel {
+	static UrlChanageService urlService = new UrlChanageService();
 
 	public static class DummyService {
 		private String dummyString = "dummy";
@@ -60,11 +46,31 @@ public class JsLinkDemo extends JPanel {
 			JOptionPane.showMessageDialog(null, "swing processing complete, invoking js callback... ", "Done!", JOptionPane.INFORMATION_MESSAGE);
 			callback.call("call", new Object[] { null, "some swing processing result" });
 		}
+	}
 
+	public static class UrlChanageService {
+
+		public UrlChanageService() {
+			JSObject global = JSObject.getWindow(null);
+			global.setMember("UrlChanageService", this);//expose this object to javascript (window.UrlChanageService)
+			global.eval(loadContent("resources/urlChangeListener.js"));//register javascript listener to url change
+		}
+
+		//invoked from swing application to force url change in browser
+		public void changeUrl(String newPath) {
+			JSObject global = JSObject.getWindow(null);
+			global.eval("window.location = '#" + newPath + "'");
+		}
+
+		//invoked by the javascript event when url changes
+		public void onUrlChanged(String newUrl) {
+			displayResult("UrlChanged to: " + newUrl);
+		}
 	}
 
 	private static Map<String, String> snippets = new HashMap<String, String>();
 	private static DummyService service = new DummyService();
+
 	static {
 		snippets.put("Hello world", loadContent("resources/hello.js"));
 		snippets.put("Echo", loadContent("resources/echo.js"));
@@ -76,7 +82,10 @@ public class JsLinkDemo extends JPanel {
 
 		setLayout(new BorderLayout());
 		if (System.getProperty("webswing.clientId") != null) {
-			/* EXPOSE JAVA SERVICE TO JAVASCRIPT GLOBAL OBJECT*/
+
+			urlService.changeUrl("HelloWorldUrl");
+
+            /* EXPOSE JAVA SERVICE TO JAVASCRIPT GLOBAL OBJECT*/
 			JSObject global = JSObject.getWindow(null);
 			global.setMember("dummyService", service);
 			/* *********************************************  */

@@ -97,7 +97,7 @@
 
 // Error and success messages
 .ws-message {
-    @include rel('margin:', 20px 0px);
+    @include rel('margin', 20px 0px);
 
     font-size: $small;
 
@@ -220,7 +220,7 @@
     width: 1px;
     height: 1px;
     display: block;
-    font-size: 1;
+    font-size: 1em;
     z-index: -1;
     color: transparent;
     background: transparent;

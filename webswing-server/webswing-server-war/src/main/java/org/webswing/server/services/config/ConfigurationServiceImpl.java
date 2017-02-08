@@ -1,9 +1,7 @@
 package org.webswing.server.services.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.commons.lang.StringUtils;
 import org.webswing.Constants;
 import org.webswing.server.common.model.SecuredPathConfig;
@@ -16,18 +14,19 @@ import org.webswing.server.extension.ExtensionClassLoader;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.model.exception.WsInitException;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private final ExtensionClassLoader extensionLoader;
 	private ConfigurationProvider provider;
-	private List<ConfigurationChangeListener> changeListeners = new ArrayList<ConfigurationChangeListener>();
+	private List<ConfigurationChangeListener> changeListeners = new ArrayList<>();
 
 	@Inject
-	public ConfigurationServiceImpl( ExtensionClassLoader extensionLoader) {
+	public ConfigurationServiceImpl(ExtensionClassLoader extensionLoader) {
 		this.extensionLoader = extensionLoader;
 	}
 

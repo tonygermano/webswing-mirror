@@ -1,58 +1,48 @@
 package org.webswing.server.services.security.modules;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheResolver;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.WebswingObjectMapper;
-import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.LoginResponseClosedException;
-import org.webswing.server.services.security.api.WebswingAuthenticationException;
-import org.webswing.server.services.security.api.WebswingSecurityModule;
-import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
+import org.webswing.server.services.security.api.*;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheResolver;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
- * Abstract implementation of {@link WebswingSecurityModule} that offers convenience methods for 
+ * Abstract implementation of {@link WebswingSecurityModule} that offers convenience methods for
  * proper handling of Ajax and non-Ajax requests and implementing the default login flow for {@link WebswingSecurityModule#doLogin(HttpServletRequest, HttpServletResponse) doLogin}.
  * </p>
  * <p>
  * By default, Webswing's javascript client use Ajax call for authentication. This implicates that the login page
- * served by the security module should be a partial HTML containing only the login form. On the other hand if user is redirected 
+ * served by the security module should be a partial HTML containing only the login form. On the other hand if user is redirected
  * to the /login url, module should respond with full HTML login page. Two abstract methods: {@link #serveLoginPartial(HttpServletRequest, HttpServletResponse, WebswingAuthenticationException) serveLoginPartial}
- *  and {@link #serveLoginPage(HttpServletRequest, HttpServletResponse, WebswingAuthenticationException) serveLoginPage} are called as appropriate for this purpose.
+ * and {@link #serveLoginPage(HttpServletRequest, HttpServletResponse, WebswingAuthenticationException) serveLoginPage} are called as appropriate for this purpose.
  * </p>
  * <p>
- * For implementing mentioned abstract methods use the {@link AbstractSecurityModule#sendHtml(HttpServletRequest, HttpServletResponse, String, Object) sendHtml} method, which 
+ * For implementing mentioned abstract methods use the {@link AbstractSecurityModule#sendHtml(HttpServletRequest, HttpServletResponse, String, Object) sendHtml} method, which
  * uses Mustache templating syntax to help you respond with dynamic pages.
  * </p>
  * <p>
  * In case the login workflow needs to perform a full redirect (see SAML2 implementation), it has to send a response recognized by the ajax caller.
  * For that purpose use {@link AbstractSecurityModule#sendRedirect(HttpServletRequest, HttpServletResponse, String)} method.
  * </p>
+ *
  * @param <T> Interface for reading security module's JSON configuration.
  */
+
 /**
  * @author vikto
  *
@@ -171,8 +161,8 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	/**
 	 * Check if request has any login credentials. If it does and they are valid return an instance of {@link AbstractWebswingUser}
 	 * otherwise throw {@link WebswingAuthenticationException}.
-	 * If no credentials are present return null. 
-	 * 
+	 * If no credentials are present return null.
+	 *
 	 * @param request Login request
 	 * @return authenticated user or null
 	 * @throws WebswingAuthenticationException if authentication failed.
@@ -180,8 +170,8 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	protected abstract AbstractWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException;
 
 	/**
-	 * If the login request is not Ajax call and a {@link #SUCCESS_URL} was sent with first request, 
-	 * send redirect to this url. 
+	 * If the login request is not Ajax call and a {@link #SUCCESS_URL} was sent with first request,
+	 * send redirect to this url.
 	 * @param user authenticated user
 	 * @param request login request
 	 * @param response login response
@@ -203,8 +193,8 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	}
 
 	/**
-	 * Send {@link HttpServletResponse#SC_UNAUTHORIZED} response status and serve full login page or partial login page if 
-	 * request was initiated by Ajax call. 
+	 * Send {@link HttpServletResponse#SC_UNAUTHORIZED} response status and serve full login page or partial login page if
+	 * request was initiated by Ajax call.
 	 * @param request
 	 * @param response
 	 * @param exception
@@ -221,21 +211,21 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 
 	/**
 	 * Respond with full login HTML page. If <code>exception</code> is not null, page should indicate the error message.
-	 *  Use {@link #sendHtml(HttpServletRequest, HttpServletResponse, String, Object) sendHtml} helper method.  
+	 *  Use {@link #sendHtml(HttpServletRequest, HttpServletResponse, String, Object) sendHtml} helper method.
 	 * @param request login request
 	 * @param response login response
 	 * @param exception null or exception thrown by previous login attempt.
-	 * @throws IOException if fails to send response 
+	 * @throws IOException if fails to send response
 	 */
 	protected abstract void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException;
 
 	/**
 	 * Respond with partial login HTML page. If <code>exception</code> is not null, page should indicate the error message.
-	 * Use {@link #sendHtml(HttpServletRequest, HttpServletResponse, String, Object) sendHtml} helper method.  
+	 * Use {@link #sendHtml(HttpServletRequest, HttpServletResponse, String, Object) sendHtml} helper method.
 	 * @param request login request
 	 * @param response login response
 	 * @param exception null or exception thrown by previous login attempt.
-	 * @throws IOException if fails to send response 
+	 * @throws IOException if fails to send response
 	 */
 	protected abstract void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException;
 
@@ -274,11 +264,11 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	}
 
 	/**
-	 * Processes the template ad sends the result HTML or if request is Ajax call, sends the processed 
-	 * template HTML as JSON response.  
+	 * Processes the template ad sends the result HTML or if request is Ajax call, sends the processed
+	 * template HTML as JSON response.
 	 * @param request login request
 	 * @param response login response
-	 * @param template path to template file.(See {@link #findTemplate(String)}) 
+	 * @param template path to template file.(See {@link #findTemplate(String)})
 	 * @param variables java POJO object or instance of Map, that will be used to replace variables in template files.
 	 * @throws IOException if fails to send response
 	 */
@@ -301,9 +291,9 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 
 	/**
 	 * Default implementation uses Mustache style templates. Override this method if other template
-	 * framework is needed. 
+	 * framework is needed.
 	 * @param w processed output will be written here
-	 * @param template path to template file.(See {@link #findTemplate(String)}) 
+	 * @param template path to template file.(See {@link #findTemplate(String)})
 	 * @param variables java POJO object or instance of Map, that will be used to replace variables in template files.
 	 * @throws IOException
 	 */
@@ -332,7 +322,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 
 	/**
 	 * Defines where to look for template files.
-	 * Default implementation looks for template in web resource first, and if not found 
+	 * Default implementation looks for template in web resource first, and if not found
 	 * it tries to load it from classpath of Security Module.
 	 * @param name path to template
 	 * @return template URL
@@ -387,6 +377,18 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 		auditLog("FAILED", r, path, module, user, reason);
 	}
 
+	public void logoutRedirect(HttpServletRequest request, HttpServletResponse response, String logoutUrl) throws IOException {
+		if (logoutUrl != null) {
+			sendRedirect(request, response, logoutUrl);
+		} else {
+			if (isAjax(request)) {
+				sendHtml(request, response, "logoutPartial.html", null);
+			} else {
+				sendHtml(request, response, "logoutPage.html", null);
+			}
+		}
+	}
+
 	public static void auditLog(String status, HttpServletRequest r, String path, String module, String username, String reason) {
 
 		String protocol = r.getScheme();
@@ -426,4 +428,5 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 			return "";
 		}
 	}
+
 }

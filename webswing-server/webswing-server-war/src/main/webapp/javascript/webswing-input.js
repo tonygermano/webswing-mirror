@@ -1,30 +1,31 @@
-define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
+define(['jquery', 'webswing-util'], function amdFactory($, util) {
     "use strict";
 
     return function InputModule() {
         var module = this;
         var api;
         module.injects = api = {
-            cfg : 'webswing.config',
-            send : 'socket.send',
-            getInput : 'canvas.getInput',
-            getCanvas : 'canvas.get',
-            cut : 'clipboard.cut',
-            copy : 'clipboard.copy',
-            paste : 'clipboard.paste',
+            cfg: 'webswing.config',
+            send: 'socket.send',
+            getInput: 'canvas.getInput',
+            getCanvas: 'canvas.get',
+            cut: 'clipboard.cut',
+            copy: 'clipboard.copy',
+            paste: 'clipboard.paste',
         };
         module.provides = {
-            register : register,
-            sendInput : sendInput,
-            dispose : dispose
+            register: register,
+            sendInput: sendInput,
+            dispose: dispose
         };
 
-        module.ready = function() {
+        module.ready = function () {
         };
 
         var latestMouseMoveEvent = null;
         var latestMouseWheelEvent = null;
         var latestWindowResizeEvent = null;
+        var latestKeyDownEvent = null;
         var mouseDown = 0;
         var inputEvtQueue = [];
 
@@ -37,7 +38,7 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
             }
             if (evts.length > 0) {
                 api.send({
-                    events : evts
+                    events: evts
                 });
             }
         }
@@ -55,6 +56,10 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                 if (latestWindowResizeEvent != null) {
                     inputEvtQueue.push(latestWindowResizeEvent);
                     latestWindowResizeEvent = null;
+                }
+                if (latestKeyDownEvent != null) {
+                    inputEvtQueue.push(latestKeyDownEvent);
+                    latestKeyDownEvent = null;
                 }
                 if (message != null) {
                     if (JSON.stringify(inputEvtQueue[inputEvtQueue.length - 1]) !== JSON.stringify(message)) {
@@ -83,7 +88,7 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
             var input = api.getInput();
             resetInput();
             focusInput(input);
-            util.bindEvent(canvas, 'mousedown', function(evt) {
+            util.bindEvent(canvas, 'mousedown', function (evt) {
                 var mousePos = getMousePos(canvas, evt, 'mousedown');
                 latestMouseMoveEvent = null;
                 enqueueInputEvent(mousePos);
@@ -91,7 +96,7 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                 sendInput();
                 return false;
             }, false);
-            util.bindEvent(canvas, 'dblclick', function(evt) {
+            util.bindEvent(canvas, 'dblclick', function (evt) {
                 var mousePos = getMousePos(canvas, evt, 'dblclick');
                 latestMouseMoveEvent = null;
                 enqueueInputEvent(mousePos);
@@ -99,13 +104,13 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                 sendInput();
                 return false;
             }, false);
-            util.bindEvent(canvas, 'mousemove', function(evt) {
+            util.bindEvent(canvas, 'mousemove', function (evt) {
                 var mousePos = getMousePos(canvas, evt, 'mousemove');
                 mousePos.mouse.button = mouseDown;
                 latestMouseMoveEvent = mousePos;
                 return false;
             }, false);
-            util.bindEvent(canvas, 'mouseup', function(evt) {
+            util.bindEvent(canvas, 'mouseup', function (evt) {
                 var mousePos = getMousePos(canvas, evt, 'mouseup');
                 latestMouseMoveEvent = null;
                 enqueueInputEvent(mousePos);
@@ -114,7 +119,7 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                 return false;
             }, false);
             // IE9, Chrome, Safari, Opera
-            util.bindEvent(canvas, "mousewheel", function(evt) {
+            util.bindEvent(canvas, "mousewheel", function (evt) {
                 var mousePos = getMousePos(canvas, evt, 'mousewheel');
                 latestMouseMoveEvent = null;
                 if (latestMouseWheelEvent != null) {
@@ -126,7 +131,7 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                 return false;
             }, false);
             // firefox
-            util.bindEvent(canvas, "DOMMouseScroll", function(evt) {
+            util.bindEvent(canvas, "DOMMouseScroll", function (evt) {
                 var mousePos = getMousePos(canvas, evt, 'mousewheel');
                 latestMouseMoveEvent = null;
                 if (latestMouseWheelEvent != null) {
@@ -137,7 +142,7 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                 evt.stopPropagation();
                 return false;
             }, false);
-            util.bindEvent(canvas, 'contextmenu', function(event) {
+            util.bindEvent(canvas, 'contextmenu', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
                 return false;
@@ -146,16 +151,16 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
             util.bindEvent(input, 'keydown', keyDownHandler, false);
             util.bindEvent(canvas, 'keydown', keyDownHandler, false);
             function keyDownHandler(event) {
-                var functionKeys=[9/*tab*/, 12/*Numpad5*/, 16/*Shift*/, 17/*ctrl*/, 18/*alt*/, 19/*pause*/, 20/*CapsLock*/, 27/*esc*/, 
-                                  32/*space*/, 33/*pgup*/, 34/*pgdown*/, 35/*end*/, 36/*home*/, 37/*left*/, 38/*up*/, 39/*right*/, 40/*down*/, 44/*prtscr*/, 
-                                  45/*insert*/, 46/*Delete*/, 91/*OSLeft*/, 92/*OSRight*/, 93/*Context*/, 145/*scrlck*/, 225/*altGraph(Linux)*/,
-                                  112/*F1*/, 113/*F2*/, 114/*F3*/, 115/*F4*/, 116/*F5*/, 117/*F6*/, 118/*F7*/, 119/*F8*/, 120/*F9*/,
-                                  121/*F10*/, 122/*F11*/, 123/*F12*/, 124/*F13*/, 125/*F14*/, 126/*F15*/, 127/*F16*/, 128/*F17*/, 129/*F18*/, 130/*F19*/, 131/*F20*/,
-                                  132/*F21*/, 133/*F22*/, 134/*F23*/, 135/*F24*/]; 
-            	
-            	var kc = event.keyCode;
-                if (functionKeys.indexOf(kc)!=-1) {
-                    if(!api.cfg.virtualKB){
+                var functionKeys = [9/*tab*/, 12/*Numpad5*/, 16/*Shift*/, 17/*ctrl*/, 18/*alt*/, 19/*pause*/, 20/*CapsLock*/, 27/*esc*/,
+                    32/*space*/, 33/*pgup*/, 34/*pgdown*/, 35/*end*/, 36/*home*/, 37/*left*/, 38/*up*/, 39/*right*/, 40/*down*/, 44/*prtscr*/,
+                    45/*insert*/, 46/*Delete*/, 91/*OSLeft*/, 92/*OSRight*/, 93/*Context*/, 145/*scrlck*/, 225/*altGraph(Linux)*/,
+                    112/*F1*/, 113/*F2*/, 114/*F3*/, 115/*F4*/, 116/*F5*/, 117/*F6*/, 118/*F7*/, 119/*F8*/, 120/*F9*/,
+                    121/*F10*/, 122/*F11*/, 123/*F12*/, 124/*F13*/, 125/*F14*/, 126/*F15*/, 127/*F16*/, 128/*F17*/, 129/*F18*/, 130/*F19*/, 131/*F20*/,
+                    132/*F21*/, 133/*F22*/, 134/*F23*/, 135/*F24*/];
+
+                var kc = event.keyCode;
+                if (functionKeys.indexOf(kc) != -1) {
+                    if (!api.cfg.virtualKB) {
                         event.preventDefault();
                         event.stopPropagation();
                     }
@@ -165,28 +170,31 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                 var ctrlCmd = api.cfg.isMac ? keyevt.key.meta : keyevt.key.ctrl;
                 if (!(ctrlCmd && !keyevt.key.alt && !keyevt.key.altgr && !keyevt.key.shift && (keyevt.key.character == 88 || keyevt.key.character == 67 || keyevt.key.character == 86))) { // cut copy
                     // default action prevented
-                    if (ctrlCmd  && !keyevt.key.alt && !keyevt.key.altgr ) {
+                    if (ctrlCmd && !keyevt.key.alt && !keyevt.key.altgr) {
                         event.preventDefault();
                     }
-                    enqueueInputEvent(keyevt);
+                    latestKeyDownEvent = keyevt;
                 }
                 return false;
             }
-            
+
             util.bindEvent(input, 'keypress', keyPressHandler, false);
             util.bindEvent(canvas, 'keypress', keyPressHandler, false);
             function keyPressHandler(event) {
                 var keyevt = getKBKey('keypress', canvas, event);
                 var ctrlCmd = api.cfg.isMac ? keyevt.key.meta : keyevt.key.ctrl;
                 if (!(ctrlCmd && !keyevt.key.alt && !keyevt.key.altgr && !keyevt.key.shift && (keyevt.key.character == 120 || keyevt.key.character == 24 || keyevt.key.character == 99
-                        || keyevt.key.character == 118 || keyevt.key.character == 22))) { // cut copy paste handled separately
+                    || keyevt.key.character == 118 || keyevt.key.character == 22))) { // cut copy paste handled separately
                     event.preventDefault();
                     event.stopPropagation();
+                    if (latestKeyDownEvent != null) {
+                        latestKeyDownEvent.key.character = keyevt.key.character;
+                    }
                     enqueueInputEvent(keyevt);
                 }
                 return false;
             }
-            
+
             util.bindEvent(input, 'keyup', keyUpHandler, false);
             util.bindEvent(canvas, 'keyup', keyUpHandler, false);
             function keyUpHandler(event) {
@@ -200,19 +208,20 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                 }
                 return false;
             }
-            util.bindEvent(input, 'cut', function(event) {
+
+            util.bindEvent(input, 'cut', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
                 api.cut(event);
                 return false;
             }, false);
-            util.bindEvent(input, 'copy', function(event) {
+            util.bindEvent(input, 'copy', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
                 api.copy(event);
                 return false;
             }, false);
-            util.bindEvent(input, 'paste', function(event) {
+            util.bindEvent(input, 'paste', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
                 api.paste(event);
@@ -256,16 +265,16 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                 delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
             }
             return {
-                mouse : {
-                    x : mouseX,
-                    y : mouseY,
-                    type : type,
-                    wheelDelta : delta,
-                    button : evt.which,
-                    ctrl : evt.ctrlKey,
-                    alt : evt.altKey,
-                    shift : evt.shiftKey,
-                    meta : evt.metaKey
+                mouse: {
+                    x: mouseX,
+                    y: mouseY,
+                    type: type,
+                    wheelDelta: delta,
+                    button: evt.which,
+                    ctrl: evt.ctrlKey,
+                    alt: evt.altKey,
+                    shift: evt.shiftKey,
+                    meta: evt.metaKey
                 }
             };
         }
@@ -280,14 +289,14 @@ define([ 'jquery', 'webswing-util' ], function amdFactory($, util) {
                 kk = char;
             }
             return {
-                key : {
-                    type : type,
-                    character : char,
-                    keycode : kk,
-                    alt : evt.altKey,
-                    ctrl : evt.ctrlKey,
-                    shift : evt.shiftKey,
-                    meta : evt.metaKey
+                key: {
+                    type: type,
+                    character: char,
+                    keycode: kk,
+                    alt: evt.altKey,
+                    ctrl: evt.ctrlKey,
+                    shift: evt.shiftKey,
+                    meta: evt.metaKey
                 }
             };
         }

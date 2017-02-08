@@ -1,17 +1,16 @@
 package org.webswing.toolkit.extra;
 
+import org.webswing.Constants;
+import sun.awt.shell.ShellFolder;
+import sun.awt.shell.ShellFolder.Invoker;
+import sun.awt.shell.Win32ShellFolderManager2;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
-
-import org.webswing.Constants;
-
-import sun.awt.shell.ShellFolder;
-import sun.awt.shell.ShellFolder.Invoker;
-import sun.awt.shell.Win32ShellFolderManager2;
 
 @SuppressWarnings("restriction")
 public class WebShellFolderManager extends Win32ShellFolderManager2 {
@@ -153,10 +152,16 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 	}
 
 	@SuppressWarnings("rawtypes")
-	@Override
 	public void sortFiles(List paramList) {
 		if (windows) {
-			super.sortFiles(paramList);
+			try {
+				Method m = super.getClass().getDeclaredMethod("sortFiles", List.class);
+				m.setAccessible(true);
+				m.invoke(defaultManager, paramList);
+			} catch (Exception e) {
+				System.err.println("Failed to invoke sortFiles method on default shell folder manager: " + e.getMessage());
+				e.printStackTrace();
+			}
 		} else {
 			try {
 				Method m = defaultManager.getClass().getDeclaredMethod("sortFiles", List.class);

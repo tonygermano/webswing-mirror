@@ -60,7 +60,7 @@
         height: 100%;
         background-repeat: no-repeat, no-repeat, no-repeat;
         background-position: -20% center, right center, left center;
-        @include rel('background-size', 100px 30px 130px 30px 130px 30px);
+        @include rel('background-size', 100px 30px);
 
         color: $white;
         font-size: $smaller;

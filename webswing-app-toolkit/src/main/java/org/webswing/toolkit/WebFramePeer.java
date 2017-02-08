@@ -1,16 +1,10 @@
 package org.webswing.toolkit;
 
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.MenuBar;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.peer.FramePeer;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-
 import org.webswing.toolkit.extra.WindowManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.peer.FramePeer;
 
 public class WebFramePeer extends WebWindowPeer implements FramePeer {
 
@@ -18,7 +12,7 @@ public class WebFramePeer extends WebWindowPeer implements FramePeer {
 
 	public WebFramePeer(Frame t) {
 		super(t);
-		state=t.getExtendedState();
+		state = t.getExtendedState();
 	}
 
 	public void setMenuBar(MenuBar paramMenuBar) {
@@ -56,7 +50,11 @@ public class WebFramePeer extends WebWindowPeer implements FramePeer {
 	public Rectangle getBoundsPrivate() {
 		return null;
 	}
-	
+
+	public void emulateActivation(boolean b) {
+
+	}
+
 	@Override
 	public void show() {
 		super.show();

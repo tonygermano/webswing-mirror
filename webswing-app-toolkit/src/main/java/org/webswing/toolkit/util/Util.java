@@ -1,47 +1,5 @@
 package org.webswing.toolkit.util;
 
-import java.applet.Applet;
-import java.awt.AWTEvent;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Panel;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
-
 import org.webswing.Constants;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.c2s.KeyboardEventMsgIn;
@@ -54,10 +12,55 @@ import org.webswing.model.s2c.WindowPartialContentMsg;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
+import javax.swing.*;
+import java.applet.Applet;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.List;
+
 public class Util {
 
-	private static List<Integer> NO_CHAR_KEY_CODES = Arrays.asList(KeyEvent.VK_F1, KeyEvent.VK_F2, KeyEvent.VK_F3, KeyEvent.VK_F4, KeyEvent.VK_F5, KeyEvent.VK_F6, KeyEvent.VK_F7, KeyEvent.VK_F8, KeyEvent.VK_F9, KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12, KeyEvent.VK_PRINTSCREEN, KeyEvent.VK_SCROLL_LOCK, KeyEvent.VK_PAUSE, KeyEvent.VK_INSERT,
-			KeyEvent.VK_HOME, KeyEvent.VK_PAGE_DOWN, KeyEvent.VK_END, KeyEvent.VK_PAGE_DOWN, KeyEvent.VK_CAPS_LOCK, KeyEvent.VK_UP, KeyEvent.VK_LEFT, KeyEvent.VK_DOWN, KeyEvent.VK_RIGHT, KeyEvent.VK_SHIFT, KeyEvent.VK_CONTROL, KeyEvent.VK_ALT, KeyEvent.VK_WINDOWS, KeyEvent.VK_ALT_GRAPH);
+	private static List<Integer> NO_CHAR_KEY_CODES = Arrays
+			.asList(KeyEvent.VK_F1, KeyEvent.VK_F2, KeyEvent.VK_F3, KeyEvent.VK_F4, KeyEvent.VK_F5, KeyEvent.VK_F6, KeyEvent.VK_F7, KeyEvent.VK_F8, KeyEvent.VK_F9, KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12, KeyEvent.VK_PRINTSCREEN, KeyEvent.VK_SCROLL_LOCK, KeyEvent.VK_PAUSE, KeyEvent.VK_INSERT, KeyEvent.VK_HOME, KeyEvent.VK_PAGE_DOWN,
+					KeyEvent.VK_END, KeyEvent.VK_PAGE_DOWN, KeyEvent.VK_CAPS_LOCK, KeyEvent.VK_UP, KeyEvent.VK_LEFT, KeyEvent.VK_DOWN, KeyEvent.VK_RIGHT, KeyEvent.VK_SHIFT, KeyEvent.VK_CONTROL, KeyEvent.VK_ALT, KeyEvent.VK_WINDOWS, KeyEvent.VK_ALT_GRAPH);
+	private static Map<Integer, Character> CONTROL_MAP;
+
+	static {
+		CONTROL_MAP = new HashMap<Integer, Character>();
+		CONTROL_MAP.put(81, '\u0011');
+		CONTROL_MAP.put(69, '\u0005');
+		CONTROL_MAP.put(82, '\u0012');
+		CONTROL_MAP.put(89, '\u0019');
+		CONTROL_MAP.put(85, '\u0015');
+		CONTROL_MAP.put(73, '\u0009');
+		CONTROL_MAP.put(79, '\u000F');
+		CONTROL_MAP.put(80, '\u0010');
+		CONTROL_MAP.put(65, '\u0001');
+		CONTROL_MAP.put(83, '\u0013');
+		CONTROL_MAP.put(68, '\u0004');
+		CONTROL_MAP.put(71, '\u0007');
+		CONTROL_MAP.put(72, '\u0008');
+		CONTROL_MAP.put(74, '\n');
+		CONTROL_MAP.put(76, '\u000C');
+		CONTROL_MAP.put(90, '\u001A');
+		CONTROL_MAP.put(88, '\u0018');
+		CONTROL_MAP.put(67, '\u0003');
+		CONTROL_MAP.put(86, '\u0016');
+		CONTROL_MAP.put(66, '\u0002');
+		CONTROL_MAP.put(77, '\r');
+	}
 
 	public static int getMouseButtonsAWTFlag(int button) {
 		switch (button) {
@@ -148,6 +151,8 @@ public class Util {
 	public static char getKeyCharacter(KeyboardEventMsgIn event) {
 		if (NO_CHAR_KEY_CODES.contains(event.getKeycode())) {
 			return KeyEvent.CHAR_UNDEFINED;
+		} else if (event.isCtrl() && !event.isAlt() && !event.isMeta() && !event.isShift() && !event.isMeta() && CONTROL_MAP.containsKey(event.getKeycode())) {
+			return CONTROL_MAP.get(event.getKeycode());
 		} else {
 			return (char) event.getCharacter();
 		}
@@ -204,7 +209,7 @@ public class Util {
 	}
 
 	public static Map<String, Image> extractWindowWebImages(AppFrameMsgOut json, Map<String, Image> webImages) {
-		for (Iterator<WindowMsg> i = json.getWindows().iterator(); i.hasNext();) {
+		for (Iterator<WindowMsg> i = json.getWindows().iterator(); i.hasNext(); ) {
 			WindowMsg window = i.next();
 			WebWindowPeer w = findWindowPeerById(window.getId());
 			if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
@@ -392,9 +397,9 @@ public class Util {
 				current = r;
 			} else {
 				if (current.y == r.y && current.height == r.height && current.x + current.width == r.x) {// is
-																												// joinable
-																											// on
-																											// row
+					// joinable
+					// on
+					// row
 					current.width += r.width;
 				} else {
 					joinedRows.add(current);

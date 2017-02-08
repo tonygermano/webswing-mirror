@@ -416,6 +416,9 @@ html.ws-fullscreen body {
   font-family: inherit;
   line-height: inherit;
 }
+.webswing-element pre {
+  overflow: auto;
+}
 .webswing-element .webswing-version {
   position: fixed;
   z-index: -1;
@@ -488,7 +491,7 @@ html.ws-fullscreen body {
   font-size: 15px;
 }
 .webswing-element .ws-message, .webswing-element .ws-login-message {
-  margin:: 20px 0px;
+  margin: 20px 0px;
   font-size: 15px;
 }
 .webswing-element .ws-message--error {
@@ -608,7 +611,7 @@ html.ws-fullscreen body {
   width: 1px;
   height: 1px;
   display: block;
-  font-size: 1;
+  font-size: 1em;
   z-index: -1;
   color: transparent;
   background: transparent;
@@ -720,7 +723,7 @@ html.ws-fullscreen body {
   height: 100%;
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-position: -20% center, right center, left center;
-  background-size: 100px 30px 130px 30px 130px 30px;
+  background-size: 100px 30px;
   color: #ffffff;
   font-size: 14px;
   font-weight: normal;
