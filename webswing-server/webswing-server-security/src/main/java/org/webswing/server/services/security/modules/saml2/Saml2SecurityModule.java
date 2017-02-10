@@ -148,7 +148,7 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 
 	@Override
 	public void doLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String logoutUrl = getConfig().getLogoutUrl();
+		String logoutUrl = replaceVar(getConfig().getLogoutUrl());
 		logoutRedirect(request, response, logoutUrl);
 	}
 

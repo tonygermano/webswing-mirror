@@ -40,6 +40,7 @@ public interface OpenIDConnectSecurityModuleConfig extends WebswingExtendableSec
 	String getRolesAttributeName();
 
 	@ConfigField(label = "Logout URL", description = "Webswing will redirect to this URL after logout.")
+	@ConfigFieldVariables
 	String getLogoutUrl();
 
 	class OpenIDConnectMetaDataGenerator extends MetadataGenerator<OpenIDConnectSecurityModuleConfig> {

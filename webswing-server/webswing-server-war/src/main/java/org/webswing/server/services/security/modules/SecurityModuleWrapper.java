@@ -124,7 +124,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 
 	}
 
-	public void doLogout(final HttpServletRequest req, final HttpServletResponse res) {
+	public void doLogout(final HttpServletRequest req, final HttpServletResponse res, final AbstractWebswingUser user) {
 		if (custom != null) {
 			try {
 				runWithContextClassLoader(new Callable<Object>() {
@@ -132,7 +132,7 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 					@Override
 					public Object call() throws Exception {
 						try {
-							custom.doLogout(req, res);
+							custom.doLogout(req, res, user);
 						} catch (Throwable e) {
 							throw new Exception(e);
 						}

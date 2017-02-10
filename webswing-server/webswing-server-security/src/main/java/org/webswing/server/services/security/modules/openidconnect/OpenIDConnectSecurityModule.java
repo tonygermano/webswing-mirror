@@ -26,18 +26,18 @@ public class OpenIDConnectSecurityModule extends AbstractExtendableSecurityModul
 	public void init() {
 		super.init();
 		try {
-			URL callback = new URL(getConfig().getContext().replaceVariables(getConfig().getCallbackUrl()));
+			URL callback = new URL(replaceVar(getConfig().getCallbackUrl()));
 
-			String trustedCertsPem = getConfig().getContext().replaceVariables(getConfig().getTrustedPemFile());
+			String trustedCertsPem = replaceVar(getConfig().getTrustedPemFile());
 			File trustedCert = getConfig().getContext().resolveFile(trustedCertsPem);
 			boolean disableCertValidation = "DISABLED".equals(trustedCertsPem);
 
-			String roleAttrName = getConfig().getContext().replaceVariables(getConfig().getRolesAttributeName());
-			String usernameAttrName = getConfig().getContext().replaceVariables(getConfig().getUsernameAttributeName());
-			URL discoveryUrl = new URL(getConfig().getContext().replaceVariables(getConfig().getImportDiscoveryJson()));
+			String roleAttrName = replaceVar(getConfig().getRolesAttributeName());
+			String usernameAttrName = replaceVar(getConfig().getUsernameAttributeName());
+			URL discoveryUrl = new URL(replaceVar(getConfig().getImportDiscoveryJson()));
 
-			String clientSecret = getConfig().getContext().replaceVariables(getConfig().getClientSecret());
-			String clientId = getConfig().getContext().replaceVariables(getConfig().getClientId());
+			String clientSecret = replaceVar(getConfig().getClientSecret());
+			String clientId = replaceVar(getConfig().getClientId());
 
 			client = new OpenIdConnectClient(discoveryUrl, callback, clientId, clientSecret, disableCertValidation, trustedCert, roleAttrName, usernameAttrName);
 		} catch (Exception e) {
@@ -66,7 +66,7 @@ public class OpenIDConnectSecurityModule extends AbstractExtendableSecurityModul
 		String openIdCode = client.getCode(request);
 		if (!StringUtils.isEmpty(openIdCode)) {
 			try {
-				AbstractWebswingUser user = client.getUser(openIdCode);
+				AbstractWebswingUser user = client.getUser(openIdCode, null);
 				logSuccess(request, user.getUserId());
 				return user;
 			} catch (Exception e1) {
@@ -80,7 +80,7 @@ public class OpenIDConnectSecurityModule extends AbstractExtendableSecurityModul
 
 	@Override
 	public void doLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String logoutUrl = getConfig().getLogoutUrl();
+		String logoutUrl = replaceVar(getConfig().getLogoutUrl());
 		logoutRedirect(request, response, logoutUrl);
 	}
 

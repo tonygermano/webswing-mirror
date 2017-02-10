@@ -9,16 +9,16 @@ import java.util.List;
 /**
  * Created by vikto on 03-Feb-17.
  */
-@ConfigFieldOrder({ "keyCloakUrl", "keyCloakRealms", "callbackUrl", "clientId", "clientSecret", "trustedPemFile", "usernameAttributeName", "rolesAttributeName", "logoutUrl" })
+@ConfigFieldOrder({ "keycloakUrl", "keyCloakRealms", "callbackUrl", "clientId", "clientSecret", "trustedPemFile", "usernameAttributeName", "rolesAttributeName" })
 public interface KeycloakSecurityModuleConfig extends WebswingExtendableSecurityModuleConfig {
-	@ConfigField(label = "KeyCloak URL")
+	@ConfigField(label = "Keycloak URL")
 	@ConfigFieldVariables
-	String getKeyCloakUrl();
+	String getKeycloakUrl();
 
 	@ConfigField(label = "Realms", description = "At least one realm is required. First realm is the default one.")
-	@ConfigFieldVariables
 	@ConfigFieldDefaultValueObject(ArrayList.class)
-	List<String> getKeyCloakRealms();
+	@ConfigFieldEditorType(editor = ConfigFieldEditorType.EditorType.ObjectListAsTable)
+	List<RealmEntry> getRealms();
 
 	@ConfigField(label = "Callback URL", description = "URL of the webswing server where auth token will be received. Must end with /login")
 	@ConfigFieldDefaultValueString("https://<webswing_host>:<webswing_port>/<swing_path>/login")
@@ -45,8 +45,5 @@ public interface KeycloakSecurityModuleConfig extends WebswingExtendableSecurity
 	@ConfigField(label = "Roles Attribute Name", description = "Leave empty if not required")
 	@ConfigFieldVariables
 	String getRolesAttributeName();
-
-	@ConfigField(label = "Logout URL", description = "Webswing will redirect to this URL after logout.")
-	String getLogoutUrl();
 
 }

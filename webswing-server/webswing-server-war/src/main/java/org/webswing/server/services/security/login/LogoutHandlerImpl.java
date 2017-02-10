@@ -1,11 +1,5 @@
 package org.webswing.server.services.security.login;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
@@ -17,6 +11,11 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.LogoutTokenAdapter;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.modules.SecurityModuleWrapper;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandler {
 	private static final Logger log = LoggerFactory.getLogger(LogoutHandlerImpl.class);
@@ -32,8 +31,9 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
+		AbstractWebswingUser user;
 		try {
-			logout(req, res);
+			user= logout(req, res);
 		} catch (Exception e) {
 			log.error("Failed to logout", e);
 			throw new WsException("Failed to logout", e);
@@ -41,7 +41,7 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 		
 		SecurityModuleWrapper securityModuleWrapper = getSecurityProvider().get();
 		try {
-			securityModuleWrapper.doLogout(req, res);
+			securityModuleWrapper.doLogout(req, res, user);
 		} catch (Exception e) {
 			log.error("Failed Logout by SecurityModule.", e);
 			throw new WsException("Failed Logout by SecurityModule.", e);
@@ -49,7 +49,7 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 		return true;
 	}
 
-	protected void logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected AbstractWebswingUser logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		AbstractWebswingUser user = getUser();
 		if (user != null) {
 			Subject subject = SecurityUtils.getSubject();
@@ -60,6 +60,8 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 				//there was no user left in the session, so we can do full log out.
 				subject.logout();
 			}
+			return user;
 		}
+		return null;
 	}
 }

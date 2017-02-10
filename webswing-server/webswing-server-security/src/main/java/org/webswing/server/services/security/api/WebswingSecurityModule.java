@@ -42,7 +42,7 @@ public interface WebswingSecurityModule {
 	 * <b>HTTP Request has valid credentials.</b> - responds with status 200 (OK) and returns instance of {@link AbstractWebswingUser}.
 	 * </li>
 	 * </ul>
-	 * 
+	 *
 	 * @param request The HTTP request from servlet container
 	 * @param response The HTTP response from servlet container
 	 * @return instance of user or null if user is not resolved
@@ -55,13 +55,14 @@ public interface WebswingSecurityModule {
 	 * This method is triggered by Webswing when a HTTP request is received on URL <blockquote>/{app_path}/logout</blockquote> 
 	 * after the current user session is invalidated.   
 	 * <br>
-	 * 
+	 *
 	 * @param request The HTTP request from servlet container
 	 * @param response The HTTP response from servlet container
+	 * @param user The user which just logged out
 	 * @throws ServletException thrown when sending the http response fails
 	 * @throws IOException thrown when sending the http response fails
 	 */
-	void doLogout(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException;
+	void doLogout(HttpServletRequest req, HttpServletResponse res, AbstractWebswingUser user) throws ServletException, IOException;
 
 	/**
 	 * This method is triggered by Webswing when a HTTP request is received on URL <blockquote>/{app_path}/login</blockquote> and user is authenticated.

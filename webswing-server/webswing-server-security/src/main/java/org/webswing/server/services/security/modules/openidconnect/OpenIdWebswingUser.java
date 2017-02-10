@@ -17,7 +17,7 @@ public class OpenIdWebswingUser extends AbstractWebswingUser {
 	Map<String, Serializable> attrs = new HashMap<>();
 	List<String> roles;
 
-	public OpenIdWebswingUser(IdToken token, String usernameAttr, String roleAttr) {
+	public OpenIdWebswingUser(IdToken token, String usernameAttr, String roleAttr, Map<String, Serializable> extraAttribs) {
 		this.token = token;
 		for (String key : token.getPayload().keySet()) {
 			Object value = token.getPayload().get(key);
@@ -27,6 +27,9 @@ public class OpenIdWebswingUser extends AbstractWebswingUser {
 			if (value instanceof String && StringUtils.equalsIgnoreCase(roleAttr, key)) {
 				roles = toList((String) value);
 			}
+		}
+		if (extraAttribs != null) {
+			attrs.putAll(extraAttribs);
 		}
 		if (attrs.get(usernameAttr) != null && attrs.get(usernameAttr) instanceof String) {
 			user = (String) attrs.get(usernameAttr);

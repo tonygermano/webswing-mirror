@@ -124,6 +124,10 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	}
 
 	@Override
+	public void doLogout(HttpServletRequest req, HttpServletResponse res, AbstractWebswingUser user) throws ServletException, IOException {
+		doLogout(req, res);
+	}
+
 	public void doLogout(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		String fullPath = getConfig().getContext().getSecuredPath();
 		sendRedirect(req, res, fullPath);
@@ -387,6 +391,10 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 				sendHtml(request, response, "logoutPage.html", null);
 			}
 		}
+	}
+
+	public String replaceVar(String s) {
+		return getConfig().getContext().replaceVariables(s);
 	}
 
 	public static void auditLog(String status, HttpServletRequest r, String path, String module, String username, String reason) {

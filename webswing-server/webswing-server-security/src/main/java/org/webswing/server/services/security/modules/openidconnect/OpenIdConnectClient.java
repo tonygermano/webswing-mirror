@@ -8,12 +8,15 @@ import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
@@ -22,6 +25,7 @@ import java.util.Map;
  * Created by vikto on 06-Feb-17.
  */
 public class OpenIdConnectClient {
+	private static final Logger log = LoggerFactory.getLogger(OpenIdConnectClient.class);
 
 	public static final String CODE = "code";
 	public static final String ISSUER = "issuer";
@@ -33,6 +37,7 @@ public class OpenIdConnectClient {
 	private final String roleAttrName;
 	private final String usernameAttrName;
 	private URL callback;
+	private String logoutUrl;
 	private AuthorizationCodeFlow flow;
 
 	public OpenIdConnectClient(URL discovery, URL callback, String clientId, String clientSecret, boolean disableCertValidation, File trustedCert, String roleAttrName, String usernameAttrName) throws Exception {
@@ -53,6 +58,7 @@ public class OpenIdConnectClient {
 		URL tokenURI;
 		String issuer;
 		if (discovery != null) {
+			log.info("Loading OpenID Connect definition from: " + discovery);
 			HttpResponse response = transportBuilder.build().createRequestFactory().buildGetRequest(new GenericUrl(discovery)).execute();
 			Map<String, Object> json = jsonFactory.createJsonParser(response.getContent()).parse(Map.class);
 			if (json.get(ISSUER) != null) {
@@ -112,11 +118,19 @@ public class OpenIdConnectClient {
 		return idTokenResponse.parseIdToken();
 	}
 
-	public AbstractWebswingUser getUser(String openIdCode) throws IOException {
+	public AbstractWebswingUser getUser(String openIdCode, Map<String, Serializable> extraAttribs) throws IOException {
 		AuthorizationCodeTokenRequest tokenRequest = flow.newTokenRequest(openIdCode).setRedirectUri(callback.toString());
 		tokenRequest.set(CLIENT_ID, flow.getClientId());
 		IdToken result = executeIdToken(tokenRequest);
-		OpenIdWebswingUser user = new OpenIdWebswingUser(result, this.usernameAttrName, this.roleAttrName);
+		OpenIdWebswingUser user = new OpenIdWebswingUser(result, this.usernameAttrName, this.roleAttrName, extraAttribs);
 		return user;
+	}
+
+	public String getLogoutUrl() {
+		return logoutUrl;
+	}
+
+	public void setLogoutUrl(String logoutUrl) {
+		this.logoutUrl = logoutUrl;
 	}
 }

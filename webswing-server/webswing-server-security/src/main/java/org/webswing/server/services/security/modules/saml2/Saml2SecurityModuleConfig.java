@@ -12,16 +12,17 @@ public interface Saml2SecurityModuleConfig extends WebswingExtendableSecurityMod
 
 	@ConfigField(label = "Identity Provider Metadata File", description = "Metadata file downloaded from Identity provider.")
 	@ConfigFieldVariables(VariableSetName.SwingApp)
-	public String getIdentityProviderMetadataFile();
+	String getIdentityProviderMetadataFile();
 
 	@ConfigField(label = "Service Provider Consumer URL", description = "Url that verifies the SAML2 token. Should be 'https://<webswing_host>:<webswing_port>/<current_app_path>/login'")
 	@ConfigFieldDefaultValueString("https://<webswing_host>:<webswing_port>/<swing_path>/login")
-	public String getServiceProviderConsumerUrl();
+	String getServiceProviderConsumerUrl();
 
 	@ConfigField(label = "Service Provider Entity ID", description = "Identitficator used when registering Webswing with Idp.")
-	public String getServiceProviderEntityId();
+	String getServiceProviderEntityId();
 
 	@ConfigField(label = "Logout URL", description = "Webswing will redirect to this URL after logout.")
-	public String getLogoutUrl();
+	@ConfigFieldVariables
+	String getLogoutUrl();
 
 }
