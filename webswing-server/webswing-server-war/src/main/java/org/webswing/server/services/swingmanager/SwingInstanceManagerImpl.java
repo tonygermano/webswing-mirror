@@ -1,20 +1,5 @@
 package org.webswing.server.services.swingmanager;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +14,7 @@ import org.webswing.server.common.model.admin.Sessions;
 import org.webswing.server.common.model.admin.SwingSession;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.CommonUtil;
+import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.files.FileTransferHandler;
@@ -45,6 +31,15 @@ import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swinginstance.SwingInstanceService;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.*;
+import java.io.File;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements SwingInstanceManager {
 	private static final Logger log = LoggerFactory.getLogger(SwingInstanceManagerImpl.class);
@@ -401,16 +396,19 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 			return false;
 		}
 		AuthorizationConfig authorizationConfig = getSecurityConfig().getAuthorizationConfig();
-		if (authorizationConfig == null || authorizationConfig.getRoles().size() == 0 || authorizationConfig.getRoles().size() == 0) {
+		if (authorizationConfig == null || (authorizationConfig.getRoles().size() == 0 && authorizationConfig.getUsers().size() == 0)) {
 			return true;
 		} else {
+			VariableSubstitutor subs = VariableSubstitutor.forSwingApp(getConfig());
 			for (String role : authorizationConfig.getRoles()) {
-				if (user.hasRole(role)) {
+				String resolvedRole=subs.replace(role) ;
+				if (user.hasRole(resolvedRole)) {
 					return true;
 				}
 			}
 			for (String u : authorizationConfig.getUsers()) {
-				if (user.getUserId().equals(u)) {
+				String resolvedUser=subs.replace(u) ;
+				if (user.getUserId().equals(resolvedUser)) {
 					return true;
 				}
 			}

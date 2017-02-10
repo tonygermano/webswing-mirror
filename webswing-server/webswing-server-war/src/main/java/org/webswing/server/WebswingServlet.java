@@ -1,6 +1,13 @@
 package org.webswing.server;
 
-import java.io.IOException;
+import com.google.inject.Binder;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.webswing.server.services.security.SecurityManagerService;
+import org.webswing.server.services.startup.StartupService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -9,16 +16,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.webswing.server.services.security.SecurityManagerService;
-import org.webswing.server.services.startup.StartupService;
-
-import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import java.io.IOException;
 
 @WebServlet(asyncSupported = true, displayName = "WebswingServlet", urlPatterns = { "/*" })
 @MultipartConfig(fileSizeThreshold = 5242880)
@@ -49,6 +47,7 @@ public class WebswingServlet extends HttpServlet {
 		} catch (Exception e) {
 			log.error("Initialization of Webswing failed. ", e);
 			destroy();
+			throw new ServletException("Webswing failed to start!", e);
 		}
 	}
 

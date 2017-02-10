@@ -25,10 +25,12 @@ import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
+import org.webswing.server.common.model.admin.InstanceManagerStatus;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.model.rest.LogRequest;
 import org.webswing.server.common.model.rest.LogResponse;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.security.api.BuiltInModules;
@@ -83,6 +85,9 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 		loadApplications();
 		super.init();
+		if (!InstanceManagerStatus.Status.Running.equals(getStatus().getStatus())) {
+			throw new RuntimeException("Failed to start primary handler.");
+		}
 	}
 
 	public void destroy() {

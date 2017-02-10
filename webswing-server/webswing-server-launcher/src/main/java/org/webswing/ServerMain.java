@@ -1,21 +1,16 @@
 package org.webswing;
 
+import org.eclipse.jetty.jmx.MBeanContainer;
+import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.webapp.WebAppContext;
+import org.webswing.toolkit.util.Logger;
+
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.eclipse.jetty.jmx.MBeanContainer;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.SecureRequestCustomizer;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.webswing.toolkit.util.Logger;
 
 public class ServerMain {
 
@@ -89,8 +84,13 @@ public class ServerMain {
 		webapp.setTempDirectory(new File(URI.create(System.getProperty(Constants.TEMP_DIR_PATH))));
 		webapp.setPersistTempDirectory(true);
 		webapp.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern", "");
+		webapp.setThrowUnavailableOnStartupException(true);
 		server.setHandler(webapp);
-		server.start();
-		server.join();
+		try {
+			server.start();
+			server.join();
+		} catch (Exception e) {
+			server.stop();
+		}
 	}
 }
