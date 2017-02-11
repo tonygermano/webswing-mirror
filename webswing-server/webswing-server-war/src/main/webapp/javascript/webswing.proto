@@ -36,6 +36,7 @@ message LinkActionMsgProto{
 		file = 0;
 		url = 1;
 		print = 2;
+		redirect = 3;
 	}
 }
 

@@ -7,7 +7,7 @@ public class LinkActionMsg implements Msg {
 	private static final long serialVersionUID = -1341111272614100725L;
 
 	public enum LinkActionType {
-		file, url, print;
+		file, url, print, redirect;
 	}
 
 	private LinkActionType action;

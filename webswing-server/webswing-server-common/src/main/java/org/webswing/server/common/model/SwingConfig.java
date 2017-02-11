@@ -1,31 +1,19 @@
 package org.webswing.server.common.model;
 
+import org.webswing.server.common.model.meta.*;
+import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.webswing.server.common.model.meta.ConfigField;
-import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
-import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
-import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
-import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
-import org.webswing.server.common.model.meta.ConfigFieldDiscriminator;
-import org.webswing.server.common.model.meta.ConfigFieldEditorType;
-import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
-import org.webswing.server.common.model.meta.ConfigFieldOrder;
-import org.webswing.server.common.model.meta.ConfigFieldPresets;
-import org.webswing.server.common.model.meta.ConfigFieldVariables;
-import org.webswing.server.common.model.meta.ConfigGroup;
-import org.webswing.server.common.model.meta.ConfigType;
-import org.webswing.server.common.model.meta.MetadataGenerator;
-import org.webswing.server.common.model.meta.VariableSetName;
-
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload",
-		"transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs", "allowUpload", "allowDelete", "allowDownload",
+		"allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
 public interface SwingConfig extends Config {
+
 	public enum SessionMode {
 		ALWAYS_NEW_SESSION,
 		CONTINUE_FOR_BROWSER,
@@ -112,7 +100,13 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.Session, label = "Auto Logout", description = "If enabled, user is automatically logged out after the swing application finished.")
 	@ConfigFieldDefaultValueBoolean(true)
+	@ConfigFieldDiscriminator
 	public boolean isAutoLogout();
+
+	@ConfigField(tab = ConfigGroup.Session, label = "Goodbye URL", description = "Absolute or relative URL to redirect to, when swing application exits. Use '/' to navigate back to Application selector.")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("")
+	String getGoodbyeUrl();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Isolated Filesystem", description = "If true, every file chooser dialog will be restricted to access only the home directory of current application.")
 	@ConfigFieldDefaultValueBoolean(false)
@@ -201,6 +195,9 @@ public interface SwingConfig extends Config {
 				names.remove("transparentFileSave");
 				names.remove("transparentFileOpen");
 				names.remove("clearTransferDir");
+			}
+			if (config.isAutoLogout()) {
+				names.remove("goodbyeUrl");
 			}
 			return names;
 		}

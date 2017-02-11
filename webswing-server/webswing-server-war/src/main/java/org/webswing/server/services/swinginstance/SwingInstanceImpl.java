@@ -1,15 +1,6 @@
 package org.webswing.server.services.swinginstance;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
+import main.Main;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -23,13 +14,8 @@ import org.webswing.model.c2s.ParamMsg;
 import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn.SimpleEventType;
 import org.webswing.model.c2s.TimestampsMsgIn;
-import org.webswing.model.internal.ApiCallMsgInternal;
-import org.webswing.model.internal.ApiEventMsgInternal;
+import org.webswing.model.internal.*;
 import org.webswing.model.internal.ApiEventMsgInternal.ApiEventType;
-import org.webswing.model.internal.ExitMsgInternal;
-import org.webswing.model.internal.JvmStatsMsgInternal;
-import org.webswing.model.internal.OpenFileResultMsgInternal;
-import org.webswing.model.internal.PrinterJobResultMsgInternal;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.LinkActionMsg;
 import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
@@ -49,6 +35,7 @@ import org.webswing.server.services.jvmconnection.JvmConnection;
 import org.webswing.server.services.jvmconnection.JvmConnectionService;
 import org.webswing.server.services.jvmconnection.JvmListener;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.modules.AbstractSecurityModule;
 import org.webswing.server.services.stats.StatisticsLogger;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingprocess.ProcessExitListener;
@@ -60,7 +47,15 @@ import org.webswing.server.util.FontUtils;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.api.WebswingApi;
 
-import main.Main;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private static final String LAUNCHER_CONFIG = "launcherConfig";
@@ -88,10 +83,11 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private final String queueId;
 	private String customArgs = "";
 	private int debugPort = 0;
+	private String locale = null;
 	private String userIp = null;
 	private String userOs = null;
-	private String userBrowser = null;
 
+	private String userBrowser = null;
 	//finished instances only
 	private Date endedAt = null;
 	private List<String> warningHistoryLog;
@@ -338,6 +334,16 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private void close() {
 		if (config.isAutoLogout()) {
 			sendToWeb(SimpleEventMsgOut.shutDownAutoLogoutNotification.buildMsgOut());
+		}
+		if (StringUtils.isNotBlank(config.getGoodbyeUrl())) {
+			VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), getClientId(), clientIp, locale, customArgs);
+			String url = subs.replace(config.getGoodbyeUrl());
+			if (url.startsWith("/")) {
+				url = AbstractSecurityModule.getContextPath(manager.getServletContext()) + url;
+			}
+			AppFrameMsgOut result = new AppFrameMsgOut();
+			result.setLinkAction(new LinkActionMsg(LinkActionType.redirect, url));
+			sendToWeb(result);
 		} else {
 			sendToWeb(SimpleEventMsgOut.shutDownNotification.buildMsgOut());
 		}
@@ -405,9 +411,10 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	private SwingProcess start(SwingProcessService processService, final SwingConfig appConfig, final ConnectionHandshakeMsgIn handshake) throws Exception {
+		this.locale = handshake.getLocale();
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), getClientId(), clientIp, handshake.getLocale(), customArgs);
+		final VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), getClientId(), clientIp, locale, customArgs);
 		SwingProcess swing = null;
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
@@ -634,7 +641,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	@Override
 	public void logWarningHistory() {
 		List<String> current = manager.getInstanceWarnings(getClientId());
-		if(current!=null){
+		if (current != null) {
 			current.addAll(manager.getInstanceWarningHistory(getClientId()));
 		}
 		warningHistoryLog = current;

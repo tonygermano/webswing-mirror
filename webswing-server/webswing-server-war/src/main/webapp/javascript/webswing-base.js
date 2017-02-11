@@ -255,7 +255,9 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 					api.print(encodeURIComponent(location.pathname + 'file?id=' + data.linkAction.src));
 				} else if (data.linkAction.action == 'file') {
 					api.download('file?id=' + data.linkAction.src);
-				}
+				} else if (data.linkAction.action == 'redirect') {
+                    window.location.href = data.linkAction.src;
+                }
 			}
 			if (data.moveAction != null) {
 				copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height, context);
