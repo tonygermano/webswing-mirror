@@ -1,15 +1,15 @@
 package org.webswing.server.services.security.extension.api;
 
 import org.webswing.server.services.security.extension.onetimeurl.OneTimeUrlSecurityExtension;
-import org.webswing.server.services.security.extension.permissionmap.PermissionMapSecurityExtension;
+import org.webswing.server.services.security.extension.accessmapping.AccessMappingSecurityExtension;
 
 public enum BuiltInModuleExtensions {
-	oneTimeUrl(OneTimeUrlSecurityExtension.class.getName()),
-	permissionMap(PermissionMapSecurityExtension.class.getName());
+	OneTimeUrl(OneTimeUrlSecurityExtension.class.getName()),
+	AccessMapping(AccessMappingSecurityExtension.class.getName());
 
 	private String className;
 
-	private BuiltInModuleExtensions(String className) {
+	BuiltInModuleExtensions(String className) {
 		this.className = className;
 	}
 

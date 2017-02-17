@@ -1,59 +1,89 @@
 package org.webswing.server.services.security.api;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * Actions or permissions defined within Webswing server to execute actions.
- * Each action defines default roles mappings for each permission. These mappings can be 
+ * Actions defined within Webswing server.
+ * Actions are grouped in AccessTypes. AccessTypes can be mapped to Roles. These mappings can be
  * customized by implementing {@link RolePermissionResolver} interface.
  */
 public enum WebswingAction {
 
 	//ADMIN CONSOLE
-	rest_getPaths(Role.admin),
-	rest_getAppInfo(Role.admin),
-	rest_getSession(Role.admin),
-	rest_sessionShutdown(Role.admin),
-	rest_sessionShutdownForce(Role.admin),
-	rest_getConfig(Role.admin),
-	rest_setConfig(Role.admin),
-	rest_startApp(Role.admin),
-	rest_stopApp(Role.admin),
-	rest_createApp(Role.admin),
-	rest_removeApp(Role.admin),
-	rest_viewLogs(Role.admin),
-	rest_getApps(Role.authenticated),
+	rest_getPaths(AccessType.admin, AccessType.support),
+	rest_getAppInfo(AccessType.admin, AccessType.support),
+	rest_getSession(AccessType.admin, AccessType.support),
+	rest_sessionShutdown(AccessType.admin, AccessType.support),
+	rest_sessionShutdownForce(AccessType.admin, AccessType.support),
+	rest_getConfig(AccessType.admin, AccessType.support),
+	rest_setConfig(AccessType.admin),
+	rest_startApp(AccessType.admin),
+	rest_stopApp(AccessType.admin),
+	rest_createApp(AccessType.admin),
+	rest_removeApp(AccessType.admin),
+	rest_viewLogs(AccessType.admin, AccessType.support),
+	rest_getApps(AccessType.admin, AccessType.support, AccessType.basic),
 	//Security 
-	rest_getOneTimePassword(Role.admin),
+	rest_getOneTimePassword(AccessType.admin, AccessType.support),
 	//websocket
-	websocket_connect(Role.authenticated),
-	websocket_startRecordingPlayback(Role.admin),
-	websocket_startSwingApplication(Role.authenticated),
-	websocket_startMirrorView(Role.admin),
+	websocket_connect(AccessType.admin, AccessType.support, AccessType.basic),
+	websocket_startRecordingPlayback(AccessType.admin, AccessType.support),
+	websocket_startSwingApplication(AccessType.admin, AccessType.support, AccessType.basic),
+	websocket_startMirrorView(AccessType.admin, AccessType.support),
 	//file handler
-	file_download(Role.authenticated),
-	file_upload(Role.authenticated);
+	file_download(AccessType.admin, AccessType.support, AccessType.basic),
+	file_upload(AccessType.admin, AccessType.support, AccessType.basic);
 
-	private String[] roles;
+	private AccessType[] accessTypes;
 
-	private WebswingAction(String... roles) {
+	WebswingAction(AccessType... accessTypes) {
 
-		this.roles = roles;
+		this.accessTypes = accessTypes;
 	}
 
-	private class Role {
-		private static final String authenticated = AbstractWebswingUser.ROLE_AUTHENTICATED;
-		private static final String admin = "admin";
+	public AccessType[] getAccessTypes() {
+		return accessTypes;
+	}
+
+	public enum AccessType {
+		basic,
+		support,
+		admin
 	}
 
 	public static class DefaultRolePermissionResolver implements RolePermissionResolver {
+		private static final Logger log = LoggerFactory.getLogger(DefaultRolePermissionResolver.class);
 
 		@Override
 		public String[] getRolesForPermission(String action) {
+			Set<String> roles = new HashSet<>();
 			try {
-				return WebswingAction.valueOf(action).roles;
+				for (AccessType at : WebswingAction.valueOf(action).accessTypes) {
+					roles.addAll(getRolesForAccessType(at));
+				}
 			} catch (Exception e) {
-				return new String[] { Role.admin };
+				log.error("Error resolving roles for action '" + action + "' falling back to admin");
+				roles = getRolesForAccessType(AccessType.admin);
 			}
+			return roles.toArray(new String[roles.size()]);
 		}
 
+		public static Set<String> getRolesForAccessType(AccessType accessType) {
+			switch (accessType) {
+			case admin:
+				return Collections.singleton(AccessType.admin.name());
+			case support:
+				return Collections.singleton(AccessType.support.name());
+			case basic:
+				return Collections.singleton(AbstractWebswingUser.ROLE_AUTHENTICATED);
+			default:
+				return Collections.emptySet();
+			}
+		}
 	}
 }
