@@ -1,28 +1,5 @@
 package org.webswing.services.impl;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import javax.jms.Connection;
-import javax.jms.ExceptionListener;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
-import javax.jms.Queue;
-import javax.jms.Session;
-
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.webswing.Constants;
 import org.webswing.ext.services.ServerConnectionService;
@@ -35,6 +12,15 @@ import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+
+import javax.jms.*;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * @author Viktor_Meszaros This class is needed to achieve classpath isolation for swing application, all functionality dependent on external libs is implemented here.
@@ -52,6 +38,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private long lastMessageTimestamp = System.currentTimeMillis();
 	private Runnable watchdog;
 	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
+	private ExecutorService jmsSender = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance());
 
 	private Map<String, Object> syncCallResposeMap = new ConcurrentHashMap<String, Object>();
 	private boolean closed;
@@ -150,15 +137,34 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		}
 	}
 
+	private void sendJmsMessage(final Serializable o) throws JMSException {
+		try {
+			jmsSender.submit(new Callable<Object>() {
+
+				@Override
+				public Object call() throws Exception {
+					producer.send(session.createObjectMessage(o));
+					return null;
+				}
+			}).get();
+		} catch (InterruptedException e) {
+		} catch (ExecutionException e) {
+			if (e.getCause() instanceof JMSException) {
+				throw (JMSException) e.getCause();
+			} else {
+				Logger.error("ServerConnectionService.sendJmsMessage", e);
+				throw new JMSException(e.getMessage());
+			}
+		}
+	}
+
 	@Override
 	public void sendObject(Serializable o) {
-		synchronized (this) {
-			if (!closed) {
-				try {
-					producer.send(session.createObjectMessage(o));
-				} catch (JMSException e) {
-					Logger.error("ServerConnectionService.sendJsonObject", e);
-				}
+		if (!closed) {
+			try {
+				sendJmsMessage(o);
+			} catch (JMSException e) {
+				Logger.error("ServerConnectionService.sendJsonObject", e);
 			}
 		}
 	}
@@ -169,9 +175,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			try {
 				Object syncObject = new Object();
 				syncCallResposeMap.put(correlationId, syncObject);
-				synchronized (this) {
-					producer.send(session.createObjectMessage(o));
-				}
+				sendJmsMessage(o);
 				Object result = null;
 				try {
 					synchronized (syncObject) {

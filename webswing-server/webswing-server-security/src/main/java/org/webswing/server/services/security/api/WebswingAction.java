@@ -14,6 +14,7 @@ import java.util.Set;
  */
 public enum WebswingAction {
 
+	master_admin_access(AccessType.admin),
 	//ADMIN CONSOLE
 	rest_getPaths(AccessType.admin, AccessType.support),
 	rest_getAppInfo(AccessType.admin, AccessType.support),

@@ -1,43 +1,11 @@
 package org.webswing.dispatch;
 
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.Window;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-
 import org.webswing.Constants;
 import org.webswing.model.internal.ExitMsgInternal;
 import org.webswing.model.internal.OpenFileResultMsgInternal;
-import org.webswing.model.s2c.AppFrameMsgOut;
-import org.webswing.model.s2c.CopyEventMsg;
-import org.webswing.model.s2c.CursorChangeEventMsg;
-import org.webswing.model.s2c.FileDialogEventMsg;
+import org.webswing.model.s2c.*;
 import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
-import org.webswing.model.s2c.LinkActionMsg;
 import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
-import org.webswing.model.s2c.WindowMoveActionMsg;
-import org.webswing.model.s2c.WindowMsg;
 import org.webswing.toolkit.WebCursor;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
@@ -47,6 +15,22 @@ import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.net.URI;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class WebPaintDispatcher {
 
@@ -119,7 +103,7 @@ public class WebPaintDispatcher {
 					}
 					json.setSendTimestamp("" + System.currentTimeMillis());
 					Services.getConnectionService().sendObject(json);
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					Logger.error("contentSender:error", e);
 				}
 			}
@@ -411,11 +395,11 @@ public class WebPaintDispatcher {
 				fdEvent.setAllowDelete(false);
 				fdEvent.setAllowDownload(false);
 				fdEvent.setAllowUpload(false);
-				if(FileDialogEventType.AutoUpload == fileChooserEventType){
-						String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
-						File timestampFoleder = new File(path, "" + System.currentTimeMillis());
-						timestampFoleder.mkdirs();
-						fileChooserDialog.setCurrentDirectory(timestampFoleder);
+				if (FileDialogEventType.AutoUpload == fileChooserEventType) {
+					String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
+					File timestampFoleder = new File(path, "" + System.currentTimeMillis());
+					timestampFoleder.mkdirs();
+					fileChooserDialog.setCurrentDirectory(timestampFoleder);
 				}
 				Window d = SwingUtilities.getWindowAncestor(fileChooserDialog);
 				d.setBounds(0, 0, 1, 1);

@@ -6,6 +6,7 @@ import org.apache.shiro.subject.Subject;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.services.security.WebswingPrincipal;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
 public class SecurityUtil {
@@ -29,11 +30,16 @@ public class SecurityUtil {
 		if (subject != null && securedPath != null) {
 			PrincipalCollection currentPrincipals = subject.getPrincipals();
 			if (currentPrincipals != null && subject.isAuthenticated()) {
+				AbstractWebswingUser masteradmin = null;
 				for (WebswingPrincipal webswingPrincipal : currentPrincipals.byType(WebswingPrincipal.class)) {
+					if ("".equals(webswingPrincipal.getSecuredPath()) && webswingPrincipal.isPermitted(WebswingAction.master_admin_access.name())) {
+						masteradmin = webswingPrincipal.getUser();
+					}
 					if (securedPath.equals(webswingPrincipal.getSecuredPath())) {
 						return webswingPrincipal.getUser();
 					}
 				}
+				return masteradmin;
 			}
 		}
 		return null;
