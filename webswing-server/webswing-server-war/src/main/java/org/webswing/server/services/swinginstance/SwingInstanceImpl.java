@@ -373,6 +373,14 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		manager.notifySwingClose(this);
 	}
 
+	@Override
+	public void startRecording() {
+		if(sessionRecorder==null){
+			sessionRecorder= new SessionRecorder(this);
+			sendToSwing(webConnection, new SimpleEventMsgIn(SimpleEventType.repaint));
+		}
+	}
+
 	public SwingSession toSwingSession(boolean stats) {
 		SwingSession session = new SwingSession();
 		session.setId(getInstanceId());

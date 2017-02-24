@@ -327,6 +327,21 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		return null;
 	}
 
+	@GET
+	@Path("/rest/record")
+	public SwingSession startRecording(@PathParam("") String id) throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_startRecording);
+		if (id.startsWith("/")) {
+			id = id.substring(1);
+		}
+		SwingInstance instance = runningInstances.findByInstanceId(id);
+		if (instance != null) {
+			instance.startRecording();
+			return instance.toSwingSession(true);
+		}
+		return null;
+	}
+
 	@DELETE
 	@Path("/rest/session")
 	public void shutdown(@PathParam("") String id, @QueryParam("force") String forceKill) throws WsException {

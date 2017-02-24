@@ -1,13 +1,29 @@
 package org.webswing.dispatch;
 
+import netscape.javascript.JSObject;
+import org.webswing.Constants;
+import org.webswing.model.MsgIn;
+import org.webswing.model.c2s.*;
+import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
+import org.webswing.model.internal.OpenFileResultMsgInternal;
+import org.webswing.model.jslink.JSObjectMsg;
+import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
+import org.webswing.toolkit.WebClipboard;
+import org.webswing.toolkit.WebClipboardTransferable;
+import org.webswing.toolkit.WebDragSourceContextPeer;
+import org.webswing.toolkit.extra.DndEventHandler;
+import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.toolkit.jslink.WebJSObject;
+import org.webswing.toolkit.util.DeamonThreadFactory;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
+import sun.awt.CausedFocusEvent;
+
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 import java.applet.Applet;
-import java.awt.AWTEvent;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -22,37 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
-
-import org.webswing.Constants;
-import org.webswing.model.MsgIn;
-import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
-import org.webswing.model.c2s.CopyEventMsgIn;
-import org.webswing.model.c2s.KeyboardEventMsgIn;
-import org.webswing.model.c2s.MouseEventMsgIn;
-import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
-import org.webswing.model.c2s.PasteEventMsgIn;
-import org.webswing.model.c2s.SimpleEventMsgIn;
-import org.webswing.model.c2s.UploadEventMsgIn;
-import org.webswing.model.c2s.FilesSelectedEventMsgIn;
-import org.webswing.model.internal.OpenFileResultMsgInternal;
-import org.webswing.model.jslink.JSObjectMsg;
-import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
-import org.webswing.toolkit.WebClipboard;
-import org.webswing.toolkit.WebClipboardTransferable;
-import org.webswing.toolkit.WebDragSourceContextPeer;
-import org.webswing.toolkit.extra.DndEventHandler;
-import org.webswing.toolkit.extra.WindowManager;
-import org.webswing.toolkit.jslink.WebJSObject;
-import org.webswing.toolkit.util.DeamonThreadFactory;
-import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Services;
-import org.webswing.toolkit.util.Util;
-
-import netscape.javascript.JSObject;
-import sun.awt.CausedFocusEvent;
 
 @SuppressWarnings("restriction")
 public class WebEventDispatcher {
@@ -126,7 +111,7 @@ public class WebEventDispatcher {
 							}
 						}
 					}
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					Logger.error("Failed to process event.", e);
 				}
 			}

@@ -41,4 +41,5 @@ public interface SwingInstance {
 
 	void logWarningHistory();
 
+	void startRecording();
 }

@@ -8,7 +8,7 @@
 </div>
 <ws-app-view path="vm.path"></ws-app-view>
 <div>
-	<h2 class="sub-header">Running sessions 
+	<h2 class="sub-header">Running sessions
 	    <div class="ws-update pull-right" ng-click="vm.refresh()">
 	        <span ng-class="{'glyphicon':true,'glyphicon-repeat':vm.timer != null,'glyphicon-refresh':vm.timer == null} "> </span>
 	        {{vm.lastUpdated| date:'h:mm:ss'}}
@@ -34,26 +34,26 @@
 	                	<a ng-click="vm.sortBy('connected')">Client status</a>
 	                </th>
 	                <th>
-	                	<a ng-click="vm.sortByMetrics()">Metrics</a> 
+	                	<a ng-click="vm.sortByMetrics()">Metrics</a>
 	                	<small>(
-	                		<a ng-click="vm.sortByMetrics('MIN')">min</a> | 
-	                		<a ng-click="vm.sortByMetrics('AVG')">avg</a> | 
+	                		<a ng-click="vm.sortByMetrics('MIN')">min</a> |
+	                		<a ng-click="vm.sortByMetrics('AVG')">avg</a> |
 	                		<a ng-click="vm.sortByMetrics('MAX')">max</a>)
 	                	</small>
 	                </th>
 	                <th>
-						<a ng-click="vm.sortByBandwidth()">Bandwidth</a> 
+						<a ng-click="vm.sortByBandwidth()">Bandwidth</a>
 	                	<small>(
-	                		<a ng-click="vm.sortByBandwidth('MIN')">min</a> | 
-	                		<a ng-click="vm.sortByBandwidth('AVG')">avg</a> | 
+	                		<a ng-click="vm.sortByBandwidth('MIN')">min</a> |
+	                		<a ng-click="vm.sortByBandwidth('AVG')">avg</a> |
 	                		<a ng-click="vm.sortByBandwidth('MAX')">max</a>)
 	                	</small>
 					</th>
 	                <th>
-						<a ng-click="vm.sortByLatency()">Latency</a> 
+						<a ng-click="vm.sortByLatency()">Latency</a>
 	                	<small>(
-	                		<a ng-click="vm.sortByLatency('MIN')">min</a> | 
-	                		<a ng-click="vm.sortByLatency('AVG')">avg</a> | 
+	                		<a ng-click="vm.sortByLatency('MIN')">min</a> |
+	                		<a ng-click="vm.sortByLatency('AVG')">avg</a> |
 	                		<a ng-click="vm.sortByLatency('MAX')">max</a>)
 	                	</small>
 					</th>
@@ -85,12 +85,17 @@
 	                            <span class="label label-danger" ui-jq="tooltip" title="Disconnected at {{session.disconnectedSince| date:'dd MMM h:mm:ss'}}">Disconnected</span>
 	                        </div>
 	                    </div>
-	                    <div ng-if="session.recording" >
-	                        <span class="glyphicon glyphicon-facetime-video" ui-jq="tooltip" title="Recording to {{session.recordingFile}}"></span> Recording...
+	                    <div ng-if="session.recorded" >
+	                        <span class="label label-info " ui-jq="tooltip" title="Recording to {{session.recordingFile}}"><span class="glyphicon glyphicon-record"></span> Recording</span>
 	                    </div>
                         <div ng-if="session.warnings!=null || session.warningHistory!=null" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
 				  			<span ng-class="{'label':true, 'label-warning':session.warnings != null, 'label-default':session.warnings == null}"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{session.warnings.length}} Warnings </span>
 						</div>
+                        <div ng-if="!session.recorded" style="margin-top:3px">
+                            <button type="button" class="btn btn-xs btn-default" ng-click="vm.record(session)">
+                                <span class="glyphicon glyphicon-record"></span> Record Session
+                            </button>
+                        </div>
 	                </td>
 	                <td>
                	        <progressbar  animate="false" max="session.metrics.memoryAllocated" value="session.metrics.memoryUsed"><span style="color:black; white-space:nowrap;">{{'MEM: '+(session.metrics.memoryUsed|number:0)+'MB   '}}<small>({{session.metrics['memoryUsed.MIN']|number:0}}|{{session.metrics['memoryUsed.AVG']|number:0}}|{{session.metrics['memoryUsed.MAX']|number:0}})</small></span></progressbar>

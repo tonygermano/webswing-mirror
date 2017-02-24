@@ -7,6 +7,7 @@
 			vm.session = {};
 			vm.lastUpdated = null;
 			vm.back = back;
+			vm.record = record;
 			vm.refresh = refresh;
 			vm.kill = kill;
 			vm.forceKill = forceKill;
@@ -37,6 +38,7 @@
 					vm.lastUpdated = new Date();
 				});
 			}
+
 			function refresh() {
 				return load().then(function() {
 					vm.timer = $timeout(refresh, 2000);
@@ -121,6 +123,12 @@
 					back();
 				});
 			}
+
+			function record(){
+                return sessionsRestService.recordSession(vm.path, vm.sessionId).then(function() {
+                    refresh();
+                });
+            }
 
 			function back() {
 				$location.path('/dashboard/overview/' + vm.path);

@@ -6,6 +6,8 @@
 	}
 	
 	&-progress{
-		animation: none;
+		&-bar {
+			animation: none;
+		}
 	}
 }

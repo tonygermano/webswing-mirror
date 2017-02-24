@@ -17,6 +17,13 @@ public class SimpleEventMsgIn implements MsgIn {
 		cancelFileSelection;
 	}
 
+	public SimpleEventMsgIn() {
+	}
+
+	public SimpleEventMsgIn(SimpleEventType type) {
+		this.type = type;
+	}
+
 	private SimpleEventType type;
 
 	public SimpleEventType getType() {

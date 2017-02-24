@@ -4,6 +4,7 @@
             return {
                 getSessions: getSessions,
                 getSession: getSession,
+                recordSession: recordSession,
                 killSession: killSession,
                 forceKillSession: forceKillSession
             };
@@ -13,53 +14,68 @@
                 function success(data) {
                     return data.data;
                 }
+
                 function failed(data) {
                     return errorHandler.handleRestError('load swing sessions', data, true);
                 }
             }
 
-            function getSession(path,id) {
+            function getSession(path, id) {
                 return $http.get(toPath(path) + '/rest/session/' + id).then(success, failed);
                 function success(data) {
                     return data.data;
                 }
+
                 function failed(data) {
                     return errorHandler.handleRestError('load swing session ' + id, data, true);
                 }
             }
 
+            function recordSession(path, id) {
+                return $http.get(toPath(path) + '/rest/record/' + id).then(success, failed);
+                function success(data) {
+                    return data.data;
+                }
+
+                function failed(data) {
+                    return errorHandler.handleRestError('start session recording', data, true);
+                }
+            }
+
             function forceKillSession(path, id) {
-                return $http.delete(toPath(path) + '/rest/session/' + id +'?force=true').then(success, failed);
+                return $http.delete(toPath(path) + '/rest/session/' + id + '?force=true').then(success, failed);
                 function success(data) {
                     messageService.info('Swing application process has been forcefully terminated.');
                 }
+
                 function failed(data) {
                     return errorHandler.handleRestError('Swing application process shutdown', data, true);
                 }
             }
-            
+
             function killSession(path, id) {
-                return $http.delete(toPath(path) + '/rest/session/' + id ).then(success, failed);
+                return $http.delete(toPath(path) + '/rest/session/' + id).then(success, failed);
                 function success(data) {
                     messageService.info('Swing application signalled to exit.');
                 }
+
                 function failed(data) {
                     return errorHandler.handleRestError('Swing application shutdown', data, true);
                 }
             }
-            
-			function toPath(path) {
-				if (path.substr(0, 4) === 'http') {
-					return path;
-				}
-				if (path.substr(0, 1) !== '/') {
-					path = '/' + path
-				}
-				if (path.length === 1) {
-					path = '';
-				}
-				return path;
-			}
+
+            function toPath(path) {
+                if (path.substr(0, 4) === 'http') {
+                    return path;
+                }
+                if (path.substr(0, 1) !== '/') {
+                    path = '/' + path
+                }
+                if (path.length === 1) {
+                    path = '';
+                }
+                return path;
+            }
         }
 
         sessionsRestService.$inject = ['baseUrl', '$http', 'errorHandler', 'messageService'];

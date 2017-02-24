@@ -6,6 +6,7 @@
 			vm.sessions = [];
 			vm.closedSessions = [];
 			vm.view = view;
+			vm.record = record;
 			vm.lastUpdated = null;
 			vm.refresh = refresh;
 			vm.timer = undefined;
@@ -146,6 +147,12 @@
 			function view(session) {
 				$location.search('id', session.id);
 				$location.path('/dashboard/session/' + vm.path);
+			}
+
+            function record(session){
+                return sessionsRestService.recordSession(vm.path, session.id).then(function() {
+                    refresh();
+                });
 			}
 
 			function play(session) {
