@@ -60,7 +60,8 @@ public interface Constants {
 	public static final String DEFAULT_WELCOME_PAGE = "webswing.defaultWelcomePage";
 	public static final String FILE_SERVLET_WAIT_TIMEOUT = "webswing.fileServletWaitTimeout";
 	public static final String REVERSE_PROXY_CONTEXT_PATH = "webswing.proxyContextPath";
-	
+	public static final String HTTPS_ONLY = "webswing.httpsOnly";
+
 
 	// swing start related properties
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";
@@ -86,8 +87,5 @@ public interface Constants {
 	public static final String EXTENSTION_INITIALIZER = "webswing.extensionInitializer";
 	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
 	public static final String CONFIG_PROVIDER = "webswing.configProvider";
-
-
-
 
 }

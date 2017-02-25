@@ -13,6 +13,7 @@ public class WebswingWebSessionManager extends DefaultWebSessionManager {
 		String proxypath = System.getProperty(Constants.REVERSE_PROXY_CONTEXT_PATH, "").replaceAll("[^A-Za-z0-9]", "_");
 		Cookie cookie = new SimpleCookie(WEBSWING_SESSION_ID + proxypath);
 		cookie.setHttpOnly(true); //more secure, protects against XSS attacks
+		cookie.setSecure(Boolean.getBoolean(Constants.HTTPS_ONLY));
 		setSessionIdCookie(cookie);
 	}
 }
