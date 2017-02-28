@@ -39,7 +39,7 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
                 url: api.cfg.connectionUrl + 'async/swing',
                 contentType: "application/json",
                 // logLevel : 'debug',
-                transport: 'long-polling',
+                transport: 'websocket',
                 trackMessageLength: true,
                 reconnectInterval: 5000,
                 fallbackTransport: 'long-polling',
