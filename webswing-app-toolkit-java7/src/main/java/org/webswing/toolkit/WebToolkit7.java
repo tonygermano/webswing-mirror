@@ -27,10 +27,6 @@ public class WebToolkit7 extends WebToolkit {
         });
     }
 
-    public FramePeer createLightweightFrame(LightweightFrame lightweightFrame) throws HeadlessException {
-        return null;
-    }
-
     @Override
     public KeyboardFocusManagerPeer getKeyboardFocusManagerPeer() throws HeadlessException {
         if (kfmp == null) {
