@@ -1,16 +1,5 @@
 package org.webswing.server.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -22,6 +11,16 @@ import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.util.WebswingObjectMapper;
 import org.webswing.server.services.security.modules.AbstractSecurityModule;
 import org.webswing.server.services.websocket.WebSocketConnection;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ServerUtil {
 	private static final Logger log = LoggerFactory.getLogger(ServerUtil.class);
@@ -89,6 +88,9 @@ public class ServerUtil {
 	public static String getClientOs(WebSocketConnection r) {
 		if (r != null) {
 			String userAgent = r.getRequest().getHeader("User-Agent");
+			if (userAgent == null) {
+				return "Unknown";
+			}
 			if (userAgent.toLowerCase().indexOf("windows") >= 0) {
 				return "Windows";
 			} else if (userAgent.toLowerCase().indexOf("mac") >= 0) {
@@ -208,9 +210,8 @@ public class ServerUtil {
 	public static String getContextPath(ServletContext ctx) {
 		return AbstractSecurityModule.getContextPath(ctx);
 	}
-	
-	
-	public static void sendHttpRedirect(HttpServletRequest req, HttpServletResponse resp, String relativeUrl) throws IOException{
+
+	public static void sendHttpRedirect(HttpServletRequest req, HttpServletResponse resp, String relativeUrl) throws IOException {
 		AbstractSecurityModule.sendHttpRedirect(req, resp, relativeUrl);
 	}
 }

@@ -1,14 +1,16 @@
 package org.webswing.toolkit;
 
+import org.webswing.toolkit.ge.WebGraphicsEnvironment;
+import sun.awt.LightweightFrame;
+import sun.awt.datatransfer.DataTransferer;
+import sun.awt.image.SurfaceManager;
+import sun.java2d.SurfaceData;
+
 import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
+import java.awt.peer.FramePeer;
 import java.awt.peer.KeyboardFocusManagerPeer;
-
-import org.webswing.toolkit.ge.WebGraphicsEnvironment;
-
-import sun.awt.image.SurfaceManager;
-import sun.java2d.SurfaceData;
 
 @SuppressWarnings("restriction")
 public class WebToolkit7 extends WebToolkit {
@@ -23,6 +25,10 @@ public class WebToolkit7 extends WebToolkit {
                 ((WebGraphicsEnvironment) GraphicsEnvironment.getLocalGraphicsEnvironment()).displayChanged();
             }
         });
+    }
+
+    public FramePeer createLightweightFrame(LightweightFrame lightweightFrame) throws HeadlessException {
+        return null;
     }
 
     @Override
@@ -49,4 +55,7 @@ public class WebToolkit7 extends WebToolkit {
         return mgr.getPrimarySurfaceData();
     }
 
+    public DataTransferer getDataTransferer() {
+        return null;
+    }
 }

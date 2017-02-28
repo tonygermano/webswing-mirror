@@ -6,6 +6,7 @@ import com.sun.swingset3.utilities.RoundedPanel;
 import com.sun.swingset3.utilities.Utilities;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
+import org.webswing.toolkit.api.WebswingUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,9 +52,11 @@ public class JsLinkDemo extends JPanel {
 	public static class UrlChanageService {
 
 		public UrlChanageService() {
-			JSObject global = JSObject.getWindow(null);
-			global.setMember("UrlChanageService", this);//expose this object to javascript (window.UrlChanageService)
-			global.eval(loadContent("resources/urlChangeListener.js"));//register javascript listener to url change
+			if (WebswingUtil.isWebswing()) {
+				JSObject global = JSObject.getWindow(null);
+				global.setMember("UrlChanageService", this);//expose this object to javascript (window.UrlChanageService)
+				global.eval(loadContent("resources/urlChangeListener.js"));//register javascript listener to url change
+			}
 		}
 
 		//invoked from swing application to force url change in browser

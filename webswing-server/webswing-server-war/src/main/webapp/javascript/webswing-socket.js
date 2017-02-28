@@ -11,12 +11,14 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
             cfg: 'webswing.config',
             processMessage: 'base.processMessage',
             showDialog: 'dialog.show',
+            showBar: 'dialog.showBar',
             hideDialog: 'dialog.hide',
             currentDialog: 'dialog.current',
             stoppedDialog: 'dialog.content.stoppedDialog',
             disconnectedDialog: 'dialog.content.disconnectedDialog',
             connectionErrorDialog: 'dialog.content.connectionErrorDialog',
-            initializingDialog: 'dialog.content.initializingDialog'
+            initializingDialog: 'dialog.content.initializingDialog',
+            longPollingWarningDialog: 'dialog.content.longPollingWarningDialog'
         };
         module.provides = {
             connect: connect,
@@ -37,7 +39,7 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
                 url: api.cfg.connectionUrl + 'async/swing',
                 contentType: "application/json",
                 // logLevel : 'debug',
-                transport: 'websocket',
+                transport: 'long-polling',
                 trackMessageLength: true,
                 reconnectInterval: 5000,
                 fallbackTransport: 'long-polling',
@@ -70,12 +72,16 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
             }
 
             request.onOpen = function (response) {
-                if (response.transport !== 'websocket' && binary) {
-                    console.error('Webswing: Binary encoding not supported for ' + response.transport + ' transport. Falling back to json encoding.');
-                    api.cfg.binarySocket = false;
-                    binary = false;
-                    dispose();
-                    connect();
+                if(response.transport !== 'websocket'){
+                    if (binary) {
+                        console.error('Webswing: Binary encoding not supported for ' + response.transport + ' transport. Falling back to json encoding.');
+                        api.cfg.binarySocket = false;
+                        binary = false;
+                        dispose();
+                        connect();
+                    }else{
+                        api.showBar(api.longPollingWarningDialog);
+                    }
                 }
             };
 

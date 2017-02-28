@@ -8,6 +8,7 @@ org.webswing.demo.dnd.BasicDnDDemo
 org.webswing.demo.dnd.DragPictureDemo
 org.webswing.demo.dnd.ClipboardDemo
 org.webswing.demo.window.WindowDecorationDemo
+org.webswing.demo.javafx.JavaFxDemo
 com.sun.swingset3.demos.frame.FrameDemo
 com.sun.swingset3.demos.dialog.DialogDemo
 com.sun.swingset3.demos.window.WindowDemo

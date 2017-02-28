@@ -22,6 +22,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 			getLocale : 'identity.getLocale',
 			showDialog : 'dialog.show',
 			hideDialog : 'dialog.hide',
+			hideDialogBar : 'dialog.hideBar',
 			startingDialog : 'dialog.content.startingDialog',
 			stoppedDialog : 'dialog.content.stoppedDialog',
 			unauthorizedAccess : 'dialog.content.unauthorizedAccess',
@@ -165,6 +166,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 			api.disposeInput();
 			api.disposeTouch();
 			api.closeFileDialog();
+			api.hideDialogBar();
 			window.removeEventListener('beforeunload', beforeUnloadEventHandler);
 			directDraw.dispose();
 		}
