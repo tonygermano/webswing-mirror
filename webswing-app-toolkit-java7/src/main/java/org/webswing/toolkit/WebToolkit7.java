@@ -1,7 +1,6 @@
 package org.webswing.toolkit;
 
 import org.webswing.toolkit.ge.WebGraphicsEnvironment;
-import sun.awt.LightweightFrame;
 import sun.awt.datatransfer.DataTransferer;
 import sun.awt.image.SurfaceManager;
 import sun.java2d.SurfaceData;
@@ -9,7 +8,6 @@ import sun.java2d.SurfaceData;
 import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
-import java.awt.peer.FramePeer;
 import java.awt.peer.KeyboardFocusManagerPeer;
 
 @SuppressWarnings("restriction")
