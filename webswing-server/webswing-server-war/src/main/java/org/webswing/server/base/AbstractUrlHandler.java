@@ -1,20 +1,5 @@
 package org.webswing.server.base;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +12,20 @@ import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class AbstractUrlHandler implements UrlHandler, SecurableService {
 	private static final Logger log = LoggerFactory.getLogger(AbstractUrlHandler.class);
@@ -246,15 +245,17 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 	private Method findRestHandlerMethod(String httpMethod, String path2) {
 		Class<? extends Annotation> methodAnnotation = httpMethod2RestAnnotation(httpMethod);
 		Method match = null;
-		int extent = path2.length();
-		for (Method method : this.getClass().getDeclaredMethods()) {
-			if (method.getAnnotation(methodAnnotation) != null) {
-				Path pathAnnotation;
-				if ((pathAnnotation = method.getAnnotation(Path.class)) != null) {
-					if (isSubPath(pathAnnotation.value(), path2)) {
-						if (path2.length() - pathAnnotation.value().length() < extent) {
-							match = method;
-							extent = path2.length() - pathAnnotation.value().length();
+		if (methodAnnotation != null) {
+			int extent = path2.length();
+			for (Method method : this.getClass().getDeclaredMethods()) {
+				if (method.getAnnotation(methodAnnotation) != null) {
+					Path pathAnnotation;
+					if ((pathAnnotation = method.getAnnotation(Path.class)) != null) {
+						if (isSubPath(pathAnnotation.value(), path2)) {
+							if (path2.length() - pathAnnotation.value().length() < extent) {
+								match = method;
+								extent = path2.length() - pathAnnotation.value().length();
+							}
 						}
 					}
 				}
