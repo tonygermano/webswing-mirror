@@ -160,4 +160,35 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<!-- =========================================DEVELOPMENT LIVE UPDATE PROFILE=========================== -->
+		<profile>
+			<id>update</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.7</version>
+						<executions>
+							<execution>
+								<id>copy-to-running-jetty</id>
+								<phase>package</phase>
+								<configuration>
+									<target>
+										<copy todir="${basedir}/../../webswing-server/webswing-server-war/target/demo/demo/SwingSet3">
+											<fileset dir="${build.directory}" includes="*.jar"/>
+											<fileset dir="${build.directory}" includes="lib/*.jar"/>
+										</copy>
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

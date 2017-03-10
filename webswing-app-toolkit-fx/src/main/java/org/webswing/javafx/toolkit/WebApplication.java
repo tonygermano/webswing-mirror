@@ -66,8 +66,8 @@ public class WebApplication extends Application {
 	@Override
 	protected void finishTerminating() {
 		super.finishTerminating();
-		for (Window w : Window.getWindows()) {
-			if (!w.isClosed()) {
+		for (java.awt.Window w : java.awt.Window.getWindows()) {
+			if (w.isShowing()) {
 				return;
 			}
 		}

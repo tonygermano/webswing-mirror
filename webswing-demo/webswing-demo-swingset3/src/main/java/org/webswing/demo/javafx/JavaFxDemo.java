@@ -1,6 +1,7 @@
 package org.webswing.demo.javafx;
 
 import com.sun.swingset3.DemoProperties;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
@@ -21,6 +22,7 @@ public class JavaFxDemo extends JPanel {
 		final JFXPanel fxPanel = new JFXPanel();
 		add(fxPanel);
 		initFX(fxPanel);
+		Platform.setImplicitExit(false);
 	}
 	private static void initFX(JFXPanel fxPanel) {
 		// This method is invoked on the JavaFX thread
