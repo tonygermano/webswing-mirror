@@ -39,6 +39,7 @@ public class WebFxView extends View {
 
 		};
 		canvas.setSize(new Dimension(1, 1));
+		canvas.setFocusTraversalKeysEnabled(false);
 		notifyResize(canvas.getSize().width, canvas.getSize().height);
 		canvas.addComponentListener(new ComponentAdapter() {
 			@Override

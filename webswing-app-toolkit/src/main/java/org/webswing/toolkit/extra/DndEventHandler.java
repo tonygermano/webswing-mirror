@@ -1,12 +1,14 @@
 package org.webswing.toolkit.extra;
 
 import java.awt.AWTEvent;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Window;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
 import org.webswing.toolkit.WebDragSourceContextPeer;
@@ -25,6 +27,7 @@ public class DndEventHandler {
 	private boolean dropped;
 	private boolean finished = true;
 	private static Cursor cursor = Cursor.getDefaultCursor();
+	private Component lastDragOverComponent;
 
 	public void processMouseEvent(Window w, AWTEvent e) {
 		if (e instanceof MouseEvent) {
@@ -39,9 +42,13 @@ public class DndEventHandler {
 				//lastDropTargetAction = dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
 				dragEnd(w, e, lastDropTargetAction != 0, lastDropTargetAction);
 			} else if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
-				dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
-				updateCursor();
-				Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(cursor);
+				Component currentComp = SwingUtilities.getDeepestComponentAt(w, me.getX(), me.getY());
+				if(currentComp!=lastDragOverComponent) {
+					lastDragOverComponent=currentComp;
+					dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
+					updateCursor();
+					Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(cursor);
+				}
 			}
 		} else if (e instanceof KeyEvent) {
 			if (e.getID() == KeyEvent.KEY_PRESSED && ((KeyEvent) e).getKeyCode() == KeyEvent.VK_ESCAPE) {
