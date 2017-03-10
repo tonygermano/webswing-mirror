@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs", "allowUpload", "allowDelete", "allowDownload",
-		"allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs", "allowUpload", "allowDelete",
+		"allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
@@ -44,6 +44,10 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.General, label = "DirectDraw Rendering", description = "DirectDraw rendering mode uses canvas instructions to render the swing application instead of server-rendered png images. DirectDraw improves performance but is not recomended for applications with lot of graphics content.")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isDirectdraw();
+
+	@ConfigField(tab = ConfigGroup.General, label = "JavaFx Support", description = "!Only for Java8! Enables native or embeded JavaFx framework support.")
+	@ConfigFieldDefaultValueBoolean(false)
+	public boolean isJavaFx();
 
 	@ConfigField(tab = ConfigGroup.General, label = "Enable Debug Mode", description = "Enables remote debug for this application. To start the application in debug mode use '?debugPort=8000' url param.")
 	@ConfigFieldDefaultValueBoolean(false)

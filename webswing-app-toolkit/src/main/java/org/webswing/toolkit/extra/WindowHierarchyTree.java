@@ -28,6 +28,9 @@ public class WindowHierarchyTree {
 	private LinkedList<WindowHierarchyNode> zOrder = new LinkedList<WindowHierarchyNode>();
 
 	protected void bringToFront(Window w) {
+		if (w != null && !w.isEnabled()) {
+			return;
+		}
 		if (lookup.containsKey(w)) {
 			WindowHierarchyNode node = lookup.get(w);
 			if (node.getParent() == null) {

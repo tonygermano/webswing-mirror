@@ -91,7 +91,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>webswing-server</finalName>
+		<finalName>${webswing-war-name}</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -208,6 +208,12 @@
 											<fileset dir="${project.basedir}/../../webswing-demo/webswing-demo-nbplatform/target">
 												<include name="lib/*.jar" />
 												<include name="nbplatform.jar" />
+											</fileset>
+										</copy>
+										<copy todir="${project.build.directory}/demo/demo/ensemble8">
+											<fileset dir="${project.basedir}/../../webswing-demo/webswing-demo-ensemble8/target">
+												<include name="lib/*.jar" />
+												<include name="Ensemble8.jar" />
 											</fileset>
 										</copy>
 									</target>

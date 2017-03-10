@@ -1,5 +1,10 @@
 package org.webswing.toolkit;
 
+import org.webswing.Constants;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
+
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.datatransfer.Clipboard;
@@ -11,11 +16,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.webswing.Constants;
-import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Services;
-import org.webswing.toolkit.util.Util;
 
 public class WebClipboard extends Clipboard {
 	private static DataFlavor htmlDf;
@@ -30,7 +30,7 @@ public class WebClipboard extends Clipboard {
 	public final static DataFlavor HTML_FLAVOR = htmlDf;
 
 	private final boolean isSystemClipboard;
-	private final ClipboardOwner owner = new ClipboardOwner() {
+	public final ClipboardOwner owner = new ClipboardOwner() {
 
 		@Override
 		public void lostOwnership(Clipboard clipboard, Transferable contents) {

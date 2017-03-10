@@ -60,6 +60,14 @@
 				<include>nbplatform.jar</include>
 			</includes>
 		</fileSet>
+		<fileSet>
+			<directory>../webswing-demo/webswing-demo-ensemble8/target</directory>
+			<outputDirectory>/demo/ensemble8</outputDirectory>
+			<includes>
+				<include>lib/*.jar</include>
+				<include>Ensemble8.jar</include>
+			</includes>
+		</fileSet>
 	</fileSets>
 	<files>
 		<file>

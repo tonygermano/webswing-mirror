@@ -23,7 +23,7 @@ public class EmbededSecurityModule extends AbstractUserPasswordSecurityModule<Em
 		super.init();
 		for (EmbededUserEntry u : getConfig().getUsers()) {
 			String user = getConfig().getContext().replaceVariables(u.getUsername());
-			String password = getConfig().getContext().replaceVariables(u.getUsername());
+			String password = getConfig().getContext().replaceVariables(u.getPassword());
 			List<String> roles = new ArrayList<>();
 			for (String r : u.getRoles()) {
 				roles.add(getConfig().getContext().replaceVariables(r));

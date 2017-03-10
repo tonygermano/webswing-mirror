@@ -52,7 +52,7 @@ public class WebEventDispatcher {
 	//these keycodes are assigned to different keys in browser  
 	private static final List<Integer> nonStandardKeyCodes = Arrays.asList(KeyEvent.VK_KP_DOWN, KeyEvent.VK_KP_UP, KeyEvent.VK_KP_RIGHT, KeyEvent.VK_KP_LEFT);
 	protected static final String WebswingApiImpl = null;
-	private static final long doubleClickMaxDelay = Long.getLong(Constants.SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY, 750);
+	public static final long doubleClickMaxDelay = Long.getLong(Constants.SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY, 750);
 
 	public void dispatchEvent(final MsgIn event) {
 		Logger.debug("WebEventDispatcher.dispatchEvent:", event);
@@ -392,17 +392,19 @@ public class WebEventDispatcher {
 
 	public static void dispatchEventInSwing(final Component c, final AWTEvent e) {
 		Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
-		if (e instanceof MouseEvent) {
-			w.setCursor(w.getCursor());// force cursor update
-		}
-		if ((Util.isWindowDecorationEvent(w, e) || WindowManager.getInstance().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
-			Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
-			WindowManager.getInstance().handleWindowDecorationEvent(w, (MouseEvent) e);
-		} else if (dndHandler.isDndInProgress() && (e instanceof MouseEvent || e instanceof KeyEvent)) {
-			dndHandler.processMouseEvent(w, e);
-		} else {
-			Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
-			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
+		if(w.isEnabled()) {
+			if (e instanceof MouseEvent) {
+				w.setCursor(w.getCursor());// force cursor update
+			}
+			if ((Util.isWindowDecorationEvent(w, e) || WindowManager.getInstance().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
+				Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
+				WindowManager.getInstance().handleWindowDecorationEvent(w, (MouseEvent) e);
+			} else if (dndHandler.isDndInProgress() && (e instanceof MouseEvent || e instanceof KeyEvent)) {
+				dndHandler.processMouseEvent(w, e);
+			} else {
+				Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
+				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
+			}
 		}
 	}
 

@@ -39,6 +39,7 @@ public class DndEventHandler {
 				//lastDropTargetAction = dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
 				dragEnd(w, e, lastDropTargetAction != 0, lastDropTargetAction);
 			} else if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
+				dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
 				updateCursor();
 				Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(cursor);
 			}

@@ -1,5 +1,12 @@
 package org.webswing;
 
+import com.sun.javafx.application.PlatformImpl;
+import org.webswing.applet.AppletContainer;
+import org.webswing.toolkit.util.ClasspathUtil;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
+
 import java.applet.Applet;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -9,12 +16,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.webswing.applet.AppletContainer;
-import org.webswing.toolkit.util.ClasspathUtil;
-import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Services;
-import org.webswing.toolkit.util.Util;
 
 public class SwingMain {
 
@@ -39,6 +40,15 @@ public class SwingMain {
 				startApplet();
 			} else {
 				startSwingApp(args);
+			}
+			if (Constants.SWING_START_SYS_PROP_JFX_TOOLKIT_WEB.equals(System.getProperty(Constants.SWING_START_SYS_PROP_JFX_TOOLKIT))) {
+				//start JavaFx platform
+				PlatformImpl.startup(new Runnable() {
+					@Override
+					public void run() {
+						//nothing to do here
+					}
+				});
 			}
 		} catch (Exception e) {
 			Logger.fatal("SwingMain:main", e);

@@ -47,6 +47,10 @@ public class WindowManager {
 	public void bringToFront(Window w) {
 		synchronized (Util.getWebToolkit().getTreeLock()) {
 			synchronized (WebPaintDispatcher.webPaintLock) {
+				//dont do anything if window is disabled
+				if(w!=null && !w.isEnabled()){
+					return;
+				}
 				if ((w == null || w.isFocusableWindow()) && activeWindow != w) {
 					Window oldActiveWindow = activeWindow;
 					activeWindow = w;
@@ -116,6 +120,12 @@ public class WindowManager {
 		if (!(isModal(w) && newWindow) && !zorder.isInSameModalBranch(activeWindow, w) && !(w instanceof sun.awt.ModalExclude)) {
 			return success;
 		}
+
+		//dont allow activation of disabled windows
+		if(!w.isEnabled()){
+			return success;
+		}
+
 		if (focusedWindowChangeAllowed || activeWindow == w) {
 
 			if (newFocusOwner != null && newFocusOwner.isFocusable() && w.isFocusableWindow()) {

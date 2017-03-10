@@ -15,6 +15,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.webswing</groupId>
+			<artifactId>webswing-app-toolkit-fx</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webswing</groupId>
 			<artifactId>webswing-app-toolkit-java6</artifactId>
 			<version>${project.version}</version>
 		</dependency>

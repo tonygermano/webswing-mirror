@@ -11,6 +11,7 @@
 	<modules>
 		<module>webswing-demo-swingset3</module>
 		<module>webswing-demo-nbplatform</module>
+		<module>webswing-demo-ensemble8</module>
 	</modules>
 	<build>
 		<plugins>

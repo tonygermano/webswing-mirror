@@ -63,6 +63,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private static final String WEB_GRAPHICS_ENV_CLASS_NAME = "org.webswing.toolkit.ge.WebGraphicsEnvironment";
 	private static final String WEB_PRINTER_JOB_CLASS_NAME = "org.webswing.toolkit.WebPrinterJob";
 	private static final String WIN_SHELL_FOLDER_MANAGER = "sun.awt.shell.Win32ShellFolderManager2";
+	private static final String JAVA_FX_PATH = System.getProperty("java.home") + "/lib/ext/jfxrt.jar";
+	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.ToolkitJarMarker";
 
 	private static final Logger log = LoggerFactory.getLogger(SwingInstance.class);
 
@@ -375,8 +377,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	@Override
 	public void startRecording() {
-		if(sessionRecorder==null){
-			sessionRecorder= new SessionRecorder(this);
+		if (sessionRecorder == null) {
+			sessionRecorder = new SessionRecorder(this);
 			sendToSwing(webConnection, new SimpleEventMsgIn(SimpleEventType.repaint));
 		}
 	}
@@ -434,6 +436,11 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.setMainClass(Main.class.getName());
 			swingConfig.setClassPath(new File(URI.create(CommonUtil.getWarFileLocation())).getAbsolutePath());
 			String javaVersion = subs.replace(appConfig.getJavaVersion());
+			boolean useJFX = config.isJavaFx();
+			if (!new File(JAVA_FX_PATH).exists()) {
+				log.error("Java FX not supported with current java version (Try version 1.8). JavaFx library not found in '" + new File(JAVA_FX_PATH).getCanonicalPath() + "'. ");
+				useJFX = false;
+			}
 			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;
 			String webGraphicsEnvClass = WEB_GRAPHICS_ENV_CLASS_NAME;
 			if (javaVersion.startsWith("1.6")) {
@@ -452,9 +459,13 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			String webSwingToolkitApiJarPath = CommonUtil.getBootClassPathForClass(WebswingApi.class.getName());
 			String webSwingToolkitJarPath = CommonUtil.getBootClassPathForClass(WEB_TOOLKIT_CLASS_NAME);
 			String webSwingToolkitJarPathSpecific = CommonUtil.getBootClassPathForClass(webToolkitClass);
-			String rtWinShellJarPath = System.getProperty("os.name", "").startsWith("Windows") ? "" : CommonUtil.getBootClassPathForClass(WIN_SHELL_FOLDER_MANAGER);
+			String rtWinShellJarPath = System.getProperty("os.name", "").startsWith("Windows") ? "" : (File.pathSeparator + CommonUtil.getBootClassPathForClass(WIN_SHELL_FOLDER_MANAGER));
 
-			String bootCp = "-Xbootclasspath/a:" + webSwingToolkitApiJarPath + File.pathSeparatorChar + webSwingToolkitJarPathSpecific + File.pathSeparatorChar + webSwingToolkitJarPath + File.pathSeparator + rtWinShellJarPath;
+			String bootCp = "-Xbootclasspath/a:" + webSwingToolkitApiJarPath + File.pathSeparatorChar + webSwingToolkitJarPathSpecific + File.pathSeparatorChar + webSwingToolkitJarPath + rtWinShellJarPath;
+
+			if (useJFX) {
+				bootCp += File.pathSeparator + CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME) + File.pathSeparator + "\"" + new File(JAVA_FX_PATH).getCanonicalPath() + "\"";
+			}
 
 			String debug = appConfig.isDebug() && (debugPort != 0) ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=" + debugPort + ",server=y,suspend=y " : "";
 			String vmArgs = appConfig.getVmArgs() == null ? "" : subs.replace(appConfig.getVmArgs());
@@ -487,6 +498,14 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.addProperty("sun.awt.fontconfig", FontUtils.createFontConfiguration(appConfig, subs));
 			swingConfig.addProperty(Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth));
 			swingConfig.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight));
+
+			if (useJFX) {
+				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_TOOLKIT, Constants.SWING_START_SYS_PROP_JFX_TOOLKIT_WEB);
+				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_PRISM, "sw");//PrismSettings
+				swingConfig.addProperty("prism.text", "t2k");//PrismFontFactory
+				swingConfig.addProperty("prism.lcdtext", "false");//PrismFontFactory
+				swingConfig.addProperty("javafx.live.resize", "false");//QuantumToolkit
+			}
 
 			switch (appConfig.getLauncherType()) {
 			case Applet:
