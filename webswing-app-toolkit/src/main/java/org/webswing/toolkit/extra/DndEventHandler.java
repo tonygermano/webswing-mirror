@@ -27,7 +27,6 @@ public class DndEventHandler {
 	private boolean dropped;
 	private boolean finished = true;
 	private static Cursor cursor = Cursor.getDefaultCursor();
-	private Component lastDragOverComponent;
 
 	public void processMouseEvent(Window w, AWTEvent e) {
 		if (e instanceof MouseEvent) {
@@ -42,13 +41,9 @@ public class DndEventHandler {
 				//lastDropTargetAction = dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
 				dragEnd(w, e, lastDropTargetAction != 0, lastDropTargetAction);
 			} else if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
-				Component currentComp = SwingUtilities.getDeepestComponentAt(w, me.getX(), me.getY());
-				if(currentComp!=lastDragOverComponent) {
-					lastDragOverComponent=currentComp;
-					dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
-					updateCursor();
-					Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(cursor);
-				}
+				dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
+				updateCursor();
+				Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(cursor);
 			}
 		} else if (e instanceof KeyEvent) {
 			if (e.getID() == KeyEvent.KEY_PRESSED && ((KeyEvent) e).getKeyCode() == KeyEvent.VK_ESCAPE) {
