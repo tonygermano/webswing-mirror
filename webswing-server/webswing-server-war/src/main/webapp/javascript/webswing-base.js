@@ -21,8 +21,10 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 			disposeIdentity : 'identity.dispose',
 			getLocale : 'identity.getLocale',
 			showDialog : 'dialog.show',
+            showDialogBar: 'dialog.showBar',
 			hideDialog : 'dialog.hide',
 			hideDialogBar : 'dialog.hideBar',
+			dialogBarContent: 'dialog.currentBar',
 			startingDialog : 'dialog.content.startingDialog',
 			stoppedDialog : 'dialog.content.stoppedDialog',
 			unauthorizedAccess : 'dialog.content.unauthorizedAccess',
@@ -71,6 +73,9 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 			api.registerInput();
 			api.registerTouch();
 			window.addEventListener('beforeunload', beforeUnloadEventHandler);
+			if(!isMirror){
+				window.addEventListener('hashchange', handshake);
+            }
 			resetState();
 			api.cfg.clientId = clientId;
 			api.cfg.appName = name;
@@ -204,10 +209,13 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 				} else if (data.event == "tooManyClientsNotification") {
 					api.showDialog(api.tooManyClientsNotification);
 				} else if (data.event == "continueOldSession") {
-					api.cfg.canPaint = false;
-					api.showDialog(api.continueOldSessionDialog);
-				} else if (data.event == "continueOldSessionAutomatic") {
-					continueSession();
+                    continueSession();
+                    var oldBarContent =  api.dialogBarContent();
+					api.showDialogBar(api.continueOldSessionDialog);
+                    window.setTimeout(function(){
+                        api.hideDialogBar();
+                        api.showDialogBar(oldBarContent);
+					}, 5000);
 				} else if (data.event == "sessionStolenNotification") {
 					api.cfg.canPaint = false;
 					api.showDialog(api.sessionStolenNotification);
@@ -257,7 +265,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 					api.print(encodeURIComponent(location.pathname + 'file?id=' + data.linkAction.src));
 				} else if (data.linkAction.action == 'file') {
 					api.download('file?id=' + data.linkAction.src);
-				} else if (data.linkAction.action == 'redirect') {
+				} else if (data.linkAction.action == 'redirect' && !api.cfg.mirrorMode) {
                     window.location.href = data.linkAction.src;
                 }
 			}
@@ -407,7 +415,8 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 				sessionId : api.getSocketId(),
 				locale : api.getLocale(),
 				mirrored : api.cfg.mirrorMode,
-				directDrawSupported : api.cfg.typedArraysSupported
+				directDrawSupported : api.cfg.typedArraysSupported,
+				url: window.location.href
 			};
 
 			if (!api.cfg.mirrorMode) {

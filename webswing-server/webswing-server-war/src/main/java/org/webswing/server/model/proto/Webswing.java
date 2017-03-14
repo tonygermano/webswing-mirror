@@ -20385,6 +20385,21 @@ public final class Webswing {
      */
     com.google.protobuf.ByteString
         getLocaleBytes();
+
+    // optional string url = 12;
+    /**
+     * <code>optional string url = 12;</code>
+     */
+    boolean hasUrl();
+    /**
+     * <code>optional string url = 12;</code>
+     */
+    java.lang.String getUrl();
+    /**
+     * <code>optional string url = 12;</code>
+     */
+    com.google.protobuf.ByteString
+        getUrlBytes();
   }
   /**
    * Protobuf type {@code org.webswing.server.model.proto.ConnectionHandshakeMsgInProto}
@@ -20493,6 +20508,11 @@ public final class Webswing {
             case 90: {
               bitField0_ |= 0x00000200;
               locale_ = input.readBytes();
+              break;
+            }
+            case 98: {
+              bitField0_ |= 0x00000400;
+              url_ = input.readBytes();
               break;
             }
           }
@@ -20896,6 +20916,49 @@ public final class Webswing {
       }
     }
 
+    // optional string url = 12;
+    public static final int URL_FIELD_NUMBER = 12;
+    private java.lang.Object url_;
+    /**
+     * <code>optional string url = 12;</code>
+     */
+    public boolean hasUrl() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional string url = 12;</code>
+     */
+    public java.lang.String getUrl() {
+      java.lang.Object ref = url_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          url_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string url = 12;</code>
+     */
+    public com.google.protobuf.ByteString
+        getUrlBytes() {
+      java.lang.Object ref = url_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        url_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       clientId_ = "";
       sessionId_ = "";
@@ -20908,6 +20971,7 @@ public final class Webswing {
       documentBase_ = "";
       params_ = java.util.Collections.emptyList();
       locale_ = "";
+      url_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -20953,6 +21017,9 @@ public final class Webswing {
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         output.writeBytes(11, getLocaleBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeBytes(12, getUrlBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -21006,6 +21073,10 @@ public final class Webswing {
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(11, getLocaleBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(12, getUrlBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -21150,6 +21221,8 @@ public final class Webswing {
         }
         locale_ = "";
         bitField0_ = (bitField0_ & ~0x00000400);
+        url_ = "";
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -21227,6 +21300,10 @@ public final class Webswing {
           to_bitField0_ |= 0x00000200;
         }
         result.locale_ = locale_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.url_ = url_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -21309,6 +21386,11 @@ public final class Webswing {
         if (other.hasLocale()) {
           bitField0_ |= 0x00000400;
           locale_ = other.locale_;
+          onChanged();
+        }
+        if (other.hasUrl()) {
+          bitField0_ |= 0x00000800;
+          url_ = other.url_;
           onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
@@ -22150,6 +22232,80 @@ public final class Webswing {
   }
   bitField0_ |= 0x00000400;
         locale_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string url = 12;
+      private java.lang.Object url_ = "";
+      /**
+       * <code>optional string url = 12;</code>
+       */
+      public boolean hasUrl() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional string url = 12;</code>
+       */
+      public java.lang.String getUrl() {
+        java.lang.Object ref = url_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          url_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string url = 12;</code>
+       */
+      public com.google.protobuf.ByteString
+          getUrlBytes() {
+        java.lang.Object ref = url_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          url_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string url = 12;</code>
+       */
+      public Builder setUrl(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        url_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string url = 12;</code>
+       */
+      public Builder clearUrl() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        url_ = getDefaultInstance().getUrl();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string url = 12;</code>
+       */
+      public Builder setUrlBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        url_ = value;
         onChanged();
         return this;
       }
@@ -29965,7 +30121,7 @@ public final class Webswing {
       "(\01325.org.webswing.server.model.proto.Tim" +
       "estampsMsgInProto\"\\\n\024TimestampsMsgInProt" +
       "o\022\026\n\016startTimestamp\030\001 \001(\t\022\025\n\rsendTimesta" +
-      "mp\030\002 \001(\t\022\025\n\rrenderingTime\030\003 \001(\t\"\257\002\n\035Conn" +
+      "mp\030\002 \001(\t\022\025\n\rrenderingTime\030\003 \001(\t\"\274\002\n\035Conn" +
       "ectionHandshakeMsgInProto\022\020\n\010clientId\030\001 " +
       "\001(\t\022\021\n\tsessionId\030\002 \001(\t\022\016\n\006viewId\030\003 \001(\t\022\024",
       "\n\014desktopWidth\030\004 \001(\r\022\025\n\rdesktopHeight\030\005 " +
@@ -29973,55 +30129,55 @@ public final class Webswing {
       "\030\007 \001(\010\022\033\n\023directDrawSupported\030\010 \001(\010\022\024\n\014d" +
       "ocumentBase\030\t \001(\t\022>\n\006params\030\n \003(\0132..org." +
       "webswing.server.model.proto.ParamMsgProt" +
-      "o\022\016\n\006locale\030\013 \001(\t\",\n\rParamMsgProto\022\014\n\004na" +
-      "me\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"\212\002\n\027KeyboardEven" +
-      "tMsgInProto\022X\n\004type\030\001 \001(\0162J.org.webswing" +
-      ".server.model.proto.KeyboardEventMsgInPr" +
-      "oto.KeyEventTypeProto\022\021\n\tcharacter\030\002 \001(\021",
-      "\022\017\n\007keycode\030\003 \001(\021\022\013\n\003alt\030\004 \001(\010\022\014\n\004ctrl\030\005" +
-      " \001(\010\022\r\n\005shift\030\006 \001(\010\022\014\n\004meta\030\007 \001(\010\"9\n\021Key" +
-      "EventTypeProto\022\014\n\010keypress\020\000\022\013\n\007keydown\020" +
-      "\001\022\t\n\005keyup\020\002\"\301\002\n\024MouseEventMsgInProto\022W\n" +
-      "\004type\030\001 \001(\0162I.org.webswing.server.model." +
-      "proto.MouseEventMsgInProto.MouseEventTyp" +
-      "eProto\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\022\n\nwheelDel" +
-      "ta\030\004 \001(\021\022\016\n\006button\030\005 \001(\021\022\014\n\004ctrl\030\006 \001(\010\022\013" +
-      "\n\003alt\030\007 \001(\010\022\r\n\005shift\030\010 \001(\010\022\014\n\004meta\030\t \001(\010" +
-      "\"^\n\023MouseEventTypeProto\022\r\n\tmousemove\020\000\022\r",
-      "\n\tmousedown\020\001\022\013\n\007mouseup\020\002\022\016\n\nmousewheel" +
-      "\020\003\022\014\n\010dblclick\020\004\"\303\001\n\023CopyEventMsgInProto" +
-      "\022X\n\004type\030\001 \001(\0162J.org.webswing.server.mod" +
-      "el.proto.CopyEventMsgInProto.CopyEventMs" +
-      "gTypeProto\022\014\n\004file\030\002 \001(\t\"D\n\025CopyEventMsg" +
-      "TypeProto\022\010\n\004copy\020\000\022\007\n\003cut\020\001\022\030\n\024getFileF" +
-      "romClipboard\020\002\"?\n\024PasteEventMsgInProto\022\014" +
-      "\n\004text\030\001 \001(\t\022\014\n\004html\030\002 \001(\t\022\013\n\003img\030\003 \001(\t\"" +
-      "\204\002\n\025SimpleEventMsgInProto\022Y\n\004type\030\001 \001(\0162" +
-      "K.org.webswing.server.model.proto.Simple",
-      "EventMsgInProto.SimpleEventTypeProto\"\217\001\n" +
-      "\024SimpleEventTypeProto\022\n\n\006unload\020\000\022\r\n\tkil" +
-      "lSwing\020\001\022\014\n\010paintAck\020\002\022\013\n\007repaint\020\003\022\020\n\014d" +
-      "ownloadFile\020\004\022\016\n\ndeleteFile\020\005\022\006\n\002hb\020\006\022\027\n" +
-      "\023cancelFileSelection\020\007\"-\n\034FilesSelectedE" +
-      "ventMsgInProto\022\r\n\005files\030\001 \003(\t\"C\n\025UploadE" +
-      "ventMsgInProto\022\020\n\010fileName\030\002 \001(\t\022\030\n\020temp" +
-      "FileLocation\030\003 \001(\t\"\226\001\n\031JavaEvalRequestMs" +
-      "gInProto\022\025\n\rcorrelationId\030\001 \001(\t\022\020\n\010objec" +
-      "tId\030\002 \001(\t\022\016\n\006method\030\003 \001(\t\022@\n\006params\030\004 \003(",
-      "\01320.org.webswing.server.model.proto.JsPa" +
-      "ramMsgProto\"\327\001\n\031PlaybackCommandMsgInProt" +
-      "o\022`\n\007command\030\001 \001(\0162O.org.webswing.server" +
-      ".model.proto.PlaybackCommandMsgInProto.P" +
-      "laybackCommandProto\"X\n\024PlaybackCommandPr" +
-      "oto\022\t\n\005reset\020\000\022\010\n\004play\020\001\022\010\n\004stop\020\002\022\010\n\004st" +
-      "ep\020\003\022\n\n\006step10\020\004\022\013\n\007step100\020\005*\374\001\n\026Simple" +
-      "EventMsgOutProto\022\035\n\031applicationAlreadyRu" +
-      "nning\020\000\022\030\n\024shutDownNotification\020\001\022\036\n\032too" +
-      "ManyClientsNotification\020\002\022\026\n\022continueOld",
-      "Session\020\003\022\026\n\022configurationError\020\004\022\035\n\031ses" +
-      "sionStolenNotification\020\005\022\026\n\022unauthorized" +
-      "Access\020\006\022\"\n\036shutDownAutoLogoutNotificati" +
-      "on\020\007"
+      "o\022\016\n\006locale\030\013 \001(\t\022\013\n\003url\030\014 \001(\t\",\n\rParamM" +
+      "sgProto\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"\212\002\n" +
+      "\027KeyboardEventMsgInProto\022X\n\004type\030\001 \001(\0162J" +
+      ".org.webswing.server.model.proto.Keyboar" +
+      "dEventMsgInProto.KeyEventTypeProto\022\021\n\tch",
+      "aracter\030\002 \001(\021\022\017\n\007keycode\030\003 \001(\021\022\013\n\003alt\030\004 " +
+      "\001(\010\022\014\n\004ctrl\030\005 \001(\010\022\r\n\005shift\030\006 \001(\010\022\014\n\004meta" +
+      "\030\007 \001(\010\"9\n\021KeyEventTypeProto\022\014\n\010keypress\020" +
+      "\000\022\013\n\007keydown\020\001\022\t\n\005keyup\020\002\"\301\002\n\024MouseEvent" +
+      "MsgInProto\022W\n\004type\030\001 \001(\0162I.org.webswing." +
+      "server.model.proto.MouseEventMsgInProto." +
+      "MouseEventTypeProto\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001(" +
+      "\021\022\022\n\nwheelDelta\030\004 \001(\021\022\016\n\006button\030\005 \001(\021\022\014\n" +
+      "\004ctrl\030\006 \001(\010\022\013\n\003alt\030\007 \001(\010\022\r\n\005shift\030\010 \001(\010\022" +
+      "\014\n\004meta\030\t \001(\010\"^\n\023MouseEventTypeProto\022\r\n\t",
+      "mousemove\020\000\022\r\n\tmousedown\020\001\022\013\n\007mouseup\020\002\022" +
+      "\016\n\nmousewheel\020\003\022\014\n\010dblclick\020\004\"\303\001\n\023CopyEv" +
+      "entMsgInProto\022X\n\004type\030\001 \001(\0162J.org.webswi" +
+      "ng.server.model.proto.CopyEventMsgInProt" +
+      "o.CopyEventMsgTypeProto\022\014\n\004file\030\002 \001(\t\"D\n" +
+      "\025CopyEventMsgTypeProto\022\010\n\004copy\020\000\022\007\n\003cut\020" +
+      "\001\022\030\n\024getFileFromClipboard\020\002\"?\n\024PasteEven" +
+      "tMsgInProto\022\014\n\004text\030\001 \001(\t\022\014\n\004html\030\002 \001(\t\022" +
+      "\013\n\003img\030\003 \001(\t\"\204\002\n\025SimpleEventMsgInProto\022Y" +
+      "\n\004type\030\001 \001(\0162K.org.webswing.server.model",
+      ".proto.SimpleEventMsgInProto.SimpleEvent" +
+      "TypeProto\"\217\001\n\024SimpleEventTypeProto\022\n\n\006un" +
+      "load\020\000\022\r\n\tkillSwing\020\001\022\014\n\010paintAck\020\002\022\013\n\007r" +
+      "epaint\020\003\022\020\n\014downloadFile\020\004\022\016\n\ndeleteFile" +
+      "\020\005\022\006\n\002hb\020\006\022\027\n\023cancelFileSelection\020\007\"-\n\034F" +
+      "ilesSelectedEventMsgInProto\022\r\n\005files\030\001 \003" +
+      "(\t\"C\n\025UploadEventMsgInProto\022\020\n\010fileName\030" +
+      "\002 \001(\t\022\030\n\020tempFileLocation\030\003 \001(\t\"\226\001\n\031Java" +
+      "EvalRequestMsgInProto\022\025\n\rcorrelationId\030\001" +
+      " \001(\t\022\020\n\010objectId\030\002 \001(\t\022\016\n\006method\030\003 \001(\t\022@",
+      "\n\006params\030\004 \003(\01320.org.webswing.server.mod" +
+      "el.proto.JsParamMsgProto\"\327\001\n\031PlaybackCom" +
+      "mandMsgInProto\022`\n\007command\030\001 \001(\0162O.org.we" +
+      "bswing.server.model.proto.PlaybackComman" +
+      "dMsgInProto.PlaybackCommandProto\"X\n\024Play" +
+      "backCommandProto\022\t\n\005reset\020\000\022\010\n\004play\020\001\022\010\n" +
+      "\004stop\020\002\022\010\n\004step\020\003\022\n\n\006step10\020\004\022\013\n\007step100" +
+      "\020\005*\374\001\n\026SimpleEventMsgOutProto\022\035\n\031applica" +
+      "tionAlreadyRunning\020\000\022\030\n\024shutDownNotifica" +
+      "tion\020\001\022\036\n\032tooManyClientsNotification\020\002\022\026",
+      "\n\022continueOldSession\020\003\022\026\n\022configurationE" +
+      "rror\020\004\022\035\n\031sessionStolenNotification\020\005\022\026\n" +
+      "\022unauthorizedAccess\020\006\022\"\n\036shutDownAutoLog" +
+      "outNotification\020\007"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -30141,7 +30297,7 @@ public final class Webswing {
           internal_static_org_webswing_server_model_proto_ConnectionHandshakeMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_ConnectionHandshakeMsgInProto_descriptor,
-              new java.lang.String[] { "ClientId", "SessionId", "ViewId", "DesktopWidth", "DesktopHeight", "ApplicationName", "Mirrored", "DirectDrawSupported", "DocumentBase", "Params", "Locale", });
+              new java.lang.String[] { "ClientId", "SessionId", "ViewId", "DesktopWidth", "DesktopHeight", "ApplicationName", "Mirrored", "DirectDrawSupported", "DocumentBase", "Params", "Locale", "Url", });
           internal_static_org_webswing_server_model_proto_ParamMsgProto_descriptor =
             getDescriptor().getMessageTypes().get(19);
           internal_static_org_webswing_server_model_proto_ParamMsgProto_fieldAccessorTable = new

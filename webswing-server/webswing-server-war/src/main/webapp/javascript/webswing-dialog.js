@@ -17,6 +17,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
             hide: hide,
             current: current,
             content: configuration(),
+            currentBar: currentBar,
             showBar: showBar,
             hideBar: hideBar
         };
@@ -24,7 +25,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
         var currentContent;
         var dialog, content, header, backdrop, spinnerTimer;
 
-        var barContent;
+        var currentContentBar;
         var bar, barContent, barHeader;
 
         function configuration() {
@@ -43,21 +44,21 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
                 tooManyClientsNotification: retryMessageDialog('There are too many active connections right now, please try again later'),
                 stoppedDialog: finalMessageDialog('The application has been closed.'),
                 continueOldSessionDialog: {
-                    content: '<p>Continue existing session?</p>',
+                    content: '<p>Welcome back! <br>You can continue working in your previous session.</p>',
                     buttons: [{
-                        label: '<span class="ws-icon-angle-double-right"></class> Continue',
-                        action: function () {
-                            api.continueSession();
-                        }
-                    }, {
-                        label: '<span class="ws-icon-certificate"></class> New session',
+                        label: '<span class="ws-icon-certificate"></class> Restart session',
                         action: function () {
                             api.kill();
                             api.newSession();
                         }
+                    },{
+                        label: '<span class="ws-icon-cancel-circled"></span>  Dismiss',
+                        action: function () {
+                            hideBar();
+                        }
                     }]
                 },
-                longPollingWarningDialog:{
+                longPollingWarningDialog: {
                     header: '<span class="ws-message--warning"><span class="ws-icon-warn"></span> Warning</span>',
                     content: '<p>Your current network blocks WebSockets. You may experience performance problems while working on this connection. Please contact your network administrator. </p>',
                     buttons: [{
@@ -139,6 +140,9 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
         }
 
         function show(msg) {
+            if(msg==null){
+                return;
+            }
             if (dialog == null) {
                 setup();
             }
@@ -150,9 +154,13 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
         }
 
         function showBar(msg) {
+            if(msg==null){
+                return;
+            }
             if (bar == null) {
                 setup();
             }
+            currentContentBar = msg;
             generateContent(msg, bar, barHeader, barContent);
             bar.slideDown('fast');
             return barContent;
@@ -199,12 +207,17 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
         }
 
         function hideBar() {
+            currentContentBar = null;
             barContent.html('');
             bar.fadeOut('fast');
         }
 
         function current() {
             return currentContent;
+        }
+
+        function currentBar() {
+            return currentContentBar;
         }
 
     };

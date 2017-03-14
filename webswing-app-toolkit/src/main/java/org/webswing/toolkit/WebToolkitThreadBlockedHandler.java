@@ -12,6 +12,7 @@ public class WebToolkitThreadBlockedHandler extends sun.awt.Mutex implements Too
         }
         try {
             unlock();
+            Thread.sleep(10);//TODO: replace with starting secondary Event loop after removing java6 support
         } catch (Exception e) {
         }
         lock();

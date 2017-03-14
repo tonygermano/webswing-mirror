@@ -197,6 +197,7 @@ message ConnectionHandshakeMsgInProto{
 	optional string documentBase = 9;
 	repeated ParamMsgProto params = 10;
 	optional string locale = 11;
+    optional string url = 12;
 }
 
 message ParamMsgProto{

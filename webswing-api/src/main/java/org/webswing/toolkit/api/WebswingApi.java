@@ -3,6 +3,8 @@ package org.webswing.toolkit.api;
 import org.webswing.toolkit.api.lifecycle.WebswingShutdownListener;
 import org.webswing.toolkit.api.security.WebswingUser;
 import org.webswing.toolkit.api.security.WebswingUserListener;
+import org.webswing.toolkit.api.url.WebswingUrlState;
+import org.webswing.toolkit.api.url.WebswingUrlStateChangeListener;
 
 /**
  * Webswing API used by Swing application for easy integration.  
@@ -12,7 +14,7 @@ public interface WebswingApi {
 	/**
 	 * Return the user of connected web session. 
 	 * <b>Note:</b>if user disconnects/closes browser, this method will return null.  
-	 * 
+	 *
 	 * @return user or null if session is disconnected.
 	 */
 	public WebswingUser getPrimaryUser();
@@ -20,7 +22,7 @@ public interface WebswingApi {
 	/**
 	 * Return the user of connected mirror view web session. (Admin console -> view session)
 	 * <b>Note:</b>if admin disconnects/closes browser, this method will return null.  
-	 * 
+	 *
 	 * @return user or null if mirror view session is disconnected.
 	 */
 	public WebswingUser getMirrorViewUser();
@@ -57,7 +59,7 @@ public interface WebswingApi {
 	 * When swing application exit and shutdown process takes longer time to process, invoking this method
 	 * will notify user (web session) the application has finished, and disconnect the user from the session.  
 	 * Swing Application process is removed from running sessions list even though the process might still be running.
-	 *   
+	 *
 	 * @param forceKillTimeout how long (in Ms) to wait for process to finish. After this time the process is forcefully terminated.
 	 */
 	public void notifyShutdown(int forceKillTimeout);
@@ -76,11 +78,44 @@ public interface WebswingApi {
 	 * @param listener listener to remove
 	 */
 	public void removeShutdownListener(WebswingShutdownListener listener);
-	
-	
+
 	/**
 	 * @return the Webswing version in 'git describe' format
 	 */
 	public String getWebswingVersion();
 
+	/**
+	 * See {@link WebswingApi#setUrlState(WebswingUrlState, boolean)}.
+	 * This method will not trigger url change event in {@link WebswingUrlStateChangeListener}
+	 *
+	 * @param state state object url is generated from
+	 */
+	public void setUrlState(WebswingUrlState state);
+
+	/**
+	 * Sets the hash Fragment of users browser URL to represent the current state of the swing application.
+	 * Intended for use in combination with {@link WebswingUrlStateChangeListener} and/or {@link WebswingApi#getUrlState()}
+	 *
+	 * @param state state object url is generated from
+	 * @param fireChangeEvent if true, invoking this method will trigger url change event
+	 */
+	public void setUrlState(WebswingUrlState state, boolean fireChangeEvent);
+
+	/**
+	 * @return current user's URL state (parsed hash fragment of URL) or null if no user is connected.
+	 */
+	public WebswingUrlState getUrlState();
+
+	/**
+	 * Register a URL state change listener
+	 * @param listener the listener
+	 */
+
+	public void removeUrlStateChangeListener(WebswingUrlStateChangeListener listener);
+
+	/**
+	 * Remove URL state change listener
+	 * @param listener the listener
+	 */
+	public void addUrlStateChangeListener(WebswingUrlStateChangeListener listener);
 }

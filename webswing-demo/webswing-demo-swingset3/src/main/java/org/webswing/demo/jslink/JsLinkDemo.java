@@ -22,7 +22,8 @@ import java.util.Map;
 @DemoProperties(value = "JsLink", category = "Webswing", description = "Demonstrates javascritp interface.", sourceFiles = { "org/webswing/demo/jslink/JsLinkDemo.java", "org/webswing/demo/jslink/resources/hello.js", "org/webswing/demo/jslink/resources/echo.js", "org/webswing/demo/jslink/resources/callback.js",
 		"org/webswing/demo/jslink/resources/javaReference.js" })
 public class JsLinkDemo extends JPanel {
-	static UrlChanageService urlService = new UrlChanageService();
+	//REPLACED WITH Webswing API interface
+	// static UrlChanageService urlService = new UrlChanageService();
 
 	public static class DummyService {
 		private String dummyString = "dummy";
@@ -86,7 +87,7 @@ public class JsLinkDemo extends JPanel {
 		setLayout(new BorderLayout());
 		if (System.getProperty("webswing.clientId") != null) {
 
-			urlService.changeUrl("HelloWorldUrl");
+			//urlService.changeUrl("HelloWorldUrl");
 
             /* EXPOSE JAVA SERVICE TO JAVASCRIPT GLOBAL OBJECT*/
 			JSObject global = JSObject.getWindow(null);

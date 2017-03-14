@@ -90,6 +90,7 @@ import javax.swing.SwingUtilities;
 import org.webswing.Constants;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.model.Msg;
 import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingApiProvider;
@@ -704,7 +705,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		return api;
 	}
 
-	public void processApiEvent(ApiEventMsgInternal event) {
+	public void processApiEvent(Msg event) {
 		api.processEvent(event);
 	}
 

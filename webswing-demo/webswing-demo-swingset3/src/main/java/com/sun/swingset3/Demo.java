@@ -31,6 +31,10 @@
 
 package com.sun.swingset3;
 
+import org.webswing.toolkit.api.WebswingApi;
+import org.webswing.toolkit.api.WebswingUtil;
+import org.webswing.toolkit.api.url.WebswingUrlState;
+
 import java.awt.Component;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -263,6 +267,9 @@ public class Demo {
     }
     
     protected void setState(State state) {
+        if(state==State.RUNNING && WebswingUtil.isWebswing()){
+            WebswingUtil.getWebswingApi().setUrlState(new WebswingUrlState(getName()));
+        }
         State oldState = this.state;
         this.state = state;
         SwingSet3.logger.log(Level.FINE, "***>" +getName() + ":setState="+state);

@@ -71,6 +71,7 @@ public class WebEventDispatcher {
 						final ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
 						Util.getWebToolkit().initSize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
 						Util.getWebToolkit().getPaintDispatcher().notifyFileDialogActive();
+						Util.getWebToolkit().processApiEvent(handshake);
 						if (System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null) {
 							// resize and refresh the applet object exposed in javascript in case of page reload/session continue
 							Applet a = (Applet) WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));

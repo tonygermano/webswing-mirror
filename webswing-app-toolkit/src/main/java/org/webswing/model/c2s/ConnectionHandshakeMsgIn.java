@@ -16,6 +16,7 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 	private String applicationName;
 	private String documentBase;
 	private String locale;
+	private String url;
 	private boolean mirrored;
 	private boolean directDrawSupported;
 	private List<ParamMsg> params;
@@ -107,5 +108,12 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 	public void setViewId(String viewId) {
 		this.viewId = viewId;
 	}
-	
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
 }

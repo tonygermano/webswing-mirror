@@ -489,4 +489,9 @@ public class WebPaintDispatcher {
 		contentSender.shutdownNow();
 	}
 
+	public void notifyUrlRedirect(String url) {
+		AppFrameMsgOut result = new AppFrameMsgOut();
+		result.setLinkAction(new LinkActionMsg(LinkActionMsg.LinkActionType.redirect, url));
+		Util.getWebToolkit().getPaintDispatcher().sendObject(result);
+	}
 }
