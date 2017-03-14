@@ -255,6 +255,7 @@ message PasteEventMsgInProto{
 	optional string text = 1;
 	optional string html = 2;
 	optional string img = 3;
+	optional bool special = 4;
 }
 
 message SimpleEventMsgInProto{

@@ -140,11 +140,13 @@ public class ClipboardDemo extends JPanel {
 		//Identifying the copy KeyStroke user can modify this
 		//to copy on some other Key combination.
 		KeyStroke paste = KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK, false);
+		KeyStroke pasteSpecial = KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK, false);
 		KeyStroke cut = KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK, false);
 		//Identifying the Paste KeyStroke user can modify this
 		//to copy on some other Key combination.
 		clipboardTable.registerKeyboardAction(new CopyAction(clipboardTable), "Copy", copy, JComponent.WHEN_FOCUSED);
 		clipboardTable.registerKeyboardAction(new PasteAction(clipboardTable), "Paste", paste, JComponent.WHEN_FOCUSED);
+		clipboardTable.registerKeyboardAction(new PasteSpecialAction(clipboardTable), "PasteSpecial", pasteSpecial, JComponent.WHEN_FOCUSED);
 		clipboardTable.registerKeyboardAction(new CutAction(clipboardTable), "Cut", cut, JComponent.WHEN_FOCUSED);
 		return clipboardTable;
 	}
@@ -403,6 +405,53 @@ public class ClipboardDemo extends JPanel {
 				model.addRow(value);
 			}
 
+		}
+
+	}
+
+	class PasteSpecialAction extends AbstractAction {
+
+		private JTable table;
+
+		public PasteSpecialAction(JTable tbl) {
+
+			putValue(NAME, "PasteSpecial(tostring)");
+			table = tbl;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+			ClipboardTableModel model = (ClipboardTableModel) table.getModel();
+			Object[] value = new Object[4];
+			try {
+				if (cb.isDataFlavorAvailable(RowTransferable.CELL_DATA_FLAVOR)) {
+					Object[] cell = (Object[]) cb.getData(RowTransferable.CELL_DATA_FLAVOR);
+					value[1] = Arrays.asList(cell).toString();
+				} else {
+					value[1] = "";
+					if (cb.isDataFlavorAvailable(DataFlavor.imageFlavor)) {
+						Image v = (Image) cb.getData(DataFlavor.imageFlavor);
+						value[1] += v.toString();
+					}
+					if (cb.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
+						String v = (String) cb.getData(DataFlavor.stringFlavor);
+						value[1] += v;
+					}
+					if (cb.isDataFlavorAvailable(new DataFlavor("text/html;class=java.lang.String"))) {
+						String v = (String) cb.getData(new DataFlavor("text/html;class=java.lang.String"));
+						value[1] += v.toString();
+					}
+					if (cb.isDataFlavorAvailable(DataFlavor.javaFileListFlavor)) {
+						List<File> v = (List<File>) cb.getData(DataFlavor.javaFileListFlavor);
+						value[1] += v.toString();
+					}
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				value[1] = ex.getMessage();
+			}
+			model.addRow(value);
 		}
 
 	}

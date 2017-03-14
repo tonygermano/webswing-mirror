@@ -28,6 +28,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
         var latestKeyDownEvent = null;
         var mouseDown = 0;
         var inputEvtQueue = [];
+        var isShift = false;
 
         function sendInput(message) {
             enqueueInputEvent();
@@ -166,11 +167,9 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
                     }
                 }
                 var keyevt = getKBKey('keydown', canvas, event);
-                // hanle paste event
-                var ctrlCmd = api.cfg.isMac ? keyevt.key.meta : keyevt.key.ctrl;
-                if (!(ctrlCmd && !keyevt.key.alt && !keyevt.key.altgr && !keyevt.key.shift && (keyevt.key.character == 88 || keyevt.key.character == 67 || keyevt.key.character == 86))) { // cut copy
+                if (!isClipboardEvent(keyevt)) { // cut copy paste handled separately
                     // default action prevented
-                    if (ctrlCmd && !keyevt.key.alt && !keyevt.key.altgr) {
+                    if (isCtrlCmd(keyevt) && !keyevt.key.alt && !keyevt.key.altgr) {
                         event.preventDefault();
                     }
                     latestKeyDownEvent = keyevt;
@@ -182,9 +181,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             util.bindEvent(canvas, 'keypress', keyPressHandler, false);
             function keyPressHandler(event) {
                 var keyevt = getKBKey('keypress', canvas, event);
-                var ctrlCmd = api.cfg.isMac ? keyevt.key.meta : keyevt.key.ctrl;
-                if (!(ctrlCmd && !keyevt.key.alt && !keyevt.key.altgr && !keyevt.key.shift && (keyevt.key.character == 120 || keyevt.key.character == 24 || keyevt.key.character == 99
-                    || keyevt.key.character == 118 || keyevt.key.character == 22))) { // cut copy paste handled separately
+                if (!isClipboardEvent(keyevt)) { // cut copy paste handled separately
                     event.preventDefault();
                     event.stopPropagation();
                     if (latestKeyDownEvent != null) {
@@ -199,8 +196,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             util.bindEvent(canvas, 'keyup', keyUpHandler, false);
             function keyUpHandler(event) {
                 var keyevt = getKBKey('keyup', canvas, event);
-                var ctrlCmd = api.cfg.isMac ? keyevt.key.meta : keyevt.key.ctrl;
-                if (!(ctrlCmd && !keyevt.key.alt && !keyevt.key.altgr && !keyevt.key.shift && (keyevt.key.character == 88 || keyevt.key.character == 67 || keyevt.key.character == 86))) { // cut copy
+                if (!isClipboardEvent(keyevt)) { // cut copy paste handled separately
                     event.preventDefault();
                     event.stopPropagation();
                     enqueueInputEvent(keyevt);
@@ -224,12 +220,29 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             util.bindEvent(input, 'paste', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                api.paste(event);
+                api.paste(event, isShift);
                 return false;
             }, false);
             util.bindEvent(document, 'mousedown', mouseDownEventHandler);
             util.bindEvent(document, 'mouseout', mouseOutEventHandler);
             util.bindEvent(document, 'mouseup', mouseUpEventHandler);
+        }
+
+        function isClipboardEvent(evt) {
+            var ctrlCmd = isCtrlCmd(evt);
+
+            var isCutCopyKey = 'keypress' === evt.key.type ? (evt.key.character == 120 || evt.key.character == 24 || evt.key.character == 99) : (evt.key.character == 88 || evt.key.character == 67);
+            var isCutCopyEvt = ctrlCmd && !evt.key.alt && !evt.key.altgr && !evt.key.shift && isCutCopyKey;
+
+            var isPasteKey = 'keypress' === evt.key.type ? (evt.key.character == 118 || evt.key.character == 22 || evt.key.character == 86) : ( evt.key.character == 86);
+            var isPasteEvt = ctrlCmd && !evt.key.alt && !evt.key.altgr && isPasteKey;
+            isShift = evt.key.shift; //Set shift flag to distinguish paste from paste-special event
+
+            return isPasteEvt || isCutCopyEvt;
+        }
+
+        function isCtrlCmd(evt) {
+            return api.cfg.isMac ? evt.key.meta : evt.key.ctrl;
         }
 
         function mouseDownEventHandler(evt) {

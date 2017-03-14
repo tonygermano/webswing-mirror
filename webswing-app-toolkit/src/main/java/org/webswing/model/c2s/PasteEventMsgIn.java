@@ -5,9 +5,18 @@ import org.webswing.model.MsgIn;
 public class PasteEventMsgIn implements MsgIn {
 
 	private static final long serialVersionUID = -2857821597134135941L;
+	private boolean special;
 	private String text;
 	private String html;
 	private String img;
+
+	public boolean isSpecial() {
+		return special;
+	}
+
+	public void setSpecial(boolean special) {
+		this.special = special;
+	}
 
 	public String getText() {
 		return text;

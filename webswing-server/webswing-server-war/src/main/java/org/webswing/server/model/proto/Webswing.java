@@ -25791,6 +25791,16 @@ public final class Webswing {
      */
     com.google.protobuf.ByteString
         getImgBytes();
+
+    // optional bool special = 4;
+    /**
+     * <code>optional bool special = 4;</code>
+     */
+    boolean hasSpecial();
+    /**
+     * <code>optional bool special = 4;</code>
+     */
+    boolean getSpecial();
   }
   /**
    * Protobuf type {@code org.webswing.server.model.proto.PasteEventMsgInProto}
@@ -25856,6 +25866,11 @@ public final class Webswing {
             case 26: {
               bitField0_ |= 0x00000004;
               img_ = input.readBytes();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              special_ = input.readBool();
               break;
             }
           }
@@ -26027,10 +26042,27 @@ public final class Webswing {
       }
     }
 
+    // optional bool special = 4;
+    public static final int SPECIAL_FIELD_NUMBER = 4;
+    private boolean special_;
+    /**
+     * <code>optional bool special = 4;</code>
+     */
+    public boolean hasSpecial() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional bool special = 4;</code>
+     */
+    public boolean getSpecial() {
+      return special_;
+    }
+
     private void initFields() {
       text_ = "";
       html_ = "";
       img_ = "";
+      special_ = false;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -26053,6 +26085,9 @@ public final class Webswing {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeBytes(3, getImgBytes());
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBool(4, special_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -26073,6 +26108,10 @@ public final class Webswing {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, getImgBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, special_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -26196,6 +26235,8 @@ public final class Webswing {
         bitField0_ = (bitField0_ & ~0x00000002);
         img_ = "";
         bitField0_ = (bitField0_ & ~0x00000004);
+        special_ = false;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -26236,6 +26277,10 @@ public final class Webswing {
           to_bitField0_ |= 0x00000004;
         }
         result.img_ = img_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.special_ = special_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -26266,6 +26311,9 @@ public final class Webswing {
           bitField0_ |= 0x00000004;
           img_ = other.img_;
           onChanged();
+        }
+        if (other.hasSpecial()) {
+          setSpecial(other.getSpecial());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -26512,6 +26560,39 @@ public final class Webswing {
   }
   bitField0_ |= 0x00000004;
         img_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional bool special = 4;
+      private boolean special_ ;
+      /**
+       * <code>optional bool special = 4;</code>
+       */
+      public boolean hasSpecial() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional bool special = 4;</code>
+       */
+      public boolean getSpecial() {
+        return special_;
+      }
+      /**
+       * <code>optional bool special = 4;</code>
+       */
+      public Builder setSpecial(boolean value) {
+        bitField0_ |= 0x00000008;
+        special_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool special = 4;</code>
+       */
+      public Builder clearSpecial() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        special_ = false;
         onChanged();
         return this;
       }
@@ -30150,34 +30231,34 @@ public final class Webswing {
       "ng.server.model.proto.CopyEventMsgInProt" +
       "o.CopyEventMsgTypeProto\022\014\n\004file\030\002 \001(\t\"D\n" +
       "\025CopyEventMsgTypeProto\022\010\n\004copy\020\000\022\007\n\003cut\020" +
-      "\001\022\030\n\024getFileFromClipboard\020\002\"?\n\024PasteEven" +
+      "\001\022\030\n\024getFileFromClipboard\020\002\"P\n\024PasteEven" +
       "tMsgInProto\022\014\n\004text\030\001 \001(\t\022\014\n\004html\030\002 \001(\t\022" +
-      "\013\n\003img\030\003 \001(\t\"\204\002\n\025SimpleEventMsgInProto\022Y" +
-      "\n\004type\030\001 \001(\0162K.org.webswing.server.model",
-      ".proto.SimpleEventMsgInProto.SimpleEvent" +
-      "TypeProto\"\217\001\n\024SimpleEventTypeProto\022\n\n\006un" +
-      "load\020\000\022\r\n\tkillSwing\020\001\022\014\n\010paintAck\020\002\022\013\n\007r" +
-      "epaint\020\003\022\020\n\014downloadFile\020\004\022\016\n\ndeleteFile" +
-      "\020\005\022\006\n\002hb\020\006\022\027\n\023cancelFileSelection\020\007\"-\n\034F" +
-      "ilesSelectedEventMsgInProto\022\r\n\005files\030\001 \003" +
-      "(\t\"C\n\025UploadEventMsgInProto\022\020\n\010fileName\030" +
-      "\002 \001(\t\022\030\n\020tempFileLocation\030\003 \001(\t\"\226\001\n\031Java" +
-      "EvalRequestMsgInProto\022\025\n\rcorrelationId\030\001" +
-      " \001(\t\022\020\n\010objectId\030\002 \001(\t\022\016\n\006method\030\003 \001(\t\022@",
-      "\n\006params\030\004 \003(\01320.org.webswing.server.mod" +
-      "el.proto.JsParamMsgProto\"\327\001\n\031PlaybackCom" +
-      "mandMsgInProto\022`\n\007command\030\001 \001(\0162O.org.we" +
-      "bswing.server.model.proto.PlaybackComman" +
-      "dMsgInProto.PlaybackCommandProto\"X\n\024Play" +
-      "backCommandProto\022\t\n\005reset\020\000\022\010\n\004play\020\001\022\010\n" +
-      "\004stop\020\002\022\010\n\004step\020\003\022\n\n\006step10\020\004\022\013\n\007step100" +
-      "\020\005*\374\001\n\026SimpleEventMsgOutProto\022\035\n\031applica" +
-      "tionAlreadyRunning\020\000\022\030\n\024shutDownNotifica" +
-      "tion\020\001\022\036\n\032tooManyClientsNotification\020\002\022\026",
-      "\n\022continueOldSession\020\003\022\026\n\022configurationE" +
-      "rror\020\004\022\035\n\031sessionStolenNotification\020\005\022\026\n" +
-      "\022unauthorizedAccess\020\006\022\"\n\036shutDownAutoLog" +
-      "outNotification\020\007"
+      "\013\n\003img\030\003 \001(\t\022\017\n\007special\030\004 \001(\010\"\204\002\n\025Simple" +
+      "EventMsgInProto\022Y\n\004type\030\001 \001(\0162K.org.webs",
+      "wing.server.model.proto.SimpleEventMsgIn" +
+      "Proto.SimpleEventTypeProto\"\217\001\n\024SimpleEve" +
+      "ntTypeProto\022\n\n\006unload\020\000\022\r\n\tkillSwing\020\001\022\014" +
+      "\n\010paintAck\020\002\022\013\n\007repaint\020\003\022\020\n\014downloadFil" +
+      "e\020\004\022\016\n\ndeleteFile\020\005\022\006\n\002hb\020\006\022\027\n\023cancelFil" +
+      "eSelection\020\007\"-\n\034FilesSelectedEventMsgInP" +
+      "roto\022\r\n\005files\030\001 \003(\t\"C\n\025UploadEventMsgInP" +
+      "roto\022\020\n\010fileName\030\002 \001(\t\022\030\n\020tempFileLocati" +
+      "on\030\003 \001(\t\"\226\001\n\031JavaEvalRequestMsgInProto\022\025" +
+      "\n\rcorrelationId\030\001 \001(\t\022\020\n\010objectId\030\002 \001(\t\022",
+      "\016\n\006method\030\003 \001(\t\022@\n\006params\030\004 \003(\01320.org.we" +
+      "bswing.server.model.proto.JsParamMsgProt" +
+      "o\"\327\001\n\031PlaybackCommandMsgInProto\022`\n\007comma" +
+      "nd\030\001 \001(\0162O.org.webswing.server.model.pro" +
+      "to.PlaybackCommandMsgInProto.PlaybackCom" +
+      "mandProto\"X\n\024PlaybackCommandProto\022\t\n\005res" +
+      "et\020\000\022\010\n\004play\020\001\022\010\n\004stop\020\002\022\010\n\004step\020\003\022\n\n\006st" +
+      "ep10\020\004\022\013\n\007step100\020\005*\374\001\n\026SimpleEventMsgOu" +
+      "tProto\022\035\n\031applicationAlreadyRunning\020\000\022\030\n" +
+      "\024shutDownNotification\020\001\022\036\n\032tooManyClient",
+      "sNotification\020\002\022\026\n\022continueOldSession\020\003\022" +
+      "\026\n\022configurationError\020\004\022\035\n\031sessionStolen" +
+      "Notification\020\005\022\026\n\022unauthorizedAccess\020\006\022\"" +
+      "\n\036shutDownAutoLogoutNotification\020\007"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -30327,7 +30408,7 @@ public final class Webswing {
           internal_static_org_webswing_server_model_proto_PasteEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_PasteEventMsgInProto_descriptor,
-              new java.lang.String[] { "Text", "Html", "Img", });
+              new java.lang.String[] { "Text", "Html", "Img", "Special", });
           internal_static_org_webswing_server_model_proto_SimpleEventMsgInProto_descriptor =
             getDescriptor().getMessageTypes().get(24);
           internal_static_org_webswing_server_model_proto_SimpleEventMsgInProto_fieldAccessorTable = new

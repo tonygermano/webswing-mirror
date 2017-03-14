@@ -345,17 +345,18 @@ public class WebEventDispatcher {
 					WebClipboard wc = (WebClipboard) Util.getWebToolkit().getSystemClipboard();
 					wc.setContents(transferable);
 				}
-				WebEventDispatcher.this.dispatchPasteEvent();
+				WebEventDispatcher.this.dispatchPasteEvent(paste.isSpecial());
 			}
 		});
 	}
 
-	private void dispatchPasteEvent() {
+	private void dispatchPasteEvent(boolean special) {
 		KeyboardEventMsgIn event = new KeyboardEventMsgIn();
 		event.setType(KeyboardEventMsgIn.KeyEventType.keydown);
 		event.setCharacter(KeyEvent.VK_V);
 		event.setKeycode(KeyEvent.VK_V);// 'v'
 		event.setCtrl(true);
+		event.setShift(special);
 		dispatchKeyboardEvent(event);
 		event.setType(KeyboardEventMsgIn.KeyEventType.keyup);
 		dispatchKeyboardEvent(event);
@@ -393,7 +394,7 @@ public class WebEventDispatcher {
 
 	public static void dispatchEventInSwing(final Component c, final AWTEvent e) {
 		Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
-		if(w.isEnabled()) {
+		if (w.isEnabled()) {
 			if (e instanceof MouseEvent) {
 				w.setCursor(w.getCursor());// force cursor update
 			}
