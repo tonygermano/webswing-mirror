@@ -142,7 +142,7 @@ public class WebComponentPeer implements ComponentPeer {
 
 	public Component getHwComponentAt(int x, int y) {
 		Component result = (Component) getTarget();
-		for (Iterator<WebComponentPeer> i = hwLayers.iterator(); i.hasNext();) {
+		for (Iterator<WebComponentPeer> i = hwLayers.iterator(); i.hasNext(); ) {
 			WebComponentPeer wcp = i.next();
 			Insets insets = ((Window) this.getTarget()).getInsets();
 			if (wcp.getBounds().contains(x - getBounds().x - insets.left, y - getBounds().y - insets.top)) {
@@ -580,6 +580,9 @@ public class WebComponentPeer implements ComponentPeer {
 	}
 
 	public void notifyWindowAreaRepainted(Rectangle r) {
+		if (r == null) {
+			r = getBounds();
+		}
 		Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(getGuid(), r);
 	}
 

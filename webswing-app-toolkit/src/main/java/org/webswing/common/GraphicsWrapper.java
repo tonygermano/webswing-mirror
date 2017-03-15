@@ -33,16 +33,22 @@ public class GraphicsWrapper extends Graphics2D {
 	}
 
 	private void addDirtyClipArea() {
-		Rectangle r = new Rectangle(getClipBounds());
-		addDirtyRectangleArea(r);
+		addDirtyRectangleArea(getClipBounds());
 	}
 
 	private void addDirtyRectangleArea(Rectangle r) {
-		r = getClipBounds().intersection(r);
-		if (r.width > 0 && r.height > 0) {
-			r.translate((int) getTransform().getTranslateX(), (int) getTransform().getTranslateY());
-			r.translate(offset.x, offset.y);
-			rootPaintComponent.notifyWindowAreaRepainted(r);
+		if(r==null){
+			rootPaintComponent.notifyWindowAreaRepainted(null);
+		}else{
+			Rectangle clip = getClipBounds();
+			if(clip!=null) {
+				r = clip.intersection(r);
+			}
+			if (r.width > 0 && r.height > 0) {
+				r.translate((int) getTransform().getTranslateX(), (int) getTransform().getTranslateY());
+				r.translate(offset.x, offset.y);
+				rootPaintComponent.notifyWindowAreaRepainted(r);
+			}
 		}
 	}
 
@@ -106,8 +112,7 @@ public class GraphicsWrapper extends Graphics2D {
 
 	@Override
 	public Rectangle getClipBounds() {
-		Rectangle r = original.getClipBounds();
-		return r == null ? new Rectangle() : r;
+		return original.getClipBounds();
 	}
 
 	@Override

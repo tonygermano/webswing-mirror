@@ -86,7 +86,14 @@ public class WebRepaintManager extends RepaintManager {
 				if (RepaintManager.currentManager(null) instanceof WebRepaintManager) {
 					((WebRepaintManager) RepaintManager.currentManager(null)).process();
 				} else {
-					RepaintManager.setCurrentManager(new WebRepaintManager(RepaintManager.currentManager(null)));
+					WebRepaintManager webRepaintManager = new WebRepaintManager(RepaintManager.currentManager(null));
+					RepaintManager.setCurrentManager(webRepaintManager);
+					for (Window w : Window.getWindows()) {
+						if (w.isShowing()) {
+							webRepaintManager.addDirtyRegion(w, w.getX(), w.getY(), w.getWidth(), w.getHeight());
+						}
+					}
+					webRepaintManager.process();
 				}
 			}
 		});
