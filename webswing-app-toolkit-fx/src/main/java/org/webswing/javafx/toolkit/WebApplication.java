@@ -1,21 +1,26 @@
 package org.webswing.javafx.toolkit;
 
 import com.sun.glass.ui.*;
+import com.sun.glass.ui.Cursor;
+import com.sun.glass.ui.Robot;
+import com.sun.glass.ui.Timer;
+import com.sun.glass.ui.Window;
 import org.webswing.Constants;
+import org.webswing.javafx.toolkit.adaper.WindowAdapter;
 import org.webswing.toolkit.util.Util;
 import sun.awt.AWTAccessor;
 
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.SecondaryLoop;
-import java.awt.Toolkit;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.LinkedList;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by vikto on 28-Feb-17.
@@ -159,11 +164,59 @@ public class WebApplication extends Application {
 
 	@Override
 	protected CommonDialogs.FileChooserResult staticCommonDialogs_showFileChooser(Window owner, String folder, String filename, String title, int type, boolean multipleMode, CommonDialogs.ExtensionFilter[] extensionFilters, int defaultFilterIndex) {
-		return null;
+		java.awt.Window parent = getWindow(owner);
+		JFileChooser fc = new JFileChooser();
+		fc.setCurrentDirectory(new File(folder));
+		fc.setSelectedFile(new File(filename));
+		fc.setDialogTitle(title);
+		fc.setMultiSelectionEnabled(multipleMode);
+		for (int i = 0; i < extensionFilters.length; i++) {
+			java.util.List<String> list = extensionFilters[i].getExtensions();
+			if (list.size() > 0) {
+				fc.addChoosableFileFilter(new FileNameExtensionFilter(extensionFilters[i].getDescription(), list.toArray(new String[list.size()])));
+			}
+		}
+
+		int result;
+		if (type == CommonDialogs.Type.OPEN) {
+			result = fc.showOpenDialog(parent);
+		} else {
+			result = fc.showSaveDialog(parent);
+		}
+		if (result == JFileChooser.APPROVE_OPTION) {
+			List<File> selected = new ArrayList<>();
+			if (!fc.isMultiSelectionEnabled() && fc.getSelectedFile() != null) {
+				selected.add(fc.getSelectedFile());
+			} else if (fc.getSelectedFiles() != null) {
+				for (File f : fc.getSelectedFiles()) {
+					selected.add(f);
+				}
+			}
+			return new CommonDialogs.FileChooserResult(selected, null);
+		}
+		return new CommonDialogs.FileChooserResult();
+	}
+
+	private java.awt.Window getWindow(Window owner) {
+		java.awt.Window parent = null;
+		if (owner instanceof WebWindow) {
+			WindowAdapter adapter = ((WebWindow) owner).w;
+			parent = adapter != null ? adapter.getThis() : null;
+		}
+		return parent;
 	}
 
 	@Override
 	protected File staticCommonDialogs_showFolderChooser(Window owner, String folder, String title) {
+		java.awt.Window parent = getWindow(owner);
+		JFileChooser fc = new JFileChooser();
+		fc.setCurrentDirectory(new File(folder));
+		fc.setDialogTitle(title);
+		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int result = fc.showOpenDialog(parent);
+		if (result == JFileChooser.APPROVE_OPTION) {
+			return fc.getSelectedFile();
+		}
 		return null;
 	}
 
