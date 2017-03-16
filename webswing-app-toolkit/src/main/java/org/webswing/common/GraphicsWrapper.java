@@ -45,9 +45,9 @@ public class GraphicsWrapper extends Graphics2D {
 				r = clip.intersection(r);
 			}
 			if (r.width > 0 && r.height > 0) {
-				r.translate((int) getTransform().getTranslateX(), (int) getTransform().getTranslateY());
-				r.translate(offset.x, offset.y);
-				rootPaintComponent.notifyWindowAreaRepainted(r);
+				Rectangle dirtyArea = getTransform().createTransformedShape(r).getBounds();
+				dirtyArea.translate(offset.x, offset.y);
+				rootPaintComponent.notifyWindowAreaRepainted(dirtyArea);
 			}
 		}
 	}
