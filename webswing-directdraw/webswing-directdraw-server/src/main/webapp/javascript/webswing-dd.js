@@ -51,7 +51,7 @@
 				}
 			});
 		}
-		
+
 		function drawWebImageInternal(image, targetCanvas, resolve, reject){
 			var newCanvas;
 			if (targetCanvas != null) {
@@ -168,7 +168,7 @@
 			}
 			return Promise.resolve();
 		}
-		
+
 		function iprtGraphicsDispose(id, imageContext) {
 			delete imageContext.graphicsStates[id];
 		}
@@ -249,7 +249,7 @@
 			var crop = args[2];
 			var bgcolor = args[3];
 			var clip = args[4];
-			
+
 			if (path(ctx, clip)) {
 				ctx.clip(fillRule(clip));
 			}
@@ -308,7 +308,7 @@
 				ctx.restore();
 			});
 		}
-		
+
 		function iprtDrawGlyphList(ctx, args){
 			var combinedArgs = resolveArgs(args[0].combined.ids,constantPoolCache);
 			var size= combinedArgs[0].points;
@@ -360,7 +360,7 @@
 			}
 			ctx.restore();
 		}
-		
+
 		function iprtSetFont(ctx, args) {
 			if(args[0] == null){
 				return ctx.font;
@@ -383,7 +383,7 @@
 			}
 			var fontFamily = font.family;
 			if (font.family !== 'sans-serif' && font.family !== 'serif' && font.family !== 'monospace'){
-				fontFamily = "\""+ctxId + font.family+"\""; 			
+				fontFamily = "\""+ctxId + font.family+"\"";
 			}
 			ctx.font = style + " " + font.size + "px " + fontFamily;
 			return font.transform;
@@ -443,8 +443,10 @@
 				break;
 			}
 			if (stroke.dash != null) {
-				ctx.setLineDash(stroke.dash);
-				ctx.lineDashOffset = stroke.dashOffset;
+			    if(ctx.setLineDash != null){//ie10 does fails on dash
+                    ctx.setLineDash(stroke.dash);
+                    ctx.lineDashOffset = stroke.dashOffset;
+                }
 			}
 		}
 
@@ -486,7 +488,7 @@
 				ctx.strokeStyle = gradient;
 			}
 		}
-		
+
 		function iprtLinearGradient(ctx, g) {
 			var x0 = g.xStart;
 			var y0 = g.yStart;
@@ -522,13 +524,13 @@
 			}
 			return gradient;
 		}
-		
+
 		// calculates how many times vector (dx, dy) will repeat from (x0, y0) until it touches a straight line
 		// which goes through (x1, y1) and perpendicular to the vector
 		function calculateTimes(x0, y0, dx, dy, x1, y1) {
 			return ((x1 - x0) * dx + (y1 - y0) * dy) / (dx * dx + dy * dy);
 		}
-		
+
 		function iprtRadialGradient(ctx, g) {
 			fixFocusPoint(g);
 			var fX = g.xFocus;
@@ -584,7 +586,7 @@
 			}
 			return gradient;
 		}
-		
+
 		// fix gradient focus point as java does
 		function fixFocusPoint(gradient) {
 			var dx = gradient.xFocus - gradient.xCenter;
@@ -604,7 +606,7 @@
 				gradient.yFocus = gradient.yCenter + dy * scale;
 			}
 		}
-		
+
 		function getDistance(x0, y0, x1, y1) {
 			return Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
 		}
@@ -660,13 +662,13 @@
 			if (arg == null) {
 				return false;
 			}
-		
+
 			if (arg.rectangle != null) {
 				ctx.beginPath();
 				pathRectangle(ctx, arg.rectangle, biased);
 				return true;
 			}
-			
+
 			if (arg.roundRectangle != null) {
 				ctx.beginPath();
 				pathRoundRectangle(ctx, arg.roundRectangle, biased);
@@ -760,7 +762,7 @@
 		function pathRoundRectangle(ctx, rr, biased) {
 			var bias = calculateBias(ctx, biased);
 			var acv = 0.22385762508460333;
-			
+
 			var pts = getRRCoords([ 0, 0, 0, 0.5 ], rr, bias);
 			ctx.moveTo(pts[0], pts[1]);
 
@@ -786,7 +788,7 @@
 
 			ctx.closePath();
 		}
-		
+
 		function getRRCoords(pts, rr, bias) {
 			var coords = [];
 			var nc = 0;
@@ -840,7 +842,7 @@
 				break;
 			}
 		}
-		
+
 		function calculateBias(ctx, biased) {
 			return (ctx.lineWidth & 1) && biased ? 0.5 : 0;
 		}
@@ -860,7 +862,7 @@
 				}
 			});
 		}
-		
+
 		function initializeFontFaces (fontFaces){
 			return new Promise(function(resolve, reject) {
 				try {
@@ -888,14 +890,14 @@
 						Promise.all(loadedFonts).then(resolve);
 					} else {
 						resolve();
-					}				
+					}
 				} catch (e) {
 					config.onErrorMessage(error);
 					reject(e);
 				}
 			});
 		}
-		
+
 		function isFontAvailable(fontName) {
 		    var canvas = document.createElement("canvas");
 		    var context = canvas.getContext("2d");
@@ -910,7 +912,7 @@
 		        return true;
 		    }
 		}
-		
+
 		function getFontFaceData(name, font, style) {
 			var fontFaceCss = "@font-face {";
 			fontFaceCss += "font-family: '"+name+"';";
@@ -921,7 +923,7 @@
 			fontFaceCss += "}";
 			return fontFaceCss
 		}
-		
+
 		function prepareImagesInternal(images, resolve, reject){
 			if (images.length > 0) {
 				var loadedImages = images.map(function(image) {
@@ -939,7 +941,7 @@
 				resolve();
 			}
 		}
-		
+
 		function toBase64(data) {
 			var binary = '';
 			var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
@@ -949,11 +951,11 @@
 			}
 			return  window.btoa(binary);
 		}
-		
+
 		function getImageData(image) {
 			return "data:image/png;base64," + toBase64(image.data);
 		}
-		
+
 		function fillRule(constant) {
 			if (constant.path != null) {
 				return constant.path.windingOdd ? 'evenodd' : 'nonzero';
@@ -996,8 +998,8 @@
 				document.body.removeChild(element);
 			});
 		}
-		
-		
+
+
 		return {
 			draw64 : draw64,
 			drawBin : drawBin,

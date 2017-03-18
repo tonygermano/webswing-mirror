@@ -1,6 +1,7 @@
 $.ajax({
 	url : "/draw/tests",
 }).done(function(d) {
+    ES6Promise.polyfill();
 	var data = $.parseJSON(d);
 
 	var selected = getUrlParameter('n');
