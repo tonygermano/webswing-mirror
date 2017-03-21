@@ -415,7 +415,7 @@ define([ 'webswing-dd', 'webswing-util' ], function amdFactory(WebswingDirectDra
 				sessionId : api.getSocketId(),
 				locale : api.getLocale(),
 				mirrored : api.cfg.mirrorMode,
-				directDrawSupported : api.cfg.typedArraysSupported,
+				directDrawSupported : api.cfg.typedArraysSupported && !(api.cfg.ieVersion && api.cfg.ieVersion <= 10),
 				url: window.location.href
 			};
 
