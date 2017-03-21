@@ -182,8 +182,8 @@ public class WebswingApiImpl implements WebswingApi {
 						String value = null;
 						if (param.contains("=")) {
 							int eq = param.indexOf("=");
-							key = URLDecoder.decode(param.substring(eq + 1), "UTF-8");
-							value = URLDecoder.decode(param.substring(0, eq), "UTF-8");
+							key = URLDecoder.decode(param.substring(0, eq), "UTF-8");
+							value = URLDecoder.decode(param.substring(eq + 1), "UTF-8");
 						}
 						parameters.put(key, value);
 					}
@@ -292,7 +292,7 @@ public class WebswingApiImpl implements WebswingApi {
 
 					String value = state.getParameters().get(key);
 					if (value != null) {
-						url += "&" + URLEncoder.encode(value, "UTF-8");
+						url += "=" + URLEncoder.encode(value, "UTF-8");
 					}
 				}
 			}
