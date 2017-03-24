@@ -17,6 +17,7 @@ public class CursorChangeEventMsg implements Msg {
 	public static final String NOT_ALLOWED_CURSOR = "not-allowed";
 	private String cursor;
 	private byte[] b64img;
+	private String curFile;
 	private int x;
 	private int y;
 
@@ -60,4 +61,11 @@ public class CursorChangeEventMsg implements Msg {
 		this.y = y;
 	}
 
+	public String getCurFile() {
+		return curFile;
+	}
+
+	public void setCurFile(String curFile) {
+		this.curFile = curFile;
+	}
 }

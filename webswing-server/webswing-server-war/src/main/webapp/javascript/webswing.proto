@@ -53,7 +53,8 @@ message CursorChangeEventMsgProto{
 	required string cursor = 1;
 	optional bytes b64img = 2;
 	optional sint32 x = 3;
-	optional sint32 y = 4; 
+	optional sint32 y = 4;
+	optional string curFile = 5;
 }
 
 message CopyEventMsgProto{

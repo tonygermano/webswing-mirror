@@ -17,6 +17,7 @@ import org.webswing.model.c2s.TimestampsMsgIn;
 import org.webswing.model.internal.*;
 import org.webswing.model.internal.ApiEventMsgInternal.ApiEventType;
 import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.model.s2c.CursorChangeEventMsg;
 import org.webswing.model.s2c.LinkActionMsg;
 import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
 import org.webswing.model.s2c.SimpleEventMsgOut;
@@ -328,6 +329,14 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				ExitMsgInternal e = (ExitMsgInternal) o;
 				kill(e.getWaitForExit());
 			}
+		} else if (o instanceof AppFrameMsgOut && ((AppFrameMsgOut) o).getCursorChange() != null) {
+			CursorChangeEventMsg cmsg = ((AppFrameMsgOut) o).getCursorChange();
+			if (cmsg.getCurFile() != null) {
+				File cur = new File(cmsg.getCurFile());
+				boolean success = fileHandler.registerFile(cur, cur.getName(), 1, TimeUnit.DAYS, getUser(), getInstanceId(), false, null);
+				cmsg.setCurFile(cur.getName());
+			}
+			sendToWeb((MsgOut) o);
 		} else if (o instanceof MsgOut) {
 			sendToWeb((MsgOut) o);
 		}

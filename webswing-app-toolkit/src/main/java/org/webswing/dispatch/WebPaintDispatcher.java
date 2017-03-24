@@ -347,6 +347,10 @@ public class WebPaintDispatcher {
 				cursorChange.setB64img(Services.getImageService().getPngImage(img));
 				cursorChange.setX(c.getHotSpot() != null ? c.getHotSpot().x : 0);
 				cursorChange.setY(c.getHotSpot() != null ? c.getHotSpot().y : 0);
+				File file = Util.convertAndSaveCursor(img,cursorChange.getX(),cursorChange.getY());
+				if (file != null) {
+					cursorChange.setCurFile(file.getAbsolutePath());
+				}
 			}
 			f.setCursorChange(cursorChange);
 			WindowManager.getInstance().setCurrentCursor(webcursorName);

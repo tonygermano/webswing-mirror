@@ -19,18 +19,56 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.awt.image.*;
+import java.io.*;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.*;
 import java.util.List;
 
 public class Util {
+
+	public static File convertAndSaveCursor(BufferedImage img, int x, int y) {
+		String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
+		try {
+			byte[] bytes = convertToIco(img, x, y);
+			int id = Arrays.hashCode(bytes);
+			File f = new File(URI.create(tempDir + "/c" + id + ".cur"));
+			if (!f.exists()) {
+				FileOutputStream output = new FileOutputStream(f);
+				output.write(bytes);
+				output.close();
+			}
+			return f;
+		} catch (Exception e) {
+			Logger.error("Failed to save cursor to file.", e);
+		}
+		return null;
+	}
+
+	private static byte[] convertToIco(BufferedImage img, int hotspotx, int hotspoty) throws IOException {
+		byte[] imgBytes = Services.getImageService().getPngImage(img);
+
+		ByteBuffer bytes = ByteBuffer.allocate(imgBytes.length + 22);
+		bytes.order(ByteOrder.LITTLE_ENDIAN);
+
+		bytes.putShort((short) 0);
+		bytes.putShort((short) 1);
+		bytes.putShort((short) 1);
+		bytes.put((byte) img.getWidth());
+		bytes.put((byte) img.getHeight()); //no need to multiply
+		bytes.put((byte) img.getColorModel().getNumColorComponents()); //the pallet size
+		bytes.put((byte) 0);
+		bytes.putShort((short) hotspotx);
+		bytes.putShort((short) hotspoty);
+		bytes.putInt(imgBytes.length);
+		bytes.putInt(22);
+		bytes.put(imgBytes);
+		return bytes.array();
+
+	}
 
 	private static List<Integer> NO_CHAR_KEY_CODES = Arrays
 			.asList(KeyEvent.VK_F1, KeyEvent.VK_F2, KeyEvent.VK_F3, KeyEvent.VK_F4, KeyEvent.VK_F5, KeyEvent.VK_F6, KeyEvent.VK_F7, KeyEvent.VK_F8, KeyEvent.VK_F9, KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12, KeyEvent.VK_PRINTSCREEN, KeyEvent.VK_SCROLL_LOCK, KeyEvent.VK_PAUSE, KeyEvent.VK_INSERT, KeyEvent.VK_HOME, KeyEvent.VK_PAGE_DOWN,
