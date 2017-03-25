@@ -403,7 +403,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                 return cursorMsg.cursor;
             } else {
                 if (api.cfg.ieVersion) {
-                    return 'url(\'file?id=' + cursorMsg.curFile + '\'), auto';
+                    return 'url(\'' + api.cfg.connectionUrl + 'file?id=' + cursorMsg.curFile + '\'), auto';
                 } else {
                     var data = util.getImageString(cursorMsg.b64img);
                     return 'url(' + data + ') ' + cursorMsg.x + ' ' + cursorMsg.y + ' , auto';
