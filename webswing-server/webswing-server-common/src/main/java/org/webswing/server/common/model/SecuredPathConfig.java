@@ -19,7 +19,7 @@ public interface SecuredPathConfig extends Config {
 	@ConfigField(label = "Context Path", description = "Url context path where the application will be deployed.")
 	public String getPath();
 
-	@ConfigField(label = "Home Folder", description = "Swing application's home directory. Swing application instances will be executed from this directory. This will also be the base directory of any relative classpath entries specified.")
+	@ConfigField(label = "Home Folder", description = "Application's home directory. Application instances will be executed from this directory. This will also be the base directory of any relative classpath entries specified.")
 	@ConfigFieldVariables
 	@ConfigFieldDiscriminator
 	@ConfigFieldDefaultValueString("${user.dir}")
@@ -39,6 +39,6 @@ public interface SecuredPathConfig extends Config {
 	@ConfigFieldDefaultValueObject(HashMap.class)
 	public Map<String, Object> getSecurity();
 
-	@ConfigField(label = "Swing App")
+	@ConfigField(label = "Application")
 	SwingConfig getSwingConfig();
 }

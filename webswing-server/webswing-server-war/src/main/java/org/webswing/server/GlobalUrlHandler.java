@@ -120,7 +120,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	}
 
 	public void loadApplications() {
-		log.info("Loading configured Swing applications.");
+		log.info("Loading configured Applications.");
 		synchronized (instanceManagers) {
 			for (String path : configService.getPaths()) {
 				SecuredPathConfig configPath = configService.getConfiguration(path);
@@ -130,7 +130,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 					if (childHandler == null) {
 						installApplication(configPath);
 					} else {
-						log.error("Application with path '" + pathMapping + "' already exists! Application skipped.", new IllegalStateException("Invalid Swing configuration."));
+						log.error("Application with path '" + pathMapping + "' already exists! Application skipped.", new IllegalStateException("Invalid Application configuration."));
 					}
 				}
 			}
@@ -340,11 +340,11 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 					uninstallApplication(swingManager);
 					return;
 				} else {
-					throw new WsException("Unable to Remove Swing app '" + path + "' while running. Stop the app first");
+					throw new WsException("Unable to Remove App '" + path + "' while running. Stop the app first");
 				}
 			}
 		}
-		throw new WsException("Unable to remove Swing app '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
+		throw new WsException("Unable to remove App '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	@GET
@@ -358,11 +358,11 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 				installApplication(configService.getConfiguration(path));
 				return;
 			} else {
-				throw new WsException("Unable to Create Swing app '" + path + "'. Application already exits.");
+				throw new WsException("Unable to Create App '" + path + "'. Application already exits.");
 
 			}
 		}
-		throw new WsException("Unable to create Swing app '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
+		throw new WsException("Unable to create App '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	@POST

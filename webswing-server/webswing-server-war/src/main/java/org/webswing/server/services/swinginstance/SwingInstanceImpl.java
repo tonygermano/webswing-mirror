@@ -114,7 +114,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			notifyUserConnected();
 		} catch (Exception e) {
 			notifyExiting();
-			throw new WsException("Failed to create Swing instance.", e);
+			throw new WsException("Failed to create App instance.", e);
 		}
 		this.sessionRecorder = ServerUtil.isRecording(websocket.getRequest()) ? new SessionRecorder(this) : null;
 		logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, websocket.isWebsocketTransport() ? 1 : 2);

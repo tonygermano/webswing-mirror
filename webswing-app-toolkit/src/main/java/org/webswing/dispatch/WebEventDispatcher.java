@@ -123,7 +123,7 @@ public class WebEventDispatcher {
 		Logger.debug("WebEventDispatcher.dispatchMessage", message);
 		switch (message.getType()) {
 		case killSwing:
-			Logger.info("Received kill signal. Swing application shutting down.");
+			Logger.info("Received kill signal. Application shutting down.");
 			Util.getWebToolkit().exitSwing(0);
 			break;
 		case deleteFile:
@@ -150,7 +150,7 @@ public class WebEventDispatcher {
 		case unload:
 			boolean instantExit = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) == 0;
 			if (instantExit) {
-				Logger.warn("Exiting swing application. Client has disconnected from web session. (swingSessionTimeout setting is 0 or less)");
+				Logger.warn("Exiting Application. Client has disconnected from web session. (swingSessionTimeout setting is 0 or less)");
 				Util.getWebToolkit().exitSwing(1);
 			}
 			break;

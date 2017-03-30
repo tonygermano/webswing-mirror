@@ -74,8 +74,8 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 			WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
 			loadConfiguration();
 		} catch (Exception e) {
-			log.error("Failed to save Swing configuration for '" + path + "':", e);
-			throw new Exception("Failed to save Swing configuration for '" + path + "':", e);
+			log.error("Failed to save configuration for '" + path + "':", e);
+			throw new Exception("Failed to save configuration for '" + path + "':", e);
 		}
 	}
 
@@ -119,7 +119,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 			MetaObject result = ConfigUtil.getConfigMetadata(securedPathConfig, cl, ctx);
 			result.setData(json);
 			if (ctx.isStarted() && !path.equals("/")) {
-				result.setMessage("Note: Only Swing configuration can be modified while the application is running. Stop the application to edit the Security configuration.");
+				result.setMessage("Note: Only App related configuration can be modified while the application is running. Stop the application to edit the Security configuration.");
 			}
 			return result;
 		} catch (Exception e) {

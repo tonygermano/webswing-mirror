@@ -71,7 +71,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					if (diff > timeoutMs) {
 						if (!terminated) {//only call once
 							terminated = true;
-							Logger.warn("Exiting swing application due to inactivity for " + diff / 1000 + " seconds.");
+							Logger.warn("Exiting application due to inactivity for " + diff / 1000 + " seconds.");
 							Util.getWebToolkit().exitSwing(1);
 						}
 					}
@@ -111,7 +111,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 				}
 			});
 		} catch (JMSException e) {
-			Logger.error("Exiting swing application because could not connect to JMS:" + e.getMessage(), e);
+			Logger.error("Exiting application because could not connect to JMS:" + e.getMessage(), e);
 			System.exit(1);
 		}
 

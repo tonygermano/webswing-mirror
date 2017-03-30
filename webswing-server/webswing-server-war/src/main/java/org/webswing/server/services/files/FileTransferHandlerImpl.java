@@ -164,7 +164,7 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 						}
 					}
 				} else {
-					throw new Exception("Related Swing instance not found.(" + clientId + ")");
+					throw new Exception("Related App instance not found.(" + clientId + ")");
 				}
 			} else {
 				throw new Exception("clientId not specified in request");

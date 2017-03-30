@@ -25,9 +25,9 @@ public interface SwingConfig extends Config {
 		Desktop;
 	}
 
-	@ConfigField(tab = ConfigGroup.General, label = "Name", description = "Swing application name.")
+	@ConfigField(tab = ConfigGroup.General, label = "Name", description = "Application name.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
-	@ConfigFieldDefaultValueString("Swing app")
+	@ConfigFieldDefaultValueString("My Application")
 	public String getName();
 
 	@ConfigField(tab = ConfigGroup.General, label = "Theme", description = "Select one of the default window decoration themes or a enter path to a XFWM4 theme folder.")
@@ -36,12 +36,12 @@ public interface SwingConfig extends Config {
 	@ConfigFieldPresets({ "Murrine", "Agualemon", "Sassandra", "Therapy", "Totem", "Vertex", "Vertex-Light" })
 	public String getTheme();
 
-	@ConfigField(tab = ConfigGroup.General, label = "Fonts", description = "Customize logical font mappings and define physical fonts available to swing application. These fonts (TTF only) will be used for DirectDraw as native fonts. Key: name of font (ie. dialog|dialoginput|sansserif|serif|monospaced), Value: path to font file.")
+	@ConfigField(tab = ConfigGroup.General, label = "Fonts", description = "Customize logical font mappings and define physical fonts available to application. These fonts (TTF only) will be used for DirectDraw as native fonts. Key: name of font (ie. dialog|dialoginput|sansserif|serif|monospaced), Value: path to font file.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldPresets({ "dialog", "dialoginput", "sansserif", "serif", "monospaced" })
 	public Map<String, String> getFontConfig();
 
-	@ConfigField(tab = ConfigGroup.General, label = "DirectDraw Rendering", description = "DirectDraw rendering mode uses canvas instructions to render the swing application instead of server-rendered png images. DirectDraw improves performance but is not recomended for applications with lot of graphics content.")
+	@ConfigField(tab = ConfigGroup.General, label = "DirectDraw Rendering", description = "DirectDraw rendering mode uses canvas instructions to render the application instead of server-rendered png images. DirectDraw improves performance but is not recomended for applications with lot of graphics content.")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isDirectdraw();
 
@@ -53,12 +53,12 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isDebug();
 
-	@ConfigField(tab = ConfigGroup.Java, label = "Working directory", description = "The User working directory. Path from which the swing process will be started. (See the Java System Property: 'user.dir')")
+	@ConfigField(tab = ConfigGroup.Java, label = "Working directory", description = "The User working directory. Path from which the application process will be started. (See the Java System Property: 'user.dir')")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("")
 	public String getUserDir();
 
-	@ConfigField(tab = ConfigGroup.Java, label = "JRE Executable", description = "Path to java executable that will be used to spawn swing application process. Java 6,7 and 8 is supported.")
+	@ConfigField(tab = ConfigGroup.Java, label = "JRE Executable", description = "Path to java executable that will be used to spawn application process. Java 6,7 and 8 is supported.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("${java.home}/bin/java")
 	public String getJreExecutable();
@@ -68,7 +68,7 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueString("${java.version}")
 	public String getJavaVersion();
 
-	@ConfigField(tab = ConfigGroup.Java, label = "Class Path", description = "Swing application's classpath. Absolute or relative path to jar file or classes directory. At least one classPath entry should be specified containing the main class. Supports ? and * wildcards.")
+	@ConfigField(tab = ConfigGroup.Java, label = "Class Path", description = "Application's classpath. Absolute or relative path to jar file or classes directory. At least one classPath entry should be specified containing the main class. Supports ? and * wildcards.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	public List<String> getClassPathEntries();
 
@@ -76,7 +76,7 @@ public interface SwingConfig extends Config {
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	public String getVmArgs();
 
-	@ConfigField(tab = ConfigGroup.Java, label = "Launcher Type", description = "Select the application type. Applet or regular Desktop swing application.")
+	@ConfigField(tab = ConfigGroup.Java, label = "Launcher Type", description = "Select the application type. Applet or regular Desktop Application.")
 	@ConfigFieldDefaultValueString("Desktop")
 	@ConfigFieldDiscriminator
 	public LauncherType getLauncherType();
@@ -90,11 +90,11 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueNumber(1)
 	public int getMaxClients();
 
-	@ConfigField(tab = ConfigGroup.Session, label = "Session Mode", description = "Select session behavior when user reconnects to application. 1.ALWAYS_NEW_SESSION: New swing application is started for every Webswing session. (Session timeout will be set to 0) 2.CONTINUE_FOR_BROWSER: Webswing session can be resumed in the same browser after connection is terminated (Session timeout applies). 3.CONTINUE_FOR_USER: Swing session can be resumed by the same user from any computer after the connection is terminated(Session timeout applies).")
+	@ConfigField(tab = ConfigGroup.Session, label = "Session Mode", description = "Select session behavior when user reconnects to application. 1.ALWAYS_NEW_SESSION: New application is started for every Webswing session. (Session timeout will be set to 0) 2.CONTINUE_FOR_BROWSER: Webswing session can be resumed in the same browser after connection is terminated (Session timeout applies). 3.CONTINUE_FOR_USER: Application session can be resumed by the same user from any computer after the connection is terminated(Session timeout applies).")
 	@ConfigFieldDefaultValueString("CONTINUE_FOR_BROWSER")
 	public SessionMode getSessionMode();
 
-	@ConfigField(tab = ConfigGroup.Session, label = "Session Timeout", description = "Specifies how long (seconds) will be the swing application left running after the user closes the browser. User can reconnect in this interval and continue in last session.")
+	@ConfigField(tab = ConfigGroup.Session, label = "Session Timeout", description = "Specifies how long (seconds) will be the application left running after the user closes the browser. User can reconnect in this interval and continue in last session.")
 	@ConfigFieldDefaultValueNumber(300)
 	public int getSwingSessionTimeout();
 
@@ -102,12 +102,12 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowStealSession();
 
-	@ConfigField(tab = ConfigGroup.Session, label = "Auto Logout", description = "If enabled, user is automatically logged out after the swing application finished.")
+	@ConfigField(tab = ConfigGroup.Session, label = "Auto Logout", description = "If enabled, user is automatically logged out after the application finished.")
 	@ConfigFieldDefaultValueBoolean(true)
 	@ConfigFieldDiscriminator
 	public boolean isAutoLogout();
 
-	@ConfigField(tab = ConfigGroup.Session, label = "Goodbye URL", description = "Absolute or relative URL to redirect to, when swing application exits. Use '/' to navigate back to Application selector.")
+	@ConfigField(tab = ConfigGroup.Session, label = "Goodbye URL", description = "Absolute or relative URL to redirect to, when application exits. Use '/' to navigate back to Application selector.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("")
 	String getGoodbyeUrl();
@@ -148,7 +148,7 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueString("${user}/upload")
 	public String getTransferDir();
 
-	@ConfigField(tab = ConfigGroup.Features, label = "Clear Upload Folder", description = "If enabled, all files in the transfer folder will be deleted when the swing process is terminated.")
+	@ConfigField(tab = ConfigGroup.Features, label = "Clear Upload Folder", description = "If enabled, all files in the transfer folder will be deleted when the application process is terminated.")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isClearTransferDir();
 
@@ -159,7 +159,7 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.Features, label = "Domains Allowed to Embed", description = "If you are embedding webswing to page on different domain, you have to enable Cross-origin resource sharing (CORS) by adding the domain in this list. Use * to allow all domains.")
 	public List<String> getAllowedCorsOrigins();
 
-	@ConfigField(tab = ConfigGroup.Features, label = "Allow JsLink", description = "If selected, the JSLink feature will be enabled, allowing swing application to invoke javascript and vice versa. (See netscape.javascript.JSObject)")
+	@ConfigField(tab = ConfigGroup.Features, label = "Allow JsLink", description = "If selected, the JSLink feature will be enabled, allowing application to invoke javascript and vice versa. (See netscape.javascript.JSObject)")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowJsLink();
 

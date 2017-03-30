@@ -16,7 +16,7 @@
                 }
 
                 function failed(data) {
-                    return errorHandler.handleRestError('load swing sessions', data, true);
+                    return errorHandler.handleRestError('load sessions', data, true);
                 }
             }
 
@@ -27,7 +27,7 @@
                 }
 
                 function failed(data) {
-                    return errorHandler.handleRestError('load swing session ' + id, data, true);
+                    return errorHandler.handleRestError('load session ' + id, data, true);
                 }
             }
 
@@ -45,7 +45,7 @@
             function forceKillSession(path, id) {
                 return $http.delete(toPath(path) + '/rest/session/' + id + '?force=true').then(success, failed);
                 function success(data) {
-                    messageService.info('Swing application process has been forcefully terminated.');
+                    messageService.info('Application process has been forcefully terminated.');
                 }
 
                 function failed(data) {
@@ -56,7 +56,7 @@
             function killSession(path, id) {
                 return $http.delete(toPath(path) + '/rest/session/' + id).then(success, failed);
                 function success(data) {
-                    messageService.info('Swing application signalled to exit.');
+                    messageService.info('Application signalled to exit.');
                 }
 
                 function failed(data) {

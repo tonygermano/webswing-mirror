@@ -123,7 +123,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 						SwingInstance swingInstance = instanceFactory.create(this, fileHandler, h, getSwingConfig(), r);
 						runningInstances.add(swingInstance);
 					} catch (Exception e) {
-						log.error("Failed to create Swing instance.", e);
+						log.error("Failed to create Application instance.", e);
 					}
 				} else {
 					r.broadcastMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
@@ -209,7 +209,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Path("/stop")
 	public void stop() throws WsException {
 		if (runningInstances.size() > 0) {
-			throw new WsException("Can not Stop if swing sessions are running. Please stop sessions first.");
+			throw new WsException("Can not Stop if Application sessions are running. Please stop sessions first.");
 		}
 		super.stop();
 	}

@@ -47,7 +47,7 @@ public class SwingProcessImpl implements SwingProcess {
 			if (verifyBaseDir()) {
 				processBuilder.directory(new File(config.getBaseDir()));
 			}
-			log.info("Starting swing process [" + config.getName() + "] from [" + config.getBaseDir() + "] :" + processBuilder.command());
+			log.info("Starting application process [" + config.getName() + "] from [" + config.getBaseDir() + "] :" + processBuilder.command());
 			process = processBuilder.start();
 			logsProcessor = processHandlerThread.scheduleAtFixedRate(new Runnable() {
 
@@ -62,7 +62,7 @@ public class SwingProcessImpl implements SwingProcess {
 							processStream(out, bufferOut, buffer, config.getName(), false);
 							processStream(err, bufferErr, buffer, config.getName(), true);
 						} catch (Exception e) {
-							log.error("Failed to process process logs for swing process " + config.getName(), e);
+							log.error("Failed to process process logs for application process " + config.getName(), e);
 							destroy();
 						}
 						if (!SwingProcessImpl.this.isRunning()) {
@@ -92,7 +92,7 @@ public class SwingProcessImpl implements SwingProcess {
 				} else if (!file.canRead()) {
 					error = "Directory is not accessible";
 				}
-				throw new IllegalArgumentException("Failed to start swing process with base dir:'" + config.getBaseDir() + "'. " + error);
+				throw new IllegalArgumentException("Failed to start application process with base dir:'" + config.getBaseDir() + "'. " + error);
 			}
 		}
 	}
@@ -103,7 +103,7 @@ public class SwingProcessImpl implements SwingProcess {
 
 	public void destroy(int delayMs) {
 		if (delayMs > 0 && delayedTermination == null) {
-			log.info("Waiting " + delayMs + "ms for swing process " + config.getName() + " to end.");
+			log.info("Waiting " + delayMs + "ms for app process " + config.getName() + " to end.");
 			delayedTermination = processHandlerThread.schedule(new Runnable() {
 				@Override
 				public void run() {
@@ -119,7 +119,7 @@ public class SwingProcessImpl implements SwingProcess {
 				destroyInternal();
 			} finally {
 				logsProcessor.cancel(false);
-				log.info("[" + config.getName() + "] Swing process terminated. ");
+				log.info("[" + config.getName() + "] app process terminated. ");
 				if (getCloseListener() != null) {
 					try {
 						getCloseListener().onClose();
@@ -134,7 +134,7 @@ public class SwingProcessImpl implements SwingProcess {
 
 	private void destroyInternal() {
 		if (isRunning()) {
-			log.info("Killing Swing process " + config.getName() + ".");
+			log.info("Killing Application process " + config.getName() + ".");
 			process.destroy();
 			forceKilled = true;
 		}

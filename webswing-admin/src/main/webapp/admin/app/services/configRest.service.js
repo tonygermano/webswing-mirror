@@ -21,7 +21,7 @@
 					return data.data;
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('load installed swing apps', data, true);
+					return errorHandler.handleRestError('load installed apps', data, true);
 				}
 			}
 
@@ -31,7 +31,7 @@
 					return data.data;
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('load installed swing apps', data, true);
+					return errorHandler.handleRestError('load installed apps', data, true);
 				}
 			}
 
@@ -58,7 +58,7 @@
 			function setSwingConfig(path, config) {
 				return $http.post(toPath(path) + '/rest/swingConfig', config).then(success, failed);
 				function success() {
-					messageService.success('Swing Configuration saved.');
+					messageService.success('App Configuration saved.');
 				}
 				function failed(data) {
 					return errorHandler.handleRestError('save ' + path + ' configuration', data);
@@ -68,40 +68,40 @@
 			function start(path) {
 				return $http.get(toPath(path) + '/start').then(success, failed);
 				function success() {
-					messageService.success('Swing application ' + toPath(path) + ' started.');
+					messageService.success('Application ' + toPath(path) + ' started.');
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('start ' + path + ' Swing application', data);
+					return errorHandler.handleRestError('start ' + path + ' application', data);
 				}
 			}
 
 			function stop(path) {
 				return $http.get(toPath(path) + '/stop').then(success, failed);
 				function success() {
-					messageService.success('Swing application ' + toPath(path) + ' stopped.');
+					messageService.success('Application ' + toPath(path) + ' stopped.');
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('stop ' + path + ' Swing application', data);
+					return errorHandler.handleRestError('stop ' + path + ' application', data);
 				}
 			}
 
 			function create(path) {
 				return $http.get(baseUrl + '/rest/create' + toPath(path)).then(success, failed);
 				function success() {
-					messageService.success('Swing application ' + toPath(path) + ' created.');
+					messageService.success('Application ' + toPath(path) + ' created.');
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('create Swing application', data);
+					return errorHandler.handleRestError('create application', data);
 				}
 			}
 
 			function remove(path) {
 				return $http.get(baseUrl + '/rest/remove' + toPath(path)).then(success, failed);
 				function success() {
-					messageService.success('Swing application ' + toPath(path) + ' removed.');
+					messageService.success('Application ' + toPath(path) + ' removed.');
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('uninstall ' + path + ' Swing application', data);
+					return errorHandler.handleRestError('uninstall ' + path + ' application', data);
 				}
 			}
 
