@@ -14,4 +14,10 @@ public interface WebswingUrlStateChangeEvent {
 	 * @return URL state parsed from the hash fragmet part of URL
 	 */
 	WebswingUrlState getState();
+
+
+	/**
+	 * @return Previous Url state
+	 */
+	WebswingUrlState getOldState();
 }

@@ -118,8 +118,9 @@ public class WebswingApiImpl implements WebswingApi {
 			final ConnectionHandshakeMsgIn event = (ConnectionHandshakeMsgIn) msg;
 			WebswingUrlState state = parseState(event.getUrl());
 			if (this.state == null || !this.state.equals(state)) {
+				WebswingUrlState oldState = this.state;
 				this.state = state;
-				final WebswingUrlStateChangeEvent stateChangeEvent = createEvent(event.getUrl(), state);
+				final WebswingUrlStateChangeEvent stateChangeEvent = createEvent(event.getUrl(), state, oldState);
 				apiProcessor.submit(new Runnable() {
 					@Override
 					public void run() {
@@ -199,8 +200,8 @@ public class WebswingApiImpl implements WebswingApi {
 		return new WebswingUrlState();
 	}
 
-	private WebswingUrlStateChangeEvent createEvent(String url, WebswingUrlState state) {
-		return new WebswingUrlStateChangeEventImpl(url, new WebswingUrlState(state));
+	private WebswingUrlStateChangeEvent createEvent(String url, WebswingUrlState state, WebswingUrlState oldState) {
+		return new WebswingUrlStateChangeEventImpl(url, new WebswingUrlState(state), oldState);
 	}
 
 	void fireShutdownListeners() {
@@ -328,10 +329,12 @@ public class WebswingApiImpl implements WebswingApi {
 
 		private String url;
 		private WebswingUrlState state;
+		private WebswingUrlState oldState;
 
-		WebswingUrlStateChangeEventImpl(String url, WebswingUrlState state) {
+		WebswingUrlStateChangeEventImpl(String url, WebswingUrlState state, WebswingUrlState oldState) {
 			this.url = url;
 			this.state = state;
+			this.oldState = oldState;
 		}
 
 		@Override
@@ -342,6 +345,11 @@ public class WebswingApiImpl implements WebswingApi {
 		@Override
 		public WebswingUrlState getState() {
 			return state;
+		}
+
+		@Override
+		public WebswingUrlState getOldState() {
+			return oldState;
 		}
 	}
 

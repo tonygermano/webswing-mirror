@@ -113,6 +113,9 @@ public class DemoSelectorPanel extends JPanel {
 			WebswingUtil.getWebswingApi().addUrlStateChangeListener(new WebswingUrlStateChangeListener() {
 				@Override
 				public void onUrlStateChange(WebswingUrlStateChangeEvent event) {
+					if(event.getState().isEmpty() && !event.getOldState().isEmpty()){
+						WebswingUtil.getWebswingApi().setUrlState(event.getOldState(),false);
+					}
 					selectDemo(demoSet, event.getState().getPath());
 				}
 			});

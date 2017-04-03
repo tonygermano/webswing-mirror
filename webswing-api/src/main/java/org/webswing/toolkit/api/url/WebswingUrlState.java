@@ -1,6 +1,7 @@
 package org.webswing.toolkit.api.url;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Map;
 public class WebswingUrlState {
 
 	String path;
-	Map<String, String> parameters = new HashMap<String, String>();
+	Map<String, String> parameters = new LinkedHashMap<String, String>();
 
 	public WebswingUrlState() {
 	}
@@ -47,6 +48,10 @@ public class WebswingUrlState {
 
 	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
+	}
+
+	public boolean isEmpty() {
+		return path == null && (parameters == null || parameters.isEmpty());
 	}
 
 	@Override

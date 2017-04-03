@@ -36,6 +36,10 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -46,10 +50,15 @@ import javax.swing.table.TableModel;
 
 import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.table.OscarCellRenderers.RowRenderer;
+import org.webswing.toolkit.api.WebswingUtil;
+import org.webswing.toolkit.api.url.WebswingUrlState;
+import org.webswing.toolkit.api.url.WebswingUrlStateChangeEvent;
+import org.webswing.toolkit.api.url.WebswingUrlStateChangeListener;
 
 @DemoProperties(value = "Clipboard", category = "Webswing", description = "Demonstrates Clipboard integration.", sourceFiles = { "org/webswing/demo/dnd/ClipboardDemo.java" })
 public class ClipboardDemo extends JPanel {
 
+	private final JTable table1;
 	private Color[] rowColors;
 
 	public ClipboardDemo() {
@@ -62,7 +71,29 @@ public class ClipboardDemo extends JPanel {
 		model1.addRow(new Object[] { null, null, "<p> Formated <b>HTML</b> text</p>", null });
 		model1.addRow(new Object[] { createImage("resources/images/ClipboardDemo.gif"), null, null, null });
 		model1.addRow(new Object[] { null, null, null, createFiles(1) });
-		JScrollPane scrollpane1 = new JScrollPane(createTable(model1));
+		table1 = createTable(model1);
+		if (WebswingUtil.isWebswing()) {
+			setSelectionFromPath();
+			WebswingUtil.getWebswingApi().addUrlStateChangeListener(new WebswingUrlStateChangeListener() {
+				@Override
+				public void onUrlStateChange(WebswingUrlStateChangeEvent event) {
+					setSelectionFromPath();
+				}
+			});
+
+		}
+		table1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				int i = table1.getSelectedRow();
+				if (WebswingUtil.isWebswing()) {
+					WebswingUrlState state = WebswingUtil.getWebswingApi().getUrlState();
+					state.getParameters().put("row", i + "");
+					WebswingUtil.getWebswingApi().setUrlState(state,false);
+				}
+			}
+		});
+		JScrollPane scrollpane1 = new JScrollPane(table1);
 		scrollpane1.setBorder(BorderFactory.createTitledBorder("Copy Table"));
 		panel.add(scrollpane1);
 		add(panel, BorderLayout.NORTH);
@@ -71,7 +102,7 @@ public class ClipboardDemo extends JPanel {
 	public JTable createTable(TableModel tableModel) {
 
 		//<snip>Create JTable
-		JTable clipboardTable = new JTable(tableModel);
+		final JTable clipboardTable = new JTable(tableModel);
 		//</snip>
 
 		//</snip>Set JTable display properties
@@ -148,7 +179,22 @@ public class ClipboardDemo extends JPanel {
 		clipboardTable.registerKeyboardAction(new PasteAction(clipboardTable), "Paste", paste, JComponent.WHEN_FOCUSED);
 		clipboardTable.registerKeyboardAction(new PasteSpecialAction(clipboardTable), "PasteSpecial", pasteSpecial, JComponent.WHEN_FOCUSED);
 		clipboardTable.registerKeyboardAction(new CutAction(clipboardTable), "Cut", cut, JComponent.WHEN_FOCUSED);
+
 		return clipboardTable;
+	}
+
+	private void setSelectionFromPath() {
+		WebswingUrlState state = WebswingUtil.getWebswingApi().getUrlState();
+		if (state!=null && state.getPath()!=null && state.getPath().equals("Clipboard")) {
+			String r = state.getParameters().get("row");
+			if (r != null) {
+				try {
+					int i = Integer.parseInt(r);
+					table1.setRowSelectionInterval(i, i);
+				} catch (NumberFormatException e) {
+				}
+			}
+		}
 	}
 
 	//<snip>Initialize table columns

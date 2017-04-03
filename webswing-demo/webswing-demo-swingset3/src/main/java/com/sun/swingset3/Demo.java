@@ -268,7 +268,9 @@ public class Demo {
     
     protected void setState(State state) {
         if(state==State.RUNNING && WebswingUtil.isWebswing()){
-            WebswingUtil.getWebswingApi().setUrlState(new WebswingUrlState(getName()));
+            WebswingUrlState s = WebswingUtil.getWebswingApi().getUrlState();
+            s.setPath(getName());
+            WebswingUtil.getWebswingApi().setUrlState(s);
         }
         State oldState = this.state;
         this.state = state;
