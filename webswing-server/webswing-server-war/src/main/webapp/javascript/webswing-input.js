@@ -107,7 +107,6 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             }, false);
             util.bindEvent(canvas, 'mousemove', function (evt) {
                 var mousePos = getMousePos(canvas, evt, 'mousemove');
-                mousePos.mouse.button = mouseDown;
                 latestMouseMoveEvent = mousePos;
                 return false;
             }, false);
@@ -246,9 +245,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
         }
 
         function mouseDownEventHandler(evt) {
-            if (evt.which == 1) {
-                mouseDown = 1;
-            }
+            mouseDown = mouseDown | Math.pow(2,evt.which);
         }
 
         function mouseOutEventHandler(evt) {
@@ -256,9 +253,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
         }
 
         function mouseUpEventHandler(evt) {
-            if (evt.which == 1) {
-                mouseDown = 0;
-            }
+            mouseDown = mouseDown & ~Math.pow(2,evt.which);
         }
 
         function focusInput(input) {
@@ -284,6 +279,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
                     type: type,
                     wheelDelta: delta,
                     button: evt.which,
+                    buttons: mouseDown,
                     ctrl: evt.ctrlKey,
                     alt: evt.altKey,
                     shift: evt.shiftKey,

@@ -232,6 +232,7 @@ message MouseEventMsgInProto{
 	optional bool alt = 7;
 	optional bool shift = 8;
 	optional bool meta = 9;
+	optional sint32 buttons = 10;
 
 	enum MouseEventTypeProto {
 		mousemove = 0;

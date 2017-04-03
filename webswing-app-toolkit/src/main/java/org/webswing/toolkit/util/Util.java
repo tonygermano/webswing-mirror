@@ -116,16 +116,14 @@ public class Util {
 
 	public static int getMouseModifiersAWTFlag(MouseEventMsgIn evt) {
 		int result = 0;
-		switch (evt.getButton()) {
-		case 1:
-			result = MouseEvent.BUTTON1_DOWN_MASK;
-			break;
-		case 2:
-			result = MouseEvent.BUTTON2_DOWN_MASK;
-			break;
-		case 3:
-			result = MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK;
-			break;
+		if ((evt.getButtons() & 2) == 2) {
+			result = result | MouseEvent.BUTTON1_DOWN_MASK;
+		}
+		if ((evt.getButtons() & 4) == 4) {
+			result = result | MouseEvent.BUTTON2_DOWN_MASK;
+		}
+		if ((evt.getButtons() & 8) == 8) {
+			result = result | MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK;
 		}
 		if (evt.isCtrl()) {
 			result = result | MouseEvent.CTRL_DOWN_MASK;

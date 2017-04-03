@@ -14,6 +14,7 @@ public class MouseEventMsgIn implements MsgIn {
 	private MouseEventType type;
 	private int wheelDelta;
 	private int button;
+	private int buttons;
 	private boolean ctrl;
 	private boolean alt;
 	private boolean shift;
@@ -91,4 +92,11 @@ public class MouseEventMsgIn implements MsgIn {
 		this.meta = meta;
 	}
 
+	public int getButtons() {
+		return buttons;
+	}
+
+	public void setButtons(int buttons) {
+		this.buttons = buttons;
+	}
 }

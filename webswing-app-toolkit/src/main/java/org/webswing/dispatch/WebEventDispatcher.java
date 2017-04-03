@@ -223,7 +223,7 @@ public class WebEventDispatcher {
 			}
 			switch (event.getType()) {
 			case mousemove:
-				id = event.getButton() == 1 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
+				id = event.getButtons() != 0 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
 				lastMouseEvent = e;
 				dispatchEventInSwing(c, e);

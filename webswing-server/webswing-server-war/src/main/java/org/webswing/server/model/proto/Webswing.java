@@ -24178,6 +24178,16 @@ public final class Webswing {
      * <code>optional bool meta = 9;</code>
      */
     boolean getMeta();
+
+    // optional sint32 buttons = 10;
+    /**
+     * <code>optional sint32 buttons = 10;</code>
+     */
+    boolean hasButtons();
+    /**
+     * <code>optional sint32 buttons = 10;</code>
+     */
+    int getButtons();
   }
   /**
    * Protobuf type {@code org.webswing.server.model.proto.MouseEventMsgInProto}
@@ -24279,6 +24289,11 @@ public final class Webswing {
             case 72: {
               bitField0_ |= 0x00000100;
               meta_ = input.readBool();
+              break;
+            }
+            case 80: {
+              bitField0_ |= 0x00000200;
+              buttons_ = input.readSInt32();
               break;
             }
           }
@@ -24574,6 +24589,22 @@ public final class Webswing {
       return meta_;
     }
 
+    // optional sint32 buttons = 10;
+    public static final int BUTTONS_FIELD_NUMBER = 10;
+    private int buttons_;
+    /**
+     * <code>optional sint32 buttons = 10;</code>
+     */
+    public boolean hasButtons() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional sint32 buttons = 10;</code>
+     */
+    public int getButtons() {
+      return buttons_;
+    }
+
     private void initFields() {
       type_ = org.webswing.server.model.proto.Webswing.MouseEventMsgInProto.MouseEventTypeProto.mousemove;
       x_ = 0;
@@ -24584,6 +24615,7 @@ public final class Webswing {
       alt_ = false;
       shift_ = false;
       meta_ = false;
+      buttons_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -24623,6 +24655,9 @@ public final class Webswing {
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeBool(9, meta_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeSInt32(10, buttons_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -24668,6 +24703,10 @@ public final class Webswing {
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(9, meta_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(10, buttons_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -24803,6 +24842,8 @@ public final class Webswing {
         bitField0_ = (bitField0_ & ~0x00000080);
         meta_ = false;
         bitField0_ = (bitField0_ & ~0x00000100);
+        buttons_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000200);
         return this;
       }
 
@@ -24867,6 +24908,10 @@ public final class Webswing {
           to_bitField0_ |= 0x00000100;
         }
         result.meta_ = meta_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.buttons_ = buttons_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -24909,6 +24954,9 @@ public final class Webswing {
         }
         if (other.hasMeta()) {
           setMeta(other.getMeta());
+        }
+        if (other.hasButtons()) {
+          setButtons(other.getButtons());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -25233,6 +25281,39 @@ public final class Webswing {
       public Builder clearMeta() {
         bitField0_ = (bitField0_ & ~0x00000100);
         meta_ = false;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 buttons = 10;
+      private int buttons_ ;
+      /**
+       * <code>optional sint32 buttons = 10;</code>
+       */
+      public boolean hasButtons() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional sint32 buttons = 10;</code>
+       */
+      public int getButtons() {
+        return buttons_;
+      }
+      /**
+       * <code>optional sint32 buttons = 10;</code>
+       */
+      public Builder setButtons(int value) {
+        bitField0_ |= 0x00000200;
+        buttons_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 buttons = 10;</code>
+       */
+      public Builder clearButtons() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        buttons_ = 0;
         onChanged();
         return this;
       }
@@ -30375,47 +30456,47 @@ public final class Webswing {
       "e\030\003 \001(\021\022\013\n\003alt\030\004 \001(\010\022\014\n\004ctrl\030\005 \001(\010\022\r\n\005sh" +
       "ift\030\006 \001(\010\022\014\n\004meta\030\007 \001(\010\"9\n\021KeyEventTypeP" +
       "roto\022\014\n\010keypress\020\000\022\013\n\007keydown\020\001\022\t\n\005keyup" +
-      "\020\002\"\301\002\n\024MouseEventMsgInProto\022W\n\004type\030\001 \001(" +
+      "\020\002\"\322\002\n\024MouseEventMsgInProto\022W\n\004type\030\001 \001(" +
       "\0162I.org.webswing.server.model.proto.Mous" +
       "eEventMsgInProto.MouseEventTypeProto\022\t\n\001" +
       "x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\022\n\nwheelDelta\030\004 \001(\021\022\016" +
       "\n\006button\030\005 \001(\021\022\014\n\004ctrl\030\006 \001(\010\022\013\n\003alt\030\007 \001(" +
-      "\010\022\r\n\005shift\030\010 \001(\010\022\014\n\004meta\030\t \001(\010\"^\n\023MouseE",
-      "ventTypeProto\022\r\n\tmousemove\020\000\022\r\n\tmousedow" +
-      "n\020\001\022\013\n\007mouseup\020\002\022\016\n\nmousewheel\020\003\022\014\n\010dblc" +
-      "lick\020\004\"\303\001\n\023CopyEventMsgInProto\022X\n\004type\030\001" +
-      " \001(\0162J.org.webswing.server.model.proto.C" +
-      "opyEventMsgInProto.CopyEventMsgTypeProto" +
-      "\022\014\n\004file\030\002 \001(\t\"D\n\025CopyEventMsgTypeProto\022" +
-      "\010\n\004copy\020\000\022\007\n\003cut\020\001\022\030\n\024getFileFromClipboa" +
-      "rd\020\002\"P\n\024PasteEventMsgInProto\022\014\n\004text\030\001 \001" +
-      "(\t\022\014\n\004html\030\002 \001(\t\022\013\n\003img\030\003 \001(\t\022\017\n\007special" +
-      "\030\004 \001(\010\"\204\002\n\025SimpleEventMsgInProto\022Y\n\004type",
-      "\030\001 \001(\0162K.org.webswing.server.model.proto" +
-      ".SimpleEventMsgInProto.SimpleEventTypePr" +
-      "oto\"\217\001\n\024SimpleEventTypeProto\022\n\n\006unload\020\000" +
-      "\022\r\n\tkillSwing\020\001\022\014\n\010paintAck\020\002\022\013\n\007repaint" +
-      "\020\003\022\020\n\014downloadFile\020\004\022\016\n\ndeleteFile\020\005\022\006\n\002" +
-      "hb\020\006\022\027\n\023cancelFileSelection\020\007\"-\n\034FilesSe" +
-      "lectedEventMsgInProto\022\r\n\005files\030\001 \003(\t\"C\n\025" +
-      "UploadEventMsgInProto\022\020\n\010fileName\030\002 \001(\t\022" +
-      "\030\n\020tempFileLocation\030\003 \001(\t\"\226\001\n\031JavaEvalRe" +
-      "questMsgInProto\022\025\n\rcorrelationId\030\001 \001(\t\022\020",
-      "\n\010objectId\030\002 \001(\t\022\016\n\006method\030\003 \001(\t\022@\n\006para" +
-      "ms\030\004 \003(\01320.org.webswing.server.model.pro" +
-      "to.JsParamMsgProto\"\327\001\n\031PlaybackCommandMs" +
-      "gInProto\022`\n\007command\030\001 \001(\0162O.org.webswing" +
-      ".server.model.proto.PlaybackCommandMsgIn" +
-      "Proto.PlaybackCommandProto\"X\n\024PlaybackCo" +
-      "mmandProto\022\t\n\005reset\020\000\022\010\n\004play\020\001\022\010\n\004stop\020" +
-      "\002\022\010\n\004step\020\003\022\n\n\006step10\020\004\022\013\n\007step100\020\005*\374\001\n" +
-      "\026SimpleEventMsgOutProto\022\035\n\031applicationAl" +
-      "readyRunning\020\000\022\030\n\024shutDownNotification\020\001",
-      "\022\036\n\032tooManyClientsNotification\020\002\022\026\n\022cont" +
-      "inueOldSession\020\003\022\026\n\022configurationError\020\004" +
-      "\022\035\n\031sessionStolenNotification\020\005\022\026\n\022unaut" +
-      "horizedAccess\020\006\022\"\n\036shutDownAutoLogoutNot" +
-      "ification\020\007"
+      "\010\022\r\n\005shift\030\010 \001(\010\022\014\n\004meta\030\t \001(\010\022\017\n\007button",
+      "s\030\n \001(\021\"^\n\023MouseEventTypeProto\022\r\n\tmousem" +
+      "ove\020\000\022\r\n\tmousedown\020\001\022\013\n\007mouseup\020\002\022\016\n\nmou" +
+      "sewheel\020\003\022\014\n\010dblclick\020\004\"\303\001\n\023CopyEventMsg" +
+      "InProto\022X\n\004type\030\001 \001(\0162J.org.webswing.ser" +
+      "ver.model.proto.CopyEventMsgInProto.Copy" +
+      "EventMsgTypeProto\022\014\n\004file\030\002 \001(\t\"D\n\025CopyE" +
+      "ventMsgTypeProto\022\010\n\004copy\020\000\022\007\n\003cut\020\001\022\030\n\024g" +
+      "etFileFromClipboard\020\002\"P\n\024PasteEventMsgIn" +
+      "Proto\022\014\n\004text\030\001 \001(\t\022\014\n\004html\030\002 \001(\t\022\013\n\003img" +
+      "\030\003 \001(\t\022\017\n\007special\030\004 \001(\010\"\204\002\n\025SimpleEventM",
+      "sgInProto\022Y\n\004type\030\001 \001(\0162K.org.webswing.s" +
+      "erver.model.proto.SimpleEventMsgInProto." +
+      "SimpleEventTypeProto\"\217\001\n\024SimpleEventType" +
+      "Proto\022\n\n\006unload\020\000\022\r\n\tkillSwing\020\001\022\014\n\010pain" +
+      "tAck\020\002\022\013\n\007repaint\020\003\022\020\n\014downloadFile\020\004\022\016\n" +
+      "\ndeleteFile\020\005\022\006\n\002hb\020\006\022\027\n\023cancelFileSelec" +
+      "tion\020\007\"-\n\034FilesSelectedEventMsgInProto\022\r" +
+      "\n\005files\030\001 \003(\t\"C\n\025UploadEventMsgInProto\022\020" +
+      "\n\010fileName\030\002 \001(\t\022\030\n\020tempFileLocation\030\003 \001" +
+      "(\t\"\226\001\n\031JavaEvalRequestMsgInProto\022\025\n\rcorr",
+      "elationId\030\001 \001(\t\022\020\n\010objectId\030\002 \001(\t\022\016\n\006met" +
+      "hod\030\003 \001(\t\022@\n\006params\030\004 \003(\01320.org.webswing" +
+      ".server.model.proto.JsParamMsgProto\"\327\001\n\031" +
+      "PlaybackCommandMsgInProto\022`\n\007command\030\001 \001" +
+      "(\0162O.org.webswing.server.model.proto.Pla" +
+      "ybackCommandMsgInProto.PlaybackCommandPr" +
+      "oto\"X\n\024PlaybackCommandProto\022\t\n\005reset\020\000\022\010" +
+      "\n\004play\020\001\022\010\n\004stop\020\002\022\010\n\004step\020\003\022\n\n\006step10\020\004" +
+      "\022\013\n\007step100\020\005*\374\001\n\026SimpleEventMsgOutProto" +
+      "\022\035\n\031applicationAlreadyRunning\020\000\022\030\n\024shutD",
+      "ownNotification\020\001\022\036\n\032tooManyClientsNotif" +
+      "ication\020\002\022\026\n\022continueOldSession\020\003\022\026\n\022con" +
+      "figurationError\020\004\022\035\n\031sessionStolenNotifi" +
+      "cation\020\005\022\026\n\022unauthorizedAccess\020\006\022\"\n\036shut" +
+      "DownAutoLogoutNotification\020\007"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -30553,7 +30634,7 @@ public final class Webswing {
           internal_static_org_webswing_server_model_proto_MouseEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_MouseEventMsgInProto_descriptor,
-              new java.lang.String[] { "Type", "X", "Y", "WheelDelta", "Button", "Ctrl", "Alt", "Shift", "Meta", });
+              new java.lang.String[] { "Type", "X", "Y", "WheelDelta", "Button", "Ctrl", "Alt", "Shift", "Meta", "Buttons", });
           internal_static_org_webswing_server_model_proto_CopyEventMsgInProto_descriptor =
             getDescriptor().getMessageTypes().get(22);
           internal_static_org_webswing_server_model_proto_CopyEventMsgInProto_fieldAccessorTable = new
