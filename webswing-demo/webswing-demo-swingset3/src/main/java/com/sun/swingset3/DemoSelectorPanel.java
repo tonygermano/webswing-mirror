@@ -113,8 +113,9 @@ public class DemoSelectorPanel extends JPanel {
 			WebswingUtil.getWebswingApi().addUrlStateChangeListener(new WebswingUrlStateChangeListener() {
 				@Override
 				public void onUrlStateChange(WebswingUrlStateChangeEvent event) {
-					if(event.getState().isEmpty() && !event.getOldState().isEmpty()){
-						WebswingUtil.getWebswingApi().setUrlState(event.getOldState(),false);
+					if(event.getState().isEmpty() && !event.getOldState().isEmpty()){  //if user reconnects or completely removes the #fragment from url
+						WebswingUtil.getWebswingApi().setUrlState(event.getOldState(),false); //the url is recreated using the old url state
+						return;
 					}
 					selectDemo(demoSet, event.getState().getPath());
 				}
