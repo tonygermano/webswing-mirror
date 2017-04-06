@@ -11,4 +11,16 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - apt-get update
           - apt-get install -y openjfx
+          # Google Cloud SDK 
+          - export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+          - SDK_VERSION=127.0.0
+          - SDK_FILENAME=google-cloud-sdk-${SDK_VERSION}-linux-x86_64.tar.gz
+          - curl -O -J https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${SDK_FILENAME}
+          - tar -zxvf ${SDK_FILENAME} --directory ${HOME}
+          - export PATH=${PATH}:${HOME}/google-cloud-sdk/bin
+          - echo ${GOOGLE_CLIENT_SECRET} > client-secret.json
+          - gcloud auth activate-service-account --key-file client-secret.json
+          # BUILD
           - mvn -Pbuild,release clean install
+          # UPLOAD
+          - gsutil -h x-goog-meta-commit:${BITBUCKET_COMMIT} cp -a public-read webswing-assembly/dist/webswing-2.5-SNAPSHOT-distribution.zip gs://builds.webswing.org/webswing-2.5-SNAPSHOT-$(date +%d%h%y.%H%M).zip
