@@ -23,4 +23,4 @@ pipelines:
           # BUILD
           - mvn -Pbuild,release clean install
           # UPLOAD
-          - gsutil -h x-goog-meta-commit:${BITBUCKET_COMMIT} cp -a public-read webswing-assembly/dist/webswing-2.5-SNAPSHOT-distribution.zip gs://builds.webswing.org/webswing-2.5-SNAPSHOT-$(date +%d%h%y.%H%M).zip
+          - gsutil -h x-goog-meta-info=$(cat webswing-assembly/dist/git.info) -h x-goog-meta-commit:${BITBUCKET_COMMIT} cp -a public-read webswing-assembly/dist/webswing-2.5-SNAPSHOT-distribution.zip gs://builds.webswing.org/builds/webswing-2.5-SNAPSHOT-$(date +%d%h%y.%H%M).zip
