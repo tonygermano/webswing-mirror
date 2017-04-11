@@ -1,4 +1,4 @@
-define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(atmosphere, ProtoBuf, wsProto) {
+define(['atmosphere', 'ProtoBuf','jquery', 'text!webswing.proto'], function amdFactory(atmosphere, ProtoBuf, $, wsProto) {
     "use strict";
     var proto = ProtoBuf.loadProto(wsProto, "webswing.proto");
     var InputEventsFrameMsgInProto = proto.build("org.webswing.server.model.proto.InputEventsFrameMsgInProto");
@@ -122,8 +122,21 @@ define(['atmosphere', 'ProtoBuf', 'text!webswing.proto'], function amdFactory(at
             request.onError = function (response) {
                 api.showDialog(api.connectionErrorDialog);
             };
-
-            socket = atmosphere.subscribe(request);
+            $.ajax({
+                xhrFields: {
+                    withCredentials: true
+                },
+                type: 'GET',
+                url: api.cfg.connectionUrl + 'rest/CSRFToken',
+                success: function (data) {
+                    request.headers['X-webswing-CSRFToken'] = data;
+                    socket = atmosphere.subscribe(request);
+                },
+                error: function (xhr) {
+                    api.showDialog(api.connectionErrorDialog);
+                    console.error("CSRF Token validation failed.");
+                }
+            });
         }
 
         function decodeResponse(response) {

@@ -22,6 +22,7 @@ import org.atmosphere.util.VoidServletConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
+import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.base.WebswingService;
 import org.webswing.server.model.exception.WsInitException;
@@ -118,7 +119,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	}
 
 	@Override
-	public WebSocketUrlHandler createBinaryWebSocketHandler(UrlHandler parent, SwingInstanceManager instanceManager) {
+	public WebSocketUrlHandler createBinaryWebSocketHandler(PrimaryUrlHandler parent, SwingInstanceManager instanceManager) {
 		WebSocketUrlHandlerImpl result = new WebSocketUrlHandlerImpl(parent, BINARY_HANDLER_PATH, this, instanceManager);
 		WebSocketAtmosphereHandler endpoint = websocketEndpoints.get(BINARY_HANDLER_PATH);
 		endpoint.addHandler(result.getFullPathMapping(), result);
@@ -126,7 +127,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	}
 
 	@Override
-	public WebSocketUrlHandler createJsonWebSocketHandler(UrlHandler parent, SwingInstanceManager instanceManager) {
+	public WebSocketUrlHandler createJsonWebSocketHandler(PrimaryUrlHandler parent, SwingInstanceManager instanceManager) {
 		WebSocketUrlHandlerImpl result = new WebSocketUrlHandlerImpl(parent, JSON_HANDLER_PATH, this, instanceManager);
 		WebSocketAtmosphereHandler endpoint = websocketEndpoints.get(JSON_HANDLER_PATH);
 		endpoint.addHandler(result.getFullPathMapping(), result);
@@ -134,7 +135,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	}
 
 	@Override
-	public WebSocketUrlHandler createPlaybackWebSocketHandler(UrlHandler parent) {
+	public WebSocketUrlHandler createPlaybackWebSocketHandler(PrimaryUrlHandler parent) {
 		RecordingPlaybackUrlHandlerImpl result = new RecordingPlaybackUrlHandlerImpl(parent, PLAYBACK_HANDLER_PATH, this);
 		WebSocketAtmosphereHandler endpoint = websocketEndpoints.get(PLAYBACK_HANDLER_PATH);
 		endpoint.addHandler(result.getFullPathMapping(), result);

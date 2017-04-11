@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.xml.security.utils.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -182,7 +184,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		return req.getPathInfo() == null || isRootPathWithoutSlash;
 	}
 
-	private void handleCorsHeaders(HttpServletRequest req, HttpServletResponse res) {
+	private void handleCorsHeaders(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		if (isOriginAllowed(req.getHeader("Origin"))) {
 			if (req.getHeader("Origin") != null) {
 				res.addHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
@@ -198,13 +200,28 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		}
 	}
 
-	private boolean isOriginAllowed(String header) {
+	public boolean isOriginAllowed(String header) {
 		List<String> allowedCorsOrigins = getSwingConfig().getAllowedCorsOrigins();
 		if (allowedCorsOrigins == null || allowedCorsOrigins.size() == 0) {
 			return false;
 		}
 		for (String s : allowedCorsOrigins) {
 			if (s.trim().equals(header) || s.trim().equals("*")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isSameOrigin(HttpServletRequest req) {
+		String origin = req.getHeader("Origin");
+		String host = req.getHeader("X-Forwarded-Host");
+		if (host == null) {
+			host = req.getHeader("Host");
+		}
+		if (origin != null && host != null) {
+			String originHost = origin.indexOf("://") >= 0 ? origin.substring(origin.indexOf("://") + 3) : origin;
+			if (StringUtils.equals(originHost, host)) {
 				return true;
 			}
 		}
@@ -363,6 +380,30 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		String webFolderPath = getConfig().getWebFolder();
 		File webFolder = StringUtils.isEmpty(webFolderPath) ? null : resolveFile(webFolderPath);
 		return ServerUtil.getWebResource(toPath(resource), getServletContext(), webFolder);
+	}
+
+	public String generateCsrfToken() {
+		String token = (String) getFromSecuritySession(Constants.HTTP_ATTR_CSRF_TOKEN_HEADER);
+		if (token == null) {
+			SecureRandom random = new SecureRandom();
+			byte[] values = new byte[32];
+			random.nextBytes(values);
+			token = Base64.encode(values);
+			setToSecuritySession(Constants.HTTP_ATTR_CSRF_TOKEN_HEADER, token);
+		}
+		return token;
+	}
+
+	public boolean validateCsrfToken(HttpServletRequest req) {
+		String token = (String) getFromSecuritySession(Constants.HTTP_ATTR_CSRF_TOKEN_HEADER);
+		if (token != null) {
+			String header = req.getParameter(Constants.HTTP_ATTR_CSRF_TOKEN_HEADER);
+			if (StringUtils.equals(header, token)) {
+				return true;
+			}
+		}
+		return false;
+
 	}
 
 	@Override

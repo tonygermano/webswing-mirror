@@ -419,4 +419,10 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		}
 		return LogReaderUtil.getZippedLog(type);
 	}
+
+	@GET
+	@Path("/rest/CSRFToken")
+	public String generateCsrfToken(){
+		return super.generateCsrfToken();
+	}
 }

@@ -21,6 +21,7 @@ import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.server.base.AbstractUrlHandler;
+import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.model.exception.WsException;
@@ -35,14 +36,14 @@ import org.webswing.server.util.ServerUtil;
 public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 	private static final Logger log = LoggerFactory.getLogger(WebSocketUrlHandlerImpl.class);
 
-	private final UrlHandler parent;
+	private final PrimaryUrlHandler parent;
 	private final WebSocketService websocket;
 	private final SwingInstanceManager instanceManager;
 	private final String path;
 
 	private boolean ready;
 
-	public WebSocketUrlHandlerImpl(UrlHandler parent, String path, WebSocketService websocket, SwingInstanceManager instanceManager) {
+	public WebSocketUrlHandlerImpl(PrimaryUrlHandler parent, String path, WebSocketService websocket, SwingInstanceManager instanceManager) {
 		this.parent = parent;
 		this.path = path;
 		this.websocket = websocket;
@@ -61,13 +62,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
-		try {
-			websocket.serve(this, req, res);
-			return true;
-		} catch (Exception e) {
-			log.error("WebSocket failed.", e);
-			throw new WsException("WebSocket failed.", e);
-		}
+		return serveDefault(req, res, parent, websocket, log);
 	}
 
 	public void onReady(final WebSocketConnection r) {

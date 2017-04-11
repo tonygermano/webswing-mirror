@@ -86,12 +86,12 @@ public interface Constants {
 	public static final String HTTP_ATTR_RECORDING_FLAG = "X-webswing-recording";
 	public static final String HTTP_ATTR_ARGS = "X-webswing-args";
 	public static final String HTTP_ATTR_DEBUG_PORT = "X-webswing-debugPort";
+	public static final String HTTP_ATTR_CSRF_TOKEN_HEADER = "X-webswing-CSRFToken";
 
 	//integration-branding
 	public static final String BRANDING_PREFIX = "webswing.brandingPrefix";
 	public static final String EXTENSTION_INITIALIZER = "webswing.extensionInitializer";
 	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
 	public static final String CONFIG_PROVIDER = "webswing.configProvider";
-
 
 }

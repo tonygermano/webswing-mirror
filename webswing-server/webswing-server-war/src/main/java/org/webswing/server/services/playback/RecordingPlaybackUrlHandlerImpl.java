@@ -17,6 +17,7 @@ import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.server.base.AbstractUrlHandler;
+import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.model.exception.WsException;
@@ -32,12 +33,12 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(RecordingPlaybackUrlHandlerImpl.class);
 	private static Map<String, SessionRecordingPlayback> playbackMap = new HashMap<String, SessionRecordingPlayback>();
-	private final UrlHandler parent;
+	private final PrimaryUrlHandler parent;
 	private final WebSocketService websocket;
 	private final String path;
 	private boolean ready;
 
-	public RecordingPlaybackUrlHandlerImpl(UrlHandler parent, String path, WebSocketService websocket) {
+	public RecordingPlaybackUrlHandlerImpl(PrimaryUrlHandler parent, String path, WebSocketService websocket) {
 		this.parent = parent;
 		this.path = path;
 		this.websocket = websocket;
@@ -55,13 +56,7 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
-		try {
-			websocket.serve(this, req, res);
-			return true;
-		} catch (Exception e) {
-			log.error("WebSocket failed.", e);
-			throw new WsException("WebSocket failed.", e);
-		}
+		return serveDefault(req, res, parent, websocket, log);
 	}
 
 	public void onReady(final WebSocketConnection r) {

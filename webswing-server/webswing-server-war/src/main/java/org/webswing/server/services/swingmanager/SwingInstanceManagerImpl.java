@@ -374,6 +374,12 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		return super.getVariables(type);
 	}
 
+	@GET
+	@Path("/rest/CSRFToken")
+	public String generateCsrfToken(){
+		return super.generateCsrfToken();
+	}
+
 	@Override
 	public void logStatValue(String instance, String name, Number value) {
 		statsLogger.log(instance, name, value);
