@@ -42,6 +42,10 @@ public interface KeycloakSecurityModuleConfig extends WebswingExtendableSecurity
 	@ConfigFieldDefaultValueString("preferred_username")
 	String getUsernameAttributeName();
 
+	@ConfigField(label = "Fallback Users File", description = "In case Keycloak Url is not reachable, fallback to local authentication. To enable fallback, set path to properties file with list of users. User entry format: user.<username>=<password>[,role1][,role2]")
+	@ConfigFieldVariables
+	String getFallbackFile();
+
 	@ConfigField(label = "Roles Attribute Name", description = "Leave empty if not required")
 	@ConfigFieldVariables
 	String getRolesAttributeName();

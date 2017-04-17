@@ -11,7 +11,7 @@ import org.webswing.server.services.security.extension.api.WebswingExtendableSec
 @ConfigFieldOrder({"file"})
 public interface PropertySecurityModuleConfig extends WebswingExtendableSecurityModuleConfig {
 
-	@ConfigField(label="File", description="Path pointing to users properties file.")
+	@ConfigField(label="File", description="Path pointing to users properties file. User entry format: user.<username>=<password>[,role1][,role2]")
 	@ConfigFieldDefaultValueString("${" + Constants.ROOT_DIR_PATH + "}/user.properties")
 	@ConfigFieldVariables(VariableSetName.SwingApp)
 	String getFile();

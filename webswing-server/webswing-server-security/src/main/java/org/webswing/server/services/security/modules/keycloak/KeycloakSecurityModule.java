@@ -3,11 +3,18 @@ package org.webswing.server.services.security.modules.keycloak;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.server.common.model.Config;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.SecurityContext;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
+import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
+import org.webswing.server.services.security.extension.api.SecurityModuleExtensionConfig;
+import org.webswing.server.services.security.extension.api.WebswingExtendableSecurityModuleConfig;
 import org.webswing.server.services.security.modules.AbstractExtendableSecurityModule;
 import org.webswing.server.services.security.modules.openidconnect.OpenIdConnectClient;
+import org.webswing.server.services.security.modules.property.PropertySecurityModule;
+import org.webswing.server.services.security.modules.property.PropertySecurityModuleConfig;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +33,7 @@ public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<Key
 
 	private Map<String, OpenIdConnectClient> clients = new HashMap<>();
 	private String defaultClient;
+	private PropertySecurityModule fallback;
 
 	public KeycloakSecurityModule(KeycloakSecurityModuleConfig config) {
 		super(config);
@@ -61,6 +69,10 @@ public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<Key
 			} else {
 				throw new RuntimeException("No Keycloak realms defined. At least one has to be defined");
 			}
+			if (StringUtils.isNotBlank(getConfig().getFallbackFile())) {
+				FallbackPropertyConfig fallbackConfig = new FallbackPropertyConfig(getConfig(), getConfig().getFallbackFile());
+				fallback = new PropertySecurityModule(fallbackConfig);
+			}
 		} catch (Exception e) {
 			log.error("Initializing of OpenID Connect client failed.", e);
 			throw new RuntimeException("Initializing of OpenID Connect client failed.", e);
@@ -68,19 +80,36 @@ public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<Key
 	}
 
 	@Override
-	protected void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		if (exception != null) {
-			sendHtml(request, response, "saml2/errorPage.html", exception);
+	public AbstractWebswingUser doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		OpenIdConnectClient realmClient = clients.get(resolveRealmName(request));
+		if (realmClient.isInitialized() || fallback == null) {
+			return super.doLogin(request, response);
 		} else {
-			OpenIdConnectClient realmClient = clients.get(resolveRealmName(request));
-			String url = realmClient.getOpenIDRedirectUrl();
-			sendRedirect(request, response, url);
+			return fallback.doLogin(request, response);
+		}
+	}
+
+	@Override
+	protected void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
+		OpenIdConnectClient realmClient = clients.get(resolveRealmName(request));
+		if (realmClient.isInitialized()) {
+			if (exception != null) {
+				sendHtml(request, response, "saml2/errorPage.html", exception);
+			} else {
+				String url = realmClient.getOpenIDRedirectUrl();
+				sendRedirect(request, response, url);
+			}
+		} else {
+			sendHtml(request, response, "saml2/errorPage.html", new Exception("Authentication server is not available."));
 		}
 	}
 
 	private String resolveRealmName(HttpServletRequest request) {
 		Map<String, Object> requestData = getLoginRequest(request);
-		String r = (String) requestData.get(REALM_PARAM);
+		String r = null;
+		if (requestData != null) {
+			r = (String) requestData.get(REALM_PARAM);
+		}
 		return r == null || clients.get(r) == null ? defaultClient : r;
 	}
 
@@ -114,10 +143,45 @@ public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<Key
 	public void doLogout(HttpServletRequest request, HttpServletResponse response, AbstractWebswingUser user) throws ServletException, IOException {
 		String logoutUrl = null;
 		String realm = (String) user.getUserAttributes().get(REALM_PARAM);
-		if (realm != null && clients.get(realm) != null) {
+		if (realm != null && clients.get(realm) != null && clients.get(realm).isInitialized()) {
 			logoutUrl = replaceVar(clients.get(realm).getLogoutUrl());
 		}
 		logoutRedirect(request, response, logoutUrl);
 	}
 
+	private class FallbackPropertyConfig implements PropertySecurityModuleConfig {
+
+		private WebswingExtendableSecurityModuleConfig c;
+		private String file;
+
+		public FallbackPropertyConfig(WebswingExtendableSecurityModuleConfig c, String file) {
+			this.c = c;
+			this.file = file;
+		}
+
+		@Override
+		public <T> T getValueAs(String name, Class<T> clazz) {
+			return c.getValueAs(name, clazz);
+		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			return c.asMap();
+		}
+
+		@Override
+		public SecurityContext getContext() {
+			return c.getContext();
+		}
+
+		@Override
+		public String getFile() {
+			return file;
+		}
+
+		@Override
+		public List<String> getExtensions() {
+			return c.getExtensions();
+		}
+	}
 }
