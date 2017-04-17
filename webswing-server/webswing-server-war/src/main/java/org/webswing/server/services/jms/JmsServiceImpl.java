@@ -25,6 +25,7 @@ public class JmsServiceImpl implements JmsService {
 
 	public void start() throws WsInitException {
 		try {
+			System.setProperty("org.apache.activemq.broker.BouncyCastlePosition","9");
 			broker = startService();
 		} catch (Exception e) {
 			log.error("Failed to start JMS service.", e);
