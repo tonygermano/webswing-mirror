@@ -116,15 +116,27 @@ public class WindowManager {
 			newWindow = true;
 		}
 
-		// dont allow activation outside modal dialog ancestors
-		if (!(isModal(w) && newWindow) && !zorder.isInSameModalBranch(activeWindow, w) && !(w instanceof sun.awt.ModalExclude)) {
-			return success;
+		//if active window is in modal branch and requested window is not modalExclude type 
+		if( zorder.isInModalBranch(activeWindow) && !(w instanceof sun.awt.ModalExclude)) {
+			// if fullModal (not document_modal) branch
+			if(zorder.isInFullModalBranch(activeWindow)){
+				//don't allow activation outside modal dialog ancestor's tree 
+				if (!(isModal(w) && newWindow) && !zorder.isInSameModalBranch(activeWindow, w)) {
+					return false;
+				}	
+			}else{//if in document_modal branch
+				//don't allow activation in same window branch
+				if(zorder.isParent(w, activeWindow)){
+					return false;
+				}
+			}
 		}
 
 		//dont allow activation of disabled windows
 		if(!w.isEnabled()){
-			return success;
+			return false;
 		}
+
 
 		if (focusedWindowChangeAllowed || activeWindow == w) {
 

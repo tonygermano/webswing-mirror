@@ -39,6 +39,7 @@ import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.TrayIcon;
 import java.awt.Window;
+import java.awt.Dialog.ModalityType;
 import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
@@ -345,6 +346,10 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		WebDialogPeer localdialogPeer = new WebDialogPeer(paramDialog);
 		targetCreatedPeer(paramDialog, localdialogPeer);
 		return localdialogPeer;
+	}
+
+	public boolean isModalityTypeSupported(ModalityType mt) {
+		return true;
 	}
 
 	public WindowPeer createWindow(Window paramWindow) throws HeadlessException {
