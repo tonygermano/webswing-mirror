@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs", "allowUpload", "allowDelete",
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs", "allowUpload", "allowDelete",
 		"allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
 public interface SwingConfig extends Config {
 
@@ -53,7 +53,7 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isDebug();
 
-	@ConfigField(tab = ConfigGroup.Java, label = "Working directory", description = "The User working directory. Path from which the application process will be started. (See the Java System Property: 'user.dir')")
+	@ConfigField(tab = ConfigGroup.Java, label = "Working Directory", description = "The User working directory. Path from which the application process will be started. (See the Java System Property: 'user.dir')")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("")
 	public String getUserDir();
@@ -97,6 +97,10 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.Session, label = "Session Timeout", description = "Specifies how long (seconds) will be the application left running after the user closes the browser. User can reconnect in this interval and continue in last session.")
 	@ConfigFieldDefaultValueNumber(300)
 	public int getSwingSessionTimeout();
+
+	@ConfigField(tab = ConfigGroup.Session, label = "Timeout if Inactive", description = "If True, the Session Timeout will apply for user inactivity (Session Timeout has to be > 0). Otherwise only disconnected sessions will time out.")
+	@ConfigFieldDefaultValueBoolean(false)
+	public boolean isTimeoutIfInactive();
 
 	@ConfigField(tab = ConfigGroup.Session, label = "Session Stealing", description = "If enabled, and session mode 'CONTINUE_FOR_USER' is selected, user can resume Webswing session even if the connection is open in other browser. Former browser window will be disconnected.")
 	@ConfigFieldDefaultValueBoolean(true)

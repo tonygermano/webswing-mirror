@@ -10,7 +10,9 @@ public enum SimpleEventMsgOut implements Msg {
 	configurationError,
 	sessionStolenNotification,
 	unauthorizedAccess,
-	shutDownAutoLogoutNotification;
+	shutDownAutoLogoutNotification,
+	sessionTimeoutWarning,
+	sessionTimedOutNotification;
 
 	public AppFrameMsgOut buildMsgOut() {
 		AppFrameMsgOut result = new AppFrameMsgOut();

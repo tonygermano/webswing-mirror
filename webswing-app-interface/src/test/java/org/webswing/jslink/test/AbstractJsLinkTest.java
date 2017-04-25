@@ -68,6 +68,11 @@ public abstract class AbstractJsLinkTest {
 			public void disconnect() {
 				
 			}
+
+			@Override
+			public void resetInactivityTimers() {
+
+			}
 		};
 		Services.initialize(null, null, serverServiceImpl, null, null, jsLinkServiceImpl);
 

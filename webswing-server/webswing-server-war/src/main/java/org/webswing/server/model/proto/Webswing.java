@@ -45,6 +45,14 @@ public final class Webswing {
      * <code>shutDownAutoLogoutNotification = 7;</code>
      */
     shutDownAutoLogoutNotification(7, 7),
+    /**
+     * <code>sessionTimeoutWarning = 8;</code>
+     */
+    sessionTimeoutWarning(8, 8),
+    /**
+     * <code>sessionTimedOutNotification = 9;</code>
+     */
+    sessionTimedOutNotification(9, 9),
     ;
 
     /**
@@ -79,6 +87,14 @@ public final class Webswing {
      * <code>shutDownAutoLogoutNotification = 7;</code>
      */
     public static final int shutDownAutoLogoutNotification_VALUE = 7;
+    /**
+     * <code>sessionTimeoutWarning = 8;</code>
+     */
+    public static final int sessionTimeoutWarning_VALUE = 8;
+    /**
+     * <code>sessionTimedOutNotification = 9;</code>
+     */
+    public static final int sessionTimedOutNotification_VALUE = 9;
 
 
     public final int getNumber() { return value; }
@@ -93,6 +109,8 @@ public final class Webswing {
         case 5: return sessionStolenNotification;
         case 6: return unauthorizedAccess;
         case 7: return shutDownAutoLogoutNotification;
+        case 8: return sessionTimeoutWarning;
+        case 9: return sessionTimedOutNotification;
         default: return null;
       }
     }
@@ -30490,13 +30508,15 @@ public final class Webswing {
       "ybackCommandMsgInProto.PlaybackCommandPr" +
       "oto\"X\n\024PlaybackCommandProto\022\t\n\005reset\020\000\022\010" +
       "\n\004play\020\001\022\010\n\004stop\020\002\022\010\n\004step\020\003\022\n\n\006step10\020\004" +
-      "\022\013\n\007step100\020\005*\374\001\n\026SimpleEventMsgOutProto" +
+      "\022\013\n\007step100\020\005*\270\002\n\026SimpleEventMsgOutProto" +
       "\022\035\n\031applicationAlreadyRunning\020\000\022\030\n\024shutD",
       "ownNotification\020\001\022\036\n\032tooManyClientsNotif" +
       "ication\020\002\022\026\n\022continueOldSession\020\003\022\026\n\022con" +
       "figurationError\020\004\022\035\n\031sessionStolenNotifi" +
       "cation\020\005\022\026\n\022unauthorizedAccess\020\006\022\"\n\036shut" +
-      "DownAutoLogoutNotification\020\007"
+      "DownAutoLogoutNotification\020\007\022\031\n\025sessionT" +
+      "imeoutWarning\020\010\022\037\n\033sessionTimedOutNotifi" +
+      "cation\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

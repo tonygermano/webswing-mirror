@@ -43,6 +43,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
                 connectionErrorDialog: retryMessageDialog('A connection error has occurred. Please reconnect to continue.'),
                 tooManyClientsNotification: retryMessageDialog('There are too many active connections right now, please try again later'),
                 stoppedDialog: finalMessageDialog('The application has been closed.'),
+                timedoutDialog: finalMessageDialog('The session has timed out.'),
                 continueOldSessionDialog: {
                     content: '<p>Welcome back! <br>You can continue working in your previous session.</p>',
                     buttons: [{
@@ -61,6 +62,16 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
                 longPollingWarningDialog: {
                     header: '<span class="ws-message--warning"><span class="ws-icon-warn"></span> Warning</span>',
                     content: '<p>Your current network blocks WebSockets. You may experience performance problems while working on this connection. Please contact your network administrator. </p>',
+                    buttons: [{
+                        label: '<span class="ws-icon-cancel-circled"></span>  Dismiss',
+                        action: function () {
+                            hideBar();
+                        }
+                    }]
+                },
+                inactivityTimeoutWarningDialog: {
+                    header: '<span class="ws-message--warning"><span class="ws-icon-warn"></span> Warning</span>',
+                    content: '<p>Your session will timeout in less then a minute due to inactivity. Please press any button to continue.  </p>',
                     buttons: [{
                         label: '<span class="ws-icon-cancel-circled"></span>  Dismiss',
                         action: function () {

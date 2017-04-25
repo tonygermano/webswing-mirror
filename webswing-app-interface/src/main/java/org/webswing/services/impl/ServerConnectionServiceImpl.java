@@ -5,9 +5,11 @@ import org.webswing.Constants;
 import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.model.MsgIn;
 import org.webswing.model.SyncMsg;
+import org.webswing.model.UserInputMsgIn;
 import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.model.internal.JvmStatsMsgInternal;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
+import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
@@ -36,6 +38,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private MessageProducer producer;
 	private MessageConsumer consumer;
 	private long lastMessageTimestamp = System.currentTimeMillis();
+	private long lastUserInputTimestamp = System.currentTimeMillis();
 	private Runnable watchdog;
 	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
 	private ExecutorService jmsSender = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance());
@@ -60,18 +63,28 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			@Override
 			public void run() {
 				int timeoutSec = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300"));
+				boolean timeoutIfInactive = Boolean.getBoolean(Constants.SWING_SESSION_TIMEOUT_IF_INACTIVE) && timeoutSec > 0;
 				if (timeoutSec >= 0) {
-					long diff = System.currentTimeMillis() - lastMessageTimestamp - 10000; /*-10000 is to compensate for 10s js heartbeat interval*/
+					long lastTstp = timeoutIfInactive ? lastUserInputTimestamp : lastMessageTimestamp + 10000;/*+10000 is to compensate for 10s js heartbeat interval*/
+					long diff = System.currentTimeMillis() - lastTstp;
 					int timeoutMs = timeoutSec * 1000;
-					timeoutMs = timeoutMs < 1000 ? 1000 : timeoutMs;
-					if ((diff / 1000 > 10) && ((diff / 1000) % 10 == 0)) {
-						Logger.warn("Inactive for " + diff / 1000 + " seconds." + (terminated ? "[waiting for application to stop]" : ""));
-						//TODO check for deadlock once
+					timeoutMs = Math.max(1000, timeoutMs);
+					if ((diff / 1000 > 10)) {
+						String msg = timeoutIfInactive ? "User" : "Session";
+						if ((diff / 1000) % 10 == 0) {
+							Logger.warn(msg + " inactive for " + diff / 1000 + " seconds." + (terminated ? "[waiting for application to stop]" : ""));
+						}
+						if (!terminated && (timeoutMs - diff < 60000)) { //countdown message for the last 60 seconds
+							sendObject(SimpleEventMsgOut.sessionTimeoutWarning.buildMsgOut());
+						}
 					}
+
 					if (diff > timeoutMs) {
 						if (!terminated) {//only call once
 							terminated = true;
+							//TODO check for deadlock once
 							Logger.warn("Exiting application due to inactivity for " + diff / 1000 + " seconds.");
+							sendObject(SimpleEventMsgOut.sessionTimedOutNotification.buildMsgOut());
 							Util.getWebToolkit().exitSwing(1);
 						}
 					}
@@ -135,6 +148,12 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		} finally {
 			closed = true;
 		}
+	}
+
+	@Override
+	public void resetInactivityTimers() {
+		lastMessageTimestamp=System.currentTimeMillis();
+		lastUserInputTimestamp=System.currentTimeMillis();
 	}
 
 	private void sendJmsMessage(final Serializable o) throws JMSException {
@@ -226,6 +245,9 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 						Logger.warn("No thread waiting for sync-ed message with id ", correlationId);
 					}
 				} else if (omsg.getObject() instanceof MsgIn) {
+					if (omsg.getObject() instanceof UserInputMsgIn) {
+						lastUserInputTimestamp = System.currentTimeMillis();
+					}
 					Util.getWebToolkit().getEventDispatcher().dispatchEvent((MsgIn) omsg.getObject());
 				} else if (omsg.getObject() instanceof ApiEventMsgInternal) {
 					Util.getWebToolkit().processApiEvent((ApiEventMsgInternal) omsg.getObject());
@@ -249,6 +271,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private static class CpuMonitor {
 		static long previousCPUTime = 0;
 		static long previousTime = 0;
+
 		static {
 			getCpuUtilization();
 		}

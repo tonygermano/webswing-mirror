@@ -1,8 +1,9 @@
 package org.webswing.model.c2s;
 
 import org.webswing.model.MsgIn;
+import org.webswing.model.UserInputMsgIn;
 
-public class KeyboardEventMsgIn implements MsgIn {
+public class KeyboardEventMsgIn implements MsgIn,UserInputMsgIn {
 
 	private static final long serialVersionUID = -896095456169586882L;
 

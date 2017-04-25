@@ -501,6 +501,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported());
 			swingConfig.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout());
+			swingConfig.addProperty(Constants.SWING_SESSION_TIMEOUT_IF_INACTIVE, appConfig.isTimeoutIfInactive());
 			swingConfig.addProperty("awt.toolkit", webToolkitClass);
 			swingConfig.addProperty("java.awt.headless", false);
 			swingConfig.addProperty("java.awt.graphicsenv", webGraphicsEnvClass);

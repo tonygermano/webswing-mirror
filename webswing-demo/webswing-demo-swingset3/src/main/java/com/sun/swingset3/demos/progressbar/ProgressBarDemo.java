@@ -40,6 +40,7 @@ import javax.swing.border.SoftBevelBorder;
 
 import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.ResourceManager;
+import org.webswing.toolkit.api.WebswingUtil;
 
 /**
  * JProgressBar Demo
@@ -170,6 +171,9 @@ public class ProgressBarDemo extends JPanel {
                     progressBar.setValue(progressBar.getValue() + 1);
                     progressTextArea.append(text.substring(textLocation, textLocation + 1));
                     textLocation++;
+                    if(WebswingUtil.isWebswing()){
+                        WebswingUtil.getWebswingApi().resetInactivityTimeout();
+                    }
                 } else {
                     timer.stop();
                     loadAction.setEnabled(true);

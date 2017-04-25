@@ -319,6 +319,11 @@ public class WebswingApiImpl implements WebswingApi {
 	}
 
 	@Override
+	public void resetInactivityTimeout() {
+		Services.getConnectionService().resetInactivityTimers();
+	}
+
+	@Override
 	public void removeUrlStateChangeListener(WebswingUrlStateChangeListener listener) {
 		if (listener != null) {
 			urlStateChangeListeners.remove(listener);

@@ -16,6 +16,7 @@ define(['atmosphere', 'ProtoBuf','jquery', 'text!webswing.proto'], function amdF
             currentDialog: 'dialog.current',
             stoppedDialog: 'dialog.content.stoppedDialog',
             disconnectedDialog: 'dialog.content.disconnectedDialog',
+            timedoutDialog: 'dialog.content.timedoutDialog',
             connectionErrorDialog: 'dialog.content.connectionErrorDialog',
             initializingDialog: 'dialog.content.initializingDialog',
             longPollingWarningDialog: 'dialog.content.longPollingWarningDialog'
@@ -114,7 +115,7 @@ define(['atmosphere', 'ProtoBuf','jquery', 'text!webswing.proto'], function amdF
             };
 
             request.onClose = function (response) {
-                if (api.currentDialog() !== api.stoppedDialog) {
+                if (api.currentDialog() !== api.stoppedDialog && api.currentDialog() !== api.timedoutDialog) {
                     api.showDialog(api.disconnectedDialog);
                 }
             };

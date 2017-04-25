@@ -118,4 +118,13 @@ public interface WebswingApi {
 	 * @param listener the listener
 	 */
 	public void addUrlStateChangeListener(WebswingUrlStateChangeListener listener);
+
+	/**
+	 * Reset session timeout to prevent automatic termination.
+	 * Useful if a long running operation has to finish even if user disconnects or is inactive for longer timeframe.
+	 * Note: Reset needs to be called in periods shorter than configured session timeout. ("webswing.sessionTimeoutSec" system property)
+	 * Note2: This method has no effect if session timeout is set to 0
+	 */
+	public void resetInactivityTimeout();
+
 }

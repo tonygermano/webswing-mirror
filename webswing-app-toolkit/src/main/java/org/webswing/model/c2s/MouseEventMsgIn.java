@@ -1,8 +1,9 @@
 package org.webswing.model.c2s;
 
 import org.webswing.model.MsgIn;
+import org.webswing.model.UserInputMsgIn;
 
-public class MouseEventMsgIn implements MsgIn {
+public class MouseEventMsgIn implements MsgIn,UserInputMsgIn {
 	private static final long serialVersionUID = 8411036255812103478L;
 
 	public enum MouseEventType {

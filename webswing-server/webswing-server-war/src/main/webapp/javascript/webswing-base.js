@@ -25,13 +25,16 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             hideDialog: 'dialog.hide',
             hideDialogBar: 'dialog.hideBar',
             dialogBarContent: 'dialog.currentBar',
+            currentDialog: 'dialog.current',
             startingDialog: 'dialog.content.startingDialog',
             stoppedDialog: 'dialog.content.stoppedDialog',
+            timedoutDialog: 'dialog.content.timedoutDialog',
             unauthorizedAccess: 'dialog.content.unauthorizedAccess',
             applicationAlreadyRunning: 'dialog.content.applicationAlreadyRunning',
             sessionStolenNotification: 'dialog.content.sessionStolenNotification',
             tooManyClientsNotification: 'dialog.content.tooManyClientsNotification',
             continueOldSessionDialog: 'dialog.content.continueOldSessionDialog',
+            inactivityTimeoutWarningDialog: 'dialog.content.inactivityTimeoutWarningDialog',
             processFileDialogEvent: 'files.process',
             closeFileDialog: 'files.close',
             openLink: 'files.link',
@@ -54,7 +57,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         var timer1, timer3;
         var drawingLock;
         var drawingQ = [];
-
+        var warningTimeout = null;
         var windowImageHolders = {};
         var directDraw = new WebswingDirectDraw({});
 
@@ -202,7 +205,9 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                         api.logout();
                     }
                 } else if (data.event == "shutDownNotification") {
-                    api.showDialog(api.stoppedDialog);
+                    if (api.currentDialog() !== api.timedoutDialog) {
+                        api.showDialog(api.stoppedDialog);
+                    }
                     api.disconnect();
                 } else if (data.event == "applicationAlreadyRunning") {
                     api.showDialog(api.applicationAlreadyRunning);
@@ -222,6 +227,15 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                 } else if (data.event == "unauthorizedAccess") {
                     api.cfg.canPaint = false;
                     api.showDialog(api.unauthorizedAccess);
+                } else if (data.event == "sessionTimeoutWarning") {
+                    window.clearTimeout(warningTimeout);
+                    api.showDialogBar(api.inactivityTimeoutWarningDialog);
+                    warningTimeout = window.setTimeout(function () {
+                        api.hideDialogBar();
+                    }, 2000);
+                } else if (data.event == "sessionTimedOutNotification") {
+                    api.showDialog(api.timedoutDialog);
+                    api.disconnect();
                 }
                 return;
             }

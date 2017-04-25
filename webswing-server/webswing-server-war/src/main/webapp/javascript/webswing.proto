@@ -110,6 +110,8 @@ enum SimpleEventMsgOutProto{
 	sessionStolenNotification = 5;
 	unauthorizedAccess = 6;
 	shutDownAutoLogoutNotification = 7;
+	sessionTimeoutWarning = 8;
+	sessionTimedOutNotification = 9;
 }
 
 message JsEvalRequestMsgOutProto{

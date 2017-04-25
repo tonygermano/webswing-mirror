@@ -11,4 +11,6 @@ public interface ServerConnectionService {
 	Object sendObjectSync(Serializable o, String correlationId) throws TimeoutException, IOException;
 	
 	void disconnect();
+
+	void resetInactivityTimers();
 }
