@@ -318,6 +318,8 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 			}
 		} else {
 			res.setStatus(HttpServletResponse.SC_OK);
+			res.setHeader("Cache-Control","no-store, must-revalidate");
+			res.setHeader("Expires","0");
 			if (!method.getReturnType().equals(Void.TYPE) && result != null) {
 				try {
 					if (method.getReturnType().equals(String.class)) {
