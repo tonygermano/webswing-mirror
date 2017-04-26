@@ -177,7 +177,7 @@ public class WebEventDispatcher {
 				event.setKeycode(0);
 			}
 			if (type == KeyEvent.KEY_TYPED) {
-				AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, 0, 0, (char) event.getCharacter());
+				AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, modifiers, 0, (char) event.getCharacter());
 				dispatchEventInSwing(w, e);
 			} else {
 				AWTEvent e = Util.createKeyEvent(src, type, when, modifiers, event.getKeycode(), character, KeyEvent.KEY_LOCATION_STANDARD);

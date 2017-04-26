@@ -172,6 +172,16 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
                         event.preventDefault();
                     }
                     latestKeyDownEvent = keyevt;
+
+                    //generate keypress event for alt+key events
+                    if (keyevt.key.alt && functionKeys.indexOf(kc) == -1) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        keyevt = getKBKey('keypress', canvas, event);
+                        var key=keyevt.key.keycode;
+                        keyevt.key.character =(!keyevt.key.shift && (key>=65  && key <= 90)) ? key +32  : key;
+                        enqueueInputEvent(keyevt);
+                    }
                 }
                 return false;
             }
@@ -245,7 +255,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
         }
 
         function mouseDownEventHandler(evt) {
-            mouseDown = mouseDown | Math.pow(2,evt.which);
+            mouseDown = mouseDown | Math.pow(2, evt.which);
         }
 
         function mouseOutEventHandler(evt) {
@@ -253,7 +263,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
         }
 
         function mouseUpEventHandler(evt) {
-            mouseDown = mouseDown & ~Math.pow(2,evt.which);
+            mouseDown = mouseDown & ~Math.pow(2, evt.which);
         }
 
         function focusInput(input) {
