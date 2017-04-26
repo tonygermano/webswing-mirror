@@ -347,7 +347,7 @@ public class WebPaintDispatcher {
 				cursorChange.setB64img(Services.getImageService().getPngImage(img));
 				cursorChange.setX(c.getHotSpot() != null ? c.getHotSpot().x : 0);
 				cursorChange.setY(c.getHotSpot() != null ? c.getHotSpot().y : 0);
-				File file = Util.convertAndSaveCursor(img,cursorChange.getX(),cursorChange.getY());
+				File file = Util.convertAndSaveCursor(img, cursorChange.getX(), cursorChange.getY());
 				if (file != null) {
 					cursorChange.setCurFile(file.getAbsolutePath());
 				}
@@ -401,6 +401,7 @@ public class WebPaintDispatcher {
 				fdEvent.setAllowUpload(false);
 				if (FileDialogEventType.AutoUpload == fileChooserEventType) {
 					String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
+					path = path.split(File.pathSeparator)[0];
 					File timestampFoleder = new File(path, "" + System.currentTimeMillis());
 					timestampFoleder.mkdirs();
 					fileChooserDialog.setCurrentDirectory(timestampFoleder);

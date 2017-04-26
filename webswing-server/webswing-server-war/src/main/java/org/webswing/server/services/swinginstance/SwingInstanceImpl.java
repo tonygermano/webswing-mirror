@@ -364,7 +364,9 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		if (process != null && config.isIsolatedFs() && config.isClearTransferDir()) {
 			String transferDir = process.getConfig().getProperties().get(Constants.SWING_START_SYS_PROP_TRANSFER_DIR);
 			try {
-				if (transferDir != null) {
+				if (transferDir.indexOf(File.pathSeparator) != -1) {
+					throw new IOException("Can not clear upload folder if multiple roots are defined. Turn off the option in Webswing config. [" + transferDir + "]");
+				} else if (transferDir != null) {
 					FileUtils.deleteDirectory(new File(transferDir));
 				}
 			} catch (IOException e) {
@@ -488,7 +490,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_THEME, subs.replace(appConfig.getTheme()));
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS, appConfig.isIsolatedFs());
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, getAbsolutePath(subs.replace(appConfig.getTransferDir()), false));
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, getAbsolutePaths(subs.replace(appConfig.getTransferDir()), false));
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD, appConfig.isAllowDownload());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD, appConfig.isAllowAutoDownload());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD, appConfig.isAllowUpload());
@@ -555,6 +557,14 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			throw new Exception(e1);
 		}
 		return swing;
+	}
+
+	private String getAbsolutePaths(String paths, boolean b) throws IOException {
+		String result = "";
+		for (String s : paths.split(File.pathSeparator)) {
+			result += getAbsolutePath(s, b) + File.pathSeparator;
+		}
+		return result.substring(0, Math.max(0, result.length() - 1));
 	}
 
 	private String getAbsolutePath(String path, boolean create) throws IOException {

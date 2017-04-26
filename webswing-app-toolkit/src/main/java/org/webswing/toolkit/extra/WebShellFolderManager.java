@@ -10,6 +10,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("restriction")
@@ -19,15 +22,22 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 	private Object defaultManager;
 
 	private File root;
+	private List<File> roots = new ArrayList<File>();
 
 	public WebShellFolderManager() {
 		String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
-		root = new IsolatedRootFile(path);
-		if (!root.getAbsoluteFile().exists()) {
-			root.mkdirs();
+		String[] paths = path.split(File.pathSeparator);
+		for (int i = 0; i < paths.length; i++) {
+			File root = new IsolatedRootFile(paths[i]);
+			if (!root.getAbsoluteFile().exists()) {
+				root.mkdirs();
+			}
+			roots.add(root);
+			if (i == 0) {
+				this.root = root;
+				System.setProperty("user.home", root.getAbsolutePath());
+			}
 		}
-		System.setProperty("user.home", root.getAbsolutePath());
-
 		windows = System.getProperty("os.name", "").startsWith("Windows");
 
 		try {
@@ -47,13 +57,13 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 			return root;
 		}
 		if (paramString.equals("roots")) {
-			return new File[] { root };
+			return roots.toArray(new File[roots.size()]);
 		}
 		if (paramString.equals("fileChooserComboBoxFolders")) {
-			return new File[] { root };
+			return roots.toArray(new File[roots.size()]);
 		}
 		if (paramString.equals("fileChooserShortcutPanelFolders")) {
-			return new File[] { root };
+			return roots.toArray(new File[roots.size()]);
 		}
 		if (paramString.startsWith("fileChooserIcon ") || paramString.startsWith("optionPaneIcon ") || paramString.startsWith("shell32Icon ")) {
 			return super.get(paramString);
@@ -64,7 +74,7 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 	@Override
 	public ShellFolder createShellFolder(File paramFile) throws FileNotFoundException {
 		try {
-			if (paramFile.getCanonicalPath().startsWith(root.getCanonicalPath())) {
+			if (isSubfolderOfRoots(paramFile)) {
 				if (windows) {
 					return super.createShellFolder(paramFile);
 				} else {
@@ -89,6 +99,16 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 				throw new FileNotFoundException("Error while creating ShellFolder. " + e.getMessage());
 			}
 		}
+	}
+
+	private boolean isSubfolderOfRoots(File paramFile) throws IOException {
+		String cp = paramFile.getCanonicalPath();
+		for (File root : roots) {
+			if (cp.startsWith(root.getCanonicalPath())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -128,11 +148,12 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 	@Override
 	public boolean isFileSystemRoot(File paramFile) {
 		try {
-			if (root.getCanonicalPath().equals(paramFile.getCanonicalPath())) {
-				return true;
-			} else {
-				return false;
+			for (File root : roots) {
+				if (root.getCanonicalPath().equals(paramFile.getCanonicalPath())) {
+					return true;
+				}
 			}
+			return false;
 		} catch (IOException e1) {
 			if (windows) {
 				return super.isFileSystemRoot(paramFile);

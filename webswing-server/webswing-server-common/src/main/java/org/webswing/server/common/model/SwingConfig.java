@@ -147,7 +147,7 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isTransparentFileSave();
 
-	@ConfigField(tab = ConfigGroup.Features, label = "Upload Folder", description = "If Isolated Filesystem is enabled. This will be the folder on the server where the user can upload and download files from.")
+	@ConfigField(tab = ConfigGroup.Features, label = "Upload Folder", description = "If Isolated Filesystem is enabled. This will be the folder on the server where the user can upload and download files from. Multiple folders can be defined using path separator (${path.separator})")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("${user}/upload")
 	public String getTransferDir();
