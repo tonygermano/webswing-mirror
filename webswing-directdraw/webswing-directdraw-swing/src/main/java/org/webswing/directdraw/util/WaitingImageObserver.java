@@ -113,7 +113,7 @@ public class WaitingImageObserver implements ImageObserver, Serializable, Clonea
 	 *            image is completely loaded; <code>true</code> otherwise.
 	 */
 	public synchronized boolean imageUpdate(final Image img, final int infoflags, final int x, final int y, final int width, final int height) {
-		if ((infoflags & ImageObserver.ALLBITS) == ImageObserver.ALLBITS) {
+		if ((infoflags & ImageObserver.ALLBITS) == ImageObserver.ALLBITS || (infoflags & ImageObserver.FRAMEBITS) == ImageObserver.FRAMEBITS) {
 			this.lock = false;
 			this.error = false;
 			notifyAll();
