@@ -3,6 +3,7 @@ package org.webswing.server.services.security.modules.property;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.io.ResourceUtils;
 import org.apache.shiro.realm.text.PropertiesRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +25,9 @@ public class PropertySecurityModule extends AbstractUserPasswordSecurityModule<P
 		String fileNameFull = getConfig().getContext().replaceVariables(fileName);
 		File file = getConfig().getContext().resolveFile(fileNameFull);
 		if (file == null) {
-			throw new RuntimeException("Unable to resolve user properties file: "+fileNameFull);
+			throw new RuntimeException("Unable to resolve user properties file: " + fileNameFull);
 		}
-		realm.setResourcePath(file.toURI().toString());
+		realm.setResourcePath(ResourceUtils.FILE_PREFIX + file.getPath());
 		realm.onInit();
 	}
 
