@@ -36,6 +36,18 @@
 			<groupId>org.webswing</groupId>
 			<artifactId>webswing-server-security</artifactId>
 			<version>${project.parent.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>javax.servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
@@ -152,6 +164,7 @@
 							<describe>${git.commit.id.describe}</describe>
 							<commitTime>${git.commit.time}</commitTime>
 							<buildTime>${git.build.time}</buildTime>
+							<Ignore-Scanning-Packages>com,org,net</Ignore-Scanning-Packages><!--prevent classpath scanning in websphere-->
 						</manifestEntries>
 					</archive>
 				</configuration>

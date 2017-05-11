@@ -198,6 +198,9 @@ public class CommonUtil {
 				if (cp.startsWith("file:")) {
 					cp = cp.substring(5);
 				}
+				if (cp.startsWith("/") && cp.contains(":")) {//remove leading slash if windows
+					cp = cp.substring(1);
+				}
 			}
 			return "\"" + cp + "\"";
 
