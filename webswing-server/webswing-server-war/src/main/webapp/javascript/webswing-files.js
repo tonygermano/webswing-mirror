@@ -6,7 +6,8 @@ define([ 'jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jqu
 		var api;
 		module.injects = api = {
 			cfg : 'webswing.config',
-			send : 'socket.send'
+			send : 'socket.send',
+			translate: 'translate.translate'
 		};
 		module.provides = {
 			process : process,
@@ -15,6 +16,9 @@ define([ 'jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jqu
 			link : link,
 			print : print
 		};
+        module.ready = function () {
+            html = api.translate(html);
+        };
 
 		var jqXHR_fileupload = [];
 		var doneFileList = [];
@@ -211,7 +215,7 @@ define([ 'jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jqu
 				$jsProgressBar.css('width', progress + '%');
 				$jsProgressText.find("em").text(progress + "%");
 				if (progress === 100) {
-					$jsProgressText.find("em").text("Complete");
+					$jsProgressText.find("em").text(api.translate("files.progComplete"));
 					setTimeout(function() {
 						if (!errorTimeout) {
 							filesSelected(doneFileList);
@@ -268,7 +272,7 @@ define([ 'jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jqu
 					fileDialogErrorMessage.hide("fast");
 					return true;
 				} else {
-					fileDialogErrorMessageContent.html('<p>File name is invalid. Please use only alphanumeric characters, space, hyphen, dot or underscore.</p>');
+					fileDialogErrorMessageContent.html(api.translate('<p>${files.saveInvlidFilename}</p>'));
 					animateShow(fileDialogErrorMessage);
 					return false;
 				}

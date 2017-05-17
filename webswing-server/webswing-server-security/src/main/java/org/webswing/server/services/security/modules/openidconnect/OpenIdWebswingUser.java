@@ -15,7 +15,7 @@ public class OpenIdWebswingUser extends AbstractWebswingUser {
 	IdToken token;
 	String user;
 	Map<String, Serializable> attrs = new HashMap<>();
-	List<String> roles;
+	List<String> roles=new ArrayList<>();
 
 	public OpenIdWebswingUser(IdToken token, String usernameAttr, String roleAttr, Map<String, Serializable> extraAttribs) {
 		this.token = token;

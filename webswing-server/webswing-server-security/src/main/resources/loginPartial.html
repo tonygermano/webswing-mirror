@@ -1,13 +1,13 @@
 <form id="webswingLginForm" accept-charset="UTF-8" role="form" class="ws-login-form">
 	<div data-id="header" class="ws-login-header">
-		<h1 class="ws-login-title">Sign in to your account</h1>
+		<h1 class="ws-login-title">${login.title}</h1>
 	</div>
 
-	<p class="ws-login-instructions">Please enter your credentials:</p>
-	<input id="nameInput" type="text" class="ws-form-field ws-form-addon" placeholder="Username" name="username" required autofocus autocomplete="off">
+	<p class="ws-login-instructions">${login.instr}</p>
+	<input id="nameInput" type="text" class="ws-form-field ws-form-addon" placeholder="${login.username}" name="username" required autofocus autocomplete="off">
 	<i class="ws-form-icon ws-form-icon--username" aria-hidden="true"></i>
 
-	<input id="passwordInput" type="password" class="ws-form-field ws-form-addon" placeholder="Password" name="password" required autocomplete="off">
+	<input id="passwordInput" type="password" class="ws-form-field ws-form-addon" placeholder="${login.password}" name="password" required autocomplete="off">
 	<i class="ws-form-icon ws-form-icon--password" aria-hidden="true"></i>
 
 	<div id="loginErrorMsg">
@@ -18,5 +18,6 @@
 		{{/errorMessage}}
 	</div>
 
-	<button type="submit" form="webswingLginForm" value="Submit" class="ws-btn-submit">Sign in</button>
+
+	<button type="submit" form="webswingLginForm" value="Submit" class="ws-btn-submit">${login.button}</button>
 </form>

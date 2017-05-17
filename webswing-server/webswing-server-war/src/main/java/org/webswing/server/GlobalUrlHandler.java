@@ -1,5 +1,6 @@
 package org.webswing.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -207,11 +208,6 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		return "";
 	}
 
-	@Override
-	public String getSecuredPath() {
-		return getPath();
-	}
-
 	public void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
 	}
@@ -279,10 +275,22 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 	@Override
 	public URL getWebResource(String resource) {
-		if (StringUtils.isBlank(getConfig().getWebFolder()) && StringUtils.equals("/index.html", toPath(resource))) {
+		if (!isCustomIndexPage() && StringUtils.equals("/index.html", toPath(resource))) {
 			resource = System.getProperty(Constants.DEFAULT_WELCOME_PAGE, "/selector/index.html");
 		}
 		return super.getWebResource(resource);
+	}
+
+	private boolean isCustomIndexPage() {
+		String customFolder = getConfig().getWebFolder();
+		if (StringUtils.isBlank(customFolder)) {
+			return false;
+		}
+		File customFolderFile = resolveFile(customFolder);
+		if (customFolderFile.isDirectory() && new File(customFolderFile, "index.html").isFile()) {
+			return true;
+		}
+		return false;
 	}
 
 	@GET
@@ -422,7 +430,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 	@GET
 	@Path("/rest/CSRFToken")
-	public String generateCsrfToken(){
+	public String generateCsrfToken() {
 		return super.generateCsrfToken();
 	}
 }

@@ -181,7 +181,7 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 			}
 		}
 		if (parent == null) {
-			return "";
+			return getFullPathMapping();
 		} else {
 			return parent.getSecuredPath();
 		}
@@ -210,7 +210,16 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 	}
 
 	public AbstractWebswingUser getMasterUser() {
-		return SecurityUtil.getUser("");
+		return SecurityUtil.getUser(getRootHandler().getSecuredPath());
+	}
+
+	@Override
+	public UrlHandler getRootHandler() {
+		if (parent != null) {
+			return parent.getRootHandler();
+		} else {
+			return this;
+		}
 	}
 
 	@Override
@@ -318,8 +327,8 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 			}
 		} else {
 			res.setStatus(HttpServletResponse.SC_OK);
-			res.setHeader("Cache-Control","no-store, must-revalidate");
-			res.setHeader("Expires","0");
+			res.setHeader("Cache-Control", "no-store, must-revalidate");
+			res.setHeader("Expires", "0");
 			if (!method.getReturnType().equals(Void.TYPE) && result != null) {
 				try {
 					if (method.getReturnType().equals(String.class)) {

@@ -89,8 +89,8 @@ public abstract class SecurityModuleExtension<T extends SecurityModuleExtensionC
 	 * 
 	 * @param user current logged in user
 	 * @param path path after '/login' (ie. if request path is '/app/login/custom', path will be '/custom') 
-	 * @param request The HTTP request from servlet container
-	 * @param response The HTTP response from servlet container
+	 * @param req The HTTP request from servlet container
+	 * @param res The HTTP response from servlet container
 	 * @return true if request was served.
 	 */
 	public boolean serveAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse res) {

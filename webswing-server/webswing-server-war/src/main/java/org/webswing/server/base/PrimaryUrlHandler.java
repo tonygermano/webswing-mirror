@@ -45,6 +45,7 @@ import org.webswing.toolkit.util.GitRepositoryState;
 public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements SecuredPathHandler, SecurityContext {
 	private static final Logger log = LoggerFactory.getLogger(PrimaryUrlHandler.class);
 	private static final String default_version = "unresolved";
+	public static final String JAVASCRIPT_NLS_PREFIX = "/javascript/nls";
 
 	protected final ConfigurationService configService;
 	protected final SecurityModuleService securityModuleService;
@@ -377,6 +378,14 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	@Override
 	public URL getWebResource(String resource) {
+		if (toPath(resource).startsWith(JAVASCRIPT_NLS_PREFIX)) {
+			String langs = getConfig().getLangFolder();
+			File langsFolder = StringUtils.isEmpty(langs) ? null : resolveFile(langs);
+			URL result = ServerUtil.getFileResource(toPath(resource).substring(JAVASCRIPT_NLS_PREFIX.length()), langsFolder);
+			if (result != null) {
+				return result;
+			}
+		}
 		String webFolderPath = getConfig().getWebFolder();
 		File webFolder = StringUtils.isEmpty(webFolderPath) ? null : resolveFile(webFolderPath);
 		return ServerUtil.getWebResource(toPath(resource), getServletContext(), webFolder);

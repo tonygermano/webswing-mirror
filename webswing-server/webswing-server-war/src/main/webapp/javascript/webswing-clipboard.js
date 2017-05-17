@@ -7,7 +7,8 @@ define(['jquery', 'text!templates/clipboard.html', 'webswing-util'], function am
         module.injects = api = {
             cfg: 'webswing.config',
             send: 'socket.send',
-            getInput: 'canvas.getInput'
+            getInput: 'canvas.getInput',
+            translate: 'translate.translate'
         };
         module.provides = {
             cut: cut,
@@ -18,6 +19,7 @@ define(['jquery', 'text!templates/clipboard.html', 'webswing-util'], function am
         };
         module.ready = function () {
             document.addEventListener("copy", copy);
+            html = api.translate(html);
         };
 
         var copyBar;

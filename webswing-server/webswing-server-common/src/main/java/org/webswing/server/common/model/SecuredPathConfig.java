@@ -13,7 +13,7 @@ import org.webswing.server.common.model.meta.ConfigFieldOrder;
 import org.webswing.server.common.model.meta.ConfigFieldVariables;
 import org.webswing.server.common.model.meta.VariableSetName;
 
-@ConfigFieldOrder({ "path", "homeDir", "webFolder", "icon", "security", "swingConfig" })
+@ConfigFieldOrder({ "path", "homeDir", "webFolder", "langFolder", "icon", "security", "swingConfig" })
 public interface SecuredPathConfig extends Config {
 
 	@ConfigField(label = "Context Path", description = "Url context path where the application will be deployed.")
@@ -29,6 +29,11 @@ public interface SecuredPathConfig extends Config {
 	@ConfigFieldVariables(VariableSetName.SwingApp)
 	@ConfigFieldDefaultValueString("")
 	public String getWebFolder();
+
+	@ConfigField(label = "Localization Folder", description = "Folder to be used to store customized messages and translations in supported languages. English is available by default.")
+	@ConfigFieldVariables(VariableSetName.SwingApp)
+	@ConfigFieldDefaultValueString("")
+	public String getLangFolder();
 
 	@ConfigField(label = "Icon", description = "Path to icon displayed in application selection dialog.")
 	@ConfigFieldVariables(VariableSetName.SwingApp)

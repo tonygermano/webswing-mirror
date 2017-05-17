@@ -1,23 +1,103 @@
-define([ 'jquery' ], function Util($) {
+define(['jquery', 'webswing-translate'], function Util($, Translate) {
     "use strict";
     $.fn.extend({
         animateCss: function (animationName) {
             var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-            this.addClass('animated ' + animationName).one(animationEnd, function() {
+            this.addClass('animated ' + animationName).one(animationEnd, function () {
                 $(this).removeClass('animated ' + animationName);
             });
         }
     });
-    
-    
+
+    var translate = new Translate().provides.translate;
+
     return {
-        isTouchDevice : isTouchDevice,
-        getImageString : getImageString,
-        bindEvent : bindEvent,
-        detectIE : detectIE,
-        preventGhosts : preventGhosts,
-        GUID : GUID,
-        detectMac : detectMac
+        webswingLogin: webswingLogin,
+        webswingLogout: webswingLogout,
+        isTouchDevice: isTouchDevice,
+        getImageString: getImageString,
+        bindEvent: bindEvent,
+        detectIE: detectIE,
+        preventGhosts: preventGhosts,
+        GUID: GUID,
+        detectMac: detectMac,
+        createCookie: createCookie,
+        readCookie: readCookie,
+        eraseCookie: eraseCookie
+    }
+
+    function webswingLogin(baseUrl, element, loginData, successCallback) {
+        $.ajax({
+            xhrFields: {
+                withCredentials: true
+            },
+            type: 'POST',
+            url: baseUrl + 'login',
+            contentType: typeof loginData === 'object' ? 'application/json' : 'application/x-www-form-urlencoded; charset=UTF-8',
+            data: typeof loginData === 'object' ? JSON.stringify(loginData) : loginData,
+            success: function (data, textStatus, request) {
+                if (successCallback != null) {
+                    successCallback(data, request);
+                }
+            },
+            error: function (xhr) {
+                var response = xhr.responseText;
+                if (response != null) {
+                    var loginMsg = {};
+                    try {
+                        loginMsg = JSON.parse(response);
+                    } catch (error) {
+                        loginMsg.partialHtml = translate('<p>${login.failedToAuthenticate}</p>');
+                    }
+                    if (loginMsg.redirectUrl != null) {
+                        window.top.location.href = loginMsg.redirectUrl;
+                    } else if (loginMsg.partialHtml != null) {
+                        if (typeof element === 'function') {
+                            element = element();
+                        }
+                        element.html(translate(loginMsg.partialHtml));
+                        var form = element.find('form').first();
+                        form.submit(function (event) {
+                            webswingLogin(baseUrl, element, form.serialize(), successCallback);
+                            event.preventDefault();
+                        });
+                    } else {
+                        element.html(translate("<p>${login.unexpectedError}</p>"));
+                    }
+                } else {
+                    element.html(translate("<p>${login.serverNotAvailable}</p>"));
+                }
+            }
+        });
+    }
+
+    function webswingLogout(baseUrl, element, doneCallback) {
+        $.ajax({
+            type: 'GET',
+            url: baseUrl + 'logout',
+        }).done(function (data, status, xhr) {
+            var response = xhr.responseText;
+            if (response != null) {
+                var loginMsg = {};
+                try {
+                    loginMsg = JSON.parse(response);
+                } catch (error) {
+                    doneCallback();
+                }
+                if (loginMsg.redirectUrl != null) {
+                    window.top.location.href = loginMsg.redirectUrl;
+                } else if (loginMsg.partialHtml != null) {
+                    if (typeof element === 'function') {
+                        element = element();
+                    }
+                    element.html(translate(loginMsg.partialHtml));
+                } else {
+                    doneCallback();
+                }
+            } else {
+                element.html(translate("<p>${login.serverNotAvailable}</p>"));
+            }
+        });
     }
 
     function isTouchDevice() {
@@ -28,7 +108,7 @@ define([ 'jquery' ], function Util($) {
         if (typeof data === 'object') {
             var binary = '';
             var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
-            for ( var i = 0, l = bytes.byteLength; i < l; i++) {
+            for (var i = 0, l = bytes.byteLength; i < l; i++) {
                 binary += String.fromCharCode(bytes[i]);
             }
             data = window.btoa(binary);
@@ -70,8 +150,8 @@ define([ 'jquery' ], function Util($) {
     function preventGhosts(element) {
         var ANTI_GHOST_DELAY = 2000;
         var POINTER_TYPE = {
-            MOUSE : 0,
-            TOUCH : 1
+            MOUSE: 0,
+            TOUCH: 1
         };
         var latestInteractionType, latestInteractionTime;
 
@@ -97,18 +177,18 @@ define([ 'jquery' ], function Util($) {
         }
 
         function attachEvents(eventList, interactionType) {
-            eventList.forEach(function(eventName) {
+            eventList.forEach(function (eventName) {
                 element[0].addEventListener(eventName, handleTap.bind(null, interactionType), true);
             });
         }
 
-        var mouseEvents = [ 'mousedown', 'mouseup', 'mousemove' ];
-        var touchEvents = [ 'touchstart', 'touchend' ];
+        var mouseEvents = ['mousedown', 'mouseup', 'mousemove'];
+        var touchEvents = ['touchstart', 'touchend'];
 
         attachEvents(mouseEvents, POINTER_TYPE.MOUSE);
         attachEvents(touchEvents, POINTER_TYPE.TOUCH);
     }
-    
+
     function GUID() {
         var S4 = function () {
             return Math.floor(Math.random() * 0x10000).toString(16);
@@ -116,7 +196,37 @@ define([ 'jquery' ], function Util($) {
         return (S4() + S4() + S4());
     }
 
-    function detectMac(){
-    	return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    function detectMac() {
+        return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    }
+
+    function createCookie(name, value, days) {
+        var expires;
+
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toGMTString();
+        } else {
+            expires = "";
+        }
+        document.cookie = escape(name) + "=" + escape(value) + expires + "; path=/";
+    }
+
+    function readCookie(name) {
+        var nameEQ = escape(name) + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ')
+                c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0)
+                return unescape(c.substring(nameEQ.length, c.length));
+        }
+        return null;
+    }
+
+    function eraseCookie(name) {
+        createCookie(name, "", -1);
     }
 });

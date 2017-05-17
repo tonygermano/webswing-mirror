@@ -1,5 +1,6 @@
 package org.webswing.server.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -170,18 +171,23 @@ public class ServerUtil {
 		}
 	}
 
-	public static URL getWebResource(String resource, ServletContext servletContext, File webFolder) {
+	public static URL getFileResource(String resource,File folder) {
 		URL result = null;
-		if (webFolder != null && webFolder.isDirectory()) {
-			File file = new File(webFolder, resource);
+		if (folder != null && folder.isDirectory()) {
+			File file = new File(folder, resource);
 			if (file.isFile()) {
 				try {
 					result = file.toURI().toURL();
 				} catch (MalformedURLException e) {
-					log.error("Failed to get file from webFolder.", e);
+					log.error("Failed to get file from Folder.", e);
 				}
 			}
 		}
+		return result;
+	}
+
+	public static URL getWebResource(String resource, ServletContext servletContext, File webFolder) {
+		URL result = getFileResource(resource,webFolder);
 		if (result == null) {
 			try {
 				result = servletContext.getResource(resource);

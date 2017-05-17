@@ -196,6 +196,11 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 	}
 
 	@Override
+	public UrlHandler getRootHandler() {
+		return parent.getRootHandler();
+	}
+
+	@Override
 	public AbstractWebswingUser getUser() {
 		return parent.getUser();
 	}

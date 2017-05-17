@@ -32,10 +32,6 @@ public class AnonymSecurityModule extends AbstractSecurityModule<WebswingSecurit
 
 	@Override
 	public void doLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if (isAjax(request)) {
-			sendHtml(request, response, "logoutPartial.html", null);
-		} else {
-			sendHtml(request, response, "logoutPage.html", null);
-		}
+		sendPartialHtml(request, response, "logoutPartial.html", null);
 	}
 }

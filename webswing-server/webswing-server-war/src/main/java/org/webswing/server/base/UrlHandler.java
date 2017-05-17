@@ -33,6 +33,8 @@ public interface UrlHandler {
 
 	String getSecuredPath();
 
+	UrlHandler getRootHandler();
+
 	AbstractWebswingUser getUser();
 
 	void checkPermission(WebswingAction action) throws WsException;

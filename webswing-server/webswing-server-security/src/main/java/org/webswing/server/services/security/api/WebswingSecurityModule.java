@@ -53,11 +53,11 @@ public interface WebswingSecurityModule {
 
 	/**
 	 * This method is triggered by Webswing when a HTTP request is received on URL <blockquote>/{app_path}/logout</blockquote> 
-	 * after the current user session is invalidated.   
+	 * after the current user session is invalidated.
 	 * <br>
 	 *
-	 * @param request The HTTP request from servlet container
-	 * @param response The HTTP response from servlet container
+	 * @param req The HTTP request from servlet container
+	 * @param res The HTTP response from servlet container
 	 * @param user The user which just logged out
 	 * @throws ServletException thrown when sending the http response fails
 	 * @throws IOException thrown when sending the http response fails
@@ -73,7 +73,7 @@ public interface WebswingSecurityModule {
 	 * @param request The HTTP request from servlet container
 	 * @param response The HTTP response from servlet container
 	 */
-	void doServeAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest request, HttpServletResponse response);
+	void doServeAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest request, HttpServletResponse response) throws IOException;
 
 	/**
 	 * Tear down of this module. Invoked when Webserver is shutting down or application is being reloaded/uninstalled.

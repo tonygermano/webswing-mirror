@@ -10,7 +10,8 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
             kill: 'base.kill',
             newSession: 'webswing.newSession',
             reTrySession: 'webswing.reTrySession',
-            logout: 'login.logout'
+            logout: 'login.logout',
+            translate: 'translate.translate'
         };
         module.provides = {
             show: show,
@@ -19,7 +20,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
             content: configuration(),
             currentBar: currentBar,
             showBar: showBar,
-            hideBar: hideBar
+            hideBar: hideBar,
         };
 
         var currentContent;
@@ -30,50 +31,50 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
 
         function configuration() {
             return {
-                emptyMessage: messageDialog('', true),
-                logingOut: messageDialog('Signing out'),
-                readyDialog: messageDialog('Ready to start your session'),
-                initializingDialog: messageDialog('Your session is being initialized', true),
-                startingDialog: messageDialog('Starting your application', true),
-                connectingDialog: messageDialog('Connecting to the server', true),
-                unauthorizedAccess: messageDialog('Unable to authorize your request'),
-                applicationAlreadyRunning: retryMessageDialog('There is already a session in progress in another window.'),
-                sessionStolenNotification: retryMessageDialog('A new session was started in another window. This session has been closed.'),
-                disconnectedDialog: retryMessageDialog('You have been disconnected from the server. Please reconnect to continue.'),
-                connectionErrorDialog: retryMessageDialog('A connection error has occurred. Please reconnect to continue.'),
-                tooManyClientsNotification: retryMessageDialog('There are too many active connections right now, please try again later'),
-                stoppedDialog: finalMessageDialog('The application has been closed.'),
-                timedoutDialog: finalMessageDialog('The session has timed out.'),
+                emptyMessage: messageDialog('dialog.emptyMessage', true),
+                logingOut: messageDialog('dialog.logingOut'),
+                readyDialog: messageDialog('dialog.readyDialog'),
+                initializingDialog: messageDialog('dialog.initializingDialog', true),
+                startingDialog: messageDialog('dialog.startingDialog', true),
+                connectingDialog: messageDialog('dialog.connectingDialog', true),
+                unauthorizedAccess: messageDialog('dialog.unauthorizedAccess'),
+                applicationAlreadyRunning: retryMessageDialog('dialog.applicationAlreadyRunning'),
+                sessionStolenNotification: retryMessageDialog('dialog.sessionStolenNotification'),
+                disconnectedDialog: retryMessageDialog('dialog.disconnectedDialog'),
+                connectionErrorDialog: retryMessageDialog('dialog.connectionErrorDialog'),
+                tooManyClientsNotification: retryMessageDialog('dialog.tooManyClientsNotification'),
+                stoppedDialog: finalMessageDialog('dialog.stoppedDialog'),
+                timedoutDialog: finalMessageDialog('dialog.timedoutDialog'),
                 continueOldSessionDialog: {
-                    content: '<p>Welcome back! <br>You can continue working in your previous session.</p>',
+                    content: '<p>${dialog.continueC}</p>',
                     buttons: [{
-                        label: '<span class="ws-icon-certificate"></class> Restart session',
+                        label: '<span class="ws-icon-certificate"></class> ${dialog.continueB1}',
                         action: function () {
                             api.kill();
                             api.newSession();
                         }
-                    },{
-                        label: '<span class="ws-icon-cancel-circled"></span>  Dismiss',
+                    }, {
+                        label: '<span class="ws-icon-cancel-circled"></span>  ${dialog.continueB2}',
                         action: function () {
                             hideBar();
                         }
                     }]
                 },
                 longPollingWarningDialog: {
-                    header: '<span class="ws-message--warning"><span class="ws-icon-warn"></span> Warning</span>',
-                    content: '<p>Your current network blocks WebSockets. You may experience performance problems while working on this connection. Please contact your network administrator. </p>',
+                    header: '<span class="ws-message--warning"><span class="ws-icon-warn"></span> ${dialog.longPollingH}</span>',
+                    content: '<p>${dialog.longPollingC} </p>',
                     buttons: [{
-                        label: '<span class="ws-icon-cancel-circled"></span>  Dismiss',
+                        label: '<span class="ws-icon-cancel-circled"></span>  ${dialog.longPollingB}',
                         action: function () {
                             hideBar();
                         }
                     }]
                 },
                 inactivityTimeoutWarningDialog: {
-                    header: '<span class="ws-message--warning"><span class="ws-icon-warn"></span> Warning</span>',
-                    content: '<p>Your session will timeout in less then a minute due to inactivity. Please press any button to continue.  </p>',
+                    header: '<span class="ws-message--warning"><span class="ws-icon-warn"></span> ${dialog.inactivityTimeoutH}</span>',
+                    content: '<p>${dialog.inactivityTimeoutC}  </p>',
                     buttons: [{
-                        label: '<span class="ws-icon-cancel-circled"></span>  Dismiss',
+                        label: '<span class="ws-icon-cancel-circled"></span>  ${dialog.inactivityTimeoutB}',
                         action: function () {
                             hideBar();
                         }
@@ -83,7 +84,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
         }
 
         function messageDialog(msg, withSpinner) {
-            var content = '<p>' + msg + '</p>';
+            var content = '<p>${' + msg + '}</p>';
             if (withSpinner) {
                 content = '<div class="ws-spinner"><div class="ws-spinner-dot-1"></div> <div class="ws-spinner-dot-2"></div></div>' + content;
             }
@@ -94,14 +95,14 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
 
         function finalMessageDialog(msg) {
             return {
-                content: '<p>' + msg + '</p>',
+                content: '<p>${' + msg + '}</p>',
                 buttons: [{
-                    label: '<span class="ws-icon-certificate"></class> New session',
+                    label: '<span class="ws-icon-certificate"></class> ${dialog.finalB1}',
                     action: function () {
                         api.newSession();
                     }
                 }, {
-                    label: '<span class="ws-icon-logout"></class> Sign out',
+                    label: '<span class="ws-icon-logout"></class> ${dialog.finalB2}',
                     action: function () {
                         api.logout();
                     }
@@ -111,14 +112,14 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
 
         function retryMessageDialog(msg) {
             return {
-                content: '<p>' + msg + '</p>',
+                content: '<p>${' + msg + '}</p>',
                 buttons: [{
-                    label: '<span class="ws-icon-arrows-cw"></class> Reconnect',
+                    label: '<span class="ws-icon-arrows-cw"></class> ${dialog.retryB1}',
                     action: function () {
                         api.reTrySession();
                     }
                 }, {
-                    label: '<span class="ws-icon-logout"></class> Sign out',
+                    label: '<span class="ws-icon-logout"></class> ${dialog.retryB2}',
                     action: function () {
                         api.logout();
                     }
@@ -151,7 +152,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
         }
 
         function show(msg) {
-            if(msg==null){
+            if (msg == null) {
                 return;
             }
             if (dialog == null) {
@@ -165,7 +166,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
         }
 
         function showBar(msg) {
-            if(msg==null){
+            if (msg == null) {
                 return;
             }
             if (bar == null) {
@@ -179,7 +180,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
 
         function generateContent(msg, dialog, header, content) {
             if (msg.header != null) {
-                header.html(msg.header);
+                header.html(api.translate(msg.header));
                 if (dialog.is(":visible")) {
                     header.fadeIn(200);
                 } else {
@@ -190,7 +191,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
                 header.html('');
             }
 
-            content.html(msg.content);
+            content.html(api.translate(msg.content));
 
             for (var e in msg.events) {
                 var element = dialog.find('*[data-id="' + e.substring(0, e.lastIndexOf('_')) + '"]');
@@ -199,7 +200,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
 
             for (var b in msg.buttons) {
                 var btn = msg.buttons[b];
-                var button = $('<button class="ws-btn">' + btn.label + '</button><span> </span>');
+                var button = $('<button class="ws-btn">' + api.translate(btn.label) + '</button><span> </span>');
                 button.on('click', btn.action);
                 content.append(button);
             }

@@ -40,7 +40,7 @@ public class EmbededSecurityModule extends AbstractUserPasswordSecurityModule<Em
 				return current;
 			}
 		}
-		throw new WebswingAuthenticationException("Invalid Username or Password");
+		throw new WebswingAuthenticationException("Invalid Username or Password", WebswingAuthenticationException.INVALID_USER_OR_PASSWORD);
 
 	}
 

@@ -89,21 +89,6 @@ public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<Key
 		}
 	}
 
-	@Override
-	protected void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		OpenIdConnectClient realmClient = clients.get(resolveRealmName(request));
-		if (realmClient.isInitialized()) {
-			if (exception != null) {
-				sendHtml(request, response, "saml2/errorPage.html", exception);
-			} else {
-				String url = realmClient.getOpenIDRedirectUrl();
-				sendRedirect(request, response, url);
-			}
-		} else {
-			sendHtml(request, response, "saml2/errorPage.html", new Exception("Authentication server is not available."));
-		}
-	}
-
 	private String resolveRealmName(HttpServletRequest request) {
 		Map<String, Object> requestData = getLoginRequest(request);
 		String r = null;
@@ -115,7 +100,17 @@ public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<Key
 
 	@Override
 	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		serveLoginPage(request, response, exception);
+		OpenIdConnectClient realmClient = clients.get(resolveRealmName(request));
+		if (realmClient.isInitialized()) {
+			if (exception != null) {
+				sendPartialHtml(request, response, "errorPartial.html", exception);
+			} else {
+				String url = realmClient.getOpenIDRedirectUrl();
+				sendRedirect(request, response, url);
+			}
+		} else {
+			sendPartialHtml(request, response, "errorPartial.html", new Exception("Authentication server is not available."));
+		}
 	}
 
 	@Override
@@ -133,7 +128,7 @@ public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<Key
 			} catch (Exception e1) {
 				logFailure(request, null, "Failed to authenticate." + e1.getMessage());
 				log.error("Failed to authenticate", e1);
-				throw new WebswingAuthenticationException("Failed to authenticate. " + e1.getMessage(), e1);
+				throw new WebswingAuthenticationException("Failed to authenticate. " + e1.getMessage(), WebswingAuthenticationException.FAILED_TO_AUTHENTICATE, e1);
 			}
 		}
 		return null;

@@ -117,6 +117,8 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 
 		protected void setHeaders(HttpServletResponse resp) {
 			resp.setStatus(HttpServletResponse.SC_OK);
+			resp.setHeader("Cache-Control", "public, max-age=120");
+			resp.setDateHeader("Last-Modified", getLastModified());
 			resp.setContentType(mime);
 			if (url.getContentLength() >= 0)
 				resp.setContentLength(url.getContentLength());
@@ -124,8 +126,13 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 
 		public boolean respondGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 			setHeaders(resp);
-			final OutputStream os = resp.getOutputStream();
-			CommonUtil.transferStreams(url.getInputStream(), os);
+			long ims = req.getDateHeader("If-Modified-Since");
+			if (ims != -1 && ims != getLastModified()) {
+				resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+			} else {
+				final OutputStream os = resp.getOutputStream();
+				CommonUtil.transferStreams(url.getInputStream(), os);
+			}
 			return true;
 		}
 

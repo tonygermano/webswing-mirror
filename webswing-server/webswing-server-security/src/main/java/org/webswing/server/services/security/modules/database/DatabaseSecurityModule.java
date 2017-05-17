@@ -95,10 +95,10 @@ public class DatabaseSecurityModule extends AbstractUserPasswordSecurityModule<D
 		try {
 			authtInfo = realm.getAuthenticationInfo(new UsernamePasswordToken(user, password));
 		} catch (AuthenticationException e) {
-			throw new WebswingAuthenticationException("Username or password is not valid!", e);
+			throw new WebswingAuthenticationException("Username or password is not valid!", WebswingAuthenticationException.INVALID_USER_OR_PASSWORD, e);
 		}
 		if (authtInfo == null) {
-			throw new WebswingAuthenticationException("User not found!");
+			throw new WebswingAuthenticationException("User not found!", WebswingAuthenticationException.INVALID_USER_OR_PASSWORD);
 		}
 		return new ShiroWebswingUser(realm, authtInfo);
 	}

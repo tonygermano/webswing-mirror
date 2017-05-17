@@ -374,46 +374,56 @@ public class WebPaintDispatcher {
 	}
 
 	public void notifyFileDialogActive() {
-		if (fileChooserDialog != null) {
-			AppFrameMsgOut f = new AppFrameMsgOut();
-			FileDialogEventMsg fdEvent = new FileDialogEventMsg();
-			f.setFileDialogEvent(fdEvent);
-			FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fileChooserDialog);
-			if (fileChooserEventType == FileDialogEventType.AutoUpload && fileChooserDialog.getFileSelectionMode() == JFileChooser.DIRECTORIES_ONLY) {
-				//open dialog with auto upload enabled will automatically select the transfer folder
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							fileChooserDialog.setSelectedFile(new File(fileChooserDialog.getCurrentDirectory().getCanonicalPath()));
-							fileChooserDialog.approveSelection();
-						} catch (IOException e) {
-							fileChooserDialog.cancelSelection();
-						}
-					}
-				});
-				return;
-			}
-			fdEvent.setEventType(fileChooserEventType);
-			if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
-				fdEvent.setAllowDelete(false);
-				fdEvent.setAllowDownload(false);
-				fdEvent.setAllowUpload(false);
-				if (FileDialogEventType.AutoUpload == fileChooserEventType) {
-					String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
-					path = path.split(File.pathSeparator)[0];
-					File timestampFoleder = new File(path, "" + System.currentTimeMillis());
-					timestampFoleder.mkdirs();
-					fileChooserDialog.setCurrentDirectory(timestampFoleder);
+		if (!SwingUtilities.isEventDispatchThread()) {
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					notifyFileDialogActive();
 				}
-				Window d = SwingUtilities.getWindowAncestor(fileChooserDialog);
-				d.setBounds(0, 0, 1, 1);
+			});
+		} else {
+			if (fileChooserDialog != null) {
+				AppFrameMsgOut f = new AppFrameMsgOut();
+				FileDialogEventMsg fdEvent = new FileDialogEventMsg();
+				f.setFileDialogEvent(fdEvent);
+				FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fileChooserDialog);
+				if (fileChooserEventType == FileDialogEventType.AutoUpload && fileChooserDialog.getFileSelectionMode() == JFileChooser.DIRECTORIES_ONLY) {
+					//open dialog with auto upload enabled will automatically select the transfer folder
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								fileChooserDialog.setSelectedFile(new File(fileChooserDialog.getCurrentDirectory().getCanonicalPath()));
+								fileChooserDialog.approveSelection();
+							} catch (IOException e) {
+								fileChooserDialog.cancelSelection();
+							}
+						}
+					});
+					return;
+				}
+				fdEvent.setEventType(fileChooserEventType);
+				if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
+					fdEvent.setAllowDelete(false);
+					fdEvent.setAllowDownload(false);
+					fdEvent.setAllowUpload(false);
+					if (FileDialogEventType.AutoUpload == fileChooserEventType) {
+						String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
+						path = path.split(File.pathSeparator)[0];
+						File timestampFoleder = new File(path, "" + System.currentTimeMillis());
+						timestampFoleder.mkdirs();
+						fileChooserDialog.setCurrentDirectory(timestampFoleder);
+					}
+					Window d = SwingUtilities.getWindowAncestor(fileChooserDialog);
+					d.setBounds(0, 0, 1, 1);
+				}
+				fdEvent.setSelection(Util.getFileChooserSelection(fileChooserDialog));
+				fdEvent.addFilter(fileChooserDialog.getChoosableFileFilters());
+				fdEvent.setMultiSelection(fileChooserDialog.isMultiSelectionEnabled());
+				Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", fileChooserEventType.name());
+				Services.getConnectionService().sendObject(f);
 			}
-			fdEvent.setSelection(Util.getFileChooserSelection(fileChooserDialog));
-			fdEvent.addFilter(fileChooserDialog.getChoosableFileFilters());
-			fdEvent.setMultiSelection(fileChooserDialog.isMultiSelectionEnabled());
-			Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", fileChooserEventType.name());
-			Services.getConnectionService().sendObject(f);
 		}
 	}
 

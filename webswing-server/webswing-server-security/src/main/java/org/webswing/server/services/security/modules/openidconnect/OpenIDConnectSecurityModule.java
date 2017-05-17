@@ -47,18 +47,13 @@ public class OpenIDConnectSecurityModule extends AbstractExtendableSecurityModul
 	}
 
 	@Override
-	protected void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
+	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
 		if (exception != null) {
-			sendHtml(request, response, "saml2/errorPage.html", exception);
+			sendHtml(request, response, "errorPartial.html", exception);
 		} else {
 			String url = client.getOpenIDRedirectUrl();
 			sendRedirect(request, response, url);
 		}
-	}
-
-	@Override
-	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		serveLoginPage(request, response, exception);
 	}
 
 	@Override
@@ -72,7 +67,7 @@ public class OpenIDConnectSecurityModule extends AbstractExtendableSecurityModul
 			} catch (Exception e1) {
 				logFailure(request, null, "Failed to authenticate." + e1.getMessage());
 				log.error("Failed to authenticate", e1);
-				throw new WebswingAuthenticationException("Failed to authenticate. " + e1.getMessage(), e1);
+				throw new WebswingAuthenticationException("Failed to authenticate. " + e1.getMessage(), WebswingAuthenticationException.FAILED_TO_AUTHENTICATE, e1);
 			}
 		}
 		return null;

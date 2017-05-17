@@ -31,10 +31,6 @@ public abstract class AbstractUserPasswordSecurityModule<T extends WebswingExten
 		return "loginPartial.html";
 	}
 
-	public String getPageTemplateName() {
-		return "loginPage.html";
-	}
-
 	public String getUserName(HttpServletRequest request) {
 		return request.getParameter("username");
 	}
@@ -63,21 +59,12 @@ public abstract class AbstractUserPasswordSecurityModule<T extends WebswingExten
 		}
 	}
 
-	@Override
-	protected void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		Map<String, Object> variables = new HashMap<>();
-		if (exception != null) {
-			variables.put("errorMessage", exception.getLocalizedMessage());
-		}
-		sendHtml(request, response, getPageTemplateName(), variables);
-	}
-
 	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
 		Map<String, Object> variables = new HashMap<>();
 		if (exception != null) {
 			variables.put("errorMessage", exception.getLocalizedMessage());
 		}
-		sendHtml(request, response, getPartialTemplateName(), variables);
+		sendPartialHtml(request, response, getPartialTemplateName(), variables);
 	}
 
 	/**

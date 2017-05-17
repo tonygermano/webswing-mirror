@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URL;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -133,8 +134,16 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 		sendRedirect(req, res, fullPath);
 	}
 
+	public void logoutRedirect(HttpServletRequest request, HttpServletResponse response, String logoutUrl) throws IOException {
+		if (logoutUrl != null) {
+			sendRedirect(request, response, logoutUrl);
+		} else {
+			sendPartialHtml(request, response, "logoutPartial.html", null);
+		}
+	}
+
 	@Override
-	public void doServeAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse res) {
+	public void doServeAuthenticated(AbstractWebswingUser user, String path, HttpServletRequest req, HttpServletResponse res) throws IOException {
 		res.setStatus(HttpServletResponse.SC_OK);
 		res.setHeader("webswingUsername", user.getUserId());
 		serveAuthenticated(user, path, req, res);
@@ -221,11 +230,13 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	 * @param exception null or exception thrown by previous login attempt.
 	 * @throws IOException if fails to send response
 	 */
-	protected abstract void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException;
+	protected void serveLoginPage(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
+		serveLoginPartial(request, response, exception);
+	}
 
 	/**
 	 * Respond with partial login HTML page. If <code>exception</code> is not null, page should indicate the error message.
-	 * Use {@link #sendHtml(HttpServletRequest, HttpServletResponse, String, Object) sendHtml} helper method.
+	 * Use {@link #sendPartialHtml(HttpServletRequest, HttpServletResponse, String, Object) sendHtml} helper method.
 	 * @param request login request
 	 * @param response login response
 	 * @param exception null or exception thrown by previous login attempt.
@@ -277,11 +288,12 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	 * @throws IOException if fails to send response
 	 */
 	protected void sendHtml(HttpServletRequest request, HttpServletResponse response, String template, Object variables) throws IOException {
+		Object[] extendedVars = new Object[] { variables, getDefaultVariables(request) };
 		if (isAjax(request)) {
 			Map<String, Object> message = new HashMap<>();
 			try {
 				Writer w = new StringWriter();
-				processTemplate(w, template, variables);
+				processTemplate(w, template, extendedVars);
 				message.put("partialHtml", w.toString());
 				WebswingObjectMapper.get().writeValue(response.getOutputStream(), message);
 			} catch (Exception e) {
@@ -289,8 +301,54 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 			}
 		} else {
 			Writer w = new OutputStreamWriter(response.getOutputStream());
-			processTemplate(w, template, variables);
+			processTemplate(w, template, extendedVars);
 		}
+	}
+
+	/**
+	 * If request is not Ajax call, template is wrapped into default HTML page.
+	 * If request is Ajax call, sends the template in JSON response.
+	 * @param request login request
+	 * @param response login response
+	 * @param template path to partial template file.(See {@link #findTemplate(String)})
+	 * @param variables java POJO object or instance of Map, that will be used to replace variables in template files.
+	 * @throws IOException if fails to send response
+	 */
+	protected void sendPartialHtml(HttpServletRequest request, HttpServletResponse response, String template, Object variables) throws IOException {
+		Map<String, String> defaultVars = getDefaultVariables(request);
+		Object[] extendedVars = new Object[] { variables, defaultVars };
+		if (isAjax(request)) {
+			sendHtml(request, response, template, variables);
+		} else {
+			Writer w = new OutputStreamWriter(response.getOutputStream());
+			Writer tempw = new StringWriter();
+			processTemplate(tempw, template, extendedVars);
+			defaultVars.put("partialHtml", Base64.getEncoder().encodeToString(tempw.toString().getBytes()));
+			processTemplate(w, "default.html", extendedVars);
+		}
+	}
+
+	private Map<String, String> getDefaultVariables(HttpServletRequest request) {
+		Map<String, String> result = new HashMap<>();
+		result.put("requestBaseUrl", getBaseUrl(request));
+		return result;
+	}
+
+	private String getBaseUrl(HttpServletRequest req) {
+		String proto = req.getHeader("X-Forwarded-Proto");
+		if (proto == null) {
+			proto = req.getRequestURL().toString().startsWith("https") ? "https" : "http";
+		}
+		String host = req.getHeader("X-Forwarded-Host");
+		if (host == null) {
+			host = req.getServerName();
+			int port = req.getServerPort();
+			if (port != 80 && port != 443) {
+				host += ":" + port;
+			}
+		}
+		String result = proto + "://" + host + config.getContext().getSecuredPath();
+		return result;
 	}
 
 	/**
@@ -301,7 +359,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	 * @param variables java POJO object or instance of Map, that will be used to replace variables in template files.
 	 * @throws IOException
 	 */
-	protected void processTemplate(Writer w, String template, Object variables) throws IOException {
+	protected void processTemplate(Writer w, String template, Object[] variables) throws IOException {
 		try {
 			if (template != null && w != null) {
 				Mustache mustache = compileTemplate(template);
@@ -379,18 +437,6 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 		path = StringUtils.isEmpty(path) ? "/" : path;
 		String module = this.getClass().getName();
 		auditLog("FAILED", r, path, module, user, reason);
-	}
-
-	public void logoutRedirect(HttpServletRequest request, HttpServletResponse response, String logoutUrl) throws IOException {
-		if (logoutUrl != null) {
-			sendRedirect(request, response, logoutUrl);
-		} else {
-			if (isAjax(request)) {
-				sendHtml(request, response, "logoutPartial.html", null);
-			} else {
-				sendHtml(request, response, "logoutPage.html", null);
-			}
-		}
 	}
 
 	public String replaceVar(String s) {
