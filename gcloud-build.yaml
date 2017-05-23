@@ -1,9 +1,9 @@
 steps:
 - name: 'maven:3.3'
   entrypoint: '/bin/sh'
-  args: ['-c','apt-get update && apt-get install -y openjfx node && mvn -B -Pbuild,release install']
+  args: ['-c','apt-get update && apt-get install -y openjfx && mvn -B -Pbuild,release install']
 #Save the build result to cloud
 - name: 'gcr.io/cloud-builders/gsutil'
   entrypoint: '/bin/sh'
-  args: ['-c', 'gsutil -h x-goog-meta-info:$(cat webswing-assembly/dist/git.info|base64 --wrap=0) -h x-goog-meta-commit:${REVISION_ID} cp -a public-read webswing-assembly/dist/webswing-$(cat webswing-assembly/dist/version.info)-distribution.zip gs://builds.webswing.org/builds/webswing-$(cat webswing-assembly/dist/version.info)-$(date +%d%h%y.%H%M).zip']
-timeout: '1200s'
+  args: ['-c', 'echo gsutil -h x-goog-meta-info:$(cat webswing-assembly/dist/git.info|base64 --wrap=0) -h x-goog-meta-commit:${REVISION_ID} cp -a public-read webswing-assembly/dist/webswing-$(cat webswing-assembly/dist/version.info)-distribution.zip gs://builds.webswing.org/builds/webswing-$(cat webswing-assembly/dist/version.info)-$(date +%d%h%y.%H%M).zip']
+timeout: '2000s'

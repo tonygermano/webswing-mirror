@@ -15,27 +15,27 @@ public class WebFileDialogPeer extends WebWindowPeer implements FileDialogPeer {
 
 	private FileDialog dialog;
 
-	@SuppressWarnings("deprecation")
-	private JFileChooser fc = new JFileChooser() {
+	@SuppressWarnings("deprecation") private JFileChooser fc = new JFileChooser() {
 		private static final long serialVersionUID = 1L;
 
 		public void approveSelection() {
 			super.approveSelection();
 			dialog.setFile(fc.getSelectedFile().getName());
-			dialog.setDirectory(fc.getCurrentDirectory().getPath());
+			dialog.setDirectory(fc.getCurrentDirectory().getPath()+File.separator);
 			dialog.hide();
-		};
+		}
 
 		public void cancelSelection() {
 			super.cancelSelection();
 			dialog.setFile(null);
 			dialog.hide();
-		};
+		}
 	};
 
 	public WebFileDialogPeer(FileDialog paramFileDialog) {
 		super(new JDialog());
 		dialog = paramFileDialog;
+		setFile(dialog.getFile());
 		fc.setMultiSelectionEnabled(false);
 	}
 
@@ -49,6 +49,9 @@ public class WebFileDialogPeer extends WebWindowPeer implements FileDialogPeer {
 
 	@Override
 	public void setFile(String file) {
+		if (file != null) {
+			fc.setSelectedFile(new File(file));
+		}
 	}
 
 	@Override

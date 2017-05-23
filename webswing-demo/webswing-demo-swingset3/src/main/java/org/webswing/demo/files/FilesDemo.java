@@ -1,25 +1,15 @@
 package org.webswing.demo.files;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Label;
+import com.sun.swingset3.DemoProperties;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-
-import com.sun.swingset3.DemoProperties;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 
 @DemoProperties(value = "Files", category = "Webswing", description = "Demonstrates file handling.", sourceFiles = { "org/webswing/demo/files/FilesDemo.java" })
 public class FilesDemo extends JPanel {
@@ -54,6 +44,33 @@ public class FilesDemo extends JPanel {
 		JButton saveBtn = new JButton("Open Save Dialog");
 		saveBtn.addActionListener(new SaveFileDialog(this));
 		panel.add(saveBtn);
+		//native file dialog
+		panel.add(new JPanel());
+		JButton fileDialog = new JButton("Native File Dialog");
+		fileDialog.addActionListener(new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Window w = SwingUtilities.getWindowAncestor(getParent());
+				FileDialog fd = new FileDialog((Frame) w, "Choose a file", FileDialog.SAVE);
+				fd.setFile("test.xml");
+				fd.setVisible(true);
+				String filename = fd.getDirectory()+fd.getFile();
+				if (filename == null)
+					System.out.println("You cancelled the choice");
+				else {
+					try {
+						PrintWriter writer = new PrintWriter(new File(filename));
+						writer.println("<hello><world/></hello>");
+						writer.close();
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
+					}
+				}
+
+			}
+		});
+		panel.add(fileDialog);
+
 		add("South", panel);
 	}
 

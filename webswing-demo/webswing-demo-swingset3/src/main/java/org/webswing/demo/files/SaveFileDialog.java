@@ -20,6 +20,7 @@ public class SaveFileDialog implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JFileChooser fc = new JFileChooser();
+		fc.setSelectedFile(new File("test.txt"));
 		int returnVal = fc.showSaveDialog((Component) e.getSource());
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
