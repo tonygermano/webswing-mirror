@@ -5,5 +5,5 @@ steps:
 #Save the build result to cloud
 - name: 'gcr.io/cloud-builders/gsutil'
   entrypoint: '/bin/sh'
-  args: ['-c', 'echo gsutil -h x-goog-meta-info:$(cat webswing-assembly/dist/git.info|base64 --wrap=0) -h x-goog-meta-commit:${REVISION_ID} cp -a public-read webswing-assembly/dist/webswing-$(cat webswing-assembly/dist/version.info)-distribution.zip gs://builds.webswing.org/builds/webswing-$(cat webswing-assembly/dist/version.info)-$(date +%d%h%y.%H%M).zip']
+  args: ['-c', 'gsutil -h x-goog-meta-info:$(cat webswing-assembly/dist/git.info|base64 --wrap=0) -h x-goog-meta-commit:${REVISION_ID} cp -a public-read webswing-assembly/dist/webswing-$(cat webswing-assembly/dist/version.info)-distribution.zip gs://builds.webswing.org/builds/webswing-$(cat webswing-assembly/dist/version.info)-$(date +%d%h%y.%H%M).zip']
 timeout: '2000s'
