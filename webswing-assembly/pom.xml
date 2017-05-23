@@ -24,6 +24,9 @@
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
                 <configuration>
+                    <gitDescribe>
+                        <skip>true</skip>
+                    </gitDescribe>
                     <skipPoms>false</skipPoms>
                     <format>json</format>
                     <generateGitPropertiesFilename>${project.basedir}/dist/git.info</generateGitPropertiesFilename>
