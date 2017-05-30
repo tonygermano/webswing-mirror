@@ -4,7 +4,7 @@
 			var vm = this;
 			vm.config = {
 				hide : [ 'path' ],
-				enable : extValue.onlineUpdatableConfigFields
+				enable : null
 			};
 			vm.variables = {};
 			vm.reset = reset;
@@ -20,7 +20,6 @@
 				if (ctl.startable != vm.stopped) {
 					vm.stopped = ctl.startable;
 					vm.config.message = null;
-					vm.config.enable = vm.stopped ? null : extValue.onlineUpdatableConfigFields;
 					activate();
 				}
 			});
@@ -56,11 +55,7 @@
 			}
 
 			function apply(config) {
-				if (vm.stopped) {
-					return configRestService.setConfig(vm.path, config).then(activate);
-				} else {
-					return configRestService.setSwingConfig(vm.path, config).then(activate);
-				}
+				return configRestService.setConfig(vm.path, config).then(activate);
 			}
 
 			function back() {

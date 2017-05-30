@@ -3,18 +3,15 @@ package org.webswing.server.common.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.webswing.server.common.model.meta.ConfigField;
-import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
-import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
-import org.webswing.server.common.model.meta.ConfigFieldDiscriminator;
-import org.webswing.server.common.model.meta.ConfigFieldEditorType;
+import org.webswing.server.common.model.meta.*;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
-import org.webswing.server.common.model.meta.ConfigFieldOrder;
-import org.webswing.server.common.model.meta.ConfigFieldVariables;
-import org.webswing.server.common.model.meta.VariableSetName;
 
-@ConfigFieldOrder({ "path", "homeDir", "webFolder", "langFolder", "icon", "security", "swingConfig" })
+@ConfigFieldOrder({ "enabled", "path", "homeDir", "webFolder", "langFolder", "icon", "security", "swingConfig" })
 public interface SecuredPathConfig extends Config {
+
+	@ConfigField(label = "Enabled", description = "If true, application will be started automatically, when server starts.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isEnabled();
 
 	@ConfigField(label = "Context Path", description = "Url context path where the application will be deployed.")
 	public String getPath();

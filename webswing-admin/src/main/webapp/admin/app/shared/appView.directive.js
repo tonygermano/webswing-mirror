@@ -25,7 +25,6 @@
 			vm.remove = remove;
 			vm.viewSessions = viewSessions;
 			vm.viewConfig = viewConfig;
-			vm.panelStatusClass = panelStatusClass;
 			vm.usageData = [ 0, 0, 0 ];
 			vm.usageOptions = {
 				thickness : 10
@@ -50,8 +49,8 @@
 					$timeout.cancel(vm.timer);
 					vm.value = data;
 					vm.b64img = 'data:image/png;base64,' + data.icon;
-					vm.stoppable = data.status.status === 'Running';
-					vm.startable = data.status.status === 'Stopped' | data.status.status === 'Error';
+					vm.stoppable = data.enabled;
+					vm.startable = !data.enabled;
 					vm.hasWarnings = wsUtils.getKeys(data.warnings).length > 0;
 					vm.usageData = getUsageData(data);
 					vm.memoryStats = getMemoryStats(data.stats);
@@ -86,14 +85,18 @@
 			}
 
 			function start() {
-				configRestService.start(vm.path);
+				configRestService.start(vm.path).then(function () {
+                    vm.refresh();
+                });
 				vm.value.status.status = 'Requesting Start';
 				vm.stoppable = false;
 				vm.startable = false;
 			}
 
 			function stop() {
-				configRestService.stop(vm.path);
+				configRestService.stop(vm.path).then(function () {
+					vm.refresh();
+                });
 				vm.value.status.status = 'Requesting Stop';
 				vm.stoppable = false;
 				vm.startable = false;
@@ -197,22 +200,6 @@
 						return Math.floor(value) + '%';
 					}
 				};
-			}
-
-			function panelStatusClass(className) {
-				if (vm.value.status != null) {
-					var s = vm.value.status.status;
-					if (s === 'Running') {
-						return className + '-success';
-					}
-					if (s === 'Stopped') {
-						return className + '-default';
-					}
-					if (s === 'Error') {
-						return className + '-danger';
-					}
-					return className + '-warning';
-				}
 			}
 
 			function resolve(name, defaultVal) {

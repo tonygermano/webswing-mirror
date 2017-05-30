@@ -6,7 +6,6 @@
 				getInfo : getInfo,
 				getConfig : getConfig,
 				setConfig : setConfig,
-				setSwingConfig : setSwingConfig,
 				getVariables : getVariables,
 				start : start,
 				stop : stop,
@@ -31,7 +30,7 @@
 					return data.data;
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('load installed apps', data, true);
+					return errorHandler.handleRestError('load status information', data, true);
 				}
 			}
 
@@ -52,16 +51,6 @@
 				}
 				function failed(data) {
 					return errorHandler.handleRestError('save path configuration', data);
-				}
-			}
-
-			function setSwingConfig(path, config) {
-				return $http.post(toPath(path) + '/rest/swingConfig', config).then(success, failed);
-				function success() {
-					messageService.success('App Configuration saved.');
-				}
-				function failed(data) {
-					return errorHandler.handleRestError('save ' + path + ' configuration', data);
 				}
 			}
 

@@ -200,7 +200,7 @@ public class ConfigurationMetadataTest {
 		}
 
 		@Override
-		public boolean isStarted() {
+		public boolean isEnabled() {
 			return true;
 		}
 	}

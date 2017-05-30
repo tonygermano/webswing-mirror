@@ -7,6 +7,7 @@ import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.ConfigContext;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.model.exception.WsInitException;
 
 public interface ConfigurationProvider {
 
@@ -16,9 +17,7 @@ public interface ConfigurationProvider {
 
 	void saveConfiguration(String path, Map<String, Object> configuration) throws Exception;
 
-	void saveSwingConfiguration(String path, Map<String, Object> newValue) throws Exception;
-
-	public void removeConfiguration(String path) throws Exception;
+	void removeConfiguration(String path) throws Exception;
 
 	void validateConfiguration(String path, Map<String, Object> c) throws Exception;
 
@@ -29,4 +28,5 @@ public interface ConfigurationProvider {
 	Map<String, Object> createDefaultConfiguration(String path);
 
 	boolean isMultiApplicationMode();
+
 }

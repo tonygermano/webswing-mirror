@@ -195,13 +195,6 @@ public class SecurityModuleWrapper implements WebswingSecurityModule {
 		}
 	}
 
-	public WebswingSecurityModuleConfig getModuleConfig() {
-		if (custom != null && custom instanceof AbstractSecurityModule) {
-			return ((AbstractSecurityModule<?>) custom).getConfig();
-		}
-		return null;
-	}
-
 	private <T> T runWithContextClassLoader(Callable<T> contextCallback) throws Exception {
 		ClassLoader original = Thread.currentThread().getContextClassLoader();
 		try {

@@ -17,8 +17,6 @@ public interface ConfigurationService extends WebswingService {
 
 	void setConfiguration(String path, Map<String, Object> securedPathConfig) throws Exception;
 
-	void setSwingConfiguration(String path, Map<String, Object> securedPathConfig) throws Exception;
-
 	void removeConfiguration(String path) throws Exception;
 
 	void registerChangeListener(ConfigurationChangeListener listener);

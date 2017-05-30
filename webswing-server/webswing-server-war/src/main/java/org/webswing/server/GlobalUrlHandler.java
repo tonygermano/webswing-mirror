@@ -26,12 +26,15 @@ import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
+import org.webswing.server.common.model.admin.ApplicationInfo;
 import org.webswing.server.common.model.admin.InstanceManagerStatus;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.model.rest.LogRequest;
 import org.webswing.server.common.model.rest.LogResponse;
+import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.model.exception.WsException;
-import org.webswing.server.model.exception.WsInitException;
+import org.webswing.server.services.config.ConfigurationChangeEvent;
+import org.webswing.server.services.config.ConfigurationChangeListener;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.security.api.BuiltInModules;
@@ -63,7 +66,34 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	private ServletContext servletContext;
 
 	private Map<String, SwingInstanceManager> instanceManagers = new LinkedHashMap<String, SwingInstanceManager>();
-	private boolean restartNeeded;
+
+	private final ConfigurationChangeListener changeListener = new ConfigurationChangeListener() {
+		@Override
+		public void onConfigChanged(ConfigurationChangeEvent e) {
+			if ("/".equals(e.getPath())) {
+				initConfiguration();
+			} else {
+				SwingInstanceManager manager = instanceManagers.get(e.getPath());
+				if (manager == null) {
+					installApplication(e.getNewConfig()).init();
+				} else if (manager.isEnabled()) {
+					manager.initConfiguration();
+				}
+			}
+		}
+
+		@Override
+		public void onConfigDeleted(ConfigurationChangeEvent e) {
+			if ("/".equals(e.getPath())) {
+				initConfiguration();
+			} else {
+				SwingInstanceManager manager = instanceManagers.get(e.getPath());
+				if (manager != null) {
+					uninstallApplication(manager);
+				}
+			}
+		}
+	};
 
 	@Inject
 	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, SecurityModuleService securityService, LoginHandlerService loginService, ServletContext servletContext) {
@@ -86,12 +116,14 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 		loadApplications();
 		super.init();
+		this.configService.registerChangeListener(this.changeListener);
 		if (!InstanceManagerStatus.Status.Running.equals(getStatus().getStatus())) {
 			throw new RuntimeException("Failed to start primary handler.");
 		}
 	}
 
 	public void destroy() {
+		this.configService.removeChangeListener(this.changeListener);
 		instanceManagers.clear();
 		super.destroy();
 	}
@@ -138,10 +170,11 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		}
 	}
 
-	public void installApplication(SecuredPathConfig swing) {
+	public SwingInstanceManager installApplication(SecuredPathConfig swing) {
 		log.info("Installing application " + swing.getPath());
 		SwingInstanceManager app = appFactory.createApp(this, swing.getPath());
 		registerFirstChildUrlHandler(app);
+		return app;
 	}
 
 	public void uninstallApplication(SwingInstanceManager appToRemove) {
@@ -299,7 +332,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		checkMasterPermission(WebswingAction.rest_getApps);
 		List<ApplicationInfoMsg> result = new ArrayList<>();
 		for (SwingInstanceManager mgr : getApplications()) {
-			if (mgr.isUserAuthorized()) {
+			if (mgr.isEnabled() && mgr.isUserAuthorized()) {
 				ApplicationInfoMsg applicationInfoMsg = mgr.getApplicationInfoMsg();
 				if (applicationInfoMsg != null) {
 					result.add(applicationInfoMsg);
@@ -307,6 +340,23 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 			}
 		}
 		return result;
+	}
+
+	@GET
+	@Path("/info")
+	public ApplicationInfo getApplicationInfo() throws WsException {
+		checkPermission(WebswingAction.rest_getAppInfo);
+		ApplicationInfo app = new ApplicationInfo();
+		app.setPath(getPathMapping());
+		app.setEnabled(isEnabled());
+		app.setUrl(getFullPathMapping());
+		app.setName("Server");
+		File icon = resolveFile(getConfig().getIcon());
+		app.setIcon(CommonUtil.loadImage(icon));
+		app.setConfig(getConfig());
+		app.setVariables(varSubs.getVariableMap());
+		app.setStatus(getStatus());
+		return app;
 	}
 
 	@GET
@@ -330,56 +380,53 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	@Path("/rest/config")
 	public MetaObject getConfigMeta() throws WsException {
 		MetaObject meta = super.getConfigMeta();
-		if (restartNeeded) {
-			meta.setMessage("Configuration has been changed. Please restart the server to apply the changes.");
-		}
 		return meta;
 	}
 
 	@GET
 	@Path("/rest/remove")
-	public void getRemoveSwingApp(@PathParam("") String path) throws Exception {
+	public void removeSwingApp(@PathParam("") String path) throws Exception {
 		checkMasterPermission(WebswingAction.rest_removeApp);
 		if (!StringUtils.isEmpty(path)) {
 			SwingInstanceManager swingManager = instanceManagers.get(path);
 			if (swingManager != null) {
-				if (!swingManager.isStarted()) {
+				if (!swingManager.isEnabled()) {
 					configService.removeConfiguration(path);
-					uninstallApplication(swingManager);
-					return;
 				} else {
 					throw new WsException("Unable to Remove App '" + path + "' while running. Stop the app first");
 				}
 			}
+		} else {
+			throw new WsException("Unable to remove App '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
 		}
-		throw new WsException("Unable to remove App '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	@GET
 	@Path("/rest/create")
-	public void getCreateSwingApp(@PathParam("") String path) throws Exception {
+	public void createSwingApp(@PathParam("") String path) throws Exception {
 		checkMasterPermission(WebswingAction.rest_createApp);
 		if (!StringUtils.isEmpty(path)) {
 			SwingInstanceManager swingManager = instanceManagers.get(path);
 			if (swingManager == null) {
 				configService.setConfiguration(path, null);
-				installApplication(configService.getConfiguration(path));
-				return;
+				swingManager = instanceManagers.get(path);
+				if (swingManager != null) {
+					swingManager.disable();
+				}
 			} else {
 				throw new WsException("Unable to Create App '" + path + "'. Application already exits.");
-
 			}
+		} else {
+			throw new WsException("Unable to create App '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
 		}
-		throw new WsException("Unable to create App '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	@POST
 	@Path("/rest/config")
-	public void setConfig(Map<String, Object> config) throws Exception {
+	public void saveConfig(Map<String, Object> config) throws Exception {
 		checkMasterPermission(WebswingAction.rest_setConfig);
 		config.put("path", "/");
 		configService.setConfiguration("/", config);
-		restartNeeded = true;
 	}
 
 	@GET

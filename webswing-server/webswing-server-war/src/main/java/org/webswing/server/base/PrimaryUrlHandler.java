@@ -29,15 +29,10 @@ import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.model.exception.WsInitException;
-import org.webswing.server.services.config.ConfigurationChangeEvent;
-import org.webswing.server.services.config.ConfigurationChangeListener;
 import org.webswing.server.services.config.ConfigurationService;
-import org.webswing.server.services.security.api.SecurityContext;
-import org.webswing.server.services.security.api.WebswingAction;
-import org.webswing.server.services.security.api.WebswingSecurityConfig;
+import org.webswing.server.services.security.api.*;
 import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.security.modules.SecurityModuleService;
-import org.webswing.server.services.security.modules.SecurityModuleWrapper;
 import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.util.GitRepositoryState;
@@ -51,43 +46,28 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	protected final SecurityModuleService securityModuleService;
 
 	private SecuredPathConfig config;
-	private SecurityModuleWrapper securityModule;
+	private WebswingSecurityModule securityModule;
+	private boolean enabled = false;
 	private InstanceManagerStatus status = new InstanceManagerStatus();
 	protected VariableSubstitutor varSubs;
 
 	public PrimaryUrlHandler(UrlHandler parent, SecurityModuleService securityModuleService, ConfigurationService configService) {
 		super(parent);
 		this.securityModuleService = securityModuleService;
+		this.securityModule = securityModuleService.createNoAccess(null, this, null);//no access until real SM is initialized
 		this.configService = configService;
 		this.varSubs = VariableSubstitutor.basic();
-
-		this.configService.registerChangeListener(new ConfigurationChangeListener() {
-
-			@Override
-			public void notifyChange(ConfigurationChangeEvent e) {
-				if (StringUtils.isNotEmpty(e.getPath()) && !"/".equals(e.getPath())) {
-					if (StringUtils.equals(e.getPath(), getPathMapping())) {
-						if (StringUtils.equals(e.getNewConfig().getPath(), getPathMapping())) {
-							config = e.getNewConfig();
-							varSubs = VariableSubstitutor.forSwingApp(getConfig());
-						}
-					}
-				}
-			}
-		});
 	}
 
 	@Override
 	public void init() {
 		try {
-			status.setStatus(Status.Starting);
-			varSubs = VariableSubstitutor.forSwingApp(getConfig());
-			if (!new File(getHome()).getAbsoluteFile().isDirectory()) {//check if home dir exists
-				throw new WsInitException("Home Folder '" + new File(getHome()).getAbsolutePath() + "'does not exist!");
-			}
-			loadSecurityModule();
 			super.init();
-			status.setStatus(Status.Running);
+			if (getConfig().isEnabled()) {
+				initConfiguration();
+			} else {
+				disable();
+			}
 		} catch (Throwable e) {
 			log.error("Failed to start '" + getPathMapping() + "'.", e);
 			try {
@@ -95,74 +75,88 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 			} catch (Throwable e1) {
 				//do nothing
 			}
-			status.setStatus(Status.Error);
-			status.setError(e.getMessage());
-			StringWriter out = new StringWriter();
-			PrintWriter stacktrace = new PrintWriter(out);
-			e.printStackTrace(stacktrace);
-			status.setErrorDetails(out.toString());
+			setStatusError(e);
 		}
 	}
 
-	protected void loadSecurityModule() {
+	public synchronized void initConfiguration() {
+		status.setStatus(Status.Starting);
+		String path = StringUtils.isEmpty(getPathMapping()) ? "/" : getPathMapping();
+		config = configService.getConfiguration(path);
 		WebswingSecurityConfig securityConfig = getSecurityConfig();
-		securityModule = securityModuleService.create(this, securityConfig);
-		if (securityModule != null) {
-			securityModule.init();
+		try {
+			varSubs = VariableSubstitutor.forSwingApp(getConfig());
+			if (!new File(getHome()).getAbsoluteFile().isDirectory()) {//check if home dir exists
+				throw new WsInitException("Home Folder '" + new File(getHome()).getAbsolutePath() + "'does not exist!");
+			}
+			securityModule = securityModuleService.create(this, securityConfig);
+			if (securityModule != null) {
+				securityModule.init();
+			}
+			status.setStatus(Status.Running);
+			enabled = true;
+		} catch (Exception e) {
+			securityModule = securityModuleService.createNoAccess(WebswingAuthenticationException.CONFIG_ERROR, this, securityConfig);
+			setStatusError(e);
 		}
+	}
+
+	public synchronized void disable() {
+		status.setStatus(Status.Stopping);
+		try {
+			killAll();
+			if (securityModule != null) {
+				securityModule.destroy();
+			}
+		} finally {
+			this.securityModule = securityModuleService.createNoAccess(null, this, null);//no access until real SM is initialized
+			enabled = false;
+		}
+		status.setStatus(Status.Stopped);
+	}
+
+	protected void killAll() {//to be implemented in subclass
+	}
+
+	private void setStatusError(Throwable e) {
+		status.setStatus(Status.Error);
+		status.setError(e.getMessage());
+		StringWriter out = new StringWriter();
+		PrintWriter stacktrace = new PrintWriter(out);
+		e.printStackTrace(stacktrace);
+		status.setErrorDetails(out.toString());
 	}
 
 	protected WebswingSecurityConfig getSecurityConfig() {
-		WebswingSecurityConfig securityConfig = getConfig().getValueAs("security", WebswingSecurityConfig.class);
-		return securityConfig;
+		return getConfig().getValueAs("security", WebswingSecurityConfig.class);
 	}
 
 	@Override
 	public void destroy() {
-		status.setStatus(Status.Stopping);
 		super.destroy();
-		if (securityModule != null) {
-			try {
-				securityModule.destroy();
-			} finally {
-				securityModule = null;
-			}
-		}
-		status.setStatus(Status.Stopped);
+		disable();
 	}
 
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		handleCorsHeaders(req, res);
-		if (status.getStatus().equals(Status.Running)) {
-			//redirect to url that is correct case and ends with '/' to ensure browser queries correct resources 
-			if (isWrongUrlCase(req) || isRootPathWithoutSlash(req)) {
-				try {
-					String redirectUrl = getFullPathMapping() + (ServerUtil.getContextPath(getServletContext()) + req.getPathInfo()).substring(getFullPathMapping().length());
-					redirectUrl = isRootPathWithoutSlash(req) ? (redirectUrl + "/") : redirectUrl;
-					//use apache flag instead: 	ProxyPreserveHost on
-					//if (System.getProperty(Constants.REVERSE_PROXY_CONTEXT_PATH) != null) { //reverse proxy will add the context path to redirect url so we need to remove it to avoid duplicate. see ProxyPassReverse apache directive
-					//	redirectUrl = redirectUrl.substring(ServerUtil.getContextPath(getServletContext()).length());
-					//}
-					String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
-					ServerUtil.sendHttpRedirect(req, res, redirectUrl + queryString);
-				} catch (IOException e) {
-					log.error("Failed to redirect.", e);
-				}
-				return true;
-			} else {
-				return super.serve(req, res);
-			}
-		} else {
+		//redirect to url that is correct case and ends with '/' to ensure browser queries correct resources
+		if (isWrongUrlCase(req) || isRootPathWithoutSlash(req)) {
 			try {
-				boolean served = serveRestMethod(req, res);
-				if (!served) {
-					ServerUtil.sendHttpRedirect(req, res, getFullPathMapping() + "/status");
-				}
-				return true;
+				String redirectUrl = getFullPathMapping() + (ServerUtil.getContextPath(getServletContext()) + req.getPathInfo()).substring(getFullPathMapping().length());
+				redirectUrl = isRootPathWithoutSlash(req) ? (redirectUrl + "/") : redirectUrl;
+				//use apache flag instead: 	ProxyPreserveHost on
+				//if (System.getProperty(Constants.REVERSE_PROXY_CONTEXT_PATH) != null) { //reverse proxy will add the context path to redirect url so we need to remove it to avoid duplicate. see ProxyPassReverse apache directive
+				//	redirectUrl = redirectUrl.substring(ServerUtil.getContextPath(getServletContext()).length());
+				//}
+				String queryString = req.getQueryString() == null ? "" : ("?" + req.getQueryString());
+				ServerUtil.sendHttpRedirect(req, res, redirectUrl + queryString);
 			} catch (IOException e) {
-				throw new WsException(e);
+				log.error("Failed to redirect.", e);
 			}
+			return true;
+		} else {
+			return super.serve(req, res);
 		}
 	}
 
@@ -250,22 +244,8 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	}
 
 	@Override
-	public boolean isStarted() {
-		return Status.Running.equals(status.getStatus()) || Status.Starting.equals(status.getStatus());
-	}
-
-	public void start() throws WsException {
-		checkMasterPermission(WebswingAction.rest_startApp);
-		if (!isStarted()) {
-			this.init();
-		}
-	}
-
-	public void stop() throws WsException {
-		checkMasterPermission(WebswingAction.rest_stopApp);
-		if (this.isStarted()) {
-			this.destroy();
-		}
+	public boolean isEnabled() {
+		return enabled;
 	}
 
 	public String getVersion() throws WsException {
@@ -288,16 +268,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	public void setConfig(Map<String, Object> config) throws Exception {
 		checkMasterPermission(WebswingAction.rest_setConfig);
-		if (!isStarted()) {
-			configService.setConfiguration(getPathMapping(), config);
-		} else {
-			throw new WsException("Can not set configuration to running handler.");
-		}
-	}
-
-	public void setSwingConfig(Map<String, Object> config) throws Exception {
-		checkMasterPermission(WebswingAction.rest_setConfig);
-		configService.setSwingConfiguration(getPathMapping(), config);
+		configService.setConfiguration(getPathMapping(), config);
 	}
 
 	protected Map<String, Boolean> getPermissions() throws Exception {
@@ -362,7 +333,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	}
 
 	@Override
-	public SecurityModuleWrapper get() {
+	public WebswingSecurityModule get() {
 		return securityModule;
 	}
 

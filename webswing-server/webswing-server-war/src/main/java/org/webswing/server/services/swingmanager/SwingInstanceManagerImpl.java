@@ -87,6 +87,9 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	public void connectView(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
 		try {
 			checkAuthorization();
+			if(!isEnabled()){
+				throw new WsException("This application is disabled.");
+			}
 		} catch (WsException e1) {
 			log.error("User authorization failed. {}", e1.getMessage());
 			r.broadcastMessage(SimpleEventMsgOut.unauthorizedAccess.buildMsgOut());
@@ -136,9 +139,10 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		}
 	}
 
-	public void shutdown(String id, boolean force) {
-		SwingInstance si = runningInstances.findByClientId(id);
-		si.shutdown(force);
+	protected void killAll() {
+		for (SwingInstance si : runningInstances.getAllInstances()) {
+			si.shutdown(true);
+		}
 	}
 
 	private boolean reachedMaxConnections() {
@@ -202,16 +206,19 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@GET
 	@Path("/start")
 	public void start() throws WsException {
-		super.start();
+		checkMasterPermission(WebswingAction.rest_startApp);
+		if (!isEnabled()) {
+			super.initConfiguration();
+		}
 	}
 
 	@GET
 	@Path("/stop")
 	public void stop() throws WsException {
-		if (runningInstances.size() > 0) {
-			throw new WsException("Can not Stop if Application sessions are running. Please stop sessions first.");
+		checkMasterPermission(WebswingAction.rest_stopApp);
+		if (isEnabled()) {
+			super.disable();
 		}
-		super.stop();
 	}
 
 	@GET
@@ -220,6 +227,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		checkPermissionLocalOrMaster(WebswingAction.rest_getAppInfo);
 		ApplicationInfo app = new ApplicationInfo();
 		app.setPath(getPathMapping());
+		app.setEnabled(isEnabled());
 		app.setUrl(getFullPathMapping());
 		app.setName(getSwingConfig().getName());
 		File icon = resolveFile(getConfig().getIcon());
@@ -251,17 +259,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@GET
-	@Path("/status")
-	public String getStatusPage() throws Exception {
-		InstanceManagerStatus status = getStatus();
-		URL webResource = getWebResource("statusPages/" + status.getStatus().name() + ".html");
-		if (webResource != null) {
-			return IOUtils.toString(webResource);
-		}
-		return null;
-	}
-
-	@GET
 	@Path("/rest/paths")
 	public List<String> getApplications(HttpServletRequest req) throws WsException {
 		checkPermissionLocalOrMaster(WebswingAction.rest_getPaths);
@@ -285,12 +282,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Path("/rest/config")
 	public void setConfig(Map<String, Object> config) throws Exception {
 		super.setConfig(config);
-	}
-
-	@POST
-	@Path("/rest/swingConfig")
-	public void setSwingConfig(Map<String, Object> config) throws Exception {
-		super.setSwingConfig(config);
 	}
 
 	@GET
@@ -376,7 +367,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 
 	@GET
 	@Path("/rest/CSRFToken")
-	public String generateCsrfToken(){
+	public String generateCsrfToken() {
 		return super.generateCsrfToken();
 	}
 
@@ -407,7 +398,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 
 	private void checkAuthorization() throws WsException {
 		if (!isUserAuthorized()) {
-			throw new WsException("User '" + getUser() + "' is not authorized to access application "+getPathMapping(), HttpServletResponse.SC_UNAUTHORIZED);
+			throw new WsException("User '" + getUser() + "' is not authorized to access application " + getPathMapping(), HttpServletResponse.SC_UNAUTHORIZED);
 		}
 	}
 
@@ -422,13 +413,13 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		} else {
 			VariableSubstitutor subs = VariableSubstitutor.forSwingApp(getConfig());
 			for (String role : authorizationConfig.getRoles()) {
-				String resolvedRole=subs.replace(role) ;
+				String resolvedRole = subs.replace(role);
 				if (user.hasRole(resolvedRole)) {
 					return true;
 				}
 			}
 			for (String u : authorizationConfig.getUsers()) {
-				String resolvedUser=subs.replace(u) ;
+				String resolvedUser = subs.replace(u);
 				if (user.getUserId().equals(resolvedUser)) {
 					return true;
 				}

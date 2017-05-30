@@ -10,6 +10,8 @@ public class WebswingAuthenticationException extends Exception {
 	public static final String FAILED_TO_AUTHENTICATE = "login.failedToAuthenticate";
 	public static final String SERVER_NOT_AVAILABLE = "login.serverNotAvailable";
 	public static final String UNEXPECTED_ERROR = "login.unexpectedError";
+	public static final String NO_ACCESS = "login.noAccessMessage";
+	public static final String CONFIG_ERROR = "login.configurationError";
 
 	String localizationKey;
 

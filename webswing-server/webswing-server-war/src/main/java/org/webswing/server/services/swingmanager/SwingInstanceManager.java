@@ -40,6 +40,8 @@ public interface SwingInstanceManager extends SecuredPathHandler, SwingInstanceH
 
 	List<String> getInstanceWarningHistory(String clientId);
 
-	public boolean isUserAuthorized();
+	boolean isUserAuthorized();
+
+	void disable();
 
 }

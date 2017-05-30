@@ -1,13 +1,17 @@
 package org.webswing.server.extension;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.ConfigContext;
 import org.webswing.server.common.model.meta.MetaObject;
@@ -16,14 +20,36 @@ import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.common.util.WebswingObjectMapper;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.model.exception.WsInitException;
+import org.webswing.toolkit.util.DeamonThreadFactory;
 
 public class DefaultConfigurationProvider implements ConfigurationProvider {
 	private static final Logger log = LoggerFactory.getLogger(DefaultConfigurationProvider.class);
 
+	private ScheduledExecutorService configReloader = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
 	protected Map<String, Object> configuration = new HashMap<String, Object>();
+	private long fileLastModified;
+	private ConfigurationUpdateHandler updateHandler;
 
 	public DefaultConfigurationProvider() throws WsInitException {
 		loadConfiguration();
+		int interval = Integer.getInteger(Constants.CONFIG_RELOAD_INTERVAL_MS, 1000);
+		if (interval > 0) {
+			configReloader.scheduleWithFixedDelay(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						reloadConfiguration();
+					} catch (Throwable t) {
+						log.error("Failed to reload configuration.", t);
+					}
+				}
+			}, interval, interval, TimeUnit.MILLISECONDS);
+		}
+	}
+
+	public DefaultConfigurationProvider(ConfigurationUpdateHandler updateHandler) throws WsInitException {//used via reflection
+		this();
+		this.updateHandler = updateHandler;
 	}
 
 	@Override
@@ -32,15 +58,27 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Map<String, Object> getConfiguration(String path) {
-		return (Map<String, Object>) configuration.get(path);
+		Map<String, Object> pathConfig = (Map<String, Object>) configuration.get(path);
+		return cloneJsonObject(pathConfig);
+	}
+
+	private Map<String, Object> cloneJsonObject(Map<String, Object> obj) {
+		if (obj != null && obj instanceof Map) {
+			try {
+				String serialized = WebswingObjectMapper.get().writeValueAsString(obj);
+				return WebswingObjectMapper.get().readValue(serialized, Map.class);
+			} catch (IOException e) {
+				log.error("Failed to clone configuration object", e);
+			}
+		}
+		return obj;
 	}
 
 	@Override
 	public SecuredPathConfig toSecuredPathConfig(String path, Map<String, Object> configuration) {
 		HashMap<String, Object> copy = configuration == null ? new HashMap<String, Object>() : new HashMap<String, Object>(configuration);
-		copy.put("path", path);
+		copy.put("path", CommonUtil.toPath(path));
 		SecuredPathConfig pathConfig = ConfigUtil.instantiateConfig(copy, SecuredPathConfig.class);
 		return pathConfig;
 	}
@@ -53,8 +91,11 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 			Map<String, Object> json = WebswingObjectMapper.get().readValue(configFile, Map.class);
 			configuration.put("path", path);
 			json.put(path, configuration);
-			WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
-			loadConfiguration();
+			synchronized (this) {
+				WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
+				this.fileLastModified = 0;
+				reloadConfiguration();
+			}
 		} catch (Exception e) {
 			log.error("Failed to save Webswing configuration :", e);
 			throw new Exception("Failed to save Webswing configuration :", e);
@@ -63,32 +104,16 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void saveSwingConfiguration(String path, Map<String, Object> configuration) throws Exception {
-		try {
-			File configFile = getConfigFile();
-			Map<String, Object> json = WebswingObjectMapper.get().readValue(configFile, Map.class);
-			Map<String, Object> pathJson = (Map<String, Object>) json.get(path);
-			SecuredPathConfig newConfig = toSecuredPathConfig(path, configuration);
-			Map<String, Object> newValue = newConfig.getSwingConfig().asMap();
-			pathJson.put("swingConfig", newValue);
-			WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
-			loadConfiguration();
-		} catch (Exception e) {
-			log.error("Failed to save configuration for '" + path + "':", e);
-			throw new Exception("Failed to save configuration for '" + path + "':", e);
-		}
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
 	public void removeConfiguration(String path) throws Exception {
 		try {
-			configuration.remove(path);
 			File configFile = getConfigFile();
 			Map<String, Object> json = WebswingObjectMapper.get().readValue(configFile, Map.class);
 			json.remove(path);
-			WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
-			loadConfiguration();
+			synchronized (this) {
+				WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(configFile, json);
+				this.fileLastModified = 0;
+				reloadConfiguration();
+			}
 		} catch (Exception e) {
 			log.error("Failed to save Webswing configuration :", e);
 			throw new Exception("Failed to save Webswing configuration :", e);
@@ -98,10 +123,6 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 	@Override
 	public void validateConfiguration(String path, Map<String, Object> configuration) throws Exception {
 		SecuredPathConfig c = toSecuredPathConfig(path, configuration);
-		String spcPath = c.getPath();
-		if (!path.equals(spcPath)) {
-			throw new WsException("Invalid configuration: path '" + path + "' configuration refers to different path ('" + spcPath + "')");
-		}
 		try {
 			WebswingObjectMapper.get().writeValueAsString(c);
 		} catch (Exception e) {
@@ -118,9 +139,6 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 		try {
 			MetaObject result = ConfigUtil.getConfigMetadata(securedPathConfig, cl, ctx);
 			result.setData(json);
-			if (ctx.isStarted() && !path.equals("/")) {
-				result.setMessage("Note: Only App related configuration can be modified while the application is running. Stop the application to edit the Security configuration.");
-			}
 			return result;
 		} catch (Exception e) {
 			log.error("Failed to generate configuration descriptor.", e);
@@ -129,18 +147,42 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Map<String, Object> loadConfiguration() throws WsInitException {
+	protected synchronized void loadConfiguration() throws WsInitException {
 		try {
 			File config = getConfigFile();
-			if (config.exists()) {
-				Map<String, Object> json = WebswingObjectMapper.get().readValue(config, Map.class);
-				configuration = json;
-				return json;
+			if (config != null && config.exists()) {
+				if (isConfigFileModified(config, this.fileLastModified)) {
+					this.fileLastModified = config.lastModified();
+					Map<String, Object> json = WebswingObjectMapper.get().readValue(config, Map.class);
+					configuration = fixPaths(json);
+				}
 			} else {
-				throw new WsInitException("Configuration file " + config.getPath() + " does not exist!");
+				if (this.fileLastModified != -1) {
+					this.fileLastModified = -1;
+					throw new WsInitException("Configuration file " + (config != null ? config.getPath() : null) + " does not exist!");
+				}
 			}
 		} catch (Exception e) {
 			throw new WsInitException("Webswing application configuration failed to load:", e);
+		}
+	}
+
+	private Map<String, Object> fixPaths(Map<String, Object> json) {
+		Map<String, Object> result = new LinkedHashMap<String, Object>();
+		for (String key : json.keySet()) {
+			String path = CommonUtil.toPath(key);
+			path = StringUtils.isEmpty(path) ? "/" : path;
+			result.put(path, json.get(key));
+		}
+		return result;
+	}
+
+	private boolean isConfigFileModified(File config, long lastModified) {
+		long currentLastModified = config.lastModified();
+		if (currentLastModified != lastModified) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -159,4 +201,44 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 	public boolean isMultiApplicationMode() {
 		return true;
 	}
+
+	private void reloadConfiguration() throws WsInitException {
+		if (updateHandler != null) {
+			Map<String, Object> oldConfig = configuration;
+			loadConfiguration();
+			Map<String, Object> newConfig = configuration;
+			if (oldConfig != newConfig) {
+				notifyChanges(oldConfig, newConfig);
+			}
+		}
+	}
+
+	private void notifyChanges(Map<String, Object> oldConfig, Map<String, Object> newConfig) {
+		for (String path : newConfig.keySet()) {
+			if (ObjectUtils.notEqual(oldConfig.get(path), newConfig.get(path))) {
+				if (newConfig.get(path) instanceof Map) {
+					try {
+						//update
+						updateHandler.notifyConfigChanged(path, toSecuredPathConfig(path, (Map<String, Object>) newConfig.get(path)));
+						log.info("App configuration for path '" + path + "' changed.");
+					} catch (Exception e) {
+						log.error("Failed to update app configuration for path '" + path + "'.", e);
+					}
+				} else {
+					log.warn("Path '" + path + "' has invalid configuration value.");
+				}
+			}
+			oldConfig.remove(path);
+		}
+		for (String path : oldConfig.keySet()) {
+			try {
+				//delete
+				updateHandler.notifyConfigDeleted(path);
+				log.error("Deleted app configuration '" + path + "'.");
+			} catch (Exception e) {
+				log.error("Failed to delete app configuration'" + path + "'.", e);
+			}
+		}
+	}
+
 }

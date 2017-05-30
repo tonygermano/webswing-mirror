@@ -29,7 +29,7 @@ import org.webswing.toolkit.util.ClasspathUtil;
 
 @ConfigType(metadataGenerator = WebswingSecurityMetadataGenerator.class)
 @ConfigFieldOrder({ "module", "classPath", "config", "authorizationConfig" })
-public interface WebswingSecurityConfig {
+public interface WebswingSecurityConfig extends Config{
 
 	@ConfigField(label = "Security Module Name", description = "Select one of built-in modules or enter full class name of custom security module (has to implement org.webswing.server.services.security.api.WebswingSecurityModule interface). Note the class and its dependencies has to be on classpath defined below.")
 	@ConfigFieldPresets(enumClass = BuiltInModules.class)

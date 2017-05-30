@@ -21,6 +21,7 @@ public class ApplicationInfo implements Serializable {
 	private int finishedInstances;
 	private Map<String, Map<Long, Number>> stats;
 	private Map<String, List<String>> warnings;
+	private boolean enabled;
 
 	public String getPath() {
 		return path;
@@ -126,4 +127,11 @@ public class ApplicationInfo implements Serializable {
 		return warnings;
 	}
 
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
 }

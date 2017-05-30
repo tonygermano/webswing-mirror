@@ -10,6 +10,7 @@ import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.LogoutTokenAdapter;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.modules.SecurityModuleWrapper;
 
 import javax.servlet.ServletException;
@@ -38,8 +39,8 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 			log.error("Failed to logout", e);
 			throw new WsException("Failed to logout", e);
 		}
-		
-		SecurityModuleWrapper securityModuleWrapper = getSecurityProvider().get();
+
+		WebswingSecurityModule securityModuleWrapper = getSecurityProvider().get();
 		try {
 			securityModuleWrapper.doLogout(req, res, user);
 		} catch (Exception e) {

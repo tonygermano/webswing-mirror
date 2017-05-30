@@ -329,6 +329,18 @@ body {
 	word-break:break-all;
 }
 
+.ws-status-panel{
+	padding-bottom: 10px;
+	margin-bottom: 20px;
+	border-bottom: 1px solid #eeeeee;
+}
+
+.ws-status-panel-label{
+	font-weight: 500;
+	line-height: 1.1;
+	font-size: 18px;
+}
+
 .loadingAnimationPanel{
     height: 40px;
     background: transparent;

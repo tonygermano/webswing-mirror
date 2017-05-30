@@ -28,7 +28,7 @@ public interface ConfigContext {
 	String replaceVariables(String string);
 
 	/**
-	 * @return true if the Context is active (ie. SwingInstanceManager isStarted)
+	 * @return true if the Context is active (ie. SwingInstanceManager isEnabled)
 	 */
-	boolean isStarted();
+	boolean isEnabled();
 }

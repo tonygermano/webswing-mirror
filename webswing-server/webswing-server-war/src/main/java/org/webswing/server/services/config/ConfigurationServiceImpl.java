@@ -3,31 +3,38 @@ package org.webswing.server.services.config;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.ConfigContext;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.extension.ConfigurationProvider;
+import org.webswing.server.extension.ConfigurationUpdateHandler;
 import org.webswing.server.extension.DefaultConfigurationProvider;
 import org.webswing.server.extension.ExtensionClassLoader;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.model.exception.WsInitException;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Singleton
-public class ConfigurationServiceImpl implements ConfigurationService {
+public class ConfigurationServiceImpl implements ConfigurationService, ConfigurationUpdateHandler {
+	private static final Logger log = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
 	private final ExtensionClassLoader extensionLoader;
+	private int interval;
 	private ConfigurationProvider provider;
 	private List<ConfigurationChangeListener> changeListeners = new ArrayList<>();
 
 	@Inject
 	public ConfigurationServiceImpl(ExtensionClassLoader extensionLoader) {
 		this.extensionLoader = extensionLoader;
+		this.interval = Integer.getInteger(Constants.CONFIG_RELOAD_INTERVAL_MS, 1000);
 	}
 
 	@Override
@@ -35,10 +42,16 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		String providerClassName = System.getProperty(Constants.CONFIG_PROVIDER, DefaultConfigurationProvider.class.getName());
 		try {
 			Class<?> providerClass = extensionLoader.loadClass(providerClassName);
-			provider = (ConfigurationProvider) providerClass.newInstance();
+			try {
+				Constructor<?> constructor = providerClass.getDeclaredConstructor(ConfigurationUpdateHandler.class);
+				provider = (ConfigurationProvider) constructor.newInstance(this);
+			} catch (NoSuchMethodException e) {
+				provider = (ConfigurationProvider) providerClass.newInstance();
+			}
 		} catch (Exception e) {
 			throw new WsInitException("Could not instantiate configuration provider " + providerClassName, e);
 		}
+
 	}
 
 	@Override
@@ -66,27 +79,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 			configuration = provider.createDefaultConfiguration(path);
 		}
 		provider.validateConfiguration(path, configuration);
-		Map<String, Object> old = provider.getConfiguration(path);
-		SecuredPathConfig oldConfig = provider.toSecuredPathConfig(path, old);
-		SecuredPathConfig newConfig = provider.toSecuredPathConfig(path, configuration);
 		provider.saveConfiguration(path, configuration);
-		notifyChange(path, oldConfig, newConfig);
-	}
-
-	@Override
-	public void setSwingConfiguration(String path, Map<String, Object> configuration) throws Exception {
-		path = asPath(path);
-		provider.validateConfiguration(path, configuration);
-
-		Map<String, Object> old = provider.getConfiguration(path);
-		SecuredPathConfig oldConfig = provider.toSecuredPathConfig(path, old);
-		if (oldConfig != null) {
-			provider.saveSwingConfiguration(path, configuration);
-			SecuredPathConfig newConfig = provider.toSecuredPathConfig(path, provider.getConfiguration(path));
-			notifyChange(path, oldConfig, newConfig);
-		} else {
-			throw new WsException("No Application found for path '" + path + "'");
-		}
 	}
 
 	@Override
@@ -106,11 +99,23 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		}
 	}
 
-	private void notifyChange(String path, SecuredPathConfig oldCfg, SecuredPathConfig newCfg) {
+	@Override
+	public void notifyConfigChanged(String path, SecuredPathConfig newCfg) {
 		synchronized (changeListeners) {
 			for (ConfigurationChangeListener listener : changeListeners) {
 				if (listener != null) {
-					listener.notifyChange(new ConfigurationChangeEvent(asPath(path), oldCfg, newCfg));
+					listener.onConfigChanged(new ConfigurationChangeEvent(asPath(path), newCfg));
+				}
+			}
+		}
+	}
+
+	@Override
+	public void notifyConfigDeleted(String path) {
+		synchronized (changeListeners) {
+			for (ConfigurationChangeListener listener : changeListeners) {
+				if (listener != null) {
+					listener.onConfigDeleted(new ConfigurationChangeEvent(asPath(path), null));
 				}
 			}
 		}
