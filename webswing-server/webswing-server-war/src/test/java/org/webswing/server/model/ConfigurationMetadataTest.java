@@ -67,10 +67,10 @@ public class ConfigurationMetadataTest {
 		}
 
 		//@ConfigFieldOrder({ "path", "homeDir", "webFolder","langFolder" "icon", "security", "swingConfig"})
-		assertTrue(configMetadata.getFields().get(0).getName().equals("path"));
-		assertTrue(configMetadata.getFields().get(1).getName().equals("homeDir"));
-		assertTrue(configMetadata.getFields().get(2).getName().equals("webFolder"));
-		assertTrue(configMetadata.getFields().get(5).getName().equals("security"));
+		assertTrue(configMetadata.getFields().get(1).getName().equals("path"));
+		assertTrue(configMetadata.getFields().get(2).getName().equals("homeDir"));
+		assertTrue(configMetadata.getFields().get(3).getName().equals("webFolder"));
+		assertTrue(configMetadata.getFields().get(6).getName().equals("security"));
 
 	}
 

@@ -199,8 +199,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 				sendRedirect(request, response, (String) msg.get(SUCCESS_URL));
 			} else {
 				String defaultPath = config.getContext().getSecuredPath();
-				String contextPath = getContextPath(request.getServletContext());
-				sendRedirect(request, response, contextPath + defaultPath);
+				sendRedirect(request, response, defaultPath);
 			}
 		}
 	}
