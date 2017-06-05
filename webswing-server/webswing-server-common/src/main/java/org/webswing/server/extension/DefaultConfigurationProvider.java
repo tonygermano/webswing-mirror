@@ -154,7 +154,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 				if (isConfigFileModified(config, this.fileLastModified)) {
 					this.fileLastModified = config.lastModified();
 					Map<String, Object> json = WebswingObjectMapper.get().readValue(config, Map.class);
-					configuration = fixPaths(json);
+					configuration = fixPaths(config, json);
 				}
 			} else {
 				if (this.fileLastModified != -1) {
@@ -167,12 +167,23 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 		}
 	}
 
-	private Map<String, Object> fixPaths(Map<String, Object> json) {
+	private Map<String, Object> fixPaths(File config, Map<String, Object> json) throws IOException {
 		Map<String, Object> result = new LinkedHashMap<String, Object>();
+		boolean changed = false;
 		for (String key : json.keySet()) {
-			String path = CommonUtil.toPath(key);
+			String path = CommonUtil.toPath(key).toLowerCase();
 			path = StringUtils.isEmpty(path) ? "/" : path;
 			result.put(path, json.get(key));
+			if (!StringUtils.equals(path, key)) {
+				changed = true;
+			}
+		}
+		if (changed) {
+			try {
+				WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(config, result);
+			} catch (IOException e) {
+				log.error("Failed save fixed paths in configuration file. ", e);
+			}
 		}
 		return result;
 	}
