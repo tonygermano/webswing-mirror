@@ -337,76 +337,90 @@ public final class Webswing {
      */
     org.webswing.server.model.proto.Webswing.JsResultMsgProtoOrBuilder getJavaResponseOrBuilder();
 
-    // optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;
+    // optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;
     /**
-     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+     */
+    boolean hasPixelsRequest();
+    /**
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+     */
+    org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto getPixelsRequest();
+    /**
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+     */
+    org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProtoOrBuilder getPixelsRequestOrBuilder();
+
+    // optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;
+    /**
+     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
      */
     boolean hasPlayback();
     /**
-     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
      */
     org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto getPlayback();
     /**
-     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
      */
     org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProtoOrBuilder getPlaybackOrBuilder();
 
-    // optional string sessionId = 13;
+    // optional string sessionId = 14;
     /**
-     * <code>optional string sessionId = 13;</code>
+     * <code>optional string sessionId = 14;</code>
      */
     boolean hasSessionId();
     /**
-     * <code>optional string sessionId = 13;</code>
+     * <code>optional string sessionId = 14;</code>
      */
     java.lang.String getSessionId();
     /**
-     * <code>optional string sessionId = 13;</code>
+     * <code>optional string sessionId = 14;</code>
      */
     com.google.protobuf.ByteString
         getSessionIdBytes();
 
-    // optional string startTimestamp = 14;
+    // optional string startTimestamp = 15;
     /**
-     * <code>optional string startTimestamp = 14;</code>
+     * <code>optional string startTimestamp = 15;</code>
      */
     boolean hasStartTimestamp();
     /**
-     * <code>optional string startTimestamp = 14;</code>
+     * <code>optional string startTimestamp = 15;</code>
      */
     java.lang.String getStartTimestamp();
     /**
-     * <code>optional string startTimestamp = 14;</code>
+     * <code>optional string startTimestamp = 15;</code>
      */
     com.google.protobuf.ByteString
         getStartTimestampBytes();
 
-    // optional string sendTimestamp = 15;
+    // optional string sendTimestamp = 16;
     /**
-     * <code>optional string sendTimestamp = 15;</code>
+     * <code>optional string sendTimestamp = 16;</code>
      */
     boolean hasSendTimestamp();
     /**
-     * <code>optional string sendTimestamp = 15;</code>
+     * <code>optional string sendTimestamp = 16;</code>
      */
     java.lang.String getSendTimestamp();
     /**
-     * <code>optional string sendTimestamp = 15;</code>
+     * <code>optional string sendTimestamp = 16;</code>
      */
     com.google.protobuf.ByteString
         getSendTimestampBytes();
 
-    // optional string ping = 16;
+    // optional string ping = 17;
     /**
-     * <code>optional string ping = 16;</code>
+     * <code>optional string ping = 17;</code>
      */
     boolean hasPing();
     /**
-     * <code>optional string ping = 16;</code>
+     * <code>optional string ping = 17;</code>
      */
     java.lang.String getPing();
     /**
-     * <code>optional string ping = 16;</code>
+     * <code>optional string ping = 17;</code>
      */
     com.google.protobuf.ByteString
         getPingBytes();
@@ -594,8 +608,21 @@ public final class Webswing {
               break;
             }
             case 98: {
-              org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.Builder subBuilder = null;
+              org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00000200) == 0x00000200)) {
+                subBuilder = pixelsRequest_.toBuilder();
+              }
+              pixelsRequest_ = input.readMessage(org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(pixelsRequest_);
+                pixelsRequest_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000200;
+              break;
+            }
+            case 106: {
+              org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000400) == 0x00000400)) {
                 subBuilder = playback_.toBuilder();
               }
               playback_ = input.readMessage(org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.PARSER, extensionRegistry);
@@ -603,26 +630,26 @@ public final class Webswing {
                 subBuilder.mergeFrom(playback_);
                 playback_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000200;
-              break;
-            }
-            case 106: {
               bitField0_ |= 0x00000400;
-              sessionId_ = input.readBytes();
               break;
             }
             case 114: {
               bitField0_ |= 0x00000800;
-              startTimestamp_ = input.readBytes();
+              sessionId_ = input.readBytes();
               break;
             }
             case 122: {
               bitField0_ |= 0x00001000;
-              sendTimestamp_ = input.readBytes();
+              startTimestamp_ = input.readBytes();
               break;
             }
             case 130: {
               bitField0_ |= 0x00002000;
+              sendTimestamp_ = input.readBytes();
+              break;
+            }
+            case 138: {
+              bitField0_ |= 0x00004000;
               ping_ = input.readBytes();
               break;
             }
@@ -936,39 +963,61 @@ public final class Webswing {
       return javaResponse_;
     }
 
-    // optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;
-    public static final int PLAYBACK_FIELD_NUMBER = 12;
-    private org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto playback_;
+    // optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;
+    public static final int PIXELSREQUEST_FIELD_NUMBER = 12;
+    private org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto pixelsRequest_;
     /**
-     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
      */
-    public boolean hasPlayback() {
+    public boolean hasPixelsRequest() {
       return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
-     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+     */
+    public org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto getPixelsRequest() {
+      return pixelsRequest_;
+    }
+    /**
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+     */
+    public org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProtoOrBuilder getPixelsRequestOrBuilder() {
+      return pixelsRequest_;
+    }
+
+    // optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;
+    public static final int PLAYBACK_FIELD_NUMBER = 13;
+    private org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto playback_;
+    /**
+     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
+     */
+    public boolean hasPlayback() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
      */
     public org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto getPlayback() {
       return playback_;
     }
     /**
-     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+     * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
      */
     public org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProtoOrBuilder getPlaybackOrBuilder() {
       return playback_;
     }
 
-    // optional string sessionId = 13;
-    public static final int SESSIONID_FIELD_NUMBER = 13;
+    // optional string sessionId = 14;
+    public static final int SESSIONID_FIELD_NUMBER = 14;
     private java.lang.Object sessionId_;
     /**
-     * <code>optional string sessionId = 13;</code>
+     * <code>optional string sessionId = 14;</code>
      */
     public boolean hasSessionId() {
-      return ((bitField0_ & 0x00000400) == 0x00000400);
+      return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
-     * <code>optional string sessionId = 13;</code>
+     * <code>optional string sessionId = 14;</code>
      */
     public java.lang.String getSessionId() {
       java.lang.Object ref = sessionId_;
@@ -985,7 +1034,7 @@ public final class Webswing {
       }
     }
     /**
-     * <code>optional string sessionId = 13;</code>
+     * <code>optional string sessionId = 14;</code>
      */
     public com.google.protobuf.ByteString
         getSessionIdBytes() {
@@ -1001,17 +1050,17 @@ public final class Webswing {
       }
     }
 
-    // optional string startTimestamp = 14;
-    public static final int STARTTIMESTAMP_FIELD_NUMBER = 14;
+    // optional string startTimestamp = 15;
+    public static final int STARTTIMESTAMP_FIELD_NUMBER = 15;
     private java.lang.Object startTimestamp_;
     /**
-     * <code>optional string startTimestamp = 14;</code>
+     * <code>optional string startTimestamp = 15;</code>
      */
     public boolean hasStartTimestamp() {
-      return ((bitField0_ & 0x00000800) == 0x00000800);
+      return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     /**
-     * <code>optional string startTimestamp = 14;</code>
+     * <code>optional string startTimestamp = 15;</code>
      */
     public java.lang.String getStartTimestamp() {
       java.lang.Object ref = startTimestamp_;
@@ -1028,7 +1077,7 @@ public final class Webswing {
       }
     }
     /**
-     * <code>optional string startTimestamp = 14;</code>
+     * <code>optional string startTimestamp = 15;</code>
      */
     public com.google.protobuf.ByteString
         getStartTimestampBytes() {
@@ -1044,17 +1093,17 @@ public final class Webswing {
       }
     }
 
-    // optional string sendTimestamp = 15;
-    public static final int SENDTIMESTAMP_FIELD_NUMBER = 15;
+    // optional string sendTimestamp = 16;
+    public static final int SENDTIMESTAMP_FIELD_NUMBER = 16;
     private java.lang.Object sendTimestamp_;
     /**
-     * <code>optional string sendTimestamp = 15;</code>
+     * <code>optional string sendTimestamp = 16;</code>
      */
     public boolean hasSendTimestamp() {
-      return ((bitField0_ & 0x00001000) == 0x00001000);
+      return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
-     * <code>optional string sendTimestamp = 15;</code>
+     * <code>optional string sendTimestamp = 16;</code>
      */
     public java.lang.String getSendTimestamp() {
       java.lang.Object ref = sendTimestamp_;
@@ -1071,7 +1120,7 @@ public final class Webswing {
       }
     }
     /**
-     * <code>optional string sendTimestamp = 15;</code>
+     * <code>optional string sendTimestamp = 16;</code>
      */
     public com.google.protobuf.ByteString
         getSendTimestampBytes() {
@@ -1087,17 +1136,17 @@ public final class Webswing {
       }
     }
 
-    // optional string ping = 16;
-    public static final int PING_FIELD_NUMBER = 16;
+    // optional string ping = 17;
+    public static final int PING_FIELD_NUMBER = 17;
     private java.lang.Object ping_;
     /**
-     * <code>optional string ping = 16;</code>
+     * <code>optional string ping = 17;</code>
      */
     public boolean hasPing() {
-      return ((bitField0_ & 0x00002000) == 0x00002000);
+      return ((bitField0_ & 0x00004000) == 0x00004000);
     }
     /**
-     * <code>optional string ping = 16;</code>
+     * <code>optional string ping = 17;</code>
      */
     public java.lang.String getPing() {
       java.lang.Object ref = ping_;
@@ -1114,7 +1163,7 @@ public final class Webswing {
       }
     }
     /**
-     * <code>optional string ping = 16;</code>
+     * <code>optional string ping = 17;</code>
      */
     public com.google.protobuf.ByteString
         getPingBytes() {
@@ -1142,6 +1191,7 @@ public final class Webswing {
       event_ = org.webswing.server.model.proto.Webswing.SimpleEventMsgOutProto.applicationAlreadyRunning;
       jsRequest_ = org.webswing.server.model.proto.Webswing.JsEvalRequestMsgOutProto.getDefaultInstance();
       javaResponse_ = org.webswing.server.model.proto.Webswing.JsResultMsgProto.getDefaultInstance();
+      pixelsRequest_ = org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.getDefaultInstance();
       playback_ = org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.getDefaultInstance();
       sessionId_ = "";
       startTimestamp_ = "";
@@ -1230,19 +1280,22 @@ public final class Webswing {
         output.writeMessage(11, javaResponse_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeMessage(12, playback_);
+        output.writeMessage(12, pixelsRequest_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeBytes(13, getSessionIdBytes());
+        output.writeMessage(13, playback_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        output.writeBytes(14, getStartTimestampBytes());
+        output.writeBytes(14, getSessionIdBytes());
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        output.writeBytes(15, getSendTimestampBytes());
+        output.writeBytes(15, getStartTimestampBytes());
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        output.writeBytes(16, getPingBytes());
+        output.writeBytes(16, getSendTimestampBytes());
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeBytes(17, getPingBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -1299,23 +1352,27 @@ public final class Webswing {
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(12, playback_);
+          .computeMessageSize(12, pixelsRequest_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(13, getSessionIdBytes());
+          .computeMessageSize(13, playback_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(14, getStartTimestampBytes());
+          .computeBytesSize(14, getSessionIdBytes());
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(15, getSendTimestampBytes());
+          .computeBytesSize(15, getStartTimestampBytes());
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(16, getPingBytes());
+          .computeBytesSize(16, getSendTimestampBytes());
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(17, getPingBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1435,6 +1492,7 @@ public final class Webswing {
           getClosedWindowFieldBuilder();
           getJsRequestFieldBuilder();
           getJavaResponseFieldBuilder();
+          getPixelsRequestFieldBuilder();
           getPlaybackFieldBuilder();
         }
       }
@@ -1506,20 +1564,26 @@ public final class Webswing {
           javaResponseBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000400);
+        if (pixelsRequestBuilder_ == null) {
+          pixelsRequest_ = org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.getDefaultInstance();
+        } else {
+          pixelsRequestBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
         if (playbackBuilder_ == null) {
           playback_ = org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.getDefaultInstance();
         } else {
           playbackBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000800);
-        sessionId_ = "";
         bitField0_ = (bitField0_ & ~0x00001000);
-        startTimestamp_ = "";
+        sessionId_ = "";
         bitField0_ = (bitField0_ & ~0x00002000);
-        sendTimestamp_ = "";
+        startTimestamp_ = "";
         bitField0_ = (bitField0_ & ~0x00004000);
-        ping_ = "";
+        sendTimestamp_ = "";
         bitField0_ = (bitField0_ & ~0x00008000);
+        ping_ = "";
+        bitField0_ = (bitField0_ & ~0x00010000);
         return this;
       }
 
@@ -1637,25 +1701,33 @@ public final class Webswing {
         if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000200;
         }
+        if (pixelsRequestBuilder_ == null) {
+          result.pixelsRequest_ = pixelsRequest_;
+        } else {
+          result.pixelsRequest_ = pixelsRequestBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00000400;
+        }
         if (playbackBuilder_ == null) {
           result.playback_ = playback_;
         } else {
           result.playback_ = playbackBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
-          to_bitField0_ |= 0x00000400;
-        }
-        result.sessionId_ = sessionId_;
         if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
           to_bitField0_ |= 0x00000800;
         }
-        result.startTimestamp_ = startTimestamp_;
+        result.sessionId_ = sessionId_;
         if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
           to_bitField0_ |= 0x00001000;
         }
-        result.sendTimestamp_ = sendTimestamp_;
+        result.startTimestamp_ = startTimestamp_;
         if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
           to_bitField0_ |= 0x00002000;
+        }
+        result.sendTimestamp_ = sendTimestamp_;
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+          to_bitField0_ |= 0x00004000;
         }
         result.ping_ = ping_;
         result.bitField0_ = to_bitField0_;
@@ -1753,26 +1825,29 @@ public final class Webswing {
         if (other.hasJavaResponse()) {
           mergeJavaResponse(other.getJavaResponse());
         }
+        if (other.hasPixelsRequest()) {
+          mergePixelsRequest(other.getPixelsRequest());
+        }
         if (other.hasPlayback()) {
           mergePlayback(other.getPlayback());
         }
         if (other.hasSessionId()) {
-          bitField0_ |= 0x00001000;
+          bitField0_ |= 0x00002000;
           sessionId_ = other.sessionId_;
           onChanged();
         }
         if (other.hasStartTimestamp()) {
-          bitField0_ |= 0x00002000;
+          bitField0_ |= 0x00004000;
           startTimestamp_ = other.startTimestamp_;
           onChanged();
         }
         if (other.hasSendTimestamp()) {
-          bitField0_ |= 0x00004000;
+          bitField0_ |= 0x00008000;
           sendTimestamp_ = other.sendTimestamp_;
           onChanged();
         }
         if (other.hasPing()) {
-          bitField0_ |= 0x00008000;
+          bitField0_ |= 0x00010000;
           ping_ = other.ping_;
           onChanged();
         }
@@ -3291,18 +3366,135 @@ public final class Webswing {
         return javaResponseBuilder_;
       }
 
-      // optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;
+      // optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;
+      private org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto pixelsRequest_ = org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto, org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.Builder, org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProtoOrBuilder> pixelsRequestBuilder_;
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+       */
+      public boolean hasPixelsRequest() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+       */
+      public org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto getPixelsRequest() {
+        if (pixelsRequestBuilder_ == null) {
+          return pixelsRequest_;
+        } else {
+          return pixelsRequestBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+       */
+      public Builder setPixelsRequest(org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto value) {
+        if (pixelsRequestBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          pixelsRequest_ = value;
+          onChanged();
+        } else {
+          pixelsRequestBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+       */
+      public Builder setPixelsRequest(
+          org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.Builder builderForValue) {
+        if (pixelsRequestBuilder_ == null) {
+          pixelsRequest_ = builderForValue.build();
+          onChanged();
+        } else {
+          pixelsRequestBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+       */
+      public Builder mergePixelsRequest(org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto value) {
+        if (pixelsRequestBuilder_ == null) {
+          if (((bitField0_ & 0x00000800) == 0x00000800) &&
+              pixelsRequest_ != org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.getDefaultInstance()) {
+            pixelsRequest_ =
+              org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.newBuilder(pixelsRequest_).mergeFrom(value).buildPartial();
+          } else {
+            pixelsRequest_ = value;
+          }
+          onChanged();
+        } else {
+          pixelsRequestBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+       */
+      public Builder clearPixelsRequest() {
+        if (pixelsRequestBuilder_ == null) {
+          pixelsRequest_ = org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.getDefaultInstance();
+          onChanged();
+        } else {
+          pixelsRequestBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+       */
+      public org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.Builder getPixelsRequestBuilder() {
+        bitField0_ |= 0x00000800;
+        onChanged();
+        return getPixelsRequestFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+       */
+      public org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProtoOrBuilder getPixelsRequestOrBuilder() {
+        if (pixelsRequestBuilder_ != null) {
+          return pixelsRequestBuilder_.getMessageOrBuilder();
+        } else {
+          return pixelsRequest_;
+        }
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto pixelsRequest = 12;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto, org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.Builder, org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProtoOrBuilder> 
+          getPixelsRequestFieldBuilder() {
+        if (pixelsRequestBuilder_ == null) {
+          pixelsRequestBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto, org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.Builder, org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProtoOrBuilder>(
+                  pixelsRequest_,
+                  getParentForChildren(),
+                  isClean());
+          pixelsRequest_ = null;
+        }
+        return pixelsRequestBuilder_;
+      }
+
+      // optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;
       private org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto playback_ = org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto, org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.Builder, org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProtoOrBuilder> playbackBuilder_;
       /**
-       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
        */
       public boolean hasPlayback() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
        */
       public org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto getPlayback() {
         if (playbackBuilder_ == null) {
@@ -3312,7 +3504,7 @@ public final class Webswing {
         }
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
        */
       public Builder setPlayback(org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto value) {
         if (playbackBuilder_ == null) {
@@ -3324,11 +3516,11 @@ public final class Webswing {
         } else {
           playbackBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         return this;
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
        */
       public Builder setPlayback(
           org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.Builder builderForValue) {
@@ -3338,15 +3530,15 @@ public final class Webswing {
         } else {
           playbackBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         return this;
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
        */
       public Builder mergePlayback(org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto value) {
         if (playbackBuilder_ == null) {
-          if (((bitField0_ & 0x00000800) == 0x00000800) &&
+          if (((bitField0_ & 0x00001000) == 0x00001000) &&
               playback_ != org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.getDefaultInstance()) {
             playback_ =
               org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.newBuilder(playback_).mergeFrom(value).buildPartial();
@@ -3357,11 +3549,11 @@ public final class Webswing {
         } else {
           playbackBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         return this;
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
        */
       public Builder clearPlayback() {
         if (playbackBuilder_ == null) {
@@ -3370,19 +3562,19 @@ public final class Webswing {
         } else {
           playbackBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
        */
       public org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.Builder getPlaybackBuilder() {
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         onChanged();
         return getPlaybackFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
        */
       public org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProtoOrBuilder getPlaybackOrBuilder() {
         if (playbackBuilder_ != null) {
@@ -3392,7 +3584,7 @@ public final class Webswing {
         }
       }
       /**
-       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 12;</code>
+       * <code>optional .org.webswing.server.model.proto.PlaybackInfoMsgProto playback = 13;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto, org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProto.Builder, org.webswing.server.model.proto.Webswing.PlaybackInfoMsgProtoOrBuilder> 
@@ -3408,16 +3600,16 @@ public final class Webswing {
         return playbackBuilder_;
       }
 
-      // optional string sessionId = 13;
+      // optional string sessionId = 14;
       private java.lang.Object sessionId_ = "";
       /**
-       * <code>optional string sessionId = 13;</code>
+       * <code>optional string sessionId = 14;</code>
        */
       public boolean hasSessionId() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
-       * <code>optional string sessionId = 13;</code>
+       * <code>optional string sessionId = 14;</code>
        */
       public java.lang.String getSessionId() {
         java.lang.Object ref = sessionId_;
@@ -3431,7 +3623,7 @@ public final class Webswing {
         }
       }
       /**
-       * <code>optional string sessionId = 13;</code>
+       * <code>optional string sessionId = 14;</code>
        */
       public com.google.protobuf.ByteString
           getSessionIdBytes() {
@@ -3447,51 +3639,51 @@ public final class Webswing {
         }
       }
       /**
-       * <code>optional string sessionId = 13;</code>
+       * <code>optional string sessionId = 14;</code>
        */
       public Builder setSessionId(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00001000;
+  bitField0_ |= 0x00002000;
         sessionId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string sessionId = 13;</code>
+       * <code>optional string sessionId = 14;</code>
        */
       public Builder clearSessionId() {
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         sessionId_ = getDefaultInstance().getSessionId();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string sessionId = 13;</code>
+       * <code>optional string sessionId = 14;</code>
        */
       public Builder setSessionIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00001000;
+  bitField0_ |= 0x00002000;
         sessionId_ = value;
         onChanged();
         return this;
       }
 
-      // optional string startTimestamp = 14;
+      // optional string startTimestamp = 15;
       private java.lang.Object startTimestamp_ = "";
       /**
-       * <code>optional string startTimestamp = 14;</code>
+       * <code>optional string startTimestamp = 15;</code>
        */
       public boolean hasStartTimestamp() {
-        return ((bitField0_ & 0x00002000) == 0x00002000);
+        return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       /**
-       * <code>optional string startTimestamp = 14;</code>
+       * <code>optional string startTimestamp = 15;</code>
        */
       public java.lang.String getStartTimestamp() {
         java.lang.Object ref = startTimestamp_;
@@ -3505,7 +3697,7 @@ public final class Webswing {
         }
       }
       /**
-       * <code>optional string startTimestamp = 14;</code>
+       * <code>optional string startTimestamp = 15;</code>
        */
       public com.google.protobuf.ByteString
           getStartTimestampBytes() {
@@ -3521,51 +3713,51 @@ public final class Webswing {
         }
       }
       /**
-       * <code>optional string startTimestamp = 14;</code>
+       * <code>optional string startTimestamp = 15;</code>
        */
       public Builder setStartTimestamp(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00002000;
+  bitField0_ |= 0x00004000;
         startTimestamp_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string startTimestamp = 14;</code>
+       * <code>optional string startTimestamp = 15;</code>
        */
       public Builder clearStartTimestamp() {
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00004000);
         startTimestamp_ = getDefaultInstance().getStartTimestamp();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string startTimestamp = 14;</code>
+       * <code>optional string startTimestamp = 15;</code>
        */
       public Builder setStartTimestampBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00002000;
+  bitField0_ |= 0x00004000;
         startTimestamp_ = value;
         onChanged();
         return this;
       }
 
-      // optional string sendTimestamp = 15;
+      // optional string sendTimestamp = 16;
       private java.lang.Object sendTimestamp_ = "";
       /**
-       * <code>optional string sendTimestamp = 15;</code>
+       * <code>optional string sendTimestamp = 16;</code>
        */
       public boolean hasSendTimestamp() {
-        return ((bitField0_ & 0x00004000) == 0x00004000);
+        return ((bitField0_ & 0x00008000) == 0x00008000);
       }
       /**
-       * <code>optional string sendTimestamp = 15;</code>
+       * <code>optional string sendTimestamp = 16;</code>
        */
       public java.lang.String getSendTimestamp() {
         java.lang.Object ref = sendTimestamp_;
@@ -3579,7 +3771,7 @@ public final class Webswing {
         }
       }
       /**
-       * <code>optional string sendTimestamp = 15;</code>
+       * <code>optional string sendTimestamp = 16;</code>
        */
       public com.google.protobuf.ByteString
           getSendTimestampBytes() {
@@ -3595,51 +3787,51 @@ public final class Webswing {
         }
       }
       /**
-       * <code>optional string sendTimestamp = 15;</code>
+       * <code>optional string sendTimestamp = 16;</code>
        */
       public Builder setSendTimestamp(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00004000;
+  bitField0_ |= 0x00008000;
         sendTimestamp_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string sendTimestamp = 15;</code>
+       * <code>optional string sendTimestamp = 16;</code>
        */
       public Builder clearSendTimestamp() {
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         sendTimestamp_ = getDefaultInstance().getSendTimestamp();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string sendTimestamp = 15;</code>
+       * <code>optional string sendTimestamp = 16;</code>
        */
       public Builder setSendTimestampBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00004000;
+  bitField0_ |= 0x00008000;
         sendTimestamp_ = value;
         onChanged();
         return this;
       }
 
-      // optional string ping = 16;
+      // optional string ping = 17;
       private java.lang.Object ping_ = "";
       /**
-       * <code>optional string ping = 16;</code>
+       * <code>optional string ping = 17;</code>
        */
       public boolean hasPing() {
-        return ((bitField0_ & 0x00008000) == 0x00008000);
+        return ((bitField0_ & 0x00010000) == 0x00010000);
       }
       /**
-       * <code>optional string ping = 16;</code>
+       * <code>optional string ping = 17;</code>
        */
       public java.lang.String getPing() {
         java.lang.Object ref = ping_;
@@ -3653,7 +3845,7 @@ public final class Webswing {
         }
       }
       /**
-       * <code>optional string ping = 16;</code>
+       * <code>optional string ping = 17;</code>
        */
       public com.google.protobuf.ByteString
           getPingBytes() {
@@ -3669,36 +3861,36 @@ public final class Webswing {
         }
       }
       /**
-       * <code>optional string ping = 16;</code>
+       * <code>optional string ping = 17;</code>
        */
       public Builder setPing(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00008000;
+  bitField0_ |= 0x00010000;
         ping_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string ping = 16;</code>
+       * <code>optional string ping = 17;</code>
        */
       public Builder clearPing() {
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00010000);
         ping_ = getDefaultInstance().getPing();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string ping = 16;</code>
+       * <code>optional string ping = 17;</code>
        */
       public Builder setPingBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00008000;
+  bitField0_ |= 0x00010000;
         ping_ = value;
         onChanged();
         return this;
@@ -16315,6 +16507,801 @@ public final class Webswing {
     // @@protoc_insertion_point(class_scope:org.webswing.server.model.proto.PlaybackInfoMsgProto)
   }
 
+  public interface PixelsAreaRequestMsgOutProtoOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // optional string correlationId = 1;
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    boolean hasCorrelationId();
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    java.lang.String getCorrelationId();
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getCorrelationIdBytes();
+
+    // optional uint32 x = 2;
+    /**
+     * <code>optional uint32 x = 2;</code>
+     */
+    boolean hasX();
+    /**
+     * <code>optional uint32 x = 2;</code>
+     */
+    int getX();
+
+    // optional uint32 y = 3;
+    /**
+     * <code>optional uint32 y = 3;</code>
+     */
+    boolean hasY();
+    /**
+     * <code>optional uint32 y = 3;</code>
+     */
+    int getY();
+
+    // optional uint32 w = 4;
+    /**
+     * <code>optional uint32 w = 4;</code>
+     */
+    boolean hasW();
+    /**
+     * <code>optional uint32 w = 4;</code>
+     */
+    int getW();
+
+    // optional uint32 h = 5;
+    /**
+     * <code>optional uint32 h = 5;</code>
+     */
+    boolean hasH();
+    /**
+     * <code>optional uint32 h = 5;</code>
+     */
+    int getH();
+  }
+  /**
+   * Protobuf type {@code org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto}
+   */
+  public static final class PixelsAreaRequestMsgOutProto extends
+      com.google.protobuf.GeneratedMessage
+      implements PixelsAreaRequestMsgOutProtoOrBuilder {
+    // Use PixelsAreaRequestMsgOutProto.newBuilder() to construct.
+    private PixelsAreaRequestMsgOutProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private PixelsAreaRequestMsgOutProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final PixelsAreaRequestMsgOutProto defaultInstance;
+    public static PixelsAreaRequestMsgOutProto getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public PixelsAreaRequestMsgOutProto getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PixelsAreaRequestMsgOutProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              correlationId_ = input.readBytes();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              x_ = input.readUInt32();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              y_ = input.readUInt32();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              w_ = input.readUInt32();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              h_ = input.readUInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_PixelsAreaRequestMsgOutProto_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_PixelsAreaRequestMsgOutProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.class, org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<PixelsAreaRequestMsgOutProto> PARSER =
+        new com.google.protobuf.AbstractParser<PixelsAreaRequestMsgOutProto>() {
+      public PixelsAreaRequestMsgOutProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PixelsAreaRequestMsgOutProto(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PixelsAreaRequestMsgOutProto> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // optional string correlationId = 1;
+    public static final int CORRELATIONID_FIELD_NUMBER = 1;
+    private java.lang.Object correlationId_;
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    public boolean hasCorrelationId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    public java.lang.String getCorrelationId() {
+      java.lang.Object ref = correlationId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          correlationId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCorrelationIdBytes() {
+      java.lang.Object ref = correlationId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        correlationId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional uint32 x = 2;
+    public static final int X_FIELD_NUMBER = 2;
+    private int x_;
+    /**
+     * <code>optional uint32 x = 2;</code>
+     */
+    public boolean hasX() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional uint32 x = 2;</code>
+     */
+    public int getX() {
+      return x_;
+    }
+
+    // optional uint32 y = 3;
+    public static final int Y_FIELD_NUMBER = 3;
+    private int y_;
+    /**
+     * <code>optional uint32 y = 3;</code>
+     */
+    public boolean hasY() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional uint32 y = 3;</code>
+     */
+    public int getY() {
+      return y_;
+    }
+
+    // optional uint32 w = 4;
+    public static final int W_FIELD_NUMBER = 4;
+    private int w_;
+    /**
+     * <code>optional uint32 w = 4;</code>
+     */
+    public boolean hasW() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional uint32 w = 4;</code>
+     */
+    public int getW() {
+      return w_;
+    }
+
+    // optional uint32 h = 5;
+    public static final int H_FIELD_NUMBER = 5;
+    private int h_;
+    /**
+     * <code>optional uint32 h = 5;</code>
+     */
+    public boolean hasH() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional uint32 h = 5;</code>
+     */
+    public int getH() {
+      return h_;
+    }
+
+    private void initFields() {
+      correlationId_ = "";
+      x_ = 0;
+      y_ = 0;
+      w_ = 0;
+      h_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getCorrelationIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeUInt32(2, x_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeUInt32(3, y_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeUInt32(4, w_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeUInt32(5, h_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getCorrelationIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(2, x_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(3, y_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(4, w_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(5, h_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_PixelsAreaRequestMsgOutProto_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_PixelsAreaRequestMsgOutProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.class, org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.Builder.class);
+      }
+
+      // Construct using org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        correlationId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        x_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        y_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        w_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        h_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_PixelsAreaRequestMsgOutProto_descriptor;
+      }
+
+      public org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto getDefaultInstanceForType() {
+        return org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.getDefaultInstance();
+      }
+
+      public org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto build() {
+        org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto buildPartial() {
+        org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto result = new org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.correlationId_ = correlationId_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.x_ = x_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.y_ = y_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.w_ = w_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.h_ = h_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto) {
+          return mergeFrom((org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto other) {
+        if (other == org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto.getDefaultInstance()) return this;
+        if (other.hasCorrelationId()) {
+          bitField0_ |= 0x00000001;
+          correlationId_ = other.correlationId_;
+          onChanged();
+        }
+        if (other.hasX()) {
+          setX(other.getX());
+        }
+        if (other.hasY()) {
+          setY(other.getY());
+        }
+        if (other.hasW()) {
+          setW(other.getW());
+        }
+        if (other.hasH()) {
+          setH(other.getH());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.webswing.server.model.proto.Webswing.PixelsAreaRequestMsgOutProto) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // optional string correlationId = 1;
+      private java.lang.Object correlationId_ = "";
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public boolean hasCorrelationId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public java.lang.String getCorrelationId() {
+        java.lang.Object ref = correlationId_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          correlationId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getCorrelationIdBytes() {
+        java.lang.Object ref = correlationId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          correlationId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public Builder setCorrelationId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        correlationId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public Builder clearCorrelationId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        correlationId_ = getDefaultInstance().getCorrelationId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public Builder setCorrelationIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        correlationId_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional uint32 x = 2;
+      private int x_ ;
+      /**
+       * <code>optional uint32 x = 2;</code>
+       */
+      public boolean hasX() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional uint32 x = 2;</code>
+       */
+      public int getX() {
+        return x_;
+      }
+      /**
+       * <code>optional uint32 x = 2;</code>
+       */
+      public Builder setX(int value) {
+        bitField0_ |= 0x00000002;
+        x_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional uint32 x = 2;</code>
+       */
+      public Builder clearX() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        x_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional uint32 y = 3;
+      private int y_ ;
+      /**
+       * <code>optional uint32 y = 3;</code>
+       */
+      public boolean hasY() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional uint32 y = 3;</code>
+       */
+      public int getY() {
+        return y_;
+      }
+      /**
+       * <code>optional uint32 y = 3;</code>
+       */
+      public Builder setY(int value) {
+        bitField0_ |= 0x00000004;
+        y_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional uint32 y = 3;</code>
+       */
+      public Builder clearY() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        y_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional uint32 w = 4;
+      private int w_ ;
+      /**
+       * <code>optional uint32 w = 4;</code>
+       */
+      public boolean hasW() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional uint32 w = 4;</code>
+       */
+      public int getW() {
+        return w_;
+      }
+      /**
+       * <code>optional uint32 w = 4;</code>
+       */
+      public Builder setW(int value) {
+        bitField0_ |= 0x00000008;
+        w_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional uint32 w = 4;</code>
+       */
+      public Builder clearW() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        w_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional uint32 h = 5;
+      private int h_ ;
+      /**
+       * <code>optional uint32 h = 5;</code>
+       */
+      public boolean hasH() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional uint32 h = 5;</code>
+       */
+      public int getH() {
+        return h_;
+      }
+      /**
+       * <code>optional uint32 h = 5;</code>
+       */
+      public Builder setH(int value) {
+        bitField0_ |= 0x00000010;
+        h_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional uint32 h = 5;</code>
+       */
+      public Builder clearH() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        h_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto)
+    }
+
+    static {
+      defaultInstance = new PixelsAreaRequestMsgOutProto(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:org.webswing.server.model.proto.PixelsAreaRequestMsgOutProto)
+  }
+
   public interface InputEventsFrameMsgInProtoOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
@@ -16440,6 +17427,20 @@ public final class Webswing {
      * <code>optional .org.webswing.server.model.proto.PlaybackCommandMsgInProto playback = 8;</code>
      */
     org.webswing.server.model.proto.Webswing.PlaybackCommandMsgInProtoOrBuilder getPlaybackOrBuilder();
+
+    // optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;
+    /**
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+     */
+    boolean hasPixelsResponse();
+    /**
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+     */
+    org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto getPixelsResponse();
+    /**
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+     */
+    org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProtoOrBuilder getPixelsResponseOrBuilder();
   }
   /**
    * Protobuf type {@code org.webswing.server.model.proto.InputEventsFrameMsgInProto}
@@ -16593,6 +17594,19 @@ public final class Webswing {
                 playback_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000040;
+              break;
+            }
+            case 74: {
+              org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000080) == 0x00000080)) {
+                subBuilder = pixelsResponse_.toBuilder();
+              }
+              pixelsResponse_ = input.readMessage(org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(pixelsResponse_);
+                pixelsResponse_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000080;
               break;
             }
           }
@@ -16828,6 +17842,28 @@ public final class Webswing {
       return playback_;
     }
 
+    // optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;
+    public static final int PIXELSRESPONSE_FIELD_NUMBER = 9;
+    private org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto pixelsResponse_;
+    /**
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+     */
+    public boolean hasPixelsResponse() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+     */
+    public org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto getPixelsResponse() {
+      return pixelsResponse_;
+    }
+    /**
+     * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+     */
+    public org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProtoOrBuilder getPixelsResponseOrBuilder() {
+      return pixelsResponse_;
+    }
+
     private void initFields() {
       events_ = java.util.Collections.emptyList();
       paste_ = org.webswing.server.model.proto.Webswing.PasteEventMsgInProto.getDefaultInstance();
@@ -16837,6 +17873,7 @@ public final class Webswing {
       jsResponse_ = org.webswing.server.model.proto.Webswing.JsResultMsgProto.getDefaultInstance();
       javaRequest_ = org.webswing.server.model.proto.Webswing.JavaEvalRequestMsgInProto.getDefaultInstance();
       playback_ = org.webswing.server.model.proto.Webswing.PlaybackCommandMsgInProto.getDefaultInstance();
+      pixelsResponse_ = org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -16873,6 +17910,9 @@ public final class Webswing {
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeMessage(8, playback_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeMessage(9, pixelsResponse_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -16914,6 +17954,10 @@ public final class Webswing {
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, playback_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(9, pixelsResponse_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -17035,6 +18079,7 @@ public final class Webswing {
           getJsResponseFieldBuilder();
           getJavaRequestFieldBuilder();
           getPlaybackFieldBuilder();
+          getPixelsResponseFieldBuilder();
         }
       }
       private static Builder create() {
@@ -17091,6 +18136,12 @@ public final class Webswing {
           playbackBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000080);
+        if (pixelsResponseBuilder_ == null) {
+          pixelsResponse_ = org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.getDefaultInstance();
+        } else {
+          pixelsResponseBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
 
@@ -17184,6 +18235,14 @@ public final class Webswing {
         } else {
           result.playback_ = playbackBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        if (pixelsResponseBuilder_ == null) {
+          result.pixelsResponse_ = pixelsResponse_;
+        } else {
+          result.pixelsResponse_ = pixelsResponseBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -17246,6 +18305,9 @@ public final class Webswing {
         }
         if (other.hasPlayback()) {
           mergePlayback(other.getPlayback());
+        }
+        if (other.hasPixelsResponse()) {
+          mergePixelsResponse(other.getPixelsResponse());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -18331,6 +19393,123 @@ public final class Webswing {
           playback_ = null;
         }
         return playbackBuilder_;
+      }
+
+      // optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;
+      private org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto pixelsResponse_ = org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto, org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.Builder, org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProtoOrBuilder> pixelsResponseBuilder_;
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+       */
+      public boolean hasPixelsResponse() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+       */
+      public org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto getPixelsResponse() {
+        if (pixelsResponseBuilder_ == null) {
+          return pixelsResponse_;
+        } else {
+          return pixelsResponseBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+       */
+      public Builder setPixelsResponse(org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto value) {
+        if (pixelsResponseBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          pixelsResponse_ = value;
+          onChanged();
+        } else {
+          pixelsResponseBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000100;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+       */
+      public Builder setPixelsResponse(
+          org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.Builder builderForValue) {
+        if (pixelsResponseBuilder_ == null) {
+          pixelsResponse_ = builderForValue.build();
+          onChanged();
+        } else {
+          pixelsResponseBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000100;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+       */
+      public Builder mergePixelsResponse(org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto value) {
+        if (pixelsResponseBuilder_ == null) {
+          if (((bitField0_ & 0x00000100) == 0x00000100) &&
+              pixelsResponse_ != org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.getDefaultInstance()) {
+            pixelsResponse_ =
+              org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.newBuilder(pixelsResponse_).mergeFrom(value).buildPartial();
+          } else {
+            pixelsResponse_ = value;
+          }
+          onChanged();
+        } else {
+          pixelsResponseBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000100;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+       */
+      public Builder clearPixelsResponse() {
+        if (pixelsResponseBuilder_ == null) {
+          pixelsResponse_ = org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.getDefaultInstance();
+          onChanged();
+        } else {
+          pixelsResponseBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000100);
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+       */
+      public org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.Builder getPixelsResponseBuilder() {
+        bitField0_ |= 0x00000100;
+        onChanged();
+        return getPixelsResponseFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+       */
+      public org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProtoOrBuilder getPixelsResponseOrBuilder() {
+        if (pixelsResponseBuilder_ != null) {
+          return pixelsResponseBuilder_.getMessageOrBuilder();
+        } else {
+          return pixelsResponse_;
+        }
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.PixelsAreaResponseMsgInProto pixelsResponse = 9;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto, org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.Builder, org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProtoOrBuilder> 
+          getPixelsResponseFieldBuilder() {
+        if (pixelsResponseBuilder_ == null) {
+          pixelsResponseBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto, org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.Builder, org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProtoOrBuilder>(
+                  pixelsResponse_,
+                  getParentForChildren(),
+                  isClean());
+          pixelsResponse_ = null;
+        }
+        return pixelsResponseBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:org.webswing.server.model.proto.InputEventsFrameMsgInProto)
@@ -30196,6 +31375,633 @@ public final class Webswing {
     // @@protoc_insertion_point(class_scope:org.webswing.server.model.proto.PlaybackCommandMsgInProto)
   }
 
+  public interface PixelsAreaResponseMsgInProtoOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // optional string correlationId = 1;
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    boolean hasCorrelationId();
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    java.lang.String getCorrelationId();
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getCorrelationIdBytes();
+
+    // optional string pixels = 2;
+    /**
+     * <code>optional string pixels = 2;</code>
+     */
+    boolean hasPixels();
+    /**
+     * <code>optional string pixels = 2;</code>
+     */
+    java.lang.String getPixels();
+    /**
+     * <code>optional string pixels = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getPixelsBytes();
+  }
+  /**
+   * Protobuf type {@code org.webswing.server.model.proto.PixelsAreaResponseMsgInProto}
+   */
+  public static final class PixelsAreaResponseMsgInProto extends
+      com.google.protobuf.GeneratedMessage
+      implements PixelsAreaResponseMsgInProtoOrBuilder {
+    // Use PixelsAreaResponseMsgInProto.newBuilder() to construct.
+    private PixelsAreaResponseMsgInProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private PixelsAreaResponseMsgInProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final PixelsAreaResponseMsgInProto defaultInstance;
+    public static PixelsAreaResponseMsgInProto getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public PixelsAreaResponseMsgInProto getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PixelsAreaResponseMsgInProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              correlationId_ = input.readBytes();
+              break;
+            }
+            case 18: {
+              bitField0_ |= 0x00000002;
+              pixels_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_PixelsAreaResponseMsgInProto_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_PixelsAreaResponseMsgInProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.class, org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<PixelsAreaResponseMsgInProto> PARSER =
+        new com.google.protobuf.AbstractParser<PixelsAreaResponseMsgInProto>() {
+      public PixelsAreaResponseMsgInProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PixelsAreaResponseMsgInProto(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PixelsAreaResponseMsgInProto> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // optional string correlationId = 1;
+    public static final int CORRELATIONID_FIELD_NUMBER = 1;
+    private java.lang.Object correlationId_;
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    public boolean hasCorrelationId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    public java.lang.String getCorrelationId() {
+      java.lang.Object ref = correlationId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          correlationId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string correlationId = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCorrelationIdBytes() {
+      java.lang.Object ref = correlationId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        correlationId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string pixels = 2;
+    public static final int PIXELS_FIELD_NUMBER = 2;
+    private java.lang.Object pixels_;
+    /**
+     * <code>optional string pixels = 2;</code>
+     */
+    public boolean hasPixels() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional string pixels = 2;</code>
+     */
+    public java.lang.String getPixels() {
+      java.lang.Object ref = pixels_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          pixels_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string pixels = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPixelsBytes() {
+      java.lang.Object ref = pixels_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        pixels_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private void initFields() {
+      correlationId_ = "";
+      pixels_ = "";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getCorrelationIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(2, getPixelsBytes());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getCorrelationIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, getPixelsBytes());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.webswing.server.model.proto.PixelsAreaResponseMsgInProto}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_PixelsAreaResponseMsgInProto_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_PixelsAreaResponseMsgInProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.class, org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.Builder.class);
+      }
+
+      // Construct using org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        correlationId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        pixels_ = "";
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_PixelsAreaResponseMsgInProto_descriptor;
+      }
+
+      public org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto getDefaultInstanceForType() {
+        return org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.getDefaultInstance();
+      }
+
+      public org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto build() {
+        org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto buildPartial() {
+        org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto result = new org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.correlationId_ = correlationId_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.pixels_ = pixels_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto) {
+          return mergeFrom((org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto other) {
+        if (other == org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto.getDefaultInstance()) return this;
+        if (other.hasCorrelationId()) {
+          bitField0_ |= 0x00000001;
+          correlationId_ = other.correlationId_;
+          onChanged();
+        }
+        if (other.hasPixels()) {
+          bitField0_ |= 0x00000002;
+          pixels_ = other.pixels_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.webswing.server.model.proto.Webswing.PixelsAreaResponseMsgInProto) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // optional string correlationId = 1;
+      private java.lang.Object correlationId_ = "";
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public boolean hasCorrelationId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public java.lang.String getCorrelationId() {
+        java.lang.Object ref = correlationId_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          correlationId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getCorrelationIdBytes() {
+        java.lang.Object ref = correlationId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          correlationId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public Builder setCorrelationId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        correlationId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public Builder clearCorrelationId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        correlationId_ = getDefaultInstance().getCorrelationId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string correlationId = 1;</code>
+       */
+      public Builder setCorrelationIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        correlationId_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string pixels = 2;
+      private java.lang.Object pixels_ = "";
+      /**
+       * <code>optional string pixels = 2;</code>
+       */
+      public boolean hasPixels() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional string pixels = 2;</code>
+       */
+      public java.lang.String getPixels() {
+        java.lang.Object ref = pixels_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          pixels_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string pixels = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPixelsBytes() {
+        java.lang.Object ref = pixels_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          pixels_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string pixels = 2;</code>
+       */
+      public Builder setPixels(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        pixels_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string pixels = 2;</code>
+       */
+      public Builder clearPixels() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        pixels_ = getDefaultInstance().getPixels();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string pixels = 2;</code>
+       */
+      public Builder setPixelsBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        pixels_ = value;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.webswing.server.model.proto.PixelsAreaResponseMsgInProto)
+    }
+
+    static {
+      defaultInstance = new PixelsAreaResponseMsgInProto(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:org.webswing.server.model.proto.PixelsAreaResponseMsgInProto)
+  }
+
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_org_webswing_server_model_proto_AppFrameMsgOutProto_descriptor;
   private static
@@ -30272,6 +32078,11 @@ public final class Webswing {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_webswing_server_model_proto_PlaybackInfoMsgProto_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_webswing_server_model_proto_PixelsAreaRequestMsgOutProto_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_webswing_server_model_proto_PixelsAreaRequestMsgOutProto_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_org_webswing_server_model_proto_InputEventsFrameMsgInProto_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -30341,6 +32152,11 @@ public final class Webswing {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_webswing_server_model_proto_PlaybackCommandMsgInProto_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_webswing_server_model_proto_PixelsAreaResponseMsgInProto_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_webswing_server_model_proto_PixelsAreaResponseMsgInProto_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -30351,7 +32167,7 @@ public final class Webswing {
   static {
     java.lang.String[] descriptorData = {
       "\n\016webswing.proto\022\037org.webswing.server.mo" +
-      "del.proto\"\352\007\n\023AppFrameMsgOutProto\022N\n\014app" +
+      "del.proto\"\300\010\n\023AppFrameMsgOutProto\022N\n\014app" +
       "lications\030\001 \003(\01328.org.webswing.server.mo" +
       "del.proto.ApplicationInfoMsgProto\022G\n\nlin" +
       "kAction\030\002 \001(\01323.org.webswing.server.mode" +
@@ -30372,151 +32188,159 @@ public final class Webswing {
       "est\030\n \001(\01329.org.webswing.server.model.pr",
       "oto.JsEvalRequestMsgOutProto\022G\n\014javaResp" +
       "onse\030\013 \001(\01321.org.webswing.server.model.p" +
-      "roto.JsResultMsgProto\022G\n\010playback\030\014 \001(\0132" +
-      "5.org.webswing.server.model.proto.Playba" +
-      "ckInfoMsgProto\022\021\n\tsessionId\030\r \001(\t\022\026\n\016sta" +
-      "rtTimestamp\030\016 \001(\t\022\025\n\rsendTimestamp\030\017 \001(\t" +
-      "\022\014\n\004ping\030\020 \001(\t\"_\n\027ApplicationInfoMsgProt" +
-      "o\022\014\n\004name\030\001 \002(\t\022\022\n\nbase64Icon\030\002 \001(\014\022\025\n\ra" +
-      "lwaysRestart\030\003 \001(\010\022\013\n\003url\030\004 \001(\t\"\275\001\n\022Link" +
-      "ActionMsgProto\022W\n\006action\030\001 \002(\0162G.org.web",
-      "swing.server.model.proto.LinkActionMsgPr" +
-      "oto.LinkActionTypeProto\022\013\n\003src\030\002 \002(\t\"A\n\023" +
-      "LinkActionTypeProto\022\010\n\004file\020\000\022\007\n\003url\020\001\022\t" +
-      "\n\005print\020\002\022\014\n\010redirect\020\003\"i\n\030WindowMoveAct" +
-      "ionMsgProto\022\n\n\002sx\030\001 \001(\021\022\n\n\002sy\030\002 \001(\021\022\n\n\002d" +
-      "x\030\003 \001(\021\022\n\n\002dy\030\004 \001(\021\022\r\n\005width\030\005 \001(\r\022\016\n\006he" +
-      "ight\030\006 \001(\r\"b\n\031CursorChangeEventMsgProto\022" +
-      "\016\n\006cursor\030\001 \002(\t\022\016\n\006b64img\030\002 \001(\014\022\t\n\001x\030\003 \001" +
-      "(\021\022\t\n\001y\030\004 \001(\021\022\017\n\007curFile\030\005 \001(\t\"Z\n\021CopyEv" +
-      "entMsgProto\022\014\n\004text\030\001 \001(\t\022\014\n\004html\030\002 \001(\t\022",
-      "\013\n\003img\030\003 \001(\014\022\r\n\005files\030\004 \003(\t\022\r\n\005other\030\005 \001" +
-      "(\010\"\314\002\n\027FileDialogEventMsgProto\022d\n\teventT" +
-      "ype\030\001 \002(\0162Q.org.webswing.server.model.pr" +
-      "oto.FileDialogEventMsgProto.FileDialogEv" +
-      "entTypeProto\022\025\n\rallowDownload\030\002 \001(\010\022\023\n\013a" +
-      "llowUpload\030\003 \001(\010\022\023\n\013allowDelete\030\004 \001(\010\022\016\n" +
-      "\006filter\030\005 \001(\t\022\030\n\020isMultiSelection\030\006 \001(\010\022" +
-      "\021\n\tselection\030\007 \001(\t\"M\n\030FileDialogEventTyp" +
-      "eProto\022\010\n\004Open\020\000\022\t\n\005Close\020\001\022\016\n\nAutoUploa" +
-      "d\020\002\022\014\n\010AutoSave\020\003\"\312\001\n\016WindowMsgProto\022\n\n\002",
-      "id\030\001 \002(\t\022N\n\007content\030\002 \003(\0132=.org.webswing" +
-      ".server.model.proto.WindowPartialContent" +
-      "MsgProto\022\022\n\ndirectDraw\030\003 \001(\014\022\r\n\005title\030\004 " +
-      "\001(\t\022\014\n\004posX\030\005 \001(\021\022\014\n\004posY\030\006 \001(\021\022\r\n\005width" +
-      "\030\007 \001(\r\022\016\n\006height\030\010 \001(\r\"z\n\034WindowPartialC" +
-      "ontentMsgProto\022\021\n\tpositionX\030\001 \001(\021\022\021\n\tpos" +
-      "itionY\030\002 \001(\021\022\r\n\005width\030\003 \001(\r\022\016\n\006height\030\004 " +
-      "\001(\r\022\025\n\rbase64Content\030\005 \001(\014\"\211\003\n\030JsEvalReq" +
-      "uestMsgOutProto\022\025\n\rcorrelationId\030\001 \001(\t\022\024" +
-      "\n\014thisObjectId\030\002 \001(\t\022^\n\004type\030\003 \001(\0162P.org",
-      ".webswing.server.model.proto.JsEvalReque" +
-      "stMsgOutProto.JsEvalRequestTypeProto\022\022\n\n" +
-      "evalString\030\004 \001(\t\022@\n\006params\030\005 \003(\01320.org.w" +
-      "ebswing.server.model.proto.JsParamMsgPro" +
-      "to\022\022\n\ngarbageIds\030\006 \003(\t\"v\n\026JsEvalRequestT" +
-      "ypeProto\022\010\n\004eval\020\000\022\010\n\004call\020\001\022\r\n\tsetMembe" +
-      "r\020\002\022\r\n\tgetMember\020\003\022\020\n\014deleteMember\020\004\022\013\n\007" +
-      "setSlot\020\005\022\013\n\007getSlot\020\006\"\366\001\n\017JsParamMsgPro" +
-      "to\022\021\n\tprimitive\030\001 \001(\t\022C\n\010jsObject\030\002 \001(\0132" +
-      "1.org.webswing.server.model.proto.JSObje",
-      "ctMsgProto\022J\n\njavaObject\030\003 \001(\01326.org.web" +
-      "swing.server.model.proto.JavaObjectRefMs" +
-      "gProto\022?\n\005array\030\004 \003(\01320.org.webswing.ser" +
-      "ver.model.proto.JsParamMsgProto\"\036\n\020JSObj" +
-      "ectMsgProto\022\n\n\002id\030\001 \001(\t\"4\n\025JavaObjectRef" +
-      "MsgProto\022\n\n\002id\030\001 \001(\t\022\017\n\007methods\030\002 \003(\t\"y\n" +
-      "\020JsResultMsgProto\022\025\n\rcorrelationId\030\001 \001(\t" +
-      "\022\r\n\005error\030\002 \001(\t\022?\n\005value\030\003 \001(\01320.org.web" +
-      "swing.server.model.proto.JsParamMsgProto" +
-      "\"6\n\024PlaybackInfoMsgProto\022\017\n\007current\030\001 \001(",
-      "\r\022\r\n\005total\030\002 \001(\r\"\354\004\n\032InputEventsFrameMsg" +
-      "InProto\022E\n\006events\030\001 \003(\01325.org.webswing.s" +
-      "erver.model.proto.InputEventMsgInProto\022D" +
-      "\n\005paste\030\002 \001(\01325.org.webswing.server.mode" +
-      "l.proto.PasteEventMsgInProto\022B\n\004copy\030\003 \001" +
-      "(\01324.org.webswing.server.model.proto.Cop" +
-      "yEventMsgInProto\022F\n\006upload\030\004 \001(\01326.org.w" +
-      "ebswing.server.model.proto.UploadEventMs" +
-      "gInProto\022O\n\010selected\030\005 \001(\0132=.org.webswin" +
-      "g.server.model.proto.FilesSelectedEventM",
-      "sgInProto\022E\n\njsResponse\030\006 \001(\01321.org.webs" +
-      "wing.server.model.proto.JsResultMsgProto" +
-      "\022O\n\013javaRequest\030\007 \001(\0132:.org.webswing.ser" +
-      "ver.model.proto.JavaEvalRequestMsgInProt" +
-      "o\022L\n\010playback\030\010 \001(\0132:.org.webswing.serve" +
-      "r.model.proto.PlaybackCommandMsgInProto\"" +
-      "\210\003\n\024InputEventMsgInProto\022Q\n\thandshake\030\001 " +
-      "\001(\0132>.org.webswing.server.model.proto.Co" +
-      "nnectionHandshakeMsgInProto\022E\n\003key\030\002 \001(\013" +
-      "28.org.webswing.server.model.proto.Keybo",
-      "ardEventMsgInProto\022D\n\005mouse\030\003 \001(\01325.org." +
+      "roto.JsResultMsgProto\022T\n\rpixelsRequest\030\014" +
+      " \001(\0132=.org.webswing.server.model.proto.P" +
+      "ixelsAreaRequestMsgOutProto\022G\n\010playback\030" +
+      "\r \001(\01325.org.webswing.server.model.proto." +
+      "PlaybackInfoMsgProto\022\021\n\tsessionId\030\016 \001(\t\022" +
+      "\026\n\016startTimestamp\030\017 \001(\t\022\025\n\rsendTimestamp" +
+      "\030\020 \001(\t\022\014\n\004ping\030\021 \001(\t\"_\n\027ApplicationInfoM" +
+      "sgProto\022\014\n\004name\030\001 \002(\t\022\022\n\nbase64Icon\030\002 \001(",
+      "\014\022\025\n\ralwaysRestart\030\003 \001(\010\022\013\n\003url\030\004 \001(\t\"\275\001" +
+      "\n\022LinkActionMsgProto\022W\n\006action\030\001 \002(\0162G.o" +
+      "rg.webswing.server.model.proto.LinkActio" +
+      "nMsgProto.LinkActionTypeProto\022\013\n\003src\030\002 \002" +
+      "(\t\"A\n\023LinkActionTypeProto\022\010\n\004file\020\000\022\007\n\003u" +
+      "rl\020\001\022\t\n\005print\020\002\022\014\n\010redirect\020\003\"i\n\030WindowM" +
+      "oveActionMsgProto\022\n\n\002sx\030\001 \001(\021\022\n\n\002sy\030\002 \001(" +
+      "\021\022\n\n\002dx\030\003 \001(\021\022\n\n\002dy\030\004 \001(\021\022\r\n\005width\030\005 \001(\r" +
+      "\022\016\n\006height\030\006 \001(\r\"b\n\031CursorChangeEventMsg" +
+      "Proto\022\016\n\006cursor\030\001 \002(\t\022\016\n\006b64img\030\002 \001(\014\022\t\n",
+      "\001x\030\003 \001(\021\022\t\n\001y\030\004 \001(\021\022\017\n\007curFile\030\005 \001(\t\"Z\n\021" +
+      "CopyEventMsgProto\022\014\n\004text\030\001 \001(\t\022\014\n\004html\030" +
+      "\002 \001(\t\022\013\n\003img\030\003 \001(\014\022\r\n\005files\030\004 \003(\t\022\r\n\005oth" +
+      "er\030\005 \001(\010\"\314\002\n\027FileDialogEventMsgProto\022d\n\t" +
+      "eventType\030\001 \002(\0162Q.org.webswing.server.mo" +
+      "del.proto.FileDialogEventMsgProto.FileDi" +
+      "alogEventTypeProto\022\025\n\rallowDownload\030\002 \001(" +
+      "\010\022\023\n\013allowUpload\030\003 \001(\010\022\023\n\013allowDelete\030\004 " +
+      "\001(\010\022\016\n\006filter\030\005 \001(\t\022\030\n\020isMultiSelection\030" +
+      "\006 \001(\010\022\021\n\tselection\030\007 \001(\t\"M\n\030FileDialogEv",
+      "entTypeProto\022\010\n\004Open\020\000\022\t\n\005Close\020\001\022\016\n\nAut" +
+      "oUpload\020\002\022\014\n\010AutoSave\020\003\"\312\001\n\016WindowMsgPro" +
+      "to\022\n\n\002id\030\001 \002(\t\022N\n\007content\030\002 \003(\0132=.org.we" +
+      "bswing.server.model.proto.WindowPartialC" +
+      "ontentMsgProto\022\022\n\ndirectDraw\030\003 \001(\014\022\r\n\005ti" +
+      "tle\030\004 \001(\t\022\014\n\004posX\030\005 \001(\021\022\014\n\004posY\030\006 \001(\021\022\r\n" +
+      "\005width\030\007 \001(\r\022\016\n\006height\030\010 \001(\r\"z\n\034WindowPa" +
+      "rtialContentMsgProto\022\021\n\tpositionX\030\001 \001(\021\022" +
+      "\021\n\tpositionY\030\002 \001(\021\022\r\n\005width\030\003 \001(\r\022\016\n\006hei" +
+      "ght\030\004 \001(\r\022\025\n\rbase64Content\030\005 \001(\014\"\211\003\n\030JsE",
+      "valRequestMsgOutProto\022\025\n\rcorrelationId\030\001" +
+      " \001(\t\022\024\n\014thisObjectId\030\002 \001(\t\022^\n\004type\030\003 \001(\016" +
+      "2P.org.webswing.server.model.proto.JsEva" +
+      "lRequestMsgOutProto.JsEvalRequestTypePro" +
+      "to\022\022\n\nevalString\030\004 \001(\t\022@\n\006params\030\005 \003(\01320" +
+      ".org.webswing.server.model.proto.JsParam" +
+      "MsgProto\022\022\n\ngarbageIds\030\006 \003(\t\"v\n\026JsEvalRe" +
+      "questTypeProto\022\010\n\004eval\020\000\022\010\n\004call\020\001\022\r\n\tse" +
+      "tMember\020\002\022\r\n\tgetMember\020\003\022\020\n\014deleteMember" +
+      "\020\004\022\013\n\007setSlot\020\005\022\013\n\007getSlot\020\006\"\366\001\n\017JsParam",
+      "MsgProto\022\021\n\tprimitive\030\001 \001(\t\022C\n\010jsObject\030" +
+      "\002 \001(\01321.org.webswing.server.model.proto." +
+      "JSObjectMsgProto\022J\n\njavaObject\030\003 \001(\01326.o" +
+      "rg.webswing.server.model.proto.JavaObjec" +
+      "tRefMsgProto\022?\n\005array\030\004 \003(\01320.org.webswi" +
+      "ng.server.model.proto.JsParamMsgProto\"\036\n" +
+      "\020JSObjectMsgProto\022\n\n\002id\030\001 \001(\t\"4\n\025JavaObj" +
+      "ectRefMsgProto\022\n\n\002id\030\001 \001(\t\022\017\n\007methods\030\002 " +
+      "\003(\t\"y\n\020JsResultMsgProto\022\025\n\rcorrelationId" +
+      "\030\001 \001(\t\022\r\n\005error\030\002 \001(\t\022?\n\005value\030\003 \001(\01320.o",
+      "rg.webswing.server.model.proto.JsParamMs" +
+      "gProto\"6\n\024PlaybackInfoMsgProto\022\017\n\007curren" +
+      "t\030\001 \001(\r\022\r\n\005total\030\002 \001(\r\"a\n\034PixelsAreaRequ" +
+      "estMsgOutProto\022\025\n\rcorrelationId\030\001 \001(\t\022\t\n" +
+      "\001x\030\002 \001(\r\022\t\n\001y\030\003 \001(\r\022\t\n\001w\030\004 \001(\r\022\t\n\001h\030\005 \001(" +
+      "\r\"\303\005\n\032InputEventsFrameMsgInProto\022E\n\006even" +
+      "ts\030\001 \003(\01325.org.webswing.server.model.pro" +
+      "to.InputEventMsgInProto\022D\n\005paste\030\002 \001(\01325" +
+      ".org.webswing.server.model.proto.PasteEv" +
+      "entMsgInProto\022B\n\004copy\030\003 \001(\01324.org.webswi",
+      "ng.server.model.proto.CopyEventMsgInProt" +
+      "o\022F\n\006upload\030\004 \001(\01326.org.webswing.server." +
+      "model.proto.UploadEventMsgInProto\022O\n\010sel" +
+      "ected\030\005 \001(\0132=.org.webswing.server.model." +
+      "proto.FilesSelectedEventMsgInProto\022E\n\njs" +
+      "Response\030\006 \001(\01321.org.webswing.server.mod" +
+      "el.proto.JsResultMsgProto\022O\n\013javaRequest" +
+      "\030\007 \001(\0132:.org.webswing.server.model.proto" +
+      ".JavaEvalRequestMsgInProto\022L\n\010playback\030\010" +
+      " \001(\0132:.org.webswing.server.model.proto.P",
+      "laybackCommandMsgInProto\022U\n\016pixelsRespon" +
+      "se\030\t \001(\0132=.org.webswing.server.model.pro" +
+      "to.PixelsAreaResponseMsgInProto\"\210\003\n\024Inpu" +
+      "tEventMsgInProto\022Q\n\thandshake\030\001 \001(\0132>.or" +
+      "g.webswing.server.model.proto.Connection" +
+      "HandshakeMsgInProto\022E\n\003key\030\002 \001(\01328.org.w" +
+      "ebswing.server.model.proto.KeyboardEvent" +
+      "MsgInProto\022D\n\005mouse\030\003 \001(\01325.org.webswing" +
+      ".server.model.proto.MouseEventMsgInProto" +
+      "\022E\n\005event\030\004 \001(\01326.org.webswing.server.mo",
+      "del.proto.SimpleEventMsgInProto\022I\n\ntimes" +
+      "tamps\030\005 \001(\01325.org.webswing.server.model." +
+      "proto.TimestampsMsgInProto\"\\\n\024Timestamps" +
+      "MsgInProto\022\026\n\016startTimestamp\030\001 \001(\t\022\025\n\rse" +
+      "ndTimestamp\030\002 \001(\t\022\025\n\rrenderingTime\030\003 \001(\t" +
+      "\"\274\002\n\035ConnectionHandshakeMsgInProto\022\020\n\010cl" +
+      "ientId\030\001 \001(\t\022\021\n\tsessionId\030\002 \001(\t\022\016\n\006viewI" +
+      "d\030\003 \001(\t\022\024\n\014desktopWidth\030\004 \001(\r\022\025\n\rdesktop" +
+      "Height\030\005 \001(\r\022\027\n\017applicationName\030\006 \001(\t\022\020\n" +
+      "\010mirrored\030\007 \001(\010\022\033\n\023directDrawSupported\030\010",
+      " \001(\010\022\024\n\014documentBase\030\t \001(\t\022>\n\006params\030\n \003" +
+      "(\0132..org.webswing.server.model.proto.Par" +
+      "amMsgProto\022\016\n\006locale\030\013 \001(\t\022\013\n\003url\030\014 \001(\t\"" +
+      ",\n\rParamMsgProto\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030" +
+      "\002 \001(\t\"\212\002\n\027KeyboardEventMsgInProto\022X\n\004typ" +
+      "e\030\001 \001(\0162J.org.webswing.server.model.prot" +
+      "o.KeyboardEventMsgInProto.KeyEventTypePr" +
+      "oto\022\021\n\tcharacter\030\002 \001(\021\022\017\n\007keycode\030\003 \001(\021\022" +
+      "\013\n\003alt\030\004 \001(\010\022\014\n\004ctrl\030\005 \001(\010\022\r\n\005shift\030\006 \001(" +
+      "\010\022\014\n\004meta\030\007 \001(\010\"9\n\021KeyEventTypeProto\022\014\n\010",
+      "keypress\020\000\022\013\n\007keydown\020\001\022\t\n\005keyup\020\002\"\322\002\n\024M" +
+      "ouseEventMsgInProto\022W\n\004type\030\001 \001(\0162I.org." +
       "webswing.server.model.proto.MouseEventMs" +
-      "gInProto\022E\n\005event\030\004 \001(\01326.org.webswing.s" +
-      "erver.model.proto.SimpleEventMsgInProto\022" +
-      "I\n\ntimestamps\030\005 \001(\01325.org.webswing.serve" +
-      "r.model.proto.TimestampsMsgInProto\"\\\n\024Ti" +
-      "mestampsMsgInProto\022\026\n\016startTimestamp\030\001 \001" +
-      "(\t\022\025\n\rsendTimestamp\030\002 \001(\t\022\025\n\rrenderingTi" +
-      "me\030\003 \001(\t\"\274\002\n\035ConnectionHandshakeMsgInPro" +
-      "to\022\020\n\010clientId\030\001 \001(\t\022\021\n\tsessionId\030\002 \001(\t\022",
-      "\016\n\006viewId\030\003 \001(\t\022\024\n\014desktopWidth\030\004 \001(\r\022\025\n" +
-      "\rdesktopHeight\030\005 \001(\r\022\027\n\017applicationName\030" +
-      "\006 \001(\t\022\020\n\010mirrored\030\007 \001(\010\022\033\n\023directDrawSup" +
-      "ported\030\010 \001(\010\022\024\n\014documentBase\030\t \001(\t\022>\n\006pa" +
-      "rams\030\n \003(\0132..org.webswing.server.model.p" +
-      "roto.ParamMsgProto\022\016\n\006locale\030\013 \001(\t\022\013\n\003ur" +
-      "l\030\014 \001(\t\",\n\rParamMsgProto\022\014\n\004name\030\001 \001(\t\022\r" +
-      "\n\005value\030\002 \001(\t\"\212\002\n\027KeyboardEventMsgInProt" +
-      "o\022X\n\004type\030\001 \001(\0162J.org.webswing.server.mo" +
-      "del.proto.KeyboardEventMsgInProto.KeyEve",
-      "ntTypeProto\022\021\n\tcharacter\030\002 \001(\021\022\017\n\007keycod" +
-      "e\030\003 \001(\021\022\013\n\003alt\030\004 \001(\010\022\014\n\004ctrl\030\005 \001(\010\022\r\n\005sh" +
-      "ift\030\006 \001(\010\022\014\n\004meta\030\007 \001(\010\"9\n\021KeyEventTypeP" +
-      "roto\022\014\n\010keypress\020\000\022\013\n\007keydown\020\001\022\t\n\005keyup" +
-      "\020\002\"\322\002\n\024MouseEventMsgInProto\022W\n\004type\030\001 \001(" +
-      "\0162I.org.webswing.server.model.proto.Mous" +
-      "eEventMsgInProto.MouseEventTypeProto\022\t\n\001" +
-      "x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\022\n\nwheelDelta\030\004 \001(\021\022\016" +
-      "\n\006button\030\005 \001(\021\022\014\n\004ctrl\030\006 \001(\010\022\013\n\003alt\030\007 \001(" +
-      "\010\022\r\n\005shift\030\010 \001(\010\022\014\n\004meta\030\t \001(\010\022\017\n\007button",
-      "s\030\n \001(\021\"^\n\023MouseEventTypeProto\022\r\n\tmousem" +
-      "ove\020\000\022\r\n\tmousedown\020\001\022\013\n\007mouseup\020\002\022\016\n\nmou" +
-      "sewheel\020\003\022\014\n\010dblclick\020\004\"\303\001\n\023CopyEventMsg" +
-      "InProto\022X\n\004type\030\001 \001(\0162J.org.webswing.ser" +
-      "ver.model.proto.CopyEventMsgInProto.Copy" +
-      "EventMsgTypeProto\022\014\n\004file\030\002 \001(\t\"D\n\025CopyE" +
-      "ventMsgTypeProto\022\010\n\004copy\020\000\022\007\n\003cut\020\001\022\030\n\024g" +
-      "etFileFromClipboard\020\002\"P\n\024PasteEventMsgIn" +
-      "Proto\022\014\n\004text\030\001 \001(\t\022\014\n\004html\030\002 \001(\t\022\013\n\003img" +
-      "\030\003 \001(\t\022\017\n\007special\030\004 \001(\010\"\204\002\n\025SimpleEventM",
-      "sgInProto\022Y\n\004type\030\001 \001(\0162K.org.webswing.s" +
-      "erver.model.proto.SimpleEventMsgInProto." +
-      "SimpleEventTypeProto\"\217\001\n\024SimpleEventType" +
-      "Proto\022\n\n\006unload\020\000\022\r\n\tkillSwing\020\001\022\014\n\010pain" +
-      "tAck\020\002\022\013\n\007repaint\020\003\022\020\n\014downloadFile\020\004\022\016\n" +
-      "\ndeleteFile\020\005\022\006\n\002hb\020\006\022\027\n\023cancelFileSelec" +
-      "tion\020\007\"-\n\034FilesSelectedEventMsgInProto\022\r" +
-      "\n\005files\030\001 \003(\t\"C\n\025UploadEventMsgInProto\022\020" +
-      "\n\010fileName\030\002 \001(\t\022\030\n\020tempFileLocation\030\003 \001" +
-      "(\t\"\226\001\n\031JavaEvalRequestMsgInProto\022\025\n\rcorr",
-      "elationId\030\001 \001(\t\022\020\n\010objectId\030\002 \001(\t\022\016\n\006met" +
-      "hod\030\003 \001(\t\022@\n\006params\030\004 \003(\01320.org.webswing" +
-      ".server.model.proto.JsParamMsgProto\"\327\001\n\031" +
-      "PlaybackCommandMsgInProto\022`\n\007command\030\001 \001" +
-      "(\0162O.org.webswing.server.model.proto.Pla" +
-      "ybackCommandMsgInProto.PlaybackCommandPr" +
-      "oto\"X\n\024PlaybackCommandProto\022\t\n\005reset\020\000\022\010" +
-      "\n\004play\020\001\022\010\n\004stop\020\002\022\010\n\004step\020\003\022\n\n\006step10\020\004" +
-      "\022\013\n\007step100\020\005*\270\002\n\026SimpleEventMsgOutProto" +
-      "\022\035\n\031applicationAlreadyRunning\020\000\022\030\n\024shutD",
-      "ownNotification\020\001\022\036\n\032tooManyClientsNotif" +
-      "ication\020\002\022\026\n\022continueOldSession\020\003\022\026\n\022con" +
-      "figurationError\020\004\022\035\n\031sessionStolenNotifi" +
-      "cation\020\005\022\026\n\022unauthorizedAccess\020\006\022\"\n\036shut" +
-      "DownAutoLogoutNotification\020\007\022\031\n\025sessionT" +
-      "imeoutWarning\020\010\022\037\n\033sessionTimedOutNotifi" +
-      "cation\020\t"
+      "gInProto.MouseEventTypeProto\022\t\n\001x\030\002 \001(\021\022" +
+      "\t\n\001y\030\003 \001(\021\022\022\n\nwheelDelta\030\004 \001(\021\022\016\n\006button" +
+      "\030\005 \001(\021\022\014\n\004ctrl\030\006 \001(\010\022\013\n\003alt\030\007 \001(\010\022\r\n\005shi" +
+      "ft\030\010 \001(\010\022\014\n\004meta\030\t \001(\010\022\017\n\007buttons\030\n \001(\021\"" +
+      "^\n\023MouseEventTypeProto\022\r\n\tmousemove\020\000\022\r\n" +
+      "\tmousedown\020\001\022\013\n\007mouseup\020\002\022\016\n\nmousewheel\020" +
+      "\003\022\014\n\010dblclick\020\004\"\303\001\n\023CopyEventMsgInProto\022",
+      "X\n\004type\030\001 \001(\0162J.org.webswing.server.mode" +
+      "l.proto.CopyEventMsgInProto.CopyEventMsg" +
+      "TypeProto\022\014\n\004file\030\002 \001(\t\"D\n\025CopyEventMsgT" +
+      "ypeProto\022\010\n\004copy\020\000\022\007\n\003cut\020\001\022\030\n\024getFileFr" +
+      "omClipboard\020\002\"P\n\024PasteEventMsgInProto\022\014\n" +
+      "\004text\030\001 \001(\t\022\014\n\004html\030\002 \001(\t\022\013\n\003img\030\003 \001(\t\022\017" +
+      "\n\007special\030\004 \001(\010\"\204\002\n\025SimpleEventMsgInProt" +
+      "o\022Y\n\004type\030\001 \001(\0162K.org.webswing.server.mo" +
+      "del.proto.SimpleEventMsgInProto.SimpleEv" +
+      "entTypeProto\"\217\001\n\024SimpleEventTypeProto\022\n\n",
+      "\006unload\020\000\022\r\n\tkillSwing\020\001\022\014\n\010paintAck\020\002\022\013" +
+      "\n\007repaint\020\003\022\020\n\014downloadFile\020\004\022\016\n\ndeleteF" +
+      "ile\020\005\022\006\n\002hb\020\006\022\027\n\023cancelFileSelection\020\007\"-" +
+      "\n\034FilesSelectedEventMsgInProto\022\r\n\005files\030" +
+      "\001 \003(\t\"C\n\025UploadEventMsgInProto\022\020\n\010fileNa" +
+      "me\030\002 \001(\t\022\030\n\020tempFileLocation\030\003 \001(\t\"\226\001\n\031J" +
+      "avaEvalRequestMsgInProto\022\025\n\rcorrelationI" +
+      "d\030\001 \001(\t\022\020\n\010objectId\030\002 \001(\t\022\016\n\006method\030\003 \001(" +
+      "\t\022@\n\006params\030\004 \003(\01320.org.webswing.server." +
+      "model.proto.JsParamMsgProto\"\327\001\n\031Playback",
+      "CommandMsgInProto\022`\n\007command\030\001 \001(\0162O.org" +
+      ".webswing.server.model.proto.PlaybackCom" +
+      "mandMsgInProto.PlaybackCommandProto\"X\n\024P" +
+      "laybackCommandProto\022\t\n\005reset\020\000\022\010\n\004play\020\001" +
+      "\022\010\n\004stop\020\002\022\010\n\004step\020\003\022\n\n\006step10\020\004\022\013\n\007step" +
+      "100\020\005\"E\n\034PixelsAreaResponseMsgInProto\022\025\n" +
+      "\rcorrelationId\030\001 \001(\t\022\016\n\006pixels\030\002 \001(\t*\270\002\n" +
+      "\026SimpleEventMsgOutProto\022\035\n\031applicationAl" +
+      "readyRunning\020\000\022\030\n\024shutDownNotification\020\001" +
+      "\022\036\n\032tooManyClientsNotification\020\002\022\026\n\022cont",
+      "inueOldSession\020\003\022\026\n\022configurationError\020\004" +
+      "\022\035\n\031sessionStolenNotification\020\005\022\026\n\022unaut" +
+      "horizedAccess\020\006\022\"\n\036shutDownAutoLogoutNot" +
+      "ification\020\007\022\031\n\025sessionTimeoutWarning\020\010\022\037" +
+      "\n\033sessionTimedOutNotification\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -30528,7 +32352,7 @@ public final class Webswing {
           internal_static_org_webswing_server_model_proto_AppFrameMsgOutProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_AppFrameMsgOutProto_descriptor,
-              new java.lang.String[] { "Applications", "LinkAction", "MoveAction", "CursorChange", "CopyEvent", "FileDialogEvent", "Windows", "ClosedWindow", "Event", "JsRequest", "JavaResponse", "Playback", "SessionId", "StartTimestamp", "SendTimestamp", "Ping", });
+              new java.lang.String[] { "Applications", "LinkAction", "MoveAction", "CursorChange", "CopyEvent", "FileDialogEvent", "Windows", "ClosedWindow", "Event", "JsRequest", "JavaResponse", "PixelsRequest", "Playback", "SessionId", "StartTimestamp", "SendTimestamp", "Ping", });
           internal_static_org_webswing_server_model_proto_ApplicationInfoMsgProto_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_org_webswing_server_model_proto_ApplicationInfoMsgProto_fieldAccessorTable = new
@@ -30613,90 +32437,102 @@ public final class Webswing {
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_PlaybackInfoMsgProto_descriptor,
               new java.lang.String[] { "Current", "Total", });
-          internal_static_org_webswing_server_model_proto_InputEventsFrameMsgInProto_descriptor =
+          internal_static_org_webswing_server_model_proto_PixelsAreaRequestMsgOutProto_descriptor =
             getDescriptor().getMessageTypes().get(15);
+          internal_static_org_webswing_server_model_proto_PixelsAreaRequestMsgOutProto_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_org_webswing_server_model_proto_PixelsAreaRequestMsgOutProto_descriptor,
+              new java.lang.String[] { "CorrelationId", "X", "Y", "W", "H", });
+          internal_static_org_webswing_server_model_proto_InputEventsFrameMsgInProto_descriptor =
+            getDescriptor().getMessageTypes().get(16);
           internal_static_org_webswing_server_model_proto_InputEventsFrameMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_InputEventsFrameMsgInProto_descriptor,
-              new java.lang.String[] { "Events", "Paste", "Copy", "Upload", "Selected", "JsResponse", "JavaRequest", "Playback", });
+              new java.lang.String[] { "Events", "Paste", "Copy", "Upload", "Selected", "JsResponse", "JavaRequest", "Playback", "PixelsResponse", });
           internal_static_org_webswing_server_model_proto_InputEventMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(16);
+            getDescriptor().getMessageTypes().get(17);
           internal_static_org_webswing_server_model_proto_InputEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_InputEventMsgInProto_descriptor,
               new java.lang.String[] { "Handshake", "Key", "Mouse", "Event", "Timestamps", });
           internal_static_org_webswing_server_model_proto_TimestampsMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(17);
+            getDescriptor().getMessageTypes().get(18);
           internal_static_org_webswing_server_model_proto_TimestampsMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_TimestampsMsgInProto_descriptor,
               new java.lang.String[] { "StartTimestamp", "SendTimestamp", "RenderingTime", });
           internal_static_org_webswing_server_model_proto_ConnectionHandshakeMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(18);
+            getDescriptor().getMessageTypes().get(19);
           internal_static_org_webswing_server_model_proto_ConnectionHandshakeMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_ConnectionHandshakeMsgInProto_descriptor,
               new java.lang.String[] { "ClientId", "SessionId", "ViewId", "DesktopWidth", "DesktopHeight", "ApplicationName", "Mirrored", "DirectDrawSupported", "DocumentBase", "Params", "Locale", "Url", });
           internal_static_org_webswing_server_model_proto_ParamMsgProto_descriptor =
-            getDescriptor().getMessageTypes().get(19);
+            getDescriptor().getMessageTypes().get(20);
           internal_static_org_webswing_server_model_proto_ParamMsgProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_ParamMsgProto_descriptor,
               new java.lang.String[] { "Name", "Value", });
           internal_static_org_webswing_server_model_proto_KeyboardEventMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(20);
+            getDescriptor().getMessageTypes().get(21);
           internal_static_org_webswing_server_model_proto_KeyboardEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_KeyboardEventMsgInProto_descriptor,
               new java.lang.String[] { "Type", "Character", "Keycode", "Alt", "Ctrl", "Shift", "Meta", });
           internal_static_org_webswing_server_model_proto_MouseEventMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(21);
+            getDescriptor().getMessageTypes().get(22);
           internal_static_org_webswing_server_model_proto_MouseEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_MouseEventMsgInProto_descriptor,
               new java.lang.String[] { "Type", "X", "Y", "WheelDelta", "Button", "Ctrl", "Alt", "Shift", "Meta", "Buttons", });
           internal_static_org_webswing_server_model_proto_CopyEventMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(22);
+            getDescriptor().getMessageTypes().get(23);
           internal_static_org_webswing_server_model_proto_CopyEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_CopyEventMsgInProto_descriptor,
               new java.lang.String[] { "Type", "File", });
           internal_static_org_webswing_server_model_proto_PasteEventMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(23);
+            getDescriptor().getMessageTypes().get(24);
           internal_static_org_webswing_server_model_proto_PasteEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_PasteEventMsgInProto_descriptor,
               new java.lang.String[] { "Text", "Html", "Img", "Special", });
           internal_static_org_webswing_server_model_proto_SimpleEventMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(24);
+            getDescriptor().getMessageTypes().get(25);
           internal_static_org_webswing_server_model_proto_SimpleEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_SimpleEventMsgInProto_descriptor,
               new java.lang.String[] { "Type", });
           internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(25);
+            getDescriptor().getMessageTypes().get(26);
           internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_FilesSelectedEventMsgInProto_descriptor,
               new java.lang.String[] { "Files", });
           internal_static_org_webswing_server_model_proto_UploadEventMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(26);
+            getDescriptor().getMessageTypes().get(27);
           internal_static_org_webswing_server_model_proto_UploadEventMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_UploadEventMsgInProto_descriptor,
               new java.lang.String[] { "FileName", "TempFileLocation", });
           internal_static_org_webswing_server_model_proto_JavaEvalRequestMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(27);
+            getDescriptor().getMessageTypes().get(28);
           internal_static_org_webswing_server_model_proto_JavaEvalRequestMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_JavaEvalRequestMsgInProto_descriptor,
               new java.lang.String[] { "CorrelationId", "ObjectId", "Method", "Params", });
           internal_static_org_webswing_server_model_proto_PlaybackCommandMsgInProto_descriptor =
-            getDescriptor().getMessageTypes().get(28);
+            getDescriptor().getMessageTypes().get(29);
           internal_static_org_webswing_server_model_proto_PlaybackCommandMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_PlaybackCommandMsgInProto_descriptor,
               new java.lang.String[] { "Command", });
+          internal_static_org_webswing_server_model_proto_PixelsAreaResponseMsgInProto_descriptor =
+            getDescriptor().getMessageTypes().get(30);
+          internal_static_org_webswing_server_model_proto_PixelsAreaResponseMsgInProto_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_org_webswing_server_model_proto_PixelsAreaResponseMsgInProto_descriptor,
+              new java.lang.String[] { "CorrelationId", "Pixels", });
           return null;
         }
       };

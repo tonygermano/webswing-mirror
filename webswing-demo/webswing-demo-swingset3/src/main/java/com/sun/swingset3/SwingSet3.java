@@ -37,15 +37,8 @@ import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.View;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Window;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
@@ -84,9 +77,11 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import com.sun.swingset3.codeview.CodeViewer;
 import com.sun.swingset3.utilities.RoundedBorder;
 import com.sun.swingset3.utilities.RoundedPanel;
+
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -308,7 +303,7 @@ public class SwingSet3 extends SingleFrameApplication {
 
 		// application framework should handle this
 		getMainFrame().setIconImage(resourceMap.getImageIcon("Application.icon").getImage());
-		
+
 		show(view);
 	}
 
@@ -430,6 +425,23 @@ public class SwingSet3 extends SingleFrameApplication {
 		sourceCodeCheckboxItem.addChangeListener(new SourceVisibilityChangeListener());
 		viewMenu.add(sourceCodeCheckboxItem);
 		menubar.add(viewMenu);
+
+		// File -> Test Robot
+		JMenuItem robotItem = new JMenuItem();
+		robotItem.setName("robot");
+		robotItem.setAction(new AbstractAction("Robot") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					sourceCodeCheckboxItem.setSelected(false);
+					new RobotDemo(getMainFrame()).start();
+				} catch (AWTException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		fileMenu.add(robotItem);
 
 		return menubar;
 	}

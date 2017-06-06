@@ -10,11 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.MsgIn;
-import org.webswing.model.c2s.CopyEventMsgIn;
-import org.webswing.model.c2s.FilesSelectedEventMsgIn;
-import org.webswing.model.c2s.InputEventMsgIn;
-import org.webswing.model.c2s.InputEventsFrameMsgIn;
-import org.webswing.model.c2s.PasteEventMsgIn;
+import org.webswing.model.c2s.*;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.model.s2c.AppFrameMsgOut;
@@ -134,6 +130,9 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 					send(r, p);
 				} else if (frame.getJavaRequest() != null) {
 					JavaEvalRequestMsgIn p = frame.getJavaRequest();
+					send(r, p);
+				} else if (frame.getPixelsResponse() != null) {
+					PixelsAreaResponseMsgIn p = frame.getPixelsResponse();
 					send(r, p);
 				}
 			} else {

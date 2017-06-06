@@ -19,6 +19,7 @@ public class AppFrameMsgOut implements MsgOut {
 	private List<WindowMsg> windows;
 	private WindowMsg closedWindow;
 	private SimpleEventMsgOut event;
+	private PixelsAreaRequestMsgOut pixelsRequest;
 	private JsEvalRequestMsgOut jsRequest;
 	private JsResultMsg javaResponse;
 	private PlaybackInfoMsg playback;
@@ -181,4 +182,11 @@ public class AppFrameMsgOut implements MsgOut {
 		this.ping = ping;
 	}
 
+	public PixelsAreaRequestMsgOut getPixelsRequest() {
+		return pixelsRequest;
+	}
+
+	public void setPixelsRequest(PixelsAreaRequestMsgOut pixelsRequest) {
+		this.pixelsRequest = pixelsRequest;
+	}
 }

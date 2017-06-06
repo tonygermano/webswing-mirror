@@ -7,6 +7,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             cfg: 'webswing.config',
             disconnect: 'webswing.disconnect',
             getSocketId: 'socket.uuid',
+            send: 'socket.send',
             getCanvas: 'canvas.get',
             registerInput: 'input.register',
             sendInput: 'input.sendInput',
@@ -242,6 +243,10 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             if (data.jsRequest != null && api.cfg.mirrorMode == false && !api.cfg.recordingPlayback) {
                 api.processJsLink(data.jsRequest);
             }
+            if (data.pixelsRequest != null && api.cfg.mirrorMode == false && !api.cfg.recordingPlayback) {
+                var pixelsResponse = getPixels(data.pixelsRequest);
+                api.send(pixelsResponse);
+            }
             if (api.cfg.canPaint) {
                 queuePaintingRequest(data);
             }
@@ -445,6 +450,23 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             }
             return {
                 handshake: handshake
+            };
+        }
+
+        function getPixels(request) {
+            var result = document.createElement("canvas");
+            result.width = request.w;
+            result.height = request.h;
+            var ctx = api.getCanvas().getContext("2d");
+            var imgData = ctx.getImageData(request.x, request.y, request.h, request.w);
+            var resctx = result.getContext("2d");
+            resctx.putImageData(imgData, 0, 0);
+            var dataurl = result.toDataURL("image/png");
+            return {
+                pixelsResponse: {
+                    correlationId: request.correlationId,
+                    pixels: dataurl
+                }
             };
         }
 

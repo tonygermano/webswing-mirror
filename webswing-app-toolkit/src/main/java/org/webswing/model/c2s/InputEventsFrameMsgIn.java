@@ -17,6 +17,7 @@ public class InputEventsFrameMsgIn implements MsgIn {
 
 	private JsResultMsg jsResponse;// java2js call return value
 	private JavaEvalRequestMsgIn javaRequest;// js2java call
+	private PixelsAreaResponseMsgIn pixelsResponse; //WebRobotPeer
 
 	public List<InputEventMsgIn> getEvents() {
 		return events;
@@ -74,4 +75,11 @@ public class InputEventsFrameMsgIn implements MsgIn {
 		this.playback = playback;
 	}
 
+	public PixelsAreaResponseMsgIn getPixelsResponse() {
+		return pixelsResponse;
+	}
+
+	public void setPixelsResponse(PixelsAreaResponseMsgIn pixelsResponse) {
+		this.pixelsResponse = pixelsResponse;
+	}
 }

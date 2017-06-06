@@ -572,8 +572,8 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		return false;
 	}
 
-	public RobotPeer createRobot(Robot paramRobot, GraphicsDevice paramGraphicsDevice) throws AWTException {
-		return null;
+	public RobotPeer createRobot(Robot robot, GraphicsDevice device) throws AWTException {
+		return new WebRobotPeer(robot,device);
 	}
 
 	public boolean isDesktopSupported() {
