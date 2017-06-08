@@ -212,7 +212,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		if (webConnection != null) {
 			synchronized (webConnection) {
 				webConnection.broadcastMessage(serialized);
-				int length = webConnection.isBinary() ? serialized.getProtoMessage().length : serialized.getJsonMessage().getBytes().length;
+				int length = serialized.getLength(webConnection.isBinary());
 				logStatValue(StatisticsLogger.OUTBOUND_SIZE_METRIC, length);
 			}
 		}

@@ -15,15 +15,16 @@ public class SummaryStats {
 	public void aggregate(Map<String, InstanceStats> instanceMap, String name, Aggregation aggregation) {
 		Set<Long> timestamps = new HashSet<>();
 		Map<Long,Number> metric = new LinkedHashMap<>();
-		for (InstanceStats instance : instanceMap.values()) {
+		ArrayList<InstanceStats> instances = new ArrayList<>(instanceMap.values());
+		for (InstanceStats instance : instances) {
 			Map<Long, Number> valueMap = instance.getStatistics().get(name);
 			if (valueMap != null) {
-				timestamps.addAll(valueMap.keySet());
+				timestamps.addAll(new ArrayList<>(valueMap.keySet()));
 			}
 		}
 		for (Long key : timestamps) {
 			List<Number> values = new ArrayList<>();
-			for (InstanceStats instance : instanceMap.values()) {
+			for (InstanceStats instance : instances) {
 				Map<Long, Number> valueMap = instance.getStatistics().get(name);
 				if (valueMap != null && valueMap.get(key)!=null) {
 					values.add(valueMap.get(key));

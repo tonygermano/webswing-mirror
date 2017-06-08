@@ -26,4 +26,13 @@ public class EncodedMessage {
 		return protoMessage;
 	}
 
+	public int getLength(boolean binary) {
+		if (binary) {
+			byte[] m = getProtoMessage();
+			return m == null ? 0 : m.length;
+		} else {
+			String m = getJsonMessage();
+			return m == null ? 0 : m.getBytes().length;
+		}
+	}
 }
