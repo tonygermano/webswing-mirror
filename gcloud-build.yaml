@@ -1,7 +1,7 @@
 steps:
 - name: 'maven:3.3'
   entrypoint: '/bin/sh'
-  args: ['-c','apt-get update && apt-get install -y openjfx && mvn -B -Pbuild,release install']
+  args: ['-c','apt-get update && apt-get install -y openjfx && rm -rf $(ls -A /workspace) && git clone https://bitbucket.org/meszarv/webswing.git /workspace && mvn -B -Pbuild,release install']
 #Save the build result to cloud
 - name: 'gcr.io/cloud-builders/gsutil'
   entrypoint: '/bin/sh'
