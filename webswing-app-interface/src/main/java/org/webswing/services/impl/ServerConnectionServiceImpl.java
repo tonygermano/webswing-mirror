@@ -18,6 +18,7 @@ import org.webswing.toolkit.util.Util;
 import javax.jms.*;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.IllegalStateException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -166,6 +167,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					return null;
 				}
 			}).get();
+		} catch (IllegalStateException e) {
+			Logger.warn("ServerConnectionService.sendJmsMessage: "+ e.getMessage());
 		} catch (InterruptedException e) {
 		} catch (ExecutionException e) {
 			if (e.getCause() instanceof JMSException) {
@@ -220,6 +223,9 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	}
 
 	public void onMessage(Message msg) {
+		if(Util.getWebToolkit().getEventDispatcher()==null){//ignore events if WebToolkit is not ready yet
+			return;
+		}
 		try {
 			lastMessageTimestamp = System.currentTimeMillis();
 			if (msg instanceof ObjectMessage) {
