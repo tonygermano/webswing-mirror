@@ -10,15 +10,16 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class InstanceStats {
 	private DateFormat format = new SimpleDateFormat("HH:mm:ss");
-	private Map<String, Map<Long, Number>> statisticsLog = new HashMap<>();
-	private Map<String, Long> lastTimestampMap = new HashMap<String, Long>();
-	private Map<String, List<Number>> lastTimestampNumbers = new HashMap<String, List<Number>>();
-	private Map<String, Number> lastMetrics = new HashMap<>();
-	private Map<String, String> warnings = new HashMap<>();
-	private Map<String, String> warningHistory = new HashMap<>();
+	private Map<String, Map<Long, Number>> statisticsLog = new ConcurrentHashMap<>();
+	private Map<String, Long> lastTimestampMap = new ConcurrentHashMap<String, Long>();
+	private Map<String, List<Number>> lastTimestampNumbers = new ConcurrentHashMap<String, List<Number>>();
+	private Map<String, Number> lastMetrics = new ConcurrentHashMap<>();
+	private Map<String, String> warnings = new ConcurrentHashMap<>();
+	private Map<String, String> warningHistory = new ConcurrentHashMap<>();
 
 	public void processMetric(MetricRule rule, String name, Number value, WarningRule warnRule) {
 		//round timestamp to interval milis
