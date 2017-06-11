@@ -3,6 +3,7 @@ package org.webswing.server.services.security.modules.saml2;
 import main.Main;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -19,9 +20,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.cert.CertificateException;
 
 public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2SecurityModuleConfig> {
 	private static final Logger log = LoggerFactory.getLogger(Saml2SecurityModule.class);
@@ -62,12 +69,35 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 			if (StringUtils.isEmpty(entityId)) {
 				throw new RuntimeException("The SAML2 Service provider entityId property must not be empty.");
 			}
+			String keyStore = getConfig().getContext().replaceVariables(getConfig().getDecryptionKeyStore());
+			PrivateKey privateKey = null;
+			if (StringUtils.isNotEmpty(keyStore)) {
+				File keyStoreFile = getConfig().getContext().resolveFile(keyStore);
+				if (file == null || !file.exists()) {
+					log.error("Failed to load keystore.", new Exception(keyStore + " does not exits."));
+				} else {
+					String ext = FilenameUtils.getExtension(keyStoreFile.getName());
+					String fileType = "p12".equals(ext) ? "PKCS12" : "JKS";
+					String keyStoreAlias = getConfig().getContext().replaceVariables(getConfig().getDecryptionKeyAlias());
+					String keyStorePwd = getConfig().getContext().replaceVariables(getConfig().getDecryptionKeyStorePwd());
+					String keyPwd = getConfig().getContext().replaceVariables(getConfig().getDecryptionKeyPwd());
+					try {
+						KeyStore store = loadKeyStore(keyStoreFile, keyStorePwd, fileType);
+						privateKey = (PrivateKey) store.getKey(keyStoreAlias, null == keyPwd ? null : keyPwd.toCharArray());
+					} catch (Exception e) {
+						log.error("Failed to load private key from keystore", e);
+					}
+				}
+			}
 			IdPConfig idpConfig = new IdPConfig(file);
 			try {
 				String spTemplate = IOUtils.toString(this.getClass().getClassLoader().getResourceAsStream("saml2/saml2-sp-template.xml"));
 				spTemplate = spTemplate.replace("${entityID}", entityId);
 				spTemplate = spTemplate.replace("${consumerUrl}", consumerUrl);
 				SPConfig spConfig = new SPConfig(new ByteArrayInputStream(spTemplate.getBytes("UTF-8")));
+				if (privateKey != null) {
+					spConfig.setPrivateKey(privateKey);
+				}
 				client = new SAMLClient(spConfig, idpConfig);
 			} catch (IOException e) {
 				throw new SAMLException("The SAML2 template file could not be loaded.", e);
@@ -147,4 +177,18 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 		logoutRedirect(request, response, logoutUrl);
 	}
 
+	public static KeyStore loadKeyStore(final File keystoreFile, final String password, final String keyStoreType) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+		final URL keystoreUrl = keystoreFile.toURI().toURL();
+		final KeyStore keystore = KeyStore.getInstance(keyStoreType);
+		InputStream is = null;
+		try {
+			is = keystoreUrl.openStream();
+			keystore.load(is, null == password ? null : password.toCharArray());
+		} finally {
+			if (null != is) {
+				is.close();
+			}
+		}
+		return keystore;
+	}
 }
