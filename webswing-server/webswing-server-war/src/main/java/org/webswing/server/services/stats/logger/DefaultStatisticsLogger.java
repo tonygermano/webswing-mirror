@@ -45,8 +45,10 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 
 	@Override
 	public void log(String instance, String name, Number value) {
-		log.trace("{},{},{}", new Object[] { instance, name, value });
-		processMetric(instance, name, value);
+		if (value != null) {
+			log.trace("{},{},{}", new Object[] { instance, name, value });
+			processMetric(instance, name, value);
+		}
 	}
 
 	public void processMetric(String instance, String name, Number value) {
@@ -118,7 +120,7 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public List<String> getInstanceWarningHistory(String instance) {
 		InstanceStats stats = instanceMap.get(instance);
