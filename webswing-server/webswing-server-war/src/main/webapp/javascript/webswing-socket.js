@@ -173,6 +173,8 @@ define(['atmosphere', 'ProtoBuf','jquery', 'text!webswing.proto'], function amdF
                 } else {
                     console.log("message is not an object " + message);
                 }
+            }else{
+                api.showDialog(api.disconnectedDialog);
             }
         }
 
