@@ -215,6 +215,9 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		}
 
 		this.desktopProperties.put("DnD.gestureMotionThreshold", 2);
+		this.desktopProperties.put("DnD.Autoscroll.initialDelay", 100);
+		this.desktopProperties.put("DnD.Autoscroll.interval", 100);
+		this.desktopProperties.put("DnD.Autoscroll.cursorHysteresis", 10);
 		this.desktopProperties.put("awt.dynamicLayoutSupported", true);
 		this.desktopProperties.put("awt.file.showAttribCol", false);
 		this.desktopProperties.put("awt.file.showHiddenFiles", false);
