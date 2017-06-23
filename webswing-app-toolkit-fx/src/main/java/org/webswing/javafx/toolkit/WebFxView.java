@@ -166,6 +166,9 @@ public class WebFxView extends View {
 					}
 				} else {
 					eventHandler.handleMouseEvent(this, time, type, button, e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), modifiers, e.isPopupTrigger(), false);
+					if (button == com.sun.glass.events.MouseEvent.BUTTON_RIGHT && type == com.sun.glass.events.MouseEvent.DOWN) {
+						eventHandler.handleMenuEvent(this, e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), false);
+					}
 					if (WebFxDnD.dragStarted.get()) {//drag initiated by this event
 						notifyDragStart(button, e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen());
 					}
