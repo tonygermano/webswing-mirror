@@ -37,7 +37,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	private static final Logger log = LoggerFactory.getLogger(WebSocketService.class);
-	private static final String WEBSOCKET_MESSAGE_SIZE = System.getProperty(Constants.WEBSOCKET_MESSAGE_SIZE, "32768");
+	private static final String WEBSOCKET_MESSAGE_SIZE = System.getProperty(Constants.WEBSOCKET_MESSAGE_SIZE, "65536");
 	private static final String WEBSOCKET_THREADPOOL_SIZE = System.getProperty(Constants.WEBSOCKET_THREAD_POOL, "10");
 	private static final Class<?>[] jsonInterceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, TrackMessageSizeInterceptor.class, SuspendTrackerInterceptor.class };
 	private static final Class<?>[] binaryInterceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, SuspendTrackerInterceptor.class };
@@ -61,7 +61,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	public void start() throws WsInitException {
 
 		Map<String, String> initParams = new HashMap<String, String>();
-		initParams.put("org.atmosphere.websocket.bufferSize", WEBSOCKET_MESSAGE_SIZE);
+		//initParams.put("org.atmosphere.websocket.bufferSize", WEBSOCKET_MESSAGE_SIZE);
 		initParams.put("org.atmosphere.websocket.maxTextMessageSize", WEBSOCKET_MESSAGE_SIZE);
 		initParams.put("org.atmosphere.websocket.maxBinaryMessageSize", WEBSOCKET_MESSAGE_SIZE);
 		initParams.put("org.atmosphere.cpr.broadcaster.maxProcessingThreads", WEBSOCKET_THREADPOOL_SIZE);
