@@ -7,7 +7,6 @@ public class ApplicationInfoMsg implements Msg, Comparable<ApplicationInfoMsg> {
 	private String name;
 	private String url;
 	private byte[] base64Icon;
-	private boolean alwaysRestart;
 
 	public String getName() {
 		return name;
@@ -31,14 +30,6 @@ public class ApplicationInfoMsg implements Msg, Comparable<ApplicationInfoMsg> {
 			return name.toLowerCase().compareTo(o.getName().toLowerCase());
 		}
 		return 0;
-	}
-
-	public void setAlwaysRestart(boolean b) {
-		alwaysRestart = b;
-	}
-
-	public boolean isAlwaysRestart() {
-		return alwaysRestart;
 	}
 
 	public String getUrl() {

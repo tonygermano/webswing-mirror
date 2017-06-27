@@ -62,10 +62,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         var windowImageHolders = {};
         var directDraw = new WebswingDirectDraw({});
 
-        function startApplication(name, alwaysReset) {
-            if (alwaysReset === true) {
-                api.disposeIdentity();
-            }
+        function startApplication(name) {
             initialize(api.getUser() + api.getIdentity() + name, name, false);
         }
 
@@ -195,7 +192,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                 if (api.cfg.mirror) {
                     startMirrorView(api.cfg.clientId, api.cfg.applicationName);
                 } else if (data.applications.length === 1) {
-                    startApplication(data.applications[0].name, data.applications[0].alwaysRestart);
+                    startApplication(data.applications[0].name);
                 }
                 return;
             }

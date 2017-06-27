@@ -8,6 +8,7 @@ import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
+import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.model.admin.ApplicationInfo;
 import org.webswing.server.common.model.admin.InstanceManagerStatus;
 import org.webswing.server.common.model.admin.Sessions;
@@ -87,7 +88,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	public void connectView(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
 		try {
 			checkAuthorization();
-			if(!isEnabled()){
+			if (!isEnabled()) {
 				throw new WsException("This application is disabled.");
 			}
 		} catch (WsException e1) {
@@ -196,7 +197,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		}
 		ApplicationInfoMsg app = new ApplicationInfoMsg();
 		app.setName(getSwingConfig().getName());
-		app.setAlwaysRestart(getSwingConfig().getSwingSessionTimeout() == 0);
 		app.setUrl(getFullPathMapping());
 		File icon = resolveFile(getConfig().getIcon());
 		app.setBase64Icon(CommonUtil.loadImage(icon));
