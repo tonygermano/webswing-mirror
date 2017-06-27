@@ -12,9 +12,10 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
             global = window[name] = {
                 scan: scanForInstances,
                 bootstrap: bootstrap,
-                utils: util
+                utils: util,
+                $: $
             };
-            scanForInstances(window[name]);
+            scanForInstances(window);
         } else {
             scanForInstances(window);
         }

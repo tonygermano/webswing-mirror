@@ -75,6 +75,7 @@ public interface Constants {
 	public static final String SWING_SCREEN_HEIGHT = "webswing.screenHeight";
 	public static final int SWING_SCREEN_WIDTH_MIN = 300;
 	public static final int SWING_SCREEN_HEIGHT_MIN = 300;
+	public static final String SWING_SCREEN_VALIDATION_DISABLED = "webswing.disableWindowPositionValidation";
 
 	//webswing configuration variables
 	public static final String USER_NAME_SUBSTITUTE = "user";
@@ -95,4 +96,5 @@ public interface Constants {
 	public static final String EXTENSTION_INITIALIZER = "webswing.extensionInitializer";
 	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
 	public static final String CONFIG_PROVIDER = "webswing.configProvider";
+
 }

@@ -97,6 +97,8 @@ public class ConfigUtil {
 									return convertNumberToTargetClass((Number) value, method.getReturnType());
 								}
 								return value;
+							} else if (ClassUtils.isAssignable(value.getClass(), Number.class, true) && ClassUtils.isAssignable(method.getReturnType(), Number.class, true)) {
+								return convertNumberToTargetClass((Number) value, method.getReturnType());
 							} else if (value instanceof Map && method.getReturnType().isInterface() && !Collection.class.isAssignableFrom(method.getReturnType())) {
 								return instantiateConfig((Map) value, method.getReturnType(), context);
 							} else if (value instanceof String && method.getReturnType().isEnum()) {

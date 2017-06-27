@@ -11,6 +11,7 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.peer.WindowPeer;
 
+import org.webswing.Constants;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Util;
 
@@ -87,6 +88,10 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 	}
 
 	protected Point validate(int x, int y, int w, int h) {
+		if (Boolean.getBoolean(Constants.SWING_SCREEN_VALIDATION_DISABLED)) {
+			return new Point(x, y);
+		}
+
 		Point result = new Point(x, y);
 		if (w == 0 && h == 0) {
 			return result;

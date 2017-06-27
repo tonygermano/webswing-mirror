@@ -111,11 +111,52 @@ public class ConfigurationMetadataTest {
 	}
 
 	@Test
-	public void testNumberTypeGenerator() throws Exception {
+	public void testNumberType() throws Exception {
+		//inteter
+		TestDefaultConfig c = numConfig(99, "i");
+		assertTrue(c.getI() == 99);
+		c = numConfig(99, "integer");
+		assertTrue(c.getInteger() == 99);
+		//double
+		c = numConfig(99.99, "d");
+		assertTrue(c.getD() == 99.99);
+		c = numConfig(99.99, "double");
+		assertTrue(c.getDouble() == 99.99);
+		//float
+		c = numConfig(99.99f, "f");
+		assertTrue(c.getF() == 99.99f);
+		c = numConfig(99.99f, "float");
+		assertTrue(c.getFloat() == 99.99f);
+
+		//int->double
+		c = numConfig(99, "d");
+		assertTrue(c.getD() == 99);
+		c = numConfig(99, "double");
+		assertTrue(c.getDouble() == 99);
+
+		//double->int
+		c = numConfig(99.99d, "i");
+		assertTrue(c.getI() == 99);
+		c = numConfig(99.99d, "integer");
+		assertTrue(c.getInteger() == 99);
+
+		//double->float
+		c = numConfig(99.99d, "f");
+		assertTrue(c.getF() == 99.99f);
+		c = numConfig(99.99d, "float");
+		assertTrue(c.getFloat() == 99.99f);
+
+		//float->double
+		c = numConfig(99.99f, "d");
+		assertTrue(c.getD() == 99.99f);
+		c = numConfig(99.99f, "double");
+		assertTrue(c.getDouble() == 99.99f);
+	}
+
+	private TestDefaultConfig numConfig(Number input, String field) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("uploadMaxSize", new Integer(1));
-		SwingConfig c = ConfigUtil.instantiateConfig(map, SwingConfig.class);
-		assertTrue(c.getUploadMaxSize() == 1);
+		map.put(field, input);
+		return ConfigUtil.instantiateConfig(map, TestDefaultConfig.class);
 	}
 
 	@ConfigFieldOrder({ "table", "string" })
@@ -171,12 +212,12 @@ public class ConfigurationMetadataTest {
 		Object getObjectNull();
 
 	}
-	
+
 	@ConfigFieldOrder({ "object", "string" })
 	public static interface EmbededConfig extends Config {
 		@ConfigField
 		Object getObject();
-		
+
 		@ConfigField
 		String getString();
 
