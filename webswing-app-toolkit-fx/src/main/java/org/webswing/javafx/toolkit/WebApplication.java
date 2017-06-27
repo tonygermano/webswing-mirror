@@ -33,8 +33,8 @@ public class WebApplication extends Application {
 
 	@Override
 	protected void runLoop(Runnable launchable) {
-		invokeLater(launchable);
 		setEventThread(AWTAccessor.getEventQueueAccessor().getDispatchThread(Toolkit.getDefaultToolkit().getSystemEventQueue()));
+		invokeLater(launchable);
 	}
 
 	@Override
