@@ -223,9 +223,6 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	}
 
 	public void onMessage(Message msg) {
-		if(Util.getWebToolkit().getEventDispatcher()==null){//ignore events if WebToolkit is not ready yet
-			return;
-		}
 		try {
 			lastMessageTimestamp = System.currentTimeMillis();
 			if (msg instanceof ObjectMessage) {
@@ -254,7 +251,9 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					if (omsg.getObject() instanceof UserInputMsgIn) {
 						lastUserInputTimestamp = System.currentTimeMillis();
 					}
-					Util.getWebToolkit().getEventDispatcher().dispatchEvent((MsgIn) omsg.getObject());
+					if(Util.getWebToolkit().getEventDispatcher()!=null){//ignore events if WebToolkit is not ready yet
+						Util.getWebToolkit().getEventDispatcher().dispatchEvent((MsgIn) omsg.getObject());
+					}
 				} else if (omsg.getObject() instanceof ApiEventMsgInternal) {
 					Util.getWebToolkit().processApiEvent((ApiEventMsgInternal) omsg.getObject());
 				}
