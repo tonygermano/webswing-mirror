@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 public interface WebSocketUrlHandler extends UrlHandler, WebSocketMessageListener {
 
 	default boolean serveDefault(HttpServletRequest req, HttpServletResponse res, PrimaryUrlHandler parent, WebSocketService websocket, Logger log) throws WsException {
-		if (!"websocket".equals(req.getHeader("Upgrade")) || parent.isSameOrigin(req) || parent.isOriginAllowed(req.getHeader("Origin"))) {
+		if (parent.isSameOrigin(req) || parent.isOriginAllowed(req.getHeader("Origin"))) {
 			if (parent.validateCsrfToken(req)) {
 				try {
 					websocket.serve(this, req, res);
