@@ -32,9 +32,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,6 +49,23 @@ public class WebEventDispatcher {
 
 	//these keycodes are assigned to different keys in browser  
 	private static final List<Integer> nonStandardKeyCodes = Arrays.asList(KeyEvent.VK_KP_DOWN, KeyEvent.VK_KP_UP, KeyEvent.VK_KP_RIGHT, KeyEvent.VK_KP_LEFT);
+	private static final Map<Integer, Integer> convertedKeyCodes = new HashMap<Integer, Integer>();
+
+	static {
+		convertedKeyCodes.put(45, 155);//	Insert
+		convertedKeyCodes.put(46, 127);//	Delete
+		convertedKeyCodes.put(189, 45);//	Minus
+		convertedKeyCodes.put(187, 61);//	Equals
+		convertedKeyCodes.put(219, 91);//	Open Bracket
+		convertedKeyCodes.put(221, 93);//	Close Bracket
+		convertedKeyCodes.put(186, 59);//	Semicolon
+		convertedKeyCodes.put(220, 92);//	Back Slash
+		convertedKeyCodes.put(226, 92);//	Back Slash
+		convertedKeyCodes.put(188, 44);//	Comma
+		convertedKeyCodes.put(190, 46);//	Period
+		convertedKeyCodes.put(191, 47);//	Slash
+	}
+
 	protected static final String WebswingApiImpl = null;
 	public static final long doubleClickMaxDelay = Long.getLong(Constants.SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY, 750);
 
@@ -170,9 +185,10 @@ public class WebEventDispatcher {
 			if (event.getKeycode() == 13) {// enter keycode
 				event.setKeycode(10);
 				character = 10;
-			} else if (event.getKeycode() == 46 && type != KeyEvent.KEY_TYPED) {// delete keycode
-				event.setKeycode(127);
-				character = 127;
+			} else if (convertedKeyCodes.containsKey(event.getKeycode()) && type != KeyEvent.KEY_TYPED) {
+				int converted = convertedKeyCodes.get(event.getKeycode());
+				event.setKeycode(converted);
+				character = (char) converted;
 			} else if (nonStandardKeyCodes.contains(event.getKeycode())) {
 				event.setKeycode(0);
 			}
