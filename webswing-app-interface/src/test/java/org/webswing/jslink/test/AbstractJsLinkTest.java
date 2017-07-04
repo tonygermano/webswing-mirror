@@ -73,6 +73,11 @@ public abstract class AbstractJsLinkTest {
 			public void resetInactivityTimers() {
 
 			}
+
+			@Override
+			public void messageApiPublish(Serializable o) throws IOException {
+
+			}
 		};
 		Services.initialize(null, null, serverServiceImpl, null, null, jsLinkServiceImpl);
 

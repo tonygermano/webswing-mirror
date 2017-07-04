@@ -79,6 +79,7 @@ import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.TrayIconPeer;
 import java.awt.peer.WindowPeer;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
@@ -92,7 +93,7 @@ import org.webswing.Constants;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.Msg;
-import org.webswing.model.internal.ApiEventMsgInternal;
+import org.webswing.toolkit.api.WebswingMessagingApi;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingApiProvider;
 import org.webswing.toolkit.extra.WindowManager;
@@ -113,9 +114,11 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	private WebEventDispatcher eventDispatcher;
 	private WebPaintDispatcher paintDispatcher;
-	private WebswingApiImpl api = new WebswingApiImpl();;
+	private WebswingApiImpl api = new WebswingApiImpl();
+	private WebswingMessagingApiImpl msgapi = new WebswingMessagingApiImpl();
 
 	private WindowManager windowManager = WindowManager.getInstance();
+	private ClassLoader swingClassLoader;
 
 	public void init() {
 		try {
@@ -576,7 +579,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	}
 
 	public RobotPeer createRobot(Robot robot, GraphicsDevice device) throws AWTException {
-		return new WebRobotPeer(robot,device);
+		return new WebRobotPeer(robot, device);
 	}
 
 	public boolean isDesktopSupported() {
@@ -709,16 +712,37 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	}
 
 	@Override
-	public WebswingApi get() {
+	public WebswingApi getApi() {
 		return api;
+	}
+
+	@Override
+	public WebswingMessagingApi getMessagingApi() {
+		return msgapi;
 	}
 
 	public void processApiEvent(Msg event) {
 		api.processEvent(event);
 	}
 
+	public boolean messageApiHasListenerForClass(String msgtype) {
+		return msgapi.hasListenerForClass(msgtype);
+	}
+
+	public void messageApiProcessMessage(Serializable object) {
+		msgapi.processMessage(object);
+	}
+
 	@Override
 	public Cursor createCustomCursor(Image cursor, Point hotSpot, String name) throws IndexOutOfBoundsException, HeadlessException {
 		return new WebCursor(cursor, hotSpot, name);
+	}
+
+	public void setSwingClassLoader(ClassLoader swingClassLoader) {
+		this.swingClassLoader = swingClassLoader;
+	}
+
+	public ClassLoader getSwingClassLoader() {
+		return swingClassLoader;
 	}
 }

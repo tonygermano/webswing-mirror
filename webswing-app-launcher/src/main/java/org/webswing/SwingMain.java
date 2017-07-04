@@ -80,6 +80,7 @@ public class SwingMain {
 	}
 
 	private static void setupContextClassLoader(ClassLoader swingClassLoader) {
+		Util.getWebToolkit().setSwingClassLoader(swingLibClassLoader);
 		Thread.currentThread().setContextClassLoader(swingClassLoader);
 		try {
 			EventQueue q = Toolkit.getDefaultToolkit().getSystemEventQueue();

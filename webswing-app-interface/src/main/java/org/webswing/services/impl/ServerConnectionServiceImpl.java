@@ -30,6 +30,8 @@ import java.util.concurrent.*;
  */
 public class ServerConnectionServiceImpl implements MessageListener, ServerConnectionService {
 
+	public static final String MSG_API_SHARED_TOPIC = "msgApiSharedTopic";
+	public static final String MSG_API_TYPE = "type";
 	private static ServerConnectionServiceImpl impl;
 	private static ActiveMQConnectionFactory connectionFactory;
 	private static long syncTimeout = Long.getLong(Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT, 3000);
@@ -46,6 +48,9 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 	private Map<String, Object> syncCallResposeMap = new ConcurrentHashMap<String, Object>();
 	private boolean closed;
+
+	private MessageProducer mgsApiProducer;
+	private MessageConsumer mgsApiConsumer;
 
 	public static ServerConnectionServiceImpl getInstance() {
 		if (impl == null) {
@@ -108,22 +113,38 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			producer = session.createProducer(producerDest);
 			consumer = session.createConsumer(consumerDest);
 			consumer.setMessageListener(this);
+
+			final Topic msgApisharedTopic = session.createTopic(MSG_API_SHARED_TOPIC);
+			mgsApiProducer = session.createProducer(msgApisharedTopic);
+			mgsApiConsumer = session.createConsumer(msgApisharedTopic);
+			mgsApiConsumer.setMessageListener(new MessageListener() {
+				@Override
+				public void onMessage(Message message) {
+					try {
+						String msgtype = message.getStringProperty(MSG_API_TYPE);
+						if(msgtype!=null && Util.getWebToolkit().messageApiHasListenerForClass(msgtype)){
+							Util.getWebToolkit().messageApiProcessMessage(((ObjectMessage)message).getObject());
+						}
+					} catch (Exception e) {
+						Logger.error("Failed to process message",e);
+					}
+				}
+			});
+
 			connection.setExceptionListener(new ExceptionListener() {
 
 				@Override
 				public void onException(JMSException paramJMSException) {
 					Logger.warn("JMS clien connection error: " + paramJMSException.getMessage());
 					try {
-						producer.close();
-						consumer.close();
-						session.close();
-						connection.close();
+						closeJMS();
 					} catch (JMSException e) {
 						// do nothing, will try to reinitialize.
 					}
 					ServerConnectionServiceImpl.this.initialize();
 				}
 			});
+
 		} catch (JMSException e) {
 			Logger.error("Exiting application because could not connect to JMS:" + e.getMessage(), e);
 			System.exit(1);
@@ -138,12 +159,20 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		exitScheduler.scheduleWithFixedDelay(watchdog, 1, 1, TimeUnit.SECONDS);
 	}
 
+	public void messageApiPublish(Serializable o) throws IOException {
+		try {
+			Message m = session.createObjectMessage(o);
+			m.setStringProperty(MSG_API_TYPE, o.getClass().getCanonicalName());
+			mgsApiProducer.send(m);
+		} catch (Exception e) {
+			Logger.error("Failed to send message: ", e);
+			throw new IOException("Failed to send message: " + e.getMessage());
+		}
+	}
+
 	public synchronized void disconnect() {
 		try {
-			producer.close();
-			consumer.close();
-			session.close();
-			connection.close();
+			closeJMS();
 		} catch (JMSException e) {
 			Logger.info("Disconnecting from JMS server failed.", e.getMessage());
 		} finally {
@@ -151,10 +180,19 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		}
 	}
 
+	private void closeJMS() throws JMSException {
+		producer.close();
+		consumer.close();
+		mgsApiProducer.close();
+		mgsApiConsumer.close();
+		session.close();
+		connection.close();
+	}
+
 	@Override
 	public void resetInactivityTimers() {
-		lastMessageTimestamp=System.currentTimeMillis();
-		lastUserInputTimestamp=System.currentTimeMillis();
+		lastMessageTimestamp = System.currentTimeMillis();
+		lastUserInputTimestamp = System.currentTimeMillis();
 	}
 
 	private void sendJmsMessage(final Serializable o) throws JMSException {
@@ -168,7 +206,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 				}
 			}).get();
 		} catch (IllegalStateException e) {
-			Logger.warn("ServerConnectionService.sendJmsMessage: "+ e.getMessage());
+			Logger.warn("ServerConnectionService.sendJmsMessage: " + e.getMessage());
 		} catch (InterruptedException e) {
 		} catch (ExecutionException e) {
 			if (e.getCause() instanceof JMSException) {
@@ -251,7 +289,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					if (omsg.getObject() instanceof UserInputMsgIn) {
 						lastUserInputTimestamp = System.currentTimeMillis();
 					}
-					if(Util.getWebToolkit().getEventDispatcher()!=null){//ignore events if WebToolkit is not ready yet
+					if (Util.getWebToolkit().getEventDispatcher() != null) {//ignore events if WebToolkit is not ready yet
 						Util.getWebToolkit().getEventDispatcher().dispatchEvent((MsgIn) omsg.getObject());
 					}
 				} else if (omsg.getObject() instanceof ApiEventMsgInternal) {

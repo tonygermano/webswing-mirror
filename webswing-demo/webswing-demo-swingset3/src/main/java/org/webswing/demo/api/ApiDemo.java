@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -23,6 +24,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.webswing.toolkit.api.WebswingApiException;
 import org.webswing.toolkit.api.WebswingUtil;
 import org.webswing.toolkit.api.lifecycle.WebswingShutdownListener;
+import org.webswing.toolkit.api.messaging.WebswingMessage;
+import org.webswing.toolkit.api.messaging.WebswingMessageListener;
+import org.webswing.toolkit.api.messaging.WebswingTopic;
 import org.webswing.toolkit.api.security.UserEvent;
 import org.webswing.toolkit.api.security.WebswingUser;
 import org.webswing.toolkit.api.security.WebswingUserListener;
@@ -31,6 +35,8 @@ import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.utilities.RoundedBorder;
 import com.sun.swingset3.utilities.RoundedPanel;
 import com.sun.swingset3.utilities.Utilities;
+
+import static sun.security.pkcs.PKCS8Key.version;
 
 @DemoProperties(value = "Webswing API", category = "Webswing", description = "Demonstrates Websiwng API.", sourceFiles = { "org/webswing/demo/api/ApiDemo.java" })
 public class ApiDemo extends JPanel {
@@ -80,7 +86,7 @@ public class ApiDemo extends JPanel {
 			infopanel.add(hasRoleButton);
 			JButton isPermittedButton = new JButton("primaryUserIsPermitted(permission)");
 			isPermittedButton.addActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					String permission = JOptionPane.showInputDialog("Permission:");
@@ -95,7 +101,7 @@ public class ApiDemo extends JPanel {
 					} catch (WebswingApiException e1) {
 						displayErrorMessage("failed to resolve permission:", e1);
 					}
-					
+
 				}
 			});
 			infopanel.add(isPermittedButton);
@@ -110,7 +116,7 @@ public class ApiDemo extends JPanel {
 			infopanel.add(exitButton);
 			JButton versionButton = new JButton("getWebswingVersion()");
 			versionButton.addActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					String version = WebswingUtil.getWebswingApi().getWebswingVersion();
@@ -122,6 +128,21 @@ public class ApiDemo extends JPanel {
 				}
 			});
 			infopanel.add(versionButton);
+			JButton messageApiBtn = new JButton("publish Message");
+			messageApiBtn.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					WebswingTopic<TestMsg> topic = WebswingUtil.getWebswingMessagingApi().getSharedTopic(TestMsg.class);
+					try {
+						topic.publish(new TestMsg("Msg from " + System.getProperty("webswing.clientId")));
+					} catch (IOException e1) {
+						displayErrorMessage("Failed to publish message to all sessions", e1);
+					}
+
+				}
+			});
+			infopanel.add(messageApiBtn);
 			infopanel.setBorder(BorderFactory.createTitledBorder("Webswing API Demonstration."));
 			add(BorderLayout.EAST, infopanel);
 			final JTextArea text = new JTextArea(50, 20);
@@ -150,9 +171,17 @@ public class ApiDemo extends JPanel {
 
 				}
 			});
-			
-			WebswingUtil.getWebswingApi().addShutdownListener(new  WebswingShutdownListener() {
-				
+
+			WebswingTopic<TestMsg> topic = WebswingUtil.getWebswingMessagingApi().getSharedTopic(TestMsg.class);
+			topic.subscribe(new WebswingMessageListener<TestMsg>() {
+				@Override
+				public void onMessage(WebswingMessage<TestMsg> message) {
+					text.append(System.getProperty("webswing.clientId") + " received: " + message.getMessage().getMessage());
+				}
+			});
+
+			WebswingUtil.getWebswingApi().addShutdownListener(new WebswingShutdownListener() {
+
 				@Override
 				public void onShutdown() {
 					text.append("onShutdown():faking my death.\n");
@@ -174,9 +203,9 @@ public class ApiDemo extends JPanel {
 
 		StringWriter writer = new StringWriter();
 		for (Object m : message) {
-			if(m instanceof String){
-				writer.write((String)m);
-			}else{
+			if (m instanceof String) {
+				writer.write((String) m);
+			} else {
 				writer.write(ReflectionToStringBuilder.toString(m, ToStringStyle.MULTI_LINE_STYLE));
 			}
 			writer.write("\n\n");
