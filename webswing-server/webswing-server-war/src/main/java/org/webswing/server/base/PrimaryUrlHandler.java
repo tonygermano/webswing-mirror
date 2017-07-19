@@ -89,6 +89,13 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 			if (!new File(getHome()).getAbsoluteFile().isDirectory()) {//check if home dir exists
 				throw new WsInitException("Home Folder '" + new File(getHome()).getAbsolutePath() + "'does not exist!");
 			}
+			try {
+				if (securityModule != null) {
+					securityModule.destroy();
+				}
+			} catch (Exception e) {
+				log.error("Failed to destroy Security module for " + path + ".", e);
+			}
 			securityModule = securityModuleService.create(this, securityConfig);
 			if (securityModule != null) {
 				securityModule.init();
@@ -103,6 +110,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 
 	public synchronized void disable() {
 		status.setStatus(Status.Stopping);
+		enabled = false;
 		try {
 			killAll();
 			if (securityModule != null) {
@@ -110,7 +118,6 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 			}
 		} finally {
 			this.securityModule = securityModuleService.createNoAccess(null, this, null);//no access until real SM is initialized
-			enabled = false;
 		}
 		status.setStatus(Status.Stopped);
 	}
