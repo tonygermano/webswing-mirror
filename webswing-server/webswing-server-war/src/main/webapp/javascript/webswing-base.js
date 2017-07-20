@@ -215,9 +215,12 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                     continueSession();
                     var oldBarContent = api.dialogBarContent();
                     api.showDialogBar(api.continueOldSessionDialog);
+                    api.dialogBarContent().focused = false;
                     window.setTimeout(function () {
-                        api.hideDialogBar();
-                        api.showDialogBar(oldBarContent);
+                        if (!api.dialogBarContent().focused) {
+                            api.hideDialogBar();
+                            api.showDialogBar(oldBarContent);
+                        }
                     }, 5000);
                 } else if (data.event == "sessionStolenNotification") {
                     api.cfg.canPaint = false;

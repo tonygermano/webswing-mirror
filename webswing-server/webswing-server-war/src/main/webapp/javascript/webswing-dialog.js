@@ -46,19 +46,24 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
                 stoppedDialog: finalMessageDialog('dialog.stoppedDialog'),
                 timedoutDialog: finalMessageDialog('dialog.timedoutDialog'),
                 continueOldSessionDialog: {
-                    content: '<p>${dialog.continueC}</p>',
-                    buttons: [{
-                        label: '<span class="ws-icon-certificate"></class> ${dialog.continueB1}',
-                        action: function () {
+                    header: '<span class="ws-message--neutral"><span class="ws-icon-info"></span> ${dialog.continueH} <span data-id="dialogHide" class="ws-icon-cancel-circled ws-right"></span></span>',
+                    content: '<p data-id="continueMsgFirst">${dialog.continueC1}<a href="javascript:void(0)" data-id="optionsLink" class="ws-right">${dialog.continueC2}</a></p>'
+                    + '<div data-id="continueMsgSecond" style="display:none;"><p>${dialog.continueC3}</p>'
+                    + '<button data-id="restartButton" class="ws-btn"><span class="ws-icon-certificate"></span> ${dialog.continueB1}</button><span> </span>'
+                    + '<button data-id="cancelButton" class="ws-btn"><span class="ws-icon-cancel-circled"></span>  ${dialog.continueB2}</button><span> </span></div>',
+                    events: {
+                        'restartButton_click':  function () {
                             api.kill();
                             api.newSession();
+                        },
+                        'cancelButton_click': hideBar,
+                        'dialogHide_click':hideBar,
+                        'optionsLink_click': function(){
+                            currentContentBar.focused=true;
+                            $('p[data-id="continueMsgFirst"]').hide();
+                            $('div[data-id="continueMsgSecond"]').show();
                         }
-                    }, {
-                        label: '<span class="ws-icon-cancel-circled"></span>  ${dialog.continueB2}',
-                        action: function () {
-                            hideBar();
-                        }
-                    }]
+                    }
                 },
                 longPollingWarningDialog: {
                     header: '<span class="ws-message--warning"><span class="ws-icon-warn"></span> ${dialog.longPollingH}</span>',
