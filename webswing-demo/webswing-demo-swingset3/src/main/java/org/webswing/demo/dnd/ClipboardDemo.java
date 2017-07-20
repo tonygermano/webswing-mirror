@@ -23,23 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -89,7 +75,7 @@ public class ClipboardDemo extends JPanel {
 				if (WebswingUtil.isWebswing()) {
 					WebswingUrlState state = WebswingUtil.getWebswingApi().getUrlState();
 					state.getParameters().put("row", i + "");
-					WebswingUtil.getWebswingApi().setUrlState(state,false);
+					WebswingUtil.getWebswingApi().setUrlState(state, false);
 				}
 			}
 		});
@@ -133,6 +119,9 @@ public class ClipboardDemo extends JPanel {
 		pm.add(new CopyAction(clipboardTable));
 		pm.add(new PasteAction(clipboardTable));
 		pm.add(new CutAction(clipboardTable));
+		pm.add(new PasteSpecialAction(clipboardTable));
+		pm.add(new PasteFromBrowserAction(clipboardTable));
+		pm.add(new CopyToBrowserAction(clipboardTable));
 		clipboardTable.addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -185,7 +174,7 @@ public class ClipboardDemo extends JPanel {
 
 	private void setSelectionFromPath() {
 		WebswingUrlState state = WebswingUtil.getWebswingApi().getUrlState();
-		if (state!=null && state.getPath()!=null && state.getPath().equals("Clipboard")) {
+		if (state != null && state.getPath() != null && state.getPath().equals("Clipboard")) {
 			String r = state.getParameters().get("row");
 			if (r != null) {
 				try {
@@ -379,6 +368,25 @@ public class ClipboardDemo extends JPanel {
 
 	}
 
+	class CopyToBrowserAction extends AbstractAction {
+
+		private JTable table;
+
+		public CopyToBrowserAction(JTable table) {
+			this.table = table;
+			putValue(NAME, "Copy to Browser");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			int row = table.getSelectedRow();
+			Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+			cb.setContents(new RowTransferable(getRowData(table, row)), null);
+			WebswingUtil.getWebswingApi().sendClipboard();
+		}
+
+	}
+
 	class CutAction extends AbstractAction {
 
 		private JTable table;
@@ -461,7 +469,7 @@ public class ClipboardDemo extends JPanel {
 
 		public PasteSpecialAction(JTable tbl) {
 
-			putValue(NAME, "PasteSpecial(tostring)");
+			putValue(NAME, "Paste Special (tostring)");
 			table = tbl;
 		}
 
@@ -499,7 +507,41 @@ public class ClipboardDemo extends JPanel {
 			}
 			model.addRow(value);
 		}
+	}
 
+	class PasteFromBrowserAction extends AbstractAction {
+
+		private JTable table;
+
+		public PasteFromBrowserAction(JTable tbl) {
+			putValue(NAME, "Paste from Browser");
+			table = tbl;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			final JDialog pasteDialog = new JDialog((JFrame) null, true);
+			JPanel panel = new JPanel();
+			panel.setFocusable(true);
+			panel.add(new JLabel("Press CTRL+V to send local clipboard."));
+			pasteDialog.getContentPane().add(panel);
+			KeyStroke paste = KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK, false);
+			panel.registerKeyboardAction(new PasteAction(table) {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						Toolkit.getDefaultToolkit().getSystemClipboard().setContents(WebswingUtil.getWebswingApi().getBrowserClipboard(), null);
+						super.actionPerformed(e);
+					} finally {
+						pasteDialog.setVisible(false);
+					}
+				}
+			}, "Paste Browser", paste, JComponent.WHEN_FOCUSED);
+			pasteDialog.pack();
+			pasteDialog.setLocationRelativeTo(null);  // *** this will center your app ***
+			pasteDialog.setVisible(true);
+			panel.requestFocus();
+		}
 	}
 
 	public static class RowTransferable implements Transferable {

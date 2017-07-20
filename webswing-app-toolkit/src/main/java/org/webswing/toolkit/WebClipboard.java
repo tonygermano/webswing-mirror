@@ -1,6 +1,7 @@
 package org.webswing.toolkit;
 
 import org.webswing.Constants;
+import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
@@ -19,6 +20,7 @@ import java.util.List;
 
 public class WebClipboard extends Clipboard {
 	private static DataFlavor htmlDf;
+
 	static {
 
 		try {
@@ -27,6 +29,7 @@ public class WebClipboard extends Clipboard {
 			Logger.error("initialization error:", e);
 		}
 	}
+
 	public final static DataFlavor HTML_FLAVOR = htmlDf;
 
 	private final boolean isSystemClipboard;
@@ -36,6 +39,7 @@ public class WebClipboard extends Clipboard {
 		public void lostOwnership(Clipboard clipboard, Transferable contents) {
 		}
 	};
+	private WebClipboardTransferable browserClipboard;
 
 	public WebClipboard(String name, boolean isSystemClipboard) {
 		super(name);
@@ -52,75 +56,72 @@ public class WebClipboard extends Clipboard {
 	@Override
 	public synchronized void setContents(Transferable contents, ClipboardOwner owner) {
 		super.setContents(contents, owner);
-		if (isSystemClipboard) {
-			String html = null;
-			String text = null;
-			byte[] img = null;
-			List<String> files = null;
-			boolean other = false;
+		if (isSystemClipboard && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD)) {
+			WebswingClipboardData data = toWebswingClipboardData(contents);
+			Util.getWebToolkit().getPaintDispatcher().notifyCopyEvent(data);
+		}
+	}
 
-			if (contents.isDataFlavorSupported(HTML_FLAVOR)) {
-				try {
-					Object transferData = contents.getTransferData(HTML_FLAVOR);
-					html = transferData.toString();
-				} catch (Exception e) {
-					Logger.error("WebClipboard:setContent:HTML", e);
-				}
-			}
+	public static WebswingClipboardData toWebswingClipboardData(Transferable contents) {
+		WebswingClipboardData data = new WebswingClipboardData();
 
-			if (contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-				try {
-					text = (String) contents.getTransferData(DataFlavor.stringFlavor);
-				} catch (Exception e) {
-					Logger.error("WebClipboard:setContent:Plain", e);
-				}
+		if (contents.isDataFlavorSupported(HTML_FLAVOR)) {
+			try {
+				Object transferData = contents.getTransferData(HTML_FLAVOR);
+				data.setHtml(transferData.toString());
+			} catch (Exception e) {
+				Logger.error("WebClipboard:setContent:HTML", e);
 			}
-			if (contents.isDataFlavorSupported(DataFlavor.imageFlavor)) {
-				try {
-					Image image = (Image) contents.getTransferData(DataFlavor.imageFlavor);
-					if (image != null) {
-						BufferedImage result = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-						Graphics g = result.getGraphics();
-						g.drawImage(image, 0, 0, null);
-						g.dispose();
-						img = Services.getImageService().getPngImage(result);
-					}
-				} catch (Exception e) {
-					Logger.error("WebClipboard:setContent:Image", e);
-				}
+		}
+
+		if (contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+			try {
+				data.setText((String) contents.getTransferData(DataFlavor.stringFlavor));
+			} catch (Exception e) {
+				Logger.error("WebClipboard:setContent:Plain", e);
 			}
-			if (contents.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-				try {
-					List<?> fileList = (List<?>) contents.getTransferData(DataFlavor.javaFileListFlavor);
-					if (fileList != null) {
-						files = new ArrayList<String>();
-						for (Object o : fileList) {
-							if (o instanceof File) {
-								File f = (File) o;
-								if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD)) {
-									if (f.exists() && f.canRead() && !f.isDirectory()) {
-										files.add(f.getAbsolutePath());
-									} else {
-										files.add("#" + f.getAbsolutePath());
-									}
+		}
+		if (contents.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+			try {
+				Image image = (Image) contents.getTransferData(DataFlavor.imageFlavor);
+				if (image != null) {
+					BufferedImage result = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+					Graphics g = result.getGraphics();
+					g.drawImage(image, 0, 0, null);
+					g.dispose();
+					data.setImg(Services.getImageService().getPngImage(result));
+				}
+			} catch (Exception e) {
+				Logger.error("WebClipboard:setContent:Image", e);
+			}
+		}
+		if (contents.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+			try {
+				List<?> fileList = (List<?>) contents.getTransferData(DataFlavor.javaFileListFlavor);
+				if (fileList != null) {
+					ArrayList<String> files = new ArrayList<String>();
+					for (Object o : fileList) {
+						if (o instanceof File) {
+							File f = (File) o;
+							if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD)) {
+								if (f.exists() && f.canRead() && !f.isDirectory()) {
+									files.add(f.getAbsolutePath());
 								} else {
-									files.add("#Downloading not allowed.");
-									break;
+									files.add("#" + f.getAbsolutePath());
 								}
+							} else {
+								files.add("#Downloading not allowed.");
+								break;
 							}
 						}
 					}
-				} catch (Exception e) {
-					Logger.error("WebClipboard:setContent:Files", e);
+					data.setFiles(files);
 				}
+			} catch (Exception e) {
+				Logger.error("WebClipboard:setContent:Files", e);
 			}
-			List<DataFlavor> flavors = new ArrayList<DataFlavor>(Arrays.asList(contents.getTransferDataFlavors()));
-			flavors.removeAll(Arrays.asList(HTML_FLAVOR, DataFlavor.stringFlavor, DataFlavor.imageFlavor, DataFlavor.javaFileListFlavor));
-			if (flavors.size() > 0) {
-				other = true;
-			}
-			Util.getWebToolkit().getPaintDispatcher().notifyCopyEvent(text, html, img, files, other);
 		}
+		return data;
 	}
 
 	private boolean stringFlavorsEquals(Transferable a, Transferable b) {
@@ -137,5 +138,13 @@ public class WebClipboard extends Clipboard {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	public void setBrowserClipboard(WebClipboardTransferable browserClipboard) {
+		this.browserClipboard = browserClipboard;
+	}
+
+	public WebClipboardTransferable getBrowserClipboard() {
+		return browserClipboard;
 	}
 }

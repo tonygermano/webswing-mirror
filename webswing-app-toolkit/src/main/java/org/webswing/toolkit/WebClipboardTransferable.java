@@ -6,9 +6,10 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 
 import org.webswing.model.c2s.PasteEventMsgIn;
+import org.webswing.toolkit.api.clipboard.BrowserTransferable;
 import org.webswing.toolkit.util.Services;
 
-public class WebClipboardTransferable implements Transferable {
+public class WebClipboardTransferable implements BrowserTransferable {
 
 	private Image image;
 	private String text;
@@ -59,5 +60,17 @@ public class WebClipboardTransferable implements Transferable {
 
 	public DataFlavor[] getTransferDataFlavors() {
 		return new DataFlavor[] { DataFlavor.imageFlavor, DataFlavor.stringFlavor, WebClipboard.HTML_FLAVOR };
+	}
+
+	public Image getImage() {
+		return image;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public String getHtml() {
+		return html;
 	}
 }

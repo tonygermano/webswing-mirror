@@ -22,6 +22,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_TRANSPARENT_FILE_SAVE = "webswing.transparentFileSave";
 	public static final String SWING_START_SYS_PROP_ALLOW_DELETE = "webswing.allowDelete";
 	public static final String SWING_START_SYS_PROP_ALLOW_JSLINK = "webswing.allowJsLink";
+	public static final String SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD = "webswing.allowLocalClipboard";
 	public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutSec";
 	public static final String SWING_SESSION_TIMEOUT_IF_INACTIVE = "webswing.sessionTimeoutIfInactive";
 	public static final String SWING_START_SYS_PROP_SYNC_TIMEOUT = "webswing.syncCallTimeout";

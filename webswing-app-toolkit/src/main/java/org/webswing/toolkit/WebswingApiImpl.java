@@ -1,5 +1,8 @@
 package org.webswing.toolkit;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.Transferable;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -9,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.webswing.Constants;
+import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.Msg;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.internal.ApiCallMsgInternal;
@@ -17,6 +21,8 @@ import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.model.internal.ApiEventMsgInternal.ApiEventType;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingApiException;
+import org.webswing.toolkit.api.clipboard.BrowserTransferable;
+import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.api.lifecycle.WebswingShutdownListener;
 import org.webswing.toolkit.api.security.UserEvent;
 import org.webswing.toolkit.api.security.WebswingUser;
@@ -327,6 +333,38 @@ public class WebswingApiImpl implements WebswingApi {
 	public void removeUrlStateChangeListener(WebswingUrlStateChangeListener listener) {
 		if (listener != null) {
 			urlStateChangeListeners.remove(listener);
+		}
+	}
+
+	@Override
+	public BrowserTransferable getBrowserClipboard() {
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		if (clipboard instanceof WebClipboard) {
+			return ((WebClipboard) clipboard).getBrowserClipboard();
+		}
+		return null;
+	}
+
+	@Override
+	public void sendClipboard(WebswingClipboardData content) {
+		if (content != null) {
+			WebPaintDispatcher paintDispatcher = Util.getWebToolkit().getPaintDispatcher();
+			if (paintDispatcher != null) {
+				paintDispatcher.notifyCopyEvent(content);
+			}
+		}
+	}
+
+	@Override
+	public void sendClipboard() {
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		Transferable transferable = clipboard.getContents(null);
+		WebswingClipboardData content = WebClipboard.toWebswingClipboardData(transferable);
+		if (content != null) {
+			WebPaintDispatcher paintDispatcher = Util.getWebToolkit().getPaintDispatcher();
+			if (paintDispatcher != null) {
+				paintDispatcher.notifyCopyEvent(content);
+			}
 		}
 	}
 

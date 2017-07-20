@@ -357,8 +357,9 @@ public class WebEventDispatcher {
 			@Override
 			public void run() {
 				WebClipboardTransferable transferable = new WebClipboardTransferable(paste);
-				if (!transferable.isEmpty()) {
-					WebClipboard wc = (WebClipboard) Util.getWebToolkit().getSystemClipboard();
+				WebClipboard wc = (WebClipboard) Util.getWebToolkit().getSystemClipboard();
+				wc.setBrowserClipboard(transferable);
+				if (!transferable.isEmpty() && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD)) {
 					wc.setContents(transferable);
 				}
 				WebEventDispatcher.this.dispatchPasteEvent(paste.isSpecial());

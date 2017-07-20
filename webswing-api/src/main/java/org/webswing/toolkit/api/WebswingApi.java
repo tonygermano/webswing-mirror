@@ -1,5 +1,7 @@
 package org.webswing.toolkit.api;
 
+import org.webswing.toolkit.api.clipboard.BrowserTransferable;
+import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.api.lifecycle.WebswingShutdownListener;
 import org.webswing.toolkit.api.security.WebswingUser;
 import org.webswing.toolkit.api.security.WebswingUserListener;
@@ -126,5 +128,39 @@ public interface WebswingApi {
 	 * Note2: This method has no effect if session timeout is set to 0
 	 */
 	public void resetInactivityTimeout();
+
+	/**
+	 * Clipboard data received from browser after CTRL+V or CTRL+SHIFT+V key events (browser security allows access to clipboard only in these events).
+	 * <br>
+	 * Typically used for customized clipboard integration, while the built-in integration is disabled in configuration ("allowLocalClipboard" is false).
+	 * <br>
+	 * Example use case:
+	 * <br>
+	 * 1.Create new context menu item "Paste from browser", that will open a modal dialog asking user to press CTRL+V.
+	 * <br>
+	 * 2.Listen for CTRL+V keystroke. When received, call this method to get the clipboard content.
+	 *
+	 * @return Latest clipboard content received from browser
+	 */
+	public BrowserTransferable getBrowserClipboard();
+
+	/**
+	 * Sends the specified data to browser.
+	 * <br>
+	 * A toolbar will appear in browser displaying the data. User can click or press CTRL+C to store the content to local clipboard.
+	 * <br>
+	 * Typically used for customized clipboard integration, while the built-in integration is disabled in configuration ("allowLocalClipboard" is false).
+	 * @param content clipboard data to be sent to browser
+	 */
+	public void sendClipboard(WebswingClipboardData content);
+
+	/**
+	 * Sends the current Swing clipboard content to browser.
+	 * <br>
+	 * A toolbar will appear in browser displaying the data. User can click or press CTRL+C to store the content to local clipboard.
+	 * <br>
+	 * Typically used for customized clipboard integration, while the built-in integration is disabled in configuration ("allowLocalClipboard" is false).
+	 */
+	public void sendClipboard();
 
 }

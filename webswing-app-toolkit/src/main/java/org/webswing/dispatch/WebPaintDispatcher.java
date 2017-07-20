@@ -9,6 +9,7 @@ import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
 import org.webswing.toolkit.WebCursor;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
+import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.DeamonThreadFactory;
@@ -359,10 +360,10 @@ public class WebPaintDispatcher {
 		}
 	}
 
-	public void notifyCopyEvent(String content, String html, byte[] img, List<String> files, boolean other) {
+	public void notifyCopyEvent(WebswingClipboardData data) {
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		CopyEventMsg copyEvent;
-		copyEvent = new CopyEventMsg(content, html, img, files, other);
+		copyEvent = new CopyEventMsg(data.getText(), data.getHtml(), data.getImg(), data.getFiles(), false);
 		f.setCopyEvent(copyEvent);
 		Logger.debug("WebPaintDispatcher:notifyCopyEvent", f);
 		Services.getConnectionService().sendObject(f);

@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs", "allowUpload", "allowDelete",
-		"allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs", "allowUpload",
+		"allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink","allowLocalClipboard" })
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
@@ -163,9 +163,13 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.Features, label = "Domains Allowed to Embed", description = "If you are embedding webswing to page on different domain, you have to enable Cross-origin resource sharing (CORS) by adding the domain in this list. Use * to allow all domains.")
 	public List<String> getAllowedCorsOrigins();
 
-	@ConfigField(tab = ConfigGroup.Features, label = "Allow JsLink", description = "If selected, the JSLink feature will be enabled, allowing application to invoke javascript and vice versa. (See netscape.javascript.JSObject)")
+	@ConfigField(tab = ConfigGroup.Features, label = "Allow JsLink", description = "If enabled, the JSLink feature will be enabled, allowing application to invoke javascript and vice versa. (See netscape.javascript.JSObject)")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowJsLink();
+
+	@ConfigField(tab = ConfigGroup.Features, label = "Allow Local Clipboard", description = "Enables built-in integration of client's local clipboard. Due to browser security limitations clipboard toolbar is displayed.")
+	@ConfigFieldDefaultValueBoolean(true)
+	boolean isAllowLocalClipboard();
 
 	public static class SwingConfigurationMetadataGenerator extends MetadataGenerator<SwingConfig> {
 		@Override
