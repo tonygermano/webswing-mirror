@@ -281,7 +281,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                 if (data.linkAction.action == 'url') {
                     api.openLink(data.linkAction.src);
                 } else if (data.linkAction.action == 'print') {
-                    api.print(encodeURIComponent(location.pathname + 'file?id=' + data.linkAction.src));
+                    api.print('file?id=' + data.linkAction.src);
                 } else if (data.linkAction.action == 'file') {
                     api.download('file?id=' + data.linkAction.src);
                 } else if (data.linkAction.action == 'redirect' && !api.cfg.mirrorMode) {

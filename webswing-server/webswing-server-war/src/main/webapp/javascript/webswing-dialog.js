@@ -20,7 +20,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
             content: configuration(),
             currentBar: currentBar,
             showBar: showBar,
-            hideBar: hideBar,
+            hideBar: hideBar
         };
 
         var currentContent;

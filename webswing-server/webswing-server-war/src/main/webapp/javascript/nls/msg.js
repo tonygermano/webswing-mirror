@@ -34,7 +34,7 @@ define({
         "dialog.stoppedDialog": "The application has been closed.",
         "dialog.timedoutDialog": "The session has timed out.",
         "dialog.continueH": "Welcome back!",
-        "dialog.continueC1": "You can continue working in your previous session.",
+        "dialog.continueC1": "You can continue working where you left off.",
         "dialog.continueC2": "Options...",
         "dialog.continueC3": "Restart Application?",
         "dialog.continueB1": "Restart",
