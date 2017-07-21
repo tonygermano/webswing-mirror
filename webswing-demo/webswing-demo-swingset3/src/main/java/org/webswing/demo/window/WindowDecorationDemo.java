@@ -1,32 +1,18 @@
 package org.webswing.demo.window;
 
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Point;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JWindow;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.text.JTextComponent;
 
 import com.sun.swingset3.DemoProperties;
 
@@ -55,7 +41,51 @@ public class WindowDecorationDemo extends JPanel {
 		info.add(new JLabel("Parent:" + getID(parent)));
 		info.add(new JLabel("Modal:" + (owner instanceof JDialog ? ((JDialog) owner).isModal() : "false")));
 		info.add(new JLabel("Always on top:" + (owner == null ? "N" : owner.isAlwaysOnTop())));
+		final JTextField fld_1=new JTextField();
+		JTextField fld_2=new JTextField();
+		fld_1.setColumns(5);
+		fld_2.setColumns(5);
+		fld_1.setInputVerifier(new InputVerifier() {
+			@Override
+			public boolean verify(JComponent jc) {
+				return ((JTextComponent)jc).getText().startsWith("S");
+			}
 
+			@Override
+			public boolean shouldYieldFocus(JComponent jc) {
+				if (verify(jc))
+					return true;
+				boolean inputOK = showLov();
+				if (inputOK){
+					return true;
+				}
+				javax.swing.JTextField source=(javax.swing.JTextField)jc;
+				source.selectAll();
+				java.awt.Toolkit.getDefaultToolkit().beep();
+				return false;
+			}
+			private boolean showLov(){
+				String ok="set def value and go to next field";
+				String stop="stop navigation";
+				List<Object> options = new ArrayList<Object>();
+				Object defaultOption;
+				options.add(ok);
+				options.add(stop);
+				defaultOption = ok;
+				int answer = JOptionPane.showOptionDialog(null, "msg", "title", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options.toArray(), defaultOption);
+				if (answer<0)
+					return false;
+				if (options.get(answer).equals(ok)){
+					fld_1.setText("S-OK");
+					return true;
+				}
+				return false;
+			}
+		});
+
+
+		info.add(fld_1);
+		info.add(fld_2);
 		if (owner == null) {
 			parentCB.setSelected(false);
 		}

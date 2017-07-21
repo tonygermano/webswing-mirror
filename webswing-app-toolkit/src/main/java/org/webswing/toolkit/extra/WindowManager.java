@@ -48,7 +48,7 @@ public class WindowManager {
 		synchronized (Util.getWebToolkit().getTreeLock()) {
 			synchronized (WebPaintDispatcher.webPaintLock) {
 				//dont do anything if window is disabled
-				if(w!=null && !w.isEnabled()){
+				if (w != null && !w.isEnabled()) {
 					return;
 				}
 				if ((w == null || w.isFocusableWindow()) && activeWindow != w) {
@@ -117,23 +117,23 @@ public class WindowManager {
 		}
 
 		//if active window is in modal branch and requested window is not modalExclude type 
-		if( zorder.isInModalBranch(activeWindow) && !(w instanceof sun.awt.ModalExclude)) {
+		if (zorder.isInModalBranch(activeWindow) && !(w instanceof sun.awt.ModalExclude)) {
 			// if fullModal (not document_modal) branch
-			if(zorder.isInFullModalBranch(activeWindow)){
+			if (zorder.isInFullModalBranch(activeWindow)) {
 				//don't allow activation outside modal dialog ancestor's tree 
 				if (!(isModal(w) && newWindow) && !zorder.isInSameModalBranch(activeWindow, w)) {
 					return false;
-				}	
-			}else{//if in document_modal branch
+				}
+			} else {//if in document_modal branch
 				//don't allow activation in same window branch
-				if(zorder.isParent(w, activeWindow)){
+				if (zorder.isParent(w, activeWindow)) {
 					return false;
 				}
 			}
 		}
 
 		//dont allow activation of disabled windows
-		if(!w.isEnabled()){
+		if (!w.isEnabled()) {
 			return false;
 		}
 
@@ -169,9 +169,15 @@ public class WindowManager {
 		return (w instanceof Dialog) && ((Dialog) w).isModal();
 	}
 
-	public void activateWindow(Window w, int x, int y) {
-		Component newFocusOwner = w.getMostRecentFocusOwner();
-		activateWindow(w, newFocusOwner, x, y, false, true, CausedFocusEvent.Cause.NATIVE_SYSTEM);
+	public void activateWindow(final Window w, final int x, final int y) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				Component newFocusOwner = w.getMostRecentFocusOwner();
+				activateWindow(w, newFocusOwner, x, y, false, true, CausedFocusEvent.Cause.NATIVE_SYSTEM);
+			}
+		});
+
 	}
 
 	public Window getVisibleWindowOnPosition(int x, int y) {
