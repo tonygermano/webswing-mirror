@@ -1,6 +1,7 @@
 package org.webswing.toolkit.extra;
 
 import org.webswing.Constants;
+import org.webswing.toolkit.util.Logger;
 import sun.awt.shell.ShellFolder;
 import sun.awt.shell.ShellFolder.Invoker;
 import sun.awt.shell.Win32ShellFolderManager2;
@@ -54,21 +55,40 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 	@Override
 	public Object get(String paramString) {
 		if (paramString.equals("fileChooserDefaultFolder")) {
-			return root;
+			return ensureExists(root);
 		}
 		if (paramString.equals("roots")) {
-			return roots.toArray(new File[roots.size()]);
+			return ensureExists(roots.toArray(new File[roots.size()]));
 		}
 		if (paramString.equals("fileChooserComboBoxFolders")) {
-			return roots.toArray(new File[roots.size()]);
+			return ensureExists(roots.toArray(new File[roots.size()]));
 		}
 		if (paramString.equals("fileChooserShortcutPanelFolders")) {
-			return roots.toArray(new File[roots.size()]);
+			return ensureExists(roots.toArray(new File[roots.size()]));
 		}
 		if (paramString.startsWith("fileChooserIcon ") || paramString.startsWith("optionPaneIcon ") || paramString.startsWith("shell32Icon ")) {
 			return super.get(paramString);
 		}
 		return null;
+	}
+
+	private File[] ensureExists(File[] roots) {
+		for (File f : roots) {
+			ensureExists(f);
+		}
+		return roots;
+	}
+
+	private File ensureExists(File f) {
+		if (!f.getAbsoluteFile().exists()) {
+			boolean done = f.mkdirs();
+			if (done) {
+				Logger.error("Isolated filesystem folder " + f.getAbsolutePath() + "not found. Make sure the folder is unique for each session (use ${user} variable) or disable the 'Clear Upload Folder' option in configuration.");
+			} else {
+				Logger.error("Isolated filesystem folder " + f.getAbsolutePath() + " could not be created. Make sure the path is valid and the process has write access.");
+			}
+		}
+		return f;
 	}
 
 	@Override
