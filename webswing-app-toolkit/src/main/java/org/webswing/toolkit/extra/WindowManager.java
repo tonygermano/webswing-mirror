@@ -170,14 +170,7 @@ public class WindowManager {
 	}
 
 	public void activateWindow(final Window w, final int x, final int y) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				Component newFocusOwner = w.getMostRecentFocusOwner();
-				activateWindow(w, newFocusOwner, x, y, false, true, CausedFocusEvent.Cause.NATIVE_SYSTEM);
-			}
-		});
-
+		activateWindow(w, null, x, y, false, true, CausedFocusEvent.Cause.NATIVE_SYSTEM);
 	}
 
 	public Window getVisibleWindowOnPosition(int x, int y) {
