@@ -76,7 +76,7 @@ public class Main {
 			Properties p = new Properties(System.getProperties());
 			p.load(propFile);
 			// set the system properties
-			System.setProperties(p);
+			System.getProperties().putAll(p);
 		} catch (Exception e) {
 			//file does not exist, do nothing
 		}
