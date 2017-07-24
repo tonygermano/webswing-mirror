@@ -7,6 +7,7 @@ import org.webswing.javafx.toolkit.adaper.JWindowAdapter;
 import org.webswing.javafx.toolkit.adaper.WindowAdapter;
 import org.webswing.javafx.toolkit.util.WebFxUtil;
 
+import javax.swing.SwingUtilities;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -52,7 +53,6 @@ public class WebWindow extends Window {
 		} else {
 			w = new JFrameAdapter(titled);
 		}
-
 
 		w.addComponentListener(new ComponentAdapter() {
 			@Override
@@ -142,6 +142,7 @@ public class WebWindow extends Window {
 			WebFxView wv = (WebFxView) view;
 			wv.canvas.setSize(getContentBounds().getSize());
 			w.getContentPane().add(wv.canvas);
+			SwingUtilities.invokeLater(() -> wv.canvas.requestFocus());
 		}
 		return true;
 	}

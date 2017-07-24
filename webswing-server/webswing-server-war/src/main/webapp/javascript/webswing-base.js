@@ -52,7 +52,8 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             kill: kill,
             handshake: handshake,
             processMessage: processMessage,
-            dispose: dispose
+            dispose: dispose,
+            repaint: repaint
         };
 
         var timer1, timer3;
