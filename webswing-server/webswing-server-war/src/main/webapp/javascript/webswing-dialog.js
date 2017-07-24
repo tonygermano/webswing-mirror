@@ -46,22 +46,19 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
                 stoppedDialog: finalMessageDialog('dialog.stoppedDialog'),
                 timedoutDialog: finalMessageDialog('dialog.timedoutDialog'),
                 continueOldSessionDialog: {
-                    header: '<span class="ws-message--neutral"><span class="ws-icon-info"></span> ${dialog.continueH} <span data-id="dialogHide" class="ws-icon-cancel-circled ws-right"></span></span>',
-                    content: '<p data-id="continueMsgFirst">${dialog.continueC1}<a href="javascript:void(0)" data-id="optionsLink" class="ws-right">${dialog.continueC2}</a></p>'
-                    + '<div data-id="continueMsgSecond" style="display:none;"><p>${dialog.continueC3}</p>'
-                    + '<button data-id="restartButton" class="ws-btn"><span class="ws-icon-certificate"></span> ${dialog.continueB1}</button><span> </span>'
-                    + '<button data-id="cancelButton" class="ws-btn"><span class="ws-icon-cancel-circled"></span>  ${dialog.continueB2}</button><span> </span></div>',
+                    header: '<span class="ws-message--neutral">${dialog.continueH} <span data-id="dialogHide" class="ws-icon-cancel-circled ws-right"></span></span>',
+                    content: '<p data-id="continueMsg">${dialog.continueC1}<a href="javascript:void(0)" data-id="restartLink">${dialog.continueC2}</a></p>',
                     events: {
-                        'restartButton_click':  function () {
+                        'restartLink_click':  function () {
                             api.kill();
                             api.newSession();
                         },
-                        'cancelButton_click': hideBar,
                         'dialogHide_click':hideBar,
-                        'optionsLink_click': function(){
+                        'continueMsg_mouseenter': function(){
                             currentContentBar.focused=true;
-                            $('p[data-id="continueMsgFirst"]').hide();
-                            $('div[data-id="continueMsgSecond"]').show();
+                        },
+                        'continueMsg_mouseleave': function(){
+                            currentContentBar.focused=false;
                         }
                     }
                 },
