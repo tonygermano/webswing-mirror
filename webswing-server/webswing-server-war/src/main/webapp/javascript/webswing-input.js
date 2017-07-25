@@ -28,7 +28,6 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
         var latestKeyDownEvent = null;
         var mouseDown = 0;
         var inputEvtQueue = [];
-        var isShift = false;
 
         function sendInput(message) {
             enqueueInputEvent();
@@ -229,7 +228,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             util.bindEvent(input, 'paste', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                api.paste(event, isShift);
+                api.paste(event, false);
                 return false;
             }, false);
             util.bindEvent(document, 'mousedown', mouseDownEventHandler);
@@ -244,8 +243,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             var isCutCopyEvt = ctrlCmd && !evt.key.alt && !evt.key.altgr && !evt.key.shift && isCutCopyKey;
 
             var isPasteKey = 'keypress' === evt.key.type ? (evt.key.character == 118 || evt.key.character == 22 || evt.key.character == 86) : ( evt.key.character == 86);
-            var isPasteEvt = ctrlCmd && !evt.key.alt && !evt.key.altgr && isPasteKey;
-            isShift = evt.key.shift; //Set shift flag to distinguish paste from paste-special event
+            var isPasteEvt = ctrlCmd && !evt.key.alt && !evt.key.altgr && !evt.key.shift &&  isPasteKey;
 
             return isPasteEvt || isCutCopyEvt;
         }

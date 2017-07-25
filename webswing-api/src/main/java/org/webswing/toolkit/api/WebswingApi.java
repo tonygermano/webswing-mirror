@@ -130,7 +130,7 @@ public interface WebswingApi {
 	public void resetInactivityTimeout();
 
 	/**
-	 * Clipboard data received from browser after CTRL+V or CTRL+SHIFT+V key events (browser security allows access to clipboard only in these events).
+	 * Clipboard data received from browser after CTRL+V key events (browser security allows access to clipboard only in these events).
 	 * <br>
 	 * Typically used for customized clipboard integration, while the built-in integration is disabled in configuration ("allowLocalClipboard" is false).
 	 * <br>
