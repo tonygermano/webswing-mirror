@@ -371,6 +371,13 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		return super.generateCsrfToken();
 	}
 
+	@GET
+	@Path("/rest/ping")
+	public void ping() {
+		//responds with 200 OK status
+	}
+
+
 	@Override
 	public void logStatValue(String instance, String name, Number value) {
 		statsLogger.log(instance, name, value);

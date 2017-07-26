@@ -179,13 +179,6 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         }
 
         function processMessage(data) {
-            if (data.ping != null) {
-                api.sendInput({
-                    timestamps: {
-                        sendTimestamp: data.ping
-                    }
-                });
-            }
             if (data.playback != null) {
                 api.playbackInfo(data);
             }

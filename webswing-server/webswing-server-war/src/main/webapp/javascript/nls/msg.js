@@ -46,6 +46,9 @@ define({
         "dialog.finalB2": "Sign out",
         "dialog.retryB1": "Reconnect",
         "dialog.retryB2": "Sign out",
+        "dialog.networkMonitor.warn":"Your network connection is slow.",
+        "dialog.networkMonitor.offline":"No network connection.",
+        "dialog.networkMonitor.hide":"Hide",
 
         //  SELECTOR
         "selector.welcome": "Welcome,",

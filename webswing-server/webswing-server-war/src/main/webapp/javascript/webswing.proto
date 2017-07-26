@@ -19,7 +19,6 @@ message AppFrameMsgOutProto {
     optional string sessionId = 14;
     optional string startTimestamp = 15;
     optional string sendTimestamp = 16;
-    optional string ping = 17;
 }
 
 message ApplicationInfoMsgProto {
@@ -194,6 +193,7 @@ message TimestampsMsgInProto {
     optional string startTimestamp = 1;
     optional string sendTimestamp = 2;
     optional string renderingTime = 3;
+    optional uint32 ping = 4;
 }
 
 message ConnectionHandshakeMsgInProto {

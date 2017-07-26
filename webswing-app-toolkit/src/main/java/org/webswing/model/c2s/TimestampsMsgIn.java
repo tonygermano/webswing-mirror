@@ -8,6 +8,7 @@ public class TimestampsMsgIn implements MsgIn {
 	private String startTimestamp;
 	private String sendTimestamp;
 	private String renderingTime;
+	private int ping;
 
 	public String getStartTimestamp() {
 		return startTimestamp;
@@ -33,4 +34,11 @@ public class TimestampsMsgIn implements MsgIn {
 		this.renderingTime = renderingTime;
 	}
 
+	public int getPing() {
+		return ping;
+	}
+
+	public void setPing(int ping) {
+		this.ping = ping;
+	}
 }

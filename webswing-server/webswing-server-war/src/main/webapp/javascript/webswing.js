@@ -1,6 +1,6 @@
 define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog',
-        'webswing-login', 'webswing-canvas', 'webswing-identity', 'webswing-jslink', 'webswing-clipboard', 'webswing-playback', 'webswing-input', 'webswing-touch', 'webswing-inject', 'webswing-translate'],
-    function f($, util, polyfill, Base, Socket, Files, Dialog, Login, Canvas, Identity, JsLink, Clipboard, Playback, Input, Touch, Injector, Translate) {
+        'webswing-login', 'webswing-canvas', 'webswing-identity', 'webswing-jslink', 'webswing-clipboard', 'webswing-playback', 'webswing-input', 'webswing-touch', 'webswing-inject', 'webswing-translate','webswing-ping'],
+    function f($, util, polyfill, Base, Socket, Files, Dialog, Login, Canvas, Identity, JsLink, Clipboard, Playback, Input, Touch, Injector, Translate,Ping) {
         "use strict";
 
         var globalName = $('[data-webswing-global-var]');
@@ -64,6 +64,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
             injector.module('clipboard', new Clipboard());
             injector.module('playback', new Playback());
             injector.module('translate', new Translate());
+            injector.module('ping', new Ping());
             var externalObj = {
                 start: 'webswing.start',
                 disconnect: 'webswing.disconnect',

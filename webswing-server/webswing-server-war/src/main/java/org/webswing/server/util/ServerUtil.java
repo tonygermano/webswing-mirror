@@ -83,7 +83,14 @@ public class ServerUtil {
 	}
 
 	public static String getClientIp(WebSocketConnection r) {
-		return r == null ? null : r.getRequest().getRemoteAddr();
+		String result=null;
+		if(r!=null && r.getRequest()!=null){
+			result=r.getRequest().getHeader("X-Forwarded-For");
+			if(result==null){
+				result=r.getRequest().getRemoteAddr();
+			}
+		}
+		return result;
 	}
 
 	public static String getClientOs(WebSocketConnection r) {

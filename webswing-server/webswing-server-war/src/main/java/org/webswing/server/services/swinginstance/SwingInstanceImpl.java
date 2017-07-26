@@ -242,6 +242,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				}
 			} else if (h instanceof TimestampsMsgIn) {
 				processTimestampMessage((TimestampsMsgIn) h);
+				jvmConnection.send(h);
 			} else {
 				jvmConnection.send(h);
 			}
@@ -255,17 +256,17 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		if (StringUtils.isNotEmpty(h.getSendTimestamp())) {
 			long currentTime = System.currentTimeMillis();
 			long sendTime = Long.parseLong(h.getSendTimestamp());
-
-			if (StringUtils.isNotEmpty(h.getRenderingTime()) && StringUtils.isNotEmpty(h.getSendTimestamp())) {
+			if (StringUtils.isNotEmpty(h.getRenderingTime()) && StringUtils.isNotEmpty(h.getStartTimestamp())) {
 				long renderingTime = Long.parseLong(h.getRenderingTime());
 				long startTime = Long.parseLong(h.getStartTimestamp());
 				logStatValue(StatisticsLogger.LATENCY_SERVER_RENDERING, sendTime - startTime);
 				logStatValue(StatisticsLogger.LATENCY_CLIENT_RENDERING, renderingTime);
 				logStatValue(StatisticsLogger.LATENCY, currentTime - startTime);
 				logStatValue(StatisticsLogger.LATENCY_NETWORK_TRANSFER, currentTime - sendTime - renderingTime);
-			} else {
-				logStatValue(StatisticsLogger.LATENCY_PING, currentTime - sendTime);
 			}
+		}
+		if (h.getPing() > 0) {
+			logStatValue(StatisticsLogger.LATENCY_PING, h.getPing());
 		}
 	}
 
@@ -322,8 +323,6 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				logStatValue(StatisticsLogger.MEMORY_ALLOCATED_METRIC, s.getHeapSize());
 				logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
 				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, s.getCpuUsage());
-				//we use this event as trigger to sample websocket latency (simple ping):
-				sendToWeb(AppFrameMsgOut.ping());
 			} else if (o instanceof ExitMsgInternal) {
 				close();
 				ExitMsgInternal e = (ExitMsgInternal) o;

@@ -467,7 +467,7 @@ html.ws-fullscreen body {
 .webswing-element .ws-modal-content {
   margin: 0px;
 }
-.webswing-element .ws-toolbar, .webswing-element .ws-clipboard, .webswing-element .ws-filebar, .webswing-element .ws-playback, .webswing-element .ws-touchbar, .webswing-element .ws-messagebar {
+.webswing-element .ws-toolbar, .webswing-element .ws-clipboard, .webswing-element .ws-filebar, .webswing-element .ws-playback, .webswing-element .ws-touchbar, .webswing-element .ws-networkbar, .webswing-element .ws-messagebar {
   width: 480px;
   padding: 15px;
   -webkit-border-radius: 3px;
@@ -514,7 +514,7 @@ html.ws-fullscreen body {
 .webswing-element .ws-message--warning {
   color: #ffb219;
 }
-.webswing-element .ws-btn, .webswing-element .ws-touchbar-btn, .webswing-element .ws-messagebar-btn {
+.webswing-element .ws-btn, .webswing-element .ws-touchbar-btn, .webswing-element .ws-networkbar-btn, .webswing-element .ws-messagebar-btn {
   cursor: pointer;
   padding: 8px 15px;
   margin: 15px 10px 0px 0px;
@@ -524,10 +524,10 @@ html.ws-fullscreen body {
   border-radius: 3px;
   font-size: 14px;
 }
-.webswing-element .ws-btn:last-of-type, .webswing-element .ws-touchbar-btn:last-of-type, .webswing-element .ws-messagebar-btn:last-of-type {
+.webswing-element .ws-btn:last-of-type, .webswing-element .ws-touchbar-btn:last-of-type, .webswing-element .ws-networkbar-btn:last-of-type, .webswing-element .ws-messagebar-btn:last-of-type {
   margin-right: 0;
 }
-.webswing-element .ws-btn:hover, .webswing-element .ws-touchbar-btn:hover, .webswing-element .ws-messagebar-btn:hover {
+.webswing-element .ws-btn:hover, .webswing-element .ws-touchbar-btn:hover, .webswing-element .ws-networkbar-btn:hover, .webswing-element .ws-messagebar-btn:hover {
   background-color: #ff5c00;
   border-color: #ff5c00;
   color: #ffffff;
@@ -552,20 +552,20 @@ html.ws-fullscreen body {
   display: block;
   float: left;
 }
-.webswing-element .ws-btn-group .ws-btn, .webswing-element .ws-btn-group .ws-touchbar-btn, .webswing-element .ws-btn-group .ws-messagebar-btn {
+.webswing-element .ws-btn-group .ws-btn, .webswing-element .ws-btn-group .ws-touchbar-btn, .webswing-element .ws-btn-group .ws-networkbar-btn, .webswing-element .ws-btn-group .ws-messagebar-btn {
   margin: 15px 0px 0px 0px;
   float: left;
   border-radius: 0px;
 }
-.webswing-element .ws-btn-group .ws-btn:first-child, .webswing-element .ws-btn-group .ws-touchbar-btn:first-child, .webswing-element .ws-btn-group .ws-messagebar-btn:first-child {
+.webswing-element .ws-btn-group .ws-btn:first-child, .webswing-element .ws-btn-group .ws-touchbar-btn:first-child, .webswing-element .ws-btn-group .ws-networkbar-btn:first-child, .webswing-element .ws-btn-group .ws-messagebar-btn:first-child {
   border-bottom-left-radius: 3px;
   border-top-left-radius: 3px;
 }
-.webswing-element .ws-btn-group .ws-btn:last-child, .webswing-element .ws-btn-group .ws-touchbar-btn:last-child, .webswing-element .ws-btn-group .ws-messagebar-btn:last-child {
+.webswing-element .ws-btn-group .ws-btn:last-child, .webswing-element .ws-btn-group .ws-touchbar-btn:last-child, .webswing-element .ws-btn-group .ws-networkbar-btn:last-child, .webswing-element .ws-btn-group .ws-messagebar-btn:last-child {
   border-bottom-right-radius: 3px;
   border-top-right-radius: 3px;
 }
-.webswing-element .ws-btn-group .ws-btn:not(:first-child), .webswing-element .ws-btn-group .ws-touchbar-btn:not(:first-child), .webswing-element .ws-btn-group .ws-messagebar-btn:not(:first-child) {
+.webswing-element .ws-btn-group .ws-btn:not(:first-child), .webswing-element .ws-btn-group .ws-touchbar-btn:not(:first-child), .webswing-element .ws-btn-group .ws-networkbar-btn:not(:first-child), .webswing-element .ws-btn-group .ws-messagebar-btn:not(:first-child) {
   border-left: 0;
 }
 .webswing-element .ws-submit-form {
@@ -1093,6 +1093,9 @@ html.ws-fullscreen body {
   width: auto;
 }
 .webswing-element .ws-touchbar-btn {
+  margin: 0;
+}
+.webswing-element .ws-networkbar-btn {
   margin: 0;
 }
 .webswing-element .ws-messagebar-btn {
