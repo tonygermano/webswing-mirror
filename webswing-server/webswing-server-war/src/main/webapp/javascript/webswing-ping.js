@@ -13,7 +13,12 @@ define(['jquery', 'text!templates/network.html', 'webswing-util',], function amd
         module.provides = {};
         module.ready = function () {
             ping = getArrayWithLimitedLength(count);
-            var blobURL = URL.createObjectURL(new Blob(['(', PingMonitor.toString(), ')("' + api.cfg.connectionUrl + '",' + interval + ')'], {type: 'application/javascript'}));
+            var connectionUrl=api.cfg.connectionUrl;
+            if (connectionUrl.indexOf('http') != 0) {
+                var host = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '')
+                connectionUrl = host + connectionUrl;
+            }
+            var blobURL = URL.createObjectURL(new Blob(['(', PingMonitor.toString(), ')("' + connectionUrl + '",' + interval + ')'], {type: 'application/javascript'}));
             worker = new Worker(blobURL);
             worker.onmessage = function (e) {
                 var p = JSON.parse(e.data);
