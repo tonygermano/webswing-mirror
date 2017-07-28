@@ -1,4 +1,4 @@
-define(['atmosphere', 'ProtoBuf','jquery', 'text!webswing.proto'], function amdFactory(atmosphere, ProtoBuf, $, wsProto) {
+define(['atmosphere', 'ProtoBuf', 'jquery', 'text!webswing.proto'], function amdFactory(atmosphere, ProtoBuf, $, wsProto) {
     "use strict";
     var proto = ProtoBuf.loadProto(wsProto, "webswing.proto");
     var InputEventsFrameMsgInProto = proto.build("org.webswing.server.model.proto.InputEventsFrameMsgInProto");
@@ -58,7 +58,7 @@ define(['atmosphere', 'ProtoBuf','jquery', 'text!webswing.proto'], function amdF
             }
 
             if (api.cfg.recordingPlayback) {
-                request.url =  api.cfg.connectionUrl + 'playback/async/swing-play';
+                request.url = api.cfg.connectionUrl + 'playback/async/swing-play';
                 request.headers['file'] = api.cfg.recordingPlayback;
             }
 
@@ -73,14 +73,14 @@ define(['atmosphere', 'ProtoBuf','jquery', 'text!webswing.proto'], function amdF
             }
 
             request.onOpen = function (response) {
-                if(response.transport !== 'websocket'){
+                if (response.transport !== 'websocket') {
                     if (binary) {
                         console.error('Webswing: Binary encoding not supported for ' + response.transport + ' transport. Falling back to json encoding.');
                         api.cfg.binarySocket = false;
                         binary = false;
                         dispose();
                         connect();
-                    }else{
+                    } else {
                         api.showBar(api.longPollingWarningDialog);
                     }
                 }
@@ -91,7 +91,7 @@ define(['atmosphere', 'ProtoBuf','jquery', 'text!webswing.proto'], function amdF
             };
 
             request.onMessage = function (response) {
-            	var receivedTimestamp=new Date().getTime();
+                var receivedTimestamp = new Date().getTime();
                 try {
                     var data = decodeResponse(response);
                     if (data.sessionId != null) {
@@ -162,19 +162,21 @@ define(['atmosphere', 'ProtoBuf','jquery', 'text!webswing.proto'], function amdF
         }
 
         function send(message) {
-            if (socket != null && socket.request.isOpen && !socket.request.closed) {
-                if (typeof message === "object") {
-                    if (binary) {
-                        var msg = new InputEventsFrameMsgInProto(message);
-                        socket.push(msg.encode().toArrayBuffer());
+            if (socket != null) {
+                if (socket.request.isOpen && !socket.request.closed) {
+                    if (typeof message === "object") {
+                        if (binary) {
+                            var msg = new InputEventsFrameMsgInProto(message);
+                            socket.push(msg.encode().toArrayBuffer());
+                        } else {
+                            socket.push(atmosphere.util.stringifyJSON(message));
+                        }
                     } else {
-                        socket.push(atmosphere.util.stringifyJSON(message));
+                        console.log("message is not an object " + message);
                     }
                 } else {
-                    console.log("message is not an object " + message);
+                    api.showDialog(api.disconnectedDialog);
                 }
-            }else{
-                api.showDialog(api.disconnectedDialog);
             }
         }
 
