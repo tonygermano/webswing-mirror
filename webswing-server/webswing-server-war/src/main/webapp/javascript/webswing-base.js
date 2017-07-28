@@ -383,8 +383,12 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                     for (var x in win.content) {
                         var winContent = win.content[x];
                         if (winContent != null) {
-                            if(win.posX + winContent.positionX<=context.canvas.width && win.posY + winContent.positionY<=context.canvas.height){
-                                context.drawImage(resultImage, winContent.positionX, winContent.positionY, winContent.width, winContent.height, win.posX + winContent.positionX, win.posY + winContent.positionY, winContent.width, winContent.height);
+                            var dx = win.posX + winContent.positionX;
+                            var dy = win.posY + winContent.positionY;
+                            var dw = winContent.width;
+                            var dh = winContent.height;
+                            if (dx <= context.canvas.width && dy <= context.canvas.height && dx + dw > 0 && dy + dh > 0) {
+                                context.drawImage(resultImage, winContent.positionX, winContent.positionY, winContent.width, winContent.height, dx, dy, dw, dh);
                             }
                         }
                     }
