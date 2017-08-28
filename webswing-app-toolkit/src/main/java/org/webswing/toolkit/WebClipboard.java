@@ -64,61 +64,62 @@ public class WebClipboard extends Clipboard {
 
 	public static WebswingClipboardData toWebswingClipboardData(Transferable contents) {
 		WebswingClipboardData data = new WebswingClipboardData();
-
-		if (contents.isDataFlavorSupported(HTML_FLAVOR)) {
-			try {
-				Object transferData = contents.getTransferData(HTML_FLAVOR);
-				data.setHtml(transferData.toString());
-			} catch (Exception e) {
-				Logger.error("WebClipboard:setContent:HTML", e);
-			}
-		}
-
-		if (contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-			try {
-				data.setText((String) contents.getTransferData(DataFlavor.stringFlavor));
-			} catch (Exception e) {
-				Logger.error("WebClipboard:setContent:Plain", e);
-			}
-		}
-		if (contents.isDataFlavorSupported(DataFlavor.imageFlavor)) {
-			try {
-				Image image = (Image) contents.getTransferData(DataFlavor.imageFlavor);
-				if (image != null) {
-					BufferedImage result = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-					Graphics g = result.getGraphics();
-					g.drawImage(image, 0, 0, null);
-					g.dispose();
-					data.setImg(Services.getImageService().getPngImage(result));
+		if(contents!=null) {
+			if (contents.isDataFlavorSupported(HTML_FLAVOR)) {
+				try {
+					Object transferData = contents.getTransferData(HTML_FLAVOR);
+					data.setHtml(transferData.toString());
+				} catch (Exception e) {
+					Logger.error("WebClipboard:setContent:HTML", e);
 				}
-			} catch (Exception e) {
-				Logger.error("WebClipboard:setContent:Image", e);
 			}
-		}
-		if (contents.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-			try {
-				List<?> fileList = (List<?>) contents.getTransferData(DataFlavor.javaFileListFlavor);
-				if (fileList != null) {
-					ArrayList<String> files = new ArrayList<String>();
-					for (Object o : fileList) {
-						if (o instanceof File) {
-							File f = (File) o;
-							if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD)) {
-								if (f.exists() && f.canRead() && !f.isDirectory()) {
-									files.add(f.getAbsolutePath());
+
+			if (contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+				try {
+					data.setText((String) contents.getTransferData(DataFlavor.stringFlavor));
+				} catch (Exception e) {
+					Logger.error("WebClipboard:setContent:Plain", e);
+				}
+			}
+			if (contents.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+				try {
+					Image image = (Image) contents.getTransferData(DataFlavor.imageFlavor);
+					if (image != null) {
+						BufferedImage result = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+						Graphics g = result.getGraphics();
+						g.drawImage(image, 0, 0, null);
+						g.dispose();
+						data.setImg(Services.getImageService().getPngImage(result));
+					}
+				} catch (Exception e) {
+					Logger.error("WebClipboard:setContent:Image", e);
+				}
+			}
+			if (contents.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+				try {
+					List<?> fileList = (List<?>) contents.getTransferData(DataFlavor.javaFileListFlavor);
+					if (fileList != null) {
+						ArrayList<String> files = new ArrayList<String>();
+						for (Object o : fileList) {
+							if (o instanceof File) {
+								File f = (File) o;
+								if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD)) {
+									if (f.exists() && f.canRead() && !f.isDirectory()) {
+										files.add(f.getAbsolutePath());
+									} else {
+										files.add("#" + f.getAbsolutePath());
+									}
 								} else {
-									files.add("#" + f.getAbsolutePath());
+									files.add("#Downloading not allowed.");
+									break;
 								}
-							} else {
-								files.add("#Downloading not allowed.");
-								break;
 							}
 						}
+						data.setFiles(files);
 					}
-					data.setFiles(files);
+				} catch (Exception e) {
+					Logger.error("WebClipboard:setContent:Files", e);
 				}
-			} catch (Exception e) {
-				Logger.error("WebClipboard:setContent:Files", e);
 			}
 		}
 		return data;
