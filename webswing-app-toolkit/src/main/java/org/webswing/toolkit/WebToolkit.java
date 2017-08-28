@@ -675,7 +675,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	public synchronized void exitSwing(final int i) {
 		if (!exiting) {
 			exiting = true;
-			SwingUtilities.invokeLater(new Runnable() {
+			Thread shutdownThread= new Thread(new Runnable() {
 				@Override
 				public void run() {
 					//tell server to kill this application after defined time
@@ -683,6 +683,9 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 					api.fireShutdownListeners();
 				}
 			});
+			shutdownThread.setName("Webswing shutdown thread");
+			shutdownThread.setDaemon(true);
+			shutdownThread.start();
 		}
 	}
 

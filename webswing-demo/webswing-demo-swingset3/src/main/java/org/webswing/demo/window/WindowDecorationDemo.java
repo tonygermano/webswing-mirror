@@ -163,7 +163,23 @@ public class WindowDecorationDemo extends JPanel {
 		menu.add(new JMenuItem("test"));
 		menu.add(new JMenuItem("test"));
 		menu.add(new JMenuItem("test"));
-		menu.add(new JMenuItem("test"));
+		JMenuItem blockItem = new JMenuItem("block EDT for 60s");
+		blockItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(60000);
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+			}
+		});
+		menu.add(blockItem);
 		context.setComponentPopupMenu(menu);
 
 		//move window

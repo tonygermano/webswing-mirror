@@ -211,26 +211,20 @@ public class WebswingApiImpl implements WebswingApi {
 	}
 
 	void fireShutdownListeners() {
-		apiProcessor.submit(new Runnable() {
-
-			@Override
-			public void run() {
-				synchronized (shutdownListeners) {
-					if (shutdownListeners.size() == 0) {
-						Logger.info("No shutdown listener found. Using default shutdown procedure.");
-						Util.getWebToolkit().defaultShutdownProcedure();
-					} else {
-						for (WebswingShutdownListener l : shutdownListeners) {
-							try {
-								l.onShutdown();
-							} catch (Exception e) {
-								Logger.error("Shutdown Listener failed.", e);
-							}
-						}
+		synchronized (shutdownListeners) {
+			if (shutdownListeners.size() == 0) {
+				Logger.info("No shutdown listener found. Using default shutdown procedure.");
+				Util.getWebToolkit().defaultShutdownProcedure();
+			} else {
+				for (WebswingShutdownListener l : shutdownListeners) {
+					try {
+						l.onShutdown();
+					} catch (Exception e) {
+						Logger.error("Shutdown Listener failed.", e);
 					}
 				}
 			}
-		});
+		}
 	}
 
 	private void fireUserListener(ApiEventType type, UserEvent event) {
