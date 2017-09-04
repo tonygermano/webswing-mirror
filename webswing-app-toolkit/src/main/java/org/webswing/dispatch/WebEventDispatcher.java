@@ -41,7 +41,7 @@ import java.util.concurrent.Executors;
 public class WebEventDispatcher {
 
 	private MouseEvent lastMouseEvent;
-	private MouseEvent lastMousePressEvent;
+	private MouseEventInfo lastMousePressEvent;
 	private Point lastMousePosition = new Point();
 	private static final DndEventHandler dndHandler = new DndEventHandler();
 	private HashMap<String, String> uploadMap = new HashMap<String, String>();
@@ -66,7 +66,6 @@ public class WebEventDispatcher {
 		convertedKeyCodes.put(191, 47);//	Slash
 	}
 
-	protected static final String WebswingApiImpl = null;
 	public static final long doubleClickMaxDelay = Long.getLong(Constants.SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY, 750);
 
 	public void dispatchEvent(final MsgIn event) {
@@ -247,26 +246,26 @@ public class WebEventDispatcher {
 			case mouseup:
 				id = MouseEvent.MOUSE_RELEASED;
 				boolean popupTrigger = (buttons == 3) ? true : false;
-				clickcount = computeClickCount(x, y, buttons, false);
+				clickcount = computeClickCount(x, y, buttons, false, event.getTimeMilis());
 				modifiers = modifiers & (((1 << 6) - 1) | (~((1 << 14) - 1)) | MouseEvent.CTRL_DOWN_MASK | MouseEvent.ALT_DOWN_MASK | MouseEvent.SHIFT_DOWN_MASK | MouseEvent.META_DOWN_MASK);
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
 				dispatchEventInSwing(c, e);
-				if (lastMousePressEvent != null && lastMousePressEvent.getX() == x && lastMousePressEvent.getY() == y) {
+				if (lastMousePressEvent != null && lastMousePressEvent.x == x && lastMousePressEvent.y == y) {
 					e = new MouseEvent(c, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
 					dispatchEventInSwing(c, e);
 					lastMouseEvent = e;
-					lastMousePressEvent = e;
+					lastMousePressEvent = MouseEventInfo.get(e, event.getTimeMilis());
 				} else {
 					lastMouseEvent = e;
-					lastMousePressEvent = e;
+					lastMousePressEvent = MouseEventInfo.get(e, event.getTimeMilis());
 				}
 				break;
 			case mousedown:
 				id = MouseEvent.MOUSE_PRESSED;
-				clickcount = computeClickCount(x, y, buttons, true);
+				clickcount = computeClickCount(x, y, buttons, true, event.getTimeMilis());
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
 				dispatchEventInSwing(c, e);
-				lastMousePressEvent = e;
+				lastMousePressEvent = MouseEventInfo.get(e, event.getTimeMilis());
 				lastMouseEvent = e;
 				break;
 			case mousewheel:
@@ -288,16 +287,16 @@ public class WebEventDispatcher {
 		}
 	}
 
-	private int computeClickCount(int x, int y, int buttons, boolean isPressed) {
+	private int computeClickCount(int x, int y, int button, boolean isPressed, int timeMilis) {
 		if (isPressed) {
-			if (lastMousePressEvent != null && lastMousePressEvent.getID() == MouseEvent.MOUSE_CLICKED && lastMousePressEvent.getButton() == buttons && lastMousePressEvent.getX() == x && lastMousePressEvent.getY() == y) {
-				if (System.currentTimeMillis() - lastMousePressEvent.getWhen() < doubleClickMaxDelay) {
-					return lastMousePressEvent.getClickCount() + 1;
+			if (lastMousePressEvent != null && lastMousePressEvent.type == MouseEvent.MOUSE_CLICKED && lastMousePressEvent.button == button && lastMousePressEvent.x == x && lastMousePressEvent.y == y) {
+				if (timeMilis - lastMousePressEvent.time < doubleClickMaxDelay) {
+					return lastMousePressEvent.clickcount + 1;
 				}
 			}
 		} else {
-			if (lastMousePressEvent != null && lastMousePressEvent.getID() == MouseEvent.MOUSE_PRESSED && lastMousePressEvent.getButton() == buttons) {
-				return lastMousePressEvent.getClickCount();
+			if (lastMousePressEvent != null && lastMousePressEvent.type == MouseEvent.MOUSE_PRESSED && lastMousePressEvent.button == button) {
+				return lastMousePressEvent.clickcount;
 			}
 		}
 		return 1;
@@ -474,5 +473,27 @@ public class WebEventDispatcher {
 
 	public static boolean isDndInProgress() {
 		return dndHandler.isDndInProgress();
+	}
+
+	private static class MouseEventInfo {
+		final int x;
+		final int y;
+		final int type;
+		final int button;
+		final int clickcount;
+		final int time;
+
+		private MouseEventInfo(MouseEvent e, int time) {
+			this.x = e.getX();
+			this.y = e.getY();
+			this.type = e.getID();
+			this.clickcount = e.getClickCount();
+			this.button=e.getButton();
+			this.time = time;
+		}
+
+		public static MouseEventInfo get(MouseEvent e, int time) {
+			return new MouseEventInfo(e, time);
+		}
 	}
 }

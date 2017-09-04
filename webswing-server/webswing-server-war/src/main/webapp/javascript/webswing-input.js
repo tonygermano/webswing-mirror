@@ -149,6 +149,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
 
             util.bindEvent(input, 'keydown', keyDownHandler, false);
             util.bindEvent(canvas, 'keydown', keyDownHandler, false);
+
             function keyDownHandler(event) {
                 var functionKeys = [9/*tab*/, 12/*Numpad5*/, 16/*Shift*/, 17/*ctrl*/, 18/*alt*/, 19/*pause*/, 20/*CapsLock*/, 27/*esc*/,
                     32/*space*/, 33/*pgup*/, 34/*pgdown*/, 35/*end*/, 36/*home*/, 37/*left*/, 38/*up*/, 39/*right*/, 40/*down*/, 44/*prtscr*/,
@@ -177,8 +178,8 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
                         event.preventDefault();
                         event.stopPropagation();
                         keyevt = getKBKey('keypress', canvas, event);
-                        var key=keyevt.key.keycode;
-                        keyevt.key.character =(!keyevt.key.shift && (key>=65  && key <= 90)) ? key +32  : key;
+                        var key = keyevt.key.keycode;
+                        keyevt.key.character = (!keyevt.key.shift && (key >= 65 && key <= 90)) ? key + 32 : key;
                         enqueueInputEvent(keyevt);
                     }
                 }
@@ -187,6 +188,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
 
             util.bindEvent(input, 'keypress', keyPressHandler, false);
             util.bindEvent(canvas, 'keypress', keyPressHandler, false);
+
             function keyPressHandler(event) {
                 var keyevt = getKBKey('keypress', canvas, event);
                 if (!isClipboardEvent(keyevt)) { // cut copy paste handled separately
@@ -202,6 +204,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
 
             util.bindEvent(input, 'keyup', keyUpHandler, false);
             util.bindEvent(canvas, 'keyup', keyUpHandler, false);
+
             function keyUpHandler(event) {
                 var keyevt = getKBKey('keyup', canvas, event);
                 if (!isClipboardEvent(keyevt)) { // cut copy paste handled separately
@@ -243,7 +246,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             var isCutCopyEvt = ctrlCmd && !evt.key.alt && !evt.key.altgr && !evt.key.shift && isCutCopyKey;
 
             var isPasteKey = 'keypress' === evt.key.type ? (evt.key.character == 118 || evt.key.character == 22 || evt.key.character == 86) : ( evt.key.character == 86);
-            var isPasteEvt = ctrlCmd && !evt.key.alt && !evt.key.altgr && !evt.key.shift &&  isPasteKey;
+            var isPasteEvt = ctrlCmd && !evt.key.alt && !evt.key.altgr && !evt.key.shift && isPasteKey;
 
             return isPasteEvt || isCutCopyEvt;
         }
@@ -291,7 +294,8 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
                     ctrl: evt.ctrlKey,
                     alt: evt.altKey,
                     shift: evt.shiftKey,
-                    meta: evt.metaKey
+                    meta: evt.metaKey,
+                    timeMilis: Date.now() % 86400000 //86400000 day in milis
                 }
             };
         }

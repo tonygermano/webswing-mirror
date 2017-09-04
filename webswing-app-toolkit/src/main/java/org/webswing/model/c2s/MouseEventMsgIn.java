@@ -3,11 +3,15 @@ package org.webswing.model.c2s;
 import org.webswing.model.MsgIn;
 import org.webswing.model.UserInputMsgIn;
 
-public class MouseEventMsgIn implements MsgIn,UserInputMsgIn {
+public class MouseEventMsgIn implements MsgIn, UserInputMsgIn {
 	private static final long serialVersionUID = 8411036255812103478L;
 
 	public enum MouseEventType {
-		mousemove, mousedown, mouseup, mousewheel, dblclick;
+		mousemove,
+		mousedown,
+		mouseup,
+		mousewheel,
+		dblclick;
 	}
 
 	private int x;
@@ -16,6 +20,7 @@ public class MouseEventMsgIn implements MsgIn,UserInputMsgIn {
 	private int wheelDelta;
 	private int button;
 	private int buttons;
+	private int timeMilis;
 	private boolean ctrl;
 	private boolean alt;
 	private boolean shift;
@@ -99,5 +104,13 @@ public class MouseEventMsgIn implements MsgIn,UserInputMsgIn {
 
 	public void setButtons(int buttons) {
 		this.buttons = buttons;
+	}
+
+	public int getTimeMilis() {
+		return timeMilis;
+	}
+
+	public void setTimeMilis(int timeMilis) {
+		this.timeMilis = timeMilis;
 	}
 }
