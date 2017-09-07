@@ -99,7 +99,6 @@ define(['jquery', 'text!templates/network.html', 'webswing-util',], function amd
             function ping(success, failure) {
                 var startTime = new Date().getTime();
                 var oReq = new XMLHttpRequest();
-                oReq.timeout = interval;
                 oReq.addEventListener("load", function (e) {
                     result("ok", new Date().getTime() - startTime);
                 });
@@ -110,6 +109,7 @@ define(['jquery', 'text!templates/network.html', 'webswing-util',], function amd
                     result("timeout", new Date().getTime() - startTime);
                 });
                 oReq.open("GET", connectionUrl + "rest/ping");
+                oReq.timeout = interval;
                 oReq.send();
             }
 

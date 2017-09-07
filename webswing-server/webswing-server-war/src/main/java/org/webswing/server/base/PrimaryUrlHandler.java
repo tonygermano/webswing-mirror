@@ -218,6 +218,9 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	public boolean isSameOrigin(HttpServletRequest req) {
 		String origin = req.getHeader("Origin");
 		String host = req.getHeader("X-Forwarded-Host");
+		if(origin==null){
+			return true; //IE11 on Win7 does not send Origin header
+		}
 		if (host == null) {
 			host = req.getHeader("Host");
 		}
