@@ -58,6 +58,7 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
                         element.html(translate(loginMsg.partialHtml));
                         var form = element.find('form').first();
                         form.submit(function (event) {
+                            element.find('#progress').show();
                             webswingLogin(baseUrl, element, form.serialize(), successCallback);
                             event.preventDefault();
                         });
@@ -69,6 +70,7 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
                 }
             }
         });
+
     }
 
     function webswingLogout(baseUrl, element, doneCallback) {
