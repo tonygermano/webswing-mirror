@@ -205,14 +205,14 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	public void setPaintMode() {
-		// TODO Auto-generated method stub
-
+		//TODO:implement proper handling of XORMode
+		setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 	}
 
 	@Override
 	public void setXORMode(Color c1) {
-		// TODO Auto-generated method stub
-
+		//TODO:implement proper handling of XORMode
+		setComposite(AlphaComposite.getInstance(AlphaComposite.XOR));
 	}
 
 	@Override

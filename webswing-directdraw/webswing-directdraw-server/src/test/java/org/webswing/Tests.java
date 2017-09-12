@@ -827,26 +827,31 @@ public class Tests {
 		 * Due to XOR if stroke widths are equal nothing will be drawn.
 		 */
 		g.setTransform(new AffineTransform());
+
+		g.setColor(Color.gray);
+		g.fillRect(175, 30, 170, 30);
+		g.setColor(Color.BLACK);
+
 		g.setComposite(AlphaComposite.Xor);
 
-		g.setStroke(new BasicStroke(1f));
+		g.setStroke(new BasicStroke(0.1f));
 		g.drawRect(175, 5, 40, 40);
 		g.setStroke(new BasicStroke(0.1f));
 		g.drawRect(175, 5, 40, 40);
 
-		g.setStroke(new BasicStroke(1f));
+		g.setStroke(new BasicStroke(1.5f));
 		g.drawRect(225, 5, 40, 40);
-		g.setStroke(new BasicStroke(0.5f));
+		g.setStroke(new BasicStroke(1.5f));
 		g.drawRect(225, 5, 40, 40);
 
 		g.setStroke(new BasicStroke(1f));
 		g.drawRect(175, 55, 40, 40);
-		g.setStroke(new BasicStroke(1.1f));
+		g.setStroke(new BasicStroke(1f));
 		g.drawRect(175, 55, 40, 40);
 
 		g.setStroke(new BasicStroke(2f));
 		g.drawRect(225, 55, 40, 40);
-		g.setStroke(new BasicStroke(1.5f));
+		g.setStroke(new BasicStroke(2f));
 		g.drawRect(225, 55, 40, 40);
 
 		g.setStroke(new BasicStroke(3f));
@@ -856,18 +861,23 @@ public class Tests {
 		g.drawRect(0, 0, 20, 20);
 
 		g.setStroke(new BasicStroke(12f));
-		g.setTransform(new AffineTransform(1d / 3, 0, 0, 1d / 4, 275, 55));
-		g.drawRect(0, 0, 180, 160);
-		g.setTransform(new AffineTransform(3, 0, 0, 2, 275, 55));
-		g.setStroke(new BasicStroke(1.5f));
-		g.drawRect(0, 0, 20, 20);
+		g.setTransform(new AffineTransform(1d, 0, 0, 1d / 4, 275, 55));
+		g.drawRect(0, 0, 120, 120);
+		g.setTransform(new AffineTransform(12, 0, 0, 3, 275, 55));
+		g.setStroke(new BasicStroke(1f));
+		g.drawRect(0, 0, 10, 10);
 
-		g.setStroke(new BasicStroke(12f));
-		g.setTransform(new AffineTransform(1d / 4, 0, 0, 1d / 3, 345, 5));
-		g.drawRect(0, 0, 160, 180);
-		g.setTransform(new AffineTransform(2, 0, 0, 3, 345, 5));
-		g.setStroke(new BasicStroke(1.45f));
-		g.drawRect(0, 0, 20, 20);
+		g.setTransform(new AffineTransform());
+		Font sansserif = new Font("SansSerif", Font.PLAIN, 18);
+		g.setFont(sansserif);
+		g.drawString("test@123&%=-*{};'/.,", 175, 50);
+
+		//		g.setStroke(new BasicStroke(12f));
+		//		g.setTransform(new AffineTransform(1d / 4, 0, 0, 1d / 3, 345, 5));
+		//		g.drawRect(0, 0, 160, 180);
+		//		g.setTransform(new AffineTransform(2, 0, 0, 3, 345, 5));
+		//		g.setStroke(new BasicStroke(1.45f));
+		//		g.drawRect(0, 0, 20, 20);
 
 		return true;
 	}
@@ -900,6 +910,36 @@ public class Tests {
 		g.setStroke(new BasicStroke(17, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 2.5f, new float[] { 3, 20, 40, 20 }, 10));
 		g.drawPolyline(new int[] { 220, 270, 320, 370, 420, 470 }, new int[] { 5, 95, 5, 95, 5, 95 }, 6);
 
+		return true;
+	}
+
+	public static boolean t32XorModeTest(Graphics2D g, int repeat) {
+		if (repeat > 0) {
+			return false;
+		}
+		g.setColor(Color.BLACK);
+		g.setBackground(Color.YELLOW);
+		Font sansserif = new Font("SansSerif", Font.PLAIN, 18);
+		g.setFont(sansserif);
+
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, 500, 100);
+		g.setColor(Color.BLACK);
+		g.drawRect(10, 50,170,30);
+
+		g.setXORMode(Color.WHITE);
+		//step1
+		g.drawRect(10, 50, 170, 30);
+		g.translate(20, 5);
+		g.drawRect(10, 50, 170, 30);
+		//		//step2
+		g.drawRect(10, 50, 170, 30);
+		g.translate(20, 5);
+		g.drawRect(10, 50, 170, 30);
+		//		//step3
+		g.drawRect(10, 50, 170, 30);
+		g.translate(20, 5);
+		g.drawRect(10, 50, 170, 30);
 		return true;
 	}
 

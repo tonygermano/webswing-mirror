@@ -127,7 +127,7 @@
                     iprtGraphicsDispose(instruction.args[0], imageContext);
                     break;
                 case InstructionProto.DRAW:
-                    iprtDraw(ctx, args);
+                    iprtDraw(ctx, args, graphicsState.transform);
                     break;
                 case InstructionProto.FILL:
                     iprtFill(ctx, args);
@@ -225,12 +225,12 @@
             }
         }
 
-        function iprtDraw(ctx, args) {
+        function iprtDraw(ctx, args, transform) {
             ctx.save();
             if (path(ctx, args[1])) {
                 ctx.clip(fillRule(args[1]));
             }
-            path(ctx, args[0], true);
+            path(ctx, args[0], true, transform);
             ctx.stroke();
             ctx.restore();
         }
@@ -285,7 +285,7 @@
             var clip = args[3];
 
             var buffer = canvasBuffer.pop();
-            return drawBin(webImageData,buffer).then(function (imageCanvas) {
+            return drawBin(webImageData, buffer).then(function (imageCanvas) {
                 ctx.save();
                 if (path(ctx, clip)) {
                     ctx.clip(fillRule(clip));
@@ -311,7 +311,7 @@
                 }
                 ctx.restore();
 
-                imageCanvas.width=0;//clear the buffer image for future reuse
+                imageCanvas.width = 0;//clear the buffer image for future reuse
                 canvasBuffer.push(imageCanvas);
             });
         }
@@ -665,32 +665,34 @@
             }
         }
 
-        function path(ctx, arg, biased) {
+        function path(ctx, arg, biased,transform) {
             if (arg == null) {
                 return false;
             }
 
+            var bias = calculateBias(ctx, biased, transform);
+
             if (arg.rectangle != null) {
                 ctx.beginPath();
-                pathRectangle(ctx, arg.rectangle, biased);
+                pathRectangle(ctx, arg.rectangle, bias);
                 return true;
             }
 
             if (arg.roundRectangle != null) {
                 ctx.beginPath();
-                pathRoundRectangle(ctx, arg.roundRectangle, biased);
+                pathRoundRectangle(ctx, arg.roundRectangle, bias);
                 return true;
             }
 
             if (arg.ellipse != null) {
                 ctx.beginPath();
-                pathEllipse(ctx, arg.ellipse, biased);
+                pathEllipse(ctx, arg.ellipse, bias);
                 return true;
             }
 
             if (arg.arc != null) {
                 ctx.beginPath();
-                pathArc(ctx, arg.arc, biased);
+                pathArc(ctx, arg.arc, bias);
                 return true;
             }
 
@@ -698,27 +700,26 @@
             if (arg.path != null) {
                 ctx.beginPath();
                 var path = arg.path;
-                var bias = calculateBias(ctx, biased);
                 var off = 0;
                 path.type.forEach(function (type, index) {
                     switch (type) {
                         case SegmentTypeProto.MOVE:
-                            ctx.moveTo(path.points[off + 0] + bias, path.points[off + 1] + bias);
+                            ctx.moveTo(path.points[off + 0] + bias.x, path.points[off + 1] + bias.y);
                             off += 2;
                             break;
                         case SegmentTypeProto.LINE:
-                            ctx.lineTo(path.points[off + 0] + bias, path.points[off + 1] + bias);
+                            ctx.lineTo(path.points[off + 0] + bias.x, path.points[off + 1] + bias.y);
                             off += 2;
                             break;
                         case SegmentTypeProto.QUAD:
-                            ctx.quadraticCurveTo(path.points[off + 0] + bias, path.points[off + 1] + bias,
-                                path.points[off + 2] + bias, path.points[off + 3] + bias);
+                            ctx.quadraticCurveTo(path.points[off + 0] + bias.x, path.points[off + 1] + bias.y,
+                                path.points[off + 2] + bias.x, path.points[off + 3] + bias.y);
                             off += 4;
                             break;
                         case SegmentTypeProto.CUBIC:
-                            ctx.bezierCurveTo(path.points[off + 0] + bias, path.points[off + 1] + bias,
-                                path.points[off + 2] + bias, path.points[off + 3] + bias,
-                                path.points[off + 4] + bias, path.points[off + 5] + bias);
+                            ctx.bezierCurveTo(path.points[off + 0] + bias.x, path.points[off + 1] + bias.y,
+                                path.points[off + 2] + bias.x, path.points[off + 3] + bias.y,
+                                path.points[off + 4] + bias.x, path.points[off + 5] + bias.y);
                             off += 6;
                             break;
                         case SegmentTypeProto.CLOSE:
@@ -733,18 +734,16 @@
             return false;
         }
 
-        function pathRectangle(ctx, rect, biased) {
-            var bias = calculateBias(ctx, biased);
-            ctx.rect(rect.x + bias, rect.y + bias, rect.w, rect.h);
+        function pathRectangle(ctx, rect, bias) {
+            ctx.rect(rect.x + bias.x, rect.y + bias.y, rect.w, rect.h);
         }
 
-        function pathEllipse(ctx, elli, biased) {
-            var bias = calculateBias(ctx, biased);
+        function pathEllipse(ctx, elli, bias) {
             var kappa = 0.5522847498307933;
             var pcv = 0.5 + kappa * 0.5;
             var ncv = 0.5 - kappa * 0.5;
 
-            ctx.moveTo(elli.x + bias + elli.w, elli.y + bias + 0.5 * elli.h);
+            ctx.moveTo(elli.x + bias.x + elli.w, elli.y + bias.y + 0.5 * elli.h);
             var pts = getEllipseCoords([1.0, pcv, pcv, 1.0, 0.5, 1.0], elli, bias);
             ctx.bezierCurveTo(pts[0], pts[1], pts[2], pts[3], pts[4], pts[5]);
             pts = getEllipseCoords([ncv, 1.0, 0.0, pcv, 0.0, 0.5], elli, bias);
@@ -757,17 +756,16 @@
         }
 
         function getEllipseCoords(pts, elli, bias) {
-            pts[0] = elli.x + bias + pts[0] * elli.w;
-            pts[1] = elli.y + bias + pts[1] * elli.h;
-            pts[2] = elli.x + bias + pts[2] * elli.w;
-            pts[3] = elli.y + bias + pts[3] * elli.h;
-            pts[4] = elli.x + bias + pts[4] * elli.w;
-            pts[5] = elli.y + bias + pts[5] * elli.h;
+            pts[0] = elli.x + bias.x + pts[0] * elli.w;
+            pts[1] = elli.y + bias.y + pts[1] * elli.h;
+            pts[2] = elli.x + bias.x + pts[2] * elli.w;
+            pts[3] = elli.y + bias.y + pts[3] * elli.h;
+            pts[4] = elli.x + bias.x + pts[4] * elli.w;
+            pts[5] = elli.y + bias.y + pts[5] * elli.h;
             return pts;
         }
 
-        function pathRoundRectangle(ctx, rr, biased) {
-            var bias = calculateBias(ctx, biased);
+        function pathRoundRectangle(ctx, rr, bias) {
             var acv = 0.22385762508460333;
 
             var pts = getRRCoords([0, 0, 0, 0.5], rr, bias);
@@ -800,15 +798,14 @@
             var coords = [];
             var nc = 0;
             for (var i = 0; i < pts.length; i += 4) {
-                coords[nc++] = rr.x + bias + pts[i + 0] * rr.w + pts[i + 1] * Math.abs(rr.arcW);
-                coords[nc++] = rr.y + bias + pts[i + 2] * rr.h + pts[i + 3] * Math.abs(rr.arcH);
+                coords[nc++] = rr.x + bias.x + pts[i + 0] * rr.w + pts[i + 1] * Math.abs(rr.arcW);
+                coords[nc++] = rr.y + bias.y + pts[i + 2] * rr.h + pts[i + 3] * Math.abs(rr.arcH);
             }
             return coords;
         }
 
-        function pathArc(ctx, arc, biased) {
-            var bias = calculateBias(ctx, biased);
-            var w = arc.w / 2, h = arc.h / 2, x = arc.x + bias + w, y = arc.y + bias + h;
+        function pathArc(ctx, arc, bias) {
+            var w = arc.w / 2, h = arc.h / 2, x = arc.x + bias.x + w, y = arc.y + bias.y + h;
             var angStRad = -(arc.start * Math.PI / 180);
             var ext = -arc.extent;
             var arcSegs = 4;
@@ -850,8 +847,15 @@
             }
         }
 
-        function calculateBias(ctx, biased) {
-            return (ctx.lineWidth & 1) && biased ? 0.5 : 0;
+        function calculateBias(ctx, biased, transform) {
+            if(!biased){
+                return {x:0,y:0};
+            }else{
+                return {
+                    x:(ctx.lineWidth * transform[0]) & 1 ? 0.5/transform[0] : 0,
+                    y:(ctx.lineWidth * transform[3]) & 1 ? 0.5/transform[3] : 0
+                }
+            }
         }
 
         function parseColor(rgba) {
