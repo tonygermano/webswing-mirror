@@ -79,6 +79,9 @@ import java.awt.peer.TextAreaPeer;
 import java.awt.peer.TextFieldPeer;
 import java.awt.peer.TrayIconPeer;
 import java.awt.peer.WindowPeer;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -130,6 +133,27 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 			}
 		} catch (Exception e) {
 			Logger.error("Failed to init X11 display: ", e.getMessage());
+		}
+		installFonts();
+	}
+
+	private void installFonts() {
+		try {
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			Properties fontsProp=new Properties();
+			String fontConfig=System.getProperty("sun.awt.fontconfig");
+			if(fontConfig!=null) {
+				fontsProp.load(new FileInputStream(new File(fontConfig)));
+				for (String name : fontsProp.stringPropertyNames()) {
+					if (name.startsWith("filename.")) {
+						String file = fontsProp.getProperty(name);
+						Font font = Font.createFont(Font.TRUETYPE_FONT, new File(file));
+						ge.registerFont(font);
+					}
+				}
+			}
+		} catch (Exception e) {
+			Logger.error("Failed to install fonts",e);
 		}
 	}
 
@@ -191,7 +215,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	private static GraphicsConfiguration config;
 	private Hashtable<String, FontPeer> cacheFontPeer;
-	private Clipboard clipboard;
+	private WebClipboard clipboard;
 	private Clipboard selectionClipboard;
 
 	private boolean exiting = false;
@@ -405,6 +429,10 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	}
 
 	public Clipboard getSystemClipboard() throws HeadlessException {
+		return getWebswingClipboard();
+	}
+
+	public WebClipboard getWebswingClipboard() {
 		synchronized (this) {
 			if (this.clipboard == null) {
 				this.clipboard = new WebClipboard("default", true);
@@ -675,7 +703,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	public synchronized void exitSwing(final int i) {
 		if (!exiting) {
 			exiting = true;
-			Thread shutdownThread= new Thread(new Runnable() {
+			Thread shutdownThread = new Thread(new Runnable() {
 				@Override
 				public void run() {
 					//tell server to kill this application after defined time
