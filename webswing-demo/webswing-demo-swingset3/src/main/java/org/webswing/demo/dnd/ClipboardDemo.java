@@ -37,6 +37,8 @@ import javax.swing.table.TableModel;
 import com.sun.swingset3.DemoProperties;
 import com.sun.swingset3.demos.table.OscarCellRenderers.RowRenderer;
 import org.webswing.toolkit.api.WebswingUtil;
+import org.webswing.toolkit.api.clipboard.BrowserTransferable;
+import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.url.WebswingUrlState;
 import org.webswing.toolkit.api.url.WebswingUrlStateChangeEvent;
 import org.webswing.toolkit.api.url.WebswingUrlStateChangeListener;
@@ -121,6 +123,7 @@ public class ClipboardDemo extends JPanel {
 		pm.add(new CutAction(clipboardTable));
 		pm.add(new PasteSpecialAction(clipboardTable));
 		pm.add(new PasteFromBrowserAction(clipboardTable));
+		pm.add(new PasteFromBrowserDialogAction(clipboardTable));
 		pm.add(new CopyToBrowserAction(clipboardTable));
 		clipboardTable.addMouseListener(new MouseAdapter() {
 
@@ -541,6 +544,36 @@ public class ClipboardDemo extends JPanel {
 			pasteDialog.setLocationRelativeTo(null);  // *** this will center your app ***
 			pasteDialog.setVisible(true);
 			panel.requestFocus();
+		}
+	}
+
+	class PasteFromBrowserDialogAction extends AbstractAction {
+
+		private JTable table;
+
+		public PasteFromBrowserDialogAction(JTable tbl) {
+			putValue(NAME, "Paste from Browser Dialog");
+			table = tbl;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (WebswingUtil.isWebswing()) {
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						PasteRequestContext ctx = new PasteRequestContext();
+						ctx.setTitle("Please paste content");
+						ctx.setMessage("User ctrl+v or paste from context menu to input field below.");
+						BrowserTransferable transferable = WebswingUtil.getWebswingApi().getBrowserClipboard(ctx);
+						if (transferable != null) {
+							Toolkit.getDefaultToolkit().getSystemClipboard().setContents(transferable, null);
+							new PasteAction(table1).actionPerformed(null);
+						}
+					}
+				}).start();
+
+			}
 		}
 	}
 

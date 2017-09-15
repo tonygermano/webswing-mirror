@@ -65,6 +65,7 @@ define({
         "clipboard.copy": "Copy to Clipboard (CTRL+C)",
         "clipboard.more": "More...",
         "clipboard.discard": "Discard",
+        "clipboard.cancel": "Cancel",
 
         //  FILES
         "files.saveTitle": "Save file",

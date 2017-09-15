@@ -21,6 +21,7 @@ import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.model.internal.ApiEventMsgInternal.ApiEventType;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingApiException;
+import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.BrowserTransferable;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.api.lifecycle.WebswingShutdownListener;
@@ -337,6 +338,12 @@ public class WebswingApiImpl implements WebswingApi {
 			return ((WebClipboard) clipboard).getBrowserClipboard();
 		}
 		return null;
+	}
+
+	@Override
+	public BrowserTransferable getBrowserClipboard(PasteRequestContext ctx) {
+		WebClipboard webclipboard = Util.getWebToolkit().getWebswingClipboard();
+		return webclipboard.requestClipboard(ctx);
 	}
 
 	@Override

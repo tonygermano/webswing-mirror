@@ -1,5 +1,6 @@
 package org.webswing.toolkit.api;
 
+import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.BrowserTransferable;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.api.lifecycle.WebswingShutdownListener;
@@ -143,6 +144,15 @@ public interface WebswingApi {
 	 * @return Latest clipboard content received from browser
 	 */
 	public BrowserTransferable getBrowserClipboard();
+
+	/**
+	 * Request user to paste from browser clipboard by showing built-in html modal dialog. This method will block EDT thread (by showing a invisible modal JDialog) until response received from user.
+	 * <br>
+	 * Typically used for customized clipboard integration, while the built-in integration is disabled in configuration ("allowLocalClipboard" is false).
+	 *
+	 * @return User submited clipboard content received from browser (null if cancelled)
+	 */
+	public BrowserTransferable getBrowserClipboard(PasteRequestContext ctx);
 
 	/**
 	 * Sends the specified data to browser.

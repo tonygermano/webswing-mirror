@@ -448,7 +448,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			String javaVersion = subs.replace(appConfig.getJavaVersion());
 			boolean useJFX = config.isJavaFx();
 			if (!new File(JAVA_FX_PATH).exists()) {
-				log.error("Java FX not supported with current java version (Try version 1.8). JavaFx library not found in '" + new File(JAVA_FX_PATH).getCanonicalPath() + "'. ");
+				log.warn("Java FX not supported with current java version (Try version 1.8). JavaFx library not found in '" + new File(JAVA_FX_PATH).getCanonicalPath() + "'. ");
 				useJFX = false;
 			}
 			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;

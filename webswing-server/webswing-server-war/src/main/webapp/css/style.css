@@ -449,7 +449,7 @@ html.ws-fullscreen body {
   min-height: 100%;
   justify-content: center;
 }
-.webswing-element .ws-modal, .webswing-element .ws-dialog, .webswing-element .ws-files, .webswing-element .ws-login, .webswing-element .ws-selector {
+.webswing-element .ws-modal, .webswing-element .ws-dialog, .webswing-element .ws-files, .webswing-element .ws-login, .webswing-element .ws-selector, .webswing-element .ws-paste {
   max-width: 320px;
   padding: 20px;
   -webkit-border-radius: 3px;
@@ -485,15 +485,15 @@ html.ws-fullscreen body {
   clear: both;
   width: 100%;
 }
-.webswing-element .ws-header, .webswing-element .ws-files-header, .webswing-element .ws-login-header, .webswing-element .ws-clipboard-header {
+.webswing-element .ws-header, .webswing-element .ws-files-header, .webswing-element .ws-login-header, .webswing-element .ws-paste-header, .webswing-element .ws-clipboard-header {
   padding-bottom: 20px;
   border-bottom: 1px solid #eeeeee;
 }
-.webswing-element .ws-title, .webswing-element .ws-files-title, .webswing-element .ws-login-title, .webswing-element .ws-selector-title, .webswing-element .ws-clipboard-title {
+.webswing-element .ws-title, .webswing-element .ws-files-title, .webswing-element .ws-login-title, .webswing-element .ws-selector-title, .webswing-element .ws-paste-title, .webswing-element .ws-clipboard-title {
   font-size: 16px;
   text-transform: uppercase;
 }
-.webswing-element .ws-text, .webswing-element .ws-files-instructions, .webswing-element .ws-login-instructions {
+.webswing-element .ws-text, .webswing-element .ws-files-instructions, .webswing-element .ws-login-instructions, .webswing-element .ws-paste-message {
   padding-top: 10px;
   color: #757575;
   font-size: 15px;
@@ -984,6 +984,24 @@ html.ws-fullscreen body {
   font-size: 14px;
   word-wrap: break-word;
   text-align: center;
+}
+.webswing-element .ws-paste-header {
+  text-align: left;
+}
+.webswing-element .ws-paste-title {
+  margin: 15px 0 5px 0;
+}
+.webswing-element .ws-paste-content {
+  margin: 0px;
+}
+.webswing-element .ws-paste-message {
+  padding: 0px;
+  margin: 20px 0px 20px 0px;
+  text-align: left;
+}
+.webswing-element .ws-paste-textarea {
+  display: block;
+  width: 100%;
 }
 .webswing-element .ws-clipboard-body {
   min-height: 100px;

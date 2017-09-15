@@ -42,6 +42,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             print: 'files.print',
             download: 'files.download',
             displayCopyBar: 'clipboard.displayCopyBar',
+            displayPasteDialog: 'clipboard.displayPasteDialog',
             processJsLink: 'jslink.process',
             playbackInfo: 'playback.playbackInfo'
         };
@@ -290,6 +291,9 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             }
             if (data.copyEvent != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
                 api.displayCopyBar(data.copyEvent);
+            }
+            if(data.pasteRequest != null && api.cfg.hasControl && !api.cfg.recordingPlayback){
+                api.displayPasteDialog(data.pasteRequest);
             }
             if (data.fileDialogEvent != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
                 api.processFileDialogEvent(data.fileDialogEvent);

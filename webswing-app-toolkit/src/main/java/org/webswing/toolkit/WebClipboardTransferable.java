@@ -16,11 +16,13 @@ public class WebClipboardTransferable implements BrowserTransferable {
 	private String html;
 
 	public WebClipboardTransferable(PasteEventMsgIn paste) {
-		if (paste.getImg() != null) {
-			this.image = Services.getImageService().readFromDataUrl(paste.getImg());
+		if (paste != null) {
+			if (paste.getImg() != null) {
+				this.image = Services.getImageService().readFromDataUrl(paste.getImg());
+			}
+			this.text = paste.getText();
+			this.html = paste.getHtml();
 		}
-		this.text = paste.getText();
-		this.html = paste.getHtml();
 	}
 
 	public boolean isEmpty() {

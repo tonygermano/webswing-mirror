@@ -1,11 +1,14 @@
 package org.webswing.toolkit;
 
 import org.webswing.Constants;
+import org.webswing.toolkit.api.clipboard.PasteRequestContext;
+import org.webswing.toolkit.api.clipboard.BrowserTransferable;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
 
+import javax.swing.SwingUtilities;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.datatransfer.Clipboard;
@@ -15,7 +18,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class WebClipboard extends Clipboard {
@@ -147,5 +149,31 @@ public class WebClipboard extends Clipboard {
 
 	public WebClipboardTransferable getBrowserClipboard() {
 		return browserClipboard;
+	}
+
+	public BrowserTransferable requestClipboard(final PasteRequestContext ctx) {
+		if(SwingUtilities.isEventDispatchThread()){
+			setBrowserClipboard(new WebClipboardTransferable(null));
+			Util.getWebToolkit().getPaintDispatcher().requestBrowserClipboard(ctx);
+			if(browserClipboard!=null && !browserClipboard.isEmpty()){
+				return browserClipboard;
+			}
+			return null;
+		}else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
+					public void run() {
+						requestClipboard(ctx);
+					}
+				});
+				if(browserClipboard!=null && !browserClipboard.isEmpty()){
+					return browserClipboard;
+				}
+			} catch (Exception e) {
+				Logger.error("Failed to process paste request.",e);
+			}
+			return null;
+		}
 	}
 }

@@ -9,6 +9,7 @@ import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
 import org.webswing.toolkit.WebCursor;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
+import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.extra.WindowManager;
@@ -17,6 +18,7 @@ import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -42,6 +44,7 @@ public class WebPaintDispatcher {
 	private volatile boolean clientReadyToReceive = true;
 	private long lastReadyStateTime;
 	private JFileChooser fileChooserDialog;
+	private JDialog clipboardDialog;
 
 	private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance());
 
@@ -509,5 +512,28 @@ public class WebPaintDispatcher {
 		AppFrameMsgOut result = new AppFrameMsgOut();
 		result.setLinkAction(new LinkActionMsg(LinkActionMsg.LinkActionType.redirect, url));
 		Util.getWebToolkit().getPaintDispatcher().sendObject(result);
+	}
+
+	public void requestBrowserClipboard(PasteRequestContext ctx) {
+		AppFrameMsgOut result = new AppFrameMsgOut();
+		PasteRequestMsg paste=new PasteRequestMsg();
+		paste.setTitle(ctx.getTitle());
+		paste.setMessage(ctx.getMessage());
+		result.setPasteRequest(paste);
+		Util.getWebToolkit().getPaintDispatcher().sendObject(result);
+
+		this.clipboardDialog = new JDialog((Dialog)null,true);
+		clipboardDialog.setBounds(new Rectangle(0,0,1,1));
+		clipboardDialog.setVisible(true);//this call is blocking until dialog is closed
+	}
+
+	public boolean closePasteRequestDialog() {
+		if(clipboardDialog!=null){
+			boolean result=clipboardDialog.isVisible();
+			clipboardDialog.setVisible(false);
+			clipboardDialog.dispose();
+			return result;
+		}
+		return false;
 	}
 }

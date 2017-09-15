@@ -8,17 +8,18 @@ message AppFrameMsgOutProto {
     optional WindowMoveActionMsgProto moveAction = 3;
     optional CursorChangeEventMsgProto cursorChange = 4;
     optional CopyEventMsgProto copyEvent = 5;
-    optional FileDialogEventMsgProto fileDialogEvent = 6;
-    repeated WindowMsgProto windows = 7;
-    optional WindowMsgProto closedWindow = 8;
-    optional SimpleEventMsgOutProto event = 9;
-    optional JsEvalRequestMsgOutProto jsRequest = 10;
-    optional JsResultMsgProto javaResponse = 11;
-    optional PixelsAreaRequestMsgOutProto pixelsRequest = 12;
-    optional PlaybackInfoMsgProto playback = 13;
-    optional string sessionId = 14;
-    optional string startTimestamp = 15;
-    optional string sendTimestamp = 16;
+    optional PasteRequestMsgProto pasteRequest = 6;
+    optional FileDialogEventMsgProto fileDialogEvent = 7;
+    repeated WindowMsgProto windows = 8;
+    optional WindowMsgProto closedWindow = 9;
+    optional SimpleEventMsgOutProto event = 10;
+    optional JsEvalRequestMsgOutProto jsRequest = 11;
+    optional JsResultMsgProto javaResponse = 12;
+    optional PixelsAreaRequestMsgOutProto pixelsRequest = 13;
+    optional PlaybackInfoMsgProto playback = 14;
+    optional string sessionId = 15;
+    optional string startTimestamp = 16;
+    optional string sendTimestamp = 17;
 }
 
 message ApplicationInfoMsgProto {
@@ -62,6 +63,11 @@ message CopyEventMsgProto {
     optional bytes img = 3;
     repeated string files = 4;
     optional bool other = 5;
+}
+
+message PasteRequestMsgProto {
+    optional string title = 1;
+    optional string message = 2;
 }
 
 message FileDialogEventMsgProto {

@@ -85,6 +85,7 @@ public class WebEventDispatcher {
 						final ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
 						Util.getWebToolkit().initSize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
 						Util.getWebToolkit().getPaintDispatcher().notifyFileDialogActive();
+						Util.getWebToolkit().getPaintDispatcher().closePasteRequestDialog();
 						Util.getWebToolkit().processApiEvent(handshake);
 						if (System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null) {
 							// resize and refresh the applet object exposed in javascript in case of page reload/session continue
@@ -355,13 +356,16 @@ public class WebEventDispatcher {
 
 			@Override
 			public void run() {
+				boolean clipboardRequested=Util.getWebToolkit().getPaintDispatcher().closePasteRequestDialog();
 				WebClipboardTransferable transferable = new WebClipboardTransferable(paste);
 				WebClipboard wc = (WebClipboard) Util.getWebToolkit().getSystemClipboard();
 				wc.setBrowserClipboard(transferable);
 				if (!transferable.isEmpty() && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD)) {
 					wc.setContents(transferable);
 				}
-				WebEventDispatcher.this.dispatchPasteEvent(paste.isSpecial());
+				if(!clipboardRequested){
+					WebEventDispatcher.this.dispatchPasteEvent(paste.isSpecial());
+				}
 			}
 		});
 	}

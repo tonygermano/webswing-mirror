@@ -15,6 +15,7 @@ public class AppFrameMsgOut implements MsgOut {
 	private WindowMoveActionMsg moveAction;
 	private CursorChangeEventMsg cursorChange;
 	private CopyEventMsg copyEvent;
+	private PasteRequestMsg pasteRequest;
 	private FileDialogEventMsg fileDialogEvent;
 	private List<WindowMsg> windows;
 	private WindowMsg closedWindow;
@@ -44,6 +45,14 @@ public class AppFrameMsgOut implements MsgOut {
 		window.setId(guid);
 		windows.add(window);
 		return window;
+	}
+
+	public PasteRequestMsg getPasteRequest() {
+		return pasteRequest;
+	}
+
+	public void setPasteRequest(PasteRequestMsg pasteRequest) {
+		this.pasteRequest = pasteRequest;
 	}
 
 	public List<ApplicationInfoMsg> getApplications() {

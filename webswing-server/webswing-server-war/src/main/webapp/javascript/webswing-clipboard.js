@@ -1,4 +1,4 @@
-define(['jquery', 'text!templates/clipboard.html', 'webswing-util'], function amdFactory($, html, util) {
+define(['jquery', 'text!templates/clipboard.html','text!templates/paste.html', 'webswing-util'], function amdFactory($, html,pasteHtml, util) {
     "use strict";
 
     return function ClipboardModule() {
@@ -15,14 +15,17 @@ define(['jquery', 'text!templates/clipboard.html', 'webswing-util'], function am
             copy: copy,
             paste: paste,
             displayCopyBar: displayCopyBar,
+            displayPasteDialog: displayPasteDialog,
             dispose: close
         };
         module.ready = function () {
             document.addEventListener("copy", copy);
             html = api.translate(html);
+            pasteHtml = api.translate(pasteHtml);
         };
 
         var copyBar;
+        var pasteDialog;
 
         function cut(event) {
             copy(event, true);
@@ -228,6 +231,47 @@ define(['jquery', 'text!templates/clipboard.html', 'webswing-util'], function am
                 copyBar.hide("fast");
                 copyBar.remove();
                 copyBar = null;
+            }
+            api.getInput().focus();
+        }
+
+        function displayPasteDialog(requestCtx){
+            if (pasteDialog != null) {
+                closePasteDialog();
+            }
+            api.cfg.rootElement.append(pasteHtml);
+            pasteDialog = api.cfg.rootElement.find('div[data-id="pasteDialog"]');
+
+            var title =pasteDialog.find('div[data-id="title"]');
+            title.html(api.translate(requestCtx.title));
+
+            var message =pasteDialog.find('div[data-id="message"]');
+            message.html(api.translate(requestCtx.message));
+
+            var textarea =pasteDialog.find('textarea[data-id="textarea"]');
+            textarea.focus();
+            textarea.on('paste', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                paste(event, false);
+                closePasteDialog();
+                return false;
+            });
+
+            var closeBtn= pasteDialog.find('button[data-id="closeBtn"]');
+            closeBtn.on('click', function (event) {
+                api.send({
+                    paste: {}
+                });
+                closePasteDialog();
+            });
+        }
+
+        function closePasteDialog() {
+            if (pasteDialog != null) {
+                pasteDialog.hide("fast");
+                pasteDialog.remove();
+                pasteDialog = null;
             }
             api.getInput().focus();
         }
