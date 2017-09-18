@@ -40,6 +40,7 @@ import java.util.concurrent.Executors;
 @SuppressWarnings("restriction")
 public class WebEventDispatcher {
 
+	private static final int CLICK_TOLERANCE = 2;
 	private MouseEvent lastMouseEvent;
 	private MouseEventInfo lastMousePressEvent;
 	private Point lastMousePosition = new Point();
@@ -251,7 +252,7 @@ public class WebEventDispatcher {
 				modifiers = modifiers & (((1 << 6) - 1) | (~((1 << 14) - 1)) | MouseEvent.CTRL_DOWN_MASK | MouseEvent.ALT_DOWN_MASK | MouseEvent.SHIFT_DOWN_MASK | MouseEvent.META_DOWN_MASK);
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
 				dispatchEventInSwing(c, e);
-				if (lastMousePressEvent != null && lastMousePressEvent.x == x && lastMousePressEvent.y == y) {
+				if (lastMousePressEvent != null && Math.abs(lastMousePressEvent.x - x) < CLICK_TOLERANCE && Math.abs(lastMousePressEvent.y - y) < CLICK_TOLERANCE) {
 					e = new MouseEvent(c, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
 					dispatchEventInSwing(c, e);
 					lastMouseEvent = e;
@@ -290,7 +291,7 @@ public class WebEventDispatcher {
 
 	private int computeClickCount(int x, int y, int button, boolean isPressed, int timeMilis) {
 		if (isPressed) {
-			if (lastMousePressEvent != null && lastMousePressEvent.type == MouseEvent.MOUSE_CLICKED && lastMousePressEvent.button == button && lastMousePressEvent.x == x && lastMousePressEvent.y == y) {
+			if (lastMousePressEvent != null && lastMousePressEvent.type == MouseEvent.MOUSE_CLICKED && lastMousePressEvent.button == button && Math.abs(lastMousePressEvent.x - x) < CLICK_TOLERANCE && Math.abs(lastMousePressEvent.y - y) < CLICK_TOLERANCE) {
 				if (timeMilis - lastMousePressEvent.time < doubleClickMaxDelay) {
 					return lastMousePressEvent.clickcount + 1;
 				}
@@ -356,14 +357,14 @@ public class WebEventDispatcher {
 
 			@Override
 			public void run() {
-				boolean clipboardRequested=Util.getWebToolkit().getPaintDispatcher().closePasteRequestDialog();
+				boolean clipboardRequested = Util.getWebToolkit().getPaintDispatcher().closePasteRequestDialog();
 				WebClipboardTransferable transferable = new WebClipboardTransferable(paste);
 				WebClipboard wc = (WebClipboard) Util.getWebToolkit().getSystemClipboard();
 				wc.setBrowserClipboard(transferable);
 				if (!transferable.isEmpty() && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD)) {
 					wc.setContents(transferable);
 				}
-				if(!clipboardRequested){
+				if (!clipboardRequested) {
 					WebEventDispatcher.this.dispatchPasteEvent(paste.isSpecial());
 				}
 			}
@@ -492,7 +493,7 @@ public class WebEventDispatcher {
 			this.y = e.getY();
 			this.type = e.getID();
 			this.clickcount = e.getClickCount();
-			this.button=e.getButton();
+			this.button = e.getButton();
 			this.time = time;
 		}
 
