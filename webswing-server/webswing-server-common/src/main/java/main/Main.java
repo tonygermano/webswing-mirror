@@ -15,10 +15,12 @@ import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -30,7 +32,7 @@ public class Main {
 
 	@SuppressWarnings("restriction")
 	public static void main(String[] args) throws Exception {
-		initializeDefaultSystemProperties();
+		initializeDefaultSystemProperties(args);
 
 		boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
 		System.setProperty(Constants.CREATE_NEW_TEMP, getCreateNewTemp(args));
@@ -70,13 +72,19 @@ public class Main {
 		}
 	}
 
-	public static void initializeDefaultSystemProperties() {
+	public static void initializeDefaultSystemProperties(String[] args) {
 		try {
 			InputStream propFile = Main.class.getClassLoader().getResourceAsStream("WEB-INF/classes/webswing.properties");
 			Properties p = new Properties(System.getProperties());
 			p.load(propFile);
-			// set the system properties
-			System.getProperties().putAll(p);
+			
+			// check the -v flag, keep existing system properties if present
+			if(Arrays.asList(args).contains("-sysvar")) {
+				for (Map.Entry<Object, Object> prop : p.entrySet())
+					System.getProperties().putIfAbsent(prop.getKey(), prop.getValue());
+			} else { 
+				System.getProperties().putAll(p);
+			}
 		} catch (Exception e) {
 			//file does not exist, do nothing
 		}
