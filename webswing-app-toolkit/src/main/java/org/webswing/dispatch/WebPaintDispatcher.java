@@ -425,7 +425,7 @@ public class WebPaintDispatcher {
 				fdEvent.setSelection(Util.getFileChooserSelection(fileChooserDialog));
 				fdEvent.addFilter(fileChooserDialog.getChoosableFileFilters());
 				fdEvent.setMultiSelection(fileChooserDialog.isMultiSelectionEnabled());
-				Logger.info("WebPaintDispatcher:notifyFileTransferBarActive", fileChooserEventType.name());
+				Logger.info("WebPaintDispatcher:notifyFileTransferBarActive " + fileChooserEventType.name());
 				Services.getConnectionService().sendObject(f);
 			}
 		}
@@ -436,7 +436,7 @@ public class WebPaintDispatcher {
 		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
 		fdEvent.setEventType(FileDialogEventType.Close);
 		f.setFileDialogEvent(fdEvent);
-		Logger.info("WebPaintDispatcher:notifyFileTransferBarHidden", FileDialogEventType.Close);
+		Logger.info("WebPaintDispatcher:notifyFileTransferBarHidden "+ FileDialogEventType.Close.name());
 
 		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD)) {
 			if (fileChooserDialog != null && fileChooserDialog.getDialogType() == JFileChooser.SAVE_DIALOG) {

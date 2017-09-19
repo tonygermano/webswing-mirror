@@ -153,11 +153,13 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 						IOUtils.copy(filecontent, output);
 						output.close();
 						filecontent.close();
+						log.info("File " + filename + " uploaded (size:" + filePart.getSize() + ") to " + f.getAbsolutePath());
 						UploadEventMsgIn msg = new UploadEventMsgIn();
 						msg.setFileName(filename);
 						msg.setTempFileLocation(f.getAbsolutePath());
 						boolean sent = instance.sendToSwing(null, msg);
 						if (!sent) {
+							log.error("Failed to send upload notification to app session. File:" + filename + "+ClientID:" + clientId);
 							f.delete();
 						} else {
 							resp.getWriter().write("{\"files\":[{\"name\":\"" + filename + "\"}]}"); // TODO size

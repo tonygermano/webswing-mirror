@@ -122,10 +122,15 @@ public class WebEventDispatcher {
 								try {
 									Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
 									uploadMap.put(upload.getFileName(), validfilename);
+									Logger.info("File upload notification received: " + validfilename);
 								} catch (IOException e) {
-									Logger.error("Error while moving uploaded file to target folder: ", e);
+									Logger.error("Error while moving uploaded file '" + validfilename + "' to target folder: ", e);
 								}
+							} else {
+								Logger.error("Error while uploading file '" + validfilename + "'. " + (currentDir.canWrite() ? " Temp upload file " + tempFile.getAbsoluteFile() + " not found" : "Can not write to target folder " + currentDir.getAbsoluteFile()));
 							}
+						} else {
+							Logger.error("Error while uploading file. FileChooser dialog instance not found");
 						}
 					}
 				} catch (Throwable e) {
@@ -449,6 +454,7 @@ public class WebEventDispatcher {
 						}
 					}
 					fc.setSelectedFiles(arr.toArray(new File[arr.size()]));
+					Logger.info("Files selected :" + arr);
 				} else {
 					if (uploadMap.get(event.getFiles().get(0)) != null) {
 						File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
@@ -456,6 +462,7 @@ public class WebEventDispatcher {
 					} else if (saveMode) {
 						fc.setSelectedFile(new File(fc.getCurrentDirectory(), event.getFiles().get(0)));
 					}
+					Logger.info("File selected :" + fc.getSelectedFile().getAbsoluteFile());
 				}
 				if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
 					fc.approveSelection();
