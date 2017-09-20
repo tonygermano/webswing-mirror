@@ -1,6 +1,7 @@
 package org.webswing.server;
 
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -76,9 +77,17 @@ public class WebswingServerModule extends AbstractModule {
 			Properties p = new Properties(System.getProperties());
 			p.load(propFile);
 			// set the system properties
-			System.getProperties().putAll(p);
+			String keepSysProps = System.getProperty(Constants.PRESERVE_SYSTEM_PROPETIES);
+			if(keepSysProps != null && Boolean.parseBoolean(keepSysProps)) {
+				for (Map.Entry<Object, Object> prop : p.entrySet()) {
+					if(!System.getProperties().containsKey(prop.getKey()))
+						System.getProperties().put(prop.getKey(), prop.getValue());
+				}
+			} else {
+				System.getProperties().putAll(p);
+			}
 		} catch (Exception e) {
-			//file does not exist, do nothing
+			log.error("Exception occurred during initialization of System Properties", e);
 		}
 	}
 

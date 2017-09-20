@@ -78,10 +78,12 @@ public class Main {
 			Properties p = new Properties(System.getProperties());
 			p.load(propFile);
 			
-			// check the -v flag, keep existing system properties if present
+			// check the -sysvar flag, keep existing system properties if present
 			if(Arrays.asList(args).contains("-sysvar")) {
-				for (Map.Entry<Object, Object> prop : p.entrySet())
-					System.getProperties().putIfAbsent(prop.getKey(), prop.getValue());
+				for (Map.Entry<Object, Object> prop : p.entrySet()) {
+					if(!System.getProperties().containsKey(prop.getKey()))
+						System.getProperties().put(prop.getKey(), prop.getValue());
+				}					
 			} else { 
 				System.getProperties().putAll(p);
 			}
