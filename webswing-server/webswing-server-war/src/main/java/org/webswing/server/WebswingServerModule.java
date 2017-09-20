@@ -77,15 +77,11 @@ public class WebswingServerModule extends AbstractModule {
 			Properties p = new Properties(System.getProperties());
 			p.load(propFile);
 			// set the system properties
-			String keepSysProps = System.getProperty(Constants.PRESERVE_SYSTEM_PROPETIES);
-			if(keepSysProps != null && Boolean.parseBoolean(keepSysProps)) {
-				for (Map.Entry<Object, Object> prop : p.entrySet()) {
-					if(!System.getProperties().containsKey(prop.getKey()))
-						System.getProperties().put(prop.getKey(), prop.getValue());
-				}
-			} else {
-				System.getProperties().putAll(p);
+			for (Map.Entry<Object, Object> prop : p.entrySet()) {
+				if(!System.getProperties().containsKey(prop.getKey()))
+					System.getProperties().put(prop.getKey(), prop.getValue());
 			}
+
 		} catch (Exception e) {
 			log.error("Exception occurred during initialization of System Properties", e);
 		}

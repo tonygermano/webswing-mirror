@@ -70,8 +70,6 @@ public interface Constants {
 	public static final String FILE_SERVLET_WAIT_TIMEOUT = "webswing.fileServletWaitTimeout";
 	public static final String REVERSE_PROXY_CONTEXT_PATH = "webswing.proxyContextPath";
 	public static final String HTTPS_ONLY = "webswing.httpsOnly";
-	public static final String PRESERVE_SYSTEM_PROPETIES = "webswing.preserveSystemProperties";
-
 
 	// swing start related properties
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";
