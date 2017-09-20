@@ -36,6 +36,7 @@ public class Main {
 
 		boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
 		System.setProperty(Constants.CREATE_NEW_TEMP, getCreateNewTemp(args));
+		System.setProperty(Constants.CLEAN_TEMP, getBoolParam(args, "-tc", true));
 
 		ProtectionDomain domain = Main.class.getProtectionDomain();
 		URL location = domain.getCodeSource().getLocation();
@@ -94,13 +95,16 @@ public class Main {
 
 	public static String getCreateNewTemp(String[] args) {
 		// create the command line parser
-		for (int i = 0; i < args.length; i += 2) {
-			if (args[i].equals("-d") && i + 1 < args.length) {
+		return getBoolParam(args, "-d", false);
+	}
+	
+	public static String getBoolParam(String[] args, String param, Boolean def) {		
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equals(param) && i + 1 < args.length) {
 				return args[i + 1];
 			}
-		}
-		return "false";
-
+		}		
+		return def.toString();
 	}
 
 	private static void retainOnlyLauncherUrl(List<URL> urls) {
@@ -222,7 +226,7 @@ public class Main {
 				File tempDir = new File(baseDir, baseName).getAbsoluteFile();
 				if (!tempDir.exists()) {
 					tempDir.mkdir();
-				} else {
+				} else if (Boolean.parseBoolean(System.getProperty(Constants.CLEAN_TEMP, "true"))){
 					for (File f : tempDir.listFiles()) {
 						if (!delete(f)) {
 							throw new IllegalStateException("Not possible to clean the temp folder. Make sure no other instance of webswing is running or use '-d true' option to create a new temp folder.");

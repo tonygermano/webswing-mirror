@@ -55,6 +55,7 @@ public interface Constants {
 	public static final String TEMP_DIR_PATH_BASE = "webswing.tempDirBase";
 	public static final String TEMP_DIR_PATH = "webswing.tempDirPath";
 	public static final String CREATE_NEW_TEMP = "webswing.createNewTemp";
+	public static final String CLEAN_TEMP = "webswing.cleanTempDir";
 	public static final String CONFIG_FILE_PATH = "webswing.configFile";
 	public static final String CONFIG_RELOAD_INTERVAL_MS = "webswing.configReloadIntervalMs";
 	public static final String DEFAULT_CONFIG_FILE_NAME = "webswing.config";
