@@ -46,7 +46,8 @@ public class VariableSubstitutor {
 			result.put(Constants.SESSION_CUSTOMARGS_SUBSTITUTE, customArgs);
 		}
 		if (config != null) {
-			result.put(Constants.HOME_FOLDER_SUBSTITUTE, config.getHomeDir());
+			result.put(Constants.APP_HOME_FOLDER_SUBSTITUTE, config.getHomeDir());
+			result.put(Constants.APP_CONTEXT_PATH_SUBSTITUTE, config.getPath());
 		}
 		return new VariableSubstitutor(result);
 	}
@@ -54,7 +55,8 @@ public class VariableSubstitutor {
 	public static VariableSubstitutor forSwingApp(SecuredPathConfig config) {
 		Map<String, String> result = new HashMap<String, String>();
 		if (config != null) {
-			result.put(Constants.HOME_FOLDER_SUBSTITUTE, config.getHomeDir());
+			result.put(Constants.APP_HOME_FOLDER_SUBSTITUTE, config.getHomeDir());
+			result.put(Constants.APP_CONTEXT_PATH_SUBSTITUTE, config.getPath());
 		}
 		return new VariableSubstitutor(result);
 	}

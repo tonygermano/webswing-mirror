@@ -84,7 +84,9 @@ public interface Constants {
 	public static final String SESSION_IP_SUBSTITUTE = "clientIp";
 	public static final String SESSION_LOCALE_SUBSTITUTE = "clientLocale";
 	public static final String SESSION_CUSTOMARGS_SUBSTITUTE = "customArgs";
-	public static final String HOME_FOLDER_SUBSTITUTE = "webswing.homeFolder";
+	public static final String APP_HOME_FOLDER_SUBSTITUTE = "webswing.homeFolder";
+	public static final String APP_CONTEXT_PATH_SUBSTITUTE = "webswing.appPath";
+
 
 	// http request header names
 	public static final String HTTP_ATTR_RECORDING_FLAG = "X-webswing-recording";
