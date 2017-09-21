@@ -1,5 +1,7 @@
 package org.webswing;
 
+import java.util.Properties;
+
 public abstract class Configuration {
 
 	private static Configuration singleton = new ConfigurationImpl();
@@ -27,5 +29,9 @@ public abstract class Configuration {
 	public static Configuration getInstance() {
 		return singleton;
 	}
+	
+	public abstract Properties getSystemProperties();
+
+	public abstract void setSystemProperties(Properties props);
 
 }

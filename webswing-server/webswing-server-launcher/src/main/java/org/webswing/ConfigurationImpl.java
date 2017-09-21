@@ -31,6 +31,8 @@ public class ConfigurationImpl extends Configuration {
 	private String keystorePassword;
 
 	private String configFile;
+	
+	private Properties systemProperties;
 
 	public static Configuration parse(String[] args) {
 		ConfigurationImpl cimpl = (ConfigurationImpl) Configuration.getInstance();
@@ -49,12 +51,14 @@ public class ConfigurationImpl extends Configuration {
 		options.addOption("kp", "keystorepwd", true, "Keystore password");
 
 		options.addOption("t", "temp", true, "The folder where temp folder will be created for the server. (./tmp)");
-		options.addOption("tc", "tempClean", true, "Delete the content of temp folder. (true)");
+		options.addOption("tc", "tempclean", true, "Delete the content of temp folder. (true)");
 		
 		options.addOption("d", true, "Create new temp folder for every instance (false)");
 
 		options.addOption("j", "jetty", true, "Jetty startup configuration file. (./jetty.properties)");
 		options.addOption("c", "config", true, "Configuration file name. (<webswing-server.war path>/webswing.config)");
+		
+		options.addOption("sp", "sysprops", true, "Custom system properties file");
 
 		try {
 			// parse the command line arguments
@@ -103,6 +107,13 @@ public class ConfigurationImpl extends Configuration {
 
 			if (line.getOptionValue('c') != null) {
 				cimpl.setConfigFile(line.getOptionValue('c'));
+			}
+			
+			if (line.getOptionValue("sp") != null) {
+				Properties props = new Properties();
+				InputStream inputStream = new FileInputStream(new File(line.getOptionValue("sp")));
+				props.load(inputStream);
+				cimpl.setSystemProperties(props);
 			}
 
 			// NOTE: -d and -t are parsed in main.Main
@@ -211,6 +222,14 @@ public class ConfigurationImpl extends Configuration {
 
 	public void setConfigFile(String configFile) {
 		this.configFile = configFile;
+	}
+
+	public Properties getSystemProperties() {
+		return systemProperties;
+	}
+
+	public void setSystemProperties(Properties props) {
+		this.systemProperties = props;
 	}
 
 	@Override
