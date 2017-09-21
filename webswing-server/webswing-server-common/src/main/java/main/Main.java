@@ -31,7 +31,7 @@ public class Main {
 
 	@SuppressWarnings("restriction")
 	public static void main(String[] args) throws Exception {
-		initializeDefaultSystemProperties(args);
+		initializeDefaultSystemProperties();
 
 		boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
 		System.setProperty(Constants.CREATE_NEW_TEMP, getCreateNewTemp(args));
@@ -72,7 +72,7 @@ public class Main {
 		}
 	}
 
-	public static void initializeDefaultSystemProperties(String[] args) {
+	public static void initializeDefaultSystemProperties() {
 		try {
 			InputStream propFile = Main.class.getClassLoader().getResourceAsStream("WEB-INF/classes/webswing.properties");
 			Properties p = new Properties(System.getProperties());
