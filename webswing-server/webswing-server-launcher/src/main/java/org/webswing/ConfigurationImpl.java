@@ -31,8 +31,6 @@ public class ConfigurationImpl extends Configuration {
 	private String keystorePassword;
 
 	private String configFile;
-	
-	private Properties systemProperties;
 
 	public static Configuration parse(String[] args) {
 		ConfigurationImpl cimpl = (ConfigurationImpl) Configuration.getInstance();

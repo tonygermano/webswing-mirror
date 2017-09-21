@@ -1,7 +1,5 @@
 package org.webswing;
 
-import java.util.Properties;
-
 public abstract class Configuration {
 
 	private static Configuration singleton = new ConfigurationImpl();
