@@ -234,7 +234,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	}
 
 	public SecuredPathConfig getConfig() {
-		if (config == null) {
+		if (config == null || !enabled) {
 			String path = StringUtils.isEmpty(getPathMapping()) ? "/" : getPathMapping();
 			config = configService.getConfiguration(path);
 		}
