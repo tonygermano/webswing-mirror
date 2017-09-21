@@ -118,10 +118,12 @@ public class ServerUtil {
 
 	public static String getClientBrowser(WebSocketConnection r) {
 		if (r != null) {
-
 			String userAgent = r.getRequest().getHeader("User-Agent");
-			String user = userAgent.toLowerCase();
 			String browser = "Unknown";
+			if(userAgent==null){
+				return browser;
+			}
+			String user = userAgent.toLowerCase();
 			if (user.contains("msie")) {
 				String substring = userAgent.substring(userAgent.indexOf("MSIE")).split(";")[0];
 				browser = substring.split(" ")[0].replace("MSIE", "IE") + "-" + substring.split(" ")[1];
