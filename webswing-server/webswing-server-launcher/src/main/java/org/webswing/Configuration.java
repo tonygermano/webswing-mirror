@@ -29,9 +29,5 @@ public abstract class Configuration {
 	public static Configuration getInstance() {
 		return singleton;
 	}
-	
-	public abstract Properties getSystemProperties();
-
-	public abstract void setSystemProperties(Properties props);
 
 }

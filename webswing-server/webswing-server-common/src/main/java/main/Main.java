@@ -78,8 +78,12 @@ public class Main {
 			InputStream propFile = Main.class.getClassLoader().getResourceAsStream("WEB-INF/classes/webswing.properties");
 			Properties p = new Properties(System.getProperties());
 			p.load(propFile);
-			System.getProperties().putAll(p);
-				
+			
+			for (Map.Entry<Object, Object> prop : p.entrySet()) {
+				if(!System.getProperties().containsKey(prop.getKey()))
+					System.getProperties().put(prop.getKey(), prop.getValue());
+			}					
+
 		} catch (Exception e) {
 			//file does not exist, do nothing
 		}

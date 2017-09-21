@@ -57,8 +57,6 @@ public class ConfigurationImpl extends Configuration {
 
 		options.addOption("j", "jetty", true, "Jetty startup configuration file. (./jetty.properties)");
 		options.addOption("c", "config", true, "Configuration file name. (<webswing-server.war path>/webswing.config)");
-		
-		options.addOption("sp", "sysprops", true, "Custom system properties file");
 
 		try {
 			// parse the command line arguments
@@ -107,13 +105,6 @@ public class ConfigurationImpl extends Configuration {
 
 			if (line.getOptionValue('c') != null) {
 				cimpl.setConfigFile(line.getOptionValue('c'));
-			}
-			
-			if (line.getOptionValue("sp") != null) {
-				Properties props = new Properties();
-				InputStream inputStream = new FileInputStream(new File(line.getOptionValue("sp")));
-				props.load(inputStream);
-				cimpl.setSystemProperties(props);
 			}
 
 			// NOTE: -d and -t are parsed in main.Main
@@ -222,14 +213,6 @@ public class ConfigurationImpl extends Configuration {
 
 	public void setConfigFile(String configFile) {
 		this.configFile = configFile;
-	}
-
-	public Properties getSystemProperties() {
-		return systemProperties;
-	}
-
-	public void setSystemProperties(Properties props) {
-		this.systemProperties = props;
 	}
 
 	@Override

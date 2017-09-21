@@ -22,7 +22,6 @@ public class ServerMain {
 		System.setProperty(Constants.SERVER_HOST, config.getHost());
 		boolean isHttpsOnly = config.isHttps() && !config.isHttp();
 		System.setProperty(Constants.HTTPS_ONLY, System.getProperty(Constants.HTTPS_ONLY, ""+isHttpsOnly));
-		System.getProperties().putAll(config.getSystemProperties());
 		if (config.getConfigFile() != null) {
 			File configFile = new File(config.getConfigFile());
 			if (configFile.exists()) {
