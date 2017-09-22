@@ -289,7 +289,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
                     y: mouseY,
                     type: type,
                     wheelDelta: delta,
-                    button: evt.which,
+                    button: type == 'mousemove' ? 0 : evt.which,
                     buttons: mouseDown,
                     ctrl: evt.ctrlKey,
                     alt: evt.altKey,
