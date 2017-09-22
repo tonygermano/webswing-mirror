@@ -28,6 +28,7 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
 
     function webswingLogin(baseUrl, element, loginData, successCallback) {
         $.ajax({
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
             xhrFields: {
                 withCredentials: true
             },
@@ -77,6 +78,7 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
         $.ajax({
             type: 'GET',
             url: baseUrl + 'logout',
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
         }).done(function (data, status, xhr) {
             var response = xhr.responseText;
             if (response != null) {
