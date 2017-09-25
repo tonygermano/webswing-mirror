@@ -4,7 +4,7 @@ define(['jquery', 'text!templates/network.html', 'webswing-util',], function amd
         var module = this;
         var api;
         var worker, ping, networkBar, severity, mute = 0;
-        var count = 4, interval = 3, maxLatency = 500, notifyIf = 2;
+        var count = 6, interval = 5, maxLatency = 500, notifyIf = 3;
         module.injects = api = {
             cfg: 'webswing.config',
             translate: 'translate.translate',

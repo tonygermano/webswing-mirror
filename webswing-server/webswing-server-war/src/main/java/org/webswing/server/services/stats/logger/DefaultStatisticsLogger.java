@@ -26,7 +26,8 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 		rules.put(WEBSOCKET_CONNECTED, DEFAULT_RULE_FLAG);
 
 		warningRules.put(MEMORY_USED_METRIC, WarningRule.memoryUtilizationRule(0.8));
-		warningRules.put(LATENCY, WarningRule.thresholdRule(LATENCY, 200));
+		warningRules.put(LATENCY, WarningRule.thresholdRule(LATENCY, 500));
+		warningRules.put(LATENCY_PING, WarningRule.thresholdRule(LATENCY_PING, 700));
 		warningRules.put(WEBSOCKET_CONNECTED, WarningRule.thresholdRule(WEBSOCKET_CONNECTED, 2, "WebSocket connection failed. Falling back to long-polling."));
 
 		summaryRulesMap.put(MEMORY_ALLOCATED_METRIC, Arrays.asList(Aggregation.SUM));
