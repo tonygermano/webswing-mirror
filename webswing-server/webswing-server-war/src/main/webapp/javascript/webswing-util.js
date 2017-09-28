@@ -78,6 +78,9 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
         $.ajax({
             type: 'GET',
             url: baseUrl + 'logout',
+            xhrFields: {
+                withCredentials: true
+            },
             headers: {'X-Requested-With': 'XMLHttpRequest'}
         }).done(function (data, status, xhr) {
             var response = xhr.responseText;

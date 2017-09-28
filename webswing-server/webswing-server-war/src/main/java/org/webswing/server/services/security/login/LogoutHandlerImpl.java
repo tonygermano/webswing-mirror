@@ -34,6 +34,9 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		AbstractWebswingUser user;
 		try {
+			if("OPTIONS".equals(req.getMethod())){
+				return true;//cors preflight, don't forward to security module
+			}
 			user= logout(req, res);
 		} catch (Exception e) {
 			log.error("Failed to logout", e);
