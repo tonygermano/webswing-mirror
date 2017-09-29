@@ -39,9 +39,7 @@ import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.View;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
@@ -81,9 +79,6 @@ import javax.swing.event.ChangeListener;
 import com.sun.swingset3.codeview.CodeViewer;
 import com.sun.swingset3.utilities.RoundedBorder;
 import com.sun.swingset3.utilities.RoundedPanel;
-
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 
 /**
  *
@@ -350,6 +345,15 @@ public class SwingSet3 extends SingleFrameApplication {
 	}
 
 	protected JComponent createMainPanel() {
+
+
+		Toolkit.getDefaultToolkit ().addAWTEventListener(new AWTEventListener() {
+			@Override
+			public void eventDispatched(AWTEvent event) {
+				System.out.println(event);
+			}
+		}, AWTEvent.KEY_EVENT_MASK);
+
 
 		// Create main panel with demo selection on left and demo/source on right
 		mainPanel = new JPanel();
