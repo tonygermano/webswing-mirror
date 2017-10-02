@@ -98,6 +98,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 showDialog: 'dialog.show',
                 readyDialog: 'dialog.content.readyDialog',
                 initializingDialog: 'dialog.content.initializingDialog',
+                cookiesDisabledDialog: 'dialog.content.cookiesDisabledDialog',
                 disposeIdentity: 'identity.dispose',
                 disposeBase: 'base.dispose',
                 disposeCanvas: 'canvas.dispose',
@@ -158,6 +159,10 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
             }
 
             function start() {
+                if(!util.checkCookie()){
+                    api.showDialog(api.cookiesDisabledDialog)
+                    return;
+                }
                 api.login(function () {
                     api.showDialog(api.initializingDialog);
                     api.connect();
@@ -242,6 +247,5 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 }
                 return result;
             }
-
         }
     });

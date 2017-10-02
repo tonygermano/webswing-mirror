@@ -45,6 +45,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
                 tooManyClientsNotification: retryMessageDialog('dialog.tooManyClientsNotification'),
                 stoppedDialog: finalMessageDialog('dialog.stoppedDialog'),
                 timedoutDialog: finalMessageDialog('dialog.timedoutDialog'),
+                cookiesDisabledDialog: messageDialog('dialog.cookiesDisabledDialog'),
                 continueOldSessionDialog: {
                     header: '<span class="ws-message--neutral">${dialog.continueH} <span data-id="dialogHide" class="ws-icon-cancel-circled ws-right"></span></span>',
                     content: '<p data-id="continueMsg">${dialog.continueC1}<a href="javascript:void(0)" data-id="restartLink">${dialog.continueC2}</a></p>',

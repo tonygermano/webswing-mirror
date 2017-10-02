@@ -1,25 +1,17 @@
 package org.webswing.demo.dnd;
 
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.geom.CubicCurve2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.QuadCurve2D;
-
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.geom.CubicCurve2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.QuadCurve2D;
+import java.io.IOException;
 
 public class CubicCurveMouse extends JFrame {
   DrawingCanvas canvas;
@@ -30,6 +22,14 @@ public class CubicCurveMouse extends JFrame {
   public CubicCurveMouse() {
 	  super();
     Container container = getContentPane();
+    Image icon= null;
+    try {
+      icon = ImageIO.read(this.getClass().getResource("paintbrush.gif"));
+      Cursor c = Toolkit.getDefaultToolkit().createCustomCursor(icon, new Point(5, 15), "brush");
+      container.setCursor(c);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
     JPanel panel = new JPanel();
     setBackground(Color.white);

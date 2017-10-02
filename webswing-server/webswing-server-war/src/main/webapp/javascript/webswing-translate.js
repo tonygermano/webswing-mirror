@@ -25,7 +25,12 @@ define(['optional-i18n!nls/msg', 'optional-i18n!nls/select'], function amdFactor
         }
 
         function getLocale() {
-            var lang = localStorage.getItem("webswingLang") || (navigator.browserLanguage || navigator.language);
+            try{
+                var storedLang = localStorage.getItem("webswingLang") ;
+            }catch (e){
+                console.log(e);
+            }
+            var lang= storedLang || (navigator.browserLanguage || navigator.language);
             return lang;
         }
 
