@@ -10,6 +10,7 @@
         "use strict";
         c = c || {};
         var config = {
+            logDebug: c.logDebug || false,
             onErrorMessage: c.onErrorMessage || function (message) {
                 console.log(message.stack);
             }
@@ -55,6 +56,7 @@
 
         function drawWebImageInternal(image, targetCanvas, resolve, reject) {
             var newCanvas;
+            var renderStart=new Date().getTime();
             if (targetCanvas != null) {
                 newCanvas = targetCanvas;
             } else {
@@ -86,6 +88,7 @@
                             });
                         }, Promise.resolve()).then(function () {
                             ctx.restore();
+                            logRenderTime(renderStart, image);
                             resolve(imageContext.canvas);
                         }, function (error) {
                             ctx.restore();
@@ -1010,6 +1013,15 @@
             });
         }
 
+        function logRenderTime(startTime, webImage) {
+            if (config.logDebug && webImage!=null) {
+                var time = new Date().getTime()-startTime;
+                var instLength = webImage.instructions == null ? 0 : webImage.instructions.length;
+                var constLength = webImage.constants == null ? 0 : webImage.constants.length;
+                var fontsLength = webImage.fontFaces == null ? 0 : webImage.fontFaces.length;
+                console.log("DirectDraw DEBUG render time "+time+"ms (insts:"+instLength+", consts:"+constLength+", fonts:"+fontsLength+")");
+            }
+        }
 
         return {
             draw64: draw64,
