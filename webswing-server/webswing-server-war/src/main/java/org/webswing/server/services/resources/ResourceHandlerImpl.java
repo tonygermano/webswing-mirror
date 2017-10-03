@@ -127,7 +127,7 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 		public boolean respondGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 			setHeaders(resp);
 			long ims = req.getDateHeader("If-Modified-Since");
-			if (ims != -1 && ims != getLastModified()) {
+			if (ims != -1 && Math.abs(ims - getLastModified()) < 1000) { //modification timestamp is same rounded to seconds
 				resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 			} else {
 				final OutputStream os = resp.getOutputStream();
