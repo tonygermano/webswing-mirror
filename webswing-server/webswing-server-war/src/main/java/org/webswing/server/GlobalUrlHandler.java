@@ -143,8 +143,9 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		WebswingSecurityConfig secConfig = super.getSecurityConfig();
 		if (BuiltInModules.INHERITED.name().equals(secConfig.getModule())) {
 			log.error("Master security module INHERITED is not valid. Falling back to default module PROPERTY_FILE.");
-			getConfig().getSecurity().put("module", BuiltInModules.PROPERTY_FILE.name());
-			secConfig = getConfig().getValueAs("security", WebswingSecurityConfig.class);
+			SecuredPathConfig newconfig = getConfig();
+			newconfig.getSecurity().put("module", BuiltInModules.PROPERTY_FILE.name());
+			secConfig = newconfig.getValueAs("security", WebswingSecurityConfig.class);
 		}
 		return secConfig;
 	}
