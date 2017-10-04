@@ -98,6 +98,7 @@ public interface Constants {
 	public static final String BRANDING_PREFIX = "webswing.brandingPrefix";
 	public static final String EXTENSTION_INITIALIZER = "webswing.extensionInitializer";
 	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
+	public static final String EXTENSION_PROVIDER = "webswing.extensionProvider" ;
 	public static final String CONFIG_PROVIDER = "webswing.configProvider";
 
 }

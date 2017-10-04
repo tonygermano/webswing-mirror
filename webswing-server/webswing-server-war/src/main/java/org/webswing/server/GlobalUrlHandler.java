@@ -33,6 +33,7 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationChangeEvent;
 import org.webswing.server.services.config.ConfigurationChangeListener;
 import org.webswing.server.services.config.ConfigurationService;
+import org.webswing.server.extension.ExtensionService;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.security.api.BuiltInModules;
 import org.webswing.server.services.security.api.WebswingAction;
@@ -61,6 +62,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	private final LoginHandlerService loginService;
 
 	private ServletContext servletContext;
+	private final ExtensionService extService;
 
 	private Map<String, SwingInstanceManager> instanceManagers = new LinkedHashMap<String, SwingInstanceManager>();
 
@@ -93,7 +95,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	};
 
 	@Inject
-	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, SecurityModuleService securityService, LoginHandlerService loginService, ServletContext servletContext) {
+	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, SecurityModuleService securityService, LoginHandlerService loginService, ServletContext servletContext, ExtensionService extService) {
 		super(null, securityService, config);
 		this.websocket = websocket;
 		this.configService = config;
@@ -101,6 +103,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		this.resourceService = resourceService;
 		this.loginService = loginService;
 		this.servletContext = servletContext;
+		this.extService = extService;
 	}
 
 	public void init() {
@@ -108,6 +111,10 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 		registerChildUrlHandler(loginService.createLoginHandler(this));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
+
+		for (UrlHandler handler : extService.createExtHandlers(this)) {
+			registerChildUrlHandler(handler);
+		}
 
 		registerChildUrlHandler(resourceService.create(this, this));
 
@@ -406,10 +413,10 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		if (!StringUtils.isEmpty(path)) {
 			SwingInstanceManager swingManager = instanceManagers.get(path);
 			if (swingManager == null) {
-				Map<String, Object> config=new HashMap<>();
-				config.put("enabled",false);
+				Map<String, Object> config = new HashMap<>();
+				config.put("enabled", false);
 				configService.setConfiguration(path, config);//first create with enabled:false to prevent initiation
-				configService.setConfiguration(path,null);//once exists,
+				configService.setConfiguration(path, null);//once exists,
 			} else {
 				throw new WsException("Unable to Create App '" + path + "'. Application already exits.");
 			}

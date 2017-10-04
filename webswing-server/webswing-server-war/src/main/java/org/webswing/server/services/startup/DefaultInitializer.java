@@ -1,4 +1,4 @@
-package org.webswing.server.extension;
+package org.webswing.server.services.startup;
 
 import java.io.File;
 import java.io.FileNotFoundException;

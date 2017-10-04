@@ -1,4 +1,4 @@
-package org.webswing.server.extension;
+package org.webswing.server.services.config;
 
 import java.io.File;
 import java.io.IOException;

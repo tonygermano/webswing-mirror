@@ -1,6 +1,5 @@
 package org.webswing.server.services.swingmanager;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
@@ -8,9 +7,7 @@ import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
-import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.model.admin.ApplicationInfo;
-import org.webswing.server.common.model.admin.InstanceManagerStatus;
 import org.webswing.server.common.model.admin.Sessions;
 import org.webswing.server.common.model.admin.SwingSession;
 import org.webswing.server.common.model.meta.MetaObject;
@@ -18,6 +15,7 @@ import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
+import org.webswing.server.extension.ExtensionService;
 import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.files.FileTransferHandlerService;
 import org.webswing.server.services.resources.ResourceHandlerService;
@@ -37,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import java.io.File;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -52,11 +49,12 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	private final ResourceHandlerService resourceService;
 	private StatisticsLogger statsLogger;
 	private FileTransferHandler fileHandler;
+	private final ExtensionService extService;
 	private SwingInstanceSet runningInstances = new SwingInstanceSet();
 	private SwingInstanceSet closedInstances = new SwingInstanceSet();
 
 	public SwingInstanceManagerImpl(UrlHandler parent, String path, SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileService, LoginHandlerService loginService, ResourceHandlerService resourceService, SecurityModuleService securityModuleService, ConfigurationService configService,
-			StatisticsLoggerService loggerService) {
+			StatisticsLoggerService loggerService,ExtensionService extService) {
 		super(parent, securityModuleService, configService);
 		this.path = path;
 		this.instanceFactory = instanceFactory;
@@ -65,7 +63,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		this.resourceService = resourceService;
 		this.statsLogger = loggerService.createLogger();
 		this.fileHandler = fileService.create(this);
-
+		this.extService = extService;
 	}
 
 	@Override
@@ -75,6 +73,9 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		registerChildUrlHandler(loginService.createLoginHandler(this));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));
 		registerChildUrlHandler(fileHandler);
+		for (UrlHandler handler : extService.createExtHandlers(this)) {
+			registerChildUrlHandler(handler);
+		}
 		registerChildUrlHandler(resourceService.create(this, this));
 		super.init();
 	}
