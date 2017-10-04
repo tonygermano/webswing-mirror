@@ -49,6 +49,8 @@ public class ConfigurationImpl extends Configuration {
 		options.addOption("kp", "keystorepwd", true, "Keystore password");
 
 		options.addOption("t", "temp", true, "The folder where temp folder will be created for the server. (./tmp)");
+		options.addOption("tc", "tempclean", true, "Delete the content of temp folder. (true)");
+		
 		options.addOption("d", true, "Create new temp folder for every instance (false)");
 
 		options.addOption("j", "jetty", true, "Jetty startup configuration file. (./jetty.properties)");

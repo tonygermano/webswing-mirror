@@ -98,6 +98,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 showDialog: 'dialog.show',
                 readyDialog: 'dialog.content.readyDialog',
                 initializingDialog: 'dialog.content.initializingDialog',
+                cookiesDisabledDialog: 'dialog.content.cookiesDisabledDialog',
                 disposeIdentity: 'identity.dispose',
                 disposeBase: 'base.dispose',
                 disposeCanvas: 'canvas.dispose',
@@ -148,7 +149,8 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                     hasControl: false,
                     mirrorMode: false,
                     canPaint: false,
-                    virtualKB: false
+                    virtualKB: false,
+                    debugLog: false
                 };
             }
 
@@ -158,6 +160,10 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
             }
 
             function start() {
+                if(!util.checkCookie()){
+                    api.showDialog(api.cookiesDisabledDialog)
+                    return;
+                }
                 api.login(function () {
                     api.showDialog(api.initializingDialog);
                     api.connect();
@@ -198,6 +204,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                     cfg.mirror = options.mirrorMode != null ? JSON.parse(options.mirrorMode) : cfg.mirror;
                     cfg.connectionUrl = options.connectionUrl != null ? options.connectionUrl : cfg.connectionUrl;
                     cfg.debugPort = options.debugPort != null ? options.debugPort : cfg.debugPort;
+                    cfg.debugLog = options.debugLog != null ? options.debugLog : cfg.debugLog;
                     cfg.javaCallTimeout = options.javaCallTimeout != null ? parseInt(options.javaCallTimeout, 10) : cfg.javaCallTimeout;
                     if (cfg.connectionUrl.substr(cfg.connectionUrl.length - 1) !== '/') {
                         cfg.connectionUrl = cfg.connectionUrl + '/';
@@ -242,6 +249,5 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 }
                 return result;
             }
-
         }
     });

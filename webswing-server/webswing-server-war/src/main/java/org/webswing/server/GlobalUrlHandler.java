@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -146,8 +143,9 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		WebswingSecurityConfig secConfig = super.getSecurityConfig();
 		if (BuiltInModules.INHERITED.name().equals(secConfig.getModule())) {
 			log.error("Master security module INHERITED is not valid. Falling back to default module PROPERTY_FILE.");
-			getConfig().getSecurity().put("module", BuiltInModules.PROPERTY_FILE.name());
-			secConfig = getConfig().getValueAs("security", WebswingSecurityConfig.class);
+			SecuredPathConfig newconfig = getConfig();
+			newconfig.getSecurity().put("module", BuiltInModules.PROPERTY_FILE.name());
+			secConfig = newconfig.getValueAs("security", WebswingSecurityConfig.class);
 		}
 		return secConfig;
 	}
@@ -408,11 +406,10 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		if (!StringUtils.isEmpty(path)) {
 			SwingInstanceManager swingManager = instanceManagers.get(path);
 			if (swingManager == null) {
-				configService.setConfiguration(path, null);
-				swingManager = instanceManagers.get(path);
-				if (swingManager != null) {
-					swingManager.disable();
-				}
+				Map<String, Object> config=new HashMap<>();
+				config.put("enabled",false);
+				configService.setConfiguration(path, config);//first create with enabled:false to prevent initiation
+				configService.setConfiguration(path,null);//once exists,
 			} else {
 				throw new WsException("Unable to Create App '" + path + "'. Application already exits.");
 			}

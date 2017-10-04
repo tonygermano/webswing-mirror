@@ -14,10 +14,7 @@ import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.jslink.WebJSObject;
-import org.webswing.toolkit.util.DeamonThreadFactory;
-import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Services;
-import org.webswing.toolkit.util.Util;
+import org.webswing.toolkit.util.*;
 import sun.awt.CausedFocusEvent;
 
 import javax.swing.JFileChooser;
@@ -48,7 +45,9 @@ public class WebEventDispatcher {
 	private HashMap<String, String> uploadMap = new HashMap<String, String>();
 	private ExecutorService eventDispatcher = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance());
 
-	//these keycodes are assigned to different keys in browser  
+	//release char map derives the event char for keyrelease event from previous keypressed events (keycode=char)
+	private static final HashMap<Integer, Integer> releaseCharMap = new HashMap<Integer, Integer>();
+	//these keycodes are assigned to different keys in browser
 	private static final List<Integer> nonStandardKeyCodes = Arrays.asList(KeyEvent.VK_KP_DOWN, KeyEvent.VK_KP_UP, KeyEvent.VK_KP_RIGHT, KeyEvent.VK_KP_LEFT);
 	private static final Map<Integer, Integer> convertedKeyCodes = new HashMap<Integer, Integer>();
 
@@ -198,6 +197,13 @@ public class WebEventDispatcher {
 			} else if (nonStandardKeyCodes.contains(event.getKeycode())) {
 				event.setKeycode(0);
 			}
+			if (event.getType() == KeyboardEventMsgIn.KeyEventType.keydown) {
+				releaseCharMap.put(event.getKeycode(), event.getCharacter());
+			}
+			if (event.getType() == KeyboardEventMsgIn.KeyEventType.keyup) {
+				Integer c = releaseCharMap.get(event.getKeycode());
+				character = (char) (c == null ? event.getCharacter() : c);
+			}
 			if (type == KeyEvent.KEY_TYPED) {
 				AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, modifiers, 0, (char) event.getCharacter());
 				dispatchEventInSwing(w, e);
@@ -218,7 +224,7 @@ public class WebEventDispatcher {
 			c = WindowManager.getInstance().getLockedToWindow();
 		} else {
 			c = WindowManager.getInstance().getVisibleComponentOnPosition(event.getX(), event.getY());
-			if (lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButton() == 1) || (event.getType() == MouseEventType.mouseup))) {
+			if (lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup))) {
 				c = (Component) lastMouseEvent.getSource();
 			}
 		}
@@ -246,6 +252,7 @@ public class WebEventDispatcher {
 			switch (event.getType()) {
 			case mousemove:
 				id = event.getButtons() != 0 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
+				buttons = lastMousePressEvent != null ? lastMouseEvent.getButton() : 1;
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
 				lastMouseEvent = e;
 				dispatchEventInSwing(c, e);

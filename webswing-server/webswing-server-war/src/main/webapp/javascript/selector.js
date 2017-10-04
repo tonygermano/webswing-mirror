@@ -17,11 +17,22 @@
         return results == null ? null : decodeURIComponent(results[1]);
     }
 
-    var lang = localStorage.getItem("webswingLang") || (navigator.browserLanguage || navigator.language);
+    try{
+        var storedLang = localStorage.getItem("webswingLang") ;
+    }catch (e){
+        console.log(e);
+    }
+    var lang= storedLang || (navigator.browserLanguage || navigator.language);
+
     require({locale: lang}, ['jquery', 'webswing-util', 'webswing-translate'], function ($, util, Translate) {
         var translateModule = new Translate();
         translateModule.ready();
         var translate = translateModule.provides.translate;
+
+        if(!util.checkCookie()){
+            $('#webswing-content').html(translate('${dialog.cookiesDisabledDialog}'));
+            return;
+        }
 
         var login = util.webswingLogin;
         var user;

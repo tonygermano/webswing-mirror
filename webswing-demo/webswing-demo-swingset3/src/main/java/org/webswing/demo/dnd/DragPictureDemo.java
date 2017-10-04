@@ -115,6 +115,14 @@ public class DragPictureDemo extends JPanel {
 
 		setPreferredSize(new Dimension(450, 630));
 		add(mugshots, BorderLayout.CENTER);
+		JButton xorModeTestButton=new JButton("XorMode drag");
+		xorModeTestButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new CubicCurveMouse();
+			}
+		});
+		add(xorModeTestButton, BorderLayout.NORTH);
 		setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 	}
 

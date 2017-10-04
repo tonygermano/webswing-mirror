@@ -12,7 +12,13 @@
         }
     });
 
-    var lang = localStorage.getItem("webswingLang") || (navigator.browserLanguage || navigator.language);
+    try{
+        var storedLang = localStorage.getItem("webswingLang") ;
+    }catch (e){
+        console.log(e);
+    }
+    var lang= storedLang || (navigator.browserLanguage || navigator.language);
+
     require({locale: lang}, ['jquery', 'webswing-translate'], function ($, Translate) {
         var translateModule = new Translate();
         translateModule.ready();

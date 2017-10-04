@@ -10,7 +10,13 @@
             }
         }
     });
-    var lang = localStorage.getItem("webswingLang") || (navigator.browserLanguage || navigator.language);
+    try{
+        var storedLang = localStorage.getItem("webswingLang") ;
+    }catch (e){
+        console.log(e);
+    }
+    var lang= storedLang || (navigator.browserLanguage || navigator.language);
+
     require({locale: lang},['webswing'], function () {
     }, function (err) {
         var failedId = err.requireModules && err.requireModules[0];

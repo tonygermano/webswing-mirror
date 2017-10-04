@@ -49,6 +49,7 @@ define({
         "dialog.networkMonitor.warn":"Your network connection is slow.",
         "dialog.networkMonitor.offline":"No network connection.",
         "dialog.networkMonitor.hide":"Hide",
+        "dialog.cookiesDisabledDialog": "Your browser does not allow cookies. Please enable cookies to continue.",
 
         //  SELECTOR
         "selector.welcome": "Welcome,",

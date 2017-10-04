@@ -117,7 +117,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             timer3 = setInterval(servletHeartbeat, 100000);
             windowImageHolders = {};
             directDraw.dispose();
-            directDraw = new WebswingDirectDraw({});
+            directDraw = new WebswingDirectDraw({logDebug:api.cfg.debugLog});
         }
 
         function sendMessageEvent(message) {

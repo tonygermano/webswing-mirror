@@ -109,10 +109,15 @@
 	margin-right: .4em
 }
 
+.chart-tooltip .tooltip-item .series-label {
+	padding-right:4px
+}
+
 .chart-tooltip .tooltip-item .color-dot {
 	width: 10px;
 	height: 10px;
-	border-radius: 50%
+	border-radius: 50%;
+	margin-right: 4px;
 }
 
 .chart-tooltip .tooltip-item .y-value {

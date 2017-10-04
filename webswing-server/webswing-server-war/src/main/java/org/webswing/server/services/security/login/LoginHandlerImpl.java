@@ -31,6 +31,9 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		try {
+			if("OPTIONS".equals(req.getMethod())){
+				return true;//cors preflight, don't forward to security module
+			}
 			login(req, res);
 			return true;
 		} catch (Exception e) {
