@@ -63,7 +63,7 @@
 			<ul class="ws-files-btn-container">
 				<li class="ws-files-btn-panel">
 					<form data-id="autoFileupload" >
-						<input data-id="autoUploadfileDialogTransferBarClientId" name="clientId" type="hidden">
+						<input data-id="autoUploadfileDialogTransferBarClientId" name="uuid" type="hidden">
 
 						<input data-id="autoFileInput" id="webswingUploadBrowse" name="files[]" accept="" type="file" class="ws-files-btn--hidden"/>
 
@@ -105,7 +105,7 @@
 			<button data-id="downloadSelectedButton" class="ws-btn ws-btn--xs ws-icon-download-cloud" title="${files.downloadTtip}"> ${files.download}</button>
 			<div data-id="fileUploadBtn" class="ws-btn ws-btn--xs ws-filebar-upload ">
 				<form data-id="fileupload">
-					<input data-id="fileDialogTransferBarClientId" name="clientId" type="hidden">
+					<input data-id="fileDialogTransferBarClientId" name="uuid" type="hidden">
 					<div>
 						<span><span class="ws-icon-upload-cloud"> </span>${files.upload}</span>
 						<input accept="" data-id="fileInput" name="files[]" class="ws-filebar-inputupload" type="file">
