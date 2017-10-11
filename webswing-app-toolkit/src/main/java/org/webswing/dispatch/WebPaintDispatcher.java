@@ -49,6 +49,7 @@ public class WebPaintDispatcher {
 	private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance());
 
 	public WebPaintDispatcher() {
+		final Long ackTimeout = Long.getLong(Constants.PAINT_ACK_TIMEOUT, 5000);
 		Runnable sendUpdate = new Runnable() {
 
 			public void run() {
@@ -65,7 +66,7 @@ public class WebPaintDispatcher {
 								lastReadyStateTime = System.currentTimeMillis();
 							}
 							if ((areasToUpdate.size() == 0 && moveAction == null) || !clientReadyToReceive) {
-								if (!clientReadyToReceive && (System.currentTimeMillis() - lastReadyStateTime) > 2000) {
+								if (!clientReadyToReceive && (System.currentTimeMillis() - lastReadyStateTime) > ackTimeout) {
 									Logger.debug("contentSender.readyToReceive re-enabled after timeout");
 									if (Util.isDD()) {
 										Services.getDirectDrawService().resetCache();

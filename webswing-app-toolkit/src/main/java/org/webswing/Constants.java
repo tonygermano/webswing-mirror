@@ -77,6 +77,9 @@ public interface Constants {
 	public static final int SWING_SCREEN_WIDTH_MIN = 300;
 	public static final int SWING_SCREEN_HEIGHT_MIN = 300;
 	public static final String SWING_SCREEN_VALIDATION_DISABLED = "webswing.disableWindowPositionValidation";
+	public static final String PAINT_ACK_TIMEOUT = "webswing.paintAckTimeout";
+
+
 
 	//webswing configuration variables
 	public static final String USER_NAME_SUBSTITUTE = "user";
