@@ -19,7 +19,7 @@ public class DefaultExtensionProvider implements ExtensionProvider {
 	}
 
 	@Override
-	public List<UrlHandler> createDefaultConfiguration(PrimaryUrlHandler parent) {
+	public List<UrlHandler> createExtensionHandlers(PrimaryUrlHandler parent) {
 		return new ArrayList<>();
 	}
 }

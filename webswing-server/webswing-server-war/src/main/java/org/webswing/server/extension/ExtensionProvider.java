@@ -6,5 +6,5 @@ import org.webswing.server.base.UrlHandler;
 import java.util.List;
 
 public interface ExtensionProvider {
-	List<UrlHandler> createDefaultConfiguration(PrimaryUrlHandler parent);
+	List<UrlHandler> createExtensionHandlers(PrimaryUrlHandler parent);
 }

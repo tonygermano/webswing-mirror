@@ -119,8 +119,8 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		registerChildUrlHandler(resourceService.create(this, this));
 
 		loadApplications();
-		super.init();
 		this.configService.registerChangeListener(this.changeListener);
+		super.init();
 		if (!InstanceManagerStatus.Status.Running.equals(getStatus().getStatus())) {
 			throw new RuntimeException("Failed to start primary handler.");
 		}

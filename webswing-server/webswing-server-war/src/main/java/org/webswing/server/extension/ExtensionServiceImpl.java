@@ -4,16 +4,12 @@ import org.webswing.Constants;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsInitException;
-import org.webswing.server.services.config.ConfigurationProvider;
-import org.webswing.server.services.config.ConfigurationUpdateHandler;
-import org.webswing.server.services.config.DefaultConfigurationProvider;
+import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.swingprocess.SwingProcessService;
-import sun.misc.ExtensionDependency;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
@@ -21,12 +17,14 @@ public class ExtensionServiceImpl implements ExtensionService, ExtensionDependen
 
 	private final ExtensionClassLoader extensionLoader;
 	private final SwingProcessService processService;
+	private final ConfigurationService configService;
 	private ExtensionProvider provider;
 
 	@Inject
-	public ExtensionServiceImpl(ExtensionClassLoader extensionLoader, SwingProcessService processService) {
+	public ExtensionServiceImpl(ExtensionClassLoader extensionLoader, SwingProcessService processService,ConfigurationService configuService) {
 		this.extensionLoader = extensionLoader;
 		this.processService = processService;
+		this.configService = configuService;
 	}
 
 	@Override
@@ -51,11 +49,16 @@ public class ExtensionServiceImpl implements ExtensionService, ExtensionDependen
 
 	@Override
 	public List<UrlHandler> createExtHandlers(PrimaryUrlHandler parent) {
-		return provider.createDefaultConfiguration(parent);
+		return provider.createExtensionHandlers(parent);
 	}
 
 	@Override
 	public SwingProcessService getProcessService() {
 		return processService;
+	}
+
+	@Override
+	public ConfigurationService getConfigService() {
+		return configService	;
 	}
 }
