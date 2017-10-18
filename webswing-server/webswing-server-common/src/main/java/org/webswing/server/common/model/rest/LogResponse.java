@@ -1,6 +1,8 @@
 package org.webswing.server.common.model.rest;
 
-public class LogResponse {
+import java.io.Serializable;
+
+public class LogResponse implements Serializable{
 	long startOffset;
 	long endOffset;
 	String log;

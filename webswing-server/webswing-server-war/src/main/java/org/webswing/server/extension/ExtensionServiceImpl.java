@@ -5,6 +5,7 @@ import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.config.ConfigurationService;
+import org.webswing.server.services.rest.RestService;
 import org.webswing.server.services.swingprocess.SwingProcessService;
 
 import javax.inject.Inject;
@@ -18,13 +19,15 @@ public class ExtensionServiceImpl implements ExtensionService, ExtensionDependen
 	private final ExtensionClassLoader extensionLoader;
 	private final SwingProcessService processService;
 	private final ConfigurationService configService;
+	private final RestService restService;
 	private ExtensionProvider provider;
 
 	@Inject
-	public ExtensionServiceImpl(ExtensionClassLoader extensionLoader, SwingProcessService processService,ConfigurationService configuService) {
+	public ExtensionServiceImpl(ExtensionClassLoader extensionLoader, SwingProcessService processService, ConfigurationService configuService, RestService restService) {
 		this.extensionLoader = extensionLoader;
 		this.processService = processService;
 		this.configService = configuService;
+		this.restService = restService;
 	}
 
 	@Override
@@ -59,6 +62,11 @@ public class ExtensionServiceImpl implements ExtensionService, ExtensionDependen
 
 	@Override
 	public ConfigurationService getConfigService() {
-		return configService	;
+		return configService;
+	}
+
+	@Override
+	public RestService getRestService() {
+		return restService;
 	}
 }

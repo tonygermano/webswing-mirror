@@ -10,10 +10,10 @@ import java.util.*;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -35,6 +35,7 @@ import org.webswing.server.services.config.ConfigurationChangeListener;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.extension.ExtensionService;
 import org.webswing.server.services.resources.ResourceHandlerService;
+import org.webswing.server.services.rest.RestService;
 import org.webswing.server.services.security.api.BuiltInModules;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingSecurityConfig;
@@ -52,6 +53,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
+@Path("")
+@Produces(MediaType.APPLICATION_JSON)
 public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstanceHolder, SecuredPathHandler {
 	private static final Logger log = LoggerFactory.getLogger(GlobalUrlHandler.class);
 
@@ -63,6 +66,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 	private ServletContext servletContext;
 	private final ExtensionService extService;
+	private final RestService restService;
 
 	private Map<String, SwingInstanceManager> instanceManagers = new LinkedHashMap<String, SwingInstanceManager>();
 
@@ -95,7 +99,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	};
 
 	@Inject
-	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, SecurityModuleService securityService, LoginHandlerService loginService, ServletContext servletContext, ExtensionService extService) {
+	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, SecurityModuleService securityService, LoginHandlerService loginService, ServletContext servletContext, ExtensionService extService, RestService restService) {
 		super(null, securityService, config);
 		this.websocket = websocket;
 		this.configService = config;
@@ -104,6 +108,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		this.loginService = loginService;
 		this.servletContext = servletContext;
 		this.extService = extService;
+		this.restService = restService;
 	}
 
 	public void init() {
@@ -117,6 +122,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		}
 
 		registerChildUrlHandler(resourceService.create(this, this));
+		registerChildUrlHandler(restService.createRestHandler(this));
 
 		loadApplications();
 		this.configService.registerChangeListener(this.changeListener);
@@ -333,7 +339,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 	@GET
 	@Path("/apps")
-	public List<ApplicationInfoMsg> getApplicationInfo(HttpServletRequest req) throws WsException {
+	public List<ApplicationInfoMsg> getApplicationsRest() throws WsException {
 		checkMasterPermission(WebswingAction.rest_getApps);
 		List<ApplicationInfoMsg> result = new ArrayList<>();
 		for (SwingInstanceManager mgr : getApplications()) {
@@ -366,7 +372,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 	@GET
 	@Path("/rest/paths")
-	public List<String> getPaths(HttpServletRequest req) throws WsException {
+	public List<String> getPaths() throws WsException {
 		checkPermission(WebswingAction.rest_getPaths);
 		List<String> result = new ArrayList<>();
 		for (SwingInstanceManager appManager : getApplications()) {
@@ -377,6 +383,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 	@GET
 	@Path("/rest/version")
+	@Produces(MediaType.TEXT_PLAIN)
 	public String getVersion() throws WsException {
 		return super.getVersion();
 	}
@@ -389,8 +396,8 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	}
 
 	@GET
-	@Path("/rest/remove")
-	public void removeSwingApp(@PathParam("") String path) throws Exception {
+	@Path("/rest/remove{appPath: .+?}")
+	public void removeSwingApp(@PathParam("appPath") String path) throws Exception {
 		checkMasterPermission(WebswingAction.rest_removeApp);
 		if (!StringUtils.isEmpty(path)) {
 			SwingInstanceManager swingManager = instanceManagers.get(path);
@@ -407,8 +414,8 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	}
 
 	@GET
-	@Path("/rest/create")
-	public void createSwingApp(@PathParam("") String path) throws Exception {
+	@Path("/rest/create{appPath: .+?}")
+	public void createSwingApp(@PathParam("appPath") String path) throws Exception {
 		checkMasterPermission(WebswingAction.rest_createApp);
 		if (!StringUtils.isEmpty(path)) {
 			SwingInstanceManager swingManager = instanceManagers.get(path);
@@ -454,33 +461,31 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 	}
 
 	@GET
-	@Path("/rest/variables")
-	public Map<String, String> getVariables(@PathParam("") String type) throws WsException {
+	@Path("/rest/variables/{type}")
+	public Map<String, String> getVariables(@PathParam("type") String type) throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
 		return super.getVariables(type);
 	}
 
 	@POST
-	@Path("/rest/logs")
-	public LogResponse getLogs(@PathParam("") String type, LogRequest request) throws WsException {
+	@Path("/rest/logs/{type}")
+	public LogResponse getLogs(@PathParam("type") String type, LogRequest request) throws WsException {
 		checkMasterPermission(WebswingAction.rest_viewLogs);
-		if (type.startsWith("/")) {
-			type = type.substring(1);
-		}
 		return LogReaderUtil.readLog(type, request);
 	}
 
 	@GET
-	@Path("/rest/logs")
-	public InputStream downloadLog(@PathParam("") String type) throws WsException {
+	@Path("/rest/logs/{type}")
+	public Response downloadLog(@PathParam("type") String type) throws WsException {
 		checkMasterPermission(WebswingAction.rest_viewLogs);
-		if (type.startsWith("/")) {
-			type = type.substring(1);
-		}
-		return LogReaderUtil.getZippedLog(type);
+		Response.ResponseBuilder builder = Response.ok(LogReaderUtil.getZippedLog(type), MediaType.APPLICATION_OCTET_STREAM);
+		builder.header("content-disposition", "attachment; filename = "+type+".zip");
+		return builder.build();
 	}
 
 	@GET
 	@Path("/rest/CSRFToken")
+	@Produces(MediaType.TEXT_PLAIN)
 	public String generateCsrfToken() {
 		return super.generateCsrfToken();
 	}

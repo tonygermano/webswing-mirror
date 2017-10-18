@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.extension.ExtensionService;
 import org.webswing.server.extension.ExtensionServiceImpl;
+import org.webswing.server.services.rest.RestService;
+import org.webswing.server.services.rest.RestServiceImpl;
 import org.webswing.server.services.startup.DefaultInitializer;
 import org.webswing.server.extension.ExtensionClassLoader;
 import org.webswing.server.services.startup.Initializer;
@@ -72,6 +74,7 @@ public class WebswingServerModule extends AbstractModule {
 		bind(SecurityModuleService.class).to(SecurityModuleServiceImpl.class);
 		bind(LoginHandlerService.class).to(LoginHandlerServiceImpl.class);
 		bind(ExtensionService.class).to(ExtensionServiceImpl.class);
+		bind(RestService.class).to(RestServiceImpl.class);
 	}
 
 	private void initializeDefaultSystemProperties() {

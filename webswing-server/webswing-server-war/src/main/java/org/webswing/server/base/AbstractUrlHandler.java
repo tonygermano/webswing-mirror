@@ -82,8 +82,9 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 				}
 			}
 		}
-		//Rest processor
-		return serveRestMethod(req, res);
+		//Rest processor: Replaced by jersey
+		//return serveRestMethod(req, res);
+		return false;
 	}
 
 	protected boolean serveRestMethod(HttpServletRequest req, HttpServletResponse res) throws WsException {

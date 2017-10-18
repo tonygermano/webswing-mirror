@@ -19,6 +19,7 @@ import org.webswing.server.extension.ExtensionService;
 import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.files.FileTransferHandlerService;
 import org.webswing.server.services.resources.ResourceHandlerService;
+import org.webswing.server.services.rest.RestService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.AuthorizationConfig;
 import org.webswing.server.services.security.api.WebswingAction;
@@ -34,11 +35,15 @@ import org.webswing.server.services.websocket.WebSocketService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@Path("")
+@Produces(MediaType.APPLICATION_JSON)
 public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements SwingInstanceManager {
 	private static final Logger log = LoggerFactory.getLogger(SwingInstanceManagerImpl.class);
 
@@ -50,11 +55,12 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	private StatisticsLogger statsLogger;
 	private FileTransferHandler fileHandler;
 	private final ExtensionService extService;
+	private final RestService restService;
 	private SwingInstanceSet runningInstances = new SwingInstanceSet();
 	private SwingInstanceSet closedInstances = new SwingInstanceSet();
 
 	public SwingInstanceManagerImpl(UrlHandler parent, String path, SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileService, LoginHandlerService loginService, ResourceHandlerService resourceService, SecurityModuleService securityModuleService, ConfigurationService configService,
-			StatisticsLoggerService loggerService,ExtensionService extService) {
+			StatisticsLoggerService loggerService, ExtensionService extService, RestService restService) {
 		super(parent, securityModuleService, configService);
 		this.path = path;
 		this.instanceFactory = instanceFactory;
@@ -64,6 +70,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		this.statsLogger = loggerService.createLogger();
 		this.fileHandler = fileService.create(this);
 		this.extService = extService;
+		this.restService = restService;
 	}
 
 	@Override
@@ -77,6 +84,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 			registerChildUrlHandler(handler);
 		}
 		registerChildUrlHandler(resourceService.create(this, this));
+		registerChildUrlHandler(restService.createRestHandler(this));
 		super.init();
 	}
 
@@ -206,25 +214,27 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 
 	@GET
 	@Path("/start")
-	public void start() throws WsException {
+	public Response start() throws WsException {
 		checkMasterPermission(WebswingAction.rest_startApp);
 		if (!isEnabled()) {
 			super.initConfiguration();
 		}
+		return Response.ok().build();
 	}
 
 	@GET
 	@Path("/stop")
-	public void stop() throws WsException {
+	public Response stop() throws WsException {
 		checkMasterPermission(WebswingAction.rest_stopApp);
 		if (isEnabled()) {
 			super.disable();
 		}
+		return Response.ok().build();
 	}
 
 	@GET
 	@Path("/info")
-	public ApplicationInfo getApplicationInfo() throws WsException {
+	public ApplicationInfo getApplicationInfoRest() throws WsException {
 		checkPermissionLocalOrMaster(WebswingAction.rest_getAppInfo);
 		ApplicationInfo app = new ApplicationInfo();
 		app.setPath(getPathMapping());
@@ -254,20 +264,21 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 
 	@GET
 	@Path("/apps")
-	public List<ApplicationInfoMsg> getApplicationInfo(HttpServletRequest req) throws WsException {
+	public List<ApplicationInfoMsg> getApplicationInfo() throws WsException {
 		checkPermission(WebswingAction.rest_getApps);
 		return Arrays.asList(getApplicationInfoMsg());
 	}
 
 	@GET
 	@Path("/rest/paths")
-	public List<String> getApplications(HttpServletRequest req) throws WsException {
+	public List<String> getApplicationsRest() throws WsException {
 		checkPermissionLocalOrMaster(WebswingAction.rest_getPaths);
 		return Arrays.asList(getFullPathMapping());
 	}
 
 	@GET
 	@Path("/rest/version")
+	@Produces(MediaType.TEXT_PLAIN)
 	public String getVersion() throws WsException {
 		return super.getVersion();
 	}
@@ -306,12 +317,9 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@GET
-	@Path("/rest/session")
-	public SwingSession getSession(@PathParam("") String id) throws WsException {
+	@Path("/rest/session/{id}")
+	public SwingSession getSession(@PathParam("id") String id) throws WsException {
 		checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
-		if (id.startsWith("/")) {
-			id = id.substring(1);
-		}
 		SwingInstance instance = runningInstances.findByInstanceId(id);
 		if (instance != null) {
 			return instance.toSwingSession(true);
@@ -320,12 +328,9 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@GET
-	@Path("/rest/record")
-	public SwingSession startRecording(@PathParam("") String id) throws WsException {
+	@Path("/rest/record/{id}")
+	public SwingSession startRecording(@PathParam("id") String id) throws WsException {
 		checkPermissionLocalOrMaster(WebswingAction.rest_startRecording);
-		if (id.startsWith("/")) {
-			id = id.substring(1);
-		}
 		SwingInstance instance = runningInstances.findByInstanceId(id);
 		if (instance != null) {
 			instance.startRecording();
@@ -335,16 +340,13 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@DELETE
-	@Path("/rest/session")
-	public void shutdown(@PathParam("") String id, @QueryParam("force") String forceKill) throws WsException {
+	@Path("/rest/session/{id}")
+	public void shutdown(@PathParam("id") String id, @QueryParam("force") String forceKill) throws WsException {
 		boolean force = Boolean.parseBoolean(forceKill);
 		if (force) {
 			checkPermissionLocalOrMaster(WebswingAction.rest_sessionShutdown);
 		} else {
 			checkPermissionLocalOrMaster(WebswingAction.rest_sessionShutdownForce);
-		}
-		if (id.startsWith("/")) {
-			id = id.substring(1);
 		}
 		SwingInstance instance = runningInstances.findByInstanceId(id);
 		if (instance != null) {
@@ -361,13 +363,15 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@GET
-	@Path("/rest/variables")
-	public Map<String, String> getVariables(@PathParam("") String type) throws WsException {
+	@Path("/rest/variables/{type}")
+	public Map<String, String> getVariables(@PathParam("type") String type) throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
 		return super.getVariables(type);
 	}
 
 	@GET
 	@Path("/rest/CSRFToken")
+	@Produces(MediaType.TEXT_PLAIN)
 	public String generateCsrfToken() {
 		return super.generateCsrfToken();
 	}
@@ -377,7 +381,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	public void ping() {
 		//responds with 200 OK status
 	}
-
 
 	@Override
 	public void logStatValue(String instance, String name, Number value) {
