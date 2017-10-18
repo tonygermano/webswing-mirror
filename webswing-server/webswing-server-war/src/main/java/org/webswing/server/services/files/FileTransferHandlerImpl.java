@@ -133,9 +133,9 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 		checkPermission(WebswingAction.file_upload);
 
 		try {
-			String clientId = request.getParameter("clientId");
-			if (clientId != null) {
-				SwingInstance instance = manager.findInstanceByClientId(clientId);
+			String uuid = request.getParameter("uuid");
+			if (uuid != null) {
+				SwingInstance instance = manager.findInstanceBySessionId(uuid);
 				if (instance != null) {
 					double maxMB = instance.getAppConfig().getUploadMaxSize();
 					long maxsize = (long) (maxMB * 1024 * 1024);
@@ -159,17 +159,17 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 						msg.setTempFileLocation(f.getAbsolutePath());
 						boolean sent = instance.sendToSwing(null, msg);
 						if (!sent) {
-							log.error("Failed to send upload notification to app session. File:" + filename + "+ClientID:" + clientId);
+							log.error("Failed to send upload notification to app session. File:" + filename + "+ClientID:" + instance.getClientId());
 							f.delete();
 						} else {
 							resp.getWriter().write("{\"files\":[{\"name\":\"" + filename + "\"}]}"); // TODO size
 						}
 					}
 				} else {
-					throw new Exception("Related App instance not found.(" + clientId + ")");
+					throw new Exception("Related App instance not found.(" + uuid + ")");
 				}
 			} else {
-				throw new Exception("clientId not specified in request");
+				throw new Exception("UUID not specified in request");
 			}
 		} catch (Exception e) {
 			if (e.getCause() instanceof EOFException) {

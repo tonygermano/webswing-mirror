@@ -6,6 +6,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
         var api;
         module.injects = api = {
             cfg: 'webswing.config',
+            socketId: 'socket.uuid',
             send: 'socket.send',
             translate: 'translate.translate'
         };
@@ -33,30 +34,30 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
 
         function process(event) {
             if (event.eventType === 'AutoUpload') {
-                autoUpload(event, api.cfg.clientId);
+                autoUpload(event, api.socketId);
             } else if (event.eventType === 'AutoSave') {
-                autoSave(event, api.cfg.clientId);
+                autoSave(event, api.socketId);
             } else if (event.eventType === 'Open') {
-                open(event, api.cfg.clientId);
+                open(event, api.socketId);
             } else if (event.eventType === 'Close') {
                 close();
             }
         }
 
-        function autoUpload(data, clientId) {
+        function autoUpload(data, uuid) {
             if (autoUploadBar == null) {
                 setup(api);
             }
             if (autoUploadBar.closest(api.cfg.rootElement).length === 0) {
                 api.cfg.rootElement.append(autoUploadBar);
             }
-            autoUploadfileDialogTransferBarClientId.val(clientId);
+            autoUploadfileDialogTransferBarClientId.val(uuid);
             autoFileInput.prop("multiple", data.isMultiSelection);
             autoFileInput.attr("accept", data.filter);
             animateShow(autoUploadBar);
         }
 
-        function autoSave(data, clientId) {
+        function autoSave(data, uuid) {
             if (autoSaveBar == null) {
                 setup(api);
             }
@@ -67,7 +68,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             animateShow(autoSaveBar);
         }
 
-        function open(data, clientId) {
+        function open(data, uuid) {
             closeAfterErrorTimeout = false;
             if (uploadBar == null) {
                 setup(api);
@@ -75,7 +76,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             if (uploadBar.closest(api.cfg.rootElement).length === 0) {
                 api.cfg.rootElement.append(uploadBar);
             }
-            fileDialogTransferBarClientId.val(clientId);
+            fileDialogTransferBarClientId.val(uuid);
 
             appendOrDetach(downloadSelectedButton, fileActionButtonGroup, data.allowDownload);
             appendOrDetach(uploadBtn, fileActionButtonGroup, data.allowUpload);
@@ -160,6 +161,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             autoJqUpload.bind('fileuploadfail', fileuploadfail);
             autoJqUpload.bind('fileuploadprogressall', fileuploadprogressall);
             autoJqUpload.bind('fileuploadadd', fileuploadadd);
+            autoJqUpload.bind('fileuploaddone', fileuploaddone);
 
             var jqUpload = fileUpload.fileupload({
                 xhrFields: {
@@ -172,6 +174,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             jqUpload.bind('fileuploadfail', fileuploadfail);
             jqUpload.bind('fileuploadprogressall', fileuploadprogressall);
             jqUpload.bind('fileuploadadd', fileuploadadd);
+            jqUpload.bind('fileuploaddone', fileuploaddone);
 
             function fileuploadadd(e, data) {
                 data.files.forEach(function (file) {
@@ -214,17 +217,18 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
                 var $jsProgressText = $(".ws-progress-text");
                 $jsProgressBar.css('width', progress + '%');
                 $jsProgressText.find("em").text(progress + "%");
-                if (progress === 100) {
-                    $jsProgressText.find("em").text(api.translate("files.progComplete"));
-                    setTimeout(function () {
-                        if (!errorTimeout) {
-                            filesSelected(doneFileList);
-                        }
-                        doneFileList = [];
-                        setProgressBarVisible(false);
-                    }, 1000);
-                    jqXHR_fileupload = [];
+
+            }
+
+            function fileuploaddone(e, data) {
+                var $jsProgressText = $(".ws-progress-text");
+                $jsProgressText.find("em").text(api.translate("files.progComplete"));
+                if (!errorTimeout) {
+                    filesSelected(doneFileList);
                 }
+                doneFileList = [];
+                setProgressBarVisible(false);
+                jqXHR_fileupload = [];
             }
 
             function cancelFileSelection(e) {

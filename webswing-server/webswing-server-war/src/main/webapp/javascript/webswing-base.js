@@ -62,7 +62,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         var drawingQ = [];
         var warningTimeout = null;
         var windowImageHolders = {};
-        var directDraw = new WebswingDirectDraw({});
+        var directDraw = new WebswingDirectDraw({logDebug:api.cfg.debugLog});
 
         function startApplication(name) {
             initialize(api.getUser() + api.getIdentity() + name, name, false);

@@ -204,7 +204,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                     cfg.mirror = options.mirrorMode != null ? JSON.parse(options.mirrorMode) : cfg.mirror;
                     cfg.connectionUrl = options.connectionUrl != null ? options.connectionUrl : cfg.connectionUrl;
                     cfg.debugPort = options.debugPort != null ? options.debugPort : cfg.debugPort;
-                    cfg.debugLog = options.debugLog != null ? options.debugLog : cfg.debugLog;
+                    cfg.debugLog = options.debugLog != null ? JSON.parse(options.debugLog) : cfg.debugLog;
                     cfg.javaCallTimeout = options.javaCallTimeout != null ? parseInt(options.javaCallTimeout, 10) : cfg.javaCallTimeout;
                     if (cfg.connectionUrl.substr(cfg.connectionUrl.length - 1) !== '/') {
                         cfg.connectionUrl = cfg.connectionUrl + '/';
