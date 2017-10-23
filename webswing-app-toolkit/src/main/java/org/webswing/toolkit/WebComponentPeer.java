@@ -184,6 +184,7 @@ public class WebComponentPeer implements ComponentPeer {
 		if (((Component) this.target).isVisible()) {
 			show();
 		}
+
 		Color localColor = ((Component) this.target).getForeground();
 		if (localColor != null) {
 			setForeground(localColor);
@@ -198,6 +199,21 @@ public class WebComponentPeer implements ComponentPeer {
 		}
 		Rectangle localRectangle = ((Component) this.target).getBounds();
 		setBounds(localRectangle.x, localRectangle.y, localRectangle.width, localRectangle.height, 3);
+
+		Color background = ((Component) this.target).getBackground();
+		if (background == null) {
+			background = Color.WHITE;
+			((Component) this.target).setBackground(background);
+			this.setBackground(background);
+		}
+
+		Color foreground = ((Component) this.target).getForeground();
+		if (foreground == null) {
+			foreground = Color.BLACK;
+			((Component) this.target).setForeground(foreground);
+			this.setForeground(foreground);
+		}
+
 	}
 
 	public boolean isObscured() {
