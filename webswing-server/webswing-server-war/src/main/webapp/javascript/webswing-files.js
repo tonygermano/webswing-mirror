@@ -29,7 +29,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
         var uploadBar, fileDialogTransferBarClientId, fileDialogErrorMessage;
         var fileActionButtonGroup, fileDialogErrorMessageContent, deleteSelectedButton, downloadSelectedButton;
         var dropZone, fileUpload, uploadProgressBar, uploadProgress, cancelBtn, uploadBtn, fileInput;
-        var autoUploadBar, autoFileupload, autoFileInput, cancelAutoUploadButton, autoUploadfileDialogTransferBarClientId;
+        var autoUploadBar, autoFileupload, autoFileInput,autoFileBrowseImg, cancelAutoUploadButton, autoUploadfileDialogTransferBarClientId;
         var autoSaveBar, autoSaveInput, cancelAutoSaveButton, autoSaveButton;
 
         function process(event) {
@@ -134,6 +134,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             autoFileupload = autoUploadBar.find('form[data-id="autoFileupload"]');
             cancelAutoUploadButton = autoUploadBar.find('button[data-id="cancelAutoUploadButton"]');
             autoFileInput = autoUploadBar.find('input[data-id="autoFileInput"]');
+            autoFileBrowseImg = autoUploadBar.find('img[data-id="autoFileBrowseImg"]');
             autoUploadfileDialogTransferBarClientId = autoUploadBar.find('input[data-id="autoUploadfileDialogTransferBarClientId"]');
 
             autoSaveBar = api.cfg.rootElement.find('div[data-id="autoSaveBar"]');
@@ -267,6 +268,10 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
                 if (validateFilename() && fileString.length > 0) {
                     filesSelected([fileString]);
                 }
+            });
+
+            autoFileBrowseImg.bind('click', function (e){
+                autoFileInput.click(); //IE fix (click on label image did not trigger file selection)
             });
 
             function validateFilename() {
