@@ -32,19 +32,9 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 
 	private ApplicationHandler appHandler;
 
-	public RestUrlHandlerImpl(UrlHandler parent) {
+	public RestUrlHandlerImpl(UrlHandler parent, Object... registrations) {
 		super(parent);
-		this.appHandler = new ApplicationHandler(new Application() {
-			@Override
-			public Set<Object> getSingletons() {
-				return Stream.of(parent).collect(Collectors.toSet());
-			}
-
-			@Override
-			public Set<Class<?>> getClasses() {
-				return Stream.of(WsExceptionMapper.class).collect(Collectors.toSet());
-			}
-		});
+		this.appHandler = new ApplicationHandler(new RestConfiguration(parent, registrations));
 	}
 
 	@Override
@@ -182,7 +172,7 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 
 	private class ResponseWriter implements ContainerResponseWriter {
 		private final HttpServletResponse response;
-		private boolean served=false;
+		private boolean served = false;
 
 		public ResponseWriter(HttpServletResponse response) {
 			this.response = response;
@@ -190,8 +180,8 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 
 		@Override
 		public OutputStream writeResponseStatusAndHeaders(long contentLength, ContainerResponse responseContext) throws ContainerException {
-			if(responseContext.getStatus()!=404){
-				served=true;
+			if (responseContext.getStatus() != 404) {
+				served = true;
 			}
 
 			// first set the content length, so that if headers have an explicit value, it takes precedence over this one
@@ -269,7 +259,7 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 			}
 		}
 
-		public boolean isServed(){
+		public boolean isServed() {
 			return served;
 		}
 	}
@@ -282,4 +272,19 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 		}
 	}
 
+	private class RestConfiguration extends ResourceConfig {
+		public RestConfiguration(UrlHandler parent, Object[] registrations) {
+			register(parent);
+			register(WsExceptionMapper.class);
+			if (registrations != null) {
+				for (Object o : registrations) {
+					if (o instanceof Class) {
+						register((Class<?>) o);
+					} else {
+						register(o);
+					}
+				}
+			}
+		}
+	}
 }

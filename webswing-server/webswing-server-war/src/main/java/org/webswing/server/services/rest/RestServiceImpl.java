@@ -16,7 +16,7 @@ public class RestServiceImpl implements RestService{
 	public RestServiceImpl(ServletContext ctx) {
 	}
 
-	public RestUrlHandler createRestHandler(UrlHandler parent) {
-		return new RestUrlHandlerImpl(parent);
+	public RestUrlHandler createRestHandler(UrlHandler parent, Object... registrations) {
+		return new RestUrlHandlerImpl(parent,registrations);
 	}
 }

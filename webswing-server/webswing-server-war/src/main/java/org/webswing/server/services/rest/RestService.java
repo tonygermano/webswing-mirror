@@ -4,5 +4,5 @@ import org.webswing.server.base.UrlHandler;
 
 public interface RestService {
 
-	public RestUrlHandler createRestHandler(UrlHandler parent);
+	public RestUrlHandler createRestHandler(UrlHandler parent, Object... registrations);
 }
