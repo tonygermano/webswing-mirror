@@ -72,10 +72,10 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 					<compilerArguments>
-						<bootclasspath>${basedir}/../../lib/rt1.6.0_45.jar</bootclasspath>
+						<bootclasspath>${basedir}/../../lib/rt1.7.0_60.jar</bootclasspath>
 					</compilerArguments>
 				</configuration>
 			</plugin>

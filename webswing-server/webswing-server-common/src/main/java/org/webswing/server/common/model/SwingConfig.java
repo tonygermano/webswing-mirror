@@ -45,7 +45,7 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isDirectdraw();
 
-	@ConfigField(tab = ConfigGroup.General, label = "JavaFx Support", description = "!Only for Java8! Enables native or embeded JavaFx framework support.")
+	@ConfigField(tab = ConfigGroup.General, label = "JavaFx Support (experimental)", description = "!Only for Java8! Enables native or embeded JavaFx framework support.")
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isJavaFx();
 

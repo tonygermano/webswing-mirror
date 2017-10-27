@@ -453,10 +453,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			}
 			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;
 			String webGraphicsEnvClass = WEB_GRAPHICS_ENV_CLASS_NAME;
-			if (javaVersion.startsWith("1.6")) {
-				webToolkitClass += "6";
-				webGraphicsEnvClass += "6";
-			} else if (javaVersion.startsWith("1.7")) {
+			if (javaVersion.startsWith("1.7")) {
 				webToolkitClass += "7";
 				webGraphicsEnvClass += "7";
 			} else if (javaVersion.startsWith("1.8")) {
@@ -464,7 +461,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				webGraphicsEnvClass += "8";
 			} else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
-				throw new RuntimeException("Java version not supported. (Version starting with 1.6 , 1.7 and 1.8 are supported.)");
+				throw new RuntimeException("Java version not supported. (Version starting with 1.7 and 1.8 are supported.)");
 			}
 			String webSwingToolkitApiJarPath = CommonUtil.getBootClassPathForClass(WebswingApi.class.getName());
 			String webSwingToolkitJarPath = CommonUtil.getBootClassPathForClass(WEB_TOOLKIT_CLASS_NAME);
