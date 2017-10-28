@@ -16,15 +16,15 @@ public interface WebswingApi {
 
 	/**
 	 * Return the user of connected web session. 
-	 * <b>Note:</b>if user disconnects/closes browser, this method will return null.  
+	 * <b>Note:</b>if user disconnects/closes browser, this method will return null.
 	 *
 	 * @return user or null if session is disconnected.
 	 */
 	public WebswingUser getPrimaryUser();
 
 	/**
-	 * Return the user of connected mirror view web session. (Admin console -> view session)
-	 * <b>Note:</b>if admin disconnects/closes browser, this method will return null.  
+	 * Return the user of connected mirror view web session. (Admin console - view session)
+	 * Note: if admin disconnects/closes browser, this method will return null.
 	 *
 	 * @return user or null if mirror view session is disconnected.
 	 */
@@ -150,6 +150,7 @@ public interface WebswingApi {
 	 * <br>
 	 * Typically used for customized clipboard integration, while the built-in integration is disabled in configuration ("allowLocalClipboard" is false).
 	 *
+	 * @param ctx request context
 	 * @return User submited clipboard content received from browser (null if cancelled)
 	 */
 	public BrowserTransferable getBrowserClipboard(PasteRequestContext ctx);

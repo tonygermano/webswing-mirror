@@ -6,7 +6,7 @@ package org.webswing.server.services.security.api;
  */
 public interface RolePermissionResolver {
 	/**
-	 * @param permission 
+	 * @param permission permission name
 	 * @return All roles the permission is allowed for
 	 */
 	String[] getRolesForPermission(String permission);

@@ -8,7 +8,7 @@ import org.webswing.server.common.model.meta.ConfigType;
 public interface Config {
 	/**
 	 * Instantiates a dynamic object of type <code>clazz</code> as a view of JSON object stored under Json
-	 * property <code>name</name>.
+	 * property <code>name</code>.
 	 * 
 	 * @param name name of Json property 
 	 * @param clazz interface type to be created

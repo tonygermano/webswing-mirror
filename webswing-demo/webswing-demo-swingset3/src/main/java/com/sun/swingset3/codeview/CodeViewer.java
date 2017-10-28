@@ -87,17 +87,13 @@ import com.sun.swingset3.utilities.Utilities;
  * The key for each snippet set is displayed in a combobox to allow the user to 
  * select which snippet set should be highlighted.  For example:<p>
  * <pre><code>
- *    //<snip>Create dog array
  *    ArrayList dogs = new ArrayList();
- *    //</snip>
  *
  *    [other code...]
  *
- *    //<snip>Create dog array
  *    dogs.add("Labrador");
  *    dogs.add("Golden Retriever");
  *    dogs.add("Australian Shepherd");
- *    //</snip>
  * </code></pre>
  * The above code would create a snippet set (containing 2 snippets) with the key 
  * &quot;Create dog array&quot;.

@@ -27,12 +27,12 @@ public interface SwingInstanceManager extends SecuredPathHandler, SwingInstanceH
 	void logStatValue(String instance, String name, Number value);
 
 	/**
-	 * @return Map<name_of_metric, Map<timestamp, value>>
-	 */
+	 * @return Map &lt; name_of_metric, Map &lt; timestamp, value &gt; &gt;
+ 	 */
 	Map<String, Map<Long, Number>> getInstanceStats(String instance);
 
 	/**
-	 * @return Map<name_of_metric, value>
+	 * @return Map &lt; name_of_metric, value &gt;
 	 */
 	Map<String, Number> getInstanceMetrics(String clientId);
 

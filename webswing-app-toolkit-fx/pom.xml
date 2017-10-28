@@ -45,7 +45,7 @@
                                 <configuration>
                                     <target>
                                         <copy todir="${basedir}/../webswing-server/webswing-server-war/target/${webswing-war-name}/WEB-INF/swing-boot">
-                                            <fileset dir="${build.directory}" includes="*.jar"/>
+                                            <fileset dir="${project.build.directory}" includes="*.jar"/>
                                         </copy>
                                     </target>
                                 </configuration>

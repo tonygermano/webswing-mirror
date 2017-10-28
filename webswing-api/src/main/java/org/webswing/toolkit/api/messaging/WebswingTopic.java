@@ -4,7 +4,7 @@ import java.io.IOException;
 
 /**
  * Reference to a topic filtered by message type
- * @param <T>
+ * @param <T> message type
  */
 public interface WebswingTopic<T> {
 
@@ -17,14 +17,14 @@ public interface WebswingTopic<T> {
 
 	/**
 	 * Subscribe for receiving messages of defined type
-	 * @param listener
+	 * @param listener the listener
 	 */
 	void subscribe(WebswingMessageListener<T> listener);
 
 
 	/**
 	 * Unsubscribe from receiving messages of defined type
-	 * @param listener
+	 * @param listener the listener
 	 */
 	void unsubscribe(WebswingMessageListener<T> listener);
 }

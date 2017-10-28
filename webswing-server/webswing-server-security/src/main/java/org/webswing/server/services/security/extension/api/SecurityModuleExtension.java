@@ -13,9 +13,9 @@ import org.webswing.server.services.security.modules.AbstractSecurityModule;
 
 /**
  * Security Extension prototype used in {@link AbstractExtendableSecurityModule}. Supports four extension points:
- * 1.{@link #doSufficientPreValidation(AbstractSecurityModule, HttpServletRequest, HttpServletResponse) doSufficientPreValidation}
- * 2.{@link #doRequiredPreValidation(AbstractSecurityModule, HttpServletRequest, HttpServletResponse) doRequiredPreValidation}
- * 3.{@link #doRequiredPostValidation(AbstractSecurityModule, AbstractWebswingUser, HttpServletRequest, HttpServletResponse) doRequiredPostValidation}
+ * 1.{@link #doSufficientPreValidation(AbstractExtendableSecurityModule, HttpServletRequest, HttpServletResponse)} doSufficientPreValidation}
+ * 2.{@link #doRequiredPreValidation(AbstractExtendableSecurityModule, HttpServletRequest, HttpServletResponse)} doRequiredPreValidation}
+ * 3.{@link #doRequiredPostValidation(AbstractExtendableSecurityModule, AbstractWebswingUser, HttpServletRequest, HttpServletResponse)} doRequiredPostValidation}
  * 4.{@link #decorateUser(AbstractWebswingUser, HttpServletRequest, HttpServletResponse) decorateUser}
  * @param <T> Interface for reading configuration settings from JSON
  */
