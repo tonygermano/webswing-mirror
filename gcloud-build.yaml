@@ -2,15 +2,11 @@
 steps:
 #download build resources
 - name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'gs://webswing-build-resources/*', '/']
-#prepare
-- name: 'maven:3.3'
-  entrypoint: '/bin/sh'
-  args: ['-c','gpg --batch --import /${_SIGNING_KEY_FILE}']
+  args: ['cp', 'gs://webswing-build-resources/*', '.']
 #build
 - name: 'maven:3.3'
   entrypoint: '/bin/sh'
-  args: ['-c','apt-get update && apt-get install -y openjfx && rm -rf $(ls -A /workspace) && git clone https://bitbucket.org/meszarv/webswing.git /workspace && mvn -s /mvnsettings.xml -B -Pbuild,release,sign deploy']
+  args: ['-c','gpg --batch --import ${_SIGNING_KEY_FILE} && apt-get update && apt-get install -y openjfx && cp mvnsettings.xml / && rm -rf $(ls -A /workspace) && git clone https://bitbucket.org/meszarv/webswing.git /workspace && mvn -s /mvnsettings.xml -B -Pbuild,release,sign deploy']
   env: ['_GPG_KEY_NAME=${_GPG_KEY_NAME}','_GPG_PASSPHRASE=${_GPG_PASSPHRASE}','_OSSRH_JIRA_USERNAME=${_OSSRH_JIRA_USERNAME}','_OSSRH_JIRA_PASSWORD=${_OSSRH_JIRA_PASSWORD}']
 #Save the build result to cloud
 - name: 'gcr.io/cloud-builders/gsutil'
