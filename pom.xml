@@ -299,6 +299,17 @@
                             <autoReleaseAfterClose>false</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>external.atlassian.jgitflow</groupId>
+                        <artifactId>jgitflow-maven-plugin</artifactId>
+                        <version>1.0-m5.1</version>
+                        <configuration>
+                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <noDeploy>true</noDeploy>
+                            <squash>true</squash>
+                            <allowSnapshots>true</allowSnapshots>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
