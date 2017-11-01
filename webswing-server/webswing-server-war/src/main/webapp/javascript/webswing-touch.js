@@ -22,35 +22,38 @@ define(['jquery', 'text!templates/touch.html', 'webswing-util', 'hammer'], funct
         var touchBar;
         var compositionText = "";
         var composition = false;
+        var registered = false;
 
         function register() {
-            var canvas = api.getCanvas();
-            // prevent ghost mouse events to be fired
-            util.preventGhosts(api.cfg.rootElement);
+            if (!registered) {
+                var canvas = api.getCanvas();
+                // prevent ghost mouse events to be fired
+                util.preventGhosts(api.cfg.rootElement);
 
-            hammer = new Hammer(canvas, {
-                touchAction: 'manipulation'
-            });
+                hammer = new Hammer(canvas, {
+                    touchAction: 'manipulation'
+                });
 
-            hammer.get('tap').set({
-                threshold: 4
-            });
-            hammer.on('tap', function (ev) {
-                if (ev.pointerType === 'touch') {
-                    var eventMsg = getTouchPos(canvas, ev, 1);
-                    api.send(eventMsg);
-                    display();
-                    canvas.focus();
-                }
+                hammer.get('tap').set({
+                    threshold: 4
+                });
+                hammer.on('tap', function (ev) {
+                    if (ev.pointerType === 'touch') {
+                        var eventMsg = getTouchPos(canvas, ev, 1);
+                        api.send(eventMsg);
+                        display();
+                        canvas.focus();
+                    }
 
-            });
-            hammer.on('press', function (ev) {
-                if (ev.pointerType === 'touch') {
-                    var eventMsg = getTouchPos(canvas, ev, 3);
-                    api.send(eventMsg);
-                }
-            });
-
+                });
+                hammer.on('press', function (ev) {
+                    if (ev.pointerType === 'touch') {
+                        var eventMsg = getTouchPos(canvas, ev, 3);
+                        api.send(eventMsg);
+                    }
+                });
+                registered = true;
+            }
         }
 
         function focusInput(input) {
