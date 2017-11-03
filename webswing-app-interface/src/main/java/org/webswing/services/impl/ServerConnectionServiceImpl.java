@@ -10,6 +10,7 @@ import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.model.internal.JvmStatsMsgInternal;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.s2c.SimpleEventMsgOut;
+import org.webswing.toolkit.api.WebswingMessagingApi;
 import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
@@ -30,12 +31,11 @@ import java.util.concurrent.*;
  */
 public class ServerConnectionServiceImpl implements MessageListener, ServerConnectionService {
 
-	public static final String MSG_API_SHARED_TOPIC = "msgApiSharedTopic";
-	public static final String MSG_API_TYPE = "type";
 	private static ServerConnectionServiceImpl impl;
 	private static ActiveMQConnectionFactory connectionFactory;
 	private static long syncTimeout = Long.getLong(Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT, 3000);
 
+	private String messageApiSharedTopicName;
 	private Connection connection;
 	private Session session;
 	private MessageProducer producer;
@@ -60,6 +60,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	}
 
 	public ServerConnectionServiceImpl() {
+		messageApiSharedTopicName = System.getProperty(Constants.SWING_START_SYS_PROP_MSG_API_TOPIC,"");
 		connectionFactory = new ActiveMQConnectionFactory(System.getProperty(Constants.JMS_URL));
 		connectionFactory.setAlwaysSessionAsync(false);
 		connectionFactory.setTrustAllPackages(true);
@@ -114,14 +115,14 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			consumer = session.createConsumer(consumerDest);
 			consumer.setMessageListener(this);
 
-			final Topic msgApisharedTopic = session.createTopic(MSG_API_SHARED_TOPIC);
+			final Topic msgApisharedTopic = session.createTopic(messageApiSharedTopicName);
 			mgsApiProducer = session.createProducer(msgApisharedTopic);
 			mgsApiConsumer = session.createConsumer(msgApisharedTopic);
 			mgsApiConsumer.setMessageListener(new MessageListener() {
 				@Override
 				public void onMessage(Message message) {
 					try {
-						String msgtype = message.getStringProperty(MSG_API_TYPE);
+						String msgtype = message.getStringProperty(WebswingMessagingApi.MSG_API_TYPE);
 						if(msgtype!=null && Util.getWebToolkit().messageApiHasListenerForClass(msgtype)){
 							Util.getWebToolkit().messageApiProcessMessage(((ObjectMessage)message).getObject());
 						}
@@ -162,7 +163,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	public void messageApiPublish(Serializable o) throws IOException {
 		try {
 			Message m = session.createObjectMessage(o);
-			m.setStringProperty(MSG_API_TYPE, o.getClass().getCanonicalName());
+			m.setStringProperty(WebswingMessagingApi.MSG_API_TYPE, o.getClass().getCanonicalName());
 			mgsApiProducer.send(m);
 		} catch (Exception e) {
 			Logger.error("Failed to send message: ", e);

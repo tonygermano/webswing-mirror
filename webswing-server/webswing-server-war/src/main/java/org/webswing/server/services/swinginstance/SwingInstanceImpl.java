@@ -47,6 +47,7 @@ import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.util.FontUtils;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.api.WebswingApi;
+import org.webswing.toolkit.api.WebswingMessagingApi;
 
 import java.io.File;
 import java.io.IOException;
@@ -499,6 +500,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD, appConfig.isAllowLocalClipboard());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, appConfig.isAllowJsLink());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_INITIAL_URL, handshake.getUrl());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_MSG_API_TOPIC, WebswingMessagingApi.MSG_API_SHARED_TOPIC + manager.getFullPathMapping());
 
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported());
