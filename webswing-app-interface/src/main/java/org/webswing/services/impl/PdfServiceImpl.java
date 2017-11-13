@@ -22,6 +22,7 @@ import org.freehep.graphicsio.PageConstants;
 import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.webswing.ext.services.PdfService;
 import org.webswing.toolkit.WebPrinterJob;
+import org.webswing.toolkit.WebPrinterJobWrapper;
 import org.webswing.toolkit.util.Util;
 
 public class PdfServiceImpl implements PdfService {
@@ -92,7 +93,7 @@ public class PdfServiceImpl implements PdfService {
 
 	private String resolveSize(PageFormat format) {
 		Paper p = format.getPaper();
-		MediaSizeName size = WebPrinterJob.findMedia(p.getWidth(), p.getHeight());
+		MediaSizeName size = WebPrinterJobWrapper.findMedia(p.getWidth(), p.getHeight());
 		if (size == MediaSizeName.ISO_A3) {
 			return PageConstants.A3;
 		} else if (size == MediaSizeName.ISO_A4) {

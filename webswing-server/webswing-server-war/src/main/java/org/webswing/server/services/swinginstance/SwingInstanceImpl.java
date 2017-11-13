@@ -48,6 +48,7 @@ import org.webswing.server.util.FontUtils;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.api.WebswingApi;
 
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -62,7 +63,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private static final String LAUNCHER_CONFIG = "launcherConfig";
 	private static final String WEB_TOOLKIT_CLASS_NAME = "org.webswing.toolkit.WebToolkit";
 	private static final String WEB_GRAPHICS_ENV_CLASS_NAME = "org.webswing.toolkit.ge.WebGraphicsEnvironment";
-	private static final String WEB_PRINTER_JOB_CLASS_NAME = "org.webswing.toolkit.WebPrinterJob";
+	private static final String WEB_PRINTER_JOB_CLASS_NAME = "org.webswing.toolkit.WebPrinterJobWrapper";
 	private static final String WIN_SHELL_FOLDER_MANAGER = "sun.awt.shell.Win32ShellFolderManager2";
 	private static final String JAVA_FX_PATH = System.getProperty("java.home") + "/lib/ext/jfxrt.jar";
 	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.ToolkitJarMarker";
@@ -505,6 +506,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.addProperty("java.awt.headless", false);
 			swingConfig.addProperty("java.awt.graphicsenv", webGraphicsEnvClass);
 			swingConfig.addProperty("java.awt.printerjob", WEB_PRINTER_JOB_CLASS_NAME);
+			swingConfig.addProperty(Constants.PRINTER_JOB_CLASS, appConfig.isAllowServerPrinting() ? PrinterJob.getPrinterJob().getClass().getCanonicalName() : "org.webswing.toolkit.WebPrinterJob");
 			swingConfig.addProperty("sun.awt.fontconfig", FontUtils.createFontConfiguration(appConfig, subs));
 			swingConfig.addProperty(Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth));
 			swingConfig.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight));

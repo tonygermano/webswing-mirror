@@ -14,6 +14,7 @@ import javax.swing.JDesktopPane;
 
 import org.webswing.SwingMain;
 import org.webswing.toolkit.WebPrintService;
+import org.webswing.toolkit.WebPrinterJobWrapper;
 import org.webswing.toolkit.util.Logger;
 
 public class RedirectedMethods {
@@ -65,6 +66,6 @@ public class RedirectedMethods {
 	}
 
 	public static PrintService[] lookupPrintServices(DocFlavor flavor, AttributeSet attributes) {
-		return new PrintService[] { WebPrintService.getService() };
+		return WebPrinterJobWrapper.wrappedLookupPrintServices(flavor, attributes);
 	}
 }
