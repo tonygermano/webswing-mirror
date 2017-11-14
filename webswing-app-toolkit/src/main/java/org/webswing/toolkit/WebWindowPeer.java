@@ -1,14 +1,6 @@
 package org.webswing.toolkit;
 
-import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.peer.WindowPeer;
 
 import org.webswing.Constants;
@@ -21,6 +13,10 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 	///////////////////// WebWindowPeer Implementation//////////////////////////////////////////////////
 	public WebWindowPeer(Window t) {
 		super(t);
+		Font font = t.getFont();
+		if (font == null) {
+			t.setFont(WebToolkit.defaultFont);
+		}
 	}
 
 	public void toFront() {
