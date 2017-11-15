@@ -80,6 +80,14 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@Override
+	public void destroy() {
+		for (SwingInstance i : runningInstances.getAllInstances()) {
+			i.kill(0);
+		}
+		super.destroy();
+	}
+
+	@Override
 	protected String getPath() {
 		return path;
 	}
@@ -376,7 +384,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	public void ping() {
 		//responds with 200 OK status
 	}
-
 
 	@Override
 	public void logStatValue(String instance, String name, Number value) {

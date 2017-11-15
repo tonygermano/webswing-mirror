@@ -43,8 +43,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private long lastMessageTimestamp = System.currentTimeMillis();
 	private long lastUserInputTimestamp = System.currentTimeMillis();
 	private Runnable watchdog;
-	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
-	private ExecutorService jmsSender = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance());
+	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing Shutdown scheduler"));
+	private ExecutorService jmsSender = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing JMS Sender"));
 
 	private Map<String, Object> syncCallResposeMap = new ConcurrentHashMap<String, Object>();
 	private boolean closed;

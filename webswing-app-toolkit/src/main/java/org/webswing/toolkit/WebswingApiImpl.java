@@ -41,7 +41,7 @@ public class WebswingApiImpl implements WebswingApi {
 	private final List<WebswingShutdownListener> shutdownListeners = Collections.synchronizedList(new ArrayList<WebswingShutdownListener>());
 	private final List<WebswingUserListener> userConnectionListeners = Collections.synchronizedList(new ArrayList<WebswingUserListener>());
 	private final List<WebswingUrlStateChangeListener> urlStateChangeListeners = Collections.synchronizedList(new ArrayList<WebswingUrlStateChangeListener>());
-	private ExecutorService apiProcessor = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance());
+	private ExecutorService apiProcessor = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing API Processor"));
 	private WebswingUser primaryUser;
 	private WebswingUser mirrorUser;
 	private WebswingUrlState state = parseState(System.getProperty(Constants.SWING_START_SYS_PROP_INITIAL_URL));

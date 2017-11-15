@@ -46,7 +46,7 @@ public class WebPaintDispatcher {
 	private JFileChooser fileChooserDialog;
 	private JDialog clipboardDialog;
 
-	private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance());
+	private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance("Webswing Paint Dispatcher"));
 
 	public WebPaintDispatcher() {
 		final Long ackTimeout = Long.getLong(Constants.PAINT_ACK_TIMEOUT, 5000);

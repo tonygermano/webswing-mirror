@@ -5,19 +5,21 @@ import java.util.concurrent.ThreadFactory;
 
 public class DeamonThreadFactory implements ThreadFactory {
 
-	private static ThreadFactory instance;
+	private final String name;
 
-	public static ThreadFactory getInstance() {
-		if(instance==null){
-			instance = new DeamonThreadFactory();
-		}
-		return instance;
+	private DeamonThreadFactory(String name) {
+		this.name = name;
+	}
+
+	public static ThreadFactory getInstance(String name) {
+		return new DeamonThreadFactory(name);
 	}
 
 	@Override
 	public Thread newThread(Runnable r) {
 		Thread t = Executors.defaultThreadFactory().newThread(r);
         t.setDaemon(true);
+        t.setName(name);
         return t;
 	}
 }

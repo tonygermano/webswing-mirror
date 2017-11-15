@@ -150,7 +150,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		//redirect to url that is correct case and ends with '/' to ensure browser queries correct resources
 		if (isWrongUrlCase(req) || isRootPathWithoutSlash(req)) {
 			try {
-				String redirectUrl = getFullPathMapping() + (ServerUtil.getContextPath(getServletContext()) + req.getPathInfo()).substring(getFullPathMapping().length());
+				String redirectUrl = getFullPathMapping() + (ServerUtil.getContextPath(getServletContext()) + toPath(req.getPathInfo())).substring(getFullPathMapping().length());
 				redirectUrl = isRootPathWithoutSlash(req) ? (redirectUrl + "/") : redirectUrl;
 				//use apache flag instead: 	ProxyPreserveHost on
 				//if (System.getProperty(Constants.REVERSE_PROXY_CONTEXT_PATH) != null) { //reverse proxy will add the context path to redirect url so we need to remove it to avoid duplicate. see ProxyPassReverse apache directive
