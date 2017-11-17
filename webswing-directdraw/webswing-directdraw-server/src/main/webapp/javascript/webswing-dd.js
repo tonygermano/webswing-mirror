@@ -29,6 +29,7 @@
         var constantPoolCache = c.constantPoolCache || {};
         var fontsArray = [];
         var canvasBuffer = [];
+        var xorLayer;
 
 
         function draw64(data, targetCanvas) {
@@ -56,7 +57,7 @@
 
         function drawWebImageInternal(image, targetCanvas, resolve, reject) {
             var newCanvas;
-            var renderStart=new Date().getTime();
+            var renderStart = new Date().getTime();
             if (targetCanvas != null) {
                 newCanvas = targetCanvas;
             } else {
@@ -117,8 +118,13 @@
         }
 
         function interpretInstruction(ctx, instruction, imageContext) {
+            var ctxOriginal = ctx;
             var args = resolveArgs(instruction.args, constantPoolCache);
             var graphicsState = imageContext.graphicsStates[imageContext.currentStateId];
+            var xorMode = isXorMode(graphicsState);
+            if (xorMode) {
+                ctx = initXorModeCtx(graphicsState, ctxOriginal);
+            }
             switch (instruction.inst) {
                 case InstructionProto.GRAPHICS_CREATE:
                     iprtGraphicsCreate(ctx, instruction.args[0], args, imageContext);
@@ -172,7 +178,186 @@
                 default:
                     console.log("instruction code: " + instruction.inst + " not recognized");
             }
+
+            if (xorMode) {
+                var bbox = ctx.popBoundingBox();
+
+                var xorModeColor = parseColorSamples(graphicsState.compositeArgs[0].composite.color);
+                applyXorModeComposition(ctxOriginal, ctx, xorModeColor, bbox);
+
+                // ctxOriginal.save();
+                // ctxOriginal.strokeStyle = '#000000';
+                // ctxOriginal.lineWidth = 1;
+                // ctxOriginal.setTransform(1, 0, 0, 1, 0, 0);
+                // ctxOriginal.drawImage(xorLayer, 0, 0);
+                // var bbox = ctx.popBoundingBox();
+                // if (bbox != null) {
+                //     ctxOriginal.beginPath();
+                //     ctxOriginal.rect(bbox.x, bbox.y, bbox.w, bbox.h);
+                //     ctxOriginal.stroke();
+                // }
+                // ctxOriginal.restore();
+            }
             return Promise.resolve();
+        }
+
+        function isXorMode(graphicsState) {
+            return graphicsState != null && graphicsState.compositeArgs != null && graphicsState.compositeArgs[0].composite.type == CompositeTypeProto.XOR_MODE;
+        }
+
+        function initXorModeCtx(graphicsState, original) {
+            if (xorLayer == null) {
+                xorLayer = document.createElement("canvas");
+            }
+            xorLayer.width = original.canvas.width;
+            xorLayer.height = original.canvas.height;
+            var ctx = xorLayer.getContext("2d");
+            wrapContext(ctx);
+            setCtxState(graphicsState, ctx);
+            return ctx;
+        }
+
+        function wrapContext(ctx) {
+            if (!ctx.wrapped) {
+                ctx.wrapped = true;
+                ctx.boundingBox = null;
+                ctx.pathBBox = null;
+                //track bounding boxes of changed areas:
+                var beginPathOriginal = ctx.beginPath;
+                ctx.beginPath = function () {
+                    this.pathBBox = {};
+                    this.pathBBox.minX = this.pathBBox.minY = 99999999999;
+                    this.pathBBox.maxX = this.pathBBox.maxY = -99999999999;
+                    return beginPathOriginal.call(this);
+                };
+                var setTransformOriginal = ctx.setTransform;
+                ctx.setTransform = function (m11, m12, m21, m22, dx, dy) {
+                    this.transfomMatrix = [m11, m12, m21, m22, dx, dy];
+                    return setTransformOriginal.call(this, m11, m12, m21, m22, dx, dy);
+                };
+
+                var transformOriginal = ctx.transform;
+                ctx.transform = function (m11, m12, m21, m22, dx, dy) {
+                    this.transfomMatrix = concatTransform(this.transfomMatrix, [m11, m12, m21, m22, dx, dy]);
+                    return transformOriginal.call(this, m11, m12, m21, m22, dx, dy);
+                };
+
+                ctx.updateMinMax = function (x, y) {
+                    var tp = transformPoint(x, y, this.transfomMatrix);
+                    if (tp.x < this.pathBBox.minX) this.pathBBox.minX = tp.x;
+                    if (tp.x > this.pathBBox.maxX) this.pathBBox.maxX = tp.x;
+                    if (tp.y < this.pathBBox.minY) this.pathBBox.minY = tp.y;
+                    if (tp.y > this.pathBBox.maxY) this.pathBBox.maxY = tp.y;
+                };
+
+                var fillTextOriginal = ctx.fillText;
+                ctx.fillText = function (text, x, y, maxWidth) {
+                    this.pathBBox = {};
+                    this.pathBBox.minX = this.pathBBox.minY = 99999999999;
+                    this.pathBBox.maxX = this.pathBBox.maxY = -99999999999;
+                    var width = maxWidth || this.measureText(text).width;
+                    var height = this.measureText("M").width * 2;//approximation
+                    this.updateMinMax(x - 3, y - height * 0.7);
+                    this.updateMinMax(x - 3, y + height * 0.3);
+                    this.updateMinMax(x + width * 1.2, y - height * 0.7);
+                    this.updateMinMax(x + width * 1.2, y + height * 0.3);
+                    this.setBoundingBox();
+                    return fillTextOriginal.call(this, text, x, y, maxWidth);
+                };
+
+                var moveToOriginal = ctx.moveTo;
+                ctx.moveTo = function (x, y) {
+                    this.updateMinMax(x, y);
+                    return moveToOriginal.call(this, x, y);
+                };
+
+                var lineToOriginal = ctx.lineTo
+                ctx.lineTo = function (x, y) {
+                    this.updateMinMax(x, y);
+                    return lineToOriginal.call(this, x, y);
+                };
+
+                var quadraticCurveToOriginal = ctx.quadraticCurveTo
+                ctx.quadraticCurveTo = function (cpx, cpy, x, y) {
+                    this.updateMinMax(x, y);
+                    this.updateMinMax(cpx, cpy);
+                    return quadraticCurveToOriginal.call(this, cpx, cpy, x, y);
+                };
+
+                var bezierCurveToOriginal = ctx.bezierCurveTo
+                ctx.bezierCurveTo = function (cp1x, cp1y, cp2x, cp2y, x, y) {
+                    this.updateMinMax(x, y);
+                    this.updateMinMax(cp1x, cp1y);
+                    this.updateMinMax(cp2x, cp2y);
+                    return bezierCurveToOriginal.call(this, cp1x, cp1y, cp2x, cp2y, x, y);
+                };
+
+                var rectOriginal = ctx.rect
+                ctx.rect = function (x, y, w, h) {
+                    this.updateMinMax(x, y);
+                    this.updateMinMax(x, y + h);
+                    this.updateMinMax(x + w, y);
+                    this.updateMinMax(x + w, y + h);
+                    return rectOriginal.call(this, x, y, w, h);
+                };
+
+                var fillOriginal = ctx.fill;
+                ctx.fill = function () {
+                    this.setBoundingBox();
+                    return fillOriginal.call(this);
+                };
+
+                var drawImageOriginal = ctx.drawImage;
+                ctx.drawImage = function () {
+                    this.pathBBox = {};
+                    this.pathBBox.minX = this.pathBBox.minY = -99999999999;
+                    this.pathBBox.maxX = this.pathBBox.maxY = 99999999999;
+                    this.setBoundingBox();
+                    return drawImageOriginal.apply(this, arguments);
+                };
+
+                var strokeOriginal = ctx.stroke;
+                ctx.stroke = function () {
+                    this.setBoundingBox(this.lineWidth / 2 + 3);
+                    return strokeOriginal.call(this);
+                }
+
+                ctx.setBoundingBox = function (excess) {
+                    excess = excess || 0;
+                    var x = Math.min(Math.max(0, this.pathBBox.minX - excess), this.canvas.width);
+                    var y = Math.min(Math.max(0, this.pathBBox.minY - excess), this.canvas.height);
+                    var mx = Math.min(Math.max(0, this.pathBBox.maxX + excess), this.canvas.width);
+                    var my = Math.min(Math.max(0, this.pathBBox.maxY + excess), this.canvas.height);
+                    this.boundingBox = {x: x, y: y, w: mx - x, h: my - y};
+                };
+
+                ctx.popBoundingBox = function () {
+                    var result = this.boundingBox;
+                    this.boundingBox = null;
+                    return result;
+                }
+            }
+        }
+
+        function applyXorModeComposition(dest, src, xor, bbox) {
+            if (bbox == null || bbox.w == 0 || bbox.h == 0) {
+                return;
+            }
+            var start = new Date().getTime();
+            var destData = dest.getImageData(bbox.x, bbox.y, bbox.w, bbox.h);
+            var srcData = src.getImageData(bbox.x, bbox.y, bbox.w, bbox.h);
+            for (var i = 0; i < destData.data.length / 4; i++) {
+                if (srcData.data[4 * i + 3] > 0) {
+                    destData.data[4 * i] = srcData.data[4 * i] ^ xor.r ^ destData.data[4 * i];    // RED (0-255)
+                    destData.data[4 * i + 1] = srcData.data[4 * i + 1] ^ xor.g ^ destData.data[4 * i + 1];    // GREEN (0-255)
+                    destData.data[4 * i + 2] = srcData.data[4 * i + 2] ^ xor.b ^ destData.data[4 * i + 2];    // BLUE (0-255)
+                    destData.data[4 * i + 3] = destData.data[4 * i + 3];  // APLHA (0-255)
+                }
+            }
+            dest.putImageData(destData, bbox.x, bbox.y);
+            if (config.logDebug){
+                console.log('DirectDraw DEBUG xormode - composition pixelsize:'+ (bbox.w* bbox.h) +' duration(ms): ' + (new Date().getTime() - start));
+            }
         }
 
         function iprtGraphicsDispose(id, imageContext) {
@@ -182,26 +367,34 @@
         function iprtGraphicsSwitch(ctx, id, imageContext) {
             var graphicsStates = imageContext.graphicsStates;
             if (graphicsStates[id] != null) {
-                if (graphicsStates[id].strokeArgs != null) {
-                    iprtSetStroke(ctx, graphicsStates[id].strokeArgs);
-                }
-                if (graphicsStates[id].paintArgs != null) {
-                    iprtSetPaint(ctx, graphicsStates[id].paintArgs);
-                }
-                if (graphicsStates[id].compositeArgs != null) {
-                    iprtSetComposite(ctx, graphicsStates[id].compositeArgs);
-                }
-                if (graphicsStates[id].fontArgs != null) {
-                    iprtSetFont(ctx, graphicsStates[id].fontArgs);
-                }
-                if (graphicsStates[id].transform != null) {
-                    var t = graphicsStates[id].transform;
-                    ctx.setTransform(t[0], t[1], t[2], t[3], t[4], t[5]);
-                }
+                setCtxState(graphicsStates[id], ctx);
             } else {
                 console.log("Graphics with id " + id + " not initialized!");
             }
             imageContext.currentStateId = id;
+        }
+
+        function setCtxState(graphicsState, ctx) {
+            if (graphicsState != null) {
+                if (graphicsState.strokeArgs != null) {
+                    iprtSetStroke(ctx, graphicsState.strokeArgs);
+                }
+                if (graphicsState.paintArgs != null) {
+                    iprtSetPaint(ctx, graphicsState.paintArgs);
+                }
+                if (graphicsState.compositeArgs != null) {
+                    iprtSetComposite(ctx, graphicsState.compositeArgs);
+                }
+                if (graphicsState.fontArgs != null) {
+                    iprtSetFont(ctx, graphicsState.fontArgs);
+                }
+                if (graphicsState.transform != null) {
+                    var t = graphicsState.transform;
+                    ctx.setTransform(t[0], t[1], t[2], t[3], t[4], t[5]);
+                } else {
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+                }
+            }
         }
 
         function iprtGraphicsCreate(ctx, id, args, imageContext) {
@@ -664,11 +857,14 @@
                     case CompositeTypeProto.XOR:
                         ctx.globalCompositeOperation = "xor";
                         break;
+                    case CompositeTypeProto.XOR_MODE://handled with custom pixel processing (no effect)
+                        ctx.globalCompositeOperation = "source-over";
+                        break;
                 }
             }
         }
 
-        function path(ctx, arg, biased,transform) {
+        function path(ctx, arg, biased, transform) {
             if (arg == null) {
                 return false;
             }
@@ -851,19 +1047,29 @@
         }
 
         function calculateBias(ctx, biased, transform) {
-            if(!biased){
-                return {x:0,y:0};
-            }else{
+            if (!biased) {
+                return {x: 0, y: 0};
+            } else {
                 return {
-                    x:(ctx.lineWidth * transform[0]) & 1 ? 0.5/transform[0] : 0,
-                    y:(ctx.lineWidth * transform[3]) & 1 ? 0.5/transform[3] : 0
+                    x: (ctx.lineWidth * transform[0]) & 1 ? 0.5 / transform[0] : 0,
+                    y: (ctx.lineWidth * transform[3]) & 1 ? 0.5 / transform[3] : 0
                 }
             }
         }
 
         function parseColor(rgba) {
+            var samles = parseColorSamples(rgba);
+            return 'rgba(' + samles.r + ',' + samles.g + ',' + samles.b + ',' + (samles.a / 255) + ')';
+        }
+
+        function parseColorSamples(rgba) {
             var mask = 0x000000FF;
-            return 'rgba(' + ((rgba >>> 24) & mask) + ',' + ((rgba >>> 16) & mask) + ',' + ((rgba) >>> 8 & mask) + ',' + ((rgba & mask) / 255) + ')';
+            return {
+                r: ((rgba >>> 24) & mask),
+                g: ((rgba >>> 16) & mask),
+                b: ((rgba) >>> 8 & mask),
+                a: (rgba & mask)
+            };
         }
 
         function prepareImages(images) {
@@ -1000,6 +1206,12 @@
             return r;
         }
 
+        function transformPoint(x, y, t) {
+            var xt = t[0] * x + t[2] * y + t[4];
+            var yt = t[1] * x + t[3] * y + t[5];
+            return {x: xt, y: yt};
+        }
+
         function dispose() {
             var styles = document.body.getElementsByTagName("style");
             var toRemove = [];
@@ -1014,12 +1226,12 @@
         }
 
         function logRenderTime(startTime, webImage) {
-            if (config.logDebug && webImage!=null) {
-                var time = new Date().getTime()-startTime;
+            if (config.logDebug && webImage != null) {
+                var time = new Date().getTime() - startTime;
                 var instLength = webImage.instructions == null ? 0 : webImage.instructions.length;
                 var constLength = webImage.constants == null ? 0 : webImage.constants.length;
                 var fontsLength = webImage.fontFaces == null ? 0 : webImage.fontFaces.length;
-                console.log("DirectDraw DEBUG render time "+time+"ms (insts:"+instLength+", consts:"+constLength+", fonts:"+fontsLength+")");
+                console.log("DirectDraw DEBUG render time " + time + "ms (insts:" + instLength + ", consts:" + constLength + ", fonts:" + fontsLength + ")");
             }
         }
 
