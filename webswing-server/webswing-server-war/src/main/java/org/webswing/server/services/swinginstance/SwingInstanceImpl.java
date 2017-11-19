@@ -513,7 +513,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 			if (useJFX) {
 				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_TOOLKIT, Constants.SWING_START_SYS_PROP_JFX_TOOLKIT_WEB);
-				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_PRISM, "sw");//PrismSettings
+				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_PRISM, "web");//PrismSettings
 				swingConfig.addProperty("prism.text", "t2k");//PrismFontFactory
 				swingConfig.addProperty("prism.lcdtext", "false");//PrismFontFactory
 				swingConfig.addProperty("javafx.live.resize", "false");//QuantumToolkit
