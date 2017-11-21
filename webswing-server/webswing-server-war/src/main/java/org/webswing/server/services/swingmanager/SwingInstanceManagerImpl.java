@@ -89,6 +89,14 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@Override
+	public void destroy() {
+		for (SwingInstance i : runningInstances.getAllInstances()) {
+			i.kill(0);
+		}
+		super.destroy();
+	}
+
+	@Override
 	protected String getPath() {
 		return path;
 	}

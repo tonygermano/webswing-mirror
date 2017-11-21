@@ -43,7 +43,7 @@ public class WebEventDispatcher {
 	private Point lastMousePosition = new Point();
 	private static final DndEventHandler dndHandler = new DndEventHandler();
 	private HashMap<String, String> uploadMap = new HashMap<String, String>();
-	private ExecutorService eventDispatcher = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance());
+	private ExecutorService eventDispatcher = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing Event Dispatcher"));
 
 	//release char map derives the event char for keyrelease event from previous keypressed events (keycode=char)
 	private static final HashMap<Integer, Integer> releaseCharMap = new HashMap<Integer, Integer>();

@@ -7,11 +7,13 @@ import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
 
+import javax.swing.SwingUtilities;
 import java.applet.Applet;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
@@ -36,20 +38,13 @@ public class SwingMain {
 			ClassLoader wrapper = new URLClassLoader(urls, SwingMain.class.getClassLoader());
 			swingLibClassLoader = Services.getClassLoaderService().createSwingClassLoader(urls, wrapper);
 			initTempFolder();
+
 			if (isApplet()) {
 				startApplet();
 			} else {
 				startSwingApp(args);
 			}
-			if (Constants.SWING_START_SYS_PROP_JFX_TOOLKIT_WEB.equals(System.getProperty(Constants.SWING_START_SYS_PROP_JFX_TOOLKIT))) {
-				//start JavaFx platform
-				PlatformImpl.startup(new Runnable() {
-					@Override
-					public void run() {
-						//nothing to do here
-					}
-				});
-			}
+
 		} catch (Exception e) {
 			Logger.fatal("SwingMain:main", e);
 			System.exit(1);
@@ -62,6 +57,7 @@ public class SwingMain {
 		java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
 		setupContextClassLoader(swingLibClassLoader);
 		Util.getWebToolkit().startDispatchers();
+		initializeJavaFX();
 		Object argsArray[] = { args };
 		main.invoke(null, argsArray);
 	}
@@ -71,11 +67,31 @@ public class SwingMain {
 		Map<String, String> props = resolveProps();
 		setupContextClassLoader(swingLibClassLoader);
 		Util.getWebToolkit().startDispatchers();
+		initializeJavaFX();
 		if (Applet.class.isAssignableFrom(appletClazz)) {
 			AppletContainer ac = new AppletContainer(appletClazz, props);
 			ac.start();
 		} else {
 			Logger.error("Error in SwingMain: " + appletClazz.getCanonicalName() + " class is not a subclass of Applet");
+		}
+	}
+
+	public static void initializeJavaFX() throws InvocationTargetException, InterruptedException {
+		if (Constants.SWING_START_SYS_PROP_JFX_TOOLKIT_WEB.equals(System.getProperty(Constants.SWING_START_SYS_PROP_JFX_TOOLKIT))) {
+			//start swing dispatch thread
+			SwingUtilities.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					//nothing to do
+				}
+			});
+			//start JavaFx platform
+			PlatformImpl.startup(new Runnable() {
+				@Override
+				public void run() {
+					//nothing to do here
+				}
+			});
 		}
 	}
 

@@ -55,15 +55,15 @@ import com.sun.swingset3.demos.DemoUtilities;
  * Extends JEditorPane for more convenient display of an HTML page. 
  * <p>
  * Swing's HTML support allows Swing components to be embedded in the HTML using
- * the <object> tag,
+ * the object tag,
  * e.g.<br>
  * <pre><code>    
- *	<object classid="swingset3.demos.controls.JButtonDemo">
+ *	object classid="swingset3.demos.controls.JButtonDemo"
  * </code></pre>
  * These embedded components will be instantiated deep inside the text package and
  * it is difficult to get a handle on the resulting instantiated component instance.
  * Thus, this class supports adding a ComponentCreationListener to be notified just
- * after the component is created.</p>
+ * after the component is created.
  * <p>
  * This class also automatically installs a hyperlink listener to ensure that
  * clicking on hyperlinks bring up the associated url in the browser.
@@ -73,7 +73,7 @@ import com.sun.swingset3.demos.DemoUtilities;
 public class HTMLPanel extends JEditorPane {
     /**
      * Callback interface for getting notification when components specified in the
-     * <object> tag are created in the editor pane.
+     * object tag are created in the editor pane.
      */
     public static interface ComponentCreationListener extends EventListener {
         public void componentCreated(HTMLPanel htmlPanel, Component component);

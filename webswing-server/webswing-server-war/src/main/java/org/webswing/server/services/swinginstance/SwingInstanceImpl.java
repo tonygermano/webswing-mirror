@@ -49,6 +49,7 @@ import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingMessagingApi;
 
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -63,7 +64,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private static final String LAUNCHER_CONFIG = "launcherConfig";
 	private static final String WEB_TOOLKIT_CLASS_NAME = "org.webswing.toolkit.WebToolkit";
 	private static final String WEB_GRAPHICS_ENV_CLASS_NAME = "org.webswing.toolkit.ge.WebGraphicsEnvironment";
-	private static final String WEB_PRINTER_JOB_CLASS_NAME = "org.webswing.toolkit.WebPrinterJob";
+	private static final String WEB_PRINTER_JOB_CLASS_NAME = "org.webswing.toolkit.WebPrinterJobWrapper";
 	private static final String WIN_SHELL_FOLDER_MANAGER = "sun.awt.shell.Win32ShellFolderManager2";
 	private static final String JAVA_FX_PATH = System.getProperty("java.home") + "/lib/ext/jfxrt.jar";
 	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.ToolkitJarMarker";
@@ -454,10 +455,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			}
 			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;
 			String webGraphicsEnvClass = WEB_GRAPHICS_ENV_CLASS_NAME;
-			if (javaVersion.startsWith("1.6")) {
-				webToolkitClass += "6";
-				webGraphicsEnvClass += "6";
-			} else if (javaVersion.startsWith("1.7")) {
+			if (javaVersion.startsWith("1.7")) {
 				webToolkitClass += "7";
 				webGraphicsEnvClass += "7";
 			} else if (javaVersion.startsWith("1.8")) {
@@ -465,7 +463,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				webGraphicsEnvClass += "8";
 			} else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
-				throw new RuntimeException("Java version not supported. (Version starting with 1.6 , 1.7 and 1.8 are supported.)");
+				throw new RuntimeException("Java version not supported. (Version starting with 1.7 and 1.8 are supported.)");
 			}
 			String webSwingToolkitApiJarPath = CommonUtil.getBootClassPathForClass(WebswingApi.class.getName());
 			String webSwingToolkitJarPath = CommonUtil.getBootClassPathForClass(WEB_TOOLKIT_CLASS_NAME);
@@ -510,13 +508,14 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.addProperty("java.awt.headless", false);
 			swingConfig.addProperty("java.awt.graphicsenv", webGraphicsEnvClass);
 			swingConfig.addProperty("java.awt.printerjob", WEB_PRINTER_JOB_CLASS_NAME);
+			swingConfig.addProperty(Constants.PRINTER_JOB_CLASS, appConfig.isAllowServerPrinting() ? PrinterJob.getPrinterJob().getClass().getCanonicalName() : "org.webswing.toolkit.WebPrinterJob");
 			swingConfig.addProperty("sun.awt.fontconfig", FontUtils.createFontConfiguration(appConfig, subs));
 			swingConfig.addProperty(Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth));
 			swingConfig.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight));
 
 			if (useJFX) {
 				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_TOOLKIT, Constants.SWING_START_SYS_PROP_JFX_TOOLKIT_WEB);
-				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_PRISM, "sw");//PrismSettings
+				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_PRISM, "web");//PrismSettings
 				swingConfig.addProperty("prism.text", "t2k");//PrismFontFactory
 				swingConfig.addProperty("prism.lcdtext", "false");//PrismFontFactory
 				swingConfig.addProperty("javafx.live.resize", "false");//QuantumToolkit

@@ -1,13 +1,6 @@
 package org.webswing.directdraw.util;
 
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Shape;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -173,7 +166,12 @@ public class RenderUtil {
 	}
 
 	private static void iprtSetComposite(Graphics2D currentg, DrawInstruction di) {
-		currentg.setComposite(getValue(0, di, Composite.class));
+		Composite composite = getValue(0, di, Composite.class);
+		if(composite instanceof AlphaComposite){
+			currentg.setComposite(composite);
+		}else if (composite instanceof XorModeComposite){
+			currentg.setXORMode(((XorModeComposite) composite).getXorColor());
+		}
 	}
 
 	private static void iprtSetFont(Graphics2D currentg, DrawInstruction di) {

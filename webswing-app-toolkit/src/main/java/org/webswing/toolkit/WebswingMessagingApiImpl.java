@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class WebswingMessagingApiImpl implements WebswingMessagingApi {
-	private ExecutorService messageProcessor = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance());
+	private ExecutorService messageProcessor = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing Messaging API processor"));
 	private Map<WebswingMessageListener, Class> listeners = new ConcurrentHashMap<WebswingMessageListener, Class>();
 
 	@Override

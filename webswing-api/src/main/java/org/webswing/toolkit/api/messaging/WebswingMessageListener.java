@@ -7,7 +7,7 @@ package org.webswing.toolkit.api.messaging;
 public interface WebswingMessageListener<T> {
 	/**
 	 * This method is invoked when a message of compatible type is published to the topic
-	 * @param message
+	 * @param message wrapped message object
 	 */
 	void onMessage(WebswingMessage<T> message);
 }

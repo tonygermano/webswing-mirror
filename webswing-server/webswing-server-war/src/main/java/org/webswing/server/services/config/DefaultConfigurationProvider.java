@@ -25,7 +25,7 @@ import org.webswing.toolkit.util.DeamonThreadFactory;
 public class DefaultConfigurationProvider implements ConfigurationProvider {
 	private static final Logger log = LoggerFactory.getLogger(DefaultConfigurationProvider.class);
 
-	private ScheduledExecutorService configReloader = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
+	private ScheduledExecutorService configReloader = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing Config Monitor"));
 	protected Map<String, Object> configuration = new HashMap<String, Object>();
 	private long fileLastModified;
 	private ConfigurationUpdateHandler updateHandler;

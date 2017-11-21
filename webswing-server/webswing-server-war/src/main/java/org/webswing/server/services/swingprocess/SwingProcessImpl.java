@@ -16,11 +16,12 @@ import javax.jms.IllegalStateException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.toolkit.util.DeamonThreadFactory;
 
 public class SwingProcessImpl implements SwingProcess {
 	private static final Logger log = LoggerFactory.getLogger(SwingProcessImpl.class);
 	private static final long LOG_POLLING_PERIOD = 100L;
-	private static ScheduledExecutorService processHandlerThread = Executors.newSingleThreadScheduledExecutor();
+	private static ScheduledExecutorService processHandlerThread = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing Process Handler"));
 
 	private final SwingProcessConfig config;
 	private Process process;

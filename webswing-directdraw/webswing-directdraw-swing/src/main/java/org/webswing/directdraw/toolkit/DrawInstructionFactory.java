@@ -40,6 +40,7 @@ import org.webswing.directdraw.model.StrokeConst;
 import org.webswing.directdraw.model.TextureConst;
 import org.webswing.directdraw.model.TransformConst;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
+import org.webswing.directdraw.util.XorModeComposite;
 
 public class DrawInstructionFactory {
 
@@ -86,7 +87,7 @@ public class DrawInstructionFactory {
 	public DrawInstruction createGraphics(WebGraphics g) {
 		DrawConstant<?> id = new IntegerConst(g.getId());
 		DrawConstant<?> transformConst = new TransformConst(ctx, g.getTransform());
-		DrawConstant<?> compositeConst = g.getComposite() instanceof AlphaComposite ? new CompositeConst(ctx, (AlphaComposite) g.getComposite()) : DrawConstant.nullConst;
+		DrawConstant<?> compositeConst =new CompositeConst(ctx,g.getComposite());
 		DrawConstant<?> strokeConst = g.getStroke() instanceof BasicStroke ? new StrokeConst(ctx, (BasicStroke) g.getStroke()) : DrawConstant.nullConst;
 		DrawConstant<?> paintConst;
 		try{
@@ -162,4 +163,7 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(InstructionProto.SET_COMPOSITE, new CompositeConst(ctx, ac));
 	}
 
+	public DrawInstruction setXorMode(Color xorColor) {
+		return new DrawInstruction(InstructionProto.SET_COMPOSITE, new CompositeConst(ctx, new XorModeComposite(xorColor)));
+	}
 }

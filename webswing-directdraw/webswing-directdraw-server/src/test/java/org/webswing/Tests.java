@@ -1,25 +1,7 @@
 package org.webswing;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.LinearGradientPaint;
+import java.awt.*;
 import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.Point;
-import java.awt.RadialGradientPaint;
-import java.awt.Rectangle;
-import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
@@ -917,29 +899,46 @@ public class Tests {
 		if (repeat > 0) {
 			return false;
 		}
-		g.setColor(Color.BLACK);
-		g.setBackground(Color.YELLOW);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
 		Font sansserif = new Font("SansSerif", Font.PLAIN, 18);
 		g.setFont(sansserif);
-
-		g.setColor(Color.WHITE);
+		g.setStroke(new BasicStroke(20,BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER));
+		//fill with gray
+		int y =30;
+		g.setColor(Color.GRAY);
 		g.fillRect(0, 0, 500, 100);
-		g.setColor(Color.BLACK);
-		g.drawRect(10, 50,170,30);
 
+		g.setColor(Color.GREEN);
+		g.drawLine(10,10,480,0);
+		g.fillRect(0,0,10,10);
+		g.setColor(Color.BLACK);
+		g.drawLine(10,30,480,20);
+		g.setColor(new Color(0,0,0,0));
+		g.fillRect(0,0,5,100);
+		g.setColor(Color.BLACK);
+
+		g.setStroke(new BasicStroke(y*2,BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER));
 		g.setXORMode(Color.WHITE);
-		//step1
-		g.drawRect(10, 50, 170, 30);
-		g.translate(20, 5);
-		g.drawRect(10, 50, 170, 30);
-		//		//step2
-		g.drawRect(10, 50, 170, 30);
-		g.translate(20, 5);
-		g.drawRect(10, 50, 170, 30);
-		//		//step3
-		g.drawRect(10, 50, 170, 30);
-		g.translate(20, 5);
-		g.drawRect(10, 50, 170, 30);
+		g.fillRect(0,0,5,5);
+		g.drawLine(50,y,100,y);
+		g.setXORMode(Color.YELLOW);
+		g.drawLine(100,y,150,y);
+		g.setXORMode(Color.GRAY);
+		g.drawLine(150,y,200,y);
+		g.setColor(Color.RED);
+		g.drawLine(200,y,250,y);
+		g.setColor(new Color(0,0,0,100));
+		g.drawLine(250,y,300,y);
+		g.setColor(Color.BLACK);
+		g.setPaint(new GradientPaint(300,y,Color.WHITE,350,y,Color.black));
+		g.drawLine(300,y,350,y);
+
+		g.setPaintMode();
+		g.setColor(Color.BLACK);
+		g.drawString("testString",10,y+30);
+		g.setXORMode(Color.GRAY);
+		g.drawString("testString123",10,y+30);
 		return true;
 	}
 

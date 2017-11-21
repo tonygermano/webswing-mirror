@@ -18542,6 +18542,16 @@ public final class Directdraw {
      * <code>optional float alpha = 2 [default = 1];</code>
      */
     float getAlpha();
+
+    // optional fixed32 color = 3;
+    /**
+     * <code>optional fixed32 color = 3;</code>
+     */
+    boolean hasColor();
+    /**
+     * <code>optional fixed32 color = 3;</code>
+     */
+    int getColor();
   }
   /**
    * Protobuf type {@code org.webswing.directdraw.proto.CompositeProto}
@@ -18608,6 +18618,11 @@ public final class Directdraw {
             case 21: {
               bitField0_ |= 0x00000002;
               alpha_ = input.readFloat();
+              break;
+            }
+            case 29: {
+              bitField0_ |= 0x00000004;
+              color_ = input.readFixed32();
               break;
             }
           }
@@ -18702,6 +18717,10 @@ public final class Directdraw {
        * <code>XOR = 12;</code>
        */
       XOR(11, 12),
+      /**
+       * <code>XOR_MODE = 13;</code>
+       */
+      XOR_MODE(12, 13),
       ;
 
       /**
@@ -18752,6 +18771,10 @@ public final class Directdraw {
        * <code>XOR = 12;</code>
        */
       public static final int XOR_VALUE = 12;
+      /**
+       * <code>XOR_MODE = 13;</code>
+       */
+      public static final int XOR_MODE_VALUE = 13;
 
 
       public final int getNumber() { return value; }
@@ -18770,6 +18793,7 @@ public final class Directdraw {
           case 10: return SRC_ATOP;
           case 11: return DST_ATOP;
           case 12: return XOR;
+          case 13: return XOR_MODE;
           default: return null;
         }
       }
@@ -18854,9 +18878,26 @@ public final class Directdraw {
       return alpha_;
     }
 
+    // optional fixed32 color = 3;
+    public static final int COLOR_FIELD_NUMBER = 3;
+    private int color_;
+    /**
+     * <code>optional fixed32 color = 3;</code>
+     */
+    public boolean hasColor() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional fixed32 color = 3;</code>
+     */
+    public int getColor() {
+      return color_;
+    }
+
     private void initFields() {
       type_ = org.webswing.directdraw.proto.Directdraw.CompositeProto.CompositeTypeProto.CLEAR;
       alpha_ = 1F;
+      color_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -18880,6 +18921,9 @@ public final class Directdraw {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeFloat(2, alpha_);
       }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeFixed32(3, color_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -18896,6 +18940,10 @@ public final class Directdraw {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(2, alpha_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFixed32Size(3, color_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -19017,6 +19065,8 @@ public final class Directdraw {
         bitField0_ = (bitField0_ & ~0x00000001);
         alpha_ = 1F;
         bitField0_ = (bitField0_ & ~0x00000002);
+        color_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
 
@@ -19053,6 +19103,10 @@ public final class Directdraw {
           to_bitField0_ |= 0x00000002;
         }
         result.alpha_ = alpha_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.color_ = color_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -19074,6 +19128,9 @@ public final class Directdraw {
         }
         if (other.hasAlpha()) {
           setAlpha(other.getAlpha());
+        }
+        if (other.hasColor()) {
+          setColor(other.getColor());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -19171,6 +19228,39 @@ public final class Directdraw {
       public Builder clearAlpha() {
         bitField0_ = (bitField0_ & ~0x00000002);
         alpha_ = 1F;
+        onChanged();
+        return this;
+      }
+
+      // optional fixed32 color = 3;
+      private int color_ ;
+      /**
+       * <code>optional fixed32 color = 3;</code>
+       */
+      public boolean hasColor() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional fixed32 color = 3;</code>
+       */
+      public int getColor() {
+        return color_;
+      }
+      /**
+       * <code>optional fixed32 color = 3;</code>
+       */
+      public Builder setColor(int value) {
+        bitField0_ |= 0x00000004;
+        color_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional fixed32 color = 3;</code>
+       */
+      public Builder clearColor() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        color_ = 0;
         onChanged();
         return this;
       }
@@ -20124,19 +20214,20 @@ public final class Directdraw {
       "ocus\030\004 \002(\021\022\016\n\006radius\030\005 \002(\021\022\016\n\006colors\030\006 \003" +
       "(\007\022\021\n\tfractions\030\007 \003(\002\022@\n\006repeat\030\010 \002(\01620." +
       "org.webswing.directdraw.proto.CyclicMeth" +
-      "odProto\"\035\n\013PointsProto\022\016\n\006points\030\001 \003(\021\"\231" +
+      "odProto\"\035\n\013PointsProto\022\016\n\006points\030\001 \003(\021\"\266" +
       "\002\n\016CompositeProto\022N\n\004type\030\001 \002(\0162@.org.we" +
       "bswing.directdraw.proto.CompositeProto.C" +
-      "ompositeTypeProto\022\020\n\005alpha\030\002 \001(\002:\0011\"\244\001\n\022" +
-      "CompositeTypeProto\022\t\n\005CLEAR\020\001\022\007\n\003SRC\020\002\022\007" +
-      "\n\003DST\020\t\022\014\n\010SRC_OVER\020\003\022\014\n\010DST_OVER\020\004\022\n\n\006S" +
-      "RC_IN\020\005\022\n\n\006DST_IN\020\006\022\013\n\007SRC_OUT\020\007\022\013\n\007DST_",
-      "OUT\020\010\022\014\n\010SRC_ATOP\020\n\022\014\n\010DST_ATOP\020\013\022\007\n\003XOR" +
-      "\020\014\"\207\001\n\014TextureProto\0228\n\005image\030\001 \002(\0132).org" +
-      ".webswing.directdraw.proto.ImageProto\022=\n" +
-      "\006anchor\030\002 \002(\0132-.org.webswing.directdraw." +
-      "proto.RectangleProto*:\n\021CyclicMethodProt" +
-      "o\022\014\n\010NO_CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
+      "ompositeTypeProto\022\020\n\005alpha\030\002 \001(\002:\0011\022\r\n\005c" +
+      "olor\030\003 \001(\007\"\262\001\n\022CompositeTypeProto\022\t\n\005CLE" +
+      "AR\020\001\022\007\n\003SRC\020\002\022\007\n\003DST\020\t\022\014\n\010SRC_OVER\020\003\022\014\n\010" +
+      "DST_OVER\020\004\022\n\n\006SRC_IN\020\005\022\n\n\006DST_IN\020\006\022\013\n\007SR",
+      "C_OUT\020\007\022\013\n\007DST_OUT\020\010\022\014\n\010SRC_ATOP\020\n\022\014\n\010DS" +
+      "T_ATOP\020\013\022\007\n\003XOR\020\014\022\014\n\010XOR_MODE\020\r\"\207\001\n\014Text" +
+      "ureProto\0228\n\005image\030\001 \002(\0132).org.webswing.d" +
+      "irectdraw.proto.ImageProto\022=\n\006anchor\030\002 \002" +
+      "(\0132-.org.webswing.directdraw.proto.Recta" +
+      "ngleProto*:\n\021CyclicMethodProto\022\014\n\010NO_CYC" +
+      "LE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -20262,7 +20353,7 @@ public final class Directdraw {
           internal_static_org_webswing_directdraw_proto_CompositeProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_directdraw_proto_CompositeProto_descriptor,
-              new java.lang.String[] { "Type", "Alpha", });
+              new java.lang.String[] { "Type", "Alpha", "Color", });
           internal_static_org_webswing_directdraw_proto_TextureProto_descriptor =
             getDescriptor().getMessageTypes().get(20);
           internal_static_org_webswing_directdraw_proto_TextureProto_fieldAccessorTable = new

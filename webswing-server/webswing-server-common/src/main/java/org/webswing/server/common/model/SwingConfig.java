@@ -11,7 +11,7 @@ import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
 @ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs", "allowUpload",
-		"allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink","allowLocalClipboard" })
+		"allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink","allowLocalClipboard","allowServerPrinting" })
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
@@ -45,7 +45,7 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isDirectdraw();
 
-	@ConfigField(tab = ConfigGroup.General, label = "JavaFx Support", description = "!Only for Java8! Enables native or embeded JavaFx framework support.")
+	@ConfigField(tab = ConfigGroup.General, label = "JavaFx Support (experimental)", description = "!Only for Java8! Enables native or embeded JavaFx framework support.")
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isJavaFx();
 
@@ -170,6 +170,10 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow Local Clipboard", description = "Enables built-in integration of client's local clipboard. Due to browser security limitations clipboard toolbar is displayed.")
 	@ConfigFieldDefaultValueBoolean(true)
 	boolean isAllowLocalClipboard();
+
+	@ConfigField(tab = ConfigGroup.Features, label = "Allow Server Printing", description = "Enables native printing on devices configured on server's OS. If disabled a pdf is generated and sent to client browser.")
+	@ConfigFieldDefaultValueBoolean(false)
+	boolean isAllowServerPrinting();
 
 	public static class SwingConfigurationMetadataGenerator extends MetadataGenerator<SwingConfig> {
 		@Override

@@ -41,7 +41,7 @@ public interface OtpAccessConfig extends Config {
 
 	/**
 	 * Used to generate default value for {{@link #getSecret()}
-	 * See {@ConfigFieldDefaultValueGenerator}
+	 * See {@link ConfigFieldDefaultValueGenerator}
 	 * @return
 	 */
 	public static String generateSecret(OtpAccessConfig config) {

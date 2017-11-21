@@ -2,7 +2,7 @@ package org.webswing.toolkit.api.messaging;
 
 /**
  * Wrapper class for the message object
- * @param <T>
+ * @param <T> type of the message
  */
 public interface WebswingMessage<T> {
 

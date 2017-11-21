@@ -25,6 +25,7 @@ import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 
 import org.webswing.directdraw.util.WaitingImageObserver;
+import org.webswing.directdraw.util.XorModeComposite;
 
 public class WebGraphics extends AbstractVectorGraphics {
 
@@ -180,6 +181,8 @@ public class WebGraphics extends AbstractVectorGraphics {
 		if (composite instanceof AlphaComposite) {
 			AlphaComposite ac = (AlphaComposite) composite;
 			thisImage.addInstruction(this, dif.setComposite(ac));
+		} else if (composite instanceof XorModeComposite) {
+			thisImage.addInstruction(this, dif.setXorMode(((XorModeComposite) composite).getXorColor()));
 		}
 	}
 
@@ -205,14 +208,12 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	public void setPaintMode() {
-		//TODO:implement proper handling of XORMode
-		//setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+		setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 	}
 
 	@Override
 	public void setXORMode(Color c1) {
-		//TODO:implement proper handling of XORMode
-		//setComposite(AlphaComposite.getInstance(AlphaComposite.XOR));
+		setComposite(new XorModeComposite(c1));
 	}
 
 	@Override

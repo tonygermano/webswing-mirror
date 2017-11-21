@@ -17,38 +17,18 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.print.DocFlavor;
 import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
 import javax.print.attribute.Attribute;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.Size2DSyntax;
-import javax.print.attribute.standard.Media;
-import javax.print.attribute.standard.MediaPrintableArea;
-import javax.print.attribute.standard.MediaSize;
-import javax.print.attribute.standard.MediaSizeName;
-import javax.print.attribute.standard.OrientationRequested;
-import javax.print.attribute.standard.PageRanges;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
+import javax.print.attribute.standard.*;
+import javax.swing.*;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.text.NumberFormatter;
 
 import org.webswing.toolkit.WebPrintService;
@@ -64,15 +44,26 @@ public class WebPrintDialog extends JDialog {
 	private MediaPanel mediaPanel;
 	private MarginsPanel marginsPanel;
 	private PrintRangePanel rangePanel;
+	private PrintService[] services;
+	private int defaultServiceIndex;
 	private PrintService service;
 	private PrintRequestAttributeSet asCurrent;
 	private DocFlavor docFlavor;
 
-	public WebPrintDialog(PrintService service, PrintRequestAttributeSet as, DocFlavor docFlavor) {
+	public WebPrintDialog(PrintService[] services, int defaultServiceIndex, PrintRequestAttributeSet as, DocFlavor docFlavor) {
 		super((JFrame) null, getMsg("dialog.printtitle"), true);
+		this.defaultServiceIndex = defaultServiceIndex;
 		this.asCurrent = new HashPrintRequestAttributeSet(as);
 		this.docFlavor = docFlavor;
-		this.service = service;
+		this.services = services;
+		try {
+			this.service = Arrays.asList(services).get(defaultServiceIndex);
+		} catch (IndexOutOfBoundsException e) {
+			if (services.length > 0) {
+				defaultServiceIndex = 0;
+				service = services[0];
+			}
+		}
 		initDialog();
 	}
 
@@ -180,9 +171,9 @@ public class WebPrintDialog extends JDialog {
 		setResizable(false);
 		pack();
 		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-	    int x = (int) ((dimension.getWidth() - getWidth()) / 2);
-	    int y = (int) ((dimension.getHeight() - getHeight()) / 2);
-	    setLocation(x, y);
+		int x = (int) ((dimension.getWidth() - getWidth()) / 2);
+		int y = (int) ((dimension.getHeight() - getHeight()) / 2);
+		setLocation(x, y);
 	}
 
 	private void update() {
@@ -211,17 +202,22 @@ public class WebPrintDialog extends JDialog {
 		return status;
 	}
 
+	public PrintService getService() {
+		return service;
+	}
+
 	public PrintRequestAttributeSet getAttributes() {
 		return asCurrent;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	class MediaPanel extends JPanel {
+	class MediaPanel extends JPanel implements ItemListener {
 		private static final long serialVersionUID = 3809387570018736561L;
 		private MarginsPanel pnlMargins;
+		private JComboBox cbService;
 		private JComboBox cbOrientation;
 		private JComboBox cbSize;
-		private ArrayList<Media> allMedia = new ArrayList<Media>();;
+		private ArrayList<Media> allMedia = new ArrayList<Media>();
 
 		public MediaPanel() {
 
@@ -231,7 +227,15 @@ public class WebPrintDialog extends JDialog {
 			setLayout(gridbag);
 			setBorder(BorderFactory.createTitledBorder(getMsg("border.media")));
 
-			cbSize = new JComboBox();
+			String[] psnames = new String[services.length];
+			for (int i = 0; i < psnames.length; i++) {
+				psnames[i] = services[i].getName();
+			}
+			cbService = new JComboBox(psnames);
+			cbService.setSelectedIndex(defaultServiceIndex);
+			cbService.addItemListener(this);
+
+			cbSize = new JComboBox(new DefaultComboBoxModel());
 			cbOrientation = new JComboBox();
 
 			c.fill = GridBagConstraints.BOTH;
@@ -239,6 +243,15 @@ public class WebPrintDialog extends JDialog {
 			c.weighty = 1.0;
 
 			c.weightx = 0.0;
+			JLabel lblService = new JLabel(getMsg("label.psname"), JLabel.TRAILING);
+			lblService.setLabelFor(cbSize);
+			addToGB(lblService, this, gridbag, c);
+			c.weightx = 1.0;
+			c.gridwidth = GridBagConstraints.REMAINDER;
+			addToGB(cbService, this, gridbag, c);
+
+			c.weightx = 0.0;
+			c.gridwidth = 1;
 			JLabel lblSize = new JLabel(getMsg("label.size"), JLabel.TRAILING);
 			lblSize.setLabelFor(cbSize);
 			addToGB(lblSize, this, gridbag, c);
@@ -255,23 +268,7 @@ public class WebPrintDialog extends JDialog {
 			addToGB(cbOrientation, this, gridbag, c);
 
 			//init data
-
-			if (service.isAttributeCategorySupported(Media.class)) {
-				Object mediaArrayObject = service.getSupportedAttributeValues(Media.class, docFlavor, asCurrent);
-				Media[] mediaArray;
-				Media media;
-				if ((mediaArrayObject instanceof Media[])) {
-					mediaArray = (Media[]) mediaArrayObject;
-
-					for (int i = 0; i < mediaArray.length; i++) {
-						media = mediaArray[i];
-						if ((media instanceof MediaSizeName)) {
-							cbSize.addItem(getMediaName(((Media) media).toString()));
-							allMedia.add((Media) media);
-						}
-					}
-				}
-			}
+			loadMediaSizes();
 
 			final List<OrientationRequested> orientations = new ArrayList<OrientationRequested>();
 			cbOrientation.addItem(getMsg("radiobutton.portrait"));
@@ -310,33 +307,54 @@ public class WebPrintDialog extends JDialog {
 			});
 		}
 
-		public void updateInfo() {
-			Media currentMedia = (Media) asCurrent.get(Media.class);
-			Media defaultMedia = (Media) service.getDefaultAttributeValue(Media.class);
-
-			if ((currentMedia == null) || (!service.isAttributeValueSupported((Attribute) currentMedia, docFlavor, asCurrent))) {
-				currentMedia = defaultMedia;
-				cbSize.setSelectedIndex(allMedia.size() > 0 ? allMedia.indexOf(defaultMedia) : -1);
-				asCurrent.add((Attribute) currentMedia);
-			} else {
-				cbSize.setSelectedIndex(allMedia.indexOf(currentMedia));
-			}
-
-			OrientationRequested or = (OrientationRequested) asCurrent.get(OrientationRequested.class);
-			if (or == null || !service.isAttributeValueSupported(or, docFlavor, asCurrent)) {
-				or = (OrientationRequested) service.getDefaultAttributeValue(OrientationRequested.class);
-				if (or == null) {
-					or = OrientationRequested.PORTRAIT;
+		private void loadMediaSizes() {
+			cbSize.removeAllItems();
+			if (service != null && service.isAttributeCategorySupported(Media.class)) {
+				Object mediaArrayObject = service.getSupportedAttributeValues(Media.class, docFlavor, asCurrent);
+				Media[] mediaArray;
+				Media media;
+				if ((mediaArrayObject instanceof Media[])) {
+					mediaArray = (Media[]) mediaArrayObject;
+					for (int i = 0; i < mediaArray.length; i++) {
+						media = mediaArray[i];
+						if ((media instanceof MediaSizeName)) {
+							cbSize.addItem(getMediaName(((Media) media).toString()));
+							allMedia.add((Media) media);
+						}
+					}
 				}
-				asCurrent.add(or);
 			}
+		}
 
-			if (or == OrientationRequested.PORTRAIT) {
-				cbOrientation.setSelectedIndex(0);
-			} else if (or == OrientationRequested.LANDSCAPE) {
-				cbOrientation.setSelectedIndex(1);
-			} else {
-				cbOrientation.setSelectedIndex(0);
+		public void updateInfo() {
+			if (service != null) {
+				Media currentMedia = (Media) asCurrent.get(Media.class);
+				Media defaultMedia = (Media) service.getDefaultAttributeValue(Media.class);
+
+				if ((currentMedia == null) || (!service.isAttributeValueSupported((Attribute) currentMedia, docFlavor, asCurrent))) {
+					currentMedia = defaultMedia;
+					cbSize.setSelectedIndex(allMedia.size() > 0 ? allMedia.indexOf(defaultMedia) : -1);
+					asCurrent.add((Attribute) currentMedia);
+				} else {
+					cbSize.setSelectedIndex(allMedia.indexOf(currentMedia));
+				}
+
+				OrientationRequested or = (OrientationRequested) asCurrent.get(OrientationRequested.class);
+				if (or == null || !service.isAttributeValueSupported(or, docFlavor, asCurrent)) {
+					or = (OrientationRequested) service.getDefaultAttributeValue(OrientationRequested.class);
+					if (or == null) {
+						or = OrientationRequested.PORTRAIT;
+					}
+					asCurrent.add(or);
+				}
+
+				if (or == OrientationRequested.PORTRAIT) {
+					cbOrientation.setSelectedIndex(0);
+				} else if (or == OrientationRequested.LANDSCAPE) {
+					cbOrientation.setSelectedIndex(1);
+				} else {
+					cbOrientation.setSelectedIndex(0);
+				}
 			}
 		}
 
@@ -349,6 +367,20 @@ public class WebPrintDialog extends JDialog {
 			pnlMargins = pnl;
 		}
 
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				int index = cbService.getSelectedIndex();
+
+				if ((index >= 0) && (index < services.length)) {
+					if (!services[index].equals(service)) {
+						service = services[index];
+						loadMediaSizes();
+						updateInfo();
+					}
+				}
+			}
+		}
 	}
 
 	class MarginsPanel extends JPanel implements ActionListener, FocusListener {
@@ -523,7 +555,7 @@ public class WebPrintDialog extends JDialog {
 			Class orCategory = OrientationRequested.class;
 			OrientationRequested or = (OrientationRequested) asCurrent.get(orCategory);
 
-			if (or == null) {
+			if (or == null && service != null) {
 				or = (OrientationRequested) service.getDefaultAttributeValue(orCategory);
 			}
 
@@ -574,49 +606,52 @@ public class WebPrintDialog extends JDialog {
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		private MediaPrintableArea validateMargins(float lm, float rm, float tm, float bm) {
+			if (service != null) {
 
-			Class mpaCategory = MediaPrintableArea.class;
-			MediaPrintableArea mpaMax = null;
-			MediaSize mediaSize = null;
+				Class mpaCategory = MediaPrintableArea.class;
+				MediaPrintableArea mpaMax = null;
+				MediaSize mediaSize = null;
 
-			Media media = (Media) asCurrent.get(Media.class);
-			if (media == null || !(media instanceof MediaSizeName)) {
-				media = (Media) service.getDefaultAttributeValue(Media.class);
-			}
-			if (media != null && (media instanceof MediaSizeName)) {
-				MediaSizeName msn = (MediaSizeName) media;
-				mediaSize = MediaSize.getMediaSizeForName(msn);
-			}
-			if (mediaSize == null) {
-				mediaSize = new MediaSize(8.5f, 11f, Size2DSyntax.INCH);
-			}
+				Media media = (Media) asCurrent.get(Media.class);
+				if (media == null || !(media instanceof MediaSizeName)) {
+					media = (Media) service.getDefaultAttributeValue(Media.class);
+				}
+				if (media != null && (media instanceof MediaSizeName)) {
+					MediaSizeName msn = (MediaSizeName) media;
+					mediaSize = MediaSize.getMediaSizeForName(msn);
+				}
+				if (mediaSize == null) {
+					mediaSize = new MediaSize(8.5f, 11f, Size2DSyntax.INCH);
+				}
 
-			if (media != null) {
-				PrintRequestAttributeSet tmpASet = new HashPrintRequestAttributeSet(asCurrent);
-				tmpASet.add(media);
+				if (media != null) {
+					PrintRequestAttributeSet tmpASet = new HashPrintRequestAttributeSet(asCurrent);
+					tmpASet.add(media);
 
-				Object values = service.getSupportedAttributeValues(mpaCategory, docFlavor, tmpASet);
-				if (values instanceof MediaPrintableArea[] && ((MediaPrintableArea[]) values).length > 0) {
-					mpaMax = ((MediaPrintableArea[]) values)[0];
+					Object values = service.getSupportedAttributeValues(mpaCategory, docFlavor, tmpASet);
+					if (values instanceof MediaPrintableArea[] && ((MediaPrintableArea[]) values).length > 0) {
+						mpaMax = ((MediaPrintableArea[]) values)[0];
 
+					}
+				}
+				if (mpaMax == null) {
+					mpaMax = new MediaPrintableArea(0f, 0f, mediaSize.getX(units), mediaSize.getY(units), units);
+				}
+
+				float wid = mediaSize.getX(units);
+				float hgt = mediaSize.getY(units);
+				float pax = lm;
+				float pay = tm;
+				float paw = wid - lm - rm;
+				float pah = hgt - tm - bm;
+
+				if (paw <= 0f || pah <= 0f || pax < 0f || pay < 0f || pax < mpaMax.getX(units) || paw > mpaMax.getWidth(units) || pay < mpaMax.getY(units) || pah > mpaMax.getHeight(units)) {
+					return null;
+				} else {
+					return new MediaPrintableArea(lm, tm, paw, pah, units);
 				}
 			}
-			if (mpaMax == null) {
-				mpaMax = new MediaPrintableArea(0f, 0f, mediaSize.getX(units), mediaSize.getY(units), units);
-			}
-
-			float wid = mediaSize.getX(units);
-			float hgt = mediaSize.getY(units);
-			float pax = lm;
-			float pay = tm;
-			float paw = wid - lm - rm;
-			float pah = hgt - tm - bm;
-
-			if (paw <= 0f || pah <= 0f || pax < 0f || pay < 0f || pax < mpaMax.getX(units) || paw > mpaMax.getWidth(units) || pay < mpaMax.getY(units) || pah > mpaMax.getHeight(units)) {
-				return null;
-			} else {
-				return new MediaPrintableArea(lm, tm, paw, pah, units);
-			}
+			return null;
 		}
 
 		/* This is complex as a MediaPrintableArea is valid only within
@@ -634,39 +669,39 @@ public class WebPrintDialog extends JDialog {
 		 */
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public void updateInfo() {
+			if (service != null) {
+				Class mpaCategory = MediaPrintableArea.class;
+				MediaPrintableArea mpa = (MediaPrintableArea) asCurrent.get(mpaCategory);
+				MediaPrintableArea mpaMax = null;
+				MediaSize mediaSize = null;
 
-			Class mpaCategory = MediaPrintableArea.class;
-			MediaPrintableArea mpa = (MediaPrintableArea) asCurrent.get(mpaCategory);
-			MediaPrintableArea mpaMax = null;
-			MediaSize mediaSize = null;
-
-			Media media = (Media) asCurrent.get(Media.class);
-			if (media == null || !(media instanceof MediaSizeName)) {
-				media = (Media) service.getDefaultAttributeValue(Media.class);
-			}
-			if (media != null && (media instanceof MediaSizeName)) {
-				MediaSizeName msn = (MediaSizeName) media;
-				mediaSize = MediaSize.getMediaSizeForName(msn);
-			}
-			if (mediaSize == null) {
-				mediaSize = new MediaSize(8.5f, 11f, Size2DSyntax.INCH);
-			}
-
-			if (media != null) {
-				PrintRequestAttributeSet tmpASet = new HashPrintRequestAttributeSet(asCurrent);
-				tmpASet.add(media);
-
-				Object values = service.getSupportedAttributeValues(mpaCategory, docFlavor, tmpASet);
-				if (values instanceof MediaPrintableArea[] && ((MediaPrintableArea[]) values).length > 0) {
-					mpaMax = ((MediaPrintableArea[]) values)[0];
-
-				} else if (values instanceof MediaPrintableArea) {
-					mpaMax = (MediaPrintableArea) values;
+				Media media = (Media) asCurrent.get(Media.class);
+				if (media == null || !(media instanceof MediaSizeName)) {
+					media = (Media) service.getDefaultAttributeValue(Media.class);
 				}
-			}
-			if (mpaMax == null) {
-				mpaMax = new MediaPrintableArea(0f, 0f, mediaSize.getX(units), mediaSize.getY(units), units);
-			}
+				if (media != null && (media instanceof MediaSizeName)) {
+					MediaSizeName msn = (MediaSizeName) media;
+					mediaSize = MediaSize.getMediaSizeForName(msn);
+				}
+				if (mediaSize == null) {
+					mediaSize = new MediaSize(8.5f, 11f, Size2DSyntax.INCH);
+				}
+
+				if (media != null) {
+					PrintRequestAttributeSet tmpASet = new HashPrintRequestAttributeSet(asCurrent);
+					tmpASet.add(media);
+
+					Object values = service.getSupportedAttributeValues(mpaCategory, docFlavor, tmpASet);
+					if (values instanceof MediaPrintableArea[] && ((MediaPrintableArea[]) values).length > 0) {
+						mpaMax = ((MediaPrintableArea[]) values)[0];
+
+					} else if (values instanceof MediaPrintableArea) {
+						mpaMax = (MediaPrintableArea) values;
+					}
+				}
+				if (mpaMax == null) {
+					mpaMax = new MediaPrintableArea(0f, 0f, mediaSize.getX(units), mediaSize.getY(units), units);
+				}
 
 			/*
 			 * At this point we now know as best we can :-
@@ -678,159 +713,160 @@ public class WebPrintDialog extends JDialog {
 			 * large compared to the size of the media.
 			 */
 
-			float wid = mediaSize.getX(MediaPrintableArea.INCH);
-			float hgt = mediaSize.getY(MediaPrintableArea.INCH);
-			float maxMarginRatio = 5f;
-			float xMgn, yMgn;
-			if (wid > maxMarginRatio) {
-				xMgn = 1f;
-			} else {
-				xMgn = wid / maxMarginRatio;
-			}
-			if (hgt > maxMarginRatio) {
-				yMgn = 1f;
-			} else {
-				yMgn = hgt / maxMarginRatio;
-			}
-
-			if (mpa == null) {
-				mpa = new MediaPrintableArea(xMgn, yMgn, wid - (2 * xMgn), hgt - (2 * yMgn), MediaPrintableArea.INCH);
-				asCurrent.add(mpa);
-			}
-			float pax = mpa.getX(units);
-			float pay = mpa.getY(units);
-			float paw = mpa.getWidth(units);
-			float pah = mpa.getHeight(units);
-			float paxMax = mpaMax.getX(units);
-			float payMax = mpaMax.getY(units);
-			float pawMax = mpaMax.getWidth(units);
-			float pahMax = mpaMax.getHeight(units);
-
-			boolean invalid = false;
-
-			// If the paper is set to something which is too small to
-			// accommodate a specified printable area, perhaps carried
-			// over from a larger paper, the adjustment that needs to be
-			// performed should seem the most natural from a user's viewpoint.
-			// Since the user is specifying margins, then we are biased
-			// towards keeping the margins as close to what is specified as
-			// possible, shrinking or growing the printable area.
-			// But the API uses printable area, so you need to know the
-			// media size in which the margins were previously interpreted,
-			// or at least have a record of the margins.
-			// In the case that this is the creation of this UI we do not
-			// have this record, so we are somewhat reliant on the client
-			// to supply a reasonable default
-			wid = mediaSize.getX(units);
-			hgt = mediaSize.getY(units);
-			if (lmVal >= 0f) {
-				invalid = true;
-
-				if (lmVal + rmVal > wid) {
-					// margins impossible, but maintain P.A if can
-					if (paw > pawMax) {
-						paw = pawMax;
-					}
-					// try to centre the printable area.
-					pax = (wid - paw) / 2f;
+				float wid = mediaSize.getX(MediaPrintableArea.INCH);
+				float hgt = mediaSize.getY(MediaPrintableArea.INCH);
+				float maxMarginRatio = 5f;
+				float xMgn, yMgn;
+				if (wid > maxMarginRatio) {
+					xMgn = 1f;
 				} else {
-					pax = (lmVal >= paxMax) ? lmVal : paxMax;
-					paw = wid - pax - rmVal;
+					xMgn = wid / maxMarginRatio;
 				}
-				if (tmVal + bmVal > hgt) {
-					if (pah > pahMax) {
-						pah = pahMax;
-					}
-					pay = (hgt - pah) / 2f;
+				if (hgt > maxMarginRatio) {
+					yMgn = 1f;
 				} else {
-					pay = (tmVal >= payMax) ? tmVal : payMax;
-					pah = hgt - pay - bmVal;
+					yMgn = hgt / maxMarginRatio;
 				}
-			}
-			if (pax < paxMax) {
-				invalid = true;
-				pax = paxMax;
-			}
-			if (pay < payMax) {
-				invalid = true;
-				pay = payMax;
-			}
-			if (paw > pawMax) {
-				invalid = true;
-				paw = pawMax;
-			}
-			if (pah > pahMax) {
-				invalid = true;
-				pah = pahMax;
-			}
 
-			if ((pax + paw > paxMax + pawMax) || (paw <= 0f)) {
-				invalid = true;
-				pax = paxMax;
-				paw = pawMax;
-			}
-			if ((pay + pah > payMax + pahMax) || (pah <= 0f)) {
-				invalid = true;
-				pay = payMax;
-				pah = pahMax;
-			}
+				if (mpa == null) {
+					mpa = new MediaPrintableArea(xMgn, yMgn, wid - (2 * xMgn), hgt - (2 * yMgn), MediaPrintableArea.INCH);
+					asCurrent.add(mpa);
+				}
+				float pax = mpa.getX(units);
+				float pay = mpa.getY(units);
+				float paw = mpa.getWidth(units);
+				float pah = mpa.getHeight(units);
+				float paxMax = mpaMax.getX(units);
+				float payMax = mpaMax.getY(units);
+				float pawMax = mpaMax.getWidth(units);
+				float pahMax = mpaMax.getHeight(units);
 
-			if (invalid) {
-				mpa = new MediaPrintableArea(pax, pay, paw, pah, units);
-				asCurrent.add(mpa);
-			}
+				boolean invalid = false;
+
+				// If the paper is set to something which is too small to
+				// accommodate a specified printable area, perhaps carried
+				// over from a larger paper, the adjustment that needs to be
+				// performed should seem the most natural from a user's viewpoint.
+				// Since the user is specifying margins, then we are biased
+				// towards keeping the margins as close to what is specified as
+				// possible, shrinking or growing the printable area.
+				// But the API uses printable area, so you need to know the
+				// media size in which the margins were previously interpreted,
+				// or at least have a record of the margins.
+				// In the case that this is the creation of this UI we do not
+				// have this record, so we are somewhat reliant on the client
+				// to supply a reasonable default
+				wid = mediaSize.getX(units);
+				hgt = mediaSize.getY(units);
+				if (lmVal >= 0f) {
+					invalid = true;
+
+					if (lmVal + rmVal > wid) {
+						// margins impossible, but maintain P.A if can
+						if (paw > pawMax) {
+							paw = pawMax;
+						}
+						// try to centre the printable area.
+						pax = (wid - paw) / 2f;
+					} else {
+						pax = (lmVal >= paxMax) ? lmVal : paxMax;
+						paw = wid - pax - rmVal;
+					}
+					if (tmVal + bmVal > hgt) {
+						if (pah > pahMax) {
+							pah = pahMax;
+						}
+						pay = (hgt - pah) / 2f;
+					} else {
+						pay = (tmVal >= payMax) ? tmVal : payMax;
+						pah = hgt - pay - bmVal;
+					}
+				}
+				if (pax < paxMax) {
+					invalid = true;
+					pax = paxMax;
+				}
+				if (pay < payMax) {
+					invalid = true;
+					pay = payMax;
+				}
+				if (paw > pawMax) {
+					invalid = true;
+					paw = pawMax;
+				}
+				if (pah > pahMax) {
+					invalid = true;
+					pah = pahMax;
+				}
+
+				if ((pax + paw > paxMax + pawMax) || (paw <= 0f)) {
+					invalid = true;
+					pax = paxMax;
+					paw = pawMax;
+				}
+				if ((pay + pah > payMax + pahMax) || (pah <= 0f)) {
+					invalid = true;
+					pay = payMax;
+					pah = pahMax;
+				}
+
+				if (invalid) {
+					mpa = new MediaPrintableArea(pax, pay, paw, pah, units);
+					asCurrent.add(mpa);
+				}
 
 			/* We now have a valid printable area.
 			 * Turn it into margins, using the mediaSize
 			 */
-			lmVal = pax;
-			tmVal = pay;
-			rmVal = mediaSize.getX(units) - pax - paw;
-			bmVal = mediaSize.getY(units) - pay - pah;
+				lmVal = pax;
+				tmVal = pay;
+				rmVal = mediaSize.getX(units) - pax - paw;
+				bmVal = mediaSize.getY(units) - pay - pah;
 
-			lmObj = new Float(lmVal);
-			rmObj = new Float(rmVal);
-			tmObj = new Float(tmVal);
-			bmObj = new Float(bmVal);
+				lmObj = new Float(lmVal);
+				rmObj = new Float(rmVal);
+				tmObj = new Float(tmVal);
+				bmObj = new Float(bmVal);
 
 			/* Now we know the values to use, we need to assign them
 			 * to the fields appropriate for the orientation.
 			 * Note: if orientation changes this method must be called.
 			 */
-			Class orCategory = OrientationRequested.class;
-			OrientationRequested or = (OrientationRequested) asCurrent.get(orCategory);
+				Class orCategory = OrientationRequested.class;
+				OrientationRequested or = (OrientationRequested) asCurrent.get(orCategory);
 
-			if (or == null) {
-				or = (OrientationRequested) service.getDefaultAttributeValue(orCategory);
+				if (or == null && service!=null) {
+					or = (OrientationRequested) service.getDefaultAttributeValue(orCategory);
+				}
+
+				Float tmp;
+
+				if (or == OrientationRequested.REVERSE_PORTRAIT) {
+					tmp = lmObj;
+					lmObj = rmObj;
+					rmObj = tmp;
+					tmp = tmObj;
+					tmObj = bmObj;
+					bmObj = tmp;
+				} else if (or == OrientationRequested.LANDSCAPE) {
+					tmp = lmObj;
+					lmObj = bmObj;
+					bmObj = rmObj;
+					rmObj = tmObj;
+					tmObj = tmp;
+				} else if (or == OrientationRequested.REVERSE_LANDSCAPE) {
+					tmp = lmObj;
+					lmObj = tmObj;
+					tmObj = rmObj;
+					rmObj = bmObj;
+					bmObj = tmp;
+				}
+
+				leftMargin.setValue(lmObj);
+				rightMargin.setValue(rmObj);
+				topMargin.setValue(tmObj);
+				bottomMargin.setValue(bmObj);
 			}
-
-			Float tmp;
-
-			if (or == OrientationRequested.REVERSE_PORTRAIT) {
-				tmp = lmObj;
-				lmObj = rmObj;
-				rmObj = tmp;
-				tmp = tmObj;
-				tmObj = bmObj;
-				bmObj = tmp;
-			} else if (or == OrientationRequested.LANDSCAPE) {
-				tmp = lmObj;
-				lmObj = bmObj;
-				bmObj = rmObj;
-				rmObj = tmObj;
-				tmObj = tmp;
-			} else if (or == OrientationRequested.REVERSE_LANDSCAPE) {
-				tmp = lmObj;
-				lmObj = tmObj;
-				tmObj = rmObj;
-				rmObj = bmObj;
-				bmObj = tmp;
-			}
-
-			leftMargin.setValue(lmObj);
-			rightMargin.setValue(rmObj);
-			topMargin.setValue(tmObj);
-			bottomMargin.setValue(bmObj);
 		}
 	}
 
@@ -993,44 +1029,49 @@ public class WebPrintDialog extends JDialog {
 
 		@SuppressWarnings({ "restriction", "rawtypes", "unchecked" })
 		public void updateInfo() {
-			Class prCategory = PageRanges.class;
-			prSupported = false;
+			if (service != null) {
+				Class prCategory = PageRanges.class;
+				prSupported = false;
 
-			if (service.isAttributeCategorySupported(prCategory)) {
-				prSupported = true;
-			}
+				if (service.isAttributeCategorySupported(prCategory)) {
+					prSupported = true;
+				}
 
-			sun.print.SunPageSelection select = sun.print.SunPageSelection.ALL;
-			int min = 1;
-			int max = 1;
+				sun.print.SunPageSelection select = sun.print.SunPageSelection.ALL;
+				int min = 1;
+				int max = 1;
 
-			PageRanges pr = (PageRanges) asCurrent.get(prCategory);
-			if (pr != null) {
-				if (!pr.equals(prAll)) {
-					select = sun.print.SunPageSelection.RANGE;
+				PageRanges pr = (PageRanges) asCurrent.get(prCategory);
+				if (pr != null) {
+					if (!pr.equals(prAll)) {
+						select = sun.print.SunPageSelection.RANGE;
 
-					int[][] members = pr.getMembers();
-					if ((members.length > 0) && (members[0].length > 1)) {
-						min = members[0][0];
-						max = members[0][1];
+						int[][] members = pr.getMembers();
+						if ((members.length > 0) && (members[0].length > 1)) {
+							min = members[0][0];
+							max = members[0][1];
+						}
 					}
 				}
-			}
 
-			if (select == sun.print.SunPageSelection.ALL) {
-				rbAll.setSelected(true);
-			} else { // RANGE
-				rbPages.setSelected(true);
+				if (select == sun.print.SunPageSelection.ALL) {
+					rbAll.setSelected(true);
+				} else { // RANGE
+					rbPages.setSelected(true);
+				}
+				tfRangeFrom.setValue(new Integer(min));
+				tfRangeTo.setValue(new Integer(max));
+				rbAll.setEnabled(prSupported);
+				rbPages.setEnabled(prSupported);
+				setupRangeWidgets();
 			}
-			tfRangeFrom.setValue(new Integer(min));
-			tfRangeTo.setValue(new Integer(max));
-			rbAll.setEnabled(prSupported);
-			rbPages.setEnabled(prSupported);
-			setupRangeWidgets();
 		}
 	}
 
 	public static void main(String[] args) {
-		new WebPrintDialog(WebPrintService.getService(), new HashPrintRequestAttributeSet(), null).setVisible(true);
+//		new WebPrintDialog(new PrintService[] { WebPrintService.getService() }, 0, new HashPrintRequestAttributeSet(), null).setVisible(true);
+		new WebPrintDialog(new PrintService[] { WebPrintService.getService(),PrintServiceLookup.lookupDefaultPrintService() }, 0, new HashPrintRequestAttributeSet(), null).setVisible(true);
+//		new WebPrintDialog(PrintServiceLookup.lookupPrintServices(null,null), 0, new HashPrintRequestAttributeSet(), null).setVisible(true);
 	}
+
 }

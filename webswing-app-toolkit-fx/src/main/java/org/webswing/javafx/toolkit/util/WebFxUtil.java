@@ -34,14 +34,14 @@ public class WebFxUtil {
 	private static BufferedImage paintInt(int width, int height, IntBuffer ints) {
 		BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		DataBufferInt dataBuf = (DataBufferInt) bi.getRaster().getDataBuffer();
-		IntBuffer.wrap(dataBuf.getData()).put(ints);
+		ints.get(dataBuf.getData(), 0, width * height);
 		return bi;
 	}
 
 	private static BufferedImage paintByte(int width, int height, ByteBuffer bytes) {
 		BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 		DataBufferByte dataBuf = (DataBufferByte) bi.getRaster().getDataBuffer();
-		ByteBuffer.wrap(dataBuf.getData()).put(bytes);
+		bytes.get(dataBuf.getData(), 0, width * height);
 		return bi;
 	}
 

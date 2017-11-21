@@ -31,6 +31,8 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY = "webswing.doubleClickMaxDelay";
 	public static final String SWING_START_SYS_PROP_INITIAL_URL = "webswing.initialUrl" ;
 	public static final String SWING_START_SYS_PROP_MSG_API_TOPIC = "webswing.messagingApiTopicName";
+	public static final	String PRINTER_JOB_CLASS = "webswing.printerJobDelegate";
+
 	//javafx startup
 	public static final String SWING_START_SYS_PROP_JFX_TOOLKIT = "glass.platform";
 	public static final String SWING_START_SYS_PROP_JFX_TOOLKIT_WEB = "Web";
