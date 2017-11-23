@@ -13,6 +13,7 @@
 			vm.forceKill = forceKill;
 			vm.timer = undefined;
 			vm.control = false;
+			vm.showThreadDump = showThreadDump;
 
 			load().then(view).then(refresh);
 
@@ -134,6 +135,10 @@
 				$location.path('/dashboard/overview/' + vm.path);
 				$timeout.cancel(vm.timer);
 			}
+
+			function showThreadDump(session, key) {
+                window.open(sessionsRestService.getStackDumpPath(vm.path, session.id, key), "_blank");
+            }
 		}
 		SessionController.$inject = [ 'baseUrl', '$scope', '$timeout', '$location', 'sessionsRestService', '$routeParams', 'wsUtils' ];
 

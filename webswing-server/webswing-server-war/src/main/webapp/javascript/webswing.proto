@@ -117,6 +117,7 @@ enum SimpleEventMsgOutProto {
     shutDownAutoLogoutNotification = 7;
     sessionTimeoutWarning = 8;
     sessionTimedOutNotification = 9;
+    applicationBusy = 10;
 }
 
 message JsEvalRequestMsgOutProto {

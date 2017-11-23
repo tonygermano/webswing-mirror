@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs", "allowUpload",
-		"allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink","allowLocalClipboard","allowServerPrinting" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs",
+		"allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting" })
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
@@ -101,6 +101,10 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.Session, label = "Timeout if Inactive", description = "If True, the Session Timeout will apply for user inactivity (Session Timeout has to be > 0). Otherwise only disconnected sessions will time out.")
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isTimeoutIfInactive();
+
+	@ConfigField(tab = ConfigGroup.Session, label = "Monitor App Responsiveness", description = "If True, Webswing will display a progress animation if Swing's Event Dispatch thread is not responding.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isMonitorEdtEnabled();
 
 	@ConfigField(tab = ConfigGroup.Session, label = "Session Stealing", description = "If enabled, and session mode 'CONTINUE_FOR_USER' is selected, user can resume Webswing session even if the connection is open in other browser. Former browser window will be disconnected.")
 	@ConfigFieldDefaultValueBoolean(true)

@@ -137,8 +137,8 @@
 								<phase>package</phase>
 								<configuration>
 									<target>
-										<copy todir="${basedir}/../webswing-server/webswing-server-war/target/${webswing-war-name}/WEB-INF/swing-lib">
-											<fileset dir="${project.build.directory}" includes="*.jar"/>
+										<copy todir="${basedir}/../webswing-server/webswing-server-war/target/${webswing-war-name}">
+											<fileset dir="${project.build.directory}" includes="WEB-INF/**"/>
 										</copy>
 									</target>
 								</configuration>

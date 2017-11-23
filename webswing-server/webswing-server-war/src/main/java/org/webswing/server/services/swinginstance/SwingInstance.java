@@ -42,4 +42,8 @@ public interface SwingInstance {
 	void logWarningHistory();
 
 	void startRecording();
+
+	String getThreadDump(String id);
+
+	void requestThreadDump();
 }

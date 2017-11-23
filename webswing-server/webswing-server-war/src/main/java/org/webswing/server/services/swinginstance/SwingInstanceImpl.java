@@ -53,10 +53,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class SwingInstanceImpl implements SwingInstance, JvmListener {
@@ -95,6 +93,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	//finished instances only
 	private Date endedAt = null;
 	private List<String> warningHistoryLog;
+	private Map<Long, ThreadDumpMsgInternal> threadDumps = new ConcurrentHashMap<>();
 
 	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection websocket) throws WsException {
 		this.manager = manager;
@@ -324,10 +323,19 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				logStatValue(StatisticsLogger.MEMORY_ALLOCATED_METRIC, s.getHeapSize());
 				logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
 				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, s.getCpuUsage());
+				logStatValue(StatisticsLogger.EDT_BLOCKED_SEC_METRIC, s.getEdtPingSeconds());
+				if(getAppConfig().isMonitorEdtEnabled()){
+					if(s.getEdtPingSeconds()>2){
+						sendToWeb(SimpleEventMsgOut.applicationBusy.buildMsgOut());
+					}
+				}
 			} else if (o instanceof ExitMsgInternal) {
 				close();
 				ExitMsgInternal e = (ExitMsgInternal) o;
 				kill(e.getWaitForExit());
+			} else if (o instanceof ThreadDumpMsgInternal) {
+				ThreadDumpMsgInternal e = (ThreadDumpMsgInternal) o;
+				threadDumps.put(e.getTimestamp(), e);
 			}
 		} else if (o instanceof AppFrameMsgOut && ((AppFrameMsgOut) o).getCursorChange() != null) {
 			CursorChangeEventMsg cmsg = ((AppFrameMsgOut) o).getCursorChange();
@@ -422,6 +430,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		}
 		session.setRecorded(isRecording());
 		session.setRecordingFile(getRecordingFile());
+		session.setThreadDumps(toMap(threadDumps));
+
 		return session;
 	}
 
@@ -692,6 +702,35 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			current.addAll(manager.getInstanceWarningHistory(getClientId()));
 		}
 		warningHistoryLog = current;
+	}
+
+	private Map<Long, String> toMap(Map<Long, ThreadDumpMsgInternal> dumps) {
+		LinkedHashMap<Long, String> result = new LinkedHashMap<>();
+		for (ThreadDumpMsgInternal dump : dumps.values()) {
+			result.put(dump.getTimestamp(), dump.getReason());
+		}
+		return result;
+	}
+
+	@Override
+	public String getThreadDump(String id) {
+		try {
+			ThreadDumpMsgInternal dump = threadDumps.get(Long.parseLong(id));
+			if(dump!=null){
+				return FileUtils.readFileToString(new File(dump.getDump()));
+			}
+			return null;
+		} catch (Exception e) {
+			log.error("Failed to load threaddump",e);
+			return null;
+		}
+	}
+
+	@Override
+	public void requestThreadDump() {
+		if (isRunning()) {
+			jvmConnection.send(new ThreadDumpRequestMsgInternal());
+		}
 	}
 
 	private void notifyUserConnected() {

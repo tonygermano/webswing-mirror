@@ -341,6 +341,43 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		return null;
 	}
 
+	@GET
+	@Path("/rest/threadDump")
+	public String getThreadDump(@PathParam("") String id, @QueryParam("id") String timestamp) throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getThreadDump);
+		if (id.startsWith("/")) {
+			id = id.substring(1);
+		}
+		SwingInstance instance = runningInstances.findByInstanceId(id);
+		if (instance != null) {
+			return instance.getThreadDump(timestamp);
+		}else{
+			List<SwingInstance> instaces = closedInstances.getAllInstances();//closed instances can have multiple instances for same id, need to manually check all
+			for(SwingInstance i:instaces){
+				if(id.equals(i.getInstanceId())){
+					String td = i.getThreadDump(timestamp);
+					if(td!=null){
+						return td;
+					}
+				}
+			}
+			throw new WsException("Not found", 404);
+		}
+	}
+
+	@POST
+	@Path("/rest/threadDump")
+	public void requestThreadDump(@PathParam("") String id) throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_requestThreadDump);
+		if (id.startsWith("/")) {
+			id = id.substring(1);
+		}
+		SwingInstance instance = runningInstances.findByInstanceId(id);
+		if (instance != null) {
+			instance.requestThreadDump();
+		}
+	}
+
 	@DELETE
 	@Path("/rest/session")
 	public void shutdown(@PathParam("") String id, @QueryParam("force") String forceKill) throws WsException {

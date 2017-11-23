@@ -2,24 +2,19 @@ package org.webswing.server.services.stats.logger;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class InstanceStats {
+	private static final int MAX_WARNING_HISTORY_SIZE = 20;
 	private DateFormat format = new SimpleDateFormat("HH:mm:ss");
 	private Map<String, Map<Long, Number>> statisticsLog = new ConcurrentHashMap<>();
 	private Map<String, Long> lastTimestampMap = new ConcurrentHashMap<String, Long>();
 	private Map<String, List<Number>> lastTimestampNumbers = new ConcurrentHashMap<String, List<Number>>();
 	private Map<String, Number> lastMetrics = new ConcurrentHashMap<>();
-	private Map<String, String> warnings = new ConcurrentHashMap<>();
-	private Map<String, String> warningHistory = new ConcurrentHashMap<>();
+	private Map<String, Warning> warnings = new ConcurrentHashMap<>();
+	private ConcurrentLinkedQueue<String> warningHistory = new ConcurrentLinkedQueue<>();
 
 	public void processMetric(MetricRule rule, String name, Number value, WarningRule warnRule) {
 		//round timestamp to interval milis
@@ -70,16 +65,23 @@ public class InstanceStats {
 
 	private void processWarningRule(String name, WarningRule warnRule) {
 		if (warnRule != null) {
-			String warning = warnRule.checkWarning(lastMetrics);
-			
+			Warning warning = warnRule.checkWarning(lastMetrics);
+
 			if (warning == null && warnings.containsKey(name)) {
-				String value = warnings.remove(name);
+				Warning value = warnings.remove(name);
 				String date = format.format(new Date());
-				warningHistory.put(name, value + " (until " + date + ")");
+				warningHistory.add(value + " (until " + date + ")");
+				if (warningHistory.size() > MAX_WARNING_HISTORY_SIZE) {
+					warningHistory.poll();
+				}
 			}
-			
+
 			if (warning != null) {
-				warnings.put(name, warning);
+				if (warnings.containsKey(name)) {
+					warnings.get(name).update(warning);
+				} else {
+					warnings.put(name, warning);
+				}
 			}
 		}
 	}
@@ -88,7 +90,7 @@ public class InstanceStats {
 		//store value
 		Number result = 0;
 		if (list != null && list.size() > 0) {
-			for (Iterator<Number> iterator = list.iterator(); iterator.hasNext();) {
+			for (Iterator<Number> iterator = list.iterator(); iterator.hasNext(); ) {
 				Number number = iterator.next();
 				switch (rule.getAggregation()) {
 				case MIN:
@@ -129,7 +131,11 @@ public class InstanceStats {
 	}
 
 	public List<String> getWarnings() {
-		return new ArrayList<>(warnings.values());
+		ArrayList<String> result = new ArrayList<>();
+		for (Warning w : warnings.values()) {
+			result.add(w.toString());
+		}
+		return result;
 	}
 
 	public Map<String, Map<Long, Number>> getStatistics() {
@@ -137,6 +143,8 @@ public class InstanceStats {
 	}
 
 	public List<String> getWarningHistory() {
-		return new ArrayList<>(warningHistory.values());
+		ArrayList<String> result = new ArrayList<>(warningHistory);
+		Collections.reverse(result);
+		return result;
 	}
 }

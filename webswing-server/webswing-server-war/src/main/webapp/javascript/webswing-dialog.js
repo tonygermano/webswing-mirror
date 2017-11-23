@@ -37,6 +37,7 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
                 initializingDialog: messageDialog('dialog.initializingDialog', true),
                 startingDialog: messageDialog('dialog.startingDialog', true),
                 connectingDialog: messageDialog('dialog.connectingDialog', true),
+                applicationBusyDialog: messageDialog('dialog.applicationBusyDialog', true),
                 unauthorizedAccess: messageDialog('dialog.unauthorizedAccess'),
                 applicationAlreadyRunning: retryMessageDialog('dialog.applicationAlreadyRunning'),
                 sessionStolenNotification: retryMessageDialog('dialog.sessionStolenNotification'),

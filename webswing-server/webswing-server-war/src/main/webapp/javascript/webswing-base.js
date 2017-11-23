@@ -36,6 +36,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             tooManyClientsNotification: 'dialog.content.tooManyClientsNotification',
             continueOldSessionDialog: 'dialog.content.continueOldSessionDialog',
             inactivityTimeoutWarningDialog: 'dialog.content.inactivityTimeoutWarningDialog',
+            applicationBusyDialog: 'dialog.content.applicationBusyDialog',
             processFileDialogEvent: 'files.process',
             closeFileDialog: 'files.close',
             openLink: 'files.link',
@@ -232,6 +233,10 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                 } else if (data.event == "sessionTimedOutNotification") {
                     api.showDialog(api.timedoutDialog);
                     api.disconnect();
+                } else if (data.event == "applicationBusy") {
+                    if(api.currentDialog()==null){
+                        api.showDialog(api.applicationBusyDialog);
+                    }
                 }
                 return;
             }

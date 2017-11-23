@@ -53,6 +53,10 @@ public final class Webswing {
      * <code>sessionTimedOutNotification = 9;</code>
      */
     sessionTimedOutNotification(9, 9),
+    /**
+     * <code>applicationBusy = 10;</code>
+     */
+    applicationBusy(10, 10),
     ;
 
     /**
@@ -95,6 +99,10 @@ public final class Webswing {
      * <code>sessionTimedOutNotification = 9;</code>
      */
     public static final int sessionTimedOutNotification_VALUE = 9;
+    /**
+     * <code>applicationBusy = 10;</code>
+     */
+    public static final int applicationBusy_VALUE = 10;
 
 
     public final int getNumber() { return value; }
@@ -111,6 +119,7 @@ public final class Webswing {
         case 7: return shutDownAutoLogoutNotification;
         case 8: return sessionTimeoutWarning;
         case 9: return sessionTimedOutNotification;
+        case 10: return applicationBusy;
         default: return null;
       }
     }
@@ -33085,14 +33094,15 @@ public final class Webswing {
       "\010\n\004play\020\001\022\010\n\004stop\020\002\022\010\n\004step\020\003\022\n\n\006step10\020" +
       "\004\022\013\n\007step100\020\005\"E\n\034PixelsAreaResponseMsgI" +
       "nProto\022\025\n\rcorrelationId\030\001 \001(\t\022\016\n\006pixels\030",
-      "\002 \001(\t*\270\002\n\026SimpleEventMsgOutProto\022\035\n\031appl" +
+      "\002 \001(\t*\315\002\n\026SimpleEventMsgOutProto\022\035\n\031appl" +
       "icationAlreadyRunning\020\000\022\030\n\024shutDownNotif" +
       "ication\020\001\022\036\n\032tooManyClientsNotification\020" +
       "\002\022\026\n\022continueOldSession\020\003\022\026\n\022configurati" +
       "onError\020\004\022\035\n\031sessionStolenNotification\020\005" +
       "\022\026\n\022unauthorizedAccess\020\006\022\"\n\036shutDownAuto" +
       "LogoutNotification\020\007\022\031\n\025sessionTimeoutWa" +
-      "rning\020\010\022\037\n\033sessionTimedOutNotification\020\t"
+      "rning\020\010\022\037\n\033sessionTimedOutNotification\020\t" +
+      "\022\023\n\017applicationBusy\020\n"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
