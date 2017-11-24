@@ -168,18 +168,25 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
                 var keyevt = getKBKey('keydown', canvas, event);
                 if (!isClipboardEvent(keyevt)) { // cut copy paste handled separately
                     // default action prevented
-                    if (isCtrlCmd(keyevt) && !keyevt.key.alt && !keyevt.key.altgr) {
+                    if (isCtrlCmd(keyevt) && !keyevt.key.alt) {
                         event.preventDefault();
+                    }
+                    if (latestKeyDownEvent != null) {
+                        enqueueInputEvent();//so we dont lose the previous keydown
                     }
                     latestKeyDownEvent = keyevt;
 
                     //generate keypress event for alt+key events
-                    if (keyevt.key.alt && functionKeys.indexOf(kc) == -1) {
+                    if (keyevt.key.alt  && functionKeys.indexOf(kc) == -1 ) {
                         event.preventDefault();
                         event.stopPropagation();
                         keyevt = getKBKey('keypress', canvas, event);
-                        var key = keyevt.key.keycode;
-                        keyevt.key.character = (!keyevt.key.shift && (key >= 65 && key <= 90)) ? key + 32 : key;
+                        if(event.key.length==1){
+                            keyevt.key.character = event.key.charCodeAt(0);
+                        }else{
+                            var key = keyevt.key.keycode;
+                            keyevt.key.character = (!keyevt.key.shift && (key >= 65 && key <= 90)) ? key + 32 : key;
+                        }
                         enqueueInputEvent(keyevt);
                     }
                 }

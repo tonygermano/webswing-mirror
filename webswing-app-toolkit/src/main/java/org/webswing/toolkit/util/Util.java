@@ -169,6 +169,10 @@ public class Util {
 		if (event.isMeta()) {
 			modifiers = modifiers | KeyEvent.META_MASK;
 		}
+		if (Util.getKeyType(event.getType()) == KeyEvent.KEY_TYPED && event.isAlt() && event.isCtrl() && !event.isShift() && !event.isMeta()) {
+			modifiers = KeyEvent.ALT_GRAPH_MASK;
+		}
+
 		return modifiers;
 	}
 
