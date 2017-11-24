@@ -11,9 +11,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             getCanvas: 'canvas.get',
             registerInput: 'input.register',
             sendInput: 'input.sendInput',
-            disposeInput: 'input.dispose',
             registerTouch: 'touch.register',
-            disposeTouch: 'touch.dispose',
             getUser: 'login.user',
             login: 'login.login',
             logout: 'login.logout',
@@ -172,8 +170,6 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             unload();
             api.sendInput();
             resetState();
-            api.disposeInput();
-            api.disposeTouch();
             api.closeFileDialog();
             api.hideDialogBar();
             window.removeEventListener('beforeunload', beforeUnloadEventHandler);
@@ -213,7 +209,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                     api.showDialogBar(api.continueOldSessionDialog);
                     api.dialogBarContent().focused = false;
                     window.setTimeout(function () {
-                        if (!api.dialogBarContent().focused) {
+                        if (api.dialogBarContent()!=null && !api.dialogBarContent().focused) {
                             api.hideDialogBar();
                             api.showDialogBar(oldBarContent);
                         }

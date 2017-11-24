@@ -11,7 +11,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             getCanvas: 'canvas.get',
             cut: 'clipboard.cut',
             copy: 'clipboard.copy',
-            paste: 'clipboard.paste',
+            paste: 'clipboard.paste'
         };
         module.provides = {
             register: register,
@@ -22,6 +22,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
         module.ready = function () {
         };
 
+        var registered = false;
         var latestMouseMoveEvent = null;
         var latestMouseWheelEvent = null;
         var latestWindowResizeEvent = null;
@@ -73,17 +74,23 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             latestMouseMoveEvent = null;
             latestMouseWheelEvent = null;
             latestWindowResizeEvent = null;
+            latestKeyDownEvent = null;
             mouseDown = 0;
             inputEvtQueue = [];
         }
 
         function dispose() {
+            registered = false;
+            resetInput();
             document.removeEventListener('mousedown', mouseDownEventHandler);
             document.removeEventListener('mouseout', mouseOutEventHandler);
             document.removeEventListener('mouseup', mouseUpEventHandler);
         }
 
         function register() {
+            if (registered) {
+                return;
+            }
             var canvas = api.getCanvas();
             var input = api.getInput();
             resetInput();
@@ -177,13 +184,13 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
                     latestKeyDownEvent = keyevt;
 
                     //generate keypress event for alt+key events
-                    if (keyevt.key.alt  && functionKeys.indexOf(kc) == -1 ) {
+                    if (keyevt.key.alt && functionKeys.indexOf(kc) == -1) {
                         event.preventDefault();
                         event.stopPropagation();
                         keyevt = getKBKey('keypress', canvas, event);
-                        if(event.key.length==1){
+                        if (event.key.length == 1) {
                             keyevt.key.character = event.key.charCodeAt(0);
-                        }else{
+                        } else {
                             var key = keyevt.key.keycode;
                             keyevt.key.character = (!keyevt.key.shift && (key >= 65 && key <= 90)) ? key + 32 : key;
                         }
@@ -244,6 +251,8 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             util.bindEvent(document, 'mousedown', mouseDownEventHandler);
             util.bindEvent(document, 'mouseout', mouseOutEventHandler);
             util.bindEvent(document, 'mouseup', mouseUpEventHandler);
+
+            registered = true;
         }
 
         function isClipboardEvent(evt) {

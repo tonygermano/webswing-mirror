@@ -15,7 +15,7 @@ define(['jquery', 'text!templates/touch.html', 'webswing-util', 'hammer'], funct
             dispose: dispose
         };
         module.ready = function () {
-            register();
+            util.preventGhosts(api.cfg.rootElement);// prevent ghost mouse events to be fired
         };
 
         var hammer;
@@ -27,8 +27,6 @@ define(['jquery', 'text!templates/touch.html', 'webswing-util', 'hammer'], funct
         function register() {
             if (!registered) {
                 var canvas = api.getCanvas();
-                // prevent ghost mouse events to be fired
-                util.preventGhosts(api.cfg.rootElement);
 
                 hammer = new Hammer(canvas, {
                     touchAction: 'manipulation'
@@ -183,6 +181,10 @@ define(['jquery', 'text!templates/touch.html', 'webswing-util', 'hammer'], funct
 
         function dispose() {
             close();
+            hammer=null;
+            compositionText='';
+            composition = false;
+            registered=false;
         }
     }
 });
