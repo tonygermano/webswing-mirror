@@ -63,7 +63,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	private Paint createTexture(Shape s, Paint paint) {
 		Rectangle bounds = s.getBounds();
-		BufferedImage img = new BufferedImage(bounds.width, bounds.height, paint.getTransparency() == Paint.OPAQUE ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB);
+		BufferedImage img = new BufferedImage(Math.max(1,bounds.width), Math.max(1,bounds.height), paint.getTransparency() == Paint.OPAQUE ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		g.translate(-bounds.x, -bounds.y);
 		g.setPaint(paint);
