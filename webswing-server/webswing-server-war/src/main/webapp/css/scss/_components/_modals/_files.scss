@@ -96,6 +96,7 @@
 	}
 	
 	&-btn-icon {
+        font-size: $large;
         @include rel('top', 15px);
         @include rel('left', 57px);
         position: absolute;
