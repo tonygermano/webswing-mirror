@@ -157,7 +157,10 @@ public class WebFxView extends View {
 			} else {
 				if (WebFxDnD.dragStarted.get()) {
 					if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_RELEASED) {
-						notifyDragDrop(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
+						int currentAction = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
+						if(currentAction != Clipboard.ACTION_NONE) {
+							notifyDragDrop(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), currentAction);
+						}
 						WebFxDnD.dragStarted.set(false);
 						setDragCursor(-1);
 					} else if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_DRAGGED) {
