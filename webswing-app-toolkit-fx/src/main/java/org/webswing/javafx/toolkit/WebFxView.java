@@ -150,6 +150,7 @@ public class WebFxView extends View {
 		int type = mapType(e.getID());
 		if (type != 0) {
 			int button = mapButton(e.getButton());
+			button = type == com.sun.glass.events.MouseEvent.MOVE ? com.sun.glass.events.MouseEvent.BUTTON_NONE : button;
 			int modifiers = mapModifiers(e.getModifiersEx());
 			if (e.getID() == MouseEvent.MOUSE_WHEEL) {
 				MouseWheelEvent we = (MouseWheelEvent) e;
@@ -158,7 +159,7 @@ public class WebFxView extends View {
 				if (WebFxDnD.dragStarted.get()) {
 					if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_RELEASED) {
 						int currentAction = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
-						if(currentAction != Clipboard.ACTION_NONE) {
+						if (currentAction != Clipboard.ACTION_NONE) {
 							notifyDragDrop(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), currentAction);
 						}
 						WebFxDnD.dragStarted.set(false);
