@@ -102,6 +102,8 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 disposeIdentity: 'identity.dispose',
                 disposeBase: 'base.dispose',
                 disposeCanvas: 'canvas.dispose',
+                disposeTouch: 'touch.dispose',
+                disposeInput: 'input.dispose',
                 disposeSocket: 'socket.dispose',
                 disposeFileDialog: 'files.close',
                 disposeCopyBar: 'clipboard.dispose',
@@ -184,6 +186,8 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
             function disconnect() {
                 api.disposeFileDialog();
                 api.disposeBase();
+                api.disposeInput();
+                api.disposeTouch();
                 api.disposeCanvas();
                 api.disposeSocket();
                 api.disposeCopyBar();

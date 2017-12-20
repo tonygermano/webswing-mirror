@@ -26,6 +26,7 @@ public class SwingSession implements Serializable {
 	private SwingInstanceStatus status;
 	private List<String> warnings;
 	private List<String> warningHistory;
+	private Map<Long,String> threadDumps;
 
 	public String getId() {
 		return id;
@@ -171,4 +172,11 @@ public class SwingSession implements Serializable {
 		this.warningHistory = warningHistory;
 	}
 
+	public Map<Long, String> getThreadDumps() {
+		return threadDumps;
+	}
+
+	public void setThreadDumps(Map<Long, String> threadDumps) {
+		this.threadDumps = threadDumps;
+	}
 }

@@ -26,6 +26,7 @@ define({
         "dialog.initializingDialog": "Your session is being initialized",
         "dialog.startingDialog": "Starting your application",
         "dialog.unauthorizedAccess": "Unable to authorize your request",
+        "dialog.applicationBusyDialog": "",
         "dialog.applicationAlreadyRunning": "There is already a session in progress in another window.",
         "dialog.sessionStolenNotification": "A new session was started in another window. This session has been closed.",
         "dialog.disconnectedDialog": "Your connection to the server is lost.",

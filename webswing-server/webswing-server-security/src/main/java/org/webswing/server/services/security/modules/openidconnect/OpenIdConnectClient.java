@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class OpenIdConnectClient {
 	private static final Logger log = LoggerFactory.getLogger(OpenIdConnectClient.class);
 
-	private static final ScheduledExecutorService aliveChecker = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
+	private static final ScheduledExecutorService aliveChecker = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing OpenID watchdog"));
 
 	public static final String CODE = "code";
 	public static final String ISSUER = "issuer";

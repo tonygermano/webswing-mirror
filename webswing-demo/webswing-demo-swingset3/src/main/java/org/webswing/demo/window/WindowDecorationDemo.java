@@ -163,7 +163,7 @@ public class WindowDecorationDemo extends JPanel {
 		menu.add(new JMenuItem("test"));
 		menu.add(new JMenuItem("test"));
 		menu.add(new JMenuItem("test"));
-		JMenuItem blockItem = new JMenuItem("block EDT for 60s");
+		JMenuItem blockItem = new JMenuItem("block EDT for 15s");
 		blockItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -171,7 +171,7 @@ public class WindowDecorationDemo extends JPanel {
 					@Override
 					public void run() {
 						try {
-							Thread.sleep(60000);
+							Thread.sleep(15000);
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
 						}

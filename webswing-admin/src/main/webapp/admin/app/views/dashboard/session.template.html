@@ -116,6 +116,20 @@
 	            </tr>
 	        </tbody>
 	    </table>
+		<table class="table table-striped">
+			<thead>
+			  <tr class="ws-table-header">
+				  <th>Thread dumps</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  <tr ng-repeat="(key,value) in vm.session.threadDumps">
+				  <td>
+					  <a ng-click="vm.showThreadDump(vm.session, key)">{{key| date:'dd MMM HH:mm:ss'}} - {{value}}</a>
+				  </td>
+			  </tr>
+			</tbody>
+		</table>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

@@ -11,9 +11,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             getCanvas: 'canvas.get',
             registerInput: 'input.register',
             sendInput: 'input.sendInput',
-            disposeInput: 'input.dispose',
             registerTouch: 'touch.register',
-            disposeTouch: 'touch.dispose',
             getUser: 'login.user',
             login: 'login.login',
             logout: 'login.logout',
@@ -36,6 +34,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             tooManyClientsNotification: 'dialog.content.tooManyClientsNotification',
             continueOldSessionDialog: 'dialog.content.continueOldSessionDialog',
             inactivityTimeoutWarningDialog: 'dialog.content.inactivityTimeoutWarningDialog',
+            applicationBusyDialog: 'dialog.content.applicationBusyDialog',
             processFileDialogEvent: 'files.process',
             closeFileDialog: 'files.close',
             openLink: 'files.link',
@@ -171,8 +170,6 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             unload();
             api.sendInput();
             resetState();
-            api.disposeInput();
-            api.disposeTouch();
             api.closeFileDialog();
             api.hideDialogBar();
             window.removeEventListener('beforeunload', beforeUnloadEventHandler);
@@ -212,7 +209,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                     api.showDialogBar(api.continueOldSessionDialog);
                     api.dialogBarContent().focused = false;
                     window.setTimeout(function () {
-                        if (!api.dialogBarContent().focused) {
+                        if (api.dialogBarContent()!=null && !api.dialogBarContent().focused) {
                             api.hideDialogBar();
                             api.showDialogBar(oldBarContent);
                         }
@@ -232,6 +229,10 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                 } else if (data.event == "sessionTimedOutNotification") {
                     api.showDialog(api.timedoutDialog);
                     api.disconnect();
+                } else if (data.event == "applicationBusy") {
+                    if(api.currentDialog()==null){
+                        api.showDialog(api.applicationBusyDialog);
+                    }
                 }
                 return;
             }

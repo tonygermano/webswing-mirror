@@ -7,6 +7,7 @@ public class JvmStatsMsgInternal implements MsgInternal {
 	private double heapSize;
 	private double heapSizeUsed;
 	private double cpuUsage;
+	private int edtPingSeconds;
 
 	public double getHeapSize() {
 		return heapSize;
@@ -32,4 +33,11 @@ public class JvmStatsMsgInternal implements MsgInternal {
 		this.cpuUsage = cpuUsage;
 	}
 
+	public void setEdtPingSeconds(int edtPingSeconds) {
+		this.edtPingSeconds = edtPingSeconds;
+	}
+
+	public int getEdtPingSeconds() {
+		return edtPingSeconds;
+	}
 }

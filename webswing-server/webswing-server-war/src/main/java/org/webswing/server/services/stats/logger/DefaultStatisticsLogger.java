@@ -20,15 +20,18 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 	private static final Map<String, List<Aggregation>> summaryRulesMap = new HashMap<>();
 	private static final Map<String, WarningRule> warningRules = new HashMap<>();
 
+
 	static {
 		rules.put(INBOUND_SIZE_METRIC, DEFAULT_RULE_AVG_PER_SEC);
 		rules.put(OUTBOUND_SIZE_METRIC, DEFAULT_RULE_AVG_PER_SEC);
 		rules.put(WEBSOCKET_CONNECTED, DEFAULT_RULE_FLAG);
+		rules.put(EDT_BLOCKED_SEC_METRIC, DEFAULT_RULE_FLAG);
 
 		warningRules.put(MEMORY_USED_METRIC, WarningRule.memoryUtilizationRule(0.8));
-		warningRules.put(LATENCY, WarningRule.thresholdRule(LATENCY, 500));
-		warningRules.put(LATENCY_PING, WarningRule.thresholdRule(LATENCY_PING, 700));
+		warningRules.put(LATENCY, WarningRule.thresholdRule(LATENCY, 700));
+		warningRules.put(LATENCY_PING, WarningRule.thresholdRule(LATENCY_PING, 500));
 		warningRules.put(WEBSOCKET_CONNECTED, WarningRule.thresholdRule(WEBSOCKET_CONNECTED, 2, "WebSocket connection failed. Falling back to long-polling."));
+		warningRules.put(EDT_BLOCKED_SEC_METRIC, WarningRule.thresholdRule(EDT_BLOCKED_SEC_METRIC, 10, "EDT blocked for %d seconds. See Thread dump for details."));
 
 		summaryRulesMap.put(MEMORY_ALLOCATED_METRIC, Arrays.asList(Aggregation.SUM));
 		summaryRulesMap.put(MEMORY_USED_METRIC, Arrays.asList(Aggregation.SUM));

@@ -88,7 +88,7 @@
 	                    <div ng-if="session.recorded" >
 	                        <span class="label label-info " ui-jq="tooltip" title="Recording to {{session.recordingFile}}"><span class="glyphicon glyphicon-record"></span> Recording</span>
 	                    </div>
-                        <div ng-if="session.warnings!=null || session.warningHistory!=null" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
+                        <div ng-if="session.warnings!=null || session.warningHistory!=null || session.threadDumps!=null" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
 				  			<span ng-class="{'label':true, 'label-warning':session.warnings != null, 'label-default':session.warnings == null}"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{session.warnings.length}} Warnings </span>
 						</div>
                         <div ng-if="!session.recorded" style="margin-top:3px">
@@ -106,10 +106,13 @@
                	        <progressbar  animate="false" max="102400" value="session.metrics.outboundSize"><span style="color:black; white-space:nowrap;">{{'OUT: '+((session.metrics.outboundSize/1024)|number:0)+'k/s   '}}<small>({{session.metrics['outboundSize.MIN']/1024|number:0}}|{{session.metrics['outboundSize.AVG']/1024|number:0}}|{{session.metrics['outboundSize.MAX']/1024|number:0}})</small></span></progressbar>
 					</td>
 					<td>
-               	        <progressbar  animate="false" max="100" value="session.metrics.latency" type="danger"><span style="color:black; white-space:nowrap;">{{'E2E:'+(session.metrics.latency|number:0)+'ms   '}}<small>({{session.metrics['latency.MIN']|number:0}}|{{session.metrics['latency.AVG']|number:0}}|{{session.metrics['latency.MAX']|number:0}})</small></span></progressbar>
-               	        <progressbar  animate="false" max="100" value="session.metrics.latencyPing" type="danger"><span style="color:black; white-space:nowrap;">{{'PING:'+(session.metrics.latencyPing|number:0)+'ms   '}}<small>({{session.metrics['latencyPing.MIN']|number:0}}|{{session.metrics['latencyPing.AVG']|number:0}}|{{session.metrics['latencyPing.MAX']|number:0}})</small></span></progressbar>
+               	        <progressbar  animate="false" max="700" value="session.metrics.latency" type="danger"><span style="color:black; white-space:nowrap;">{{'E2E:'+(session.metrics.latency|number:0)+'ms   '}}<small>({{session.metrics['latency.MIN']|number:0}}|{{session.metrics['latency.AVG']|number:0}}|{{session.metrics['latency.MAX']|number:0}})</small></span></progressbar>
+               	        <progressbar  animate="false" max="500" value="session.metrics.latencyPing" type="danger"><span style="color:black; white-space:nowrap;">{{'PING:'+(session.metrics.latencyPing|number:0)+'ms   '}}<small>({{session.metrics['latencyPing.MIN']|number:0}}|{{session.metrics['latencyPing.AVG']|number:0}}|{{session.metrics['latencyPing.MAX']|number:0}})</small></span></progressbar>
 			        </td>
 			        <td>
+						<button type="button" class="btn btn-default"  ui-jq="tooltip" title="Thread Dump" ng-click="vm.requestThreadDump(session)">
+							<span class="glyphicon glyphicon-list-alt"></span>
+						</button>
 			            <button type="button" class="btn btn-primary" ng-click="vm.view(session)">
 			                <span class="glyphicon glyphicon-camera"></span> View
 			            </button>
@@ -173,7 +176,7 @@
 	                            <span class="label label-success" ui-jq="tooltip" title="Application finished.">Finished</span>
 	                        </div>
 	                    </div>
-	                    <div ng-if="session.warningHistory!=null" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
+	                    <div ng-if="session.warningHistory!=null || session.threadDumps!=null" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
 				  			<span class="label label-default"> <span class="glyphicon glyphicon-exclamation-sign"></span> Warnings </span>
 						</div>
 	                </td>
@@ -221,6 +224,20 @@
 			            </tr>
 			        </tbody>
 			    </table>
+				<table class="table table-striped">
+					<thead>
+						<tr class="ws-table-header">
+							<th>Thread dumps</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="(key,value) in vm.warningSession.threadDumps">
+							<td>
+								<a ng-click="vm.showThreadDump(vm.warningSession, key)">{{key| date:'dd MMM HH:mm:ss'}} - {{value}}</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 		      </div>
 		      <div class="modal-footer">
 		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

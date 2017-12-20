@@ -307,11 +307,17 @@ public class WindowEventHandler {
 	}
 
 	public boolean isEventHandlingLocked() {
+		if (lockedOnEvent && (window == null || !window.isEnabled() || !window.isShowing())) {
+			lockedOnEvent = false;
+		}
 		return lockedOnEvent;
 	}
 
 	public Window getLockedToWindow() {
-		return window;
+		if (isEventHandlingLocked()) {
+			return window;
+		}
+		return null;
 	}
 
 }

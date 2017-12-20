@@ -169,6 +169,10 @@ public class Util {
 		if (event.isMeta()) {
 			modifiers = modifiers | KeyEvent.META_MASK;
 		}
+		if (Util.getKeyType(event.getType()) == KeyEvent.KEY_TYPED && event.isAlt() && event.isCtrl() && !event.isShift() && !event.isMeta()) {
+			modifiers = KeyEvent.ALT_GRAPH_MASK;
+		}
+
 		return modifiers;
 	}
 
@@ -333,7 +337,7 @@ public class Util {
 	}
 
 	public static boolean isWindowDecorationEvent(Window w, AWTEvent e) {
-		if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID()) {
+		if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID() && w!=null && w.isEnabled() && w.isShowing()) {
 			return isWindowDecorationPosition((Window) w, new Point(((MouseEvent) e).getXOnScreen(), ((MouseEvent) e).getYOnScreen()));
 		}
 		return false;

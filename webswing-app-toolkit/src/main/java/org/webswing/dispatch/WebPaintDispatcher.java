@@ -46,7 +46,7 @@ public class WebPaintDispatcher {
 	private JFileChooser fileChooserDialog;
 	private JDialog clipboardDialog;
 
-	private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance());
+	private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance("Webswing Paint Dispatcher"));
 
 	public WebPaintDispatcher() {
 		final Long ackTimeout = Long.getLong(Constants.PAINT_ACK_TIMEOUT, 5000);
@@ -107,7 +107,7 @@ public class WebPaintDispatcher {
 						Logger.trace("contentSender:pngEncodingDone", json.hashCode());
 					}
 					json.setSendTimestamp("" + System.currentTimeMillis());
-					Services.getConnectionService().sendObject(json);
+					sendObject(json);
 				} catch (Throwable e) {
 					Logger.error("contentSender:error", e);
 				}
@@ -178,7 +178,7 @@ public class WebPaintDispatcher {
 		fdEvent.setId(guid);
 		f.setClosedWindow(fdEvent);
 		Logger.debug("WebPaintDispatcher:notifyWindowClosed", guid);
-		Services.getConnectionService().sendObject(f);
+		sendObject(f);
 	}
 
 	public void notifyWindowRepaint(Window w) {
@@ -206,7 +206,7 @@ public class WebPaintDispatcher {
 		LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.url, uri.toString());
 		f.setLinkAction(linkAction);
 		Logger.info("WebPaintDispatcher:notifyOpenLinkAction", uri);
-		Services.getConnectionService().sendObject(f);
+		sendObject(f);
 	}
 
 	@SuppressWarnings("restriction")
@@ -360,7 +360,7 @@ public class WebPaintDispatcher {
 			f.setCursorChange(cursorChange);
 			WindowManager.getInstance().setCurrentCursor(webcursorName);
 			Logger.debug("WebPaintDispatcher:notifyCursorUpdate", f);
-			Services.getConnectionService().sendObject(f);
+			sendObject(f);
 		}
 	}
 
@@ -370,7 +370,7 @@ public class WebPaintDispatcher {
 		copyEvent = new CopyEventMsg(data.getText(), data.getHtml(), data.getImg(), data.getFiles(), false);
 		f.setCopyEvent(copyEvent);
 		Logger.debug("WebPaintDispatcher:notifyCopyEvent", f);
-		Services.getConnectionService().sendObject(f);
+		sendObject(f);
 	}
 
 	public void notifyFileDialogActive(WebWindowPeer webWindowPeer) {
@@ -427,7 +427,7 @@ public class WebPaintDispatcher {
 				fdEvent.addFilter(fileChooserDialog.getChoosableFileFilters());
 				fdEvent.setMultiSelection(fileChooserDialog.isMultiSelectionEnabled());
 				Logger.info("WebPaintDispatcher:notifyFileTransferBarActive " + fileChooserEventType.name());
-				Services.getConnectionService().sendObject(f);
+				sendObject(f);
 			}
 		}
 	}
@@ -454,7 +454,7 @@ public class WebPaintDispatcher {
 							if (saveFile.exists()) {
 								msg.setOverwriteDetails(saveFile.length() + "|" + saveFile.lastModified());
 							}
-							Util.getWebToolkit().getPaintDispatcher().sendObject(msg);
+							sendObject(msg);
 						}
 					}
 				} catch (Exception e) {
@@ -463,7 +463,7 @@ public class WebPaintDispatcher {
 			}
 		}
 		fileChooserDialog = null;
-		Services.getConnectionService().sendObject(f);
+		sendObject(f);
 	}
 
 	public JFileChooser getFileChooserDialog() {
@@ -504,7 +504,7 @@ public class WebPaintDispatcher {
 	public void notifyApplicationExiting(int waitBeforeKill) {
 		ExitMsgInternal f = new ExitMsgInternal();
 		f.setWaitForExit(waitBeforeKill);
-		Services.getConnectionService().sendObject(f);
+		sendObject(f);
 		Services.getConnectionService().disconnect();
 		contentSender.shutdownNow();
 	}

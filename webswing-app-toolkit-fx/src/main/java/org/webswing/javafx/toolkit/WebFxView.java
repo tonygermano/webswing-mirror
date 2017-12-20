@@ -4,11 +4,14 @@ import com.sun.glass.events.KeyEvent;
 import com.sun.glass.ui.Clipboard;
 import com.sun.glass.ui.Pixels;
 import com.sun.glass.ui.View;
+import com.sun.javafx.geom.RectBounds;
+import com.sun.prism.web.WebTextureWrapper;
 import org.webswing.javafx.toolkit.util.WebFxUtil;
 import org.webswing.toolkit.util.Util;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.RepaintManager;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -147,6 +150,7 @@ public class WebFxView extends View {
 		int type = mapType(e.getID());
 		if (type != 0) {
 			int button = mapButton(e.getButton());
+			button = type == com.sun.glass.events.MouseEvent.MOVE ? com.sun.glass.events.MouseEvent.BUTTON_NONE : button;
 			int modifiers = mapModifiers(e.getModifiersEx());
 			if (e.getID() == MouseEvent.MOUSE_WHEEL) {
 				MouseWheelEvent we = (MouseWheelEvent) e;
@@ -154,7 +158,10 @@ public class WebFxView extends View {
 			} else {
 				if (WebFxDnD.dragStarted.get()) {
 					if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_RELEASED) {
-						notifyDragDrop(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
+						int currentAction = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
+						if (currentAction != Clipboard.ACTION_NONE) {
+							notifyDragDrop(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), currentAction);
+						}
 						WebFxDnD.dragStarted.set(false);
 						setDragCursor(-1);
 					} else if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_DRAGGED) {
@@ -317,7 +324,19 @@ public class WebFxView extends View {
 		if (getWindow() != null) {
 			this.image = WebFxUtil.pixelsToImage(pixels);
 			Window win = ((WebWindow) getWindow()).w.getThis();
-			win.repaint();
+			RepaintManager rm = RepaintManager.currentManager(win);
+			WebTextureWrapper texture = WebTextureWrapper.textureLookup.get(System.identityHashCode(pixels.getPixels()));
+			if (texture != null) {
+				synchronized (texture.getDirtyAreas()) {
+					for (RectBounds r : texture.getDirtyAreas()) {
+						rm.addDirtyRegion(win, (int) Math.floor(r.getMinX()) + win.getInsets().left, (int) Math.floor(r.getMinY()) + win.getInsets().top, (int) Math.ceil(r.getWidth()), (int) Math.ceil(r.getHeight()));
+					}
+				}
+				WebTextureWrapper.textureLookup.clear();
+				texture.getDirtyAreas().clear();
+			} else {
+				win.repaint();
+			}
 		}
 	}
 

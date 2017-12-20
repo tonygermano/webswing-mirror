@@ -1,6 +1,8 @@
 package org.webswing.services.impl;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.webswing.Constants;
 import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.model.MsgIn;
@@ -8,6 +10,8 @@ import org.webswing.model.SyncMsg;
 import org.webswing.model.UserInputMsgIn;
 import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.model.internal.JvmStatsMsgInternal;
+import org.webswing.model.internal.ThreadDumpMsgInternal;
+import org.webswing.model.internal.ThreadDumpRequestMsgInternal;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.toolkit.jslink.WebJSObject;
@@ -16,14 +20,20 @@ import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
 
 import javax.jms.*;
+import javax.swing.SwingUtilities;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.lang.IllegalStateException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
+import java.lang.management.*;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Viktor_Meszaros This class is needed to achieve classpath isolation for swing application, all functionality dependent on external libs is implemented here.
@@ -43,8 +53,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private long lastMessageTimestamp = System.currentTimeMillis();
 	private long lastUserInputTimestamp = System.currentTimeMillis();
 	private Runnable watchdog;
-	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
-	private ExecutorService jmsSender = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance());
+	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing Shutdown scheduler"));
+	private ExecutorService jmsSender = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing JMS Sender"));
 
 	private Map<String, Object> syncCallResposeMap = new ConcurrentHashMap<String, Object>();
 	private boolean closed;
@@ -65,38 +75,65 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		connectionFactory.setTrustAllPackages(true);
 		watchdog = new Runnable() {
 			private boolean terminated = false;
+			boolean exitDumpCreated = false;
+			AtomicInteger pingEventDispatchThread = new AtomicInteger(0);
 
 			@Override
 			public void run() {
-				int timeoutSec = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300"));
-				boolean timeoutIfInactive = Boolean.getBoolean(Constants.SWING_SESSION_TIMEOUT_IF_INACTIVE) && timeoutSec > 0;
-				if (timeoutSec >= 0) {
-					long lastTstp = timeoutIfInactive ? lastUserInputTimestamp : lastMessageTimestamp + 10000;/*+10000 is to compensate for 10s js heartbeat interval*/
-					long diff = System.currentTimeMillis() - lastTstp;
-					int timeoutMs = timeoutSec * 1000;
-					timeoutMs = Math.max(1000, timeoutMs);
-					if ((diff / 1000 > 10)) {
-						String msg = timeoutIfInactive ? "User" : "Session";
-						if ((diff / 1000) % 10 == 0) {
-							Logger.warn(msg + " inactive for " + diff / 1000 + " seconds." + (terminated ? "[waiting for application to stop]" : ""));
+				try {
+					int timeoutSec = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300"));
+					boolean timeoutIfInactive = Boolean.getBoolean(Constants.SWING_SESSION_TIMEOUT_IF_INACTIVE) && timeoutSec > 0;
+					if (timeoutSec >= 0) {
+						long lastTstp = timeoutIfInactive ? lastUserInputTimestamp : lastMessageTimestamp + 10000;/*+10000 is to compensate for 10s js heartbeat interval*/
+						long diff = System.currentTimeMillis() - lastTstp;
+						int timeoutMs = timeoutSec * 1000;
+						timeoutMs = Math.max(1000, timeoutMs);
+						if ((diff / 1000 > 10)) {
+							String msg = timeoutIfInactive ? "User" : "Session";
+							if ((diff / 1000) % 100 == 0) {
+								Logger.warn(msg + " inactive for " + diff / 1000 + " seconds." + (terminated ? "[waiting for application to stop]" : ""));
+							}
+							if (!terminated && (timeoutMs - diff < 60000)) { //countdown message for the last 60 seconds
+								sendObject(SimpleEventMsgOut.sessionTimeoutWarning.buildMsgOut());
+							}
+							Integer waitForExit = Integer.getInteger(Constants.SWING_START_SYS_PROP_WAIT_FOR_EXIT, 30000);
+							if (terminated && !exitDumpCreated && diff > (timeoutMs + waitForExit - 5000)) {
+								sendObject(getThreadDumpMsg("Before-Kill Thread Dump"));
+								Logger.warn("Application did not exit gracefully within " + waitForExit / 1000 + " seconds. Application will be forcefully terminated. Thread dump has been generated.");
+							}
+
+							if (terminated && diff > (timeoutMs + waitForExit + 10000)) {// if still alive 10 seconds after server should have killed this process
+								Logger.warn("Application has not been forcefully terminated by server. Exiting Manually.");
+								System.exit(1);
+							}
 						}
-						if (!terminated && (timeoutMs - diff < 60000)) { //countdown message for the last 60 seconds
-							sendObject(SimpleEventMsgOut.sessionTimeoutWarning.buildMsgOut());
+
+						if (diff > timeoutMs) {
+							if (!terminated) {//only call once
+								terminated = true;
+								Logger.warn("Exiting application due to inactivity for " + diff / 1000 + " seconds.");
+								sendObject(SimpleEventMsgOut.sessionTimedOutNotification.buildMsgOut());
+								Util.getWebToolkit().exitSwing(1);
+							}
+						}
+					}
+					if (!terminated) {
+						sendObject(getStats(pingEventDispatchThread.get()));
+						if (pingEventDispatchThread.getAndIncrement() == 10) {//if value is not reset after 10 seconds - EDT is stuck
+							Logger.warn("Application is not responding for 10 seconds. Thread dump generated . ");
+							sendObject(getThreadDumpMsg("Application not responding"));
+						} else {
+							SwingUtilities.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									pingEventDispatchThread.set(0);
+								}
+							});
 						}
 					}
 
-					if (diff > timeoutMs) {
-						if (!terminated) {//only call once
-							terminated = true;
-							//TODO check for deadlock once
-							Logger.warn("Exiting application due to inactivity for " + diff / 1000 + " seconds.");
-							sendObject(SimpleEventMsgOut.sessionTimedOutNotification.buildMsgOut());
-							Util.getWebToolkit().exitSwing(1);
-						}
-					}
-				}
-				if (!terminated) {
-					sendObject(getStats());
+				} catch (Throwable e) {
+					Logger.error("Exception in webswing shutdown scheduler", e);
 				}
 			}
 		};
@@ -122,11 +159,11 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 				public void onMessage(Message message) {
 					try {
 						String msgtype = message.getStringProperty(MSG_API_TYPE);
-						if(msgtype!=null && Util.getWebToolkit().messageApiHasListenerForClass(msgtype)){
-							Util.getWebToolkit().messageApiProcessMessage(((ObjectMessage)message).getObject());
+						if (msgtype != null && Util.getWebToolkit().messageApiHasListenerForClass(msgtype)) {
+							Util.getWebToolkit().messageApiProcessMessage(((ObjectMessage) message).getObject());
 						}
 					} catch (Exception e) {
-						Logger.error("Failed to process message",e);
+						Logger.error("Failed to process message", e);
 					}
 				}
 			});
@@ -294,6 +331,13 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					}
 				} else if (omsg.getObject() instanceof ApiEventMsgInternal) {
 					Util.getWebToolkit().processApiEvent((ApiEventMsgInternal) omsg.getObject());
+				} else if (omsg.getObject() instanceof ThreadDumpRequestMsgInternal) {
+					exitScheduler.execute(new Runnable() {
+						@Override
+						public void run() {
+							sendObject(getThreadDumpMsg("User requested thread dump"));
+						}
+					});
 				}
 			}
 		} catch (Exception e) {
@@ -301,13 +345,14 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		}
 	}
 
-	private JvmStatsMsgInternal getStats() {
+	private JvmStatsMsgInternal getStats(int edtPing) {
 		JvmStatsMsgInternal result = new JvmStatsMsgInternal();
 		int mb = 1024 * 1024;
 		Runtime runtime = Runtime.getRuntime();
 		result.setHeapSize(runtime.maxMemory() / mb);
 		result.setHeapSizeUsed((runtime.totalMemory() - runtime.freeMemory()) / mb);
 		result.setCpuUsage(CpuMonitor.getCpuUtilization());
+		result.setEdtPingSeconds(edtPing);
 		return result;
 	}
 
@@ -343,6 +388,103 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			cpuUsage = cpuUsage / processors;
 			return Math.max(0, cpuUsage) * 100;
 		}
+	}
+
+	private ThreadDumpMsgInternal getThreadDumpMsg(String reason) {
+		ThreadDumpMsgInternal msg = new ThreadDumpMsgInternal();
+		msg.setTimestamp(System.currentTimeMillis());
+		msg.setReason(reason);
+		msg.setDump(saveThreadDump(reason));
+		return msg;
+	}
+
+	public static String saveThreadDump(String reason) {
+		final StringBuilder dump = new StringBuilder();
+		final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+		final ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(threadMXBean.getAllThreadIds(), true, true);
+		for (ThreadInfo threadInfo : threadInfos) {
+			dump.append(threadInfoToString(threadInfo));
+			dump.append("\n");
+		}
+		dump.toString();
+
+		String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
+		String clientId = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID);
+		String timestamp = new SimpleDateFormat("yy.MM.dd.HH.mm.ss").format(new Date());
+		try {
+			File file = new File(URI.create(tempDir + "ThreadDump-" + timestamp + "-" + URLEncoder.encode(clientId + "-" + reason, "UTF-8") + ".txt"));
+			FileUtils.write(file, dump.toString());
+			return file.getAbsolutePath();
+		} catch (Exception e) {
+			Logger.error("Failed to save thread dump. ", e);
+		}
+		return null;
+	}
+
+	private static String threadInfoToString(ThreadInfo ti) {
+		StringBuilder sb = new StringBuilder("\"" + ti.getThreadName() + "\"" + " Id=" + ti.getThreadId() + " " + ti.getThreadState());
+		if (ti.getLockName() != null) {
+			sb.append(" on " + ti.getLockName());
+		}
+		if (ti.getLockOwnerName() != null) {
+			sb.append(" owned by \"" + ti.getLockOwnerName() + "\" Id=" + ti.getLockOwnerId());
+		}
+		if (ti.isSuspended()) {
+			sb.append(" (suspended)");
+		}
+		if (ti.isInNative()) {
+			sb.append(" (in native)");
+		}
+		sb.append('\n');
+		int i = 0;
+		StackTraceElement[] stackTrace = ti.getStackTrace();
+		for (; i < stackTrace.length; i++) {
+			StackTraceElement ste = stackTrace[i];
+			sb.append("\tat " + ste.toString());
+			sb.append('\n');
+			if (i == 0 && ti.getLockInfo() != null) {
+				Thread.State ts = ti.getThreadState();
+				switch (ts) {
+				case BLOCKED:
+					sb.append("\t-  blocked on " + ti.getLockInfo());
+					sb.append('\n');
+					break;
+				case WAITING:
+					sb.append("\t-  waiting on " + ti.getLockInfo());
+					sb.append('\n');
+					break;
+				case TIMED_WAITING:
+					sb.append("\t-  waiting on " + ti.getLockInfo());
+					sb.append('\n');
+					break;
+				default:
+				}
+			}
+
+			MonitorInfo[] lockedMonitors = ti.getLockedMonitors();
+			for (MonitorInfo mi : lockedMonitors) {
+				if (mi.getLockedStackDepth() == i) {
+					sb.append("\t-  locked " + mi);
+					sb.append('\n');
+				}
+			}
+		}
+		if (i < stackTrace.length) {
+			sb.append("\t...");
+			sb.append('\n');
+		}
+
+		LockInfo[] locks = ti.getLockedSynchronizers();
+		if (locks.length > 0) {
+			sb.append("\n\tNumber of locked synchronizers = " + locks.length);
+			sb.append('\n');
+			for (LockInfo li : locks) {
+				sb.append("\t- " + li);
+				sb.append('\n');
+			}
+		}
+		sb.append('\n');
+		return sb.toString();
 	}
 
 }

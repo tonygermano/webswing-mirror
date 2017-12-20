@@ -207,7 +207,7 @@ message PointsProto {
 message CompositeProto {
 	required CompositeTypeProto type = 1;
 	optional float alpha = 2 [default = 1];
-
+	optional fixed32 color = 3;
 	enum CompositeTypeProto {
 		CLEAR = 1;
 		SRC = 2;
@@ -221,6 +221,7 @@ message CompositeProto {
 		SRC_ATOP = 10;
 		DST_ATOP = 11;
 		XOR = 12;
+		XOR_MODE = 13;
 	}
 }
 

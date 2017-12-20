@@ -19,7 +19,7 @@ public class WebTimer extends Timer {
 	@Override
 	protected long _start(final Runnable runnable, int period) {
 		if (timer == null) {
-			timer = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance());
+			timer = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing FX Timer"));
 		}
 		future= timer.scheduleAtFixedRate(runnable, 0, period, TimeUnit.MILLISECONDS);
 		return 1; // need something non-zero to denote success.

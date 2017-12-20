@@ -12,7 +12,8 @@ public enum SimpleEventMsgOut implements Msg {
 	unauthorizedAccess,
 	shutDownAutoLogoutNotification,
 	sessionTimeoutWarning,
-	sessionTimedOutNotification;
+	sessionTimedOutNotification,
+	applicationBusy;
 
 	public AppFrameMsgOut buildMsgOut() {
 		AppFrameMsgOut result = new AppFrameMsgOut();
