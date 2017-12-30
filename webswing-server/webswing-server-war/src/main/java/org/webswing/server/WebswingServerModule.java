@@ -12,6 +12,7 @@ import org.webswing.server.extension.ExtensionServiceImpl;
 import org.webswing.server.services.rest.RestService;
 import org.webswing.server.services.rest.RestServiceImpl;
 import org.webswing.server.services.startup.DefaultInitializer;
+import org.webswing.server.extension.EnterpriseExtensionService;
 import org.webswing.server.extension.ExtensionClassLoader;
 import org.webswing.server.services.startup.Initializer;
 import org.webswing.server.services.config.ConfigurationService;
@@ -74,6 +75,7 @@ public class WebswingServerModule extends AbstractModule {
 		bind(SecurityModuleService.class).to(SecurityModuleServiceImpl.class);
 		bind(LoginHandlerService.class).to(LoginHandlerServiceImpl.class);
 		bind(ExtensionService.class).to(ExtensionServiceImpl.class);
+		bind(EnterpriseExtensionService.class).to(ExtensionServiceImpl.class);
 		bind(RestService.class).to(RestServiceImpl.class);
 	}
 

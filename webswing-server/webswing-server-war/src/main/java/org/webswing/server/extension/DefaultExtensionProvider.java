@@ -1,5 +1,7 @@
 package org.webswing.server.extension;
 
+import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 
@@ -21,5 +23,10 @@ public class DefaultExtensionProvider implements ExtensionProvider {
 	@Override
 	public List<UrlHandler> createExtensionHandlers(PrimaryUrlHandler parent) {
 		return new ArrayList<>();
+	}
+
+	@Override
+	public CacheManager getCacheManager() {
+		return new MemoryConstrainedCacheManager();
 	}
 }

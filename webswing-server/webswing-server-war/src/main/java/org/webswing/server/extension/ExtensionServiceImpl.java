@@ -1,5 +1,8 @@
 package org.webswing.server.extension;
 
+import org.apache.shiro.cache.CacheManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
@@ -14,13 +17,14 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 
 @Singleton
-public class ExtensionServiceImpl implements ExtensionService, ExtensionDependencies {
+public class ExtensionServiceImpl implements EnterpriseExtensionService, ExtensionDependencies {
 
 	private final ExtensionClassLoader extensionLoader;
 	private final SwingProcessService processService;
 	private final ConfigurationService configService;
 	private final RestService restService;
 	private ExtensionProvider provider;
+	private Logger logger = LoggerFactory.getLogger(ExtensionServiceImpl.class); 
 
 	@Inject
 	public ExtensionServiceImpl(ExtensionClassLoader extensionLoader, SwingProcessService processService, ConfigurationService configuService, RestService restService) {
@@ -33,6 +37,7 @@ public class ExtensionServiceImpl implements ExtensionService, ExtensionDependen
 	@Override
 	public void start() throws WsInitException {
 		String providerClassName = System.getProperty(Constants.EXTENSION_PROVIDER, DefaultExtensionProvider.class.getName());
+		logger.info("Initializing extension provider {}", providerClassName);
 		try {
 			Class<?> providerClass = extensionLoader.loadClass(providerClassName);
 			try {
@@ -68,5 +73,10 @@ public class ExtensionServiceImpl implements ExtensionService, ExtensionDependen
 	@Override
 	public RestService getRestService() {
 		return restService;
+	}
+
+	@Override
+	public CacheManager getSecurityCacheManager() {
+		return provider.getCacheManager();
 	}
 }
