@@ -43,8 +43,13 @@ public class WebswingServlet extends HttpServlet {
 		};
 				
 		try {
-			Injector injector = Guice.createInjector(Modules.combine(servletModule, Modules.override(new WebswingServerModule()).with(createBindingModule())));
-			
+			Injector injector;
+			if(System.getProperty(Constants.GUICE_BINDING_MODULE) == null) {
+				injector = Guice.createInjector(servletModule, new WebswingServerModule());
+			} else {
+				injector = Guice.createInjector(Modules.combine(servletModule, Modules.override(new WebswingServerModule()).with(createBindingModule())));
+			}
+				
 			this.startup = injector.getInstance(StartupService.class);
 			this.startup.start();
 			this.securityManager = injector.getInstance(SecurityManagerService.class);
@@ -115,19 +120,18 @@ public class WebswingServlet extends HttpServlet {
 		return handler.getLastModified(req);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private Module createBindingModule() throws InstantiationException, IllegalAccessException {
 		Module result = null;
 		String moduleClassName = System.getProperty(Constants.GUICE_BINDING_MODULE);
-		if (moduleClassName != null) {
-			try {
-				result = (AbstractModule) WebswingServerModule.class.getClassLoader().loadClass(moduleClassName).newInstance();
-				return result;
-			} catch (Exception e) {
-				log.warn("Failed to load extension module {} ", moduleClassName);
-			}
+
+		try {
+			result = (AbstractModule) WebswingServerModule.class.getClassLoader().loadClass(moduleClassName)
+					.newInstance();
+			return result;
+		} catch (Exception e) {
+			log.warn("Failed to load extension module {} ", moduleClassName);
 		}
-		
+
 		return result;
 	}
 }
