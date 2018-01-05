@@ -8,6 +8,4 @@ import java.util.List;
 
 public interface ExtensionProvider {
 	List<UrlHandler> createExtensionHandlers(PrimaryUrlHandler parent);
-
-	CacheManager getCacheManager();
 }

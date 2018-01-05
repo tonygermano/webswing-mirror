@@ -25,8 +25,4 @@ public class DefaultExtensionProvider implements ExtensionProvider {
 		return new ArrayList<>();
 	}
 
-	@Override
-	public CacheManager getCacheManager() {
-		return new MemoryConstrainedCacheManager();
-	}
 }

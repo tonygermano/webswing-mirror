@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -15,7 +16,6 @@ import org.apache.shiro.web.servlet.ShiroHttpServletResponse;
 import org.apache.shiro.web.subject.WebSubject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.server.extension.EnterpriseExtensionService;
 import org.webswing.server.model.exception.WsInitException;
 
 import com.google.inject.Inject;
@@ -28,19 +28,17 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 	private final DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
 
 	private ServletContext context;
-	private EnterpriseExtensionService extension;
 
 	@Inject
-	public SecurityManagerServiceImpl(ServletContext context, EnterpriseExtensionService extension) {
+	public SecurityManagerServiceImpl(ServletContext context) {
 		this.context = context;
-		this.extension = extension;
 	}
 
 	@Override
 	public void start() {
 		log.info("Starting SecurityManagerServiceImpl");
 		try {
-			securityManager.setCacheManager(extension.getSecurityCacheManager());
+			securityManager.setCacheManager(new MemoryConstrainedCacheManager());
 			securityManager.setSessionManager(new WebswingWebSessionManager());
 			securityManager.setRealm(new WebswingRealmAdapter());
 			SecurityUtils.setSecurityManager(securityManager);

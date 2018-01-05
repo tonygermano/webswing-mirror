@@ -1,5 +1,11 @@
 package org.webswing.server.extension;
 
+import java.lang.reflect.Constructor;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.shiro.cache.CacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,13 +17,8 @@ import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.rest.RestService;
 import org.webswing.server.services.swingprocess.SwingProcessService;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.lang.reflect.Constructor;
-import java.util.List;
-
 @Singleton
-public class ExtensionServiceImpl implements EnterpriseExtensionService, ExtensionDependencies {
+public class ExtensionServiceImpl implements ExtensionService, ExtensionDependencies {
 
 	private final ExtensionClassLoader extensionLoader;
 	private final SwingProcessService processService;
@@ -47,6 +48,7 @@ public class ExtensionServiceImpl implements EnterpriseExtensionService, Extensi
 				provider = (ExtensionProvider) providerClass.newInstance();
 			}
 		} catch (Exception e) {
+			logger.error("Could not instantiate extension provider {}", providerClassName, e);
 			throw new WsInitException("Could not instantiate extension provider " + providerClassName, e);
 		}
 	}
@@ -74,9 +76,8 @@ public class ExtensionServiceImpl implements EnterpriseExtensionService, Extensi
 	public RestService getRestService() {
 		return restService;
 	}
-
-	@Override
-	public CacheManager getSecurityCacheManager() {
-		return provider.getCacheManager();
+	
+	protected ExtensionProvider getProvider() {
+		return provider;
 	}
 }
