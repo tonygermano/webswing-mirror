@@ -9,7 +9,9 @@ import org.webswing.toolkit.api.security.WebswingUser;
  * Authenticated users in Webswing are represented by this class. Every {@link WebswingSecurityModule} should provide a subclass
  * of this abstract class.  
  */
-public abstract class AbstractWebswingUser implements WebswingUser {
+public abstract class AbstractWebswingUser implements WebswingUser, Serializable {
+
+	private static final long serialVersionUID = -9025181162519446299L;
 
 	/**
 	 * Special role representing all authenticated users. 
