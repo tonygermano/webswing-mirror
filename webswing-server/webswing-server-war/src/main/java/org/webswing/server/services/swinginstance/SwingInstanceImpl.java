@@ -470,9 +470,12 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			} else if (javaVersion.startsWith("1.8")) {
 				webToolkitClass += "8";
 				webGraphicsEnvClass += "8";
-			} else {
+			} else if (javaVersion.startsWith("9")) {
+                webToolkitClass += "9";
+                webGraphicsEnvClass += "9";
+            } else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
-				throw new RuntimeException("Java version not supported. (Version starting with 1.7 and 1.8 are supported.)");
+				throw new RuntimeException("Java version not supported. (Version starting with 1.7, 1.8 and 9 are supported.)");
 			}
 			String webSwingToolkitApiJarPath = CommonUtil.getBootClassPathForClass(WebswingApi.class.getName());
 			String webSwingToolkitJarPath = CommonUtil.getBootClassPathForClass(WEB_TOOLKIT_CLASS_NAME);

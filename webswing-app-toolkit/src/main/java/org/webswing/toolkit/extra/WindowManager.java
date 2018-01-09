@@ -29,12 +29,12 @@ import sun.awt.CausedFocusEvent;
 public class WindowManager {
 
 	private static WindowManager singleton = null;
-	private WindowHierarchyTree zorder = new WindowHierarchyTree();
-	private Window activeWindow = null;
+	protected WindowHierarchyTree zorder = new WindowHierarchyTree();
+    protected Window activeWindow = null;
 	private WindowEventHandler eventhandler = new WindowEventHandler();
 	private String currentCursor = CursorChangeEventMsg.DEFAULT_CURSOR;
 
-	private WindowManager() {
+	protected WindowManager() {
 	}
 
 	public static WindowManager getInstance() {
@@ -165,7 +165,7 @@ public class WindowManager {
 
 	}
 
-	private boolean isModal(Window w) {
+	protected boolean isModal(Window w) {
 		return (w instanceof Dialog) && ((Dialog) w).isModal();
 	}
 

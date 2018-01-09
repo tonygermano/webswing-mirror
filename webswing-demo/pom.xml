@@ -75,7 +75,7 @@
 					<source>1.7</source>
 					<target>1.7</target>
 					<compilerArguments>
-						<bootclasspath>${basedir}/../../lib/rt1.7.0_60.jar</bootclasspath>
+						<bootclasspath>${basedir}/../../lib/rt1.7.0_60.jar;${basedir}/../../lib/jfxrt.jar</bootclasspath>
 					</compilerArguments>
 				</configuration>
 			</plugin>

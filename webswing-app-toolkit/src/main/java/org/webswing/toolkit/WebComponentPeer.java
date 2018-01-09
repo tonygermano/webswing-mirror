@@ -276,7 +276,7 @@ public class WebComponentPeer implements ComponentPeer {
 
 			if ((validPosition.x != this.oldX) || (validPosition.y != this.oldY) || (w != this.oldWidth) || (h != this.oldHeight)) {
 				if (oldWidth != 0 && oldHeight != 0 && target instanceof Window) {
-					WindowManager.getInstance().requestRepaintAfterMove((Window) target, new Rectangle(oldX, oldY, oldWidth, oldHeight));
+                    Util.getWebToolkit().getWindowManager().requestRepaintAfterMove((Window) target, new Rectangle(oldX, oldY, oldWidth, oldHeight));
 				}
 				this.oldX = validPosition.x;
 				this.oldY = validPosition.y;

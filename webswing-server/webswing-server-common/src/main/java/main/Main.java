@@ -26,6 +26,7 @@ import java.util.jar.JarFile;
 
 import org.webswing.Constants;
 import org.webswing.toolkit.WebToolkit;
+import sun.management.jmxremote.ConnectorBootstrap;
 
 public class Main {
 
@@ -44,7 +45,7 @@ public class Main {
 		List<URL> urls = new ArrayList<URL>();
 		if (client) {
 			// initialize jmx agent
-			sun.management.Agent.startAgent();
+            ConnectorBootstrap.startLocalConnectorServer();
 
 			populateClasspathFromDir("WEB-INF/swing-lib", urls);
 			initializeExtLibServices(urls);

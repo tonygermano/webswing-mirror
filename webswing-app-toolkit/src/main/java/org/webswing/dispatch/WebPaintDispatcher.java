@@ -80,7 +80,7 @@ public class WebPaintDispatcher {
 							if (currentAreasToUpdate.size() == 0 && moveAction == null) {
 								return;
 							}
-							windowNonVisibleAreas = WindowManager.getInstance().extractNonVisibleAreas();
+							windowNonVisibleAreas = Util.getWebToolkit().getWindowManager().extractNonVisibleAreas();
 							json = Util.fillJsonWithWindowsData(currentAreasToUpdate, windowNonVisibleAreas);
 							if (Util.isDD()) {
 								windowWebImages = new HashMap<String, Image>();
@@ -343,7 +343,7 @@ public class WebPaintDispatcher {
 			webcursor = overridenCursorName;
 			webcursorName = overridenCursorName.getName();
 		}
-		if (!WindowManager.getInstance().getCurrentCursor().equals(webcursorName)) {
+		if (!Util.getWebToolkit().getWindowManager().getCurrentCursor().equals(webcursorName)) {
 			AppFrameMsgOut f = new AppFrameMsgOut();
 			CursorChangeEventMsg cursorChange = new CursorChangeEventMsg(webcursorName);
 			if (webcursor instanceof WebCursor) {
@@ -358,7 +358,7 @@ public class WebPaintDispatcher {
 				}
 			}
 			f.setCursorChange(cursorChange);
-			WindowManager.getInstance().setCurrentCursor(webcursorName);
+            Util.getWebToolkit().getWindowManager().setCurrentCursor(webcursorName);
 			Logger.debug("WebPaintDispatcher:notifyCursorUpdate", f);
 			sendObject(f);
 		}

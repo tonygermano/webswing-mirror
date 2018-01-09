@@ -22,7 +22,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <compilerArguments>
-                        <bootclasspath>${basedir}/../lib/rt1.8.0_25.jar</bootclasspath>
+                        <bootclasspath>${basedir}/../lib/rt1.8.0_25.jar;${basedir}/../lib/jfxrt.jar</bootclasspath>
                     </compilerArguments>
                 </configuration>
             </plugin>

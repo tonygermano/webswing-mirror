@@ -1,6 +1,6 @@
 package org.webswing.toolkit;
 
-import com.sun.glass.events.KeyEvent;
+import java.awt.event.KeyEvent;
 import org.webswing.model.c2s.KeyboardEventMsgIn;
 import org.webswing.model.c2s.MouseEventMsgIn;
 import org.webswing.model.c2s.PixelsAreaResponseMsgIn;

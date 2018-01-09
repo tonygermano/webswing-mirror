@@ -45,6 +45,7 @@
         <module>webswing-app-toolkit-fx</module>
         <module>webswing-app-toolkit-java7</module>
         <module>webswing-app-toolkit-java8</module>
+        <module>webswing-app-toolkit-java9</module>
         <module>webswing-app-launcher</module>
         <module>webswing-app-interface</module>
         <module>webswing-directdraw</module>
@@ -100,7 +101,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
@@ -186,7 +187,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4</version>
+                <version>3.0.0-M1</version>
                 <executions>
                     <execution>
                         <id>enforce-java</id>
@@ -196,7 +197,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>1.8.0</version>
+                                    <version>1.9.0</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>

@@ -173,7 +173,7 @@
 			<plugin>
 				<groupId>nl.geodienstencentrum.maven</groupId>
 				<artifactId>sass-maven-plugin</artifactId>
-				<version>2.21</version>
+				<version>2.25</version>
 				<configuration>
 					<sassSourceDirectory>${project.basedir}/src/main/webapp/css/scss</sassSourceDirectory>
 					<destination>${project.basedir}/src/main/webapp/css</destination>

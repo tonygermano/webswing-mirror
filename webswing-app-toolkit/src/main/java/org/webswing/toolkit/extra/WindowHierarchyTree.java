@@ -99,7 +99,7 @@ public class WindowHierarchyTree {
 			}
 			rebuildZOrder(false);
 			requestRepaintUnderlying(index, window.getBounds());
-			if (successor != null && WindowManager.getInstance().isWindowActive(window)) {
+			if (successor != null && Util.getWebToolkit().getWindowManager().isWindowActive(window)) {
 				WindowManager.getInstance().activateWindow(successor);
 			}
 		} else {

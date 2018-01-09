@@ -1,6 +1,6 @@
 package org.webswing.toolkit;
 
-import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.toolkit.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +30,7 @@ public class WebFramePeer extends WebWindowPeer implements FramePeer {
 					@Override
 					public void run() {
 						f.setSize(newSize);
-						WindowManager.getInstance().requestRepaintAfterMove(f, new Rectangle(f.getX(), f.getY(), originalSize.width, originalSize.height));
+                        Util.getWebToolkit().getWindowManager().requestRepaintAfterMove(f, new Rectangle(f.getX(), f.getY(), originalSize.width, originalSize.height));
 					}
 				});
 			}

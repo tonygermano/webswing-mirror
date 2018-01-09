@@ -185,7 +185,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		}
 	}
 
-	protected WindowManager getWindowManager() {
+	public WindowManager getWindowManager() {
 		return windowManager;
 	}
 
@@ -398,7 +398,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	}
 
 	@Override
-	protected synchronized MouseInfoPeer getMouseInfoPeer() {
+	public synchronized MouseInfoPeer getMouseInfoPeer() {
 		{
 			if (mPeer == null) {
 				mPeer = new WebMouseInfoPeer();
@@ -626,7 +626,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		return true;
 	}
 
-	protected DesktopPeer createDesktopPeer(Desktop paramDesktop) throws HeadlessException {
+	public DesktopPeer createDesktopPeer(Desktop paramDesktop) throws HeadlessException {
 		return new WebDesktopPeer(paramDesktop);
 	}
 

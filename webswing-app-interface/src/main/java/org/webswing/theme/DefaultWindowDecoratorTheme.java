@@ -30,7 +30,7 @@ import org.apache.commons.io.IOUtils;
 import org.webswing.Constants;
 import org.webswing.common.WindowActionType;
 import org.webswing.common.WindowDecoratorTheme;
-import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.toolkit.util.Util;
 import org.webswing.toolkit.util.Logger;
 
 public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
@@ -204,7 +204,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-		ImageSet is = (window != null && window.equals(WindowManager.getInstance().getActiveWindow())) ? active : inactive;
+		ImageSet is = (window != null && window.equals(Util.getWebToolkit().getWindowManager().getActiveWindow())) ? active : inactive;
 
 		int xOffset = 0;
 		int yOffset = 0;
@@ -265,19 +265,19 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 	}
 
 	private Rectangle getHideRect(Window w) {
-		ImageSet is = (w != null && w.equals(WindowManager.getInstance().getActiveWindow())) ? active : inactive;
+		ImageSet is = (w != null && w.equals(Util.getWebToolkit().getWindowManager().getActiveWindow())) ? active : inactive;
 		int x = w.getWidth() - BUTTON_SPACING - is.CLOSE.getWidth() - BUTTON_SPACING - is.MAXIMIZE.getWidth() - BUTTON_SPACING - is.HIDE.getWidth();
 		return new Rectangle(x, 0 + (is.TITLE.getHeight() - is.HIDE.getHeight()) / 2, is.HIDE.getWidth(), is.HIDE.getHeight());
 	}
 
 	private Rectangle getMaximizeRect(Window w) {
-		ImageSet is = (w != null && w.equals(WindowManager.getInstance().getActiveWindow())) ? active : inactive;
+		ImageSet is = (w != null && w.equals(Util.getWebToolkit().getWindowManager().getActiveWindow())) ? active : inactive;
 		int x = w.getWidth() - BUTTON_SPACING - is.CLOSE.getWidth() - BUTTON_SPACING - is.MAXIMIZE.getWidth();
 		return new Rectangle(x, 0 + (is.TITLE.getHeight() - is.CLOSE.getHeight()) / 2, is.CLOSE.getWidth(), is.CLOSE.getHeight());
 	}
 
 	private Rectangle getCloseRect(Window w) {
-		ImageSet is = (w != null && w.equals(WindowManager.getInstance().getActiveWindow())) ? active : inactive;
+		ImageSet is = (w != null && w.equals(Util.getWebToolkit().getWindowManager().getActiveWindow())) ? active : inactive;
 		int x = w.getWidth() - BUTTON_SPACING - is.CLOSE.getWidth();
 		return new Rectangle(x, 0 + (is.TITLE.getHeight() - is.CLOSE.getHeight()) / 2, is.CLOSE.getWidth(), is.CLOSE.getHeight());
 	}

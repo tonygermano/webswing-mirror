@@ -6,7 +6,7 @@ import java.awt.Window;
 import java.awt.peer.KeyboardFocusManagerPeer;
 import java.lang.reflect.Method;
 
-import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.toolkit.util.Util;
 import org.webswing.toolkit.util.Logger;
 
 import sun.awt.CausedFocusEvent;
@@ -21,12 +21,12 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 
 	@Override
 	public Component getCurrentFocusOwner() {
-		return WindowManager.getInstance().getActiveWindow().getFocusOwner();
+		return Util.getWebToolkit().getWindowManager().getActiveWindow().getFocusOwner();
 	}
 
 	@Override
 	public Window getCurrentFocusedWindow() {
-		return WindowManager.getInstance().getActiveWindow();
+		return Util.getWebToolkit().getWindowManager().getActiveWindow();
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 			heavyweight = descendant;
 		}
 
-		Component c = WindowManager.getInstance().getActiveWindow().getFocusOwner();
+		Component c = Util.getWebToolkit().getWindowManager().getActiveWindow().getFocusOwner();
 		CausedFocusEvent focusEvent;
 		if ((c != null) && (c.getPeer() == null)) {
 			c = null;

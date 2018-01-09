@@ -37,10 +37,10 @@ import java.util.concurrent.Executors;
 @SuppressWarnings("restriction")
 public class WebEventDispatcher {
 
-	private static final int CLICK_TOLERANCE = 2;
-	private MouseEvent lastMouseEvent;
-	private MouseEventInfo lastMousePressEvent;
-	private Point lastMousePosition = new Point();
+	protected static final int CLICK_TOLERANCE = 2;
+	protected MouseEvent lastMouseEvent;
+    protected MouseEventInfo lastMousePressEvent;
+    protected Point lastMousePosition = new Point();
 	private static final DndEventHandler dndHandler = new DndEventHandler();
 	private HashMap<String, String> uploadMap = new HashMap<String, String>();
 	private ExecutorService eventDispatcher = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing Event Dispatcher"));
@@ -180,7 +180,7 @@ public class WebEventDispatcher {
 	}
 
 	private void dispatchKeyboardEvent(KeyboardEventMsgIn event) {
-		Window w = (Window) WindowManager.getInstance().getActiveWindow();
+		Window w = (Window) Util.getWebToolkit().getWindowManager().getActiveWindow();
 		if (w != null) {
 			long when = System.currentTimeMillis();
 			int modifiers = Util.getKeyModifiersAWTFlag(event);
@@ -218,12 +218,12 @@ public class WebEventDispatcher {
 		}
 	}
 
-	private void dispatchMouseEvent(MouseEventMsgIn event) {
+	protected void dispatchMouseEvent(MouseEventMsgIn event) {
 		Component c = null;
-		if (WindowManager.getInstance().isLockedToWindowDecorationHandler()) {
-			c = WindowManager.getInstance().getLockedToWindow();
+		if (Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) {
+			c = Util.getWebToolkit().getWindowManager().getLockedToWindow();
 		} else {
-			c = WindowManager.getInstance().getVisibleComponentOnPosition(event.getX(), event.getY());
+			c = Util.getWebToolkit().getWindowManager().getVisibleComponentOnPosition(event.getX(), event.getY());
 			if (lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup))) {
 				c = (Component) lastMouseEvent.getSource();
 			}
@@ -247,7 +247,7 @@ public class WebEventDispatcher {
 			int buttons = Util.getMouseButtonsAWTFlag(event.getButton());
 			if (buttons != 0 && event.getType() == MouseEventType.mousedown) {
 				Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
-				WindowManager.getInstance().activateWindow(w, null, x, y, false, true, CausedFocusEvent.Cause.MOUSE_EVENT);
+                Util.getWebToolkit().getWindowManager().activateWindow(w, null, x, y, false, true, CausedFocusEvent.Cause.MOUSE_EVENT);
 			}
 			switch (event.getType()) {
 			case mousemove:
@@ -301,7 +301,7 @@ public class WebEventDispatcher {
 		}
 	}
 
-	private int computeClickCount(int x, int y, int button, boolean isPressed, int timeMilis) {
+	protected int computeClickCount(int x, int y, int button, boolean isPressed, int timeMilis) {
 		if (isPressed) {
 			if (lastMousePressEvent != null && lastMousePressEvent.type == MouseEvent.MOUSE_CLICKED && lastMousePressEvent.button == button && Math.abs(lastMousePressEvent.x - x) < CLICK_TOLERANCE && Math.abs(lastMousePressEvent.y - y) < CLICK_TOLERANCE) {
 				if (timeMilis - lastMousePressEvent.time < doubleClickMaxDelay) {
@@ -431,9 +431,9 @@ public class WebEventDispatcher {
 			if (e instanceof MouseEvent) {
 				w.setCursor(w.getCursor());// force cursor update
 			}
-			if ((Util.isWindowDecorationEvent(w, e) || WindowManager.getInstance().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
+			if ((Util.isWindowDecorationEvent(w, e) || Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
 				Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
-				WindowManager.getInstance().handleWindowDecorationEvent(w, (MouseEvent) e);
+                Util.getWebToolkit().getWindowManager().handleWindowDecorationEvent(w, (MouseEvent) e);
 			} else if (dndHandler.isDndInProgress() && (e instanceof MouseEvent || e instanceof KeyEvent)) {
 				dndHandler.processMouseEvent(w, e);
 			} else {
@@ -494,7 +494,7 @@ public class WebEventDispatcher {
 		return dndHandler.isDndInProgress();
 	}
 
-	private static class MouseEventInfo {
+	protected static class MouseEventInfo {
 		final int x;
 		final int y;
 		final int type;
