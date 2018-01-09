@@ -105,7 +105,8 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 disposeSocket: 'socket.dispose',
                 disposeFileDialog: 'files.close',
                 disposeCopyBar: 'clipboard.dispose',
-                showPlaybackControls: 'playback.showControls'
+                showPlaybackControls: 'playback.showControls',
+                externalApi: 'external'
             };
             module.provides = {
                 config: defaultCtxConfig(),
@@ -118,6 +119,9 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
             };
             module.ready = function () {
                 configure();
+                if (typeof api.cfg.onReady ===  'function'){
+                    api.cfg.onReady(api.externalApi);
+                }
                 if (api.cfg.autoStart) {
                     api.start();
                 } else {
@@ -213,6 +217,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                         cfg.recordingPlayback = cfg.applicationName = options.recordingPlayback;
                         api.showPlaybackControls();
                     }
+                    cfg.onReady = typeof options.onReady === 'function' ? options.onReady : cfg.onReady;
                 }
                 appletParams = appletParams != null ? appletParams : readAppletParams(cfg.rootElement);
                 if (appletParams != null) {
