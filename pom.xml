@@ -45,7 +45,6 @@
         <module>webswing-app-toolkit-fx</module>
         <module>webswing-app-toolkit-java7</module>
         <module>webswing-app-toolkit-java8</module>
-        <module>webswing-app-toolkit-java9</module>
         <module>webswing-app-launcher</module>
         <module>webswing-app-interface</module>
         <module>webswing-directdraw</module>
@@ -197,7 +196,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>1.9.0</version>
+                                    <version>1.8.0</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -237,6 +236,21 @@
                             <version>1</version>
                             <packaging>jar</packaging>
                             <file>${basedir}/lib/rt-win-shell.jar</file>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-java9-jdk.jsobject-modpatch</id>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <groupId>jdk.jsobject.modpatch</groupId>
+                            <artifactId>jdk.jsobject.modpatch</artifactId>
+                            <version>1</version>
+                            <packaging>jar</packaging>
+                            <file>${basedir}/lib/jdk.jsobject.modpatch</file>
                             <generatePom>true</generatePom>
                         </configuration>
                     </execution>
@@ -320,6 +334,17 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <!--===============================JAVA9 profile===================================-->
+        <profile>
+            <id>Java9 build</id>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+            <modules>
+                <module>webswing-app-toolkit-java9</module>
+            </modules>
         </profile>
     </profiles>
 </project>

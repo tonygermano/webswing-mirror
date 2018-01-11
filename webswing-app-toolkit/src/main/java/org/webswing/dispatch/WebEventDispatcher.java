@@ -8,17 +8,18 @@ import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
 import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.model.jslink.JSObjectMsg;
 import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
+import org.webswing.toolkit.FocusEventCause;
 import org.webswing.toolkit.WebClipboard;
 import org.webswing.toolkit.WebClipboardTransferable;
 import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.extra.DndEventHandler;
-import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.jslink.WebJSObject;
-import org.webswing.toolkit.util.*;
-import sun.awt.CausedFocusEvent;
+import org.webswing.toolkit.util.DeamonThreadFactory;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
 
-import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -39,8 +40,8 @@ public class WebEventDispatcher {
 
 	protected static final int CLICK_TOLERANCE = 2;
 	protected MouseEvent lastMouseEvent;
-    protected MouseEventInfo lastMousePressEvent;
-    protected Point lastMousePosition = new Point();
+	protected MouseEventInfo lastMousePressEvent;
+	protected Point lastMousePosition = new Point();
 	private static final DndEventHandler dndHandler = new DndEventHandler();
 	private HashMap<String, String> uploadMap = new HashMap<String, String>();
 	private ExecutorService eventDispatcher = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing Event Dispatcher"));
@@ -52,18 +53,18 @@ public class WebEventDispatcher {
 	private static final Map<Integer, Integer> convertedKeyCodes = new HashMap<Integer, Integer>();
 
 	static {
-		convertedKeyCodes.put(45, 155);//	Insert
-		convertedKeyCodes.put(46, 127);//	Delete
-		convertedKeyCodes.put(189, 45);//	Minus
-		convertedKeyCodes.put(187, 61);//	Equals
-		convertedKeyCodes.put(219, 91);//	Open Bracket
-		convertedKeyCodes.put(221, 93);//	Close Bracket
-		convertedKeyCodes.put(186, 59);//	Semicolon
-		convertedKeyCodes.put(220, 92);//	Back Slash
-		convertedKeyCodes.put(226, 92);//	Back Slash
-		convertedKeyCodes.put(188, 44);//	Comma
-		convertedKeyCodes.put(190, 46);//	Period
-		convertedKeyCodes.put(191, 47);//	Slash
+		convertedKeyCodes.put(45, KeyEvent.VK_INSERT);//	Insert 155
+		convertedKeyCodes.put(46, KeyEvent.VK_DELETE);//	Delete 127
+		convertedKeyCodes.put(189, KeyEvent.VK_MINUS);//	Minus 45
+		convertedKeyCodes.put(187, KeyEvent.VK_EQUALS);//	Equals 61
+		convertedKeyCodes.put(219, KeyEvent.VK_OPEN_BRACKET);//	Open Bracket 91
+		convertedKeyCodes.put(221, KeyEvent.VK_CLOSE_BRACKET);//	Close Bracket 93
+		convertedKeyCodes.put(186, KeyEvent.VK_SEMICOLON);//	Semicolon 59
+		convertedKeyCodes.put(220, KeyEvent.VK_BACK_SLASH);//	Back Slash 92
+		convertedKeyCodes.put(226, KeyEvent.VK_BACK_SLASH);//	Back Slash 92
+		convertedKeyCodes.put(188, KeyEvent.VK_COMMA);//	Comma 44
+		convertedKeyCodes.put(190, KeyEvent.VK_PERIOD);//	Period 46
+		convertedKeyCodes.put(191, KeyEvent.VK_SLASH);//	Slash 47
 	}
 
 	public static final long doubleClickMaxDelay = Long.getLong(Constants.SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY, 750);
@@ -247,7 +248,7 @@ public class WebEventDispatcher {
 			int buttons = Util.getMouseButtonsAWTFlag(event.getButton());
 			if (buttons != 0 && event.getType() == MouseEventType.mousedown) {
 				Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
-                Util.getWebToolkit().getWindowManager().activateWindow(w, null, x, y, false, true, CausedFocusEvent.Cause.MOUSE_EVENT);
+				Util.getWebToolkit().getWindowManager().activateWindow(w, null, x, y, false, true, FocusEventCause.MOUSE_EVENT);
 			}
 			switch (event.getType()) {
 			case mousemove:
@@ -433,7 +434,7 @@ public class WebEventDispatcher {
 			}
 			if ((Util.isWindowDecorationEvent(w, e) || Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
 				Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
-                Util.getWebToolkit().getWindowManager().handleWindowDecorationEvent(w, (MouseEvent) e);
+				Util.getWebToolkit().getWindowManager().handleWindowDecorationEvent(w, (MouseEvent) e);
 			} else if (dndHandler.isDndInProgress() && (e instanceof MouseEvent || e instanceof KeyEvent)) {
 				dndHandler.processMouseEvent(w, e);
 			} else {

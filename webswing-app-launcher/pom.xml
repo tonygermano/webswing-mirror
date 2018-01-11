@@ -28,11 +28,6 @@
 			<artifactId>webswing-app-toolkit-java8</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>org.webswing</groupId>
-            <artifactId>webswing-app-toolkit-java9</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 	</dependencies>
 	<build>
 		<finalName>webswing-app-launcher</finalName>
@@ -74,6 +69,20 @@
 		</plugins>
 	</build>
 	<profiles>
+		<!--===============================JAVA9 profile===================================-->
+		<profile>
+			<id>Java9 build</id>
+			<activation>
+				<jdk>9</jdk>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.webswing</groupId>
+					<artifactId>webswing-app-toolkit-java9</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
 		<!-- =========================================DEVELOPMENT LIVE UPDATE PROFILE=========================== -->
 		<profile>
 			<id>update</id>

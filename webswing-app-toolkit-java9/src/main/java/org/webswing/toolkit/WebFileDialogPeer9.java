@@ -1,88 +1,16 @@
 package org.webswing.toolkit;
 
-import java.awt.FileDialog;
-import java.awt.Window;
-import java.awt.peer.FileDialogPeer;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.List;
+import java.awt.*;
+import java.awt.event.FocusEvent;
 
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
+public class WebFileDialogPeer9 extends WebFileDialogPeer {
 
-public class WebFileDialogPeer9 extends WebWindowPeer9 implements FileDialogPeer {
-    
-    private FileDialog dialog;
-    
-    @SuppressWarnings("deprecation")
-    private JFileChooser fc = new JFileChooser() {
-        private static final long serialVersionUID = 1L;
-        
-        public void approveSelection() {
-            super.approveSelection();
-            dialog.setFile(fc.getSelectedFile().getName());
-            dialog.setDirectory(fc.getCurrentDirectory().getPath());
-            dialog.hide();
-        };
-        
-        public void cancelSelection() {
-            super.cancelSelection();
-            dialog.setFile(null);
-            dialog.hide();
-        };
-    };
-    
     public WebFileDialogPeer9(FileDialog paramFileDialog) {
-        super(new JDialog());
-        dialog = paramFileDialog;
-        fc.setMultiSelectionEnabled(false);
+        super(paramFileDialog);
     }
-    
+
     @Override
-    public void blockWindows(List<Window> windows) {
-    }
-    
-    @Override
-    public void setDirectory(String dir) {
-    }
-    
-    @Override
-    public void setFile(String file) {
-    }
-    
-    @Override
-    public void setFilenameFilter(final FilenameFilter filter) {
-        FileFilter ffilter = new FileFilter() {
-            
-            @Override
-            public String getDescription() {
-                return "filter";
-            }
-            
-            @Override
-            public boolean accept(File f) {
-                return filter.accept(f.getParentFile(), f.getName());
-            }
-        };
-        fc.setFileFilter(ffilter);
-    }
-    
-    @Override
-    public void show() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (dialog.getMode() == FileDialog.LOAD) {
-                    fc.showOpenDialog(null);
-                } else {
-                    fc.showSaveDialog(null);
-                }
-            }
-        }).start();
-        
-    }
-    
-    public void hide() {
+    public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEvent.Cause cause) {
+        return WebToolkit9.requestFocus(target,lightweightChild,temporary,focusedWindowChangeAllowed,time,cause);
     }
 }

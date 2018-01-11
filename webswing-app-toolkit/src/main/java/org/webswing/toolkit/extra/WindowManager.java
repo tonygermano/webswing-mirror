@@ -1,29 +1,22 @@
 package org.webswing.toolkit.extra;
 
-import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Window;
+import org.webswing.common.WindowActionType;
+import org.webswing.dispatch.WebEventDispatcher;
+import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.model.s2c.CursorChangeEventMsg;
+import org.webswing.toolkit.FocusEventCause;
+import org.webswing.toolkit.WebComponentPeer;
+import org.webswing.toolkit.WebToolkit;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.SwingUtilities;
-
-import org.webswing.common.WindowActionType;
-import org.webswing.dispatch.WebEventDispatcher;
-import org.webswing.dispatch.WebPaintDispatcher;
-import org.webswing.model.s2c.CursorChangeEventMsg;
-import org.webswing.toolkit.WebComponentPeer;
-import org.webswing.toolkit.WebKeyboardFocusManagerPeer;
-import org.webswing.toolkit.WebToolkit;
-import org.webswing.toolkit.util.Services;
-import org.webswing.toolkit.util.Util;
-
-import sun.awt.CausedFocusEvent;
 
 @SuppressWarnings("restriction")
 public class WindowManager {
@@ -108,7 +101,7 @@ public class WindowManager {
 		activateWindow(w, 0, 0);
 	}
 
-	public boolean activateWindow(Window w, Component newFocusOwner, int x, int y, boolean tmp, boolean focusedWindowChangeAllowed, CausedFocusEvent.Cause cause) {
+	public boolean activateWindow(Window w, Component newFocusOwner, int x, int y, boolean tmp, boolean focusedWindowChangeAllowed, FocusEventCause cause) {
 		boolean success = false;
 		boolean newWindow = false;
 		if (!zorder.contains(w)) {
@@ -141,13 +134,13 @@ public class WindowManager {
 		if (focusedWindowChangeAllowed || activeWindow == w) {
 
 			if (newFocusOwner != null && newFocusOwner.isFocusable() && w.isFocusableWindow()) {
-				int result = WebKeyboardFocusManagerPeer.shouldNativelyFocusHeavyweight(w, newFocusOwner, tmp, true, new Date().getTime(), cause);
+				int result = Util.getWebToolkit().shouldNativelyFocusHeavyweight(w, newFocusOwner, tmp, true, new Date().getTime(), cause);
 				switch (result) {
 				case 1:
 					success = true;
 					break;
 				case 2:
-					WebKeyboardFocusManagerPeer.deliverFocus(w, newFocusOwner, tmp, true, new Date().getTime(), cause);
+					Util.getWebToolkit().deliverFocus(w, newFocusOwner, tmp, true, new Date().getTime(), cause);
 					success = true;
 					break;
 				default:
@@ -170,7 +163,7 @@ public class WindowManager {
 	}
 
 	public void activateWindow(final Window w, final int x, final int y) {
-		activateWindow(w, null, x, y, false, true, CausedFocusEvent.Cause.NATIVE_SYSTEM);
+		activateWindow(w, null, x, y, false, true, FocusEventCause.NATIVE_SYSTEM);
 	}
 
 	public Window getVisibleWindowOnPosition(int x, int y) {
@@ -186,7 +179,7 @@ public class WindowManager {
 		Component result = activeWindow;
 		Window positionWin = zorder.getVisibleWindowOnPosition(x, y);
 		if (positionWin != null) {
-			result = ((WebComponentPeer) positionWin.getPeer()).getHwComponentAt(x, y);
+			result = Util.getPeer(positionWin).getHwComponentAt(x, y);
 		}
 		return result;
 	}

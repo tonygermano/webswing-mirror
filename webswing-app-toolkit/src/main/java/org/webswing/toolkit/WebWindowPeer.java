@@ -7,7 +7,7 @@ import org.webswing.Constants;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Util;
 
-public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
+abstract public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////// WebWindowPeer Implementation//////////////////////////////////////////////////

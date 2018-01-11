@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.peer.FramePeer;
 
-public class WebFramePeer extends WebWindowPeer implements FramePeer {
+abstract public class WebFramePeer extends WebWindowPeer implements FramePeer {
 
 	private int state;
 

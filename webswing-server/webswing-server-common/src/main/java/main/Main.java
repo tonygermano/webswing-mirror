@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -78,11 +79,11 @@ public class Main {
 			InputStream propFile = Main.class.getClassLoader().getResourceAsStream("WEB-INF/classes/webswing.properties");
 			Properties p = new Properties(System.getProperties());
 			p.load(propFile);
-			
+
 			for (Map.Entry<Object, Object> prop : p.entrySet()) {
 				if(!System.getProperties().containsKey(prop.getKey()))
 					System.getProperties().put(prop.getKey(), prop.getValue());
-			}					
+			}
 
 		} catch (Exception e) {
 			//file does not exist, do nothing
@@ -93,13 +94,13 @@ public class Main {
 		// create the command line parser
 		return getBoolParam(args, "-d", false);
 	}
-	
-	public static String getBoolParam(String[] args, String param, Boolean def) {		
+
+	public static String getBoolParam(String[] args, String param, Boolean def) {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals(param) && i + 1 < args.length) {
 				return args[i + 1];
 			}
-		}		
+		}
 		return def.toString();
 	}
 
@@ -114,7 +115,17 @@ public class Main {
 
 	private static void initializeExtLibServices(List<URL> urls) throws Exception {
 		// sets up Services class providing jms connection and other services in separated classloader to prevent classpath pollution of swing application.
-		ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), null);
+
+		//JAVA9 needs to set parent classloader to ClassLoader.getPlatformClassLoader(), otherwise the parent is the boot classloader which only contains the java.base module
+		//we use reflection to be backwards compatible with java8
+		ClassLoader parent = null;
+		try {
+			parent = (ClassLoader) ClassLoader.class.getDeclaredMethod("getPlatformClassLoader").invoke(null);
+		} catch (Exception e) {
+			//ignore
+		}
+
+		ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), parent);
 		Class<?> classLoaderUtilClass = extLibClassLoader.loadClass("org.webswing.util.ClassLoaderUtil");
 		Method initializeServicesMethod = classLoaderUtilClass.getMethod("initializeServices");
 		initializeServicesMethod.invoke(null);

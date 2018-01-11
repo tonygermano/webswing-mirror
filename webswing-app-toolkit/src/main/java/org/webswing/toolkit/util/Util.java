@@ -9,6 +9,7 @@ import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
 import org.webswing.model.s2c.WindowMsg;
 import org.webswing.model.s2c.WindowPartialContentMsg;
+import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 
@@ -21,6 +22,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.*;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -337,7 +339,7 @@ public class Util {
 	}
 
 	public static boolean isWindowDecorationEvent(Window w, AWTEvent e) {
-		if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID() && w!=null && w.isEnabled() && w.isShowing()) {
+		if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID() && w != null && w.isEnabled() && w.isShowing()) {
 			return isWindowDecorationPosition((Window) w, new Point(((MouseEvent) e).getXOnScreen(), ((MouseEvent) e).getYOnScreen()));
 		}
 		return false;
@@ -625,4 +627,17 @@ public class Util {
 		return "";
 	}
 
+	public static WebComponentPeer getPeer(Component comp) {
+		if (comp == null) {
+			return null;
+		}
+		try {
+			Field peer = Component.class.getDeclaredField("peer");
+			peer.setAccessible(true);
+			return (WebComponentPeer) peer.get(comp);
+		} catch (Exception e) {
+			Logger.error("Failed to read peer of component " + comp, e);
+			return null;
+		}
+	}
 }

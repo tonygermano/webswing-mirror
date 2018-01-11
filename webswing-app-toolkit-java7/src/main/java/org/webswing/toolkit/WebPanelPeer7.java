@@ -1,0 +1,16 @@
+package org.webswing.toolkit;
+
+import sun.awt.CausedFocusEvent;
+
+import java.awt.*;
+
+public class WebPanelPeer7 extends WebPanelPeer {
+    public WebPanelPeer7(Panel panel) {
+        super(panel);
+    }
+
+    @Override
+    public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
+        return WebToolkit7.requestFocus(target,lightweightChild,temporary,focusedWindowChangeAllowed,time,cause);
+    }
+}

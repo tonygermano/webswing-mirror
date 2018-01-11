@@ -1,10 +1,6 @@
 package org.webswing.toolkit.ge;
 
-import java.awt.AWTException;
-import java.awt.Component;
-import java.awt.GraphicsDevice;
-import java.awt.Image;
-import java.awt.ImageCapabilities;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.VolatileImage;
@@ -20,6 +16,8 @@ import sun.awt.image.OffScreenImage;
 public class WebGraphicsConfig extends BufferedImageGraphicsConfig {
 
 	WebScreenDevice device;
+	private int width;
+	private int height;
 
 	public static WebGraphicsConfig getWebGraphicsConfig(int width, int height) {
 		return new WebGraphicsConfig(width, height);
@@ -27,6 +25,8 @@ public class WebGraphicsConfig extends BufferedImageGraphicsConfig {
 
 	private WebGraphicsConfig(int width, int height) {
 		super(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB), null);
+		this.width = width;
+		this.height = height;
 	}
 
 	@Override
@@ -50,6 +50,10 @@ public class WebGraphicsConfig extends BufferedImageGraphicsConfig {
 		} else {
 			return super.createCompatibleVolatileImage(width, height, caps, transparency);
 		}
+	}
+
+	public Rectangle getBounds() {
+		return new Rectangle(0, 0, this.width, this.height);
 	}
 
 }

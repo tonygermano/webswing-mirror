@@ -63,6 +63,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private static final String WEB_GRAPHICS_ENV_CLASS_NAME = "org.webswing.toolkit.ge.WebGraphicsEnvironment";
 	private static final String WEB_PRINTER_JOB_CLASS_NAME = "org.webswing.toolkit.WebPrinterJobWrapper";
 	private static final String WIN_SHELL_FOLDER_MANAGER = "sun.awt.shell.Win32ShellFolderManager2";
+	private static final String JAVA9_PATCHED_JSOBJECT_MODULE_MARKER = "netscape.javascript.WebswingPatchedJSObjectJarMarker";
 	private static final String JAVA_FX_PATH = System.getProperty("java.home") + "/lib/ext/jfxrt.jar";
 	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.ToolkitJarMarker";
 
@@ -464,6 +465,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			}
 			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;
 			String webGraphicsEnvClass = WEB_GRAPHICS_ENV_CLASS_NAME;
+			String j9modules="";
 			if (javaVersion.startsWith("1.7")) {
 				webToolkitClass += "7";
 				webGraphicsEnvClass += "7";
@@ -473,6 +475,11 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			} else if (javaVersion.startsWith("9")) {
                 webToolkitClass += "9";
                 webGraphicsEnvClass += "9";
+                j9modules=" --patch-module jdk.jsobject="+CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_JSOBJECT_MODULE_MARKER);
+                j9modules+=" --add-reads jdk.jsobject=ALL-UNNAMED ";
+                j9modules+=" --add-opens java.base/java.net=ALL-UNNAMED "; // URLStreamHandler reflective access from SwingClassloader
+                j9modules+=" --add-opens java.desktop/java.awt=ALL-UNNAMED "; // EventQueue reflective access from SwingMain
+                j9modules+=" --add-opens java.desktop/sun.awt.windows=ALL-UNNAMED "; // sun.awt.windows.ThemeReader reflective access from WebToolkit
             } else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
 				throw new RuntimeException("Java version not supported. (Version starting with 1.7, 1.8 and 9 are supported.)");
@@ -490,7 +497,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 			String debug = appConfig.isDebug() && (debugPort != 0) ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=" + debugPort + ",server=y,suspend=y " : "";
 			String vmArgs = appConfig.getVmArgs() == null ? "" : subs.replace(appConfig.getVmArgs());
-			swingConfig.setJvmArgs(bootCp + debug + " -noverify " + vmArgs);
+			swingConfig.setJvmArgs(j9modules+ bootCp + debug + " -noverify " + vmArgs );
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, getClientId());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.queueId);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_HOME, getAbsolutePath(".", false));
