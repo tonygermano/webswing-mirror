@@ -348,12 +348,9 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@GET
-	@Path("/rest/threadDump")
-	public String getThreadDump(@PathParam("") String id, @QueryParam("id") String timestamp) throws WsException {
+	@Path("/rest/threadDump/{path}")
+	public String getThreadDump(@PathParam("path") String id, @QueryParam("id") String timestamp) throws WsException {
 		checkPermissionLocalOrMaster(WebswingAction.rest_getThreadDump);
-		if (id.startsWith("/")) {
-			id = id.substring(1);
-		}
 		SwingInstance instance = runningInstances.findByInstanceId(id);
 		if (instance != null) {
 			return instance.getThreadDump(timestamp);
@@ -372,12 +369,9 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@POST
-	@Path("/rest/threadDump")
-	public void requestThreadDump(@PathParam("") String id) throws WsException {
+	@Path("/rest/threadDump/{path}")
+	public void requestThreadDump(@PathParam("path") String id) throws WsException {
 		checkPermissionLocalOrMaster(WebswingAction.rest_requestThreadDump);
-		if (id.startsWith("/")) {
-			id = id.substring(1);
-		}
 		SwingInstance instance = runningInstances.findByInstanceId(id);
 		if (instance != null) {
 			instance.requestThreadDump();
