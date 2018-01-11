@@ -50,6 +50,15 @@ public class WebRepaintManager extends RepaintManager {
 	}
 
 	private void addDirtyRegionPrivate(Container c, int x, int y, int w, int h) {
+		/* Special cases we don't have to bother with. */
+		if ((w <= 0) || (h <= 0) || (c == null)) {
+			return;
+		}
+
+		if ((c.getWidth() <= 0) || (c.getHeight() <= 0)) {
+			return;
+		}
+
 		synchronized (delegate) {
 			Rectangle r = dirty.get(c);
 			if (r != null) {
