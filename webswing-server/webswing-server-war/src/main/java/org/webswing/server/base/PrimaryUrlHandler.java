@@ -296,10 +296,9 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	}
 
 	public Map<String, String> getVariables(String type) throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
 		VariableSetName key;
 		try {
-			key = VariableSetName.valueOf(type.substring(1));
+			key = VariableSetName.valueOf(type);
 		} catch (Exception e) {
 			key = VariableSetName.Basic;
 		}

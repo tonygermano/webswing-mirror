@@ -1,11 +1,15 @@
 package org.webswing.server;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.util.Modules;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.startup.StartupService;
 
@@ -31,17 +35,25 @@ public class WebswingServlet extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
+		log.info("Initializing Webswing...");
 		Module servletModule = new Module() {
 			public void configure(Binder binder) {
 				binder.bind(ServletContext.class).toInstance(getServletContext());
 			}
 		};
-		Injector injector = Guice.createInjector(servletModule, new WebswingServerModule());
-		this.securityManager = injector.getInstance(SecurityManagerService.class);
+				
 		try {
-			this.securityManager.start();
+			Injector injector;
+			if(System.getProperty(Constants.GUICE_BINDING_MODULE) == null) {
+				injector = Guice.createInjector(servletModule, new WebswingServerModule());
+			} else {
+				injector = Guice.createInjector(Modules.combine(servletModule, Modules.override(new WebswingServerModule()).with(createBindingModule())));
+			}
+				
 			this.startup = injector.getInstance(StartupService.class);
 			this.startup.start();
+			this.securityManager = injector.getInstance(SecurityManagerService.class);
+			this.securityManager.start();
 			this.handler = injector.getInstance(GlobalUrlHandler.class);
 			this.handler.init();
 		} catch (Exception e) {
@@ -106,5 +118,20 @@ public class WebswingServlet extends HttpServlet {
 	@Override
 	protected long getLastModified(HttpServletRequest req) {
 		return handler.getLastModified(req);
+	}
+	
+	private Module createBindingModule() throws InstantiationException, IllegalAccessException {
+		Module result = null;
+		String moduleClassName = System.getProperty(Constants.GUICE_BINDING_MODULE);
+
+		try {
+			result = (AbstractModule) WebswingServerModule.class.getClassLoader().loadClass(moduleClassName)
+					.newInstance();
+			return result;
+		} catch (Exception e) {
+			log.warn("Failed to load extension module {} ", moduleClassName);
+		}
+
+		return result;
 	}
 }

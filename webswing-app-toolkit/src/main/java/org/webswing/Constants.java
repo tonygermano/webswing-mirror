@@ -30,6 +30,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_WAIT_FOR_EXIT = "webswing.waitForExit";
 	public static final String SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY = "webswing.doubleClickMaxDelay";
 	public static final String SWING_START_SYS_PROP_INITIAL_URL = "webswing.initialUrl" ;
+	public static final String SWING_START_SYS_PROP_MSG_API_TOPIC = "webswing.messagingApiTopicName";
 	public static final	String PRINTER_JOB_CLASS = "webswing.printerJobDelegate";
 
 	//javafx startup
@@ -72,6 +73,7 @@ public interface Constants {
 	public static final String FILE_SERVLET_WAIT_TIMEOUT = "webswing.fileServletWaitTimeout";
 	public static final String REVERSE_PROXY_CONTEXT_PATH = "webswing.proxyContextPath";
 	public static final String HTTPS_ONLY = "webswing.httpsOnly";
+	public static final String GUICE_BINDING_MODULE = "webswing.bindingModule";
 
 	// swing start related properties
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";
@@ -103,6 +105,8 @@ public interface Constants {
 	public static final String BRANDING_PREFIX = "webswing.brandingPrefix";
 	public static final String EXTENSTION_INITIALIZER = "webswing.extensionInitializer";
 	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
+	public static final String EXTENSION_PROVIDER = "webswing.extensionProvider" ;
 	public static final String CONFIG_PROVIDER = "webswing.configProvider";
+
 
 }

@@ -1,9 +1,10 @@
 package org.webswing.server.common.model.admin;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Sessions {
+public class Sessions implements Serializable{
 	private List<SwingSession> sessions = new ArrayList<SwingSession>();
 	private List<SwingSession> closedSessions = new ArrayList<SwingSession>();
 

@@ -1,4 +1,4 @@
-package org.webswing.server.extension;
+package org.webswing.server.services.startup;
 
 import org.webswing.server.model.exception.WsInitException;
 

@@ -1,9 +1,11 @@
 package org.webswing.server.services.swingmanager;
 
 import org.webswing.server.base.UrlHandler;
+import org.webswing.server.extension.ExtensionService;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.files.FileTransferHandlerService;
 import org.webswing.server.services.resources.ResourceHandlerService;
+import org.webswing.server.services.rest.RestService;
 import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.modules.SecurityModuleService;
 import org.webswing.server.services.stats.StatisticsLoggerService;
@@ -24,9 +26,12 @@ public class SwingInstanceManagerServiceImpl implements SwingInstanceManagerServ
 	private final SecurityModuleService securityModuleService;
 	private final ConfigurationService configService;
 	private final StatisticsLoggerService loggerService;
+	private final ExtensionService extService;
+	private final RestService restService;
 
 	@Inject
-	public SwingInstanceManagerServiceImpl(SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileHandler, LoginHandlerService loginHandler, ResourceHandlerService resourceHandler, SecurityModuleService securityModuleService, ConfigurationService configService, StatisticsLoggerService loggerService) {
+	public SwingInstanceManagerServiceImpl(SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileHandler, LoginHandlerService loginHandler, ResourceHandlerService resourceHandler, SecurityModuleService securityModuleService, ConfigurationService configService, StatisticsLoggerService loggerService,
+			ExtensionService extService, RestService restService) {
 		this.instanceService = instanceFactory;
 		this.websocket = websocket;
 		this.fileService = fileHandler;
@@ -35,11 +40,12 @@ public class SwingInstanceManagerServiceImpl implements SwingInstanceManagerServ
 		this.securityModuleService = securityModuleService;
 		this.configService = configService;
 		this.loggerService = loggerService;
-
+		this.extService = extService;
+		this.restService = restService;
 	}
 
 	public SwingInstanceManager createApp(UrlHandler parent, String path) {
-		return new SwingInstanceManagerImpl(parent, path, instanceService, websocket, fileService, loginService, resourceHandler, securityModuleService, configService, loggerService);
+		return new SwingInstanceManagerImpl(parent, path, instanceService, websocket, fileService, loginService, resourceHandler, securityModuleService, configService, loggerService, extService, restService);
 	}
 
 }

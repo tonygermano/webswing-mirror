@@ -7,9 +7,9 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.server.extension.DefaultInitializer;
 import org.webswing.server.extension.ExtensionClassLoader;
-import org.webswing.server.extension.Initializer;
+import org.webswing.server.extension.ExtensionService;
+import org.webswing.server.extension.ExtensionServiceImpl;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.config.ConfigurationServiceImpl;
 import org.webswing.server.services.files.FileTransferHandlerService;
@@ -20,12 +20,16 @@ import org.webswing.server.services.jvmconnection.JvmConnectionService;
 import org.webswing.server.services.jvmconnection.JvmConnectionServiceImpl;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.resources.ResourceHandlerServiceImpl;
+import org.webswing.server.services.rest.RestService;
+import org.webswing.server.services.rest.RestServiceImpl;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.security.SecurityManagerServiceImpl;
 import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.login.LoginHandlerServiceImpl;
 import org.webswing.server.services.security.modules.SecurityModuleService;
 import org.webswing.server.services.security.modules.SecurityModuleServiceImpl;
+import org.webswing.server.services.startup.DefaultInitializer;
+import org.webswing.server.services.startup.Initializer;
 import org.webswing.server.services.startup.StartupService;
 import org.webswing.server.services.startup.StartupServiceImpl;
 import org.webswing.server.services.stats.StatisticsLoggerService;
@@ -69,6 +73,8 @@ public class WebswingServerModule extends AbstractModule {
 		bind(SecurityManagerService.class).to(SecurityManagerServiceImpl.class);
 		bind(SecurityModuleService.class).to(SecurityModuleServiceImpl.class);
 		bind(LoginHandlerService.class).to(LoginHandlerServiceImpl.class);
+		bind(ExtensionService.class).to(ExtensionServiceImpl.class);
+		bind(RestService.class).to(RestServiceImpl.class);
 	}
 
 	private void initializeDefaultSystemProperties() {

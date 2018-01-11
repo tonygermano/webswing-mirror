@@ -36,18 +36,21 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 
 	@Override
 	public void start() {
+		log.info("Starting SecurityManagerServiceImpl");
 		try {
 			securityManager.setCacheManager(new MemoryConstrainedCacheManager());
 			securityManager.setSessionManager(new WebswingWebSessionManager());
 			securityManager.setRealm(new WebswingRealmAdapter());
 			SecurityUtils.setSecurityManager(securityManager);
 		} catch (Exception e) {
+			log.error("Failed to start security service", e);
 			new WsInitException("Failed to start security service", e);
 		}
 	}
 
 	@Override
 	public void stop() {
+		log.info("Stopping SecurityManagerServiceImpl");
 		securityManager.destroy();
 	}
 

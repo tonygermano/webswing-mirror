@@ -1,9 +1,13 @@
 package org.webswing.server.services.security;
 
+import java.io.Serializable;
+
 import org.apache.shiro.authz.Permission;
 
-public class WebswingPermission implements Permission {
+public class WebswingPermission implements Permission, Serializable {
 
+	private static final long serialVersionUID = 8721141086374586400L;
+	
 	private final String securedPath;
 	private final String permissionName;
 

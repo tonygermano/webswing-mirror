@@ -1,4 +1,4 @@
-package org.webswing.server.extension;
+package org.webswing.server.services.config;
 
 import org.webswing.server.common.model.SecuredPathConfig;
 
