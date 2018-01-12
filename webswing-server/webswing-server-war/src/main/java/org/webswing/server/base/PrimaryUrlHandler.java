@@ -1,18 +1,5 @@
 package org.webswing.server.base;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.URL;
-import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.xml.security.utils.Base64;
 import org.slf4j.Logger;
@@ -22,20 +9,31 @@ import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.model.admin.InstanceManagerStatus;
 import org.webswing.server.common.model.admin.InstanceManagerStatus.Status;
-import org.webswing.server.common.model.meta.MetaObject;
-import org.webswing.server.common.model.meta.VariableSetName;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.config.ConfigurationService;
-import org.webswing.server.services.security.api.*;
+import org.webswing.server.services.security.api.SecurityContext;
+import org.webswing.server.services.security.api.WebswingAuthenticationException;
+import org.webswing.server.services.security.api.WebswingSecurityConfig;
+import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.security.modules.SecurityModuleService;
 import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
-import org.webswing.toolkit.util.GitRepositoryState;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URL;
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.Map;
 
 public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements SecuredPathHandler, SecurityContext {
 	private static final Logger log = LoggerFactory.getLogger(PrimaryUrlHandler.class);
@@ -258,89 +256,6 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		return enabled;
 	}
 
-	public String getVersion() throws WsException {
-		String describe = GitRepositoryState.getInstance().getDescribe();
-		if (describe == null) {
-			return default_version;
-		}
-		return describe;
-	}
-
-	public MetaObject getMeta(Map<String, Object> json) throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
-		return configService.describeConfiguration(getPathMapping(), json, this);
-	}
-
-	public MetaObject getConfigMeta() throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
-		return configService.describeConfiguration(getPathMapping(), null, this);
-	}
-
-	public void setConfig(Map<String, Object> config) throws Exception {
-		checkMasterPermission(WebswingAction.rest_setConfig);
-		configService.setConfiguration(getPathMapping(), config);
-	}
-
-	protected Map<String, Boolean> getPermissions() throws Exception {
-		Map<String, Boolean> permissions = new HashMap<>();
-		permissions.put("dashboard", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo));
-		permissions.put("configView", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig));
-		permissions.put("configSwingEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
-		permissions.put("sessions", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getSession));
-		permissions.put("configEdit", false);
-		permissions.put("start", false);
-		permissions.put("stop", false);
-		permissions.put("remove", false);
-		permissions.put("logsView", false);
-		return permissions;
-	}
-
-	public Map<String, String> getVariables(String type) throws WsException {
-		VariableSetName key;
-		try {
-			key = VariableSetName.valueOf(type);
-		} catch (Exception e) {
-			key = VariableSetName.Basic;
-		}
-		VariableSubstitutor vs;
-		switch (key) {
-		case SwingInstance:
-			String userName = getUser() == null ? "<webswing user>" : getUser().getUserId();
-			vs = VariableSubstitutor.forSwingInstance(getConfig(), userName, null, "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing custom args>");
-			return vs.getVariableMap();
-		case SwingApp:
-			vs = VariableSubstitutor.forSwingApp(getConfig());
-			return vs.getVariableMap();
-		case Basic:
-		default:
-			vs = VariableSubstitutor.basic();
-			return vs.getVariableMap();
-		}
-	}
-
-	protected boolean isPermited(WebswingAction... actions) {
-		for (WebswingAction action : actions) {
-			boolean local = getUser() != null && getUser().isPermitted(action.name());
-			if (!local) {
-				boolean master = isMasterPermited(actions);
-				if (!master) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	protected boolean isMasterPermited(WebswingAction... actions) {
-		for (WebswingAction action : actions) {
-			boolean master = getMasterUser() != null && getMasterUser().isPermitted(action.name());
-			if (!master) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	@Override
 	public WebswingSecurityModule get() {
 		return securityModule;
@@ -400,6 +315,10 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		return varSubs.replace(string);
 	}
 
+	public Map<String, String> getVariableMap() {
+		return varSubs.getVariableMap();
+	}
+
 	@Override
 	public Object getFromSecuritySession(String attributeName) {
 		return SecurityUtil.getFromSecuritySession(attributeName);
@@ -409,5 +328,4 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	public void setToSecuritySession(String attributeName, Object value) {
 		SecurityUtil.setToSecuritySession(attributeName, value);
 	}
-
 }

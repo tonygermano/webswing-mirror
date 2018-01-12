@@ -4,13 +4,16 @@ import org.glassfish.jersey.internal.MapPropertiesDelegate;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.server.*;
 import org.glassfish.jersey.server.internal.ContainerUtils;
+import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.server.GlobalUrlHandler;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.services.rest.resources.GlobalRestService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,19 +25,20 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.security.Principal;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container, RestUrlHandler {
 	private static final Logger log = LoggerFactory.getLogger(RestUrlHandlerImpl.class);
 
 	private ApplicationHandler appHandler;
 
-	public RestUrlHandlerImpl(UrlHandler parent, Object... registrations) {
+	public RestUrlHandlerImpl(UrlHandler parent, AbstractBinder binder, Class... resources) {
 		super(parent);
-		this.appHandler = new ApplicationHandler(new RestConfiguration(parent, registrations));
+		this.appHandler = new ApplicationHandler(new RestConfiguration(binder, resources));
 	}
 
 	@Override
@@ -273,18 +277,24 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 	}
 
 	private class RestConfiguration extends ResourceConfig {
-		public RestConfiguration(UrlHandler parent, Object[] registrations) {
-			register(parent);
-			register(WsExceptionMapper.class);
-			if (registrations != null) {
-				for (Object o : registrations) {
-					if (o instanceof Class) {
-						register((Class<?>) o);
-					} else {
-						register(o);
-					}
+		public RestConfiguration(AbstractBinder binder, Class[] resources) {
+			// setup jersey's hk2 dependency injection
+			register(new Feature() {
+				@Override
+				public boolean configure(FeatureContext context) {
+					context.register(binder);
+					return true;
 				}
+			});
+
+			//register resources
+			for (Class r : resources) {
+				register(r);
 			}
+
+			//register providers
+			register(WsExceptionMapper.class);
 		}
 	}
+
 }

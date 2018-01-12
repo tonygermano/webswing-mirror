@@ -7,6 +7,8 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.util.*;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,13 +51,9 @@ import org.webswing.server.services.swingmanager.SwingInstanceManagerService;
 import org.webswing.server.services.websocket.WebSocketService;
 import org.webswing.server.util.LogReaderUtil;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 @Singleton
-@Path("")
-@Produces(MediaType.APPLICATION_JSON)
-public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstanceHolder, SecuredPathHandler {
+public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstanceHolder, SecuredPathHandler{
 	private static final Logger log = LoggerFactory.getLogger(GlobalUrlHandler.class);
 
 	private final WebSocketService websocket;
@@ -122,7 +120,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		}
 
 		registerChildUrlHandler(resourceService.create(this, this));
-		registerChildUrlHandler(restService.createRestHandler(this));
+		registerChildUrlHandler(restService.createGlobalRestHandler(this));
 
 		loadApplications();
 		this.configService.registerChangeListener(this.changeListener);
@@ -252,10 +250,6 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		return "";
 	}
 
-	public void setServletContext(ServletContext servletContext) {
-		this.servletContext = servletContext;
-	}
-
 	public ServletContext getServletContext() {
 		return servletContext;
 	}
@@ -279,6 +273,19 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 			for (SwingInstanceManager im : instanceManagers.values()) {
 				SwingInstance instance;
 				if ((instance = im.findInstanceByClientId(clientId)) != null) {
+					return instance;
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public SwingInstance findInstanceByInstanceId(String instanceId) {
+		synchronized (instanceManagers) {
+			for (SwingInstanceManager im : instanceManagers.values()) {
+				SwingInstance instance;
+				if ((instance = im.findInstanceByInstanceId(instanceId)) != null) {
 					return instance;
 				}
 			}
@@ -317,6 +324,12 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		return result;
 	}
 
+	public SwingInstanceManager getApplication(String path) {
+		synchronized (instanceManagers) {
+			return instanceManagers.get(path);
+		}
+	}
+
 	@Override
 	public URL getWebResource(String resource) {
 		if (!isCustomIndexPage() && StringUtils.equals("/index.html", toPath(resource))) {
@@ -337,156 +350,4 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 		return false;
 	}
 
-	@GET
-	@Path("/apps")
-	public List<ApplicationInfoMsg> getApplicationsRest() throws WsException {
-		checkMasterPermission(WebswingAction.rest_getApps);
-		List<ApplicationInfoMsg> result = new ArrayList<>();
-		for (SwingInstanceManager mgr : getApplications()) {
-			if (mgr.isEnabled() && mgr.isUserAuthorized()) {
-				ApplicationInfoMsg applicationInfoMsg = mgr.getApplicationInfoMsg();
-				if (applicationInfoMsg != null) {
-					result.add(applicationInfoMsg);
-				}
-			}
-		}
-		return result;
-	}
-
-	@GET
-	@Path("/info")
-	public ApplicationInfo getApplicationInfo() throws WsException {
-		checkPermission(WebswingAction.rest_getAppInfo);
-		ApplicationInfo app = new ApplicationInfo();
-		app.setPath(getPathMapping());
-		app.setEnabled(isEnabled());
-		app.setUrl(getFullPathMapping());
-		app.setName("Server");
-		File icon = resolveFile(getConfig().getIcon());
-		app.setIcon(CommonUtil.loadImage(icon));
-		app.setConfig(getConfig());
-		app.setVariables(varSubs.getVariableMap());
-		app.setStatus(getStatus());
-		return app;
-	}
-
-	@GET
-	@Path("/rest/paths")
-	public List<String> getPaths() throws WsException {
-		checkPermission(WebswingAction.rest_getPaths);
-		List<String> result = new ArrayList<>();
-		for (SwingInstanceManager appManager : getApplications()) {
-			result.add(appManager.getFullPathMapping());
-		}
-		return result;
-	}
-
-	@GET
-	@Path("/rest/version")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String getVersion() throws WsException {
-		return super.getVersion();
-	}
-
-	@GET
-	@Path("/rest/config")
-	public MetaObject getConfigMeta() throws WsException {
-		MetaObject meta = super.getConfigMeta();
-		return meta;
-	}
-
-	@GET
-	@Path("/rest/remove{appPath: .+?}")
-	public void removeSwingApp(@PathParam("appPath") String path) throws Exception {
-		checkMasterPermission(WebswingAction.rest_removeApp);
-		if (!StringUtils.isEmpty(path)) {
-			SwingInstanceManager swingManager = instanceManagers.get(path);
-			if (swingManager != null) {
-				if (!swingManager.isEnabled()) {
-					configService.removeConfiguration(path);
-				} else {
-					throw new WsException("Unable to Remove App '" + path + "' while running. Stop the app first");
-				}
-			}
-		} else {
-			throw new WsException("Unable to remove App '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
-		}
-	}
-
-	@GET
-	@Path("/rest/create{appPath: .+?}")
-	public void createSwingApp(@PathParam("appPath") String path) throws Exception {
-		checkMasterPermission(WebswingAction.rest_createApp);
-		if (!StringUtils.isEmpty(path)) {
-			SwingInstanceManager swingManager = instanceManagers.get(path);
-			if (swingManager == null) {
-				Map<String, Object> config = new HashMap<>();
-				config.put("enabled", false);
-				configService.setConfiguration(path, config);//first create with enabled:false to prevent initiation
-				configService.setConfiguration(path, null);//once exists,
-			} else {
-				throw new WsException("Unable to Create App '" + path + "'. Application already exits.");
-			}
-		} else {
-			throw new WsException("Unable to create App '" + path + "'", HttpServletResponse.SC_BAD_REQUEST);
-		}
-	}
-
-	@POST
-	@Path("/rest/config")
-	public void saveConfig(Map<String, Object> config) throws Exception {
-		checkMasterPermission(WebswingAction.rest_setConfig);
-		config.put("path", "/");
-		configService.setConfiguration("/", config);
-	}
-
-	@GET
-	@Path("/rest/permissions")
-	public Map<String, Boolean> getPermissions() throws Exception {
-		Map<String, Boolean> perm = super.getPermissions();
-		boolean multiApplicationMode = configService.isMultiApplicationMode();
-		perm.put("start", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_startApp));
-		perm.put("stop", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_stopApp));
-		perm.put("remove", multiApplicationMode && isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_removeApp));
-		perm.put("create", multiApplicationMode && isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_createApp));
-		perm.put("configEdit", isMasterPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig, WebswingAction.rest_setConfig));
-		perm.put("logsView", isMasterPermited(WebswingAction.rest_viewLogs));
-		return perm;
-	}
-
-	@POST
-	@Path("/rest/metaConfig")
-	public MetaObject getMeta(Map<String, Object> json) throws WsException {
-		return super.getMeta(json);
-	}
-
-	@GET
-	@Path("/rest/variables/{type}")
-	public Map<String, String> getVariables(@PathParam("type") String type) throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
-		return super.getVariables(type);
-	}
-
-	@POST
-	@Path("/rest/logs/{type}")
-	public LogResponse getLogs(@PathParam("type") String type, LogRequest request) throws WsException {
-		checkMasterPermission(WebswingAction.rest_viewLogs);
-		return LogReaderUtil.readLog(type, request);
-	}
-
-	@GET
-	@Path("/rest/logs/{type}")
-	public Response downloadLog(@PathParam("type") String type) throws WsException {
-		checkMasterPermission(WebswingAction.rest_viewLogs);
-		Response.ResponseBuilder builder = Response.ok(LogReaderUtil.getZippedLog(type), MediaType.APPLICATION_OCTET_STREAM);
-		builder.header("content-disposition", "attachment; filename = "+type+".zip");
-		return builder.build();
-	}
-
-	@GET
-	@Path("/rest/CSRFToken")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String generateCsrfToken() {
-		return super.generateCsrfToken();
-	}
 }

@@ -10,9 +10,12 @@ public interface SwingInstanceHolder {
 
 	SwingInstance findInstanceByClientId(String clientId);
 
+	SwingInstance findInstanceByInstanceId(String instanceId);
+
 	List<SwingInstance> getAllInstances();
 
 	List<SwingInstance> getAllClosedInstances();
 	
 	List<SwingInstanceManager> getApplications();
+
 }

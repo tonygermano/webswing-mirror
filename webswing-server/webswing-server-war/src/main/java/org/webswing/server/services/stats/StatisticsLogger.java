@@ -3,7 +3,7 @@ package org.webswing.server.services.stats;
 import java.util.List;
 import java.util.Map;
 
-public interface StatisticsLogger {
+public interface StatisticsLogger extends StatisticsReader{
 
 	public static final String INBOUND_SIZE_METRIC = "inboundSize";
 	public static final String OUTBOUND_SIZE_METRIC = "outboundSize";
@@ -20,19 +20,6 @@ public interface StatisticsLogger {
 
 	void log(String instance, String name, Number value);
 
-	Map<String, Map<Long, Number>> getSummaryStats();
-	
-	Map<String,List<String>> getSummaryWarnings();
-
-	Map<String, Map<Long, Number>> getInstanceStats(String instance);
-
-	Map<String, Number> getInstanceMetrics(String clientId);
-
-	List<String> getInstanceWarnings(String instance);
-
-	List<String> getInstanceWarningHistory(String instance);
-	
 	void removeInstance(String instance);
-
 
 }

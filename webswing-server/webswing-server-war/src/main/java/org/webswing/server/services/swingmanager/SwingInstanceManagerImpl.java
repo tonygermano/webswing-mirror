@@ -27,6 +27,7 @@ import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.modules.SecurityModuleService;
 import org.webswing.server.services.stats.StatisticsLogger;
 import org.webswing.server.services.stats.StatisticsLoggerService;
+import org.webswing.server.services.stats.StatisticsReader;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swinginstance.SwingInstanceService;
 import org.webswing.server.services.websocket.WebSocketConnection;
@@ -42,8 +43,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@Path("")
-@Produces(MediaType.APPLICATION_JSON)
 public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements SwingInstanceManager {
 	private static final Logger log = LoggerFactory.getLogger(SwingInstanceManagerImpl.class);
 
@@ -84,7 +83,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 			registerChildUrlHandler(handler);
 		}
 		registerChildUrlHandler(resourceService.create(this, this));
-		registerChildUrlHandler(restService.createRestHandler(this));
+		registerChildUrlHandler(restService.createSwingAppRestHandler(this));
 		super.init();
 	}
 
@@ -188,6 +187,11 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	@Override
+	public SwingInstance findInstanceByInstanceId(String instanceId) {
+		return runningInstances.findByInstanceId(instanceId);
+	}
+
+	@Override
 	public SwingInstance findInstanceByClientId(String clientId) {
 		return runningInstances.findByClientId(clientId);
 	}
@@ -220,230 +224,14 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		return app;
 	}
 
-	@GET
-	@Path("/start")
-	public Response start() throws WsException {
-		checkMasterPermission(WebswingAction.rest_startApp);
-		if (!isEnabled()) {
-			super.initConfiguration();
-		}
-		return Response.ok().build();
-	}
-
-	@GET
-	@Path("/stop")
-	public Response stop() throws WsException {
-		checkMasterPermission(WebswingAction.rest_stopApp);
-		if (isEnabled()) {
-			super.disable();
-		}
-		return Response.ok().build();
-	}
-
-	@GET
-	@Path("/info")
-	public ApplicationInfo getApplicationInfoRest() throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getAppInfo);
-		ApplicationInfo app = new ApplicationInfo();
-		app.setPath(getPathMapping());
-		app.setEnabled(isEnabled());
-		app.setUrl(getFullPathMapping());
-		app.setName(getSwingConfig().getName());
-		File icon = resolveFile(getConfig().getIcon());
-		app.setIcon(CommonUtil.loadImage(icon));
-		app.setConfig(getConfig());
-		app.setVariables(varSubs.getVariableMap());
-		app.setRunningInstances(runningInstances.size());
-		int connected = 0;
-		for (SwingInstance si : runningInstances.getAllInstances()) {
-			if (si.getSessionId() != null) {
-				connected++;
-			}
-		}
-		app.setConnectedInstances(connected);
-		app.setFinishedInstances(closedInstances.size());
-		int maxRunningInstances = getSwingConfig().getMaxClients();
-		app.setMaxRunningInstances(maxRunningInstances);
-		app.setStatus(getStatus());
-		app.setStats(statsLogger.getSummaryStats());
-		app.setWarnings(statsLogger.getSummaryWarnings());
-		return app;
-	}
-
-	@GET
-	@Path("/apps")
-	public List<ApplicationInfoMsg> getApplicationInfo() throws WsException {
-		checkPermission(WebswingAction.rest_getApps);
-		return Arrays.asList(getApplicationInfoMsg());
-	}
-
-	@GET
-	@Path("/rest/paths")
-	public List<String> getApplicationsRest() throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getPaths);
-		return Arrays.asList(getFullPathMapping());
-	}
-
-	@GET
-	@Path("/rest/version")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String getVersion() throws WsException {
-		return super.getVersion();
-	}
-
-	@GET
-	@Path("/rest/config")
-	public MetaObject getConfigMeta() throws WsException {
-		MetaObject meta = super.getConfigMeta();
-		return meta;
-	}
-
-	@POST
-	@Path("/rest/config")
-	public void setConfig(Map<String, Object> config) throws Exception {
-		super.setConfig(config);
-	}
-
-	@GET
-	@Path("/rest/permissions")
-	public Map<String, Boolean> getPermissions() throws Exception {
-		return super.getPermissions();
-	}
-
-	@GET
-	@Path("/rest/sessions")
-	public Sessions getSessions() throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
-		Sessions result = new Sessions();
-		for (SwingInstance si : getAllInstances()) {
-			result.getSessions().add(si.toSwingSession(false));
-		}
-		for (SwingInstance si : getAllClosedInstances()) {
-			result.getClosedSessions().add(si.toSwingSession(false));
-		}
-		return result;
-	}
-
-	@GET
-	@Path("/rest/session/{id}")
-	public SwingSession getSession(@PathParam("id") String id) throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
-		SwingInstance instance = runningInstances.findByInstanceId(id);
-		if (instance != null) {
-			return instance.toSwingSession(true);
-		}
-		return null;
-	}
-
-	@GET
-	@Path("/rest/record/{id}")
-	public SwingSession startRecording(@PathParam("id") String id) throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_startRecording);
-		SwingInstance instance = runningInstances.findByInstanceId(id);
-		if (instance != null) {
-			instance.startRecording();
-			return instance.toSwingSession(true);
-		}
-		return null;
-	}
-
-	@GET
-	@Path("/rest/threadDump/{path}")
-	public String getThreadDump(@PathParam("path") String id, @QueryParam("id") String timestamp) throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getThreadDump);
-		SwingInstance instance = runningInstances.findByInstanceId(id);
-		if (instance != null) {
-			return instance.getThreadDump(timestamp);
-		}else{
-			List<SwingInstance> instaces = closedInstances.getAllInstances();//closed instances can have multiple instances for same id, need to manually check all
-			for(SwingInstance i:instaces){
-				if(id.equals(i.getInstanceId())){
-					String td = i.getThreadDump(timestamp);
-					if(td!=null){
-						return td;
-					}
-				}
-			}
-			throw new WsException("Not found", 404);
-		}
-	}
-
-	@POST
-	@Path("/rest/threadDump/{path}")
-	public void requestThreadDump(@PathParam("path") String id) throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_requestThreadDump);
-		SwingInstance instance = runningInstances.findByInstanceId(id);
-		if (instance != null) {
-			instance.requestThreadDump();
-		}
-	}
-
-	@DELETE
-	@Path("/rest/session/{id}")
-	public void shutdown(@PathParam("id") String id, @QueryParam("force") String forceKill) throws WsException {
-		boolean force = Boolean.parseBoolean(forceKill);
-		if (force) {
-			checkPermissionLocalOrMaster(WebswingAction.rest_sessionShutdown);
-		} else {
-			checkPermissionLocalOrMaster(WebswingAction.rest_sessionShutdownForce);
-		}
-		SwingInstance instance = runningInstances.findByInstanceId(id);
-		if (instance != null) {
-			instance.shutdown(force);
-		} else {
-			throw new WsException("Instance with id " + id + " not found.");
-		}
-	}
-
-	@POST
-	@Path("/rest/metaConfig")
-	public MetaObject getMeta(Map<String, Object> json) throws WsException {
-		return super.getMeta(json);
-	}
-
-	@GET
-	@Path("/rest/variables/{type}")
-	public Map<String, String> getVariables(@PathParam("type") String type) throws WsException {
-		checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
-		return super.getVariables(type);
-	}
-
-	@GET
-	@Path("/rest/CSRFToken")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String generateCsrfToken() {
-		return super.generateCsrfToken();
-	}
-
-	@GET
-	@Path("/rest/ping")
-	public void ping() {
-		//responds with 200 OK status
-	}
-
 	@Override
 	public void logStatValue(String instance, String name, Number value) {
 		statsLogger.log(instance, name, value);
 	}
 
 	@Override
-	public Map<String, Map<Long, Number>> getInstanceStats(String instance) {
-		return statsLogger.getInstanceStats(instance);
-	}
-
-	@Override
-	public Map<String, Number> getInstanceMetrics(String clientId) {
-		return statsLogger.getInstanceMetrics(clientId);
-	}
-
-	@Override
-	public List<String> getInstanceWarnings(String instance) {
-		return statsLogger.getInstanceWarnings(instance);
-	}
-
-	@Override
-	public List<String> getInstanceWarningHistory(String instance) {
-		return statsLogger.getInstanceWarningHistory(instance);
+	public StatisticsReader getStatsReader() {
+		return statsLogger;
 	}
 
 	private void checkAuthorization() throws WsException {

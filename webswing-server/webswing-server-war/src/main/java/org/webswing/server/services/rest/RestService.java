@@ -1,8 +1,12 @@
 package org.webswing.server.services.rest;
 
+import org.webswing.server.GlobalUrlHandler;
+import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 
 public interface RestService {
 
-	public RestUrlHandler createRestHandler(UrlHandler parent, Object... registrations);
+	RestUrlHandler createGlobalRestHandler(GlobalUrlHandler parent);
+
+	RestUrlHandler createSwingAppRestHandler(PrimaryUrlHandler parent);
 }

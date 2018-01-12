@@ -38,6 +38,7 @@ import org.webswing.server.services.jvmconnection.JvmListener;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.modules.AbstractSecurityModule;
 import org.webswing.server.services.stats.StatisticsLogger;
+import org.webswing.server.services.stats.StatisticsReader;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingprocess.ProcessExitListener;
 import org.webswing.server.services.swingprocess.SwingProcess;
@@ -420,13 +421,14 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		session.setUserBrowser(userBrowser);
 		session.setEndedAt(getEndedAt());
 		session.setStatus(getStatus());
+		StatisticsReader statReader = manager.getStatsReader();
 		if (stats) {
-			session.setStats(manager.getInstanceStats(getClientId()));
+			session.setStats(statReader.getInstanceStats(getClientId()));
 		}
-		session.setMetrics(manager.getInstanceMetrics(getClientId()));
-		session.setWarnings(manager.getInstanceWarnings(getClientId()));
+		session.setMetrics(statReader.getInstanceMetrics(getClientId()));
+		session.setWarnings(statReader.getInstanceWarnings(getClientId()));
 		if (isRunning()) {
-			session.setWarningHistory(manager.getInstanceWarningHistory(getClientId()));
+			session.setWarningHistory(statReader.getInstanceWarningHistory(getClientId()));
 		} else {
 			session.setWarningHistory(warningHistoryLog);
 		}
@@ -709,9 +711,10 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	@Override
 	public void logWarningHistory() {
-		List<String> current = manager.getInstanceWarnings(getClientId());
+		StatisticsReader statReader = manager.getStatsReader();
+		List<String> current = statReader.getInstanceWarnings(getClientId());
 		if (current != null) {
-			current.addAll(manager.getInstanceWarningHistory(getClientId()));
+			current.addAll(statReader.getInstanceWarningHistory(getClientId()));
 		}
 		warningHistoryLog = current;
 	}
