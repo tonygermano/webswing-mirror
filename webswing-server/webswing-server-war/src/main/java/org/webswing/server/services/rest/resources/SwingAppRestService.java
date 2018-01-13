@@ -163,12 +163,12 @@ public class SwingAppRestService extends BaseRestService {
 	}
 
 	@Override
-	PrimaryUrlHandler getHandler() {
+	protected PrimaryUrlHandler getHandler() {
 		return handler;
 	}
 
 	@Override
-	ConfigurationService getConfigService() {
+	protected ConfigurationService getConfigService() {
 		return configService;
 	}
 

@@ -133,7 +133,7 @@ public class GlobalRestService extends BaseRestService {
 	}
 
 	@Override
-	PrimaryUrlHandler getHandler() {
+	protected PrimaryUrlHandler getHandler() {
 		return handler;
 	}
 
@@ -142,7 +142,7 @@ public class GlobalRestService extends BaseRestService {
 	}
 
 	@Override
-	ConfigurationService getConfigService() {
+	protected ConfigurationService getConfigService() {
 		return configService;
 	}
 }

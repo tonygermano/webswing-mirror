@@ -22,9 +22,9 @@ import java.util.Map;
 public abstract class BaseRestService {
 	private static final String default_version = "unresolved";
 
-	abstract PrimaryUrlHandler getHandler();
+	protected abstract PrimaryUrlHandler getHandler();
 
-	abstract ConfigurationService getConfigService();
+	protected abstract ConfigurationService getConfigService();
 
 	@GET
 	@Path("/apps")
@@ -55,8 +55,6 @@ public abstract class BaseRestService {
 		app.setStatus(h.getStatus());
 		return app;
 	}
-
-	;
 
 	@GET
 	@Path("/rest/paths")
