@@ -45,7 +45,8 @@ public class SwingInstanceManagerServiceImpl implements SwingInstanceManagerServ
 	}
 
 	public SwingInstanceManager createApp(UrlHandler parent, String path) {
-		return new SwingInstanceManagerImpl(parent, path, instanceService, websocket, fileService, loginService, resourceHandler, securityModuleService, configService, loggerService, extService, restService);
+		SwingInstanceHolderProvider holder = new SwingInstanceHolderImpl();
+		return new SwingInstanceManagerImpl(parent, path, instanceService, websocket, fileService, loginService, resourceHandler, securityModuleService, configService, loggerService, extService, restService, holder);
 	}
 
 }

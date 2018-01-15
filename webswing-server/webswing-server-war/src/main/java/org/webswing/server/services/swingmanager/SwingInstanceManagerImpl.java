@@ -1,5 +1,11 @@
 package org.webswing.server.services.swingmanager;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
@@ -7,15 +13,11 @@ import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
-import org.webswing.server.common.model.admin.ApplicationInfo;
-import org.webswing.server.common.model.admin.Sessions;
-import org.webswing.server.common.model.admin.SwingSession;
-import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.VariableSubstitutor;
+import org.webswing.server.extension.ExtensionService;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
-import org.webswing.server.extension.ExtensionService;
 import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.files.FileTransferHandlerService;
 import org.webswing.server.services.resources.ResourceHandlerService;
@@ -33,16 +35,6 @@ import org.webswing.server.services.swinginstance.SwingInstanceService;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements SwingInstanceManager {
 	private static final Logger log = LoggerFactory.getLogger(SwingInstanceManagerImpl.class);
 
@@ -55,11 +47,10 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	private FileTransferHandler fileHandler;
 	private final ExtensionService extService;
 	private final RestService restService;
-	private SwingInstanceSet runningInstances = new SwingInstanceSet();
-	private SwingInstanceSet closedInstances = new SwingInstanceSet();
+	private final SwingInstanceHolderProvider instanceHolder;
 
 	public SwingInstanceManagerImpl(UrlHandler parent, String path, SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileService, LoginHandlerService loginService, ResourceHandlerService resourceService, SecurityModuleService securityModuleService, ConfigurationService configService,
-			StatisticsLoggerService loggerService, ExtensionService extService, RestService restService) {
+			StatisticsLoggerService loggerService, ExtensionService extService, RestService restService, SwingInstanceHolderProvider instanceHolder) {
 		super(parent, securityModuleService, configService);
 		this.path = path;
 		this.instanceFactory = instanceFactory;
@@ -70,6 +61,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		this.fileHandler = fileService.create(this);
 		this.extService = extService;
 		this.restService = restService;
+		this.instanceHolder = instanceHolder;
 	}
 
 	@Override
@@ -89,7 +81,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 
 	@Override
 	public void destroy() {
-		for (SwingInstance i : runningInstances.getAllInstances()) {
+		for (SwingInstance i : instanceHolder.getAllInstances()) {
 			i.kill(0);
 		}
 		super.destroy();
@@ -116,9 +108,9 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 			SwingInstance instance;
 			if (handshake.isMirrored()) {
 				checkPermissionLocalOrMaster(WebswingAction.websocket_startMirrorView);
-				instance = runningInstances.findByInstanceId(handshake.getClientId());
+				instance = instanceHolder.findInstanceByInstanceId(handshake.getClientId());
 			} else {
-				instance = runningInstances.findByInstanceId(handshake, r);
+				instance = instanceHolder.findInstanceByInstanceId(handshake, r);
 			}
 			if (instance != null) {
 				instance.connectSwingInstance(r, handshake);
@@ -141,7 +133,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 				if (!reachedMaxConnections()) {
 					try {
 						SwingInstance swingInstance = instanceFactory.create(this, fileHandler, h, getSwingConfig(), r);
-						runningInstances.add(swingInstance);
+						instanceHolder.add(swingInstance);
 					} catch (Exception e) {
 						log.error("Failed to create Application instance.", e);
 					}
@@ -157,7 +149,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	}
 
 	protected void killAll() {
-		for (SwingInstance si : runningInstances.getAllInstances()) {
+		for (SwingInstance si : instanceHolder.getAllInstances()) {
 			si.shutdown(true);
 		}
 	}
@@ -168,42 +160,39 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		} else if (getSwingConfig().getMaxClients() == 0) {
 			return true;
 		} else {
-			return runningInstances.size() >= getSwingConfig().getMaxClients();
+			return instanceHolder.getRunningInstancesCount() >= getSwingConfig().getMaxClients();
 		}
 	}
 
 	public void notifySwingClose(SwingInstance swingInstance) {
-		if (!closedInstances.contains(swingInstance)) {
-			closedInstances.add(swingInstance);
-		}
-		runningInstances.remove(swingInstance.getInstanceId());
+		instanceHolder.remove(swingInstance);
 		swingInstance.logWarningHistory();
 		statsLogger.removeInstance(swingInstance.getClientId());
 	}
 
 	@Override
 	public SwingInstance findInstanceBySessionId(String uuid) {
-		return runningInstances.findBySessionId(uuid);
+		return instanceHolder.findInstanceBySessionId(uuid);
 	}
 
 	@Override
 	public SwingInstance findInstanceByInstanceId(String instanceId) {
-		return runningInstances.findByInstanceId(instanceId);
+		return instanceHolder.findInstanceByInstanceId(instanceId);
 	}
 
 	@Override
 	public SwingInstance findInstanceByClientId(String clientId) {
-		return runningInstances.findByClientId(clientId);
+		return instanceHolder.findInstanceByClientId(clientId);
 	}
 
 	@Override
 	public List<SwingInstance> getAllInstances() {
-		return runningInstances.getAllInstances();
+		return instanceHolder.getAllInstances();
 	}
 
 	@Override
 	public List<SwingInstance> getAllClosedInstances() {
-		return closedInstances.getAllInstances();
+		return instanceHolder.getAllClosedInstances();
 	}
 
 	@Override
