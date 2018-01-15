@@ -351,14 +351,15 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
         }
 
         function download(url) {
-            var hiddenIFrameID = 'hiddenDownloader', iframe = document.getElementById(hiddenIFrameID);
-            if (iframe === null) {
-                iframe = document.createElement('iframe');
-                iframe.id = hiddenIFrameID;
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
-            }
-            iframe.src = api.cfg.connectionUrl + url;
+             var hiddenIFrameID = 'hiddenDownloader'+url, iframe = document.getElementById(hiddenIFrameID);
+             if(iframe!=null){
+                iframe.parentNode.removeChild(iframe);
+             }
+             iframe = document.createElement('iframe');
+             iframe.id = hiddenIFrameID;
+             iframe.style.display = 'none';
+             document.body.appendChild(iframe);
+             iframe.src = api.cfg.connectionUrl + url;
         }
 
         function link(url) {
