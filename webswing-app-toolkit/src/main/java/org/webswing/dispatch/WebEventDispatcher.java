@@ -42,6 +42,7 @@ public class WebEventDispatcher {
 	protected MouseEvent lastMouseEvent;
 	protected MouseEventInfo lastMousePressEvent;
 	protected Point lastMousePosition = new Point();
+	private static Component lastEnteredWindow;
 	private static final DndEventHandler dndHandler = new DndEventHandler();
 	private HashMap<String, String> uploadMap = new HashMap<String, String>();
 	private ExecutorService eventDispatcher = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing Event Dispatcher"));
@@ -225,7 +226,7 @@ public class WebEventDispatcher {
 			c = Util.getWebToolkit().getWindowManager().getLockedToWindow();
 		} else {
 			c = Util.getWebToolkit().getWindowManager().getVisibleComponentOnPosition(event.getX(), event.getY());
-			if (lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup))) {
+			if (!dndHandler.isDndInProgress() && lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup))) {
 				c = (Component) lastMouseEvent.getSource();
 			}
 		}
@@ -233,6 +234,7 @@ public class WebEventDispatcher {
 			if (Util.getWebToolkit().getPaintDispatcher() != null) {
 				Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
+			dispatchExitEvent(System.currentTimeMillis(), 0, -1, -1, event.getX(), event.getY());
 			return;
 		}
 		if (c != null && c.isShowing()) {
@@ -298,7 +300,6 @@ public class WebEventDispatcher {
 			default:
 				break;
 			}
-
 		}
 	}
 
@@ -439,8 +440,29 @@ public class WebEventDispatcher {
 				dndHandler.processMouseEvent(w, e);
 			} else {
 				Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
+				dispatchEnterExitEvents(w, e);
 				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
 			}
+		}
+	}
+
+	private static void dispatchEnterExitEvents(Window w, AWTEvent e) {
+		if (e instanceof MouseEvent && lastEnteredWindow != w) {
+			MouseEvent oe = (MouseEvent) e;
+			dispatchExitEvent(oe.getWhen(), oe.getModifiersEx() | oe.getModifiers(), oe.getX(), oe.getY(), oe.getXOnScreen(), oe.getYOnScreen());
+			if (w != null) {
+				MouseEvent enterEvent = new MouseEvent(w, MouseEvent.MOUSE_ENTERED, oe.getWhen(), oe.getModifiersEx() | oe.getModifiers(), oe.getX(), oe.getY(), oe.getXOnScreen(), oe.getYOnScreen(), oe.getClickCount(), oe.isPopupTrigger(), oe.getButton());
+				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(enterEvent);
+			}
+			lastEnteredWindow = w;
+		}
+	}
+
+	private static void dispatchExitEvent(long when, int mod, int x, int y, int absX, int absY) {
+		if (lastEnteredWindow != null && lastEnteredWindow.isShowing()) {
+			MouseEvent exitEvent = new MouseEvent(lastEnteredWindow, MouseEvent.MOUSE_EXITED, when, mod, x, y, absX, absY, 0, false, 0);
+			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(exitEvent);
+			lastEnteredWindow = null;
 		}
 	}
 
