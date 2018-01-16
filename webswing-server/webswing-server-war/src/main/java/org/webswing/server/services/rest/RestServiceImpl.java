@@ -1,12 +1,8 @@
 package org.webswing.server.services.rest;
 
-import org.atmosphere.annotation.WebSocketProtocolServiceProcessor;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.webswing.server.GlobalUrlHandler;
 import org.webswing.server.base.PrimaryUrlHandler;
-import org.webswing.server.base.UrlHandler;
-import org.webswing.server.base.WebswingService;
-import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.rest.resources.GlobalRestService;
 import org.webswing.server.services.rest.resources.SwingAppRestService;
@@ -14,7 +10,6 @@ import org.webswing.server.services.swingmanager.SwingInstanceManager;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.ServletContext;
 
 @Singleton
 public class RestServiceImpl implements RestService {

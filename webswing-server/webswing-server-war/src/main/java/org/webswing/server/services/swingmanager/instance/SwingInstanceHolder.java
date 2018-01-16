@@ -1,4 +1,4 @@
-package org.webswing.server.services.swingmanager;
+package org.webswing.server.services.swingmanager.instance;
 
 import java.util.List;
 
@@ -8,14 +8,14 @@ public interface SwingInstanceHolder {
 
 	SwingInstance findInstanceBySessionId(String uuid);
 
-	SwingInstance findInstanceByClientId(String clientId);
-
 	SwingInstance findInstanceByInstanceId(String instanceId);
 
 	List<SwingInstance> getAllInstances();
 
 	List<SwingInstance> getAllClosedInstances();
 	
-	List<SwingInstanceManager> getApplications();
+	void add(SwingInstance swingInstance);
+
+	void remove(SwingInstance swingInstance);
 
 }

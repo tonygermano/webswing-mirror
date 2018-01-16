@@ -1,4 +1,4 @@
-package org.webswing.server.services.swingmanager;
+package org.webswing.server.services.swingmanager.instance;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,25 +38,6 @@ public class SwingInstanceSet {
 		return null;
 	}
 
-	public synchronized SwingInstance findByClientId(String clientId) {
-		for (SwingInstance i : instances) {
-			if (clientId != null && clientId.equals(i.getClientId())) {
-				return i;
-			}
-		}
-		return null;
-	}
-
-	public synchronized SwingInstance findByInstanceId(ConnectionHandshakeMsgIn h, WebSocketConnection r) {
-		for (SwingInstance i : instances) {
-			String idForMode = ServerUtil.resolveInstanceIdForMode(r, h, i.getAppConfig());
-			if (idForMode != null && idForMode.equals(i.getInstanceId())) {
-				return i;
-			}
-		}
-		return null;
-	}
-
 	public synchronized SwingInstance findByInstanceId(String instanceId) {
 		for (SwingInstance i : instances) {
 			if (instanceId != null && instanceId.equals(i.getInstanceId())) {
@@ -67,7 +48,7 @@ public class SwingInstanceSet {
 	}
 
 	public synchronized List<SwingInstance> getAllInstances() {
-		return new ArrayList<SwingInstance>(instances);
+		return new ArrayList<>(instances);
 	}
 
 }

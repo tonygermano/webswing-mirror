@@ -21,6 +21,7 @@ import org.webswing.server.services.security.api.WebswingSecurityConfig;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
 import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.security.modules.SecurityModuleService;
+import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
 
@@ -77,7 +78,9 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		}
 	}
 
-	public synchronized void initConfiguration() {
+	public abstract  List<SwingInstanceManager> getApplications();
+
+ 	public synchronized void initConfiguration() {
 		status.setStatus(Status.Starting);
 		String path = StringUtils.isEmpty(getPathMapping()) ? "/" : getPathMapping();
 		config = configService.getConfiguration(path);
@@ -328,4 +331,5 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	public void setToSecuritySession(String attributeName, Object value) {
 		SecurityUtil.setToSecuritySession(attributeName, value);
 	}
+
 }

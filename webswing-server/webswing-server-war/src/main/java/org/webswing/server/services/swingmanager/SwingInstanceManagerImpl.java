@@ -32,8 +32,10 @@ import org.webswing.server.services.stats.StatisticsLoggerService;
 import org.webswing.server.services.stats.StatisticsReader;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swinginstance.SwingInstanceService;
+import org.webswing.server.services.swingmanager.instance.SwingInstanceHolder;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
+import org.webswing.server.util.ServerUtil;
 
 public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements SwingInstanceManager {
 	private static final Logger log = LoggerFactory.getLogger(SwingInstanceManagerImpl.class);
@@ -47,10 +49,10 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	private FileTransferHandler fileHandler;
 	private final ExtensionService extService;
 	private final RestService restService;
-	private final SwingInstanceHolderProvider instanceHolder;
+	private final SwingInstanceHolder instanceHolder;
 
 	public SwingInstanceManagerImpl(UrlHandler parent, String path, SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileService, LoginHandlerService loginService, ResourceHandlerService resourceService, SecurityModuleService securityModuleService, ConfigurationService configService,
-			StatisticsLoggerService loggerService, ExtensionService extService, RestService restService, SwingInstanceHolderProvider instanceHolder) {
+			StatisticsLoggerService loggerService, ExtensionService extService, RestService restService, SwingInstanceHolder instanceHolder) {
 		super(parent, securityModuleService, configService);
 		this.path = path;
 		this.instanceFactory = instanceFactory;
@@ -110,7 +112,8 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 				checkPermissionLocalOrMaster(WebswingAction.websocket_startMirrorView);
 				instance = instanceHolder.findInstanceByInstanceId(handshake.getClientId());
 			} else {
-				instance = instanceHolder.findInstanceByInstanceId(handshake, r);
+				String idForMode = ServerUtil.resolveInstanceIdForMode(r, handshake, getSwingConfig());
+				instance = instanceHolder.findInstanceByInstanceId(idForMode);
 			}
 			if (instance != null) {
 				instance.connectSwingInstance(r, handshake);
@@ -160,7 +163,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		} else if (getSwingConfig().getMaxClients() == 0) {
 			return true;
 		} else {
-			return instanceHolder.getRunningInstancesCount() >= getSwingConfig().getMaxClients();
+			return instanceHolder.getAllInstances().size() >= getSwingConfig().getMaxClients();
 		}
 	}
 
@@ -168,31 +171,6 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		instanceHolder.remove(swingInstance);
 		swingInstance.logWarningHistory();
 		statsLogger.removeInstance(swingInstance.getClientId());
-	}
-
-	@Override
-	public SwingInstance findInstanceBySessionId(String uuid) {
-		return instanceHolder.findInstanceBySessionId(uuid);
-	}
-
-	@Override
-	public SwingInstance findInstanceByInstanceId(String instanceId) {
-		return instanceHolder.findInstanceByInstanceId(instanceId);
-	}
-
-	@Override
-	public SwingInstance findInstanceByClientId(String clientId) {
-		return instanceHolder.findInstanceByClientId(clientId);
-	}
-
-	@Override
-	public List<SwingInstance> getAllInstances() {
-		return instanceHolder.getAllInstances();
-	}
-
-	@Override
-	public List<SwingInstance> getAllClosedInstances() {
-		return instanceHolder.getAllClosedInstances();
 	}
 
 	@Override
@@ -253,6 +231,11 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public SwingInstanceHolder getSwingInstanceHolder() {
+		return instanceHolder;
 	}
 
 }

@@ -38,6 +38,9 @@ import org.webswing.server.services.swinginstance.SwingInstanceService;
 import org.webswing.server.services.swinginstance.SwingInstanceServiceImpl;
 import org.webswing.server.services.swingmanager.SwingInstanceManagerService;
 import org.webswing.server.services.swingmanager.SwingInstanceManagerServiceImpl;
+import org.webswing.server.services.swingmanager.instance.SwingInstanceHolder;
+import org.webswing.server.services.swingmanager.instance.SwingInstanceHolderService;
+import org.webswing.server.services.swingmanager.instance.SwingInstanceHolderServiceImpl;
 import org.webswing.server.services.swingprocess.SwingProcessService;
 import org.webswing.server.services.swingprocess.SwingProcessServiceImpl;
 import org.webswing.server.services.websocket.WebSocketService;
@@ -63,6 +66,7 @@ public class WebswingServerModule extends AbstractModule {
 		bind(JmsService.class).to(JmsServiceImpl.class);
 		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
 		bind(SwingInstanceManagerService.class).to(SwingInstanceManagerServiceImpl.class);
+		bind(SwingInstanceHolderService.class).to(SwingInstanceHolderServiceImpl.class);
 		bind(SwingInstanceService.class).to(SwingInstanceServiceImpl.class);
 		bind(JvmConnectionService.class).to(JvmConnectionServiceImpl.class);
 		bind(SwingProcessService.class).to(SwingProcessServiceImpl.class);

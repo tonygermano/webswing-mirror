@@ -1,12 +1,10 @@
-package org.webswing.server.services.swingmanager;
+package org.webswing.server.services.swingmanager.instance;
 
 import java.util.List;
 
-import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.server.services.swinginstance.SwingInstance;
-import org.webswing.server.services.websocket.WebSocketConnection;
 
-public class SwingInstanceHolderImpl implements SwingInstanceHolderProvider{
+public class SwingInstanceHolderImpl implements SwingInstanceHolder{
 
 	private SwingInstanceSet runningInstances = new SwingInstanceSet();
 	private SwingInstanceSet closedInstances = new SwingInstanceSet();
@@ -22,11 +20,6 @@ public class SwingInstanceHolderImpl implements SwingInstanceHolderProvider{
 	}
 
 	@Override
-	public SwingInstance findInstanceByClientId(String clientId) {
-		return runningInstances.findByClientId(clientId);
-	}
-
-	@Override
 	public List<SwingInstance> getAllInstances() {
 		return runningInstances.getAllInstances();
 	}
@@ -37,23 +30,8 @@ public class SwingInstanceHolderImpl implements SwingInstanceHolderProvider{
 	}
 
 	@Override
-	public List<SwingInstanceManager> getApplications() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public SwingInstance findInstanceByInstanceId(ConnectionHandshakeMsgIn handshake, WebSocketConnection r) {
-		return runningInstances.findByInstanceId(handshake, r);
-	}
-
-	@Override
 	public void add(SwingInstance swingInstance) {
 		runningInstances.add(swingInstance);		
-	}
-
-	@Override
-	public int getRunningInstancesCount() {
-		return runningInstances.size();
 	}
 
 	@Override

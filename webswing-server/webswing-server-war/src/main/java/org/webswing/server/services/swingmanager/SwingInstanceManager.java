@@ -1,8 +1,6 @@
 package org.webswing.server.services.swingmanager;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
@@ -11,9 +9,10 @@ import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.stats.StatisticsReader;
 import org.webswing.server.services.swinginstance.SwingInstance;
+import org.webswing.server.services.swingmanager.instance.SwingInstanceHolder;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
-public interface SwingInstanceManager extends SecuredPathHandler, SwingInstanceHolder, UrlHandler {
+public interface SwingInstanceManager extends SecuredPathHandler, UrlHandler {
 
 	File resolveFile(String name);
 
@@ -32,5 +31,7 @@ public interface SwingInstanceManager extends SecuredPathHandler, SwingInstanceH
 	boolean isUserAuthorized();
 
 	void disable();
+
+	SwingInstanceHolder getSwingInstanceHolder();
 
 }

@@ -10,6 +10,9 @@ import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.modules.SecurityModuleService;
 import org.webswing.server.services.stats.StatisticsLoggerService;
 import org.webswing.server.services.swinginstance.SwingInstanceService;
+import org.webswing.server.services.swingmanager.instance.SwingInstanceHolder;
+import org.webswing.server.services.swingmanager.instance.SwingInstanceHolderImpl;
+import org.webswing.server.services.swingmanager.instance.SwingInstanceHolderService;
 import org.webswing.server.services.websocket.WebSocketService;
 
 import com.google.inject.Inject;
@@ -28,10 +31,11 @@ public class SwingInstanceManagerServiceImpl implements SwingInstanceManagerServ
 	private final StatisticsLoggerService loggerService;
 	private final ExtensionService extService;
 	private final RestService restService;
+	private final SwingInstanceHolderService instanceHolderService;
 
 	@Inject
 	public SwingInstanceManagerServiceImpl(SwingInstanceService instanceFactory, WebSocketService websocket, FileTransferHandlerService fileHandler, LoginHandlerService loginHandler, ResourceHandlerService resourceHandler, SecurityModuleService securityModuleService, ConfigurationService configService, StatisticsLoggerService loggerService,
-			ExtensionService extService, RestService restService) {
+			ExtensionService extService, RestService restService, SwingInstanceHolderService instanceHolderService) {
 		this.instanceService = instanceFactory;
 		this.websocket = websocket;
 		this.fileService = fileHandler;
@@ -42,10 +46,11 @@ public class SwingInstanceManagerServiceImpl implements SwingInstanceManagerServ
 		this.loggerService = loggerService;
 		this.extService = extService;
 		this.restService = restService;
+		this.instanceHolderService = instanceHolderService;
 	}
 
 	public SwingInstanceManager createApp(UrlHandler parent, String path) {
-		SwingInstanceHolderProvider holder = new SwingInstanceHolderImpl();
+		SwingInstanceHolder holder = instanceHolderService.createInstanceHolder();
 		return new SwingInstanceManagerImpl(parent, path, instanceService, websocket, fileService, loginService, resourceHandler, securityModuleService, configService, loggerService, extService, restService, holder);
 	}
 

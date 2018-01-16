@@ -35,7 +35,7 @@ public class SwingAppRestService extends BaseRestService {
 	protected ApplicationInfo getAppInfoImpl() {
 		ApplicationInfo app = super.getAppInfoImpl();
 		app.setName(handler.getSwingConfig().getName());
-		List<SwingInstance> allRunning = manager.getAllInstances();
+		List<SwingInstance> allRunning = manager.getSwingInstanceHolder().getAllInstances();
 		app.setRunningInstances(allRunning.size());
 		int connected = 0;
 		for (SwingInstance si : allRunning) {
@@ -44,7 +44,7 @@ public class SwingAppRestService extends BaseRestService {
 			}
 		}
 		app.setConnectedInstances(connected);
-		app.setFinishedInstances(manager.getAllClosedInstances().size());
+		app.setFinishedInstances(manager.getSwingInstanceHolder().getAllClosedInstances().size());
 		int maxRunningInstances = handler.getSwingConfig().getMaxClients();
 		app.setMaxRunningInstances(maxRunningInstances);
 		app.setStats(manager.getStatsReader().getSummaryStats());
@@ -82,10 +82,10 @@ public class SwingAppRestService extends BaseRestService {
 	public Sessions getSessions() throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
 		Sessions result = new Sessions();
-		for (SwingInstance si : manager.getAllInstances()) {
+		for (SwingInstance si : manager.getSwingInstanceHolder().getAllInstances()) {
 			result.getSessions().add(si.toSwingSession(false));
 		}
-		for (SwingInstance si : manager.getAllClosedInstances()) {
+		for (SwingInstance si : manager.getSwingInstanceHolder().getAllClosedInstances()) {
 			result.getClosedSessions().add(si.toSwingSession(false));
 		}
 		return result;
@@ -95,7 +95,7 @@ public class SwingAppRestService extends BaseRestService {
 	@Path("/rest/session/{id}")
 	public SwingSession getSession(@PathParam("id") String id) throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
-		SwingInstance instance = manager.findInstanceByInstanceId(id);
+		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
 		if (instance != null) {
 			return instance.toSwingSession(true);
 		}
@@ -106,7 +106,7 @@ public class SwingAppRestService extends BaseRestService {
 	@Path("/rest/record/{id}")
 	public SwingSession startRecording(@PathParam("id") String id) throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_startRecording);
-		SwingInstance instance = manager.findInstanceByInstanceId(id);
+		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
 		if (instance != null) {
 			instance.startRecording();
 			return instance.toSwingSession(true);
@@ -118,11 +118,11 @@ public class SwingAppRestService extends BaseRestService {
 	@Path("/rest/threadDump/{path}")
 	public String getThreadDump(@PathParam("path") String id, @QueryParam("id") String timestamp) throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getThreadDump);
-		SwingInstance instance = manager.findInstanceByInstanceId(id);
+		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
 		if (instance != null) {
 			return instance.getThreadDump(timestamp);
 		} else {
-			List<SwingInstance> instaces = manager.getAllClosedInstances();//closed instances can have multiple instances for same id, need to manually check all
+			List<SwingInstance> instaces = manager.getSwingInstanceHolder().getAllClosedInstances();//closed instances can have multiple instances for same id, need to manually check all
 			for (SwingInstance i : instaces) {
 				if (id.equals(i.getInstanceId())) {
 					String td = i.getThreadDump(timestamp);
@@ -139,7 +139,7 @@ public class SwingAppRestService extends BaseRestService {
 	@Path("/rest/threadDump/{path}")
 	public void requestThreadDump(@PathParam("path") String id) throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_requestThreadDump);
-		SwingInstance instance = manager.findInstanceByInstanceId(id);
+		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
 		if (instance != null) {
 			instance.requestThreadDump();
 		}
@@ -154,7 +154,7 @@ public class SwingAppRestService extends BaseRestService {
 		} else {
 			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_sessionShutdownForce);
 		}
-		SwingInstance instance = manager.findInstanceByInstanceId(id);
+		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
 		if (instance != null) {
 			instance.shutdown(force);
 		} else {

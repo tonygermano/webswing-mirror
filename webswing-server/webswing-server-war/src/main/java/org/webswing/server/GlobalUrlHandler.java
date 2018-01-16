@@ -2,7 +2,6 @@ package org.webswing.server;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.*;
@@ -12,25 +11,15 @@ import javax.inject.Singleton;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
-import org.webswing.server.common.model.admin.ApplicationInfo;
 import org.webswing.server.common.model.admin.InstanceManagerStatus;
-import org.webswing.server.common.model.meta.MetaObject;
-import org.webswing.server.common.model.rest.LogRequest;
-import org.webswing.server.common.model.rest.LogResponse;
-import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationChangeEvent;
 import org.webswing.server.services.config.ConfigurationChangeListener;
@@ -39,21 +28,16 @@ import org.webswing.server.extension.ExtensionService;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.rest.RestService;
 import org.webswing.server.services.security.api.BuiltInModules;
-import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.api.WebswingSecurityConfig;
 import org.webswing.server.services.security.login.LoginHandlerService;
 import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.security.modules.SecurityModuleService;
-import org.webswing.server.services.swinginstance.SwingInstance;
-import org.webswing.server.services.swingmanager.SwingInstanceHolder;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingmanager.SwingInstanceManagerService;
 import org.webswing.server.services.websocket.WebSocketService;
-import org.webswing.server.util.LogReaderUtil;
-
 
 @Singleton
-public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstanceHolder, SecuredPathHandler{
+public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHandler{
 	private static final Logger log = LoggerFactory.getLogger(GlobalUrlHandler.class);
 
 	private final WebSocketService websocket;
@@ -252,67 +236,6 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 	public ServletContext getServletContext() {
 		return servletContext;
-	}
-
-	@Override
-	public SwingInstance findInstanceBySessionId(String uuid) {
-		synchronized (instanceManagers) {
-			for (SwingInstanceManager im : instanceManagers.values()) {
-				SwingInstance instance;
-				if ((instance = im.findInstanceBySessionId(uuid)) != null) {
-					return instance;
-				}
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public SwingInstance findInstanceByClientId(String clientId) {
-		synchronized (instanceManagers) {
-			for (SwingInstanceManager im : instanceManagers.values()) {
-				SwingInstance instance;
-				if ((instance = im.findInstanceByClientId(clientId)) != null) {
-					return instance;
-				}
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public SwingInstance findInstanceByInstanceId(String instanceId) {
-		synchronized (instanceManagers) {
-			for (SwingInstanceManager im : instanceManagers.values()) {
-				SwingInstance instance;
-				if ((instance = im.findInstanceByInstanceId(instanceId)) != null) {
-					return instance;
-				}
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public List<SwingInstance> getAllInstances() {
-		ArrayList<SwingInstance> result = new ArrayList<>();
-		synchronized (instanceManagers) {
-			for (SwingInstanceManager im : instanceManagers.values()) {
-				result.addAll(im.getAllInstances());
-			}
-		}
-		return result;
-	}
-
-	@Override
-	public List<SwingInstance> getAllClosedInstances() {
-		ArrayList<SwingInstance> result = new ArrayList<>();
-		synchronized (instanceManagers) {
-			for (SwingInstanceManager im : instanceManagers.values()) {
-				result.addAll(im.getAllClosedInstances());
-			}
-		}
-		return result;
 	}
 
 	@Override

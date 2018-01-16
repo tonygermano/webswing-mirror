@@ -135,7 +135,7 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 		try {
 			String uuid = request.getParameter("uuid");
 			if (uuid != null) {
-				SwingInstance instance = manager.findInstanceBySessionId(uuid);
+				SwingInstance instance = manager.getSwingInstanceHolder().findInstanceBySessionId(uuid);
 				if (instance != null) {
 					double maxMB = instance.getAppConfig().getUploadMaxSize();
 					long maxsize = (long) (maxMB * 1024 * 1024);
