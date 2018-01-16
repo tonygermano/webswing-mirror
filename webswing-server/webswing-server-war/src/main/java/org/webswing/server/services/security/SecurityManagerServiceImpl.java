@@ -10,6 +10,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
@@ -40,7 +41,7 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 		log.info("Starting SecurityManagerServiceImpl");
 		try {
 			securityManager.setCacheManager(getCacheManager());
-			securityManager.setSessionManager(new WebswingWebSessionManager());
+			securityManager.setSessionManager(getSessionManager());
 			securityManager.setRealm(new WebswingRealmAdapter());
 			SecurityUtils.setSecurityManager(securityManager);
 		} catch (Exception e) {
@@ -53,6 +54,10 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 		return new MemoryConstrainedCacheManager();
 	}
 
+	protected SessionManager getSessionManager() {
+		return new WebswingWebSessionManager();
+	}
+	
 	@Override
 	public void stop() {
 		log.info("Stopping SecurityManagerServiceImpl");
