@@ -63,15 +63,15 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         var windowImageHolders = {};
         var directDraw = new WebswingDirectDraw({logDebug:api.cfg.debugLog});
 
-        function startApplication(name) {
-            initialize(api.getUser() + api.getIdentity() + name, name, false);
+        function startApplication() {
+            initialize(null,false);
         }
 
-        function startMirrorView(clientId, appName) {
-            initialize(clientId, appName, true)
+        function startMirrorView(clientId) {
+            initialize(clientId,true)
         }
 
-        function initialize(clientId, name, isMirror) {
+        function initialize(clientId,isMirror) {
             api.registerInput();
             api.registerTouch();
             window.addEventListener('beforeunload', beforeUnloadEventHandler);
@@ -80,7 +80,6 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             }
             resetState();
             api.cfg.clientId = clientId;
-            api.cfg.appName = name;
             api.cfg.canPaint = true;
             api.cfg.hasControl = !isMirror;
             api.cfg.mirrorMode = isMirror;
@@ -106,7 +105,6 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         function resetState() {
             api.cfg.clientId = '';
             api.cfg.viewId = util.GUID();
-            api.cfg.appName = null;
             api.cfg.hasControl = false;
             api.cfg.mirrorMode = false;
             api.cfg.canPaint = false;
@@ -182,9 +180,9 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             }
             if (data.applications != null && data.applications.length != 0) {
                 if (api.cfg.mirror) {
-                    startMirrorView(api.cfg.clientId, api.cfg.applicationName);
+                    startMirrorView(api.cfg.clientId);
                 } else if (data.applications.length === 1) {
-                    startApplication(data.applications[0].name);
+                    startApplication();
                 }
                 return;
             }
@@ -437,10 +435,10 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
 
         function getHandShake(canvas) {
             var handshake = {
-                applicationName: api.cfg.appName,
                 clientId: api.cfg.clientId,
+                browserId: api.getIdentity(),
                 viewId: api.cfg.viewId,
-                sessionId: api.getSocketId(),
+                connectionId: api.getSocketId(),
                 locale: api.getLocale(),
                 mirrored: api.cfg.mirrorMode,
                 directDrawSupported: api.cfg.typedArraysSupported && !(api.cfg.ieVersion && api.cfg.ieVersion <= 10),

@@ -135,7 +135,7 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 		try {
 			String uuid = request.getParameter("uuid");
 			if (uuid != null) {
-				SwingInstance instance = manager.getSwingInstanceHolder().findInstanceBySessionId(uuid);
+				SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByConnectionId(uuid);
 				if (instance != null) {
 					double maxMB = instance.getAppConfig().getUploadMaxSize();
 					long maxsize = (long) (maxMB * 1024 * 1024);
@@ -159,7 +159,7 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 						msg.setTempFileLocation(f.getAbsolutePath());
 						boolean sent = instance.sendToSwing(null, msg);
 						if (!sent) {
-							log.error("Failed to send upload notification to app session. File:" + filename + "+ClientID:" + instance.getClientId());
+							log.error("Failed to send upload notification to app session. File:" + filename + " InstanceID:" + instance.getInstanceId());
 							f.delete();
 						} else {
 							resp.getWriter().write("{\"files\":[{\"name\":\"" + filename + "\"}]}"); // TODO size

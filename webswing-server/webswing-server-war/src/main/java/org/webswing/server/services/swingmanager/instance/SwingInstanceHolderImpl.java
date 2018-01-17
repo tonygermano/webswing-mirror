@@ -10,8 +10,13 @@ public class SwingInstanceHolderImpl implements SwingInstanceHolder{
 	private SwingInstanceSet closedInstances = new SwingInstanceSet();
 	
 	@Override
-	public SwingInstance findInstanceBySessionId(String uuid) {
-		return runningInstances.findBySessionId(uuid);
+	public SwingInstance findInstanceByConnectionId(String uuid) {
+		return runningInstances.findByConnectionId(uuid);
+	}
+
+	@Override
+	public SwingInstance findInstanceByOwnerId(String ownerId) {
+		return runningInstances.findByOwnerId(ownerId);
 	}
 
 	@Override

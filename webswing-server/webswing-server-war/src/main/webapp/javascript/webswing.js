@@ -135,7 +135,6 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 return {
                     rootElement: setupRootElement(rootElement),
                     autoStart: false,
-                    applicationName: null,
                     args: null,
                     connectionUrl: location.origin + location.pathname,
                     mirror: false,
@@ -151,7 +150,6 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                     /* webswing instance context */
                     clientId: null,
                     viewId: null,
-                    appName: null,
                     hasControl: false,
                     mirrorMode: false,
                     canPaint: false,
@@ -202,7 +200,6 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 options = options != null ? options : readOptions(cfg.rootElement);
                 if (options != null) {
                     cfg.autoStart = options.autoStart != null ? JSON.parse(options.autoStart) : cfg.autoStart;
-                    cfg.applicationName = options.applicationName != null ? options.applicationName : cfg.applicationName;
                     cfg.securityToken = options.securityToken != null ? options.securityToken : cfg.securityToken;
                     cfg.realm = options.realm != null ? options.realm : cfg.realm;
                     cfg.args = options.args != null ? options.args : cfg.args;
@@ -218,7 +215,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                         cfg.connectionUrl = cfg.connectionUrl + '/';
                     }
                     if (options.recordingPlayback != null) {
-                        cfg.recordingPlayback = cfg.applicationName = options.recordingPlayback;
+                        cfg.recordingPlayback = options.recordingPlayback;
                         api.showPlaybackControls();
                     }
                     cfg.onReady = typeof options.onReady === 'function' ? options.onReady : cfg.onReady;

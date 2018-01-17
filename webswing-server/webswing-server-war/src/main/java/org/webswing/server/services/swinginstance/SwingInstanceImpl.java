@@ -45,6 +45,7 @@ import org.webswing.server.services.swingprocess.SwingProcess;
 import org.webswing.server.services.swingprocess.SwingProcessConfig;
 import org.webswing.server.services.swingprocess.SwingProcessService;
 import org.webswing.server.services.websocket.WebSocketConnection;
+import org.webswing.server.services.websocket.WebSocketUserInfo;
 import org.webswing.server.util.FontUtils;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.api.WebswingApi;
@@ -70,29 +71,24 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.ToolkitJarMarker";
 
 	private static final Logger log = LoggerFactory.getLogger(SwingInstance.class);
+	private final String instanceId;
+	private final String ownerId;
+
+	private WebSocketConnection webConnection;
+	private WebSocketConnection mirroredWebConnection;
 
 	private final SwingInstanceManager manager;
 	private final FileTransferHandler fileHandler;
-	private final String instanceId;
-	private final String clientId;
-	private String clientIp;
-	private AbstractWebswingUser user;
 	private SwingProcess process;
 	private JvmConnection jvmConnection;
 	private SessionRecorder sessionRecorder;
-	private WebSocketConnection webConnection;
-	private WebSocketConnection mirroredWebConnection;
-	private SwingConfig config;
-	private Date disconnectedSince;
-	private final Date startedAt = new Date();
-	private final String queueId;
-	private String customArgs = "";
-	private int debugPort = 0;
-	private String locale = null;
-	private String userIp = null;
-	private String userOs = null;
 
-	private String userBrowser = null;
+	private SwingConfig config;
+	private VariableSubstitutor subs;
+
+	private final Date startedAt = new Date();
+	private WebSocketUserInfo lastConnection = null;
+
 	//finished instances only
 	private Date endedAt = null;
 	private List<String> warningHistoryLog;
@@ -102,18 +98,16 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		this.manager = manager;
 		this.fileHandler = fileHandler;
 		this.webConnection = websocket;
-		this.instanceId = ServerUtil.resolveInstanceIdForMode(websocket, h, config);
 		this.config = config;
-		this.user = websocket.getUser();
-		this.clientId = h.getClientId();
-		this.customArgs = ServerUtil.getCustomArgs(websocket.getRequest());
-		this.debugPort = ServerUtil.getDebugPort(websocket.getRequest());
-		this.clientIp = ServerUtil.getClientIp(websocket);
-		this.queueId = user.getUserId() + "-" + config.getName() + "-" + startedAt.getTime();
-		updateUser(websocket);
+		this.ownerId = ServerUtil.resolveOwnerIdForSessionMode(websocket, h, config);
+		this.instanceId = ServerUtil.generateInstanceId(websocket, h, manager.getPathMapping());
+		AbstractWebswingUser user = websocket.getUser();
+		WebSocketUserInfo info = websocket.getUserInfo();
+		subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), this.getInstanceId(), info.getUserIp(), h.getLocale(), info.getCustomArgs());
+
 		try {
-			this.jvmConnection = connectionService.connect(this.queueId, this);
-			process = start(processService, config, h);
+			this.jvmConnection = connectionService.connect(this.instanceId, this);
+			process = start(processService, config, h, websocket);
 			notifyUserConnected();
 		} catch (Exception e) {
 			notifyExiting();
@@ -127,7 +121,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		if (h.isMirrored()) {// connect as mirror viewer
 			connectMirroredWebSession(r);
 		} else {// continue old session?
-			if (h.getSessionId() != null && h.getSessionId().equals(getSessionId())) {
+			if (h.getConnectionId() != null && h.getConnectionId().equals(getConnectionId())) {
 				sendToSwing(r, h);
 			} else {
 				boolean result = connectPrimaryWebSession(r);
@@ -151,9 +145,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			}
 			if (this.webConnection == null) {
 				this.webConnection = resource;
-				updateUser(resource);
 				logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, resource.isWebsocketTransport() ? 1 : 2);
-				this.disconnectedSince = null;
 				notifyUserConnected();
 				return true;
 			}
@@ -162,17 +154,12 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	}
 
-	private void updateUser(WebSocketConnection resource) {
-		userIp = ServerUtil.getClientIp(webConnection);
-		userOs = ServerUtil.getClientOs(webConnection);
-		userBrowser = ServerUtil.getClientBrowser(webConnection);
-	}
-
 	private void disconnectPrimaryWebSession() {
 		if (this.webConnection != null) {
 			notifyUserDisconnected();
+			this.lastConnection = this.webConnection.getUserInfo();
+			this.lastConnection.setDisconnected();
 			this.webConnection = null;
-			this.disconnectedSince = new Date();
 			logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, 0);
 		}
 	}
@@ -304,7 +291,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				}
 			} else if (o instanceof PrinterJobResultMsgInternal) {
 				PrinterJobResultMsgInternal pj = (PrinterJobResultMsgInternal) o;
-				boolean success = fileHandler.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, getUser(), getInstanceId(), false, null);
+				boolean success = fileHandler.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), false, null);
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
 					LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.print, pj.getId());
@@ -314,7 +301,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			} else if (o instanceof OpenFileResultMsgInternal) {
 				OpenFileResultMsgInternal fr = (OpenFileResultMsgInternal) o;
 				String id = UUID.randomUUID().toString();
-				boolean success = fileHandler.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, getUser(), getInstanceId(), fr.isWaitForFile(), fr.getOverwriteDetails());
+				boolean success = fileHandler.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), fr.isWaitForFile(), fr.getOverwriteDetails());
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
 					LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.file, id);
@@ -327,8 +314,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
 				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, s.getCpuUsage());
 				logStatValue(StatisticsLogger.EDT_BLOCKED_SEC_METRIC, s.getEdtPingSeconds());
-				if(getAppConfig().isMonitorEdtEnabled()){
-					if(s.getEdtPingSeconds()>2){
+				if (getAppConfig().isMonitorEdtEnabled()) {
+					if (s.getEdtPingSeconds() > 2) {
 						sendToWeb(SimpleEventMsgOut.applicationBusy.buildMsgOut());
 					}
 				}
@@ -344,7 +331,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			CursorChangeEventMsg cmsg = ((AppFrameMsgOut) o).getCursorChange();
 			if (cmsg.getCurFile() != null) {
 				File cur = new File(cmsg.getCurFile());
-				boolean success = fileHandler.registerFile(cur, cur.getName(), 1, TimeUnit.DAYS, getUser(), getInstanceId(), false, null);
+				boolean success = fileHandler.registerFile(cur, cur.getName(), 1, TimeUnit.DAYS, getUserId(), getInstanceId(), false, null);
 				cmsg.setCurFile(cur.getName());
 			}
 			sendToWeb((MsgOut) o);
@@ -358,7 +345,6 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			sendToWeb(SimpleEventMsgOut.shutDownAutoLogoutNotification.buildMsgOut());
 		}
 		if (StringUtils.isNotBlank(config.getGoodbyeUrl())) {
-			VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), getClientId(), clientIp, locale, customArgs);
 			String url = subs.replace(config.getGoodbyeUrl());
 			if (url.startsWith("/")) {
 				url = AbstractSecurityModule.getContextPath(manager.getServletContext()) + url;
@@ -410,25 +396,30 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		session.setId(getInstanceId());
 		session.setApplet(LauncherType.Applet.equals(getAppConfig().getLauncherType()));
 		session.setApplication(getAppConfig().getName());
-		session.setConnected(getSessionId() != null);
-		if (!session.getConnected()) {
-			session.setDisconnectedSince(getDisconnectedSince());
+		session.setConnected(getConnectionId() != null);
+		WebSocketUserInfo info;
+		if (webConnection == null) {
+			info = lastConnection;
+		} else {
+			info = webConnection.getUserInfo();
 		}
+		session.setDisconnectedSince(info.getDisconnectedSince());
+		session.setUser(info.getUserId());
+		session.setUserIp(info.getUserIp());
+		session.setUserOs(info.getUserOs());
+		session.setUserBrowser(info.getUserBrowser());
+
 		session.setStartedAt(getStartedAt());
-		session.setUser(getUser());
-		session.setUserIp(userIp);
-		session.setUserOs(userOs);
-		session.setUserBrowser(userBrowser);
 		session.setEndedAt(getEndedAt());
 		session.setStatus(getStatus());
 		StatisticsReader statReader = manager.getStatsReader();
 		if (stats) {
-			session.setStats(statReader.getInstanceStats(getClientId()));
+			session.setStats(statReader.getInstanceStats(this.getInstanceId()));
 		}
-		session.setMetrics(statReader.getInstanceMetrics(getClientId()));
-		session.setWarnings(statReader.getInstanceWarnings(getClientId()));
+		session.setMetrics(statReader.getInstanceMetrics(this.getInstanceId()));
+		session.setWarnings(statReader.getInstanceWarnings(this.getInstanceId()));
 		if (isRunning()) {
-			session.setWarningHistory(statReader.getInstanceWarningHistory(getClientId()));
+			session.setWarningHistory(statReader.getInstanceWarningHistory(this.getInstanceId()));
 		} else {
 			session.setWarningHistory(warningHistoryLog);
 		}
@@ -445,15 +436,13 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		}
 	}
 
-	private SwingProcess start(SwingProcessService processService, final SwingConfig appConfig, final ConnectionHandshakeMsgIn handshake) throws Exception {
-		this.locale = handshake.getLocale();
+	private SwingProcess start(SwingProcessService processService, final SwingConfig appConfig, final ConnectionHandshakeMsgIn handshake, WebSocketConnection websocket) throws Exception {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), getClientId(), clientIp, locale, customArgs);
 		SwingProcess swing = null;
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
-			swingConfig.setName(getClientId());
+			swingConfig.setName(this.getInstanceId());
 			String java = getAbsolutePath(subs.replace(appConfig.getJreExecutable()), false);
 			swingConfig.setJreExecutable(java);
 			String homeDir = getAbsolutePath(subs.replace(appConfig.getUserDir()), true);
@@ -468,7 +457,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			}
 			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;
 			String webGraphicsEnvClass = WEB_GRAPHICS_ENV_CLASS_NAME;
-			String j9modules="";
+			String j9modules = "";
 			if (javaVersion.startsWith("1.7")) {
 				webToolkitClass += "7";
 				webGraphicsEnvClass += "7";
@@ -476,14 +465,14 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				webToolkitClass += "8";
 				webGraphicsEnvClass += "8";
 			} else if (javaVersion.startsWith("9")) {
-                webToolkitClass += "9";
-                webGraphicsEnvClass += "9";
-                j9modules=" --patch-module jdk.jsobject="+CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_JSOBJECT_MODULE_MARKER);
-                j9modules+=" --add-reads jdk.jsobject=ALL-UNNAMED ";
-                j9modules+=" --add-opens java.base/java.net=ALL-UNNAMED "; // URLStreamHandler reflective access from SwingClassloader
-                j9modules+=" --add-opens java.desktop/java.awt=ALL-UNNAMED "; // EventQueue reflective access from SwingMain
-                j9modules+=" --add-opens java.desktop/sun.awt.windows=ALL-UNNAMED "; // sun.awt.windows.ThemeReader reflective access from WebToolkit
-            } else {
+				webToolkitClass += "9";
+				webGraphicsEnvClass += "9";
+				j9modules = " --patch-module jdk.jsobject=" + CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_JSOBJECT_MODULE_MARKER);
+				j9modules += " --add-reads jdk.jsobject=ALL-UNNAMED ";
+				j9modules += " --add-opens java.base/java.net=ALL-UNNAMED "; // URLStreamHandler reflective access from SwingClassloader
+				j9modules += " --add-opens java.desktop/java.awt=ALL-UNNAMED "; // EventQueue reflective access from SwingMain
+				j9modules += " --add-opens java.desktop/sun.awt.windows=ALL-UNNAMED "; // sun.awt.windows.ThemeReader reflective access from WebToolkit
+			} else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
 				throw new RuntimeException("Java version not supported. (Version starting with 1.7, 1.8 and 9 are supported.)");
 			}
@@ -498,11 +487,12 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				bootCp += File.pathSeparator + CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME) + File.pathSeparator + "\"" + new File(JAVA_FX_PATH).getCanonicalPath() + "\"";
 			}
 
+			int debugPort = websocket.getUserInfo().getDebugPort();
 			String debug = appConfig.isDebug() && (debugPort != 0) ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=" + debugPort + ",server=y,suspend=y " : "";
 			String vmArgs = appConfig.getVmArgs() == null ? "" : subs.replace(appConfig.getVmArgs());
-			swingConfig.setJvmArgs(j9modules+ bootCp + debug + " -noverify " + vmArgs );
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, getClientId());
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.queueId);
+			swingConfig.setJvmArgs(j9modules + bootCp + debug + " -noverify " + vmArgs);
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, this.getInstanceId());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.instanceId);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_HOME, getAbsolutePath(".", false));
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
 			swingConfig.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
@@ -615,15 +605,20 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		return f.getCanonicalPath();
 	}
 
-	public String getClientId() {
-		return clientId;
+	@Override
+	public String getOwnerId() {
+		return ownerId;
+	}
+
+	public String getInstanceId() {
+		return instanceId;
 	}
 
 	public SwingConfig getAppConfig() {
 		return config;
 	}
 
-	public String getSessionId() {
+	public String getConnectionId() {
 		if (webConnection != null) {
 			return webConnection.uuid();
 		}
@@ -641,14 +636,6 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		return (process != null && process.isRunning());
 	}
 
-	public String getUser() {
-		return user.getUserId();
-	}
-
-	public Date getDisconnectedSince() {
-		return disconnectedSince;
-	}
-
 	public Date getStartedAt() {
 		return startedAt;
 	}
@@ -663,10 +650,6 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	public String getRecordingFile() {
 		return sessionRecorder != null ? sessionRecorder.getFileName() : null;
-	}
-
-	public String getInstanceId() {
-		return instanceId;
 	}
 
 	public SwingInstanceStatus getStatus() {
@@ -691,7 +674,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	@Override
 	public void webSessionDisconnected(String connectionId) {
-		if (getSessionId() != null && getSessionId().equals(connectionId)) {
+		if (getConnectionId() != null && getConnectionId().equals(connectionId)) {
 			disconnectPrimaryWebSession();
 		} else if (getMirroredSessionId() != null && getMirroredSessionId().equals(connectionId)) {
 			disconnectMirroredWebSession();
@@ -699,22 +682,22 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	@Override
-	public String getMirrorSessionId() {
+	public String getMirrorConnectionId() {
 		return mirroredWebConnection != null ? mirroredWebConnection.uuid() : null;
 	}
 
 	public void logStatValue(String name, Number value) {
 		if (StringUtils.isNotEmpty(name)) {
-			manager.logStatValue(getClientId(), name, value);
+			manager.logStatValue(this.getInstanceId(), name, value);
 		}
 	}
 
 	@Override
 	public void logWarningHistory() {
 		StatisticsReader statReader = manager.getStatsReader();
-		List<String> current = statReader.getInstanceWarnings(getClientId());
+		List<String> current = statReader.getInstanceWarnings(this.getInstanceId());
 		if (current != null) {
-			current.addAll(statReader.getInstanceWarningHistory(getClientId()));
+			current.addAll(statReader.getInstanceWarningHistory(this.getInstanceId()));
 		}
 		warningHistoryLog = current;
 	}
@@ -731,12 +714,12 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	public String getThreadDump(String id) {
 		try {
 			ThreadDumpMsgInternal dump = threadDumps.get(Long.parseLong(id));
-			if(dump!=null){
+			if (dump != null) {
 				return FileUtils.readFileToString(new File(dump.getDump()));
 			}
 			return null;
 		} catch (Exception e) {
-			log.error("Failed to load threaddump",e);
+			log.error("Failed to load threaddump", e);
 			return null;
 		}
 	}
@@ -775,4 +758,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		jvmConnection.send(event);
 	}
 
+	public String getUserId() {
+		return webConnection == null ? lastConnection.getUserId() : webConnection.getUserId();
+	}
 }

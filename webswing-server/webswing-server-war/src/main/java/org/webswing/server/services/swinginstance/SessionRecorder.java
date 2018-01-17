@@ -31,14 +31,14 @@ public class SessionRecorder {
 
 	public SessionRecorder(SwingInstance swingInstance) {
 		try {
-			URI uri = URI.create(System.getProperty(Constants.TEMP_DIR_PATH) + URLEncoder.encode(swingInstance.getClientId(), "UTF-8") + ".wss");
+			URI uri = URI.create(System.getProperty(Constants.TEMP_DIR_PATH) + URLEncoder.encode(swingInstance.getInstanceId(), "UTF-8") + ".wss");
 			File file = new File(uri);
 			this.fileName = file.getCanonicalPath();
-			log.info("Starting session recording for " + swingInstance.getClientId() + " into file:" + file);
+			log.info("Starting session recording for " + swingInstance.getInstanceId() + " into file:" + file);
 			if (out == null) {
 				out = new FileOutputStream(file);
 				header = new SessionRecordingHeader();
-				header.setClientId(swingInstance.getClientId());
+				header.setClientId(swingInstance.getInstanceId());
 				header.setStartDate(new Date());
 				this.lastFrame = header.getStartDate().getTime();
 				byte[] version = ByteBuffer.allocate(4).putInt(SessionRecordingHeader.version).array();

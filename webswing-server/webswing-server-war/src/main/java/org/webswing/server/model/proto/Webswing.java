@@ -22271,20 +22271,20 @@ public final class Webswing {
     com.google.protobuf.ByteString
         getClientIdBytes();
 
-    // optional string sessionId = 2;
+    // optional string connectionId = 2;
     /**
-     * <code>optional string sessionId = 2;</code>
+     * <code>optional string connectionId = 2;</code>
      */
-    boolean hasSessionId();
+    boolean hasConnectionId();
     /**
-     * <code>optional string sessionId = 2;</code>
+     * <code>optional string connectionId = 2;</code>
      */
-    java.lang.String getSessionId();
+    java.lang.String getConnectionId();
     /**
-     * <code>optional string sessionId = 2;</code>
+     * <code>optional string connectionId = 2;</code>
      */
     com.google.protobuf.ByteString
-        getSessionIdBytes();
+        getConnectionIdBytes();
 
     // optional string viewId = 3;
     /**
@@ -22300,6 +22300,21 @@ public final class Webswing {
      */
     com.google.protobuf.ByteString
         getViewIdBytes();
+
+    // optional string browserId = 13;
+    /**
+     * <code>optional string browserId = 13;</code>
+     */
+    boolean hasBrowserId();
+    /**
+     * <code>optional string browserId = 13;</code>
+     */
+    java.lang.String getBrowserId();
+    /**
+     * <code>optional string browserId = 13;</code>
+     */
+    com.google.protobuf.ByteString
+        getBrowserIdBytes();
 
     // optional uint32 desktopWidth = 4;
     /**
@@ -22484,7 +22499,7 @@ public final class Webswing {
             }
             case 18: {
               bitField0_ |= 0x00000002;
-              sessionId_ = input.readBytes();
+              connectionId_ = input.readBytes();
               break;
             }
             case 26: {
@@ -22493,51 +22508,56 @@ public final class Webswing {
               break;
             }
             case 32: {
-              bitField0_ |= 0x00000008;
+              bitField0_ |= 0x00000010;
               desktopWidth_ = input.readUInt32();
               break;
             }
             case 40: {
-              bitField0_ |= 0x00000010;
+              bitField0_ |= 0x00000020;
               desktopHeight_ = input.readUInt32();
               break;
             }
             case 50: {
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000040;
               applicationName_ = input.readBytes();
               break;
             }
             case 56: {
-              bitField0_ |= 0x00000040;
+              bitField0_ |= 0x00000080;
               mirrored_ = input.readBool();
               break;
             }
             case 64: {
-              bitField0_ |= 0x00000080;
+              bitField0_ |= 0x00000100;
               directDrawSupported_ = input.readBool();
               break;
             }
             case 74: {
-              bitField0_ |= 0x00000100;
+              bitField0_ |= 0x00000200;
               documentBase_ = input.readBytes();
               break;
             }
             case 82: {
-              if (!((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
+              if (!((mutable_bitField0_ & 0x00000400) == 0x00000400)) {
                 params_ = new java.util.ArrayList<org.webswing.server.model.proto.Webswing.ParamMsgProto>();
-                mutable_bitField0_ |= 0x00000200;
+                mutable_bitField0_ |= 0x00000400;
               }
               params_.add(input.readMessage(org.webswing.server.model.proto.Webswing.ParamMsgProto.PARSER, extensionRegistry));
               break;
             }
             case 90: {
-              bitField0_ |= 0x00000200;
+              bitField0_ |= 0x00000400;
               locale_ = input.readBytes();
               break;
             }
             case 98: {
-              bitField0_ |= 0x00000400;
+              bitField0_ |= 0x00000800;
               url_ = input.readBytes();
+              break;
+            }
+            case 106: {
+              bitField0_ |= 0x00000008;
+              browserId_ = input.readBytes();
               break;
             }
           }
@@ -22548,7 +22568,7 @@ public final class Webswing {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
+        if (((mutable_bitField0_ & 0x00000400) == 0x00000400)) {
           params_ = java.util.Collections.unmodifiableList(params_);
         }
         this.unknownFields = unknownFields.build();
@@ -22626,20 +22646,20 @@ public final class Webswing {
       }
     }
 
-    // optional string sessionId = 2;
-    public static final int SESSIONID_FIELD_NUMBER = 2;
-    private java.lang.Object sessionId_;
+    // optional string connectionId = 2;
+    public static final int CONNECTIONID_FIELD_NUMBER = 2;
+    private java.lang.Object connectionId_;
     /**
-     * <code>optional string sessionId = 2;</code>
+     * <code>optional string connectionId = 2;</code>
      */
-    public boolean hasSessionId() {
+    public boolean hasConnectionId() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional string sessionId = 2;</code>
+     * <code>optional string connectionId = 2;</code>
      */
-    public java.lang.String getSessionId() {
-      java.lang.Object ref = sessionId_;
+    public java.lang.String getConnectionId() {
+      java.lang.Object ref = connectionId_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
@@ -22647,22 +22667,22 @@ public final class Webswing {
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
-          sessionId_ = s;
+          connectionId_ = s;
         }
         return s;
       }
     }
     /**
-     * <code>optional string sessionId = 2;</code>
+     * <code>optional string connectionId = 2;</code>
      */
     public com.google.protobuf.ByteString
-        getSessionIdBytes() {
-      java.lang.Object ref = sessionId_;
+        getConnectionIdBytes() {
+      java.lang.Object ref = connectionId_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        sessionId_ = b;
+        connectionId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -22712,6 +22732,49 @@ public final class Webswing {
       }
     }
 
+    // optional string browserId = 13;
+    public static final int BROWSERID_FIELD_NUMBER = 13;
+    private java.lang.Object browserId_;
+    /**
+     * <code>optional string browserId = 13;</code>
+     */
+    public boolean hasBrowserId() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional string browserId = 13;</code>
+     */
+    public java.lang.String getBrowserId() {
+      java.lang.Object ref = browserId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          browserId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string browserId = 13;</code>
+     */
+    public com.google.protobuf.ByteString
+        getBrowserIdBytes() {
+      java.lang.Object ref = browserId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        browserId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     // optional uint32 desktopWidth = 4;
     public static final int DESKTOPWIDTH_FIELD_NUMBER = 4;
     private int desktopWidth_;
@@ -22719,7 +22782,7 @@ public final class Webswing {
      * <code>optional uint32 desktopWidth = 4;</code>
      */
     public boolean hasDesktopWidth() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <code>optional uint32 desktopWidth = 4;</code>
@@ -22735,7 +22798,7 @@ public final class Webswing {
      * <code>optional uint32 desktopHeight = 5;</code>
      */
     public boolean hasDesktopHeight() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <code>optional uint32 desktopHeight = 5;</code>
@@ -22751,7 +22814,7 @@ public final class Webswing {
      * <code>optional string applicationName = 6;</code>
      */
     public boolean hasApplicationName() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <code>optional string applicationName = 6;</code>
@@ -22794,7 +22857,7 @@ public final class Webswing {
      * <code>optional bool mirrored = 7;</code>
      */
     public boolean hasMirrored() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
      * <code>optional bool mirrored = 7;</code>
@@ -22810,7 +22873,7 @@ public final class Webswing {
      * <code>optional bool directDrawSupported = 8;</code>
      */
     public boolean hasDirectDrawSupported() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
+      return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
      * <code>optional bool directDrawSupported = 8;</code>
@@ -22826,7 +22889,7 @@ public final class Webswing {
      * <code>optional string documentBase = 9;</code>
      */
     public boolean hasDocumentBase() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
+      return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
      * <code>optional string documentBase = 9;</code>
@@ -22905,7 +22968,7 @@ public final class Webswing {
      * <code>optional string locale = 11;</code>
      */
     public boolean hasLocale() {
-      return ((bitField0_ & 0x00000200) == 0x00000200);
+      return ((bitField0_ & 0x00000400) == 0x00000400);
     }
     /**
      * <code>optional string locale = 11;</code>
@@ -22948,7 +23011,7 @@ public final class Webswing {
      * <code>optional string url = 12;</code>
      */
     public boolean hasUrl() {
-      return ((bitField0_ & 0x00000400) == 0x00000400);
+      return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
      * <code>optional string url = 12;</code>
@@ -22986,8 +23049,9 @@ public final class Webswing {
 
     private void initFields() {
       clientId_ = "";
-      sessionId_ = "";
+      connectionId_ = "";
       viewId_ = "";
+      browserId_ = "";
       desktopWidth_ = 0;
       desktopHeight_ = 0;
       applicationName_ = "";
@@ -23014,37 +23078,40 @@ public final class Webswing {
         output.writeBytes(1, getClientIdBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getSessionIdBytes());
+        output.writeBytes(2, getConnectionIdBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeBytes(3, getViewIdBytes());
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeUInt32(4, desktopWidth_);
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeUInt32(5, desktopHeight_);
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeBytes(6, getApplicationNameBytes());
       }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeBool(7, mirrored_);
       }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeBool(8, directDrawSupported_);
       }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
         output.writeBytes(9, getDocumentBaseBytes());
       }
       for (int i = 0; i < params_.size(); i++) {
         output.writeMessage(10, params_.get(i));
       }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
         output.writeBytes(11, getLocaleBytes());
       }
-      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
         output.writeBytes(12, getUrlBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBytes(13, getBrowserIdBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -23061,33 +23128,33 @@ public final class Webswing {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getSessionIdBytes());
+          .computeBytesSize(2, getConnectionIdBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, getViewIdBytes());
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(4, desktopWidth_);
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(5, desktopHeight_);
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(6, getApplicationNameBytes());
       }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(7, mirrored_);
       }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(8, directDrawSupported_);
       }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(9, getDocumentBaseBytes());
       }
@@ -23095,13 +23162,17 @@ public final class Webswing {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(10, params_.get(i));
       }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(11, getLocaleBytes());
       }
-      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(12, getUrlBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(13, getBrowserIdBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -23222,32 +23293,34 @@ public final class Webswing {
         super.clear();
         clientId_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
-        sessionId_ = "";
+        connectionId_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
         viewId_ = "";
         bitField0_ = (bitField0_ & ~0x00000004);
-        desktopWidth_ = 0;
+        browserId_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
-        desktopHeight_ = 0;
+        desktopWidth_ = 0;
         bitField0_ = (bitField0_ & ~0x00000010);
-        applicationName_ = "";
+        desktopHeight_ = 0;
         bitField0_ = (bitField0_ & ~0x00000020);
-        mirrored_ = false;
+        applicationName_ = "";
         bitField0_ = (bitField0_ & ~0x00000040);
-        directDrawSupported_ = false;
+        mirrored_ = false;
         bitField0_ = (bitField0_ & ~0x00000080);
-        documentBase_ = "";
+        directDrawSupported_ = false;
         bitField0_ = (bitField0_ & ~0x00000100);
+        documentBase_ = "";
+        bitField0_ = (bitField0_ & ~0x00000200);
         if (paramsBuilder_ == null) {
           params_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000200);
+          bitField0_ = (bitField0_ & ~0x00000400);
         } else {
           paramsBuilder_.clear();
         }
         locale_ = "";
-        bitField0_ = (bitField0_ & ~0x00000400);
-        url_ = "";
         bitField0_ = (bitField0_ & ~0x00000800);
+        url_ = "";
+        bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
 
@@ -23283,7 +23356,7 @@ public final class Webswing {
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.sessionId_ = sessionId_;
+        result.connectionId_ = connectionId_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
@@ -23291,42 +23364,46 @@ public final class Webswing {
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.desktopWidth_ = desktopWidth_;
+        result.browserId_ = browserId_;
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.desktopHeight_ = desktopHeight_;
+        result.desktopWidth_ = desktopWidth_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.applicationName_ = applicationName_;
+        result.desktopHeight_ = desktopHeight_;
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
-        result.mirrored_ = mirrored_;
+        result.applicationName_ = applicationName_;
         if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000080;
         }
-        result.directDrawSupported_ = directDrawSupported_;
+        result.mirrored_ = mirrored_;
         if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000100;
         }
+        result.directDrawSupported_ = directDrawSupported_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
         result.documentBase_ = documentBase_;
         if (paramsBuilder_ == null) {
-          if (((bitField0_ & 0x00000200) == 0x00000200)) {
+          if (((bitField0_ & 0x00000400) == 0x00000400)) {
             params_ = java.util.Collections.unmodifiableList(params_);
-            bitField0_ = (bitField0_ & ~0x00000200);
+            bitField0_ = (bitField0_ & ~0x00000400);
           }
           result.params_ = params_;
         } else {
           result.params_ = paramsBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
-          to_bitField0_ |= 0x00000200;
-        }
-        result.locale_ = locale_;
         if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000400;
+        }
+        result.locale_ = locale_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00000800;
         }
         result.url_ = url_;
         result.bitField0_ = to_bitField0_;
@@ -23350,14 +23427,19 @@ public final class Webswing {
           clientId_ = other.clientId_;
           onChanged();
         }
-        if (other.hasSessionId()) {
+        if (other.hasConnectionId()) {
           bitField0_ |= 0x00000002;
-          sessionId_ = other.sessionId_;
+          connectionId_ = other.connectionId_;
           onChanged();
         }
         if (other.hasViewId()) {
           bitField0_ |= 0x00000004;
           viewId_ = other.viewId_;
+          onChanged();
+        }
+        if (other.hasBrowserId()) {
+          bitField0_ |= 0x00000008;
+          browserId_ = other.browserId_;
           onChanged();
         }
         if (other.hasDesktopWidth()) {
@@ -23367,7 +23449,7 @@ public final class Webswing {
           setDesktopHeight(other.getDesktopHeight());
         }
         if (other.hasApplicationName()) {
-          bitField0_ |= 0x00000020;
+          bitField0_ |= 0x00000040;
           applicationName_ = other.applicationName_;
           onChanged();
         }
@@ -23378,7 +23460,7 @@ public final class Webswing {
           setDirectDrawSupported(other.getDirectDrawSupported());
         }
         if (other.hasDocumentBase()) {
-          bitField0_ |= 0x00000100;
+          bitField0_ |= 0x00000200;
           documentBase_ = other.documentBase_;
           onChanged();
         }
@@ -23386,7 +23468,7 @@ public final class Webswing {
           if (!other.params_.isEmpty()) {
             if (params_.isEmpty()) {
               params_ = other.params_;
-              bitField0_ = (bitField0_ & ~0x00000200);
+              bitField0_ = (bitField0_ & ~0x00000400);
             } else {
               ensureParamsIsMutable();
               params_.addAll(other.params_);
@@ -23399,7 +23481,7 @@ public final class Webswing {
               paramsBuilder_.dispose();
               paramsBuilder_ = null;
               params_ = other.params_;
-              bitField0_ = (bitField0_ & ~0x00000200);
+              bitField0_ = (bitField0_ & ~0x00000400);
               paramsBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getParamsFieldBuilder() : null;
@@ -23409,12 +23491,12 @@ public final class Webswing {
           }
         }
         if (other.hasLocale()) {
-          bitField0_ |= 0x00000400;
+          bitField0_ |= 0x00000800;
           locale_ = other.locale_;
           onChanged();
         }
         if (other.hasUrl()) {
-          bitField0_ |= 0x00000800;
+          bitField0_ |= 0x00001000;
           url_ = other.url_;
           onChanged();
         }
@@ -23519,76 +23601,76 @@ public final class Webswing {
         return this;
       }
 
-      // optional string sessionId = 2;
-      private java.lang.Object sessionId_ = "";
+      // optional string connectionId = 2;
+      private java.lang.Object connectionId_ = "";
       /**
-       * <code>optional string sessionId = 2;</code>
+       * <code>optional string connectionId = 2;</code>
        */
-      public boolean hasSessionId() {
+      public boolean hasConnectionId() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional string sessionId = 2;</code>
+       * <code>optional string connectionId = 2;</code>
        */
-      public java.lang.String getSessionId() {
-        java.lang.Object ref = sessionId_;
+      public java.lang.String getConnectionId() {
+        java.lang.Object ref = connectionId_;
         if (!(ref instanceof java.lang.String)) {
           java.lang.String s = ((com.google.protobuf.ByteString) ref)
               .toStringUtf8();
-          sessionId_ = s;
+          connectionId_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>optional string sessionId = 2;</code>
+       * <code>optional string connectionId = 2;</code>
        */
       public com.google.protobuf.ByteString
-          getSessionIdBytes() {
-        java.lang.Object ref = sessionId_;
+          getConnectionIdBytes() {
+        java.lang.Object ref = connectionId_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          sessionId_ = b;
+          connectionId_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>optional string sessionId = 2;</code>
+       * <code>optional string connectionId = 2;</code>
        */
-      public Builder setSessionId(
+      public Builder setConnectionId(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000002;
-        sessionId_ = value;
+        connectionId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string sessionId = 2;</code>
+       * <code>optional string connectionId = 2;</code>
        */
-      public Builder clearSessionId() {
+      public Builder clearConnectionId() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        sessionId_ = getDefaultInstance().getSessionId();
+        connectionId_ = getDefaultInstance().getConnectionId();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string sessionId = 2;</code>
+       * <code>optional string connectionId = 2;</code>
        */
-      public Builder setSessionIdBytes(
+      public Builder setConnectionIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000002;
-        sessionId_ = value;
+        connectionId_ = value;
         onChanged();
         return this;
       }
@@ -23667,13 +23749,87 @@ public final class Webswing {
         return this;
       }
 
+      // optional string browserId = 13;
+      private java.lang.Object browserId_ = "";
+      /**
+       * <code>optional string browserId = 13;</code>
+       */
+      public boolean hasBrowserId() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional string browserId = 13;</code>
+       */
+      public java.lang.String getBrowserId() {
+        java.lang.Object ref = browserId_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          browserId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string browserId = 13;</code>
+       */
+      public com.google.protobuf.ByteString
+          getBrowserIdBytes() {
+        java.lang.Object ref = browserId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          browserId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string browserId = 13;</code>
+       */
+      public Builder setBrowserId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        browserId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string browserId = 13;</code>
+       */
+      public Builder clearBrowserId() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        browserId_ = getDefaultInstance().getBrowserId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string browserId = 13;</code>
+       */
+      public Builder setBrowserIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        browserId_ = value;
+        onChanged();
+        return this;
+      }
+
       // optional uint32 desktopWidth = 4;
       private int desktopWidth_ ;
       /**
        * <code>optional uint32 desktopWidth = 4;</code>
        */
       public boolean hasDesktopWidth() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
        * <code>optional uint32 desktopWidth = 4;</code>
@@ -23685,7 +23841,7 @@ public final class Webswing {
        * <code>optional uint32 desktopWidth = 4;</code>
        */
       public Builder setDesktopWidth(int value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         desktopWidth_ = value;
         onChanged();
         return this;
@@ -23694,7 +23850,7 @@ public final class Webswing {
        * <code>optional uint32 desktopWidth = 4;</code>
        */
       public Builder clearDesktopWidth() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         desktopWidth_ = 0;
         onChanged();
         return this;
@@ -23706,7 +23862,7 @@ public final class Webswing {
        * <code>optional uint32 desktopHeight = 5;</code>
        */
       public boolean hasDesktopHeight() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
        * <code>optional uint32 desktopHeight = 5;</code>
@@ -23718,7 +23874,7 @@ public final class Webswing {
        * <code>optional uint32 desktopHeight = 5;</code>
        */
       public Builder setDesktopHeight(int value) {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         desktopHeight_ = value;
         onChanged();
         return this;
@@ -23727,7 +23883,7 @@ public final class Webswing {
        * <code>optional uint32 desktopHeight = 5;</code>
        */
       public Builder clearDesktopHeight() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         desktopHeight_ = 0;
         onChanged();
         return this;
@@ -23739,7 +23895,7 @@ public final class Webswing {
        * <code>optional string applicationName = 6;</code>
        */
       public boolean hasApplicationName() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
        * <code>optional string applicationName = 6;</code>
@@ -23779,7 +23935,7 @@ public final class Webswing {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000020;
+  bitField0_ |= 0x00000040;
         applicationName_ = value;
         onChanged();
         return this;
@@ -23788,7 +23944,7 @@ public final class Webswing {
        * <code>optional string applicationName = 6;</code>
        */
       public Builder clearApplicationName() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         applicationName_ = getDefaultInstance().getApplicationName();
         onChanged();
         return this;
@@ -23801,7 +23957,7 @@ public final class Webswing {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000020;
+  bitField0_ |= 0x00000040;
         applicationName_ = value;
         onChanged();
         return this;
@@ -23813,7 +23969,7 @@ public final class Webswing {
        * <code>optional bool mirrored = 7;</code>
        */
       public boolean hasMirrored() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
        * <code>optional bool mirrored = 7;</code>
@@ -23825,7 +23981,7 @@ public final class Webswing {
        * <code>optional bool mirrored = 7;</code>
        */
       public Builder setMirrored(boolean value) {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         mirrored_ = value;
         onChanged();
         return this;
@@ -23834,7 +23990,7 @@ public final class Webswing {
        * <code>optional bool mirrored = 7;</code>
        */
       public Builder clearMirrored() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         mirrored_ = false;
         onChanged();
         return this;
@@ -23846,7 +24002,7 @@ public final class Webswing {
        * <code>optional bool directDrawSupported = 8;</code>
        */
       public boolean hasDirectDrawSupported() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
        * <code>optional bool directDrawSupported = 8;</code>
@@ -23858,7 +24014,7 @@ public final class Webswing {
        * <code>optional bool directDrawSupported = 8;</code>
        */
       public Builder setDirectDrawSupported(boolean value) {
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         directDrawSupported_ = value;
         onChanged();
         return this;
@@ -23867,7 +24023,7 @@ public final class Webswing {
        * <code>optional bool directDrawSupported = 8;</code>
        */
       public Builder clearDirectDrawSupported() {
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         directDrawSupported_ = false;
         onChanged();
         return this;
@@ -23879,7 +24035,7 @@ public final class Webswing {
        * <code>optional string documentBase = 9;</code>
        */
       public boolean hasDocumentBase() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
        * <code>optional string documentBase = 9;</code>
@@ -23919,7 +24075,7 @@ public final class Webswing {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000100;
+  bitField0_ |= 0x00000200;
         documentBase_ = value;
         onChanged();
         return this;
@@ -23928,7 +24084,7 @@ public final class Webswing {
        * <code>optional string documentBase = 9;</code>
        */
       public Builder clearDocumentBase() {
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000200);
         documentBase_ = getDefaultInstance().getDocumentBase();
         onChanged();
         return this;
@@ -23941,7 +24097,7 @@ public final class Webswing {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000100;
+  bitField0_ |= 0x00000200;
         documentBase_ = value;
         onChanged();
         return this;
@@ -23951,9 +24107,9 @@ public final class Webswing {
       private java.util.List<org.webswing.server.model.proto.Webswing.ParamMsgProto> params_ =
         java.util.Collections.emptyList();
       private void ensureParamsIsMutable() {
-        if (!((bitField0_ & 0x00000200) == 0x00000200)) {
+        if (!((bitField0_ & 0x00000400) == 0x00000400)) {
           params_ = new java.util.ArrayList<org.webswing.server.model.proto.Webswing.ParamMsgProto>(params_);
-          bitField0_ |= 0x00000200;
+          bitField0_ |= 0x00000400;
          }
       }
 
@@ -24102,7 +24258,7 @@ public final class Webswing {
       public Builder clearParams() {
         if (paramsBuilder_ == null) {
           params_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000200);
+          bitField0_ = (bitField0_ & ~0x00000400);
           onChanged();
         } else {
           paramsBuilder_.clear();
@@ -24179,7 +24335,7 @@ public final class Webswing {
           paramsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               org.webswing.server.model.proto.Webswing.ParamMsgProto, org.webswing.server.model.proto.Webswing.ParamMsgProto.Builder, org.webswing.server.model.proto.Webswing.ParamMsgProtoOrBuilder>(
                   params_,
-                  ((bitField0_ & 0x00000200) == 0x00000200),
+                  ((bitField0_ & 0x00000400) == 0x00000400),
                   getParentForChildren(),
                   isClean());
           params_ = null;
@@ -24193,7 +24349,7 @@ public final class Webswing {
        * <code>optional string locale = 11;</code>
        */
       public boolean hasLocale() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
        * <code>optional string locale = 11;</code>
@@ -24233,7 +24389,7 @@ public final class Webswing {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000400;
+  bitField0_ |= 0x00000800;
         locale_ = value;
         onChanged();
         return this;
@@ -24242,7 +24398,7 @@ public final class Webswing {
        * <code>optional string locale = 11;</code>
        */
       public Builder clearLocale() {
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000800);
         locale_ = getDefaultInstance().getLocale();
         onChanged();
         return this;
@@ -24255,7 +24411,7 @@ public final class Webswing {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000400;
+  bitField0_ |= 0x00000800;
         locale_ = value;
         onChanged();
         return this;
@@ -24267,7 +24423,7 @@ public final class Webswing {
        * <code>optional string url = 12;</code>
        */
       public boolean hasUrl() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
        * <code>optional string url = 12;</code>
@@ -24307,7 +24463,7 @@ public final class Webswing {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000800;
+  bitField0_ |= 0x00001000;
         url_ = value;
         onChanged();
         return this;
@@ -24316,7 +24472,7 @@ public final class Webswing {
        * <code>optional string url = 12;</code>
        */
       public Builder clearUrl() {
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00001000);
         url_ = getDefaultInstance().getUrl();
         onChanged();
         return this;
@@ -24329,7 +24485,7 @@ public final class Webswing {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000800;
+  bitField0_ |= 0x00001000;
         url_ = value;
         onChanged();
         return this;
@@ -33041,68 +33197,69 @@ public final class Webswing {
       "ng.server.model.proto.TimestampsMsgInPro" +
       "to\"j\n\024TimestampsMsgInProto\022\026\n\016startTimes" +
       "tamp\030\001 \001(\t\022\025\n\rsendTimestamp\030\002 \001(\t\022\025\n\rren" +
-      "deringTime\030\003 \001(\t\022\014\n\004ping\030\004 \001(\r\"\274\002\n\035Conne" +
+      "deringTime\030\003 \001(\t\022\014\n\004ping\030\004 \001(\r\"\322\002\n\035Conne" +
       "ctionHandshakeMsgInProto\022\020\n\010clientId\030\001 \001" +
-      "(\t\022\021\n\tsessionId\030\002 \001(\t\022\016\n\006viewId\030\003 \001(\t\022\024\n",
-      "\014desktopWidth\030\004 \001(\r\022\025\n\rdesktopHeight\030\005 \001" +
-      "(\r\022\027\n\017applicationName\030\006 \001(\t\022\020\n\010mirrored\030" +
-      "\007 \001(\010\022\033\n\023directDrawSupported\030\010 \001(\010\022\024\n\014do" +
-      "cumentBase\030\t \001(\t\022>\n\006params\030\n \003(\0132..org.w" +
-      "ebswing.server.model.proto.ParamMsgProto" +
-      "\022\016\n\006locale\030\013 \001(\t\022\013\n\003url\030\014 \001(\t\",\n\rParamMs" +
-      "gProto\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"\212\002\n\027" +
-      "KeyboardEventMsgInProto\022X\n\004type\030\001 \001(\0162J." +
-      "org.webswing.server.model.proto.Keyboard" +
-      "EventMsgInProto.KeyEventTypeProto\022\021\n\tcha",
-      "racter\030\002 \001(\021\022\017\n\007keycode\030\003 \001(\021\022\013\n\003alt\030\004 \001" +
-      "(\010\022\014\n\004ctrl\030\005 \001(\010\022\r\n\005shift\030\006 \001(\010\022\014\n\004meta\030" +
-      "\007 \001(\010\"9\n\021KeyEventTypeProto\022\014\n\010keypress\020\000" +
-      "\022\013\n\007keydown\020\001\022\t\n\005keyup\020\002\"\345\002\n\024MouseEventM" +
-      "sgInProto\022W\n\004type\030\001 \001(\0162I.org.webswing.s" +
-      "erver.model.proto.MouseEventMsgInProto.M" +
-      "ouseEventTypeProto\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021" +
-      "\022\022\n\nwheelDelta\030\004 \001(\021\022\016\n\006button\030\005 \001(\021\022\014\n\004" +
-      "ctrl\030\006 \001(\010\022\013\n\003alt\030\007 \001(\010\022\r\n\005shift\030\010 \001(\010\022\014" +
-      "\n\004meta\030\t \001(\010\022\017\n\007buttons\030\n \001(\021\022\021\n\ttimeMil",
-      "is\030\013 \001(\021\"^\n\023MouseEventTypeProto\022\r\n\tmouse" +
-      "move\020\000\022\r\n\tmousedown\020\001\022\013\n\007mouseup\020\002\022\016\n\nmo" +
-      "usewheel\020\003\022\014\n\010dblclick\020\004\"\303\001\n\023CopyEventMs" +
-      "gInProto\022X\n\004type\030\001 \001(\0162J.org.webswing.se" +
-      "rver.model.proto.CopyEventMsgInProto.Cop" +
-      "yEventMsgTypeProto\022\014\n\004file\030\002 \001(\t\"D\n\025Copy" +
-      "EventMsgTypeProto\022\010\n\004copy\020\000\022\007\n\003cut\020\001\022\030\n\024" +
-      "getFileFromClipboard\020\002\"P\n\024PasteEventMsgI" +
-      "nProto\022\014\n\004text\030\001 \001(\t\022\014\n\004html\030\002 \001(\t\022\013\n\003im" +
-      "g\030\003 \001(\t\022\017\n\007special\030\004 \001(\010\"\204\002\n\025SimpleEvent",
-      "MsgInProto\022Y\n\004type\030\001 \001(\0162K.org.webswing." +
-      "server.model.proto.SimpleEventMsgInProto" +
-      ".SimpleEventTypeProto\"\217\001\n\024SimpleEventTyp" +
-      "eProto\022\n\n\006unload\020\000\022\r\n\tkillSwing\020\001\022\014\n\010pai" +
-      "ntAck\020\002\022\013\n\007repaint\020\003\022\020\n\014downloadFile\020\004\022\016" +
-      "\n\ndeleteFile\020\005\022\006\n\002hb\020\006\022\027\n\023cancelFileSele" +
-      "ction\020\007\"-\n\034FilesSelectedEventMsgInProto\022" +
-      "\r\n\005files\030\001 \003(\t\"C\n\025UploadEventMsgInProto\022" +
-      "\020\n\010fileName\030\002 \001(\t\022\030\n\020tempFileLocation\030\003 " +
-      "\001(\t\"\226\001\n\031JavaEvalRequestMsgInProto\022\025\n\rcor",
-      "relationId\030\001 \001(\t\022\020\n\010objectId\030\002 \001(\t\022\016\n\006me" +
-      "thod\030\003 \001(\t\022@\n\006params\030\004 \003(\01320.org.webswin" +
-      "g.server.model.proto.JsParamMsgProto\"\327\001\n" +
-      "\031PlaybackCommandMsgInProto\022`\n\007command\030\001 " +
-      "\001(\0162O.org.webswing.server.model.proto.Pl" +
-      "aybackCommandMsgInProto.PlaybackCommandP" +
-      "roto\"X\n\024PlaybackCommandProto\022\t\n\005reset\020\000\022" +
-      "\010\n\004play\020\001\022\010\n\004stop\020\002\022\010\n\004step\020\003\022\n\n\006step10\020" +
-      "\004\022\013\n\007step100\020\005\"E\n\034PixelsAreaResponseMsgI" +
-      "nProto\022\025\n\rcorrelationId\030\001 \001(\t\022\016\n\006pixels\030",
-      "\002 \001(\t*\315\002\n\026SimpleEventMsgOutProto\022\035\n\031appl" +
-      "icationAlreadyRunning\020\000\022\030\n\024shutDownNotif" +
-      "ication\020\001\022\036\n\032tooManyClientsNotification\020" +
-      "\002\022\026\n\022continueOldSession\020\003\022\026\n\022configurati" +
-      "onError\020\004\022\035\n\031sessionStolenNotification\020\005" +
-      "\022\026\n\022unauthorizedAccess\020\006\022\"\n\036shutDownAuto" +
-      "LogoutNotification\020\007\022\031\n\025sessionTimeoutWa" +
-      "rning\020\010\022\037\n\033sessionTimedOutNotification\020\t" +
-      "\022\023\n\017applicationBusy\020\n"
+      "(\t\022\024\n\014connectionId\030\002 \001(\t\022\016\n\006viewId\030\003 \001(\t",
+      "\022\021\n\tbrowserId\030\r \001(\t\022\024\n\014desktopWidth\030\004 \001(" +
+      "\r\022\025\n\rdesktopHeight\030\005 \001(\r\022\027\n\017applicationN" +
+      "ame\030\006 \001(\t\022\020\n\010mirrored\030\007 \001(\010\022\033\n\023directDra" +
+      "wSupported\030\010 \001(\010\022\024\n\014documentBase\030\t \001(\t\022>" +
+      "\n\006params\030\n \003(\0132..org.webswing.server.mod" +
+      "el.proto.ParamMsgProto\022\016\n\006locale\030\013 \001(\t\022\013" +
+      "\n\003url\030\014 \001(\t\",\n\rParamMsgProto\022\014\n\004name\030\001 \001" +
+      "(\t\022\r\n\005value\030\002 \001(\t\"\212\002\n\027KeyboardEventMsgIn" +
+      "Proto\022X\n\004type\030\001 \001(\0162J.org.webswing.serve" +
+      "r.model.proto.KeyboardEventMsgInProto.Ke",
+      "yEventTypeProto\022\021\n\tcharacter\030\002 \001(\021\022\017\n\007ke" +
+      "ycode\030\003 \001(\021\022\013\n\003alt\030\004 \001(\010\022\014\n\004ctrl\030\005 \001(\010\022\r" +
+      "\n\005shift\030\006 \001(\010\022\014\n\004meta\030\007 \001(\010\"9\n\021KeyEventT" +
+      "ypeProto\022\014\n\010keypress\020\000\022\013\n\007keydown\020\001\022\t\n\005k" +
+      "eyup\020\002\"\345\002\n\024MouseEventMsgInProto\022W\n\004type\030" +
+      "\001 \001(\0162I.org.webswing.server.model.proto." +
+      "MouseEventMsgInProto.MouseEventTypeProto" +
+      "\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\022\n\nwheelDelta\030\004 \001" +
+      "(\021\022\016\n\006button\030\005 \001(\021\022\014\n\004ctrl\030\006 \001(\010\022\013\n\003alt\030" +
+      "\007 \001(\010\022\r\n\005shift\030\010 \001(\010\022\014\n\004meta\030\t \001(\010\022\017\n\007bu",
+      "ttons\030\n \001(\021\022\021\n\ttimeMilis\030\013 \001(\021\"^\n\023MouseE" +
+      "ventTypeProto\022\r\n\tmousemove\020\000\022\r\n\tmousedow" +
+      "n\020\001\022\013\n\007mouseup\020\002\022\016\n\nmousewheel\020\003\022\014\n\010dblc" +
+      "lick\020\004\"\303\001\n\023CopyEventMsgInProto\022X\n\004type\030\001" +
+      " \001(\0162J.org.webswing.server.model.proto.C" +
+      "opyEventMsgInProto.CopyEventMsgTypeProto" +
+      "\022\014\n\004file\030\002 \001(\t\"D\n\025CopyEventMsgTypeProto\022" +
+      "\010\n\004copy\020\000\022\007\n\003cut\020\001\022\030\n\024getFileFromClipboa" +
+      "rd\020\002\"P\n\024PasteEventMsgInProto\022\014\n\004text\030\001 \001" +
+      "(\t\022\014\n\004html\030\002 \001(\t\022\013\n\003img\030\003 \001(\t\022\017\n\007special",
+      "\030\004 \001(\010\"\204\002\n\025SimpleEventMsgInProto\022Y\n\004type" +
+      "\030\001 \001(\0162K.org.webswing.server.model.proto" +
+      ".SimpleEventMsgInProto.SimpleEventTypePr" +
+      "oto\"\217\001\n\024SimpleEventTypeProto\022\n\n\006unload\020\000" +
+      "\022\r\n\tkillSwing\020\001\022\014\n\010paintAck\020\002\022\013\n\007repaint" +
+      "\020\003\022\020\n\014downloadFile\020\004\022\016\n\ndeleteFile\020\005\022\006\n\002" +
+      "hb\020\006\022\027\n\023cancelFileSelection\020\007\"-\n\034FilesSe" +
+      "lectedEventMsgInProto\022\r\n\005files\030\001 \003(\t\"C\n\025" +
+      "UploadEventMsgInProto\022\020\n\010fileName\030\002 \001(\t\022" +
+      "\030\n\020tempFileLocation\030\003 \001(\t\"\226\001\n\031JavaEvalRe",
+      "questMsgInProto\022\025\n\rcorrelationId\030\001 \001(\t\022\020" +
+      "\n\010objectId\030\002 \001(\t\022\016\n\006method\030\003 \001(\t\022@\n\006para" +
+      "ms\030\004 \003(\01320.org.webswing.server.model.pro" +
+      "to.JsParamMsgProto\"\327\001\n\031PlaybackCommandMs" +
+      "gInProto\022`\n\007command\030\001 \001(\0162O.org.webswing" +
+      ".server.model.proto.PlaybackCommandMsgIn" +
+      "Proto.PlaybackCommandProto\"X\n\024PlaybackCo" +
+      "mmandProto\022\t\n\005reset\020\000\022\010\n\004play\020\001\022\010\n\004stop\020" +
+      "\002\022\010\n\004step\020\003\022\n\n\006step10\020\004\022\013\n\007step100\020\005\"E\n\034" +
+      "PixelsAreaResponseMsgInProto\022\025\n\rcorrelat",
+      "ionId\030\001 \001(\t\022\016\n\006pixels\030\002 \001(\t*\315\002\n\026SimpleEv" +
+      "entMsgOutProto\022\035\n\031applicationAlreadyRunn" +
+      "ing\020\000\022\030\n\024shutDownNotification\020\001\022\036\n\032tooMa" +
+      "nyClientsNotification\020\002\022\026\n\022continueOldSe" +
+      "ssion\020\003\022\026\n\022configurationError\020\004\022\035\n\031sessi" +
+      "onStolenNotification\020\005\022\026\n\022unauthorizedAc" +
+      "cess\020\006\022\"\n\036shutDownAutoLogoutNotification" +
+      "\020\007\022\031\n\025sessionTimeoutWarning\020\010\022\037\n\033session" +
+      "TimedOutNotification\020\t\022\023\n\017applicationBus" +
+      "y\020\n"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -33234,7 +33391,7 @@ public final class Webswing {
           internal_static_org_webswing_server_model_proto_ConnectionHandshakeMsgInProto_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_org_webswing_server_model_proto_ConnectionHandshakeMsgInProto_descriptor,
-              new java.lang.String[] { "ClientId", "SessionId", "ViewId", "DesktopWidth", "DesktopHeight", "ApplicationName", "Mirrored", "DirectDrawSupported", "DocumentBase", "Params", "Locale", "Url", });
+              new java.lang.String[] { "ClientId", "ConnectionId", "ViewId", "BrowserId", "DesktopWidth", "DesktopHeight", "ApplicationName", "Mirrored", "DirectDrawSupported", "DocumentBase", "Params", "Locale", "Url", });
           internal_static_org_webswing_server_model_proto_ParamMsgProto_descriptor =
             getDescriptor().getMessageTypes().get(21);
           internal_static_org_webswing_server_model_proto_ParamMsgProto_fieldAccessorTable = new

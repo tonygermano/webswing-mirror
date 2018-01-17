@@ -39,7 +39,7 @@ public class SwingAppRestService extends BaseRestService {
 		app.setRunningInstances(allRunning.size());
 		int connected = 0;
 		for (SwingInstance si : allRunning) {
-			if (si.getSessionId() != null) {
+			if (si.getConnectionId() != null) {
 				connected++;
 			}
 		}

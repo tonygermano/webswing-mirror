@@ -15,16 +15,19 @@ import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.util.SecurityUtil;
+import org.webswing.server.util.ServerUtil;
 
 public class WebSocketConnection {
 	private static final Logger log = LoggerFactory.getLogger(WebSocketConnection.class);
 
 	private AtmosphereResource resource;
 	private UrlHandler handler;
+	private WebSocketUserInfo userInfo;
 
 	public WebSocketConnection(AtmosphereResource resource, UrlHandler handler) {
 		this.resource = resource;
 		this.handler = handler;
+		this.userInfo=new WebSocketUserInfo(this);
 	}
 
 	public boolean isBinary() {
@@ -49,6 +52,12 @@ public class WebSocketConnection {
 
 	public AbstractWebswingUser getUser() {
 		return SecurityUtil.getUser(this);
+	}
+
+	public String getUserId() {
+		AbstractWebswingUser user = getUser();
+		String userId =user != null ? user.getUserId() : "null";;
+		return userId;
 	}
 
 	public void broadcastMessage(EncodedMessage o) {
@@ -87,4 +96,7 @@ public class WebSocketConnection {
 		return TRANSPORT.WEBSOCKET.equals(resource.transport());
 	}
 
+	public WebSocketUserInfo getUserInfo() {
+		return userInfo;
+	}
 }

@@ -13,7 +13,6 @@
                 var config = {
                     autoStart: false,
                     connectionUrl: baseUrl,
-                    applicationName: $routeParams.playback,
                     recordingPlayback: $routeParams.playback,
                     control: false,
                     mirrorMode: true

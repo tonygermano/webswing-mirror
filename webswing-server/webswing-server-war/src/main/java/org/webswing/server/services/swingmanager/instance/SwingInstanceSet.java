@@ -5,10 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.server.services.swinginstance.SwingInstance;
-import org.webswing.server.services.websocket.WebSocketConnection;
-import org.webswing.server.util.ServerUtil;
 
 public class SwingInstanceSet {
 	Set<SwingInstance> instances = new HashSet<SwingInstance>();
@@ -29,9 +26,9 @@ public class SwingInstanceSet {
 		return instances.size();
 	}
 
-	public synchronized SwingInstance findBySessionId(String sessionId) {
+	public synchronized SwingInstance findByConnectionId(String connectionId) {
 		for (SwingInstance i : instances) {
-			if (sessionId != null && (sessionId.equals(i.getSessionId()) || sessionId.equals(i.getMirrorSessionId()))) {
+			if (connectionId != null && (connectionId.equals(i.getConnectionId()) || connectionId.equals(i.getMirrorConnectionId()))) {
 				return i;
 			}
 		}
@@ -47,8 +44,18 @@ public class SwingInstanceSet {
 		return null;
 	}
 
+	public SwingInstance findByOwnerId(String ownerId) {
+		for (SwingInstance i : instances) {
+			if (ownerId != null && ownerId.equals(i.getOwnerId())) {
+				return i;
+			}
+		}
+		return null;
+	}
+
 	public synchronized List<SwingInstance> getAllInstances() {
 		return new ArrayList<>(instances);
 	}
+
 
 }

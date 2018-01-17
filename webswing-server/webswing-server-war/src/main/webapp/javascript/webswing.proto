@@ -205,8 +205,9 @@ message TimestampsMsgInProto {
 
 message ConnectionHandshakeMsgInProto {
     optional string clientId = 1;
-    optional string sessionId = 2;
+    optional string connectionId = 2;
     optional string viewId = 3;
+    optional string browserId = 13;
     optional uint32 desktopWidth = 4;
     optional uint32 desktopHeight = 5;
     optional string applicationName = 6;

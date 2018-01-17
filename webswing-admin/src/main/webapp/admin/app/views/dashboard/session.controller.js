@@ -55,7 +55,6 @@
 					autoStart : false,
 					connectionUrl : "/"+vm.path,
 					clientId : vm.session.id,
-					applicationName : vm.session.application,
 					control : vm.control,
 					mirrorMode : true
 				};

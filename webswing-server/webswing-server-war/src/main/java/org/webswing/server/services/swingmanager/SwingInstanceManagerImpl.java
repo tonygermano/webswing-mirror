@@ -101,6 +101,9 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 			if (!isEnabled()) {
 				throw new WsException("This application is disabled.");
 			}
+			if(handshake.isMirrored()){
+				checkPermissionLocalOrMaster(WebswingAction.websocket_startMirrorView);
+			}
 		} catch (WsException e1) {
 			log.error("User authorization failed. {}", e1.getMessage());
 			r.broadcastMessage(SimpleEventMsgOut.unauthorizedAccess.buildMsgOut());
@@ -108,12 +111,11 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		}
 		try {
 			SwingInstance instance;
-			if (handshake.isMirrored()) {
-				checkPermissionLocalOrMaster(WebswingAction.websocket_startMirrorView);
-				instance = instanceHolder.findInstanceByInstanceId(handshake.getClientId());
-			} else {
-				String idForMode = ServerUtil.resolveInstanceIdForMode(r, handshake, getSwingConfig());
-				instance = instanceHolder.findInstanceByInstanceId(idForMode);
+			if(handshake.isMirrored()){
+				instance=instanceHolder.findInstanceByInstanceId(handshake.getClientId());
+			}else {
+				String ownerId = ServerUtil.resolveOwnerIdForSessionMode(r, handshake, getSwingConfig());
+				instance = instanceHolder.findInstanceByOwnerId(ownerId);
 			}
 			if (instance != null) {
 				instance.connectSwingInstance(r, handshake);
@@ -170,7 +172,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	public void notifySwingClose(SwingInstance swingInstance) {
 		instanceHolder.remove(swingInstance);
 		swingInstance.logWarningHistory();
-		statsLogger.removeInstance(swingInstance.getClientId());
+		statsLogger.removeInstance(swingInstance.getInstanceId());
 	}
 
 	@Override
