@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("restriction")
 public class WebEventDispatcher {
@@ -42,6 +43,7 @@ public class WebEventDispatcher {
 	protected MouseEvent lastMouseEvent;
 	protected MouseEventInfo lastMousePressEvent;
 	protected Point lastMousePosition = new Point();
+	public static AtomicBoolean javaFXdragStarted= new AtomicBoolean(false);
 	private static Component lastEnteredWindow;
 	private static final DndEventHandler dndHandler = new DndEventHandler();
 	private HashMap<String, String> uploadMap = new HashMap<String, String>();
@@ -226,7 +228,7 @@ public class WebEventDispatcher {
 			c = Util.getWebToolkit().getWindowManager().getLockedToWindow();
 		} else {
 			c = Util.getWebToolkit().getWindowManager().getVisibleComponentOnPosition(event.getX(), event.getY());
-			if (!dndHandler.isDndInProgress() && lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup))) {
+			if (relatedToLastEvent(event, lastMouseEvent) && !javaFXdragStarted.get() && !dndHandler.isDndInProgress() ) {
 				c = (Component) lastMouseEvent.getSource();
 			}
 		}
@@ -301,6 +303,12 @@ public class WebEventDispatcher {
 				break;
 			}
 		}
+	}
+
+	private static boolean relatedToLastEvent(MouseEventMsgIn event, MouseEvent lastMouseEvent) {
+		return lastMouseEvent != null &&
+				(lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) &&
+				((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup));
 	}
 
 	protected int computeClickCount(int x, int y, int button, boolean isPressed, int timeMilis) {
