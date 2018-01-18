@@ -57,6 +57,11 @@ public class WebPrinterJobWrapper extends PrinterJob {
 	}
 
 	@Override
+	public void setPrintService(PrintService service) throws PrinterException {
+		delegate.setPrintService(service);
+	}
+
+	@Override
 	public boolean printDialog() throws HeadlessException {
 		PrintService[] services = wrappedLookupPrintServices(null, null);
 		int defaultServiceIndex = getIndexOfPrintService(services);

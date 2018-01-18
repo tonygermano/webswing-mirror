@@ -33,14 +33,17 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("restriction")
 public class WebEventDispatcher {
 
-	private static final int CLICK_TOLERANCE = 2;
-	private MouseEvent lastMouseEvent;
-	private MouseEventInfo lastMousePressEvent;
-	private Point lastMousePosition = new Point();
+	protected static final int CLICK_TOLERANCE = 2;
+	protected MouseEvent lastMouseEvent;
+	protected MouseEventInfo lastMousePressEvent;
+	protected Point lastMousePosition = new Point();
+	public static AtomicBoolean javaFXdragStarted= new AtomicBoolean(false);
+	private static Component lastEnteredWindow;
 	private static final DndEventHandler dndHandler = new DndEventHandler();
 	private HashMap<String, String> uploadMap = new HashMap<String, String>();
 	private ExecutorService eventDispatcher = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing Event Dispatcher"));
@@ -52,18 +55,18 @@ public class WebEventDispatcher {
 	private static final Map<Integer, Integer> convertedKeyCodes = new HashMap<Integer, Integer>();
 
 	static {
-		convertedKeyCodes.put(45, 155);//	Insert
-		convertedKeyCodes.put(46, 127);//	Delete
-		convertedKeyCodes.put(189, 45);//	Minus
-		convertedKeyCodes.put(187, 61);//	Equals
-		convertedKeyCodes.put(219, 91);//	Open Bracket
-		convertedKeyCodes.put(221, 93);//	Close Bracket
-		convertedKeyCodes.put(186, 59);//	Semicolon
-		convertedKeyCodes.put(220, 92);//	Back Slash
-		convertedKeyCodes.put(226, 92);//	Back Slash
-		convertedKeyCodes.put(188, 44);//	Comma
-		convertedKeyCodes.put(190, 46);//	Period
-		convertedKeyCodes.put(191, 47);//	Slash
+		convertedKeyCodes.put(45, KeyEvent.VK_INSERT);//	Insert 155
+		convertedKeyCodes.put(46, KeyEvent.VK_DELETE);//	Delete 127
+		convertedKeyCodes.put(189, KeyEvent.VK_MINUS);//	Minus 45
+		convertedKeyCodes.put(187, KeyEvent.VK_EQUALS);//	Equals 61
+		convertedKeyCodes.put(219, KeyEvent.VK_OPEN_BRACKET);//	Open Bracket 91
+		convertedKeyCodes.put(221, KeyEvent.VK_CLOSE_BRACKET);//	Close Bracket 93
+		convertedKeyCodes.put(186, KeyEvent.VK_SEMICOLON);//	Semicolon 59
+		convertedKeyCodes.put(220, KeyEvent.VK_BACK_SLASH);//	Back Slash 92
+		convertedKeyCodes.put(226, KeyEvent.VK_BACK_SLASH);//	Back Slash 92
+		convertedKeyCodes.put(188, KeyEvent.VK_COMMA);//	Comma 44
+		convertedKeyCodes.put(190, KeyEvent.VK_PERIOD);//	Period 46
+		convertedKeyCodes.put(191, KeyEvent.VK_SLASH);//	Slash 47
 	}
 
 	public static final long doubleClickMaxDelay = Long.getLong(Constants.SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY, 750);
@@ -224,7 +227,7 @@ public class WebEventDispatcher {
 			c = WindowManager.getInstance().getLockedToWindow();
 		} else {
 			c = WindowManager.getInstance().getVisibleComponentOnPosition(event.getX(), event.getY());
-			if (lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup))) {
+			if (relatedToLastEvent(event, lastMouseEvent) && !javaFXdragStarted.get() && !dndHandler.isDndInProgress() ) {
 				c = (Component) lastMouseEvent.getSource();
 			}
 		}
@@ -232,6 +235,7 @@ public class WebEventDispatcher {
 			if (Util.getWebToolkit().getPaintDispatcher() != null) {
 				Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
+			dispatchExitEvent(System.currentTimeMillis(), 0, -1, -1, event.getX(), event.getY());
 			return;
 		}
 		if (c != null && c.isShowing()) {
@@ -297,8 +301,13 @@ public class WebEventDispatcher {
 			default:
 				break;
 			}
-
 		}
+	}
+
+	private static boolean relatedToLastEvent(MouseEventMsgIn event, MouseEvent lastMouseEvent) {
+		return lastMouseEvent != null &&
+				(lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) &&
+				((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup));
 	}
 
 	private int computeClickCount(int x, int y, int button, boolean isPressed, int timeMilis) {
@@ -438,8 +447,29 @@ public class WebEventDispatcher {
 				dndHandler.processMouseEvent(w, e);
 			} else {
 				Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
+				dispatchEnterExitEvents(w, e);
 				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
 			}
+		}
+	}
+
+	private static void dispatchEnterExitEvents(Window w, AWTEvent e) {
+		if (e instanceof MouseEvent && lastEnteredWindow != w) {
+			MouseEvent oe = (MouseEvent) e;
+			dispatchExitEvent(oe.getWhen(), oe.getModifiersEx() | oe.getModifiers(), oe.getX(), oe.getY(), oe.getXOnScreen(), oe.getYOnScreen());
+			if (w != null) {
+				MouseEvent enterEvent = new MouseEvent(w, MouseEvent.MOUSE_ENTERED, oe.getWhen(), oe.getModifiersEx() | oe.getModifiers(), oe.getX(), oe.getY(), oe.getXOnScreen(), oe.getYOnScreen(), oe.getClickCount(), oe.isPopupTrigger(), oe.getButton());
+				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(enterEvent);
+			}
+			lastEnteredWindow = w;
+		}
+	}
+
+	private static void dispatchExitEvent(long when, int mod, int x, int y, int absX, int absY) {
+		if (lastEnteredWindow != null && lastEnteredWindow.isShowing()) {
+			MouseEvent exitEvent = new MouseEvent(lastEnteredWindow, MouseEvent.MOUSE_EXITED, when, mod, x, y, absX, absY, 0, false, 0);
+			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(exitEvent);
+			lastEnteredWindow = null;
 		}
 	}
 
