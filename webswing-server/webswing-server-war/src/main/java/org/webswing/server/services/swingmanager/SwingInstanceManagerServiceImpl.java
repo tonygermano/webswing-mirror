@@ -11,7 +11,6 @@ import org.webswing.server.services.security.modules.SecurityModuleService;
 import org.webswing.server.services.stats.StatisticsLoggerService;
 import org.webswing.server.services.swinginstance.SwingInstanceService;
 import org.webswing.server.services.swingmanager.instance.SwingInstanceHolder;
-import org.webswing.server.services.swingmanager.instance.SwingInstanceHolderImpl;
 import org.webswing.server.services.swingmanager.instance.SwingInstanceHolderService;
 import org.webswing.server.services.websocket.WebSocketService;
 
@@ -50,7 +49,7 @@ public class SwingInstanceManagerServiceImpl implements SwingInstanceManagerServ
 	}
 
 	public SwingInstanceManager createApp(UrlHandler parent, String path) {
-		SwingInstanceHolder holder = instanceHolderService.createInstanceHolder();
+		SwingInstanceHolder holder = instanceHolderService.createInstanceHolder(path);
 		return new SwingInstanceManagerImpl(parent, path, instanceService, websocket, fileService, loginService, resourceHandler, securityModuleService, configService, loggerService, extService, restService, holder);
 	}
 

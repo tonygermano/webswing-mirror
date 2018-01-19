@@ -135,4 +135,8 @@ public class ConfigurationServiceImpl implements ConfigurationService, Configura
 	public boolean isMultiApplicationMode() {
 		return provider.isMultiApplicationMode();
 	}
+	
+	protected ConfigurationProvider getProvider() {
+		return provider;
+	}
 }
