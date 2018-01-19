@@ -127,10 +127,10 @@
             }
             switch (instruction.inst) {
                 case InstructionProto.GRAPHICS_CREATE:
-                    iprtGraphicsCreate(ctx, instruction.args[0], args, imageContext);
+                    iprtGraphicsCreate(ctxOriginal, instruction.args[0], args, imageContext);
                     break;
                 case InstructionProto.GRAPHICS_SWITCH:
-                    iprtGraphicsSwitch(ctx, instruction.args[0], imageContext);
+                    iprtGraphicsSwitch(ctxOriginal, instruction.args[0], imageContext);
                     break;
                 case InstructionProto.GRAPHICS_DISPOSE:
                     iprtGraphicsDispose(instruction.args[0], imageContext);
@@ -155,22 +155,22 @@
                     break;
                 case InstructionProto.SET_STROKE:
                     graphicsState.strokeArgs = args;
-                    iprtSetStroke(ctx, args);
+                    iprtSetStroke(ctxOriginal, args);
                     break;
                 case InstructionProto.SET_PAINT:
                     graphicsState.paintArgs = args;
-                    iprtSetPaint(ctx, args);
+                    iprtSetPaint(ctxOriginal, args);
                     break;
                 case InstructionProto.SET_COMPOSITE:
                     graphicsState.compositeArgs = args;
-                    iprtSetComposite(ctx, args);
+                    iprtSetComposite(ctxOriginal, args);
                     break;
                 case InstructionProto.SET_FONT:
                     graphicsState.fontArgs = args;
-                    graphicsState.fontTransform = iprtSetFont(ctx, args);
+                    graphicsState.fontTransform = iprtSetFont(ctxOriginal, args);
                     break;
                 case InstructionProto.TRANSFORM:
-                    graphicsState.transform = concatTransform(graphicsState.transform, iprtTransform(ctx, args));
+                    graphicsState.transform = concatTransform(graphicsState.transform, iprtTransform(ctxOriginal, args));
                     break;
                 case InstructionProto.DRAW_GLYPH_LIST:
                     iprtDrawGlyphList(ctx, args);

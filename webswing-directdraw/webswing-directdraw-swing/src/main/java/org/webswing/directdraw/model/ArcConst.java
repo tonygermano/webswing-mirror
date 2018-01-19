@@ -20,12 +20,12 @@ public class ArcConst extends MutableDrawConstantHolder<Arc2D, ArcProto> {
 	@Override
 	public ArcProto buildMessage(Arc2D value) {
 		ArcProto.Builder model = ArcProto.newBuilder();
-		model.setX((int) value.getX());
-		model.setY((int) value.getY());
-		model.setW((int) value.getWidth());
-		model.setH((int) value.getHeight());
-		model.setStart((int) value.getAngleStart());
-		model.setExtent((int) value.getAngleExtent());
+		model.setX((float) value.getX());
+		model.setY((float) value.getY());
+		model.setW((float) value.getWidth());
+		model.setH((float) value.getHeight());
+		model.setStart((float) value.getAngleStart());
+		model.setExtent((float) value.getAngleExtent());
 		model.setType(ArcTypeProto.valueOf(value.getArcType()));
 		return model.build();
 	}
