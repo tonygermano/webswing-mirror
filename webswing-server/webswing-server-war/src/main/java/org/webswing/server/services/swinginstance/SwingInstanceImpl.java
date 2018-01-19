@@ -60,7 +60,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class SwingInstanceImpl implements SwingInstance, JvmListener {
+public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListener {
+
+	private static final long serialVersionUID = -4640770499863974871L;
+	
 	private static final String LAUNCHER_CONFIG = "launcherConfig";
 	private static final String WEB_TOOLKIT_CLASS_NAME = "org.webswing.toolkit.WebToolkit";
 	private static final String WEB_GRAPHICS_ENV_CLASS_NAME = "org.webswing.toolkit.ge.WebGraphicsEnvironment";
