@@ -19,10 +19,10 @@ public class RectangleConst extends MutableDrawConstantHolder<Rectangle2D, Recta
 	@Override
 	public RectangleProto buildMessage(Rectangle2D value) {
 		RectangleProto.Builder model = RectangleProto.newBuilder();
-		model.setX((int) value.getX());
-		model.setY((int) value.getY());
-		model.setW((int) value.getWidth());
-		model.setH((int) value.getHeight());
+		model.setX((float) value.getX());
+		model.setY((float) value.getY());
+		model.setW((float) value.getWidth());
+		model.setH((float) value.getHeight());
 		return model.build();
 	}
 

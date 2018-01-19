@@ -14,10 +14,10 @@ public class EllipseConst extends MutableDrawConstantHolder<Ellipse2D, EllipsePr
 	@Override
 	protected EllipseProto buildMessage(Ellipse2D value) {
 		EllipseProto.Builder model = EllipseProto.newBuilder();
-		model.setX((int) value.getX());
-		model.setY((int) value.getY());
-		model.setW((int) value.getWidth());
-		model.setH((int) value.getHeight());
+		model.setX((float) value.getX());
+		model.setY((float) value.getY());
+		model.setW((float) value.getWidth());
+		model.setH((float) value.getHeight());
 		return model.build();
 	}
 
