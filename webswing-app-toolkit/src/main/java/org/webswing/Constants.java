@@ -4,6 +4,7 @@ public interface Constants {
 
 	// Web related constants
 	public static final String CLIENT_ID_COOKIE = "webswingID";
+	public static final String ENTERPRISE_MODULE = "org.webswing.enterprise.EnterpriseServerModule";
 
 	// swing startup properties
 	public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
@@ -73,7 +74,6 @@ public interface Constants {
 	public static final String FILE_SERVLET_WAIT_TIMEOUT = "webswing.fileServletWaitTimeout";
 	public static final String REVERSE_PROXY_CONTEXT_PATH = "webswing.proxyContextPath";
 	public static final String HTTPS_ONLY = "webswing.httpsOnly";
-	public static final String GUICE_BINDING_MODULE = "webswing.bindingModule";
 
 	// swing start related properties
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";

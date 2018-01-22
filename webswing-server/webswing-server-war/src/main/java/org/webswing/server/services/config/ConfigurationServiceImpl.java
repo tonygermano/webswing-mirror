@@ -123,20 +123,20 @@ public class ConfigurationServiceImpl implements ConfigurationService, Configura
 		return provider.describeConfiguration(asPath(path), json, ctx, extensionLoader);
 	}
 
-	private String asPath(String path) {
+	@Override
+	public boolean isMultiApplicationMode() {
+		return provider.isMultiApplicationMode();
+	}
+
+	protected ConfigurationProvider getProvider() {
+		return provider;
+	}
+
+	public static String asPath(String path) {
 		String p = CommonUtil.toPath(path);
 		if (StringUtils.isBlank(p)) {
 			p = "/";
 		}
 		return p;
-	}
-
-	@Override
-	public boolean isMultiApplicationMode() {
-		return provider.isMultiApplicationMode();
-	}
-	
-	protected ConfigurationProvider getProvider() {
-		return provider;
 	}
 }

@@ -4,9 +4,11 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
+import com.google.inject.multibindings.Multibinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
+import org.webswing.server.base.WebswingService;
 import org.webswing.server.extension.ExtensionClassLoader;
 import org.webswing.server.extension.ExtensionService;
 import org.webswing.server.extension.ExtensionServiceImpl;
@@ -61,7 +63,14 @@ public class WebswingServerModule extends AbstractModule {
 
 		bind(GlobalUrlHandler.class);
 
+		Multibinder<WebswingService> serviceBinder = Multibinder.newSetBinder(binder(), WebswingService.class);
+
 		bind(StartupService.class).to(StartupServiceImpl.class);
+		serviceBinder.addBinding().to(JmsServiceImpl.class);
+		serviceBinder.addBinding().to(WebSocketServiceImpl.class);
+		serviceBinder.addBinding().to(ConfigurationServiceImpl.class);
+		serviceBinder.addBinding().to(ExtensionServiceImpl.class);
+
 		bind(WebSocketService.class).to(WebSocketServiceImpl.class);
 		bind(JmsService.class).to(JmsServiceImpl.class);
 		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);

@@ -1,10 +1,6 @@
 package org.webswing.server;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import com.google.inject.*;
 import com.google.inject.util.Modules;
 
 import org.slf4j.Logger;
@@ -44,10 +40,12 @@ public class WebswingServlet extends HttpServlet {
 				
 		try {
 			Injector injector;
-			if(System.getProperty(Constants.GUICE_BINDING_MODULE) == null) {
+			Module enterpriseModule = createEnterpriseModule();
+			if(enterpriseModule == null) {
 				injector = Guice.createInjector(servletModule, new WebswingServerModule());
 			} else {
-				injector = Guice.createInjector(Modules.combine(servletModule, Modules.override(new WebswingServerModule()).with(createBindingModule())));
+				Module overriddenModule = Modules.override(new WebswingServerModule()).with(enterpriseModule);
+				injector = Guice.createInjector(Modules.combine(servletModule,overriddenModule ));
 			}
 				
 			this.startup = injector.getInstance(StartupService.class);
@@ -120,18 +118,16 @@ public class WebswingServlet extends HttpServlet {
 		return handler.getLastModified(req);
 	}
 	
-	private Module createBindingModule() throws InstantiationException, IllegalAccessException {
-		Module result = null;
-		String moduleClassName = System.getProperty(Constants.GUICE_BINDING_MODULE);
-
+	private Module createEnterpriseModule(){
 		try {
-			result = (AbstractModule) WebswingServerModule.class.getClassLoader().loadClass(moduleClassName)
-					.newInstance();
-			return result;
-		} catch (Exception e) {
-			log.warn("Failed to load extension module {} ", moduleClassName);
+			Class<?> moduleClass = WebswingServerModule.class.getClassLoader().loadClass(Constants.ENTERPRISE_MODULE);
+			Module module = (AbstractModule) moduleClass.newInstance();
+			log.info("Webswing Enterprise module intialized.");
+			return module;
+		} catch (Throwable e) {
+			log.debug("Enterprise module not available. "+e.getMessage());
+			return null;
 		}
 
-		return result;
 	}
 }

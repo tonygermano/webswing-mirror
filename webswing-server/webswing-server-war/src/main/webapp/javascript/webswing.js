@@ -122,7 +122,9 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
             module.ready = function () {
                 configure();
                 if (typeof api.cfg.onReady ===  'function'){
-                    api.cfg.onReady(api.externalApi);
+                    api.login(function () {
+                        api.cfg.onReady(api.externalApi);
+                    });
                 }
                 if (api.cfg.autoStart) {
                     api.start();
