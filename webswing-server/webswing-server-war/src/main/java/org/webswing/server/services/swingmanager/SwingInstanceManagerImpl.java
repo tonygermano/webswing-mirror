@@ -165,7 +165,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		} else if (getSwingConfig().getMaxClients() == 0) {
 			return true;
 		} else {
-			return instanceHolder.getAllInstances().size() >= getSwingConfig().getMaxClients();
+			return instanceHolder.getRunningInstacesCount() >= getSwingConfig().getMaxClients();
 		}
 	}
 

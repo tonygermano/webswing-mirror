@@ -47,4 +47,9 @@ public class SwingInstanceHolderImpl implements SwingInstanceHolder{
 		runningInstances.remove(swingInstance.getInstanceId());		
 	}
 
+	@Override
+	public int getRunningInstacesCount() {
+		return runningInstances.size();
+	}
+
 }

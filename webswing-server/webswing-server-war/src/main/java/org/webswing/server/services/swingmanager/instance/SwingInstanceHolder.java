@@ -19,4 +19,6 @@ public interface SwingInstanceHolder {
 	void add(SwingInstance swingInstance);
 
 	void remove(SwingInstance swingInstance);
+	
+	int getRunningInstacesCount();
 }
