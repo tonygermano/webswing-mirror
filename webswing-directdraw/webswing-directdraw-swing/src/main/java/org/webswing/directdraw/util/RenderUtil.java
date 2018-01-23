@@ -23,11 +23,20 @@ public class RenderUtil {
 		return result;
 	}
 
-	public static BufferedImage render(BufferedImage result, List<DrawInstruction> instructions) {
-		Map<Integer, Graphics2D> map = new HashMap<Integer, Graphics2D>();
+	public static RenderContext createRenderContext(BufferedImage result){
+		return new RenderContext(result);
+	}
 
-		Graphics2D currentGraphics = null;
-		for (DrawInstruction di : instructions) {
+	public static class RenderContext{
+		private Map<Integer, Graphics2D> map = new HashMap<Integer, Graphics2D>();
+		private Graphics2D currentGraphics = null;
+		private BufferedImage result;
+
+		RenderContext(BufferedImage result){
+			this.result = result;
+		}
+
+		public void interpret( DrawInstruction di){
 			switch (di.getInstruction()) {
 			case GRAPHICS_CREATE:
 				currentGraphics = iprtGraphicsCreate(result, di, map);
@@ -83,10 +92,23 @@ public class RenderUtil {
 			}
 		}
 
-		for (Graphics2D g2d : map.values()) {
-			g2d.dispose();
+		public void interpret( List<DrawInstruction> instructions){
+			for (DrawInstruction di : instructions) {
+				interpret(di);
+			}
 		}
 
+		public void dispose(){
+			for (Graphics2D g2d : map.values()) {
+				g2d.dispose();
+			}
+		}
+	}
+
+	public static BufferedImage render(BufferedImage result, List<DrawInstruction> instructions) {
+		RenderContext ctx= new RenderContext(result);
+		ctx.interpret(instructions);
+		ctx.dispose();
 		return result;
 	}
 
