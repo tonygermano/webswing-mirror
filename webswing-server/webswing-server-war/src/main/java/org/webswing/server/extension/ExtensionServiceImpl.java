@@ -15,6 +15,7 @@ import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.rest.RestService;
+import org.webswing.server.services.rest.RestUrlHandler;
 import org.webswing.server.services.swingprocess.SwingProcessService;
 
 @Singleton
@@ -73,10 +74,10 @@ public class ExtensionServiceImpl implements ExtensionService, ExtensionDependen
 	}
 
 	@Override
-	public RestService getRestService() {
-		return restService;
+	public RestUrlHandler createRestHandler(UrlHandler parent, Class... resources) {
+		return restService.createRestHandler(parent,resources);
 	}
-	
+
 	protected ExtensionProvider getProvider() {
 		return provider;
 	}

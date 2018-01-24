@@ -9,4 +9,6 @@ public interface RestService {
 	RestUrlHandler createGlobalRestHandler(GlobalUrlHandler parent);
 
 	RestUrlHandler createSwingAppRestHandler(PrimaryUrlHandler parent);
+
+	RestUrlHandler createRestHandler(UrlHandler parent, Class... resources);
 }
