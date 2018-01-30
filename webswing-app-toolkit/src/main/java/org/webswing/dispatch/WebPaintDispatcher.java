@@ -12,7 +12,6 @@ import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.extra.WebRepaintManager;
-import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
@@ -41,6 +40,7 @@ public class WebPaintDispatcher {
 
 	private volatile Map<String, Set<Rectangle>> areasToUpdate = new HashMap<String, Set<Rectangle>>();
 	private volatile WindowMoveActionMsg moveAction;
+	private volatile FocusEventMsg focusEvent;
 	private volatile boolean clientReadyToReceive = true;
 	private long lastReadyStateTime;
 	private JFileChooser fileChooserDialog;
@@ -92,6 +92,10 @@ public class WebPaintDispatcher {
 							if (moveAction != null) {
 								json.setMoveAction(moveAction);
 								moveAction = null;
+							}
+							if (focusEvent!= null) {
+								json.setFocusEvent(focusEvent);
+								focusEvent = null;
 							}
 							clientReadyToReceive = false;
 						}
@@ -536,5 +540,9 @@ public class WebPaintDispatcher {
 			return result;
 		}
 		return false;
+	}
+
+	public void notifyFocusEvent(FocusEventMsg msg) {
+		focusEvent=msg;
 	}
 }
