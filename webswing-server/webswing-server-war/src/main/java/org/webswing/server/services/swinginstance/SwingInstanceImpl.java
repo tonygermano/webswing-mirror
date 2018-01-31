@@ -495,6 +495,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			String vmArgs = appConfig.getVmArgs() == null ? "" : subs.replace(appConfig.getVmArgs());
 			swingConfig.setJvmArgs(j9modules + bootCp + debug + " -noverify " + vmArgs);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, this.getInstanceId());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_ID, manager.getPathMapping());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.instanceId);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_HOME, getAbsolutePath(".", false));
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
