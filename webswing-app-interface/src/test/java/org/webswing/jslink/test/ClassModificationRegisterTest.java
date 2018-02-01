@@ -7,6 +7,8 @@ import org.webswing.classloader.ClassModificationRegister;
 
 import javax.script.ScriptException;
 
+import java.io.File;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -14,7 +16,7 @@ public class ClassModificationRegisterTest {
 
 	@Before
 	public void setUp() throws Exception {
-		System.setProperty(Constants.TEMP_DIR_PATH, ".");
+		System.setProperty(Constants.TEMP_DIR_PATH, new File(".").getAbsoluteFile().toURI().toString());
 		System.setProperty(Constants.SWING_START_SYS_PROP_APP_ID, "test");
 		ClassModificationRegister r1 = new ClassModificationRegister();
 		r1.setModificationState("class1",true);
