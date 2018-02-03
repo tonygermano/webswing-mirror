@@ -8,6 +8,7 @@ public interface Constants {
 
 	// swing startup properties
 	public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
+	public static final String SWING_START_SYS_PROP_APP_ID = "webswing.appId";
 	public static final String SWING_START_SYS_PROP_JMS_ID = "webswing.jmsQueueId";
 	public static final String SWING_START_SYS_PROP_MAIN_CLASS = "webswing.mainClass";
 	public static final String SWING_START_SYS_PROP_APP_HOME = "webswing.applicationHome";
@@ -107,6 +108,5 @@ public interface Constants {
 	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
 	public static final String EXTENSION_PROVIDER = "webswing.extensionProvider" ;
 	public static final String CONFIG_PROVIDER = "webswing.configProvider";
-
 
 }

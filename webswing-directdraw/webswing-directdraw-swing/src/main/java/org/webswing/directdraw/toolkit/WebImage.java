@@ -1,22 +1,7 @@
 package org.webswing.directdraw.toolkit;
 
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.model.CompositeDrawConstantHolder;
-import org.webswing.directdraw.model.DrawConstant;
-import org.webswing.directdraw.model.DrawInstruction;
-import org.webswing.directdraw.model.FontFaceConst;
-import org.webswing.directdraw.model.IntegerConst;
+import org.webswing.directdraw.model.*;
 import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
 import org.webswing.directdraw.proto.Directdraw.FontFaceProto;
@@ -24,13 +9,21 @@ import org.webswing.directdraw.proto.Directdraw.WebImageProto;
 import org.webswing.directdraw.util.DirectDrawUtils;
 import org.webswing.directdraw.util.DrawConstantPool;
 import org.webswing.directdraw.util.RenderUtil;
-
 import sun.awt.image.SurfaceManager;
 import sun.java2d.SurfaceData;
+
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
+import java.util.*;
+import java.util.List;
 
 @SuppressWarnings({ "unused", "restriction" })
 public class WebImage extends Image {
 
+	public static final String FALLBACK_PROPERTY = "webswing.ddFallbackThreshold";
 	private String id = UUID.randomUUID().toString();
 	private DirectDraw context;
 	private final Dimension size;
@@ -41,8 +34,9 @@ public class WebImage extends Image {
 	private boolean resetBeforeRepaint;
 
 	private RenderUtil.RenderContext fallbackContext;
-	private int fallbackInstThreshold = -1;
+	private int fallbackInstThreshold = Integer.getInteger(FALLBACK_PROPERTY,-1);
 	BufferedImage fallbackImage;
+	private boolean fallbackViable=true;
 
 	public WebImage(DirectDraw dd, int w, int h) {
 		this(dd, w, h, new ArrayList<DrawInstruction>());
@@ -145,7 +139,7 @@ public class WebImage extends Image {
 
 	public boolean isDirty() {
 		synchronized (this) {
-			return !instructions.isEmpty() || fallbackContext!=null;
+			return !instructions.isEmpty() || fallbackContext != null;
 		}
 	}
 
@@ -179,28 +173,48 @@ public class WebImage extends Image {
 	}
 
 	private void addInstructionInternal(DrawInstruction in) {
-		if(fallbackContext!=null){
+		if(in.getInstruction().equals(InstructionProto.COPY_AREA)){
+			fallbackViable=false;
+			if(fallbackContext!=null){
+				//cancel fallback
+				fallbackContext.dispose();
+				fallbackContext=null;
+				for(WebGraphics ug: usedGraphics){
+					instructions.add(context.getInstructionFactory().createGraphics(ug));
+				}
+				Graphics2D g= (Graphics2D) lastUsedG.create();
+				g.setTransform(new AffineTransform(1,0,0,1,0,0));
+				g.setClip(null);
+				g.drawImage(fallbackImage,0,0,null);
+				g.dispose();
+				fallbackImage=null;
+			}
+		}
+		if (fallbackContext != null) {
 			fallbackContext.interpret(in);
-		}else {
+		} else {
 			instructions.add(in);
 		}
 
-		if (fallbackInstThreshold != -1 && instructions.size() > fallbackInstThreshold) {
+		if (fallbackViable && fallbackInstThreshold != -1 && instructions.size() > fallbackInstThreshold) {
 			initializeFallback().interpret(instructions);
 			instructions.clear();
 		}
 	}
 
 	private RenderUtil.RenderContext initializeFallback() {
-		if(fallbackImage==null){
-			fallbackImage= new BufferedImage(size.width,size.height,BufferedImage.TYPE_INT_ARGB);
-		}else {
+		if (fallbackImage == null) {
+			fallbackImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+		} else {
 			Graphics2D g = fallbackImage.createGraphics();
-			g.setBackground(new Color(0,0,0,0));
-			g.clearRect(0,0,size.width,size.height);
+			g.setBackground(new Color(0, 0, 0, 0));
+			g.clearRect(0, 0, size.width, size.height);
 			g.dispose();
 		}
-		fallbackContext=RenderUtil.createRenderContext(fallbackImage);
+		RenderingHints hints= new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		hints.put(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		hints.put(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		fallbackContext = RenderUtil.createRenderContext(fallbackImage,hints);
 		return fallbackContext;
 	}
 
@@ -213,13 +227,14 @@ public class WebImage extends Image {
 	public WebImage extractReadOnlyWebImage(boolean reset) {
 		WebImage result;
 		synchronized (this) {
-			if(fallbackContext==null){
+			if (fallbackContext == null) {
 				result = reset ? new ReadOnlyWebImage(context, size.width, size.height, instructions) : new ReadOnlyWebImage(context, size.width, size.height, new ArrayList<DrawInstruction>(instructions));
-			}else{
-				List<DrawInstruction> fallbackInstruction= new ArrayList<>();
-				DrawInstruction in = context.getInstructionFactory().drawImage(fallbackImage, new AffineTransform(), null, null, new Rectangle(size.width, size.height));
-				fallbackInstruction.add(in);
-				result = new ReadOnlyWebImage(context, size.width, size.height, fallbackInstruction);
+			} else {
+				WebImage readonlyFallbackSource = new WebImage(context, size.width, size.height);
+				Graphics g = readonlyFallbackSource.getGraphics();
+				g.drawImage(fallbackImage, 0, 0, null);
+				g.dispose();
+				result = readonlyFallbackSource.extractReadOnlyWebImage(true);
 			}
 			result.id = id;
 			if (reset) {
@@ -273,10 +288,11 @@ public class WebImage extends Image {
 			usedGraphics.clear();
 			// do not clear these collections as they are be copied to read-only instance
 			instructions = new ArrayList<DrawInstruction>();
-			if(fallbackContext!=null){
+			if (fallbackContext != null) {
 				fallbackContext.dispose();
 			}
-			fallbackContext=null;
+			fallbackContext = null;
+			fallbackViable=true;
 		}
 	}
 
@@ -287,17 +303,17 @@ public class WebImage extends Image {
 	}
 
 	public BufferedImage getSnapshot() {
-		if(fallbackContext!=null){
+		if (fallbackContext != null) {
 			return fallbackImage;
-		}else{
+		} else {
 			return RenderUtil.render(instructions, size);
 		}
 	}
 
 	public BufferedImage getSnapshot(BufferedImage result) {
-		if(fallbackContext!=null){
+		if (fallbackContext != null) {
 			return fallbackImage;
-		}else {
+		} else {
 			return RenderUtil.render(result, instructions);
 		}
 	}

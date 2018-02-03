@@ -9,6 +9,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             getSocketId: 'socket.uuid',
             send: 'socket.send',
             getCanvas: 'canvas.get',
+            getInput: 'canvas.getInput',
             registerInput: 'input.register',
             sendInput: 'input.sendInput',
             registerTouch: 'touch.register',
@@ -284,6 +285,16 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             }
             if (data.moveAction != null) {
                 copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height, context);
+            }
+            if (data.focusEvent != null) {
+                var input=api.getInput();
+                if(data.focusEvent.type === 'focusWithCarretGained'){
+                    input.style.top = (data.focusEvent.y+data.focusEvent.caretY)+'px';
+                    input.style.left = (data.focusEvent.x+data.focusEvent.caretX)+'px';
+                }else{
+                    input.style.top = null;
+                    input.style.left = null;
+                }
             }
             if (data.cursorChange != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
                 canvas.style.cursor = getCursorStyle(data.cursorChange);

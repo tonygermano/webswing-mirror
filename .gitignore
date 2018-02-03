@@ -26,3 +26,5 @@ stats.log*
 audit.log*
 /.metadata/
 /.recommenders/
+*.unmodified_classes
+*.unmodified_classes.lock

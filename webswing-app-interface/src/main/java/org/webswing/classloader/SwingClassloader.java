@@ -11,12 +11,7 @@ import java.net.URLStreamHandler;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.Constant;
@@ -170,6 +165,7 @@ public class SwingClassloader extends URLClassLoader {
 
 	private Hashtable<String, Class<?>> classes = new Hashtable<String, Class<?>>(); // Hashtable is synchronized thus thread-safe
 	private String[] ignored_packages;
+	private ClassModificationRegister modRegister= new ClassModificationRegister();
 	private ClassLoaderRepository repository;
 	private final URLClassLoader repoClassLoader;
 
@@ -232,7 +228,12 @@ public class SwingClassloader extends URLClassLoader {
 				} else { // Fifth try: Load classes via repository
 					try {
 						clazz = repository.loadClass(class_name);
-						clazz = modifyClass(clazz);
+						if(modRegister.canSkipModification(class_name)) {
+							definePackage(clazz);
+						}else {
+							clazz = modifyClass(clazz);
+						}
+						modRegister.notifyClassLoaded(class_name);
 						repository.removeClass(clazz);
 					} catch (ClassNotFoundException e) {
 						//in case the class was loaded from external source using defineClass (ie. remote EJB stub)
@@ -302,10 +303,7 @@ public class SwingClassloader extends URLClassLoader {
 			return clazz;
 		}
 
-		Package s = getPackage(clazz.getPackageName());
-		if (s == null) {
-			super.definePackage(clazz.getPackageName(), null, null, null, null, null, null, null);
-		}
+		definePackage(clazz);
 
 		if (!classReplacementMapping.values().contains(clazz.getClassName())) {
 			ClassGen cg = new ClassGen(clazz);
@@ -319,10 +317,10 @@ public class SwingClassloader extends URLClassLoader {
 			// interceptPaintMethod(clazz, cg, cp, f);
 
 			// +++++++++ Reroute (static) methods that require special handling +++++++++++++
-			rerouteMehods(clazz, cg, cp, f);
+			boolean rerouted = rerouteMehods(clazz, cg, cp, f);
 
 			// +++++++++ Override methods that needs to be modified +++++++++++++
-			overrideMehods(cg, cp, f);
+			//overrideMehods(cg, cp, f);
 
 			// dump
 			// try {
@@ -332,9 +330,18 @@ public class SwingClassloader extends URLClassLoader {
 			// ex.printStackTrace();
 			// }
 			// end dump
+
+			modRegister.setModificationState(clazz.getClassName(),rerouted);
 			return cg.getJavaClass();
 		} else {
 			return clazz;
+		}
+	}
+
+	private void definePackage(JavaClass clazz) {
+		Package s = getPackage(clazz.getPackageName());
+		if (s == null) {
+			super.definePackage(clazz.getPackageName(), null, null, null, null, null, null, null);
 		}
 	}
 
@@ -382,7 +389,7 @@ public class SwingClassloader extends URLClassLoader {
 
 	}
 
-	private void rerouteMehods(JavaClass clazz, ClassGen cg, ConstantPoolGen cp, InstructionFactory f) {
+	private boolean rerouteMehods(JavaClass clazz, ClassGen cg, ConstantPoolGen cp, InstructionFactory f) {
 		Map<Integer, Integer> indexReplacementMap = new HashMap<Integer, Integer>();
 		// find methods to replace in current class
 		for (String methodDef : methodReplacementMapping.keySet()) {
@@ -424,7 +431,9 @@ public class SwingClassloader extends URLClassLoader {
 					}
 				}
 			}
-
+			return true;
+		}else {
+			return false;
 		}
 	}
 
