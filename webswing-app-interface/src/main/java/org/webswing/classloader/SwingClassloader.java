@@ -14,10 +14,7 @@ import java.security.cert.Certificate;
 import java.util.*;
 
 import org.apache.bcel.Constants;
-import org.apache.bcel.classfile.Constant;
-import org.apache.bcel.classfile.ConstantClass;
-import org.apache.bcel.classfile.JavaClass;
-import org.apache.bcel.classfile.Method;
+import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.ALOAD;
 import org.apache.bcel.generic.CHECKCAST;
 import org.apache.bcel.generic.CPInstruction;
@@ -34,6 +31,7 @@ import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.ClassLoaderRepository;
+import org.apache.commons.io.IOUtils;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.util.ClassLoaderUtil;
 
@@ -219,22 +217,25 @@ public class SwingClassloader extends URLClassLoader {
 				}
 			}
 			if (cl == null) {
-				JavaClass clazz = null;
 				/*
 				 * Fourth try: Special request?
 				 */
+				byte[] bytes=null;
+
 				if (class_name.indexOf("$$BCEL$$") >= 0) {
-					clazz = createClass(class_name);
+					bytes = createClass(class_name).getBytes();
 				} else { // Fifth try: Load classes via repository
 					try {
-						clazz = repository.loadClass(class_name);
 						if(modRegister.canSkipModification(class_name)) {
-							definePackage(clazz);
+							definePackage(class_name.substring(0,class_name.lastIndexOf(".")));
+							bytes=loadClassBytes(class_name);
 						}else {
+							JavaClass clazz = repository.loadClass(class_name);
 							clazz = modifyClass(clazz);
+							repository.removeClass(clazz);
+							bytes = clazz.getBytes();
 						}
 						modRegister.notifyClassLoaded(class_name);
-						repository.removeClass(clazz);
 					} catch (ClassNotFoundException e) {
 						//in case the class was loaded from external source using defineClass (ie. remote EJB stub)
 						cl = findLoadedClass(class_name);
@@ -248,11 +249,10 @@ public class SwingClassloader extends URLClassLoader {
 						}
 					}
 				}
-				if (clazz != null) {
-					byte[] bytes = clazz.getBytes();
+				if (bytes != null) {
 					java.security.Permissions perms = new java.security.Permissions();
 					perms.add(SecurityConstants.ALL_PERMISSION);
-					String classFilePath = repoClassLoader.getResource(clazz.getClassName().replace('.', '/') + ".class").toExternalForm();
+					String classFilePath = repoClassLoader.getResource(class_name.replace('.', '/') + ".class").toExternalForm();
 					int jarSeparatorIndex = classFilePath.lastIndexOf('!');
 					boolean inJar = classFilePath.startsWith("jar:");
 					classFilePath = jarSeparatorIndex > 0 && inJar ? classFilePath.substring(4, jarSeparatorIndex) : classFilePath;
@@ -303,7 +303,7 @@ public class SwingClassloader extends URLClassLoader {
 			return clazz;
 		}
 
-		definePackage(clazz);
+		definePackage(clazz.getPackageName());
 
 		if (!classReplacementMapping.values().contains(clazz.getClassName())) {
 			ClassGen cg = new ClassGen(clazz);
@@ -338,10 +338,10 @@ public class SwingClassloader extends URLClassLoader {
 		}
 	}
 
-	private void definePackage(JavaClass clazz) {
-		Package s = getPackage(clazz.getPackageName());
+	private void definePackage(String pkgname) {
+		Package s = getPackage(pkgname);
 		if (s == null) {
-			super.definePackage(clazz.getPackageName(), null, null, null, null, null, null, null);
+			super.definePackage(pkgname, null, null, null, null, null, null, null);
 		}
 	}
 
@@ -513,4 +513,39 @@ public class SwingClassloader extends URLClassLoader {
 		return repoClassLoader.getResources(name);
 	}
 
+
+	public byte[] loadClassBytes(String className) throws ClassNotFoundException {
+		String classFile = className.replace('.', '/');
+		try {
+			InputStream is = repoClassLoader.getResourceAsStream(classFile + ".class");
+			Throwable error = null;
+			byte[] result=null;
+			try {
+				if (is == null) {
+					throw new ClassNotFoundException(className + " not found.");
+				}
+				result = IOUtils.toByteArray(is);;
+			} catch (Throwable e) {
+				error = e;
+				throw e;
+			} finally {
+				if (is != null) {
+					if (error != null) {
+						try {
+							is.close();
+						} catch (Throwable e) {
+							error.addSuppressed(e);
+						}
+					} else {
+						is.close();
+					}
+				}
+
+			}
+
+			return result;
+		} catch (IOException e) {
+			throw new ClassNotFoundException(className + " not found: " + e, e);
+		}
+	}
 }
