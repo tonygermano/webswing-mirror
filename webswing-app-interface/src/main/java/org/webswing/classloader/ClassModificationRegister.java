@@ -58,9 +58,14 @@ public class ClassModificationRegister {
 	}
 
 	File getClassListFile() {
-		String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
-		String applicationName = URLEncoder.encode(System.getProperty(Constants.SWING_START_SYS_PROP_APP_ID));
-		return new File(URI.create(tempDir + applicationName + ".unmodified_classes"));
+		String blacklistFileName=System.getProperty(Constants.SWING_START_SYS_PROP_CLASS_MODIFICATION_BLACKLIST);
+		if(blacklistFileName!=null){
+			return new File(blacklistFileName);
+		}else {
+			String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
+			String applicationName = URLEncoder.encode(System.getProperty(Constants.SWING_START_SYS_PROP_APP_ID));
+			return new File(URI.create(tempDir + applicationName + ".unmodified_classes"));
+		}
 	}
 
 	File getClassListLockFile() {

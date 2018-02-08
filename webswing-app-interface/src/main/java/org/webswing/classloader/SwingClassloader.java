@@ -389,7 +389,7 @@ public class SwingClassloader extends URLClassLoader {
 
 	}
 
-	private boolean rerouteMehods(JavaClass clazz, ClassGen cg, ConstantPoolGen cp, InstructionFactory f) {
+	private static boolean rerouteMehods(JavaClass clazz, ClassGen cg, ConstantPoolGen cp, InstructionFactory f) {
 		Map<Integer, Integer> indexReplacementMap = new HashMap<Integer, Integer>();
 		// find methods to replace in current class
 		for (String methodDef : methodReplacementMapping.keySet()) {
@@ -548,4 +548,17 @@ public class SwingClassloader extends URLClassLoader {
 			throw new ClassNotFoundException(className + " not found: " + e, e);
 		}
 	}
+
+	public static boolean isModified(Class<?> c) throws Exception {
+		String classFile = c.getName().replace('.', '/');
+		InputStream is = c.getClassLoader().getResourceAsStream(classFile + ".class");
+		ClassParser parser = new ClassParser(is, c.getName());
+		JavaClass javaClass = parser.parse();
+		ClassGen cg = new ClassGen(javaClass);
+		ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
+		InstructionFactory f = new InstructionFactory(cg);
+		boolean result = rerouteMehods(javaClass, cg, cp, f);
+		return result;
+	}
+
 }

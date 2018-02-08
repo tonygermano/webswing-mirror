@@ -163,7 +163,7 @@ public class GraphicsWrapper extends Graphics2D {
 
 	@Override
 	public void clearRect(int x, int y, int width, int height) {
-		synchronized (original) {
+		synchronized (WebPaintDispatcher.webPaintLock) {
 			original.clearRect(x, y, width, height);
 			addDirtyRectangleArea(new Rectangle(x, y, width, height));
 		}
