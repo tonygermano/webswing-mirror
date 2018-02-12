@@ -18,6 +18,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 public class ConfigurationServiceImpl implements ConfigurationService, ConfigurationUpdateHandler {
@@ -26,7 +27,7 @@ public class ConfigurationServiceImpl implements ConfigurationService, Configura
 	private final ExtensionClassLoader extensionLoader;
 	private int interval;
 	private ConfigurationProvider provider;
-	private List<ConfigurationChangeListener> changeListeners = new ArrayList<>();
+	private List<ConfigurationChangeListener> changeListeners = new CopyOnWriteArrayList<>();
 
 	@Inject
 	public ConfigurationServiceImpl(ExtensionClassLoader extensionLoader) {
