@@ -177,6 +177,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             jqUpload.bind('fileuploaddone', fileuploaddone);
 
             function fileuploadadd(e, data) {
+                data.form.fileupload({url: api.cfg.connectionUrl + 'file?uuid='+api.socketId()});
                 data.files.forEach(function (file) {
                     doneFileList.push(file.name);
                 });
