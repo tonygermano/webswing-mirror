@@ -52,10 +52,10 @@ public class SwingMain {
 	}
 
 	private static void startSwingApp(String[] args) throws Exception {
+		setupContextClassLoader(swingLibClassLoader);
 		Class<?> clazz = swingLibClassLoader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_MAIN_CLASS));
 		Class<?> mainArgType[] = { (new String[0]).getClass() };
 		java.lang.reflect.Method main = clazz.getMethod("main", mainArgType);
-		setupContextClassLoader(swingLibClassLoader);
 		Util.getWebToolkit().startDispatchers();
 		initializeJavaFX();
 		Object argsArray[] = { args };
@@ -63,9 +63,9 @@ public class SwingMain {
 	}
 
 	private static void startApplet() throws Exception {
+		setupContextClassLoader(swingLibClassLoader);
 		Class<?> appletClazz = swingLibClassLoader.loadClass(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
 		Map<String, String> props = resolveProps();
-		setupContextClassLoader(swingLibClassLoader);
 		Util.getWebToolkit().startDispatchers();
 		initializeJavaFX();
 		if (Applet.class.isAssignableFrom(appletClazz)) {
