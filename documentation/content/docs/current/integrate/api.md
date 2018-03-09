@@ -22,11 +22,11 @@ Some examples are given in the project *webswing-demo-swingset3* in the class *A
 
 **getPrimaryUser()**
 
-Returns the user of connected web session. Note:if user disconnects/closes browser, this method will return null.
+Returns the user of connected web session. Note: If user disconnects/closes browser, this method will return null.
 
 **getMirrorViewUser()**
 
-Returns the user of connected mirror view web session. (Admin console -> view session) Note:if admin disconnects/closes browser, this method will return null.
+Returns the user of connected mirror view web session. (Admin console -> view session). Note: If admin disconnects/closes browser, this method will return null.
 
 **Boolean primaryUserHasRole(String role) throws WebswingApiException**
 
@@ -67,13 +67,13 @@ Removes user listener
 
 **void notifyShutdown(int forceKillTimeout)**
 
-When swing application exit and shutdown process takes longer time to process, invoking this method will notify user (web session) the application has finished, and disconnect the user from the session. Swing Application process is removed from running sessions list even though the process might still be running.
+When Swing application exits and shuts down, the process takes longer. Invoking this method will notify the user (web session) the application has finished, and disconnect the user from the session. Swing application process is removed from running sessions list even though the process might still be running.
 
 `Parameters` _forceKillTimeout_ - how long (in Ms) to wait for process to finish. After this time the process is forcefully terminated.
 
 **void addShutdownListener(WebswingShutdownListener listener)**
 
-Adds listener that is triggered when Webswing requests swing application to exit. If there is no explicit shutdown listener Webswing use default shutdown procedure (send window closing event to all windows). Otherwise listeners are fired. It is expected the result of listener execution will exit the swing process. Otherwise the swing process will be forcefully terminated after defined timeout (system property "webswing.waitForExit", default: 30000)
+Adds listener that is triggered when Webswing requests Swing application to exit. If there is no explicit shutdown listener, Webswing uses the default shutdown procedure (send window closing event to all windows). Otherwise, listeners are fired. It is expected the result of listener execution will exit the Swing process. Otherwise, the Swing process will be forcefully terminated after defined timeout (system property "webswing.waitForExit", default: 30000).
 
 **void removeShutdownListener(WebswingShutdownListener listener)**
 
@@ -81,17 +81,17 @@ Removes shutdown listener
 
 **void setUrlState(WebswingUrlState state)**
 
-See WebswingApi#setUrlState(WebswingUrlState, boolean). This method will not trigger url change event in WebswingUrlStateChangeListener
+See WebswingApi#setUrlState(WebswingUrlState, boolean). This method will not trigger URL change event in WebswingUrlStateChangeListener
 
-`Parameters` _state_ - state object url is generated from
+`Parameters` _state_ - state object URL is generated from
 
 **void setUrlState(WebswingUrlState state, boolean fireChangeEvent)**
 
-Sets the hash Fragment of users browser URL to represent the current state of the swing application. Intended for use in combination with WebswingUrlStateChangeListener and/or WebswingApi#getUrlState()
+Sets the hash Fragment of the user's browser URL to represent the current state of the Swing application. Intended for use in combination with WebswingUrlStateChangeListener and/or WebswingApi#getUrlState().
 
 `Parameters`
-_state_ - state object url is generated from, 
-_fireChangeEvent_ - if true, invoking this method will trigger url change event
+_state_ - state object URL is generated from, 
+_fireChangeEvent_ - if true, invoking this method will trigger URL change event
 
 
 **WebswingUrlState getUrlState()**
@@ -115,14 +115,14 @@ Typically used for customized clipboard integration, while the built-in integrat
 
 Example use case:
 
-1. Create new context menu item "Paste from browser", that will open a modal dialog asking user to press CTRL+V.
+1. Create new context menu item "Paste from browser"; that will open a modal dialog asking user to press CTRL+V.
 2. Listen for CTRL+V keystroke. When received, call this method to get the clipboard content.
 
 Returns latest clipboard content received from browser
 
 **BrowserTransferable getBrowserClipboard(PasteRequestContext ctx)**
 
-Requests user to paste from browser clipboard by showing built-in html modal dialog. This method will block EDT thread (by showing a invisible modal JDialog) until response received from user.
+Requests user to paste from browser clipboard by showing built-in html modal dialog. This method will block EDT thread (by showing an invisible modal JDialog) until a response is received from user.
 Typically used for customized clipboard integration, while the built-in integration is disabled in configuration ("allowLocalClipboard" is false).
 
 Returns user submitted clipboard content received from browser (null if canceled)
@@ -130,7 +130,7 @@ Returns user submitted clipboard content received from browser (null if canceled
 **void sendClipboard(WebswingClipboardData content)**
 
 Sends the specified data to browser.
-A toolbar will appear in browser displaying the data. User can click or press CTRL+C to store the content to local clipboard.
+A toolbar will appear in the browser displaying the data. The user can click or press CTRL+C to store the content to local clipboard.
 Typically used for customized clipboard integration, while the built-in integration is disabled in configuration ("allowLocalClipboard" is false).
 
 `Parameters`
@@ -146,7 +146,7 @@ Typically used for customized clipboard integration, while the built-in integrat
 
 **void resetInactivityTimeout()**
 
-Resets session timeout to prevent automatic termination. Useful if a long running operation has to finish even if user disconnects or is inactive for longer timeframe. Note: Reset needs to be called in periods shorter than configured session timeout. ("webswing.sessionTimeoutSec" system property) Note2: This method has no effect if session timeout is set to 0
+Resets session timeout to prevent automatic termination. Useful if a long running operation has to finish, even if user disconnects or is inactive for a longer timeframe. Note: Reset needs to be called in periods shorter than configured session timeout. ("webswing.sessionTimeoutSec" system property) Note2: This method has no effect if session timeout is set to 0.
 
 **String getWebswingVersion**
 

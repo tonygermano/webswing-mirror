@@ -11,7 +11,7 @@ Starting Webswing with option `-h` will print out help with list of all possible
 c:\webswing>java -jar webswing-server.war -h
 ```
 
-You can define following options in start scripts:
+You can define the following options in start scripts:
 
 Option						|Description						|Default value
 ----------------------------|-----------------------------------|-------------
@@ -23,7 +23,7 @@ Option						|Description						|Default value
  **-ks <arg>**     | Keystore file location for ssl configuration |
  **-p <arg>**      | HTTP port where the web server will listen. If 0 HTTP is disable|`8080`
  **-s <arg>**      | HTTPS port where the web server will listen.If 0 HTTP is disabled.|`0`
- **-t <arg>**      | The folder where temp folder will be created for the webswing server|`./tmp`
+ **-t <arg>**      | The folder where temp folder will be created for the Webswing server|`./tmp`
  **-tc <arg>**     | Clean the temp folder before Webswing start |`true`
  **-tp <arg>**     | Truststore password				|
  **-ts <arg>**     | Truststore file location for SSL configuration|
