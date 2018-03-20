@@ -11,6 +11,7 @@
         c = c || {};
         var config = {
             logDebug: c.logDebug || false,
+            ieVersion: c.ieVersion || false,
             onErrorMessage: c.onErrorMessage || function (message) {
                 console.log(message.stack);
             }
@@ -354,7 +355,11 @@
                     destData.data[4 * i + 3] = destData.data[4 * i + 3];  // APLHA (0-255)
                 }
             }
-            dest.putImageData(destData, bbox.x, bbox.y);
+            if(config.ieVersion && config.ieVersion<=11){
+                dest.putImageData(destData, bbox.x+0.5, bbox.y+0.5);
+            }else{
+                dest.putImageData(destData, bbox.x, bbox.y);
+            }
             if (config.logDebug){
                 console.log('DirectDraw DEBUG xormode - composition pixelsize:'+ (bbox.w* bbox.h) +' duration(ms): ' + (new Date().getTime() - start));
             }
