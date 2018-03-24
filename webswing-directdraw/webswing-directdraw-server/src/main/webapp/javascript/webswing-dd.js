@@ -335,6 +335,12 @@
                 ctx.popBoundingBox = function () {
                     var result = this.boundingBox;
                     this.boundingBox = null;
+                    if(result != null){
+                        result.x=Math.floor(result.x);
+                        result.y=Math.floor(result.y);
+                        result.w=Math.ceil(result.w);
+                        result.h=Math.ceil(result.h);
+                    }
                     return result;
                 }
             }
@@ -355,11 +361,7 @@
                     destData.data[4 * i + 3] = destData.data[4 * i + 3];  // APLHA (0-255)
                 }
             }
-            if(config.ieVersion && config.ieVersion<=11){
-                dest.putImageData(destData, bbox.x+0.5, bbox.y+0.5);
-            }else{
-                dest.putImageData(destData, bbox.x, bbox.y);
-            }
+            dest.putImageData(destData, bbox.x, bbox.y);
             if (config.logDebug){
                 console.log('DirectDraw DEBUG xormode - composition pixelsize:'+ (bbox.w* bbox.h) +' duration(ms): ' + (new Date().getTime() - start));
             }
