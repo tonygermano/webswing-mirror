@@ -72,7 +72,7 @@ abstract public class WebComponentPeer implements ComponentPeer {
 	}
 
 	public BufferedImage extractBufferedImage(Rectangle sub) {
-		BufferedImage safeImage = new BufferedImage(sub.width, sub.height, BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage safeImage = new BufferedImage(sub.width, sub.height, BufferedImage.TYPE_INT_ARGB);
 		if (isInitialized()) {
 			Graphics2D g = (Graphics2D) safeImage.getGraphics();
 			g.drawImage(image, 0, 0, sub.width, sub.height, sub.x, sub.y, sub.x + sub.width, sub.y + sub.height, null);
@@ -122,7 +122,7 @@ abstract public class WebComponentPeer implements ComponentPeer {
 				} else {
 					w = image.getWidth();
 					h = image.getHeight();
-					windowDecorationImage = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
+					windowDecorationImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 				}
 				Graphics g = windowDecorationImage.getGraphics();
 				Services.getImageService().getWindowDecorationTheme().paintWindowDecoration(g, target, w, h);

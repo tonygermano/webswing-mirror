@@ -25,6 +25,7 @@ public class ImageServiceImpl implements ImageService {
 
 	private static ImageServiceImpl impl;
 	private Map<Integer, PngEncoder> encoders;
+	private ByteArrayOutputStream encoderBuffer = new ByteArrayOutputStream();
 	private WindowDecoratorTheme windowDecorationTheme;
 
 	public static ImageServiceImpl getInstance() {
@@ -48,39 +49,45 @@ public class ImageServiceImpl implements ImageService {
 
 	public byte[] getPngImage(BufferedImage image) {
 		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			PngEncoder encoder = getEncoder(image);
 			if (encoder != null) {
-				encoder.encode(image, baos);
+				byte[] result;
+				synchronized (encoderBuffer) {
+					encoder.encode(image, encoderBuffer);
+					result = encoderBuffer.toByteArray();
+					encoderBuffer.reset();
+				}
+				return result;
 			} else {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				ImageIO.write(image, "png", baos);
+				return baos.toByteArray();
 			}
-			return baos.toByteArray();
 		} catch (IOException e) {
 			Logger.error("ImageService:Writing image interrupted:" + e.getMessage(), e);
 		}
 		return null;
 	}
-	
+
 	public PngEncoder getEncoder(BufferedImage image) {
 		int type;
 		switch (image.getType()) {
-			case BufferedImage.TYPE_BYTE_BINARY:
-			case BufferedImage.TYPE_BYTE_INDEXED:
-				type = image.getColorModel().hasAlpha() ? PngEncoder.COLOR_INDEXED_ALPHA : PngEncoder.COLOR_INDEXED;
-				break;
-			
-			case BufferedImage.TYPE_INT_RGB:
-			case BufferedImage.TYPE_INT_ARGB:
-			case BufferedImage.TYPE_INT_ARGB_PRE:
-			case BufferedImage.TYPE_3BYTE_BGR:
-			case BufferedImage.TYPE_4BYTE_ABGR:
-			case BufferedImage.TYPE_4BYTE_ABGR_PRE:
-				type = image.getColorModel().hasAlpha() ? PngEncoder.COLOR_TRUECOLOR_ALPHA : PngEncoder.COLOR_TRUECOLOR;
-				break;
-			
-			default:
-				return null;
+		case BufferedImage.TYPE_BYTE_BINARY:
+		case BufferedImage.TYPE_BYTE_INDEXED:
+			type = image.getColorModel().hasAlpha() ? PngEncoder.COLOR_INDEXED_ALPHA : PngEncoder.COLOR_INDEXED;
+			break;
+
+		case BufferedImage.TYPE_INT_RGB:
+		case BufferedImage.TYPE_INT_ARGB:
+		case BufferedImage.TYPE_INT_ARGB_PRE:
+		case BufferedImage.TYPE_3BYTE_BGR:
+		case BufferedImage.TYPE_4BYTE_ABGR:
+		case BufferedImage.TYPE_4BYTE_ABGR_PRE:
+			type = image.getColorModel().hasAlpha() ? PngEncoder.COLOR_TRUECOLOR_ALPHA : PngEncoder.COLOR_TRUECOLOR;
+			break;
+
+		default:
+			return null;
 		}
 		PngEncoder encoder = encoders.get(type);
 		if (encoder == null) {

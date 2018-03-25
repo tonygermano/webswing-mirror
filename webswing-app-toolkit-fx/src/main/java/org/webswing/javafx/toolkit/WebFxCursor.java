@@ -68,7 +68,7 @@ public class WebFxCursor extends Cursor {
 
 	@Override
 	protected long _createCursor(int x, int y, Pixels pixels) {
-		c = new WebCursor(WebFxUtil.pixelsToImage(pixels), new Point(x, y), "WebFXCursor#" + pixels.hashCode());
+		c = new WebCursor(WebFxUtil.pixelsToImage(null,pixels), new Point(x, y), "WebFXCursor#" + pixels.hashCode());
 		return System.identityHashCode(pixels.hashCode());
 	}
 
