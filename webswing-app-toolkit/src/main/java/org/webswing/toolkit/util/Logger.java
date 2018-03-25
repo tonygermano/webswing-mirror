@@ -1,5 +1,7 @@
 package org.webswing.toolkit.util;
 
+import org.webswing.Constants;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -13,7 +15,7 @@ public class Logger {
 	public static final int FATAL = 5;
 
 	private static Logger log = new Logger();
-	private int thresshold = 2;
+	private int threshold = Integer.getInteger(Constants.SWING_START_SYS_PROP_LOG_LEVEL,2);
 
 	public static void trace(String message, Object... o) {
 		log(TRACE, "TRACE: " + message, o);
@@ -40,7 +42,7 @@ public class Logger {
 	}
 
 	public static void log(int level, String message, Object... o) {
-		if (log.thresshold <= level) {
+		if (log.threshold <= level) {
 			if (o.length > 0) {
 				StringBuilder sb = new StringBuilder(message);
 				sb.append(" -> ");
@@ -65,7 +67,7 @@ public class Logger {
 	}
 
 	public static void setThreshold(int t) {
-		log.thresshold = t;
+		log.threshold = t;
 	}
 
 	private void log(String s) {

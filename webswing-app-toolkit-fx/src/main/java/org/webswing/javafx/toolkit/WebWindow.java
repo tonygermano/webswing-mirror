@@ -140,9 +140,7 @@ public class WebWindow extends Window {
 		w.getContentPane().removeAll();
 		if (view != null && view instanceof WebFxView) {
 			WebFxView wv = (WebFxView) view;
-			wv.canvas.setSize(getContentBounds().getSize());
-			w.getContentPane().add(wv.canvas);
-			SwingUtilities.invokeLater(() -> wv.canvas.requestFocus());
+			wv.setupWindow(w,getContentBounds());
 		}
 		return true;
 	}
@@ -286,7 +284,7 @@ public class WebWindow extends Window {
 
 	@Override
 	protected void _setIcon(long ptr, Pixels pixels) {
-		w.setIconImages(Arrays.asList(WebFxUtil.pixelsToImage(pixels)));
+		w.setIconImages(Arrays.asList(WebFxUtil.pixelsToImage(null,pixels)));
 	}
 
 	protected void setDragCursor(java.awt.Cursor c) {
