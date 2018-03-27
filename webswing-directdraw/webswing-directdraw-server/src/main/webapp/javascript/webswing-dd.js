@@ -11,6 +11,7 @@
         c = c || {};
         var config = {
             logDebug: c.logDebug || false,
+            ieVersion: c.ieVersion || false,
             onErrorMessage: c.onErrorMessage || function (message) {
                 console.log(message.stack);
             }
@@ -334,6 +335,12 @@
                 ctx.popBoundingBox = function () {
                     var result = this.boundingBox;
                     this.boundingBox = null;
+                    if(result != null){
+                        result.x=Math.floor(result.x);
+                        result.y=Math.floor(result.y);
+                        result.w=Math.ceil(result.w);
+                        result.h=Math.ceil(result.h);
+                    }
                     return result;
                 }
             }

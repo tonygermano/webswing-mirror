@@ -55,13 +55,16 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             dispose: dispose,
             repaint: repaint
         };
+        module.ready = function () {
+            directDraw = new WebswingDirectDraw({logDebug:api.cfg.debugLog, ieVersion:api.cfg.ieVersion});
+        };
 
         var timer1, timer3;
         var drawingLock;
         var drawingQ = [];
         var warningTimeout = null;
         var windowImageHolders = {};
-        var directDraw = new WebswingDirectDraw({logDebug:api.cfg.debugLog});
+        var directDraw;
 
         function startApplication(name) {
             initialize(api.getUser() + api.getIdentity() + name, name, false);
@@ -116,7 +119,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             timer3 = setInterval(servletHeartbeat, 100000);
             windowImageHolders = {};
             directDraw.dispose();
-            directDraw = new WebswingDirectDraw({logDebug:api.cfg.debugLog});
+            directDraw = new WebswingDirectDraw({logDebug:api.cfg.debugLog, ieVersion:api.cfg.ieVersion});
         }
 
         function sendMessageEvent(message) {
@@ -388,12 +391,18 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                     for (var x in win.content) {
                         var winContent = win.content[x];
                         if (winContent != null) {
-                            var dx = win.posX + winContent.positionX;
-                            var dy = win.posY + winContent.positionY;
-                            var dw = winContent.width;
-                            var dh = winContent.height;
+                            var sx = Math.min(resultImage.width, Math.max(0, winContent.positionX));
+                            var sy = Math.min(resultImage.height, Math.max(0, winContent.positionY));
+                            var sw = Math.min(resultImage.width - sx, winContent.width - (sx - winContent.positionX));
+                            var sh = Math.min(resultImage.height - sy, winContent.height - (sy - winContent.positionY));
+
+                            var dx = win.posX + sx;
+                            var dy = win.posY + sy;
+                            var dw = sw;
+                            var dh = sh;
+
                             if (dx <= context.canvas.width && dy <= context.canvas.height && dx + dw > 0 && dy + dh > 0) {
-                                context.drawImage(resultImage, winContent.positionX, winContent.positionY, winContent.width, winContent.height, dx, dy, dw, dh);
+                                context.drawImage(resultImage, sx, sy, sw, sh, dx, dy, dw, dh);
                             }
                         }
                     }

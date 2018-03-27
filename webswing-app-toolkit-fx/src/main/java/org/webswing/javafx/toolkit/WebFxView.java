@@ -7,16 +7,21 @@ import com.sun.glass.ui.View;
 import com.sun.javafx.geom.RectBounds;
 import com.sun.prism.web.WebTextureWrapper;
 import org.webswing.dispatch.WebEventDispatcher;
+import org.webswing.javafx.toolkit.adaper.WindowAdapter;
 import org.webswing.javafx.toolkit.util.WebFxUtil;
+import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by vikto on 01-Mar-17.
@@ -24,6 +29,7 @@ import java.util.Map;
 public class WebFxView extends View {
 
 	BufferedImage image;
+	BufferedImage tmp;
 
 	JComponent canvas;
 
@@ -158,12 +164,12 @@ public class WebFxView extends View {
 				eventHandler.handleScrollEvent(this, time, e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), 0, -we.getPreciseWheelRotation(), modifiers, 1, 1, 1, 1, 1, 1);
 			} else {
 				if (WebEventDispatcher.javaFXdragStarted.get()) {
-					if (e.getID() != MouseEvent.MOUSE_WHEEL ) {
+					if (e.getID() != MouseEvent.MOUSE_WHEEL) {
 						if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_RELEASED) {
 							int currentAction = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
 							if (currentAction != Clipboard.ACTION_NONE) {
 								notifyDragDrop(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), currentAction);
-							}else{
+							} else {
 								notifyDragEnd(currentAction);
 							}
 							WebEventDispatcher.javaFXdragStarted.set(false);
@@ -332,21 +338,36 @@ public class WebFxView extends View {
 	@Override
 	protected void _uploadPixels(long ptr, Pixels pixels) {
 		if (getWindow() != null) {
-			this.image = WebFxUtil.pixelsToImage(pixels);
 			Window win = ((WebWindow) getWindow()).w.getThis();
 			RepaintManager rm = RepaintManager.currentManager(win);
 			WebTextureWrapper texture = WebTextureWrapper.textureLookup.get(System.identityHashCode(pixels.getPixels()));
+			Set<RectBounds> tmpBounds = new HashSet<>();
 			if (texture != null) {
 				synchronized (texture.getDirtyAreas()) {
-					for (RectBounds r : texture.getDirtyAreas()) {
-						rm.addDirtyRegion(win, (int) Math.floor(r.getMinX()) + win.getInsets().left, (int) Math.floor(r.getMinY()) + win.getInsets().top, (int) Math.ceil(r.getWidth()), (int) Math.ceil(r.getHeight()));
-					}
+					tmpBounds.addAll(texture.getDirtyAreas());
+					texture.getDirtyAreas().clear();
 				}
 				WebTextureWrapper.textureLookup.clear();
-				texture.getDirtyAreas().clear();
+			}
+
+			BufferedImage previous = this.image;
+			this.image = WebFxUtil.pixelsToImage(this.tmp, pixels);
+			if (previous != null && this.image != null && previous.getWidth() == this.image.getWidth() && previous.getHeight() == this.image.getHeight() && previous.getType() == this.image.getType()) {
+
+				long start = System.currentTimeMillis();
+				Set<RectBounds> diff = WebFxUtil.findUpdateAreas(this.image, previous, tmpBounds);
+				Logger.debug("WebFxView#_uploadPixels: Compared in " + (System.currentTimeMillis() - start) + "ms, diff: " + diff.size());
+
+				for (RectBounds r : diff) {
+					rm.addDirtyRegion(win, (int) Math.floor(r.getMinX()) + win.getInsets().left, (int) Math.floor(r.getMinY()) + win.getInsets().top, (int) Math.ceil(r.getWidth()), (int) Math.ceil(r.getHeight()));
+				}
+
+				//recycle previous image
+				this.tmp = previous;
 			} else {
 				win.repaint();
 			}
+
 		}
 	}
 
@@ -364,4 +385,13 @@ public class WebFxView extends View {
 	protected void notifyDragStart(int button, int x, int y, int xAbs, int yAbs) {
 		super.notifyDragStart(button, x, y, xAbs, yAbs);
 	}
+
+	protected void setupWindow(WindowAdapter w, Rectangle contentBounds) {
+		canvas.setSize(contentBounds.getSize());
+		image = null;
+		tmp = null;
+		w.getContentPane().add(canvas);
+		SwingUtilities.invokeLater(() -> canvas.requestFocus());
+	}
+
 }
