@@ -44,7 +44,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 }
             });
             for (var exportName in result) {
-                root[exportName] = $.extend(root[exportName], result[exportName]);
+                root[exportName] = $.extend(result[exportName], root[exportName]);
             }
         }
 
