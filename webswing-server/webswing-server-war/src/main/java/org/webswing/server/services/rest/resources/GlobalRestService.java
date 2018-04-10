@@ -5,6 +5,7 @@ import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.GlobalUrlHandler;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.common.model.admin.ApplicationInfo;
+import org.webswing.server.common.model.admin.Sessions;
 import org.webswing.server.common.model.rest.LogRequest;
 import org.webswing.server.common.model.rest.LogResponse;
 import org.webswing.server.model.exception.WsException;
@@ -130,7 +131,17 @@ public class GlobalRestService extends BaseRestService {
 		Response.ResponseBuilder builder = Response.ok(LogReaderUtil.getZippedLog(type), MediaType.APPLICATION_OCTET_STREAM);
 		builder.header("content-disposition", "attachment; filename = " + type + ".zip");
 		return builder.build();
-	}
+    }
+
+    @GET
+    @Path("/rest/sessions")
+    public Sessions getSessions() throws WsException {
+        getHandler().checkMasterPermission(WebswingAction.rest_getSession);
+        Sessions result = new Sessions();
+        getGlobalHandler().getApplications().forEach(app -> app.getSwingInstanceHolder().getAllInstances().forEach(si -> result.getSessions().add(si.toSwingSession(false))));
+        getGlobalHandler().getApplications().forEach(app -> app.getSwingInstanceHolder().getAllClosedInstances().forEach(si -> result.getClosedSessions().add(si.toSwingSession(false))));
+        return result;
+    }
 
 	@Override
 	protected PrimaryUrlHandler getHandler() {
