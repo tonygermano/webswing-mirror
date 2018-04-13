@@ -399,6 +399,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		session.setId(getInstanceId());
 		session.setApplet(LauncherType.Applet.equals(getAppConfig().getLauncherType()));
 		session.setApplication(getAppConfig().getName());
+		session.setApplicationUrl(manager.getFullPathMapping());
 		session.setConnected(getConnectionId() != null);
 		WebSocketUserInfo info;
 		if (webConnection == null) {
