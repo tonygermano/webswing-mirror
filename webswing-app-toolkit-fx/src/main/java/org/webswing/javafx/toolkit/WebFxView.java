@@ -125,7 +125,7 @@ public class WebFxView extends View {
 		EventHandler eventHandler = getEventHandler();
 		if (eventHandler == null)
 			return;
-		long time = System.nanoTime();
+		long time = getTime(e);
 		int action = mapAction(e);
 		int keyCode = mapKeyCode(e);
 		int modifiers = mapModifiers(e.getModifiersEx());
@@ -153,7 +153,7 @@ public class WebFxView extends View {
 		EventHandler eventHandler = getEventHandler();
 		if (eventHandler == null)
 			return;
-		long time = System.nanoTime();
+		long time = getTime(e);
 		int type = mapType(e.getID());
 		if (type != 0) {
 			int button = mapButton(e.getButton());
@@ -198,6 +198,10 @@ public class WebFxView extends View {
 				}
 			}
 		}
+	}
+
+	private long getTime(InputEvent e) {
+		return System.nanoTime() - ((System.currentTimeMillis() - e.getWhen()) * 1000000);
 	}
 
 	private void setDragCursor(int action) {

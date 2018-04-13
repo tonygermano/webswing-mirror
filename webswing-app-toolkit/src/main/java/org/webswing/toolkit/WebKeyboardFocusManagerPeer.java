@@ -59,7 +59,7 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 	private static FocusEventMsg getFocusEvent(){
 		Component o = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
 		FocusEventMsg msg = new FocusEventMsg();
-		if (o != null) {
+		if (o != null && o.isShowing()) {
 			msg.setType(FocusEventMsg.FocusEventType.focusGained);
 			Point l = o.getLocationOnScreen();
 			msg.setX(l.x);
