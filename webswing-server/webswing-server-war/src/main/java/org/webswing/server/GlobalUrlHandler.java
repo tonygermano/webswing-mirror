@@ -39,6 +39,7 @@ import org.webswing.server.services.websocket.WebSocketService;
 @Singleton
 public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHandler{
 	private static final Logger log = LoggerFactory.getLogger(GlobalUrlHandler.class);
+	private static final String SERVERNAME = System.getProperty(Constants.BRANDING_PREFIX, "webswing.org");
 
 	private final WebSocketService websocket;
 	private final ConfigurationService configService;
@@ -122,6 +123,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHa
 
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) {
 		try {
+			setSecurityHeaders(req, res);
 			boolean served = super.serve(req, res);
 			if (!served) {
 				throw new WsException("Not Found.", HttpServletResponse.SC_NOT_FOUND);
@@ -130,6 +132,19 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHa
 			handleException(e, req, res);
 		}
 		return true;
+	}
+
+	private void setSecurityHeaders(HttpServletRequest req, HttpServletResponse res) {
+		res.addHeader("Server", SERVERNAME);
+		if (!Boolean.getBoolean(Constants.DISABLE_HTTP_SECURITY_HEADERS)) {
+			res.addHeader("X-Frame-Options", "SAMEORIGIN");
+			res.addHeader("X-Content-Type-Options", "nosniff");
+			res.addHeader("X-XSS-Protection", "1; mode=block");
+			res.addHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+			if (StringUtils.equalsIgnoreCase(req.getScheme(), "https")) {
+				res.addHeader("Strict-Transport-Security", "1; mode=block");
+			}
+		}
 	}
 
 	@Override
