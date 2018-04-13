@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.webswing</groupId>
     <artifactId>webswing</artifactId>
-    <version>2.5.3-SNAPSHOT</version>
+    <version>2.5.3</version>
     <packaging>pom</packaging>
     <name>Webswing</name>
     <description>Webswing is a web server that allows to run any swing application inside your web browser using only pure HTML5.</description>
