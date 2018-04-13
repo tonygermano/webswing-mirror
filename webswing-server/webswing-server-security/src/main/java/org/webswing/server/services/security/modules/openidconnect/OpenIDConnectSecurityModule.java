@@ -48,10 +48,10 @@ public class OpenIDConnectSecurityModule extends AbstractExtendableSecurityModul
 
 	@Override
 	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		if (exception != null) {
+		String url = client.getOpenIDRedirectUrl();
+		if (exception != null || url == null) {
 			sendHtml(request, response, "errorPartial.html", exception);
 		} else {
-			String url = client.getOpenIDRedirectUrl();
 			sendRedirect(request, response, url);
 		}
 	}

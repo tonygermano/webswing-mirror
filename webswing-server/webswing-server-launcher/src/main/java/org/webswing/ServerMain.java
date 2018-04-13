@@ -1,6 +1,5 @@
 package org.webswing;
 
-import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -73,11 +72,6 @@ public class ServerMain {
 		}
 
 		server.setConnectors(connectors.toArray(new Connector[connectors.size()]));
-
-		// enable jmx
-		MBeanContainer mbContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
-		server.addEventListener(mbContainer);
-		server.addBean(mbContainer);
 
 		WebAppContext webapp = new WebAppContext();
 		webapp.setContextPath("/");

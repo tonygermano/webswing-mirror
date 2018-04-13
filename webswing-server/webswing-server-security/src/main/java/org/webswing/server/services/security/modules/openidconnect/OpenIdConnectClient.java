@@ -11,7 +11,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.toolkit.util.DeamonThreadFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -21,17 +20,12 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by vikto on 06-Feb-17.
  */
 public class OpenIdConnectClient {
 	private static final Logger log = LoggerFactory.getLogger(OpenIdConnectClient.class);
-
-	private static final ScheduledExecutorService aliveChecker = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing OpenID watchdog"));
 
 	public static final String CODE = "code";
 	public static final String ISSUER = "issuer";
@@ -52,6 +46,8 @@ public class OpenIdConnectClient {
 	private ClientParametersAuthentication auth;
 	private JacksonFactory jsonFactory = new JacksonFactory();
 	private AuthorizationCodeFlow flow;
+	private Integer pingPeriod;
+	private long lastPing=System.currentTimeMillis();
 
 	public OpenIdConnectClient(URL discovery, URL callback, String clientId, String clientSecret, boolean disableCertValidation, File trustedCert, String roleAttrName, String usernameAttrName) throws Exception {
 		this.callback = callback;
@@ -73,21 +69,15 @@ public class OpenIdConnectClient {
 		}
 		method = BearerToken.authorizationHeaderAccessMethod();
 
+		pingPeriod = Integer.getInteger("org.webswing.openid.ping.interval", 60) *1000;
 		initializeFlow();
-
-		Integer period = Integer.getInteger("org.webswing.openid.ping.interval", 60);
-		aliveChecker.scheduleAtFixedRate(new Runnable() {
-			@Override
-			public void run() {
-				initializeFlow();
-			}
-		}, period, period, TimeUnit.SECONDS);
 	}
 
 	private synchronized void initializeFlow() {
 		URL authURI;
 		URL tokenURI;
 		String issuer;
+		lastPing=System.currentTimeMillis();
 		if (discovery != null) {
 			try {
 				log.info("Loading OpenID Connect definition from: " + discovery);
@@ -125,7 +115,7 @@ public class OpenIdConnectClient {
 	}
 
 	public String getOpenIDRedirectUrl() throws IOException {
-		if (flow != null) {
+		if (isInitialized()) {
 			return flow.newAuthorizationUrl().setRedirectUri(callback.toString()).build();
 		}
 		return null;
@@ -165,6 +155,13 @@ public class OpenIdConnectClient {
 	}
 
 	public boolean isInitialized() {
+		if((System.currentTimeMillis() - lastPing) > pingPeriod){
+			try {
+				initializeFlow();
+			} catch (Exception e) {
+				log.error("Authentication server error:",e);
+			}
+		}
 		return flow != null;
 	}
 

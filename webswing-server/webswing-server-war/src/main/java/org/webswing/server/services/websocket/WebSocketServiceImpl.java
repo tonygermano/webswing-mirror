@@ -13,9 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.atmosphere.client.TrackMessageSizeInterceptor;
-import org.atmosphere.cpr.AtmosphereInterceptor;
-import org.atmosphere.cpr.AtmosphereRequest;
-import org.atmosphere.cpr.AtmosphereResponse;
+import org.atmosphere.cpr.*;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
 import org.atmosphere.interceptor.SuspendTrackerInterceptor;
 import org.atmosphere.util.VoidServletConfig;
@@ -145,7 +143,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	public void serve(WebSocketUrlHandler handler, HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
 		WebSocketAtmosphereHandler endpoint = websocketEndpoints.get(handler.getPathMapping());
 		endpoint.addHandler(req, handler);
-		framework.doCometSupport(AtmosphereRequest.wrap(req), AtmosphereResponse.wrap(res));
+		framework.doCometSupport( AtmosphereRequestImpl.wrap(req), AtmosphereResponseImpl.wrap(res));
 	}
 
 }

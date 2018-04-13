@@ -101,11 +101,11 @@ public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<Key
 	@Override
 	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
 		OpenIdConnectClient realmClient = clients.get(resolveRealmName(request));
-		if (realmClient.isInitialized()) {
+		String url = realmClient.getOpenIDRedirectUrl();
+		if (url != null) {
 			if (exception != null) {
 				sendPartialHtml(request, response, "errorPartial.html", exception);
 			} else {
-				String url = realmClient.getOpenIDRedirectUrl();
 				sendRedirect(request, response, url);
 			}
 		} else {
