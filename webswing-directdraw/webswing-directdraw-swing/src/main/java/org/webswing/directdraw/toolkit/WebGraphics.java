@@ -133,7 +133,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 		} catch (Exception e) {
 			//ignore
 		}
-		BufferedImage bufferedImage = new BufferedImage(image.getWidth(observer), image.getHeight(observer), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bufferedImage = new BufferedImage(Math.max(1,image.getWidth(observer)), Math.max(1,image.getHeight(observer)), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = bufferedImage.createGraphics();
 		try {
 			return new ImageConvertResult(graphics.drawImage(image, 0, 0, observer), bufferedImage);
