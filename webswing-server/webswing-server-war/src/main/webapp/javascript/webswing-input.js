@@ -29,6 +29,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
         var latestKeyDownEvent = null;
         var mouseDown = 0;
         var inputEvtQueue = [];
+        var pixelsScrolled = 0;
 
         function sendInput(message) {
             enqueueInputEvent();
@@ -124,26 +125,17 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
                 sendInput();
                 return false;
             }, false);
-            // IE9, Chrome, Safari, Opera
-            util.bindEvent(canvas, "mousewheel", function (evt) {
-                var mousePos = getMousePos(canvas, evt, 'mousewheel');
-                latestMouseMoveEvent = null;
-                if (latestMouseWheelEvent != null) {
-                    mousePos.mouse.wheelDelta += latestMouseWheelEvent.mouse.wheelDelta;
+            util.bindEvent(canvas, "wheel", function (evt) {
+                pixelsScrolled += evt.deltaY
+                if(pixelsScrolled>=250 || pixelsScrolled<=-250){
+                    pixelsScrolled=0;
+                    var mousePos = getMousePos(canvas, evt, 'mousewheel');
+                    latestMouseMoveEvent = null;
+                    if (latestMouseWheelEvent != null) {
+                        mousePos.mouse.wheelDelta += latestMouseWheelEvent.mouse.wheelDelta;
+                    }
+                    latestMouseWheelEvent = mousePos;
                 }
-                latestMouseWheelEvent = mousePos;
-                evt.preventDefault();
-                evt.stopPropagation();
-                return false;
-            }, false);
-            // firefox
-            util.bindEvent(canvas, "DOMMouseScroll", function (evt) {
-                var mousePos = getMousePos(canvas, evt, 'mousewheel');
-                latestMouseMoveEvent = null;
-                if (latestMouseWheelEvent != null) {
-                    mousePos.mouse.wheelDelta += latestMouseWheelEvent.mouse.wheelDelta;
-                }
-                latestMouseWheelEvent = mousePos;
                 evt.preventDefault();
                 evt.stopPropagation();
                 return false;
