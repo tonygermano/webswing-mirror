@@ -214,7 +214,7 @@ public class WebEventDispatcher {
 			} else {
 				AWTEvent e = Util.createKeyEvent(src, type, when, modifiers, event.getKeycode(), character, KeyEvent.KEY_LOCATION_STANDARD);
 				dispatchEventInSwing(w, e);
-				if (event.getKeycode() == 32 && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && !event.isCtrl()) {// space keycode handle press
+				if ((event.getKeycode() == 32 ||event.getKeycode() == 9) && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && !event.isCtrl()) {// space keycode handle press
 					event.setType(KeyboardEventMsgIn.KeyEventType.keypress);
 					dispatchKeyboardEvent(event);
 				}
