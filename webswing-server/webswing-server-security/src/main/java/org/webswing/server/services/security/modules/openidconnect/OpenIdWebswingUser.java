@@ -12,13 +12,13 @@ import java.util.*;
  */
 public class OpenIdWebswingUser extends AbstractWebswingUser {
 
-	IdToken token;
-	String user;
+    private static final long serialVersionUID = 8364301023317885503L;
+    
+    String user;
 	Map<String, Serializable> attrs = new HashMap<>();
 	List<String> roles=new ArrayList<>();
 
 	public OpenIdWebswingUser(IdToken token, String usernameAttr, String roleAttr, Map<String, Serializable> extraAttribs) {
-		this.token = token;
 		for (String key : token.getPayload().keySet()) {
 			Object value = token.getPayload().get(key);
 			if (value instanceof Serializable) {
