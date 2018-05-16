@@ -29,6 +29,7 @@ public class ConfigurationImpl extends Configuration {
 	private String truststorePassword;
 	private String keystore;
 	private String keystorePassword;
+        private boolean clientAuthEnabled = false;
 
 	private String configFile;
 
@@ -131,6 +132,8 @@ public class ConfigurationImpl extends Configuration {
 		setTruststorePassword(prop.getProperty(PREFIX + ".server.https.truststore.password"));
 		setKeystore(prop.getProperty(PREFIX + ".server.https.keystore"));
 		setKeystorePassword(prop.getProperty(PREFIX + ".server.https.keystore.password"));
+                
+                setClientAuthEnabled(Boolean.parseBoolean(prop.getProperty(PREFIX + ".server.https.clientAuthEnabled")));
 	}
 
 	public String getHost() {
@@ -218,5 +221,19 @@ public class ConfigurationImpl extends Configuration {
 		return "########################Server Configuration ################################\n" + " host=" + host + "\n http=" + http + "\n httpPort=" + httpPort + "\n https=" + https + "\n httpsPort=" + httpsPort + "\n truststore=" + truststore + "\n truststorePassword=***" + "\n keystore=" + keystore + "\n keystorePassword=***"
 				+ "\n configFile=" + configFile + "\n########################Server Configuration End#############################\n";
 	}
+
+    /**
+     * @return the clientAuthEnabled
+     */
+    public boolean isClientAuthEnabled() {
+        return clientAuthEnabled;
+    }
+
+    /**
+     * @param clientAuthEnabled the clientAuthEnabled to set
+     */
+    public void setClientAuthEnabled(boolean clientAuthEnabled) {
+        this.clientAuthEnabled = clientAuthEnabled;
+    }
 
 }

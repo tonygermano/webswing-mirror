@@ -21,6 +21,8 @@ public abstract class Configuration {
 	public abstract String getKeystore();
 
 	public abstract String getKeystorePassword();
+        
+        public abstract boolean isClientAuthEnabled();
 
 	public abstract String getConfigFile();
 

@@ -57,7 +57,7 @@ public class ServerMain {
 					sslContextFactory.setKeyStorePassword(config.getKeystorePassword());
 					sslContextFactory.setTrustStorePath(config.getTruststore());
 					sslContextFactory.setTrustStorePassword(config.getTruststorePassword());
-					sslContextFactory.setNeedClientAuth(false);
+					sslContextFactory.setNeedClientAuth(config.isClientAuthEnabled());
 
 					HttpConfiguration https_config = new HttpConfiguration();
 					SecureRequestCustomizer src = new SecureRequestCustomizer();
