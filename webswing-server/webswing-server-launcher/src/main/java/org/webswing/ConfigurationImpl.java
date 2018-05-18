@@ -126,7 +126,7 @@ public class ConfigurationImpl extends Configuration {
         setHttp(Boolean.parseBoolean(prop.getProperty(PREFIX + ".server.http", "true")));
         setHttpPort(prop.getProperty(PREFIX + ".server.http.port"));
 
-        setHttps(Boolean.parseBoolean(prop.getProperty(PREFIX + ".server.https", "false")));
+        setHttps(Boolean.parseBoolean(prop.getProperty(PREFIX + ".server.https", "true")));
         setHttpsPort(prop.getProperty(PREFIX + ".server.https.port"));
         setTruststore(prop.getProperty(PREFIX + ".server.https.truststore"));
         setTruststorePassword(prop.getProperty(PREFIX + ".server.https.truststore.password"));
