@@ -4,6 +4,10 @@
 
 The best days of swing framework are gone. Desktop applications lost popularity and everything is forced to be online and mobile. But what about existing application? Using applet technology proved to be insecure, and rewriting the application to web is too expensive. This is where Webswing can help you. With Webswing, your application is securely running on a server and a user's browser only displays the application window. All this without changing a single line of source code.
 
+## Attribution
+
+In case you are using Webswing to deliver your product **give a credit and a create link on your page to webswing.org!**
+
 ## Contribution
 
 If you want to contribute to Webswing, be sure to review the [contribution guidelines](http://webswing.org/docs/version-2.5/contrib/).
