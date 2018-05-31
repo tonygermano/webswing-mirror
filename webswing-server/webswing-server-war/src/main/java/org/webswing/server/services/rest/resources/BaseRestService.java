@@ -119,6 +119,7 @@ public abstract class BaseRestService {
 	@GET
 	@Path("/rest/permissions")
 	public Map<String, Boolean> getPermissions() throws Exception {
+		getHandler().checkPermissionLocalOrMaster(WebswingAction.master_basic_access);
 		return getPermissionsImpl();
 	}
 
@@ -150,7 +151,8 @@ public abstract class BaseRestService {
 	@GET
 	@Path("/rest/CSRFToken")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String generateCsrfToken() {
+	public String generateCsrfToken() throws WsException{
+		getHandler().checkPermissionLocalOrMaster(WebswingAction.websocket_connect);
 		return getHandler().generateCsrfToken();
 	}
 
