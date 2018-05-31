@@ -47,7 +47,7 @@ public class JmsServiceImpl implements JmsService {
 		// BrokerService broker= BrokerFactory.createBroker("xbean:mq.xml");
 		System.setProperty("org.apache.activemq.SERIALIZABLE_PACKAGES", Constants.JMS_SERIALIZABLE_PACKAGES);
 		BrokerService broker = new BrokerService();
-		broker.setUseJmx(true);
+		broker.setUseJmx(Boolean.getBoolean(Constants.JMS_ENABLE_JMX));
 		broker.setPersistent(false);
 
 		PolicyMap policyMap = new PolicyMap();
@@ -56,7 +56,6 @@ public class JmsServiceImpl implements JmsService {
 		ConstantPendingMessageLimitStrategy pendingMessageLimitStrategy = new ConstantPendingMessageLimitStrategy();
 		pendingMessageLimitStrategy.setLimit(10);
 		defaultEntry.setPendingMessageLimitStrategy(pendingMessageLimitStrategy);
-		defaultEntry.setMemoryLimit(5 * 1024 * 1024);
 		defaultEntry.setMemoryLimit(getDestinationMemoryLimit());
 
 		policyMap.setDefaultEntry(defaultEntry);
