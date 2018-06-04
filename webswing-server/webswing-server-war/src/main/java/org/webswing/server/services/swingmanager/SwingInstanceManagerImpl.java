@@ -412,7 +412,8 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 
 	@GET
 	@Path("/rest/CSRFToken")
-	public String generateCsrfToken() {
+	public String generateCsrfToken() throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getApps);
 		return super.generateCsrfToken();
 	}
 
