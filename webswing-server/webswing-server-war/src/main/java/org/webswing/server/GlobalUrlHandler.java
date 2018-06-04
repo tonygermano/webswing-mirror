@@ -489,7 +489,8 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SwingInstance
 
 	@GET
 	@Path("/rest/CSRFToken")
-	public String generateCsrfToken() {
+	public String generateCsrfToken() throws WsException {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getApps);
 		return super.generateCsrfToken();
 	}
 }

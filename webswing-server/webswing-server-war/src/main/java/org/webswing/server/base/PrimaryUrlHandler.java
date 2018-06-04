@@ -282,6 +282,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	}
 
 	protected Map<String, Boolean> getPermissions() throws Exception {
+		checkPermissionLocalOrMaster(WebswingAction.rest_getApps);
 		Map<String, Boolean> permissions = new HashMap<>();
 		permissions.put("dashboard", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo));
 		permissions.put("configView", isPermited(WebswingAction.rest_getPaths, WebswingAction.rest_getAppInfo, WebswingAction.rest_getConfig));
@@ -372,7 +373,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		return ServerUtil.getWebResource(toPath(resource), getServletContext(), webFolder);
 	}
 
-	public String generateCsrfToken() {
+	public String generateCsrfToken() throws WsException {
 		String token = (String) getFromSecuritySession(Constants.HTTP_ATTR_CSRF_TOKEN_HEADER);
 		if (token == null) {
 			SecureRandom random = new SecureRandom();

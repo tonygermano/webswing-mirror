@@ -53,6 +53,7 @@ public interface Constants {
 	public static final String JMS_URL = "webswing.jmsUrl";
 	public static final String JMS_URL_DEFAULT = "nio://127.0.0.1:34455";
 	public static final String JMS_SERIALIZABLE_PACKAGES = "*";
+	public static final String JMS_ENABLE_JMX = "webswing.enableActiveMqJmx";
 
 	// server startup constants
 	public static final String WAR_FILE_LOCATION = "webswing.warLocation";
