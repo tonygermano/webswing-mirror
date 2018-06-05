@@ -27,4 +27,4 @@ We use [bitbucket issues](https://bitbucket.org/meszarv/webswing/issues) for tra
 
 ## License
 
-[Apache License 2.0](LICENSE.txt)
+[GNU Affero General Public License](https://www.gnu.org/licenses/agpl-3.0.en.html)
