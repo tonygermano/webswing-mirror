@@ -1,7 +1,22 @@
 package org.webswing.directdraw.toolkit;
 
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.webswing.directdraw.DirectDraw;
-import org.webswing.directdraw.model.*;
+import org.webswing.directdraw.model.CompositeDrawConstantHolder;
+import org.webswing.directdraw.model.DrawConstant;
+import org.webswing.directdraw.model.DrawInstruction;
+import org.webswing.directdraw.model.FontFaceConst;
+import org.webswing.directdraw.model.IntegerConst;
 import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
 import org.webswing.directdraw.proto.Directdraw.FontFaceProto;
@@ -9,16 +24,10 @@ import org.webswing.directdraw.proto.Directdraw.WebImageProto;
 import org.webswing.directdraw.util.DirectDrawUtils;
 import org.webswing.directdraw.util.DrawConstantPool;
 import org.webswing.directdraw.util.RenderUtil;
+
+import sun.awt.SunToolkit;
 import sun.awt.image.SurfaceManager;
 import sun.java2d.SurfaceData;
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
-import java.util.*;
-import java.util.List;
 
 @SuppressWarnings({ "unused", "restriction" })
 public class WebImage extends Image {
@@ -139,7 +148,7 @@ public class WebImage extends Image {
 
 	public boolean isDirty() {
 		synchronized (this) {
-			return !instructions.isEmpty() || fallbackContext != null;
+			return !instructions.isEmpty() || isFallbackActive();
 		}
 	}
 
@@ -175,7 +184,7 @@ public class WebImage extends Image {
 	private void addInstructionInternal(DrawInstruction in) {
 		if(in.getInstruction().equals(InstructionProto.COPY_AREA)){
 			fallbackViable=false;
-			if(fallbackContext!=null){
+			if(isFallbackActive()){
 				//cancel fallback
 				fallbackContext.dispose();
 				fallbackContext=null;
@@ -190,7 +199,7 @@ public class WebImage extends Image {
 				fallbackImage=null;
 			}
 		}
-		if (fallbackContext != null) {
+		if (isFallbackActive()) {
 			fallbackContext.interpret(in);
 		} else {
 			instructions.add(in);
@@ -202,6 +211,10 @@ public class WebImage extends Image {
 		}
 	}
 
+	protected boolean isFallbackActive() {
+		return fallbackContext != null;
+	}
+
 	private RenderUtil.RenderContext initializeFallback() {
 		if (fallbackImage == null) {
 			fallbackImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
@@ -211,9 +224,7 @@ public class WebImage extends Image {
 			g.clearRect(0, 0, size.width, size.height);
 			g.dispose();
 		}
-		RenderingHints hints= new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-		hints.put(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		hints.put(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		RenderingHints hints= new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_SPEED);
 		fallbackContext = RenderUtil.createRenderContext(fallbackImage,hints);
 		return fallbackContext;
 	}
@@ -288,7 +299,7 @@ public class WebImage extends Image {
 			usedGraphics.clear();
 			// do not clear these collections as they are be copied to read-only instance
 			instructions = new ArrayList<DrawInstruction>();
-			if (fallbackContext != null) {
+			if (isFallbackActive()) {
 				fallbackContext.dispose();
 			}
 			fallbackContext = null;
@@ -303,7 +314,7 @@ public class WebImage extends Image {
 	}
 
 	public BufferedImage getSnapshot() {
-		if (fallbackContext != null) {
+		if (isFallbackActive()) {
 			return fallbackImage;
 		} else {
 			return RenderUtil.render(instructions, size);
@@ -311,7 +322,7 @@ public class WebImage extends Image {
 	}
 
 	public BufferedImage getSnapshot(BufferedImage result) {
-		if (fallbackContext != null) {
+		if (isFallbackActive()) {
 			return fallbackImage;
 		} else {
 			return RenderUtil.render(result, instructions);

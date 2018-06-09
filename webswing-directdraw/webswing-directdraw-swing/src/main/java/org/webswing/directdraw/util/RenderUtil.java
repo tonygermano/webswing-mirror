@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.webswing.directdraw.model.DrawConstant;
 import org.webswing.directdraw.model.DrawInstruction;
 import org.webswing.directdraw.model.GlyphListConst.StringConstValue;
 
@@ -189,8 +190,12 @@ public class RenderUtil {
 	}
 
 	private static void iprtDraw(Graphics2D g, DrawInstruction di) {
-		g.setClip(getShape(1, di));
-		g.draw(getShape(0, di));
+		if(di.getArg(1)!= DrawConstant.nullConst){
+			g.setClip(getShape(1, di));
+		}
+		if(di.getArg(0)!=DrawConstant.nullConst) {
+			g.draw(getShape(0, di));
+		}
 	}
 
 	private static void iprtFill(Graphics2D g, DrawInstruction di) {
@@ -266,7 +271,7 @@ public class RenderUtil {
 		return getValue(index, instruction);
 	}
 
-	public static Shape getShape(int index, DrawInstruction instruction) {
+	private static Shape getShape(int index, DrawInstruction instruction) {
 		return getValue(index, instruction);
 	}
 

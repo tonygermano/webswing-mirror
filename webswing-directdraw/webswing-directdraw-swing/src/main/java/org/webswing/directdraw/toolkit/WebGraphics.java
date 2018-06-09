@@ -55,15 +55,27 @@ public class WebGraphics extends AbstractVectorGraphics {
 			if (onDemandTexturePaint) {
 				thisImage.addInstruction(this, dif.setPaint(createTexture(s, getPaint())));
 			}
-			thisImage.addInstruction(this, dif.draw(s, getClip()));
+			if(thisImage.isFallbackActive()){
+				thisImage.addInstruction(this, dif.drawFallback(s));
+			}else {
+				thisImage.addInstruction(this, dif.draw(s, getClip()));
+			}
 		} else {
 			fill(getStroke().createStrokedShape(s));
 		}
 	}
 
+	@Override
+	protected void changeClip(Shape clip) {
+		super.changeClip(clip);
+		if(thisImage.isFallbackActive()){
+			thisImage.addInstruction(this, dif.clipFallback(getClip()));
+		}
+	}
+
 	private Paint createTexture(Shape s, Paint paint) {
 		Rectangle bounds = s.getBounds();
-		BufferedImage img = new BufferedImage(Math.max(1,bounds.width), Math.max(1,bounds.height), paint.getTransparency() == Paint.OPAQUE ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB);
+		BufferedImage img = new BufferedImage(bounds.width, bounds.height, paint.getTransparency() == Paint.OPAQUE ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		g.translate(-bounds.x, -bounds.y);
 		g.setPaint(paint);
@@ -133,7 +145,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 		} catch (Exception e) {
 			//ignore
 		}
-		BufferedImage bufferedImage = new BufferedImage(Math.max(1,image.getWidth(observer)), Math.max(1,image.getHeight(observer)), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bufferedImage = new BufferedImage(image.getWidth(observer), image.getHeight(observer), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = bufferedImage.createGraphics();
 		try {
 			return new ImageConvertResult(graphics.drawImage(image, 0, 0, observer), bufferedImage);
