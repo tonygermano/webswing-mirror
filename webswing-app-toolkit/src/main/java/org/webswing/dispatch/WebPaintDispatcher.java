@@ -12,6 +12,7 @@ import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.extra.WebRepaintManager;
+import org.webswing.toolkit.extra.WebShellFolderManager;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
@@ -93,7 +94,7 @@ public class WebPaintDispatcher {
 								json.setMoveAction(moveAction);
 								moveAction = null;
 							}
-							if (focusEvent!= null) {
+							if (focusEvent != null) {
 								json.setFocusEvent(focusEvent);
 								focusEvent = null;
 							}
@@ -362,7 +363,7 @@ public class WebPaintDispatcher {
 				}
 			}
 			f.setCursorChange(cursorChange);
-            Util.getWebToolkit().getWindowManager().setCurrentCursor(webcursorName);
+			Util.getWebToolkit().getWindowManager().setCurrentCursor(webcursorName);
 			Logger.debug("WebPaintDispatcher:notifyCursorUpdate", f);
 			sendObject(f);
 		}
@@ -441,8 +442,8 @@ public class WebPaintDispatcher {
 		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
 		fdEvent.setEventType(FileDialogEventType.Close);
 		f.setFileDialogEvent(fdEvent);
-		Logger.info("WebPaintDispatcher:notifyFileTransferBarHidden "+ FileDialogEventType.Close.name());
-
+		Logger.info("WebPaintDispatcher:notifyFileTransferBarHidden " + FileDialogEventType.Close.name());
+		validateSelection(fileChooserDialog);
 		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD)) {
 			if (fileChooserDialog != null && fileChooserDialog.getDialogType() == JFileChooser.SAVE_DIALOG) {
 				try {
@@ -468,6 +469,29 @@ public class WebPaintDispatcher {
 		}
 		fileChooserDialog = null;
 		sendObject(f);
+	}
+
+	private void validateSelection(JFileChooser fileChooserDialog) {
+		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ISOLATED_FS) && fileChooserDialog != null) {
+
+			try {
+				if (fileChooserDialog.getSelectedFile() != null) {
+					if (!WebShellFolderManager.isSubfolderOfRoots(fileChooserDialog.getSelectedFile())) {
+						throw new IOException("Invalid selection " + fileChooserDialog.getSelectedFile());
+					}
+				}
+				if (fileChooserDialog.getSelectedFiles() != null && fileChooserDialog.getSelectedFiles().length > 0) {
+					for (File selection : fileChooserDialog.getSelectedFiles()) {
+						if (!WebShellFolderManager.isSubfolderOfRoots(selection)) {
+							throw new IOException("Invalid selection " + selection);
+						}
+					}
+				}
+			} catch (IOException e) {
+				Logger.error("Selection is outside isolated path",e);
+				fileChooserDialog.cancelSelection();
+			}
+		}
 	}
 
 	public JFileChooser getFileChooserDialog() {
@@ -521,20 +545,20 @@ public class WebPaintDispatcher {
 
 	public void requestBrowserClipboard(PasteRequestContext ctx) {
 		AppFrameMsgOut result = new AppFrameMsgOut();
-		PasteRequestMsg paste=new PasteRequestMsg();
+		PasteRequestMsg paste = new PasteRequestMsg();
 		paste.setTitle(ctx.getTitle());
 		paste.setMessage(ctx.getMessage());
 		result.setPasteRequest(paste);
 		Util.getWebToolkit().getPaintDispatcher().sendObject(result);
 
-		this.clipboardDialog = new JDialog((Dialog)null,true);
-		clipboardDialog.setBounds(new Rectangle(0,0,1,1));
+		this.clipboardDialog = new JDialog((Dialog) null, true);
+		clipboardDialog.setBounds(new Rectangle(0, 0, 1, 1));
 		clipboardDialog.setVisible(true);//this call is blocking until dialog is closed
 	}
 
 	public boolean closePasteRequestDialog() {
-		if(clipboardDialog!=null){
-			boolean result=clipboardDialog.isVisible();
+		if (clipboardDialog != null) {
+			boolean result = clipboardDialog.isVisible();
 			clipboardDialog.setVisible(false);
 			clipboardDialog.dispose();
 			return result;
@@ -543,6 +567,6 @@ public class WebPaintDispatcher {
 	}
 
 	public void notifyFocusEvent(FocusEventMsg msg) {
-		focusEvent=msg;
+		focusEvent = msg;
 	}
 }
