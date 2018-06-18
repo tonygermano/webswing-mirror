@@ -347,7 +347,7 @@
 										<war destfile="${project.build.directory}/${project.build.finalName}.war" update="true">
 											<fileset dir="${project.basedir}/../../webswing-app-launcher/target" includes="WEB-INF/swing-boot/*.jar" />
 											<fileset dir="${project.basedir}/../../webswing-app-interface/target" includes="WEB-INF/swing-lib/*.jar" />
-											<fileset dir="${project.basedir}/../webswing-server-launcher/target" includes="WEB-INF/server-lib/*.jar" />
+											<fileset dir="${project.basedir}/../webswing-server-launcher/target" includes="WEB-INF/server-lib/*" />
 											<fileset dir="${project.basedir}/../webswing-server-common/target/classes/" includes="main/*.class" />
 											<fileset dir="${project.build.directory}/require-build/" includes="javascript/**" />
 										</war>

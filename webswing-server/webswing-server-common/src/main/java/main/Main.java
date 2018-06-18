@@ -15,13 +15,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -46,7 +40,7 @@ public class Main {
 		List<URL> urls = new ArrayList<URL>();
 		if (client) {
 			// initialize jmx agent
-            ConnectorBootstrap.startLocalConnectorServer();
+			ConnectorBootstrap.startLocalConnectorServer();
 
 			populateClasspathFromDir("WEB-INF/swing-lib", urls);
 			initializeExtLibServices(urls);
@@ -61,7 +55,18 @@ public class Main {
 		if (client) {
 			mainClass = defaultCL.loadClass("org.webswing.SwingMain");
 		} else {
-			mainClass = defaultCL.loadClass("org.webswing.ServerMain");
+			try {
+				mainClass = defaultCL.loadClass("org.webswing.ServerMain");
+			} catch (ClassNotFoundException e) {
+				InputStream readme = Main.class.getClassLoader().getResourceAsStream("WEB-INF/server-lib/README.txt");
+				if (readme != null) {
+					Scanner s = new Scanner(readme).useDelimiter("\\A");
+					String result = s.hasNext() ? s.next() : "";
+					throw new Exception(result, e);
+				} else {
+					throw new Exception("Unexpected error.", e);
+				}
+			}
 		}
 
 		Method method = mainClass.getMethod("main", args.getClass());
@@ -81,7 +86,7 @@ public class Main {
 			p.load(propFile);
 
 			for (Map.Entry<Object, Object> prop : p.entrySet()) {
-				if(!System.getProperties().containsKey(prop.getKey()))
+				if (!System.getProperties().containsKey(prop.getKey()))
 					System.getProperties().put(prop.getKey(), prop.getValue());
 			}
 
@@ -105,7 +110,7 @@ public class Main {
 	}
 
 	private static void retainOnlyLauncherUrl(List<URL> urls) {
-		for (Iterator<URL> i = urls.iterator(); i.hasNext();) {
+		for (Iterator<URL> i = urls.iterator(); i.hasNext(); ) {
 			if (!i.next().getFile().contains("webswing-app-launcher")) {
 				i.remove();
 			}
@@ -233,7 +238,7 @@ public class Main {
 				File tempDir = new File(baseDir, baseName).getAbsoluteFile();
 				if (!tempDir.exists()) {
 					tempDir.mkdir();
-				} else if (Boolean.parseBoolean(System.getProperty(Constants.CLEAN_TEMP, "true"))){
+				} else if (Boolean.parseBoolean(System.getProperty(Constants.CLEAN_TEMP, "true"))) {
 					for (File f : tempDir.listFiles()) {
 						if (!delete(f)) {
 							throw new IllegalStateException("Not possible to clean the temp folder. Make sure no other instance of webswing is running or use '-d true' option to create a new temp folder.");

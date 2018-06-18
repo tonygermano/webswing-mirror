@@ -14,6 +14,7 @@
                     autoStart: false,
                     connectionUrl: baseUrl,
                     recordingPlayback: $routeParams.playback,
+                    debugLog: true,
                     control: false,
                     mirrorMode: true
                 };
