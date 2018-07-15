@@ -28,6 +28,7 @@
 			vm.aceLoaded = aceLoaded;
 			vm.applyConfig = applyConfig;
 			vm.resetConfig = resetConfig;
+			vm.updateJson = function(){/*initialized with ace editor (aceLoaded())*/};
 
 			$scope.$on('wsHelperOpened', function(evt, data, i) {
 				$scope.$broadcast('wsHelperClose', data, i);
@@ -83,13 +84,15 @@
 				}
 			}
 
-			function applyConfig() {
-				if (!vm.isForm) {
-					vm.apply(JSON.parse(vm.json)).then(vm.updateJson);
-				} else {
-					vm.apply(wsUtils.extractValues(vm.value));
-				}
-			}
+            function applyConfig() {
+                var json = !vm.isForm ? JSON.parse(vm.json) : wsUtils.extractValues(vm.value);
+                configRestService.getMeta(vm.path, json).then(function (data) {
+                    vm.value = angular.extend({}, vm.value, data);
+                    vm.json = wsUtils.toJson(vm.value);
+                    var json = !vm.isForm ? JSON.parse(vm.json) : wsUtils.extractValues(vm.value);
+                    vm.apply(json).then(vm.updateJson);
+                });
+            }
 
 			function resetConfig() {
 				vm.reset().then(vm.updateJson);

@@ -36,8 +36,14 @@ public class EmbededSecurityModule extends AbstractUserPasswordSecurityModule<Em
 	public AbstractWebswingUser verifyUserPassword(String user, String password) throws WebswingAuthenticationException {
 		if (userMap.containsKey(user)) {
 			EmbededWebswingUser current = userMap.get(user);
-			if (StringUtils.equals(password, current.getPassword())) {
-				return current;
+			if(current.getPassword().startsWith(HashUtil.PREFIX)){
+				if(HashUtil.authenticate(password.toCharArray(),current.getPassword())){
+					return current;
+				}
+			}else{
+				if (StringUtils.equals(password, current.getPassword())) {
+					return current;
+				}
 			}
 		}
 		throw new WebswingAuthenticationException("Invalid Username or Password", WebswingAuthenticationException.INVALID_USER_OR_PASSWORD);
