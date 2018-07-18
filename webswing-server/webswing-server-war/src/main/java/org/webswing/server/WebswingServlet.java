@@ -1,6 +1,7 @@
 package org.webswing.server;
 
 import com.google.inject.*;
+import com.google.inject.Module;
 import com.google.inject.util.Modules;
 
 import org.slf4j.Logger;

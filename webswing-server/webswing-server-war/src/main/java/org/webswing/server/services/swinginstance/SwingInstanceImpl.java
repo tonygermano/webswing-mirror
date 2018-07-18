@@ -70,6 +70,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	private static final String WEB_PRINTER_JOB_CLASS_NAME = "org.webswing.toolkit.WebPrinterJobWrapper";
 	private static final String WIN_SHELL_FOLDER_MANAGER = "sun.awt.shell.Win32ShellFolderManager2";
 	private static final String JAVA9_PATCHED_JSOBJECT_MODULE_MARKER = "netscape.javascript.WebswingPatchedJSObjectJarMarker";
+	private static final String JAVA9_PATCHED_SHELL_FOLDER_MANAGER = "sun.awt.shell.WebswingPatchedWin32ShellFolderManager2";
 	private static final String JAVA_FX_PATH = System.getProperty("java.home") + "/lib/ext/jfxrt.jar";
 	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.ToolkitJarMarker";
 
@@ -468,17 +469,19 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			} else if (javaVersion.startsWith("1.8")) {
 				webToolkitClass += "8";
 				webGraphicsEnvClass += "8";
-			} else if (javaVersion.startsWith("9")) {
+			} else if (javaVersion.startsWith("9") || javaVersion.startsWith("10")) {
 				webToolkitClass += "9";
 				webGraphicsEnvClass += "9";
 				j9modules = " --patch-module jdk.jsobject=" + CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_JSOBJECT_MODULE_MARKER);
+				j9modules += " --patch-module java.desktop=" + CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_SHELL_FOLDER_MANAGER);
 				j9modules += " --add-reads jdk.jsobject=ALL-UNNAMED ";
 				j9modules += " --add-opens java.base/java.net=ALL-UNNAMED "; // URLStreamHandler reflective access from SwingClassloader
 				j9modules += " --add-opens java.desktop/java.awt=ALL-UNNAMED "; // EventQueue reflective access from SwingMain
 				j9modules += " --add-opens java.desktop/sun.awt.windows=ALL-UNNAMED "; // sun.awt.windows.ThemeReader reflective access from WebToolkit
+				j9modules += " --add-opens java.desktop/sun.awt.shell=ALL-UNNAMED "; // sun.awt.shell.ShellFolderManager reflective access from WebShellFolderManager
 			} else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
-				throw new RuntimeException("Java version not supported. (Version starting with 1.7, 1.8 and 9 are supported.)");
+				throw new RuntimeException("Java version not supported. (Versions starting with 1.7, 1.8, 9 and 10 are supported.)");
 			}
 			String webSwingToolkitApiJarPath = CommonUtil.getBootClassPathForClass(WebswingApi.class.getName());
 			String webSwingToolkitJarPath = CommonUtil.getBootClassPathForClass(WEB_TOOLKIT_CLASS_NAME);
