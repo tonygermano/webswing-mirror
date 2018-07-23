@@ -71,7 +71,8 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 configure: 'webswing.configure',
                 kill: 'base.kill',
                 setControl: 'webswing.setControl',
-                repaint: 'base.repaint'
+                repaint: 'base.repaint',
+                uuid: 'socket.uuid'
             };
             injector.module('external', {
                 provides: externalObj,

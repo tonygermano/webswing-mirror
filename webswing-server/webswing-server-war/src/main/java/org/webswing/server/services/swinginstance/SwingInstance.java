@@ -43,4 +43,6 @@ public interface SwingInstance {
 	String getThreadDump(String id);
 
 	void requestThreadDump();
+	
+	String getUserId();
 }
