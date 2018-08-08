@@ -423,6 +423,19 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		//responds with 200 OK status
 	}
 
+	@GET
+	@Path("/rest/metrics")
+	public SwingSession getMetrics(@PathParam("") String uuid) throws WsException {
+		if (uuid.startsWith("/")) {
+			uuid = uuid.substring(1);
+		}
+		SwingInstance instance = findInstanceBySessionId(uuid);
+		if (instance != null && getUser().getUserId().equals(instance.getUser())) {
+			return instance.toSwingSession(true);
+		}
+		return null;
+	}
+
 	@Override
 	public void logStatValue(String instance, String name, Number value) {
 		statsLogger.log(instance, name, value);
