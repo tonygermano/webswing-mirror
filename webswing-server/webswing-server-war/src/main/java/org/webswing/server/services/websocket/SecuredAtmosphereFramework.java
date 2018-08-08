@@ -43,7 +43,12 @@ class SecuredAtmosphereFramework extends AtmosphereFramework implements Securabl
 
 		@Override
 		public Cookie[] getCookies() {
-			Cookie[] cookies = super.getCookies();
+			Cookie[] cookies = null;
+			try {
+				cookies = super.getCookies();
+			} catch (Exception e) {
+				//atmosphere throws npe on tomcat if no cookie present
+			}
 			if (cookies == null || cookies.length == 0) {
 				String cookieHeader = getHeader("Cookie");
 				cookies = parseCookieHeader(cookieHeader);

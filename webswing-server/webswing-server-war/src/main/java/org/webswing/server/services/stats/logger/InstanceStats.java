@@ -3,8 +3,10 @@ package org.webswing.server.services.stats.logger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 public class InstanceStats {
 	private static final int MAX_WARNING_HISTORY_SIZE = 20;
@@ -15,6 +17,7 @@ public class InstanceStats {
 	private Map<String, Number> lastMetrics = new ConcurrentHashMap<>();
 	private Map<String, Warning> warnings = new ConcurrentHashMap<>();
 	private ConcurrentLinkedQueue<String> warningHistory = new ConcurrentLinkedQueue<>();
+	private Map<String, Number[]> sessionStats = new ConcurrentHashMap<String, Number[]>();
 
 	public void processMetric(MetricRule rule, String name, Number value, WarningRule warnRule) {
 		//round timestamp to interval milis
@@ -50,6 +53,7 @@ public class InstanceStats {
 				List<Number> list = lastTimestampNumbers.remove(name);
 				Number aggregated = calculateValue(rule, list);
 				valueMap.put(last, aggregated);
+				calculateSessionValue(rule, name, aggregated);
 				lastMetrics.put(name, aggregated);
 				processWarningRule(name, warnRule);
 			}
@@ -63,7 +67,37 @@ public class InstanceStats {
 		}
 	}
 
-	private void processWarningRule(String name, WarningRule warnRule) {
+	private void calculateSessionValue(MetricRule rule, String name, Number aggregated) {
+	    String key = name + "." + rule.getAggregation() + ".SESSION";
+	    if(!sessionStats.containsKey(key)) {
+	        sessionStats.put(key, new Number[]{aggregated, 1});
+	    } else {
+	        Number result = 0;
+	        Number[] values = sessionStats.get(key);
+	        Number lastValue = values[0];
+	        Number count = values[1];
+	        
+	        switch (rule.getAggregation()) {
+            case MIN:
+                result = Math.min(aggregated.doubleValue(), lastValue.doubleValue());
+                break;
+            case MAX:
+                result = Math.max(aggregated.doubleValue(), lastValue.doubleValue());
+                break;
+            case SUM: 
+                result = lastValue.doubleValue() + aggregated.doubleValue();
+                break;
+            case AVG:
+            default:
+                result = lastValue.doubleValue() + (aggregated.doubleValue()-lastValue.doubleValue())/count.doubleValue();
+                break;
+            }
+
+	        sessionStats.replace(key, new Number[]{result, count.doubleValue()+1});
+	    }
+    }
+
+    private void processWarningRule(String name, WarningRule warnRule) {
 		if (warnRule != null) {
 			Warning warning = warnRule.checkWarning(lastMetrics);
 
@@ -127,6 +161,7 @@ public class InstanceStats {
 				metrics.put(name + "." + a, calculateValue(rule, valueList));
 			}
 		}
+		metrics.putAll(getSessionStatistics());
 		return metrics;
 	}
 
@@ -141,6 +176,11 @@ public class InstanceStats {
 	public Map<String, Map<Long, Number>> getStatistics() {
 		return statisticsLog;
 	}
+	
+	   public Map<String, Number> getSessionStatistics() {
+	       Map<String, Number> stats = sessionStats.entrySet().stream().collect(Collectors.<Entry<String, Number[]>, String, Number>toMap(p -> p.getKey(), p -> p.getValue()[0]));
+	       return stats;
+	    }
 
 	public List<String> getWarningHistory() {
 		ArrayList<String> result = new ArrayList<>(warningHistory);

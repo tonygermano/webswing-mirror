@@ -240,8 +240,15 @@ public class WebEventDispatcher {
 		}
 		if (c != null && c.isShowing()) {
 			MouseEvent e = null;
-			int x = (int) (event.getX() - c.getLocationOnScreen().getX());
-			int y = (int) (event.getY() - c.getLocationOnScreen().getY());
+			int x = 0;
+			int y = 0;
+			try {
+				x = (int) (event.getX() - c.getLocationOnScreen().getX());
+				y = (int) (event.getY() - c.getLocationOnScreen().getY());
+			} catch (IllegalComponentStateException e1) {
+				//in case the window closed in meantime, just ignore this event
+				return;
+			}
 			lastMousePosition.x = event.getX();
 			lastMousePosition.y = event.getY();
 			long when = System.currentTimeMillis();

@@ -22,10 +22,10 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 	private boolean windows;
 	private Object defaultManager;
 
-	private File root;
-	private List<File> roots = new ArrayList<File>();
+	private static File root;
+	private static List<File> roots = new ArrayList<File>();
 
-	public WebShellFolderManager() {
+	static {
 		String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
 		String[] paths = path.split(File.pathSeparator);
 		for (int i = 0; i < paths.length; i++) {
@@ -35,12 +35,14 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 			}
 			roots.add(root);
 			if (i == 0) {
-				this.root = root;
+				WebShellFolderManager.root = root;
 				System.setProperty("user.home", root.getAbsolutePath());
 			}
 		}
-		windows = System.getProperty("os.name", "").startsWith("Windows");
+	}
 
+	public WebShellFolderManager() {
+		windows = System.getProperty("os.name", "").startsWith("Windows");
 		try {
 			Class<?> managerClass = ClassLoader.getSystemClassLoader().loadClass("sun.awt.shell.ShellFolderManager");
 			Constructor<?> c = managerClass.getDeclaredConstructor();
@@ -121,7 +123,7 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 		}
 	}
 
-	private boolean isSubfolderOfRoots(File paramFile) throws IOException {
+	public static boolean isSubfolderOfRoots(File paramFile) throws IOException {
 		String cp = paramFile.getCanonicalPath();
 		for (File root : roots) {
 			if (cp.startsWith(root.getCanonicalPath())) {
