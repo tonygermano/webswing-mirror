@@ -12,6 +12,7 @@ import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.extra.WebRepaintManager;
+import org.webswing.toolkit.extra.WebShellFolderManager;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
@@ -437,8 +438,8 @@ public class WebPaintDispatcher {
 		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
 		fdEvent.setEventType(FileDialogEventType.Close);
 		f.setFileDialogEvent(fdEvent);
-		Logger.info("WebPaintDispatcher:notifyFileTransferBarHidden "+ FileDialogEventType.Close.name());
-
+		Logger.info("WebPaintDispatcher:notifyFileTransferBarHidden " + FileDialogEventType.Close.name());
+		validateSelection(fileChooserDialog);
 		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD)) {
 			if (fileChooserDialog != null && fileChooserDialog.getDialogType() == JFileChooser.SAVE_DIALOG) {
 				try {
@@ -464,6 +465,29 @@ public class WebPaintDispatcher {
 		}
 		fileChooserDialog = null;
 		sendObject(f);
+	}
+
+	private void validateSelection(JFileChooser fileChooserDialog) {
+		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ISOLATED_FS) && fileChooserDialog != null) {
+
+			try {
+				if (fileChooserDialog.getSelectedFile() != null) {
+					if (!WebShellFolderManager.isSubfolderOfRoots(fileChooserDialog.getSelectedFile())) {
+						throw new IOException("Invalid selection " + fileChooserDialog.getSelectedFile());
+					}
+				}
+				if (fileChooserDialog.getSelectedFiles() != null && fileChooserDialog.getSelectedFiles().length > 0) {
+					for (File selection : fileChooserDialog.getSelectedFiles()) {
+						if (!WebShellFolderManager.isSubfolderOfRoots(selection)) {
+							throw new IOException("Invalid selection " + selection);
+						}
+					}
+				}
+			} catch (IOException e) {
+				Logger.error("Selection is outside isolated path",e);
+				fileChooserDialog.cancelSelection();
+			}
+		}
 	}
 
 	public JFileChooser getFileChooserDialog() {
