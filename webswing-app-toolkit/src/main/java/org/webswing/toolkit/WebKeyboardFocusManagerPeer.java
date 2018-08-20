@@ -32,7 +32,11 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 
 	@Override
 	public Component getCurrentFocusOwner() {
-		return Util.getWebToolkit().getWindowManager().getActiveWindow().getFocusOwner();
+		Window window = Util.getWebToolkit().getWindowManager().getActiveWindow();
+		if(window!=null){
+			return window.getFocusOwner();
+		}
+		return null;
 	}
 
 	@Override
