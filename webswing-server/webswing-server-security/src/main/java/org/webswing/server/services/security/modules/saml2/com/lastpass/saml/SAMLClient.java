@@ -17,11 +17,35 @@
  */
 package org.webswing.server.services.security.modules.saml2.com.lastpass.saml;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
+import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.utilities.java.support.xml.BasicParserPool;
+import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import org.apache.commons.io.IOUtils;
+import org.joda.time.DateTime;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.saml.common.SAMLObjectBuilder;
+import org.opensaml.saml.saml2.core.*;
+import org.opensaml.saml.saml2.encryption.Decrypter;
+import org.opensaml.security.credential.BasicCredential;
+import org.opensaml.xmlsec.encryption.support.DecryptionException;
+import org.opensaml.xmlsec.encryption.support.InlineEncryptedKeyResolver;
+import org.opensaml.xmlsec.keyinfo.impl.StaticKeyInfoCredentialResolver;
+import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.support.SignatureException;
+import org.opensaml.xmlsec.signature.support.SignatureValidator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
+import org.xml.sax.InputSource;
+
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.ValidationException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,45 +53,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
-
-import javax.xml.bind.DatatypeConverter;
-
-import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
-import org.opensaml.Configuration;
-import org.opensaml.common.SAMLObjectBuilder;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.Attribute;
-import org.opensaml.saml2.core.AttributeStatement;
-import org.opensaml.saml2.core.Audience;
-import org.opensaml.saml2.core.AudienceRestriction;
-import org.opensaml.saml2.core.AuthnRequest;
-import org.opensaml.saml2.core.AuthnStatement;
-import org.opensaml.saml2.core.Conditions;
-import org.opensaml.saml2.core.EncryptedAssertion;
-import org.opensaml.saml2.core.Issuer;
-import org.opensaml.saml2.core.Response;
-import org.opensaml.saml2.core.StatusCode;
-import org.opensaml.saml2.core.Subject;
-import org.opensaml.saml2.core.SubjectConfirmation;
-import org.opensaml.saml2.core.SubjectConfirmationData;
-import org.opensaml.saml2.encryption.Decrypter;
-import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.encryption.DecryptionException;
-import org.opensaml.xml.encryption.InlineEncryptedKeyResolver;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.parse.BasicParserPool;
-import org.opensaml.xml.security.credential.BasicCredential;
-import org.opensaml.xml.security.keyinfo.StaticKeyInfoCredentialResolver;
-import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.signature.SignatureValidator;
-import org.opensaml.xml.validation.ValidationException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSSerializer;
-import org.xml.sax.InputSource;
 
 
 /**
@@ -95,7 +80,7 @@ public class SAMLClient {
 
 	private SPConfig spConfig;
 	private IdPConfig idpConfig;
-	private SignatureValidator sigValidator;
+	private BasicCredential credentials;
 	private BasicParserPool parsers;
 
 	/* do date comparisons +/- this many seconds */
@@ -109,15 +94,20 @@ public class SAMLClient {
 		this.spConfig = spConfig;
 		this.idpConfig = idpConfig;
 
-		BasicCredential cred = new BasicCredential();
+		BasicCredential cred = new BasicCredential(){};
 		cred.setEntityId(idpConfig.getEntityId());
 		cred.setPublicKey(idpConfig.getCert().getPublicKey());
 
-		sigValidator = new SignatureValidator(cred);
+		credentials = cred;
 
 		// create xml parsers
 		parsers = new BasicParserPool();
 		parsers.setNamespaceAware(true);
+		try {
+			parsers.initialize();
+		} catch (ComponentInitializationException e) {
+			throw new SAMLException(e);
+		}
 	}
 
 	/**
@@ -143,10 +133,10 @@ public class SAMLClient {
 			Document doc = parsers.getBuilder().parse(new InputSource(new StringReader(authnResponse)));
 
 			Element root = doc.getDocumentElement();
-			return (Response) Configuration.getUnmarshallerFactory().getUnmarshaller(root).unmarshall(root);
-		} catch (org.opensaml.xml.parse.XMLParserException e) {
+			return (Response) XMLObjectProviderRegistrySupport.getUnmarshallerFactory().getUnmarshaller(root).unmarshall(root);
+		} catch (XMLParserException e) {
 			throw new SAMLException(e);
-		} catch (org.opensaml.xml.io.UnmarshallingException e) {
+		} catch (UnmarshallingException e) {
 			throw new SAMLException(e);
 		} catch (org.xml.sax.SAXException e) {
 			throw new SAMLException(e);
@@ -161,7 +151,7 @@ public class SAMLClient {
 	private Assertion decrypt(EncryptedAssertion encrypted) throws DecryptionException {
 		if (spConfig.getPrivateKey() == null)
 			throw new DecryptionException("Encrypted assertion found but no SP key available");
-		BasicCredential cred = new BasicCredential();
+		BasicCredential cred = new BasicCredential(){};
 		cred.setPrivateKey(spConfig.getPrivateKey());
 		StaticKeyInfoCredentialResolver resolver = new StaticKeyInfoCredentialResolver(cred);
 		Decrypter decrypter = new Decrypter(null, resolver, new InlineEncryptedKeyResolver());
@@ -185,14 +175,14 @@ public class SAMLClient {
 		return assertions;
 	}
 
-	private void validate(Response response) throws ValidationException {
+	private void validate(Response response) throws ValidationException, SignatureException {
 		// response signature must match IdP's key, if present
 		Signature sig = response.getSignature();
 		if (sig != null)
-			sigValidator.validate(sig);
+			SignatureValidator.validate(sig,credentials);
 
 		// response must be successful
-		if (response.getStatus() == null || response.getStatus().getStatusCode() == null || !(StatusCode.SUCCESS_URI.equals(response.getStatus().getStatusCode().getValue()))) {
+		if (response.getStatus() == null || response.getStatus().getStatusCode() == null || !(StatusCode.SUCCESS.equals(response.getStatus().getStatusCode().getValue()))) {
 			throw new ValidationException("Response has an unsuccessful status code");
 		}
 
@@ -227,7 +217,7 @@ public class SAMLClient {
 				throw new ValidationException("Assertion must be signed");
 
 			sig = assertion.getSignature();
-			sigValidator.validate(sig);
+			SignatureValidator.validate(sig,credentials);
 
 			// Assertion must contain an authnstatement
 			// with an unexpired session
@@ -323,7 +313,7 @@ public class SAMLClient {
 	}
 
 	@SuppressWarnings("unchecked") private String createAuthnRequest(String requestId) throws SAMLException {
-		XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+		XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
 		SAMLObjectBuilder<AuthnRequest> builder = (SAMLObjectBuilder<AuthnRequest>) builderFactory.getBuilder(AuthnRequest.DEFAULT_ELEMENT_NAME);
 
@@ -341,7 +331,7 @@ public class SAMLClient {
 
 		try {
 			// samlobject to xml dom object
-			Element elem = Configuration.getMarshallerFactory().getMarshaller(request).marshall(request);
+			Element elem = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(request).marshall(request);
 
 			// and to a string...
 			Document document = elem.getOwnerDocument();
@@ -428,6 +418,8 @@ public class SAMLClient {
 		try {
 			validate(response);
 		} catch (ValidationException e) {
+			throw new SAMLException(e);
+		} catch (SignatureException e) {
 			throw new SAMLException(e);
 		}
 

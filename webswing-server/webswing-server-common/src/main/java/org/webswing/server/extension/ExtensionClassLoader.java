@@ -1,8 +1,11 @@
 package org.webswing.server.extension;
 
+import sun.misc.CompoundEnumeration;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Enumeration;
 
 public class ExtensionClassLoader extends URLClassLoader {
 
@@ -22,7 +25,7 @@ public class ExtensionClassLoader extends URLClassLoader {
 		try {
 			return webClassLoader.loadClass(name);
 		} catch (ClassNotFoundException e) {
-			return super.loadClass(name,resolve);
+			return super.loadClass(name, resolve);
 		}
 	}
 
@@ -38,4 +41,9 @@ public class ExtensionClassLoader extends URLClassLoader {
 		return url;
 	}
 
+	@Override
+	public Enumeration<URL> getResources(String name) throws IOException {
+		Enumeration<URL>[] tmp = (Enumeration<URL>[]) new Enumeration<?>[] { super.getResources(name), webClassLoader.getResources(name) };
+		return new CompoundEnumeration<URL>(tmp);
+	}
 }

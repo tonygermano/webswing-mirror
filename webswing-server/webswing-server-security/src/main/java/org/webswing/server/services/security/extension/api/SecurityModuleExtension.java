@@ -3,7 +3,7 @@ package org.webswing.server.services.security.extension.api;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.LoginResponseClosedException;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
