@@ -319,6 +319,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 		if (isAjax(request)) {
 			sendHtml(request, response, template, variables);
 		} else {
+			response.setContentType("text/html;charset=UTF-8");
 			Writer w = new OutputStreamWriter(response.getOutputStream());
 			Writer tempw = new StringWriter();
 			processTemplate(tempw, template, extendedVars);
