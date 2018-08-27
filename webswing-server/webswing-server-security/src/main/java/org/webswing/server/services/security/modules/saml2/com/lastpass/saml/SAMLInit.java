@@ -17,27 +17,23 @@
  */
 package org.webswing.server.services.security.modules.saml2.com.lastpass.saml;
 
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.xml.ConfigurationException;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
 
 /**
  * Library initialization routines.
  *
  * Applications must call SAMLInit.initialize() before anything else!
  */
-public class SAMLInit
-{
-    protected SAMLInit()
-    {
-    }
+public class SAMLInit {
+	protected SAMLInit() {
+	}
 
-    public static void initialize()
-        throws SAMLException
-    {
-        try {
-            DefaultBootstrap.bootstrap();
-        } catch (ConfigurationException e) {
-            throw new SAMLException(e);
-        }
-    }
+	public static void initialize() throws SAMLException {
+		try {
+			InitializationService.initialize();
+		} catch (InitializationException e) {
+			throw new SAMLException(e);
+		}
+	}
 }

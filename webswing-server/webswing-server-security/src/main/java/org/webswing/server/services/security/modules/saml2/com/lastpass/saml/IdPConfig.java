@@ -26,23 +26,23 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.opensaml.Configuration;
-import org.opensaml.xml.parse.BasicParserPool;
-import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.io.UnmarshallerFactory;
-import org.opensaml.saml2.metadata.EntitiesDescriptor;
-import org.opensaml.saml2.metadata.EntityDescriptor;
-import org.opensaml.saml2.metadata.IDPSSODescriptor;
-import org.opensaml.saml2.metadata.SingleSignOnService;
-import org.opensaml.saml2.metadata.KeyDescriptor;
-import org.opensaml.xml.signature.KeyInfo;
-import org.opensaml.xml.signature.X509Data;
-import org.opensaml.xml.signature.X509Certificate;
-import org.opensaml.xml.security.credential.UsageType;
-import org.opensaml.common.xml.SAMLConstants;
 
 import javax.xml.bind.DatatypeConverter;
 
+import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.utilities.java.support.xml.BasicParserPool;
+import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import org.opensaml.core.config.Configuration;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.UnmarshallerFactory;
+import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.saml.common.xml.SAMLConstants;
+import org.opensaml.saml.saml2.metadata.*;
+import org.opensaml.security.credential.UsageType;
+import org.opensaml.xmlsec.signature.KeyInfo;
+import org.opensaml.xmlsec.signature.X509Certificate;
+import org.opensaml.xmlsec.signature.X509Data;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -75,12 +75,12 @@ public class IdPConfig
     {
         FileInputStream inputStream;
         try {
-            inputStream = new FileInputStream(metadataFile);        
-        } 
+            inputStream = new FileInputStream(metadataFile);
+        }
         catch (java.io.IOException e) {
             throw new SAMLException(e);
         }
-        
+
         try {
             init(inputStream);
         } finally {
@@ -116,28 +116,26 @@ public class IdPConfig
         EntityDescriptor edesc;
 
         try {
+            parsers.initialize();
             Document doc = parsers.parse(inputStream);
             Element root = doc.getDocumentElement();
 
             UnmarshallerFactory unmarshallerFactory =
-                Configuration.getUnmarshallerFactory();
+                    XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
 
             XMLObject object = unmarshallerFactory
             .getUnmarshaller(root)
             .unmarshall(root);
-            
+
             if(object instanceof EntitiesDescriptor){
             	edesc = ((EntitiesDescriptor) object).getEntityDescriptors().get(0);
             }else{
             	edesc = (EntityDescriptor) object;
             }
         }
-        catch (org.opensaml.xml.parse.XMLParserException e) {
+        catch (XMLParserException | ComponentInitializationException | UnmarshallingException e) {
             throw new SAMLException(e);
         }
-        catch (org.opensaml.xml.io.UnmarshallingException e) {
-            throw new SAMLException(e);
-        }        
 
         // fetch idp information
         IDPSSODescriptor idpDesc = edesc.getIDPSSODescriptor(
