@@ -39,9 +39,6 @@ public class Main {
 
 		List<URL> urls = new ArrayList<URL>();
 		if (client) {
-			// initialize jmx agent
-			ConnectorBootstrap.startLocalConnectorServer();
-
 			populateClasspathFromDir("WEB-INF/swing-lib", urls);
 			initializeExtLibServices(urls);
 			retainOnlyLauncherUrl(urls);
