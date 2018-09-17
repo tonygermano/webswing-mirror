@@ -378,6 +378,21 @@
                             <generatePom>true</generatePom>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>install-java9-java.desktop-modpatch</id>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <groupId>java.desktop.modpatch</groupId>
+                            <artifactId>java.desktop.modpatch</artifactId>
+                            <version>1</version>
+                            <packaging>jar</packaging>
+                            <file>${basedir}/lib/java.desktop.modpatch</file>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
@@ -465,6 +480,16 @@
             <id>Java9 build</id>
             <activation>
                 <jdk>9</jdk>
+            </activation>
+            <modules>
+                <module>webswing-app-toolkit-java9</module>
+            </modules>
+        </profile>
+        <!--===============================JAVA10 profile===================================-->
+        <profile>
+            <id>Java10 build</id>
+            <activation>
+                <jdk>10</jdk>
             </activation>
             <modules>
                 <module>webswing-app-toolkit-java9</module>
