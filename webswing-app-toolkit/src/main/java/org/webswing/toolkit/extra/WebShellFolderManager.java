@@ -4,7 +4,7 @@ import org.webswing.Constants;
 import org.webswing.toolkit.util.Logger;
 import sun.awt.shell.ShellFolder;
 import sun.awt.shell.ShellFolder.Invoker;
-import sun.awt.shell.Win32ShellFolderManager2;
+import sun.awt.shell.WebswingPatchedWin32ShellFolderManager2;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("restriction")
-public class WebShellFolderManager extends Win32ShellFolderManager2 {
+public class WebShellFolderManager extends WebswingPatchedWin32ShellFolderManager2 {
 
 	private boolean windows;
 	private Object defaultManager;
