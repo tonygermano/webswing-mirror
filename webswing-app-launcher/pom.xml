@@ -69,25 +69,11 @@
 		</plugins>
 	</build>
 	<profiles>
-		<!--===============================JAVA9 profile===================================-->
+		<!--===============================JAVA9+ profile===================================-->
 		<profile>
-			<id>Java9 build</id>
+			<id>Java9+ build</id>
 			<activation>
-				<jdk>9</jdk>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.webswing</groupId>
-					<artifactId>webswing-app-toolkit-java9</artifactId>
-					<version>${project.version}</version>
-				</dependency>
-			</dependencies>
-		</profile>
-		<!--===============================JAVA10 profile===================================-->
-		<profile>
-			<id>Java10 build</id>
-			<activation>
-				<jdk>10</jdk>
+				<jdk>[9,)</jdk>
 			</activation>
 			<dependencies>
 				<dependency>

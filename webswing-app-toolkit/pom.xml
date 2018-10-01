@@ -9,11 +9,6 @@
 	</parent>
 	<dependencies>
 		<dependency>
-			<groupId>rt-win-shell</groupId>
-			<artifactId>rt-win-shell</artifactId>
-			<version>1</version>
-		</dependency>
-		<dependency>
 			<groupId>jdk.jsobject.modpatch</groupId>
 			<artifactId>jdk.jsobject.modpatch</artifactId>
 			<version>1</version>

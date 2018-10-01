@@ -76,7 +76,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.4</version>
+                <version>3.8.1</version>
             </dependency>
             <dependency>
                 <groupId>commons-collections</groupId>
@@ -220,7 +220,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.2-beta-4</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.os72</groupId>
@@ -349,21 +349,6 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>install-rt-win-shell</id>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <groupId>rt-win-shell</groupId>
-                            <artifactId>rt-win-shell</artifactId>
-                            <version>1</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/rt-win-shell.jar</file>
-                            <generatePom>true</generatePom>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>install-java9-jdk.jsobject-modpatch</id>
                         <goals>
                             <goal>install-file</goal>
@@ -475,21 +460,11 @@
             </build>
         </profile>
 
-        <!--===============================JAVA9 profile===================================-->
+        <!--===============================JAVA9+ profile===================================-->
         <profile>
-            <id>Java9 build</id>
+            <id>Java9+ build</id>
             <activation>
-                <jdk>9</jdk>
-            </activation>
-            <modules>
-                <module>webswing-app-toolkit-java9</module>
-            </modules>
-        </profile>
-        <!--===============================JAVA10 profile===================================-->
-        <profile>
-            <id>Java10 build</id>
-            <activation>
-                <jdk>10</jdk>
+                <jdk>[9,)</jdk>
             </activation>
             <modules>
                 <module>webswing-app-toolkit-java9</module>

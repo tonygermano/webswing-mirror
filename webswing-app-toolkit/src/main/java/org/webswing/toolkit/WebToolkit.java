@@ -232,8 +232,8 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	@Override
 	protected void initializeDesktopProperties() {
-		if (System.getProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS, "").equalsIgnoreCase("true")) {
-			this.desktopProperties.put("Shell.shellFolderManager", "org.webswing.toolkit.extra.WebShellFolderManager");
+		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ISOLATED_FS)) {
+			this.desktopProperties.put("Shell.shellFolderManager", "org.webswing.toolkit.extra.IsolatedFsShellFolderManager");
 		} else {
 			if (System.getProperty("os.name", "").startsWith("Windows")) {
 				this.desktopProperties.put("Shell.shellFolderManager", "sun.awt.shell.Win32ShellFolderManager2");

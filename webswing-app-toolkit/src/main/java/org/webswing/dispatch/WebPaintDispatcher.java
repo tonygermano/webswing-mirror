@@ -11,8 +11,8 @@ import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
+import org.webswing.toolkit.extra.IsolatedFsShellFolderManager;
 import org.webswing.toolkit.extra.WebRepaintManager;
-import org.webswing.toolkit.extra.WebShellFolderManager;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
@@ -476,13 +476,13 @@ public class WebPaintDispatcher {
 
 			try {
 				if (fileChooserDialog.getSelectedFile() != null) {
-					if (!WebShellFolderManager.isSubfolderOfRoots(fileChooserDialog.getSelectedFile())) {
+					if (!IsolatedFsShellFolderManager.isSubfolderOfRoots(fileChooserDialog.getSelectedFile())) {
 						throw new IOException("Invalid selection " + fileChooserDialog.getSelectedFile());
 					}
 				}
 				if (fileChooserDialog.getSelectedFiles() != null && fileChooserDialog.getSelectedFiles().length > 0) {
 					for (File selection : fileChooserDialog.getSelectedFiles()) {
-						if (!WebShellFolderManager.isSubfolderOfRoots(selection)) {
+						if (!IsolatedFsShellFolderManager.isSubfolderOfRoots(selection)) {
 							throw new IOException("Invalid selection " + selection);
 						}
 					}

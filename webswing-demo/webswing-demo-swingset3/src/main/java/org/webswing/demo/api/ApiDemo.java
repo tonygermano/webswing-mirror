@@ -36,7 +36,6 @@ import com.sun.swingset3.utilities.RoundedBorder;
 import com.sun.swingset3.utilities.RoundedPanel;
 import com.sun.swingset3.utilities.Utilities;
 
-import static sun.security.pkcs.PKCS8Key.version;
 
 @DemoProperties(value = "Webswing API", category = "Webswing", description = "Demonstrates Websiwng API.", sourceFiles = { "org/webswing/demo/api/ApiDemo.java" })
 public class ApiDemo extends JPanel {

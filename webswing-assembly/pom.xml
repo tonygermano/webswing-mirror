@@ -58,7 +58,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.6</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -70,7 +69,9 @@
                 <configuration>
                     <finalName>webswing-${project.version}</finalName>
                     <outputDirectory>dist</outputDirectory>
-                    <descriptor>src/main/assembly/dist.xml</descriptor>
+                    <descriptors>
+                        <descriptor>src/main/assembly/dist.xml</descriptor>
+                    </descriptors>
                 </configuration>
             </plugin>
         </plugins>
@@ -85,7 +86,9 @@
                         <configuration>
                             <finalName>webswing</finalName>
                             <outputDirectory>dist/docker</outputDirectory>
-                            <descriptor>src/main/assembly/dist.xml</descriptor>
+                            <descriptors>
+                                <descriptor>src/main/assembly/dist.xml</descriptor>
+                            </descriptors>
                         </configuration>
                     </plugin>
                     <plugin>
