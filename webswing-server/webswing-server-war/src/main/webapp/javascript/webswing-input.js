@@ -126,9 +126,9 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
                 return false;
             }, false);
             util.bindEvent(canvas, "wheel", function (evt) {
-                pixelsScrolled += evt.deltaY
-                if(pixelsScrolled>=250 || pixelsScrolled<=-250){
-                    pixelsScrolled=0;
+                pixelsScrolled += util.detectFF() ? evt.deltaY * 100 : evt.deltaY
+                if (pixelsScrolled >= 250 || pixelsScrolled <= -250) {
+                    pixelsScrolled = 0;
                     var mousePos = getMousePos(canvas, evt, 'mousewheel');
                     latestMouseMoveEvent = null;
                     if (latestMouseWheelEvent != null) {
@@ -253,7 +253,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             var isCutCopyKey = 'keypress' === evt.key.type ? (evt.key.character == 120 || evt.key.character == 24 || evt.key.character == 99) : (evt.key.character == 88 || evt.key.character == 67);
             var isCutCopyEvt = ctrlCmd && !evt.key.alt && !evt.key.altgr && !evt.key.shift && isCutCopyKey;
 
-            var isPasteKey = 'keypress' === evt.key.type ? (evt.key.character == 118 || evt.key.character == 22 || evt.key.character == 86) : ( evt.key.character == 86);
+            var isPasteKey = 'keypress' === evt.key.type ? (evt.key.character == 118 || evt.key.character == 22 || evt.key.character == 86) : (evt.key.character == 86);
             var isPasteEvt = ctrlCmd && !evt.key.alt && !evt.key.altgr && !evt.key.shift && isPasteKey;
 
             return isPasteEvt || isCutCopyEvt;
@@ -289,7 +289,11 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             var mouseY = Math.round(evt.clientY - rect.top);
             var delta = 0;
             if (type == 'mousewheel') {
-                delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
+                if(util.detectFF()){
+                    delta = -Math.max(-1, Math.min(1, ( -evt.deltaY*100 )));
+                }else{
+                    delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
+                }
             }
             return {
                 mouse: {
