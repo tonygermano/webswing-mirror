@@ -52,6 +52,7 @@ public class DndEventHandler {
 			}
 		} else if (e instanceof KeyEvent) {
 			if (e.getID() == KeyEvent.KEY_PRESSED && ((KeyEvent) e).getKeyCode() == KeyEvent.VK_ESCAPE) {
+				enteredComponent=null;
 				dragEnd(w, e, false, 0);
 			}
 		}
