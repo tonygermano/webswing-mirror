@@ -111,7 +111,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected boolean writeImage(Image image, AffineTransform transform, Rectangle2D crop, Color bgcolor, ImageObserver observer) {
-		if(crop.getWidth()<=0 || crop.getHeight()<=0){
+		if(crop!=null && (crop.getWidth()<=0 || crop.getHeight()<=0)){
 			return true;
 		}
 		if (image instanceof WebImage || image instanceof VolatileWebImageWrapper) {
