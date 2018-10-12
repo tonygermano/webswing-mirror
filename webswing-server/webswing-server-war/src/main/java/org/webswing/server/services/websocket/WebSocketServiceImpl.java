@@ -1,6 +1,7 @@
 package org.webswing.server.services.websocket;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.subject.Subject;
 import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.cpr.*;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
@@ -67,7 +69,6 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 		initParams.put("org.atmosphere.cpr.broadcaster.shareableThreadPool", "true");
 		initParams.put("org.atmosphere.cpr.scanClassPath", "false");
 		initParams.put("org.atmosphere.cpr.AtmosphereFramework.analytics", "false");
-		initParams.put("org.atmosphere.cpr.sessionSupport", "true");
 		initParams.put("org.atmosphere.cpr.broadcasterCacheClass", "org.atmosphere.cache.UUIDBroadcasterCache");
 		initParams.put("org.atmosphere.container.JSR356AsyncSupport.mappingPath", "/{PATH}");
 
@@ -147,12 +148,12 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 		framework.doCometSupport( AtmosphereRequestImpl.wrap(req), AtmosphereResponseImpl.wrap(res));
 	}
 
-	public void disconnectWebsockets(String sessionId){
+	public void disconnectWebsockets(Serializable sessionId){
 		BroadcasterFactory f = framework.getBroadcasterFactory();
 		for (Broadcaster b : f.lookupAll()) {
 			for (AtmosphereResource r : b.getAtmosphereResources()) {
-				if (r.session(false) != null && r.session().getId().equals(sessionId)) {
-					AtmosphereResourceImpl.class.cast(r).session(null);
+				Subject subject= (Subject) r.getRequest().getAttribute(SecurityManagerService.SECURITY_SUBJECT);
+				if (subject!=null && subject.getSession().getId().equals(sessionId)) {
 					try {
 						r.close();
 					} catch (IOException e) {

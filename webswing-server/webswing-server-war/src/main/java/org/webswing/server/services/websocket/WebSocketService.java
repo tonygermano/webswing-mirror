@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.Serializable;
 
 public interface WebSocketService extends WebswingService {
 	
@@ -17,7 +18,7 @@ public interface WebSocketService extends WebswingService {
 
 	WebSocketUrlHandler createPlaybackWebSocketHandler(PrimaryUrlHandler parent);
 
-	void disconnectWebsockets(String sessionId);
+	void disconnectWebsockets(Serializable sessionId);
 
 	void serve(WebSocketUrlHandler handler, HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException;
 }

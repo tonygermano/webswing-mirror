@@ -3,7 +3,6 @@ package org.webswing.server.services.security.login;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
-import org.atmosphere.cpr.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.base.AbstractUrlHandler;
@@ -12,13 +11,11 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.LogoutTokenAdapter;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
-import org.webswing.server.services.security.modules.SecurityModuleWrapper;
 import org.webswing.server.services.websocket.WebSocketService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandler {
@@ -39,10 +36,10 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		AbstractWebswingUser user;
 		try {
-			if("OPTIONS".equals(req.getMethod())){
+			if ("OPTIONS".equals(req.getMethod())) {
 				return true;//cors preflight, don't forward to security module
 			}
-			user= logout(req, res);
+			user = logout(req, res);
 		} catch (Exception e) {
 			log.error("Failed to logout", e);
 			throw new WsException("Failed to logout", e);
@@ -67,7 +64,7 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 				subject.login(new LogoutTokenAdapter(getSecuredPath(), user));
 			} catch (AuthenticationException e) {
 				//notify atmosphere the session is invalidated
-				webSockets.disconnectWebsockets(req.getSession().getId());
+				webSockets.disconnectWebsockets(subject.getSession().getId());
 				//there was no user left in the session, so we can do full log out.
 				subject.logout();
 			}

@@ -7,6 +7,7 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.base.UrlHandler;
+import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.security.WebswingPrincipal;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
@@ -15,18 +16,18 @@ import org.webswing.server.services.websocket.WebSocketConnection;
 public class SecurityUtil {
 	private static final Logger log = LoggerFactory.getLogger(SecurityUtil.class);
 
-
 	public static AbstractWebswingUser getUser(UrlHandler urlHandler) {
-		return resolveUser(urlHandler);
+		Subject subject = SecurityUtils.getSubject();
+		return resolveUser(subject, urlHandler);
 	}
 
 	public static AbstractWebswingUser getUser(WebSocketConnection connection) {
+		Subject subject = (Subject) connection.getRequest().getAttribute(SecurityManagerService.SECURITY_SUBJECT);
 		UrlHandler urlHandler = connection.getHandler();
-		return resolveUser(urlHandler);
+		return resolveUser(subject, urlHandler);
 	}
 
-	private static AbstractWebswingUser resolveUser(UrlHandler handler) {
-		Subject subject = SecurityUtils.getSubject();
+	private static AbstractWebswingUser resolveUser(Subject subject, UrlHandler handler) {
 		String securedPath = handler.getSecuredPath();
 		if (subject != null && securedPath != null) {
 			try {
@@ -44,7 +45,7 @@ public class SecurityUtil {
 					return masteradmin;
 				}
 			} catch (UnknownSessionException e) {
-				log.info("User already logged out.",e);
+				log.info("User already logged out.", e);
 				return null;
 
 			}
