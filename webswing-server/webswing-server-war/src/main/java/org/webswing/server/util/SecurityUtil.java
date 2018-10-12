@@ -1,8 +1,11 @@
 package org.webswing.server.util;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.services.security.WebswingPrincipal;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
@@ -10,36 +13,40 @@ import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
 public class SecurityUtil {
+	private static final Logger log = LoggerFactory.getLogger(SecurityUtil.class);
+
 
 	public static AbstractWebswingUser getUser(UrlHandler urlHandler) {
-		return getUser(urlHandler.getSecuredPath());
-	}
-
-	public static AbstractWebswingUser getUser(String path) {
-		Subject subject = SecurityUtils.getSubject();
-		return resolveUser(subject, path);
+		return resolveUser(urlHandler);
 	}
 
 	public static AbstractWebswingUser getUser(WebSocketConnection connection) {
-		Subject subject = SecurityUtils.getSubject();
 		UrlHandler urlHandler = connection.getHandler();
-		return resolveUser(subject, urlHandler.getSecuredPath());
+		return resolveUser(urlHandler);
 	}
 
-	private static AbstractWebswingUser resolveUser(Subject subject, String securedPath) {
+	private static AbstractWebswingUser resolveUser(UrlHandler handler) {
+		Subject subject = SecurityUtils.getSubject();
+		String securedPath = handler.getSecuredPath();
 		if (subject != null && securedPath != null) {
-			PrincipalCollection currentPrincipals = subject.getPrincipals();
-			if (currentPrincipals != null && subject.isAuthenticated()) {
-				AbstractWebswingUser masteradmin = null;
-				for (WebswingPrincipal webswingPrincipal : currentPrincipals.byType(WebswingPrincipal.class)) {
-					if ("".equals(webswingPrincipal.getSecuredPath()) && webswingPrincipal.isPermitted(WebswingAction.master_admin_access.name())) {
-						masteradmin = webswingPrincipal.getUser();
+			try {
+				PrincipalCollection currentPrincipals = subject.getPrincipals();
+				if (currentPrincipals != null && subject.isAuthenticated()) {
+					AbstractWebswingUser masteradmin = null;
+					for (WebswingPrincipal webswingPrincipal : currentPrincipals.byType(WebswingPrincipal.class)) {
+						if (handler.getRootHandler().getSecuredPath().equals(webswingPrincipal.getSecuredPath()) && webswingPrincipal.isPermitted(WebswingAction.master_admin_access.name())) {
+							masteradmin = webswingPrincipal.getUser();
+						}
+						if (securedPath.equals(webswingPrincipal.getSecuredPath())) {
+							return webswingPrincipal.getUser();
+						}
 					}
-					if (securedPath.equals(webswingPrincipal.getSecuredPath())) {
-						return webswingPrincipal.getUser();
-					}
+					return masteradmin;
 				}
-				return masteradmin;
+			} catch (UnknownSessionException e) {
+				log.info("User already logged out.",e);
+				return null;
+
 			}
 		}
 		return null;

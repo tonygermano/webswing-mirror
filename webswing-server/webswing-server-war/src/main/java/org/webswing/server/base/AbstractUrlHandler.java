@@ -210,7 +210,7 @@ public abstract class AbstractUrlHandler implements UrlHandler, SecurableService
 	}
 
 	public AbstractWebswingUser getMasterUser() {
-		return SecurityUtil.getUser(getRootHandler().getSecuredPath());
+		return SecurityUtil.getUser(getRootHandler());
 	}
 
 	@Override

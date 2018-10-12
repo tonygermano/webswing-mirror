@@ -17,5 +17,7 @@ public interface WebSocketService extends WebswingService {
 
 	WebSocketUrlHandler createPlaybackWebSocketHandler(PrimaryUrlHandler parent);
 
+	void disconnectWebsockets(String sessionId);
+
 	void serve(WebSocketUrlHandler handler, HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException;
 }

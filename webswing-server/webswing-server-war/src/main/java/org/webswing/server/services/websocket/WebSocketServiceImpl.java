@@ -67,6 +67,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 		initParams.put("org.atmosphere.cpr.broadcaster.shareableThreadPool", "true");
 		initParams.put("org.atmosphere.cpr.scanClassPath", "false");
 		initParams.put("org.atmosphere.cpr.AtmosphereFramework.analytics", "false");
+		initParams.put("org.atmosphere.cpr.sessionSupport", "true");
 		initParams.put("org.atmosphere.cpr.broadcasterCacheClass", "org.atmosphere.cache.UUIDBroadcasterCache");
 		initParams.put("org.atmosphere.container.JSR356AsyncSupport.mappingPath", "/{PATH}");
 
@@ -146,4 +147,19 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 		framework.doCometSupport( AtmosphereRequestImpl.wrap(req), AtmosphereResponseImpl.wrap(res));
 	}
 
+	public void disconnectWebsockets(String sessionId){
+		BroadcasterFactory f = framework.getBroadcasterFactory();
+		for (Broadcaster b : f.lookupAll()) {
+			for (AtmosphereResource r : b.getAtmosphereResources()) {
+				if (r.session(false) != null && r.session().getId().equals(sessionId)) {
+					AtmosphereResourceImpl.class.cast(r).session(null);
+					try {
+						r.close();
+					} catch (IOException e) {
+						log.error("Failed to close websocket connection " + r.uuid());
+					}
+				}
+			}
+		}
+	}
 }

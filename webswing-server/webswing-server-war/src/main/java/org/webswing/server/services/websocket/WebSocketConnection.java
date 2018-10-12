@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.session.UnknownSessionException;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResource.TRANSPORT;
 import org.slf4j.Logger;
@@ -48,7 +49,11 @@ public class WebSocketConnection {
 	}
 
 	public AbstractWebswingUser getUser() {
-		return SecurityUtil.getUser(this);
+		try {
+			return SecurityUtil.getUser(this);
+		} catch (UnknownSessionException e) {
+			return null;
+		}
 	}
 
 	public void broadcastMessage(EncodedMessage o) {
@@ -82,8 +87,8 @@ public class WebSocketConnection {
 			log.error("Failed to close websocket connection " + resource.uuid());
 		}
 	}
-	
-	public boolean isWebsocketTransport(){
+
+	public boolean isWebsocketTransport() {
 		return TRANSPORT.WEBSOCKET.equals(resource.transport());
 	}
 
