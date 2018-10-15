@@ -70,7 +70,7 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 		final ShiroHttpServletResponse response = new ShiroHttpServletResponse(res, context, request);
 
 		final Subject subject = new WebSubject.Builder(securityManager, request, response).buildWebSubject();
-
+		request.setAttribute(SECURITY_SUBJECT, subject);
 		return subject.execute(new Callable<Object>() {
 			public Object call() throws Exception {
 				updateSessionLastAccessTime(request, response);

@@ -18,6 +18,7 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
         getImageString: getImageString,
         bindEvent: bindEvent,
         detectIE: detectIE,
+        detectFF: detectFF,
         preventGhosts: preventGhosts,
         GUID: GUID,
         detectMac: detectMac,
@@ -206,6 +207,10 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
 
     function detectMac() {
         return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    }
+
+    function detectFF() {
+        return typeof InstallTrigger !== 'undefined';
     }
 
     function createCookie(name, value, days) {

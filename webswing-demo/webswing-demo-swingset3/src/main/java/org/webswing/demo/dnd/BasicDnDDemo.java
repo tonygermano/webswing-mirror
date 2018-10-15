@@ -35,6 +35,10 @@ package org.webswing.demo.dnd;
  * BasicDnD.java requires no other files.
  */
 
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -185,7 +189,39 @@ public class BasicDnDDemo extends JPanel implements ActionListener {
 			}
 		});
 		list.setDropMode(DropMode.ON_OR_INSERT);
+		try
+		{
+			list.getDropTarget().addDropTargetListener(new DropTargetListener() {
+				@Override
+				public void dragEnter(DropTargetDragEvent dtde) {
+					System.out.println("BasicDnDDemo:dragEnter:");
+				}
 
+				@Override
+				public void dragOver(DropTargetDragEvent dtde) {
+					System.out.println("BasicDnDDemo:dragOver");
+				}
+
+				@Override
+				public void dropActionChanged(DropTargetDragEvent dtde) {
+					System.out.println("BasicDnDDemo:dropActionChanged");
+				}
+
+				@Override
+				public void dragExit(DropTargetEvent dte) {
+					System.out.println("BasicDnDDemo:exit");
+				}
+
+				@Override
+				public void drop(DropTargetDropEvent dtde) {
+					System.out.println("BasicDnDDemo:drop");
+				}
+			});
+		}
+		catch (final TooManyListenersException e)
+		{
+			System.out.println("Cannot register listener");
+		}
 		JScrollPane listView = new JScrollPane(list);
 		listView.setPreferredSize(new Dimension(300, 100));
 		leftPanel.add(createPanelForComponent(listView, "JList"));

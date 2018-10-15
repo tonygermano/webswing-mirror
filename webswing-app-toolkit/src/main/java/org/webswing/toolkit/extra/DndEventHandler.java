@@ -26,6 +26,7 @@ public class DndEventHandler {
 	private int lastDropTargetAction = 0;
 	private boolean dropped;
 	private boolean finished = true;
+	private Component enteredComponent;
 	private static Cursor cursor = Cursor.getDefaultCursor();
 
 	public void processMouseEvent(Window w, AWTEvent e) {
@@ -33,7 +34,12 @@ public class DndEventHandler {
 			MouseEvent me = (MouseEvent) e;
 			int modifiers = (me.getModifiersEx() & (MouseEvent.CTRL_DOWN_MASK | MouseEvent.SHIFT_DOWN_MASK)) | MouseEvent.BUTTON1_DOWN_MASK;
 			int currentDropAction = WebDragSourceContextPeer.convertModifiersToDropAction(modifiers, sourceActions);
-			lastDropTargetAction = dropTarget.handleEnterMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
+			if(enteredComponent==w){
+				lastDropTargetAction = dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
+			}else{
+				lastDropTargetAction = dropTarget.handleEnterMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
+				enteredComponent=w;
+			}
 			if (e.getID() == MouseEvent.MOUSE_RELEASED) {
 				//dragSource.dragMouseMoved(currentDropAction, modifiers, me.getXOnScreen(), me.getYOnScreen());
 				//dragSource.dragEnter(currentDropAction, modifiers, me.getXOnScreen(), me.getYOnScreen());
@@ -41,12 +47,12 @@ public class DndEventHandler {
 				//lastDropTargetAction = dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
 				dragEnd(w, e, lastDropTargetAction != 0, lastDropTargetAction);
 			} else if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
-				dropTarget.handleMotionMessage(w, me.getX(), me.getY(), currentDropAction, sourceActions, formats, 123123123);
 				updateCursor();
 				Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(cursor);
 			}
 		} else if (e instanceof KeyEvent) {
 			if (e.getID() == KeyEvent.KEY_PRESSED && ((KeyEvent) e).getKeyCode() == KeyEvent.VK_ESCAPE) {
+				enteredComponent=null;
 				dragEnd(w, e, false, 0);
 			}
 		}
@@ -82,6 +88,7 @@ public class DndEventHandler {
 		dropTarget = WebDropTargetContextPeer.getWebDropTargetContextPeer();
 		this.dropped = false;
 		this.finished = false;
+		this.enteredComponent=null;
 	}
 
 	private void dragEnd(Window w, AWTEvent e, boolean supported, int dropAction) {
