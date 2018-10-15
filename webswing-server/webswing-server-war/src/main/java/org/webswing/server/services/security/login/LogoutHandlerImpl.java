@@ -11,7 +11,7 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.LogoutTokenAdapter;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingSecurityModule;
-import org.webswing.server.services.security.modules.SecurityModuleWrapper;
+import org.webswing.server.services.websocket.WebSocketService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,9 +20,11 @@ import java.io.IOException;
 
 public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandler {
 	private static final Logger log = LoggerFactory.getLogger(LogoutHandlerImpl.class);
+	private final WebSocketService webSockets;
 
-	public LogoutHandlerImpl(UrlHandler parent) {
+	public LogoutHandlerImpl(WebSocketService webSockets, UrlHandler parent) {
 		super(parent);
+		this.webSockets = webSockets;
 	}
 
 	@Override
@@ -34,10 +36,10 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		AbstractWebswingUser user;
 		try {
-			if("OPTIONS".equals(req.getMethod())){
+			if ("OPTIONS".equals(req.getMethod())) {
 				return true;//cors preflight, don't forward to security module
 			}
-			user= logout(req, res);
+			user = logout(req, res);
 		} catch (Exception e) {
 			log.error("Failed to logout", e);
 			throw new WsException("Failed to logout", e);
@@ -61,6 +63,8 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 				//logout only user for the secured path (in case other users are logged in the same session)
 				subject.login(new LogoutTokenAdapter(getSecuredPath(), user));
 			} catch (AuthenticationException e) {
+				//notify atmosphere the session is invalidated
+				webSockets.disconnectWebsockets(subject.getSession().getId());
 				//there was no user left in the session, so we can do full log out.
 				subject.logout();
 			}
@@ -68,4 +72,5 @@ public class LogoutHandlerImpl extends AbstractUrlHandler implements LogoutHandl
 		}
 		return null;
 	}
+
 }
