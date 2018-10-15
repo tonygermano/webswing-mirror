@@ -25,8 +25,11 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
         createCookie: createCookie,
         readCookie: readCookie,
         eraseCookie: eraseCookie,
-        checkCookie: checkCookie
+        checkCookie: checkCookie,
+        dpr: Math.ceil(window.devicePixelRatio) || 1
     }
+
+
 
     function webswingLogin(baseUrl, element, loginData, successCallback) {
         $.ajax({

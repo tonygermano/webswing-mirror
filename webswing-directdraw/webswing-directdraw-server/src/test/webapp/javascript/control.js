@@ -8,10 +8,13 @@ $.ajax({
 
 	data.forEach(function(method, index, array) {
 		if (selected == null || (selected != null && index == selected)) {
-			document.body.innerHTML += '<div id="' + method + 'label"></div><canvas id="' + method + '" width="1000" height="100"></canvas>';
+			document.body.innerHTML += '<div id="' + method + 'label"></div>';
+			document.body.innerHTML += '<canvas id="' + method + 'DD" style="width:500px;height:100px"></canvas>';
+			document.body.innerHTML += '<img id="' + method + 'PNG" />';
 		}
 	});
-	var dd = new WebswingDirectDraw();
+    var dpr= window.devicePixelRatio || 1;
+	var dd = new WebswingDirectDraw({dpr:dpr});
 	var sequence = Promise.resolve();
 	data.forEach(function(method, index) {
 		sequence = sequence.then(function(resolved) {
@@ -25,8 +28,10 @@ $.ajax({
 				$.ajax({
 					url : "/draw?reset&test=" + method,
 				}).done(function(d) {
-					var canvas = document.getElementById(method);
-					var ctx = canvas.getContext("2d");
+					var canvasDD = document.getElementById(method+'DD');
+					canvasDD.width=500*dpr;
+					canvasDD.height=100*dpr;
+					var ctxDD = canvasDD.getContext("2d");
 					var json = $.parseJSON(d);
 					addInfo(json, index, document.getElementById(method + "label"));
 					var sequence = Promise.resolve();
@@ -36,7 +41,7 @@ $.ajax({
 							return dd.draw64(img);
 						}).then(function(resultCanvas) {
 							console.log('finished ' + method);
-							ctx.drawImage(resultCanvas, 0, 0);
+							ctxDD.drawImage(resultCanvas, 0, 0);
 						}, function(error) {
 							console.log(error);
 						});
@@ -45,7 +50,7 @@ $.ajax({
 						resolve();
 					});
 					json.originalImg.forEach(function(img) {
-						drawImage(canvas, img);
+						drawImage(method, img);
 					});
 				});
 			}else{
@@ -61,20 +66,15 @@ function addInfo(json, index, element) {
 			+ ((json.protoRenderTime / json.originalRenderTime) * 100).toPrecision(4) + "% in time";
 }
 
-function drawImage(canvas, b64image) {
-	return new Promise(function(resolve, reject) {
-		var imageObj;
-		imageObj = new Image();
-		imageObj.onload = function() {
-			var context = canvas.getContext("2d");
-			context.drawImage(imageObj, 500, 0);
-			imageObj.onload = null;
-			imageObj.src = '';
-			resolve();
-		};
-		imageObj.src = 'data:image/png;base64,' + b64image;
-	});
-
+function drawImage(method, b64image) {
+    var imageObj = document.getElementById(method + 'PNG');
+    // imageObj.onload = function () {
+    //     var context = canvas.getContext("2d");
+    //     context.drawImage(imageObj, 500, 0);
+    //     imageObj.onload = null;
+    //     imageObj.src = '';
+    // };
+    imageObj.src = 'data:image/png;base64,' + b64image;
 }
 
 function getUrlParameter(sParam) {

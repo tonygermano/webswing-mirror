@@ -57,7 +57,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             repaint: repaint
         };
         module.ready = function () {
-            directDraw = new WebswingDirectDraw({logDebug:api.cfg.debugLog, ieVersion:api.cfg.ieVersion});
+            directDraw = new WebswingDirectDraw({logDebug: api.cfg.debugLog, ieVersion: api.cfg.ieVersion, dpr: util.dpr});
         };
 
         var timer1, timer3;
@@ -68,14 +68,14 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         var directDraw;
 
         function startApplication() {
-            initialize(null,false);
+            initialize(null, false);
         }
 
         function startMirrorView(clientId) {
-            initialize(clientId,true)
+            initialize(clientId, true)
         }
 
-        function initialize(clientId,isMirror) {
+        function initialize(clientId, isMirror) {
             api.registerInput();
             api.registerTouch();
             window.addEventListener('beforeunload', beforeUnloadEventHandler);
@@ -118,7 +118,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             timer3 = setInterval(servletHeartbeat, 100000);
             windowImageHolders = {};
             directDraw.dispose();
-            directDraw = new WebswingDirectDraw({logDebug:api.cfg.debugLog, ieVersion:api.cfg.ieVersion});
+            directDraw = new WebswingDirectDraw({logDebug: api.cfg.debugLog, ieVersion: api.cfg.ieVersion, dpr: util.dpr});
         }
 
         function sendMessageEvent(message) {
@@ -211,7 +211,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                     api.showDialogBar(api.continueOldSessionDialog);
                     api.dialogBarContent().focused = false;
                     window.setTimeout(function () {
-                        if (api.dialogBarContent()!=null && !api.dialogBarContent().focused) {
+                        if (api.dialogBarContent() != null && !api.dialogBarContent().focused) {
                             api.hideDialogBar();
                             api.showDialogBar(oldBarContent);
                         }
@@ -232,7 +232,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                     api.showDialog(api.timedoutDialog);
                     api.disconnect();
                 } else if (data.event == "applicationBusy") {
-                    if(api.currentDialog()==null){
+                    if (api.currentDialog() == null) {
                         api.showDialog(api.applicationBusyDialog);
                     }
                 }
@@ -290,11 +290,11 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                 copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height, context);
             }
             if (data.focusEvent != null) {
-                var input=api.getInput();
-                if(data.focusEvent.type === 'focusWithCarretGained'){
-                    input.style.top = (data.focusEvent.y+data.focusEvent.caretY)+'px';
-                    input.style.left = (data.focusEvent.x+data.focusEvent.caretX)+'px';
-                }else{
+                var input = api.getInput();
+                if (data.focusEvent.type === 'focusWithCarretGained') {
+                    input.style.top = (data.focusEvent.y + data.focusEvent.caretY) + 'px';
+                    input.style.left = (data.focusEvent.x + data.focusEvent.caretX) + 'px';
+                } else {
                     input.style.top = null;
                     input.style.left = null;
                 }
@@ -305,7 +305,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             if (data.copyEvent != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
                 api.displayCopyBar(data.copyEvent);
             }
-            if(data.pasteRequest != null && api.cfg.hasControl && !api.cfg.recordingPlayback){
+            if (data.pasteRequest != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
                 api.displayPasteDialog(data.pasteRequest);
             }
             if (data.fileDialogEvent != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
@@ -361,7 +361,10 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                         if (winContent != null) {
                             var imageObj = new Image();
                             var onloadFunction = function () {
+                                context.save()
+                                context.setTransform(util.dpr, 0, 0, util.dpr, 0, 0);
                                 context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
+                                context.restore();
                                 resolved();
                                 imageObj.onload = null;
                                 imageObj.src = '';
@@ -397,16 +400,17 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                 }
                 ddPromise.then(function (resultImage) {
                     windowImageHolders[win.id] = resultImage;
+                    var dpr = util.dpr;
                     for (var x in win.content) {
                         var winContent = win.content[x];
                         if (winContent != null) {
-                            var sx = Math.min(resultImage.width, Math.max(0, winContent.positionX));
-                            var sy = Math.min(resultImage.height, Math.max(0, winContent.positionY));
-                            var sw = Math.min(resultImage.width - sx, winContent.width - (sx - winContent.positionX));
-                            var sh = Math.min(resultImage.height - sy, winContent.height - (sy - winContent.positionY));
+                            var sx = Math.min(resultImage.width, Math.max(0, winContent.positionX * dpr));
+                            var sy = Math.min(resultImage.height, Math.max(0, winContent.positionY * dpr));
+                            var sw = Math.min(resultImage.width - sx, winContent.width * dpr - (sx - winContent.positionX * dpr));
+                            var sh = Math.min(resultImage.height - sy, winContent.height * dpr - (sy - winContent.positionY * dpr));
 
-                            var dx = win.posX + sx;
-                            var dy = win.posY + sy;
+                            var dx = win.posX * dpr + sx;
+                            var dy = win.posY * dpr + sy;
                             var dw = sw;
                             var dh = sh;
 
@@ -423,21 +427,24 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         }
 
         function adjustCanvasSize(canvas, width, height) {
-            if (canvas.width != width || canvas.height != height) {
-                var snapshot = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
-                canvas.width = width;
-                canvas.height = height;
-                canvas.getContext("2d").putImageData(snapshot, 0, 0);
+            if (canvas.width != width * util.dpr || canvas.height != height * util.dpr) {
+                var ctx = canvas.getContext("2d");
+                var snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                canvas.width = width * util.dpr;
+                canvas.height = height * util.dpr;
+                ctx.putImageData(snapshot, 0, 0);
             }
         }
 
         function clear(x, y, w, h, context) {
-            context.clearRect(x, y, w, h);
+            var dpr = util.dpr;
+            context.clearRect(x * dpr, y * dpr, w * dpr, h * dpr);
         }
 
         function copy(sx, sy, dx, dy, w, h, context) {
-            var copy = context.getImageData(sx, sy, w, h);
-            context.putImageData(copy, dx, dy);
+            var dpr = util.dpr;
+            var copy = context.getImageData(sx * dpr, sy * dpr, w * dpr, h * dpr);
+            context.putImageData(copy, dx * dpr, dy * dpr);
         }
 
         function getCursorStyle(cursorMsg) {

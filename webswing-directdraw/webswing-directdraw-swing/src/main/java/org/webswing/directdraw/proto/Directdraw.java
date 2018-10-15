@@ -8098,23 +8098,23 @@ public final class Directdraw {
      */
     float getM00();
 
-    // optional float m10 = 2;
+    // optional float m10 = 2 [default = 0];
     /**
-     * <code>optional float m10 = 2;</code>
+     * <code>optional float m10 = 2 [default = 0];</code>
      */
     boolean hasM10();
     /**
-     * <code>optional float m10 = 2;</code>
+     * <code>optional float m10 = 2 [default = 0];</code>
      */
     float getM10();
 
-    // optional float m01 = 3;
+    // optional float m01 = 3 [default = 0];
     /**
-     * <code>optional float m01 = 3;</code>
+     * <code>optional float m01 = 3 [default = 0];</code>
      */
     boolean hasM01();
     /**
-     * <code>optional float m01 = 3;</code>
+     * <code>optional float m01 = 3 [default = 0];</code>
      */
     float getM01();
 
@@ -8128,23 +8128,23 @@ public final class Directdraw {
      */
     float getM11();
 
-    // optional float m02 = 5;
+    // optional float m02 = 5 [default = 0];
     /**
-     * <code>optional float m02 = 5;</code>
+     * <code>optional float m02 = 5 [default = 0];</code>
      */
     boolean hasM02();
     /**
-     * <code>optional float m02 = 5;</code>
+     * <code>optional float m02 = 5 [default = 0];</code>
      */
     float getM02();
 
-    // optional float m12 = 6;
+    // optional float m12 = 6 [default = 0];
     /**
-     * <code>optional float m12 = 6;</code>
+     * <code>optional float m12 = 6 [default = 0];</code>
      */
     boolean hasM12();
     /**
-     * <code>optional float m12 = 6;</code>
+     * <code>optional float m12 = 6 [default = 0];</code>
      */
     float getM12();
   }
@@ -8285,33 +8285,33 @@ public final class Directdraw {
       return m00_;
     }
 
-    // optional float m10 = 2;
+    // optional float m10 = 2 [default = 0];
     public static final int M10_FIELD_NUMBER = 2;
     private float m10_;
     /**
-     * <code>optional float m10 = 2;</code>
+     * <code>optional float m10 = 2 [default = 0];</code>
      */
     public boolean hasM10() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional float m10 = 2;</code>
+     * <code>optional float m10 = 2 [default = 0];</code>
      */
     public float getM10() {
       return m10_;
     }
 
-    // optional float m01 = 3;
+    // optional float m01 = 3 [default = 0];
     public static final int M01_FIELD_NUMBER = 3;
     private float m01_;
     /**
-     * <code>optional float m01 = 3;</code>
+     * <code>optional float m01 = 3 [default = 0];</code>
      */
     public boolean hasM01() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional float m01 = 3;</code>
+     * <code>optional float m01 = 3 [default = 0];</code>
      */
     public float getM01() {
       return m01_;
@@ -8333,33 +8333,33 @@ public final class Directdraw {
       return m11_;
     }
 
-    // optional float m02 = 5;
+    // optional float m02 = 5 [default = 0];
     public static final int M02_FIELD_NUMBER = 5;
     private float m02_;
     /**
-     * <code>optional float m02 = 5;</code>
+     * <code>optional float m02 = 5 [default = 0];</code>
      */
     public boolean hasM02() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional float m02 = 5;</code>
+     * <code>optional float m02 = 5 [default = 0];</code>
      */
     public float getM02() {
       return m02_;
     }
 
-    // optional float m12 = 6;
+    // optional float m12 = 6 [default = 0];
     public static final int M12_FIELD_NUMBER = 6;
     private float m12_;
     /**
-     * <code>optional float m12 = 6;</code>
+     * <code>optional float m12 = 6 [default = 0];</code>
      */
     public boolean hasM12() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional float m12 = 6;</code>
+     * <code>optional float m12 = 6 [default = 0];</code>
      */
     public float getM12() {
       return m12_;
@@ -8710,22 +8710,22 @@ public final class Directdraw {
         return this;
       }
 
-      // optional float m10 = 2;
+      // optional float m10 = 2 [default = 0];
       private float m10_ ;
       /**
-       * <code>optional float m10 = 2;</code>
+       * <code>optional float m10 = 2 [default = 0];</code>
        */
       public boolean hasM10() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional float m10 = 2;</code>
+       * <code>optional float m10 = 2 [default = 0];</code>
        */
       public float getM10() {
         return m10_;
       }
       /**
-       * <code>optional float m10 = 2;</code>
+       * <code>optional float m10 = 2 [default = 0];</code>
        */
       public Builder setM10(float value) {
         bitField0_ |= 0x00000002;
@@ -8734,7 +8734,7 @@ public final class Directdraw {
         return this;
       }
       /**
-       * <code>optional float m10 = 2;</code>
+       * <code>optional float m10 = 2 [default = 0];</code>
        */
       public Builder clearM10() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -8743,22 +8743,22 @@ public final class Directdraw {
         return this;
       }
 
-      // optional float m01 = 3;
+      // optional float m01 = 3 [default = 0];
       private float m01_ ;
       /**
-       * <code>optional float m01 = 3;</code>
+       * <code>optional float m01 = 3 [default = 0];</code>
        */
       public boolean hasM01() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional float m01 = 3;</code>
+       * <code>optional float m01 = 3 [default = 0];</code>
        */
       public float getM01() {
         return m01_;
       }
       /**
-       * <code>optional float m01 = 3;</code>
+       * <code>optional float m01 = 3 [default = 0];</code>
        */
       public Builder setM01(float value) {
         bitField0_ |= 0x00000004;
@@ -8767,7 +8767,7 @@ public final class Directdraw {
         return this;
       }
       /**
-       * <code>optional float m01 = 3;</code>
+       * <code>optional float m01 = 3 [default = 0];</code>
        */
       public Builder clearM01() {
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -8809,22 +8809,22 @@ public final class Directdraw {
         return this;
       }
 
-      // optional float m02 = 5;
+      // optional float m02 = 5 [default = 0];
       private float m02_ ;
       /**
-       * <code>optional float m02 = 5;</code>
+       * <code>optional float m02 = 5 [default = 0];</code>
        */
       public boolean hasM02() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional float m02 = 5;</code>
+       * <code>optional float m02 = 5 [default = 0];</code>
        */
       public float getM02() {
         return m02_;
       }
       /**
-       * <code>optional float m02 = 5;</code>
+       * <code>optional float m02 = 5 [default = 0];</code>
        */
       public Builder setM02(float value) {
         bitField0_ |= 0x00000010;
@@ -8833,7 +8833,7 @@ public final class Directdraw {
         return this;
       }
       /**
-       * <code>optional float m02 = 5;</code>
+       * <code>optional float m02 = 5 [default = 0];</code>
        */
       public Builder clearM02() {
         bitField0_ = (bitField0_ & ~0x00000010);
@@ -8842,22 +8842,22 @@ public final class Directdraw {
         return this;
       }
 
-      // optional float m12 = 6;
+      // optional float m12 = 6 [default = 0];
       private float m12_ ;
       /**
-       * <code>optional float m12 = 6;</code>
+       * <code>optional float m12 = 6 [default = 0];</code>
        */
       public boolean hasM12() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional float m12 = 6;</code>
+       * <code>optional float m12 = 6 [default = 0];</code>
        */
       public float getM12() {
         return m12_;
       }
       /**
-       * <code>optional float m12 = 6;</code>
+       * <code>optional float m12 = 6 [default = 0];</code>
        */
       public Builder setM12(float value) {
         bitField0_ |= 0x00000020;
@@ -8866,7 +8866,7 @@ public final class Directdraw {
         return this;
       }
       /**
-       * <code>optional float m12 = 6;</code>
+       * <code>optional float m12 = 6 [default = 0];</code>
        */
       public Builder clearM12() {
         bitField0_ = (bitField0_ & ~0x00000020);
@@ -20169,65 +20169,66 @@ public final class Directdraw {
       "swing.directdraw.proto.CombinedProto\":\n\r" +
       "FontFaceProto\022\014\n\004name\030\001 \002(\t\022\014\n\004font\030\002 \002(" +
       "\014\022\r\n\005style\030\003 \001(\t\"\032\n\nColorProto\022\014\n\004rgba\030\001" +
-      " \002(\007\"\032\n\nImageProto\022\014\n\004data\030\001 \002(\014\"d\n\016Tran" +
-      "sformProto\022\016\n\003m00\030\001 \001(\002:\0011\022\013\n\003m10\030\002 \001(\002\022",
-      "\013\n\003m01\030\003 \001(\002\022\016\n\003m11\030\004 \001(\002:\0011\022\013\n\003m02\030\005 \001(" +
-      "\002\022\013\n\003m12\030\006 \001(\002\"\034\n\rCombinedProto\022\013\n\003ids\030\001" +
-      " \003(\r\"\032\n\nGlyphProto\022\014\n\004data\030\001 \001(\014\"<\n\016Rect" +
-      "angleProto\022\t\n\001x\030\001 \002(\002\022\t\n\001y\030\002 \002(\002\022\t\n\001w\030\003 " +
-      "\002(\002\022\t\n\001h\030\004 \002(\002\":\n\014EllipseProto\022\t\n\001x\030\001 \002(" +
-      "\002\022\t\n\001y\030\002 \002(\002\022\t\n\001w\030\003 \002(\002\022\t\n\001h\030\004 \002(\002\"]\n\023Ro" +
-      "undRectangleProto\022\t\n\001x\030\001 \002(\002\022\t\n\001y\030\002 \002(\002\022" +
-      "\t\n\001w\030\003 \002(\002\022\t\n\001h\030\004 \002(\002\022\014\n\004arcW\030\005 \001(\002\022\014\n\004a" +
-      "rcH\030\006 \001(\002\"\307\001\n\010ArcProto\022\t\n\001x\030\001 \002(\002\022\t\n\001y\030\002" +
-      " \002(\002\022\t\n\001w\030\003 \002(\002\022\t\n\001h\030\004 \002(\002\022\r\n\005start\030\005 \001(",
-      "\002\022\016\n\006extent\030\006 \001(\002\022B\n\004type\030\007 \001(\01624.org.we" +
-      "bswing.directdraw.proto.ArcProto.ArcType" +
-      "Proto\",\n\014ArcTypeProto\022\010\n\004OPEN\020\000\022\t\n\005CHORD" +
-      "\020\001\022\007\n\003PIE\020\002\"\300\001\n\tPathProto\022\022\n\nwindingOdd\030" +
-      "\001 \002(\010\022G\n\004type\030\002 \003(\01629.org.webswing.direc" +
-      "tdraw.proto.PathProto.SegmentTypeProto\022\016" +
-      "\n\006points\030\003 \003(\002\"F\n\020SegmentTypeProto\022\010\n\004MO" +
-      "VE\020\000\022\010\n\004LINE\020\001\022\010\n\004QUAD\020\002\022\t\n\005CUBIC\020\003\022\t\n\005C" +
-      "LOSE\020\004\"\365\001\n\tFontProto\022\016\n\006family\030\001 \002(\t\022B\n\005" +
-      "style\030\002 \001(\01623.org.webswing.directdraw.pr",
-      "oto.FontProto.StyleProto\022\014\n\004size\030\003 \001(\r\022@" +
-      "\n\ttransform\030\004 \001(\0132-.org.webswing.directd" +
-      "raw.proto.TransformProto\"D\n\nStyleProto\022\n" +
-      "\n\006NORMAL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006ITALIC\020\002\022\021\n\rB" +
-      "OLDANDITALIC\020\003\"\346\002\n\013StrokeProto\022\r\n\005width\030" +
-      "\001 \002(\002\022\022\n\nmiterLimit\030\002 \001(\002\022H\n\004join\030\003 \001(\0162" +
-      ":.org.webswing.directdraw.proto.StrokePr" +
-      "oto.StrokeJoinProto\022F\n\003cap\030\004 \001(\01629.org.w" +
-      "ebswing.directdraw.proto.StrokeProto.Str" +
-      "okeCapProto\022\014\n\004dash\030\005 \003(\002\022\022\n\ndashOffset\030",
-      "\006 \001(\002\"A\n\017StrokeJoinProto\022\016\n\nJOIN_MITER\020\000" +
-      "\022\016\n\nJOIN_ROUND\020\001\022\016\n\nJOIN_BEVEL\020\002\"=\n\016Stro" +
-      "keCapProto\022\014\n\010CAP_BUTT\020\000\022\r\n\tCAP_ROUND\020\001\022" +
-      "\016\n\nCAP_SQUARE\020\002\"\266\001\n\023LinearGradientProto\022" +
-      "\016\n\006xStart\030\001 \002(\021\022\016\n\006yStart\030\002 \002(\021\022\014\n\004xEnd\030" +
-      "\003 \002(\021\022\014\n\004yEnd\030\004 \002(\021\022\016\n\006colors\030\005 \003(\007\022\021\n\tf" +
-      "ractions\030\006 \003(\002\022@\n\006repeat\030\007 \002(\01620.org.web" +
-      "swing.directdraw.proto.CyclicMethodProto" +
-      "\"\314\001\n\023RadialGradientProto\022\017\n\007xCenter\030\001 \002(" +
-      "\021\022\017\n\007yCenter\030\002 \002(\021\022\016\n\006xFocus\030\003 \002(\021\022\016\n\006yF",
-      "ocus\030\004 \002(\021\022\016\n\006radius\030\005 \002(\021\022\016\n\006colors\030\006 \003" +
-      "(\007\022\021\n\tfractions\030\007 \003(\002\022@\n\006repeat\030\010 \002(\01620." +
-      "org.webswing.directdraw.proto.CyclicMeth" +
-      "odProto\"\035\n\013PointsProto\022\016\n\006points\030\001 \003(\021\"\266" +
-      "\002\n\016CompositeProto\022N\n\004type\030\001 \002(\0162@.org.we" +
-      "bswing.directdraw.proto.CompositeProto.C" +
-      "ompositeTypeProto\022\020\n\005alpha\030\002 \001(\002:\0011\022\r\n\005c" +
-      "olor\030\003 \001(\007\"\262\001\n\022CompositeTypeProto\022\t\n\005CLE" +
-      "AR\020\001\022\007\n\003SRC\020\002\022\007\n\003DST\020\t\022\014\n\010SRC_OVER\020\003\022\014\n\010" +
-      "DST_OVER\020\004\022\n\n\006SRC_IN\020\005\022\n\n\006DST_IN\020\006\022\013\n\007SR",
-      "C_OUT\020\007\022\013\n\007DST_OUT\020\010\022\014\n\010SRC_ATOP\020\n\022\014\n\010DS" +
-      "T_ATOP\020\013\022\007\n\003XOR\020\014\022\014\n\010XOR_MODE\020\r\"\207\001\n\014Text" +
-      "ureProto\0228\n\005image\030\001 \002(\0132).org.webswing.d" +
-      "irectdraw.proto.ImageProto\022=\n\006anchor\030\002 \002" +
-      "(\0132-.org.webswing.directdraw.proto.Recta" +
-      "ngleProto*:\n\021CyclicMethodProto\022\014\n\010NO_CYC" +
-      "LE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
+      " \002(\007\"\032\n\nImageProto\022\014\n\004data\030\001 \002(\014\"p\n\016Tran" +
+      "sformProto\022\016\n\003m00\030\001 \001(\002:\0011\022\016\n\003m10\030\002 \001(\002:",
+      "\0010\022\016\n\003m01\030\003 \001(\002:\0010\022\016\n\003m11\030\004 \001(\002:\0011\022\016\n\003m0" +
+      "2\030\005 \001(\002:\0010\022\016\n\003m12\030\006 \001(\002:\0010\"\034\n\rCombinedPr" +
+      "oto\022\013\n\003ids\030\001 \003(\r\"\032\n\nGlyphProto\022\014\n\004data\030\001" +
+      " \001(\014\"<\n\016RectangleProto\022\t\n\001x\030\001 \002(\002\022\t\n\001y\030\002" +
+      " \002(\002\022\t\n\001w\030\003 \002(\002\022\t\n\001h\030\004 \002(\002\":\n\014EllipsePro" +
+      "to\022\t\n\001x\030\001 \002(\002\022\t\n\001y\030\002 \002(\002\022\t\n\001w\030\003 \002(\002\022\t\n\001h" +
+      "\030\004 \002(\002\"]\n\023RoundRectangleProto\022\t\n\001x\030\001 \002(\002" +
+      "\022\t\n\001y\030\002 \002(\002\022\t\n\001w\030\003 \002(\002\022\t\n\001h\030\004 \002(\002\022\014\n\004arc" +
+      "W\030\005 \001(\002\022\014\n\004arcH\030\006 \001(\002\"\307\001\n\010ArcProto\022\t\n\001x\030" +
+      "\001 \002(\002\022\t\n\001y\030\002 \002(\002\022\t\n\001w\030\003 \002(\002\022\t\n\001h\030\004 \002(\002\022\r",
+      "\n\005start\030\005 \001(\002\022\016\n\006extent\030\006 \001(\002\022B\n\004type\030\007 " +
+      "\001(\01624.org.webswing.directdraw.proto.ArcP" +
+      "roto.ArcTypeProto\",\n\014ArcTypeProto\022\010\n\004OPE" +
+      "N\020\000\022\t\n\005CHORD\020\001\022\007\n\003PIE\020\002\"\300\001\n\tPathProto\022\022\n" +
+      "\nwindingOdd\030\001 \002(\010\022G\n\004type\030\002 \003(\01629.org.we" +
+      "bswing.directdraw.proto.PathProto.Segmen" +
+      "tTypeProto\022\016\n\006points\030\003 \003(\002\"F\n\020SegmentTyp" +
+      "eProto\022\010\n\004MOVE\020\000\022\010\n\004LINE\020\001\022\010\n\004QUAD\020\002\022\t\n\005" +
+      "CUBIC\020\003\022\t\n\005CLOSE\020\004\"\365\001\n\tFontProto\022\016\n\006fami" +
+      "ly\030\001 \002(\t\022B\n\005style\030\002 \001(\01623.org.webswing.d",
+      "irectdraw.proto.FontProto.StyleProto\022\014\n\004" +
+      "size\030\003 \001(\r\022@\n\ttransform\030\004 \001(\0132-.org.webs" +
+      "wing.directdraw.proto.TransformProto\"D\n\n" +
+      "StyleProto\022\n\n\006NORMAL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006I" +
+      "TALIC\020\002\022\021\n\rBOLDANDITALIC\020\003\"\346\002\n\013StrokePro" +
+      "to\022\r\n\005width\030\001 \002(\002\022\022\n\nmiterLimit\030\002 \001(\002\022H\n" +
+      "\004join\030\003 \001(\0162:.org.webswing.directdraw.pr" +
+      "oto.StrokeProto.StrokeJoinProto\022F\n\003cap\030\004" +
+      " \001(\01629.org.webswing.directdraw.proto.Str" +
+      "okeProto.StrokeCapProto\022\014\n\004dash\030\005 \003(\002\022\022\n",
+      "\ndashOffset\030\006 \001(\002\"A\n\017StrokeJoinProto\022\016\n\n" +
+      "JOIN_MITER\020\000\022\016\n\nJOIN_ROUND\020\001\022\016\n\nJOIN_BEV" +
+      "EL\020\002\"=\n\016StrokeCapProto\022\014\n\010CAP_BUTT\020\000\022\r\n\t" +
+      "CAP_ROUND\020\001\022\016\n\nCAP_SQUARE\020\002\"\266\001\n\023LinearGr" +
+      "adientProto\022\016\n\006xStart\030\001 \002(\021\022\016\n\006yStart\030\002 " +
+      "\002(\021\022\014\n\004xEnd\030\003 \002(\021\022\014\n\004yEnd\030\004 \002(\021\022\016\n\006color" +
+      "s\030\005 \003(\007\022\021\n\tfractions\030\006 \003(\002\022@\n\006repeat\030\007 \002" +
+      "(\01620.org.webswing.directdraw.proto.Cycli" +
+      "cMethodProto\"\314\001\n\023RadialGradientProto\022\017\n\007" +
+      "xCenter\030\001 \002(\021\022\017\n\007yCenter\030\002 \002(\021\022\016\n\006xFocus",
+      "\030\003 \002(\021\022\016\n\006yFocus\030\004 \002(\021\022\016\n\006radius\030\005 \002(\021\022\016" +
+      "\n\006colors\030\006 \003(\007\022\021\n\tfractions\030\007 \003(\002\022@\n\006rep" +
+      "eat\030\010 \002(\01620.org.webswing.directdraw.prot" +
+      "o.CyclicMethodProto\"\035\n\013PointsProto\022\016\n\006po" +
+      "ints\030\001 \003(\021\"\266\002\n\016CompositeProto\022N\n\004type\030\001 " +
+      "\002(\0162@.org.webswing.directdraw.proto.Comp" +
+      "ositeProto.CompositeTypeProto\022\020\n\005alpha\030\002" +
+      " \001(\002:\0011\022\r\n\005color\030\003 \001(\007\"\262\001\n\022CompositeType" +
+      "Proto\022\t\n\005CLEAR\020\001\022\007\n\003SRC\020\002\022\007\n\003DST\020\t\022\014\n\010SR" +
+      "C_OVER\020\003\022\014\n\010DST_OVER\020\004\022\n\n\006SRC_IN\020\005\022\n\n\006DS",
+      "T_IN\020\006\022\013\n\007SRC_OUT\020\007\022\013\n\007DST_OUT\020\010\022\014\n\010SRC_" +
+      "ATOP\020\n\022\014\n\010DST_ATOP\020\013\022\007\n\003XOR\020\014\022\014\n\010XOR_MOD" +
+      "E\020\r\"\207\001\n\014TextureProto\0228\n\005image\030\001 \002(\0132).or" +
+      "g.webswing.directdraw.proto.ImageProto\022=" +
+      "\n\006anchor\030\002 \002(\0132-.org.webswing.directdraw" +
+      ".proto.RectangleProto*:\n\021CyclicMethodPro" +
+      "to\022\014\n\010NO_CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020" +
+      "\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

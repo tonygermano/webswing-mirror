@@ -55,18 +55,24 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <webswing-war-name>webswing-server</webswing-war-name>
-        <jersey.version>2.26</jersey.version>
+        <jersey.version>2.27</jersey.version>
         <guice.version>4.1.0</guice.version>
         <activemq.version>5.15.4</activemq.version>
         <opensaml.version>3.3.1</opensaml.version>
         <bouncycastle.version>1.60</bouncycastle.version>
+        <jackson.version>2.9.7</jackson.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.9.7</version>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
