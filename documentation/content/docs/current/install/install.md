@@ -100,4 +100,33 @@ Webswing distribution contains several files, but only three of them are necessa
 
 `webswing.log` file for storing Webswing server and swing application instance logs.
 
+## Docker
 
+Create docker-compose.yml file:
+```
+version: "3.3"
+
+services:
+  webswing:
+    image: nimirium/webswing:2.5.2
+    environment:
+      - WEBSWING=/opt/app/config/webswing.config
+    volumes:
+      - /opt/app:/opt/app
+    ports:
+      - "80:8080"
+```
+
+Environment variable WEBSWING specifies where your config file is.
+Volume syncs container with host, so your config survives the restart of container.
+Docker ports are of "host:container" syntax. So with "80:8080" your app will be accessible without specifying port number.
+
+On your host create folder `/opt/app` and place there application jar and dependencies in `/opt/app/lib`.
+Copy `webswing.config` from your DEV machine to `/opt/app/webswing.config`.
+To configure your app setup the classpath like following:
+
+```
+"classPathEntries" : [ "/opt/app/lib/*.jar", "/opt/app/MySwingApp.jar" ]
+```
+
+Run `docker-compose up -d`

@@ -1,9 +1,9 @@
-+++
-title= "Documentation v2.5"
-subTitle= "Webswing Documentation"
-weight= 100
-date = "2017-04-24T18:36:24+02:00"
-+++
+---
+title: "Documentation v2.5"
+subTitle: "Webswing Documentation"
+weight: 100
+date: "2017-04-24T18:36:24+02:00"
+---
 
 ## Overview
 
@@ -83,6 +83,7 @@ Webswing provides many convenient integrated features which makes working with W
 * **[DirectDraw](contrib) - rendering directly from Java2d to HTML Canvas**
 * **Configurable Swing window decoration themes**
 * **Java 7 and 8 support**
+* **Open JDK**
 
 On Server, you can:
 
@@ -91,6 +92,8 @@ On Server, you can:
 * **Use one of built-in security providers (including SAML2 or OpenID Connect) or create your own**
 * **Mirror view - see what users see from admin console**
 * **Use your own branding**
+* **Cluster deployment** (Enterprise edition)
+* **Docker and Kubernetes** (Enterprise edition)
 
 ## How does it work?
 

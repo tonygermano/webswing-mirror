@@ -53,7 +53,7 @@ Here is the snippet of the relevant part of Webswing configuration for NetBeans 
  {
     "name" : "NetBeans IDE (set homeDir)",
     "mainClass" : "org.netbeans.Main",
-    "classPathEntries" : [ "platform/lib/*.jar","platform/lib/*/*.jar" ],
+    "classPathEntries" : [ "platform/*/*.jar/","platform/lib/*/*.jar" ],
     "vmArgs" : "-Dnetbeans.user=${user.dir}/tmp/netbeans/${user} -Dnetbeans.home=platform  -Dorg.netbeans.log.startup=print -DTopSecurityManager.disable=true -Dnetbeans.dirs=\"platform;nb;ergonomics;ide;extide;java;apisupport;webcommon;websvccommon;enterprise;mobility;profiler;python;php;identity;harness;cnd;dlight;groovy;extra;javacard;javafx\"",
     "args" : "",
     "homeDir" : "c:/Program Files/NetBeans 8.0.2",
