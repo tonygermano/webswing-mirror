@@ -6,7 +6,8 @@
 				getInfo : getInfo,
 				getConfig : getConfig,
 				setConfig : setConfig,
-				getVariables : getVariables,
+				getVariables: getVariables,
+				resolve: resolve,
 				start : start,
 				stop : stop,
 				remove : remove,
@@ -94,14 +95,28 @@
 				}
 			}
 
-			function getVariables(path,type) {
-				return $http.get(toPath(path) + '/rest/variables/'+type).then(success, failed);
+			function getVariables(path,type,searchSequence) {
+				var url = toPath(path) + '/rest/variables/search/' + encodeURIComponent(type) + '?search=' + encodeURIComponent(searchSequence);
+				return $http.get(url).then(success, failed);
 				function success(data) {
 					return data.data;
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('load available configuration variables', data, true);
+					return errorHandler.handleRestError('get variables new', data, false);
 				}
+			}
+
+			function resolve(path,type,searchSequence) {
+
+                var url = toPath(path) + '/rest/variables/resolve/' + type + '?resolve=' + searchSequence;
+
+                return $http.get(url).then(success, failed);
+                function success(data) {
+                    return data.data;
+                }
+                function failed(data) {
+                    return errorHandler.handleRestError('resolve', data, false);
+                }
 			}
 
 			function getMeta(path,config) {

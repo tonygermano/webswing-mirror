@@ -1,11 +1,12 @@
 (function (define) {
     define([], function f() {
+        // TODO (kundist): remove method, if not used
         function substitutorFilter() {
             return function (string, object) {
                 if (string != null && string.indexOf('${') > -1) {
                     for (var i = 0; i < 3; i++) {
                         var res = string;
-                        for (key in object) {
+                        for (var key in object) {
                             res = replaceAll(res, '${' + key + '}', object[key]);
                         }
                         if (res === string) {
