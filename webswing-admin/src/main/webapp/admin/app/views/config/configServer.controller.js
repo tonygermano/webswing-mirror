@@ -9,7 +9,6 @@
                 enable: null
             };
             vm.info = {status: {status: 'loading...'}};
-            vm.variables = {};
             vm.reset = reset;
             vm.apply = apply;
             vm.baseUrl = baseUrl;
@@ -25,14 +24,6 @@
                         return configRestService.getInfo(baseUrl);
                     }).then(function (data) {
                         vm.info = data;
-                    }).then(function () {
-                        return configRestService.getVariables(baseUrl, 'Basic');
-                    }).then(function (data) {
-                        vm.variables['Basic'] = data;
-                    }).then(function () {
-                        return configRestService.getVariables(baseUrl, 'SwingApp');
-                    }).then(function (data) {
-                        vm.variables['SwingApp'] = data;
                     }).then(function () {
                         loading.stopLoading();
                     });

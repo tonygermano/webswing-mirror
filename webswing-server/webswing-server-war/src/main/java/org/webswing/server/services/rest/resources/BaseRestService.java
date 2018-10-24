@@ -1,5 +1,6 @@
 package org.webswing.server.services.rest.resources;
 
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.common.model.admin.ApplicationInfo;
@@ -15,9 +16,7 @@ import org.webswing.toolkit.util.GitRepositoryState;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class BaseRestService {
 	private static final String default_version = "unresolved";
@@ -83,30 +82,108 @@ public abstract class BaseRestService {
 		return getConfigService().describeConfiguration(getHandler().getPathMapping(), null, getHandler());
 	}
 
-	@GET
-	@Path("/rest/variables/{type}")
-	public Map<String, String> getVariables(@PathParam("type") String type) throws WsException {
-		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
-		VariableSetName key;
+	private VariableSubstitutor getVariableSubstitutorByType(String type) {
+
+		VariableSetName variableType;
+
 		try {
-			key = VariableSetName.valueOf(type);
+			variableType = VariableSetName.valueOf(type);
 		} catch (Exception e) {
-			key = VariableSetName.Basic;
+			variableType = VariableSetName.Basic;
 		}
-		VariableSubstitutor vs;
-		switch (key) {
+
+		VariableSubstitutor variableSubstitutor;
+
+		switch (variableType) {
+
 		case SwingInstance:
 			String userName = getHandler().getUser() == null ? "<webswing user>" : getHandler().getUser().getUserId();
-			vs = VariableSubstitutor.forSwingInstance(getHandler().getConfig(), userName, null, "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing custom args>");
-			return vs.getVariableMap();
+			variableSubstitutor = VariableSubstitutor.forSwingInstance(getHandler().getConfig(), userName, null, "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing custom args>");
+			break;
+
 		case SwingApp:
-			vs = VariableSubstitutor.forSwingApp(getHandler().getConfig());
-			return vs.getVariableMap();
+			variableSubstitutor = VariableSubstitutor.forSwingApp(getHandler().getConfig());
+			break;
+
 		case Basic:
 		default:
-			vs = VariableSubstitutor.basic();
-			return vs.getVariableMap();
+			variableSubstitutor = VariableSubstitutor.basic();
+			break;
 		}
+
+		return variableSubstitutor;
+	}
+
+
+	@GET
+	@Path("/rest/variables/search/{type}")
+	public Map<String, String> searchVariables(@PathParam("type") String type, @QueryParam("search") String searchSequence) throws WsException {
+		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
+		final int VARIABLES_RESULT_COUNT = 10;
+		if (searchSequence == null) {
+			searchSequence = "";
+		}
+
+		// transform search sequence - this is case insensitive search
+		searchSequence = searchSequence.toLowerCase();
+
+		// alphabetically sorted variables, whose name (key of the map entry) starts with search sequence
+		Map<String, String> searchResultStartBy = new TreeMap<>();
+		// alphabetically sorted variables, whose name (key of the map entry) contains search sequence
+		Map<String, String> searchResultContains = new TreeMap<>();
+
+		// first, sort all existing variables by alphabetically order,
+		// because empty search string - getting list of first 10th variables, not first 10th finded un-ordered variables
+		SortedMap<String, String> variables = new TreeMap<>(this.getVariableSubstitutorByType(type).getVariableMap());
+
+		for (Map.Entry<String, String> variable : variables.entrySet()) {
+			if (searchResultStartBy.size() + searchResultContains.size() == VARIABLES_RESULT_COUNT) {
+				break;
+			}
+
+			// search in variable names
+			//
+			String variableLowerCase = variable.getKey().toLowerCase();
+
+			if (variableLowerCase.startsWith(searchSequence)) {
+				searchResultStartBy.put(variable.getKey(), variable.getValue());
+				continue;
+			}
+			if (variableLowerCase.contains(searchSequence)) {
+				searchResultContains.put(variable.getKey(), variable.getValue());
+				continue;
+			}
+
+			// search in variable values
+			//
+			String valueLowerCase = variable.getValue().toLowerCase();
+
+			if (valueLowerCase.contains(searchSequence)) {
+				searchResultContains.put(variable.getKey(), variable.getValue());
+				//noinspection UnnecessaryContinue
+				continue;
+			}
+		}
+
+		// all results, ordered and sorted per result category
+		Map<String, String> allResults = new LinkedHashMap<>();
+
+		allResults.putAll(searchResultStartBy);
+		allResults.putAll(searchResultContains);
+
+		return allResults;
+	}
+
+
+	@GET
+	@Path("/rest/variables/resolve/{type}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String resolve(@PathParam("type") String type, @QueryParam("resolve") String stringToResolve) throws WsException {
+		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getConfig);
+		if (stringToResolve == null) {
+			return null;
+		}
+		return this.getVariableSubstitutorByType(type).replace(stringToResolve);
 	}
 
 	@POST
@@ -151,7 +228,7 @@ public abstract class BaseRestService {
 	@GET
 	@Path("/rest/CSRFToken")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String generateCsrfToken() throws WsException{
+	public String generateCsrfToken() throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.websocket_connect);
 		return getHandler().generateCsrfToken();
 	}

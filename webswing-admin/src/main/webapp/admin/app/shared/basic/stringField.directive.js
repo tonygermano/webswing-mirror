@@ -8,13 +8,14 @@
                 scope: {
                     value: '=',
                     items: '=',
-                    variables: '=',
                     readonly: '=',
                     discriminator: '=',
                     restricted: '@',
                     label: '@',
                     desc: '@',
-                    type: '@'
+                    type: '@',
+                    path: '=',
+                    field: '='
                 },
                 controllerAs: 'vm',
                 bindToController: true,
@@ -27,16 +28,16 @@
 
         }
 
-        function controller($scope, $attrs) {
+        function controller($scope, $attrs, configRestService) {
             var vm = this;
             vm.originalValue = vm.value;
             vm.required = resolve('required', false);
             vm.requiredMsg = resolve('requiredMsg', 'This value is mandatory!');
             vm.helpVisible = false;
+            vm.resolvedString = '';
             vm.setChoice = setChoice;
-            vm.openHelper = openHelper;
             vm.toggleHelper = toggleHelper;
-
+            vm.toggleHelperClose = toggleHelperClose;
             vm.onBlur = onBlur;
 
             $scope.$on('wsHelperClose', function (evt, ctrl) {
@@ -46,19 +47,19 @@
             });
 
             function toggleHelper() {
-                if (vm.variables != null) {
-                    vm.helpVisible = !vm.helpVisible;
-                    if (vm.helpVisible) {
-                        $scope.$emit('wsHelperOpened', vm);
-                    }
+                configRestService
+                    .resolve(vm.path, vm.field.variables, vm.value)
+                    .then(function (responseData) {
+                        vm.resolvedString = responseData;
+                    });
+                vm.helpVisible = !vm.helpVisible;
+                if (vm.helpVisible) {
+                    $scope.$emit('wsHelperOpened', vm);
                 }
             }
 
-            function openHelper() {
-                if (vm.variables != null) {
-                    vm.helpVisible = true;
-                    $scope.$emit('wsHelperOpened', vm);
-                }
+            function toggleHelperClose() {
+                $scope.$broadcast('wsHelperClose', null, null);
             }
 
             function setChoice(value) {
@@ -92,7 +93,7 @@
             }
         }
 
-        controller.$inject = ['$scope', '$attrs'];
+        controller.$inject = ['$scope', '$attrs', 'configRestService'];
 
         return wsStringFieldDirective;
     });

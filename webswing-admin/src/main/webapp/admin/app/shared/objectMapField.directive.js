@@ -8,13 +8,14 @@
 				scope : {
 					field : '=',
 					value : '=',
-					variables : '=',
 					items : "=",
 					readonly : '=',
 					restricted : '@',
 					desc : '@',
-					label : '@'
-				},
+					label : '@',
+                    path: '='
+
+                },
 				controllerAs : 'vm',
 				bindToController : true,
 				controller : wsObjectMapFieldDirectiveController

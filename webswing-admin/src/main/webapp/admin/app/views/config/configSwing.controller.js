@@ -33,18 +33,6 @@
 					return configRestService.getConfig(vm.path).then(function(data) {
 						vm.config = angular.extend({}, vm.config, data);
 					}).then(function() {
-						return configRestService.getVariables(vm.path, 'Basic');
-					}).then(function(data) {
-						vm.variables['Basic'] = data;
-					}).then(function() {
-						return configRestService.getVariables(vm.path, 'SwingApp');
-					}).then(function(data) {
-						vm.variables['SwingApp'] = data;
-					}).then(function() {
-						return configRestService.getVariables(vm.path, 'SwingInstance');
-					}).then(function(data) {
-						vm.variables['SwingInstance'] = data;
-					}).then(function() {
 						loading.stopLoading();
 					});
 				}

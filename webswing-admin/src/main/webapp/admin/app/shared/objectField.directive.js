@@ -8,11 +8,11 @@
 				scope : {
 					field : '=',
 					value : '=',
-					variables : '=',
 					readonly : '=',
 					desc : '@',
 					label : '@',
-					restricted : '@'
+					restricted : '@',
+					path: '='
 				},
 				controllerAs : 'vm',
 				bindToController : true,
@@ -94,7 +94,7 @@
 						if (newField.type === 'Object') {
 							angular.extend(fields[int], newField);
 						} else {
-							newField.enable
+							newField.enable;
 							fields[int] = newField;
 						}
 					}

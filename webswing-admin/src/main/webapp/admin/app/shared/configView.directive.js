@@ -8,7 +8,6 @@
 				scope : {
 					path : '=',
 					value : '=',
-					variables : '=',
 					readonly : '=',
 					apply : '=',
 					reset : '='
