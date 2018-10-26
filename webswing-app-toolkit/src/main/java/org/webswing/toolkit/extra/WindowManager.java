@@ -112,6 +112,9 @@ public class WindowManager {
 		boolean success = false;
 		boolean newWindow = false;
 		if (!zorder.contains(w)) {
+			if(w.getClass().getName().contains("JLightweightFrame")){
+				return false;
+			}
 			zorder.addWindow(w);
 			newWindow = true;
 		}

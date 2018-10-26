@@ -231,6 +231,17 @@ public class Util {
 		return null;
 	}
 
+	public static Window[] getAllWindows() {
+		List<Window> windows = new ArrayList<>(Arrays.asList(Window.getWindows()));
+		for (Iterator<Window> i = windows.iterator(); i.hasNext(); ) {
+			Window w = i.next();
+			if (w.getClass().getName().contains("JLightweightFrame")) {
+				i.remove();
+			}
+		}
+		return windows.toArray(new Window[windows.size()]);
+	}
+
 	public static Map<String, Map<Integer, BufferedImage>> extractWindowImages(AppFrameMsgOut json, Map<String, Map<Integer, BufferedImage>> windowImages) {
 		for (WindowMsg window : json.getWindows()) {
 			WebWindowPeer w = findWindowPeerById(window.getId());
@@ -562,7 +573,7 @@ public class Util {
 
 	public static void repaintAllWindow() {
 		synchronized (WebPaintDispatcher.webPaintLock) {
-			for (Window w : Window.getWindows()) {
+			for (Window w : Util.getAllWindows()) {
 				if (w.isShowing()) {
 					final Object peer = WebToolkit.targetToPeer(w);
 					if (peer != null && peer instanceof WebWindowPeer) {
