@@ -348,7 +348,7 @@ public class Util {
 	}
 
 	public static boolean isWindowDecorationEvent(Window w, AWTEvent e) {
-		if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID() && w!=null && w.isEnabled() && w.isShowing()) {
+		if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID() && w != null && w.isEnabled() && w.isShowing()) {
 			return isWindowDecorationPosition((Window) w, new Point(((MouseEvent) e).getXOnScreen(), ((MouseEvent) e).getYOnScreen()));
 		}
 		return false;
@@ -636,4 +636,24 @@ public class Util {
 		return "";
 	}
 
+	public static void waitForImage(Image i) {
+		Graphics imageLoaderG = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).getGraphics();
+		ImageObserver observer = new ImageObserver() {
+			@Override
+			public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
+				notifyAll();
+				return true;
+			}
+		};
+
+		synchronized (observer) {
+			if (!imageLoaderG.drawImage(i, 0, 0, observer)) {
+				try {
+					observer.wait(300);
+				} catch (InterruptedException e) {
+					//ignore
+				}
+			}
+		}
+	}
 }

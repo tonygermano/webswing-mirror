@@ -1,31 +1,15 @@
 package org.webswing.directdraw.toolkit;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.TexturePaint;
+import org.webswing.directdraw.util.RenderUtil;
+import org.webswing.directdraw.util.XorModeComposite;
+
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
-
-import org.webswing.directdraw.util.WaitingImageObserver;
-import org.webswing.directdraw.util.XorModeComposite;
 
 public class WebGraphics extends AbstractVectorGraphics {
 
@@ -131,11 +115,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 		if (image instanceof BufferedImage) {
 			return new ImageConvertResult(true, (BufferedImage) image);
 		}
-		try {
-			new WaitingImageObserver(image).waitImageLoaded();//magic
-		} catch (Exception e) {
-			//ignore
-		}
+		RenderUtil.waitForImage(image);
 		BufferedImage bufferedImage = new BufferedImage(image.getWidth(observer), image.getHeight(observer), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = bufferedImage.createGraphics();
 		try {

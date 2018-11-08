@@ -1,12 +1,12 @@
 package org.webswing.toolkit;
 
+import org.webswing.toolkit.util.Util;
+
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-
-import org.webswing.toolkit.util.WaitingImageObserver;
 
 public class WebCursor extends Cursor {
 
@@ -24,7 +24,7 @@ public class WebCursor extends Cursor {
 		if (image instanceof BufferedImage) {
 			return (BufferedImage) image;
 		} else {
-			new WaitingImageObserver(image).waitImageLoaded();
+			Util.waitForImage(image);
 			BufferedImage bimg = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
 			Graphics g = bimg.getGraphics();
 			g.drawImage(image, 0, 0, null);
