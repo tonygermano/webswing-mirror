@@ -524,6 +524,10 @@ public class Util {
 
 	public static JFileChooser discoverFileChooser(WebWindowPeer windowPeer) {
 		Window w = (Window) windowPeer.getTarget();
+		return discoverFileChooser(w);
+	}
+
+	public static JFileChooser discoverFileChooser(Window w) {
 		if (w instanceof JDialog) {
 			Container pane = ((JDialog) w).getContentPane();
 			if (pane != null) {

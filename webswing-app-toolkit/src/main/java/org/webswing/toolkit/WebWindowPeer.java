@@ -61,16 +61,10 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 	}
 
 	public void show() {
-		if (isJFileChooserDialog()) {
-			Util.getWebToolkit().getPaintDispatcher().notifyFileDialogActive(this);
-		}
 		Util.getWebToolkit().getWindowManager().activateWindow((Window) target);
 	}
 
 	public void hide() {
-		if (isJFileChooserDialog()) {
-			Util.getWebToolkit().getPaintDispatcher().notifyFileDialogHidden(this);
-		}
 		Util.getWebToolkit().getWindowManager().removeWindow((Window) target);
 		notifyWindowClosed();
 	}
@@ -117,10 +111,6 @@ public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 	}
 
 	public void updateAlwaysOnTopState() {
-	}
-
-	public boolean isJFileChooserDialog() {
-		return Util.discoverFileChooser(this) != null;
 	}
 
 }

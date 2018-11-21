@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.WindowActionType;
@@ -65,6 +66,12 @@ public class WindowManager {
 						WebComponentPeer oldActiveWindowPeer = (WebComponentPeer) WebToolkit.targetToPeer(oldActiveWindow);
 						oldActiveWindowPeer.updateWindowDecorationImage();
 						Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(oldActiveWindow);
+					}
+					if(	Util.discoverFileChooser(oldActiveWindow) != null){
+						Util.getWebToolkit().getPaintDispatcher().notifyFileDialogHidden();
+					}
+					if(Util.discoverFileChooser(activeWindow) != null){
+						Util.getWebToolkit().getPaintDispatcher().notifyFileDialogActive(activeWindow);
 					}
 				}
 				if (w != null) {

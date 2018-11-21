@@ -376,8 +376,8 @@ public class WebPaintDispatcher {
 		sendObject(f);
 	}
 
-	public void notifyFileDialogActive(WebWindowPeer webWindowPeer) {
-		fileChooserDialog = Util.discoverFileChooser(webWindowPeer);
+	public void notifyFileDialogActive(Window window) {
+		fileChooserDialog = Util.discoverFileChooser(window);
 		notifyFileDialogActive();
 	}
 
@@ -435,7 +435,7 @@ public class WebPaintDispatcher {
 		}
 	}
 
-	public void notifyFileDialogHidden(WebWindowPeer webWindowPeer) {
+	public void notifyFileDialogHidden() {
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
 		fdEvent.setEventType(FileDialogEventType.Close);
