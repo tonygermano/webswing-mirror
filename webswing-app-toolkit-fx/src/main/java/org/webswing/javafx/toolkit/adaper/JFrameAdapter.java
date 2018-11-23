@@ -1,6 +1,7 @@
 package org.webswing.javafx.toolkit.adaper;
 
 import javax.swing.JFrame;
+import javax.swing.JRootPane;
 import java.awt.Window;
 
 public class JFrameAdapter extends JFrame implements WindowAdapter {
@@ -8,6 +9,7 @@ public class JFrameAdapter extends JFrame implements WindowAdapter {
 		super();
 		if (!titled) {
 			setUndecorated(true);
+			getRootPane().setWindowDecorationStyle(JRootPane.NONE);
 		}
 	}
 
