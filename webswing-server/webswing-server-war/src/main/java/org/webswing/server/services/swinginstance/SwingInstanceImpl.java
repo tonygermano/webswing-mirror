@@ -310,7 +310,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				}
 			} else if (o instanceof OpenFileResultMsgInternal) {
 				OpenFileResultMsgInternal fr = (OpenFileResultMsgInternal) o;
-				String id = UUID.randomUUID().toString();
+				String extension = getFileExtension(fr.getFile());
+				String id = UUID.randomUUID().toString() + extension;
 				boolean success = fileHandler.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, getUser(), getInstanceId(), fr.isWaitForFile(), fr.getOverwriteDetails());
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
@@ -324,8 +325,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
 				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, s.getCpuUsage());
 				logStatValue(StatisticsLogger.EDT_BLOCKED_SEC_METRIC, s.getEdtPingSeconds());
-				if(getAppConfig().isMonitorEdtEnabled()){
-					if(s.getEdtPingSeconds()>2){
+				if (getAppConfig().isMonitorEdtEnabled()) {
+					if (s.getEdtPingSeconds() > 2) {
 						sendToWeb(SimpleEventMsgOut.applicationBusy.buildMsgOut());
 					}
 				}
@@ -716,12 +717,12 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	public String getThreadDump(String id) {
 		try {
 			ThreadDumpMsgInternal dump = threadDumps.get(Long.parseLong(id));
-			if(dump!=null){
+			if (dump != null) {
 				return FileUtils.readFileToString(new File(dump.getDump()));
 			}
 			return null;
 		} catch (Exception e) {
-			log.error("Failed to load threaddump",e);
+			log.error("Failed to load threaddump", e);
 			return null;
 		}
 	}
@@ -758,6 +759,15 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			event = new ApiEventMsgInternal(type, null, null);
 		}
 		jvmConnection.send(event);
+	}
+
+	private String getFileExtension(File file) {
+		String name = file.getName();
+		int lastIndexOf = name.lastIndexOf(".");
+		if (lastIndexOf == -1) {
+			return "";
+		}
+		return name.substring(lastIndexOf);
 	}
 
 }

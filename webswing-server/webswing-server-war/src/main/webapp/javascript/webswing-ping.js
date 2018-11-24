@@ -1,16 +1,20 @@
-define(['jquery', 'text!templates/network.html', 'webswing-util',], function amdFactory($, html, util) {
+define([], function amdFactory() {
     "use strict";
     return function PingModule() {
         var module = this;
         var api;
-        var worker, ping, networkBar, severity, mute = 0;
+        var worker, ping, severity, mute = 0;
         var count = 6, interval = 5, maxLatency = 500, notifyIf = 3;
         module.injects = api = {
             cfg: 'webswing.config',
-            translate: 'translate.translate',
-            sendInput: 'input.sendInput'
+            sendInput: 'input.sendInput',
+            showWarning: 'dialog.showNetworkBar',
+            hideWarning: 'dialog.hideNetworkBar',
+            dialogContent: 'dialog.content'
         };
-        module.provides = {};
+        module.provides = {
+            mutePingWarning: mutePingWarning
+        };
         module.ready = function () {
             ping = getArrayWithLimitedLength(count);
             var connectionUrl=api.cfg.connectionUrl;
@@ -53,42 +57,24 @@ define(['jquery', 'text!templates/network.html', 'webswing-util',], function amd
                 }
             }
             if (fails == count) {
-                msg = '<span class="ws-message--error"><span class="ws-icon-warn"></span>${dialog.networkMonitor.offline}</span>';
+                msg = api.dialogContent.networkOfflineWarningDialog;
                 severity = 2;
             } else if (warns >= notifyIf) {
-                msg = '<span class="ws-message--warning"><span class="ws-icon-warn"></span>${dialog.networkMonitor.warn}</span>';
+                msg = api.dialogContent.networkSlowWarningDialog;
                 severity = 1;
             } else {
                 severity = 0;
             }
 
             if (msg != null && severity != mute) {
-                display(api.translate(msg));
+                api.showWarning(msg)
             } else {
-                close();
+                api.hideWarning();
             }
         }
 
-
-        function display(msg) {
-            if (networkBar == null) {
-                api.cfg.rootElement.append(api.translate(html));
-                networkBar = api.cfg.rootElement.find('div[data-id="networkBar"]');
-                networkBar.find('a[data-id="hide"]').on('click', function (evt) {
-                    mute = severity;
-                    close();
-                });
-            }
-            networkBar.find('span[data-id="message"]').html(msg);
-            networkBar.show("fast");
-        }
-
-        function close() {
-            if (networkBar != null) {
-                networkBar.hide("fast");
-                networkBar.remove();
-                networkBar = null;
-            }
+        function mutePingWarning(severity){
+            mute=severity;
         }
 
         function PingMonitor(connectionUrl, is) {
