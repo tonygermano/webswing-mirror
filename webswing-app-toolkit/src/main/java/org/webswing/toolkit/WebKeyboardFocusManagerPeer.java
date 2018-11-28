@@ -39,7 +39,7 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 
 	}
 
-	public static int shouldNativelyFocusHeavyweight(Window heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
+	public static int shouldNativelyFocusHeavyweight(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, CausedFocusEvent.Cause cause) {
 		try {
 			Method m2 = KeyboardFocusManager.class.getDeclaredMethod("shouldNativelyFocusHeavyweight", Component.class, Component.class, Boolean.TYPE, Boolean.TYPE, Long.TYPE, CausedFocusEvent.Cause.class);
 			m2.setAccessible(true);

@@ -185,13 +185,15 @@ public class WebPaintDispatcher {
 	public void notifyWindowRepaint(Window w) {
 		Rectangle bounds = w.getBounds();
 		WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(w);
-		notifyWindowAreaRepainted(peer.getGuid(), new Rectangle(0, 0, bounds.width, bounds.height));
+		if(peer!=null){
+			notifyWindowAreaRepainted(peer.getGuid(), new Rectangle(0, 0, bounds.width, bounds.height));
+		}
 	}
 
 	@SuppressWarnings("restriction")
 	public void notifyWindowRepaintAll() {
 		notifyBackgroundRepainted(new Rectangle(Util.getWebToolkit().getScreenSize()));
-		for (Window w : Window.getWindows()) {
+		for (Window w : Util.getAllWindows()) {
 			if (w.isShowing()) {
 				notifyWindowRepaint(w);
 			}
@@ -212,7 +214,7 @@ public class WebPaintDispatcher {
 
 	@SuppressWarnings("restriction")
 	public void resetWindowsPosition(int oldWidht, int oldHeight) {
-		for (Window w : Window.getWindows()) {
+		for (Window w : Util.getAllWindows()) {
 			WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(w);
 			if (peer != null) {
 				Rectangle b = w.getBounds();
@@ -374,8 +376,8 @@ public class WebPaintDispatcher {
 		sendObject(f);
 	}
 
-	public void notifyFileDialogActive(WebWindowPeer webWindowPeer) {
-		fileChooserDialog = Util.discoverFileChooser(webWindowPeer);
+	public void notifyFileDialogActive(Window window) {
+		fileChooserDialog = Util.discoverFileChooser(window);
 		notifyFileDialogActive();
 	}
 
@@ -433,7 +435,7 @@ public class WebPaintDispatcher {
 		}
 	}
 
-	public void notifyFileDialogHidden(WebWindowPeer webWindowPeer) {
+	public void notifyFileDialogHidden() {
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
 		fdEvent.setEventType(FileDialogEventType.Close);

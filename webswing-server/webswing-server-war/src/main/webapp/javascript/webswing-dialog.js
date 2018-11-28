@@ -1,4 +1,4 @@
-define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cssBootstrap) {
+define(['jquery', 'text!templates/dialog.html', 'text!templates/network.html',], function amdFactory($, html, networkHtml) {
     "use strict";
 
     return function DialogModule() {
@@ -11,7 +11,8 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
             newSession: 'webswing.newSession',
             reTrySession: 'webswing.reTrySession',
             logout: 'login.logout',
-            translate: 'translate.translate'
+            translate: 'translate.translate',
+            mutePingWarning: 'ping.mutePingWarning'
         };
         module.provides = {
             show: show,
@@ -20,7 +21,9 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
             content: configuration(),
             currentBar: currentBar,
             showBar: showBar,
-            hideBar: hideBar
+            hideBar: hideBar,
+            showNetworkBar:showNetworkBar,
+            hideNetworkBar:hideNetworkBar
         };
 
         var currentContent;
@@ -28,6 +31,8 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
 
         var currentContentBar;
         var bar, barContent, barHeader;
+
+        var networkBar;
 
         function configuration() {
             return {
@@ -83,6 +88,14 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
                             hideBar();
                         }
                     }]
+                },
+                networkOfflineWarningDialog: {
+                    content: '<span class="ws-message--error"><span class="ws-icon-warn"></span>${dialog.networkMonitor.offline}</span>',
+                    severity: 2
+                },
+                networkSlowWarningDialog: {
+                    content: '<span class="ws-message--warning"><span class="ws-icon-warn"></span>${dialog.networkMonitor.warn}</span>',
+                    severity: 1
                 }
             };
         }
@@ -236,5 +249,25 @@ define(['jquery', 'text!templates/dialog.html'], function amdFactory($, html, cs
             return currentContentBar;
         }
 
+        function showNetworkBar(msg) {
+            if (networkBar == null) {
+                api.cfg.rootElement.append(api.translate(networkHtml));
+                networkBar = api.cfg.rootElement.find('div[data-id="networkBar"]');
+                networkBar.find('a[data-id="hide"]').on('click', function (evt) {
+                    api.mutePingWarning(msg.severity);
+                    hideNetworkBar();
+                });
+            }
+            networkBar.find('span[data-id="message"]').html(api.translate(msg.content));
+            networkBar.show("fast");
+        }
+
+        function hideNetworkBar() {
+            if (networkBar != null) {
+                networkBar.hide("fast");
+                networkBar.remove();
+                networkBar = null;
+            }
+        }
     };
 });

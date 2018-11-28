@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.WindowActionType;
@@ -66,6 +67,12 @@ public class WindowManager {
 						oldActiveWindowPeer.updateWindowDecorationImage();
 						Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(oldActiveWindow);
 					}
+					if(	Util.discoverFileChooser(oldActiveWindow) != null){
+						Util.getWebToolkit().getPaintDispatcher().notifyFileDialogHidden();
+					}
+					if(Util.discoverFileChooser(activeWindow) != null){
+						Util.getWebToolkit().getPaintDispatcher().notifyFileDialogActive(activeWindow);
+					}
 				}
 				if (w != null) {
 					zorder.bringToFront(w);
@@ -112,6 +119,9 @@ public class WindowManager {
 		boolean success = false;
 		boolean newWindow = false;
 		if (!zorder.contains(w)) {
+			if(w.getClass().getName().contains("JLightweightFrame")){
+				return false;
+			}
 			zorder.addWindow(w);
 			newWindow = true;
 		}
@@ -140,19 +150,8 @@ public class WindowManager {
 
 		if (focusedWindowChangeAllowed || activeWindow == w) {
 
-			if (newFocusOwner != null && newFocusOwner.isFocusable() && w.isFocusableWindow()) {
-				int result = WebKeyboardFocusManagerPeer.shouldNativelyFocusHeavyweight(w, newFocusOwner, tmp, true, new Date().getTime(), cause);
-				switch (result) {
-				case 1:
-					success = true;
-					break;
-				case 2:
-					WebKeyboardFocusManagerPeer.deliverFocus(w, newFocusOwner, tmp, true, new Date().getTime(), cause);
-					success = true;
-					break;
-				default:
-					break;
-				}
+			if(w.isFocusableWindow()) {
+				success = deliverFocus(w, newFocusOwner, tmp, cause);
 			}
 
 			if (SwingUtilities.isRectangleContainingRectangle(new Rectangle(0, 0, w.getWidth(), w.getHeight()), new Rectangle(x, y, 0, 0))) {
@@ -163,6 +162,25 @@ public class WindowManager {
 		}
 		return success;
 
+	}
+
+	public boolean deliverFocus(Component hwComponent, Component newFocusOwner, boolean tmp, CausedFocusEvent.Cause cause) {
+		boolean success = false ;
+		if (newFocusOwner != null && newFocusOwner.isFocusable() ) {
+			int result = WebKeyboardFocusManagerPeer.shouldNativelyFocusHeavyweight(hwComponent, newFocusOwner, tmp, true, new Date().getTime(), cause);
+			switch (result) {
+			case 1:
+				success = true;
+				break;
+			case 2:
+				WebKeyboardFocusManagerPeer.deliverFocus(hwComponent, newFocusOwner, tmp, true, new Date().getTime(), cause);
+				success = true;
+				break;
+			default:
+				break;
+			}
+		}
+		return success;
 	}
 
 	private boolean isModal(Window w) {

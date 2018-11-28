@@ -231,6 +231,17 @@ public class Util {
 		return null;
 	}
 
+	public static Window[] getAllWindows() {
+		List<Window> windows = new ArrayList<>(Arrays.asList(Window.getWindows()));
+		for (Iterator<Window> i = windows.iterator(); i.hasNext(); ) {
+			Window w = i.next();
+			if (w.getClass().getName().contains("JLightweightFrame")) {
+				i.remove();
+			}
+		}
+		return windows.toArray(new Window[windows.size()]);
+	}
+
 	public static Map<String, Map<Integer, BufferedImage>> extractWindowImages(AppFrameMsgOut json, Map<String, Map<Integer, BufferedImage>> windowImages) {
 		for (WindowMsg window : json.getWindows()) {
 			WebWindowPeer w = findWindowPeerById(window.getId());
@@ -337,7 +348,7 @@ public class Util {
 	}
 
 	public static boolean isWindowDecorationEvent(Window w, AWTEvent e) {
-		if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID() && w!=null && w.isEnabled() && w.isShowing()) {
+		if (e instanceof MouseEvent && MouseEvent.MOUSE_WHEEL != e.getID() && w != null && w.isEnabled() && w.isShowing()) {
 			return isWindowDecorationPosition((Window) w, new Point(((MouseEvent) e).getXOnScreen(), ((MouseEvent) e).getYOnScreen()));
 		}
 		return false;
@@ -513,6 +524,10 @@ public class Util {
 
 	public static JFileChooser discoverFileChooser(WebWindowPeer windowPeer) {
 		Window w = (Window) windowPeer.getTarget();
+		return discoverFileChooser(w);
+	}
+
+	public static JFileChooser discoverFileChooser(Window w) {
 		if (w instanceof JDialog) {
 			Container pane = ((JDialog) w).getContentPane();
 			if (pane != null) {
@@ -562,7 +577,7 @@ public class Util {
 
 	public static void repaintAllWindow() {
 		synchronized (WebPaintDispatcher.webPaintLock) {
-			for (Window w : Window.getWindows()) {
+			for (Window w : Util.getAllWindows()) {
 				if (w.isShowing()) {
 					final Object peer = WebToolkit.targetToPeer(w);
 					if (peer != null && peer instanceof WebWindowPeer) {
@@ -625,4 +640,24 @@ public class Util {
 		return "";
 	}
 
+	public static void waitForImage(Image i) {
+		Graphics imageLoaderG = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).getGraphics();
+		ImageObserver observer = new ImageObserver() {
+			@Override
+			public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
+				notifyAll();
+				return true;
+			}
+		};
+
+		synchronized (observer) {
+			if (!imageLoaderG.drawImage(i, 0, 0, observer)) {
+				try {
+					observer.wait(300);
+				} catch (InterruptedException e) {
+					//ignore
+				}
+			}
+		}
+	}
 }

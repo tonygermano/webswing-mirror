@@ -62,8 +62,8 @@ public class WebToolkit8 extends WebToolkit {
 	@Override
 	public FramePeer createLightweightFrame(LightweightFrame arg0)
 			throws HeadlessException {
-		// TODO Auto-generated method stub
-		return null;
+        WebLWFramePeer8 localWFramePeer = new WebLWFramePeer8(arg0);
+        return localWFramePeer;
 	}
 
 }

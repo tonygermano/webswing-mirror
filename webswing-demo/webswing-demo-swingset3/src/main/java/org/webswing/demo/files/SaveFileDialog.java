@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.PrintWriter;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 public class SaveFileDialog implements ActionListener {
 
@@ -19,7 +20,28 @@ public class SaveFileDialog implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		JFileChooser fc = new JFileChooser();
+		JFileChooser fc = new JFileChooser(){
+			@Override
+			public void approveSelection(){
+				File f = getSelectedFile();
+				if(f.exists() && getDialogType() == SAVE_DIALOG){
+					int result = JOptionPane.showConfirmDialog(this,"The file exists, overwrite?","Existing file",JOptionPane.YES_NO_CANCEL_OPTION);
+					switch(result){
+					case JOptionPane.YES_OPTION:
+						super.approveSelection();
+						return;
+					case JOptionPane.NO_OPTION:
+						return;
+					case JOptionPane.CLOSED_OPTION:
+						return;
+					case JOptionPane.CANCEL_OPTION:
+						cancelSelection();
+						return;
+					}
+				}
+				super.approveSelection();
+			}
+		};
 		fc.setSelectedFile(new File("test.txt"));
 		int returnVal = fc.showSaveDialog((Component) e.getSource());
 
