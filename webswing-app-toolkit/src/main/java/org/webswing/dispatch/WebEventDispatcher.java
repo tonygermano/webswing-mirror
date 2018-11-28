@@ -43,7 +43,7 @@ public class WebEventDispatcher {
 	protected MouseEvent lastMouseEvent;
 	protected MouseEventInfo lastMousePressEvent;
 	protected Point lastMousePosition = new Point();
-	public static AtomicBoolean javaFXdragStarted= new AtomicBoolean(false);
+	public static AtomicBoolean javaFXdragStarted = new AtomicBoolean(false);
 	private static Component lastEnteredWindow;
 	private static final DndEventHandler dndHandler = new DndEventHandler();
 	private HashMap<String, String> uploadMap = new HashMap<String, String>();
@@ -115,26 +115,7 @@ public class WebEventDispatcher {
 						handleFileSelectionEvent((FilesSelectedEventMsgIn) event);
 					}
 					if (event instanceof UploadEventMsgIn) {
-						UploadEventMsgIn upload = (UploadEventMsgIn) event;
-						JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
-						if (dialog != null) {
-							File currentDir = dialog.getCurrentDirectory();
-							File tempFile = new File(upload.getTempFileLocation());
-							String validfilename = Util.resolveUploadFilename(currentDir, upload.getFileName());
-							if (currentDir.canWrite() && tempFile.exists()) {
-								try {
-									Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
-									uploadMap.put(upload.getFileName(), validfilename);
-									Logger.info("File upload notification received: " + validfilename);
-								} catch (IOException e) {
-									Logger.error("Error while moving uploaded file '" + validfilename + "' to target folder: ", e);
-								}
-							} else {
-								Logger.error("Error while uploading file '" + validfilename + "'. " + (currentDir.canWrite() ? " Temp upload file " + tempFile.getAbsoluteFile() + " not found" : "Can not write to target folder " + currentDir.getAbsoluteFile()));
-							}
-						} else {
-							Logger.error("Error while uploading file. FileChooser dialog instance not found");
-						}
+						handleUploadEvent((UploadEventMsgIn) event);
 					}
 				} catch (Throwable e) {
 					Logger.error("Failed to process event.", e);
@@ -313,9 +294,7 @@ public class WebEventDispatcher {
 	}
 
 	private static boolean relatedToLastEvent(MouseEventMsgIn event, MouseEvent lastMouseEvent) {
-		return lastMouseEvent != null &&
-				(lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) &&
-				((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup));
+		return lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup));
 	}
 
 	protected int computeClickCount(int x, int y, int button, boolean isPressed, int timeMilis) {
@@ -481,44 +460,78 @@ public class WebEventDispatcher {
 		}
 	}
 
-	private void handleFileSelectionEvent(FilesSelectedEventMsgIn e) {
-		JFileChooser fc = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
-		FilesSelectedEventMsgIn event = (FilesSelectedEventMsgIn) e;
-		if (fc != null) {
-			FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fc);
-			boolean saveMode = FileDialogEventType.AutoSave == fileChooserEventType;
-			fc.rescanCurrentDirectory();
-			if (event.getFiles() != null && event.getFiles().size() > 0) {
-				if (fc.isMultiSelectionEnabled()) {
-					List<File> arr = new ArrayList<File>();
-					for (int i = 0; i < event.getFiles().size(); i++) {
-						if (uploadMap.get(event.getFiles().get(i)) != null) {
-							arr.add(new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i))));
-						} else if (saveMode) {
-							arr.add(new File(fc.getCurrentDirectory(), event.getFiles().get(i)));
+	private void handleFileSelectionEvent(final FilesSelectedEventMsgIn e) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				JFileChooser fc = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
+				FilesSelectedEventMsgIn event = (FilesSelectedEventMsgIn) e;
+				if (fc != null) {
+					FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fc);
+					boolean saveMode = FileDialogEventType.AutoSave == fileChooserEventType;
+					fc.rescanCurrentDirectory();
+					if (event.getFiles() != null && event.getFiles().size() > 0) {
+						if (fc.isMultiSelectionEnabled()) {
+							List<File> arr = new ArrayList<File>();
+							for (int i = 0; i < event.getFiles().size(); i++) {
+								if (uploadMap.get(event.getFiles().get(i)) != null) {
+									arr.add(new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i))));
+								} else if (saveMode) {
+									arr.add(new File(fc.getCurrentDirectory(), event.getFiles().get(i)));
+								}
+							}
+							fc.setSelectedFiles(arr.toArray(new File[arr.size()]));
+							Logger.info("Files selected :" + arr);
+						} else {
+							if (uploadMap.get(event.getFiles().get(0)) != null) {
+								File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
+								fc.setSelectedFile(f);
+							} else if (saveMode) {
+								fc.setSelectedFile(new File(fc.getCurrentDirectory(), event.getFiles().get(0)));
+							}
+							Logger.info("File selected :" + fc.getSelectedFile().getAbsoluteFile());
+						}
+						if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
+							fc.approveSelection();
+						}
+					} else {
+						if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
+							fc.cancelSelection();
 						}
 					}
-					fc.setSelectedFiles(arr.toArray(new File[arr.size()]));
-					Logger.info("Files selected :" + arr);
-				} else {
-					if (uploadMap.get(event.getFiles().get(0)) != null) {
-						File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
-						fc.setSelectedFile(f);
-					} else if (saveMode) {
-						fc.setSelectedFile(new File(fc.getCurrentDirectory(), event.getFiles().get(0)));
+				}
+				uploadMap.clear();
+			}
+		});
+	}
+
+	private void handleUploadEvent(final UploadEventMsgIn upload) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
+				if (dialog != null) {
+					File currentDir = dialog.getCurrentDirectory();
+					File tempFile = new File(upload.getTempFileLocation());
+					String validfilename = Util.resolveUploadFilename(currentDir, upload.getFileName());
+					if (currentDir.canWrite() && tempFile.exists()) {
+						try {
+							Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
+							uploadMap.put(upload.getFileName(), validfilename);
+							Logger.info("File upload notification received: " + validfilename);
+						} catch (IOException e) {
+							Logger.error("Error while moving uploaded file '" + validfilename + "' to target folder: ", e);
+						}
+					} else {
+						Logger.error("Error while uploading file '" + validfilename + "'. " + (currentDir.canWrite() ? " Temp upload file " + tempFile.getAbsoluteFile() + " not found" : "Can not write to target folder " + currentDir.getAbsoluteFile()));
 					}
-					Logger.info("File selected :" + fc.getSelectedFile().getAbsoluteFile());
-				}
-				if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
-					fc.approveSelection();
-				}
-			} else {
-				if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
-					fc.cancelSelection();
+				} else {
+					Logger.error("Error while uploading file. FileChooser dialog instance not found");
 				}
 			}
-		}
-		uploadMap.clear();
+		});
 	}
 
 	public void handleAutoUploadCancelled() {

@@ -29,6 +29,7 @@ public class WindowDecorationDemo extends JPanel {
 	JCheckBox modalCB = new JCheckBox("Modal");
 	Window thisWindow;
 	private Point initialClick;
+	private JButton mPopup;
 
 	public WindowDecorationDemo() {
 		this(null, null, null, false, false);
@@ -104,6 +105,7 @@ public class WindowDecorationDemo extends JPanel {
 		checkboxes.add(ontopCB);
 		checkboxes.add(modalCB);
 		JPanel buttonsPanel = new JPanel(new FlowLayout());
+		addPopupButton(buttonsPanel);
 		JButton frame = new JButton("new Frame");
 		frame.setToolTipText("This is a veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeery long tooltip text");
 		frame.addActionListener(new ActionListener() {
@@ -325,6 +327,33 @@ public class WindowDecorationDemo extends JPanel {
 
 		frame.pack();
 		frame.setVisible(true);
+	}
+
+	public void addPopupButton(JPanel jpanel) {
+		this.mPopup = new JButton("popup");
+		this.mPopup.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				WindowDecorationDemo.this.doPopupTest();
+			}
+		});
+		jpanel.add(this.mPopup);
+	}
+
+	private void doPopupTest() {
+		PopupFactory popupFactory = PopupFactory.getSharedInstance();
+		Point buttonLocation = this.mPopup.getLocationOnScreen();
+		JPanel jp = new JPanel(new BorderLayout(5, 5));
+		jp.add(new JTextField(10), "North");
+		JButton x = new JButton("X");
+		jp.add(x);
+		final Popup popup = popupFactory.getPopup(this,jp, buttonLocation.x, buttonLocation.y);
+		x.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				popup.hide();
+			}
+		});
+		popup.show();
 	}
 
 	public static void window(Window owner, Point position, boolean ontop) {

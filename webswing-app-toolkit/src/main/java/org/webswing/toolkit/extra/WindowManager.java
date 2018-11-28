@@ -59,6 +59,12 @@ public class WindowManager {
 						oldActiveWindowPeer.updateWindowDecorationImage();
 						Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(oldActiveWindow);
 					}
+					if(	Util.discoverFileChooser(oldActiveWindow) != null){
+						Util.getWebToolkit().getPaintDispatcher().notifyFileDialogHidden();
+					}
+					if(Util.discoverFileChooser(activeWindow) != null){
+						Util.getWebToolkit().getPaintDispatcher().notifyFileDialogActive(activeWindow);
+					}
 				}
 				if (w != null) {
 					zorder.bringToFront(w);
@@ -105,6 +111,9 @@ public class WindowManager {
 		boolean success = false;
 		boolean newWindow = false;
 		if (!zorder.contains(w)) {
+			if(w.getClass().getName().contains("JLightweightFrame")){
+				return false;
+			}
 			zorder.addWindow(w);
 			newWindow = true;
 		}
@@ -147,15 +156,8 @@ public class WindowManager {
 					break;
 				}
 			}
-
-			if (SwingUtilities.isRectangleContainingRectangle(new Rectangle(0, 0, w.getWidth(), w.getHeight()), new Rectangle(x, y, 0, 0))) {
-				bringToFront(w);
-			} else {
-				bringToFront(null);
-			}
 		}
 		return success;
-
 	}
 
 	protected boolean isModal(Window w) {

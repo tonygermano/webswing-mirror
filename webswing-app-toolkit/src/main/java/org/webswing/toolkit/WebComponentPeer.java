@@ -1,25 +1,8 @@
 package org.webswing.toolkit;
 
 import java.applet.Applet;
-import java.awt.AWTEvent;
-import java.awt.AWTException;
-import java.awt.BufferCapabilities;
+import java.awt.*;
 import java.awt.BufferCapabilities.FlipContents;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.SystemColor;
-import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.ComponentEvent;
 import java.awt.event.PaintEvent;
 import java.awt.image.BufferedImage;

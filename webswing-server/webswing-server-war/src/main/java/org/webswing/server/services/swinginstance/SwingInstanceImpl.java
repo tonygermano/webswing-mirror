@@ -63,7 +63,7 @@ import java.util.concurrent.TimeUnit;
 public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListener {
 
 	private static final long serialVersionUID = -4640770499863974871L;
-	
+
 	private static final String LAUNCHER_CONFIG = "launcherConfig";
 	private static final String WEB_TOOLKIT_CLASS_NAME = "org.webswing.toolkit.WebToolkit";
 	private static final String WEB_GRAPHICS_ENV_CLASS_NAME = "org.webswing.toolkit.ge.WebGraphicsEnvironment";
@@ -303,7 +303,8 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				}
 			} else if (o instanceof OpenFileResultMsgInternal) {
 				OpenFileResultMsgInternal fr = (OpenFileResultMsgInternal) o;
-				String id = UUID.randomUUID().toString();
+				String extension = getFileExtension(fr.getFile());
+				String id = UUID.randomUUID().toString() + extension;
 				boolean success = fileHandler.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), fr.isWaitForFile(), fr.getOverwriteDetails());
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
@@ -767,4 +768,14 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	public String getUserId() {
 		return webConnection == null ? lastConnection.getUserId() : webConnection.getUserId();
 	}
+
+	private String getFileExtension(File file) {
+		String name = file.getName();
+		int lastIndexOf = name.lastIndexOf(".");
+		if (lastIndexOf == -1) {
+			return "";
+		}
+		return name.substring(lastIndexOf);
+	}
+
 }

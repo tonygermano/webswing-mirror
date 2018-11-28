@@ -21,21 +21,22 @@ import java.util.jar.JarFile;
 
 import org.webswing.Constants;
 import org.webswing.toolkit.WebToolkit;
-import sun.management.jmxremote.ConnectorBootstrap;
+import org.webswing.toolkit.util.Logger;
 
 public class Main {
 
 	@SuppressWarnings("restriction")
-	public static void main(String[] args) throws Exception {
-		initializeDefaultSystemProperties();
+	public static void main(String[] args) {
+		try {
+			initializeDefaultSystemProperties();
 
-		boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
-		System.setProperty(Constants.CREATE_NEW_TEMP, getCreateNewTemp(args));
-		System.setProperty(Constants.CLEAN_TEMP, getBoolParam(args, "-tc", true));
+			boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
+			System.setProperty(Constants.CREATE_NEW_TEMP, getCreateNewTemp(args));
+			System.setProperty(Constants.CLEAN_TEMP, getBoolParam(args, "-tc", true));
 
-		ProtectionDomain domain = Main.class.getProtectionDomain();
-		URL location = domain.getCodeSource().getLocation();
-		System.setProperty(Constants.WAR_FILE_LOCATION, location.toExternalForm());
+			ProtectionDomain domain = Main.class.getProtectionDomain();
+			URL location = domain.getCodeSource().getLocation();
+			System.setProperty(Constants.WAR_FILE_LOCATION, location.toExternalForm());
 
 		List<URL> urls = new ArrayList<URL>();
 		if (client) {
@@ -66,13 +67,17 @@ public class Main {
 			}
 		}
 
-		Method method = mainClass.getMethod("main", args.getClass());
-		method.setAccessible(true);
-		try {
-			method.invoke(null, new Object[] { args });
-		} catch (IllegalAccessException e) {
-			// This should not happen, as we have
-			// disabled access checks
+			Method method = mainClass.getMethod("main", args.getClass());
+			method.setAccessible(true);
+			try {
+				method.invoke(null, new Object[] { args });
+			} catch (IllegalAccessException e) {
+				// This should not happen, as we have
+				// disabled access checks
+			}
+		} catch (Exception e) {
+			Logger.fatal("Uncaught exception.",e);
+			System.exit(1);
 		}
 	}
 

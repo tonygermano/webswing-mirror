@@ -186,9 +186,10 @@ public class SAMLClient {
 			throw new ValidationException("Response has an unsuccessful status code");
 		}
 
-		// response destination must match ACS
-		if (!spConfig.getAcs().equals(response.getDestination()))
-			throw new ValidationException("Response is destined for a different endpoint");
+		// response destination must match ACS (optional if response not signed)
+		if(sig != null || response.getDestination()!=null)
+			if (!spConfig.getAcs().equals(response.getDestination()))
+				throw new ValidationException("Response is destined for a different endpoint");
 
 		DateTime now = DateTime.now();
 

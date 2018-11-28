@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -282,5 +283,30 @@ public class RenderUtil {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static void waitForImage(Image i) {
+		try {
+			Graphics imageLoaderG = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).getGraphics();
+			ImageObserver observer = new ImageObserver() {
+				@Override
+				public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
+					notifyAll();
+					return true;
+				}
+			};
+
+			synchronized (observer) {
+				if (!imageLoaderG.drawImage(i, 0, 0, observer)) {
+					try {
+						observer.wait(300);
+					} catch (InterruptedException e) {
+						//ignore
+					}
+				}
+			}
+		} catch (Exception e) {
+			//ignore
+		}
 	}
 }
