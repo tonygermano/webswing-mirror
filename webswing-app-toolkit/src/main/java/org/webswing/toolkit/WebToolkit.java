@@ -711,7 +711,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	abstract public SurfaceData webComponentPeerReplaceSurfaceData(SurfaceManager mgr);
 
-	abstract public int shouldNativelyFocusHeavyweight(Window heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) ;
+	abstract public int shouldNativelyFocusHeavyweight(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) ;
 
 	@SuppressWarnings("deprecation")
 	abstract public boolean deliverFocus(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) ;

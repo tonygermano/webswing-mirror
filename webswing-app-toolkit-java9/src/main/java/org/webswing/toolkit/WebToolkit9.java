@@ -82,7 +82,7 @@ public class WebToolkit9 extends WebToolkit {
 	}
 
 	@Override
-	public int shouldNativelyFocusHeavyweight(Window heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) {
+	public int shouldNativelyFocusHeavyweight(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) {
 		try {
 			Method m2 = KeyboardFocusManager.class.getDeclaredMethod("shouldNativelyFocusHeavyweight", Component.class, Component.class, Boolean.TYPE, Boolean.TYPE, Long.TYPE, FocusEvent.Cause.class);
 			m2.setAccessible(true);
@@ -145,6 +145,8 @@ public class WebToolkit9 extends WebToolkit {
 			Applet applet = (Applet) target;
 			Window window = ((WebAppletContext) applet.getAppletContext()).getContainer();
 			return Util.getWebToolkit().getWindowManager().activateWindow(window, paramComponent, 0, 0, temporary, focusedWindowChangeAllowed, FocusEventCause.getValue(paramCause));
+		} else if (target instanceof Panel){
+			return Util.getWebToolkit().getWindowManager().deliverFocus((Panel)target, paramComponent, temporary, FocusEventCause.getValue(paramCause));
 		} else {
 			return false;
 		}

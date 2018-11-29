@@ -660,7 +660,7 @@ public class Util {
 		Graphics imageLoaderG = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).getGraphics();
 		ImageObserver observer = new ImageObserver() {
 			@Override
-			public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
+			public synchronized boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
 				notifyAll();
 				return true;
 			}

@@ -142,19 +142,34 @@ public class WindowManager {
 
 		if (focusedWindowChangeAllowed || activeWindow == w) {
 
-			if (newFocusOwner != null && newFocusOwner.isFocusable() && w.isFocusableWindow()) {
-				int result = Util.getWebToolkit().shouldNativelyFocusHeavyweight(w, newFocusOwner, tmp, true, new Date().getTime(), cause);
-				switch (result) {
-				case 1:
-					success = true;
-					break;
-				case 2:
-					Util.getWebToolkit().deliverFocus(w, newFocusOwner, tmp, true, new Date().getTime(), cause);
-					success = true;
-					break;
-				default:
-					break;
-				}
+			if(w.isFocusableWindow()) {
+				success = deliverFocus(w, newFocusOwner, tmp, cause);
+			}
+
+			if (SwingUtilities.isRectangleContainingRectangle(new Rectangle(0, 0, w.getWidth(), w.getHeight()), new Rectangle(x, y, 0, 0))) {
+				bringToFront(w);
+			} else {
+				bringToFront(null);
+			}
+		}
+		return success;
+
+	}
+
+	public boolean deliverFocus(Component hwComponent, Component newFocusOwner, boolean tmp, FocusEventCause cause) {
+		boolean success = false ;
+		if (newFocusOwner != null && newFocusOwner.isFocusable() ) {
+			int result = Util.getWebToolkit().shouldNativelyFocusHeavyweight(hwComponent, newFocusOwner, tmp, true, new Date().getTime(), cause);
+			switch (result) {
+			case 1:
+				success = true;
+				break;
+			case 2:
+				Util.getWebToolkit().deliverFocus(hwComponent, newFocusOwner, tmp, true, new Date().getTime(), cause);
+				success = true;
+				break;
+			default:
+				break;
 			}
 		}
 		return success;

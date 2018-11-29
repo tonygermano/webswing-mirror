@@ -1,14 +1,7 @@
 package org.webswing.toolkit;
 
-import java.applet.Applet;
-import java.awt.*;
-import java.awt.peer.FramePeer;
-import java.awt.peer.KeyboardFocusManagerPeer;
-import java.lang.reflect.Method;
-
 import org.webswing.applet.WebAppletContext;
 import org.webswing.toolkit.ge.WebGraphicsEnvironment;
-
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
 import sun.awt.CausedFocusEvent;
@@ -17,6 +10,12 @@ import sun.awt.SunToolkit;
 import sun.awt.datatransfer.DataTransferer;
 import sun.awt.image.SurfaceManager;
 import sun.java2d.SurfaceData;
+
+import java.applet.Applet;
+import java.awt.*;
+import java.awt.peer.FramePeer;
+import java.awt.peer.KeyboardFocusManagerPeer;
+import java.lang.reflect.Method;
 
 @SuppressWarnings("restriction")
 public class WebToolkit8 extends WebToolkit {
@@ -103,7 +102,7 @@ public class WebToolkit8 extends WebToolkit {
         }
     }
 
-    public int shouldNativelyFocusHeavyweight(Window heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) {
+    public int shouldNativelyFocusHeavyweight(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) {
         try {
             Method m2 = KeyboardFocusManager.class.getDeclaredMethod("shouldNativelyFocusHeavyweight", Component.class, Component.class, Boolean.TYPE, Boolean.TYPE, Long.TYPE, CausedFocusEvent.Cause.class);
             m2.setAccessible(true);
@@ -145,6 +144,8 @@ public class WebToolkit8 extends WebToolkit {
             Applet applet = (Applet) target;
             Window window = ((WebAppletContext) applet.getAppletContext()).getContainer();
             return Util.getWebToolkit().getWindowManager().activateWindow(window, paramComponent, 0, 0, temporary, focusedWindowChangeAllowed, FocusEventCause.getValue(paramCause));
+        } else if (target instanceof Panel){
+            return Util.getWebToolkit().getWindowManager().deliverFocus((Panel)target, paramComponent, temporary, FocusEventCause.getValue(paramCause));
         } else {
             return false;
         }
