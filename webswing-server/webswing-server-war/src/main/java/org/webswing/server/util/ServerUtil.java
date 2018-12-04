@@ -93,6 +93,15 @@ public class ServerUtil {
 		return result;
 	}
 
+	public static String getClientIp(HttpServletRequest r) {
+		String result=null;
+		result=r.getHeader("X-Forwarded-For");
+		if(result==null){
+			result=r.getRemoteAddr();
+		}
+		return result;
+	}
+
 	public static String getClientOs(WebSocketConnection r) {
 		if (r != null) {
 			String userAgent = r.getRequest().getHeader("User-Agent");

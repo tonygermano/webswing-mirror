@@ -78,6 +78,7 @@ public interface Constants {
 	public static final String REVERSE_PROXY_CONTEXT_PATH = "webswing.proxyContextPath";
 	public static final String HTTPS_ONLY = "webswing.httpsOnly";
 	public static final String DISABLE_HTTP_SECURITY_HEADERS = "webswing.disableHttpSecurityHeaders";
+	public static final String LINK_COOKIE_TO_IP = "webswing.linkCookieToIpAddress";
 
 
 	// swing start related properties
