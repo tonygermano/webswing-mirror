@@ -250,7 +250,9 @@ public class RenderUtil {
 			ImageObserver observer = new ImageObserver() {
 				@Override
 				public synchronized boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
-					notifyAll();
+					if ((infoflags & ImageObserver.ALLBITS) == ImageObserver.ALLBITS || (infoflags & ImageObserver.FRAMEBITS) == ImageObserver.FRAMEBITS) {
+						notifyAll();
+					}
 					return true;
 				}
 			};
