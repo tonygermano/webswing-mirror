@@ -93,6 +93,15 @@ public class ServerUtil {
 		return result;
 	}
 
+	public static String getClientIp(HttpServletRequest r) {
+		String result=null;
+		result=r.getHeader("X-Forwarded-For");
+		if(result==null){
+			result=r.getRemoteAddr();
+		}
+		return result;
+	}
+
 	public static String getClientOs(WebSocketConnection r) {
 		if (r != null) {
 			String userAgent = r.getRequest().getHeader("User-Agent");
@@ -164,17 +173,17 @@ public class ServerUtil {
 	}
 
 	public static boolean isRecording(HttpServletRequest r) {
-		String recording = (String) r.getHeader(Constants.HTTP_ATTR_RECORDING_FLAG);
+		String recording = (String) r.getParameter(Constants.HTTP_ATTR_RECORDING_FLAG);
 		return Boolean.parseBoolean(recording);
 	}
 
 	public static String getCustomArgs(HttpServletRequest r) {
-		String args = (String) r.getHeader(Constants.HTTP_ATTR_ARGS);
+		String args = (String) r.getParameter(Constants.HTTP_ATTR_ARGS);
 		return args != null ? args : "";
 	}
 
 	public static int getDebugPort(HttpServletRequest r) {
-		String recording = (String) r.getHeader(Constants.HTTP_ATTR_DEBUG_PORT);
+		String recording = (String) r.getParameter(Constants.HTTP_ATTR_DEBUG_PORT);
 		try {
 			return Integer.parseInt(recording);
 		} catch (NumberFormatException e) {

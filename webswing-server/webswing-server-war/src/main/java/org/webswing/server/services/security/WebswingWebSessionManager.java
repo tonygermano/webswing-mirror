@@ -1,9 +1,17 @@
 package org.webswing.server.services.security;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.session.InvalidSessionException;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.webswing.Constants;
+import org.webswing.server.util.ServerUtil;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class WebswingWebSessionManager extends DefaultWebSessionManager {
 
@@ -15,5 +23,23 @@ public class WebswingWebSessionManager extends DefaultWebSessionManager {
 		cookie.setHttpOnly(true); //more secure, protects against XSS attacks
 		cookie.setSecure(Boolean.getBoolean(Constants.HTTPS_ONLY));
 		setSessionIdCookie(cookie);
+	}
+
+	@Override
+	protected void validate(Session session, SessionKey key) throws InvalidSessionException {
+		super.validate(session, key);
+		if(Boolean.getBoolean(Constants.LINK_COOKIE_TO_IP) && key instanceof WebSessionKey){
+			WebSessionKey webkey= (WebSessionKey) key;
+			if(webkey.getServletRequest() instanceof HttpServletRequest){
+				String currentIp = ServerUtil.getClientIp((HttpServletRequest) webkey.getServletRequest());
+				String sessionIp = session.getHost();
+				if(!StringUtils.equals(currentIp,sessionIp)){
+					InvalidSessionException ise = new InvalidSessionException("IP address does not match Session host.");
+					onInvalidation(session, ise, key);
+					throw ise;
+				}
+			}
+
+		}
 	}
 }

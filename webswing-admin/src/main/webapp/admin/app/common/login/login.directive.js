@@ -27,6 +27,7 @@
                     backdrop: 'static'
                 });
                 vm.loginDialog.rendered.then(function () {
+                    $location.path('/');
                     var element = $('#webswingLoginDialogContent')
                     var loginData = {
                         securityToken: $location.search().securityToken,
@@ -36,6 +37,7 @@
                     doLoginCallback(element, loginData, function () {
                         vm.loginDialog.dismiss();
                         vm.loginDialog = null;
+                        $location.path('/');
                     });
                 });
                 vm.loginDialog.result.then(function () {
