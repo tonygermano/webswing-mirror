@@ -1,11 +1,15 @@
 package org.webswing;
 
 import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.webswing.toolkit.util.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.util.ArrayList;
@@ -81,6 +85,16 @@ public class ServerMain {
 		webapp.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern", "");
 		webapp.setThrowUnavailableOnStartupException(true);
 		server.setHandler(webapp);
+
+		ErrorHandler errorHandler = new ErrorHandler(){//custom event handler to hide running jetty version (pen test)
+			@Override
+			protected void writeErrorPageBody(HttpServletRequest request, Writer writer, int code, String message, boolean showStacks) throws IOException {
+				String uri = request.getRequestURI();
+				this.writeErrorPageMessage(request, writer, code, message, uri);
+			}
+		};
+		webapp.setErrorHandler(errorHandler);
+
 		try {
 			server.start();
 			server.join();

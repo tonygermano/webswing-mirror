@@ -150,7 +150,7 @@ define(['atmosphere', 'ProtoBuf', 'jquery', 'text!webswing.proto'], function amd
                 data = AppFrameMsgOutProto.decode(message);
                 explodeEnumNames(data);
             } else {
-                data = atmosphere.util.parseJSON(message);
+                data = JSON.parse(message);
             }
             return data;
         }
@@ -169,7 +169,7 @@ define(['atmosphere', 'ProtoBuf', 'jquery', 'text!webswing.proto'], function amd
                             var msg = new InputEventsFrameMsgInProto(message);
                             socket.push(msg.encode().toArrayBuffer());
                         } else {
-                            socket.push(atmosphere.util.stringifyJSON(message));
+                            socket.push(JSON.stringify(message));
                         }
                     } else {
                         console.log("message is not an object " + message);
