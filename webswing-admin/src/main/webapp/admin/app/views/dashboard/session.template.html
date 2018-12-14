@@ -25,13 +25,8 @@
 				<div ng-if="vm.session.recorded" >
 					<span class="label label-info " ui-jq="tooltip" title="Recording to {{vm.session.recordingFile}}"><span class="glyphicon glyphicon-record"></span> Recording</span>
 				</div>
-				<div ng-if="vm.session.warnings.length!=null || vm.session.warningHistory!=null" data-toggle="modal" data-target="#warnModal">
-		  			<span ng-class="{'label':true, 'label-warning':vm.session.warnings != null, 'label-default':vm.session.warnings == null}"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{vm.session.warnings.length}} Warnings </span>
-				</div>
-				<div ng-if="!vm.session.recorded" style="margin-top:3px">
-					<button type="button" class="btn btn-xs btn-default" ng-click="vm.record()">
-						<span class="glyphicon glyphicon-record"></span> Record Session
-					</button>
+				<div ng-if="vm.hasWarnings()" data-toggle="modal" data-target="#warnModal">
+		  			<span ng-class="{'label':true, 'label-warning':vm.session.warnings.length>0, 'label-default':vm.session.warnings.length===0}"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{vm.session.warnings.length}} Warnings </span>
 				</div>
 			</td>
 			<td>

@@ -5,6 +5,7 @@
             vm.path = $routeParams.path;
             vm.sessions = [];
             vm.closedSessions = [];
+            vm.recordings = [];
             vm.view = view;
             vm.record = record;
             vm.lastUpdated = null;
@@ -27,6 +28,8 @@
             vm.getBrowserIcon = getBrowserIcon;
             vm.showThreadDump = showThreadDump;
             vm.requestThreadDump = requestThreadDump;
+            vm.hasWarnings = hasWarnings
+
             refresh();
 
             $scope.$on('$destroy', function () {
@@ -46,8 +49,9 @@
             function refresh() {
                 return sessionsRestService.getSessions(vm.path).then(function (data) {
                     $timeout.cancel(vm.timer);
-                    vm.sessions = data.sessions;
-                    vm.closedSessions = data.closedSessions;
+                    vm.sessions = data.sessions || [];
+                    vm.closedSessions = data.closedSessions || [];
+                    vm.recordings = data.recordings || [];
                     vm.lastUpdated = new Date();
                 }).then(function () {
                     vm.timer = $timeout(refresh, 2000);
@@ -156,8 +160,8 @@
                 });
             }
 
-            function play(session) {
-                $location.url('/dashboard/playback?playback=' + session.recordingFile);
+            function play(file) {
+                $location.url('/dashboard/playback/' + vm.path + '?playback=' + file);
             }
 
             function back() {
@@ -174,9 +178,14 @@
                 window.open(sessionsRestService.getStackDumpPath(vm.path, session.id, key), "_blank");
             }
 
-            function requestThreadDump(session){
+            function requestThreadDump(session) {
                 sessionsRestService.requestThreadDump(vm.path, session.id);
             }
+
+            function hasWarnings(session) {
+                return (session.warnings &&session.warnings.length > 0) || session.warningHistory.length > 0 || Object.keys(session.threadDumps).length > 0
+            }
+
         }
 
         OverviewController.$inject = ['$scope', '$timeout', '$location', 'sessionsRestService', '$routeParams', 'wsUtils'];

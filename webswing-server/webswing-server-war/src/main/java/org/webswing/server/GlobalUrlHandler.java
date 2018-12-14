@@ -41,7 +41,6 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHa
 	private static final Logger log = LoggerFactory.getLogger(GlobalUrlHandler.class);
 	private static final String SERVERNAME = System.getProperty(Constants.BRANDING_PREFIX, "webswing.org");
 
-	private final WebSocketService websocket;
 	private final ConfigurationService configService;
 	private final SwingInstanceManagerService appFactory;
 	private final ResourceHandlerService resourceService;
@@ -82,9 +81,8 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHa
 	};
 
 	@Inject
-	public GlobalUrlHandler(WebSocketService websocket, ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, SecurityModuleService securityService, LoginHandlerService loginService, ServletContext servletContext, ExtensionService extService, RestService restService) {
+	public GlobalUrlHandler( ConfigurationService config, SwingInstanceManagerService appFactory, ResourceHandlerService resourceService, SecurityModuleService securityService, LoginHandlerService loginService, ServletContext servletContext, ExtensionService extService, RestService restService) {
 		super(null, securityService, config);
-		this.websocket = websocket;
 		this.configService = config;
 		this.appFactory = appFactory;
 		this.resourceService = resourceService;
@@ -95,7 +93,6 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHa
 	}
 
 	public void init() {
-		registerChildUrlHandler(websocket.createPlaybackWebSocketHandler(this));
 
 		registerChildUrlHandler(loginService.createLoginHandler(this));
 		registerChildUrlHandler(loginService.createLogoutHandler(this));

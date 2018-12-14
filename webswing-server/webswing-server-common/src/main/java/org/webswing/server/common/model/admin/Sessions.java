@@ -4,9 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Sessions implements Serializable{
+public class Sessions implements Serializable {
 	private List<SwingSession> sessions = new ArrayList<SwingSession>();
 	private List<SwingSession> closedSessions = new ArrayList<SwingSession>();
+	private List<String> recordings = new ArrayList<>();
 
 	public List<SwingSession> getSessions() {
 		return sessions;
@@ -24,4 +25,11 @@ public class Sessions implements Serializable{
 		this.closedSessions = closedSessions;
 	}
 
+	public List<String> getRecordings() {
+		return recordings;
+	}
+
+	public void setRecordings(List<String> recordings) {
+		this.recordings = recordings;
+	}
 }

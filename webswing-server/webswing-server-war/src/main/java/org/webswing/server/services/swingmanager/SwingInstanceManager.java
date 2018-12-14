@@ -34,4 +34,5 @@ public interface SwingInstanceManager extends SecuredPathHandler, UrlHandler {
 
 	SwingInstanceHolder getSwingInstanceHolder();
 
+	String getRecordingsDirPath();
 }

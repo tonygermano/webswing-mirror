@@ -222,6 +222,8 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                         api.showPlaybackControls();
                     }
                     cfg.onReady = typeof options.onReady === 'function' ? options.onReady : cfg.onReady;
+                }else{
+                    return $.extend(true, [], cfg);
                 }
                 appletParams = appletParams != null ? appletParams : readAppletParams(cfg.rootElement);
                 if (appletParams != null) {

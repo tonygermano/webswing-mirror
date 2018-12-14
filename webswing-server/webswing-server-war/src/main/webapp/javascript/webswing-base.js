@@ -429,10 +429,17 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         function adjustCanvasSize(canvas, width, height) {
             if (canvas.width != width * util.dpr || canvas.height != height * util.dpr) {
                 var ctx = canvas.getContext("2d");
-                var snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                var snapshot;
+                if(canvas.width!==0 && canvas.height!=0){
+                    snapshot=ctx.getImageData(0, 0, canvas.width, canvas.height);
+                }
                 canvas.width = width * util.dpr;
                 canvas.height = height * util.dpr;
-                ctx.putImageData(snapshot, 0, 0);
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+                if(snapshot!=null){
+                    ctx.putImageData(snapshot, 0, 0);
+                }
             }
         }
 

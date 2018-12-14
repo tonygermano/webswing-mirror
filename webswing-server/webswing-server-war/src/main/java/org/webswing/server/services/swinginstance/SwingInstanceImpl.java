@@ -35,6 +35,8 @@ import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.jvmconnection.JvmConnection;
 import org.webswing.server.services.jvmconnection.JvmConnectionService;
 import org.webswing.server.services.jvmconnection.JvmListener;
+import org.webswing.server.services.recorder.SessionRecorder;
+import org.webswing.server.services.recorder.SessionRecorderService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.modules.AbstractSecurityModule;
 import org.webswing.server.services.stats.StatisticsLogger;
@@ -97,7 +99,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	private List<String> warningHistoryLog;
 	private Map<Long, ThreadDumpMsgInternal> threadDumps = new ConcurrentHashMap<>();
 
-	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection websocket) throws WsException {
+	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService,SessionRecorderService recorderService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection websocket) throws WsException {
 		this.manager = manager;
 		this.fileHandler = fileHandler;
 		this.webConnection = websocket;
@@ -116,7 +118,10 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			notifyExiting();
 			throw new WsException("Failed to create App instance.", e);
 		}
-		this.sessionRecorder = ServerUtil.isRecording(websocket.getRequest()) ? new SessionRecorder(this) : null;
+		this.sessionRecorder = recorderService.create(this, manager);
+		if(ServerUtil.isRecording(websocket.getRequest())) {
+			sessionRecorder.startRecording();
+		};
 		logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, websocket.isWebsocketTransport() ? 1 : 2);
 	}
 
@@ -199,7 +204,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 
 	public void sendToWeb(MsgOut o) {
 		EncodedMessage serialized = new EncodedMessage(o);
-		if (sessionRecorder != null) {
+		if (sessionRecorder.isRecording()) {
 			sessionRecorder.saveFrame(serialized.getProtoMessage());
 		}
 		if (webConnection != null) {
@@ -382,18 +387,25 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		if (isRunning()) {
 			process.setProcessExitListener(null);
 		}
-		if (sessionRecorder != null) {
-			sessionRecorder.close();
+		try {
+			if(sessionRecorder.isRecording()) {
+				sessionRecorder.stopRecording();
+			}
+		} catch (WsException e) {
+			log.error("Stop Recording:",e);
 		}
 		manager.notifySwingClose(this);
 	}
 
 	@Override
-	public void startRecording() {
-		if (sessionRecorder == null) {
-			sessionRecorder = new SessionRecorder(this);
-			sendToSwing(webConnection, new SimpleEventMsgIn(SimpleEventType.repaint));
-		}
+	public void startRecording() throws WsException {
+		sessionRecorder.startRecording();
+		sendToSwing(webConnection, new SimpleEventMsgIn(SimpleEventType.repaint));
+	}
+
+	@Override
+	public void stopRecording() throws WsException {
+		sessionRecorder.stopRecording();
 	}
 
 	public SwingSession toSwingSession(boolean stats) {
@@ -652,12 +664,12 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		return endedAt;
 	}
 
-	public Boolean isRecording() {
-		return sessionRecorder != null && !sessionRecorder.isFailed();
+	public boolean isRecording() {
+		return sessionRecorder.isRecording();
 	}
 
 	public String getRecordingFile() {
-		return sessionRecorder != null ? sessionRecorder.getFileName() : null;
+		return sessionRecorder.getFileName();
 	}
 
 	public SwingInstanceStatus getStatus() {

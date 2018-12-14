@@ -1,18 +1,20 @@
 (function (define) {
     define([], function f() {
-        function PlaybackController(baseUrl, $scope, $location, $routeParams) {
+        function PlaybackController($scope, $location, $routeParams) {
             var vm = this;
+            vm.path = $routeParams.path;
             vm.back = back;
             view();
 
             $scope.$on('$destroy', function () {
                 window.webswingadmin.webswingplayback.disconnect();
+                window.webswingadmin.webswingplayback=null;
             });
 
             function view() {
                 var config = {
                     autoStart: false,
-                    connectionUrl: baseUrl,
+                    connectionUrl: "/"+vm.path,
                     recordingPlayback: $routeParams.playback,
                     debugLog: true,
                     control: false,
@@ -25,10 +27,10 @@
             }
 
             function back() {
-                $location.path('/dashboard/overview');
+                $location.path('/dashboard/overview/' + vm.path);
             }
         }
-        PlaybackController.$inject = ['baseUrl', '$scope', '$location', '$routeParams'];
+        PlaybackController.$inject = ['$scope', '$location', '$routeParams'];
 
         return PlaybackController;
     });

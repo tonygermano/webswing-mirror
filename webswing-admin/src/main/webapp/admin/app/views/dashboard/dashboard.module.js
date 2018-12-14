@@ -38,7 +38,7 @@
 				controllerAs : 'vm',
 				templateUrl : 'app/views/dashboard/session.template.html'
 			});
-			$routeProvider.when('/dashboard/playback', {
+			$routeProvider.when('/dashboard/playback/:path*', {
 				controller : 'DashboardPlaybackController',
 				controllerAs : 'vm',
 				templateUrl : 'app/views/dashboard/playback.template.html'

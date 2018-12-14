@@ -43,8 +43,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	private static final Class<?>[] binaryInterceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, SuspendTrackerInterceptor.class };
 	private static final String BINARY_HANDLER_PATH = "/async/swing-bin";
 	private static final String JSON_HANDLER_PATH = "/async/swing";
-	private static final String PLAYBACK_HANDLER_WS_PATH = "/async/swing-play";
-	private static final String PLAYBACK_HANDLER_PATH = "/playback" + PLAYBACK_HANDLER_WS_PATH;
+	private static final String PLAYBACK_HANDLER_PATH = "/async/swing-play";
 
 	private final SecuredAtmosphereFramework framework;
 	private final ServletContext context;
@@ -79,6 +78,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 				public ServletContext getServletContext() {
 					return context;
 				}
+
 				@Override
 				public String getServletName() {
 					return "WebswingServlet";
@@ -92,7 +92,7 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 			websocketEndpoints.put(PLAYBACK_HANDLER_PATH, new WebSocketAtmosphereHandler());
 			framework.addAtmosphereHandler("*" + JSON_HANDLER_PATH, websocketEndpoints.get(JSON_HANDLER_PATH), instantiate(jsonInterceptors));
 			framework.addAtmosphereHandler("*" + BINARY_HANDLER_PATH, websocketEndpoints.get(BINARY_HANDLER_PATH), instantiate(binaryInterceptors));
-			framework.addAtmosphereHandler("*" + PLAYBACK_HANDLER_WS_PATH, websocketEndpoints.get(PLAYBACK_HANDLER_PATH), instantiate(binaryInterceptors));
+			framework.addAtmosphereHandler("*" + PLAYBACK_HANDLER_PATH, websocketEndpoints.get(PLAYBACK_HANDLER_PATH), instantiate(binaryInterceptors));
 
 		} catch (ServletException e) {
 			throw new WsInitException("Failed to initialize Websocket framework", e);
@@ -135,8 +135,8 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	}
 
 	@Override
-	public WebSocketUrlHandler createPlaybackWebSocketHandler(PrimaryUrlHandler parent) {
-		RecordingPlaybackUrlHandlerImpl result = new RecordingPlaybackUrlHandlerImpl(parent, PLAYBACK_HANDLER_PATH, this);
+	public WebSocketUrlHandler createPlaybackWebSocketHandler(PrimaryUrlHandler parent, SwingInstanceManager instanceManager) {
+		RecordingPlaybackUrlHandlerImpl result = new RecordingPlaybackUrlHandlerImpl(parent, PLAYBACK_HANDLER_PATH, this, instanceManager);
 		WebSocketAtmosphereHandler endpoint = websocketEndpoints.get(PLAYBACK_HANDLER_PATH);
 		endpoint.addHandler(result.getFullPathMapping(), result);
 		return result;
@@ -145,15 +145,15 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	public void serve(WebSocketUrlHandler handler, HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
 		WebSocketAtmosphereHandler endpoint = websocketEndpoints.get(handler.getPathMapping());
 		endpoint.addHandler(req, handler);
-		framework.doCometSupport( AtmosphereRequestImpl.wrap(req), AtmosphereResponseImpl.wrap(res));
+		framework.doCometSupport(AtmosphereRequestImpl.wrap(req), AtmosphereResponseImpl.wrap(res));
 	}
 
-	public void disconnectWebsockets(Serializable sessionId){
+	public void disconnectWebsockets(Serializable sessionId) {
 		BroadcasterFactory f = framework.getBroadcasterFactory();
 		for (Broadcaster b : f.lookupAll()) {
 			for (AtmosphereResource r : b.getAtmosphereResources()) {
-				Subject subject= (Subject) r.getRequest().getAttribute(SecurityManagerService.SECURITY_SUBJECT);
-				if (subject!=null && subject.getSession().getId().equals(sessionId)) {
+				Subject subject = (Subject) r.getRequest().getAttribute(SecurityManagerService.SECURITY_SUBJECT);
+				if (subject != null && subject.getSession().getId().equals(sessionId)) {
 					try {
 						r.close();
 					} catch (IOException e) {

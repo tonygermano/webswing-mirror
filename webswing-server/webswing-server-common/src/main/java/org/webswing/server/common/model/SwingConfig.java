@@ -11,7 +11,7 @@ import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
 @ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs",
-		"allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting" })
+		"allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
@@ -178,6 +178,12 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow Server Printing", description = "Enables native printing on devices configured on server's OS. If disabled a pdf is generated and sent to client browser.")
 	@ConfigFieldDefaultValueBoolean(false)
 	boolean isAllowServerPrinting();
+
+	@ConfigField(tab = ConfigGroup.Features, label = "Recordings Folder", description = "Folder to be used to store session recording files for this application. Session recording can be initiated in admin console or by user using ?recording=true url parameter.")
+	@ConfigFieldVariables(VariableSetName.SwingApp)
+	@ConfigFieldDefaultValueString("${webswing.tempDirPath}recordings${webswing.appPath}/")
+	String getRecordingsFolder();
+
 
 	public static class SwingConfigurationMetadataGenerator extends MetadataGenerator<SwingConfig> {
 		@Override

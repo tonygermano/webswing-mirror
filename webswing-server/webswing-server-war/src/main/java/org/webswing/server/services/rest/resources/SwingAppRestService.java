@@ -15,8 +15,9 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
-import java.util.List;
+import java.io.File;
+import java.net.URI;
+import java.util.*;
 
 @Path("")
 @Produces(MediaType.APPLICATION_JSON)
@@ -81,13 +82,33 @@ public class SwingAppRestService extends BaseRestService {
 	@Path("/rest/sessions")
 	public Sessions getSessions() throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
+		Set<String> localRecordingFiles=new HashSet<>();
 		Sessions result = new Sessions();
 		for (SwingInstance si : manager.getSwingInstanceHolder().getAllInstances()) {
-			result.getSessions().add(si.toSwingSession(false));
+			SwingSession session = si.toSwingSession(false);
+			result.getSessions().add(session);
+			if(session.getRecordingFile()!=null){
+				localRecordingFiles.add(session.getRecordingFile());
+			}
 		}
 		for (SwingInstance si : manager.getSwingInstanceHolder().getAllClosedInstances()) {
-			result.getClosedSessions().add(si.toSwingSession(false));
+			SwingSession session = si.toSwingSession(false);
+			result.getClosedSessions().add(session);
+			if(session.getRecordingFile()!=null){
+				localRecordingFiles.add(session.getRecordingFile());
+			}
 		}
+
+		List<String> externalRecordings=new ArrayList<>();
+		File recordingsDir = new File(URI.create(manager.getRecordingsDirPath()));
+		if(recordingsDir.exists()&& recordingsDir.isDirectory() && recordingsDir.canRead() )
+		for(File rFile:recordingsDir.listFiles()){
+			if(!localRecordingFiles.contains(rFile.getName())){
+				externalRecordings.add(rFile.getName());
+			}
+
+		}
+		result.setRecordings(externalRecordings);
 		return result;
 	}
 
@@ -118,7 +139,11 @@ public class SwingAppRestService extends BaseRestService {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_startRecording);
 		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
 		if (instance != null) {
-			instance.startRecording();
+			if(instance.isRecording()){
+				instance.stopRecording();
+			}else {
+				instance.startRecording();
+			}
 			return instance.toSwingSession(true);
 		}
 		return null;

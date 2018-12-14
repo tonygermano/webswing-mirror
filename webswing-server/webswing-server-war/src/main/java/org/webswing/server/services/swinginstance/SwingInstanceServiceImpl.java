@@ -5,6 +5,7 @@ import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.jvmconnection.JvmConnectionService;
+import org.webswing.server.services.recorder.SessionRecorderService;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingprocess.SwingProcessService;
 import org.webswing.server.services.websocket.WebSocketConnection;
@@ -16,17 +17,19 @@ import com.google.inject.Singleton;
 public class SwingInstanceServiceImpl implements SwingInstanceService {
 
 	private final JvmConnectionService connectionService;
+	private final SessionRecorderService recorderService;
 	private final SwingProcessService processService;
 
 	@Inject
-	public SwingInstanceServiceImpl(SwingProcessService processService, JvmConnectionService connectionService) {
+	public SwingInstanceServiceImpl(SwingProcessService processService, JvmConnectionService connectionService, SessionRecorderService recorderService) {
 		this.processService = processService;
 		this.connectionService = connectionService;
+		this.recorderService = recorderService;
 	}
 
 	@Override
 	public SwingInstance create(SwingInstanceManager manager, FileTransferHandler fileHandler, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection r) throws WsException {
-		return new SwingInstanceImpl(manager, fileHandler, processService, connectionService, h, config, r);
+		return new SwingInstanceImpl(manager, fileHandler, processService, connectionService,recorderService, h, config, r);
 	}
 
 }

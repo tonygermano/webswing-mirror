@@ -1,11 +1,5 @@
 package org.webswing.server.services.swingmanager;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
@@ -36,6 +30,11 @@ import org.webswing.server.services.swingmanager.instance.SwingInstanceHolder;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
 import org.webswing.server.util.ServerUtil;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements SwingInstanceManager {
 	private static final Logger log = LoggerFactory.getLogger(SwingInstanceManagerImpl.class);
@@ -68,6 +67,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 
 	@Override
 	public void init() {
+		registerChildUrlHandler(websocket.createPlaybackWebSocketHandler(this,this));
 		registerChildUrlHandler(websocket.createBinaryWebSocketHandler(this, this));
 		registerChildUrlHandler(websocket.createJsonWebSocketHandler(this, this));
 		registerChildUrlHandler(loginService.createLoginHandler(this));
@@ -101,7 +101,7 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 			if (!isEnabled()) {
 				throw new WsException("This application is disabled.");
 			}
-			if(handshake.isMirrored()){
+			if (handshake.isMirrored()) {
 				checkPermissionLocalOrMaster(WebswingAction.websocket_startMirrorView);
 			}
 		} catch (WsException e1) {
@@ -111,9 +111,9 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 		}
 		try {
 			SwingInstance instance;
-			if(handshake.isMirrored()){
-				instance=instanceHolder.findInstanceByInstanceId(handshake.getClientId());
-			}else {
+			if (handshake.isMirrored()) {
+				instance = instanceHolder.findInstanceByInstanceId(handshake.getClientId());
+			} else {
 				String ownerId = ServerUtil.resolveOwnerIdForSessionMode(r, handshake, getSwingConfig());
 				instance = instanceHolder.findInstanceByOwnerId(ownerId);
 			}
@@ -237,7 +237,13 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 
 	@Override
 	public SwingInstanceHolder getSwingInstanceHolder() {
-		return instanceHolder;
+		return this.instanceHolder;
+	}
+
+	@Override
+	public String getRecordingsDirPath() {
+		VariableSubstitutor subs = VariableSubstitutor.forSwingApp(getConfig());
+		return subs.replace(getConfig().getSwingConfig().getRecordingsFolder());
 	}
 
 }
