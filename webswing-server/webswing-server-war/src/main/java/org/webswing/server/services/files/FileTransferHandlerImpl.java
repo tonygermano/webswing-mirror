@@ -63,6 +63,8 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 			} else if (req.getMethod().equals("POST")) {
 				handleUpload(req, res);
 				return true;
+			} else if (req.getMethod().equals("OPTIONS")){
+				return true;
 			}
 		} catch (Exception e) {
 			log.error("FileTransfer failed.", e);
