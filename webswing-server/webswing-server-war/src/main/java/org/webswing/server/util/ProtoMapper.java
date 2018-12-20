@@ -2,6 +2,7 @@ package org.webswing.server.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.Enum;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -12,16 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.protobuf.*;
 import org.webswing.model.MsgOut;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor.JavaType;
-import com.google.protobuf.GeneratedMessage;
-import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
-import com.google.protobuf.ProtocolMessageEnum;
 
 public class ProtoMapper {
 	public static final String basicProtoPackage = "org.webswing.server.model.proto.Webswing";
@@ -43,7 +41,7 @@ public class ProtoMapper {
 		}
 		try {
 			Class<?> protoClass = resolveProtoCounterpartClass(c);
-			GeneratedMessage protoMsg = (GeneratedMessage) protoClass.getDeclaredMethod("parseFrom", byte[].class).invoke(null, bytes);
+			GeneratedMessageV3 protoMsg = (GeneratedMessageV3) protoClass.getDeclaredMethod("parseFrom", byte[].class).invoke(null, bytes);
 			return decodeMessage(protoMsg, c);
 		} catch (IOException e) {
 			throw e;

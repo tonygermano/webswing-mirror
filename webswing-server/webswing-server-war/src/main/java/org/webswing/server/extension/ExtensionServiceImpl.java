@@ -1,12 +1,7 @@
 package org.webswing.server.extension;
 
-import java.lang.reflect.Constructor;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.apache.shiro.cache.CacheManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -17,6 +12,9 @@ import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.rest.RestService;
 import org.webswing.server.services.rest.RestUrlHandler;
 import org.webswing.server.services.swingprocess.SwingProcessService;
+
+import java.lang.reflect.Constructor;
+import java.util.List;
 
 @Singleton
 public class ExtensionServiceImpl implements ExtensionService, ExtensionDependencies {

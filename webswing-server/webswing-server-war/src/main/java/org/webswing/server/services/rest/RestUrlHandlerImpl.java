@@ -4,16 +4,13 @@ import org.glassfish.jersey.internal.MapPropertiesDelegate;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.server.*;
 import org.glassfish.jersey.server.internal.ContainerUtils;
-import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.server.GlobalUrlHandler;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
-import org.webswing.server.services.rest.resources.GlobalRestService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 
 import javax.servlet.http.HttpServletRequest;
