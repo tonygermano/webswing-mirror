@@ -299,7 +299,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				}
 			} else if (o instanceof PrinterJobResultMsgInternal) {
 				PrinterJobResultMsgInternal pj = (PrinterJobResultMsgInternal) o;
-				boolean success = fileHandler.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), false, null);
+				boolean success = fileHandler.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, getUserId(), getInstanceId(),pj.isTempFile(), false, null);
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
 					LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.print, pj.getId());
@@ -310,7 +310,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				OpenFileResultMsgInternal fr = (OpenFileResultMsgInternal) o;
 				String extension = getFileExtension(fr.getFile());
 				String id = UUID.randomUUID().toString() + extension;
-				boolean success = fileHandler.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), fr.isWaitForFile(), fr.getOverwriteDetails());
+				boolean success = fileHandler.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), false, fr.isWaitForFile(), fr.getOverwriteDetails());
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
 					LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.file, id);
@@ -340,7 +340,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			CursorChangeEventMsg cmsg = ((AppFrameMsgOut) o).getCursorChange();
 			if (cmsg.getCurFile() != null) {
 				File cur = new File(cmsg.getCurFile());
-				boolean success = fileHandler.registerFile(cur, cur.getName(), 1, TimeUnit.DAYS, getUserId(), getInstanceId(), false, null);
+				boolean success = fileHandler.registerFile(cur, cur.getName(), 1, TimeUnit.DAYS, getUserId(), getInstanceId(), false, false, null);
 				cmsg.setCurFile(cur.getName());
 			}
 			sendToWeb((MsgOut) o);

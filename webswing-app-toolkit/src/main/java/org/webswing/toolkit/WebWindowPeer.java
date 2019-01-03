@@ -88,6 +88,10 @@ abstract public class WebWindowPeer extends WebContainerPeer implements WindowPe
 		}
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		Insets insets = this.getInsets();
+		if (screen.height < insets.top || screen.width < 40) {
+			return result;
+		}
+
 		if (y < 0) {
 			result.y = 0;
 		}

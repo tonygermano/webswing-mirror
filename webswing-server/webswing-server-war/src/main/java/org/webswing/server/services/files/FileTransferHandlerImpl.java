@@ -216,11 +216,7 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 		return null;
 	}
 
-	public boolean registerFile(File file, final String id, long validForTime, TimeUnit timeUnit, String validForUser, String instanceId, boolean waitForFile, String overwriteDetails) {
-		return registerFileInternal(file, id, validForTime, timeUnit, validForUser, instanceId, false, waitForFile, overwriteDetails);
-	}
-
-	private boolean registerFileInternal(File file, final String id, long validForTime, TimeUnit timeUnit, String validForUser, String instanceId, boolean temp, boolean waitForFile, String overwriteDetails) {
+	public boolean registerFile(File file, final String id, long validForTime, TimeUnit timeUnit, String validForUser, String instanceId, boolean temp, boolean waitForFile, String overwriteDetails) {
 		final FileDescriptor fd = new FileDescriptor(file, validForUser);
 		fd.temporary = temp;
 		fd.waitForFile = waitForFile;

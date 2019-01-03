@@ -130,6 +130,7 @@ public class WebPrinterJob extends PrinterJob {
 		}
 		PrinterJobResultMsgInternal printResult = new PrinterJobResultMsgInternal();
 		printResult.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
+		printResult.setTempFile(true);
 		printResult.setId(id);
 		printResult.setPdfFile(f);
 		Util.getWebToolkit().getPaintDispatcher().sendObject(printResult);
