@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.services.security.api.WebswingAction;
 
 public class AnonymWebswingUser extends AbstractWebswingUser {
 	public static final String anonymUserName = "anonym";
@@ -21,7 +22,7 @@ public class AnonymWebswingUser extends AbstractWebswingUser {
 
 	@Override
 	public boolean hasRole(String role) {
-		return true;
+		return WebswingAction.AccessType.basic.name().equals(role);
 	}
 
 	public boolean isAuthenticated() {
