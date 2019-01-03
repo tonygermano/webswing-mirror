@@ -9,6 +9,7 @@ public class PrinterJobResultMsgInternal implements MsgInternal {
 	private static final long serialVersionUID = 6352518694214860256L;
 	private File pdfFile;
 	private String id;
+	private boolean tempFile;
 	private String clientId;
 
 	public File getPdfFile() {
@@ -35,4 +36,11 @@ public class PrinterJobResultMsgInternal implements MsgInternal {
 		this.clientId = clientId;
 	}
 
+	public boolean isTempFile() {
+		return tempFile;
+	}
+
+	public void setTempFile(boolean tempFile) {
+		this.tempFile = tempFile;
+	}
 }

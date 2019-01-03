@@ -140,9 +140,9 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	private void installFonts() {
 		try {
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			Properties fontsProp=new Properties();
-			String fontConfig=System.getProperty("sun.awt.fontconfig");
-			if(fontConfig!=null) {
+			Properties fontsProp = new Properties();
+			String fontConfig = System.getProperty("sun.awt.fontconfig");
+			if (fontConfig != null) {
 				fontsProp.load(new FileInputStream(new File(fontConfig)));
 				for (String name : fontsProp.stringPropertyNames()) {
 					if (name.startsWith("filename.")) {
@@ -153,7 +153,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 				}
 			}
 		} catch (Exception e) {
-			Logger.error("Failed to install fonts",e);
+			Logger.error("Failed to install fonts", e);
 		}
 	}
 
@@ -162,7 +162,9 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		paintDispatcher = new WebPaintDispatcher();
 	}
 
-	public void initSize(final Integer desktopWidth, final Integer desktopHeight) {
+	public void initSize(final Integer width, final Integer height) {
+		final Integer desktopWidth = Math.max(Constants.SWING_SCREEN_WIDTH_MIN, width);
+		final Integer desktopHeight = Math.max(Constants.SWING_SCREEN_HEIGHT_MIN, height);
 		if (!SwingUtilities.isEventDispatchThread()) {
 			SwingUtilities.invokeLater(new Runnable() {
 
@@ -220,8 +222,8 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	private boolean exiting = false;
 
-	public static int screenWidth = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_WIDTH, Constants.SWING_SCREEN_WIDTH_MIN + ""));
-	public static int screenHeight = Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_HEIGHT, Constants.SWING_SCREEN_HEIGHT_MIN + ""));
+	public static int screenWidth = Math.max(Constants.SWING_SCREEN_WIDTH_MIN,Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_WIDTH, Constants.SWING_SCREEN_WIDTH_MIN + "")));
+	public static int screenHeight = Math.max(Constants.SWING_SCREEN_HEIGHT_MIN,Integer.parseInt(System.getProperty(Constants.SWING_SCREEN_HEIGHT, Constants.SWING_SCREEN_HEIGHT_MIN + "")));
 
 	public static final Object targetToPeer(Object paramObject) {
 		return SunToolkit.targetToPeer(paramObject);

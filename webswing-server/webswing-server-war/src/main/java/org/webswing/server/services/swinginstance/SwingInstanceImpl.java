@@ -301,7 +301,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				}
 			} else if (o instanceof PrinterJobResultMsgInternal) {
 				PrinterJobResultMsgInternal pj = (PrinterJobResultMsgInternal) o;
-				boolean success = fileHandler.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, getUser(), getInstanceId(), false, null);
+				boolean success = fileHandler.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, getUser(), getInstanceId(),pj.isTempFile(), false, null);
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
 					LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.print, pj.getId());
@@ -312,7 +312,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				OpenFileResultMsgInternal fr = (OpenFileResultMsgInternal) o;
 				String extension = getFileExtension(fr.getFile());
 				String id = UUID.randomUUID().toString() + extension;
-				boolean success = fileHandler.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, getUser(), getInstanceId(), fr.isWaitForFile(), fr.getOverwriteDetails());
+				boolean success = fileHandler.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, getUser(), getInstanceId(), false, fr.isWaitForFile(), fr.getOverwriteDetails());
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
 					LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.file, id);
@@ -342,7 +342,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			CursorChangeEventMsg cmsg = ((AppFrameMsgOut) o).getCursorChange();
 			if (cmsg.getCurFile() != null) {
 				File cur = new File(cmsg.getCurFile());
-				boolean success = fileHandler.registerFile(cur, cur.getName(), 1, TimeUnit.DAYS, getUser(), getInstanceId(), false, null);
+				boolean success = fileHandler.registerFile(cur, cur.getName(), 1, TimeUnit.DAYS, getUser(), getInstanceId(), false,false, null);
 				cmsg.setCurFile(cur.getName());
 			}
 			sendToWeb((MsgOut) o);

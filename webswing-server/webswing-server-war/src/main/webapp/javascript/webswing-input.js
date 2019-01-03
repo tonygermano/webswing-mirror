@@ -127,7 +127,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             }, false);
             util.bindEvent(canvas, "wheel", function (evt) {
                 pixelsScrolled += util.detectFF() ? evt.deltaY * 100 : evt.deltaY
-                if (pixelsScrolled >= 250 || pixelsScrolled <= -250) {
+                if (pixelsScrolled >= 100 || pixelsScrolled <= -100) {
                     pixelsScrolled = 0;
                     var mousePos = getMousePos(canvas, evt, 'mousewheel');
                     latestMouseMoveEvent = null;
@@ -289,9 +289,11 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             var mouseY = Math.round(evt.clientY - rect.top);
             var delta = 0;
             if (type == 'mousewheel') {
-                if(util.detectFF()){
-                    delta = -Math.max(-1, Math.min(1, ( -evt.deltaY*100 )));
-                }else{
+                if (util.detectFF()) {
+                    delta = -Math.max(-1, Math.min(1, (-evt.deltaY * 100)));
+                } else if (util.detectIE() <= 11) {
+                    delta = -Math.max(-1, Math.min(1, (-evt.deltaY)));
+                } else {
                     delta = -Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail)));
                 }
             }
