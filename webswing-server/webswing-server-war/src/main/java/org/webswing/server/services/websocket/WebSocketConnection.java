@@ -59,6 +59,10 @@ public class WebSocketConnection {
 		}
 	}
 
+	public void logoutUser(){
+		SecurityUtil.logoutUser(this);
+	}
+
 	public String getUserId() {
 		AbstractWebswingUser user = getUser();
 		String userId =user != null ? user.getUserId() : "null";;

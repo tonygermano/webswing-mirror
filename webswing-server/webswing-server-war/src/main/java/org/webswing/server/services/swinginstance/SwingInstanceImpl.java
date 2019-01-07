@@ -99,7 +99,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	private List<String> warningHistoryLog;
 	private Map<Long, ThreadDumpMsgInternal> threadDumps = new ConcurrentHashMap<>();
 
-	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService,SessionRecorderService recorderService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection websocket) throws WsException {
+	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService, SessionRecorderService recorderService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection websocket) throws WsException {
 		this.manager = manager;
 		this.fileHandler = fileHandler;
 		this.webConnection = websocket;
@@ -119,9 +119,9 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			throw new WsException("Failed to create App instance.", e);
 		}
 		this.sessionRecorder = recorderService.create(this, manager);
-		if(ServerUtil.isRecording(websocket.getRequest())) {
+		if (ServerUtil.isRecording(websocket.getRequest())) {
 			sessionRecorder.startRecording();
-		};
+		}
 		logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, websocket.isWebsocketTransport() ? 1 : 2);
 	}
 
@@ -299,7 +299,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				}
 			} else if (o instanceof PrinterJobResultMsgInternal) {
 				PrinterJobResultMsgInternal pj = (PrinterJobResultMsgInternal) o;
-				boolean success = fileHandler.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, getUserId(), getInstanceId(),pj.isTempFile(), false, null);
+				boolean success = fileHandler.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), pj.isTempFile(), false, null);
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
 					LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.print, pj.getId());
@@ -352,6 +352,11 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	private void close() {
 		if (config.isAutoLogout()) {
 			sendToWeb(SimpleEventMsgOut.shutDownAutoLogoutNotification.buildMsgOut());
+			if (webConnection != null) {
+				webConnection.logoutUser();
+			} else if (lastConnection != null) {
+				lastConnection.logoutUser();
+			}
 		}
 		if (StringUtils.isNotBlank(config.getGoodbyeUrl())) {
 			String url = subs.replace(config.getGoodbyeUrl());
@@ -374,7 +379,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 					throw new IOException("Can not clear upload folder if multiple roots are defined. Turn off the option in Webswing config. [" + transferDir + "]");
 				} else if (transferDir != null) {
 					FileUtils.deleteDirectory(new File(transferDir));
-					log.info("Transfer dir for session ["+process.getConfig().getName()+"] cleared. ["+transferDir+"]");
+					log.info("Transfer dir for session [" + process.getConfig().getName() + "] cleared. [" + transferDir + "]");
 				}
 			} catch (IOException e) {
 				log.error("Failed to delete transfer dir " + transferDir, e);
@@ -388,11 +393,11 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			process.setProcessExitListener(null);
 		}
 		try {
-			if(sessionRecorder.isRecording()) {
+			if (sessionRecorder.isRecording()) {
 				sessionRecorder.stopRecording();
 			}
 		} catch (WsException e) {
-			log.error("Stop Recording:",e);
+			log.error("Stop Recording:", e);
 		}
 		manager.notifySwingClose(this);
 	}
@@ -482,7 +487,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			} else if (javaVersion.startsWith("1.8")) {
 				webToolkitClass += "8";
 				webGraphicsEnvClass += "8";
-			} else if (javaVersion.startsWith("9") || javaVersion.startsWith("10")|| javaVersion.startsWith("11")) {
+			} else if (javaVersion.startsWith("9") || javaVersion.startsWith("10") || javaVersion.startsWith("11")) {
 				webToolkitClass += "9";
 				webGraphicsEnvClass += "9";
 				j9modules = " --patch-module jdk.jsobject=" + CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_JSOBJECT_MODULE_MARKER);

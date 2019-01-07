@@ -1,5 +1,6 @@
 package org.webswing.server.services.websocket;
 
+import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
 
 import java.util.Date;
@@ -12,6 +13,7 @@ public class WebSocketUserInfo {
 	private final int debugPort;
 	private final String userIp;
 	private final String userOs;
+	private final SecurityUtil.LogoutHandle logoutHandle;
 	private Date disconnectedSince;
 
 	WebSocketUserInfo(WebSocketConnection conn) {
@@ -21,6 +23,7 @@ public class WebSocketUserInfo {
 		this.userIp = ServerUtil.getClientIp(conn);
 		this.userOs = ServerUtil.getClientOs(conn);
 		this.userBrowser = ServerUtil.getClientBrowser(conn);
+		this.logoutHandle = SecurityUtil.getLogoutHandle(conn);
 	}
 
 	public String getUserId() {
@@ -52,6 +55,10 @@ public class WebSocketUserInfo {
 	}
 
 	public void setDisconnected() {
-		disconnectedSince=new Date();
+		disconnectedSince = new Date();
+	}
+
+	public void logoutUser() {
+		this.logoutHandle.logout();
 	}
 }

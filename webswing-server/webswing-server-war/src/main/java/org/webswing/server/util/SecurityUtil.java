@@ -13,6 +13,8 @@ import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
+import java.lang.ref.WeakReference;
+
 public class SecurityUtil {
 	private static final Logger log = LoggerFactory.getLogger(SecurityUtil.class);
 
@@ -63,4 +65,27 @@ public class SecurityUtil {
 		subject.getSession().setAttribute(attributeName, value);
 	}
 
+	public static void logoutUser(WebSocketConnection connection) {
+		getLogoutHandle(connection).logout();
+	}
+
+	public static LogoutHandle getLogoutHandle(WebSocketConnection conn) {
+		Subject subject = (Subject) conn.getRequest().getAttribute(SecurityManagerService.SECURITY_SUBJECT);
+		return new LogoutHandle(subject);
+	}
+
+	public static class LogoutHandle {
+		private WeakReference<Subject> subject;
+
+		private LogoutHandle(Subject subject) {
+			this.subject = new WeakReference(subject);
+		}
+
+		public void logout() {
+			Subject s = this.subject.get();
+			if (s != null) {
+				s.logout();
+			}
+		}
+	}
 }
