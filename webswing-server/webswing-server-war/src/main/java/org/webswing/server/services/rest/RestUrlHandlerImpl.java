@@ -76,6 +76,7 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 			appHandler.handle(requestContext);
 			return responseWriter.isServed();
 		} catch (final Exception e) {
+			log.error("Rest API call failed.",e);
 			throw new WsException(e.getMessage(), e);
 		}
 	}
