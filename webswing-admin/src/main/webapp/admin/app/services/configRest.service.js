@@ -108,7 +108,7 @@
 
 			function resolve(path,type,searchSequence) {
 
-                var url = toPath(path) + '/rest/variables/resolve/' + type + '?resolve=' + searchSequence;
+                var url = toPath(path) + '/rest/variables/resolve/' + type + '?resolve=' + encodeURIComponent(searchSequence);
 
                 return $http.get(url).then(success, failed);
                 function success(data) {
