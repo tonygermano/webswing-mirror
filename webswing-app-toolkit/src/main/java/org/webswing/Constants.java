@@ -69,6 +69,7 @@ public interface Constants {
 	public static final String CONFIG_FILE_PATH = "webswing.configFile";
 	public static final String CONFIG_RELOAD_INTERVAL_MS = "webswing.configReloadIntervalMs";
 	public static final String DEFAULT_CONFIG_FILE_NAME = "webswing.config";
+	public static final String DEFAULT_RECORDINGS_FOLDER = "${webswing.tempDirPath}recordings${webswing.appPath}/";
 	public static final String SERVER_HOST = "webswing.server.host";
 	public static final String SERVER_PORT = "webswing.server.port";
 	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";

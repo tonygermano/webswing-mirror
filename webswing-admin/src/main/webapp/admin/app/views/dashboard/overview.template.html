@@ -96,7 +96,7 @@
                             <button type="button" class="btn btn-xs btn-default" ng-click="vm.record(session)">
                                 <span class="glyphicon glyphicon-record"></span> Record Session
                             </button>
-							<button ng-if="session.recordingFile != null" type="button" class="btn btn-primary btn-xs" ng-click="vm.play(session)">
+							<button ng-if="session.recordingFile != null" type="button" class="btn btn-primary btn-xs" ng-click="vm.play(session.recordingFile)">
 								<span class="glyphicon glyphicon-play"></span>
 							</button>
                         </div>

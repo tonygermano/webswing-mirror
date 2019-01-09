@@ -2,6 +2,7 @@ package org.webswing.server.services.swingmanager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
@@ -33,6 +34,7 @@ import org.webswing.server.util.ServerUtil;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -243,7 +245,19 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Override
 	public String getRecordingsDirPath() {
 		VariableSubstitutor subs = VariableSubstitutor.forSwingApp(getConfig());
-		return subs.replace(getConfig().getSwingConfig().getRecordingsFolder());
+		String recFolderString= subs.replace(getConfig().getSwingConfig().getRecordingsFolder());
+		try {
+			String uri = new File(URI.create(recFolderString)).toURI().toString();
+			return uri;
+		} catch (IllegalArgumentException e) {
+			File resolved = resolveFile(recFolderString);
+			if(resolved!=null){
+				return resolved.toURI().toString();
+			}else {
+				File uninitialized = new File(recFolderString);
+				return uninitialized.toURI().toString();
+			}
+		}
 	}
 
 }

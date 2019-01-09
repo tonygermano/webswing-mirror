@@ -31,7 +31,7 @@ public class SessionRecorderImpl implements SessionRecorder {
 
 	private String fileName;
 
-	private long lastFrame=0;
+	private long lastFrame = 0;
 
 	public SessionRecorderImpl(SwingInstance swingInstance, SwingInstanceManager manager) {
 		this.swingInstance = swingInstance;
@@ -68,7 +68,7 @@ public class SessionRecorderImpl implements SessionRecorder {
 				if (outputStream != null) {
 					byte[] length = ByteBuffer.allocate(4).putInt(serialized.length).array();
 					long now = new Date().getTime();
-					this.lastFrame= this.lastFrame==0?now:this.lastFrame;
+					this.lastFrame = this.lastFrame == 0 ? now : this.lastFrame;
 					byte[] delay = ByteBuffer.allocate(4).putInt((int) (now - this.lastFrame)).array();
 					this.lastFrame = now;
 					try {
@@ -97,17 +97,17 @@ public class SessionRecorderImpl implements SessionRecorder {
 		if (!recording) {
 			try {
 				String fileName = URLEncoder.encode(swingInstance.getInstanceId(), "UTF-8") + ".wss";
-				URI uri = URI.create(this.recordingDir + fileName);
-				File file = new File(uri);
-				if(file.exists()){
+				File folderUri = new File(URI.create(this.recordingDir));
+				File file = new File(folderUri, fileName);
+				if (file.exists()) {
 					file.delete();
-				}else if( !file.getParentFile().exists()){
+				} else if (!file.getParentFile().exists()) {
 					file.getParentFile().mkdirs();
 				}
 				this.fileName = fileName;
-				log.info("Starting session recording for " + swingInstance.getInstanceId() + " into file:" + uri);
+				log.info("Starting session recording for " + swingInstance.getInstanceId() + " into file:" + file.getAbsolutePath());
 				//make sure previous out stream is closed
-				if(outputStream!=null){
+				if (outputStream != null) {
 					outputStream.close();
 				}
 				outputStream = new FileOutputStream(file);
@@ -118,7 +118,7 @@ public class SessionRecorderImpl implements SessionRecorder {
 				byte[] version = ByteBuffer.allocate(4).putInt(SessionRecordingHeader.version).array();
 				byte[] headerbytes = serializeObject(header);
 				outputStream.write(version);
-				recording=true;
+				recording = true;
 				saveFrame(headerbytes);
 			} catch (FileNotFoundException e) {
 				log.error("Failed to create session recording file.", e);
@@ -147,7 +147,7 @@ public class SessionRecorderImpl implements SessionRecorder {
 				log.error("Failed to close recording file.", e);
 				throw new WsException("Failed to close recording file.", e);
 			} finally {
-				recording=false;
+				recording = false;
 			}
 		} else {
 			throw new WsException("Recording not started.");

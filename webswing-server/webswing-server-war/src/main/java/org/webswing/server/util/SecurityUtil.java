@@ -1,6 +1,7 @@
 package org.webswing.server.util;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
@@ -24,9 +25,14 @@ public class SecurityUtil {
 	}
 
 	public static AbstractWebswingUser getUser(WebSocketConnection connection) {
-		Subject subject = (Subject) connection.getRequest().getAttribute(SecurityManagerService.SECURITY_SUBJECT);
-		UrlHandler urlHandler = connection.getHandler();
-		return resolveUser(subject, urlHandler);
+		try {
+			Subject subject = (Subject) connection.getRequest().getAttribute(SecurityManagerService.SECURITY_SUBJECT);
+			UrlHandler urlHandler = connection.getHandler();
+			return resolveUser(subject, urlHandler);
+		} catch (ExpiredSessionException e) {
+			log.info("User session expired.", e);
+			return null;
+		}
 	}
 
 	private static AbstractWebswingUser resolveUser(Subject subject, UrlHandler handler) {
@@ -47,7 +53,7 @@ public class SecurityUtil {
 					return masteradmin;
 				}
 			} catch (UnknownSessionException e) {
-				log.info("User already logged out.", e);
+				log.info("User already logged out: " + e.getMessage());
 				return null;
 
 			}
@@ -84,7 +90,11 @@ public class SecurityUtil {
 		public void logout() {
 			Subject s = this.subject.get();
 			if (s != null) {
-				s.logout();
+				try {
+					s.logout();
+				} catch (UnknownSessionException e) {
+					log.info("Logout failed. Session invalid: " + e.getMessage());
+				}
 			}
 		}
 	}

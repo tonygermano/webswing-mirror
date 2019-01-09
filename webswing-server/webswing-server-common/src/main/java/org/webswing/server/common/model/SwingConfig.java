@@ -1,5 +1,6 @@
 package org.webswing.server.common.model;
 
+import org.webswing.Constants;
 import org.webswing.server.common.model.meta.*;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
@@ -181,7 +182,7 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Recordings Folder", description = "Folder to be used to store session recording files for this application. Session recording can be initiated in admin console or by user using ?recording=true url parameter.")
 	@ConfigFieldVariables(VariableSetName.SwingApp)
-	@ConfigFieldDefaultValueString("${webswing.tempDirPath}recordings${webswing.appPath}/")
+	@ConfigFieldDefaultValueString(Constants.DEFAULT_RECORDINGS_FOLDER)
 	String getRecordingsFolder();
 
 
