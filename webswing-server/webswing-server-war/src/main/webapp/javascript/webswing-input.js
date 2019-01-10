@@ -97,6 +97,7 @@ define(['jquery', 'webswing-util'], function amdFactory($, util) {
             resetInput();
             focusInput(input);
             util.bindEvent(canvas, 'mousedown', function (evt) {
+                mouseDownEventHandler(evt);
                 var mousePos = getMousePos(canvas, evt, 'mousedown');
                 latestMouseMoveEvent = null;
                 enqueueInputEvent(mousePos);
