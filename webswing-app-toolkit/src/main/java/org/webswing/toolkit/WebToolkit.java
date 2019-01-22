@@ -741,10 +741,16 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	}
 
 	public void defaultShutdownProcedure() {
-		//first send windows closing event to all windows
-		for (Window w : Window.getWindows()) {
-			w.dispatchEvent(new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
-		}
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				//first send windows closing event to all windows
+				for (Window w : Window.getWindows()) {
+					w.dispatchEvent(new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
+				}
+			}
+		});
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
