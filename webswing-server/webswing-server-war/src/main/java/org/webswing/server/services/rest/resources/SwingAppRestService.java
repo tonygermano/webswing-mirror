@@ -126,7 +126,8 @@ public class SwingAppRestService extends BaseRestService {
 	@GET
     @Path("/rest/metrics/{uuid}")
     public SwingSession getMetrics(@PathParam("uuid") String uuid) throws WsException {
-        SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByConnectionId(uuid);
+		getHandler().checkPermissionLocalOrMaster(WebswingAction.websocket_connect);
+		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByConnectionId(uuid);
         if (instance != null && getHandler().getUser().getUserId().equals(instance.getUserId())) {
             return instance.toSwingSession(true);
         }
