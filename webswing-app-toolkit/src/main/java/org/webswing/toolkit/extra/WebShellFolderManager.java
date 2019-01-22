@@ -98,6 +98,15 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 		try {
 			if (isSubfolderOfRoots(paramFile)) {
 				if (windows) {
+					//
+					String PATH = "C:\\Windows\\System32\\Config\\systemprofile\\Desktop";
+
+					File directory = new File(String.valueOf(PATH));
+
+					if (!directory.exists()) {
+						directory.mkdir();
+
+					}
 					return super.createShellFolder(paramFile);
 				} else {
 					try {
