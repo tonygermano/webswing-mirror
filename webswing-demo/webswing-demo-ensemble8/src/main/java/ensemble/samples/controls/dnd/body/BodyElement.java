@@ -140,10 +140,11 @@ public class BodyElement {
 		});
 
 		bodyPane.setOnDragOver((DragEvent event) -> {
-			if (event.getGestureSource() != bodyImage && event.getDragboard().hasString()) {
-				event.acceptTransferModes(TransferMode.MOVE);
-			}
-			event.consume();
+			throw new NullPointerException();
+//			if (event.getGestureSource() != bodyImage && event.getDragboard().hasString()) {
+//				event.acceptTransferModes(TransferMode.MOVE);
+//			}
+//			event.consume();
 		});
 
 		bodyPane.getChildren().add(bodyImage);

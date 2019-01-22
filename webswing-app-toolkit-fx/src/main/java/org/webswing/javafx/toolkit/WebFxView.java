@@ -166,16 +166,27 @@ public class WebFxView extends View {
 				if (WebEventDispatcher.javaFXdragStarted.get()) {
 					if (e.getID() != MouseEvent.MOUSE_WHEEL) {
 						if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_RELEASED) {
-							int currentAction = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
-							if (currentAction != Clipboard.ACTION_NONE) {
-								notifyDragDrop(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), currentAction);
-							} else {
-								notifyDragEnd(currentAction);
+							try {
+								int currentAction = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
+								if (currentAction != Clipboard.ACTION_NONE) {
+									notifyDragDrop(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), currentAction);
+								} else {
+									notifyDragEnd(currentAction);
+								}
+							}catch (Exception ex){
+								Logger.debug("Exception on event",ex);
+							}finally {
+								WebEventDispatcher.javaFXdragStarted.set(false);
+								setDragCursor(-1);
 							}
-							WebEventDispatcher.javaFXdragStarted.set(false);
-							setDragCursor(-1);
 						} else if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_DRAGGED) {
-							setDragCursor(notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx())));
+							try {
+								int cursorid = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
+								setDragCursor(cursorid);
+							} catch (Exception ex) {
+								Logger.debug("Exception on event",ex);
+								setDragCursor(0);
+							}
 						} else if (e.getID() == MouseEvent.MOUSE_EXITED) {
 							setDragCursor(-1);
 							notifyDragLeave();
