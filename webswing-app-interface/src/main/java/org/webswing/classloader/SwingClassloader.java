@@ -227,7 +227,9 @@ public class SwingClassloader extends URLClassLoader {
 				} else { // Fifth try: Load classes via repository
 					try {
 						if(modRegister.canSkipModification(class_name)) {
-							definePackage(class_name.substring(0,class_name.lastIndexOf(".")));
+							if(class_name.lastIndexOf(".")>0) {
+								definePackage(class_name.substring(0, class_name.lastIndexOf(".")));
+							}
 							bytes=loadClassBytes(class_name);
 						}else {
 							JavaClass clazz = repository.loadClass(class_name);
