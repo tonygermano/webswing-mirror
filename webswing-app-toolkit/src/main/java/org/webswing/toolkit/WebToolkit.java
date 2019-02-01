@@ -135,6 +135,14 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 			Logger.error("Failed to init X11 display: ", e.getMessage());
 		}
 		installFonts();
+
+		if (System.getProperty("os.name", "").startsWith("Windows")) {
+			String path = System.getProperty("user.home") + "\\Desktop";
+			File desktopFolder = new File(path);
+			if (!desktopFolder.exists() && !desktopFolder.mkdir()) {
+				Logger.error("Failed to create Desktop folder: " + path);
+			}
+		}
 	}
 
 	private void installFonts() {
