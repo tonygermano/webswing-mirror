@@ -98,11 +98,6 @@ public class WebShellFolderManager extends Win32ShellFolderManager2 {
 		try {
 			if (isSubfolderOfRoots(paramFile)) {
 				if (windows) {
-					String path = System.getProperty("user.home") + "\\Desktop";
-					File desktopFolder = new File(path);
-					if (!desktopFolder.exists() && !desktopFolder.mkdir()) {
-					    throw new IOException("Failed to create Desktop folder: " + path);
-					}
 					return super.createShellFolder(paramFile);
 				} else {
 					try {
