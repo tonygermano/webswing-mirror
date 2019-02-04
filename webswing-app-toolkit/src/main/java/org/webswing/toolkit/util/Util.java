@@ -123,7 +123,7 @@ public class Util {
 			result = result | MouseEvent.BUTTON2_DOWN_MASK;
 		}
 		if ((evt.getButtons() & 8) == 8) {
-			result = result | MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK;
+			result = result | MouseEvent.BUTTON3_DOWN_MASK;
 		}
 		if (evt.isCtrl()) {
 			result = result | MouseEvent.CTRL_DOWN_MASK;

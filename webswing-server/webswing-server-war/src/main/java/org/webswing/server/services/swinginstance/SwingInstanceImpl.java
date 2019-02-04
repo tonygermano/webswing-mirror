@@ -44,6 +44,7 @@ import org.webswing.server.services.swingprocess.SwingProcess;
 import org.webswing.server.services.swingprocess.SwingProcessConfig;
 import org.webswing.server.services.swingprocess.SwingProcessService;
 import org.webswing.server.services.websocket.WebSocketConnection;
+import org.webswing.server.services.websocket.WebSocketUserInfo;
 import org.webswing.server.util.FontUtils;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.api.WebswingApi;
@@ -90,6 +91,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private String userOs = null;
 
 	private String userBrowser = null;
+	private WebSocketUserInfo lastConnection = null;
+
 	//finished instances only
 	private Date endedAt = null;
 	private List<String> warningHistoryLog;
@@ -168,6 +171,8 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private void disconnectPrimaryWebSession() {
 		if (this.webConnection != null) {
 			notifyUserDisconnected();
+			this.lastConnection = this.webConnection.getUserInfo();
+			this.lastConnection.setDisconnected();
 			this.webConnection = null;
 			this.disconnectedSince = new Date();
 			logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, 0);
@@ -354,6 +359,11 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private void close() {
 		if (config.isAutoLogout()) {
 			sendToWeb(SimpleEventMsgOut.shutDownAutoLogoutNotification.buildMsgOut());
+			if (webConnection != null) {
+				webConnection.logoutUser();
+			} else if (lastConnection != null) {
+				lastConnection.logoutUser();
+			}
 		}
 		if (StringUtils.isNotBlank(config.getGoodbyeUrl())) {
 			VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), getClientId(), clientIp, locale, customArgs);
