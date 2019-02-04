@@ -22,10 +22,12 @@ public class WebSocketConnection {
 
 	private AtmosphereResource resource;
 	private UrlHandler handler;
+	private WebSocketUserInfo userInfo;
 
 	public WebSocketConnection(AtmosphereResource resource, UrlHandler handler) {
 		this.resource = resource;
 		this.handler = handler;
+		this.userInfo=new WebSocketUserInfo(this);
 	}
 
 	public boolean isBinary() {
@@ -54,6 +56,16 @@ public class WebSocketConnection {
 		} catch (UnknownSessionException e) {
 			return null;
 		}
+	}
+
+	public void logoutUser(){
+		SecurityUtil.logoutUser(this);
+	}
+
+	public String getUserId() {
+		AbstractWebswingUser user = getUser();
+		String userId =user != null ? user.getUserId() : "null";;
+		return userId;
 	}
 
 	public void broadcastMessage(EncodedMessage o) {
@@ -92,4 +104,7 @@ public class WebSocketConnection {
 		return TRANSPORT.WEBSOCKET.equals(resource.transport());
 	}
 
+	public WebSocketUserInfo getUserInfo() {
+		return userInfo;
+	}
 }
