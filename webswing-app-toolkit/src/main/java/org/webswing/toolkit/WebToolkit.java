@@ -130,13 +130,6 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 				initDisplayMethod.setAccessible(true);
 				initDisplayMethod.invoke(null, false);
 			}
-			if (System.getProperty("os.name", "").startsWith("Windows")) {
-                String path = System.getProperty("user.home") + "\\Desktop";
-                File desktopFolder = new File(path);
-                if (!desktopFolder.exists() && !desktopFolder.mkdir()) {
-                    throw new IOException("Failed to create Desktop folder: " + path);
-                }
-			}
 		} catch (Exception e) {
 			Logger.error("Failed to init X11 display: ", e.getMessage());
 		}

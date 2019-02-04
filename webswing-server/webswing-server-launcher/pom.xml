@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>webswing-server</artifactId>
 		<groupId>org.webswing</groupId>
-		<version>2.5.11</version>
+		<version>2.6-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<dependencies>
@@ -68,4 +68,56 @@
 			</plugin>
 		</plugins>
 	</build>
+    <profiles>
+        <!-- =========================================SERVERLESS BUILD PROFILE================================== -->
+        <profile>
+            <id>serverless</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/serverless</outputDirectory>
+                                    <includeScope>runtime</includeScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/serverless</outputDirectory>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>serverless</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <echo file="${project.build.directory}/WEB-INF/server-lib/README.txt">This is a serverless Webswing build. No embedded server is included. Deploy to supported Servlet container. (ie. Tomcat)</echo>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
