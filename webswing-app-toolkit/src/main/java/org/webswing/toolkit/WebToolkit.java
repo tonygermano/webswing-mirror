@@ -81,6 +81,7 @@ import java.awt.peer.TrayIconPeer;
 import java.awt.peer.WindowPeer;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
