@@ -134,8 +134,6 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		} catch (Exception e) {
 			Logger.error("Failed to init X11 display: ", e.getMessage());
 		}
-		installFonts();
-
 		if (System.getProperty("os.name", "").startsWith("Windows")) {
 			String path = System.getProperty("user.home") + "\\Desktop";
 			File desktopFolder = new File(path);
@@ -143,6 +141,8 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 				Logger.error("Failed to create Desktop folder: " + path);
 			}
 		}
+		
+		installFonts();
 	}
 
 	private void installFonts() {
