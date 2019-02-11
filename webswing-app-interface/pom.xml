@@ -93,10 +93,10 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<compilerArguments>
-						<bootclasspath>${basedir}/../lib/rt1.7.0_60.jar</bootclasspath>
+						<bootclasspath>${basedir}/../lib/rt1.8.0_25.jar</bootclasspath>
 					</compilerArguments>
 				</configuration>
 			</plugin>
@@ -134,7 +134,6 @@
 				<plugins>
 					<plugin>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.7</version>
 						<executions>
 							<execution>
 								<id>copy-to-running-jetty</id>

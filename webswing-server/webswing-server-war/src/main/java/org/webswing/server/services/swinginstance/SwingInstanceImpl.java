@@ -474,19 +474,16 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			swingConfig.setClassPath(new File(URI.create(CommonUtil.getWarFileLocation())).getAbsolutePath());
 			String javaVersion = subs.replace(appConfig.getJavaVersion());
 			boolean useJFX = config.isJavaFx();
-			if (!new File(JAVA_FX_PATH).exists()) {
-				log.warn("Java FX not supported with current java version (Try version 1.8). JavaFx library not found in '" + new File(JAVA_FX_PATH).getCanonicalPath() + "'. ");
-				useJFX = false;
-			}
 			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;
 			String webGraphicsEnvClass = WEB_GRAPHICS_ENV_CLASS_NAME;
 			String j9modules = "";
-			if (javaVersion.startsWith("1.7")) {
-				webToolkitClass += "7";
-				webGraphicsEnvClass += "7";
-			} else if (javaVersion.startsWith("1.8")) {
+			if (javaVersion.startsWith("1.8")) {
 				webToolkitClass += "8";
 				webGraphicsEnvClass += "8";
+				if (useJFX && !new File(JAVA_FX_PATH).exists() ) {
+					log.warn("JavaFx library not found in '" + new File(JAVA_FX_PATH).getCanonicalPath() + "'. ");
+					useJFX = false;
+				}
 			} else if (javaVersion.startsWith("9") || javaVersion.startsWith("10") || javaVersion.startsWith("11")) {
 				webToolkitClass += "9";
 				webGraphicsEnvClass += "9";
@@ -498,7 +495,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				j9modules += " --add-opens java.desktop/sun.awt.windows=ALL-UNNAMED "; // sun.awt.windows.ThemeReader reflective access from WebToolkit
 			} else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
-				throw new RuntimeException("Java version not supported. (Versions starting with 1.7, 1.8, 9+ are supported.)");
+				throw new RuntimeException("Java version not supported. (Versions starting with 1.8, 9+ are supported.)");
 			}
 			String webSwingToolkitApiJarPath = CommonUtil.getBootClassPathForClass(WebswingApi.class.getName());
 			String webSwingToolkitJarPath = CommonUtil.getBootClassPathForClass(WEB_TOOLKIT_CLASS_NAME);

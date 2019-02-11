@@ -53,7 +53,7 @@ Webswing is developed as standard modular maven project with seven separate mave
 
 `webswing-app-toolkit` module contains the custom implementation of java.awt.Toolkit called WebToolkit. This project must not contain any external dependencies, because it is part of boot classpath when running the swing application instance. This module contains also model classes for communication with web.
 
-`webswing-app-toolkit-java7` and `webswing-app-toolkit-java8`  module implements Java version specific methods and interfaces.  
+`webswing-app-toolkit-java8` and `webswing-app-toolkit-java9`  module implements Java version specific methods and interfaces.  
 
 `webswing-app-launcher` module takes care of correct initialization of Swing application's classpath and executing the main method of the Swing application in a special Webswing classloader.
 
