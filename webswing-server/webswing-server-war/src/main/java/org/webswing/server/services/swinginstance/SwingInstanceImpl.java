@@ -484,9 +484,9 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 					log.warn("JavaFx library not found in '" + new File(JAVA_FX_PATH).getCanonicalPath() + "'. ");
 					useJFX = false;
 				}
-			} else if (javaVersion.startsWith("9") || javaVersion.startsWith("10") || javaVersion.startsWith("11")) {
-				webToolkitClass += "9";
-				webGraphicsEnvClass += "9";
+			} else if (javaVersion.startsWith("11")) {
+				webToolkitClass += "11";
+				webGraphicsEnvClass += "11";
 				j9modules = " --patch-module jdk.jsobject=" + CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_JSOBJECT_MODULE_MARKER);
 				j9modules += " --patch-module java.desktop=" + CommonUtil.getBootClassPathForClass(SHELL_FOLDER_MANAGER);
 				j9modules += " --add-reads jdk.jsobject=ALL-UNNAMED ";
@@ -495,7 +495,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				j9modules += " --add-opens java.desktop/sun.awt.windows=ALL-UNNAMED "; // sun.awt.windows.ThemeReader reflective access from WebToolkit
 			} else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
-				throw new RuntimeException("Java version not supported. (Versions starting with 1.8, 9+ are supported.)");
+				throw new RuntimeException("Java version not supported. (Versions starting with 1.8 and 11 are supported.)");
 			}
 			String webSwingToolkitApiJarPath = CommonUtil.getBootClassPathForClass(WebswingApi.class.getName());
 			String webSwingToolkitJarPath = CommonUtil.getBootClassPathForClass(WEB_TOOLKIT_CLASS_NAME);

@@ -3,9 +3,9 @@ package org.webswing.toolkit.ge;
 import sun.awt.FontConfiguration;
 
 @SuppressWarnings("restriction")
-public class WebGraphicsEnvironment9 extends WebGraphicsEnvironment {
+public class WebGraphicsEnvironment11 extends WebGraphicsEnvironment {
     
-    public WebGraphicsEnvironment9() {
+    public WebGraphicsEnvironment11() {
         if (hasFontConfiguration()) {
             System.setProperty("sun.font.fontmanager", org.webswing.toolkit.ge.WebFontManager.class.getName());
         }

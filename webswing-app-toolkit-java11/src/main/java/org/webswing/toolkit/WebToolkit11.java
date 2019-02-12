@@ -7,8 +7,6 @@ import java.awt.peer.*;
 import java.lang.reflect.Method;
 
 import org.webswing.applet.WebAppletContext;
-import org.webswing.dispatch.*;
-import org.webswing.toolkit.extra.*;
 import org.webswing.toolkit.ge.*;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
@@ -17,32 +15,32 @@ import sun.awt.datatransfer.*;
 import sun.awt.image.*;
 import sun.java2d.*;
 
-public class WebToolkit9 extends WebToolkit {
+public class WebToolkit11 extends WebToolkit {
 	private KeyboardFocusManagerPeer kfmp;
 
 	@Override
 	WebFramePeer createWebFramePeer(Frame frame) throws HeadlessException {
-		return new WebFramePeer9(frame);
+		return new WebFramePeer11(frame);
 	}
 
 	@Override
 	WebDialogPeer createWebDialogPeer(Dialog paramDialog) {
-		return new WebDialogPeer9(paramDialog);
+		return new WebDialogPeer11(paramDialog);
 	}
 
 	@Override
 	WebWindowPeer createWebWindowPeer(Window paramWindow) {
-		return new WebWindowPeer9(paramWindow);
+		return new WebWindowPeer11(paramWindow);
 	}
 
 	@Override
 	WebPanelPeer createWebPanelPeer(Panel panel) {
-		return new WebPanelPeer9(panel);
+		return new WebPanelPeer11(panel);
 	}
 
 	@Override
 	WebFileDialogPeer createWebFileDialogPeer(FileDialog paramFileDialog) {
-		return new WebFileDialogPeer9(paramFileDialog);
+		return new WebFileDialogPeer11(paramFileDialog);
 	}
 
 	@Override

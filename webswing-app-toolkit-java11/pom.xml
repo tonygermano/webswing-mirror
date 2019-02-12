@@ -16,10 +16,10 @@
         </dependency>
     </dependencies>
 
-    <artifactId>webswing-app-toolkit-java9</artifactId>
+    <artifactId>webswing-app-toolkit-java11</artifactId>
 
     <build>
-        <finalName>webswing-app-toolkit-java9</finalName>
+        <finalName>webswing-app-toolkit-java11</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -33,7 +33,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>1.9.0</version>
+                                    <version>11</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>

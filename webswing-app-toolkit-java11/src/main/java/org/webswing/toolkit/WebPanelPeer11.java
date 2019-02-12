@@ -3,14 +3,14 @@ package org.webswing.toolkit;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 
-public class WebFileDialogPeer9 extends WebFileDialogPeer {
+public class WebPanelPeer11 extends WebPanelPeer {
 
-    public WebFileDialogPeer9(FileDialog paramFileDialog) {
-        super(paramFileDialog);
+    public WebPanelPeer11(Panel panel) {
+        super(panel);
     }
 
     @Override
     public boolean requestFocus(Component lightweightChild, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEvent.Cause cause) {
-        return WebToolkit9.requestFocus(target,lightweightChild,temporary,focusedWindowChangeAllowed,time,cause);
+        return WebToolkit11.requestFocus(target,lightweightChild,temporary,focusedWindowChangeAllowed,time,cause);
     }
 }
