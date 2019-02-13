@@ -5,10 +5,10 @@ import com.sun.javafx.font.PGFont;
 
 import java.io.InputStream;
 
-public class WebFontFactory implements FontFactory {
+public abstract class AbstractWebFontFactory implements FontFactory {
 	private final FontFactory fontFactory;
 
-	public WebFontFactory(FontFactory fontFactory) {
+	public AbstractWebFontFactory(FontFactory fontFactory) {
 		this.fontFactory = fontFactory;
 	}
 
@@ -48,17 +48,11 @@ public class WebFontFactory implements FontFactory {
 	}
 
 	@Override
-	public PGFont loadEmbeddedFont(String name, InputStream stream, float size, boolean register) {
-		return fontFactory.loadEmbeddedFont(name, stream, size, register);
-	}
-
-	@Override
-	public PGFont loadEmbeddedFont(String name, String path, float size, boolean register) {
-		return fontFactory.loadEmbeddedFont(name, path, size, register);
-	}
-
-	@Override
 	public boolean isPlatformFont(String name) {
 		return fontFactory.isPlatformFont(name);
+	}
+
+	FontFactory getFontFactory() {
+		return fontFactory;
 	}
 }

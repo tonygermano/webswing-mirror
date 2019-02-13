@@ -43,6 +43,8 @@
         <module>webswing-admin</module>
         <module>webswing-app-toolkit</module>
         <module>webswing-app-toolkit-fx</module>
+        <module>webswing-app-toolkit-fx-java8</module>
+        <module>webswing-app-toolkit-fx-java11</module>
         <module>webswing-app-toolkit-java8</module>
         <module>webswing-app-toolkit-java11</module>
         <module>webswing-app-launcher</module>

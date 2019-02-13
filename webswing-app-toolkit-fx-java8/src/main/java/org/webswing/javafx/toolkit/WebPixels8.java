@@ -5,16 +5,16 @@ import com.sun.glass.ui.Pixels;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-public class WebPixels extends Pixels {
-	public WebPixels(int width, int height, ByteBuffer data) {
+public class WebPixels8 extends Pixels {
+	public WebPixels8(int width, int height, ByteBuffer data) {
 		super(width, height, data);
 	}
 
-	public WebPixels(int width, int height, IntBuffer data) {
+	public WebPixels8(int width, int height, IntBuffer data) {
 		super(width, height, data);
 	}
 
-	public WebPixels(int width, int height, IntBuffer data, float scale) {
+	public WebPixels8(int width, int height, IntBuffer data, float scale) {
 		super(width, height, data, scale);
 	}
 

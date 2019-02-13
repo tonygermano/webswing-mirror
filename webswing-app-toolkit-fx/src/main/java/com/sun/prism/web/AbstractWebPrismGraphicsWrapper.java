@@ -14,12 +14,12 @@ import com.sun.prism.*;
 import com.sun.prism.paint.Color;
 import com.sun.prism.paint.Paint;
 
-public class WebPrismGraphicsWrapper implements ReadbackGraphics {
+public abstract class AbstractWebPrismGraphicsWrapper implements ReadbackGraphics {
 
-	private final Graphics original;
+	final Graphics original;
 	private final WebTextureWrapper texture;
 
-	public WebPrismGraphicsWrapper(Graphics original, WebTextureWrapper texture) {
+	public AbstractWebPrismGraphicsWrapper(Graphics original, WebTextureWrapper texture) {
 		this.original = original;
 		this.texture = texture;
 	}
@@ -429,16 +429,6 @@ public class WebPrismGraphicsWrapper implements ReadbackGraphics {
 	@Override
 	public void setup3DRendering() {
 		original.setup3DRendering();
-	}
-
-	@Override
-	public void setPixelScaleFactor(float pixelScale) {
-		original.setPixelScaleFactor(pixelScale);
-	}
-
-	@Override
-	public float getPixelScaleFactor() {
-		return original.getPixelScaleFactor();
 	}
 
 	@Override

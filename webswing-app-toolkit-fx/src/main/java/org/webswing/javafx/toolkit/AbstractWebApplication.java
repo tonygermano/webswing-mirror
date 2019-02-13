@@ -2,7 +2,6 @@ package org.webswing.javafx.toolkit;
 
 import com.sun.glass.ui.*;
 import com.sun.glass.ui.Cursor;
-import com.sun.glass.ui.Robot;
 import com.sun.glass.ui.Timer;
 import com.sun.glass.ui.Window;
 import org.webswing.Constants;
@@ -25,7 +24,7 @@ import java.util.List;
 /**
  * Created by vikto on 28-Feb-17.
  */
-public class WebApplication extends Application {
+public abstract class AbstractWebApplication extends Application {
 
 	public static final long doubleClickMaxDelay = Long.getLong(Constants.SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY, 750);
 
@@ -134,27 +133,17 @@ public class WebApplication extends Application {
 
 	@Override
 	public Pixels createPixels(int width, int height, ByteBuffer data) {
-		return new WebPixels(width, height, data);
+		return WebsinwgFxToolkitFactory.getFactory().createPixels(width,height,data);
 	}
 
 	@Override
 	public Pixels createPixels(int width, int height, IntBuffer data) {
-		return new WebPixels(width, height, data);
-	}
-
-	@Override
-	public Pixels createPixels(int width, int height, IntBuffer data, float scale) {
-		return new WebPixels(width, height, data, scale);
+		return WebsinwgFxToolkitFactory.getFactory().createPixels(width,height,data);
 	}
 
 	@Override
 	protected int staticPixels_getNativeFormat() {
 		return Pixels.Format.BYTE_BGRA_PRE;
-	}
-
-	@Override
-	public Robot createRobot() {
-		return null;
 	}
 
 	@Override

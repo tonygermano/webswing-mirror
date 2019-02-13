@@ -13,6 +13,11 @@
             <artifactId>webswing-app-toolkit</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>11.0.2</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -21,12 +26,66 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
-                    <compilerArguments>
-                        <bootclasspath>${basedir}/../lib/rt1.8.0_25.jar${path.separator}${basedir}/../lib/jfxrt.jar</bootclasspath>
-                    </compilerArguments>
                 </configuration>
+
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>javafx-8</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <compilerArguments>
+                                <bootclasspath>${basedir}/../lib/rt1.8.0_25.jar${path.separator}${basedir}/../lib/jfxrt.jar</bootclasspath>
+                            </compilerArguments>
+                            <outputDirectory>${project.build.outputDirectory}_java8</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>javafx-11</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}_java11</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>java8</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classesDirectory>${project.build.outputDirectory}_java8</classesDirectory>
+                            <classifier>java8</classifier>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>java11</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classesDirectory>${project.build.outputDirectory}_java11</classesDirectory>
+                            <classifier>java11</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
+
     </build>
 
     <profiles>

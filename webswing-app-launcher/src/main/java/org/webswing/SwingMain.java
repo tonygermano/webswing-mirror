@@ -1,6 +1,5 @@
 package org.webswing;
 
-import com.sun.javafx.application.PlatformImpl;
 import org.webswing.applet.AppletContainer;
 import org.webswing.toolkit.util.ClasspathUtil;
 import org.webswing.toolkit.util.Logger;
@@ -22,7 +21,6 @@ import java.util.Map;
 public class SwingMain {
 
 	public static ClassLoader swingLibClassLoader;
-	public static ClassLoader securityClassLoader;
 
 	public static void main(String[] args) {
 		try {
@@ -86,12 +84,19 @@ public class SwingMain {
 				}
 			});
 			//start JavaFx platform
-			PlatformImpl.startup(new Runnable() {
-				@Override
-				public void run() {
-					//nothing to do here
-				}
-			});
+			try {
+				Class<?> clazz = swingLibClassLoader.loadClass("com.sun.javafx.application.PlatformImpl");
+				Class<?> startupAttrType[] = { Runnable.class };
+				java.lang.reflect.Method startup = clazz.getMethod("startup", startupAttrType);
+				startup.invoke(null,new Runnable() {
+					@Override
+					public void run() {
+						//nothing to do here
+					}
+				});
+			} catch (IllegalAccessException |ClassNotFoundException|NoSuchMethodException  e) {
+				Logger.error("Failed to initialize Javafx Platform",e);
+			}
 		}
 	}
 

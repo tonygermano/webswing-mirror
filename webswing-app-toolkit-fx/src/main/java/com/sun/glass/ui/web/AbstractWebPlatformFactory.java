@@ -7,11 +7,7 @@ import com.sun.glass.ui.delegate.MenuDelegate;
 import com.sun.glass.ui.delegate.MenuItemDelegate;
 import org.webswing.javafx.toolkit.*;
 
-public class WebPlatformFactory extends PlatformFactory {
-	@Override
-	public Application createApplication() {
-		return new WebApplication();
-	}
+public abstract class AbstractWebPlatformFactory extends PlatformFactory {
 
 	@Override
 	public MenuBarDelegate createMenuBarDelegate(MenuBar menubar) {
