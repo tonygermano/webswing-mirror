@@ -1,5 +1,6 @@
 package org.webswing.javafx.toolkit;
 
+import com.sun.glass.ui.Application;
 import com.sun.glass.ui.Pixels;
 import com.sun.javafx.font.FontFactory;
 import com.sun.prism.Graphics;
@@ -24,6 +25,11 @@ public class WebsinwgFxToolkitFactory8 extends WebsinwgFxToolkitFactory{
 	@Override
 	public Pixels createPixels(int width, int height, IntBuffer data) {
 		return new WebPixels8(width,height,data);
+	}
+
+	@Override
+	public Application createApplication() {
+		return new WebApplication8();
 	}
 
 	@Override

@@ -40,6 +40,7 @@ public interface Constants {
 
 
 	//javafx startup
+	public static final String SWING_FX_TOOLKIT_FACTORY = "webswing.fxToolkitFactory";
 	public static final String SWING_START_SYS_PROP_JFX_TOOLKIT = "glass.platform";
 	public static final String SWING_START_SYS_PROP_JFX_TOOLKIT_WEB = "Web";
 	public static final String SWING_START_SYS_PROP_JFX_PRISM = "prism.order";
@@ -118,4 +119,5 @@ public interface Constants {
 	public static final String EXTENSION_PROVIDER = "webswing.extensionProvider" ;
 	public static final String CONFIG_PROVIDER = "webswing.configProvider";
 
+	;
 }

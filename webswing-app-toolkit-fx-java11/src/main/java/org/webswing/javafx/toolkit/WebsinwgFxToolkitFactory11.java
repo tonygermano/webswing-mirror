@@ -1,5 +1,6 @@
 package org.webswing.javafx.toolkit;
 
+import com.sun.glass.ui.Application;
 import com.sun.glass.ui.Pixels;
 import com.sun.javafx.font.FontFactory;
 import com.sun.prism.Graphics;
@@ -29,5 +30,10 @@ public class WebsinwgFxToolkitFactory11 extends WebsinwgFxToolkitFactory {
 	@Override
 	public FontFactory createWebFontFactory(FontFactory fontFactory) {
 		return new WebFontFactory11(fontFactory);
+	}
+
+	@Override
+	public Application createApplication() {
+		return new WebApplication11();
 	}
 }

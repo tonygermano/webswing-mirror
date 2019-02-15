@@ -73,7 +73,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	private static final String SHELL_FOLDER_MANAGER = "sun.awt.shell.PublicShellFolderManager";
 	private static final String JAVA9_PATCHED_JSOBJECT_MODULE_MARKER = "netscape.javascript.WebswingPatchedJSObjectJarMarker";
 	private static final String JAVA_FX_PATH = System.getProperty("java.home") + "/lib/ext/jfxrt.jar";
-	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.ToolkitJarMarker";
+	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.toolkit.WebsinwgFxToolkitFactory";
 
 	private static final Logger log = LoggerFactory.getLogger(SwingInstance.class);
 	private final String instanceId;
@@ -475,18 +475,29 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			String javaVersion = subs.replace(appConfig.getJavaVersion());
 			boolean useJFX = config.isJavaFx();
 			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;
+			String webFxToolkitFactory = JAVA_FX_TOOLKIT_CLASS_NAME;
+			String javaFxBootClasspath ="";
+			String javaFxAppClasspath = "";
 			String webGraphicsEnvClass = WEB_GRAPHICS_ENV_CLASS_NAME;
 			String j9modules = "";
 			if (javaVersion.startsWith("1.8")) {
 				webToolkitClass += "8";
+				webFxToolkitFactory +="8";
 				webGraphicsEnvClass += "8";
-				if (useJFX && !new File(JAVA_FX_PATH).exists() ) {
-					log.warn("JavaFx library not found in '" + new File(JAVA_FX_PATH).getCanonicalPath() + "'. ");
-					useJFX = false;
+				if (useJFX) {
+					if(!new File(JAVA_FX_PATH).exists()){
+						log.warn("JavaFx library not found in '" + new File(JAVA_FX_PATH).getCanonicalPath() + "'. ");
+						useJFX = false;
+					}
+					javaFxBootClasspath += File.pathSeparator + CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME) + File.pathSeparator + CommonUtil.getBootClassPathForClass(webFxToolkitFactory) + File.pathSeparator + "\"" + new File(JAVA_FX_PATH).getCanonicalPath() + "\"";
 				}
 			} else if (javaVersion.startsWith("11")) {
 				webToolkitClass += "11";
+				webFxToolkitFactory +="11";
 				webGraphicsEnvClass += "11";
+				if (useJFX) {
+					javaFxAppClasspath += CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME) +";" + CommonUtil.getBootClassPathForClass(webFxToolkitFactory)+";";
+				}
 				j9modules = " --patch-module jdk.jsobject=" + CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_JSOBJECT_MODULE_MARKER);
 				j9modules += " --patch-module java.desktop=" + CommonUtil.getBootClassPathForClass(SHELL_FOLDER_MANAGER);
 				j9modules += " --add-reads jdk.jsobject=ALL-UNNAMED ";
@@ -505,7 +516,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			String bootCp = "-Xbootclasspath/a:" + webSwingToolkitApiJarPath + File.pathSeparatorChar + webSwingToolkitJarPathSpecific + File.pathSeparatorChar + webSwingToolkitJarPath + shellFolderMgrJarPath;
 
 			if (useJFX) {
-				bootCp += File.pathSeparator + CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME) + File.pathSeparator + "\"" + new File(JAVA_FX_PATH).getCanonicalPath() + "\"";
+				bootCp += javaFxBootClasspath;
 			}
 
 			int debugPort = websocket.getUserInfo().getDebugPort();
@@ -516,7 +527,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_ID, manager.getPathMapping());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.instanceId);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_HOME, getAbsolutePath(".", false));
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, javaFxAppClasspath + subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
 			swingConfig.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 			swingConfig.addProperty(Constants.JMS_URL, System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT));
 
@@ -548,6 +559,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			swingConfig.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight));
 
 			if (useJFX) {
+				swingConfig.addProperty(Constants.SWING_FX_TOOLKIT_FACTORY, webFxToolkitFactory);
 				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_TOOLKIT, Constants.SWING_START_SYS_PROP_JFX_TOOLKIT_WEB);
 				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_PRISM, "web");//PrismSettings
 				swingConfig.addProperty("prism.text", "t2k");//PrismFontFactory
