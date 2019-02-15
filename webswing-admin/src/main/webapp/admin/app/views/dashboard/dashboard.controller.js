@@ -13,12 +13,13 @@
 			vm.permissions = permissions;
 			vm.showSingle = showSingle;
 			vm.isActive = isActive;
+			vm.filter = '';
 			refresh();
 
 			function refresh() {
 				vm.paths = [];
 				configRestService.getPaths().then(function(data) {
-					vm.paths = data;
+					vm.paths = data.sort();
 					vm.lastUpdated = new Date();
 				})
 			}
