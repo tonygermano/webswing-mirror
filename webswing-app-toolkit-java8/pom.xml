@@ -27,6 +27,12 @@
 					</compilerArguments>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<bootclasspath>${basedir}/../lib/rt1.8.0_25.jar${path.separator}${basedir}/../lib/jfxrt.jar</bootclasspath>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>
