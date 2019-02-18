@@ -393,7 +393,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			process.setProcessExitListener(null);
 		}
 		try {
-			if (sessionRecorder.isRecording()) {
+			if (sessionRecorder!=null && sessionRecorder.isRecording()) {
 				sessionRecorder.stopRecording();
 			}
 		} catch (WsException e) {
