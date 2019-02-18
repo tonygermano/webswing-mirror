@@ -7,7 +7,7 @@ steps:
 - name: 'maven:3-jdk-11'
   entrypoint: '/bin/sh'
   args: ['-c','gpg --batch --import ${_SIGNING_KEY_FILE} && apt-get update && apt-get install -y openjfx && cp mvnsettings.xml / && rm -rf $(ls -A /workspace) && git clone -b ${BRANCH_NAME} https://bitbucket.org/meszarv/webswing.git /workspace && mvn -s /mvnsettings.xml -B -Pbuild,release,publish deploy']
-  env: ['GPG_TTY=$(tty)','_GPG_KEY_NAME=${_GPG_KEY_NAME}','_GPG_PASSPHRASE=${_GPG_PASSPHRASE}','_OSSRH_JIRA_USERNAME=${_OSSRH_JIRA_USERNAME}','_OSSRH_JIRA_PASSWORD=${_OSSRH_JIRA_PASSWORD}']
+  env: ['_GPG_KEY_NAME=${_GPG_KEY_NAME}','_GPG_PASSPHRASE=${_GPG_PASSPHRASE}','_OSSRH_JIRA_USERNAME=${_OSSRH_JIRA_USERNAME}','_OSSRH_JIRA_PASSWORD=${_OSSRH_JIRA_PASSWORD}']
 #Save the build result to cloud
 - name: 'gcr.io/cloud-builders/gsutil'
   entrypoint: '/bin/sh'
