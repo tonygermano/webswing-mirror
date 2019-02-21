@@ -496,7 +496,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				webFxToolkitFactory +="11";
 				webGraphicsEnvClass += "11";
 				if (useJFX) {
-					javaFxAppClasspath += CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME) +";" + CommonUtil.getBootClassPathForClass(webFxToolkitFactory)+";";
+					javaFxAppClasspath += CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME,false) +";" + CommonUtil.getBootClassPathForClass(webFxToolkitFactory,false)+";";
 				}
 				j9modules = " --patch-module jdk.jsobject=" + CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_JSOBJECT_MODULE_MARKER);
 				j9modules += " --patch-module java.desktop=" + CommonUtil.getBootClassPathForClass(SHELL_FOLDER_MANAGER);
