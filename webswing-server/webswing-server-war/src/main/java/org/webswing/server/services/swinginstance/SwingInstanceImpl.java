@@ -109,6 +109,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		AbstractWebswingUser user = websocket.getUser();
 		WebSocketUserInfo info = websocket.getUserInfo();
 		subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), this.getInstanceId(), info.getUserIp(), h.getLocale(), info.getCustomArgs());
+		this.sessionRecorder = recorderService.create(this, manager);
 
 		try {
 			this.jvmConnection = connectionService.connect(this.instanceId, this);
@@ -118,7 +119,6 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			notifyExiting();
 			throw new WsException("Failed to create App instance.", e);
 		}
-		this.sessionRecorder = recorderService.create(this, manager);
 		if (ServerUtil.isRecording(websocket.getRequest())) {
 			sessionRecorder.startRecording();
 		}
@@ -204,7 +204,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 
 	public void sendToWeb(MsgOut o) {
 		EncodedMessage serialized = new EncodedMessage(o);
-		if (sessionRecorder.isRecording()) {
+		if (sessionRecorder!=null && sessionRecorder.isRecording()) {
 			sessionRecorder.saveFrame(serialized.getProtoMessage());
 		}
 		if (webConnection != null) {
