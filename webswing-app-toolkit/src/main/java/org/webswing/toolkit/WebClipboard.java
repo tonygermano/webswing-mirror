@@ -22,11 +22,13 @@ import java.util.List;
 
 public class WebClipboard extends Clipboard {
 	private static DataFlavor htmlDf;
+	private static DataFlavor plaintxtDf;
 
 	static {
 
 		try {
 			htmlDf = new DataFlavor("text/html;class=java.lang.String");
+			plaintxtDf = new DataFlavor("text/plain;class=java.lang.String");
 		} catch (ClassNotFoundException e) {
 			Logger.error("initialization error:", e);
 		}
@@ -81,6 +83,12 @@ public class WebClipboard extends Clipboard {
 					data.setText((String) contents.getTransferData(DataFlavor.stringFlavor));
 				} catch (Exception e) {
 					Logger.error("WebClipboard:setContent:Plain", e);
+				}
+			} else if(contents.isDataFlavorSupported(plaintxtDf)) {
+				try {
+					data.setText((String) contents.getTransferData(plaintxtDf));
+				} catch (Exception e) {
+					Logger.error("WebClipboard:setContent:text/plain", e);
 				}
 			}
 			if (contents.isDataFlavorSupported(DataFlavor.imageFlavor)) {
