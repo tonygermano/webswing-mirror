@@ -4,13 +4,13 @@
 // Colors
 $white: #ffffff;
 $black: #000000;
-$primary: #ff5c00; // Brand color
-$primary-darker: #ed500d;
-$primary-lighter: #ff6d01;
+$primary: #0099CF; // Brand color
+$primary-darker: #0078A5;
+$primary-lighter: lighten($primary,10%);
 $secondary: #2e2f33; // Secondary brand color
 $secondary-darker: #292a2e;
 $secondary-lighter: #333438;
-$primary-text: #212121; // For regular text
+$primary-text: #0C1726; // For regular text
 $secondary-text: #757575; // For faded text
 
 $light-grey-0: #fafafa; // Lightest background
