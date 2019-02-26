@@ -386,7 +386,7 @@ public class ClipboardDemo extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			int row = table.getSelectedRow();
 			Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
-			Object[] data = getRowData(table, row);
+			final Object[] data = getRowData(table, row);
 			cb.setContents(new Transferable() {
 				@Override
 				public DataFlavor[] getTransferDataFlavors() {
