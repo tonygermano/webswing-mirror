@@ -56,6 +56,10 @@ body {
 	background-color: #428bca;
 }
 
+.nav-sidebar-search{
+	margin-bottom:10px;
+}
+
 .message-area {
 	position: fixed;
 	bottom: 0;

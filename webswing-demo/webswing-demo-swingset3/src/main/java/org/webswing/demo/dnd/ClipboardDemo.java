@@ -125,6 +125,7 @@ public class ClipboardDemo extends JPanel {
 		pm.add(new PasteFromBrowserAction(clipboardTable));
 		pm.add(new PasteFromBrowserDialogAction(clipboardTable));
 		pm.add(new CopyToBrowserAction(clipboardTable));
+		pm.add(new CopyAsPlainText(clipboardTable));
 		clipboardTable.addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -367,6 +368,41 @@ public class ClipboardDemo extends JPanel {
 			int row = table.getSelectedRow();
 			Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
 			cb.setContents(new RowTransferable(getRowData(table, row)), null);
+		}
+
+	}
+
+	class CopyAsPlainText extends AbstractAction {
+		private final DataFlavor TEXT = new DataFlavor("text/plain;class=java.lang.String", "Plain Text");
+
+		private JTable table;
+
+		public CopyAsPlainText(JTable table) {
+			this.table = table;
+			putValue(NAME, "Copy as plain/text");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			int row = table.getSelectedRow();
+			Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+			final Object[] data = getRowData(table, row);
+			cb.setContents(new Transferable() {
+				@Override
+				public DataFlavor[] getTransferDataFlavors() {
+					return new DataFlavor[]{TEXT};
+				}
+
+				@Override
+				public boolean isDataFlavorSupported(DataFlavor flavor) {
+					return flavor.equals(TEXT);
+				}
+
+				@Override
+				public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+					return data[1];
+				}
+			}, null);
 		}
 
 	}
