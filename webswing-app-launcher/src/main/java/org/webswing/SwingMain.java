@@ -76,6 +76,16 @@ public class SwingMain {
 
 	public static void initializeJavaFX() throws InvocationTargetException, InterruptedException {
 		if (Constants.SWING_START_SYS_PROP_JFX_TOOLKIT_WEB.equals(System.getProperty(Constants.SWING_START_SYS_PROP_JFX_TOOLKIT))) {
+
+			// Fix jvm crash starting javafx app on windows - See: https://bugs.openjdk.java.net/browse/JDK-8201539
+			if (System.getProperty("os.name", "").startsWith("Windows")) {
+				try {
+					System.load("C:\\Windows\\System32\\WindowsCodecs.dll");
+				} catch (UnsatisfiedLinkError e) {
+					System.err.println("Native code library failed to load.\n" + e);
+				}
+			}
+
 			//start swing dispatch thread
 			SwingUtilities.invokeAndWait(new Runnable() {
 				@Override

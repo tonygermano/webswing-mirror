@@ -28,6 +28,12 @@
 			<groupId>org.webswing</groupId>
 			<artifactId>webswing-app-toolkit-fx-java11</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.webswing</groupId>
