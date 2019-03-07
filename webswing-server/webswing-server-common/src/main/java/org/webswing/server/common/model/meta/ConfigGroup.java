@@ -7,6 +7,7 @@ public enum ConfigGroup {
 	Server("Server"), 
 	Swing("Swing"), 
 	Session("Session"), 
+	Logging("Logging"), 
 	Features("Features");
 
 	String label;

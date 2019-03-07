@@ -4,6 +4,7 @@ public class LogRequest {
 	boolean backwards;
 	long offset;
 	long max;
+	String logName;
 
 	public boolean isBackwards() {
 		return backwards;
@@ -22,6 +23,12 @@ public class LogRequest {
 	}
 	public void setMax(long max) {
 		this.max = max;
+	}
+	public String getLogName() {
+		return logName;
+	}
+	public void setLogName(String logName) {
+		this.logName = logName;
 	}
 	
 	

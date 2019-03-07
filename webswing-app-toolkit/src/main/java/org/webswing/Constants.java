@@ -65,6 +65,7 @@ public interface Constants {
 	public static final String ROOT_DIR_PATH = "webswing.rootDir";
 	public static final String TEMP_DIR_PATH_BASE = "webswing.tempDirBase";
 	public static final String TEMP_DIR_PATH = "webswing.tempDirPath";
+	public static final String LOGS_DIR_PATH = "webswing.logsDir";
 	public static final String CREATE_NEW_TEMP = "webswing.createNewTemp";
 	public static final String CLEAN_TEMP = "webswing.cleanTempDir";
 	public static final String CONFIG_FILE_PATH = "webswing.configFile";
@@ -118,6 +119,8 @@ public interface Constants {
 	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
 	public static final String EXTENSION_PROVIDER = "webswing.extensionProvider" ;
 	public static final String CONFIG_PROVIDER = "webswing.configProvider";
+	
+	public static final String SESSION_LOG_PATTERN = "%d %-5p [%t] (%F:%L) %m%n";
 
 	;
 }

@@ -3,15 +3,37 @@
 		function logRestService(baseUrl, $http, errorHandler, messageService) {
 			return {
 				getLog : getLog,
+				getSessionLog : getSessionLog,
+				getSessionLogNames : getSessionLogNames
 			};
 
 			function getLog(type, query) {
-				return $http.post(baseUrl + '/rest/logs/' + type, query).then(success, failed);
+				return $http.post(toPath(path) + '/rest/logs/' + type, query).then(success, failed);
 				function success(data) {
 					return data.data;
 				}
 				function failed(data) {
 					return errorHandler.handleRestError('load ' + type + ' log', data, true);
+				}
+			}
+			
+			function getSessionLog(path, query) {
+				return $http.post(toPath(path) + '/rest/logs/session', query).then(success, failed);
+				function success(data) {
+					return data.data;
+				}
+				function failed(data) {
+					return errorHandler.handleRestError('load session log', data, true);
+				}
+			}
+			
+			function getSessionLogNames(path, app) {
+				return $http.get(toPath(path) + '/rest/logs/session/names?app=' + app).then(success, failed);
+				function success(data) {
+					return data.data;
+				}
+				function failed(data) {
+					return errorHandler.handleRestError('load session log names - ' + app, data, true);
 				}
 			}
 

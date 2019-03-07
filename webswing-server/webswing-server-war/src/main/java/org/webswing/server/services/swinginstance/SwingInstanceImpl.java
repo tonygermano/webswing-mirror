@@ -3,6 +3,9 @@ package org.webswing.server.services.swinginstance;
 import main.Main;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Appender;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.RollingFileAppender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -49,6 +52,7 @@ import org.webswing.server.services.swingprocess.SwingProcessService;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketUserInfo;
 import org.webswing.server.util.FontUtils;
+import org.webswing.server.util.LogReaderUtil;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingMessagingApi;
@@ -466,6 +470,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
 			swingConfig.setName(this.getInstanceId());
+			swingConfig.setApplicationName(getAppConfig().getName());
 			String java = getAbsolutePath(subs.replace(appConfig.getJreExecutable()), false);
 			swingConfig.setJreExecutable(java);
 			String homeDir = getAbsolutePath(subs.replace(appConfig.getUserDir()), true);
@@ -566,7 +571,11 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				swingConfig.addProperty("prism.lcdtext", "false");//PrismFontFactory
 				swingConfig.addProperty("javafx.live.resize", "false");//QuantumToolkit
 			}
-
+			
+			if (config.isSessionLogging()) {
+		        swingConfig.setLogAppender(createSessionLogAppender());
+			}
+			
 			switch (appConfig.getLauncherType()) {
 			case Applet:
 				AppletLauncherConfig applet = appConfig.getValueAs(LAUNCHER_CONFIG, AppletLauncherConfig.class);
@@ -637,6 +646,23 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			}
 		}
 		return f.getCanonicalPath();
+	}
+	
+	private Appender createSessionLogAppender() {
+		String logDir = subs.replace(config.getLoggingDirectory());
+		if (StringUtils.isBlank(logDir)) {
+			logDir = System.getProperty(Constants.LOGS_DIR_PATH, "");
+		}
+		
+        RollingFileAppender appender = new RollingFileAppender();
+        appender.setAppend(true);
+        appender.setFile(logDir + "webswing-" + this.getInstanceId() + "-" + LogReaderUtil.normalizeApplicationUrlForFileName(manager.getApplicationInfoMsg().getUrl()) + ".session.log");
+        appender.setMaxFileSize(config.getLogMaxFileSize());
+        appender.setMaxBackupIndex(config.getLogMaxBackupIndex());
+        appender.setLayout(new PatternLayout(Constants.SESSION_LOG_PATTERN));
+        appender.activateOptions();
+        
+        return appender;
 	}
 
 	@Override

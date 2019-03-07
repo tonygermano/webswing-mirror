@@ -7,6 +7,7 @@
             vm.closedSessions = [];
             vm.recordings = [];
             vm.view = view;
+            vm.viewLogs = viewLogs;
             vm.record = record;
             vm.lastUpdated = null;
             vm.refresh = refresh;
@@ -152,6 +153,11 @@
             function view(session) {
                 $location.search('id', session.id);
                 $location.path('/dashboard/session/' + vm.path);
+            }
+            
+            function viewLogs(session) {
+            	$location.search('app', "/" + vm.path);
+            	$location.path('/logs/session/');
             }
 
             function record(session) {

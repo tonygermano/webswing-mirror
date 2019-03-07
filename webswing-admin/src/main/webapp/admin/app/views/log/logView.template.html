@@ -12,7 +12,18 @@
 			    </div>
 		    </div>
 			<ul class="nav nav-sidebar">
-				<li ng-repeat="type in vm.types" ng-class="{active:  vm.isActive(type)}"><a ng-click="vm.showLog(type)">{{type.label}} <span ng-click="vm.download(type)" class="glyphicon glyphicon-download-alt pull-right" title="Download zip" ></span></a> </li>
+				<li ng-repeat="type in vm.types" ng-class="{active:  vm.isActive(type)}">
+					<a ng-click="vm.showLog(type)">
+						{{type.label}}
+						<select ng-if="vm.isSessionType(type) && vm.isActive(type)" ng-model="vm.app" class="pull-right">
+							<option ng-repeat="app in vm.apps" ng-selected="vm.isActiveApp(app)" value="{{app.url}}">{{app.name}}</option>
+						</select>
+						<span ng-if="type.downloadEnabled" ng-click="vm.download(type, event)" class="glyphicon glyphicon-download-alt pull-right" title="Download zip" ></span>
+					</a>
+				</li>
+				<li class="secondary" ng-repeat="logName in vm.appLogNames" ng-if="vm.type && vm.isSessionType(vm.type)" ng-class="{active:  vm.isActiveAppLogName(logName)}">
+					<a ng-click="vm.showAppLog(vm.type, vm.app, logName)" style="padding-left: 40px;">{{logName}}</a>
+				</li>
 			</ul>
 		</div>
 		<div ng-class="{'col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2':vm.types.length > 1, 'main':true}">

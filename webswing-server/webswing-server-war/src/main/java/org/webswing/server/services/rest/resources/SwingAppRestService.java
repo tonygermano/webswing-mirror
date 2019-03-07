@@ -1,15 +1,21 @@
 package org.webswing.server.services.rest.resources;
 
+import org.apache.commons.lang.StringUtils;
+import org.webswing.Constants;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.common.model.admin.ApplicationInfo;
 import org.webswing.server.common.model.admin.Sessions;
 import org.webswing.server.common.model.admin.SwingSession;
+import org.webswing.server.common.model.rest.LogRequest;
+import org.webswing.server.common.model.rest.LogResponse;
+import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
+import org.webswing.server.util.LogReaderUtil;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -197,7 +203,31 @@ public class SwingAppRestService extends BaseRestService {
 			throw new WsException("Instance with id " + id + " not found.");
 		}
 	}
+	
+	@POST
+	@Path("/rest/logs/session")
+	public LogResponse getLogs(LogRequest request) throws WsException {
+		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
+		return LogReaderUtil.readSessionLog(getSessionLogsDir(), request);
+	}
+	
+	@GET
+	@Path("/rest/logs/session/names")
+	public List<String> getLogNames() throws WsException {
+		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
+		return LogReaderUtil.readSessionLogNames(getSessionLogsDir(), getAppInfo().getUrl());
+	}
 
+	private String getSessionLogsDir() {
+		VariableSubstitutor subs = VariableSubstitutor.forSwingApp(manager.getConfig());
+		String logDir = subs.replace(manager.getConfig().getSwingConfig().getLoggingDirectory());
+		if (StringUtils.isBlank(logDir)) {
+			logDir = System.getProperty(Constants.LOGS_DIR_PATH, "");
+		}
+		
+		return logDir;
+	}
+	
 	@Override
 	protected PrimaryUrlHandler getHandler() {
 		return handler;

@@ -14,13 +14,14 @@ import java.util.concurrent.TimeUnit;
 
 import javax.jms.IllegalStateException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Appender;
+import org.apache.log4j.Logger;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 
 public class SwingProcessImpl implements SwingProcess {
-	private static final Logger log = LoggerFactory.getLogger(SwingProcessImpl.class);
+	private final Logger log;
 	private static final long LOG_POLLING_PERIOD = 100L;
+	
 	private static ScheduledExecutorService processHandlerThread = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing Process Handler"));
 
 	private final SwingProcessConfig config;
@@ -40,6 +41,16 @@ public class SwingProcessImpl implements SwingProcess {
 	public SwingProcessImpl(SwingProcessConfig config) {
 		super();
 		this.config = config;
+		
+		log = Logger.getLogger(SwingProcessImpl.class + "_" + config.getApplicationName()); // because of different log configurations per app, we need a separate logger instance for each app
+		
+		Appender logAppender = config.getLogAppender();
+		
+		if (config.getLogAppender() != null) {
+			logAppender.setName(getClass().getName());
+			log.addAppender(logAppender);
+	        log.setAdditivity(false);
+		}
 	}
 
 	public void execute() throws Exception {
@@ -266,7 +277,7 @@ public class SwingProcessImpl implements SwingProcess {
 		return result.toArray(new String[result.size()]);
 	}
 
-	private static void processStream(InputStream out, StringBuilder bufferOut, byte[] buffer, String name, boolean isError) throws IOException {
+	private void processStream(InputStream out, StringBuilder bufferOut, byte[] buffer, String name, boolean isError) throws IOException {
 		long start = System.currentTimeMillis();
 		boolean timeout = false;
 		while (out.available() > 0 && !timeout) {
