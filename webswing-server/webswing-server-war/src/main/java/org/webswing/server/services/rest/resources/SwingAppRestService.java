@@ -1,5 +1,25 @@
 package org.webswing.server.services.rest.resources;
 
+import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.common.model.admin.ApplicationInfo;
@@ -8,16 +28,11 @@ import org.webswing.server.common.model.admin.SwingSession;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.security.api.WebswingAction;
+import org.webswing.server.services.stats.StatisticsLoggerService;
+import org.webswing.server.services.stats.logger.InstanceStats;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
-
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.File;
-import java.net.URI;
-import java.util.*;
+import org.webswing.server.util.LoggerStatisticsUtil;
 
 @Path("")
 @Produces(MediaType.APPLICATION_JSON)
@@ -26,6 +41,7 @@ public class SwingAppRestService extends BaseRestService {
 	@Inject SwingInstanceManager manager;
 	@Inject PrimaryUrlHandler handler;
 	@Inject ConfigurationService configService;
+	@Inject StatisticsLoggerService loggerService;
 
 	@Override
 	protected List<ApplicationInfoMsg> getAppsImpl() {
@@ -196,6 +212,17 @@ public class SwingAppRestService extends BaseRestService {
 		} else {
 			throw new WsException("Instance with id " + id + " not found.");
 		}
+	}
+	
+	@GET
+	@Path("/rest/stats")
+	public Map<String, Map<Long, Number>> getStats() throws WsException {
+		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getStats);
+		
+		List<InstanceStats> allStats = new ArrayList<InstanceStats>(manager.getStatsReader().getAllInstanceStats());
+		allStats.addAll(loggerService.getServerLogger().getAllInstanceStats()); // merge with server stats (to include server CPU usage)
+		
+		return LoggerStatisticsUtil.mergeSummaryInstanceStats(allStats);
 	}
 
 	@Override

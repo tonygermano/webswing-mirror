@@ -7,6 +7,7 @@ import org.webswing.server.base.UrlHandler;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.rest.resources.GlobalRestService;
 import org.webswing.server.services.rest.resources.SwingAppRestService;
+import org.webswing.server.services.stats.StatisticsLoggerService;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingprocess.SwingProcessService;
 
@@ -17,11 +18,13 @@ import javax.inject.Singleton;
 public class RestServiceImpl implements RestService {
 
 	private final ConfigurationService configService;
+	private final StatisticsLoggerService loggerService;
 	private final SwingProcessService processService;
 
 	@Inject
-	public RestServiceImpl(ConfigurationService configService,SwingProcessService processService) {
+	public RestServiceImpl(ConfigurationService configService, StatisticsLoggerService loggerService, SwingProcessService processService) {
 		this.configService = configService;
+		this.loggerService = loggerService;
 		this.processService = processService;
 	}
 
@@ -52,6 +55,7 @@ public class RestServiceImpl implements RestService {
 					bind(parent).to(SwingInstanceManager.class);
 				}
 				bind(configService).to(ConfigurationService.class);
+				bind(loggerService).to(StatisticsLoggerService.class);
 				bind(processService).to(SwingProcessService.class);
 			}
 		};

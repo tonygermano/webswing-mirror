@@ -1,0 +1,185 @@
+<div class="container-fluid">
+    <div class="row">
+
+        <div ng-if="vm.apps.length > 1" class="col-sm-3 col-md-2 sidebar">
+            <h3 class="sub-header">Applications</h3>
+            <ul class="nav nav-sidebar">
+                <li ng-class="{active:  vm.appFilter == null}"><a ng-click="vm.filter('app',null)">Show All</a></li>
+                <li ng-repeat="app in vm.apps" ng-class="{active:  vm.appFilter == app.url}"><a ng-click="vm.filter('app',app.url)">{{app.url}}</a></li>
+            </ul>
+        </div>
+        <div ng-class="{'col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2':vm.apps.length > 1, 'main':true}">
+            <div class="row">
+				<div class="col-xs-12 col-sm-3">
+					<h4>Memory</h4>
+					<ws-line-graph value="vm.memoryStats"></ws-line-graph>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<h4>CPU</h4>
+					<ws-line-graph value="vm.cpuStats"></ws-line-graph>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<h4>Bandwidth</h4>
+					<ws-line-graph value="vm.bandwidthStats"></ws-line-graph>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<h4>Latency</h4>
+					<ws-line-graph value="vm.latencyStats"></ws-line-graph>
+				</div>
+			</div>
+            
+            <h2 class="sub-header">
+                Sessions
+                <div class="ws-update pull-right" ng-click="vm.refresh()">
+                    <span class="glyphicon glyphicon-refresh"> </span>
+                    {{vm.lastUpdated| date:'h:mm:ss'}}
+                </div>
+            </h2>
+            
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr class="ws-table-header">
+                            <th><a ng-click="vm.sortBy()">No. (Id)</a></th>
+                            <th><a ng-click="vm.sortBy('application')">App</a></th>
+                            <th><a ng-click="vm.sortBy('user')">User</a></th>
+                            <th>IP</th>
+                            <th><a ng-click="vm.sortBy('startedAt')">Start time</a></th>
+                            <th><a ng-click="vm.sortBy('connected')">Client status</a></th>
+                            <th>Metrics</th>
+                            <th>Bandwidth</th>
+                            <th>Latency</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="session in vm.sessions | orderBy:vm.sortExp:vm.sortReverse">
+                            <td><span
+                                title="app Id: {{session.id}}"
+                                ui-jq="tooltip">{{$index + 1}}</span></td>
+                            <td>{{session.application}}</td>
+                            <td>{{session.user}} <span
+                                class="{{vm.getOsIcon(session.userOs)}}"
+                                title="Operating system: {{session.userOs}}"></span>
+                                <span
+                                class="{{vm.getBrowserIcon(session.userBrowser)}}"
+                                title="Browser: {{session.userBrowser}}"></span>
+                            </td>
+                            <td>{{session.userIp}}</td>
+                            <td>{{session.startedAt| date:'dd MMM
+                                h:mm:ss'}}</td>
+                            <td>
+                                <div ng-switch on="session.connected">
+                                    <div ng-switch-when="true">
+                                        <span
+                                            class="label label-success">Connected</span>
+                                    </div>
+                                    <div ng-switch-when="false">
+                                        <span class="label label-danger"
+                                            ui-jq="tooltip"
+                                            title="Disconnected at {{session.disconnectedSince| date:'dd MMM h:mm:ss'}}">Disconnected</span>
+                                    </div>
+                                </div>
+                                <div ng-if="session.recorded">
+                                    <span class="label label-info "
+                                        ui-jq="tooltip"
+                                        title="Recording to {{session.recordingFile}}"><span
+                                        class="glyphicon glyphicon-record"></span>
+                                        Recording</span>
+                                </div>
+                                <div
+                                    ng-if="session.warnings!=null || session.warningHistory!=null || session.threadDumps!=null"
+                                    data-toggle="modal"
+                                    ng-click="vm.warningSession=session"
+                                    data-target="#warnModal">
+                                    <span
+                                        ng-class="{'label':true, 'label-warning':session.warnings != null, 'label-default':session.warnings == null}">
+                                        <span
+                                        class="glyphicon glyphicon-exclamation-sign"></span>
+                                        {{session.warnings.length}}
+                                        Warnings
+                                    </span>
+                                </div>
+                                <div ng-if="!session.recorded"
+                                    style="margin-top: 3px">
+                                    <button type="button"
+                                        class="btn btn-xs btn-default"
+                                        ng-click="vm.record(session)">
+                                        <span
+                                            class="glyphicon glyphicon-record"></span>
+                                        Record Session
+                                    </button>
+                                </div>
+                            </td>
+                            <td><progressbar animate="false"
+                                    max="session.metrics.memoryAllocated"
+                                    value="session.metrics.memoryUsed">
+                                <span
+                                    style="color: black; white-space: nowrap;">{{'MEM:
+                                    '+(session.metrics.memoryUsed|number:0)+'MB
+                                    '}}<small>({{session.metrics['memoryUsed.MIN']|number:0}}|{{session.metrics['memoryUsed.AVG']|number:0}}|{{session.metrics['memoryUsed.MAX']|number:0}})</small>
+                                </span></progressbar> <progressbar animate="false" max="100"
+                                    value="session.metrics.cpuUtilization"
+                                    type="success"> <span
+                                    style="color: black; white-space: nowrap;">{{'CPU:
+                                    '+(session.metrics.cpuUtilization
+                                    |number:0) +'% '}}<small>({{session.metrics['cpuUtilization.MIN']|number:0}}|{{session.metrics['cpuUtilization.AVG']|number:0}}|{{session.metrics['cpuUtilization.MAX']|number:0}})</small>
+                                </span></progressbar></td>
+                            <td><progressbar animate="false"
+                                    max="102400"
+                                    value="session.metrics.inboundSize"
+                                    type="success"> <span
+                                    style="color: black; white-space: nowrap;">{{'IN:
+                                    '+((session.metrics.inboundSize/1024)|number:0)+'k/s
+                                    '}}<small>({{session.metrics['inboundSize.MIN']/1024|number:0}}|{{session.metrics['inboundSize.AVG']/1024|number:0}}|{{session.metrics['inboundSize.MAX']/1024|number:0}})</small>
+                                </span></progressbar> <progressbar animate="false"
+                                    max="102400"
+                                    value="session.metrics.outboundSize">
+                                <span
+                                    style="color: black; white-space: nowrap;">{{'OUT:
+                                    '+((session.metrics.outboundSize/1024)|number:0)+'k/s
+                                    '}}<small>({{session.metrics['outboundSize.MIN']/1024|number:0}}|{{session.metrics['outboundSize.AVG']/1024|number:0}}|{{session.metrics['outboundSize.MAX']/1024|number:0}})</small>
+                                </span></progressbar></td>
+                            <td><progressbar animate="false"
+                                    max="700"
+                                    value="session.metrics.latency"
+                                    type="danger"> <span
+                                    style="color: black; white-space: nowrap;">{{'E2E:'+(session.metrics.latency|number:0)+'ms
+                                    '}}<small>({{session.metrics['latency.MIN']|number:0}}|{{session.metrics['latency.AVG']|number:0}}|{{session.metrics['latency.MAX']|number:0}})</small>
+                                </span></progressbar> <progressbar animate="false" max="500"
+                                    value="session.metrics.latencyPing"
+                                    type="danger"> <span
+                                    style="color: black; white-space: nowrap;">{{'PING:'+(session.metrics.latencyPing|number:0)+'ms
+                                    '}}<small>({{session.metrics['latencyPing.MIN']|number:0}}|{{session.metrics['latencyPing.AVG']|number:0}}|{{session.metrics['latencyPing.MAX']|number:0}})</small>
+                                </span></progressbar></td>
+                            <td>
+<!--                                 <button type="button" -->
+<!--                                     class="btn btn-default" -->
+<!--                                     ui-jq="tooltip" title="Thread Dump" -->
+<!--                                     ng-click="vm.requestThreadDump(session)"> -->
+<!--                                     <span -->
+<!--                                         class="glyphicon glyphicon-list-alt"></span> -->
+<!--                                 </button> -->
+                                <button type="button"
+                                    class="btn btn-primary"
+                                    ng-click="vm.view(session)">
+                                    <span
+                                        class="glyphicon glyphicon-camera"></span>
+                                    View
+                                </button>
+                                <button type="button"
+                                    class="btn btn-danger"
+                                    ng-click="vm.kill(session)">
+                                    <span
+                                        class="glyphicon glyphicon-remove"></span>
+                                    Shutdown
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

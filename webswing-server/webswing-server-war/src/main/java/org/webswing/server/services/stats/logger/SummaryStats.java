@@ -1,6 +1,7 @@
 package org.webswing.server.services.stats.logger;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,10 +13,9 @@ import java.util.Set;
 public class SummaryStats {
 	private Map<String, Map<Long, Number>> metricsLog = new HashMap<>();
 
-	public void aggregate(Map<String, InstanceStats> instanceMap, String name, Aggregation aggregation) {
+	public void aggregate(Collection<InstanceStats> instances, String name, Aggregation aggregation) {
 		Set<Long> timestamps = new HashSet<>();
 		Map<Long,Number> metric = new LinkedHashMap<>();
-		ArrayList<InstanceStats> instances = new ArrayList<>(instanceMap.values());
 		for (InstanceStats instance : instances) {
 			Map<Long, Number> valueMap = instance.getStatistics().get(name);
 			if (valueMap != null) {
