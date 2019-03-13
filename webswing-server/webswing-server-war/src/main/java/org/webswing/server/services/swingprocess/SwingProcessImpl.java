@@ -14,8 +14,11 @@ import java.util.concurrent.TimeUnit;
 
 import javax.jms.IllegalStateException;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 
 public class SwingProcessImpl implements SwingProcess {
@@ -42,14 +45,17 @@ public class SwingProcessImpl implements SwingProcess {
 		super();
 		this.config = config;
 		
-		log = Logger.getLogger(SwingProcessImpl.class + "_" + config.getApplicationName()); // because of different log configurations per app, we need a separate logger instance for each app
-		
 		Appender logAppender = config.getLogAppender();
 		
 		if (config.getLogAppender() != null) {
-			logAppender.setName(getClass().getName());
+			log = (Logger) LogManager.getLogger(SwingProcessImpl.class + "_" + config.getApplicationName() + "_" + config.getName()); // because of different log configurations per app, we need a separate logger instance for each app session
+
+			Configuration loggerConfig = ((LoggerContext) LogManager.getContext(false)).getConfiguration();
+			loggerConfig.setLoggerAdditive(log, false);
+			
 			log.addAppender(logAppender);
-	        log.setAdditivity(false);
+		} else {
+			log = (Logger) LogManager.getLogger(SwingProcessImpl.class + "_" + config.getApplicationName()); // use default appender configuration (webswing.log)
 		}
 	}
 
@@ -139,6 +145,7 @@ public class SwingProcessImpl implements SwingProcess {
 						log.error("Failed to call onClose on " + getCloseListener());
 					}
 				}
+				log.getAppenders().values().forEach(appender -> appender.stop());
 				destroying = false;
 			}
 		}

@@ -12,7 +12,7 @@ import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
 @ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "allowStealSession", "autoLogout", "goodbyeUrl", 
-		"sessionLogging", "loggingDirectory", "logMaxFileSize", "logMaxBackupIndex", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
+		"sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
@@ -129,14 +129,14 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.Logging, label = "Logging Directory", description = "Session logging directory. Path where session logs will be stored.")
 	public String getLoggingDirectory();
 	
-	@ConfigField(tab = ConfigGroup.Logging, label = "Maximum Log File Size", description = "Maximum size of the log file. After file size is exceeded a new log file is created.")
-	@ConfigFieldDefaultValueString("10MB")
-	public String getLogMaxFileSize();
+	@ConfigField(tab = ConfigGroup.Logging, label = "Maximum Session Logs Size", description = "Maximum size of all session log files. After file size is exceeded, old log files are deleted.")
+	@ConfigFieldDefaultValueString("1000MB")
+	public String getSessionLogMaxFileSize();
 	
-	@ConfigField(tab = ConfigGroup.Logging, label = "Maximum Log File Backup Index", description = "Maximum number of log files to keep before the oldest is erased.")
-	@ConfigFieldDefaultValueNumber(50)
-	public int getLogMaxBackupIndex();
-
+	@ConfigField(tab = ConfigGroup.Logging, label = "Session Log Size", description = "Maximum size of a single session log file.")
+	@ConfigFieldDefaultValueString("10MB")
+	public String getSessionLogFileSize();
+	
 	@ConfigField(tab = ConfigGroup.Features, label = "Isolated Filesystem", description = "If true, every file chooser dialog will be restricted to access only the home directory of current application.")
 	@ConfigFieldDefaultValueBoolean(false)
 	@ConfigFieldDiscriminator
@@ -244,8 +244,8 @@ public interface SwingConfig extends Config {
 			}
 			if (!config.isSessionLogging()) {
 				names.remove("loggingDirectory");
-				names.remove("logMaxFileSize");
-				names.remove("logMaxBackupIndex");
+				names.remove("sessionLogMaxFileSize");
+				names.remove("sessionLogFileSize");
 			}
 			return names;
 		}

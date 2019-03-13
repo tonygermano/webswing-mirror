@@ -1,6 +1,6 @@
 (function(define) {
 	define([], function f() {
-		function LogViewController($scope, $timeout, $location, $routeParams, $anchorScroll, logRestService, configRestService, baseUrl) {
+		function LogViewController($scope, $timeout, $location, $routeParams, $anchorScroll, logRestService, baseUrl) {
 			var vm = this;
 			
 			vm.path = $routeParams.path;
@@ -31,11 +31,10 @@
 				downloadEnabled : false
 			}  ];
 			vm.showLog = showLog;
-			vm.showAppLogNames = showAppLogNames;
 			vm.showAppLog = showAppLog;
 			vm.isActive = isActive;
 			vm.isActiveApp = isActiveApp;
-			vm.isActiveAppLogName = isActiveAppLogName;
+			vm.isActiveAppInstanceId = isActiveAppInstanceId;
 			vm.isSessionType = isSessionType;
 			vm.split = split;
 			vm.timer = undefined;
@@ -43,17 +42,19 @@
 			vm.endOffset = -1;
 			vm.log = [];
 			vm.download = download;
+			vm.downloadSessionLogs = downloadSessionLogs;
 			vm.apps = [];
-			vm.appLogNames = [];
+			vm.appInstanceIds = [];
+			vm.instanceIdTimer;
 			
 			vm.type = findType();
 			
 			vm.app = $location.search().app;
-			vm.logName = $location.search().logName;
+			vm.instanceId = $location.search().instanceId;
 			loadApps();
-			loadAppLogNames();
+			loadAppInstanceIds();
 			
-			if (vm.type && (!isSessionType(vm.type) || (vm.app && vm.logName))) {
+			if (vm.type && (!isSessionType(vm.type) || (vm.app && vm.instanceId))) {
 				load(100 * 1024, -1, true).then(function() {
 					$timeout(function() {
 						$location.hash('endOfPageAnchor');
@@ -66,10 +67,29 @@
 				$timeout.cancel(vm.timer);
 			});
 			
-			$scope.$watch('vm.app', function(newVal, oldVal) {
-			    vm.app = newVal;
-			    if (vm.type && isSessionType(vm.type) && newVal && newVal !== oldVal) {
-			    	showAppLogNames(vm.type, vm.app);
+			$scope.$watch('vm.instanceId', function(newVal, oldVal) {
+			    vm.instanceId = newVal;
+			    
+			    if (vm.instanceIdTimer) {
+			    	$timeout.cancel(vm.instanceIdTimer);
+			    }
+			    
+			    vm.log = [];
+			    
+			    if (vm.type && isSessionType(vm.type) && newVal && newVal !== oldVal && newVal != null) {
+			    	// TODO do not fire reading log until a valid value from datalist is selected
+			    	vm.instanceIdTimer = $timeout(function() {
+			    		if (vm.timer) {
+							$timeout.cancel(vm.timer);
+						}
+			    		
+			    		load(100 * 1024, -1, true).then(function() {
+							$timeout(function() {
+								$location.hash('endOfPageAnchor');
+								$anchorScroll();
+							}, 100);
+						}).then(loadDelta);
+			    	}, 500);
 			    }
 			});
 
@@ -92,11 +112,11 @@
 				var params = {
 					backwards : backwards,
 					offset : start,
-					max : size,
-					logName : vm.logName || null
+					max : size
 				};
 				
 				if (isSessionType(vm.type)) {
+					params['instanceId'] = vm.instanceId || null;
 					return logRestService.getSessionLog(vm.app, params).then(function(data) {
 						handleLogResponse(data, backwards);
 					});
@@ -128,22 +148,23 @@
 					vm.apps = [];
 					return;
 				}
-				return configRestService.getApps().then(function(data) {
+				return logRestService.getSessionLogApps().then(function(data) {
 					vm.apps = data;
 					if (vm.apps && vm.apps.length && (!vm.app || !vm.app.length)) {
 						// select first app by default
 						vm.app = vm.apps[0].url;
+						loadAppInstanceIds();
 					}
 				});
 			}
 			
-			function loadAppLogNames() {
+			function loadAppInstanceIds() {
 				if (!vm.type || !isSessionType(vm.type) || !vm.app || !vm.app.length) {
-					vm.appLogNames = [];
+					vm.appInstanceIds = [];
 					return;
 				}
-				return logRestService.getSessionLogNames(vm.app, vm.app).then(function(data) {
-					vm.appLogNames = data;
+				return logRestService.getSessionLogInstanceIds(vm.app).then(function(data) {
+					vm.appInstanceIds = data;
 				});
 			}
 			
@@ -172,21 +193,15 @@
 				
 				$location.path('/logs/' + type.url);
 				$location.search('app', null);
-				$location.search('logName', null);
+				$location.search('instanceId', null);
 			}
 			
-			function showAppLog(type, app, logName) {
+			function showAppLog(type, app, instanceId) {
 				$location.path('/logs/' + type.url);
 				$location.search('app', app);
-				$location.search('logName', logName);
+				$location.search('instanceId', instanceId || null);
 			}
 			
-			function showAppLogNames(type, app) {
-				$location.path('/logs/' + type.url);
-				$location.search('app', app);
-				$location.search('logName', null);
-			}
-
 			function isActive(type) {
 				return vm.type && vm.type.label === type.label;
 			}
@@ -195,21 +210,37 @@
 				return vm.app && vm.app == app.url;
 			}
 			
-			function isActiveAppLogName(logName) {
-				return vm.logName && vm.logName == logName;
+			function isActiveAppInstanceId(instanceId) {
+				return vm.instanceId && vm.instanceId == instanceId;
 			}
 
-			function download(type, event) {
+			function download(type) {
 				window.open(baseUrl + '/rest/logs/' + type.url, '_blank');
-				event.stopPropagation();
+			}
+			
+			function downloadSessionLogs(appUrl) {
+				window.open(toPath(appUrl) + '/rest/logs/session', '_blank');
 			}
 			
 			function isSessionType(type) {
 				return type.url == 'session';
 			}
+			
+			function toPath(path) {
+				if (path.substr(0, 4) === 'http') {
+					return path;
+				}
+				if (path.substr(0, 1) !== '/') {
+					path = '/' + path
+				}
+				if (path.length === 1) {
+					path = '';
+				}
+				return path;
+			}
 
 		}
-		LogViewController.$inject = [ '$scope', '$timeout', '$location', '$routeParams', '$anchorScroll', 'logRestService', 'configRestService', 'baseUrl' ];
+		LogViewController.$inject = [ '$scope', '$timeout', '$location', '$routeParams', '$anchorScroll', 'logRestService', 'baseUrl' ];
 
 		return LogViewController;
 	});

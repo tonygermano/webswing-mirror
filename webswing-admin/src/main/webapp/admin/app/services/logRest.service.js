@@ -4,8 +4,19 @@
 			return {
 				getLog : getLog,
 				getSessionLog : getSessionLog,
-				getSessionLogNames : getSessionLogNames
+				getSessionLogInstanceIds : getSessionLogInstanceIds,
+				getSessionLogApps : getSessionLogApps
 			};
+			
+			function getSessionLogApps() {
+				return $http.get(baseUrl + '/rest/logs/sessionApps').then(success, failed);
+				function success(data) {
+					return data.data;
+				}
+				function failed(data) {
+					return errorHandler.handleRestError('load installed apps', data, true);
+				}
+			}
 
 			function getLog(type, query) {
 				return $http.post(toPath(path) + '/rest/logs/' + type, query).then(success, failed);
@@ -27,13 +38,13 @@
 				}
 			}
 			
-			function getSessionLogNames(path, app) {
-				return $http.get(toPath(path) + '/rest/logs/session/names?app=' + app).then(success, failed);
+			function getSessionLogInstanceIds(path) {
+				return $http.get(toPath(path) + '/rest/logs/session/instanceIds').then(success, failed);
 				function success(data) {
 					return data.data;
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('load session log names - ' + app, data, true);
+					return errorHandler.handleRestError('load session log instance ids - ' + app, data, true);
 				}
 			}
 

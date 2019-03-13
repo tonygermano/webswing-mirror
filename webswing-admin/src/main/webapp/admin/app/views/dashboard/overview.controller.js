@@ -1,17 +1,19 @@
 (function (define) {
     define([], function f() {
-        function OverviewController($scope, $timeout, $location, sessionsRestService, $routeParams, wsUtils) {
+        function OverviewController($scope, $timeout, $location, sessionsRestService, logRestService, $routeParams, wsUtils) {
             var vm = this;
             vm.path = $routeParams.path;
             vm.sessions = [];
             vm.closedSessions = [];
             vm.recordings = [];
+            vm.log = [];
             vm.view = view;
-            vm.viewLogs = viewLogs;
             vm.record = record;
             vm.lastUpdated = null;
             vm.refresh = refresh;
             vm.timer = undefined;
+            vm.logTimer = undefined;
+            vm.logEndOffset = -1;
             vm.play = play;
             vm.back = back;
             vm.kill = kill;
@@ -27,14 +29,19 @@
             vm.sortFinishedBy = sortFinishedBy;
             vm.getOsIcon = getOsIcon;
             vm.getBrowserIcon = getBrowserIcon;
+            vm.loadSessionLogs = loadSessionLogs;
+            vm.stopLogs = stopLogs;
+            vm.split = split;
             vm.showThreadDump = showThreadDump;
             vm.requestThreadDump = requestThreadDump;
             vm.hasWarnings = hasWarnings
+            vm.sessionLoggingEnabled = false;
 
             refresh();
 
             $scope.$on('$destroy', function () {
                 $timeout.cancel(vm.timer);
+				$timeout.cancel(vm.logTimer);
             });
 
             $scope.$watch('vm.sessions', function (value) {
@@ -53,6 +60,7 @@
                     vm.sessions = data.sessions || [];
                     vm.closedSessions = data.closedSessions || [];
                     vm.recordings = data.recordings || [];
+                    vm.sessionLoggingEnabled = data.sessionLoggingEnabled;
                     vm.lastUpdated = new Date();
                 }).then(function () {
                     vm.timer = $timeout(refresh, 2000);
@@ -143,6 +151,10 @@
                     return 'wsa-icon-unknown';
                 }
             }
+            
+            function split(line) {
+            	return line.split(/\n(?=\d{4})/g);
+			}
 
             function kill(session) {
                 return sessionsRestService.killSession(vm.path, session.id).then(function () {
@@ -155,10 +167,66 @@
                 $location.path('/dashboard/session/' + vm.path);
             }
             
-            function viewLogs(session) {
-            	$location.search('app', "/" + vm.path);
-            	$location.path('/logs/session/');
+            function loadSessionLogs(session) {
+            	stopLogs();
+            	
+            	vm.logSession = session;
+            	vm.logs = [];
+            	
+            	loadLogs(100 * 1024, -1, true).then(function() {
+            		loadLogsDelta();
+            	});
             }
+            
+            function stopLogs() {
+            	if (vm.logTimer) {
+					$timeout.cancel(vm.logTimer);
+				}
+            	vm.logs = [];
+            }
+            
+            function loadLogsDelta() {
+				return loadLogs(100 * 1024, vm.logEndOffset, false).then(function(data) {
+					$timeout.cancel(vm.logTimer);
+				}).then(function() {
+					if (vm.logTimer) {
+						$timeout.cancel(vm.logTimer);
+					}
+					vm.logTimer = $timeout(loadLogsDelta, 1000);
+					return vm.logTimer;
+				}, function() {
+					$timeout.cancel(vm.logTimer);
+					vm.logTimer = undefined;
+				});
+			}
+
+			function loadLogs(size, start, backwards) {
+				var params = {
+					backwards : backwards,
+					offset : start,
+					max : size,
+					instanceId: vm.logSession.id
+				};
+				
+				return logRestService.getSessionLog(vm.path, params).then(function(data) {
+					handleLogResponse(data, backwards);
+				});
+			}
+			
+			function handleLogResponse(data, backwards) {
+				if (data.log.length > 0) {
+					var log = data.log.split(/\n(?=\d{4})/g);
+					if (backwards) {
+						vm.log = log.concat(vm.log);
+						vm.logStartOffset = data.startOffset;
+						vm.logEndOffset = Math.max(vm.logEndOffset, data.endOffset);
+					} else {
+						vm.log = vm.log.concat(log);
+						vm.logStartOffset = Math.min(vm.logStartOffset, data.startOffset);
+						vm.logEndOffset = data.endOffset;
+					}
+				}
+			}
 
             function record(session) {
                 return sessionsRestService.recordSession(vm.path, session.id).then(function () {
@@ -194,7 +262,7 @@
 
         }
 
-        OverviewController.$inject = ['$scope', '$timeout', '$location', 'sessionsRestService', '$routeParams', 'wsUtils'];
+        OverviewController.$inject = ['$scope', '$timeout', '$location', 'sessionsRestService', 'logRestService', '$routeParams', 'wsUtils'];
 
         return OverviewController;
     });

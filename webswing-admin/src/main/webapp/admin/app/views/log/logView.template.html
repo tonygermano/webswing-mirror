@@ -15,18 +15,29 @@
 				<li ng-repeat="type in vm.types" ng-class="{active:  vm.isActive(type)}">
 					<a ng-click="vm.showLog(type)">
 						{{type.label}}
-						<select ng-if="vm.isSessionType(type) && vm.isActive(type)" ng-model="vm.app" class="pull-right">
-							<option ng-repeat="app in vm.apps" ng-selected="vm.isActiveApp(app)" value="{{app.url}}">{{app.name}}</option>
-						</select>
-						<span ng-if="type.downloadEnabled" ng-click="vm.download(type, event)" class="glyphicon glyphicon-download-alt pull-right" title="Download zip" ></span>
+						<span ng-if="type.downloadEnabled" ng-click="vm.download(type)" class="glyphicon glyphicon-download-alt pull-right" title="Download zip" ></span>
 					</a>
 				</li>
-				<li class="secondary" ng-repeat="logName in vm.appLogNames" ng-if="vm.type && vm.isSessionType(vm.type)" ng-class="{active:  vm.isActiveAppLogName(logName)}">
-					<a ng-click="vm.showAppLog(vm.type, vm.app, logName)" style="padding-left: 40px;">{{logName}}</a>
+				
+				<li class="secondary" ng-repeat="app in vm.apps" ng-if="vm.type && vm.isSessionType(vm.type)" ng-class="{active:  vm.isActiveApp(app)}">
+					<a ng-click="vm.showAppLog(vm.type, app.url)">
+						{{app.url}}
+						<span ng-click="vm.downloadSessionLogs(app.url)" class="glyphicon glyphicon-download-alt pull-right" title="Download zip" ></span>
+					</a>
 				</li>
 			</ul>
 		</div>
 		<div ng-class="{'col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2':vm.types.length > 1, 'main':true}">
+			<div ng-if="vm.type && vm.isSessionType(vm.type)" class="log-search-session">
+				<div class="log-search-session-controls">
+					<label for="instanceId">Session Id</label>
+					<input id="instanceId" type="text" class="form-control" list="autocompleList" ng-model="vm.instanceId" placeholder="Search session id..." />
+				</div>
+				<datalist id="autocompleList">
+					<option ng-repeat="instanceId in vm.appInstanceIds" value="{{instanceId}}">{{instanceId}}</option>
+				</datalist>
+			</div>
+			
 			<table class="table table-striped ws-log-table">
 				<thead>
 					<tr class="ws-table-header">
@@ -35,7 +46,7 @@
 				</thead>
 				<tbody>
 					<tr ng-repeat="line in vm.log | filter:vm.filter  track by $index ">
-						<td ng-repeat="field in vm.split(line)" ng-class="{'ws-log-long':field.length>30}"><pre>{{::field}}</pre></td>
+						<td ng-repeat="field in vm.split(line)" ng-class="{'ws-log-long':field.length>30}" ng-if="field.length > 0"><pre>{{::field}}</pre></td>
 					</tr>
 				</tbody>
 			</table>

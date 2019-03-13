@@ -50,6 +50,10 @@ body {
 	padding-left: 20px;
 }
 
+.nav-sidebar > li.secondary > a {
+	padding-left: 40px;
+}
+
 .nav-sidebar>li {
 	cursor: pointer;
 }
@@ -412,4 +416,22 @@ body {
     transform: scale(1.0);
     -webkit-transform: scale(1.0);
   }
+}
+
+.log-search-session {
+	padding-bottom: 20px;
+}
+
+.log-search-session-controls {
+	display: flex; 
+	align-items: center;
+}
+
+.log-search-session-controls label {
+	white-space: nowrap;
+	margin: 0 10px 0 0;
+}
+
+.log-search-session-controls input {
+	flex-grow: 1;
 }

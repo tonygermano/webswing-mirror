@@ -1,14 +1,33 @@
 package org.webswing.server.services.rest.resources;
 
+import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.lang.StringUtils;
 import org.webswing.Constants;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
+import org.webswing.server.common.model.admin.AppSessions;
 import org.webswing.server.common.model.admin.ApplicationInfo;
-import org.webswing.server.common.model.admin.Sessions;
 import org.webswing.server.common.model.admin.SwingSession;
-import org.webswing.server.common.model.rest.LogRequest;
 import org.webswing.server.common.model.rest.LogResponse;
+import org.webswing.server.common.model.rest.SessionLogRequest;
 import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
@@ -16,14 +35,6 @@ import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.util.LogReaderUtil;
-
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.File;
-import java.net.URI;
-import java.util.*;
 
 @Path("")
 @Produces(MediaType.APPLICATION_JSON)
@@ -86,10 +97,10 @@ public class SwingAppRestService extends BaseRestService {
 
 	@GET
 	@Path("/rest/sessions")
-	public Sessions getSessions() throws WsException {
+	public AppSessions getSessions() throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
 		Set<String> localRecordingFiles=new HashSet<>();
-		Sessions result = new Sessions();
+		AppSessions result = new AppSessions();
 		for (SwingInstance si : manager.getSwingInstanceHolder().getAllInstances()) {
 			SwingSession session = si.toSwingSession(false);
 			result.getSessions().add(session);
@@ -115,6 +126,7 @@ public class SwingAppRestService extends BaseRestService {
 
 		}
 		result.setRecordings(externalRecordings);
+		result.setSessionLoggingEnabled(manager.getConfig().getSwingConfig().isSessionLogging());
 		return result;
 	}
 
@@ -206,16 +218,30 @@ public class SwingAppRestService extends BaseRestService {
 	
 	@POST
 	@Path("/rest/logs/session")
-	public LogResponse getLogs(LogRequest request) throws WsException {
+	public LogResponse getLogs(SessionLogRequest request) throws WsException {
 		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
-		return LogReaderUtil.readSessionLog(getSessionLogsDir(), request);
+		
+		if (StringUtils.isBlank(request.getInstanceId())) {
+			return null;
+		}
+		
+		return LogReaderUtil.readSessionLog(getAppInfo().getUrl(), getSessionLogsDir(), request);
 	}
 	
 	@GET
-	@Path("/rest/logs/session/names")
-	public List<String> getLogNames() throws WsException {
+	@Path("/rest/logs/session")
+	public Response downloadLog() throws WsException {
 		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
-		return LogReaderUtil.readSessionLogNames(getSessionLogsDir(), getAppInfo().getUrl());
+		Response.ResponseBuilder builder = Response.ok(LogReaderUtil.getZippedSessionLog(getSessionLogsDir(), getAppInfo().getUrl()), MediaType.APPLICATION_OCTET_STREAM);
+		builder.header("content-disposition", "attachment; filename = " + LogReaderUtil.normalizeForFileName(getAppInfo().getName()) + "_session_logs.zip");
+		return builder.build();
+    }
+	
+	@GET
+	@Path("/rest/logs/session/instanceIds")
+	public List<String> getLogInstanceIds() throws WsException {
+		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
+		return LogReaderUtil.readSessionLogInstanceIds(getSessionLogsDir(), getAppInfo().getUrl());
 	}
 
 	private String getSessionLogsDir() {

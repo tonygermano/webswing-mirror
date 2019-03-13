@@ -3,7 +3,7 @@ package org.webswing.server.services.swingprocess;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Appender;
+import org.apache.logging.log4j.core.Appender;
 
 public class SwingProcessConfig {
 	private String name;

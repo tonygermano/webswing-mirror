@@ -2,7 +2,6 @@
 	define([], function f() {
 		function configRestService(baseUrl, $http, errorHandler, messageService) {
 			return {
-				getApps : getApps,
 				getPaths : getPaths,
 				getInfo : getInfo,
 				getConfig : getConfig,
@@ -15,16 +14,6 @@
 				create : create,
 				getMeta : getMeta
 			};
-			
-			function getApps() {
-				return $http.get(baseUrl + '/apps').then(success, failed);
-				function success(data) {
-					return data.data;
-				}
-				function failed(data) {
-					return errorHandler.handleRestError('load installed apps', data, true);
-				}
-			}
 
 			function getPaths() {
 				return $http.get(baseUrl + '/rest/paths').then(success, failed);
