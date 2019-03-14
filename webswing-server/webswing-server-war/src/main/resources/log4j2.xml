@@ -6,7 +6,7 @@
 			<PatternLayout pattern="%d %-5p [%t] (%F:%L) %m%n" />
 		</Console>
 		
-		<RollingFile name="R" fileName="${sys:webswing.logsDir}webswing.log" filePattern="${sys:webswing.logsDir}webswing.log.%i">
+		<RollingFile name="R" fileName="${sys:webswing.logsDir:-}webswing.log" filePattern="${sys:webswing.logsDir:-}webswing.log.%i">
 			<PatternLayout pattern="%d %-5p [%t] (%F:%L) %m%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="100 MB"/>
@@ -14,7 +14,7 @@
 			<DefaultRolloverStrategy max="5" />
 		</RollingFile>
 		
-		<RollingFile name="S" fileName="${sys:webswing.logsDir}stats.log" filePattern="${sys:webswing.logsDir}stats.log.%i">
+		<RollingFile name="S" fileName="${sys:webswing.logsDir:-}stats.log" filePattern="${sys:webswing.logsDir:-}stats.log.%i">
 			<PatternLayout pattern="%d{dd-MMM-yyyy-HH:mm:ss.SSS},%m%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="100 MB"/>
@@ -22,7 +22,7 @@
 			<DefaultRolloverStrategy max="5" />
 		</RollingFile>
 		
-		<RollingFile name="A" fileName="${sys:webswing.logsDir}audit.log" filePattern="${sys:webswing.logsDir}audit.log.%i">
+		<RollingFile name="A" fileName="${sys:webswing.logsDir:-}audit.log" filePattern="${sys:webswing.logsDir:-}audit.log.%i">
 			<PatternLayout pattern="%d{dd-MMM-yyyy-HH:mm:ss.SSS} | %m%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="100 MB"/>

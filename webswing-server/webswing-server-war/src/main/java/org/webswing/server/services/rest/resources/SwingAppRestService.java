@@ -23,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.webswing.Constants;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
-import org.webswing.server.common.model.admin.AppSessions;
 import org.webswing.server.common.model.admin.ApplicationInfo;
+import org.webswing.server.common.model.admin.Sessions;
 import org.webswing.server.common.model.admin.SwingSession;
 import org.webswing.server.common.model.rest.LogResponse;
 import org.webswing.server.common.model.rest.SessionLogRequest;
@@ -97,10 +97,10 @@ public class SwingAppRestService extends BaseRestService {
 
 	@GET
 	@Path("/rest/sessions")
-	public AppSessions getSessions() throws WsException {
+	public Sessions getSessions() throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
 		Set<String> localRecordingFiles=new HashSet<>();
-		AppSessions result = new AppSessions();
+		Sessions result = new Sessions();
 		for (SwingInstance si : manager.getSwingInstanceHolder().getAllInstances()) {
 			SwingSession session = si.toSwingSession(false);
 			result.getSessions().add(session);
@@ -126,7 +126,6 @@ public class SwingAppRestService extends BaseRestService {
 
 		}
 		result.setRecordings(externalRecordings);
-		result.setSessionLoggingEnabled(manager.getConfig().getSwingConfig().isSessionLogging());
 		return result;
 	}
 
