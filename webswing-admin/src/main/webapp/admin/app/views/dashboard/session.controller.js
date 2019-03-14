@@ -125,7 +125,8 @@
             }
 
             function back() {
-                $location.path('/dashboard/overview/' + vm.path);
+            	$location.search('app', vm.path);
+                $location.path('/sessions');
                 $timeout.cancel(vm.timer);
             }
 

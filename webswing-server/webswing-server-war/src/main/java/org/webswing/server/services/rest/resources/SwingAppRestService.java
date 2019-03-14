@@ -168,6 +168,7 @@ public class SwingAppRestService extends BaseRestService {
 
 	@GET
 	@Path("/rest/threadDump/{path}")
+	@Produces("text/plain")
 	public String getThreadDump(@PathParam("path") String id, @QueryParam("id") String timestamp) throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getThreadDump);
 		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);

@@ -3,20 +3,41 @@
         function SessionsController($scope, $timeout, $location, configRestService, sessionsRestService, $route, $routeParams, wsUtils, baseUrl) {
             var vm = this;
             vm.appFilter = $routeParams.app;
-            vm.apps=[];
-            vm.nodes=[];
-            vm.nodeFilter=$routeParams.nodeId;
+        	if (vm.appFilter && vm.appFilter.substr(0, 1) !== '/') {
+        		vm.appFilter = '/' + vm.appFilter;
+            }
+            vm.paths = [];
             vm.sortExp = 'startedAt';
             vm.sortReverse = true;
             vm.sortBy = sortBy;
+            vm.isSortByAsc = isSortByAsc;
+            vm.isSortByDesc = isSortByDesc;
+            vm.getSortByMetricsExpr = getSortByMetricsExpr;
+            vm.getSortByBandwidthExpr = getSortByBandwidthExpr;
+            vm.getSortByLatencyExpr = getSortByLatencyExpr;
+            vm.sortFinishedExp = 'endedAt';
+            vm.sortFinishedReverse = true;
+            vm.sortFinishedBy = sortFinishedBy;
+            vm.isSortFinishedByAsc = isSortFinishedByAsc;
+            vm.isSortFinishedByDesc = isSortFinishedByDesc;
+            vm.searchAppFilter = '';
             vm.sessions=[];
+            vm.closedSessions = [];
+            vm.recordings = [];
             vm.lastUpdated = null;
             vm.refresh = refresh;
             vm.getOsIcon = getOsIcon;
             vm.getBrowserIcon = getBrowserIcon;
 			vm.filter = filter;
 			vm.view = view;
+			vm.record = record;
+			vm.play = play;
+			vm.playOther = playOther;
 			vm.kill = kill;
+			vm.sessionTab = 'running';
+			vm.showThreadDump = showThreadDump;
+			vm.requestThreadDump = requestThreadDump;
+			vm.hasWarnings = hasWarnings;
             vm.now = function () {
                 return new Date().getTime();
             }
@@ -28,8 +49,10 @@
             });
             
             function refresh() {
-            	sessionsRestService.getSessions(vm.appFilter, true).then(function(data){
-					vm.sessions = data.sessions;
+            	sessionsRestService.getSessions(vm.appFilter).then(function(data){
+					vm.sessions = data.sessions || [];
+					vm.closedSessions = data.closedSessions || [];
+                    vm.recordings = data.recordings || [];
 					vm.lastUpdated = new Date();
             	}).then(function () {
                     vm.timer = $timeout(refresh, 5000);
@@ -46,8 +69,8 @@
 					vm.latencyStats = getLatencyStats(data);
             	});
             	
-				configRestService.getApps().then(function(data) {
-					vm.apps = data;
+				configRestService.getPaths().then(function(data) {
+					vm.paths = data.sort();
 				});
             }
             
@@ -149,12 +172,61 @@
             }
             
             function sortBy(exp) {
-                if (vm.sortExp === exp) {
-                    vm.sortReverse = !vm.sortReverse;
-                } else {
-                    vm.sortExp = exp;
-                    vm.sortReverse = false;
+            	if (vm.sortExp === exp) {
+            		vm.sortReverse = !vm.sortReverse;
+            	} else {
+            		vm.sortExp = exp;
+            		vm.sortReverse = false;
+            	}
+            }
+            
+            function isSortByAsc(exp) {
+                return vm.sortExp === exp && !vm.sortReverse;
+            }
+            
+            function isSortByDesc(exp) {
+            	return vm.sortExp === exp && vm.sortReverse;
+            }
+            
+            function getSortByMetricsExpr(aggreg) {
+                var exp = 'metrics.memoryUsed';
+                if (aggreg != null) {
+                    exp = "metrics['memoryUsed." + aggreg + "']";
                 }
+                return exp;
+            }
+
+            function getSortByLatencyExpr(aggreg) {
+                var exp = 'metrics.latency';
+                if (aggreg != null) {
+                    exp = "metrics['latency." + aggreg + "']";
+                }
+                return exp;
+            }
+
+            function getSortByBandwidthExpr(aggreg) {
+                var exp = 'metrics.inboundSize + metrics.outboundSize';
+                if (aggreg != null) {
+                    exp = "metrics['inboundSize." + aggreg + "'] + metrics['outboundSize." + aggreg + "']";
+                }
+                return exp;
+            }
+            
+            function sortFinishedBy(exp) {
+                if (vm.sortFinishedExp === exp) {
+                    vm.sortFinishedReverse = !vm.sortFinishedReverse;
+                } else {
+                    vm.sortFinishedExp = exp;
+                    vm.sortFinishedReverse = false;
+                }
+            }
+            
+            function isSortFinishedByAsc(exp) {
+            	return vm.sortFinishedExp === exp && !vm.sortFinishedReverse;
+            }
+            
+            function isSortFinishedByDesc(exp) {
+            	return vm.sortFinishedExp === exp && vm.sortFinishedReverse;
             }
             
             function kill(session) {
@@ -165,6 +237,34 @@
 
             function view(session) {
                 window.open(baseUrl + '/admin/#/dashboard/session' + session.applicationUrl + '?id=' + session.id, '_blank');
+            }
+            
+            function record(session) {
+                return sessionsRestService.recordSession(session.applicationUrl, session.id).then(function () {
+                    refresh();
+                });
+            }
+
+            function play(session, file) {
+                $location.url('/dashboard/playback' + session.applicationUrl + '?playback=' + file);
+            }
+            
+            function playOther(file) {
+            	if (vm.appFilter && vm.appFilter.length) {
+            		$location.url('/dashboard/playback' + vm.appFilter + '?playback=' + file);
+            	}
+            }
+            
+            function showThreadDump(session, key) {
+                window.open(sessionsRestService.getStackDumpPath(session.applicationUrl, session.id, key), "_blank");
+            }
+
+            function requestThreadDump(session) {
+                sessionsRestService.requestThreadDump(session.applicationUrl, session.id);
+            }
+            
+            function hasWarnings(session) {
+                return (session.warnings &&session.warnings.length > 0) || session.warningHistory.length > 0 || Object.keys(session.threadDumps).length > 0
             }
 
         }

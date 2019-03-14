@@ -1,19 +1,19 @@
 (function(define) {
 	define([ 'views/dashboard/dashboard.controller',
-	         'views/dashboard/overview.controller', 
+//	         'views/dashboard/overview.controller', 
 	         'views/dashboard/session.controller', 
 	         'views/dashboard/playback.controller' 
 	         ],
-	         function f(DashboardController, DashboardOverviewController, DashboardSessionController, DashboardPlaybackController) {
+	         function f(DashboardController, /*DashboardOverviewController,*/ DashboardSessionController, DashboardPlaybackController) {
 		var module = angular.module('wsDashboard', []);
 
 		module.controller('DashboardController', DashboardController);
-		module.controller('DashboardOverviewController', DashboardOverviewController);
+//		module.controller('DashboardOverviewController', DashboardOverviewController);
 		module.controller('DashboardSessionController', DashboardSessionController);
 		module.controller('DashboardPlaybackController', DashboardPlaybackController);
 
 		module.run([ 'navigationService', function(navigationService) {
-			var dashboard = navigationService.addLocation('Dashboard', '#/dashboard');
+			var dashboard = navigationService.addLocation('Applications', '#/dashboard');
 			// dashboard.addLocation("Overview", '#/dashboard/overview', true);
 		} ]);
 
@@ -28,11 +28,11 @@
 				controllerAs : 'vm',
 				templateUrl : 'app/views/dashboard/dashboard.template.html'
 			});
-			$routeProvider.when('/dashboard/overview/:path*', {
-				controller : 'DashboardOverviewController',
-				controllerAs : 'vm',
-				templateUrl : 'app/views/dashboard/overview.template.html'
-			});
+//			$routeProvider.when('/dashboard/overview/:path*', {
+//				controller : 'DashboardOverviewController',
+//				controllerAs : 'vm',
+//				templateUrl : 'app/views/dashboard/overview.template.html'
+//			});
 			$routeProvider.when('/dashboard/session/:path*', {
 				controller : 'DashboardSessionController',
 				controllerAs : 'vm',
