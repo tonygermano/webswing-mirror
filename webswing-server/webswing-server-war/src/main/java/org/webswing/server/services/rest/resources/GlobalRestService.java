@@ -1,5 +1,22 @@
 package org.webswing.server.services.rest.resources;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.lang.StringUtils;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.GlobalUrlHandler;
@@ -11,18 +28,11 @@ import org.webswing.server.common.model.rest.LogResponse;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.security.api.WebswingAction;
+import org.webswing.server.services.stats.StatisticsLoggerService;
+import org.webswing.server.services.stats.logger.InstanceStats;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.util.LogReaderUtil;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.webswing.server.util.LoggerStatisticsUtil;
 
 @Path("")
 @Produces(MediaType.APPLICATION_JSON)
@@ -30,7 +40,8 @@ public class GlobalRestService extends BaseRestService {
 
 	@Inject GlobalUrlHandler handler;
 	@Inject ConfigurationService configService;
-
+	@Inject StatisticsLoggerService loggerService;
+	
 	@Override
 	protected List<ApplicationInfoMsg> getAppsImpl() {
 		List<ApplicationInfoMsg> result = new ArrayList<>();
@@ -141,6 +152,21 @@ public class GlobalRestService extends BaseRestService {
         getGlobalHandler().getApplications().forEach(app -> app.getSwingInstanceHolder().getAllInstances().forEach(si -> result.getSessions().add(si.toSwingSession(false))));
         getGlobalHandler().getApplications().forEach(app -> app.getSwingInstanceHolder().getAllClosedInstances().forEach(si -> result.getClosedSessions().add(si.toSwingSession(false))));
         return result;
+    }
+    
+    @GET
+    @Path("/rest/stats")
+    public Map<String, Map<Long, Number>> getStats() throws WsException {
+    	getHandler().checkMasterPermission(WebswingAction.rest_getStats);
+    	
+    	List<InstanceStats> allStats = getGlobalHandler().getApplications().stream()
+    			.map(app -> app.getStatsReader().getAllInstanceStats())
+    			.flatMap(Collection::stream)
+    			.collect(Collectors.toList());
+    	
+    	allStats.addAll(loggerService.getServerLogger().getAllInstanceStats()); // merge with server stats (to include server CPU usage)
+    	
+    	return LoggerStatisticsUtil.mergeSummaryInstanceStats(allStats);
     }
 
 	@Override

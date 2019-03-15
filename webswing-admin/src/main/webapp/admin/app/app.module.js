@@ -4,9 +4,10 @@
         'shared/shared.module',
         'views/dashboard/dashboard.module',
         'views/config/config.module',
+        'views/sessions/sessions.module',
         'views/log/log.module',
         'services/services.module'], function f() {
-        var app = angular.module('wsAdmin', ['ngRoute', 'ui.bootstrap', 'ui.ace', 'ui.jq', 'n3-pie-chart', 'n3-line-chart', 'ngTextcomplete', 'wsCommon', 'wsShared', 'wsServices', 'wsDashboard', 'wsConfig', 'wsLogView', 'wsExternal']);
+        var app = angular.module('wsAdmin', ['ngRoute', 'ui.bootstrap', 'ui.ace', 'ui.jq', 'n3-pie-chart', 'n3-line-chart', 'ngTextcomplete', 'wsCommon', 'wsShared', 'wsServices', 'wsDashboard', 'wsSessions', 'wsConfig', 'wsLogView', 'wsExternal']);
         app.value('baseUrl', getBaseLocation());
 
         function getBaseLocation() {

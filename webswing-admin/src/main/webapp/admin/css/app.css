@@ -240,6 +240,7 @@ body {
 	display: inline;
 	font-size: 15px;
 	position: relative;
+	cursor: pointer;
 }
 
 .ws-panel-heading {
@@ -400,4 +401,47 @@ body {
     transform: scale(1.0);
     -webkit-transform: scale(1.0);
   }
+}
+
+.ws-table-header th a {
+	cursor: pointer;
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+}
+
+.ws-table-header th {
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+}
+
+.ws-table-header th.sortAsc::after,
+.ws-table-header th a.sortAsc::after {
+    content: "\25B2";
+    margin-left: 5px;
+    text-decoration: none;
+}
+
+.ws-table-header th.sortDesc::after,
+.ws-table-header th a.sortDesc::after {
+    content: "\25BC";
+    margin-left: 5px;
+}
+
+.ws-table-header th small a.sortAsc,
+.ws-table-header th small a.sortDesc {
+    text-decoration: none;
+}
+
+.ws-table-header th small a.sortAsc span,
+.ws-table-header th small a.sortDesc span {
+    text-decoration: underline;
+}
+
+.dropdown-menu li.title {
+	padding: 3px 20px;
+	font-weight: bold;
 }

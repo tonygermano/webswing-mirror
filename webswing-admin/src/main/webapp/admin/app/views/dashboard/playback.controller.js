@@ -27,7 +27,8 @@
             }
 
             function back() {
-                $location.path('/dashboard/overview/' + vm.path);
+            	$location.search('app', vm.path);
+                $location.path('/sessions');
             }
         }
         PlaybackController.$inject = ['$scope', '$location', '$routeParams'];
