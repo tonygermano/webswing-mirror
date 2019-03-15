@@ -42,7 +42,7 @@ public class DirectDrawUtils {
 		sgHelper = (SunGraphics2D) new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).getGraphics();
 		sgHelper.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		// logical fonts
-		webFonts.setProperty("Dialog", "serif");
+		webFonts.setProperty("Dialog", "sans-serif");
 		webFonts.setProperty("DialogInput", "monospace");
 		webFonts.setProperty("Serif", "serif");
 		webFonts.setProperty("SansSerif", "sans-serif");
