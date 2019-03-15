@@ -1,5 +1,5 @@
+syntax = "proto2";
 package org.webswing.server.model.proto;
-
 /* ===================SERVER -> BROWSER====================*/
 
 message AppFrameMsgOutProto {
