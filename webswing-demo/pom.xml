@@ -15,6 +15,7 @@
 	</modules>
 	<properties>
 		<sonar.skip>true</sonar.skip>
+		<javafx.version>11.0.2</javafx.version>
 	</properties>
 	<build>
 		<plugins>

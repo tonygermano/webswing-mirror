@@ -7,9 +7,6 @@
 		<version>2.6-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
-	<properties>
-		<javafx.version>11.0.2</javafx.version>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.webswing</groupId>
