@@ -1,6 +1,7 @@
 package org.webswing.server.services.stats.logger;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +18,7 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 	private static final MetricRule DEFAULT_RULE_AVG_PER_SEC = new MetricRule(Aggregation.AVG_PER_SEC, TimeUnit.SECONDS.toMillis(10), 60);
 	private static final MetricRule DEFAULT_RULE_FLAG = new MetricRule(Aggregation.AVG_PER_SEC, 0, 1);
 	private static final Map<String, MetricRule> rules = new HashMap<>();
-	private static final Map<String, List<Aggregation>> summaryRulesMap = new HashMap<>();
 	private static final Map<String, WarningRule> warningRules = new HashMap<>();
-
 
 	static {
 		rules.put(INBOUND_SIZE_METRIC, DEFAULT_RULE_AVG_PER_SEC);
@@ -38,6 +37,8 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 		summaryRulesMap.put(INBOUND_SIZE_METRIC, Arrays.asList(Aggregation.SUM));
 		summaryRulesMap.put(OUTBOUND_SIZE_METRIC, Arrays.asList(Aggregation.SUM));
 		summaryRulesMap.put(CPU_UTIL_METRIC, Arrays.asList(Aggregation.SUM));
+		summaryRulesMap.put(CPU_UTIL_SESSION_METRIC, Arrays.asList(Aggregation.SUM));
+		summaryRulesMap.put(CPU_UTIL_SERVER_METRIC, Arrays.asList(Aggregation.SUM));
 		summaryRulesMap.put(LATENCY_PING, Arrays.asList(Aggregation.AVG));
 		summaryRulesMap.put(LATENCY_NETWORK_TRANSFER, Arrays.asList(Aggregation.AVG));
 		summaryRulesMap.put(LATENCY_CLIENT_RENDERING, Arrays.asList(Aggregation.AVG));
@@ -80,7 +81,7 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 		for (String name : summaryRulesMap.keySet()) {
 			List<Aggregation> summaryAggreg = summaryRulesMap.get(name);
 			for (Aggregation aggregation : summaryAggreg) {
-				stats.aggregate(instanceMap, name, aggregation);
+				stats.aggregate(instanceMap.values(), name, aggregation);
 			}
 		}
 		return stats.getStatistics();
@@ -136,6 +137,11 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 
 	public void removeInstance(String instance) {
 		instanceMap.remove(instance);
+	}
+	
+	@Override
+	public Collection<InstanceStats> getAllInstanceStats() {
+		return instanceMap.values();
 	}
 
 }

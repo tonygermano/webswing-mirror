@@ -30,7 +30,7 @@ public class SecurityUtil {
 			UrlHandler urlHandler = connection.getHandler();
 			return resolveUser(subject, urlHandler);
 		} catch (ExpiredSessionException e) {
-			log.info("User session expired.", e);
+			log.info("User session expired."+ e.getMessage());
 			return null;
 		}
 	}

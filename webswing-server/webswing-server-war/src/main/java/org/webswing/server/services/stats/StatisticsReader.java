@@ -1,9 +1,16 @@
 package org.webswing.server.services.stats;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.webswing.server.services.stats.logger.Aggregation;
+import org.webswing.server.services.stats.logger.InstanceStats;
+
 public interface StatisticsReader {
+	
+	Map<String, List<Aggregation>> summaryRulesMap = new HashMap<>();
 
 	Map<String, Map<Long, Number>> getSummaryStats();
 
@@ -22,5 +29,7 @@ public interface StatisticsReader {
 	List<String> getInstanceWarnings(String instance);
 
 	List<String> getInstanceWarningHistory(String instance);
+	
+	Collection<InstanceStats> getAllInstanceStats();
 
 }

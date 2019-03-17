@@ -1,7 +1,11 @@
 package org.webswing.server.services.stats;
 
-public interface StatisticsLoggerService {
+import org.webswing.server.base.WebswingService;
+
+public interface StatisticsLoggerService extends WebswingService {
 
 	StatisticsLogger createLogger();
+	
+	StatisticsLogger getServerLogger();
 	
 }

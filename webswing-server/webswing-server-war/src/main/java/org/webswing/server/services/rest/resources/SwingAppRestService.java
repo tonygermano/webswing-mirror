@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -32,9 +33,12 @@ import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.security.api.WebswingAction;
+import org.webswing.server.services.stats.StatisticsLoggerService;
+import org.webswing.server.services.stats.logger.InstanceStats;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.util.LogReaderUtil;
+import org.webswing.server.util.LoggerStatisticsUtil;
 
 @Path("")
 @Produces(MediaType.APPLICATION_JSON)
@@ -43,6 +47,7 @@ public class SwingAppRestService extends BaseRestService {
 	@Inject SwingInstanceManager manager;
 	@Inject PrimaryUrlHandler handler;
 	@Inject ConfigurationService configService;
+	@Inject StatisticsLoggerService loggerService;
 
 	@Override
 	protected List<ApplicationInfoMsg> getAppsImpl() {
@@ -169,6 +174,7 @@ public class SwingAppRestService extends BaseRestService {
 
 	@GET
 	@Path("/rest/threadDump/{path}")
+	@Produces("text/plain")
 	public String getThreadDump(@PathParam("path") String id, @QueryParam("id") String timestamp) throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getThreadDump);
 		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
@@ -251,6 +257,17 @@ public class SwingAppRestService extends BaseRestService {
 		}
 		
 		return logDir;
+	}
+	
+	@GET
+	@Path("/rest/stats")
+	public Map<String, Map<Long, Number>> getStats() throws WsException {
+		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getStats);
+		
+		List<InstanceStats> allStats = new ArrayList<InstanceStats>(manager.getStatsReader().getAllInstanceStats());
+		allStats.addAll(loggerService.getServerLogger().getAllInstanceStats()); // merge with server stats (to include server CPU usage)
+		
+		return LoggerStatisticsUtil.mergeSummaryInstanceStats(allStats);
 	}
 	
 	@Override

@@ -19,7 +19,7 @@
 	        <thead>
 	            <tr class="ws-table-header">
 	                <th>
-	                	<a ng-click="vm.sortBy()">No. (Id)</a>
+	                	No. (Id)
 	                </th>
 	                <th>
 						<a ng-click="vm.sortBy('user')">User</a>
@@ -110,8 +110,8 @@
                	        <progressbar  animate="false" max="102400" value="session.metrics.outboundSize"><span style="color:black; white-space:nowrap;">{{'OUT: '+((session.metrics.outboundSize/1024)|number:0)+'k/s   '}}<small>({{session.metrics['outboundSize.MIN']/1024|number:0}}|{{session.metrics['outboundSize.AVG']/1024|number:0}}|{{session.metrics['outboundSize.MAX']/1024|number:0}})</small></span></progressbar>
 					</td>
 					<td>
-               	        <progressbar  animate="false" max="700" value="session.metrics.latency" type="danger"><span style="color:black; white-space:nowrap;">{{'E2E:'+(session.metrics.latency|number:0)+'ms   '}}<small>({{session.metrics['latency.MIN']|number:0}}|{{session.metrics['latency.AVG']|number:0}}|{{session.metrics['latency.MAX']|number:0}})</small></span></progressbar>
-               	        <progressbar  animate="false" max="500" value="session.metrics.latencyPing" type="danger"><span style="color:black; white-space:nowrap;">{{'PING:'+(session.metrics.latencyPing|number:0)+'ms   '}}<small>({{session.metrics['latencyPing.MIN']|number:0}}|{{session.metrics['latencyPing.AVG']|number:0}}|{{session.metrics['latencyPing.MAX']|number:0}})</small></span></progressbar>
+               	        <progressbar  animate="false" max="700" value="session.metrics.latency" type="danger"><span style="color:black; white-space:nowrap;">{{'E2E: '+(session.metrics.latency|number:0)+'ms   '}}<small>({{session.metrics['latency.MIN']|number:0}}|{{session.metrics['latency.AVG']|number:0}}|{{session.metrics['latency.MAX']|number:0}})</small></span></progressbar>
+               	        <progressbar  animate="false" max="500" value="session.metrics.latencyPing" type="danger"><span style="color:black; white-space:nowrap;">{{'PING: '+(session.metrics.latencyPing|number:0)+'ms   '}}<small>({{session.metrics['latencyPing.MIN']|number:0}}|{{session.metrics['latencyPing.AVG']|number:0}}|{{session.metrics['latencyPing.MAX']|number:0}})</small></span></progressbar>
 			        </td>
 			        <td>
 						<button type="button" class="btn btn-default"  ui-jq="tooltip" title="Thread Dump" ng-click="vm.requestThreadDump(session)">
@@ -224,7 +224,7 @@
 			</tbody>
 		</table>
 	</div>
-    	<!-- WarningModal -->
+    <!-- WarningModal -->
 	<div class="modal fade" id="warnModal" tabindex="-1" role="dialog" >
 	  <div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">

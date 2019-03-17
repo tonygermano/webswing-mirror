@@ -349,9 +349,13 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				}
 			} else if (o instanceof JvmStatsMsgInternal) {
 				JvmStatsMsgInternal s = (JvmStatsMsgInternal) o;
+				
+				double cpuUsage = s.getCpuUsage();
+				
 				logStatValue(StatisticsLogger.MEMORY_ALLOCATED_METRIC, s.getHeapSize());
 				logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
-				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, s.getCpuUsage());
+				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, cpuUsage);
+				logStatValue(StatisticsLogger.CPU_UTIL_SESSION_METRIC, cpuUsage);
 				logStatValue(StatisticsLogger.EDT_BLOCKED_SEC_METRIC, s.getEdtPingSeconds());
 				if (getAppConfig().isMonitorEdtEnabled()) {
 					if (s.getEdtPingSeconds() > 2) {

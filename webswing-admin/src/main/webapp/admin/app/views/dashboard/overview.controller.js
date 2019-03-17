@@ -34,7 +34,7 @@
             vm.split = split;
             vm.showThreadDump = showThreadDump;
             vm.requestThreadDump = requestThreadDump;
-            vm.hasWarnings = hasWarnings
+            vm.hasWarnings = hasWarnings;
             vm.sessionLoggingEnabled = false;
 
             refresh();
