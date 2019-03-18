@@ -3,6 +3,7 @@
         function sessionsRestService(baseUrl, $http, errorHandler, messageService) {
             return {
                 getSessions: getSessions,
+                getStats: getStats,
                 getSession: getSession,
                 recordSession: recordSession,
                 killSession: killSession,
@@ -12,7 +13,14 @@
             };
 
             function getSessions(path) {
-                return $http.get(toPath(path) + '/rest/sessions/').then(success, failed);
+            	var url = '';
+            	if (!path) {
+            		url = baseUrl;
+            	} else {
+            		url = toPath(path);
+            	}
+            	
+                return $http.get(url + '/rest/sessions/').then(success, failed);
 
                 function success(data) {
                     return data.data;
@@ -21,6 +29,25 @@
                 function failed(data) {
                     return errorHandler.handleRestError('load sessions', data, true);
                 }
+            }
+            
+            function getStats(path) {
+            	var url = '';
+            	if (!path) {
+            		url = baseUrl;
+            	} else {
+            		url = toPath(path);
+            	}
+            	
+            	return $http.get(url + '/rest/stats/').then(success, failed);
+            	
+            	function success(data) {
+            		return data.data;
+            	}
+            	
+            	function failed(data) {
+            		return errorHandler.handleRestError('load stats', data, true);
+            	}
             }
 
             function getSession(path, id) {

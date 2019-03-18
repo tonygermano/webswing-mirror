@@ -48,6 +48,7 @@
 				return configRestService.getInfo(vm.path).then(function(data) {
 					$timeout.cancel(vm.timer);
 					vm.value = data;
+					vm.pathNormalized = vm.path.replace(/\W+/g, "_");
 					vm.b64img = 'data:image/png;base64,' + data.icon;
 					vm.stoppable = data.enabled;
 					vm.startable = !data.enabled;
@@ -70,7 +71,8 @@
 			}
 
 			function viewSessions() {
-				$location.path('/dashboard/overview' + vm.path);
+				$location.search('app', vm.path);
+				$location.path('/sessions');
 			}
 
 			function viewConfig() {

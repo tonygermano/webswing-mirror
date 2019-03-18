@@ -51,7 +51,8 @@
 			}
 
 			function toSessions() {
-				$location.path('/dashboard/overview/' + vm.path);
+				$location.search('app', vm.path);
+                $location.path('/sessions');
 			}
 		}
 		SwingConfigController.$inject = [ '$scope', '$timeout', '$location', 'configRestService', '$routeParams', 'permissions', 'loading', 'extValue' ];

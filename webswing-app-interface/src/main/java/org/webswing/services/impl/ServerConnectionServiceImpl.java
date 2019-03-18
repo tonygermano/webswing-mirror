@@ -366,21 +366,17 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		}
 
 		static double getCpuUtilization() {
-			long currentCpuTime = 0;
-			ThreadMXBean tmbean = ManagementFactory.getThreadMXBean();
-			long[] tids = tmbean.getAllThreadIds();
-			ThreadInfo[] tinfos = tmbean.getThreadInfo(tids);
-
-			for (int i = 0; i < tids.length; i++) {
-				long cpuTime = tmbean.getThreadCpuTime(tids[i]);
-				if (cpuTime != -1 && tinfos[i] != null) {
-					currentCpuTime += cpuTime;
-				}
-			}
+			com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+			long currentCpuTime = operatingSystemMXBean.getProcessCpuTime();
+			
+			long now = ManagementFactory.getRuntimeMXBean().getUptime();
+			
 			long cpuTimeDelta = currentCpuTime - previousCPUTime;
-			long timeDelta = System.currentTimeMillis() - previousTime;
 			previousCPUTime = currentCpuTime;
-			previousTime = System.currentTimeMillis();
+			
+			long timeDelta = now - previousTime;
+			previousTime = now;
+			
 			int processors = Runtime.getRuntime().availableProcessors();
 			if (timeDelta == 0 || processors == 0) {
 				return 0;

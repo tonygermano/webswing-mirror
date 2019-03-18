@@ -28,7 +28,7 @@
             vm.getBrowserIcon = getBrowserIcon;
             vm.showThreadDump = showThreadDump;
             vm.requestThreadDump = requestThreadDump;
-            vm.hasWarnings = hasWarnings
+            vm.hasWarnings = hasWarnings;
 
             refresh();
 
