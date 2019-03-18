@@ -483,6 +483,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		session.setRecorded(isRecording());
 		session.setRecordingFile(getRecordingFile());
 		session.setThreadDumps(toMap(threadDumps));
+		session.setLoggingEnabled(getAppConfig().isSessionLogging());
 
 		return session;
 	}

@@ -171,7 +171,7 @@
             	stopLogs();
             	
             	vm.logSession = session;
-            	vm.logs = [];
+            	vm.log = [];
             	
             	loadLogs(100 * 1024, -1, true).then(function() {
             		loadLogsDelta();
@@ -182,7 +182,7 @@
             	if (vm.logTimer) {
 					$timeout.cancel(vm.logTimer);
 				}
-            	vm.logs = [];
+            	vm.log = [];
             }
             
             function loadLogsDelta() {
