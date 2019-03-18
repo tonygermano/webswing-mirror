@@ -250,13 +250,7 @@ public class SwingAppRestService extends BaseRestService {
 	}
 
 	private String getSessionLogsDir() {
-		VariableSubstitutor subs = VariableSubstitutor.forSwingApp(manager.getConfig());
-		String logDir = subs.replace(manager.getConfig().getSwingConfig().getLoggingDirectory());
-		if (StringUtils.isBlank(logDir)) {
-			logDir = System.getProperty(Constants.LOGS_DIR_PATH, "");
-		}
-		
-		return logDir;
+		return LogReaderUtil.getSessionLogDir(VariableSubstitutor.forSwingApp(manager.getConfig()), manager.getConfig().getSwingConfig());
 	}
 	
 	@GET

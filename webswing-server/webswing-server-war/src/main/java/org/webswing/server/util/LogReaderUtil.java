@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
+import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.model.rest.LogRequest;
 import org.webswing.server.common.model.rest.LogResponse;
 import org.webswing.server.common.model.rest.SessionLogRequest;
@@ -143,7 +144,7 @@ public class LogReaderUtil {
 		String filename = System.getProperty(WEBSWING_LOG_FILE_TYPE_PREFIX + type);
 		if (filename != null) {
 			filename = VariableSubstitutor.basic().replace(filename);
-			File file = Paths.get(System.getProperty(Constants.LOGS_DIR_PATH, "") + filename).toAbsolutePath().normalize().toFile();
+			File file = Paths.get(getDefaultLogDir() + filename).toAbsolutePath().normalize().toFile();
 			return file;
 		}
 		return null;
@@ -169,6 +170,21 @@ public class LogReaderUtil {
 		}
 		
 		return logFiles;
+	}
+	
+	public static String getSessionLogDir(VariableSubstitutor subs, SwingConfig config) {
+		String logDir = subs.replace(config.getLoggingDirectory());
+		if (StringUtils.isBlank(logDir)) {
+			logDir = LogReaderUtil.getDefaultLogDir();
+		} else if (!logDir.endsWith("/") && !logDir.endsWith("\\")) {
+			logDir = logDir + "/";
+		}
+		
+		return logDir;
+	}
+	
+	private static String getDefaultLogDir() {
+		return System.getProperty(Constants.LOGS_DIR_PATH, "logs/");
 	}
 
 	public static String normalizeForFileName(String text) {

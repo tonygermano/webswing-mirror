@@ -680,10 +680,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	}
 	
 	private Appender createSessionLogAppender() {
-		String logDir = subs.replace(config.getLoggingDirectory());
-		if (StringUtils.isBlank(logDir)) {
-			logDir = System.getProperty(Constants.LOGS_DIR_PATH, "");
-		}
+		String logDir = LogReaderUtil.getSessionLogDir(subs, config);
 		
 		if (StringUtils.isNotBlank(logDir)) {
 			// make path relative for logger

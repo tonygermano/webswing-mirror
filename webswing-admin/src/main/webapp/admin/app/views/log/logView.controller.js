@@ -77,7 +77,6 @@
 			    vm.log = [];
 			    
 			    if (vm.type && isSessionType(vm.type) && newVal && newVal !== oldVal && newVal != null) {
-			    	// TODO do not fire reading log until a valid value from datalist is selected
 			    	vm.instanceIdTimer = $timeout(function() {
 			    		if (vm.timer) {
 							$timeout.cancel(vm.timer);
@@ -128,7 +127,7 @@
 			}
 			
 			function handleLogResponse(data, backwards) {
-				if (data.log.length > 0) {
+				if (data.log && data.log.length > 0) {
 					var log = data.log.split(vm.type.lineDelimiter);
 					if (backwards) {
 						vm.log = log.concat(vm.log);
