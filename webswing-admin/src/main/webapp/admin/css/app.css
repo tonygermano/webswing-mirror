@@ -76,6 +76,14 @@ body {
 	margin-bottom:10px;
 }
 
+.navbar-nav > li > span {
+	line-height: 20px;
+	padding: 15px;
+	color: #5e5e5e;
+	background-color: transparent;
+	display: block;
+}
+
 .message-area {
 	position: fixed;
 	bottom: 0;
