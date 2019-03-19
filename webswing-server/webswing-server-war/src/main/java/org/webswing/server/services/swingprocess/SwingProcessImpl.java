@@ -166,7 +166,9 @@ public class SwingProcessImpl implements SwingProcess {
 						log.error("Failed to call onClose on " + getCloseListener());
 					}
 				}
-				log.getAppenders().values().forEach(appender -> appender.stop());
+				if (hasSessionLog) {
+					log.getAppenders().values().forEach(appender -> appender.stop());
+				}
 				destroying = false;
 			}
 		}
