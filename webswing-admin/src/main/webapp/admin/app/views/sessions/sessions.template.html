@@ -225,6 +225,9 @@
 			                    <button ng-if="session.recordingFile != null" type="button" class="btn btn-primary" ng-click="vm.play(session, session.recordingFile)">
 			                        <span class="glyphicon glyphicon-play"></span> Play
 			                    </button>
+								<button ng-if="session.loggingEnabled" type="button" class="btn btn-primary" data-toggle="modal" ng-click="vm.loadSessionLogs(session)" data-target="#logsModal">
+					                <span class="glyphicon glyphicon-list"></span> Logs
+					            </button>
 			                </td>
 			            </tr>
 			        </tbody>
