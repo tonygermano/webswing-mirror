@@ -30,10 +30,12 @@ define(['webswing-util'], function amdFactory(util) {
                 resizeCheck = setInterval(function () {
                     if (!api.cfg.mirror && (canvas.width() !== width() || canvas.height() !== height())) {
                         var snapshot = get().getContext("2d").getImageData(0, 0, get().width, get().height);
-                        get().width = width() * dpr;
-                        get().height = height() * dpr;
-                        get().style.width = width() + 'px';
-                        get().style.height = height() + 'px';
+                        var w=width();
+                        var h= height();
+                        get().width = w * dpr;
+                        get().height = h * dpr;
+                        get().style.width = w + 'px';
+                        get().style.height = h + 'px';
                         get().getContext("2d").putImageData(snapshot, 0, 0);
                         api.sendHandshake();
                     }
