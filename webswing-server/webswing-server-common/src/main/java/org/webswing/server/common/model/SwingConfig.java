@@ -127,14 +127,18 @@ public interface SwingConfig extends Config {
 	public boolean isSessionLogging();
 	
 	@ConfigField(tab = ConfigGroup.Logging, label = "Logging Directory", description = "Session logging directory. Path where session logs will be stored.")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("${webswing.logsDir:-logs/}")
 	public String getLoggingDirectory();
 	
 	@ConfigField(tab = ConfigGroup.Logging, label = "Maximum Session Logs Size", description = "Maximum size of all session log files. After file size is exceeded, old log files are deleted.")
-	@ConfigFieldDefaultValueString("1000MB")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("${webswing.sessionLog.maxSize:-1000MB}")
 	public String getSessionLogMaxFileSize();
 	
 	@ConfigField(tab = ConfigGroup.Logging, label = "Session Log Size", description = "Maximum size of a single session log file.")
-	@ConfigFieldDefaultValueString("10MB")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("${webswing.sessionLog.size:-10MB}")
 	public String getSessionLogFileSize();
 	
 	@ConfigField(tab = ConfigGroup.Features, label = "Isolated Filesystem", description = "If true, every file chooser dialog will be restricted to access only the home directory of current application.")

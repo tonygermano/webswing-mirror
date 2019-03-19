@@ -694,8 +694,10 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		
 		BuiltConfiguration logConfig = ConfigurationBuilderFactory.newConfigurationBuilder().build();
 		
-		long maxLogRollingSize = FileSize.parse(config.getSessionLogFileSize(), DEFAULT_LOG_SIZE) / 2;
+		String singleSize = subs.replace(config.getSessionLogFileSize());
+		long maxLogRollingSize = FileSize.parse(singleSize, DEFAULT_LOG_SIZE) / 2;
 		SizeBasedTriggeringPolicy sizeBasedPolicy = SizeBasedTriggeringPolicy.createPolicy(maxLogRollingSize + " B");
+		String maxSize = subs.replace(config.getSessionLogMaxFileSize());
 		
 		RollingFileAppender appender = RollingFileAppender.newBuilder()
 				.withName(SwingProcessImpl.class.getName())
@@ -709,7 +711,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 						.withConfig(logConfig)
 						.withCustomActions(new Action[] {
 								DeleteAction.createDeleteAction(logDir, false, 1, false, PathSortByModificationTime.createSorter(true), 
-										new PathCondition[] {IfFileName.createNameCondition(globPattern, null, IfAccumulatedFileSize.createFileSizeCondition(config.getSessionLogMaxFileSize()))}, null, logConfig)
+										new PathCondition[] {IfFileName.createNameCondition(globPattern, null, IfAccumulatedFileSize.createFileSizeCondition(maxSize))}, null, logConfig)
 						})
 						.build())
 				.build();

@@ -65,7 +65,6 @@ public interface Constants {
 	public static final String ROOT_DIR_PATH = "webswing.rootDir";
 	public static final String TEMP_DIR_PATH_BASE = "webswing.tempDirBase";
 	public static final String TEMP_DIR_PATH = "webswing.tempDirPath";
-	public static final String LOGS_DIR_PATH = "webswing.logsDir";
 	public static final String CREATE_NEW_TEMP = "webswing.createNewTemp";
 	public static final String CLEAN_TEMP = "webswing.cleanTempDir";
 	public static final String CONFIG_FILE_PATH = "webswing.configFile";
@@ -86,6 +85,10 @@ public interface Constants {
 	public static final String DISABLE_HTTP_SECURITY_HEADERS = "webswing.disableHttpSecurityHeaders";
 	public static final String LINK_COOKIE_TO_IP = "webswing.linkCookieToIpAddress";
 
+	// logging properties
+	public static final String LOGS_DIR_PATH = "webswing.logsDir";
+	public static final String LOGS_SESSION_MAX_SIZE = "webswing.sessionLog.maxSize";
+	public static final String LOGS_SESSION_SIZE = "webswing.sessionLog.size";
 
 	// swing start related properties
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";
