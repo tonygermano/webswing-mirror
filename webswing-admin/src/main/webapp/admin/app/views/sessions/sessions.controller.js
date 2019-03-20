@@ -241,9 +241,9 @@
                     refresh();
                 });
             }
-
+            
             function view(session) {
-                window.open(baseUrl + '/admin/#/dashboard/session' + session.applicationUrl + '?id=' + session.id, '_blank');
+                $location.url('/dashboard/session' + session.applicationUrl + '?id=' + session.id);
             }
             
             function loadSessionLogs(session) {
