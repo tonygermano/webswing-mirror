@@ -5,9 +5,9 @@ import org.webswing.toolkit.util.Logger;
 import sun.awt.shell.PublicShellFolderManager;
 import sun.awt.shell.ShellFolder;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +16,7 @@ public class IsolatedFsShellFolderManager extends PublicShellFolderManager {
 
 	private static File root;
 	private static List<File> roots = new ArrayList<File>();
+	private static String platformImagesFolder = System.getProperty("webswing.platformIcons","webswingplatformicons");
 
 	static {
 		String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
@@ -34,21 +35,54 @@ public class IsolatedFsShellFolderManager extends PublicShellFolderManager {
 	}
 
 	@Override
-	public Object get(String paramString) {
-		if (paramString.equals("fileChooserDefaultFolder")) {
+	public Object get(String key) {
+		if (key.equals("fileChooserDefaultFolder")) {
 			return ensureExists(root);
 		}
-		if (paramString.equals("roots")) {
+		if (key.equals("roots")) {
 			return ensureExists(roots.toArray(new File[roots.size()]));
 		}
-		if (paramString.equals("fileChooserComboBoxFolders")) {
+		if (key.equals("fileChooserComboBoxFolders")) {
 			return ensureExists(roots.toArray(new File[roots.size()]));
 		}
-		if (paramString.equals("fileChooserShortcutPanelFolders")) {
+		if (key.equals("fileChooserShortcutPanelFolders")) {
 			return ensureExists(roots.toArray(new File[roots.size()]));
 		}
-		if (paramString.startsWith("fileChooserIcon ") || paramString.startsWith("optionPaneIcon ") || paramString.startsWith("shell32Icon ")) {
-			return super.get(paramString);
+		if (key.startsWith("fileChooserIcon ")) {
+			String fcIconType;
+			if (key.equals("fileChooserIcon ListView") || key.equals("fileChooserIcon ViewMenu")) {
+				fcIconType = platformImagesFolder + "/ListView.gif";
+			} else if (key.equals("fileChooserIcon DetailsView")) {
+				fcIconType = platformImagesFolder + "/DetailsView.gif";;
+			} else if (key.equals("fileChooserIcon UpFolder")) {
+				fcIconType = platformImagesFolder + "/UpFolder.gif";;
+			} else if (key.equals("fileChooserIcon NewFolder")) {
+				fcIconType = platformImagesFolder + "/NewFolder.gif";;
+			} else {
+				return null;
+			}
+			return getImage(fcIconType,key);
+		}
+		if (key.startsWith("optionPaneIcon ")) {
+			String iconType;
+			if (key == "optionPaneIcon Error") {
+				iconType = platformImagesFolder + "/Error.gif";
+			} else if (key == "optionPaneIcon Information") {
+				iconType = platformImagesFolder + "/Inform.gif";
+			} else if (key == "optionPaneIcon Question") {
+				iconType = platformImagesFolder + "/Question.gif";
+			} else if (key == "optionPaneIcon Warning") {
+				iconType = platformImagesFolder + "/Warn.gif";
+			} else {
+				return null;
+			}
+			return getImage(iconType,key);
+		}
+		if (key.startsWith("shell32Icon ") || key.startsWith("shell32LargeIcon ")) {
+			String name = key.substring(key.indexOf(" ") + 1);
+			boolean large = key.startsWith("shell32LargeIcon ");
+			String filename= platformImagesFolder + "/"+name+(large?"_large":"")+".png";
+			return getImage(filename,key);
 		}
 		return null;
 	}
@@ -115,5 +149,27 @@ public class IsolatedFsShellFolderManager extends PublicShellFolderManager {
 		} catch (IOException e1) {
 			return super.isFileSystemRoot(paramFile);
 		}
+	}
+
+	private Image getImage(String imageFile, String key) {
+		try (InputStream resource = ClassLoader.getSystemResourceAsStream(imageFile)) {
+			if (resource == null) {
+				Logger.debug("IsolatedFsShellFolderManager.get("+key+"): Webswing platform image "+imageFile+" not found." );
+				return null;
+			}
+
+			try (BufferedInputStream in = new BufferedInputStream(resource); ByteArrayOutputStream out = new ByteArrayOutputStream(1024)) {
+				byte[] buffer = new byte[1024];
+				int n;
+				while ((n = in.read(buffer)) > 0) {
+					out.write(buffer, 0, n);
+				}
+				out.flush();
+				return Toolkit.getDefaultToolkit().createImage(out.toByteArray());
+			}
+		} catch (IOException ioe) {
+			Logger.error("IsolatedFsShellFolderManager.getImage("+imageFile+"): "+ioe.toString());
+		}
+		return null;
 	}
 }
