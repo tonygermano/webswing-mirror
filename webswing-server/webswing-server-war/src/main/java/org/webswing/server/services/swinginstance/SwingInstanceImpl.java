@@ -1,8 +1,35 @@
 package org.webswing.server.services.swinginstance;
 
-import main.Main;
+import java.awt.print.PrinterJob;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
+import org.apache.logging.log4j.core.appender.rolling.FileSize;
+import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
+import org.apache.logging.log4j.core.appender.rolling.action.Action;
+import org.apache.logging.log4j.core.appender.rolling.action.DeleteAction;
+import org.apache.logging.log4j.core.appender.rolling.action.IfAccumulatedFileSize;
+import org.apache.logging.log4j.core.appender.rolling.action.IfFileName;
+import org.apache.logging.log4j.core.appender.rolling.action.PathCondition;
+import org.apache.logging.log4j.core.appender.rolling.action.PathSortByModificationTime;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -14,8 +41,15 @@ import org.webswing.model.c2s.ParamMsg;
 import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn.SimpleEventType;
 import org.webswing.model.c2s.TimestampsMsgIn;
-import org.webswing.model.internal.*;
+import org.webswing.model.internal.ApiCallMsgInternal;
+import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.model.internal.ApiEventMsgInternal.ApiEventType;
+import org.webswing.model.internal.ExitMsgInternal;
+import org.webswing.model.internal.JvmStatsMsgInternal;
+import org.webswing.model.internal.OpenFileResultMsgInternal;
+import org.webswing.model.internal.PrinterJobResultMsgInternal;
+import org.webswing.model.internal.ThreadDumpMsgInternal;
+import org.webswing.model.internal.ThreadDumpRequestMsgInternal;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.CursorChangeEventMsg;
 import org.webswing.model.s2c.LinkActionMsg;
@@ -45,22 +79,17 @@ import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingprocess.ProcessExitListener;
 import org.webswing.server.services.swingprocess.SwingProcess;
 import org.webswing.server.services.swingprocess.SwingProcessConfig;
+import org.webswing.server.services.swingprocess.SwingProcessImpl;
 import org.webswing.server.services.swingprocess.SwingProcessService;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketUserInfo;
 import org.webswing.server.util.FontUtils;
+import org.webswing.server.util.LogReaderUtil;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingMessagingApi;
 
-import java.awt.print.PrinterJob;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import main.Main;
 
 public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListener {
 
@@ -74,6 +103,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	private static final String JAVA9_PATCHED_JSOBJECT_MODULE_MARKER = "netscape.javascript.WebswingPatchedJSObjectJarMarker";
 	private static final String JAVA_FX_PATH = System.getProperty("java.home") + "/lib/ext/jfxrt.jar";
 	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.toolkit.WebsinwgFxToolkitFactory";
+	private static final long DEFAULT_LOG_SIZE = 10 * 1024 * 1024; // 10 MB
 
 	private static final Logger log = LoggerFactory.getLogger(SwingInstance.class);
 	private final String instanceId;
@@ -453,6 +483,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		session.setRecorded(isRecording());
 		session.setRecordingFile(getRecordingFile());
 		session.setThreadDumps(toMap(threadDumps));
+		session.setLoggingEnabled(getAppConfig().isSessionLogging());
 
 		return session;
 	}
@@ -470,6 +501,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
 			swingConfig.setName(this.getInstanceId());
+			swingConfig.setApplicationName(getAppConfig().getName());
 			String java = getAbsolutePath(subs.replace(appConfig.getJreExecutable()), false);
 			swingConfig.setJreExecutable(java);
 			String homeDir = getAbsolutePath(subs.replace(appConfig.getUserDir()), true);
@@ -570,7 +602,11 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				swingConfig.addProperty("prism.lcdtext", "false");//PrismFontFactory
 				swingConfig.addProperty("javafx.live.resize", "false");//QuantumToolkit
 			}
-
+			
+			if (config.isSessionLogging()) {
+		        swingConfig.setLogAppender(createSessionLogAppender());
+			}
+			
 			switch (appConfig.getLauncherType()) {
 			case Applet:
 				AppletLauncherConfig applet = appConfig.getValueAs(LAUNCHER_CONFIG, AppletLauncherConfig.class);
@@ -641,6 +677,47 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			}
 		}
 		return f.getCanonicalPath();
+	}
+	
+	private Appender createSessionLogAppender() {
+		String logDir = LogReaderUtil.getSessionLogDir(subs, config);
+		
+		if (StringUtils.isNotBlank(logDir)) {
+			// make path relative for logger
+			logDir = new File("").toURI().relativize(new File(logDir).toURI()).getPath();
+		}
+		
+		String appUrlNormalized = LogReaderUtil.normalizeForFileName(manager.getApplicationInfoMsg().getUrl());
+		String sessionIdNormalized = LogReaderUtil.normalizeForFileName(this.getInstanceId());
+		String logFileName = logDir + "/webswing-" + sessionIdNormalized + "-" + appUrlNormalized + ".session.log";
+		String globPattern = "webswing-*-" + appUrlNormalized + ".session.log*";
+		
+		BuiltConfiguration logConfig = ConfigurationBuilderFactory.newConfigurationBuilder().build();
+		
+		String singleSize = subs.replace(config.getSessionLogFileSize());
+		long maxLogRollingSize = FileSize.parse(singleSize, DEFAULT_LOG_SIZE) / 2;
+		SizeBasedTriggeringPolicy sizeBasedPolicy = SizeBasedTriggeringPolicy.createPolicy(maxLogRollingSize + " B");
+		String maxSize = subs.replace(config.getSessionLogMaxFileSize());
+		
+		RollingFileAppender appender = RollingFileAppender.newBuilder()
+				.withName(SwingProcessImpl.class.getName())
+				.withFileName(logFileName)
+				.withFilePattern(logFileName + ".%i")
+				.withAppend(true)
+				.withLayout(PatternLayout.newBuilder().withPattern(Constants.SESSION_LOG_PATTERN).build())
+				.withPolicy(sizeBasedPolicy)
+				.withStrategy(DefaultRolloverStrategy.newBuilder()
+						.withMax("1")
+						.withConfig(logConfig)
+						.withCustomActions(new Action[] {
+								DeleteAction.createDeleteAction(logDir, false, 1, false, PathSortByModificationTime.createSorter(true), 
+										new PathCondition[] {IfFileName.createNameCondition(globPattern, null, IfAccumulatedFileSize.createFileSizeCondition(maxSize))}, null, logConfig)
+						})
+						.build())
+				.build();
+        appender.start();
+        
+        return appender;
 	}
 
 	@Override

@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs",
-		"allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "allowStealSession", "autoLogout", "goodbyeUrl", 
+		"sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
@@ -120,7 +120,27 @@ public interface SwingConfig extends Config {
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("")
 	String getGoodbyeUrl();
-
+	
+	@ConfigField(tab = ConfigGroup.Logging, label = "Session logging", description = "If enabled, sessions are logged into a separate log file.")
+	@ConfigFieldDefaultValueBoolean(false)
+	@ConfigFieldDiscriminator
+	public boolean isSessionLogging();
+	
+	@ConfigField(tab = ConfigGroup.Logging, label = "Logging Directory", description = "Session logging directory. Path where session logs will be stored.")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("${webswing.logsDir:-logs/}")
+	public String getLoggingDirectory();
+	
+	@ConfigField(tab = ConfigGroup.Logging, label = "Maximum Session Logs Size", description = "Maximum size of all session log files. After file size is exceeded, old log files are deleted.")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("${webswing.sessionLog.maxSize:-1000MB}")
+	public String getSessionLogMaxFileSize();
+	
+	@ConfigField(tab = ConfigGroup.Logging, label = "Session Log Size", description = "Maximum size of a single session log file.")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("${webswing.sessionLog.size:-10MB}")
+	public String getSessionLogFileSize();
+	
 	@ConfigField(tab = ConfigGroup.Features, label = "Isolated Filesystem", description = "If true, every file chooser dialog will be restricted to access only the home directory of current application.")
 	@ConfigFieldDefaultValueBoolean(false)
 	@ConfigFieldDiscriminator
@@ -225,6 +245,11 @@ public interface SwingConfig extends Config {
 			}
 			if (config.isAutoLogout()) {
 				names.remove("goodbyeUrl");
+			}
+			if (!config.isSessionLogging()) {
+				names.remove("loggingDirectory");
+				names.remove("sessionLogMaxFileSize");
+				names.remove("sessionLogFileSize");
 			}
 			return names;
 		}

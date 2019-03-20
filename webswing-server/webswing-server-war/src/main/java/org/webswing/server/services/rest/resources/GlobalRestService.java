@@ -41,7 +41,7 @@ public class GlobalRestService extends BaseRestService {
 	@Inject GlobalUrlHandler handler;
 	@Inject ConfigurationService configService;
 	@Inject StatisticsLoggerService loggerService;
-	
+
 	@Override
 	protected List<ApplicationInfoMsg> getAppsImpl() {
 		List<ApplicationInfoMsg> result = new ArrayList<>();
@@ -143,6 +143,18 @@ public class GlobalRestService extends BaseRestService {
 		builder.header("content-disposition", "attachment; filename = " + type + ".zip");
 		return builder.build();
     }
+	
+	@GET
+	@Path("/rest/logs/sessionApps")
+	public List<ApplicationInfoMsg> getAppsForSessionLogView() throws WsException {
+		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
+		getHandler().checkMasterPermission(WebswingAction.rest_getApps);
+		
+		return getGlobalHandler().getApplications().stream()
+				.filter(app -> app.getConfig().getSwingConfig().isSessionLogging())
+				.map(app -> app.getApplicationInfoMsg())
+				.collect(Collectors.toList());
+	}
 
     @GET
     @Path("/rest/sessions")
@@ -153,7 +165,7 @@ public class GlobalRestService extends BaseRestService {
         getGlobalHandler().getApplications().forEach(app -> app.getSwingInstanceHolder().getAllClosedInstances().forEach(si -> result.getClosedSessions().add(si.toSwingSession(false))));
         return result;
     }
-    
+
     @GET
     @Path("/rest/stats")
     public Map<String, Map<Long, Number>> getStats() throws WsException {

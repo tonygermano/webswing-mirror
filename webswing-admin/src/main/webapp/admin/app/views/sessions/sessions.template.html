@@ -153,6 +153,9 @@
                                 <button type="button" class="btn btn-primary" ng-click="vm.view(session)">
                                     <span class="glyphicon glyphicon-camera"></span> View
                                 </button>
+                                <button ng-if="session.loggingEnabled" type="button" class="btn btn-primary" data-toggle="modal" ng-click="vm.loadSessionLogs(session)" data-target="#logsModal">
+					                <span class="glyphicon glyphicon-list"></span> Logs
+					            </button>
                                 <button type="button" class="btn btn-danger" ng-click="vm.kill(session)">
                                     <span class="glyphicon glyphicon-remove"></span> Shutdown
                                 </button>
@@ -222,6 +225,9 @@
 			                    <button ng-if="session.recordingFile != null" type="button" class="btn btn-primary" ng-click="vm.play(session, session.recordingFile)">
 			                        <span class="glyphicon glyphicon-play"></span> Play
 			                    </button>
+								<button ng-if="session.loggingEnabled" type="button" class="btn btn-primary" data-toggle="modal" ng-click="vm.loadSessionLogs(session)" data-target="#logsModal">
+					                <span class="glyphicon glyphicon-list"></span> Logs
+					            </button>
 			                </td>
 			            </tr>
 			        </tbody>
@@ -314,6 +320,37 @@
 		  </div>
 		</div>
 	  </div>
+	</div>
+	
+	<div class="modal fade" id="logsModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg" role="document" style="width: 90%;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Logs for session {{vm.logSession.id}}</h4>
+				</div>
+				
+				<div class="modal-body">
+					<div id="logTable" style="overflow: auto; max-height: 60vh;">
+						<table class="table table-striped ws-log-table">
+							<thead>
+								<tr class="ws-table-header">
+									<th>Messages</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="line in vm.log track by $index ">
+									<td ng-repeat="field in vm.split(line)" ng-class="{'ws-log-long':field.length>30}"><pre>{{::field}}</pre></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.stopLogs()">Close</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 

@@ -14,13 +14,19 @@ import java.util.concurrent.TimeUnit;
 
 import javax.jms.IllegalStateException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 
 public class SwingProcessImpl implements SwingProcess {
-	private static final Logger log = LoggerFactory.getLogger(SwingProcessImpl.class);
+	private final Logger log;
+	private final Logger defaultLog;
 	private static final long LOG_POLLING_PERIOD = 100L;
+	
 	private static ScheduledExecutorService processHandlerThread = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing Process Handler"));
 
 	private final SwingProcessConfig config;
@@ -31,6 +37,8 @@ public class SwingProcessImpl implements SwingProcess {
 	private StringBuilder bufferOut = new StringBuilder();
 	private StringBuilder bufferErr = new StringBuilder();
 	private byte[] buffer = new byte[4096];
+	private boolean hasSessionLog;
+	private String sessionLogDestination;
 
 	private boolean destroying;
 	private ScheduledFuture<?> delayedTermination;
@@ -40,6 +48,26 @@ public class SwingProcessImpl implements SwingProcess {
 	public SwingProcessImpl(SwingProcessConfig config) {
 		super();
 		this.config = config;
+		
+		defaultLog = (Logger) LogManager.getLogger(SwingProcessImpl.class + "_" + config.getApplicationName());
+		
+		Appender logAppender = config.getLogAppender();
+		
+		if (config.getLogAppender() != null) {
+			log = (Logger) LogManager.getLogger(SwingProcessImpl.class + "_" + config.getApplicationName() + "_" + config.getName()); // because of different log configurations per app, we need a separate logger instance for each app session
+
+			Configuration loggerConfig = ((LoggerContext) LogManager.getContext(false)).getConfiguration();
+			loggerConfig.setLoggerAdditive(log, false);
+			
+			if (logAppender instanceof RollingFileAppender) {
+				sessionLogDestination = new File(((RollingFileAppender) logAppender).getFileName()).getAbsolutePath();
+			}
+			
+			log.addAppender(logAppender);
+			hasSessionLog = true;
+		} else {
+			log = defaultLog; // use default appender configuration (webswing.log)
+		}
 	}
 
 	public void execute() throws Exception {
@@ -48,7 +76,14 @@ public class SwingProcessImpl implements SwingProcess {
 			if (verifyBaseDir()) {
 				processBuilder.directory(new File(config.getBaseDir()));
 			}
+			
 			log.info("Starting application process [" + config.getName() + "] from [" + config.getBaseDir() + "] :" + processBuilder.command());
+			if (hasSessionLog) {
+				defaultLog.info("Starting application process [" + config.getName() + "] from [" + config.getBaseDir() + "] :" + processBuilder.command());
+				defaultLog.info("Logging into: " + sessionLogDestination);
+				log.info("Logging into: " + sessionLogDestination);
+			}
+			
 			process = processBuilder.start();
 			logsProcessor = processHandlerThread.scheduleAtFixedRate(new Runnable() {
 
@@ -121,12 +156,18 @@ public class SwingProcessImpl implements SwingProcess {
 			} finally {
 				logsProcessor.cancel(false);
 				log.info("[" + config.getName() + "] app process terminated. ");
+				if (hasSessionLog) {
+					defaultLog.info("[" + config.getName() + "] app process terminated. ");
+				}
 				if (getCloseListener() != null) {
 					try {
 						getCloseListener().onClose();
 					} catch (Exception e) {
 						log.error("Failed to call onClose on " + getCloseListener());
 					}
+				}
+				if (hasSessionLog) {
+					log.getAppenders().values().forEach(appender -> appender.stop());
 				}
 				destroying = false;
 			}
@@ -266,7 +307,7 @@ public class SwingProcessImpl implements SwingProcess {
 		return result.toArray(new String[result.size()]);
 	}
 
-	private static void processStream(InputStream out, StringBuilder bufferOut, byte[] buffer, String name, boolean isError) throws IOException {
+	private void processStream(InputStream out, StringBuilder bufferOut, byte[] buffer, String name, boolean isError) throws IOException {
 		long start = System.currentTimeMillis();
 		boolean timeout = false;
 		while (out.available() > 0 && !timeout) {
