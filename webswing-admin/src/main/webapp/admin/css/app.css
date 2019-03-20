@@ -50,14 +50,38 @@ body {
 	padding-left: 20px;
 }
 
+.nav-sidebar > li.secondary > a {
+	padding-left: 40px;
+}
+
+.nav-sidebar>li {
+	cursor: pointer;
+}
+
 .nav-sidebar>.active>a, .nav-sidebar>.active>a:hover, .nav-sidebar>.active>a:focus
 	{
 	color: #fff;
 	background-color: #428bca;
 }
 
+.nav-sidebar>.active>a select {
+	color: black;
+}
+
+.nav-sidebar>.active.secondary>a, .nav-sidebar>.active.secondary>a:hover, .nav-sidebar>.active.secondary>a:focus {
+	background-color: #72b2ea;
+}
+
 .nav-sidebar-search{
 	margin-bottom:10px;
+}
+
+.navbar-nav > li > span {
+	line-height: 20px;
+	padding: 15px;
+	color: #5e5e5e;
+	background-color: transparent;
+	display: block;
 }
 
 .message-area {
@@ -444,4 +468,22 @@ body {
 .dropdown-menu li.title {
 	padding: 3px 20px;
 	font-weight: bold;
+}
+
+.log-search-session {
+	padding-bottom: 20px;
+}
+
+.log-search-session-controls {
+	display: flex; 
+	align-items: center;
+}
+
+.log-search-session-controls label {
+	white-space: nowrap;
+	margin: 0 10px 0 0;
+}
+
+.log-search-session-controls input {
+	flex-grow: 1;
 }

@@ -85,6 +85,10 @@ public interface Constants {
 	public static final String DISABLE_HTTP_SECURITY_HEADERS = "webswing.disableHttpSecurityHeaders";
 	public static final String LINK_COOKIE_TO_IP = "webswing.linkCookieToIpAddress";
 
+	// logging properties
+	public static final String LOGS_DIR_PATH = "webswing.logsDir";
+	public static final String LOGS_SESSION_MAX_SIZE = "webswing.sessionLog.maxSize";
+	public static final String LOGS_SESSION_SIZE = "webswing.sessionLog.size";
 
 	// swing start related properties
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";
@@ -118,6 +122,8 @@ public interface Constants {
 	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
 	public static final String EXTENSION_PROVIDER = "webswing.extensionProvider" ;
 	public static final String CONFIG_PROVIDER = "webswing.configProvider";
+	
+	public static final String SESSION_LOG_PATTERN = "%d %-5p [%t] (%F:%L) %m%n";
 
 	;
 }

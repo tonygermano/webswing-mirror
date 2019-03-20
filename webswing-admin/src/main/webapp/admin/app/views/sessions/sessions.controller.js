@@ -1,6 +1,6 @@
 (function (define) {
     define([], function f() {
-        function SessionsController($scope, $timeout, $location, configRestService, sessionsRestService, $route, $routeParams, wsUtils, baseUrl) {
+        function SessionsController($scope, $timeout, $location, configRestService, sessionsRestService, logRestService, $route, $routeParams, wsUtils, baseUrl) {
             var vm = this;
             vm.appFilter = $routeParams.app;
         	if (vm.appFilter && vm.appFilter.substr(0, 1) !== '/') {
@@ -24,6 +24,7 @@
             vm.sessions=[];
             vm.closedSessions = [];
             vm.recordings = [];
+            vm.log = [];
             vm.lastUpdated = null;
             vm.refresh = refresh;
             vm.getOsIcon = getOsIcon;
@@ -38,6 +39,11 @@
 			vm.showThreadDump = showThreadDump;
 			vm.requestThreadDump = requestThreadDump;
 			vm.hasWarnings = hasWarnings;
+			vm.logTimer = undefined;
+            vm.logEndOffset = -1;
+            vm.loadSessionLogs = loadSessionLogs;
+            vm.stopLogs = stopLogs;
+            vm.split = split;
             vm.now = function () {
                 return new Date().getTime();
             }
@@ -46,6 +52,7 @@
             
             $scope.$on('$destroy', function () {
                 $timeout.cancel(vm.timer);
+                $timeout.cancel(vm.logTimer);
             });
             
             function refresh() {
@@ -234,10 +241,77 @@
                     refresh();
                 });
             }
-
+            
             function view(session) {
-                window.open(baseUrl + '/admin/#/dashboard/session' + session.applicationUrl + '?id=' + session.id, '_blank');
+                $location.url('/dashboard/session' + session.applicationUrl + '?id=' + session.id);
             }
+            
+            function loadSessionLogs(session) {
+            	stopLogs();
+            	
+            	vm.logSession = session;
+            	vm.log = [];
+            	
+            	loadLogs(session.applicationUrl, 100 * 1024, -1, true).then(function() {
+            		loadLogsDelta(session.applicationUrl);
+            	});
+            }
+            
+            function stopLogs() {
+            	if (vm.logTimer) {
+					$timeout.cancel(vm.logTimer);
+				}
+            	vm.log = [];
+            }
+            
+            function loadLogsDelta(path) {
+				return loadLogs(path, 100 * 1024, vm.logEndOffset, false).then(function(data) {
+					$timeout.cancel(vm.logTimer);
+				}).then(function() {
+					if (vm.logTimer) {
+						$timeout.cancel(vm.logTimer);
+					}
+					vm.logTimer = $timeout(function() {
+						loadLogsDelta(path);
+					}, 1000);
+					return vm.logTimer;
+				}, function() {
+					$timeout.cancel(vm.logTimer);
+					vm.logTimer = undefined;
+				});
+			}
+
+			function loadLogs(path, size, start, backwards) {
+				var params = {
+					backwards : backwards,
+					offset : start,
+					max : size,
+					instanceId: vm.logSession.id
+				};
+				
+				return logRestService.getSessionLog(path, params).then(function(data) {
+					handleLogResponse(data, backwards);
+				});
+			}
+			
+			function handleLogResponse(data, backwards) {
+				if (data.log.length > 0) {
+					var log = data.log.split(/\n(?=\d{4})/g);
+					if (backwards) {
+						vm.log = log.concat(vm.log);
+						vm.logStartOffset = data.startOffset;
+						vm.logEndOffset = Math.max(vm.logEndOffset, data.endOffset);
+					} else {
+						vm.log = vm.log.concat(log);
+						vm.logStartOffset = Math.min(vm.logStartOffset, data.startOffset);
+						vm.logEndOffset = data.endOffset;
+					}
+				}
+			}
+			
+			function split(line) {
+            	return line.split(/\n(?=\d{4})/g);
+			}
             
             function record(session) {
                 return sessionsRestService.recordSession(session.applicationUrl, session.id).then(function () {
@@ -269,7 +343,7 @@
 
         }
 
-        SessionsController.$inject = ['$scope', '$timeout', '$location', 'configRestService', 'sessionsRestService', '$route', '$routeParams', 'wsUtils', 'baseUrl'];
+        SessionsController.$inject = ['$scope', '$timeout', '$location', 'configRestService', 'sessionsRestService', 'logRestService', '$route', '$routeParams', 'wsUtils', 'baseUrl'];
 
         return SessionsController;
     });

@@ -13,7 +13,8 @@
 				stop : stop,
 				remove : remove,
 				create : create,
-				getMeta : getMeta
+				getMeta : getMeta,
+				getVersion : getVersion
 			};
 			
 			function getApps() {
@@ -32,7 +33,7 @@
 					return data.data;
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('load installed apps', data, true);
+					return errorHandler.handleRestError('load installed apps paths', data, true);
 				}
 			}
 
@@ -137,6 +138,16 @@
 				}
 				function failed(data) {
 					return errorHandler.handleRestError('reload settings view', data, true);
+				}
+			}
+			
+			function getVersion() {
+				return $http.get(baseUrl + '/rest/version').then(success, failed);
+				function success(data) {
+					return data.data;
+				}
+				function failed(data) {
+					return errorHandler.handleRestError('load version', data, true);
 				}
 			}
 

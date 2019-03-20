@@ -3,8 +3,11 @@ package org.webswing.server.services.swingprocess;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.core.Appender;
+
 public class SwingProcessConfig {
 	private String name;
+	private String applicationName;
 	private String jreExecutable;
 	private String baseDir;
 	private String mainClass;
@@ -12,6 +15,7 @@ public class SwingProcessConfig {
 	private String jvmArgs;
 	private Map<String, String> properties = new HashMap<String, String>();
 	private String args;
+	private Appender logAppender;
 
 	public String getName() {
 		return name;
@@ -19,6 +23,14 @@ public class SwingProcessConfig {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getApplicationName() {
+		return applicationName;
+	}
+
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
 	}
 
 	public String getJreExecutable() {
@@ -92,4 +104,13 @@ public class SwingProcessConfig {
 	public void addProperty(String name, int value) {
 		addProperty(name, Integer.toString(value));
 	}
+
+	public Appender getLogAppender() {
+		return logAppender;
+	}
+
+	public void setLogAppender(Appender logAppender) {
+		this.logAppender = logAppender;
+	}
+	
 }

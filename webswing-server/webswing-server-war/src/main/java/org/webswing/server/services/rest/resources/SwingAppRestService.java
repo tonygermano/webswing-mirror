@@ -20,11 +20,16 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang.StringUtils;
+import org.webswing.Constants;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.common.model.admin.ApplicationInfo;
 import org.webswing.server.common.model.admin.Sessions;
 import org.webswing.server.common.model.admin.SwingSession;
+import org.webswing.server.common.model.rest.LogResponse;
+import org.webswing.server.common.model.rest.SessionLogRequest;
+import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.security.api.WebswingAction;
@@ -32,6 +37,7 @@ import org.webswing.server.services.stats.StatisticsLoggerService;
 import org.webswing.server.services.stats.logger.InstanceStats;
 import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
+import org.webswing.server.util.LogReaderUtil;
 import org.webswing.server.util.LoggerStatisticsUtil;
 
 @Path("")
@@ -215,6 +221,38 @@ public class SwingAppRestService extends BaseRestService {
 		}
 	}
 	
+	@POST
+	@Path("/rest/logs/session")
+	public LogResponse getLogs(SessionLogRequest request) throws WsException {
+		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
+		
+		if (StringUtils.isBlank(request.getInstanceId())) {
+			return null;
+		}
+		
+		return LogReaderUtil.readSessionLog(getAppInfo().getUrl(), getSessionLogsDir(), request);
+	}
+	
+	@GET
+	@Path("/rest/logs/session")
+	public Response downloadLog() throws WsException {
+		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
+		Response.ResponseBuilder builder = Response.ok(LogReaderUtil.getZippedSessionLog(getSessionLogsDir(), getAppInfo().getUrl()), MediaType.APPLICATION_OCTET_STREAM);
+		builder.header("content-disposition", "attachment; filename = " + LogReaderUtil.normalizeForFileName(getAppInfo().getName()) + "_session_logs.zip");
+		return builder.build();
+    }
+	
+	@GET
+	@Path("/rest/logs/session/instanceIds")
+	public List<String> getLogInstanceIds() throws WsException {
+		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
+		return LogReaderUtil.readSessionLogInstanceIds(getSessionLogsDir(), getAppInfo().getUrl());
+	}
+
+	private String getSessionLogsDir() {
+		return LogReaderUtil.getSessionLogDir(VariableSubstitutor.forSwingApp(manager.getConfig()), manager.getConfig().getSwingConfig());
+	}
+	
 	@GET
 	@Path("/rest/stats")
 	public Map<String, Map<Long, Number>> getStats() throws WsException {
@@ -225,7 +263,7 @@ public class SwingAppRestService extends BaseRestService {
 		
 		return LoggerStatisticsUtil.mergeSummaryInstanceStats(allStats);
 	}
-
+	
 	@Override
 	protected PrimaryUrlHandler getHandler() {
 		return handler;
