@@ -54,6 +54,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             autoUploadfileDialogTransferBarClientId.val(uuid);
             autoFileInput.prop("multiple", data.isMultiSelection);
             autoFileInput.attr("accept", data.filter);
+            setProgressBarVisible(false);
             animateShow(autoUploadBar);
         }
 
@@ -206,7 +207,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
                         if (closeAfterErrorTimeout) {
                             close();
                         }
-                    }, 7000);
+                    }, 3000);
                 }
             }
 

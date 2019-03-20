@@ -678,4 +678,12 @@ public class Util {
 			}
 		}
 	}
+
+	public static File getTimestampedTransferFolder(String marker) {
+		String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
+		path = path.split(File.pathSeparator)[0];
+		File timestampFoleder = new File(path, marker + System.currentTimeMillis());
+		timestampFoleder.mkdirs();
+		return timestampFoleder;
+	}
 }

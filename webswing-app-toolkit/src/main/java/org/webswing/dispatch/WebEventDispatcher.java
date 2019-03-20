@@ -478,7 +478,7 @@ public class WebEventDispatcher {
 								if (uploadMap.get(event.getFiles().get(i)) != null) {
 									arr.add(new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i))));
 								} else if (saveMode) {
-									arr.add(new File(fc.getCurrentDirectory(), event.getFiles().get(i)));
+									arr.add(new File(Util.getTimestampedTransferFolder("autosavemulti"), event.getFiles().get(i)));
 								}
 							}
 							fc.setSelectedFiles(arr.toArray(new File[arr.size()]));
@@ -488,7 +488,7 @@ public class WebEventDispatcher {
 								File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
 								fc.setSelectedFile(f);
 							} else if (saveMode) {
-								fc.setSelectedFile(new File(fc.getCurrentDirectory(), event.getFiles().get(0)));
+								fc.setSelectedFile(new File(Util.getTimestampedTransferFolder("autosave"), event.getFiles().get(0)));
 							}
 							Logger.info("File selected :" + fc.getSelectedFile().getAbsoluteFile());
 						}

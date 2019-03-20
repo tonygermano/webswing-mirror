@@ -421,11 +421,7 @@ public class WebPaintDispatcher {
 					fdEvent.setAllowDownload(false);
 					fdEvent.setAllowUpload(false);
 					if (FileDialogEventType.AutoUpload == fileChooserEventType) {
-						String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
-						path = path.split(File.pathSeparator)[0];
-						File timestampFoleder = new File(path, "" + System.currentTimeMillis());
-						timestampFoleder.mkdirs();
-						fileChooserDialog.setCurrentDirectory(timestampFoleder);
+						fileChooserDialog.setCurrentDirectory(Util.getTimestampedTransferFolder("autoupload"));
 					}
 					Window d = SwingUtilities.getWindowAncestor(fileChooserDialog);
 					d.setBounds(0, 0, 1, 1);
