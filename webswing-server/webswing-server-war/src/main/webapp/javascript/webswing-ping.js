@@ -2,8 +2,8 @@ define([], function amdFactory() {
     "use strict";
     return function PingModule() {
         var module = this;
-        var api;
-        var worker, ping, severity, mute = 0;
+        var api,intervalHandle;
+        var worker, ping, severity, mute;
         var count = 6, interval = 5, maxLatency = 500, notifyIf = 3;
         module.injects = api = {
             cfg: 'webswing.config',
@@ -13,16 +13,22 @@ define([], function amdFactory() {
             dialogContent: 'dialog.content'
         };
         module.provides = {
-            mutePingWarning: mutePingWarning
+            mutePingWarning: mutePingWarning,
+            start: start,
+            dispose: dispose
         };
         module.ready = function () {
+        };
+
+        function start(){
+            mute = 0;
             ping = getArrayWithLimitedLength(count);
             var connectionUrl=api.cfg.connectionUrl;
             if (connectionUrl.indexOf('http') != 0) {
                 var host = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '')
                 connectionUrl = host + connectionUrl;
             }
-            var blobURL = URL.createObjectURL(new Blob(['(', PingMonitor.toString(), ')("' + connectionUrl + '",' + interval + ')'], {type: 'application/javascript'}));
+            var blobURL = URL.createObjectURL(new Blob(['onmessage=(', PingMonitor.toString(), ')("' + connectionUrl + '",' + interval + ')'], {type: 'application/javascript'}));
             worker = new Worker(blobURL);
             worker.onmessage = function (e) {
                 var p = JSON.parse(e.data);
@@ -40,7 +46,10 @@ define([], function amdFactory() {
                 }
                 evaluateNetworkStatus();
             };
-        };
+            intervalHandle=setInterval(function(){
+                worker.postMessage('doPing');
+            }, interval*1000);
+        }
 
         function evaluateNetworkStatus() {
             var msg = null;
@@ -80,9 +89,7 @@ define([], function amdFactory() {
         function PingMonitor(connectionUrl, is) {
             var interval = is * 1000;
 
-            setInterval(ping, interval);
-
-            function ping(success, failure) {
+            function ping() {
                 var startTime = new Date().getTime();
                 var oReq = new XMLHttpRequest();
                 oReq.addEventListener("load", function (e) {
@@ -102,6 +109,12 @@ define([], function amdFactory() {
             function result(status, ms) {
                 postMessage(JSON.stringify({result: status, latency: ms}));
             }
+
+            return function onmessage(msg){
+                if(msg.data==='doPing'){
+                    ping();
+                }
+            }
         }
 
 
@@ -114,6 +127,17 @@ define([], function amdFactory() {
                 return Array.prototype.push.apply(this, arguments);
             }
             return array;
+        }
+
+        function dispose(){
+            if(worker!=null){
+                worker.terminate();
+            }
+            if(intervalHandle!=null){
+                clearInterval(intervalHandle);
+                intervalHandle=null;
+            }
+
         }
 
     };

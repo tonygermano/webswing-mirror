@@ -59,7 +59,6 @@
                     mirrorMode: true
                 };
                 window.webswingadmin.scan();
-                window.webswingadmin.webswingmirrorview.disconnect();
                 window.webswingadmin.webswingmirrorview.configure(config);
                 window.webswingadmin.webswingmirrorview.start();
             }

@@ -44,6 +44,11 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 }
             });
             for (var exportName in result) {
+                if(root[exportName] !=null && root[exportName].disconnect !=null){
+                    console.warn("Bootstrapping Webswing instance named '"+exportName+"'.Instance with this name has already been bootstrapped. Disconnecting old instance.");
+                    root[exportName].disconnect();
+                    delete root[exportName];
+                }
                 root[exportName] = $.extend(result[exportName], root[exportName]);
             }
         }
@@ -108,6 +113,8 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 disposeSocket: 'socket.dispose',
                 disposeFileDialog: 'files.close',
                 disposeCopyBar: 'clipboard.dispose',
+                disposePing: 'ping.dispose',
+                startPing: 'ping.start',
                 showPlaybackControls: 'playback.showControls',
                 externalApi: 'external'
             };
@@ -172,6 +179,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                     return;
                 }
                 api.login(function () {
+                    api.startPing();
                     api.showDialog(api.initializingDialog);
                     api.connect();
                 });
@@ -196,6 +204,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 api.disposeCanvas();
                 api.disposeSocket();
                 api.disposeCopyBar();
+                api.disposePing();
             }
 
             function configure(options, appletParams) {
