@@ -540,6 +540,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				j9modules += " --add-opens java.base/java.net=ALL-UNNAMED "; // URLStreamHandler reflective access from SwingClassloader
 				j9modules += " --add-opens java.desktop/java.awt=ALL-UNNAMED "; // EventQueue reflective access from SwingMain
 				j9modules += " --add-opens java.desktop/sun.awt.windows=ALL-UNNAMED "; // sun.awt.windows.ThemeReader reflective access from WebToolkit
+				j9modules += " --add-opens java.desktop/java.awt.event=ALL-UNNAMED "; // ava.awt.event.KeyEvent.extendedKeyCode reflective access from Util
 			} else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
 				throw new RuntimeException("Java version not supported. (Versions starting with 1.8 and 11 are supported.)");

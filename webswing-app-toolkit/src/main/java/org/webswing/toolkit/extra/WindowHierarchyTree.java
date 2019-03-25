@@ -103,7 +103,7 @@ public class WindowHierarchyTree {
 				WindowManager.getInstance().activateWindow(successor);
 			}
 		} else {
-			Logger.error("Window not registered. Could not remove.", window);
+			Logger.debug("Window not registered. Could not remove.", window);
 		}
 	}
 
