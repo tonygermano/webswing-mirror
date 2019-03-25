@@ -26,10 +26,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<KeycloakSecurityModuleConfig> {
 	private static final Logger log = LoggerFactory.getLogger(KeycloakSecurityModule.class);
 	public static final String REALM_PARAM = "realm";
+	private static final String OIDC_STATE = "KC_OpenIdConnectSessionState";
 
 	private Map<String, OpenIdConnectClient> clients = new HashMap<>();
 	private String defaultClient;
@@ -101,7 +103,9 @@ public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<Key
 	@Override
 	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
 		OpenIdConnectClient realmClient = clients.get(resolveRealmName(request));
-		String url = realmClient.getOpenIDRedirectUrl();
+		String state = UUID.randomUUID().toString().substring(0,7);
+		getConfig().getContext().setToSecuritySession(OIDC_STATE, state);
+		String url = realmClient.getOpenIDRedirectUrl(state);
 		if (url != null) {
 			if (exception != null) {
 				sendPartialHtml(request, response, "errorPartial.html", exception);
@@ -120,6 +124,8 @@ public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<Key
 			try {
 				String realmName = resolveRealmName(request);
 				OpenIdConnectClient realmClient = clients.get(realmName);
+				String expectedState = (String) getConfig().getContext().getFromSecuritySession(OIDC_STATE);
+				realmClient.validateCodeRequest(request,expectedState);
 				Map<String, Serializable> extraAttr = new HashMap<>();
 				extraAttr.put(REALM_PARAM, realmName);
 				AbstractWebswingUser user = realmClient.getUser(openIdCode, extraAttr);
@@ -129,6 +135,9 @@ public class KeycloakSecurityModule extends AbstractExtendableSecurityModule<Key
 				logFailure(request, null, "Failed to authenticate." + e1.getMessage());
 				log.error("Failed to authenticate", e1);
 				throw new WebswingAuthenticationException("Failed to authenticate. " + e1.getMessage(), WebswingAuthenticationException.FAILED_TO_AUTHENTICATE, e1);
+			}finally {
+				//reset the state value
+				getConfig().getContext().setToSecuritySession(OIDC_STATE,null);
 			}
 		}
 		return null;

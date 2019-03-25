@@ -13,9 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.UUID;
 
 public class OpenIDConnectSecurityModule extends AbstractExtendableSecurityModule<OpenIDConnectSecurityModuleConfig> {
 	private static final Logger log = LoggerFactory.getLogger(OpenIDConnectSecurityModule.class);
+	private static final String OIDC_STATE = "OpenIdConnectSessionState";
 
 	private OpenIdConnectClient client;
 
@@ -48,7 +50,9 @@ public class OpenIDConnectSecurityModule extends AbstractExtendableSecurityModul
 
 	@Override
 	protected void serveLoginPartial(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
-		String url = client.getOpenIDRedirectUrl();
+		String state = UUID.randomUUID().toString().substring(0,7);
+		getConfig().getContext().setToSecuritySession(OIDC_STATE, state);
+		String url = client.getOpenIDRedirectUrl(state);
 		if (exception != null || url == null) {
 			sendHtml(request, response, "errorPartial.html", exception);
 		} else {
@@ -61,6 +65,8 @@ public class OpenIDConnectSecurityModule extends AbstractExtendableSecurityModul
 		String openIdCode = client.getCode(request);
 		if (!StringUtils.isEmpty(openIdCode)) {
 			try {
+				String expectedState = (String) getConfig().getContext().getFromSecuritySession(OIDC_STATE);
+				client.validateCodeRequest(request,expectedState);
 				AbstractWebswingUser user = client.getUser(openIdCode, null);
 				logSuccess(request, user.getUserId());
 				return user;
@@ -68,6 +74,9 @@ public class OpenIDConnectSecurityModule extends AbstractExtendableSecurityModul
 				logFailure(request, null, "Failed to authenticate." + e1.getMessage());
 				log.error("Failed to authenticate", e1);
 				throw new WebswingAuthenticationException("Failed to authenticate. " + e1.getMessage(), WebswingAuthenticationException.FAILED_TO_AUTHENTICATE, e1);
+			}finally {
+				//reset the state value
+				getConfig().getContext().setToSecuritySession(OIDC_STATE,null);
 			}
 		}
 		return null;
