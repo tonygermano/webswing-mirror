@@ -17,6 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -25,10 +26,12 @@ import org.webswing.Constants;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.common.model.admin.ApplicationInfo;
+import org.webswing.server.common.model.admin.BasicApplicationInfo;
 import org.webswing.server.common.model.admin.Sessions;
 import org.webswing.server.common.model.admin.SwingSession;
 import org.webswing.server.common.model.rest.LogResponse;
 import org.webswing.server.common.model.rest.SessionLogRequest;
+import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
@@ -76,8 +79,15 @@ public class SwingAppRestService extends BaseRestService {
 	}
 
 	@Override
-	protected List<String> getPathsImpl() {
-		return Arrays.asList(handler.getFullPathMapping());
+	protected List<BasicApplicationInfo> getPathsImpl() {
+		BasicApplicationInfo app = new BasicApplicationInfo();
+		app.setPath(manager.getPathMapping());
+		app.setUrl(manager.getFullPathMapping());
+		app.setEnabled(manager.isEnabled());
+		app.setName(handler.getSwingConfig().getName());
+		List<SwingInstance> allRunning = manager.getSwingInstanceHolder().getAllInstances();
+		app.setRunningInstances(allRunning.size());
+		return Arrays.asList(app);
 	}
 
 	@GET
@@ -98,6 +108,19 @@ public class SwingAppRestService extends BaseRestService {
 			getHandler().disable();
 		}
 		return Response.ok().build();
+	}
+
+	@GET
+	@Path("/appicon")
+	@Produces("image/png")
+	public Response appicon() throws WsException {
+		getHandler().checkPermissionLocalOrMaster(WebswingAction.websocket_connect);
+		CacheControl cc = new CacheControl();
+		cc.setMaxAge(60*60);
+		cc.setPrivate(true);
+		File icon = handler.resolveFile(handler.getConfig().getIcon());
+		byte[] image = CommonUtil.loadImage(icon);
+		return Response.ok(image).cacheControl(cc).build();
 	}
 
 	@GET
@@ -122,15 +145,17 @@ public class SwingAppRestService extends BaseRestService {
 		}
 
 		List<String> externalRecordings=new ArrayList<>();
-		File recordingsDir = new File(URI.create(manager.getRecordingsDirPath()));
-		if(recordingsDir.exists()&& recordingsDir.isDirectory() && recordingsDir.canRead() )
-		for(File rFile:recordingsDir.listFiles()){
-			if(!localRecordingFiles.contains(rFile.getName())){
-				externalRecordings.add(rFile.getName());
-			}
+		if(manager.getRecordingsDirPath()!=null) {
+			File recordingsDir = new File(URI.create(manager.getRecordingsDirPath()));
+			if (recordingsDir.exists() && recordingsDir.isDirectory() && recordingsDir.canRead())
+				for (File rFile : recordingsDir.listFiles()) {
+					if (!localRecordingFiles.contains(rFile.getName())) {
+						externalRecordings.add(rFile.getName());
+					}
 
+				}
+			result.setRecordings(externalRecordings);
 		}
-		result.setRecordings(externalRecordings);
 		return result;
 	}
 

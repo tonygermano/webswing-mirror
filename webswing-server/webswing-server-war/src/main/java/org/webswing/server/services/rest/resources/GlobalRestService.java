@@ -22,6 +22,7 @@ import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.GlobalUrlHandler;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.common.model.admin.ApplicationInfo;
+import org.webswing.server.common.model.admin.BasicApplicationInfo;
 import org.webswing.server.common.model.admin.Sessions;
 import org.webswing.server.common.model.rest.LogRequest;
 import org.webswing.server.common.model.rest.LogResponse;
@@ -30,6 +31,7 @@ import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.stats.StatisticsLoggerService;
 import org.webswing.server.services.stats.logger.InstanceStats;
+import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.util.LogReaderUtil;
 import org.webswing.server.util.LoggerStatisticsUtil;
@@ -64,10 +66,19 @@ public class GlobalRestService extends BaseRestService {
 	}
 
 	@Override
-	protected List<String> getPathsImpl() {
-		List<String> result = new ArrayList<>();
+	protected List<BasicApplicationInfo> getPathsImpl() {
+		List<BasicApplicationInfo> result = new ArrayList<>();
 		for (SwingInstanceManager appManager : getGlobalHandler().getApplications()) {
-			result.add(appManager.getFullPathMapping());
+			BasicApplicationInfo app = new BasicApplicationInfo();
+			app.setPath(appManager.getPathMapping());
+			app.setUrl(appManager.getFullPathMapping());
+			app.setEnabled(appManager.isEnabled());
+			if(appManager.getConfig()!=null && appManager.getConfig().getSwingConfig()!=null) {
+				app.setName(appManager.getConfig().getSwingConfig().getName());
+			}
+			List<SwingInstance> allRunning = appManager.getSwingInstanceHolder().getAllInstances();
+			app.setRunningInstances(allRunning.size());
+			result.add(app);
 		}
 		return result;
 	}

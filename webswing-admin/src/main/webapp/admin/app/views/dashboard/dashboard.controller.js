@@ -18,15 +18,25 @@
 
 			function refresh() {
 				vm.paths = [];
-				configRestService.getPaths().then(function(data) {
-					vm.paths = data.sort();
+				return configRestService.getPaths().then(function(data) {
+					vm.paths = data.sort(function(a,b){
+						var aname = (a.name||'');
+						var bname = (b.name||'');
+						if(aname===bname){
+							return 0;
+						}else{
+							return aname<bname? -1:1;
+						}
+					});
 					vm.lastUpdated = new Date();
 				})
 			}
 
 			function getVisiblePaths() {
 				if (vm.path != null) {
-					return [ '/' + vm.path ];
+					return vm.paths.filter(function(p) {
+						return p.url==='/' + vm.path
+					});
 				} else {
 					return vm.paths;
 				}
@@ -55,7 +65,14 @@
 			}
 
 			function create() {
-				configRestService.create(vm.newPath).then(refresh);
+				var newapppath = vm.newPath;
+				newapppath = newapppath.charAt(0) !== '/' ? newapppath : newapppath.substring(1);
+				newapppath = newapppath.replace(/\W+/g, "-");
+				configRestService.create(newapppath).then(refresh).then(function(){
+					showSingle(vm.paths.filter(function (p){
+						return "/"+newapppath===p.path;
+					})[0].url);
+				});
 			}
 
 		}

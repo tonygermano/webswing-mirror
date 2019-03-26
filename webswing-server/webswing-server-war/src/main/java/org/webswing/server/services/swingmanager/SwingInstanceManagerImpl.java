@@ -245,19 +245,22 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 	@Override
 	public String getRecordingsDirPath() {
 		VariableSubstitutor subs = VariableSubstitutor.forSwingApp(getConfig());
-		String recFolderString= subs.replace(getConfig().getSwingConfig().getRecordingsFolder());
-		try {
-			String uri = new File(URI.create(recFolderString)).toURI().toString();
-			return uri;
-		} catch (IllegalArgumentException e) {
-			File resolved = resolveFile(recFolderString);
-			if(resolved!=null){
-				return resolved.toURI().toString();
-			}else {
-				File uninitialized = new File(recFolderString);
-				return uninitialized.toURI().toString();
+		if(getConfig().getSwingConfig()!=null) {
+			String recFolderString = subs.replace(getConfig().getSwingConfig().getRecordingsFolder());
+			try {
+				String uri = new File(URI.create(recFolderString)).toURI().toString();
+				return uri;
+			} catch (IllegalArgumentException e) {
+				File resolved = resolveFile(recFolderString);
+				if (resolved != null) {
+					return resolved.toURI().toString();
+				} else {
+					File uninitialized = new File(recFolderString);
+					return uninitialized.toURI().toString();
+				}
 			}
 		}
+		return null;
 	}
 
 }

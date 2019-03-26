@@ -77,7 +77,15 @@
             	});
             	
 				configRestService.getPaths().then(function(data) {
-					vm.paths = data.sort();
+					vm.paths = data.sort(function(a,b){
+                        var aname = (a.name||'');
+                        var bname = (b.name||'');
+                        if(aname===bname){
+                            return 0;
+                        }else{
+                            return aname<bname? -1:1;
+                        }
+                    });
 				});
             }
             

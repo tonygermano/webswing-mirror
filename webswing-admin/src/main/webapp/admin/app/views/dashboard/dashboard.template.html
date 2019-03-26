@@ -10,7 +10,17 @@
 		    </div>
 			<ul class="nav nav-sidebar">
 				<li ng-class="{active:  vm.isActive(null)}"><a ng-click="vm.showSingle(null)">Show All</a></li>
-				<li ng-repeat="location in vm.paths | filter:vm.filter" ng-class="{active:  vm.isActive(location)}"><a ng-click="vm.showSingle(location)">{{location}}</a></li>
+				<li ng-repeat="p in vm.paths | filter:vm.filter" ng-class="{active:  vm.isActive(p.url)}">
+					<a ng-click="vm.showSingle(p.url)">
+						<div class="row ws-app-header" >
+							<img ng-src="{{p.url}}/appicon" alt="{{p.name}}" class="ws-app-img img-circle"></img>
+							<div class="ws-app-name ">
+								<h5>{{p.name}}  </h5>
+								<small>{{p.path}} </small>
+							</div>
+						</div>
+					</a>
+				</li>
 			</ul>
 		</div>
         <div ng-class="{'col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2':vm.paths.length > 1, 'main':true}">
@@ -28,7 +38,7 @@
 				</h2>
 				<div class="row">
 					<div ng-repeat="path in vm.getVisiblePaths() | filter:vm.filter" class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
-						<ws-app-view reload="vm.refresh" path="path" detail="true"></ws-app-view>
+						<ws-app-view reload="vm.refresh" path="path.url" detail="true"></ws-app-view>
 					</div>
 				</div>
 			</div>

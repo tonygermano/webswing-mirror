@@ -105,14 +105,16 @@
 			}
 
 			function remove() {
-				configRestService.remove(vm.value.path).then(function() {
-					if (vm.refresh != null) {
-						$location.path('/dashboard');
-						if (vm.reload != null) {
-							vm.reload();
+				$timeout(function() {
+					configRestService.remove(vm.value.path).then(function() {
+						if (vm.refresh != null) {
+							$location.path('/dashboard');
+							if (vm.reload != null) {
+								vm.reload();
+							}
 						}
-					}
-				});
+					});
+				}, 500);
 				vm.value.status.status = 'Uninstalling Application';
 				vm.stoppable = false;
 				vm.startable = false;

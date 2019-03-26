@@ -1,7 +1,7 @@
 <div ng-if="vm.value!=null" class="panel panel-default">
 	<div class="panel-heading">
 		<div class="row ws-app-header">
-			<img ng-src="{{vm.b64img}}" alt="{{vm.value.name}}" class="ws-app-img img-circle"></img>
+			<img ng-src="{{vm.value.url}}/appicon" alt="{{vm.value.name}}" class="ws-app-img img-circle"></img>
 			<div class="ws-app-name ">
 				<h4>{{vm.value.name}}  </h4>
 				<a href="{{vm.value.url}}">{{vm.value.path}} </a>
@@ -60,7 +60,7 @@
 				        	</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-								<button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="vm.stop()">Remove</button>
+								<button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="vm.remove()">Remove</button>
 							</div>
 						</div>
 					</div>

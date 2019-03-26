@@ -4,6 +4,7 @@ import org.apache.commons.lang3.text.StrSubstitutor;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.common.model.admin.ApplicationInfo;
+import org.webswing.server.common.model.admin.BasicApplicationInfo;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.model.meta.VariableSetName;
 import org.webswing.server.common.util.CommonUtil;
@@ -11,6 +12,8 @@ import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.security.api.WebswingAction;
+import org.webswing.server.services.security.login.SecuredPathHandler;
+import org.webswing.server.services.swinginstance.SwingInstance;
 import org.webswing.toolkit.util.GitRepositoryState;
 
 import javax.ws.rs.*;
@@ -45,10 +48,8 @@ public abstract class BaseRestService {
 		PrimaryUrlHandler h = getHandler();
 		ApplicationInfo app = new ApplicationInfo();
 		app.setPath(h.getPathMapping());
-		app.setEnabled(h.isEnabled());
 		app.setUrl(h.getFullPathMapping());
-		File icon = h.resolveFile(h.getConfig().getIcon());
-		app.setIcon(CommonUtil.loadImage(icon));
+		app.setEnabled(h.isEnabled());
 		app.setConfig(h.getConfig());
 		app.setVariables(h.getVariableMap());
 		app.setStatus(h.getStatus());
@@ -57,12 +58,12 @@ public abstract class BaseRestService {
 
 	@GET
 	@Path("/rest/paths")
-	public List<String> getPaths() throws WsException {
+	public List<BasicApplicationInfo> getPaths() throws WsException {
 		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getPaths);
 		return getPathsImpl();
 	}
 
-	protected abstract List<String> getPathsImpl();
+	protected abstract List<BasicApplicationInfo> getPathsImpl();
 
 	@POST
 	@Path("/rest/config")
