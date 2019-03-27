@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "allowStealSession", "autoLogout", "goodbyeUrl", 
-		"sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "loadingAnimationDelay", "allowStealSession", "autoLogout",
+		"goodbyeUrl", "sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
@@ -105,7 +105,12 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.Session, label = "Monitor App Responsiveness", description = "If True, Webswing will display a progress animation if Swing's Event Dispatch thread is not responding.")
 	@ConfigFieldDefaultValueBoolean(true)
+	@ConfigFieldDiscriminator
 	public boolean isMonitorEdtEnabled();
+
+	@ConfigField(tab = ConfigGroup.Session, label = "Loading Animation delay", description = "If EDT thread is blocked for more then defined delay in seconds, dialog with loading animation is displayed appears. Delay must be  >= 2 seconds.")
+	@ConfigFieldDefaultValueNumber(2)
+	int getLoadingAnimationDelay();
 
 	@ConfigField(tab = ConfigGroup.Session, label = "Session Stealing", description = "If enabled, and session mode 'CONTINUE_FOR_USER' is selected, user can resume Webswing session even if the connection is open in other browser. Former browser window will be disconnected.")
 	@ConfigFieldDefaultValueBoolean(true)
@@ -205,7 +210,6 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueString(Constants.DEFAULT_RECORDINGS_FOLDER)
 	String getRecordingsFolder();
 
-
 	public static class SwingConfigurationMetadataGenerator extends MetadataGenerator<SwingConfig> {
 		@Override
 		public Class<?> getExplicitType(SwingConfig config, ClassLoader cl, String propertyName, Method readMethod, Object value) throws ClassNotFoundException {
@@ -250,6 +254,9 @@ public interface SwingConfig extends Config {
 				names.remove("loggingDirectory");
 				names.remove("sessionLogMaxFileSize");
 				names.remove("sessionLogFileSize");
+			}
+			if(!config.isMonitorEdtEnabled()){
+				names.remove("loadingAnimationDelay");
 			}
 			return names;
 		}

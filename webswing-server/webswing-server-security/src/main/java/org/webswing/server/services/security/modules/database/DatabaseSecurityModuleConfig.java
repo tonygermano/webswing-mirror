@@ -70,7 +70,7 @@ public interface DatabaseSecurityModuleConfig extends WebswingExtendableSecurity
 	@ConfigFieldDefaultValueBoolean(false)
 	boolean getHashHexEncoded();
 
-	public class DatabaseSecurityModuleConfigMetaGenerator extends MetadataGenerator<DatabaseSecurityModuleConfig> {
+	public class DatabaseSecurityModuleConfigMetaGenerator extends ExtensionMetadataGenerator<DatabaseSecurityModuleConfig> {
 		@Override
 		protected String[] getPresets(DatabaseSecurityModuleConfig config, ClassLoader cl, String propertyName, Method readMethod) {
 			if (propertyName.equals("dataSourceProperties")) {

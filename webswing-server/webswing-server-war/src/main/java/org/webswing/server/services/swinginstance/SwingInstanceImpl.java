@@ -358,7 +358,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				logStatValue(StatisticsLogger.CPU_UTIL_SESSION_METRIC, cpuUsage);
 				logStatValue(StatisticsLogger.EDT_BLOCKED_SEC_METRIC, s.getEdtPingSeconds());
 				if (getAppConfig().isMonitorEdtEnabled()) {
-					if (s.getEdtPingSeconds() > 2) {
+					if (s.getEdtPingSeconds() > Math.max(2,getAppConfig().getLoadingAnimationDelay())) {
 						sendToWeb(SimpleEventMsgOut.applicationBusy.buildMsgOut());
 					}
 				}

@@ -17,7 +17,7 @@ public interface EmbededSecurityModuleConfig extends WebswingExtendableSecurityM
 	@ConfigFieldDiscriminator
 	List<EmbededUserEntry> getUsers();
 
-	public class MetadataGenerator extends org.webswing.server.common.model.meta.MetadataGenerator<EmbededSecurityModuleConfig> {
+	public class MetadataGenerator extends ExtensionMetadataGenerator<EmbededSecurityModuleConfig> {
 		@Override
 		protected Object getValue(EmbededSecurityModuleConfig config, ClassLoader cl, String propertyName, Method readMethod) throws Exception {
 			Object value = super.getValue(config, cl, propertyName, readMethod);
