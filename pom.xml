@@ -436,7 +436,7 @@
                         <configuration>
                             <autoVersionSubmodules>true</autoVersionSubmodules>
                             <noDeploy>true</noDeploy>
-                            <squash>true</squash>
+                            <squash>false</squash>
                             <allowSnapshots>true</allowSnapshots>
                         </configuration>
                     </plugin>
