@@ -22,6 +22,7 @@ import javax.swing.WindowConstants;
 
 import org.webswing.directdraw.DirectDrawServicesAdapter;
 import org.webswing.directdraw.toolkit.WebGraphics;
+import org.webswing.directdraw.toolkit.WebImage;
 
 public class Tests {
 
@@ -940,6 +941,61 @@ public class Tests {
 		g.setXORMode(Color.GRAY);
 		g.drawString("testString123",10,y+30);
 		return true;
+	}
+
+	public static boolean t33RenderCancelledFallbackTest(Graphics2D g, int repeat) {
+		if (repeat > 0) {
+			return false;
+		}
+		System.setProperty(WebImage.FALLBACK_PROPERTY,100+"");
+		g.setColor(Color.BLACK);
+		g.setTransform(new AffineTransform(1.1,0.001,-0.001,1.1,2,2));
+		for (int i = 0; i < 100; i++) {
+			g.drawLine(0,i*3,i*3,0);
+		}
+		g.setTransform(new AffineTransform(1,0,0,1,0,0));
+		g.copyArea(0,0,1,1,1,1);//cancels the fallback
+		g.setTransform(new AffineTransform(1.1,0.001,-0.001,1.1,2,2));
+		for (int i = 100; i < 130; i++) {
+			g.drawLine(0,i*3,i*3,0);
+		}
+		return true;
+	}
+
+	public static boolean t34RenderFallbackWithCopyAreaTest(Graphics2D g, int repeat) {
+		if (repeat > 0) {
+			return false;
+		}
+		System.setProperty(WebImage.FALLBACK_PROPERTY,100+"");
+		drawlines(g);
+
+		return true;
+	}
+
+	public static boolean t35RenderNoFallbackWithCopyAreaTest(Graphics2D g, int repeat) {
+		if (repeat > 0) {
+			return false;
+		}
+		System.setProperty(WebImage.FALLBACK_PROPERTY,-1+"");
+		drawlines(g);
+
+		return true;
+	}
+
+	private static void drawlines(Graphics2D g) {
+		for (int j = 0; j < 20; j++) {
+			if(j!=0) {
+				g.setClip(0, 0, 500, 100);
+				g.copyArea(0, 0, 500, 100, 20, 1);
+			}
+			g.setColor(Color.BLACK);
+			g.setBackground(Color.white);
+			g.setClip(0,0,20,100);
+			g.clearRect(0,0,20,100);
+			for (int i = 0; i < 100; i++) {
+				g.drawLine(0,i*4,i*i,0);
+			}
+		}
 	}
 
 	private static void filledThenStroked(Graphics2D g) {

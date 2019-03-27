@@ -1,5 +1,7 @@
 package org.webswing.server.services.security.modules.property;
 
+import java.io.File;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -10,17 +12,15 @@ import org.slf4j.LoggerFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.modules.AbstractUserPasswordSecurityModule;
-import org.webswing.server.services.security.modules.keycloak.KeycloakSecurityModule;
-
-import java.io.File;
 
 public class PropertySecurityModule extends AbstractUserPasswordSecurityModule<PropertySecurityModuleConfig> {
+
 	private static final Logger log = LoggerFactory.getLogger(PropertySecurityModule.class);
 	private PropertiesRealm realm;
 
 	public PropertySecurityModule(PropertySecurityModuleConfig config) {
 		super(config);
-		realm = new PropertiesRealm();
+		realm = new PropertiesRealmSerializable();
 		String fileName = getConfig().getFile();
 		String fileNameFull = getConfig().getContext().replaceVariables(fileName);
 		File file = getConfig().getContext().resolveFile(fileNameFull);

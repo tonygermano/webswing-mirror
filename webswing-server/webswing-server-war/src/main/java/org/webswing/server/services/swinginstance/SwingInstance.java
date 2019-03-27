@@ -5,19 +5,17 @@ import org.webswing.model.MsgOut;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.model.admin.SwingSession;
+import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
 public interface SwingInstance {
+	String getOwnerId();
 
 	String getInstanceId();
 
-	String getSessionId();
+	String getConnectionId();
 
-	String getMirrorSessionId();
-
-	String getClientId();
-
-	String getUser();
+	String getMirrorConnectionId();
 
 	SwingConfig getAppConfig();
 
@@ -41,9 +39,15 @@ public interface SwingInstance {
 
 	void logWarningHistory();
 
-	void startRecording();
+	boolean isRecording();
+
+	void startRecording() throws WsException;
+
+	void stopRecording() throws WsException;
 
 	String getThreadDump(String id);
 
 	void requestThreadDump();
+
+	String getUserId();
 }

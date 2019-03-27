@@ -41,15 +41,11 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import sun.nio.ch.IOUtil;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -140,10 +136,11 @@ public class BodyElement {
 		});
 
 		bodyPane.setOnDragOver((DragEvent event) -> {
-			if (event.getGestureSource() != bodyImage && event.getDragboard().hasString()) {
-				event.acceptTransferModes(TransferMode.MOVE);
-			}
-			event.consume();
+			throw new NullPointerException();
+//			if (event.getGestureSource() != bodyImage && event.getDragboard().hasString()) {
+//				event.acceptTransferModes(TransferMode.MOVE);
+//			}
+//			event.consume();
 		});
 
 		bodyPane.getChildren().add(bodyImage);

@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>webswing-server</artifactId>
 		<groupId>org.webswing</groupId>
-		<version>2.5.12</version>
+		<version>2.6</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<dependencies>
@@ -35,10 +35,10 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<compilerArguments>
-						<bootclasspath>${basedir}/../../lib/rt1.7.0_60.jar</bootclasspath>
+						<bootclasspath>${basedir}/../../lib/rt1.8.0_25.jar</bootclasspath>
 					</compilerArguments>
 				</configuration>
 			</plugin>
@@ -68,4 +68,55 @@
 			</plugin>
 		</plugins>
 	</build>
+    <profiles>
+        <!-- =========================================SERVERLESS BUILD PROFILE================================== -->
+        <profile>
+            <id>serverless</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/serverless</outputDirectory>
+                                    <includeScope>runtime</includeScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/serverless</outputDirectory>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>serverless</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <echo file="${project.build.directory}/WEB-INF/server-lib/README.txt">This is a serverless Webswing build. No embedded server is included. Deploy to supported Servlet container. (ie. Tomcat)</echo>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

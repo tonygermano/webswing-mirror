@@ -135,7 +135,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 			Logger.error("Failed to init X11 display: ", e.getMessage());
 		}
 		if (System.getProperty("os.name", "").startsWith("Windows")) {
-			String path = System.getProperty("user.home") + "\\Desktop";
+			String path = System.getenv("USERPROFILE") + "\\Desktop";
 			File desktopFolder = new File(path);
 			if (!desktopFolder.exists() && !desktopFolder.mkdir()) {
 				Logger.error("Failed to create Desktop folder: " + path);
@@ -195,7 +195,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		}
 	}
 
-	protected WindowManager getWindowManager() {
+	public WindowManager getWindowManager() {
 		return windowManager;
 	}
 
@@ -243,8 +243,8 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	@Override
 	protected void initializeDesktopProperties() {
-		if (System.getProperty(Constants.SWING_START_SYS_PROP_ISOLATED_FS, "").equalsIgnoreCase("true")) {
-			this.desktopProperties.put("Shell.shellFolderManager", "org.webswing.toolkit.extra.WebShellFolderManager");
+		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ISOLATED_FS)) {
+			this.desktopProperties.put("Shell.shellFolderManager", "org.webswing.toolkit.extra.IsolatedFsShellFolderManager");
 		} else {
 			if (System.getProperty("os.name", "").startsWith("Windows")) {
 				this.desktopProperties.put("Shell.shellFolderManager", "sun.awt.shell.Win32ShellFolderManager2");
@@ -377,38 +377,54 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	}
 
 	public FramePeer createFrame(Frame frame) throws HeadlessException {
-		WebFramePeer localWFramePeer = new WebFramePeer(frame);
+		WebFramePeer localWFramePeer = createWebFramePeer(frame);
 		targetCreatedPeer(frame, localWFramePeer);
 		return localWFramePeer;
 	}
 
+	abstract WebFramePeer createWebFramePeer(Frame frame) throws HeadlessException;
+
 	public DialogPeer createDialog(Dialog paramDialog) throws HeadlessException {
-		WebDialogPeer localdialogPeer = new WebDialogPeer(paramDialog);
+		WebDialogPeer localdialogPeer = createWebDialogPeer(paramDialog);
 		targetCreatedPeer(paramDialog, localdialogPeer);
 		return localdialogPeer;
 	}
+
+	abstract  WebDialogPeer createWebDialogPeer(Dialog paramDialog);
 
 	public boolean isModalityTypeSupported(ModalityType mt) {
 		return true;
 	}
 
 	public WindowPeer createWindow(Window paramWindow) throws HeadlessException {
-		WebWindowPeer localwindowPeer = new WebWindowPeer(paramWindow);
+		WebWindowPeer localwindowPeer = createWebWindowPeer(paramWindow);
 		targetCreatedPeer(paramWindow, localwindowPeer);
 		return localwindowPeer;
 	}
+
+	abstract WebWindowPeer createWebWindowPeer(Window paramWindow);
 
 	public PanelPeer createPanel(Panel panel) {
 		if (panel instanceof Applet) {
 			return super.createPanel(panel);
 		}
-		WebPanelPeer localpanelPeer = new WebPanelPeer(panel);
+		WebPanelPeer localpanelPeer = createWebPanelPeer(panel);
 		targetCreatedPeer(panel, localpanelPeer);
 		return localpanelPeer;
 	}
 
+	abstract WebPanelPeer createWebPanelPeer(Panel panel);
+
+	public FileDialogPeer createFileDialog(FileDialog paramFileDialog) throws HeadlessException{
+		WebFileDialogPeer localFileDialogPeer= createWebFileDialogPeer(paramFileDialog);
+		return localFileDialogPeer;
+	};
+
+	abstract WebFileDialogPeer createWebFileDialogPeer(FileDialog paramFileDialog);
+
+
 	@Override
-	protected synchronized MouseInfoPeer getMouseInfoPeer() {
+	public synchronized MouseInfoPeer getMouseInfoPeer() {
 		{
 			if (mPeer == null) {
 				mPeer = new WebMouseInfoPeer();
@@ -580,10 +596,6 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		throw new UnsupportedOperationException();
 	}
 
-	public FileDialogPeer createFileDialog(FileDialog paramFileDialog) throws HeadlessException {
-		return new WebFileDialogPeer(paramFileDialog);
-	}
-
 	public MenuBarPeer createMenuBar(MenuBar paramMenuBar) throws HeadlessException {
 		throw new UnsupportedOperationException();
 	}
@@ -636,7 +648,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		return true;
 	}
 
-	protected DesktopPeer createDesktopPeer(Desktop paramDesktop) throws HeadlessException {
+	public DesktopPeer createDesktopPeer(Desktop paramDesktop) throws HeadlessException {
 		return new WebDesktopPeer(paramDesktop);
 	}
 
@@ -709,6 +721,11 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	abstract public boolean webConpoenentPeerUpdateGraphicsData();
 
 	abstract public SurfaceData webComponentPeerReplaceSurfaceData(SurfaceManager mgr);
+
+	abstract public int shouldNativelyFocusHeavyweight(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) ;
+
+	@SuppressWarnings("deprecation")
+	abstract public boolean deliverFocus(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) ;
 
 	public synchronized void exitSwing(final int i) {
 		if (!exiting) {

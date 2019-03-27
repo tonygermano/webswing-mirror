@@ -2,17 +2,30 @@
 	define([], function f() {
 		function configRestService(baseUrl, $http, errorHandler, messageService) {
 			return {
+				getApps : getApps,
 				getPaths : getPaths,
 				getInfo : getInfo,
 				getConfig : getConfig,
 				setConfig : setConfig,
-				getVariables : getVariables,
+				getVariables: getVariables,
+				resolve: resolve,
 				start : start,
 				stop : stop,
 				remove : remove,
 				create : create,
-				getMeta : getMeta
+				getMeta : getMeta,
+				getVersion : getVersion
 			};
+			
+			function getApps() {
+				return $http.get(baseUrl + '/apps').then(success, failed);
+				function success(data) {
+					return data.data;
+				}
+				function failed(data) {
+					return errorHandler.handleRestError('load installed apps', data, true);
+				}
+			}
 
 			function getPaths() {
 				return $http.get(baseUrl + '/rest/paths').then(success, failed);
@@ -20,7 +33,7 @@
 					return data.data;
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('load installed apps', data, true);
+					return errorHandler.handleRestError('load installed apps paths', data, true);
 				}
 			}
 
@@ -94,14 +107,28 @@
 				}
 			}
 
-			function getVariables(path,type) {
-				return $http.get(toPath(path) + '/rest/variables/'+type).then(success, failed);
+			function getVariables(path,type,searchSequence) {
+				var url = toPath(path) + '/rest/variables/search/' + encodeURIComponent(type) + '?search=' + encodeURIComponent(searchSequence);
+				return $http.get(url).then(success, failed);
 				function success(data) {
 					return data.data;
 				}
 				function failed(data) {
-					return errorHandler.handleRestError('load available configuration variables', data, true);
+					return errorHandler.handleRestError('get variables new', data, false);
 				}
+			}
+
+			function resolve(path,type,searchSequence) {
+
+                var url = toPath(path) + '/rest/variables/resolve/' + type + '?resolve=' + encodeURIComponent(searchSequence);
+
+                return $http.get(url).then(success, failed);
+                function success(data) {
+                    return data.data;
+                }
+                function failed(data) {
+                    return errorHandler.handleRestError('resolve', data, false);
+                }
 			}
 
 			function getMeta(path,config) {
@@ -111,6 +138,16 @@
 				}
 				function failed(data) {
 					return errorHandler.handleRestError('reload settings view', data, true);
+				}
+			}
+			
+			function getVersion() {
+				return $http.get(baseUrl + '/rest/version').then(success, failed);
+				function success(data) {
+					return data.data;
+				}
+				function failed(data) {
+					return errorHandler.handleRestError('load version', data, true);
 				}
 			}
 

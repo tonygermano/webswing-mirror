@@ -82,7 +82,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 	}
 
 	public void onDisconnect(WebSocketConnection r) {
-		SwingInstance instance = instanceManager.findInstanceBySessionId(r.uuid());
+		SwingInstance instance = instanceManager.getSwingInstanceHolder().findInstanceByConnectionId(r.uuid());
 		if (instance != null) {
 			instance.webSessionDisconnected(r.uuid());
 		}
@@ -138,7 +138,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 			} else {
 				log.error("Unable to decode message: " + message);
 			}
-			SwingInstance instance = instanceManager.findInstanceBySessionId(r.uuid());
+			SwingInstance instance = instanceManager.getSwingInstanceHolder().findInstanceByConnectionId(r.uuid());
 			if (instance != null) {
 				instance.logStatValue(StatisticsLogger.INBOUND_SIZE_METRIC, length);
 			}
@@ -151,7 +151,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 	}
 
 	private void send(WebSocketConnection r, MsgIn o) {
-		SwingInstance instance = instanceManager.findInstanceBySessionId(r.uuid());
+		SwingInstance instance = instanceManager.getSwingInstanceHolder().findInstanceByConnectionId(r.uuid());
 		if (instance != null) {
 			instance.sendToSwing(r, o);
 		}

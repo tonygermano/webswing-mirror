@@ -629,7 +629,7 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 
 	@Override
 	public void setClip(Shape clip) {
-		userClip = transformShape(clip);
+		changeClip(transformShape(clip));
 	}
 
 	@Override
@@ -638,7 +638,11 @@ public abstract class AbstractVectorGraphics extends Graphics2D {
 		if (userClip != null) {
 			s = intersectShapes(userClip, s);
 		}
-		userClip = s;
+		changeClip(s);
+	}
+
+	protected void changeClip(Shape clip){
+		userClip = clip;
 	}
 
 	/**

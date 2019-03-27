@@ -16,6 +16,7 @@ import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.util.SecurityUtil;
+import org.webswing.server.util.ServerUtil;
 
 public class WebSocketConnection {
 	private static final Logger log = LoggerFactory.getLogger(WebSocketConnection.class);

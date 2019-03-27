@@ -36,7 +36,7 @@ import org.webswing.toolkit.WebPrintService;
 public class WebPrintDialog extends JDialog {
 
 	private static final long serialVersionUID = 7094056515358259815L;
-	private static ResourceBundle messages = ResourceBundle.getBundle("sun.print.resources.serviceui");
+	private static ResourceBundle messages = ResourceBundle.getBundle("org.webswing.toolkit.util.WebPrintDialogResources");
 	private JButton cancel;
 	private JButton approve;
 	private JPanel content;

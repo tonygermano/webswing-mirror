@@ -23,6 +23,7 @@ public class AppFrameMsgOut implements MsgOut {
 	private PixelsAreaRequestMsgOut pixelsRequest;
 	private JsEvalRequestMsgOut jsRequest;
 	private JsResultMsg javaResponse;
+	private FocusEventMsg focusEvent;
 	private PlaybackInfoMsg playback;
 	private String sessionId;
 	private String startTimestamp = "" + System.currentTimeMillis();
@@ -181,5 +182,13 @@ public class AppFrameMsgOut implements MsgOut {
 
 	public void setPixelsRequest(PixelsAreaRequestMsgOut pixelsRequest) {
 		this.pixelsRequest = pixelsRequest;
+	}
+
+	public FocusEventMsg getFocusEvent() {
+		return focusEvent;
+	}
+
+	public void setFocusEvent(FocusEventMsg focusEvent) {
+		this.focusEvent = focusEvent;
 	}
 }

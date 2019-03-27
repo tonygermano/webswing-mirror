@@ -11,14 +11,14 @@
 	<div class="row" collapse="vm.label != null && value.collapsed" >
 		<div class="ws-config-group col-md-12 ws-order-number-start" >
 	        <ws-field ng-repeat="field in value.fields"
-	                  field="field"  
-	                  variables="vm.variables"
-	                  readonly="vm.readonly">
+	                  field="field"
+	                  readonly="vm.readonly"
+					  path="vm.path">
 	        </ws-field>
 	        <ws-field ng-repeat="object in value.objects"
-	                  field="object"  
-	                  variables="vm.variables"
-	                  readonly="vm.readonly">
+	                  field="object"
+	                  readonly="vm.readonly"
+			          path="vm.path">
 	        </ws-field>
 	    </div>
 	</div>

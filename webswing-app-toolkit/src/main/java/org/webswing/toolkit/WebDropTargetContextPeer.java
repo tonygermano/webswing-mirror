@@ -4,7 +4,7 @@ import java.awt.Component;
 import java.awt.Window;
 import java.io.IOException;
 
-import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.toolkit.util.Util;
 
 import sun.awt.PeerEvent;
 import sun.awt.SunToolkit;
@@ -34,7 +34,7 @@ public class WebDropTargetContextPeer extends SunDropTargetContextPeer {
             dragSource.dragFinished(success, dropAction, dropx, dropy);
         }
         if (success) {
-            WindowManager.getInstance().activateWindow(dropWindow, dropx, dropy);
+            Util.getWebToolkit().getWindowManager().activateWindow(dropWindow, dropx, dropy);
         }
     }
 

@@ -11,18 +11,10 @@ import java.net.URLStreamHandler;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.bcel.Constants;
-import org.apache.bcel.classfile.Constant;
-import org.apache.bcel.classfile.ConstantClass;
-import org.apache.bcel.classfile.JavaClass;
-import org.apache.bcel.classfile.Method;
+import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.ALOAD;
 import org.apache.bcel.generic.CHECKCAST;
 import org.apache.bcel.generic.CPInstruction;
@@ -39,6 +31,7 @@ import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.ClassLoaderRepository;
+import org.apache.commons.io.IOUtils;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.util.ClassLoaderUtil;
 
@@ -170,6 +163,7 @@ public class SwingClassloader extends URLClassLoader {
 
 	private Hashtable<String, Class<?>> classes = new Hashtable<String, Class<?>>(); // Hashtable is synchronized thus thread-safe
 	private String[] ignored_packages;
+	private ClassModificationRegister modRegister= new ClassModificationRegister();
 	private ClassLoaderRepository repository;
 	private final URLClassLoader repoClassLoader;
 
@@ -223,17 +217,27 @@ public class SwingClassloader extends URLClassLoader {
 				}
 			}
 			if (cl == null) {
-				JavaClass clazz = null;
 				/*
 				 * Fourth try: Special request?
 				 */
+				byte[] bytes=null;
+
 				if (class_name.indexOf("$$BCEL$$") >= 0) {
-					clazz = createClass(class_name);
+					bytes = createClass(class_name).getBytes();
 				} else { // Fifth try: Load classes via repository
 					try {
-						clazz = repository.loadClass(class_name);
-						clazz = modifyClass(clazz);
-						repository.removeClass(clazz);
+						if(modRegister.canSkipModification(class_name)) {
+							if(class_name.lastIndexOf(".")>0) {
+								definePackage(class_name.substring(0, class_name.lastIndexOf(".")));
+							}
+							bytes=loadClassBytes(class_name);
+						}else {
+							JavaClass clazz = repository.loadClass(class_name);
+							clazz = modifyClass(clazz);
+							repository.removeClass(clazz);
+							bytes = clazz.getBytes();
+						}
+						modRegister.notifyClassLoaded(class_name);
 					} catch (ClassNotFoundException e) {
 						//in case the class was loaded from external source using defineClass (ie. remote EJB stub)
 						cl = findLoadedClass(class_name);
@@ -247,11 +251,10 @@ public class SwingClassloader extends URLClassLoader {
 						}
 					}
 				}
-				if (clazz != null) {
-					byte[] bytes = clazz.getBytes();
+				if (bytes != null) {
 					java.security.Permissions perms = new java.security.Permissions();
 					perms.add(SecurityConstants.ALL_PERMISSION);
-					String classFilePath = repoClassLoader.getResource(clazz.getClassName().replace('.', '/') + ".class").toExternalForm();
+					String classFilePath = repoClassLoader.getResource(class_name.replace('.', '/') + ".class").toExternalForm();
 					int jarSeparatorIndex = classFilePath.lastIndexOf('!');
 					boolean inJar = classFilePath.startsWith("jar:");
 					classFilePath = jarSeparatorIndex > 0 && inJar ? classFilePath.substring(4, jarSeparatorIndex) : classFilePath;
@@ -302,10 +305,7 @@ public class SwingClassloader extends URLClassLoader {
 			return clazz;
 		}
 
-		Package s = getPackage(clazz.getPackageName());
-		if (s == null) {
-			super.definePackage(clazz.getPackageName(), null, null, null, null, null, null, null);
-		}
+		definePackage(clazz.getPackageName());
 
 		if (!classReplacementMapping.values().contains(clazz.getClassName())) {
 			ClassGen cg = new ClassGen(clazz);
@@ -319,10 +319,10 @@ public class SwingClassloader extends URLClassLoader {
 			// interceptPaintMethod(clazz, cg, cp, f);
 
 			// +++++++++ Reroute (static) methods that require special handling +++++++++++++
-			rerouteMehods(clazz, cg, cp, f);
+			boolean rerouted = rerouteMehods(clazz, cg, cp, f);
 
 			// +++++++++ Override methods that needs to be modified +++++++++++++
-			overrideMehods(cg, cp, f);
+			//overrideMehods(cg, cp, f);
 
 			// dump
 			// try {
@@ -332,9 +332,18 @@ public class SwingClassloader extends URLClassLoader {
 			// ex.printStackTrace();
 			// }
 			// end dump
+
+			modRegister.setModificationState(clazz.getClassName(),rerouted);
 			return cg.getJavaClass();
 		} else {
 			return clazz;
+		}
+	}
+
+	private void definePackage(String pkgname) {
+		Package s = getPackage(pkgname);
+		if (s == null) {
+			super.definePackage(pkgname, null, null, null, null, null, null, null);
 		}
 	}
 
@@ -382,7 +391,7 @@ public class SwingClassloader extends URLClassLoader {
 
 	}
 
-	private void rerouteMehods(JavaClass clazz, ClassGen cg, ConstantPoolGen cp, InstructionFactory f) {
+	private static boolean rerouteMehods(JavaClass clazz, ClassGen cg, ConstantPoolGen cp, InstructionFactory f) {
 		Map<Integer, Integer> indexReplacementMap = new HashMap<Integer, Integer>();
 		// find methods to replace in current class
 		for (String methodDef : methodReplacementMapping.keySet()) {
@@ -424,7 +433,9 @@ public class SwingClassloader extends URLClassLoader {
 					}
 				}
 			}
-
+			return true;
+		}else {
+			return false;
 		}
 	}
 
@@ -502,6 +513,54 @@ public class SwingClassloader extends URLClassLoader {
 	@Override
 	public Enumeration<URL> getResources(String name) throws IOException {
 		return repoClassLoader.getResources(name);
+	}
+
+
+	public byte[] loadClassBytes(String className) throws ClassNotFoundException {
+		String classFile = className.replace('.', '/');
+		try {
+			InputStream is = repoClassLoader.getResourceAsStream(classFile + ".class");
+			Throwable error = null;
+			byte[] result=null;
+			try {
+				if (is == null) {
+					throw new ClassNotFoundException(className + " not found.");
+				}
+				result = IOUtils.toByteArray(is);;
+			} catch (Throwable e) {
+				error = e;
+				throw e;
+			} finally {
+				if (is != null) {
+					if (error != null) {
+						try {
+							is.close();
+						} catch (Throwable e) {
+							error.addSuppressed(e);
+						}
+					} else {
+						is.close();
+					}
+				}
+
+			}
+
+			return result;
+		} catch (IOException e) {
+			throw new ClassNotFoundException(className + " not found: " + e, e);
+		}
+	}
+
+	public static boolean isModified(Class<?> c) throws Exception {
+		String classFile = c.getName().replace('.', '/');
+		InputStream is = c.getClassLoader().getResourceAsStream(classFile + ".class");
+		ClassParser parser = new ClassParser(is, c.getName());
+		JavaClass javaClass = parser.parse();
+		ClassGen cg = new ClassGen(javaClass);
+		ConstantPoolGen cp = cg.getConstantPool(); // cg creates constant pool
+		InstructionFactory f = new InstructionFactory(cg);
+		boolean result = rerouteMehods(javaClass, cg, cp, f);
+		return result;
 	}
 
 }

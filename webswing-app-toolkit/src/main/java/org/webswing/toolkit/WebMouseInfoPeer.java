@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.awt.Window;
 import java.awt.peer.MouseInfoPeer;
 
-import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Util;
 
 
@@ -21,7 +20,7 @@ public class WebMouseInfoPeer implements MouseInfoPeer{
 
     public boolean isWindowUnderMouse(Window w) {
         Point last = Util.getWebToolkit().getEventDispatcher().getLastMousePosition();
-        Window wx= WindowManager.getInstance().getVisibleWindowOnPosition(last.x, last.y);
+        Window wx= Util.getWebToolkit().getWindowManager().getVisibleWindowOnPosition(last.x, last.y);
         if(w==wx){
             return true;
         }else{

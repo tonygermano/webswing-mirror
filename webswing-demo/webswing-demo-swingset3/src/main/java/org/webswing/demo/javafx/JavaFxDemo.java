@@ -79,8 +79,8 @@ public class JavaFxDemo extends JPanel {
 		root.getChildren().add(text);
 
 		final SwingNode swingNode = new SwingNode();
-		pane.setTop(swingNode);
-		pane.setCenter(root);
+		pane.setTop(root);
+		pane.setCenter(swingNode);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

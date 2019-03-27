@@ -55,7 +55,7 @@
                 url: 'apps',
                 success: function (data, textStatus, request) {
                     loadPermissions(function (showAdmin) {
-                        show(JSON.parse(data), showAdmin);
+                        show(data, showAdmin);
                     });
                 },
                 error: function (data) {
@@ -74,7 +74,7 @@
                 type: 'GET',
                 url: 'rest/permissions',
                 success: function (data, textStatus, request) {
-                    callback(data && JSON.parse(data).dashboard);
+                    callback(data && data.dashboard);
                 },
                 error: function (data) {
                     callback(false);

@@ -6,7 +6,7 @@ import java.awt.peer.DialogPeer;
 import java.util.List;
 
 
-public class WebDialogPeer extends WebWindowPeer implements DialogPeer {
+abstract public class WebDialogPeer extends WebWindowPeer implements DialogPeer {
 
     public WebDialogPeer(Dialog t) {
         super(t);

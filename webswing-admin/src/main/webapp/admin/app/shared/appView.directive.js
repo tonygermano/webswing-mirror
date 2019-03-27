@@ -48,6 +48,7 @@
 				return configRestService.getInfo(vm.path).then(function(data) {
 					$timeout.cancel(vm.timer);
 					vm.value = data;
+					vm.pathNormalized = vm.path.replace(/\W+/g, "_");
 					vm.b64img = 'data:image/png;base64,' + data.icon;
 					vm.stoppable = data.enabled;
 					vm.startable = !data.enabled;
@@ -70,7 +71,8 @@
 			}
 
 			function viewSessions() {
-				$location.path('/dashboard/overview' + vm.path);
+				$location.search('app', vm.path);
+				$location.path('/sessions');
 			}
 
 			function viewConfig() {
@@ -103,14 +105,16 @@
 			}
 
 			function remove() {
-				configRestService.remove(vm.value.path).then(function() {
-					if (vm.refresh != null) {
-						$location.path('/dashboard');
-						if (vm.reload != null) {
-							vm.reload();
+				$timeout(function() {
+					configRestService.remove(vm.value.path).then(function() {
+						if (vm.refresh != null) {
+							$location.path('/dashboard');
+							if (vm.reload != null) {
+								vm.reload();
+							}
 						}
-					}
-				});
+					});
+				}, 500);
 				vm.value.status.status = 'Uninstalling Application';
 				vm.stoppable = false;
 				vm.startable = false;

@@ -7,6 +7,8 @@ import org.webswing.toolkit.api.messaging.WebswingTopic;
  */
 
 public interface WebswingMessagingApi {
+	public static final String MSG_API_SHARED_TOPIC = "msgApiSharedTopic";
+	public static final String MSG_API_TYPE = "type";
 
 	/**
 	 * Creates a reference to a generic message topic shared across all swing sessions.

@@ -10,7 +10,7 @@ import javax.swing.JWindow;
 
 import org.webswing.toolkit.util.Services;
 
-public class WebContainerPeer extends WebComponentPeer implements ContainerPeer {
+abstract public class WebContainerPeer extends WebComponentPeer implements ContainerPeer {
 
 	public WebContainerPeer(Container t) {
 		super(t);

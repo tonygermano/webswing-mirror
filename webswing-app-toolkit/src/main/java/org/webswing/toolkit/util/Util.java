@@ -9,6 +9,7 @@ import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
 import org.webswing.model.s2c.WindowMsg;
 import org.webswing.model.s2c.WindowPartialContentMsg;
+import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 
@@ -21,6 +22,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.*;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -640,6 +642,20 @@ public class Util {
 		return "";
 	}
 
+	public static WebComponentPeer getPeer(Component comp) {
+		if (comp == null) {
+			return null;
+		}
+		try {
+			Field peer = Component.class.getDeclaredField("peer");
+			peer.setAccessible(true);
+			return (WebComponentPeer) peer.get(comp);
+		} catch (Exception e) {
+			Logger.error("Failed to read peer of component " + comp, e);
+			return null;
+		}
+	}
+
 	public static void waitForImage(Image i) {
 		Graphics imageLoaderG = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).getGraphics();
 		ImageObserver observer = new ImageObserver() {
@@ -661,5 +677,13 @@ public class Util {
 				}
 			}
 		}
+	}
+
+	public static File getTimestampedTransferFolder(String marker) {
+		String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
+		path = path.split(File.pathSeparator)[0];
+		File timestampFoleder = new File(path, marker + System.currentTimeMillis());
+		timestampFoleder.mkdirs();
+		return timestampFoleder;
 	}
 }

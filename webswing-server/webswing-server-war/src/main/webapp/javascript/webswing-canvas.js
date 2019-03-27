@@ -1,4 +1,4 @@
-define(['jquery'], function amdFactory() {
+define(['webswing-util'], function amdFactory(util) {
     "use strict";
     return function CanvasModule() {
         var module = this;
@@ -19,17 +19,23 @@ define(['jquery'], function amdFactory() {
 
         function create() {
             if (canvas == null) {
-                api.cfg.rootElement.append('<canvas data-id="canvas" style="display:block" width="' + width() + '" height="' + height() + '" tabindex="-1"/>');
+                var dpr = util.dpr;
+                api.cfg.rootElement.append('<canvas data-id="canvas" style="display:block; width:' + width() + 'px;height:' + height() + 'px;" width="' + width() * dpr + '" height="' + height() * dpr + '" tabindex="-1"/>');
                 api.cfg.rootElement.append('<input data-id="input-handler" class="ws-input-hidden" type="text" value="" />');
                 canvas = api.cfg.rootElement.find('canvas[data-id="canvas"]');
+                //canvas[0].getContext("2d").scale(dpr, dpr);
                 inputHandler = api.cfg.rootElement.find('input[data-id="input-handler"]');
             }
             if (resizeCheck == null) {
                 resizeCheck = setInterval(function () {
                     if (!api.cfg.mirror && (canvas.width() !== width() || canvas.height() !== height())) {
                         var snapshot = get().getContext("2d").getImageData(0, 0, get().width, get().height);
-                        get().width = width();
-                        get().height = height();
+                        var w=width();
+                        var h= height();
+                        get().width = w * dpr;
+                        get().height = h * dpr;
+                        get().style.width = w + 'px';
+                        get().style.height = h + 'px';
                         get().getContext("2d").putImageData(snapshot, 0, 0);
                         api.sendHandshake();
                     }

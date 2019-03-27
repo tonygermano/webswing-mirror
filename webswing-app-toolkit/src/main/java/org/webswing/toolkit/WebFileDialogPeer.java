@@ -11,7 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-public class WebFileDialogPeer extends WebWindowPeer implements FileDialogPeer {
+abstract public class WebFileDialogPeer extends WebWindowPeer implements FileDialogPeer {
 
 	private FileDialog dialog;
 

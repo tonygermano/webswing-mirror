@@ -4,7 +4,7 @@
 		<span class="glyphicon glyphicon-chevron-down ws-tooltip" ng-if="!vm.collapsed" ng-click="vm.collapsed = !vm.collapsed"></span>
 		<span class="ws-order-number" >{{::vm.label}}</span>
 	</h4>
-	
+
 	<div class="row" collapse="vm.collapsed" >
 		<div class="col-md-12">
 			<div class="table-responsive">
@@ -38,11 +38,11 @@
 										<span ng-class="{'glyphicon': true ,'glyphicon-unchecked':!item[col.name], 'glyphicon-check':item[col.name]}"></span>
 										{{item[col.name]?'ON':'OFF'}}
 									</button>
-				                    
+
 				                    <div ng-if="col.type==='String' || col.type==='Number'" class="edit-app-list-entry" >
 										<div class="input-group" style="width:100%">
-							                <input  class="form-control" name="input" type="{{::col.type}}"	ng-model="item[col.name]" 
-													ws-substitutor-helper variables="vm.variables[col.variables]" message="item[col.name]">
+							                <input  class="form-control" name="input" type="{{::col.type}}"	ng-model="item[col.name]"
+													ws-substitutor-helper variables-type="col.variables" message="item[col.name]" path="vm.path">
 							                <div class="input-group-addon" ng-if="col.presets != null" dropdown dropdown-toggle>
 							                    <span class="glyphicon glyphicon-chevron-down" ></span>
 							                    <ul class="dropdown-menu pull-right">
@@ -53,10 +53,10 @@
 							                </div>
 							            </div>
 						            </div>
-				                    
+
 				                    <div ng-if="col.type==='StringList' " class="edit-app-list-entry" ng-repeat="s in item[col.name] track by $index">
 				                    	<div class="input-group">
-							                <input type="text" class="form-control" ws-substitutor-helper variables="vm.variables[col.variables]" message="item[col.name][$index]" ng-model="item[col.name][$index]" > 
+							                <input type="text" class="form-control" ws-substitutor-helper variables="col.variables" message="item[col.name][$index]" path="vm.path" ng-model="item[col.name][$index]" >
 							                <div class="input-group-addon" ng-if="col.presets != null " dropdown dropdown-toggle>
 							                    <span class="glyphicon glyphicon-chevron-down" ></span>
 							                    <ul class="dropdown-menu pull-right">

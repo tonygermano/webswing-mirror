@@ -1,5 +1,6 @@
 package org.webswing.server.common.model;
 
+import org.webswing.Constants;
 import org.webswing.server.common.model.meta.*;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
@@ -10,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "allowStealSession", "autoLogout", "goodbyeUrl", "isolatedFs",
-		"allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "loadingAnimationDelay", "allowStealSession", "autoLogout",
+		"goodbyeUrl", "sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
@@ -104,7 +105,12 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.Session, label = "Monitor App Responsiveness", description = "If True, Webswing will display a progress animation if Swing's Event Dispatch thread is not responding.")
 	@ConfigFieldDefaultValueBoolean(true)
+	@ConfigFieldDiscriminator
 	public boolean isMonitorEdtEnabled();
+
+	@ConfigField(tab = ConfigGroup.Session, label = "Loading Animation delay", description = "If EDT thread is blocked for more then defined delay in seconds, dialog with loading animation is displayed appears. Delay must be  >= 2 seconds.")
+	@ConfigFieldDefaultValueNumber(2)
+	int getLoadingAnimationDelay();
 
 	@ConfigField(tab = ConfigGroup.Session, label = "Session Stealing", description = "If enabled, and session mode 'CONTINUE_FOR_USER' is selected, user can resume Webswing session even if the connection is open in other browser. Former browser window will be disconnected.")
 	@ConfigFieldDefaultValueBoolean(true)
@@ -119,7 +125,27 @@ public interface SwingConfig extends Config {
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("")
 	String getGoodbyeUrl();
-
+	
+	@ConfigField(tab = ConfigGroup.Logging, label = "Session logging", description = "If enabled, sessions are logged into a separate log file.")
+	@ConfigFieldDefaultValueBoolean(false)
+	@ConfigFieldDiscriminator
+	public boolean isSessionLogging();
+	
+	@ConfigField(tab = ConfigGroup.Logging, label = "Logging Directory", description = "Session logging directory. Path where session logs will be stored.")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("${webswing.logsDir:-logs/}")
+	public String getLoggingDirectory();
+	
+	@ConfigField(tab = ConfigGroup.Logging, label = "Maximum Session Logs Size", description = "Maximum size of all session log files. After file size is exceeded, old log files are deleted.")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("${webswing.sessionLog.maxSize:-1000MB}")
+	public String getSessionLogMaxFileSize();
+	
+	@ConfigField(tab = ConfigGroup.Logging, label = "Session Log Size", description = "Maximum size of a single session log file.")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	@ConfigFieldDefaultValueString("${webswing.sessionLog.size:-10MB}")
+	public String getSessionLogFileSize();
+	
 	@ConfigField(tab = ConfigGroup.Features, label = "Isolated Filesystem", description = "If true, every file chooser dialog will be restricted to access only the home directory of current application.")
 	@ConfigFieldDefaultValueBoolean(false)
 	@ConfigFieldDiscriminator
@@ -179,6 +205,11 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(false)
 	boolean isAllowServerPrinting();
 
+	@ConfigField(tab = ConfigGroup.Features, label = "Recordings Folder", description = "Folder to be used to store session recording files for this application. Session recording can be initiated in admin console or by user using ?recording=true url parameter.")
+	@ConfigFieldVariables(VariableSetName.SwingApp)
+	@ConfigFieldDefaultValueString(Constants.DEFAULT_RECORDINGS_FOLDER)
+	String getRecordingsFolder();
+
 	public static class SwingConfigurationMetadataGenerator extends MetadataGenerator<SwingConfig> {
 		@Override
 		public Class<?> getExplicitType(SwingConfig config, ClassLoader cl, String propertyName, Method readMethod, Object value) throws ClassNotFoundException {
@@ -218,6 +249,14 @@ public interface SwingConfig extends Config {
 			}
 			if (config.isAutoLogout()) {
 				names.remove("goodbyeUrl");
+			}
+			if (!config.isSessionLogging()) {
+				names.remove("loggingDirectory");
+				names.remove("sessionLogMaxFileSize");
+				names.remove("sessionLogFileSize");
+			}
+			if(!config.isMonitorEdtEnabled()){
+				names.remove("loadingAnimationDelay");
 			}
 			return names;
 		}

@@ -9,8 +9,9 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 	private static final long serialVersionUID = -7143564320373144470L;
 
 	private String clientId;
-	private String sessionId;
+	private String browserId;
 	private String viewId;
+	private String connectionId;
 	private Integer desktopWidth;
 	private Integer desktopHeight;
 	private String applicationName;
@@ -29,12 +30,20 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 		this.clientId = clientId;
 	}
 
-	public String getSessionId() {
-		return sessionId;
+	public String getBrowserId() {
+		return browserId;
 	}
 
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
+	public void setBrowserId(String browserId) {
+		this.browserId = browserId;
+	}
+
+	public String getConnectionId() {
+		return connectionId;
+	}
+
+	public void setConnectionId(String connectionId) {
+		this.connectionId = connectionId;
 	}
 
 	public Integer getDesktopWidth() {

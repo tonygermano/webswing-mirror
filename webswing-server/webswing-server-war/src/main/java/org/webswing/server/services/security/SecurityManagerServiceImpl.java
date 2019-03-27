@@ -7,8 +7,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
@@ -37,18 +39,29 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 
 	@Override
 	public void start() {
+		log.info("Starting SecurityManagerServiceImpl");
 		try {
-			securityManager.setCacheManager(new MemoryConstrainedCacheManager());
-			securityManager.setSessionManager(new WebswingWebSessionManager());
+			securityManager.setCacheManager(getCacheManager());
+			securityManager.setSessionManager(getSessionManager());
 			securityManager.setRealm(new WebswingRealmAdapter());
 			SecurityUtils.setSecurityManager(securityManager);
 		} catch (Exception e) {
+			log.error("Failed to start security service", e);
 			new WsInitException("Failed to start security service", e);
 		}
 	}
 
+	protected CacheManager getCacheManager() {
+		return new MemoryConstrainedCacheManager();
+	}
+
+	protected SessionManager getSessionManager() {
+		return new WebswingWebSessionManager();
+	}
+	
 	@Override
 	public void stop() {
+		log.info("Stopping SecurityManagerServiceImpl");
 		securityManager.destroy();
 	}
 

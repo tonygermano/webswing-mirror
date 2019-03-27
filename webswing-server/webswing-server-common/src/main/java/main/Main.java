@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,13 +15,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -43,26 +38,34 @@ public class Main {
 			URL location = domain.getCodeSource().getLocation();
 			System.setProperty(Constants.WAR_FILE_LOCATION, location.toExternalForm());
 
-			List<URL> urls = new ArrayList<URL>();
-			if (client) {
-				// initialize jmx agent
-				sun.management.Agent.startAgent();
-
-				populateClasspathFromDir("WEB-INF/swing-lib", urls);
-				initializeExtLibServices(urls);
-				retainOnlyLauncherUrl(urls);
-			} else {
-				initTempDirPath(args);
-				populateClasspathFromDir("WEB-INF/server-lib", urls);
-			}
-			ClassLoader defaultCL = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
-			Thread.currentThread().setContextClassLoader(defaultCL);
-			Class<?> mainClass;
-			if (client) {
-				mainClass = defaultCL.loadClass("org.webswing.SwingMain");
-			} else {
+		List<URL> urls = new ArrayList<URL>();
+		if (client) {
+			populateClasspathFromDir("WEB-INF/swing-lib", urls);
+			initializeExtLibServices(urls);
+			retainOnlyLauncherUrl(urls);
+		} else {
+			initTempDirPath(args);
+			populateClasspathFromDir("WEB-INF/server-lib", urls);
+		}
+		ClassLoader defaultCL = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
+		Thread.currentThread().setContextClassLoader(defaultCL);
+		Class<?> mainClass;
+		if (client) {
+			mainClass = defaultCL.loadClass("org.webswing.SwingMain");
+		} else {
+			try {
 				mainClass = defaultCL.loadClass("org.webswing.ServerMain");
+			} catch (ClassNotFoundException e) {
+				InputStream readme = Main.class.getClassLoader().getResourceAsStream("WEB-INF/server-lib/README.txt");
+				if (readme != null) {
+					Scanner s = new Scanner(readme).useDelimiter("\\A");
+					String result = s.hasNext() ? s.next() : "";
+					throw new Exception(result, e);
+				} else {
+					throw new Exception("Unexpected error.", e);
+				}
 			}
+		}
 
 			Method method = mainClass.getMethod("main", args.getClass());
 			method.setAccessible(true);
@@ -83,11 +86,11 @@ public class Main {
 			InputStream propFile = Main.class.getClassLoader().getResourceAsStream("WEB-INF/classes/webswing.properties");
 			Properties p = new Properties(System.getProperties());
 			p.load(propFile);
-			
+
 			for (Map.Entry<Object, Object> prop : p.entrySet()) {
-				if(!System.getProperties().containsKey(prop.getKey()))
+				if (!System.getProperties().containsKey(prop.getKey()))
 					System.getProperties().put(prop.getKey(), prop.getValue());
-			}					
+			}
 
 		} catch (Exception e) {
 			//file does not exist, do nothing
@@ -98,18 +101,18 @@ public class Main {
 		// create the command line parser
 		return getBoolParam(args, "-d", false);
 	}
-	
-	public static String getBoolParam(String[] args, String param, Boolean def) {		
+
+	public static String getBoolParam(String[] args, String param, Boolean def) {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals(param) && i + 1 < args.length) {
 				return args[i + 1];
 			}
-		}		
+		}
 		return def.toString();
 	}
 
 	private static void retainOnlyLauncherUrl(List<URL> urls) {
-		for (Iterator<URL> i = urls.iterator(); i.hasNext();) {
+		for (Iterator<URL> i = urls.iterator(); i.hasNext(); ) {
 			if (!i.next().getFile().contains("webswing-app-launcher")) {
 				i.remove();
 			}
@@ -119,7 +122,17 @@ public class Main {
 
 	private static void initializeExtLibServices(List<URL> urls) throws Exception {
 		// sets up Services class providing jms connection and other services in separated classloader to prevent classpath pollution of swing application.
-		ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), null);
+
+		//JAVA9 needs to set parent classloader to ClassLoader.getPlatformClassLoader(), otherwise the parent is the boot classloader which only contains the java.base module
+		//we use reflection to be backwards compatible with java8
+		ClassLoader parent = null;
+		try {
+			parent = (ClassLoader) ClassLoader.class.getDeclaredMethod("getPlatformClassLoader").invoke(null);
+		} catch (Exception e) {
+			//ignore
+		}
+
+		ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), parent);
 		Class<?> classLoaderUtilClass = extLibClassLoader.loadClass("org.webswing.util.ClassLoaderUtil");
 		Method initializeServicesMethod = classLoaderUtilClass.getMethod("initializeServices");
 		initializeServicesMethod.invoke(null);
@@ -227,7 +240,7 @@ public class Main {
 				File tempDir = new File(baseDir, baseName).getAbsoluteFile();
 				if (!tempDir.exists()) {
 					tempDir.mkdir();
-				} else if (Boolean.parseBoolean(System.getProperty(Constants.CLEAN_TEMP, "true"))){
+				} else if (Boolean.parseBoolean(System.getProperty(Constants.CLEAN_TEMP, "true"))) {
 					for (File f : tempDir.listFiles()) {
 						if (!delete(f)) {
 							throw new IllegalStateException("Not possible to clean the temp folder. Make sure no other instance of webswing is running or use '-d true' option to create a new temp folder.");

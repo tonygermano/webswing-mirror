@@ -11,9 +11,8 @@ import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
+import org.webswing.toolkit.extra.IsolatedFsShellFolderManager;
 import org.webswing.toolkit.extra.WebRepaintManager;
-import org.webswing.toolkit.extra.WebShellFolderManager;
-import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
@@ -42,6 +41,7 @@ public class WebPaintDispatcher {
 
 	private volatile Map<String, Set<Rectangle>> areasToUpdate = new HashMap<String, Set<Rectangle>>();
 	private volatile WindowMoveActionMsg moveAction;
+	private volatile FocusEventMsg focusEvent;
 	private volatile boolean clientReadyToReceive = true;
 	private long lastReadyStateTime;
 	private JFileChooser fileChooserDialog;
@@ -81,7 +81,7 @@ public class WebPaintDispatcher {
 							if (currentAreasToUpdate.size() == 0 && moveAction == null) {
 								return;
 							}
-							windowNonVisibleAreas = WindowManager.getInstance().extractNonVisibleAreas();
+							windowNonVisibleAreas = Util.getWebToolkit().getWindowManager().extractNonVisibleAreas();
 							json = Util.fillJsonWithWindowsData(currentAreasToUpdate, windowNonVisibleAreas);
 							if (Util.isDD()) {
 								windowWebImages = new HashMap<String, Image>();
@@ -93,6 +93,10 @@ public class WebPaintDispatcher {
 							if (moveAction != null) {
 								json.setMoveAction(moveAction);
 								moveAction = null;
+							}
+							if (focusEvent != null) {
+								json.setFocusEvent(focusEvent);
+								focusEvent = null;
 							}
 							clientReadyToReceive = false;
 						}
@@ -346,7 +350,7 @@ public class WebPaintDispatcher {
 			webcursor = overridenCursorName;
 			webcursorName = overridenCursorName.getName();
 		}
-		if (!WindowManager.getInstance().getCurrentCursor().equals(webcursorName)) {
+		if (!Util.getWebToolkit().getWindowManager().getCurrentCursor().equals(webcursorName)) {
 			AppFrameMsgOut f = new AppFrameMsgOut();
 			CursorChangeEventMsg cursorChange = new CursorChangeEventMsg(webcursorName);
 			if (webcursor instanceof WebCursor) {
@@ -361,7 +365,7 @@ public class WebPaintDispatcher {
 				}
 			}
 			f.setCursorChange(cursorChange);
-			WindowManager.getInstance().setCurrentCursor(webcursorName);
+			Util.getWebToolkit().getWindowManager().setCurrentCursor(webcursorName);
 			Logger.debug("WebPaintDispatcher:notifyCursorUpdate", f);
 			sendObject(f);
 		}
@@ -417,11 +421,7 @@ public class WebPaintDispatcher {
 					fdEvent.setAllowDownload(false);
 					fdEvent.setAllowUpload(false);
 					if (FileDialogEventType.AutoUpload == fileChooserEventType) {
-						String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
-						path = path.split(File.pathSeparator)[0];
-						File timestampFoleder = new File(path, "" + System.currentTimeMillis());
-						timestampFoleder.mkdirs();
-						fileChooserDialog.setCurrentDirectory(timestampFoleder);
+						fileChooserDialog.setCurrentDirectory(Util.getTimestampedTransferFolder("autoupload"));
 					}
 					Window d = SwingUtilities.getWindowAncestor(fileChooserDialog);
 					d.setBounds(0, 0, 1, 1);
@@ -474,13 +474,13 @@ public class WebPaintDispatcher {
 
 			try {
 				if (fileChooserDialog.getSelectedFile() != null) {
-					if (!WebShellFolderManager.isSubfolderOfRoots(fileChooserDialog.getSelectedFile())) {
+					if (!IsolatedFsShellFolderManager.isSubfolderOfRoots(fileChooserDialog.getSelectedFile())) {
 						throw new IOException("Invalid selection " + fileChooserDialog.getSelectedFile());
 					}
 				}
 				if (fileChooserDialog.getSelectedFiles() != null && fileChooserDialog.getSelectedFiles().length > 0) {
 					for (File selection : fileChooserDialog.getSelectedFiles()) {
-						if (!WebShellFolderManager.isSubfolderOfRoots(selection)) {
+						if (!IsolatedFsShellFolderManager.isSubfolderOfRoots(selection)) {
 							throw new IOException("Invalid selection " + selection);
 						}
 					}
@@ -543,24 +543,28 @@ public class WebPaintDispatcher {
 
 	public void requestBrowserClipboard(PasteRequestContext ctx) {
 		AppFrameMsgOut result = new AppFrameMsgOut();
-		PasteRequestMsg paste=new PasteRequestMsg();
+		PasteRequestMsg paste = new PasteRequestMsg();
 		paste.setTitle(ctx.getTitle());
 		paste.setMessage(ctx.getMessage());
 		result.setPasteRequest(paste);
 		Util.getWebToolkit().getPaintDispatcher().sendObject(result);
 
-		this.clipboardDialog = new JDialog((Dialog)null,true);
-		clipboardDialog.setBounds(new Rectangle(0,0,1,1));
+		this.clipboardDialog = new JDialog((Dialog) null, true);
+		clipboardDialog.setBounds(new Rectangle(0, 0, 1, 1));
 		clipboardDialog.setVisible(true);//this call is blocking until dialog is closed
 	}
 
 	public boolean closePasteRequestDialog() {
-		if(clipboardDialog!=null){
-			boolean result=clipboardDialog.isVisible();
+		if (clipboardDialog != null) {
+			boolean result = clipboardDialog.isVisible();
 			clipboardDialog.setVisible(false);
 			clipboardDialog.dispose();
 			return result;
 		}
 		return false;
+	}
+
+	public void notifyFocusEvent(FocusEventMsg msg) {
+		focusEvent = msg;
 	}
 }

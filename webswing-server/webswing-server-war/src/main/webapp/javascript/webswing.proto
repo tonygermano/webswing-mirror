@@ -1,5 +1,5 @@
+syntax = "proto2";
 package org.webswing.server.model.proto;
-
 /* ===================SERVER -> BROWSER====================*/
 
 message AppFrameMsgOutProto {
@@ -20,6 +20,23 @@ message AppFrameMsgOutProto {
     optional string sessionId = 15;
     optional string startTimestamp = 16;
     optional string sendTimestamp = 17;
+    optional FocusEventMsgProto focusEvent = 18;
+}
+
+message FocusEventMsgProto {
+    required FocusEventTypeProto type = 1;
+    optional sint32 x = 2;
+    optional sint32 y = 3;
+    optional uint32 w = 4;
+    optional uint32 h = 5;
+    optional sint32 caretX = 6;
+    optional sint32 caretY = 7;
+
+    enum FocusEventTypeProto {
+        focusLost = 1;
+        focusGained = 2;
+        focusWithCarretGained = 3;
+    }
 }
 
 message ApplicationInfoMsgProto {
@@ -205,8 +222,9 @@ message TimestampsMsgInProto {
 
 message ConnectionHandshakeMsgInProto {
     optional string clientId = 1;
-    optional string sessionId = 2;
+    optional string connectionId = 2;
     optional string viewId = 3;
+    optional string browserId = 13;
     optional uint32 desktopWidth = 4;
     optional uint32 desktopHeight = 5;
     optional string applicationName = 6;

@@ -15,10 +15,13 @@ import java.util.Set;
 public enum WebswingAction {
 
 	master_admin_access(AccessType.admin),
+	master_support_access(AccessType.support),
+	master_basic_access(AccessType.basic),
 	//ADMIN CONSOLE
 	rest_getPaths(AccessType.admin, AccessType.support),
 	rest_getAppInfo(AccessType.admin, AccessType.support),
 	rest_getSession(AccessType.admin, AccessType.support),
+	rest_getStats(AccessType.admin, AccessType.support),
 	rest_startRecording(AccessType.admin, AccessType.support),
 	rest_sessionShutdown(AccessType.admin, AccessType.support),
 	rest_sessionShutdownForce(AccessType.admin, AccessType.support),

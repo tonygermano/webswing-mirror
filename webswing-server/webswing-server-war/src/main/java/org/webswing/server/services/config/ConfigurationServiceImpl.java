@@ -10,9 +10,6 @@ import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.ConfigContext;
 import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.CommonUtil;
-import org.webswing.server.extension.ConfigurationProvider;
-import org.webswing.server.extension.ConfigurationUpdateHandler;
-import org.webswing.server.extension.DefaultConfigurationProvider;
 import org.webswing.server.extension.ExtensionClassLoader;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.model.exception.WsInitException;
@@ -21,6 +18,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 public class ConfigurationServiceImpl implements ConfigurationService, ConfigurationUpdateHandler {
@@ -29,7 +27,7 @@ public class ConfigurationServiceImpl implements ConfigurationService, Configura
 	private final ExtensionClassLoader extensionLoader;
 	private int interval;
 	private ConfigurationProvider provider;
-	private List<ConfigurationChangeListener> changeListeners = new ArrayList<>();
+	private List<ConfigurationChangeListener> changeListeners = new CopyOnWriteArrayList<>();
 
 	@Inject
 	public ConfigurationServiceImpl(ExtensionClassLoader extensionLoader) {
@@ -126,16 +124,20 @@ public class ConfigurationServiceImpl implements ConfigurationService, Configura
 		return provider.describeConfiguration(asPath(path), json, ctx, extensionLoader);
 	}
 
-	private String asPath(String path) {
+	@Override
+	public boolean isMultiApplicationMode() {
+		return provider.isMultiApplicationMode();
+	}
+
+	protected ConfigurationProvider getProvider() {
+		return provider;
+	}
+
+	public static String asPath(String path) {
 		String p = CommonUtil.toPath(path);
 		if (StringUtils.isBlank(p)) {
 			p = "/";
 		}
 		return p;
-	}
-
-	@Override
-	public boolean isMultiApplicationMode() {
-		return provider.isMultiApplicationMode();
 	}
 }

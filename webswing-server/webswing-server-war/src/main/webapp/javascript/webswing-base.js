@@ -9,6 +9,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             getSocketId: 'socket.uuid',
             send: 'socket.send',
             getCanvas: 'canvas.get',
+            getInput: 'canvas.getInput',
             registerInput: 'input.register',
             sendInput: 'input.sendInput',
             registerTouch: 'touch.register',
@@ -56,7 +57,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             repaint: repaint
         };
         module.ready = function () {
-            directDraw = new WebswingDirectDraw({logDebug:api.cfg.debugLog, ieVersion:api.cfg.ieVersion});
+            directDraw = new WebswingDirectDraw({logDebug: api.cfg.debugLog, ieVersion: api.cfg.ieVersion, dpr: util.dpr});
         };
 
         var timer1, timer3;
@@ -66,15 +67,15 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         var windowImageHolders = {};
         var directDraw;
 
-        function startApplication(name) {
-            initialize(api.getUser() + api.getIdentity() + name, name, false);
+        function startApplication() {
+            initialize(null, false);
         }
 
-        function startMirrorView(clientId, appName) {
-            initialize(clientId, appName, true)
+        function startMirrorView(clientId) {
+            initialize(clientId, true)
         }
 
-        function initialize(clientId, name, isMirror) {
+        function initialize(clientId, isMirror) {
             api.registerInput();
             api.registerTouch();
             window.addEventListener('beforeunload', beforeUnloadEventHandler);
@@ -83,7 +84,6 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             }
             resetState();
             api.cfg.clientId = clientId;
-            api.cfg.appName = name;
             api.cfg.canPaint = true;
             api.cfg.hasControl = !isMirror;
             api.cfg.mirrorMode = isMirror;
@@ -109,7 +109,6 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         function resetState() {
             api.cfg.clientId = '';
             api.cfg.viewId = util.GUID();
-            api.cfg.appName = null;
             api.cfg.hasControl = false;
             api.cfg.mirrorMode = false;
             api.cfg.canPaint = false;
@@ -119,7 +118,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             timer3 = setInterval(servletHeartbeat, 100000);
             windowImageHolders = {};
             directDraw.dispose();
-            directDraw = new WebswingDirectDraw({logDebug:api.cfg.debugLog, ieVersion:api.cfg.ieVersion});
+            directDraw = new WebswingDirectDraw({logDebug: api.cfg.debugLog, ieVersion: api.cfg.ieVersion, dpr: util.dpr});
         }
 
         function sendMessageEvent(message) {
@@ -185,9 +184,9 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             }
             if (data.applications != null && data.applications.length != 0) {
                 if (api.cfg.mirror) {
-                    startMirrorView(api.cfg.clientId, api.cfg.applicationName);
+                    startMirrorView(api.cfg.clientId);
                 } else if (data.applications.length === 1) {
-                    startApplication(data.applications[0].name);
+                    startApplication();
                 }
                 return;
             }
@@ -212,7 +211,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                     api.showDialogBar(api.continueOldSessionDialog);
                     api.dialogBarContent().focused = false;
                     window.setTimeout(function () {
-                        if (api.dialogBarContent()!=null && !api.dialogBarContent().focused) {
+                        if (api.dialogBarContent() != null && !api.dialogBarContent().focused) {
                             api.hideDialogBar();
                             api.showDialogBar(oldBarContent);
                         }
@@ -233,7 +232,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                     api.showDialog(api.timedoutDialog);
                     api.disconnect();
                 } else if (data.event == "applicationBusy") {
-                    if(api.currentDialog()==null){
+                    if (api.currentDialog() == null) {
                         api.showDialog(api.applicationBusyDialog);
                     }
                 }
@@ -290,13 +289,23 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             if (data.moveAction != null) {
                 copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height, context);
             }
+            if (data.focusEvent != null) {
+                var input = api.getInput();
+                if (data.focusEvent.type === 'focusWithCarretGained') {
+                    input.style.top = (data.focusEvent.y + data.focusEvent.caretY) + 'px';
+                    input.style.left = (data.focusEvent.x + data.focusEvent.caretX) + 'px';
+                } else {
+                    input.style.top = null;
+                    input.style.left = null;
+                }
+            }
             if (data.cursorChange != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
                 canvas.style.cursor = getCursorStyle(data.cursorChange);
             }
             if (data.copyEvent != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
                 api.displayCopyBar(data.copyEvent);
             }
-            if(data.pasteRequest != null && api.cfg.hasControl && !api.cfg.recordingPlayback){
+            if (data.pasteRequest != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
                 api.displayPasteDialog(data.pasteRequest);
             }
             if (data.fileDialogEvent != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
@@ -352,7 +361,10 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                         if (winContent != null) {
                             var imageObj = new Image();
                             var onloadFunction = function () {
+                                context.save()
+                                context.setTransform(util.dpr, 0, 0, util.dpr, 0, 0);
                                 context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
+                                context.restore();
                                 resolved();
                                 imageObj.onload = null;
                                 imageObj.src = '';
@@ -388,16 +400,17 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                 }
                 ddPromise.then(function (resultImage) {
                     windowImageHolders[win.id] = resultImage;
+                    var dpr = util.dpr;
                     for (var x in win.content) {
                         var winContent = win.content[x];
                         if (winContent != null) {
-                            var sx = Math.min(resultImage.width, Math.max(0, winContent.positionX));
-                            var sy = Math.min(resultImage.height, Math.max(0, winContent.positionY));
-                            var sw = Math.min(resultImage.width - sx, winContent.width - (sx - winContent.positionX));
-                            var sh = Math.min(resultImage.height - sy, winContent.height - (sy - winContent.positionY));
+                            var sx = Math.min(resultImage.width, Math.max(0, winContent.positionX * dpr));
+                            var sy = Math.min(resultImage.height, Math.max(0, winContent.positionY * dpr));
+                            var sw = Math.min(resultImage.width - sx, winContent.width * dpr - (sx - winContent.positionX * dpr));
+                            var sh = Math.min(resultImage.height - sy, winContent.height * dpr - (sy - winContent.positionY * dpr));
 
-                            var dx = win.posX + sx;
-                            var dy = win.posY + sy;
+                            var dx = win.posX * dpr + sx;
+                            var dy = win.posY * dpr + sy;
                             var dw = sw;
                             var dh = sh;
 
@@ -414,21 +427,31 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
         }
 
         function adjustCanvasSize(canvas, width, height) {
-            if (canvas.width != width || canvas.height != height) {
-                var snapshot = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
-                canvas.width = width;
-                canvas.height = height;
-                canvas.getContext("2d").putImageData(snapshot, 0, 0);
+            if (canvas.width != width * util.dpr || canvas.height != height * util.dpr) {
+                var ctx = canvas.getContext("2d");
+                var snapshot;
+                if(canvas.width!==0 && canvas.height!=0){
+                    snapshot=ctx.getImageData(0, 0, canvas.width, canvas.height);
+                }
+                canvas.width = width * util.dpr;
+                canvas.height = height * util.dpr;
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+                if(snapshot!=null){
+                    ctx.putImageData(snapshot, 0, 0);
+                }
             }
         }
 
         function clear(x, y, w, h, context) {
-            context.clearRect(x, y, w, h);
+            var dpr = util.dpr;
+            context.clearRect(x * dpr, y * dpr, w * dpr, h * dpr);
         }
 
         function copy(sx, sy, dx, dy, w, h, context) {
-            var copy = context.getImageData(sx, sy, w, h);
-            context.putImageData(copy, dx, dy);
+            var dpr = util.dpr;
+            var copy = context.getImageData(sx * dpr, sy * dpr, w * dpr, h * dpr);
+            context.putImageData(copy, dx * dpr, dy * dpr);
         }
 
         function getCursorStyle(cursorMsg) {
@@ -446,10 +469,10 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
 
         function getHandShake(canvas) {
             var handshake = {
-                applicationName: api.cfg.appName,
                 clientId: api.cfg.clientId,
+                browserId: api.getIdentity(),
                 viewId: api.cfg.viewId,
-                sessionId: api.getSocketId(),
+                connectionId: api.getSocketId(),
                 locale: api.getLocale(),
                 mirrored: api.cfg.mirrorMode,
                 directDrawSupported: api.cfg.typedArraysSupported && !(api.cfg.ieVersion && api.cfg.ieVersion <= 10),

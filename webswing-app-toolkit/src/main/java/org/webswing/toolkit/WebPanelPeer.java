@@ -13,8 +13,9 @@ import java.awt.peer.PanelPeer;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.GraphicsWrapper;
+import org.webswing.toolkit.util.Util;
 
-public class WebPanelPeer extends WebContainerPeer implements PanelPeer {
+abstract public class WebPanelPeer extends WebContainerPeer implements PanelPeer {
 
 	private Insets insets;
 	
@@ -37,10 +38,7 @@ public class WebPanelPeer extends WebContainerPeer implements PanelPeer {
 	WebWindowPeer getParentWindowPeer() {
 		Panel target = (Panel) getTarget();
 		Window w = SwingUtilities.windowForComponent(target);
-		if (w != null && w.getPeer() != null) {
-			return (WebWindowPeer) w.getPeer();
-		}
-		return null;
+		return (WebWindowPeer) Util.getPeer(w);
 	}
 
 	@Override

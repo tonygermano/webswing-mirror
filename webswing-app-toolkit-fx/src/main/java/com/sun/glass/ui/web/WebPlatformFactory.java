@@ -8,9 +8,10 @@ import com.sun.glass.ui.delegate.MenuItemDelegate;
 import org.webswing.javafx.toolkit.*;
 
 public class WebPlatformFactory extends PlatformFactory {
+
 	@Override
 	public Application createApplication() {
-		return new WebApplication();
+		return WebsinwgFxToolkitFactory.getFactory().createApplication();
 	}
 
 	@Override

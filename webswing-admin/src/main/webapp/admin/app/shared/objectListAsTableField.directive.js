@@ -8,11 +8,11 @@
 				scope : {
 					field : '=',
 					value : '=',
-					variables : '=',
 					readonly : '=',
 					restricted : '@',
 					desc : '@',
-					label : '@'
+					label : '@',
+                    path : '='
 				},
 				controllerAs : 'vm',
 				bindToController : true,

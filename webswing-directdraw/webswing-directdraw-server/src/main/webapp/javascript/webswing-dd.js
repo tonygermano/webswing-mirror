@@ -14,7 +14,8 @@
             ieVersion: c.ieVersion || false,
             onErrorMessage: c.onErrorMessage || function (message) {
                 console.log(message.stack);
-            }
+            },
+            dpr: c.dpr || 1
         };
         var ctxId = Math.floor(Math.random() * 0x10000).toString(16);
         var proto = webswingProto != null ? ProtoBuf.loadProto(webswingProto, "directdraw.proto") : ProtoBuf.loadProtoFile("/directdraw.proto");
@@ -31,7 +32,6 @@
         var fontsArray = [];
         var canvasBuffer = [];
         var xorLayer;
-
 
         function draw64(data, targetCanvas) {
             return drawWebImage(WebImageProto.decode64(data), targetCanvas);
@@ -63,10 +63,11 @@
                 newCanvas = targetCanvas;
             } else {
                 newCanvas = document.createElement("canvas");
+                newCanvas.getContext("2d").scale(config.dpr, config.dpr);
             }
-            if (newCanvas.width != image.width || newCanvas.height != image.height) {
-                newCanvas.width = image.width;
-                newCanvas.height = image.height;
+            if (newCanvas.width != image.width * config.dpr || newCanvas.height != image.height * config.dpr) {
+                newCanvas.width = image.width * config.dpr;
+                newCanvas.height = image.height * config.dpr;
             }
 
             var imageContext = {
@@ -209,6 +210,7 @@
         function initXorModeCtx(graphicsState, original) {
             if (xorLayer == null) {
                 xorLayer = document.createElement("canvas");
+                xorLayer.getContext("2d").scale(config.dpr, config.dpr);
             }
             xorLayer.width = original.canvas.width;
             xorLayer.height = original.canvas.height;
@@ -335,11 +337,11 @@
                 ctx.popBoundingBox = function () {
                     var result = this.boundingBox;
                     this.boundingBox = null;
-                    if(result != null){
-                        result.x=Math.floor(result.x);
-                        result.y=Math.floor(result.y);
-                        result.w=Math.ceil(result.w);
-                        result.h=Math.ceil(result.h);
+                    if (result != null) {
+                        result.x = Math.floor(result.x);
+                        result.y = Math.floor(result.y);
+                        result.w = Math.ceil(result.w);
+                        result.h = Math.ceil(result.h);
                     }
                     return result;
                 }
@@ -362,8 +364,8 @@
                 }
             }
             dest.putImageData(destData, bbox.x, bbox.y);
-            if (config.logDebug){
-                console.log('DirectDraw DEBUG xormode - composition pixelsize:'+ (bbox.w* bbox.h) +' duration(ms): ' + (new Date().getTime() - start));
+            if (config.logDebug) {
+                console.log('DirectDraw DEBUG xormode - composition pixelsize:' + (bbox.w * bbox.h) + ' duration(ms): ' + (new Date().getTime() - start));
             }
         }
 
@@ -399,7 +401,8 @@
                     var t = graphicsState.transform;
                     ctx.setTransform(t[0], t[1], t[2], t[3], t[4], t[5]);
                 } else {
-                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+                    var iT = identityTransform();
+                    ctx.setTransform(iT[0], iT[1], iT[2], iT[3], iT[4], iT[5]);
                 }
             }
         }
@@ -410,7 +413,7 @@
                 graphicsStates[id] = {};
                 imageContext.currentStateId = id;
                 args.shift();
-                graphicsStates[id].transform = iprtTransform(ctx, args, true);
+                graphicsStates[id].transform = iprtSetTransform(ctx, args);
                 args.shift();
                 iprtSetStroke(ctx, args);
                 graphicsStates[id].strokeArgs = args.slice(0, 1);
@@ -490,6 +493,7 @@
             var buffer = canvasBuffer.pop();
             return drawBin(webImageData, buffer).then(function (imageCanvas) {
                 ctx.save();
+                var dpr = config.dpr;
                 if (path(ctx, clip)) {
                     ctx.clip(fillRule(clip));
                 }
@@ -500,17 +504,17 @@
                     ctx.fillStyle = parseColor(bgcolor.color.rgba);
                     ctx.beginPath();
                     if (crop == null) {
-                        ctx.rect(0, 0, imageCanvas.width, imageCanvas.height);
+                        ctx.rect(0, 0, imageCanvas.width / dpr, imageCanvas.height / dpr);
                     } else {
                         ctx.rect(0, 0, crop.rectangle.w, crop.rectangle.h);
                     }
                     ctx.fill();
                 }
                 if (crop == null) {
-                    ctx.drawImage(imageCanvas, 0, 0);
+                    ctx.drawImage(imageCanvas, 0, 0, imageCanvas.width, imageCanvas.height, 0, 0, imageCanvas.width / dpr, imageCanvas.height / dpr);
                 } else {
                     crop = crop.rectangle;
-                    ctx.drawImage(imageCanvas, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
+                    ctx.drawImage(imageCanvas, crop.x * dpr, crop.y * dpr, crop.w * dpr, crop.h * dpr, 0, 0, crop.w, crop.h);
                 }
                 ctx.restore();
 
@@ -602,6 +606,7 @@
         function iprtCopyArea(ctx, args) {
             var p = args[0].points.points;
             var clip = args[1];
+            var dpr = config.dpr;
             ctx.save();
 
             if (path(ctx, clip)) {
@@ -609,21 +614,24 @@
             }
             ctx.beginPath();
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.rect(p[0], p[1], p[2], p[3]);
+            ctx.rect(p[0] * dpr, p[1] * dpr, p[2] * dpr, p[3] * dpr);
             ctx.clip();
-            ctx.translate(p[4], p[5]);
+            ctx.translate(p[4] * dpr, p[5] * dpr);
             ctx.drawImage(ctx.canvas, 0, 0);
             ctx.restore();
         }
 
-        function iprtTransform(ctx, args, reset) {
+        function iprtTransform(ctx, args) {
             var t = args[0].transform;
-            if (reset) {
-                ctx.setTransform(t.m00, t.m10, t.m01, t.m11, t.m02, t.m12);
-            } else {
-                ctx.transform(t.m00, t.m10, t.m01, t.m11, t.m02, t.m12);
-            }
+            ctx.transform(t.m00, t.m10, t.m01, t.m11, t.m02, t.m12);
             return [t.m00, t.m10, t.m01, t.m11, t.m02, t.m12];
+        }
+
+        function iprtSetTransform(ctx, args) {
+            var t = args[0].transform;
+            t = withDpr([t.m00, t.m10, t.m01, t.m11, t.m02, t.m12]);
+            ctx.setTransform(t[0], t[1], t[2], t[3], t[4], t[5]);
+            return t;
         }
 
         function iprtSetStroke(ctx, args) {
@@ -1201,16 +1209,23 @@
         function concatTransform(m, t) {
             var r = [];
             if (m == null) {
-                return t;
-            } else {
-                r[0] = m[0] * t[0] + m[2] * t[1];
-                r[1] = m[1] * t[0] + m[3] * t[1];
-                r[2] = m[0] * t[2] + m[2] * t[3];
-                r[3] = m[1] * t[2] + m[3] * t[3];
-                r[4] = m[0] * t[4] + m[2] * t[5] + m[4];
-                r[5] = m[1] * t[4] + m[3] * t[5] + m[5];
+                m = identityTransform();
             }
+            r[0] = m[0] * t[0] + m[2] * t[1];
+            r[1] = m[1] * t[0] + m[3] * t[1];
+            r[2] = m[0] * t[2] + m[2] * t[3];
+            r[3] = m[1] * t[2] + m[3] * t[3];
+            r[4] = m[0] * t[4] + m[2] * t[5] + m[4];
+            r[5] = m[1] * t[4] + m[3] * t[5] + m[5];
             return r;
+        }
+
+        function withDpr(m) {
+            return concatTransform(identityTransform(), m);
+        }
+
+        function identityTransform() {
+            return [config.dpr, 0, 0, config.dpr, 0, 0]
         }
 
         function transformPoint(x, y, t) {

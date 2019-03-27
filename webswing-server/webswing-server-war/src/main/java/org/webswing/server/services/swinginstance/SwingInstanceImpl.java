@@ -1,8 +1,35 @@
 package org.webswing.server.services.swinginstance;
 
-import main.Main;
+import java.awt.print.PrinterJob;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
+import org.apache.logging.log4j.core.appender.rolling.FileSize;
+import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
+import org.apache.logging.log4j.core.appender.rolling.action.Action;
+import org.apache.logging.log4j.core.appender.rolling.action.DeleteAction;
+import org.apache.logging.log4j.core.appender.rolling.action.IfAccumulatedFileSize;
+import org.apache.logging.log4j.core.appender.rolling.action.IfFileName;
+import org.apache.logging.log4j.core.appender.rolling.action.PathCondition;
+import org.apache.logging.log4j.core.appender.rolling.action.PathSortByModificationTime;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -14,8 +41,15 @@ import org.webswing.model.c2s.ParamMsg;
 import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.c2s.SimpleEventMsgIn.SimpleEventType;
 import org.webswing.model.c2s.TimestampsMsgIn;
-import org.webswing.model.internal.*;
+import org.webswing.model.internal.ApiCallMsgInternal;
+import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.model.internal.ApiEventMsgInternal.ApiEventType;
+import org.webswing.model.internal.ExitMsgInternal;
+import org.webswing.model.internal.JvmStatsMsgInternal;
+import org.webswing.model.internal.OpenFileResultMsgInternal;
+import org.webswing.model.internal.PrinterJobResultMsgInternal;
+import org.webswing.model.internal.ThreadDumpMsgInternal;
+import org.webswing.model.internal.ThreadDumpRequestMsgInternal;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.CursorChangeEventMsg;
 import org.webswing.model.s2c.LinkActionMsg;
@@ -35,62 +69,59 @@ import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.jvmconnection.JvmConnection;
 import org.webswing.server.services.jvmconnection.JvmConnectionService;
 import org.webswing.server.services.jvmconnection.JvmListener;
+import org.webswing.server.services.recorder.SessionRecorder;
+import org.webswing.server.services.recorder.SessionRecorderService;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.modules.AbstractSecurityModule;
 import org.webswing.server.services.stats.StatisticsLogger;
+import org.webswing.server.services.stats.StatisticsReader;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingprocess.ProcessExitListener;
 import org.webswing.server.services.swingprocess.SwingProcess;
 import org.webswing.server.services.swingprocess.SwingProcessConfig;
+import org.webswing.server.services.swingprocess.SwingProcessImpl;
 import org.webswing.server.services.swingprocess.SwingProcessService;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketUserInfo;
 import org.webswing.server.util.FontUtils;
+import org.webswing.server.util.LogReaderUtil;
 import org.webswing.server.util.ServerUtil;
 import org.webswing.toolkit.api.WebswingApi;
+import org.webswing.toolkit.api.WebswingMessagingApi;
 
-import java.awt.print.PrinterJob;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import main.Main;
 
-public class SwingInstanceImpl implements SwingInstance, JvmListener {
+public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListener {
+
+	private static final long serialVersionUID = -4640770499863974871L;
+
 	private static final String LAUNCHER_CONFIG = "launcherConfig";
 	private static final String WEB_TOOLKIT_CLASS_NAME = "org.webswing.toolkit.WebToolkit";
 	private static final String WEB_GRAPHICS_ENV_CLASS_NAME = "org.webswing.toolkit.ge.WebGraphicsEnvironment";
 	private static final String WEB_PRINTER_JOB_CLASS_NAME = "org.webswing.toolkit.WebPrinterJobWrapper";
-	private static final String WIN_SHELL_FOLDER_MANAGER = "sun.awt.shell.Win32ShellFolderManager2";
+	private static final String SHELL_FOLDER_MANAGER = "sun.awt.shell.PublicShellFolderManager";
+	private static final String JAVA9_PATCHED_JSOBJECT_MODULE_MARKER = "netscape.javascript.WebswingPatchedJSObjectJarMarker";
 	private static final String JAVA_FX_PATH = System.getProperty("java.home") + "/lib/ext/jfxrt.jar";
-	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.ToolkitJarMarker";
+	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.toolkit.WebsinwgFxToolkitFactory";
+	private static final long DEFAULT_LOG_SIZE = 10 * 1024 * 1024; // 10 MB
 
 	private static final Logger log = LoggerFactory.getLogger(SwingInstance.class);
+	private final String instanceId;
+	private final String ownerId;
+
+	private WebSocketConnection webConnection;
+	private WebSocketConnection mirroredWebConnection;
 
 	private final SwingInstanceManager manager;
 	private final FileTransferHandler fileHandler;
-	private final String instanceId;
-	private final String clientId;
-	private String clientIp;
-	private AbstractWebswingUser user;
 	private SwingProcess process;
 	private JvmConnection jvmConnection;
 	private SessionRecorder sessionRecorder;
-	private WebSocketConnection webConnection;
-	private WebSocketConnection mirroredWebConnection;
-	private SwingConfig config;
-	private Date disconnectedSince;
-	private final Date startedAt = new Date();
-	private final String queueId;
-	private String customArgs = "";
-	private int debugPort = 0;
-	private String locale = null;
-	private String userIp = null;
-	private String userOs = null;
 
-	private String userBrowser = null;
+	private SwingConfig config;
+	private VariableSubstitutor subs;
+
+	private final Date startedAt = new Date();
 	private WebSocketUserInfo lastConnection = null;
 
 	//finished instances only
@@ -98,28 +129,29 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	private List<String> warningHistoryLog;
 	private Map<Long, ThreadDumpMsgInternal> threadDumps = new ConcurrentHashMap<>();
 
-	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection websocket) throws WsException {
+	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService, SessionRecorderService recorderService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection websocket) throws WsException {
 		this.manager = manager;
 		this.fileHandler = fileHandler;
 		this.webConnection = websocket;
-		this.instanceId = ServerUtil.resolveInstanceIdForMode(websocket, h, config);
 		this.config = config;
-		this.user = websocket.getUser();
-		this.clientId = h.getClientId();
-		this.customArgs = ServerUtil.getCustomArgs(websocket.getRequest());
-		this.debugPort = ServerUtil.getDebugPort(websocket.getRequest());
-		this.clientIp = ServerUtil.getClientIp(websocket);
-		this.queueId = user.getUserId() + "-" + config.getName() + "-" + startedAt.getTime();
-		updateUser(websocket);
+		this.ownerId = ServerUtil.resolveOwnerIdForSessionMode(websocket, h, config);
+		this.instanceId = ServerUtil.generateInstanceId(websocket, h, manager.getPathMapping());
+		AbstractWebswingUser user = websocket.getUser();
+		WebSocketUserInfo info = websocket.getUserInfo();
+		subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), this.getInstanceId(), info.getUserIp(), h.getLocale(), info.getCustomArgs());
+		this.sessionRecorder = recorderService.create(this, manager);
+
 		try {
-			this.jvmConnection = connectionService.connect(this.queueId, this);
-			process = start(processService, config, h);
+			this.jvmConnection = connectionService.connect(this.instanceId, this);
+			process = start(processService, config, h, websocket);
 			notifyUserConnected();
 		} catch (Exception e) {
 			notifyExiting();
 			throw new WsException("Failed to create App instance.", e);
 		}
-		this.sessionRecorder = ServerUtil.isRecording(websocket.getRequest()) ? new SessionRecorder(this) : null;
+		if (ServerUtil.isRecording(websocket.getRequest())) {
+			sessionRecorder.startRecording();
+		}
 		logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, websocket.isWebsocketTransport() ? 1 : 2);
 	}
 
@@ -127,7 +159,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		if (h.isMirrored()) {// connect as mirror viewer
 			connectMirroredWebSession(r);
 		} else {// continue old session?
-			if (h.getSessionId() != null && h.getSessionId().equals(getSessionId())) {
+			if (h.getConnectionId() != null && h.getConnectionId().equals(getConnectionId())) {
 				sendToSwing(r, h);
 			} else {
 				boolean result = connectPrimaryWebSession(r);
@@ -151,9 +183,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			}
 			if (this.webConnection == null) {
 				this.webConnection = resource;
-				updateUser(resource);
 				logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, resource.isWebsocketTransport() ? 1 : 2);
-				this.disconnectedSince = null;
 				notifyUserConnected();
 				return true;
 			}
@@ -162,19 +192,12 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	}
 
-	private void updateUser(WebSocketConnection resource) {
-		userIp = ServerUtil.getClientIp(webConnection);
-		userOs = ServerUtil.getClientOs(webConnection);
-		userBrowser = ServerUtil.getClientBrowser(webConnection);
-	}
-
 	private void disconnectPrimaryWebSession() {
 		if (this.webConnection != null) {
 			notifyUserDisconnected();
 			this.lastConnection = this.webConnection.getUserInfo();
 			this.lastConnection.setDisconnected();
 			this.webConnection = null;
-			this.disconnectedSince = new Date();
 			logStatValue(StatisticsLogger.WEBSOCKET_CONNECTED, 0);
 		}
 	}
@@ -211,7 +234,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	public void sendToWeb(MsgOut o) {
 		EncodedMessage serialized = new EncodedMessage(o);
-		if (sessionRecorder != null) {
+		if (sessionRecorder!=null && sessionRecorder.isRecording()) {
 			sessionRecorder.saveFrame(serialized.getProtoMessage());
 		}
 		if (webConnection != null) {
@@ -306,7 +329,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				}
 			} else if (o instanceof PrinterJobResultMsgInternal) {
 				PrinterJobResultMsgInternal pj = (PrinterJobResultMsgInternal) o;
-				boolean success = fileHandler.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, getUser(), getInstanceId(),pj.isTempFile(), false, null);
+				boolean success = fileHandler.registerFile(pj.getPdfFile(), pj.getId(), 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), pj.isTempFile(), false, null);
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
 					LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.print, pj.getId());
@@ -317,7 +340,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				OpenFileResultMsgInternal fr = (OpenFileResultMsgInternal) o;
 				String extension = getFileExtension(fr.getFile());
 				String id = UUID.randomUUID().toString() + extension;
-				boolean success = fileHandler.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, getUser(), getInstanceId(), false, fr.isWaitForFile(), fr.getOverwriteDetails());
+				boolean success = fileHandler.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), false, fr.isWaitForFile(), fr.getOverwriteDetails());
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
 					LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.file, id);
@@ -326,12 +349,16 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 				}
 			} else if (o instanceof JvmStatsMsgInternal) {
 				JvmStatsMsgInternal s = (JvmStatsMsgInternal) o;
+				
+				double cpuUsage = s.getCpuUsage();
+				
 				logStatValue(StatisticsLogger.MEMORY_ALLOCATED_METRIC, s.getHeapSize());
 				logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
-				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, s.getCpuUsage());
+				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, cpuUsage);
+				logStatValue(StatisticsLogger.CPU_UTIL_SESSION_METRIC, cpuUsage);
 				logStatValue(StatisticsLogger.EDT_BLOCKED_SEC_METRIC, s.getEdtPingSeconds());
 				if (getAppConfig().isMonitorEdtEnabled()) {
-					if (s.getEdtPingSeconds() > 2) {
+					if (s.getEdtPingSeconds() > Math.max(2,getAppConfig().getLoadingAnimationDelay())) {
 						sendToWeb(SimpleEventMsgOut.applicationBusy.buildMsgOut());
 					}
 				}
@@ -347,7 +374,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			CursorChangeEventMsg cmsg = ((AppFrameMsgOut) o).getCursorChange();
 			if (cmsg.getCurFile() != null) {
 				File cur = new File(cmsg.getCurFile());
-				boolean success = fileHandler.registerFile(cur, cur.getName(), 1, TimeUnit.DAYS, getUser(), getInstanceId(), false,false, null);
+				boolean success = fileHandler.registerFile(cur, cur.getName(), 1, TimeUnit.DAYS, getUserId(), getInstanceId(), false, false, null);
 				cmsg.setCurFile(cur.getName());
 			}
 			sendToWeb((MsgOut) o);
@@ -366,7 +393,6 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			}
 		}
 		if (StringUtils.isNotBlank(config.getGoodbyeUrl())) {
-			VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), getClientId(), clientIp, locale, customArgs);
 			String url = subs.replace(config.getGoodbyeUrl());
 			if (url.startsWith("/")) {
 				url = AbstractSecurityModule.getContextPath(manager.getServletContext()) + url;
@@ -387,7 +413,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 					throw new IOException("Can not clear upload folder if multiple roots are defined. Turn off the option in Webswing config. [" + transferDir + "]");
 				} else if (transferDir != null) {
 					FileUtils.deleteDirectory(new File(transferDir));
-					log.info("Transfer dir for session ["+process.getConfig().getName()+"] cleared. ["+transferDir+"]");
+					log.info("Transfer dir for session [" + process.getConfig().getName() + "] cleared. [" + transferDir + "]");
 				}
 			} catch (IOException e) {
 				log.error("Failed to delete transfer dir " + transferDir, e);
@@ -400,18 +426,25 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		if (isRunning()) {
 			process.setProcessExitListener(null);
 		}
-		if (sessionRecorder != null) {
-			sessionRecorder.close();
+		try {
+			if (sessionRecorder!=null && sessionRecorder.isRecording()) {
+				sessionRecorder.stopRecording();
+			}
+		} catch (WsException e) {
+			log.error("Stop Recording:", e);
 		}
 		manager.notifySwingClose(this);
 	}
 
 	@Override
-	public void startRecording() {
-		if (sessionRecorder == null) {
-			sessionRecorder = new SessionRecorder(this);
-			sendToSwing(webConnection, new SimpleEventMsgIn(SimpleEventType.repaint));
-		}
+	public void startRecording() throws WsException {
+		sessionRecorder.startRecording();
+		sendToSwing(webConnection, new SimpleEventMsgIn(SimpleEventType.repaint));
+	}
+
+	@Override
+	public void stopRecording() throws WsException {
+		sessionRecorder.stopRecording();
 	}
 
 	public SwingSession toSwingSession(boolean stats) {
@@ -419,30 +452,38 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		session.setId(getInstanceId());
 		session.setApplet(LauncherType.Applet.equals(getAppConfig().getLauncherType()));
 		session.setApplication(getAppConfig().getName());
-		session.setConnected(getSessionId() != null);
-		if (!session.getConnected()) {
-			session.setDisconnectedSince(getDisconnectedSince());
+		session.setApplicationUrl(manager.getFullPathMapping());
+		session.setConnected(getConnectionId() != null);
+		WebSocketUserInfo info;
+		if (webConnection == null) {
+			info = lastConnection;
+		} else {
+			info = webConnection.getUserInfo();
 		}
+		session.setDisconnectedSince(info.getDisconnectedSince());
+		session.setUser(info.getUserId());
+		session.setUserIp(info.getUserIp());
+		session.setUserOs(info.getUserOs());
+		session.setUserBrowser(info.getUserBrowser());
+
 		session.setStartedAt(getStartedAt());
-		session.setUser(getUser());
-		session.setUserIp(userIp);
-		session.setUserOs(userOs);
-		session.setUserBrowser(userBrowser);
 		session.setEndedAt(getEndedAt());
 		session.setStatus(getStatus());
+		StatisticsReader statReader = manager.getStatsReader();
 		if (stats) {
-			session.setStats(manager.getInstanceStats(getClientId()));
+			session.setStats(statReader.getInstanceStats(this.getInstanceId()));
 		}
-		session.setMetrics(manager.getInstanceMetrics(getClientId()));
-		session.setWarnings(manager.getInstanceWarnings(getClientId()));
+		session.setMetrics(statReader.getInstanceMetrics(this.getInstanceId()));
+		session.setWarnings(statReader.getInstanceWarnings(this.getInstanceId()));
 		if (isRunning()) {
-			session.setWarningHistory(manager.getInstanceWarningHistory(getClientId()));
+			session.setWarningHistory(statReader.getInstanceWarningHistory(this.getInstanceId()));
 		} else {
 			session.setWarningHistory(warningHistoryLog);
 		}
 		session.setRecorded(isRecording());
 		session.setRecordingFile(getRecordingFile());
 		session.setThreadDumps(toMap(threadDumps));
+		session.setLoggingEnabled(getAppConfig().isSessionLogging());
 
 		return session;
 	}
@@ -453,15 +494,14 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		}
 	}
 
-	private SwingProcess start(SwingProcessService processService, final SwingConfig appConfig, final ConnectionHandshakeMsgIn handshake) throws Exception {
-		this.locale = handshake.getLocale();
+	private SwingProcess start(SwingProcessService processService, final SwingConfig appConfig, final ConnectionHandshakeMsgIn handshake, WebSocketConnection websocket) throws Exception {
 		final Integer screenWidth = handshake.getDesktopWidth();
 		final Integer screenHeight = handshake.getDesktopHeight();
-		final VariableSubstitutor subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), getClientId(), clientIp, locale, customArgs);
 		SwingProcess swing = null;
 		try {
 			SwingProcessConfig swingConfig = new SwingProcessConfig();
-			swingConfig.setName(getClientId());
+			swingConfig.setName(this.getInstanceId());
+			swingConfig.setApplicationName(getAppConfig().getName());
 			String java = getAbsolutePath(subs.replace(appConfig.getJreExecutable()), false);
 			swingConfig.setJreExecutable(java);
 			String homeDir = getAbsolutePath(subs.replace(appConfig.getUserDir()), true);
@@ -470,40 +510,61 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.setClassPath(new File(URI.create(CommonUtil.getWarFileLocation())).getAbsolutePath());
 			String javaVersion = subs.replace(appConfig.getJavaVersion());
 			boolean useJFX = config.isJavaFx();
-			if (!new File(JAVA_FX_PATH).exists()) {
-				log.warn("Java FX not supported with current java version (Try version 1.8). JavaFx library not found in '" + new File(JAVA_FX_PATH).getCanonicalPath() + "'. ");
-				useJFX = false;
-			}
 			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;
+			String webFxToolkitFactory = JAVA_FX_TOOLKIT_CLASS_NAME;
+			String javaFxBootClasspath ="";
+			String javaFxAppClasspath = "";
 			String webGraphicsEnvClass = WEB_GRAPHICS_ENV_CLASS_NAME;
-			if (javaVersion.startsWith("1.7")) {
-				webToolkitClass += "7";
-				webGraphicsEnvClass += "7";
-			} else if (javaVersion.startsWith("1.8")) {
+			String j9modules = "";
+			if (javaVersion.startsWith("1.8")) {
 				webToolkitClass += "8";
+				webFxToolkitFactory +="8";
 				webGraphicsEnvClass += "8";
+				if (useJFX) {
+					if(!new File(JAVA_FX_PATH).exists()){
+						log.warn("JavaFx library not found in '" + new File(JAVA_FX_PATH).getCanonicalPath() + "'. ");
+						useJFX = false;
+					}
+					javaFxBootClasspath += File.pathSeparator + CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME) + File.pathSeparator + CommonUtil.getBootClassPathForClass(webFxToolkitFactory) + File.pathSeparator + "\"" + new File(JAVA_FX_PATH).getCanonicalPath() + "\"";
+				}
+			} else if (javaVersion.startsWith("11")) {
+				webToolkitClass += "11";
+				webFxToolkitFactory +="11";
+				webGraphicsEnvClass += "11";
+				if (useJFX) {
+					javaFxAppClasspath += CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME,false) +";" + CommonUtil.getBootClassPathForClass(webFxToolkitFactory,false)+";";
+				}
+				j9modules = " --patch-module jdk.jsobject=" + CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_JSOBJECT_MODULE_MARKER);
+				j9modules += " --patch-module java.desktop=" + CommonUtil.getBootClassPathForClass(SHELL_FOLDER_MANAGER);
+				j9modules += " --add-reads jdk.jsobject=ALL-UNNAMED ";
+				j9modules += " --add-opens java.base/java.net=ALL-UNNAMED "; // URLStreamHandler reflective access from SwingClassloader
+				j9modules += " --add-opens java.desktop/java.awt=ALL-UNNAMED "; // EventQueue reflective access from SwingMain
+				j9modules += " --add-opens java.desktop/sun.awt.windows=ALL-UNNAMED "; // sun.awt.windows.ThemeReader reflective access from WebToolkit
+				j9modules += " --add-opens java.desktop/java.awt.event=ALL-UNNAMED "; // ava.awt.event.KeyEvent.extendedKeyCode reflective access from Util
 			} else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
-				throw new RuntimeException("Java version not supported. (Version starting with 1.7 and 1.8 are supported.)");
+				throw new RuntimeException("Java version not supported. (Versions starting with 1.8 and 11 are supported.)");
 			}
 			String webSwingToolkitApiJarPath = CommonUtil.getBootClassPathForClass(WebswingApi.class.getName());
 			String webSwingToolkitJarPath = CommonUtil.getBootClassPathForClass(WEB_TOOLKIT_CLASS_NAME);
 			String webSwingToolkitJarPathSpecific = CommonUtil.getBootClassPathForClass(webToolkitClass);
-			String rtWinShellJarPath = System.getProperty("os.name", "").startsWith("Windows") ? "" : (File.pathSeparator + CommonUtil.getBootClassPathForClass(WIN_SHELL_FOLDER_MANAGER));
+			String shellFolderMgrJarPath = (File.pathSeparator + CommonUtil.getBootClassPathForClass(SHELL_FOLDER_MANAGER));
 
-			String bootCp = "-Xbootclasspath/a:" + webSwingToolkitApiJarPath + File.pathSeparatorChar + webSwingToolkitJarPathSpecific + File.pathSeparatorChar + webSwingToolkitJarPath + rtWinShellJarPath;
+			String bootCp = "-Xbootclasspath/a:" + webSwingToolkitApiJarPath + File.pathSeparatorChar + webSwingToolkitJarPathSpecific + File.pathSeparatorChar + webSwingToolkitJarPath + shellFolderMgrJarPath;
 
 			if (useJFX) {
-				bootCp += File.pathSeparator + CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME) + File.pathSeparator + "\"" + new File(JAVA_FX_PATH).getCanonicalPath() + "\"";
+				bootCp += javaFxBootClasspath;
 			}
 
+			int debugPort = websocket.getUserInfo().getDebugPort();
 			String debug = appConfig.isDebug() && (debugPort != 0) ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=" + debugPort + ",server=y,suspend=y " : "";
 			String vmArgs = appConfig.getVmArgs() == null ? "" : subs.replace(appConfig.getVmArgs());
-			swingConfig.setJvmArgs(bootCp + debug + " -noverify " + vmArgs);
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, getClientId());
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.queueId);
+			swingConfig.setJvmArgs(j9modules + bootCp + debug + " -noverify " + vmArgs);
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, this.getInstanceId());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_ID, manager.getPathMapping());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.instanceId);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_HOME, getAbsolutePath(".", false));
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, javaFxAppClasspath + subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
 			swingConfig.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 			swingConfig.addProperty(Constants.JMS_URL, System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT));
 
@@ -519,6 +580,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD, appConfig.isAllowLocalClipboard());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, appConfig.isAllowJsLink());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_INITIAL_URL, handshake.getUrl());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_MSG_API_TOPIC, WebswingMessagingApi.MSG_API_SHARED_TOPIC + manager.getFullPathMapping());
 
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported());
@@ -534,13 +596,18 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			swingConfig.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight));
 
 			if (useJFX) {
+				swingConfig.addProperty(Constants.SWING_FX_TOOLKIT_FACTORY, webFxToolkitFactory);
 				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_TOOLKIT, Constants.SWING_START_SYS_PROP_JFX_TOOLKIT_WEB);
 				swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JFX_PRISM, "web");//PrismSettings
 				swingConfig.addProperty("prism.text", "t2k");//PrismFontFactory
 				swingConfig.addProperty("prism.lcdtext", "false");//PrismFontFactory
 				swingConfig.addProperty("javafx.live.resize", "false");//QuantumToolkit
 			}
-
+			
+			if (config.isSessionLogging()) {
+		        swingConfig.setLogAppender(createSessionLogAppender());
+			}
+			
 			switch (appConfig.getLauncherType()) {
 			case Applet:
 				AppletLauncherConfig applet = appConfig.getValueAs(LAUNCHER_CONFIG, AppletLauncherConfig.class);
@@ -612,16 +679,62 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		}
 		return f.getCanonicalPath();
 	}
+	
+	private Appender createSessionLogAppender() {
+		String logDir = LogReaderUtil.getSessionLogDir(subs, config);
+		
+		if (StringUtils.isNotBlank(logDir)) {
+			// make path relative for logger
+			logDir = new File("").toURI().relativize(new File(logDir).toURI()).getPath();
+		}
+		
+		String appUrlNormalized = LogReaderUtil.normalizeForFileName(manager.getApplicationInfoMsg().getUrl());
+		String sessionIdNormalized = LogReaderUtil.normalizeForFileName(this.getInstanceId());
+		String logFileName = logDir + "/webswing-" + sessionIdNormalized + "-" + appUrlNormalized + ".session.log";
+		String globPattern = "webswing-*-" + appUrlNormalized + ".session.log*";
+		
+		BuiltConfiguration logConfig = ConfigurationBuilderFactory.newConfigurationBuilder().build();
+		
+		String singleSize = subs.replace(config.getSessionLogFileSize());
+		long maxLogRollingSize = FileSize.parse(singleSize, DEFAULT_LOG_SIZE) / 2;
+		SizeBasedTriggeringPolicy sizeBasedPolicy = SizeBasedTriggeringPolicy.createPolicy(maxLogRollingSize + " B");
+		String maxSize = subs.replace(config.getSessionLogMaxFileSize());
+		
+		RollingFileAppender appender = RollingFileAppender.newBuilder()
+				.withName(SwingProcessImpl.class.getName())
+				.withFileName(logFileName)
+				.withFilePattern(logFileName + ".%i")
+				.withAppend(true)
+				.withLayout(PatternLayout.newBuilder().withPattern(Constants.SESSION_LOG_PATTERN).build())
+				.withPolicy(sizeBasedPolicy)
+				.withStrategy(DefaultRolloverStrategy.newBuilder()
+						.withMax("1")
+						.withConfig(logConfig)
+						.withCustomActions(new Action[] {
+								DeleteAction.createDeleteAction(logDir, false, 1, false, PathSortByModificationTime.createSorter(true), 
+										new PathCondition[] {IfFileName.createNameCondition(globPattern, null, IfAccumulatedFileSize.createFileSizeCondition(maxSize))}, null, logConfig)
+						})
+						.build())
+				.build();
+        appender.start();
+        
+        return appender;
+	}
 
-	public String getClientId() {
-		return clientId;
+	@Override
+	public String getOwnerId() {
+		return ownerId;
+	}
+
+	public String getInstanceId() {
+		return instanceId;
 	}
 
 	public SwingConfig getAppConfig() {
 		return config;
 	}
 
-	public String getSessionId() {
+	public String getConnectionId() {
 		if (webConnection != null) {
 			return webConnection.uuid();
 		}
@@ -639,14 +752,6 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		return (process != null && process.isRunning());
 	}
 
-	public String getUser() {
-		return user.getUserId();
-	}
-
-	public Date getDisconnectedSince() {
-		return disconnectedSince;
-	}
-
 	public Date getStartedAt() {
 		return startedAt;
 	}
@@ -655,16 +760,12 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 		return endedAt;
 	}
 
-	public Boolean isRecording() {
-		return sessionRecorder != null && !sessionRecorder.isFailed();
+	public boolean isRecording() {
+		return sessionRecorder.isRecording();
 	}
 
 	public String getRecordingFile() {
-		return sessionRecorder != null ? sessionRecorder.getFileName() : null;
-	}
-
-	public String getInstanceId() {
-		return instanceId;
+		return sessionRecorder.getFileName();
 	}
 
 	public SwingInstanceStatus getStatus() {
@@ -689,7 +790,7 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 
 	@Override
 	public void webSessionDisconnected(String connectionId) {
-		if (getSessionId() != null && getSessionId().equals(connectionId)) {
+		if (getConnectionId() != null && getConnectionId().equals(connectionId)) {
 			disconnectPrimaryWebSession();
 		} else if (getMirroredSessionId() != null && getMirroredSessionId().equals(connectionId)) {
 			disconnectMirroredWebSession();
@@ -697,21 +798,22 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 	}
 
 	@Override
-	public String getMirrorSessionId() {
+	public String getMirrorConnectionId() {
 		return mirroredWebConnection != null ? mirroredWebConnection.uuid() : null;
 	}
 
 	public void logStatValue(String name, Number value) {
 		if (StringUtils.isNotEmpty(name)) {
-			manager.logStatValue(getClientId(), name, value);
+			manager.logStatValue(this.getInstanceId(), name, value);
 		}
 	}
 
 	@Override
 	public void logWarningHistory() {
-		List<String> current = manager.getInstanceWarnings(getClientId());
+		StatisticsReader statReader = manager.getStatsReader();
+		List<String> current = statReader.getInstanceWarnings(this.getInstanceId());
 		if (current != null) {
-			current.addAll(manager.getInstanceWarningHistory(getClientId()));
+			current.addAll(statReader.getInstanceWarningHistory(this.getInstanceId()));
 		}
 		warningHistoryLog = current;
 	}
@@ -770,6 +872,10 @@ public class SwingInstanceImpl implements SwingInstance, JvmListener {
 			event = new ApiEventMsgInternal(type, null, null);
 		}
 		jvmConnection.send(event);
+	}
+
+	public String getUserId() {
+		return webConnection == null ? lastConnection.getUserId() : webConnection.getUserId();
 	}
 
 	private String getFileExtension(File file) {

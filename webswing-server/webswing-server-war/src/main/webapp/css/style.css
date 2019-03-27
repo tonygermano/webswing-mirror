@@ -6,7 +6,7 @@
   overflow: hidden;
   width: 100%;
   height: 100%;
-  color: #212121;
+  color: #0C1726;
   font-family: "open sans", sans-serif;
   font-weight: normal;
   line-height: 1.4;
@@ -400,11 +400,11 @@ html.ws-fullscreen body {
 }
 .webswing-element ::-moz-selection,
 .webswing-element ::selection {
-  background-color: #ff5c00;
+  background-color: #0099CF;
   color: #ffffff;
 }
 .webswing-element a:link, .webswing-element a:visited, .webswing-element a:hover, .webswing-element a:active, .webswing-element a:focus {
-  color: #ff5c00;
+  color: #0099CF;
   text-decoration: none;
 }
 .webswing-element a,
@@ -528,12 +528,12 @@ html.ws-fullscreen body {
   margin-right: 0;
 }
 .webswing-element .ws-btn:hover, .webswing-element .ws-touchbar-btn:hover, .webswing-element .ws-networkbar-btn:hover, .webswing-element .ws-messagebar-btn:hover {
-  background-color: #ff5c00;
-  border-color: #ff5c00;
+  background-color: #0099CF;
+  border-color: #0099CF;
   color: #ffffff;
 }
 .webswing-element .ws-btn--selected {
-  color: #ff5c00;
+  color: #0099CF;
 }
 .webswing-element .ws-btn--inactive {
   border-color: #e2e2e2;
@@ -581,7 +581,7 @@ html.ws-fullscreen body {
   height: 100%;
   max-height: 60px;
   margin-top: 20px;
-  background: #ff5c00;
+  background: #0099CF;
   border-width: 0;
   border-radius: 0 0 3px 3px;
   color: #ffffff;
@@ -613,10 +613,10 @@ html.ws-fullscreen body {
   left: 0;
 }
 .webswing-element .ws-btn-submit:hover {
-  background: #ff6d01;
+  background: #03bdff;
 }
 .webswing-element .ws-input-hidden {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   width: 1px;
@@ -654,10 +654,10 @@ html.ws-fullscreen body {
   font-size: 15px;
 }
 .webswing-element .ws-form-field:focus {
-  border-color: #ff5c00;
+  border-color: #0099CF;
 }
 .webswing-element .ws-form-field:hover {
-  border-color: #ff5c00;
+  border-color: #0099CF;
 }
 .webswing-element .ws-form-underscore {
   margin: 15px auto 5px auto;
@@ -668,7 +668,7 @@ html.ws-fullscreen body {
   font-size: 16px;
 }
 .webswing-element .ws-form-addon:focus {
-  border-color: #ff5c00;
+  border-color: #0099CF;
   border-left-width: 35px;
 }
 .webswing-element .ws-form-addon:focus + .ws-form-icon {
@@ -781,7 +781,7 @@ html.ws-fullscreen body {
   display: inline-block;
   width: 60%;
   height: 60%;
-  background-color: #ff5c00;
+  background-color: #0099CF;
   border-radius: 100%;
   -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
   animation: sk-bounce 2.0s infinite ease-in-out;
@@ -1028,7 +1028,7 @@ html.ws-fullscreen body {
 }
 .webswing-element .ws-clipboard-item--active {
   display: block;
-  color: #212121;
+  color: #0C1726;
 }
 .webswing-element .ws-clipboard-text-area {
   padding: 10px;

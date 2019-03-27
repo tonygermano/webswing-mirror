@@ -8,17 +8,18 @@ import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
 import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.model.jslink.JSObjectMsg;
 import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
+import org.webswing.toolkit.FocusEventCause;
 import org.webswing.toolkit.WebClipboard;
 import org.webswing.toolkit.WebClipboardTransferable;
 import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.extra.DndEventHandler;
-import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.jslink.WebJSObject;
-import org.webswing.toolkit.util.*;
-import sun.awt.CausedFocusEvent;
+import org.webswing.toolkit.util.DeamonThreadFactory;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
 
-import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -164,7 +165,7 @@ public class WebEventDispatcher {
 	}
 
 	private void dispatchKeyboardEvent(KeyboardEventMsgIn event) {
-		Window w = (Window) WindowManager.getInstance().getActiveWindow();
+		Window w = (Window) Util.getWebToolkit().getWindowManager().getActiveWindow();
 		if (w != null) {
 			long when = System.currentTimeMillis();
 			int modifiers = Util.getKeyModifiersAWTFlag(event);
@@ -194,7 +195,7 @@ public class WebEventDispatcher {
 			} else {
 				AWTEvent e = Util.createKeyEvent(src, type, when, modifiers, event.getKeycode(), character, KeyEvent.KEY_LOCATION_STANDARD);
 				dispatchEventInSwing(w, e);
-				if (event.getKeycode() == 32 && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && !event.isCtrl()) {// space keycode handle press
+				if ((event.getKeycode() == 32 ||event.getKeycode() == 9) && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && !event.isCtrl()) {// space keycode handle press
 					event.setType(KeyboardEventMsgIn.KeyEventType.keypress);
 					dispatchKeyboardEvent(event);
 				}
@@ -202,13 +203,13 @@ public class WebEventDispatcher {
 		}
 	}
 
-	private void dispatchMouseEvent(MouseEventMsgIn event) {
+	protected void dispatchMouseEvent(MouseEventMsgIn event) {
 		Component c = null;
-		if (WindowManager.getInstance().isLockedToWindowDecorationHandler()) {
-			c = WindowManager.getInstance().getLockedToWindow();
+		if (Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) {
+			c = Util.getWebToolkit().getWindowManager().getLockedToWindow();
 		} else {
-			c = WindowManager.getInstance().getVisibleComponentOnPosition(event.getX(), event.getY());
-			if (relatedToLastEvent(event, lastMouseEvent) && !javaFXdragStarted.get() && !dndHandler.isDndInProgress()) {
+			c = Util.getWebToolkit().getWindowManager().getVisibleComponentOnPosition(event.getX(), event.getY());
+			if (relatedToLastEvent(event, lastMouseEvent) && !javaFXdragStarted.get() && !dndHandler.isDndInProgress() ) {
 				c = (Component) lastMouseEvent.getSource();
 			}
 		}
@@ -239,7 +240,7 @@ public class WebEventDispatcher {
 			int buttons = Util.getMouseButtonsAWTFlag(event.getButton());
 			if (buttons != 0 && event.getType() == MouseEventType.mousedown) {
 				Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
-				WindowManager.getInstance().activateWindow(w, null, x, y, false, true, CausedFocusEvent.Cause.MOUSE_EVENT);
+				Util.getWebToolkit().getWindowManager().activateWindow(w, null, x, y, false, true, FocusEventCause.MOUSE_EVENT);
 			}
 			switch (event.getType()) {
 			case mousemove:
@@ -296,7 +297,7 @@ public class WebEventDispatcher {
 		return lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup));
 	}
 
-	private int computeClickCount(int x, int y, int button, boolean isPressed, int timeMilis) {
+	protected int computeClickCount(int x, int y, int button, boolean isPressed, int timeMilis) {
 		if (isPressed) {
 			if (lastMousePressEvent != null && lastMousePressEvent.type == MouseEvent.MOUSE_CLICKED && lastMousePressEvent.button == button && Math.abs(lastMousePressEvent.x - x) < CLICK_TOLERANCE && Math.abs(lastMousePressEvent.y - y) < CLICK_TOLERANCE) {
 				if (timeMilis - lastMousePressEvent.time < doubleClickMaxDelay) {
@@ -426,9 +427,9 @@ public class WebEventDispatcher {
 			if (e instanceof MouseEvent) {
 				w.setCursor(w.getCursor());// force cursor update
 			}
-			if ((Util.isWindowDecorationEvent(w, e) || WindowManager.getInstance().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
+			if ((Util.isWindowDecorationEvent(w, e) || Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
 				Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
-				WindowManager.getInstance().handleWindowDecorationEvent(w, (MouseEvent) e);
+				Util.getWebToolkit().getWindowManager().handleWindowDecorationEvent(w, (MouseEvent) e);
 			} else if (dndHandler.isDndInProgress() && (e instanceof MouseEvent || e instanceof KeyEvent)) {
 				dndHandler.processMouseEvent(w, e);
 			} else {
@@ -477,7 +478,7 @@ public class WebEventDispatcher {
 								if (uploadMap.get(event.getFiles().get(i)) != null) {
 									arr.add(new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i))));
 								} else if (saveMode) {
-									arr.add(new File(fc.getCurrentDirectory(), event.getFiles().get(i)));
+									arr.add(new File(Util.getTimestampedTransferFolder("autosavemulti"), event.getFiles().get(i)));
 								}
 							}
 							fc.setSelectedFiles(arr.toArray(new File[arr.size()]));
@@ -487,7 +488,7 @@ public class WebEventDispatcher {
 								File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
 								fc.setSelectedFile(f);
 							} else if (saveMode) {
-								fc.setSelectedFile(new File(fc.getCurrentDirectory(), event.getFiles().get(0)));
+								fc.setSelectedFile(new File(Util.getTimestampedTransferFolder("autosave"), event.getFiles().get(0)));
 							}
 							Logger.info("File selected :" + fc.getSelectedFile().getAbsoluteFile());
 						}
@@ -544,7 +545,7 @@ public class WebEventDispatcher {
 		return dndHandler.isDndInProgress();
 	}
 
-	private static class MouseEventInfo {
+	protected static class MouseEventInfo {
 		final int x;
 		final int y;
 		final int type;

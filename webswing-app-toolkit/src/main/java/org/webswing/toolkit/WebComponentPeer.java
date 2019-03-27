@@ -34,7 +34,6 @@ import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
 
 import sun.awt.AWTAccessor;
-import sun.awt.CausedFocusEvent.Cause;
 import sun.awt.PaintEventDispatcher;
 import sun.awt.RepaintArea;
 import sun.awt.image.OffScreenImage;
@@ -47,7 +46,7 @@ import sun.java2d.SurfaceData;
 import sun.java2d.pipe.Region;
 
 @SuppressWarnings("restriction")
-public class WebComponentPeer implements ComponentPeer {
+abstract public class WebComponentPeer implements ComponentPeer {
 
 	private String guid = UUID.randomUUID().toString();
 
@@ -259,7 +258,7 @@ public class WebComponentPeer implements ComponentPeer {
 
 			if ((validPosition.x != this.oldX) || (validPosition.y != this.oldY) || (w != this.oldWidth) || (h != this.oldHeight)) {
 				if (oldWidth != 0 && oldHeight != 0 && target instanceof Window) {
-					WindowManager.getInstance().requestRepaintAfterMove((Window) target, new Rectangle(oldX, oldY, oldWidth, oldHeight));
+					Util.getWebToolkit().getWindowManager().requestRepaintAfterMove((Window) target, new Rectangle(oldX, oldY, oldWidth, oldHeight));
 				}
 				this.oldX = validPosition.x;
 				this.oldY = validPosition.y;
@@ -448,20 +447,6 @@ public class WebComponentPeer implements ComponentPeer {
 					Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(component.getCursor());
 				}
 			}
-		}
-	}
-
-	public boolean requestFocus(Component paramComponent, boolean temporary, boolean focusedWindowChangeAllowed, long time, Cause paramCause) {
-		if (target instanceof Window) {
-			return Util.getWebToolkit().getWindowManager().activateWindow((Window) target, paramComponent, 0, 0, temporary, focusedWindowChangeAllowed, paramCause);
-		} else if (target instanceof Applet) {
-			Applet applet = (Applet) target;
-			Window window = ((WebAppletContext) applet.getAppletContext()).getContainer();
-			return Util.getWebToolkit().getWindowManager().activateWindow(window, paramComponent, 0, 0, temporary, focusedWindowChangeAllowed, paramCause);
-		} else if (target instanceof Panel){
-			return Util.getWebToolkit().getWindowManager().deliverFocus((Panel)target, paramComponent, temporary, paramCause);
-		}else{
-			return false;
 		}
 	}
 

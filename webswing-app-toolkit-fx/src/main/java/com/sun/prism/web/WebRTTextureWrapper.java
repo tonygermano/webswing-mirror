@@ -3,6 +3,7 @@ package com.sun.prism.web;
 import com.sun.glass.ui.Screen;
 import com.sun.prism.Graphics;
 import com.sun.prism.RTTexture;
+import org.webswing.javafx.toolkit.WebsinwgFxToolkitFactory;
 
 import java.nio.Buffer;
 
@@ -44,7 +45,7 @@ public class WebRTTextureWrapper extends WebTextureWrapper implements RTTexture 
 	@Override
 	public Graphics createGraphics() {
 		Graphics originalGraphics = original.createGraphics();
-		return new WebPrismGraphicsWrapper(originalGraphics,this);
+		return WebsinwgFxToolkitFactory.getFactory().createWebPrismGraphicsWrapper(originalGraphics,this);
 	}
 
 	@Override

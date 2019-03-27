@@ -43,7 +43,7 @@ public interface OpenIDConnectSecurityModuleConfig extends WebswingExtendableSec
 	@ConfigFieldVariables
 	String getLogoutUrl();
 
-	class OpenIDConnectMetaDataGenerator extends MetadataGenerator<OpenIDConnectSecurityModuleConfig> {
+	class OpenIDConnectMetaDataGenerator extends ExtensionMetadataGenerator<OpenIDConnectSecurityModuleConfig> {
 
 	}
 }

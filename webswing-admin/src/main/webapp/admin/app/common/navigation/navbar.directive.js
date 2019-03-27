@@ -15,7 +15,7 @@
 			};
 		}
 
-		function wsNavbarDirectiveController($scope, navigationService, loginService, baseUrl, permissions) {
+		function wsNavbarDirectiveController($scope, navigationService, loginService, configRestService, baseUrl, permissions) {
 			var vm = this;
 			vm.isActive = navigationService.isActive;
 			vm.isCollapsed = true;
@@ -23,6 +23,8 @@
 			vm.baseUrl = baseUrl;
 			vm.locations = [];
 			$scope.$on('wsPermissionsReloaded', loadLocations);
+			
+			loadVersion();
 
 			function loadLocations() {
 				vm.locations.length = 0;// clean array
@@ -33,13 +35,34 @@
 					}
 				}
 			}
+			
+			function loadVersion() {
+				configRestService.getVersion().then(function(version) {
+					vm.version = parseVersion(version);
+				});
+			}
 
 			function logout() {
 				loginService.logout();
 			}
 
+			function parseVersion(version) {
+				if (!version) {
+					return version;
+				}
+				var idx = version.indexOf('-');
+				if (idx != -1) {
+					if (version.indexOf('-', idx+1) != -1) {
+						idx = version.indexOf('-', idx+1);
+					}
+					version = version.substring(0, idx);
+				}
+				
+				return version;
+			}
+			
 		}
-		wsNavbarDirectiveController.$inject = [ '$scope', 'navigationService', 'loginService', 'baseUrl', 'permissions' ];
+		wsNavbarDirectiveController.$inject = [ '$scope', 'navigationService', 'loginService', 'configRestService', 'baseUrl', 'permissions' ];
 
 		return wsNavbarDirective;
 	});

@@ -28,6 +28,7 @@ public class OpenIdConnectClient {
 	private static final Logger log = LoggerFactory.getLogger(OpenIdConnectClient.class);
 
 	public static final String CODE = "code";
+	public static final String STATE = "state";
 	public static final String ISSUER = "issuer";
 	public static final String AUTHORIZATION_ENDPOINT = "authorization_endpoint";
 	public static final String TOKEN_ENDPOINT = "token_endpoint";
@@ -114,14 +115,22 @@ public class OpenIdConnectClient {
 		}
 	}
 
-	public String getOpenIDRedirectUrl() throws IOException {
+	public String getOpenIDRedirectUrl(String state) throws IOException {
 		if (isInitialized()) {
-			return flow.newAuthorizationUrl().setRedirectUri(callback.toString()).build();
+			return flow.newAuthorizationUrl().setRedirectUri(callback.toString()).setState(state).build();
 		}
 		return null;
 	}
 
 	public static String getCode(HttpServletRequest request) {
+		return getQueryParam(request, CODE);
+	}
+
+	public static String getState(HttpServletRequest request) {
+		return getQueryParam(request, STATE);
+	}
+
+	private static String getQueryParam(HttpServletRequest request, String paramName) {
 		String query = request.getQueryString();
 		if (query == null)
 			return null;
@@ -131,7 +140,7 @@ public class OpenIdConnectClient {
 			if (eq == -1)
 				continue;
 			String name = param.substring(0, eq);
-			if (!name.equals(CODE))
+			if (!name.equals(paramName))
 				continue;
 			return param.substring(eq + 1);
 		}
@@ -171,5 +180,11 @@ public class OpenIdConnectClient {
 
 	public void setLogoutUrl(String logoutUrl) {
 		this.logoutUrl = logoutUrl;
+	}
+
+	public void validateCodeRequest(HttpServletRequest request, String expectedState) throws Exception {
+		if(expectedState==null || !expectedState.equals(getState(request))){
+			throw new Exception("Unexpected value of state parameter in code authorization request. (expected: "+expectedState+", received: "+getState(request)+")");
+		}
 	}
 }

@@ -19,7 +19,7 @@
 	        <thead>
 	            <tr class="ws-table-header">
 	                <th>
-	                	<a ng-click="vm.sortBy()">No. (Id)</a>
+	                	No. (Id)
 	                </th>
 	                <th>
 						<a ng-click="vm.sortBy('user')">User</a>
@@ -87,14 +87,18 @@
 	                    </div>
 	                    <div ng-if="session.recorded" >
 	                        <span class="label label-info " ui-jq="tooltip" title="Recording to {{session.recordingFile}}"><span class="glyphicon glyphicon-record"></span> Recording</span>
+							<button class="btn btn-default btn-xs " ui-jq="tooltip" title="Stop Recording" ng-click="vm.record(session)"><span class="glyphicon glyphicon-stop"></span></button>
 	                    </div>
-                        <div ng-if="session.warnings!=null || session.warningHistory!=null || session.threadDumps!=null" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
-				  			<span ng-class="{'label':true, 'label-warning':session.warnings != null, 'label-default':session.warnings == null}"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{session.warnings.length}} Warnings </span>
+                        <div ng-if="vm.hasWarnings(session)" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
+				  			<span ng-class="{'label':true, 'label-warning':session.warnings.length>0, 'label-default':session.warnings.length===0}"> <span class="glyphicon glyphicon-exclamation-sign"></span> {{session.warnings.length}} Warnings </span>
 						</div>
                         <div ng-if="!session.recorded" style="margin-top:3px">
                             <button type="button" class="btn btn-xs btn-default" ng-click="vm.record(session)">
                                 <span class="glyphicon glyphicon-record"></span> Record Session
                             </button>
+							<button ng-if="session.recordingFile != null" type="button" class="btn btn-primary btn-xs" ng-click="vm.play(session.recordingFile)">
+								<span class="glyphicon glyphicon-play"></span>
+							</button>
                         </div>
 	                </td>
 	                <td>
@@ -106,8 +110,8 @@
                	        <progressbar  animate="false" max="102400" value="session.metrics.outboundSize"><span style="color:black; white-space:nowrap;">{{'OUT: '+((session.metrics.outboundSize/1024)|number:0)+'k/s   '}}<small>({{session.metrics['outboundSize.MIN']/1024|number:0}}|{{session.metrics['outboundSize.AVG']/1024|number:0}}|{{session.metrics['outboundSize.MAX']/1024|number:0}})</small></span></progressbar>
 					</td>
 					<td>
-               	        <progressbar  animate="false" max="700" value="session.metrics.latency" type="danger"><span style="color:black; white-space:nowrap;">{{'E2E:'+(session.metrics.latency|number:0)+'ms   '}}<small>({{session.metrics['latency.MIN']|number:0}}|{{session.metrics['latency.AVG']|number:0}}|{{session.metrics['latency.MAX']|number:0}})</small></span></progressbar>
-               	        <progressbar  animate="false" max="500" value="session.metrics.latencyPing" type="danger"><span style="color:black; white-space:nowrap;">{{'PING:'+(session.metrics.latencyPing|number:0)+'ms   '}}<small>({{session.metrics['latencyPing.MIN']|number:0}}|{{session.metrics['latencyPing.AVG']|number:0}}|{{session.metrics['latencyPing.MAX']|number:0}})</small></span></progressbar>
+               	        <progressbar  animate="false" max="700" value="session.metrics.latency" type="danger"><span style="color:black; white-space:nowrap;">{{'E2E: '+(session.metrics.latency|number:0)+'ms   '}}<small>({{session.metrics['latency.MIN']|number:0}}|{{session.metrics['latency.AVG']|number:0}}|{{session.metrics['latency.MAX']|number:0}})</small></span></progressbar>
+               	        <progressbar  animate="false" max="500" value="session.metrics.latencyPing" type="danger"><span style="color:black; white-space:nowrap;">{{'PING: '+(session.metrics.latencyPing|number:0)+'ms   '}}<small>({{session.metrics['latencyPing.MIN']|number:0}}|{{session.metrics['latencyPing.AVG']|number:0}}|{{session.metrics['latencyPing.MAX']|number:0}})</small></span></progressbar>
 			        </td>
 			        <td>
 						<button type="button" class="btn btn-default"  ui-jq="tooltip" title="Thread Dump" ng-click="vm.requestThreadDump(session)">
@@ -115,6 +119,9 @@
 						</button>
 			            <button type="button" class="btn btn-primary" ng-click="vm.view(session)">
 			                <span class="glyphicon glyphicon-camera"></span> View
+			            </button>
+			            <button ng-if="vm.sessionLoggingEnabled" type="button" class="btn btn-primary" data-toggle="modal" ng-click="vm.loadSessionLogs(session)" data-target="#logsModal">
+			                <span class="glyphicon glyphicon-list"></span> Logs
 			            </button>
 			            <button type="button" class="btn btn-danger" ng-click="vm.kill(session)">
 			                <span class="glyphicon glyphicon-remove"></span> Shutdown
@@ -176,74 +183,133 @@
 	                            <span class="label label-success" ui-jq="tooltip" title="Application finished.">Finished</span>
 	                        </div>
 	                    </div>
-	                    <div ng-if="session.warningHistory!=null || session.threadDumps!=null" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
+	                    <div ng-if="vm.hasWarnings(session)" data-toggle="modal" ng-click="vm.warningSession=session" data-target="#warnModal">
 				  			<span class="label label-default"> <span class="glyphicon glyphicon-exclamation-sign"></span> Warnings </span>
 						</div>
 	                </td>
 	                <td>
-	                    <button ng-if="session.recorded" type="button" class="btn btn-primary" ng-click="vm.play(session)">
+	                    <button ng-if="session.recordingFile != null" type="button" class="btn btn-primary" ng-click="vm.play(session.recordingFile)">
 	                        <span class="glyphicon glyphicon-play"></span> Play
 	                    </button>
 	                </td>
 	            </tr>
 	        </tbody>
 	    </table>
-    	<!-- WarningModal -->
-		<div class="modal fade" id="warnModal" tabindex="-1" role="dialog" >
-		  <div class="modal-dialog modal-lg" role="document">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h4 class="modal-title">Warnings for session {{vm.warningSession.id}}:</h4>
-		      </div>
-		      <div class="modal-body">
-		   	    <table class="table table-striped">
-			        <thead>
-			            <tr class="ws-table-header">
-			                <th>Warning Message</th>
-			            </tr>
-			        </thead>
-			        <tbody>
-			            <tr ng-repeat="msg in vm.warningSession.warnings">
-			                <td>
-		                    	{{msg}}
-			                </td>
-			            </tr>
-			        </tbody>
-			    </table>
-		   	    <table class="table table-striped">
-			        <thead>
-			            <tr class="ws-table-header">
-			                <th>Historic Warning Messages</th>
-			            </tr>
-			        </thead>
-			        <tbody>
-			            <tr ng-repeat="historyMsg in vm.warningSession.warningHistory">
-			                <td>
-		                    	{{historyMsg}}
-			                </td>
-			            </tr>
-			        </tbody>
-			    </table>
-				<table class="table table-striped">
-					<thead>
-						<tr class="ws-table-header">
-							<th>Thread dumps</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="(key,value) in vm.warningSession.threadDumps">
-							<td>
-								<a ng-click="vm.showThreadDump(vm.warningSession, key)">{{key| date:'dd MMM HH:mm:ss'}} - {{value}}</a>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-		      </div>
-		      <div class="modal-footer">
-		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-		      </div>
-		    </div>
+	</div>
+
+	<h2 ng-if="vm.recordings.length>0" class="sub-header">Other Recordings</h2>
+	<div ng-if="vm.recordings.length>0" class="table-responsive">
+		<table class="table table-striped">
+			<thead>
+			<tr class="ws-table-header">
+				<th>No.</th>
+				<th>File</th>
+				<th>Actions</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr ng-repeat="recording in vm.recordings">
+				<td>
+					<span>{{$index + 1}}</span>
+				</td>
+				<td>
+					<span>{{recording}}</span>
+				</td>
+				<td>
+					<button type="button" class="btn btn-primary btn-sm" ng-click="vm.play(recording)">
+						<span class="glyphicon glyphicon-play"></span> Play
+					</button>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+    <!-- WarningModal -->
+	<div class="modal fade" id="warnModal" tabindex="-1" role="dialog" >
+	  <div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h4 class="modal-title">Warnings for session {{vm.warningSession.id}}:</h4>
 		  </div>
+		  <div class="modal-body">
+			<table class="table table-striped">
+				<thead>
+					<tr class="ws-table-header">
+						<th>Warning Message</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="msg in vm.warningSession.warnings">
+						<td>
+							{{msg}}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table table-striped">
+				<thead>
+					<tr class="ws-table-header">
+						<th>Historic Warning Messages</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="historyMsg in vm.warningSession.warningHistory">
+						<td>
+							{{historyMsg}}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table table-striped">
+				<thead>
+					<tr class="ws-table-header">
+						<th>Thread dumps</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="(key,value) in vm.warningSession.threadDumps">
+						<td>
+							<a ng-click="vm.showThreadDump(vm.warningSession, key)">{{key| date:'dd MMM HH:mm:ss'}} - {{value}}</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	
+	<div class="modal fade" id="logsModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg" role="document" style="width: 90%;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Logs for session {{vm.logSession.id}}</h4>
+				</div>
+				
+				<div class="modal-body">
+					<div id="logTable" style="overflow: auto; max-height: 60vh;">
+						<table class="table table-striped ws-log-table">
+							<thead>
+								<tr class="ws-table-header">
+									<th>Messages</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="line in vm.log track by $index ">
+									<td ng-repeat="field in vm.split(line)" ng-class="{'ws-log-long':field.length>30}"><pre>{{::field}}</pre></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.stopLogs()">Close</button>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

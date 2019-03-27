@@ -125,7 +125,7 @@ public class WebFxView extends View {
 		EventHandler eventHandler = getEventHandler();
 		if (eventHandler == null)
 			return;
-		long time = System.nanoTime();
+		long time = getTime(e);
 		int action = mapAction(e);
 		int keyCode = mapKeyCode(e);
 		int modifiers = mapModifiers(e.getModifiersEx());
@@ -153,7 +153,7 @@ public class WebFxView extends View {
 		EventHandler eventHandler = getEventHandler();
 		if (eventHandler == null)
 			return;
-		long time = System.nanoTime();
+		long time = getTime(e);
 		int type = mapType(e.getID());
 		if (type != 0) {
 			int button = mapButton(e.getButton());
@@ -166,16 +166,27 @@ public class WebFxView extends View {
 				if (WebEventDispatcher.javaFXdragStarted.get()) {
 					if (e.getID() != MouseEvent.MOUSE_WHEEL) {
 						if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_RELEASED) {
-							int currentAction = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
-							if (currentAction != Clipboard.ACTION_NONE) {
-								notifyDragDrop(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), currentAction);
-							} else {
-								notifyDragEnd(currentAction);
+							try {
+								int currentAction = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
+								if (currentAction != Clipboard.ACTION_NONE) {
+									notifyDragDrop(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), currentAction);
+								} else {
+									notifyDragEnd(currentAction);
+								}
+							}catch (Exception ex){
+								Logger.debug("Exception on event",ex);
+							}finally {
+								WebEventDispatcher.javaFXdragStarted.set(false);
+								setDragCursor(-1);
 							}
-							WebEventDispatcher.javaFXdragStarted.set(false);
-							setDragCursor(-1);
 						} else if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_DRAGGED) {
-							setDragCursor(notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx())));
+							try {
+								int cursorid = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
+								setDragCursor(cursorid);
+							} catch (Exception ex) {
+								Logger.debug("Exception on event",ex);
+								setDragCursor(0);
+							}
 						} else if (e.getID() == MouseEvent.MOUSE_EXITED) {
 							setDragCursor(-1);
 							notifyDragLeave();
@@ -198,6 +209,10 @@ public class WebFxView extends View {
 				}
 			}
 		}
+	}
+
+	private long getTime(InputEvent e) {
+		return System.nanoTime() - ((System.currentTimeMillis() - e.getWhen()) * 1000000);
 	}
 
 	private void setDragCursor(int action) {

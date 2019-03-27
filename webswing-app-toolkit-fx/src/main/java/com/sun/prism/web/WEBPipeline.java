@@ -5,6 +5,7 @@ import com.sun.javafx.font.FontFactory;
 import com.sun.prism.GraphicsPipeline;
 import com.sun.prism.ResourceFactory;
 import com.sun.prism.sw.SWPipeline;
+import org.webswing.javafx.toolkit.WebsinwgFxToolkitFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +85,7 @@ public class WEBPipeline extends GraphicsPipeline {
 
 	public FontFactory getFontFactory() {
 		if (webFontFactory == null) {
-			webFontFactory = new WebFontFactory(pipeline.getFontFactory());
+			webFontFactory = WebsinwgFxToolkitFactory.getFactory().createWebFontFactory(pipeline.getFontFactory());
 		}
 		return webFontFactory;
 	}

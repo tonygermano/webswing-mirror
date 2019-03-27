@@ -1,9 +1,7 @@
 package org.webswing.server.services.stats;
 
-import java.util.List;
-import java.util.Map;
 
-public interface StatisticsLogger {
+public interface StatisticsLogger extends StatisticsReader{
 
 	public static final String INBOUND_SIZE_METRIC = "inboundSize";
 	public static final String OUTBOUND_SIZE_METRIC = "outboundSize";
@@ -15,24 +13,13 @@ public interface StatisticsLogger {
 	public static final String LATENCY_NETWORK_TRANSFER = "latencyNetworkTransfer";
 	public static final String LATENCY_PING = "latencyPing";
 	public static final String LATENCY= "latency";
-	public static final String CPU_UTIL_METRIC = "cpuUtilization";
+	public static final String CPU_UTIL_METRIC = "cpuUtilization"; // total CPU utilization, SESSION + SERVER
+	public static final String CPU_UTIL_SESSION_METRIC = "cpuUtilizationSession";
+	public static final String CPU_UTIL_SERVER_METRIC = "cpuUtilizationServer";
 	public static final String WEBSOCKET_CONNECTED = "webSocketConnected";
 
 	void log(String instance, String name, Number value);
 
-	Map<String, Map<Long, Number>> getSummaryStats();
-	
-	Map<String,List<String>> getSummaryWarnings();
-
-	Map<String, Map<Long, Number>> getInstanceStats(String instance);
-
-	Map<String, Number> getInstanceMetrics(String clientId);
-
-	List<String> getInstanceWarnings(String instance);
-
-	List<String> getInstanceWarningHistory(String instance);
-	
 	void removeInstance(String instance);
-
 
 }

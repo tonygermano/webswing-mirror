@@ -39,15 +39,27 @@ public class WebGraphics extends AbstractVectorGraphics {
 			if (onDemandTexturePaint) {
 				thisImage.addInstruction(this, dif.setPaint(createTexture(s, getPaint())));
 			}
-			thisImage.addInstruction(this, dif.draw(s, getClip()));
+			if(thisImage.isFallbackActive()){
+				thisImage.addInstruction(this, dif.drawFallback(s));
+			}else {
+				thisImage.addInstruction(this, dif.draw(s, getClip()));
+			}
 		} else {
 			fill(getStroke().createStrokedShape(s));
 		}
 	}
 
+	@Override
+	protected void changeClip(Shape clip) {
+		super.changeClip(clip);
+		if(thisImage.isFallbackActive()){
+			thisImage.addInstruction(this, dif.clipFallback(getClip()));
+		}
+	}
+
 	private Paint createTexture(Shape s, Paint paint) {
 		Rectangle bounds = s.getBounds();
-		BufferedImage img = new BufferedImage(Math.max(1,bounds.width), Math.max(1,bounds.height), paint.getTransparency() == Paint.OPAQUE ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB);
+		BufferedImage img = new BufferedImage(bounds.width, bounds.height, paint.getTransparency() == Paint.OPAQUE ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		g.translate(-bounds.x, -bounds.y);
 		g.setPaint(paint);

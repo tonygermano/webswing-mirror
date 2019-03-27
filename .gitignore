@@ -24,3 +24,7 @@ webswing-server/webswing-server-war/overlays/
 webswing-server/webswing-server-war/.externalToolBuilders/org.eclipse.wst.jsdt.core.javascriptValidator (1).launch
 stats.log*
 audit.log*
+/.metadata/
+/.recommenders/
+*.unmodified_classes
+*.unmodified_classes.lock

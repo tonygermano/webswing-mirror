@@ -83,11 +83,11 @@ public class ServerUtil {
 	}
 
 	public static String getClientIp(WebSocketConnection r) {
-		String result=null;
-		if(r!=null && r.getRequest()!=null){
-			result=r.getRequest().getHeader("X-Forwarded-For");
-			if(result==null){
-				result=r.getRequest().getRemoteAddr();
+		String result = null;
+		if (r != null && r.getRequest() != null) {
+			result = r.getRequest().getHeader("X-Forwarded-For");
+			if (result == null) {
+				result = r.getRequest().getRemoteAddr();
 			}
 		}
 		return result;
@@ -129,7 +129,7 @@ public class ServerUtil {
 		if (r != null) {
 			String userAgent = r.getRequest().getHeader("User-Agent");
 			String browser = "Unknown";
-			if(userAgent==null){
+			if (userAgent == null) {
 				return browser;
 			}
 			String user = userAgent.toLowerCase();
@@ -153,21 +153,23 @@ public class ServerUtil {
 		return null;
 	}
 
-	public static String resolveInstanceIdForMode(WebSocketConnection r, ConnectionHandshakeMsgIn h, SwingConfig conf) {
-		if (h.isMirrored()) {
-			return h.getClientId();
-		} else {
-			switch (conf.getSessionMode()) {
-			case ALWAYS_NEW_SESSION:
-				return h.getClientId() + h.getViewId();
-			case CONTINUE_FOR_BROWSER:
-				return h.getClientId();
-			case CONTINUE_FOR_USER:
-				return r.getUser() != null ? r.getUser().getUserId() : "null";
-			default:
-				return h.getClientId();
-			}
+	public static String resolveOwnerIdForSessionMode(WebSocketConnection r, ConnectionHandshakeMsgIn h, SwingConfig conf) {
+		String user = r.getUser() != null ? r.getUser().getUserId() : "null";
+		switch (conf.getSessionMode()) {
+		case CONTINUE_FOR_USER:
+			return user;
+		case CONTINUE_FOR_BROWSER:
+			return user + h.getBrowserId();
+		case ALWAYS_NEW_SESSION:
+		default:
+			return user + h.getBrowserId() + h.getViewId();
 		}
+	}
+
+	public static String generateInstanceId(WebSocketConnection r, ConnectionHandshakeMsgIn h, String appPath) {
+		String user = r.getUser() != null ? r.getUser().getUserId() : "null";
+		String app = (appPath.startsWith("/") ? appPath.substring(1) : appPath).replace("/", "+");
+		return app + "_" + user + "_" + h.getBrowserId() + "_" + System.currentTimeMillis();
 	}
 
 	public static boolean isRecording(HttpServletRequest r) {
@@ -189,7 +191,7 @@ public class ServerUtil {
 		}
 	}
 
-	public static URL getFileResource(String resource,File folder) {
+	public static URL getFileResource(String resource, File folder) {
 		URL result = null;
 		if (folder != null && folder.isDirectory()) {
 			File file = new File(folder, resource);
@@ -205,7 +207,7 @@ public class ServerUtil {
 	}
 
 	public static URL getWebResource(String resource, ServletContext servletContext, File webFolder) {
-		URL result = getFileResource(resource,webFolder);
+		URL result = getFileResource(resource, webFolder);
 		if (result == null) {
 			try {
 				result = servletContext.getResource(resource);
@@ -238,4 +240,5 @@ public class ServerUtil {
 	public static void sendHttpRedirect(HttpServletRequest req, HttpServletResponse resp, String relativeUrl) throws IOException {
 		AbstractSecurityModule.sendHttpRedirect(req, resp, relativeUrl);
 	}
+
 }

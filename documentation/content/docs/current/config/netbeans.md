@@ -5,9 +5,9 @@ weight: 20
 
 ## NetBeans Platform Application setup
 
-In general NetBeans platform applications are configured the same way as [regular swing applications](../swing). We can use Admin console or edit the `webswing.config` file manually. There are however few specific settings that are necessary for running NetBeans in Webswing.
+In general, NetBeans platform applications are configured the same way as [regular Swing applications](../swing). We can use Admin console or edit the `webswing.config` file manually. There are however a few specific settings that are necessary for running NetBeans in Webswing.
 
-In Webswing distribution there are two examples for setting up NetBeans platform. 
+In Webswing distribution, there are two examples for setting up NetBeans platform. 
 
 ---
 
@@ -25,7 +25,7 @@ First is a minimalistic NetBeans platform demonstration bootstrapped with simple
 }  
 ```
 
-Most important part here is the `-DTopSecurityManager.disable=true` property in `vmArgs`. This tells NetBeans to disable its default Java Security Manager which would otherwise prevent Webswing to do its magic. 
+The most important part here is the `-DTopSecurityManager.disable=true` property in `vmArgs`. This tells NetBeans to disable its default Java Security Manager, which would otherwise prevent Webswing from doing its magic. 
 
 We are using our own main class to bootstrap the NetBeans application. This is the only class located in `nbplatform.jar`. The `lib` folder contains the smallest subset of NetBeans libraries for starting the NB platform window. This is the content of main class:
 
@@ -45,15 +45,15 @@ public class NbMain {
 
 ## Full NetBeans IDE setup
 
-Second example included in distribution is the full blown NetBeans 8 IDE. The NetBeans installation itself is not included in the Webswing distribution for  for obvious reasons. So before running it, you will need to set up the `homeDir` property in `webswing.config` file to point to your NetBeans installation.
+The second example included in distribution is the full blown NetBeans 8 IDE. The NetBeans installation itself is not included in the Webswing distribution, for obvious reasons. So before running it, you will need to set up the `homeDir` property in `webswing.config` file to point to your NetBeans installation.
 
-Here is the snippet of relevant part of Webswing configuration for NetBeans IDE:
+Here is the snippet of the relevant part of Webswing configuration for NetBeans IDE:
 
 ```json
  {
     "name" : "NetBeans IDE (set homeDir)",
     "mainClass" : "org.netbeans.Main",
-    "classPathEntries" : [ "platform/lib/*.jar","platform/lib/*/*.jar" ],
+    "classPathEntries" : [ "platform/*/*.jar/","platform/lib/*/*.jar" ],
     "vmArgs" : "-Dnetbeans.user=${user.dir}/tmp/netbeans/${user} -Dnetbeans.home=platform  -Dorg.netbeans.log.startup=print -DTopSecurityManager.disable=true -Dnetbeans.dirs=\"platform;nb;ergonomics;ide;extide;java;apisupport;webcommon;websvccommon;enterprise;mobility;profiler;python;php;identity;harness;cnd;dlight;groovy;extra;javacard;javafx\"",
     "args" : "",
     "homeDir" : "c:/Program Files/NetBeans 8.0.2",
@@ -68,11 +68,11 @@ Here are the most important parts of the setup explained.
  
 **`mainClass : "org.netbeans.Main"`**
 
-Main class for NetBeans will always be the above in case you are using standard way of packaging. 
+The main class for NetBeans will always be the above in case you are using the standard way of packaging. 
 
 **`"classPathEntries" : [ "platform/lib/*.jar","platform/lib/*/*.jar" ]`**
 
-These folders contains the NetBeans libraries that are necessary for bootstrapping the NB application. Always use only these folders. NetBeans will load the rest of libraries by its plugin system.
+These folders contain the NetBeans libraries that are necessary for bootstrapping the NB application. Always use only these folders. NetBeans will load the rest of libraries by its plugin system.
 
 **`"vmArgs" : "-Dnetbeans.home=platform"`**
 
@@ -80,7 +80,7 @@ This setting tells NetBeans where to look for platform libraries and resources.
 
 **`"vmArgs" : "-Dnetbeans.user=${user.dir}/tmp/netbeans/${user}"`**
 
-NetBeans create its user session files in folder specified by this setting. It is good to have it different for each user, therefore we include the Webswing specific variable `${user}` to the path. 
+NetBeans create its user session files in a folder specified by this setting. It is good to have it as different for each user, therefore, we include the Webswing specific variable `${user}` to the path. 
 
 **`"vmArgs" : "-DTopSecurityManager.disable=true"`**
 

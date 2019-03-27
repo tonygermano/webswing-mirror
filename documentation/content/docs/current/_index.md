@@ -1,20 +1,20 @@
-+++
-title= "Documentation v2.5"
-subTitle= "Webswing Documentation"
-weight= 1
-date = "2017-04-24T18:36:24+02:00"
-+++
+---
+title: "Documentation v2.5"
+subTitle: "Webswing Documentation"
+weight: 100
+date: "2017-04-24T18:36:24+02:00"
+---
 
 ## Overview
 
 [Webswing](http://webswing.org) is a specialized web server for running Swing based Java applications in your browser. 
 
 For many years Swing has been the framework of choice for many companies and individuals for creating rich applications.
-They all invested lot of money and effort into developing these applications. But nowadays Swing framework is becoming the limiting factor 
+They all invested a lot of money and effort into developing these applications. But nowadays, the Swing framework is becoming the limiting factor 
 for them, because they are not able to use these applications in modern web browsers. And with the Applet technology support being 
 discontinued, it leaves these companies with very few options. 
 
-This is where Webswing comes in rescue. With virtually no extra work the Swing application or Applet can instantly be used in a browser just like the native application.
+This is where Webswing comes to the rescue. With virtually no extra work, the Swing application or Applet can instantly be used in a browser just like the native application.
 All it takes is a simple configuration using the built-in admin web interface.
 
 Webswing offers a unique and instant solution for: 
@@ -49,7 +49,7 @@ a way to support your Applet on modern browsers, Webswing is a great option for 
 >native JavaFx application support (beta) has been added to 2.5 version
 
 If you are just starting to develop a new application and you are looking at Webswing, you might want to consider other web frameworks first (like Vaadin, Angular or React).
-However, Webswing can be useful in situations when your web application needs to use a swing based component that would be difficult to implement in native web technologies. 
+However, Webswing can be useful in situations when your web application needs to use a swing-based component that would be difficult to implement in native web technologies. 
 Webswing views can be easily integrated and managed inside other web applications leveraging the built-in [JsLink](integrate/jslink) (java-to-javascript) interface.    
 
 Running your application in Webswing brings many advantages compared to standard desktop use, such as:
@@ -83,14 +83,17 @@ Webswing provides many convenient integrated features which makes working with W
 * **[DirectDraw](contrib) - rendering directly from Java2d to HTML Canvas**
 * **Configurable Swing window decoration themes**
 * **Java 7 and 8 support**
+* **Open JDK**
 
-On Server you can 
+On Server, you can:
 
 * **Configure and monitor your applications from admin console**
 * **Use Multi Tenant Deployment with isolated login contexts**
 * **Use one of built-in security providers (including SAML2 or OpenID Connect) or create your own**
 * **Mirror view - see what users see from admin console**
 * **Use your own branding**
+* **Cluster deployment** (Enterprise edition)
+* **Docker and Kubernetes** (Enterprise edition)
 
 ## How does it work?
 
@@ -100,7 +103,7 @@ Java ships with platform specific implementations for Windows, X11 and Mac.
 ![Swing as desktop application](img/howItWorks1.png)
 
 Webswing defines a new platform implementation for "Web", which simply turns 
-web browser to a virtual desktop and translates platform specific actions to browser actions in best possible way.
+web browser to a virtual desktop and translates platform specific actions to browser actions in the best possible way.
 
 ![Swing app deployed in Webswing](img/howItWorks2.png)
 
@@ -109,7 +112,7 @@ There are two core actions that every platform has to provide for Swing.
 * Display content on screen
 * Generate user input events
 
-Webswing displays the content in browser using HTML Canvas and captures keyboard and mouse events in javascript to generate Swing input events.
+Webswing displays the content in a browser using HTML Canvas and captures keyboard and mouse events in JavaScript to generate Swing input events.
 
  
 

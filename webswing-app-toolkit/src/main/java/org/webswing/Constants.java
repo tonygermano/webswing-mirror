@@ -4,9 +4,11 @@ public interface Constants {
 
 	// Web related constants
 	public static final String CLIENT_ID_COOKIE = "webswingID";
+	public static final String ENTERPRISE_MODULE = "org.webswing.enterprise.EnterpriseServerModule";
 
 	// swing startup properties
 	public static final String SWING_START_SYS_PROP_CLIENT_ID = "webswing.clientId";
+	public static final String SWING_START_SYS_PROP_APP_ID = "webswing.appId";
 	public static final String SWING_START_SYS_PROP_JMS_ID = "webswing.jmsQueueId";
 	public static final String SWING_START_SYS_PROP_MAIN_CLASS = "webswing.mainClass";
 	public static final String SWING_START_SYS_PROP_APP_HOME = "webswing.applicationHome";
@@ -36,7 +38,9 @@ public interface Constants {
 
 	public static final	String PRINTER_JOB_CLASS = "webswing.printerJobDelegate";
 
+
 	//javafx startup
+	public static final String SWING_FX_TOOLKIT_FACTORY = "webswing.fxToolkitFactory";
 	public static final String SWING_START_SYS_PROP_JFX_TOOLKIT = "glass.platform";
 	public static final String SWING_START_SYS_PROP_JFX_TOOLKIT_WEB = "Web";
 	public static final String SWING_START_SYS_PROP_JFX_PRISM = "prism.order";
@@ -66,6 +70,7 @@ public interface Constants {
 	public static final String CONFIG_FILE_PATH = "webswing.configFile";
 	public static final String CONFIG_RELOAD_INTERVAL_MS = "webswing.configReloadIntervalMs";
 	public static final String DEFAULT_CONFIG_FILE_NAME = "webswing.config";
+	public static final String DEFAULT_RECORDINGS_FOLDER = "${webswing.tempDirPath}recordings${webswing.appPath}/";
 	public static final String SERVER_HOST = "webswing.server.host";
 	public static final String SERVER_PORT = "webswing.server.port";
 	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";
@@ -80,6 +85,10 @@ public interface Constants {
 	public static final String DISABLE_HTTP_SECURITY_HEADERS = "webswing.disableHttpSecurityHeaders";
 	public static final String LINK_COOKIE_TO_IP = "webswing.linkCookieToIpAddress";
 
+	// logging properties
+	public static final String LOGS_DIR_PATH = "webswing.logsDir";
+	public static final String LOGS_SESSION_MAX_SIZE = "webswing.sessionLog.maxSize";
+	public static final String LOGS_SESSION_SIZE = "webswing.sessionLog.size";
 
 	// swing start related properties
 	public static final String SWING_SCREEN_WIDTH = "webswing.screenWidth";
@@ -111,6 +120,10 @@ public interface Constants {
 	public static final String BRANDING_PREFIX = "webswing.brandingPrefix";
 	public static final String EXTENSTION_INITIALIZER = "webswing.extensionInitializer";
 	public static final String EXTENSTION_CLASSLOADER = "webswing.extensionClassLoader";
+	public static final String EXTENSION_PROVIDER = "webswing.extensionProvider" ;
 	public static final String CONFIG_PROVIDER = "webswing.configProvider";
+	
+	public static final String SESSION_LOG_PATTERN = "%d %-5p [%t] (%F:%L) %m%n";
 
+	;
 }

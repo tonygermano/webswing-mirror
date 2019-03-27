@@ -27,6 +27,8 @@ public class SwingSession implements Serializable {
 	private List<String> warnings;
 	private List<String> warningHistory;
 	private Map<Long,String> threadDumps;
+	private String applicationUrl;
+	private boolean loggingEnabled;
 
 	public String getId() {
 		return id;
@@ -179,4 +181,21 @@ public class SwingSession implements Serializable {
 	public void setThreadDumps(Map<Long, String> threadDumps) {
 		this.threadDumps = threadDumps;
 	}
+
+    public String getApplicationUrl() {
+        return applicationUrl;
+    }
+
+    public void setApplicationUrl(String applicationUrl) {
+        this.applicationUrl = applicationUrl;
+    }
+
+	public boolean isLoggingEnabled() {
+		return loggingEnabled;
+	}
+
+	public void setLoggingEnabled(boolean loggingEnabled) {
+		this.loggingEnabled = loggingEnabled;
+	}
+    
 }

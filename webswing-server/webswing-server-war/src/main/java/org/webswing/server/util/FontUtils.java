@@ -22,7 +22,7 @@ public class FontUtils {
 
 	private static List<String> logicalNames = Arrays.asList("monospaced", "serif", "sansserif", "dialoginput", "dialog");
 	private static List<String> styles = Arrays.asList("bolditalic", "italic", "bold", "plain");
-	private static String defaultChargroup = SystemUtils.IS_OS_WINDOWS ? "alpbabet" : "latin-1";
+	private static String defaultChargroup = System.getProperty("os.name", "").startsWith("Windows") ? "alpbabet" : "latin-1";
 
 	public static String createFontConfiguration(SwingConfig appConfig, VariableSubstitutor subs) throws IOException {
 		if (appConfig.getFontConfig() != null && appConfig.getFontConfig().size() > 0) {

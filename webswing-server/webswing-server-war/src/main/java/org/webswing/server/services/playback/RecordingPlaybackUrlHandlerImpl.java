@@ -2,6 +2,7 @@ package org.webswing.server.services.playback;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.login.SecuredPathHandler;
+import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.websocket.WebSocketConnection;
 import org.webswing.server.services.websocket.WebSocketService;
 import org.webswing.server.services.websocket.WebSocketUrlHandler;
@@ -35,13 +37,15 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 	private static Map<String, SessionRecordingPlayback> playbackMap = new HashMap<String, SessionRecordingPlayback>();
 	private final PrimaryUrlHandler parent;
 	private final WebSocketService websocket;
+	private final SwingInstanceManager instanceManager;
 	private final String path;
 	private boolean ready;
 
-	public RecordingPlaybackUrlHandlerImpl(PrimaryUrlHandler parent, String path, WebSocketService websocket) {
+	public RecordingPlaybackUrlHandlerImpl(PrimaryUrlHandler parent, String path, WebSocketService websocket, SwingInstanceManager instanceManager) {
 		this.parent = parent;
 		this.path = path;
 		this.websocket = websocket;
+		this.instanceManager = instanceManager;
 	}
 
 	@Override
@@ -64,7 +68,8 @@ public class RecordingPlaybackUrlHandlerImpl implements WebSocketUrlHandler {
 			AppFrameMsgOut appInfo = new AppFrameMsgOut();
 			if (r.hasPermission(WebswingAction.websocket_startRecordingPlayback)) {
 				String file = r.getRequest().getParameter("file");
-				File recordingFile = new File(file);
+				String recordingsPath = instanceManager.getRecordingsDirPath();
+				File recordingFile = new File(URI.create(recordingsPath + file));
 				try {
 					recordingFile = new File(recordingFile.getParentFile(), URLEncoder.encode(recordingFile.getName(), "UTF-8"));
 				} catch (UnsupportedEncodingException e) {

@@ -44,7 +44,12 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 }
             });
             for (var exportName in result) {
-                root[exportName] = $.extend(root[exportName], result[exportName]);
+                if(root[exportName] !=null && root[exportName].disconnect !=null){
+                    console.warn("Bootstrapping Webswing instance named '"+exportName+"'.Instance with this name has already been bootstrapped. Disconnecting old instance.");
+                    root[exportName].disconnect();
+                    delete root[exportName];
+                }
+                root[exportName] = $.extend(result[exportName], root[exportName]);
             }
         }
 
@@ -108,7 +113,10 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 disposeSocket: 'socket.dispose',
                 disposeFileDialog: 'files.close',
                 disposeCopyBar: 'clipboard.dispose',
-                showPlaybackControls: 'playback.showControls'
+                disposePing: 'ping.dispose',
+                startPing: 'ping.start',
+                showPlaybackControls: 'playback.showControls',
+                externalApi: 'external'
             };
             module.provides = {
                 config: defaultCtxConfig(),
@@ -121,6 +129,11 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
             };
             module.ready = function () {
                 configure();
+                if (typeof api.cfg.onReady ===  'function'){
+                    api.login(function () {
+                        api.cfg.onReady(api.externalApi);
+                    });
+                }
                 if (api.cfg.autoStart) {
                     api.start();
                 } else {
@@ -132,7 +145,6 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 return {
                     rootElement: setupRootElement(rootElement),
                     autoStart: false,
-                    applicationName: null,
                     args: null,
                     connectionUrl: location.origin + location.pathname,
                     mirror: false,
@@ -148,7 +160,6 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                     /* webswing instance context */
                     clientId: null,
                     viewId: null,
-                    appName: null,
                     hasControl: false,
                     mirrorMode: false,
                     canPaint: false,
@@ -168,6 +179,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                     return;
                 }
                 api.login(function () {
+                    api.startPing();
                     api.showDialog(api.initializingDialog);
                     api.connect();
                 });
@@ -192,6 +204,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 api.disposeCanvas();
                 api.disposeSocket();
                 api.disposeCopyBar();
+                api.disposePing();
             }
 
             function configure(options, appletParams) {
@@ -199,7 +212,6 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 options = options != null ? options : readOptions(cfg.rootElement);
                 if (options != null) {
                     cfg.autoStart = options.autoStart != null ? JSON.parse(options.autoStart) : cfg.autoStart;
-                    cfg.applicationName = options.applicationName != null ? options.applicationName : cfg.applicationName;
                     cfg.securityToken = options.securityToken != null ? options.securityToken : cfg.securityToken;
                     cfg.realm = options.realm != null ? options.realm : cfg.realm;
                     cfg.args = options.args != null ? options.args : cfg.args;
@@ -215,9 +227,12 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                         cfg.connectionUrl = cfg.connectionUrl + '/';
                     }
                     if (options.recordingPlayback != null) {
-                        cfg.recordingPlayback = cfg.applicationName = options.recordingPlayback;
+                        cfg.recordingPlayback = options.recordingPlayback;
                         api.showPlaybackControls();
                     }
+                    cfg.onReady = typeof options.onReady === 'function' ? options.onReady : cfg.onReady;
+                }else{
+                    return $.extend(true, [], cfg);
                 }
                 appletParams = appletParams != null ? appletParams : readAppletParams(cfg.rootElement);
                 if (appletParams != null) {
