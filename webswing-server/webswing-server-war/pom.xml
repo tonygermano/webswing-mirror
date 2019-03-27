@@ -224,32 +224,32 @@
                                     <target>
                                         <copy todir="${project.build.directory}/${project.build.finalName}">
                                             <fileset dir="${project.basedir}/../webswing-server-common/target/classes/">
-                                                <include name="main/*.class"/>
+                                                <include name="main/*.class" />
                                             </fileset>
-                                            <fileset dir="${project.basedir}/../../webswing-app-interface/target" includes="WEB-INF/swing-lib/*.jar"/>
-                                            <fileset dir="${project.basedir}/../../webswing-app-launcher/target" includes="WEB-INF/swing-boot/*.jar"/>
+                                            <fileset dir="${project.basedir}/../../webswing-app-interface/target" includes="WEB-INF/swing-lib/*.jar" />
+                                            <fileset dir="${project.basedir}/../../webswing-app-launcher/target" includes="WEB-INF/swing-boot/*.jar" />
                                         </copy>
                                         <copy todir="${project.build.directory}/demo">
                                             <fileset dir="${project.basedir}/../../webswing-assembly/src/main/demo">
-                                                <include name="**/*"/>
+                                                <include name="**/*" />
                                             </fileset>
                                         </copy>
                                         <copy todir="${project.build.directory}/demo/demo/SwingSet3">
                                             <fileset dir="${project.basedir}/../../webswing-demo/webswing-demo-swingset3/target">
-                                                <include name="lib/*.jar"/>
-                                                <include name="SwingSet3.jar"/>
+                                                <include name="lib/*.jar" />
+                                                <include name="SwingSet3.jar" />
                                             </fileset>
                                         </copy>
                                         <copy todir="${project.build.directory}/demo/demo/nbmin">
                                             <fileset dir="${project.basedir}/../../webswing-demo/webswing-demo-nbplatform/target">
-                                                <include name="lib/*.jar"/>
-                                                <include name="nbplatform.jar"/>
+                                                <include name="lib/*.jar" />
+                                                <include name="nbplatform.jar" />
                                             </fileset>
                                         </copy>
                                         <copy todir="${project.build.directory}/demo/demo/ensemble8">
                                             <fileset dir="${project.basedir}/../../webswing-demo/webswing-demo-ensemble8/target">
-                                                <include name="lib/*.jar"/>
-                                                <include name="Ensemble8.jar"/>
+                                                <include name="lib/*.jar" />
+                                                <include name="Ensemble8.jar" />
                                             </fileset>
                                         </copy>
                                     </target>
@@ -351,11 +351,11 @@
                                 <configuration>
                                     <target>
                                         <war destfile="${project.build.directory}/${project.build.finalName}.war" update="true">
-                                            <fileset dir="${project.basedir}/../../webswing-app-launcher/target" includes="WEB-INF/swing-boot/*.jar"/>
-                                            <fileset dir="${project.basedir}/../../webswing-app-interface/target" includes="WEB-INF/swing-lib/*.jar"/>
-                                            <fileset dir="${project.basedir}/../webswing-server-launcher/target" includes="WEB-INF/server-lib/*"/>
-                                            <fileset dir="${project.basedir}/../webswing-server-common/target/classes/" includes="main/*.class"/>
-                                            <fileset dir="${project.build.directory}/require-build/" includes="javascript/**"/>
+                                            <fileset dir="${project.basedir}/../../webswing-app-launcher/target" includes="WEB-INF/swing-boot/*.jar" />
+                                            <fileset dir="${project.basedir}/../../webswing-app-interface/target" includes="WEB-INF/swing-lib/*.jar" />
+                                            <fileset dir="${project.basedir}/../webswing-server-launcher/target" includes="WEB-INF/server-lib/*" />
+                                            <fileset dir="${project.basedir}/../webswing-server-common/target/classes/" includes="main/*.class" />
+                                            <fileset dir="${project.build.directory}/require-build/" includes="javascript/**" />
                                         </war>
                                     </target>
                                 </configuration>
