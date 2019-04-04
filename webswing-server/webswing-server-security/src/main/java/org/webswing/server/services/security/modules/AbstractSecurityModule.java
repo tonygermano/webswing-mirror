@@ -291,7 +291,6 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 		if (isAjax(request)) {
 			Map<String, Object> message = new HashMap<>();
 			try {
-				response.setContentType("text/html");
 				Writer w = new StringWriter();
 				processTemplate(w, template, extendedVars);
 				message.put("partialHtml", w.toString());
@@ -300,6 +299,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 				throw new IOException("Failed to send login template message", e);
 			}
 		} else {
+			response.setContentType("text/html");
 			Writer w = new OutputStreamWriter(response.getOutputStream());
 			processTemplate(w, template, extendedVars);
 		}
