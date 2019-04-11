@@ -186,19 +186,6 @@
 
                 var xorModeColor = parseColorSamples(graphicsState.compositeArgs[0].composite.color);
                 applyXorModeComposition(ctxOriginal, ctx, xorModeColor, bbox);
-
-                // ctxOriginal.save();
-                // ctxOriginal.strokeStyle = '#000000';
-                // ctxOriginal.lineWidth = 1;
-                // ctxOriginal.setTransform(1, 0, 0, 1, 0, 0);
-                // ctxOriginal.drawImage(xorLayer, 0, 0);
-                // var bbox = ctx.popBoundingBox();
-                // if (bbox != null) {
-                //     ctxOriginal.beginPath();
-                //     ctxOriginal.rect(bbox.x, bbox.y, bbox.w, bbox.h);
-                //     ctxOriginal.stroke();
-                // }
-                // ctxOriginal.restore();
             }
             return Promise.resolve();
         }
@@ -265,7 +252,11 @@
                     this.updateMinMax(x + width * 1.2, y - height * 0.7);
                     this.updateMinMax(x + width * 1.2, y + height * 0.3);
                     this.setBoundingBox();
-                    return fillTextOriginal.call(this, text, x, y, maxWidth);
+                    if (maxWidth === undefined) { //IE can not handle maxWidth==undefined
+                        return fillTextOriginal.call(this, text, x, y);
+                    } else {
+                        return fillTextOriginal.call(this, text, x, y, maxWidth);
+                    }
                 };
 
                 var moveToOriginal = ctx.moveTo;
