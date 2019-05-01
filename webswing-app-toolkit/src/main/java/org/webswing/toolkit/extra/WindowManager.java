@@ -44,6 +44,11 @@ public class WindowManager {
 				if (w != null && !w.isEnabled()) {
 					return;
 				}
+				//do not allow clearing activeWindow if file chooser is active
+				if (Util.discoverFileChooser(activeWindow) != null && w == null) {
+					return;
+				}
+
 				if ((w == null || w.isFocusableWindow()) && activeWindow != w) {
 					Window oldActiveWindow = activeWindow;
 					activeWindow = w;
