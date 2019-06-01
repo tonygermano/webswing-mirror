@@ -22,7 +22,8 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
         };
 
         var jqXHR_fileupload = [];
-        var doneFileList = [];
+        var uploadingFiles = [];
+        var uploadedFiles = [];
         var timeout;
         var errorTimeout;
         var closeAfterErrorTimeout;
@@ -51,6 +52,8 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             if (autoUploadBar.closest(api.cfg.rootElement).length === 0) {
                 api.cfg.rootElement.append(autoUploadBar);
             }
+            uploadingFiles = [];
+            uploadedFiles = [];
             autoUploadfileDialogTransferBarClientId.val(uuid);
             autoFileInput.prop("multiple", data.isMultiSelection);
             autoFileInput.attr("accept", data.filter);
@@ -180,7 +183,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             function fileuploadadd(e, data) {
                 data.form.fileupload({url: api.cfg.connectionUrl + 'file?uuid='+api.socketId()});
                 data.files.forEach(function (file) {
-                    doneFileList.push(file.name);
+                    uploadingFiles.push(file.name);
                 });
                 jqXHR_fileupload.push(data);
                 setProgressBarVisible(true);
@@ -197,8 +200,8 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
                         clearTimeout(errorTimeout);
                     }
                     data.files.forEach(function (file) {
-                        var index = doneFileList.indexOf(file.name);
-                        doneFileList.splice(index, 1);
+                        var index = uploadingFiles.indexOf(file.name);
+                        uploadingFiles.splice(index, 1);
                     });
                     errorTimeout = setTimeout(function () {
                         errorTimeout = null;
@@ -225,12 +228,19 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             function fileuploaddone(e, data) {
                 var $jsProgressText = $(".ws-progress-text");
                 $jsProgressText.find("em").text(api.translate("files.progComplete"));
-                if (!errorTimeout) {
-                    filesSelected(doneFileList);
+                var finishedFile=data.result.files[0].name;
+                uploadedFiles.push(finishedFile);
+                uploadingFiles.splice(uploadingFiles.indexOf(finishedFile),1);
+                if (!errorTimeout && uploadingFiles.length==0) {
+                    filesSelected(uploadedFiles);
+                    uploadedFiles=[]
+                    setProgressBarVisible(false);
+                    jqXHR_fileupload = [];
                 }
-                doneFileList = [];
-                setProgressBarVisible(false);
-                jqXHR_fileupload = [];
+            }
+
+            function isEqual(array1,array2){
+                return array1.length === array2.length && array1.sort().every(function(value, index) { return value === array2.sort()[index]});
             }
 
             function cancelFileSelection(e) {
@@ -353,15 +363,15 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
         }
 
         function download(url) {
-             var hiddenIFrameID = 'hiddenDownloader'+url, iframe = document.getElementById(hiddenIFrameID);
-             if(iframe!=null){
+            var hiddenIFrameID = 'hiddenDownloader'+url, iframe = document.getElementById(hiddenIFrameID);
+            if(iframe!=null){
                 iframe.parentNode.removeChild(iframe);
-             }
-             iframe = document.createElement('iframe');
-             iframe.id = hiddenIFrameID;
-             iframe.style.display = 'none';
-             document.body.appendChild(iframe);
-             iframe.src = api.cfg.connectionUrl + url;
+            }
+            iframe = document.createElement('iframe');
+            iframe.id = hiddenIFrameID;
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            iframe.src = api.cfg.connectionUrl + url;
         }
 
         function link(url) {

@@ -37,8 +37,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 	private static final Logger log = LoggerFactory.getLogger(WebSocketService.class);
-	private static final String WEBSOCKET_MESSAGE_SIZE = System.getProperty(Constants.WEBSOCKET_MESSAGE_SIZE, ""+(1024*1024));
-	private static final String WEBSOCKET_THREADPOOL_SIZE = System.getProperty(Constants.WEBSOCKET_THREAD_POOL, "10");
+	private static final String WEBSOCKET_MESSAGE_SIZE = System.getProperty(Constants.WEBSOCKET_MESSAGE_SIZE, "" + (1024 * 1024));
+	private static final String WEBSOCKET_THREADPOOL_SIZE = System.getProperty(Constants.WEBSOCKET_THREAD_POOL, "100");
 	private static final Class<?>[] jsonInterceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, TrackMessageSizeInterceptor.class, SuspendTrackerInterceptor.class };
 	private static final Class<?>[] binaryInterceptors = new Class<?>[] { AtmosphereResourceLifecycleInterceptor.class, SuspendTrackerInterceptor.class };
 	private static final String BINARY_HANDLER_PATH = "/async/swing-bin";
@@ -63,9 +63,11 @@ public class WebSocketServiceImpl implements WebswingService, WebSocketService {
 		//initParams.put("org.atmosphere.websocket.bufferSize", WEBSOCKET_MESSAGE_SIZE);
 		initParams.put("org.atmosphere.websocket.maxTextMessageSize", WEBSOCKET_MESSAGE_SIZE);
 		initParams.put("org.atmosphere.websocket.maxBinaryMessageSize", WEBSOCKET_MESSAGE_SIZE);
-		initParams.put("org.atmosphere.cpr.broadcaster.maxProcessingThreads", WEBSOCKET_THREADPOOL_SIZE);
-		initParams.put("org.atmosphere.cpr.broadcaster.maxAsyncWriteThreads", WEBSOCKET_THREADPOOL_SIZE);
-		initParams.put("org.atmosphere.cpr.broadcaster.shareableThreadPool", "true");
+		if (Integer.parseInt(WEBSOCKET_THREADPOOL_SIZE) > 0) {
+			initParams.put("org.atmosphere.cpr.broadcaster.maxProcessingThreads", WEBSOCKET_THREADPOOL_SIZE);
+			initParams.put("org.atmosphere.cpr.broadcaster.maxAsyncWriteThreads", WEBSOCKET_THREADPOOL_SIZE);
+			initParams.put("org.atmosphere.cpr.broadcaster.shareableThreadPool", "true");
+		}
 		initParams.put("org.atmosphere.cpr.scanClassPath", "false");
 		initParams.put("org.atmosphere.cpr.AtmosphereFramework.analytics", "false");
 		initParams.put("org.atmosphere.cpr.broadcasterCacheClass", "org.atmosphere.cache.UUIDBroadcasterCache");

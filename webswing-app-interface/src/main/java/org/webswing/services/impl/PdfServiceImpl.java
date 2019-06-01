@@ -53,6 +53,7 @@ public class PdfServiceImpl implements PdfService {
 			UserProperties props = createPdfProperties(format);
 			g.setProperties(props);
 			g.openPage(getPageDimension(props), null);
+			g.clipRect(format.getImageableX(),format.getImageableY(),format.getImageableWidth(),format.getImageableHeight());
 		} catch (IOException e) {
 			((PDFGraphics2D) pdfGrapthics).endExport();
 			throw new RuntimeException(e);
@@ -71,24 +72,13 @@ public class PdfServiceImpl implements PdfService {
 		UserProperties props = new UserProperties();
 		String orientation = format.getOrientation() == PageFormat.LANDSCAPE ? PageConstants.LANDSCAPE : PageConstants.PORTRAIT;
 		String size = resolveSize(format);
-		String margin = resolveMargins(format);
 		props.setProperty(PDFGraphics2D.ORIENTATION, orientation);
 		props.setProperty(PDFGraphics2D.PAGE_SIZE, size);
 		props.setProperty(PDFGraphics2D.FIT_TO_PAGE, false);
-		props.setProperty(PDFGraphics2D.PAGE_MARGINS, margin);
+		props.setProperty(PDFGraphics2D.PAGE_MARGINS, "0, 0, 0, 0");
 		props.setProperty(PDFGraphics2D.AUTHOR, "Webswing.org");
-		props.setProperty(PDFGraphics2D.KEYWORDS, "Page:" + size + " Orientation:" + orientation + " Margins:" + margin);
+		props.setProperty(PDFGraphics2D.KEYWORDS, "Page:" + size + " Orientation:" + orientation );
 		return props;
-	}
-
-	private String resolveMargins(PageFormat format) {
-		DecimalFormat nf = new DecimalFormat("#");
-		String separator = ", ";
-		String top = nf.format(format.getImageableY());
-		String left = nf.format(format.getImageableX());
-		String bottom = nf.format(format.getHeight() - format.getImageableHeight() - format.getImageableY());
-		String right = nf.format(format.getWidth() - format.getImageableWidth() - format.getImageableX());
-		return top + separator + left + separator + bottom + separator + right;
 	}
 
 	private String resolveSize(PageFormat format) {

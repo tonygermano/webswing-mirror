@@ -12,11 +12,11 @@ import java.util.*;
  */
 public class OpenIdWebswingUser extends AbstractWebswingUser {
 
-    private static final long serialVersionUID = 8364301023317885503L;
-    
-    String user;
+	private static final long serialVersionUID = 8364301023317885503L;
+
+	String user;
 	Map<String, Serializable> attrs = new HashMap<>();
-	List<String> roles=new ArrayList<>();
+	List<String> roles = new ArrayList<>();
 
 	public OpenIdWebswingUser(IdToken token, String usernameAttr, String roleAttr, Map<String, Serializable> extraAttribs) {
 		for (String key : token.getPayload().keySet()) {
@@ -24,8 +24,8 @@ public class OpenIdWebswingUser extends AbstractWebswingUser {
 			if (value instanceof Serializable) {
 				attrs.put(key, (Serializable) value);
 			}
-			if (value instanceof String && StringUtils.equalsIgnoreCase(roleAttr, key)) {
-				roles = toList((String) value);
+			if (StringUtils.equalsIgnoreCase(roleAttr, key)) {
+				roles = toList(value);
 			}
 		}
 		if (extraAttribs != null) {
@@ -38,14 +38,20 @@ public class OpenIdWebswingUser extends AbstractWebswingUser {
 		}
 	}
 
-	private List<String> toList(String value) {
-		if (value != null) {
-			if (StringUtils.startsWith(value, "[") && StringUtils.endsWith(value, "]")) {
-				value = value.substring(1, value.length() - 1);
+	private List<String> toList(Object objValue) {
+		if (objValue != null) {
+			if (objValue instanceof String) {
+				String value = (String) objValue;
+				if (StringUtils.startsWith(value, "[") && StringUtils.endsWith(value, "]")) {
+					value = value.substring(1, value.length() - 1);
+				}
+				String[] values = StringUtils.split(value, ",");
+				values = StringUtils.stripAll(values);
+				return Arrays.asList(values);
+			}else if(objValue instanceof List){
+				return (List<String>) objValue;
 			}
-			String[] values = StringUtils.split(value, ",");
-			values = StringUtils.stripAll(values);
-			return Arrays.asList(values);
+
 		}
 		return Collections.emptyList();
 	}

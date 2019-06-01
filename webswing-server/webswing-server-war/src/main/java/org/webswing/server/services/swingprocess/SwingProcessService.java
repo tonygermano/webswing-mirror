@@ -1,6 +1,8 @@
 package org.webswing.server.services.swingprocess;
 
-public interface SwingProcessService {
+import org.webswing.server.services.startup.StartupService;
+
+public interface SwingProcessService extends StartupService {
 
 	SwingProcess create(SwingProcessConfig config);
 }

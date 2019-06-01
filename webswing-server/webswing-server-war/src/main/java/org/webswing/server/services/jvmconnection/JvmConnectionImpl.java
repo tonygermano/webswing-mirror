@@ -116,9 +116,9 @@ public class JvmConnectionImpl implements MessageListener, JvmConnection {
 					consumer.close();
 					producer.close();
 					session.close();
+					((ActiveMQConnection) connection).destroyDestination((ActiveMQDestination) consumerQueue);
+					((ActiveMQConnection) connection).destroyDestination((ActiveMQDestination) producerQueue);
 				} finally {
-					((ActiveMQConnection) connection).destroyDestination((ActiveMQDestination) consumerQueue);
-					((ActiveMQConnection) connection).destroyDestination((ActiveMQDestination) consumerQueue);
 					connection.close();
 					jmsOpen = false;
 				}

@@ -29,4 +29,6 @@ public interface ConfigurationProvider {
 
 	boolean isMultiApplicationMode();
 
+	void dispose();
+
 }

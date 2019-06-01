@@ -549,7 +549,8 @@ public class WebPaintDispatcher {
 		result.setPasteRequest(paste);
 		Util.getWebToolkit().getPaintDispatcher().sendObject(result);
 
-		this.clipboardDialog = new JDialog((Dialog) null, true);
+		Window window = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+		this.clipboardDialog = new JDialog(window, JDialog.DEFAULT_MODALITY_TYPE);
 		clipboardDialog.setBounds(new Rectangle(0, 0, 1, 1));
 		clipboardDialog.setVisible(true);//this call is blocking until dialog is closed
 	}

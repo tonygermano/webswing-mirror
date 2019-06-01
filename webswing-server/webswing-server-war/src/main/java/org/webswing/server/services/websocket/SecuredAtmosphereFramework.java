@@ -3,6 +3,7 @@ package org.webswing.server.services.websocket;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,23 @@ class SecuredAtmosphereFramework extends AtmosphereFramework implements Securabl
 
 	public SecuredAtmosphereFramework(SecurityManagerService securityManager) {
 		this.securityManager = securityManager;
+	}
+
+	@Override
+	public AtmosphereFramework init(final ServletConfig sc, boolean wrap) throws ServletException {
+		AtmosphereFramework fw = super.init(sc, wrap);
+
+		//remove system shutdown hook - we handle shutdown in container lifecycle
+		try {
+			if (this.shutdownHook != null) {
+				Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
+				shutdownHook = null;
+			}
+		} catch (IllegalStateException ex) {
+			logger.trace("", ex);
+		}
+
+		return fw;
 	}
 
 	public org.atmosphere.cpr.Action doCometSupport(AtmosphereRequest req, AtmosphereResponse res) throws IOException, ServletException {
@@ -62,7 +80,7 @@ class SecuredAtmosphereFramework extends AtmosphereFramework implements Securabl
 
 		/**
 		 * Parse a cookie header into an array of cookies according to RFC 2109.
-		 * 
+		 *
 		 * @param header
 		 *      Value of an HTTP "Cookie" header
 		 */

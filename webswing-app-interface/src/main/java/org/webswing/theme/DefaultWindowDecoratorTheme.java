@@ -248,7 +248,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		g.drawImage(is.CLOSE, x, y + (is.TITLE.getHeight() - is.CLOSE.getHeight()) / 2, null);
 
 		// Dialogs can be RESIZABLE too, at least on Linux/Unix
-		if ((window instanceof Dialog && ((Dialog) window).isResizable()) || (window instanceof Frame) && ((Frame) window).isResizable()) {
+		if (isMinMaxButtonVisible(window)) {
 			x -= BUTTON_SPACING + is.MAXIMIZE.getWidth();
 			g.drawImage(is.MAXIMIZE, x, y + (is.TITLE.getHeight() - is.MAXIMIZE.getHeight()) / 2, null);
 
@@ -310,7 +310,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		Insets i = w.getInsets();
 
 		// Dialogs can be RESIZABLE too, at least on Linux/Unix
-		if ((w instanceof Dialog && ((Dialog) w).isResizable()) || (w instanceof Frame) && ((Frame) w).isResizable()) {
+		if (isMinMaxButtonVisible(w)) {
 			if (SwingUtilities.isRectangleContainingRectangle(getHideRect(w), eventPoint)) {
 				return WindowActionType.minimize;
 			}
@@ -323,7 +323,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		}
 
 		// resize
-		if((w instanceof Dialog && ((Dialog) w).isResizable()) || (w instanceof Frame) && ((Frame) w).isResizable()){
+		if(canResize(w)){
 			if (e.getX() < 10 && e.getY() < 10) {
 				return WindowActionType.resizeUniTopLeft;
 			}
@@ -356,6 +356,14 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		}
 		return WindowActionType.cursorChanged;
 
+	}
+
+	public boolean isMinMaxButtonVisible(Object w) {
+		return (w instanceof Frame) && ((Frame) w).isResizable();
+	}
+
+	public boolean canResize(Window w) {
+		return (w instanceof Dialog && ((Dialog) w).isResizable()) || (w instanceof Frame) && ((Frame) w).isResizable();
 	}
 
 }

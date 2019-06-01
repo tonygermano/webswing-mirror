@@ -19,6 +19,7 @@ import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.CheckSerializedSize;
 
 import javax.jms.*;
 import javax.swing.SwingUtilities;
@@ -239,13 +240,14 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 				@Override
 				public Object call() throws Exception {
-					producer.send(session.createObjectMessage(o));
+					producer.send(session.createObjectMessage(o),DeliveryMode.NON_PERSISTENT,4,3000);
 					return null;
 				}
-			}).get();
+			}).get(4,TimeUnit.SECONDS);
 		} catch (IllegalStateException e) {
 			Logger.warn("ServerConnectionService.sendJmsMessage: " + e.getMessage());
 		} catch (InterruptedException e) {
+			Logger.error("ServerConnectionService.sendJmsMessage: Sending frame interrupted.", e);
 		} catch (ExecutionException e) {
 			if (e.getCause() instanceof JMSException) {
 				throw (JMSException) e.getCause();
@@ -253,6 +255,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 				Logger.error("ServerConnectionService.sendJmsMessage", e);
 				throw new JMSException(e.getMessage());
 			}
+		} catch (TimeoutException e) {
+			Logger.error("ServerConnectionService.sendJmsMessage: Sending frame timed out. (frame size:"+ CheckSerializedSize.getSerializedSize(o) +")", e);
 		}
 	}
 

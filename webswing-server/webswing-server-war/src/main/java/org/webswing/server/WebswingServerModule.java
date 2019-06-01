@@ -72,6 +72,7 @@ public class WebswingServerModule extends AbstractModule {
 		serviceBinder.addBinding().to(ConfigurationServiceImpl.class);
 		serviceBinder.addBinding().to(ExtensionServiceImpl.class);
 		serviceBinder.addBinding().to(StatisticsLoggerServiceImpl.class);
+		serviceBinder.addBinding().to(SwingProcessServiceImpl.class);
 
 		bind(WebSocketService.class).to(WebSocketServiceImpl.class);
 		bind(JmsService.class).to(JmsServiceImpl.class);

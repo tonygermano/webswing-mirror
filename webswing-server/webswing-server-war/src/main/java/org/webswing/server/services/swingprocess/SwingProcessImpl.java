@@ -25,10 +25,9 @@ import org.webswing.toolkit.util.DeamonThreadFactory;
 public class SwingProcessImpl implements SwingProcess {
 	private final Logger log;
 	private final Logger defaultLog;
+	private final ScheduledExecutorService processHandlerThread;
 	private static final long LOG_POLLING_PERIOD = 100L;
 	
-	private static ScheduledExecutorService processHandlerThread = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing Process Handler"));
-
 	private final SwingProcessConfig config;
 	private Process process;
 	private ScheduledFuture<?> logsProcessor;
@@ -45,12 +44,13 @@ public class SwingProcessImpl implements SwingProcess {
 	private boolean forceKilled = false;
 	private ProcessExitListener closeListener;
 
-	public SwingProcessImpl(SwingProcessConfig config) {
+	public SwingProcessImpl(SwingProcessConfig config, ScheduledExecutorService processHandlerThread) {
 		super();
 		this.config = config;
 		
 		defaultLog = (Logger) LogManager.getLogger(SwingProcessImpl.class + "_" + config.getApplicationName());
-		
+		this.processHandlerThread = processHandlerThread;
+
 		Appender logAppender = config.getLogAppender();
 		
 		if (config.getLogAppender() != null) {

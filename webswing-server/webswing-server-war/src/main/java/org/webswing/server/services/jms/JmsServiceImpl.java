@@ -1,9 +1,11 @@
 package org.webswing.server.services.jms;
 
+import com.google.inject.Singleton;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
+import org.apache.activemq.transport.nio.SelectorManager;
 import org.apache.activemq.usage.MemoryUsage;
 import org.apache.activemq.usage.SystemUsage;
 import org.slf4j.Logger;
@@ -11,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.model.exception.WsInitException;
 
-import com.google.inject.Singleton;
+import java.util.concurrent.ExecutorService;
 
 @Singleton
 public class JmsServiceImpl implements JmsService {
@@ -37,6 +39,9 @@ public class JmsServiceImpl implements JmsService {
 		try {
 			if (broker != null) {
 				broker.stop();
+				broker.waitUntilStopped();
+				//activemq client does not close "ActiveMQ NIO Worker #" threads when connection is closed. Need to do it manually.
+				((ExecutorService)SelectorManager.getInstance().getSelectorExecutor()).shutdown();
 			}
 		} catch (Exception e) {
 			log.error("Failed to stop JMS service.", e);
@@ -71,6 +76,7 @@ public class JmsServiceImpl implements JmsService {
 		broker.addConnector(System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT));
 
 		broker.start();
+		broker.waitUntilStarted();
 		return broker;
 
 	}

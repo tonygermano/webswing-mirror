@@ -25,14 +25,12 @@ public class ConfigurationServiceImpl implements ConfigurationService, Configura
 	private static final Logger log = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
 	private final ExtensionClassLoader extensionLoader;
-	private int interval;
 	private ConfigurationProvider provider;
 	private List<ConfigurationChangeListener> changeListeners = new CopyOnWriteArrayList<>();
 
 	@Inject
 	public ConfigurationServiceImpl(ExtensionClassLoader extensionLoader) {
 		this.extensionLoader = extensionLoader;
-		this.interval = Integer.getInteger(Constants.CONFIG_RELOAD_INTERVAL_MS, 1000);
 	}
 
 	@Override
@@ -56,6 +54,14 @@ public class ConfigurationServiceImpl implements ConfigurationService, Configura
 	public void stop() {
 		synchronized (changeListeners) {
 			changeListeners.clear();
+		}
+		if(provider!=null){
+			try {
+				provider.dispose();
+				provider=null;
+			} catch (Exception e) {
+				log.error("Failed to dispose config provider",e);
+			}
 		}
 	}
 

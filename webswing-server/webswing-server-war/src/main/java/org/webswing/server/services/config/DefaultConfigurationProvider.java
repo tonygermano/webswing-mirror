@@ -213,6 +213,11 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 		return true;
 	}
 
+	@Override
+	public void dispose() {
+		configReloader.shutdown();
+	}
+
 	private void reloadConfiguration() throws WsInitException {
 		if (updateHandler != null) {
 			Map<String, Object> oldConfig = configuration;
