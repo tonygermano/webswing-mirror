@@ -15,6 +15,7 @@ import org.webswing.model.internal.ThreadDumpRequestMsgInternal;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.toolkit.api.WebswingMessagingApi;
+import org.webswing.toolkit.api.WebswingUtil;
 import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
@@ -84,6 +85,13 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			public void run() {
 				try {
 					int timeoutSec = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300"));
+
+					// IE halts js execution when filechooser is open and no heartbeat messages are sent causing timeout(see https://bitbucket.org/webswing/webswing-home/issues/18)
+					if(Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog() != null && WebswingUtil.getWebswingApi().getPrimaryUser()!=null){
+						int minTimeoutSecIfFileChooserActive = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC_IF_FILECHOOSER_ACTIVE, "1800"));
+						timeoutSec = Math.max(timeoutSec, minTimeoutSecIfFileChooserActive);
+					}
+
 					boolean timeoutIfInactive = Boolean.getBoolean(Constants.SWING_SESSION_TIMEOUT_IF_INACTIVE) && timeoutSec > 0;
 					if (timeoutSec >= 0) {
 						long lastTstp = timeoutIfInactive ? lastUserInputTimestamp : lastMessageTimestamp + 10000;/*+10000 is to compensate for 10s js heartbeat interval*/

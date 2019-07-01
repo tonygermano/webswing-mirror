@@ -133,10 +133,7 @@ public class ServerUtil {
 				return browser;
 			}
 			String user = userAgent.toLowerCase();
-			if (user.contains("msie")) {
-				String substring = userAgent.substring(userAgent.indexOf("MSIE")).split(";")[0];
-				browser = substring.split(" ")[0].replace("MSIE", "IE") + "-" + substring.split(" ")[1];
-			} else if (user.contains("safari") && user.contains("version")) {
+			 if (user.contains("safari") && user.contains("version")) {
 				browser = (userAgent.substring(userAgent.indexOf("Safari")).split(" ")[0]).split("/")[0] + "-" + (userAgent.substring(userAgent.indexOf("Version")).split(" ")[0]).split("/")[1];
 			} else if (user.contains("opr") || user.contains("opera")) {
 				if (user.contains("opera"))
@@ -147,6 +144,13 @@ public class ServerUtil {
 				browser = (userAgent.substring(userAgent.indexOf("Chrome")).split(" ")[0]).replace("/", "-");
 			} else if (user.contains("firefox")) {
 				browser = (userAgent.substring(userAgent.indexOf("Firefox")).split(" ")[0]).replace("/", "-");
+			}if (user.contains("msie")) {
+				String substring = userAgent.substring(userAgent.indexOf("MSIE")).split(";")[0];
+				browser = substring.split(" ")[0].replace("MSIE", "IE") + "-" + substring.split(" ")[1];
+			} else if(user.contains("trident/7.0")){
+				browser="IE - 11";
+			} else {
+			 	browser=user;
 			}
 			return browser;
 		}

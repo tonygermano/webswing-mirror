@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,6 +35,11 @@ public class OpenIdConnectClient {
 	public static final String TOKEN_ENDPOINT = "token_endpoint";
 	public static final String OPENID_SCOPE = "openid profile";
 	public static final String CLIENT_ID = "client_id";
+	public static final String ACCESS_TOKEN = "access_token";
+	public static final String ID_TOKEN = "id_token";
+	public static final String REFRESH_TOKEN = "refresh_token";
+	public static final String SCOPE = "scope";
+	public static final String TOKEN_TYPE = "token_type";
 
 	private final String roleAttrName;
 	private final String usernameAttrName;
@@ -147,17 +153,27 @@ public class OpenIdConnectClient {
 		return null;
 	}
 
-	private static IdToken executeIdToken(TokenRequest tokenRequest) throws IOException {
+	private static IdTokenResponse executeIdToken(TokenRequest tokenRequest) throws IOException {
 		IdTokenResponse idTokenResponse = IdTokenResponse.execute(tokenRequest);
-		return idTokenResponse.parseIdToken();
+		return idTokenResponse;
 	}
 
 	public AbstractWebswingUser getUser(String openIdCode, Map<String, Serializable> extraAttribs) throws IOException {
 		if (flow != null) {
 			AuthorizationCodeTokenRequest tokenRequest = flow.newTokenRequest(openIdCode).setRedirectUri(callback.toString());
 			tokenRequest.set(CLIENT_ID, flow.getClientId());
-			IdToken result = executeIdToken(tokenRequest);
-			OpenIdWebswingUser user = new OpenIdWebswingUser(result, this.usernameAttrName, this.roleAttrName, extraAttribs);
+			IdTokenResponse idTokenResponse = executeIdToken(tokenRequest);
+			Map<String,Serializable> attribs=new HashMap<>();
+			if (extraAttribs != null) {
+				attribs.putAll(extraAttribs);
+			}
+			attribs.put(ID_TOKEN,idTokenResponse.getIdToken());
+			attribs.put(ACCESS_TOKEN,idTokenResponse.getAccessToken());
+			attribs.put(REFRESH_TOKEN,idTokenResponse.getRefreshToken());
+			attribs.put(SCOPE,idTokenResponse.getScope());
+			attribs.put(TOKEN_TYPE,idTokenResponse.getTokenType());
+
+			OpenIdWebswingUser user = new OpenIdWebswingUser(idTokenResponse.parseIdToken(), this.usernameAttrName, this.roleAttrName, attribs);
 			return user;
 		}
 		return null;
@@ -187,4 +203,5 @@ public class OpenIdConnectClient {
 			throw new Exception("Unexpected value of state parameter in code authorization request. (expected: "+expectedState+", received: "+getState(request)+")");
 		}
 	}
+
 }
