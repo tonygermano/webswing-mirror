@@ -19,7 +19,7 @@ public class VariableSubstitutor {
 		return new VariableSubstitutor(new HashMap<String, String>());
 	}
 
-	public static VariableSubstitutor forSwingInstance(SecuredPathConfig config, String user, Map<String, Serializable> userAttributes, String sessionId, String clientIp, String locale, String customArgs) {
+	public static VariableSubstitutor forSwingInstance(SecuredPathConfig config, String user, Map<String, Serializable> userAttributes, String sessionId, String clientIp, String locale, String timeZone, String customArgs) {
 		Map<String, String> result = new HashMap<String, String>();
 		if (user != null) {
 			result.put(Constants.USER_NAME_SUBSTITUTE, user);
@@ -41,6 +41,9 @@ public class VariableSubstitutor {
 		}
 		if (locale != null) {
 			result.put(Constants.SESSION_LOCALE_SUBSTITUTE, locale);
+		}
+		if (timeZone != null) {
+			result.put(Constants.SESSION_TIMEZONE_SUBSTITUTE, timeZone);
 		}
 		if (customArgs != null) {
 			result.put(Constants.SESSION_CUSTOMARGS_SUBSTITUTE, customArgs);

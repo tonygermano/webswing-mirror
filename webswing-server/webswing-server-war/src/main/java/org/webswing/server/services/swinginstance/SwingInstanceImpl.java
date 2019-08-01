@@ -138,7 +138,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		this.instanceId = ServerUtil.generateInstanceId(websocket, h, manager.getPathMapping());
 		AbstractWebswingUser user = websocket.getUser();
 		WebSocketUserInfo info = websocket.getUserInfo();
-		subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), this.getInstanceId(), info.getUserIp(), h.getLocale(), info.getCustomArgs());
+		subs = VariableSubstitutor.forSwingInstance(manager.getConfig(), user.getUserId(), user.getUserAttributes(), this.getInstanceId(), info.getUserIp(), h.getLocale(), h.getTimeZone(), info.getCustomArgs());
 		this.sessionRecorder = recorderService.create(this, manager);
 
 		try {

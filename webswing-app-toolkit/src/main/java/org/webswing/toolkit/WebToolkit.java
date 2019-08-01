@@ -1,44 +1,7 @@
 package org.webswing.toolkit;
 
 import java.applet.Applet;
-import java.awt.AWTException;
-import java.awt.Button;
-import java.awt.Checkbox;
-import java.awt.CheckboxMenuItem;
-import java.awt.Choice;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Desktop;
-import java.awt.Dialog;
-import java.awt.FileDialog;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
-import java.awt.Image;
-import java.awt.JobAttributes;
-import java.awt.KeyboardFocusManager;
-import java.awt.Label;
-import java.awt.List;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
-import java.awt.PageAttributes;
-import java.awt.Panel;
-import java.awt.Point;
-import java.awt.PopupMenu;
-import java.awt.PrintJob;
-import java.awt.RenderingHints;
-import java.awt.Robot;
-import java.awt.ScrollPane;
-import java.awt.Scrollbar;
-import java.awt.SystemTray;
-import java.awt.TextArea;
-import java.awt.TextField;
-import java.awt.TrayIcon;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.Dialog.ModalityType;
 import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
@@ -91,6 +54,7 @@ import java.util.Properties;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.webswing.Constants;
 import org.webswing.dispatch.WebEventDispatcher;
@@ -358,6 +322,12 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 				Logger.debug("Failed to set xpStyleEnabled to true", e);
 			}
 		}
+
+		System.setProperty("swing.disablevistaanimation","true");//See:com.sun.java.swing.plaf.windows.AnimationController.VISTA_ANIMATION_DISABLED
+
+		int repaintInterval = 400;
+		UIManager.put("ProgressBar.repaintInterval", repaintInterval);
+		UIManager.put("ProgressBar.cycleTime", repaintInterval*60);
 	}
 
 	public boolean needUpdateWindow() {
@@ -668,6 +638,11 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	public void beep() {
 
+	}
+
+	@Override
+	public Dimension getBestCursorSize(int preferredWidth, int preferredHeight) throws HeadlessException {
+		return new Dimension(preferredWidth, preferredHeight);
 	}
 
 	@Override

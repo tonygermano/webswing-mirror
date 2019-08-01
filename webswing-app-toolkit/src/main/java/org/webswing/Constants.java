@@ -106,6 +106,7 @@ public interface Constants {
 	public static final String SESSION_ID_SUBSTITUTE = "clientId";
 	public static final String SESSION_IP_SUBSTITUTE = "clientIp";
 	public static final String SESSION_LOCALE_SUBSTITUTE = "clientLocale";
+	public static final String SESSION_TIMEZONE_SUBSTITUTE = "clientTimeZone";
 	public static final String SESSION_CUSTOMARGS_SUBSTITUTE = "customArgs";
 	public static final String APP_HOME_FOLDER_SUBSTITUTE = "webswing.homeFolder";
 	public static final String APP_CONTEXT_PATH_SUBSTITUTE = "webswing.appPath";

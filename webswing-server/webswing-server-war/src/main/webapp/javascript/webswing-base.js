@@ -57,7 +57,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             repaint: repaint
         };
         module.ready = function () {
-            directDraw = new WebswingDirectDraw({logDebug: api.cfg.debugLog, ieVersion: api.cfg.ieVersion, dpr: util.dpr});
+            directDraw = new WebswingDirectDraw({logTrace: api.cfg.traceLog, logDebug: api.cfg.debugLog, ieVersion: api.cfg.ieVersion, dpr: util.dpr});
         };
 
         var timer1, timer3;
@@ -118,7 +118,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
             timer3 = setInterval(servletHeartbeat, 100000);
             windowImageHolders = {};
             directDraw.dispose();
-            directDraw = new WebswingDirectDraw({logDebug: api.cfg.debugLog, ieVersion: api.cfg.ieVersion, dpr: util.dpr});
+            directDraw = new WebswingDirectDraw({logTrace: api.cfg.traceLog, logDebug: api.cfg.debugLog, ieVersion: api.cfg.ieVersion, dpr: util.dpr});
         }
 
         function sendMessageEvent(message) {
@@ -474,6 +474,7 @@ define(['webswing-dd', 'webswing-util'], function amdFactory(WebswingDirectDraw,
                 viewId: api.cfg.viewId,
                 connectionId: api.getSocketId(),
                 locale: api.getLocale(),
+                timeZone: util.getTimeZone(),
                 mirrored: api.cfg.mirrorMode,
                 directDrawSupported: api.cfg.typedArraysSupported && !(api.cfg.ieVersion && api.cfg.ieVersion <= 10),
                 url: window.location.href

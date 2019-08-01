@@ -26,7 +26,8 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
         readCookie: readCookie,
         eraseCookie: eraseCookie,
         checkCookie: checkCookie,
-        dpr: Math.ceil(window.devicePixelRatio) || 1
+        dpr: Math.ceil(window.devicePixelRatio) || 1,
+        getTimeZone: getTimeZone
     }
 
 
@@ -256,4 +257,30 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
         document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
         return ret;
     }
+    
+    function getTimeZone() {
+    	var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    	
+    	if (timeZone) {
+    		return timeZone;
+    	}
+    	
+    	// IE, get offset in minutes
+    	return getTimeZoneFromOffset(new Date().getTimezoneOffset());
+    }
+    
+    function getTimeZoneFromOffset(offset) {
+    	return "GMT" + ((offset < 0 ? '+' : '-') + // Note the reversed sign!
+    			pad(parseInt(Math.abs(offset / 60)), 2) +
+                pad(Math.abs(offset % 60), 2));
+    }
+    
+    function pad(number, length) {
+        var str = "" + number;
+        while (str.length < length) {
+            str = '0' + str;
+        }
+        return str;
+    }
+    
 });

@@ -2,12 +2,7 @@ package org.webswing;
 
 import java.awt.*;
 import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -855,13 +850,13 @@ public class Tests {
 		g.setFont(sansserif);
 		g.drawString("test@123&%=-*{};'/.,", 175, 50);
 
-		//		g.setStroke(new BasicStroke(12f));
-		//		g.setTransform(new AffineTransform(1d / 4, 0, 0, 1d / 3, 345, 5));
-		//		g.drawRect(0, 0, 160, 180);
-		//		g.setTransform(new AffineTransform(2, 0, 0, 3, 345, 5));
-		//		g.setStroke(new BasicStroke(1.45f));
-		//		g.drawRect(0, 0, 20, 20);
-
+//				g.setStroke(new BasicStroke(12f));
+//				g.setTransform(new AffineTransform(1d / 4, 0, 0, 1d / 3, 345, 5));
+//				g.drawRect(0, 0, 160, 180);
+//				g.setTransform(new AffineTransform(2, 0, 0, 3, 345, 5));
+//				g.setStroke(new BasicStroke(1.45f));
+//				g.drawRect(0, 0, 20, 20);
+//
 		return true;
 	}
 
@@ -979,6 +974,22 @@ public class Tests {
 		System.setProperty(WebImage.FALLBACK_PROPERTY,-1+"");
 		drawlines(g);
 
+		return true;
+	}
+
+	public static boolean t36DPRbasedBiasCalculationTest(Graphics2D g, int repeat) {
+		if (repeat > 0) {
+			return false;
+		}
+		g.setColor(Color.green);
+		Path2D p = new Path2D.Double();
+		p.moveTo(0,25);
+		p.lineTo(499,25);
+		g.draw(p);
+		g.setColor(Color.red);
+		g.fillRect(0,0,500,25);
+		g.setColor(Color.blue);
+		g.fillRect(0,26,500,27);
 		return true;
 	}
 

@@ -234,6 +234,7 @@ message ConnectionHandshakeMsgInProto {
     repeated ParamMsgProto params = 10;
     optional string locale = 11;
     optional string url = 12;
+    optional string timeZone = 14;
 }
 
 message ParamMsgProto {

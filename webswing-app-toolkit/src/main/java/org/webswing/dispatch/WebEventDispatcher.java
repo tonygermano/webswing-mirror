@@ -191,10 +191,10 @@ public class WebEventDispatcher {
 			}
 			if (type == KeyEvent.KEY_TYPED) {
 				AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, modifiers, 0, (char) event.getCharacter());
-				dispatchEventInSwing(w, e);
+				dispatchKeyEventInSwing(w, e);
 			} else {
 				AWTEvent e = Util.createKeyEvent(src, type, when, modifiers, event.getKeycode(), character, KeyEvent.KEY_LOCATION_STANDARD);
-				dispatchEventInSwing(w, e);
+				dispatchKeyEventInSwing(w, e);
 				if ((event.getKeycode() == 32 ||event.getKeycode() == 9) && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && !event.isCtrl()) {// space keycode handle press
 					event.setType(KeyboardEventMsgIn.KeyEventType.keypress);
 					dispatchKeyboardEvent(event);
@@ -205,12 +205,14 @@ public class WebEventDispatcher {
 
 	protected void dispatchMouseEvent(MouseEventMsgIn event) {
 		Component c = null;
+		boolean relatedToLastEvent = false;
 		if (Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) {
 			c = Util.getWebToolkit().getWindowManager().getLockedToWindow();
 		} else {
 			c = Util.getWebToolkit().getWindowManager().getVisibleComponentOnPosition(event.getX(), event.getY());
 			if (relatedToLastEvent(event, lastMouseEvent) && !javaFXdragStarted.get() && !dndHandler.isDndInProgress() ) {
 				c = (Component) lastMouseEvent.getSource();
+				relatedToLastEvent=true;
 			}
 		}
 		if (c == null) {
@@ -248,7 +250,7 @@ public class WebEventDispatcher {
 				buttons = 0; //in swing mouse move/drag has always MouseEvent.button==0
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
 				lastMouseEvent = e;
-				dispatchEventInSwing(c, e);
+				dispatchMouseEventInSwing(c, e, relatedToLastEvent);
 				break;
 			case mouseup:
 				id = MouseEvent.MOUSE_RELEASED;
@@ -256,10 +258,10 @@ public class WebEventDispatcher {
 				clickcount = computeClickCount(x, y, buttons, false, event.getTimeMilis());
 				modifiers = modifiers & (((1 << 6) - 1) | (~((1 << 14) - 1)) | MouseEvent.CTRL_DOWN_MASK | MouseEvent.ALT_DOWN_MASK | MouseEvent.SHIFT_DOWN_MASK | MouseEvent.META_DOWN_MASK);
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
-				dispatchEventInSwing(c, e);
+				dispatchMouseEventInSwing(c, e, relatedToLastEvent);
 				if (lastMousePressEvent != null && Math.abs(lastMousePressEvent.x - x) < CLICK_TOLERANCE && Math.abs(lastMousePressEvent.y - y) < CLICK_TOLERANCE) {
 					e = new MouseEvent(c, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
-					dispatchEventInSwing(c, e);
+					dispatchMouseEventInSwing(c, e, relatedToLastEvent);
 					lastMouseEvent = e;
 					lastMousePressEvent = MouseEventInfo.get(e, event.getTimeMilis());
 				} else {
@@ -271,7 +273,7 @@ public class WebEventDispatcher {
 				id = MouseEvent.MOUSE_PRESSED;
 				clickcount = computeClickCount(x, y, buttons, true, event.getTimeMilis());
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
-				dispatchEventInSwing(c, e);
+				dispatchMouseEventInSwing(c, e, relatedToLastEvent);
 				lastMousePressEvent = MouseEventInfo.get(e, event.getTimeMilis());
 				lastMouseEvent = e;
 				break;
@@ -280,7 +282,7 @@ public class WebEventDispatcher {
 				buttons = 0;
 				modifiers = 0;
 				e = new MouseWheelEvent(c, id, when, modifiers, x, y, clickcount, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 3, event.getWheelDelta());
-				dispatchEventInSwing(c, e);
+				dispatchMouseEventInSwing(c, e, relatedToLastEvent);
 				break;
 			case dblclick:
 				// e = new MouseEvent(w, MouseEvent.MOUSE_CLICKED, when,
@@ -424,18 +426,34 @@ public class WebEventDispatcher {
 	public static void dispatchEventInSwing(final Component c, final AWTEvent e) {
 		Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
 		if (w.isEnabled()) {
-			if (e instanceof MouseEvent) {
-				w.setCursor(w.getCursor());// force cursor update
-			}
-			if ((Util.isWindowDecorationEvent(w, e) || Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) && e instanceof MouseEvent) {
-				Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
-				Util.getWebToolkit().getWindowManager().handleWindowDecorationEvent(w, (MouseEvent) e);
-			} else if (dndHandler.isDndInProgress() && (e instanceof MouseEvent || e instanceof KeyEvent)) {
+			Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
+			dispatchEnterExitEvents(w, e);
+			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
+		}
+	}
+
+	public static void dispatchKeyEventInSwing(final Component c, final AWTEvent e) {
+		Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
+		if (w.isEnabled()) {
+			if (dndHandler.isDndInProgress()) {
 				dndHandler.processMouseEvent(w, e);
 			} else {
-				Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
-				dispatchEnterExitEvents(w, e);
-				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
+				dispatchEventInSwing(c,e);
+			}
+		}
+	}
+
+	public static void dispatchMouseEventInSwing(final Component c, final MouseEvent e, boolean relatedToPreviousEvent) {
+		Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
+		if (w.isEnabled()) {
+				w.setCursor(w.getCursor());// force cursor update
+			if ((!relatedToPreviousEvent &&Util.isWindowDecorationEvent(w, e)) || Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) {
+				Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
+				Util.getWebToolkit().getWindowManager().handleWindowDecorationEvent(w, (MouseEvent) e);
+			} else if (dndHandler.isDndInProgress() ) {
+				dndHandler.processMouseEvent(w, e);
+			} else {
+				dispatchEventInSwing(c,e);
 			}
 		}
 	}

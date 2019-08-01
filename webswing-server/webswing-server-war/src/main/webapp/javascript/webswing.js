@@ -164,8 +164,8 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                     mirrorMode: false,
                     canPaint: false,
                     virtualKB: false,
-                    debugLog: false
-                };
+                    traceLog: false,
+                    touchMode: false                };
             }
 
             function setupRootElement(rootElement) {
@@ -222,6 +222,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                     cfg.connectionUrl = options.connectionUrl != null ? options.connectionUrl : cfg.connectionUrl;
                     cfg.debugPort = options.debugPort != null ? options.debugPort : cfg.debugPort;
                     cfg.debugLog = options.debugLog != null ? JSON.parse(options.debugLog) : cfg.debugLog;
+                    cfg.traceLog = options.traceLog != null ? JSON.parse(options.traceLog) : cfg.traceLog;
                     cfg.javaCallTimeout = options.javaCallTimeout != null ? parseInt(options.javaCallTimeout, 10) : cfg.javaCallTimeout;
                     if (cfg.connectionUrl.substr(cfg.connectionUrl.length - 1) !== '/') {
                         cfg.connectionUrl = cfg.connectionUrl + '/';

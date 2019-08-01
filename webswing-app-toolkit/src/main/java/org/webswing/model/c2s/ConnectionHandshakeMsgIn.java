@@ -17,6 +17,7 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 	private String applicationName;
 	private String documentBase;
 	private String locale;
+	private String timeZone;
 	private String url;
 	private boolean mirrored;
 	private boolean directDrawSupported;
@@ -108,6 +109,14 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 
 	public void setLocale(String locale) {
 		this.locale = locale;
+	}
+
+	public String getTimeZone() {
+		return timeZone;
+	}
+
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
 	}
 
 	public String getViewId() {

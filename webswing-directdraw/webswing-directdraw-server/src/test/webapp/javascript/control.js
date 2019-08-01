@@ -13,8 +13,9 @@ $.ajax({
 			document.body.innerHTML += '<img id="' + method + 'PNG" />';
 		}
 	});
-    var dpr= window.devicePixelRatio || 1;
-	var dd = new WebswingDirectDraw({dpr:dpr});
+    var dpr= Math.ceil(window.devicePixelRatio) || 1;
+    console.log("DPR="+dpr);
+	var dd = new WebswingDirectDraw({dpr:dpr,logTrace:true});
 	var sequence = Promise.resolve();
 	data.forEach(function(method, index) {
 		sequence = sequence.then(function(resolved) {

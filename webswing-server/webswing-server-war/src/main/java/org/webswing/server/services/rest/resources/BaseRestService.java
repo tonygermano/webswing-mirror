@@ -99,7 +99,7 @@ public abstract class BaseRestService {
 
 		case SwingInstance:
 			String userName = getHandler().getUser() == null ? "<webswing user>" : getHandler().getUser().getUserId();
-			variableSubstitutor = VariableSubstitutor.forSwingInstance(getHandler().getConfig(), userName, null, "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing custom args>");
+			variableSubstitutor = VariableSubstitutor.forSwingInstance(getHandler().getConfig(), userName, null, "<webswing client Id>", "<webswing client IP address>", "<webswing client locale>", "<webswing client timezone>", "<webswing custom args>");
 			break;
 
 		case SwingApp:

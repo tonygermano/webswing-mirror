@@ -11,6 +11,7 @@
         c = c || {};
         var config = {
             logDebug: c.logDebug || false,
+            logTrace: c.logTrace || false,
             ieVersion: c.ieVersion || false,
             onErrorMessage: c.onErrorMessage || function (message) {
                 console.log(message.stack);
@@ -83,6 +84,9 @@
                 })
                 .then(function () {
                     var ctx = imageContext.canvas.getContext("2d");
+                    if(config.logTrace){
+                        ctx= wrap2TraceLoggerCtx(ctx);
+                    }
                     if (image.instructions != null) {
                         ctx.save();
                         image.instructions.reduce(function (seq, instruction) {
@@ -197,7 +201,6 @@
         function initXorModeCtx(graphicsState, original) {
             if (xorLayer == null) {
                 xorLayer = document.createElement("canvas");
-                xorLayer.getContext("2d").scale(config.dpr, config.dpr);
             }
             xorLayer.width = original.canvas.width;
             xorLayer.height = original.canvas.height;
@@ -317,11 +320,12 @@
                 }
 
                 ctx.setBoundingBox = function (excess) {
-                    excess = excess || 0;
-                    var x = Math.min(Math.max(0, this.pathBBox.minX - excess), this.canvas.width);
-                    var y = Math.min(Math.max(0, this.pathBBox.minY - excess), this.canvas.height);
-                    var mx = Math.min(Math.max(0, this.pathBBox.maxX + excess), this.canvas.width);
-                    var my = Math.min(Math.max(0, this.pathBBox.maxY + excess), this.canvas.height);
+                    var excessX = (excess || 0) * this.transfomMatrix[0];
+                    var excessY = (excess || 0) * this.transfomMatrix[3];
+                    var x = Math.min(Math.max(0, this.pathBBox.minX - excessX), this.canvas.width);
+                    var y = Math.min(Math.max(0, this.pathBBox.minY - excessY), this.canvas.height);
+                    var mx = Math.min(Math.max(0, this.pathBBox.maxX + excessX), this.canvas.width);
+                    var my = Math.min(Math.max(0, this.pathBBox.maxY + excessY), this.canvas.height);
                     this.boundingBox = {x: x, y: y, w: mx - x, h: my - y};
                 };
 
@@ -1056,9 +1060,13 @@
             if (!biased) {
                 return {x: 0, y: 0};
             } else {
+                var dx = ctx.lineWidth * transform[0] / config.dpr % 2;
+                var dy = ctx.lineWidth * transform[3] / config.dpr % 2;
+                var xbias = (dx > 0.0001 && dx < 1.9999) ? (0.5 / transform[0] * config.dpr) : 0
+                var ybias = (dy > 0.0001 && dy < 1.9999) ? (0.5 / transform[3] * config.dpr) : 0
                 return {
-                    x: (ctx.lineWidth * transform[0]) & 1 ? 0.5 / transform[0] : 0,
-                    y: (ctx.lineWidth * transform[3]) & 1 ? 0.5 / transform[3] : 0
+                    x: xbias,
+                    y: ybias
                 }
             }
         }
@@ -1246,6 +1254,38 @@
                 var fontsLength = webImage.fontFaces == null ? 0 : webImage.fontFaces.length;
                 console.log("DirectDraw DEBUG render time " + time + "ms (insts:" + instLength + ", consts:" + constLength + ", fonts:" + fontsLength + ")");
             }
+        }
+
+        function wrap2TraceLoggerCtx(ctx) {
+            if (ctx.traceLoggerWrapped) {
+                return ctx
+            }
+
+            ['fill', 'stroke', 'beginPath', 'save', 'restore',
+                'setTransform', 'clip', 'rect', 'drawImage', 'fillRect', 'transform',
+                'fillText', 'scale', 'setLineDash', 'moveTo', 'lineTo', 'quadraticCurveTo',
+                'bezierCurveTo', 'closePath'].reduce(function (ctx, name) {
+                ctx[name] = tracerFactory(ctx[name], name);
+                return ctx;
+            }, ctx);
+
+            function tracerFactory(original, name) {
+                return function () {
+                    console.log("ctx." + name + "(" + printArguments(arguments) + ")")
+                    original.apply(ctx, arguments);
+                }
+            }
+
+            function printArguments(a) {
+                var str = '';
+                for (var i = 0; i < a.length; i++) {
+                    str += "," + JSON.stringify(a[i]);
+                }
+                return str.length > 0 ? str.substring(1) : str;
+            }
+
+            ctx.traceLoggerWrapped = true;
+            return ctx;
         }
 
         return {
