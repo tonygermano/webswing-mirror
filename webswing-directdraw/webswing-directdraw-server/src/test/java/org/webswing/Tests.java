@@ -993,6 +993,53 @@ public class Tests {
 		return true;
 	}
 
+	public static boolean t37ScaledTextRenderingTest(Graphics2D g, int repeat) {
+		if (repeat > 0) {
+			return false;
+		}
+		g.setFont(new Font("dialog",Font.PLAIN,12));
+		String ys="iiiiwiwiiiii";
+		int yswidth = g.getFontMetrics().stringWidth(ys);
+		String Ms = "wwwwwwwwwwwwwwwww";
+		int Mswidth = g.getFontMetrics().stringWidth(Ms);
+
+		g.setColor(Color.BLACK);
+		g.drawLine(0,10,yswidth,10);
+		g.setColor(Color.RED);
+		g.drawLine(yswidth,10,Mswidth+yswidth,10);
+		g.drawString(ys+Ms,0,10);
+		g.setColor(Color.BLACK);
+		g.drawString(ys,0,12);
+		g.drawString(Ms,yswidth,12);
+
+		g.translate(0,20);
+		g.scale(2,2);
+		yswidth = g.getFontMetrics().stringWidth(ys);
+		Mswidth = g.getFontMetrics().stringWidth(Ms);
+
+		g.setColor(Color.BLACK);
+		g.drawLine(0,10,yswidth,10);
+		g.setColor(Color.RED);
+		g.drawLine(yswidth,10,Mswidth+yswidth,10);
+		g.drawString(ys+Ms,0,10);
+		g.setColor(Color.BLACK);
+		g.drawString(ys,0,12);
+		g.drawString(Ms,yswidth,12);
+
+		g.translate(0,20);
+		g.scale(0.5,0.5);
+		yswidth = g.getFontMetrics().stringWidth(ys);
+		Mswidth = g.getFontMetrics().stringWidth(Ms);
+
+		g.setColor(Color.BLACK);
+		g.drawLine(0,10,yswidth,10);
+		g.setColor(Color.RED);
+		g.drawLine(yswidth,10,Mswidth+yswidth,10);
+		g.drawString(ys+Ms,0,10);
+
+		return true;
+	}
+
 	private static void drawlines(Graphics2D g) {
 		for (int j = 0; j < 20; j++) {
 			if(j!=0) {

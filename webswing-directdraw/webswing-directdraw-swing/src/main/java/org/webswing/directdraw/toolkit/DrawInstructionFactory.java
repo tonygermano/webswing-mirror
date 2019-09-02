@@ -1,15 +1,6 @@
 package org.webswing.directdraw.toolkit;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GradientPaint;
-import java.awt.LinearGradientPaint;
-import java.awt.Paint;
-import java.awt.RadialGradientPaint;
-import java.awt.Shape;
-import java.awt.TexturePaint;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
@@ -60,8 +51,19 @@ public class DrawInstructionFactory {
 		return new DrawInstruction(image, transformConst, cropConst, bgConst, toPathConst(clip));
 	}
 
-	public DrawInstruction drawString(String s, double x, double y, int width, Shape clip) {
-		return new DrawInstruction(InstructionProto.DRAW_STRING, new StringConst(ctx, s), new PointsConst(ctx, (int) x, (int) y, width), toPathConst(clip));
+	public DrawInstruction drawString(String s, double x, double y, Shape clip, FontMetrics fm) {
+		int[] widths = new int[s.length()+2];
+		int tmpwidth=0;
+		String tmp ="";
+		widths[0]=(int)x;
+		widths[1]=(int)y;
+		for (int i = 0 ;i<s.length();i++){
+			tmp+=s.charAt(i);
+			int nextTmpWidth = fm.stringWidth(tmp);
+			widths[i+2]=nextTmpWidth-tmpwidth;
+			tmpwidth=nextTmpWidth;
+		}
+		return new DrawInstruction(InstructionProto.DRAW_STRING, new StringConst(ctx, s), new PointsConst(ctx, widths), toPathConst(clip));
 	}
 
 	public DrawInstruction drawGlyphList(String string, Font font, double x, double y, AffineTransform transform, Shape clip) {

@@ -285,13 +285,13 @@ public class RenderUtil {
 		return null;
 	}
 
-	public static void waitForImage(Image i) {
+	public static ImageObserver waitForImage(Image i) {
 		try {
 			Graphics imageLoaderG = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).getGraphics();
 			ImageObserver observer = new ImageObserver() {
 				@Override
 				public synchronized boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
-					if ((infoflags & ImageObserver.ALLBITS) == ImageObserver.ALLBITS || (infoflags & ImageObserver.FRAMEBITS) == ImageObserver.FRAMEBITS) {
+					if ((infoflags & (ImageObserver.ALLBITS |ImageObserver.FRAMEBITS)) != 0) {
 						notifyAll();
 					}
 					return true;
@@ -307,8 +307,9 @@ public class RenderUtil {
 					}
 				}
 			}
+			return observer;
 		} catch (Exception e) {
-			//ignore
+			return null;
 		}
 	}
 }

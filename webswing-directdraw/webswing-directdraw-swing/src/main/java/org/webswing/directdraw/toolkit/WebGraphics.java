@@ -10,6 +10,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 public class WebGraphics extends AbstractVectorGraphics {
 
@@ -18,6 +20,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 	private boolean disposed = false;
 	private int id;
 	private boolean onDemandTexturePaint;
+	private static Map<Image, ImageObserver> loadedImgs = new WeakHashMap<>();
 
 	public WebGraphics(WebImage webImage) {
 		super(new Dimension(webImage.getWidth(null), webImage.getHeight(null)));
@@ -39,9 +42,9 @@ public class WebGraphics extends AbstractVectorGraphics {
 			if (onDemandTexturePaint) {
 				thisImage.addInstruction(this, dif.setPaint(createTexture(s, getPaint())));
 			}
-			if(thisImage.isFallbackActive()){
+			if (thisImage.isFallbackActive()) {
 				thisImage.addInstruction(this, dif.drawFallback(s));
-			}else {
+			} else {
 				thisImage.addInstruction(this, dif.draw(s, getClip()));
 			}
 		} else {
@@ -52,7 +55,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 	@Override
 	protected void changeClip(Shape clip) {
 		super.changeClip(clip);
-		if(thisImage.isFallbackActive()){
+		if (thisImage.isFallbackActive()) {
 			thisImage.addInstruction(this, dif.clipFallback(getClip()));
 		}
 	}
@@ -107,7 +110,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected boolean writeImage(Image image, AffineTransform transform, Rectangle2D crop, Color bgcolor, ImageObserver observer) {
-		if(crop!=null && (crop.getWidth()<=0 || crop.getHeight()<=0)){
+		if (crop != null && (crop.getWidth() <= 0 || crop.getHeight() <= 0)) {
 			return true;
 		}
 		if (image instanceof WebImage || image instanceof VolatileWebImageWrapper) {
@@ -127,8 +130,15 @@ public class WebGraphics extends AbstractVectorGraphics {
 		if (image instanceof BufferedImage) {
 			return new ImageConvertResult(true, (BufferedImage) image);
 		}
-		RenderUtil.waitForImage(image);
-		BufferedImage bufferedImage = new BufferedImage(image.getWidth(observer), image.getHeight(observer), BufferedImage.TYPE_INT_ARGB);
+
+		boolean skip = loadedImgs.containsKey(image);
+		if (!skip) {
+			loadedImgs.put(image, RenderUtil.waitForImage(image));
+		}
+
+		int width = image.getWidth(observer);
+		int height = image.getHeight(observer);
+		BufferedImage bufferedImage = new BufferedImage(width <= 0 ? 1 : width, height <= 0 ? 1 : height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = bufferedImage.createGraphics();
 		try {
 			return new ImageConvertResult(graphics.drawImage(image, 0, 0, observer), bufferedImage);
@@ -141,8 +151,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 	protected void writeString(String string, double x, double y) {
 		Font font = getFont();
 		if (thisImage.getContext().requestFont(font)) {
-			int width = getFontMetrics().stringWidth(string);
-			thisImage.addInstruction(this, dif.drawString(string, x, y, width, getClip()));
+			thisImage.addInstruction(this, dif.drawString(string, x, y, getClip(), getFontMetrics()));
 		} else {
 			thisImage.addInstruction(this, dif.drawGlyphList(string, font, x, y, getTransform(), getClip()));
 		}

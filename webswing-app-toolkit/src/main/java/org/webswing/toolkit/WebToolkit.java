@@ -323,6 +323,12 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 			}
 		}
 
+		if(Util.isDD()){
+			RenderingHints hints= new RenderingHints(RenderingHints.KEY_FRACTIONALMETRICS,RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
+			this.desktopProperties.put("awt.font.desktophints",hints);
+		}
+
+
 		System.setProperty("swing.disablevistaanimation","true");//See:com.sun.java.swing.plaf.windows.AnimationController.VISTA_ANIMATION_DISABLED
 
 		int repaintInterval = 400;

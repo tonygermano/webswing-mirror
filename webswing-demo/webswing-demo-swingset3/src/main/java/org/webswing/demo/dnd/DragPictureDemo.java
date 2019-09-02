@@ -59,7 +59,7 @@ public class DragPictureDemo extends JPanel {
 		pic5 = new DTPicture(createImageIcon("images/" + adeleString + ".jpg", adeleString).getImage());
 		pic5.setTransferHandler(picHandler);
 		mugshots.add(pic5);
-		pic6 = new DTPicture(createImageIcon("images/" + alexiString + ".jpg", alexiString).getImage());
+		pic6 = new DTPicture(Toolkit.getDefaultToolkit().getImage(DragPictureDemo.class.getResource("resources/images/duke.running.gif")));
 		pic6.setTransferHandler(picHandler);
 		mugshots.add(pic6);
 

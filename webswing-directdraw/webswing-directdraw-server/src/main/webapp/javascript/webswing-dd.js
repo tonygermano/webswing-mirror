@@ -551,7 +551,9 @@
 
         function iprtDrawString(ctx, args, fontTransform) {
             var string = args[0].string;
-            var points = args[1].points.points;
+            var p = args[1].points.points;
+            var x=p[0];
+            var y=p[1];
             var clip = args[2];
             ctx.save();
             if (path(ctx, clip)) {
@@ -559,13 +561,20 @@
             }
             if (fontTransform != null) {
                 var t = fontTransform;
-                ctx.transform(t.m00, t.m10, t.m01, t.m11, t.m02 + points[0], t.m12 + points[1]);
+                ctx.transform(t.m00, t.m10, t.m01, t.m11, t.m02 + x, t.m12 + y);
                 ctx.fillText(string, 0, 0);
             } else {
-                var canvasWidth = ctx.measureText(string).width;
-                var scaleX = points[2] / canvasWidth;
-                ctx.scale(scaleX, 1);
-                ctx.fillText(string, points[0] / scaleX, points[1]);
+                var currentX=x;
+                for (var i = 0;i<string.length;i++){
+                    var c = string.charAt(i);
+                    var canvasWidth = ctx.measureText(c).width;
+                    ctx.save();
+                    var scaleX = p[i+2] / canvasWidth;
+                    ctx.scale(scaleX, 1);
+                    ctx.fillText(c, currentX/scaleX, y);
+                    ctx.restore();
+                    currentX+=p[i+2];
+                }
             }
             ctx.restore();
         }
