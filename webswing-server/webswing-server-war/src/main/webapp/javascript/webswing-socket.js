@@ -1,10 +1,10 @@
-define(['atmosphere', 'ProtoBuf', 'jquery', 'text!webswing.proto'], function amdFactory(atmosphere, ProtoBuf, $, wsProto) {
-    "use strict";
-    var proto = ProtoBuf.loadProto(wsProto, "webswing.proto");
-    var InputEventsFrameMsgInProto = proto.build("org.webswing.server.model.proto.InputEventsFrameMsgInProto");
-    var AppFrameMsgOutProto = proto.build("org.webswing.server.model.proto.AppFrameMsgOutProto");
+import {org} from "./proto/proto";
+import atmosphere from "atmosphere.js";
+let InputEventsFrameMsgInProto = org.webswing.server.model.proto.InputEventsFrameMsgInProto;
+let AppFrameMsgOutProto = org.webswing.server.model.proto.AppFrameMsgOutProto;
 
-    return function SocketModule() {
+
+    export default function Socket() {
         var module = this;
         var api;
         module.injects = api = {
@@ -147,8 +147,11 @@ define(['atmosphere', 'ProtoBuf', 'jquery', 'text!webswing.proto'], function amd
                 if (message.byteLength === 1) {
                     return {};// ignore atmosphere heartbeat
                 }
-                data = AppFrameMsgOutProto.decode(message);
-                explodeEnumNames(data);
+                var uint8View = new Uint8Array(message);
+                var proto = AppFrameMsgOutProto.decode(uint8View);
+                data = AppFrameMsgOutProto.toObject(proto,{
+                    enums:String
+                });
             } else {
                 data = JSON.parse(message);
             }
@@ -166,8 +169,9 @@ define(['atmosphere', 'ProtoBuf', 'jquery', 'text!webswing.proto'], function amd
                 if (socket.request.isOpen && !socket.request.closed) {
                     if (typeof message === "object") {
                         if (binary) {
-                            var msg = new InputEventsFrameMsgInProto(message);
-                            socket.push(msg.encode().toArrayBuffer());
+                            var proto =InputEventsFrameMsgInProto.fromObject(message);
+                            var msg = InputEventsFrameMsgInProto.encode(proto).finish();
+                            socket.push(typedArrayToBuffer(msg));
                         } else {
                             socket.push(JSON.stringify(message));
                         }
@@ -195,30 +199,8 @@ define(['atmosphere', 'ProtoBuf', 'jquery', 'text!webswing.proto'], function amd
             return uuid;
         }
 
-        function explodeEnumNames(data) {
-            if (data != null) {
-                if (Array.isArray(data)) {
-                    data.forEach(function (d) {
-                        explodeEnumNames(d);
-                    });
-                } else {
-                    data.$type._fields.forEach(function (field) {
-                        if (field.resolvedType != null) {
-                            if (field.resolvedType.className === "Enum") {
-                                var enm = field.resolvedType.object;
-                                for (var key in enm) {
-                                    if (enm[key] === data[field.name]) {
-                                        data[field.name] = key;
-                                    }
-                                }
-                            } else if (field.resolvedType.className === "Message") {
-                                explodeEnumNames(data[field.name]);
-                            }
-                        }
-                    });
-                }
-            }
-        }
-    };
+    }
 
-});
+    function typedArrayToBuffer(array){
+        return array.buffer.slice(array.byteOffset, array.byteLength + array.byteOffset)
+    }

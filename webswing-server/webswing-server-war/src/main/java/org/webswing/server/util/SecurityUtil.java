@@ -14,9 +14,11 @@ import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.ref.WeakReference;
 
 public class SecurityUtil {
+	public static final String CLIENT_IP_SESSION_ATTR = "webswingClientIp";
 	private static final Logger log = LoggerFactory.getLogger(SecurityUtil.class);
 
 	public static AbstractWebswingUser getUser(UrlHandler urlHandler) {
@@ -34,6 +36,31 @@ public class SecurityUtil {
 			return null;
 		}
 	}
+
+	public static String getRemoteAddr(WebSocketConnection connection) {
+		try {
+			Subject subject = (Subject) connection.getRequest().getAttribute(SecurityManagerService.SECURITY_SUBJECT);
+			String ip = (String) subject.getSession().getAttribute(CLIENT_IP_SESSION_ATTR);
+			if(ip !=null){
+				return ip;
+			}
+			return "Unknown";
+		} catch (ExpiredSessionException e) {
+			log.info("Can not resolve remote IP address. User session expired."+ e.getMessage());
+			return "Unknown";
+		}
+	}
+
+
+	public static String getClientIp(HttpServletRequest r) {
+		String result=null;
+		result=r.getHeader("X-Forwarded-For");
+		if(result==null){
+			result=r.getRemoteAddr();
+		}
+		return result;
+	}
+
 
 	private static AbstractWebswingUser resolveUser(Subject subject, UrlHandler handler) {
 		String securedPath = handler.getSecuredPath();

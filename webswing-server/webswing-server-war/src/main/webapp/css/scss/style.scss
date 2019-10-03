@@ -16,7 +16,6 @@
 .webswing-element {
 	@extend %ws-root;
 
-	// _utilities: Mixins, variables, and third party code
 	@import '_utilities/_normalize';  // Normalize.css, makes default styles more predictable
 	@import '_utilities/_mixins';     // SASS mixins, mostly for convenience
 	@import '_utilities/_utility';    // Custom utility classes for Webswing
@@ -27,17 +26,113 @@
 	// _components: Various components that make up the application
 	@import '_components/_basic';                   // Form fields etc
 	@import '_components/_forms';                   // Form fields etc
-	@import '_components/_progress-bar';            // A progress bar for file import and export
-	@import '_components/_spinner';                 // CSS loading animation
-	@import '_components/_modals/_dialog';          // Common dialogs
-	@import '_components/_modals/_files';           // File up/download dialog
 	@import '_components/_modals/_login';           // Login modal
 	@import '_components/_modals/_selector';   		// Webswing app selection
-	@import '_components/_modals/_paste';   		// Clipboard paste request dialog
-	@import '_components/_toolbars/_clipboard';     // Clipboard integration toolbar
-	@import '_components/_toolbars/_files';     	// File dialog integration toolbar
-	@import '_components/_toolbars/_playback';     	// Session recording playback toolbar
 	@import '_components/_toolbars/_touch';     	// Touch interface integration
-	@import '_components/_toolbars/_network';     	// Network monitor notifications
-	@import '_components/_toolbars/_message';     	// Message dialog toolbar
+	
+	.webswing-element-content {
+		@extend %ws-root-content;
+		
+		// _base: Document-wide base styles
+		@import '_base/_base';   // Sets all HTML element styles after the reset
+		
+		// _utilities: Mixins, variables, and third party code
+		@import '_utilities/_mixins';     // SASS mixins, mostly for convenience
+		@import '_utilities/_utility';    // Custom utility classes for Webswing
+		
+		@import '_components/_basic';                   // Form fields etc
+		@import '_components/_forms';                   // Form fields etc
+		@import '_components/_progress-bar';            // A progress bar for file import and export
+		@import '_components/_spinner';                 // CSS loading animation
+		@import '_components/_modals/_dialog';          // Common dialogs
+		@import '_components/_modals/_files';           // File up/download dialog
+		@import '_components/_modals/_paste';   		// Clipboard paste request dialog
+		@import '_components/_toolbars/_clipboard';     // Clipboard integration toolbar
+		@import '_components/_toolbars/_files';     	// File dialog integration toolbar
+		@import '_components/_toolbars/_playback';     	// Session recording playback toolbar
+		@import '_components/_toolbars/_network';     	// Network monitor notifications
+		@import '_components/_toolbars/_message';     	// Message dialog toolbar
+		
+		canvas {
+			z-index: 100;
+		}
+		
+		.webswing-html-canvas.modal-blocked {
+			pointer-events: none;
+		}
+		
+		&.composition {
+			position: relative;
+		}
+		
+	}
+	
+	&.touch {
+		display: flex;
+		flex-direction: column;
+		overflow: auto;
+		touch-action: manipulation;
+		
+		* {
+			touch-action: manipulation;
+		}
+		
+		.webswing-element-content {
+			flex-grow: 1;
+			touch-action: manipulation;
+			-webkit-user-select: none; 
+			-khtml-user-select: none; 
+			-moz-user-select: none; 
+			-ms-user-select: none; 
+			-o-user-select: none; 
+			user-select: none;
+			-webkit-tap-highlight-color: rgba(0,0,0,0);
+    		-webkit-touch-callout: none;
+			position: relative;
+			
+			canvas {
+				touch-action: manipulation;
+				-webkit-user-select: none; 
+				-khtml-user-select: none; 
+				-moz-user-select: none; 
+				-ms-user-select: none; 
+				-o-user-select: none; 
+				user-select: none;
+				-webkit-tap-highlight-color: rgba(0,0,0,0);
+    			-webkit-touch-callout: none;
+    			position: absolute;
+    			top: 0;
+    			left: 0;
+				
+				&:focus {
+					outline: none;
+				}
+			}
+			
+			.ws-input-hidden {
+				-webkit-user-select: text; 
+				-khtml-user-select: text; 
+				-moz-user-select: text; 
+				-ms-user-select: text; 
+				-o-user-select: text; 
+				user-select: text;
+			}
+			
+			.ws-modal-container {
+			}
+			
+			.ws-clipboard, .ws-networkbar, .ws-commonbar {
+				position: fixed;
+				bottom: 65px;
+				box-shadow: none;
+				border-bottom-right-radius: 0;
+				border-bottom-left-radius: 0;
+			}
+			
+			.ws-modal-container {
+				position: fixed;
+			}
+		}
+	}
+
 }

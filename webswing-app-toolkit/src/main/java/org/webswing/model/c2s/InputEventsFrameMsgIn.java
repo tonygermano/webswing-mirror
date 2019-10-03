@@ -14,7 +14,9 @@ public class InputEventsFrameMsgIn implements MsgIn {
 	private PasteEventMsgIn paste;
 	private FilesSelectedEventMsgIn selected;
 	private PlaybackCommandMsgIn playback;
-
+	private WindowEventMsgIn window;
+	private ActionEventMsgIn action;
+	
 	private JsResultMsg jsResponse;// java2js call return value
 	private JavaEvalRequestMsgIn javaRequest;// js2java call
 	private PixelsAreaResponseMsgIn pixelsResponse; //WebRobotPeer
@@ -82,4 +84,21 @@ public class InputEventsFrameMsgIn implements MsgIn {
 	public void setPixelsResponse(PixelsAreaResponseMsgIn pixelsResponse) {
 		this.pixelsResponse = pixelsResponse;
 	}
+
+	public WindowEventMsgIn getWindow() {
+		return window;
+	}
+
+	public void setWindow(WindowEventMsgIn window) {
+		this.window = window;
+	}
+
+	public ActionEventMsgIn getAction() {
+		return action;
+	}
+
+	public void setAction(ActionEventMsgIn action) {
+		this.action = action;
+	}
+	
 }

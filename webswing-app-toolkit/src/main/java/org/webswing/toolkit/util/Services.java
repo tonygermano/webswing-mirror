@@ -6,6 +6,7 @@ import org.webswing.ext.services.JsLinkService;
 import org.webswing.ext.services.PdfService;
 import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.ext.services.SwingClassLoaderFactoryService;
+import org.webswing.ext.services.ToolkitFXService;
 
 public class Services {
 
@@ -15,6 +16,7 @@ public class Services {
 	private static SwingClassLoaderFactoryService classloaderService;
 	private static DirectDrawService directDrawService;
 	private static JsLinkService jsLinkService;
+	private static ToolkitFXService toolkitFXService;
 
 	public static void initialize(ImageService imageServiceImpl, PdfService pdfServiceImpl, ServerConnectionService serverServiceImpl, SwingClassLoaderFactoryService classloaderServiceImpl, DirectDrawService directDrawServiceImpl, JsLinkService jsLinkServiceImpl) {
 		imageService = imageServiceImpl;
@@ -71,6 +73,17 @@ public class Services {
 			System.exit(1);
 		}
 		return jsLinkService;
+	}
+	
+	public static ToolkitFXService getToolkitFXService() {
+		if (toolkitFXService == null) {
+			Logger.warn("ToolkitFXService service has not been initialized. Ignoring...");
+		}
+		return toolkitFXService;
+	}
+	
+	public static void initializeToolkitFXService(ToolkitFXService toolkitFXService) {
+		Services.toolkitFXService = toolkitFXService;
 	}
 
 }

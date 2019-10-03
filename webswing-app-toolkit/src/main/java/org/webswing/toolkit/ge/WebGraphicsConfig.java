@@ -38,7 +38,7 @@ public class WebGraphicsConfig extends BufferedImageGraphicsConfig {
 	}
 
 	public Image createAcceleratedImage(Component target, int paramInt1, int paramInt2) {
-		ColorModel localColorModel = getColorModel(1);
+		ColorModel localColorModel = getColorModel(2);
 		WritableRaster localWritableRaster = localColorModel.createCompatibleWritableRaster(paramInt1, paramInt2);
 		return new OffScreenImage(target, localColorModel, localWritableRaster, localColorModel.isAlphaPremultiplied());
 	}
@@ -54,6 +54,10 @@ public class WebGraphicsConfig extends BufferedImageGraphicsConfig {
 
 	public Rectangle getBounds() {
 		return new Rectangle(0, 0, this.width, this.height);
+	}
+
+	public boolean isTranslucencyCapable() {
+		return true;
 	}
 
 }

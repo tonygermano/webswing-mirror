@@ -2,14 +2,11 @@ package org.webswing.toolkit;
 
 import java.awt.*;
 import java.awt.peer.KeyboardFocusManagerPeer;
-import java.lang.reflect.Method;
 
 import org.webswing.model.s2c.FocusEventMsg;
 import org.webswing.toolkit.util.Util;
-import org.webswing.toolkit.util.Logger;
 
-import sun.awt.SunToolkit;
-
+import javax.swing.JPasswordField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -80,10 +77,15 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 						msg.setType(FocusEventMsg.FocusEventType.focusWithCarretGained);
 						msg.setCaretX(location.x);
 						msg.setCaretY(location.y);
+						msg.setCaretH(location.height);
+						msg.setEditable(tc.isEditable());
 					}
 				} catch (BadLocationException e) {
 					e.printStackTrace();
 				}
+			}
+			if(o instanceof JPasswordField){
+				msg.setType(FocusEventMsg.FocusEventType.focusPasswordGained);
 			}
 		} else {
 			msg.setType(FocusEventMsg.FocusEventType.focusLost);

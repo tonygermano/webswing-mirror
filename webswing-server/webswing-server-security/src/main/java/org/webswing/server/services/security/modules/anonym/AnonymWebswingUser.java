@@ -8,11 +8,15 @@ import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
 
 public class AnonymWebswingUser extends AbstractWebswingUser {
-	public static final String anonymUserName = "anonym";
+	private String userId;
+
+	public AnonymWebswingUser(String userIdParam) {
+		this.userId=userIdParam;
+	}
 
 	@Override
 	public String getUserId() {
-		return anonymUserName;
+		return userId;
 	}
 
 	@Override

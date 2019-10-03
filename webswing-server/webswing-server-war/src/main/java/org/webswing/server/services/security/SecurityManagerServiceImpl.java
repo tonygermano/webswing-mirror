@@ -22,6 +22,7 @@ import org.webswing.server.model.exception.WsInitException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.webswing.server.util.SecurityUtil;
 import org.webswing.server.util.ServerUtil;
 
 @Singleton
@@ -71,7 +72,7 @@ public class SecurityManagerServiceImpl implements SecurityManagerService {
 		final ShiroHttpServletResponse response = new ShiroHttpServletResponse(res, context, request);
 
 		WebSubject.Builder builder = new WebSubject.Builder(securityManager, request, response);
-		builder.host(ServerUtil.getClientIp(request));
+		builder.host(SecurityUtil.getClientIp(request));
 		final Subject subject = builder.buildWebSubject();
 		request.setAttribute(SECURITY_SUBJECT, subject);
 		return subject.execute(new Callable<Object>() {

@@ -1,27 +1,52 @@
 package org.webswing.javafx.toolkit;
 
+import java.awt.AWTEvent;
+import java.awt.AWTException;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.InvocationEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
+
+import org.webswing.dispatch.WebEventDispatcher;
+import org.webswing.ext.services.ToolkitFXService;
+import org.webswing.javafx.toolkit.adaper.WindowAdapter;
+import org.webswing.javafx.toolkit.util.WebFxUtil;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
+
 import com.sun.glass.events.KeyEvent;
 import com.sun.glass.ui.Clipboard;
 import com.sun.glass.ui.Pixels;
 import com.sun.glass.ui.View;
 import com.sun.javafx.geom.RectBounds;
 import com.sun.prism.web.WebTextureWrapper;
-import org.webswing.dispatch.WebEventDispatcher;
-import org.webswing.javafx.toolkit.adaper.WindowAdapter;
-import org.webswing.javafx.toolkit.util.WebFxUtil;
-import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Util;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import javafx.stage.Stage;
 
 /**
  * Created by vikto on 01-Mar-17.
@@ -353,6 +378,10 @@ public class WebFxView extends View {
 	@Override
 	protected void _uploadPixels(long ptr, Pixels pixels) {
 		if (getWindow() != null) {
+			if (Util.isTestMode()) {
+				lookupStages();
+			}
+			
 			Window win = ((WebWindow) getWindow()).w.getThis();
 			RepaintManager rm = RepaintManager.currentManager(win);
 			WebTextureWrapper texture = WebTextureWrapper.textureLookup.get(System.identityHashCode(pixels.getPixels()));
@@ -383,6 +412,46 @@ public class WebFxView extends View {
 				win.repaint();
 			}
 
+		}
+	}
+	
+	private void lookupStages() {
+		try {
+			AWTEvent event = EventQueue.getCurrentEvent();
+			if (event instanceof InvocationEvent) {
+				ToolkitFXService toolkitFXService = Services.getToolkitFXService();
+				
+				if (toolkitFXService == null) {
+					return;
+				}
+				
+				try {
+					Field f = event.getClass().getDeclaredField("runnable");
+					f.setAccessible(true);
+					Runnable runnable = (Runnable) f.get(event);
+					Field arg = runnable.getClass().getDeclaredField("arg$1");
+					arg.setAccessible(true);
+					
+					Object sceneState = arg.get(runnable);
+					Method getScene = Class.forName("com.sun.javafx.tk.quantum.SceneState").getDeclaredMethod("getScene");
+					getScene.setAccessible(true);
+					
+					Object glassScene = getScene.invoke(sceneState);
+					Method getStage = Class.forName("com.sun.javafx.tk.quantum.GlassScene").getDeclaredMethod("getStage");
+					getStage.setAccessible(true);
+					
+					Object glassStage = getStage.invoke(glassScene);
+					Field fxStage = Class.forName("com.sun.javafx.tk.quantum.WindowStage").getDeclaredField("fxStage");
+					fxStage.setAccessible(true);
+					
+					Stage stage = (Stage) fxStage.get(glassStage);
+					toolkitFXService.registerStage(stage);
+				} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException e) {
+					Logger.warn("Exception while looking for Stages!", e);
+				}
+			}
+		} catch (Exception e) {
+			Logger.error("Exception while looking for Stages!", e);
 		}
 	}
 

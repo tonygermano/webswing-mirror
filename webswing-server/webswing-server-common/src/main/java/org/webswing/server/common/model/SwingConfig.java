@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "loadingAnimationDelay", "allowStealSession", "autoLogout",
-		"goodbyeUrl", "sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowedCorsOrigins", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "compositingWinManager", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "loadingAnimationDelay", "allowStealSession", "autoLogout",
+		"goodbyeUrl", "sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
@@ -46,25 +46,33 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isDirectdraw();
 
-	@ConfigField(tab = ConfigGroup.General, label = "JavaFx Support (experimental)", description = "!Only for Java8! Enables native or embeded JavaFx framework support.")
+	@ConfigField(tab = ConfigGroup.General, label = "JavaFx Support", description = "Enables native or embeded JavaFx framework support.")
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isJavaFx();
+	
+	@ConfigField(tab = ConfigGroup.General, label = "Compositing Window Manager", description = "Use window manager that provides an off-screen buffer for each window. Allows advanced window positioning when embedding and better communication integration. Recommended with DirectDraw rendering mode.")
+	@ConfigFieldDefaultValueBoolean(false)
+	public boolean isCompositingWinManager();
 
 	@ConfigField(tab = ConfigGroup.General, label = "Enable Debug Mode", description = "Enables remote debug for this application. To start the application in debug mode use '?debugPort=8000' url param.")
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isDebug();
+	
+	@ConfigField(tab = ConfigGroup.General, label = "Enable Test Mode", description = "Enables test mode for this application to be able to test it in Webswing Test Tool.")
+	@ConfigFieldDefaultValueBoolean(false)
+	public boolean isTestMode();
 
 	@ConfigField(tab = ConfigGroup.Java, label = "Working Directory", description = "The User working directory. Path from which the application process will be started. (See the Java System Property: 'user.dir')")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("")
 	public String getUserDir();
 
-	@ConfigField(tab = ConfigGroup.Java, label = "JRE Executable", description = "Path to java executable that will be used to spawn application process. Java 6,7 and 8 is supported.")
+	@ConfigField(tab = ConfigGroup.Java, label = "JRE Executable", description = "Path to java executable that will be used to spawn application process. Java 8 and 11 are supported.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("${java.home}/bin/java")
 	public String getJreExecutable();
 
-	@ConfigField(tab = ConfigGroup.Java, label = "Java Version", description = "Java version of the JRE executable defined above. Expected values are starting with '1.6', '1.7' or '1.8'.")
+	@ConfigField(tab = ConfigGroup.Java, label = "Java Version", description = "Java version of the JRE executable defined above. Expected values are starting with '1.8' or '11'.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("${java.version}")
 	public String getJavaVersion();
@@ -190,9 +198,6 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueNumber(5)
 	public double getUploadMaxSize();
 
-	@ConfigField(tab = ConfigGroup.Features, label = "Domains Allowed to Embed", description = "If you are embedding webswing to page on different domain, you have to enable Cross-origin resource sharing (CORS) by adding the domain in this list. Use * to allow all domains.")
-	public List<String> getAllowedCorsOrigins();
-
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow JsLink", description = "If enabled, the JSLink feature will be enabled, allowing application to invoke javascript and vice versa. (See netscape.javascript.JSObject)")
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isAllowJsLink();
@@ -204,6 +209,12 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow Server Printing", description = "Enables native printing on devices configured on server's OS. If disabled a pdf is generated and sent to client browser.")
 	@ConfigFieldDefaultValueBoolean(false)
 	boolean isAllowServerPrinting();
+
+	@Deprecated
+	/*
+	*  Use SecuredPathConfig.getAllowedCorsOrigins instead.
+	*/
+	public List<String> getAllowedCorsOrigins();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Recordings Folder", description = "Folder to be used to store session recording files for this application. Session recording can be initiated in admin console or by user using ?recording=true url parameter.")
 	@ConfigFieldVariables(VariableSetName.SwingApp)

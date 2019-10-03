@@ -1,4 +1,4 @@
-define({
+export var msg= {
     root: {
         // LOGIN
         "login.title": "Sign in to your account",
@@ -51,6 +51,11 @@ define({
         "dialog.networkMonitor.offline":"No network connection.",
         "dialog.networkMonitor.hide":"Hide",
         "dialog.cookiesDisabledDialog": "Your browser does not allow cookies. Please enable cookies to continue.",
+        "dialog.touchSwitchMode.mouse": "Do you want to switch to mouse mode?",
+        "dialog.touchSwitchMode.touch": "Do you want to switch to touch mode?",
+        "dialog.touchSwitchMode.switchButton": "Switch",
+        "dialog.touchSwitchMode.cancelButton": "Hide",
+        
 
         //  SELECTOR
         "selector.welcome": "Welcome,",
@@ -68,6 +73,8 @@ define({
         "clipboard.more": "More...",
         "clipboard.discard": "Discard",
         "clipboard.cancel": "Cancel",
+        "clipboard.paste.title.touch": "Please paste content",
+        "clipboard.paste.message.touch": "Press and hold on the input below to paste from clipboard.",
 
         //  FILES
         "files.saveTitle": "Save file",
@@ -86,6 +93,24 @@ define({
         "files.deleteTtip": "Delete selected files",
         "files.cancel": "Cancel",
         "files.progress": "Progress:",
-        "files.progComplete": "Complete"
+        "files.progComplete": "Complete",
+        "files.downloadLink.link.title": "Open link",
+        "files.downloadLink.link.message": "Please click the button below to open link.",
+        "files.downloadLink.link.button": "Open",
+        "files.downloadLink.download.title": "Download file",
+        "files.downloadLink.download.message": "Please click the button below to download the file.",
+        "files.downloadLink.download.button": "Download",
+        "files.downloadLink.print.title": "Print",
+        "files.downloadLink.print.message": "Please click the button below to view the printed file.",
+        "files.downloadLink.print.button": "View",
+        
+        //  TOUCH
+        "touch.controlMode": "Control Mode",
+        "touch.desktopMode": "Desktop Mode",
+        "touch.copy": "Copy",
+        "touch.cut": "Cut",
+        "touch.paste": "Paste",
+        "touch.keyboard": "Keyboard",
+        "touch.fullscreen": "Fullscreen"
     }
-})
+}

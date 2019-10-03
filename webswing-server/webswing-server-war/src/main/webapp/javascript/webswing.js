@@ -1,11 +1,43 @@
-define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswing-socket', 'webswing-files', 'webswing-dialog',
-        'webswing-login', 'webswing-canvas', 'webswing-identity', 'webswing-jslink', 'webswing-clipboard', 'webswing-playback', 'webswing-input', 'webswing-touch', 'webswing-inject', 'webswing-translate','webswing-ping'],
-    function f($, util, polyfill, Base, Socket, Files, Dialog, Login, Canvas, Identity, JsLink, Clipboard, Playback, Input, Touch, Injector, Translate,Ping) {
+import Util from './webswing-util'
+import Base from './webswing-base'
+import Socket from './webswing-socket'
+import Files from './webswing-files'
+import Dialog from './webswing-dialog'
+import Login from './webswing-login'
+import Canvas from './webswing-canvas'
+import Identity from './webswing-identity'
+import JsLink from './webswing-jslink'
+import Clipboard from './webswing-clipboard'
+import Playback from './webswing-playback'
+import Input from './webswing-input'
+import Touch from './webswing-touch'
+import Injector from './webswing-inject'
+import Translate from './webswing-translate'
+import Ping from './webswing-ping'
+
+export default function Webswing(i18n) {
         "use strict";
 
+    var util = Util(i18n);
         var globalName = $('[data-webswing-global-var]');
         var global = {};
-        var typedArraysSupported = polyfill();
+        var typedArraysSupported = isArrayBufferSupported();
+        
+        if (!Element.prototype.matches) {
+        	// fix for IE matches selector
+        	Element.prototype.matches = Element.prototype.msMatchesSelector;
+        }
+        
+        if (!Element.prototype.closest) {
+        	Element.prototype.closest = function(s) {
+        		var el = this;
+        		do {
+        			if (el.matches(s)) return el;
+        			el = el.parentElement || el.parentNode;
+        		} while (el !== null && el.nodeType === 1);
+        		return null;
+        	};
+        }
 
         if (globalName != null && globalName.length !== 0) {
             var name = globalName.data('webswingGlobalVar');
@@ -57,16 +89,16 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
             var injector = new Injector();
             injector.module('webswing', new WebswingInstance(element));
             injector.module('dialog', new Dialog());
-            injector.module('canvas', new Canvas());
-            injector.module('base', new Base());
-            injector.module('input', new Input());
-            injector.module('touch', new Touch());
+        	injector.module('canvas', new Canvas(util));
+       		injector.module('base', new Base(util));
+        	injector.module('input', new Input(util));
+        	injector.module('touch', new Touch(util));
             injector.module('socket', new Socket());
-            injector.module('files', new Files());
-            injector.module('login', new Login());
-            injector.module('identity', new Identity());
+        	injector.module('files', new Files(util));
+        	injector.module('login', new Login(util));
+        	injector.module('identity', new Identity(util));
             injector.module('jslink', new JsLink());
-            injector.module('clipboard', new Clipboard());
+        	injector.module('clipboard', new Clipboard(util));
             injector.module('playback', new Playback());
             injector.module('translate', new Translate());
             injector.module('ping', new Ping());
@@ -77,7 +109,11 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 kill: 'base.kill',
                 setControl: 'webswing.setControl',
                 repaint: 'base.repaint',
-                uuid: 'socket.uuid'
+                uuid: 'socket.uuid',
+                requestComponentTree: 'base.requestComponentTree',
+                getWindows: 'base.getWindows',
+                getWindowById: 'base.getWindowById',
+                performAction: 'base.performAction'
             };
             injector.module('external', {
                 provides: externalObj,
@@ -143,7 +179,8 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
 
             function defaultCtxConfig() {
                 return {
-                    rootElement: setupRootElement(rootElement),
+                    rootElementWrapper: setupRootElement(rootElement),
+                    rootElement: setupRootElementContent(rootElement),
                     autoStart: false,
                     args: null,
                     connectionUrl: location.origin + location.pathname,
@@ -164,13 +201,30 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                     mirrorMode: false,
                     canPaint: false,
                     virtualKB: false,
+                    debugLog: false,
                     traceLog: false,
-                    touchMode: false                };
+                    touchMode: false,
+                    compositingWindowsListener: {
+                    	windowOpening: function(htmlOrCanvasWindow) {},
+                    	windowOpened: function(htmlOrCanvasWindow) {},
+                    	windowClosing: function(htmlOrCanvasWindow) {},
+                    	windowClosed: function(htmlOrCanvasWindow) {},
+                    	windowModalBlockedChanged: function(htmlOrCanvasWindow) {}
+                    }
+                };
             }
 
             function setupRootElement(rootElement) {
                 return rootElement.addClass('webswing-element');
-
+            }
+            
+            function setupRootElementContent(rootElement) {
+            	var detachedContent = rootElement.children().detach();
+            	var wrapper = $("<div class='webswing-element-content' />");
+            	rootElement.append(wrapper);
+            	wrapper.append(detachedContent);
+            	
+            	return wrapper;
             }
 
             function start() {
@@ -209,7 +263,7 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
 
             function configure(options, appletParams) {
                 var cfg = api.cfg;
-                options = options != null ? options : readOptions(cfg.rootElement);
+                options = options != null ? options : readOptions(cfg.rootElementWrapper);
                 if (options != null) {
                     cfg.autoStart = options.autoStart != null ? JSON.parse(options.autoStart) : cfg.autoStart;
                     cfg.securityToken = options.securityToken != null ? options.securityToken : cfg.securityToken;
@@ -232,10 +286,11 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                         api.showPlaybackControls();
                     }
                     cfg.onReady = typeof options.onReady === 'function' ? options.onReady : cfg.onReady;
+                    cfg.compositingWindowsListener = typeof options.compositingWindowsListener === 'object' ? options.compositingWindowsListener : cfg.compositingWindowsListener;
                 }else{
                     return $.extend(true, [], cfg);
                 }
-                appletParams = appletParams != null ? appletParams : readAppletParams(cfg.rootElement);
+                appletParams = appletParams != null ? appletParams : readAppletParams(cfg.rootElementWrapper);
                 if (appletParams != null) {
                     cfg.params = [];
                     for (var prop in appletParams) {
@@ -271,4 +326,11 @@ define(['jquery', 'webswing-util', 'webswing-polyfill', 'webswing-base', 'webswi
                 return result;
             }
         }
-    });
+
+	    function isArrayBufferSupported() {
+	        if ('ArrayBuffer' in window && ArrayBuffer.toString().indexOf("[native code]") !== -1) {
+	            return true;
+	        }
+	        return false;
+	    }
+}

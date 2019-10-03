@@ -123,20 +123,8 @@ public class WindowManager {
 			newWindow = true;
 		}
 
-		//if active window is in modal branch and requested window is not modalExclude type 
-		if (zorder.isInModalBranch(activeWindow) && !(w instanceof sun.awt.ModalExclude)) {
-			// if fullModal (not document_modal) branch
-			if (zorder.isInFullModalBranch(activeWindow)) {
-				//don't allow activation outside modal dialog ancestor's tree 
-				if (!(isModal(w) && newWindow) && !zorder.isInSameModalBranch(activeWindow, w)) {
-					return false;
-				}
-			} else {//if in document_modal branch
-				//don't allow activation in same window branch
-				if (zorder.isParent(w, activeWindow)) {
-					return false;
-				}
-			}
+		if (isBlockedByModality(w, newWindow)) {
+			return false;
 		}
 
 		//dont allow activation of disabled windows
@@ -159,6 +147,26 @@ public class WindowManager {
 		}
 		return success;
 
+	}
+	
+	public boolean isBlockedByModality(Window w, boolean newWindow) {
+		//if active window is in modal branch and requested window is not modalExclude type 
+		if (zorder.isInModalBranch(activeWindow) && !(w instanceof sun.awt.ModalExclude)) {
+			// if fullModal (not document_modal) branch
+			if (zorder.isInFullModalBranch(activeWindow)) {
+				//don't allow activation outside modal dialog ancestor's tree 
+				if (!(isModal(w) && newWindow) && !zorder.isInSameModalBranch(activeWindow, w)) {
+					return true;
+				}
+			} else {//if in document_modal branch
+				//don't allow activation in same window branch
+				if (zorder.isParent(w, activeWindow)) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 
 	public boolean deliverFocus(Component hwComponent, Component newFocusOwner, boolean tmp, FocusEventCause cause) {
@@ -197,9 +205,14 @@ public class WindowManager {
 	}
 
 	@SuppressWarnings("deprecation")
-	public Component getVisibleComponentOnPosition(int x, int y) {
+	public Component getVisibleComponentOnPosition(int x, int y, String winId) {
 		Component result = activeWindow;
-		Window positionWin = zorder.getVisibleWindowOnPosition(x, y);
+		Window positionWin;
+		if (winId != null && winId.length() > 0) {
+			positionWin = Util.findWindowById(winId);
+		} else {
+			positionWin = zorder.getVisibleWindowOnPosition(x, y);
+		}
 		if (positionWin != null) {
 			result = Util.getPeer(positionWin).getHwComponentAt(x, y);
 		}
@@ -208,6 +221,10 @@ public class WindowManager {
 
 	public Map<String, List<Rectangle>> extractNonVisibleAreas() {
 		return zorder.extractNonVisibleAreas();
+	}
+
+	public List<String> getZOrder() {
+		return zorder.getZOrder();
 	}
 
 	public void requestRepaintAfterMove(Window w, Rectangle originalPosition) {

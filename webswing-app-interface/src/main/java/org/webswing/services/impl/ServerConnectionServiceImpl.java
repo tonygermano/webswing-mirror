@@ -2,7 +2,6 @@ package org.webswing.services.impl;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.webswing.Constants;
 import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.model.MsgIn;
@@ -16,7 +15,9 @@ import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.toolkit.api.WebswingMessagingApi;
 import org.webswing.toolkit.api.WebswingUtil;
+import org.webswing.toolkit.api.lifecycle.ShutdownReason;
 import org.webswing.toolkit.jslink.WebJSObject;
+import org.webswing.toolkit.util.CpuMonitor;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
@@ -27,7 +28,6 @@ import javax.swing.SwingUtilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.lang.IllegalStateException;
 import java.lang.management.*;
 import java.net.URI;
@@ -36,7 +36,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Viktor_Meszaros This class is needed to achieve classpath isolation for swing application, all functionality dependent on external libs is implemented here.
@@ -52,8 +54,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private Session session;
 	private MessageProducer producer;
 	private MessageConsumer consumer;
-	private long lastMessageTimestamp = System.currentTimeMillis();
-	private long lastUserInputTimestamp = System.currentTimeMillis();
+	private AtomicLong lastMessageTimestamp = new AtomicLong(System.currentTimeMillis());
+	private AtomicLong lastUserInputTimestamp = new AtomicLong(System.currentTimeMillis());
 	private Runnable watchdog;
 	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing Shutdown scheduler"));
 	private ExecutorService jmsSender = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing JMS Sender"));
@@ -64,6 +66,12 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private MessageProducer mgsApiProducer;
 	private MessageConsumer mgsApiConsumer;
 
+	private Object delayedShutdownScheduleLock = new Object();
+	private ScheduledFuture<?> delayedShutdownFuture;
+	private Boolean schedulingShutdown;
+	private AtomicBoolean terminated = new AtomicBoolean(false);
+
+
 	public static ServerConnectionServiceImpl getInstance() {
 		if (impl == null) {
 			impl = new ServerConnectionServiceImpl();
@@ -72,12 +80,11 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	}
 
 	public ServerConnectionServiceImpl() {
-		messageApiSharedTopicName = System.getProperty(Constants.SWING_START_SYS_PROP_MSG_API_TOPIC,"");
+		messageApiSharedTopicName = System.getProperty(Constants.SWING_START_SYS_PROP_MSG_API_TOPIC, "");
 		connectionFactory = new ActiveMQConnectionFactory(System.getProperty(Constants.JMS_URL));
 		connectionFactory.setAlwaysSessionAsync(false);
 		connectionFactory.setTrustAllPackages(true);
 		watchdog = new Runnable() {
-			private boolean terminated = false;
 			boolean exitDumpCreated = false;
 			AtomicInteger pingEventDispatchThread = new AtomicInteger(0);
 
@@ -85,49 +92,58 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			public void run() {
 				try {
 					int timeoutSec = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300"));
+					synchronized (delayedShutdownScheduleLock) {
+						if ( delayedShutdownFuture!=null && !delayedShutdownFuture.isDone()) {
+							if (delayedShutdownFuture.getDelay(TimeUnit.SECONDS) % 60 == 0) {
+								Logger.warn("Application shutdown expected in " + delayedShutdownFuture.getDelay(TimeUnit.SECONDS) + " secongs");
+							}
+							timeoutSec = -1; //if shutdown is scheduled, we ignore the timeout setting
+						}
+					}
 
 					// IE halts js execution when filechooser is open and no heartbeat messages are sent causing timeout(see https://bitbucket.org/webswing/webswing-home/issues/18)
-					if(Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog() != null && WebswingUtil.getWebswingApi().getPrimaryUser()!=null){
+					if (timeoutSec >= 0 && Util.getWebToolkit().getPaintDispatcher() != null && Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog() != null && WebswingUtil.getWebswingApi().getPrimaryUser() != null) {
 						int minTimeoutSecIfFileChooserActive = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC_IF_FILECHOOSER_ACTIVE, "1800"));
 						timeoutSec = Math.max(timeoutSec, minTimeoutSecIfFileChooserActive);
 					}
 
 					boolean timeoutIfInactive = Boolean.getBoolean(Constants.SWING_SESSION_TIMEOUT_IF_INACTIVE) && timeoutSec > 0;
 					if (timeoutSec >= 0) {
-						long lastTstp = timeoutIfInactive ? lastUserInputTimestamp : lastMessageTimestamp + 10000;/*+10000 is to compensate for 10s js heartbeat interval*/
+						long lastTstp = timeoutIfInactive ? lastUserInputTimestamp.get() : lastMessageTimestamp.get() + 10000;/*+10000 is to compensate for 10s js heartbeat interval*/
 						long diff = System.currentTimeMillis() - lastTstp;
 						int timeoutMs = timeoutSec * 1000;
 						timeoutMs = Math.max(1000, timeoutMs);
 						if ((diff / 1000 > 10)) {
 							String msg = timeoutIfInactive ? "User" : "Session";
-							if ((diff / 1000) % 100 == 0) {
-								Logger.warn(msg + " inactive for " + diff / 1000 + " seconds." + (terminated ? "[waiting for application to stop]" : ""));
+							if ((diff / 1000) % 60 == 0) {
+								Logger.warn(msg + " inactive for " + diff / 1000 + " seconds." + (terminated.get() ? "[waiting for application to stop]" : ""));
 							}
-							if (!terminated && (timeoutMs - diff < 60000)) { //countdown message for the last 60 seconds
+							if (!terminated.get() && (timeoutMs - diff < 60000)) { //countdown message for the last 60 seconds
 								sendObject(SimpleEventMsgOut.sessionTimeoutWarning.buildMsgOut());
 							}
 							Integer waitForExit = Integer.getInteger(Constants.SWING_START_SYS_PROP_WAIT_FOR_EXIT, 30000);
-							if (terminated && !exitDumpCreated && diff > (timeoutMs + waitForExit - 5000)) {
+							if (terminated.get() && !exitDumpCreated && diff > (timeoutMs + waitForExit - 5000)) {
 								sendObject(getThreadDumpMsg("Before-Kill Thread Dump"));
 								Logger.warn("Application did not exit gracefully within " + waitForExit / 1000 + " seconds. Application will be forcefully terminated. Thread dump has been generated.");
+								exitDumpCreated=true;
 							}
 
-							if (terminated && diff > (timeoutMs + waitForExit + 10000)) {// if still alive 10 seconds after server should have killed this process
+							if (terminated.get() && diff > (timeoutMs + waitForExit + 10000)) {// if still alive 10 seconds after server should have killed this process
 								Logger.warn("Application has not been forcefully terminated by server. Exiting Manually.");
 								System.exit(1);
 							}
 						}
 
 						if (diff > timeoutMs) {
-							if (!terminated) {//only call once
-								terminated = true;
-								Logger.warn("Exiting application due to inactivity for " + diff / 1000 + " seconds.");
-								sendObject(SimpleEventMsgOut.sessionTimedOutNotification.buildMsgOut());
-								Util.getWebToolkit().exitSwing(1);
+							if (!terminated.get()) {//only call once
+								scheduleShutdown(ShutdownReason.Inactivity,() -> {
+									Logger.warn("Exiting application due to inactivity for " + diff / 1000 + " seconds.");
+									sendObject(SimpleEventMsgOut.sessionTimedOutNotification.buildMsgOut());
+								});
 							}
 						}
 					}
-					if (!terminated) {
+					if (!terminated.get()) {
 						sendObject(getStats(pingEventDispatchThread.get()));
 						if (pingEventDispatchThread.getAndIncrement() == 10) {//if value is not reset after 10 seconds - EDT is stuck
 							Logger.warn("Application is not responding for 10 seconds. Thread dump generated . ");
@@ -169,8 +185,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 				public void onMessage(Message message) {
 					try {
 						String msgtype = message.getStringProperty(WebswingMessagingApi.MSG_API_TYPE);
-						if(msgtype!=null && Util.getWebToolkit().messageApiHasListenerForClass(msgtype)){
-							Util.getWebToolkit().messageApiProcessMessage(((ObjectMessage)message).getObject());
+						if (msgtype != null && Util.getWebToolkit().messageApiHasListenerForClass(msgtype)) {
+							Util.getWebToolkit().messageApiProcessMessage(((ObjectMessage) message).getObject());
 						}
 					} catch (Exception e) {
 						Logger.error("Failed to process message", e);
@@ -217,6 +233,29 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		}
 	}
 
+	@Override
+	public void scheduleShutdown(ShutdownReason reason) {
+		scheduleShutdown(reason,()->{});
+	}
+
+	private void scheduleShutdown(ShutdownReason reason,Runnable shutdownlogic) {
+		synchronized (delayedShutdownScheduleLock) {
+			schedulingShutdown=true;
+			if (delayedShutdownFuture==null || delayedShutdownFuture.isDone()) {
+				int delaySeconds = Util.getWebToolkit().executeOnBeforeShutdownListeners(reason);
+				delayedShutdownFuture = exitScheduler.schedule(()->{
+					shutdownlogic.run();
+					terminated.set(true);
+					Util.getWebToolkit().exitSwing(0);
+				}, delaySeconds, TimeUnit.SECONDS);
+				Logger.info("(" + reason + ") Application Shutdown scheduled. (delayed by " + delayedShutdownFuture.getDelay(TimeUnit.SECONDS) + " seconds).");
+			} else {
+				Logger.info("(" + reason + ") Application Shutdown request ignored. Delayed shutdown already scheduled in " + delayedShutdownFuture.getDelay(TimeUnit.SECONDS) + " seconds.");
+			}
+			schedulingShutdown=false;
+		}
+	}
+
 	public synchronized void disconnect() {
 		try {
 			closeJMS();
@@ -238,8 +277,20 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 	@Override
 	public void resetInactivityTimers() {
-		lastMessageTimestamp = System.currentTimeMillis();
-		lastUserInputTimestamp = System.currentTimeMillis();
+		if(schedulingShutdown){
+			//if resetInactivityTimers called from onBeforeShutdown listener, we need to defer execution, because the shutdown timer is not yet created.
+			exitScheduler.schedule(()->resetInactivityTimers(),1, TimeUnit.MILLISECONDS);
+		}else{
+			lastMessageTimestamp.getAndSet(System.currentTimeMillis());
+			lastUserInputTimestamp.getAndSet(System.currentTimeMillis());
+			synchronized (delayedShutdownScheduleLock) {
+				if(delayedShutdownFuture!=null && !delayedShutdownFuture.isDone()){
+					Logger.warn("Cancelling Delayed Application Shutdown expected in " + delayedShutdownFuture.getDelay(TimeUnit.SECONDS) + " seconds.");
+					delayedShutdownFuture.cancel(false);
+				}
+			}
+		}
+
 	}
 
 	private void sendJmsMessage(final Serializable o) throws JMSException {
@@ -248,10 +299,10 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 				@Override
 				public Object call() throws Exception {
-					producer.send(session.createObjectMessage(o),DeliveryMode.NON_PERSISTENT,4,3000);
+					producer.send(session.createObjectMessage(o), DeliveryMode.NON_PERSISTENT, 4, 3000);
 					return null;
 				}
-			}).get(4,TimeUnit.SECONDS);
+			}).get(4, TimeUnit.SECONDS);
 		} catch (IllegalStateException e) {
 			Logger.warn("ServerConnectionService.sendJmsMessage: " + e.getMessage());
 		} catch (InterruptedException e) {
@@ -264,7 +315,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 				throw new JMSException(e.getMessage());
 			}
 		} catch (TimeoutException e) {
-			Logger.error("ServerConnectionService.sendJmsMessage: Sending frame timed out. (frame size:"+ CheckSerializedSize.getSerializedSize(o) +")", e);
+			Logger.error("ServerConnectionService.sendJmsMessage: Sending frame timed out. (frame size:" + CheckSerializedSize.getSerializedSize(o) + ")", e);
 		}
 	}
 
@@ -312,7 +363,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 	public void onMessage(Message msg) {
 		try {
-			lastMessageTimestamp = System.currentTimeMillis();
+			lastMessageTimestamp.getAndSet(System.currentTimeMillis());
 			if (msg instanceof ObjectMessage) {
 				ObjectMessage omsg = (ObjectMessage) msg;
 				try {
@@ -337,7 +388,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					}
 				} else if (omsg.getObject() instanceof MsgIn) {
 					if (omsg.getObject() instanceof UserInputMsgIn) {
-						lastUserInputTimestamp = System.currentTimeMillis();
+						lastUserInputTimestamp.getAndSet(System.currentTimeMillis());
 					}
 					if (Util.getWebToolkit().getEventDispatcher() != null) {//ignore events if WebToolkit is not ready yet
 						Util.getWebToolkit().getEventDispatcher().dispatchEvent((MsgIn) omsg.getObject());
@@ -367,36 +418,6 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		result.setCpuUsage(CpuMonitor.getCpuUtilization());
 		result.setEdtPingSeconds(edtPing);
 		return result;
-	}
-
-	private static class CpuMonitor {
-		static long previousCPUTime = 0;
-		static long previousTime = 0;
-
-		static {
-			getCpuUtilization();
-		}
-
-		static double getCpuUtilization() {
-			com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-			long currentCpuTime = operatingSystemMXBean.getProcessCpuTime();
-			
-			long now = ManagementFactory.getRuntimeMXBean().getUptime();
-			
-			long cpuTimeDelta = currentCpuTime - previousCPUTime;
-			previousCPUTime = currentCpuTime;
-			
-			long timeDelta = now - previousTime;
-			previousTime = now;
-			
-			int processors = Runtime.getRuntime().availableProcessors();
-			if (timeDelta == 0 || processors == 0) {
-				return 0;
-			}
-			double cpuUsage = (double) TimeUnit.NANOSECONDS.toMillis(cpuTimeDelta) / (double) timeDelta;
-			cpuUsage = cpuUsage / processors;
-			return Math.max(0, cpuUsage) * 100;
-		}
 	}
 
 	private ThreadDumpMsgInternal getThreadDumpMsg(String reason) {

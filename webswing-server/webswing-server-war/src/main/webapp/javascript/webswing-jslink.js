@@ -1,6 +1,4 @@
-define([], function amdFactory() {
-
-    return function JsLinkModule() {
+    export default function JsLink() {
         var module = this;
         var api;
         module.injects = api = {
@@ -167,5 +165,4 @@ define([], function amdFactory() {
                 }
             }
         }
-    };
-});
+    }

@@ -54,6 +54,11 @@
 	        @include dropshadow-3;
 	        border-color: $white;
 	    }
+	    
+	    a {
+	    	color: $primary-text;
+	    	outline: none;
+	    }
 	}
 	
     &-btn-thumb {

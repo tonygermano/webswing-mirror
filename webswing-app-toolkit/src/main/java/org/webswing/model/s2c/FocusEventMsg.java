@@ -6,11 +6,13 @@ public class FocusEventMsg implements MsgOut{
 	public enum FocusEventType {
 		focusLost,
 		focusGained,
-		focusWithCarretGained;
+		focusWithCarretGained,
+		focusPasswordGained;
 	}
 
 	FocusEventType type;
-	int x, y, w, h, caretX, caretY;
+	int x, y, w, h, caretX, caretY, caretH;
+	boolean editable;
 
 	public FocusEventType getType() {
 		return type;
@@ -67,4 +69,21 @@ public class FocusEventMsg implements MsgOut{
 	public void setCaretY(int caretY) {
 		this.caretY = caretY;
 	}
+
+	public int getCaretH() {
+		return caretH;
+	}
+
+	public void setCaretH(int caretH) {
+		this.caretH = caretH;
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setEditable(boolean editable) {
+		this.editable = editable;
+	}
+	
 }

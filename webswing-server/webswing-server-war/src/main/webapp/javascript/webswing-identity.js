@@ -1,6 +1,5 @@
-define(['webswing-util'], function amdFactory(util) {
     "use strict";
-    return function JsLinkModule() {
+    export default function JsLink(util) {
         var module = this;
         module.provides = {
             get: get,
@@ -23,5 +22,4 @@ define(['webswing-util'], function amdFactory(util) {
             util.eraseCookie(cookieName);
         }
 
-    };
-});
+    }

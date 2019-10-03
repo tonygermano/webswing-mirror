@@ -15,6 +15,7 @@ import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.LoginTokenAdapter;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.util.SecurityUtil;
 
 public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler {
 	private static final Logger log = LoggerFactory.getLogger(LoginHandlerImpl.class);
@@ -31,7 +32,7 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 	@Override
 	public boolean serve(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		try {
-			if("OPTIONS".equals(req.getMethod())){
+			if ("OPTIONS".equals(req.getMethod())) {
 				return true;//cors preflight, don't forward to security module
 			}
 			login(req, res);
@@ -53,6 +54,7 @@ public class LoginHandlerImpl extends AbstractUrlHandler implements LoginHandler
 				AbstractWebswingUser resolvedUser = getSecurityProvider().get().doLogin(req, resp);
 				if (resolvedUser != null) {
 					subject.login(new LoginTokenAdapter(getSecuredPath(), resolvedUser));
+					subject.getSession().setAttribute(SecurityUtil.CLIENT_IP_SESSION_ATTR, SecurityUtil.getClientIp(req));
 				}
 			} catch (Exception ux) {
 				log.error("Unexpected authentication error.", ux);

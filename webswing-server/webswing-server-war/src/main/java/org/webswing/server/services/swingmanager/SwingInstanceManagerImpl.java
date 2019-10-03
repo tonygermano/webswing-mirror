@@ -2,7 +2,6 @@ package org.webswing.server.services.swingmanager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.Constants;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;

@@ -1,7 +1,8 @@
-define(['jquery', 'text!templates/dialog.html', 'text!templates/network.html',], function amdFactory($, html, networkHtml) {
-    "use strict";
+import html from "./templates/dialog.html"
+import networkHtml  from './templates/network.html'
+"use strict";
 
-    return function DialogModule() {
+    export default function Dialog() {
         var module = this;
         var api;
         module.injects = api = {
@@ -12,7 +13,8 @@ define(['jquery', 'text!templates/dialog.html', 'text!templates/network.html',],
             reTrySession: 'webswing.reTrySession',
             logout: 'login.logout',
             translate: 'translate.translate',
-            mutePingWarning: 'ping.mutePingWarning'
+            mutePingWarning: 'ping.mutePingWarning',
+            switchMode: 'touch.switchMode'
         };
         module.provides = {
             show: show,
@@ -96,6 +98,38 @@ define(['jquery', 'text!templates/dialog.html', 'text!templates/network.html',],
                 networkSlowWarningDialog: {
                     content: '<span class="ws-message--warning"><span class="ws-icon-warn"></span>${dialog.networkMonitor.warn}</span>',
                     severity: 1
+                },
+                touchSwitchModeMouseDialog: {
+                	content: '<p><span class="ws-message--neutral">${dialog.touchSwitchMode.mouse}</span> <span class="ws-right"><a href="javascript:void(0)" data-id="barHide">${dialog.touchSwitchMode.cancelButton}</a></span></p>',
+                	buttons: [{
+                		label: '${dialog.touchSwitchMode.switchButton}',
+                		action: function() {
+                			hideBar();
+                			api.switchMode(true, false);
+                		}
+                	}],
+                	events: {
+                        'barHide_click': function() {
+                			hideBar();
+                			api.switchMode(false, true);
+                		}
+                    }
+                },
+                touchSwitchModeTouchDialog: {
+                	content: '<p><span class="ws-message--neutral">${dialog.touchSwitchMode.touch}</span> <span class="ws-right"><a href="javascript:void(0)" data-id="barHide">${dialog.touchSwitchMode.cancelButton}</a></span></p>',
+                	buttons: [{
+                		label: '${dialog.touchSwitchMode.switchButton}',
+                		action: function() {
+                			hideBar();
+                			api.switchMode(true, false);
+                		}
+                	}],
+                	events: {
+                        'barHide_click': function() {
+                			hideBar();
+                			api.switchMode(false, true);
+                		}
+                    }
                 }
             };
         }
@@ -269,5 +303,4 @@ define(['jquery', 'text!templates/dialog.html', 'text!templates/network.html',],
                 networkBar = null;
             }
         }
-    };
-});
+    }

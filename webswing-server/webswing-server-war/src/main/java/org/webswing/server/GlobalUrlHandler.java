@@ -2,7 +2,7 @@ package org.webswing.server;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -150,9 +150,9 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHa
 		log.info("Loading master security module.(" + getConfig().getSecurity() + ").");
 		WebswingSecurityConfig secConfig = super.getSecurityConfig();
 		if (BuiltInModules.INHERITED.name().equals(secConfig.getModule())) {
-			log.error("Master security module INHERITED is not valid. Falling back to default module PROPERTY_FILE.");
+			log.error("Master security module INHERITED is not valid. Falling back to default module EMBEDDED.");
 			SecuredPathConfig newconfig = getConfig();
-			newconfig.getSecurity().put("module", BuiltInModules.PROPERTY_FILE.name());
+			newconfig.getSecurity().put("module", BuiltInModules.EMBEDDED.name());
 			secConfig = newconfig.getValueAs("security", WebswingSecurityConfig.class);
 		}
 		return secConfig;

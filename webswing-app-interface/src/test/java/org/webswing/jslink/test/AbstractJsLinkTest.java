@@ -3,7 +3,11 @@ package org.webswing.jslink.test;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -15,6 +19,7 @@ import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.services.impl.JsLinkServiceImpl;
+import org.webswing.toolkit.api.lifecycle.ShutdownReason;
 import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.Services;
 
@@ -78,14 +83,20 @@ public abstract class AbstractJsLinkTest {
 			public void messageApiPublish(Serializable o) throws IOException {
 
 			}
+
+			@Override
+			public void scheduleShutdown(ShutdownReason admin) {
+
+			}
+
 		};
 		Services.initialize(null, null, serverServiceImpl, null, null, jsLinkServiceImpl);
 
 		engine.eval("var define =function(array,f){ this['JsLink']=f()}");
 		engine.eval("self=this; this.setTimeout=function(f,t){f()}");
-		engine.eval(new FileReader("../webswing-server/webswing-server-war/src/main/webapp/javascript/es6promise.js"));
+		engine.eval(new FileReader("src/test/resources/es6promise.js"));
 		engine.eval("ES6Promise.polyfill()");
-		engine.eval(new FileReader("../webswing-server/webswing-server-war/src/main/webapp/javascript/webswing-jslink.js"));
+		engine.eval(read("../webswing-server/webswing-server-war/src/main/webapp/javascript/webswing-jslink.js").replaceFirst("export default ",""));
 		engine.put("sendJava", this);
 		engine.eval("var result=null;var window={test:'test'};");
 		engine.eval("var cfg={javaCallTimeout:0}");
@@ -111,4 +122,17 @@ public abstract class AbstractJsLinkTest {
 		}
 	}
 
+	private static String read(String filePath)
+	{
+		StringBuilder contentBuilder = new StringBuilder();
+		try (Stream<String> stream = Files.lines( Paths.get(filePath), StandardCharsets.UTF_8))
+		{
+			stream.forEach(s -> contentBuilder.append(s).append("\n"));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		return contentBuilder.toString();
+	}
 }

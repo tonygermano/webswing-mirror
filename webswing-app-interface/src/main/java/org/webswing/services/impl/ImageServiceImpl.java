@@ -108,7 +108,7 @@ public class ImageServiceImpl implements ImageService {
 					implclass = ImageServiceImpl.class.getClassLoader().loadClass(WindowDecoratorTheme.DECORATION_THEME_IMPL_DEFAULT);
 				} catch (ClassNotFoundException e1) {
 					Logger.fatal("ImageService: Fatal error:Default decoration theme not found.");
-					Util.getWebToolkit().exitSwing(1);
+					System.exit(1);
 				}
 			}
 			if (WindowDecoratorTheme.class.isAssignableFrom(implclass)) {
@@ -116,11 +116,11 @@ public class ImageServiceImpl implements ImageService {
 					this.windowDecorationTheme = (WindowDecoratorTheme) implclass.newInstance();
 				} catch (Exception e) {
 					Logger.fatal("ImageService: exception when creating instance of " + implclass.getCanonicalName(), e);
-					Util.getWebToolkit().exitSwing(1);
+					System.exit(1);
 				}
 			} else {
 				Logger.fatal("ImageService: Fatal error: Decoration theme not instance of WindowDecoratorThemeIfc:" + implclass.getCanonicalName());
-				Util.getWebToolkit().exitSwing(1);
+				System.exit(1);
 			}
 		}
 		return windowDecorationTheme;

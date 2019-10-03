@@ -1,4 +1,8 @@
 webswing-server/webswing-server-war/src/main/java/org/webswing/server/model/proto/Webswing.java text eol=lf
 webswing-directdraw/webswing-directdraw-swing/src/main/java/org/webswing/directdraw/proto/Directdraw.java text eol=lf
+webswing-directdraw/webswing-directdraw-javascript/src/main/webapp/proto/dd.d.ts text eol=lf
+webswing-directdraw/webswing-directdraw-javascript/src/main/webapp/proto/dd.js text eol=lf
+webswing-server/webswing-server-war/src/main/webapp/javascript/proto/proto.d.ts text eol=lf
+webswing-server/webswing-server-war/src/main/webapp/javascript/proto/proto.js text eol=lf
 webswing-server/webswing-server-war/src/main/webapp/css/style.css text eol=lf
 webswing-server/webswing-server-war/src/main/webapp/css/style.css.map text eol=lf

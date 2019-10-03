@@ -12,6 +12,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.webswing.toolkit.util.GitRepositoryState;
 import org.webswing.toolkit.util.Logger;
 
 public class ConfigurationImpl extends Configuration {
@@ -33,6 +34,8 @@ public class ConfigurationImpl extends Configuration {
 
     private String configFile;
 
+    private String contextPath="/";
+
     public static Configuration parse(String[] args) {
         ConfigurationImpl cimpl = (ConfigurationImpl) Configuration.getInstance();
         // create the command line parser
@@ -42,6 +45,7 @@ public class ConfigurationImpl extends Configuration {
         Options options = new Options();
         options.addOption("h", "host", true, "Local interface address where the web server will listen. (localhost)");
         options.addOption("p", "port", true, "Http port where the web server will listen. If 0 http is disabled. (8080)");
+        options.addOption("ctx", "contextpath", true, "Context path where Webswing is deployed.(/)");
 
         options.addOption("s", "sslport", true, "Https port where the web server will listen. If 0 http is disabled. (0)");
         options.addOption("ts", "truststore", true, "Truststore file location for ssl configuration ");
@@ -74,6 +78,11 @@ public class ConfigurationImpl extends Configuration {
                 String value = line.getOptionValue('p');
                 cimpl.setHttp(value.equals("0") ? false : true);
                 cimpl.setHttpPort(value);
+            }
+
+            if (line.getOptionValue("ctx") != null) {
+                String value = line.getOptionValue("ctx");
+                cimpl.setContextPath(value);
             }
 
             if (line.getOptionValue('s') != null) {
@@ -212,6 +221,15 @@ public class ConfigurationImpl extends Configuration {
         return configFile;
     }
 
+    @Override
+    public String getContextPath() {
+        return contextPath;
+    }
+
+    public void setContextPath(String contextPath) {
+        this.contextPath = contextPath;
+    }
+
     public void setConfigFile(String configFile) {
         this.configFile = configFile;
     }
@@ -219,7 +237,7 @@ public class ConfigurationImpl extends Configuration {
     @Override
     public String toString() {
         return "########################Server Configuration ################################\n" + " host=" + host + "\n http=" + http + "\n httpPort=" + httpPort + "\n https=" + https + "\n httpsPort=" + httpsPort + "\n truststore=" + truststore + "\n truststorePassword=***" + "\n keystore=" + keystore + "\n keystorePassword=***"
-                + "\n configFile=" + configFile + "\n########################Server Configuration End#############################\n";
+                + "\n configFile=" + configFile + "\n contextPath=" + contextPath + "\n version=" + GitRepositoryState.getInstance().getDescribe() +  "\n########################Server Configuration End#############################\n";
     }
 
     /**

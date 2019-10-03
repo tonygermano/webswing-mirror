@@ -4,11 +4,11 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.webswing.Constants;
 import org.webswing.server.common.model.Config;
 import org.webswing.server.common.model.meta.ConfigField;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
@@ -28,19 +28,19 @@ import org.webswing.server.services.security.api.WebswingSecurityConfig.Webswing
 import org.webswing.toolkit.util.ClasspathUtil;
 
 @ConfigType(metadataGenerator = WebswingSecurityMetadataGenerator.class)
-@ConfigFieldOrder({ "module", "classPath", "config", "authorizationConfig" })
-public interface WebswingSecurityConfig extends Config{
-
-	@ConfigField(label = "Security Module Name", description = "Select one of built-in modules or enter full class name of custom security module (has to implement org.webswing.server.services.security.api.WebswingSecurityModule interface). Note the class and its dependencies has to be on classpath defined below.")
-	@ConfigFieldPresets(enumClass = BuiltInModules.class)
-	@ConfigFieldDefaultValueString("INHERITED")
-	@ConfigFieldDiscriminator
-	public String getModule();
+@ConfigFieldOrder({ "classPath", "module", "config", "authorizationConfig" })
+public interface WebswingSecurityConfig extends Config {
 
 	@ConfigField(label = "Security Module Class Path", description = "Additional classpath for built-in Security module or for defining custom security module. ")
 	@ConfigFieldVariables(VariableSetName.SwingApp)
 	@ConfigFieldDiscriminator
 	public List<String> getClassPath();
+
+	@ConfigField(label = "Security Module Name", description = "Select one of built-in modules or enter full class name of custom security module (has to implement org.webswing.server.services.security.api.WebswingSecurityModule interface). Note the class and its dependencies has to be on classpath defined above.")
+	@ConfigFieldPresets(enumClass = BuiltInModules.class)
+	@ConfigFieldDefaultValueString("INHERITED")
+	@ConfigFieldDiscriminator
+	public String getModule();
 
 	@ConfigField(label = "Security Module Config", description = "Security module specific configuration.")
 	@ConfigFieldEditorType(editor = EditorType.Object)
@@ -82,6 +82,32 @@ public interface WebswingSecurityConfig extends Config{
 		}
 
 		@Override
+		protected String[] getPresets(WebswingSecurityConfig config, ClassLoader cl, String propertyName, Method readMethod) {
+			if (propertyName.equals("classPath")) {
+				try {
+					String securityRootString = "${" + Constants.ROOT_DIR_PATH + "}/security/";
+					File securityRoot = new File(getContext().replaceVariables("${" + Constants.ROOT_DIR_PATH + "}/security"));
+					if (securityRoot.exists() && securityRoot.isDirectory()) {
+						return Arrays.stream(securityRoot.list()).map(f -> securityRootString + f + "/*").toArray(String[]::new);
+					} else {
+						return new String[] {};
+					}
+				} catch (Exception e) {
+					//do nothing
+				}
+			} else if (propertyName.equals("module")) {
+				ArrayList<String> discovered = new ArrayList<>();
+				ServiceLoader<WebswingSecurityModuleProvider> loader = ServiceLoader.load(WebswingSecurityModuleProvider.class, cl);
+				for (Iterator<WebswingSecurityModuleProvider> i = loader.iterator(); i.hasNext(); ) {
+					discovered.addAll(i.next().getSecurityModuleClassNames());
+				}
+				Stream<String> builtin = Arrays.stream(super.getPresets(config, cl, propertyName, readMethod)).filter(sm -> !(isRootPath() && sm.equals(BuiltInModules.INHERITED.name())));
+				return Stream.concat(builtin, discovered.stream()).toArray(String[]::new);
+			}
+			return super.getPresets(config, cl, propertyName, readMethod);
+		}
+
+		@Override
 		public Class<?> getExplicitType(WebswingSecurityConfig config, ClassLoader cl, String propertyName, Method readMethod, Object value) throws ClassNotFoundException {
 			if (propertyName.equals("config")) {
 				String securityModuleClassName = BuiltInModules.getSecurityModuleClassName(config.getModule());
@@ -104,12 +130,20 @@ public interface WebswingSecurityConfig extends Config{
 		@Override
 		protected LinkedHashSet<String> getPropertyNames(WebswingSecurityConfig config, ClassLoader cl) throws Exception {
 			LinkedHashSet<String> names = super.getPropertyNames(config, cl);
-			if (parent instanceof Config) {
-				if ("/".equals(((Config) parent).asMap().get("path"))) {
-					names.remove("authorizationConfig");
-				}
+			if (isRootPath()) {
+				names.remove("authorizationConfig");
 			}
 			return names;
+		}
+
+		private boolean isRootPath() {
+			if (parent instanceof Config) {
+				Object path = ((Config) parent).asMap().get("path");
+				if ("/".equals(path) || "".equals(path)) {
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

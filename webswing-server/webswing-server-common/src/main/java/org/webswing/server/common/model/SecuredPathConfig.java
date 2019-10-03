@@ -1,12 +1,11 @@
 package org.webswing.server.common.model;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.webswing.server.common.model.meta.*;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
-@ConfigFieldOrder({ "enabled", "path", "homeDir", "webFolder", "langFolder", "icon", "security", "swingConfig" })
+@ConfigFieldOrder({ "enabled", "path", "homeDir", "webFolder","restrictedResources", "langFolder", "icon", "security", "allowedCorsOrigins", "swingConfig" })
 public interface SecuredPathConfig extends Config {
 
 	@ConfigField(label = "Enabled", description = "If true, application will be started automatically, when server starts.")
@@ -27,12 +26,17 @@ public interface SecuredPathConfig extends Config {
 	@ConfigFieldDefaultValueString("")
 	public String getWebFolder();
 
+	@ConfigField(label = "Restricted Resources", description = "Defined Path-prefix restricts access to resources only to authenticated users. Applies to static resources inside 'Web Folder' or packaged with Webswing.")
+	@ConfigFieldVariables(VariableSetName.SwingApp)
+	@ConfigFieldDefaultValueObject(ArrayList.class)
+	public List<String> getRestrictedResources();
+
 	@ConfigField(label = "Localization Folder", description = "Folder to be used to store customized messages and translations in supported languages. English is available by default.")
 	@ConfigFieldVariables(VariableSetName.SwingApp)
 	@ConfigFieldDefaultValueString("")
 	public String getLangFolder();
 
-	@ConfigField(label = "Icon", description = "Path to icon displayed in application selection dialog.")
+	@ConfigField(label = "Icon", description = "Path to icon displayed in application selection dialog. Recommended size 256x256.")
 	@ConfigFieldVariables(VariableSetName.SwingApp)
 	public String getIcon();
 
@@ -41,6 +45,19 @@ public interface SecuredPathConfig extends Config {
 	@ConfigFieldDefaultValueObject(HashMap.class)
 	public Map<String, Object> getSecurity();
 
+	@ConfigField(label = "CORS Origins", description = "If you are embedding webswing to page on different domain, you have to enable Cross-origin resource sharing (CORS) by adding the domain in this list. Use * to allow all domains.")
+	@ConfigFieldDefaultValueGenerator("defaultFromOldProperty")
+	public List<String> getAllowedCorsOrigins();
+
 	@ConfigField(label = "Application")
+	@ConfigFieldDefaultValueObject
 	SwingConfig getSwingConfig();
+
+	public static  List<String> defaultFromOldProperty(SecuredPathConfig config) {
+		return config.getSwingConfig()!=null? config.getSwingConfig().getAllowedCorsOrigins(): Collections.emptyList();
+	}
+
 }
+
+
+

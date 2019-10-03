@@ -65,6 +65,10 @@ public class CommonUtil {
 			return null;
 		}
 		name = subs.replace(name);
+		File relativeToHomeInConfigProfile = new File(Main.getConfigProfileDir(), homeDir + File.separator + name).getAbsoluteFile();
+		if (relativeToHomeInConfigProfile.exists()) {
+			return relativeToHomeInConfigProfile;
+		}
 		File relativeToHomeInRoot = new File(Main.getRootDir(), homeDir + File.separator + name).getAbsoluteFile();
 		if (relativeToHomeInRoot.exists()) {
 			return relativeToHomeInRoot;

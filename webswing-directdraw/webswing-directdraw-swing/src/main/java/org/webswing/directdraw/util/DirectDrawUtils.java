@@ -1,10 +1,6 @@
 package org.webswing.directdraw.util;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -57,7 +53,7 @@ public class DirectDrawUtils {
 
 	/**
 	 * there is a bug in the jdk 1.6 which makes Font.getAttributes() not work correctly. The method does not return all values. What we dow here is using the old JDK 1.5 method.
-	 * 
+	 *
 	 * @param font font
 	 *
 	 * @return Attributes of font
@@ -110,6 +106,94 @@ public class DirectDrawUtils {
 		BufferedImage result = new BufferedImage(cm, raster, isAlphaPremultiplied, properties);
 		img.copyData(raster);
 		return result;
+	}
+
+	public static int findFirstVisibleIndex(String s, double x, double y, Shape clip, FontMetrics fm) {
+		if (clip == null) {
+			return 0;
+		}
+		int idx = 0;
+		int idxMin = 0;
+		int idxMax = s.length();
+		while (true) {
+			VisibilityHints hints = getVisibilityHintsForIndex(idx, s, x, y, clip, fm);
+			if (hints.leftVisible) {
+				idxMax = idx - 1;
+			} else {
+				if (hints.indexVisible) {
+					return idx;
+				} else {
+					if(hints.rightVisible){
+						idxMin = idx + 1;
+					}else{
+						return s.length();//invalid option
+					}
+				}
+			}
+			idx = idxMin + (idxMax - idxMin) / 2;
+		}
+	}
+
+	public static int findLastVisibleIndex(int firstIndex, String s, double x, double y, Shape clip, FontMetrics fm) {
+		if (clip == null || firstIndex == s.length()) {
+			return s.length();
+		}
+		int idx = s.length();
+		int idxMin = firstIndex;
+		int idxMax = s.length();
+
+		while (true) {
+			VisibilityHints hints = getVisibilityHintsForIndex(idx, s, x, y, clip, fm);
+			if (hints.rightVisible) {
+					idxMin = idx + 1;
+			} else {
+				if (hints.indexVisible) {
+					return Math.min(idx+1,s.length());
+				} else {
+					if(hints.leftVisible){
+						idxMax = idx - 1;
+					}else{
+						return s.length();//invalid option
+					}
+				}
+			}
+			idx = idxMin + (idxMax - idxMin) / 2;
+		}
+	}
+
+	private static VisibilityHints getVisibilityHintsForIndex(int index, String s, double x, double y, Shape clip, FontMetrics fm) {
+		VisibilityHints result = new VisibilityHints();
+		y = y - fm.getAscent();
+		double h = fm.getDescent() + fm.getAscent();
+
+		String txtL = s.substring(0, index);
+		String txtI = s.substring(index, Math.min(index + 1, s.length()));
+		String txtR = s.substring(Math.min(index + 1, s.length()));
+
+		double wL = (fm.stringWidth(txtL));
+		double xL = x;
+		if (clip.contains(xL, y, wL, h) || clip.intersects(xL, y, wL, h)) {
+			result.leftVisible = true;
+		}
+
+		double wI = fm.stringWidth(txtI);
+		double xI = xL + wL;
+		if (clip.contains(xI, y, wI, h) || clip.intersects(xI, y, wI, h)) {
+			result.indexVisible = true;
+		}
+
+		double wR = fm.stringWidth(txtR);
+		double xR = xI + wI;
+		if (clip.contains(xR, y, wR, h) || clip.intersects(xR, y, wR, h)) {
+			result.rightVisible = true;
+		}
+		return result;
+	}
+
+	static class VisibilityHints {
+		public boolean leftVisible;
+		public boolean rightVisible;
+		public boolean indexVisible;
 	}
 
 	private static class GraphicsStatus {

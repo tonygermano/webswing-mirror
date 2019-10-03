@@ -9,8 +9,7 @@ import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.webswing.Constants;
-import org.webswing.server.util.ServerUtil;
-
+import org.webswing.server.util.SecurityUtil;
 import javax.servlet.http.HttpServletRequest;
 
 public class WebswingWebSessionManager extends DefaultWebSessionManager {
@@ -31,7 +30,7 @@ public class WebswingWebSessionManager extends DefaultWebSessionManager {
 		if(Boolean.getBoolean(Constants.LINK_COOKIE_TO_IP) && key instanceof WebSessionKey){
 			WebSessionKey webkey= (WebSessionKey) key;
 			if(webkey.getServletRequest() instanceof HttpServletRequest){
-				String currentIp = ServerUtil.getClientIp((HttpServletRequest) webkey.getServletRequest());
+				String currentIp = SecurityUtil.getClientIp((HttpServletRequest) webkey.getServletRequest());
 				String sessionIp = session.getHost();
 				if(!StringUtils.equals(currentIp,sessionIp)){
 					InvalidSessionException ise = new InvalidSessionException("IP address does not match Session host.");

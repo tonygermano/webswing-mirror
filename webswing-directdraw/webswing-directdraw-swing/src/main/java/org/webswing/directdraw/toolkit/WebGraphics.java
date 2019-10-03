@@ -149,6 +149,9 @@ public class WebGraphics extends AbstractVectorGraphics {
 
 	@Override
 	protected void writeString(String string, double x, double y) {
+		if(string.trim().length()==0){
+			return;
+		}
 		Font font = getFont();
 		if (thisImage.getContext().requestFont(font)) {
 			thisImage.addInstruction(this, dif.drawString(string, x, y, getClip(), getFontMetrics()));

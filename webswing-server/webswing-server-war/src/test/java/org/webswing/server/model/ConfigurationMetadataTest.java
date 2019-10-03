@@ -3,7 +3,9 @@ package org.webswing.server.model;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,21 +17,11 @@ import org.webswing.server.common.model.Config;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.model.SwingConfig.SessionMode;
-import org.webswing.server.common.model.meta.ConfigContext;
-import org.webswing.server.common.model.meta.ConfigField;
-import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
-import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
-import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
-import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
-import org.webswing.server.common.model.meta.ConfigFieldEditorType;
-import org.webswing.server.common.model.meta.ConfigFieldOrder;
+import org.webswing.server.common.model.meta.*;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
-import org.webswing.server.common.model.meta.MetaField;
-import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.common.util.WebswingObjectMapper;
 import org.webswing.server.services.security.api.BuiltInModules;
-import org.webswing.server.services.security.extension.onetimeurl.OtpAccessConfig;
 
 @SuppressWarnings("unchecked")
 public class ConfigurationMetadataTest {
@@ -70,7 +62,6 @@ public class ConfigurationMetadataTest {
 		assertTrue(configMetadata.getFields().get(1).getName().equals("path"));
 		assertTrue(configMetadata.getFields().get(2).getName().equals("homeDir"));
 		assertTrue(configMetadata.getFields().get(3).getName().equals("webFolder"));
-		assertTrue(configMetadata.getFields().get(6).getName().equals("security"));
 
 	}
 
@@ -106,8 +97,8 @@ public class ConfigurationMetadataTest {
 
 	@Test
 	public void testDefaultValueGenerator() throws Exception {
-		OtpAccessConfig c = ConfigUtil.instantiateConfig(null, OtpAccessConfig.class);
-		assertTrue(c.getSecret() != null);
+		TestDefaultConfig c = ConfigUtil.instantiateConfig(null, TestDefaultConfig.class);
+		assertTrue(c.getGeneratedString().equals(c.getString()+TestDefaultConfig.GENERATED_STRING) );
 	}
 
 	@Test
@@ -161,6 +152,8 @@ public class ConfigurationMetadataTest {
 
 	@ConfigFieldOrder({ "table", "string" })
 	public static interface TestDefaultConfig extends Config {
+		String GENERATED_STRING = "generated string";
+
 		@ConfigField
 		@ConfigFieldEditorType(editor = EditorType.ObjectListAsTable)
 		@ConfigFieldDefaultValueObject(ArrayList.class)
@@ -211,6 +204,13 @@ public class ConfigurationMetadataTest {
 
 		Object getObjectNull();
 
+		@ConfigField
+		@ConfigFieldDefaultValueGenerator("generateString")
+		String getGeneratedString();
+
+		public static String generateString(TestDefaultConfig config) {
+			return config.getString()+GENERATED_STRING;
+		}
 	}
 
 	@ConfigFieldOrder({ "object", "string" })

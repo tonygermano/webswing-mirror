@@ -1,12 +1,11 @@
 package org.webswing.server.services.stats;
 
-import java.lang.management.ManagementFactory;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.stats.logger.DefaultStatisticsLogger;
+import org.webswing.toolkit.util.CpuMonitor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -52,34 +51,4 @@ public class StatisticsLoggerServiceImpl implements StatisticsLoggerService{
 		return serverLogger;
 	}
 	
-	private static class CpuMonitor {
-		static long previousCPUTime = 0;
-		static long previousTime = 0;
-
-		static {
-			getCpuUtilization();
-		}
-
-		static double getCpuUtilization() {
-			com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-			long currentCpuTime = operatingSystemMXBean.getProcessCpuTime();
-			
-			long now = ManagementFactory.getRuntimeMXBean().getUptime();
-			
-			long cpuTimeDelta = currentCpuTime - previousCPUTime;
-			previousCPUTime = currentCpuTime;
-			
-			long timeDelta = now - previousTime;
-			previousTime = now;
-			
-			int processors = Runtime.getRuntime().availableProcessors();
-			if (timeDelta == 0 || processors == 0) {
-				return 0;
-			}
-			double cpuUsage = (double) TimeUnit.NANOSECONDS.toMillis(cpuTimeDelta) / (double) timeDelta;
-			cpuUsage = cpuUsage / processors;
-			return Math.max(0, cpuUsage) * 100;
-		}
-	}
-
 }

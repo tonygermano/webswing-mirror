@@ -62,23 +62,31 @@ public class WindowEventHandler {
 					if (wat.equals(WindowActionType.maximize)) {
 						Window w = (Window) e.getSource();
 						Rectangle o = w.getBounds();
-						Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
-						if (o.x == 0 && o.y == 0 && o.width == size.width && o.height == size.height && previousSize.containsKey(w)) {
-							// restore previous size
-							o = previousSize.get(w);
-							moveWindow(w, o.x, o.y);
-							resizeWindow(w, o.width, o.height);
-							if (w instanceof JFrame) {
-								((JFrame) w).setExtendedState(JFrame.NORMAL);
+						
+						if (w instanceof JFrame) {
+							JFrame frame = (JFrame) w;
+							if (frame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+								frame.setExtendedState(JFrame.NORMAL);
+								o = previousSize.get(w);
+								moveWindow(w, o.x, o.y);
+								resizeWindow(w, o.width, o.height);
+							} else {
+								frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+								// bounds are handled by WebFramePeer.setState
 							}
 						} else {
-							if (w instanceof JFrame) {
-								((JFrame) w).setExtendedState(JFrame.MAXIMIZED_BOTH);
+							Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+							if (o.x == 0 && o.y == 0 && o.width == size.width && o.height == size.height && previousSize.containsKey(w)) {
+								// restore previous size
+								o = previousSize.get(w);
+								moveWindow(w, o.x, o.y);
+								resizeWindow(w, o.width, o.height);
 							} else {
 								moveWindow(w, 0, 0);
 								resizeWindow(w, size.width, size.height);
 							}
 						}
+						
 						previousSize.put(w, o);
 					}
 					lockedOnEvent = false;

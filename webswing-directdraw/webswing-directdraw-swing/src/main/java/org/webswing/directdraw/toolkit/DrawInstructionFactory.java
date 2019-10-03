@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.*;
 import org.webswing.directdraw.proto.Directdraw.DrawInstructionProto.InstructionProto;
+import org.webswing.directdraw.util.DirectDrawUtils;
 import org.webswing.directdraw.util.XorModeComposite;
 
 public class DrawInstructionFactory {
@@ -52,18 +53,22 @@ public class DrawInstructionFactory {
 	}
 
 	public DrawInstruction drawString(String s, double x, double y, Shape clip, FontMetrics fm) {
-		int[] widths = new int[s.length()+2];
+		int firstIndex= DirectDrawUtils.findFirstVisibleIndex(s, x, y, clip,fm);
+		int lastIndex = DirectDrawUtils.findLastVisibleIndex(firstIndex,s, x, y, clip,fm);
+		int offset = fm.stringWidth(s.substring(0,firstIndex));
+		String visibleString = s.substring(firstIndex,lastIndex);
+		int[] widths = new int[visibleString.length()+2];
 		int tmpwidth=0;
 		String tmp ="";
-		widths[0]=(int)x;
+		widths[0]=(int)x+offset;
 		widths[1]=(int)y;
-		for (int i = 0 ;i<s.length();i++){
-			tmp+=s.charAt(i);
+		for (int i = 0 ;i<visibleString.length();i++){
+			tmp+=visibleString.charAt(i);
 			int nextTmpWidth = fm.stringWidth(tmp);
 			widths[i+2]=nextTmpWidth-tmpwidth;
 			tmpwidth=nextTmpWidth;
 		}
-		return new DrawInstruction(InstructionProto.DRAW_STRING, new StringConst(ctx, s), new PointsConst(ctx, widths), toPathConst(clip));
+		return new DrawInstruction(InstructionProto.DRAW_STRING, new StringConst(ctx, visibleString), new PointsConst(ctx, widths), toPathConst(clip));
 	}
 
 	public DrawInstruction drawGlyphList(String string, Font font, double x, double y, AffineTransform transform, Shape clip) {

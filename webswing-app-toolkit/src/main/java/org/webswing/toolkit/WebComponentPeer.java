@@ -154,6 +154,7 @@ abstract public class WebComponentPeer implements ComponentPeer {
 	private Color background;
 	private Color foreground;
 	private Font font;
+	protected float opacity;
 
 	public static WebComponentPeer getPeerForTarget(Object paramObject) {
 		WebComponentPeer localWObjectPeer = (WebComponentPeer) WebToolkit.targetToPeer(paramObject);

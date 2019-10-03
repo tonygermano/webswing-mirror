@@ -1,7 +1,7 @@
-define([ 'jquery', 'text!templates/playback.html' ], function amdFactory($, html) {
-    "use strict";
+import html from './templates/playback.html'
+"use strict";
 
-    return function PlaybackModule() {
+    export default function Playback() {
         var module = this;
         var api;
         module.injects = api = {
@@ -34,9 +34,11 @@ define([ 'jquery', 'text!templates/playback.html' ], function amdFactory($, html
             api.cfg.rootElement.append(html);
             playbackBar = api.cfg.rootElement.find('div[data-id="playbackBar"]');
             playbackBar.find('button[data-id="reset"]').on('click', function(e) {
+            	var ctx=api.getCanvas().getContext("2d");
+            	ctx.clearRect(0, 0, api.getCanvas().width, api.getCanvas().height);
+            	$("canvas.webswing-canvas:not([data-id=canvas])").remove();
+            	
                 sendCommand('reset');
-                var ctx=api.getCanvas().getContext("2d");
-                ctx.clearRect(0, 0, api.getCanvas().width, api.getCanvas().height);
             });
             playbackBar.find('button[data-id="play"]').on('click', function(e) {
                 sendCommand('play');
@@ -64,5 +66,4 @@ define([ 'jquery', 'text!templates/playback.html' ], function amdFactory($, html
             });
         }
 
-    };
-});
+    }

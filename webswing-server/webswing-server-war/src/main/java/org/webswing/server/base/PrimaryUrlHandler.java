@@ -1,7 +1,7 @@
 package org.webswing.server.base;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.xml.security.utils.Base64;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -190,21 +190,21 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	private void handleCorsHeaders(HttpServletRequest req, HttpServletResponse res) throws WsException {
 		if (isOriginAllowed(req.getHeader("Origin"))) {
 			if (req.getHeader("Origin") != null) {
-				res.addHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
-				res.addHeader("Access-Control-Allow-Credentials", "true");
-				res.addHeader("Access-Control-Expose-Headers", Constants.HTTP_ATTR_ARGS + ", " + Constants.HTTP_ATTR_RECORDING_FLAG + ", X-Cache-Date, X-Atmosphere-tracking-id, X-Requested-With");
+				res.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
+				res.setHeader("Access-Control-Allow-Credentials", "true");
+				res.setHeader("Access-Control-Expose-Headers", Constants.HTTP_ATTR_ARGS + ", " + Constants.HTTP_ATTR_RECORDING_FLAG + ", X-Cache-Date, X-Atmosphere-tracking-id, X-Requested-With");
 			}
 
 			if ("OPTIONS".equals(req.getMethod())) {
-				res.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-				res.addHeader("Access-Control-Allow-Headers", Constants.HTTP_ATTR_ARGS + ", " + Constants.HTTP_ATTR_RECORDING_FLAG + ", X-Requested-With, Origin, Content-Type, Content-Range, Content-Disposition, Content-Description, X-Atmosphere-Framework, X-Cache-Date, X-Atmosphere-tracking-id, X-Atmosphere-Transport");
-				res.addHeader("Access-Control-Max-Age", "-1");
+				res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST, DELETE");
+				res.setHeader("Access-Control-Allow-Headers", Constants.HTTP_ATTR_ARGS + ", " + Constants.HTTP_ATTR_RECORDING_FLAG + ", X-Requested-With, Origin, Content-Type, Content-Range, Content-Disposition, Content-Description, X-Atmosphere-Framework, X-Cache-Date, X-Atmosphere-tracking-id, X-Atmosphere-Transport");
+				res.setHeader("Access-Control-Max-Age", "-1");
 			}
 		}
 	}
 
 	public boolean isOriginAllowed(String header) {
-		List<String> allowedCorsOrigins = getSwingConfig().getAllowedCorsOrigins();
+		List<String> allowedCorsOrigins = getConfig().getAllowedCorsOrigins();
 		if (allowedCorsOrigins == null || allowedCorsOrigins.size() == 0) {
 			return false;
 		}
@@ -295,7 +295,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 			SecureRandom random = new SecureRandom();
 			byte[] values = new byte[32];
 			random.nextBytes(values);
-			token = Base64.encode(values);
+			token = Base64.encodeBase64String(values);
 			setToSecuritySession(Constants.HTTP_ATTR_CSRF_TOKEN_HEADER, token);
 		}
 		return token;

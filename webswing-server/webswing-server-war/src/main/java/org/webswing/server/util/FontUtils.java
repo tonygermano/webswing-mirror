@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.webswing.Constants;
 import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.util.VariableSubstitutor;

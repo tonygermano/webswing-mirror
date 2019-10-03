@@ -20,7 +20,7 @@ public class WebSocketUserInfo {
 		this.userId = conn.getUserId();
 		this.customArgs = ServerUtil.getCustomArgs(conn.getRequest());
 		this.debugPort = ServerUtil.getDebugPort(conn.getRequest());
-		this.userIp = ServerUtil.getClientIp(conn);
+		this.userIp = conn.getRemoteAddr();
 		this.userOs = ServerUtil.getClientOs(conn);
 		this.userBrowser = ServerUtil.getClientBrowser(conn);
 		this.logoutHandle = SecurityUtil.getLogoutHandle(conn);

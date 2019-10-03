@@ -21,6 +21,10 @@ message AppFrameMsgOutProto {
     optional string startTimestamp = 16;
     optional string sendTimestamp = 17;
     optional FocusEventMsgProto focusEvent = 18;
+    repeated ComponentTreeMsgProto componentTree = 19;
+    optional bool directDraw = 20;
+    optional ActionEventMsgOutProto actionEvent = 21;
+    optional bool compositingWM = 22;
 }
 
 message FocusEventMsgProto {
@@ -31,11 +35,14 @@ message FocusEventMsgProto {
     optional uint32 h = 5;
     optional sint32 caretX = 6;
     optional sint32 caretY = 7;
+    optional sint32 caretH = 8;
+    optional bool editable = 9;
 
     enum FocusEventTypeProto {
         focusLost = 1;
         focusGained = 2;
         focusWithCarretGained = 3;
+        focusPasswordGained = 4;
     }
 }
 
@@ -113,6 +120,11 @@ message WindowMsgProto {
     optional sint32 posY = 6;
     optional uint32 width = 7;
     optional uint32 height = 8;
+    optional string name = 9;
+    optional bool html = 10;
+    optional bool modalBlocked = 11;
+    optional string ownerId = 12;
+    optional uint32 state = 13;
 }
 
 message WindowPartialContentMsgProto {
@@ -203,6 +215,8 @@ message InputEventsFrameMsgInProto {
     optional JavaEvalRequestMsgInProto javaRequest = 7;
     optional PlaybackCommandMsgInProto playback = 8;
     optional PixelsAreaResponseMsgInProto pixelsResponse = 9;
+    optional WindowEventMsgInProto window = 10;
+    optional ActionEventMsgInProto action = 11;
 }
 
 message InputEventMsgInProto {
@@ -270,6 +284,7 @@ message MouseEventMsgInProto {
     optional bool meta = 9;
     optional sint32 buttons = 10;
     optional sint32 timeMilis = 11;
+    optional string winId = 12;
 
     enum MouseEventTypeProto {
         mousemove = 0;
@@ -309,6 +324,7 @@ message SimpleEventMsgInProto {
         deleteFile = 5;
         hb = 6;
         cancelFileSelection = 7;
+        requestComponentTree = 8;
     }
 }
 
@@ -346,3 +362,46 @@ message PixelsAreaResponseMsgInProto {
     optional string pixels = 2;
 }
 
+message ComponentTreeMsgProto {
+	optional string componentType = 1;
+	optional string name = 2;
+	optional string value = 3;
+	optional sint32 screenX = 4;
+	optional sint32 screenY = 5;
+	optional sint32 width = 6;
+	optional sint32 height = 7;
+	optional bool enabled = 8;
+	optional bool visible = 9;
+	repeated ComponentTreeMsgProto components = 10;
+	optional bool hidden = 11;
+	optional bool selected = 12;
+}
+
+message WindowEventMsgInProto {
+	optional string id = 1;
+	optional sint32 x = 2;
+	optional sint32 y = 3;
+	optional sint32 width = 4;
+	optional sint32 height = 5;
+	optional bool close = 6;
+}
+
+message ActionEventMsgInProto {
+	optional string actionName = 1;
+	optional string data = 2;
+	optional bytes binaryData = 3;
+	optional string windowId = 4;
+	optional ActionEventTypeProto eventType = 5;
+
+    enum ActionEventTypeProto {
+    	init = 0;
+    	user = 1;
+    }
+}
+
+message ActionEventMsgOutProto {
+	optional string actionName = 1;
+	optional string data = 2;
+	optional bytes binaryData = 3;
+	optional string windowId = 4;
+}

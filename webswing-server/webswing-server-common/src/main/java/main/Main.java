@@ -1,36 +1,43 @@
 package main;
 
 import java.awt.Toolkit;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.ProtectionDomain;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.webswing.Constants;
 import org.webswing.toolkit.WebToolkit;
-import org.webswing.toolkit.util.Logger;
+
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import static java.nio.file.StandardWatchEventKinds.*;
 
 public class Main {
 
+	private static ClassLoader defaultCL;
+
 	@SuppressWarnings("restriction")
 	public static void main(String[] args) {
+		boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
+
 		try {
 			initializeDefaultSystemProperties();
 
-			boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
 			System.setProperty(Constants.CREATE_NEW_TEMP, getCreateNewTemp(args));
 			System.setProperty(Constants.CLEAN_TEMP, getBoolParam(args, "-tc", true));
 
@@ -38,34 +45,34 @@ public class Main {
 			URL location = domain.getCodeSource().getLocation();
 			System.setProperty(Constants.WAR_FILE_LOCATION, location.toExternalForm());
 
-		List<URL> urls = new ArrayList<URL>();
-		if (client) {
-			populateClasspathFromDir("WEB-INF/swing-lib", urls);
-			initializeExtLibServices(urls);
-			retainOnlyLauncherUrl(urls);
-		} else {
-			initTempDirPath(args);
-			populateClasspathFromDir("WEB-INF/server-lib", urls);
-		}
-		ClassLoader defaultCL = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
-		Thread.currentThread().setContextClassLoader(defaultCL);
-		Class<?> mainClass;
-		if (client) {
-			mainClass = defaultCL.loadClass("org.webswing.SwingMain");
-		} else {
-			try {
-				mainClass = defaultCL.loadClass("org.webswing.ServerMain");
-			} catch (ClassNotFoundException e) {
-				InputStream readme = Main.class.getClassLoader().getResourceAsStream("WEB-INF/server-lib/README.txt");
-				if (readme != null) {
-					Scanner s = new Scanner(readme).useDelimiter("\\A");
-					String result = s.hasNext() ? s.next() : "";
-					throw new Exception(result, e);
-				} else {
-					throw new Exception("Unexpected error.", e);
+			List<URL> urls = new ArrayList<URL>();
+			if (client) {
+				populateClasspathFromDir("WEB-INF/swing-lib", urls);
+				initializeExtLibServices(urls);
+				retainOnlyLauncherUrl(urls);
+			} else {
+				initTempDirPath(args);
+				populateClasspathFromDir("WEB-INF/server-lib", urls);
+			}
+			defaultCL = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
+			Thread.currentThread().setContextClassLoader(defaultCL);
+			Class<?> mainClass;
+			if (client) {
+				mainClass = defaultCL.loadClass("org.webswing.SwingMain");
+			} else {
+				try {
+					mainClass = defaultCL.loadClass("org.webswing.ServerMain");
+				} catch (ClassNotFoundException e) {
+					InputStream readme = Main.class.getClassLoader().getResourceAsStream("WEB-INF/server-lib/README.txt");
+					if (readme != null) {
+						Scanner s = new Scanner(readme).useDelimiter("\\A");
+						String result = s.hasNext() ? s.next() : "";
+						throw new Exception(result, e);
+					} else {
+						throw new Exception("Unexpected error.", e);
+					}
 				}
 			}
-		}
 
 			Method method = mainClass.getMethod("main", args.getClass());
 			method.setAccessible(true);
@@ -76,7 +83,8 @@ public class Main {
 				// disabled access checks
 			}
 		} catch (Exception e) {
-			Logger.fatal("Uncaught exception.",e);
+			System.err.println("Uncaught exception.");
+			e.printStackTrace();
 			System.exit(1);
 		}
 	}
@@ -286,6 +294,33 @@ public class Main {
 		}
 	}
 
+	public static File getConfigProfileDir() {
+		if (System.getProperty(Constants.CONFIG_PATH) == null) {
+			System.setProperty(Constants.CONFIG_PATH, getRootDir().getAbsolutePath());
+			return getRootDir();
+		} else {
+			try {
+				String configProfile = System.getProperty(Constants.CONFIG_PATH);
+				File relative = new File(getRootDir(), configProfile);
+				if (relative.exists()) {
+					return relative;
+				} else {
+					File absolute = new File(configProfile);
+					if (absolute.exists()) {
+						return absolute;
+					} else {
+						throw new IOException("Failed to resolve configuration profile path for '" + configProfile + "'");
+					}
+				}
+			} catch (IOException e) {
+				System.out.println("Ignoring Config profile setting due to following exception:");
+				e.printStackTrace();
+				System.setProperty(Constants.CONFIG_PATH, getRootDir().getAbsolutePath());
+				return getRootDir();
+			}
+		}
+	}
+
 	private static boolean delete(File f) {
 		if (f.isDirectory()) {
 			for (File fx : f.listFiles()) {
@@ -307,5 +342,9 @@ public class Main {
 			}
 		}
 		System.setProperty(Constants.TEMP_DIR_PATH_BASE, "tmp");
+	}
+
+	public static ClassLoader getDefaultCL() {
+		return defaultCL;
 	}
 }

@@ -11,7 +11,6 @@ import org.webswing.directdraw.util.DirectDrawUtils;
 import org.webswing.directdraw.util.DrawConstantPool;
 
 public class DirectDraw {
-	private static final int DRAW_CONSTANTS_POOL_CACHE_CAPACITY = 8192;
 
 	private DirectDrawServicesAdapter services = new DirectDrawServicesAdapter();
 	private DrawInstructionFactory instructionFactory = new DrawInstructionFactory(this);
@@ -28,7 +27,7 @@ public class DirectDraw {
 	}
 
 	public void resetConstantCache() {
-		constantPool = new DrawConstantPool(DRAW_CONSTANTS_POOL_CACHE_CAPACITY);
+		constantPool = new DrawConstantPool();
 	}
 
 	public DrawConstantPool getConstantPool() {

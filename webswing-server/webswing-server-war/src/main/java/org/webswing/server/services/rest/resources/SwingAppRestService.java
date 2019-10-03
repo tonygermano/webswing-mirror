@@ -21,12 +21,14 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang.StringUtils;
-import org.webswing.Constants;
+import org.apache.commons.lang3.StringUtils;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
+import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.admin.ApplicationInfo;
 import org.webswing.server.common.model.admin.BasicApplicationInfo;
+import org.webswing.server.common.model.admin.Manifest;
+import org.webswing.server.common.model.admin.Manifest.IconDef;
 import org.webswing.server.common.model.admin.Sessions;
 import org.webswing.server.common.model.admin.SwingSession;
 import org.webswing.server.common.model.rest.LogResponse;
@@ -114,7 +116,9 @@ public class SwingAppRestService extends BaseRestService {
 	@Path("/appicon")
 	@Produces("image/png")
 	public Response appicon() throws WsException {
-		getHandler().checkPermissionLocalOrMaster(WebswingAction.websocket_connect);
+		// must be accessible without login for manifest.json
+//		getHandler().checkPermissionLocalOrMaster(WebswingAction.websocket_connect);
+
 		CacheControl cc = new CacheControl();
 		cc.setMaxAge(60*60);
 		cc.setPrivate(true);
@@ -289,6 +293,28 @@ public class SwingAppRestService extends BaseRestService {
 		return LoggerStatisticsUtil.mergeSummaryInstanceStats(allStats);
 	}
 	
+	@GET
+	@Path("/manifest.json")
+	@Produces("application/json")
+	public Manifest manifest() throws WsException {
+		// must be accessible without login
+		SecuredPathConfig config = handler.getConfig();
+
+		String color = "#FFFFFF";
+
+		Manifest manifest = new Manifest();
+		manifest.setName(config.getSwingConfig().getName());
+		manifest.setShort_name(manifest.getName());
+		manifest.setIcon(new IconDef(getHandler().getFullPathMapping() + "/appicon", "256x256")); // this is just a hardcoded value, not real size
+		manifest.setStart_url(getHandler().getFullPathMapping());
+		manifest.setScope(getHandler().getFullPathMapping());
+		manifest.setBackground_color(color);
+		manifest.setDisplay("fullscreen");
+		manifest.setTheme_color(color);
+
+		return manifest;
+	}
+
 	@Override
 	protected PrimaryUrlHandler getHandler() {
 		return handler;

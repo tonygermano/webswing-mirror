@@ -59,6 +59,10 @@ public class WebSocketConnection {
 		}
 	}
 
+	public String getRemoteAddr(){
+		return SecurityUtil.getRemoteAddr(this);
+	}
+
 	public void logoutUser(){
 		SecurityUtil.logoutUser(this);
 	}

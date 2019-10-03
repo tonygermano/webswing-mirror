@@ -6,11 +6,7 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.swing.SwingUtilities;
 
@@ -27,6 +23,8 @@ public class WindowHierarchyTree {
 	private LinkedList<WindowHierarchyNode> alwaysOnTopZOrder = new LinkedList<WindowHierarchyNode>();
 	private LinkedList<WindowHierarchyNode> regularZOrder = new LinkedList<WindowHierarchyNode>();
 	private LinkedList<WindowHierarchyNode> zOrder = new LinkedList<WindowHierarchyNode>();
+
+	private ArrayDeque<Window> modalsStack = new ArrayDeque<>();
 
 	protected void bringToFront(Window w) {
 		if (w != null && !w.isEnabled()) {
@@ -56,6 +54,9 @@ public class WindowHierarchyTree {
 	protected void addWindow(Window window) {
 		if (!lookup.containsKey(window)) {
 			WindowHierarchyNode parentNode = lookup.get(window.getParent());
+			if((window instanceof Dialog) && ((Dialog) window).isModal()){
+				modalsStack.push(window);
+			}
 			if (window.getParent() == null || parentNode == null) {
 				//window without parent
 				WindowHierarchyNode thisNode = new WindowHierarchyNode(window);
@@ -80,6 +81,7 @@ public class WindowHierarchyTree {
 		if (lookup.containsKey(window)) {
 			WindowHierarchyNode node = lookup.get(window);
 			int index = zOrder.indexOf(node);
+			modalsStack.remove(window);
 			Window successor = findSuccessor(window);
 			lookup.remove(window);
 			WindowHierarchyNode parent = node.getParent();
@@ -109,6 +111,9 @@ public class WindowHierarchyTree {
 
 	private Window findSuccessor(Window window) {
 		WindowHierarchyNode node = lookup.get(window);
+		if (modalsStack.size()>0){
+			return modalsStack.peek();
+		}
 		if (node.getParent() != null) {
 			return node.getParent().getW();
 		} else {
@@ -256,6 +261,15 @@ public class WindowHierarchyTree {
 			}
 		}
 		return result;
+	}
+	
+	public List<String> getZOrder() {
+		List<String> zorder = new ArrayList<>();
+		for (int i = 0; i < zOrder.size(); i++) {
+			String id = ((WebWindowPeer) WebToolkit.targetToPeer(zOrder.get(i).getW())).getGuid();
+			zorder.add(id);
+		}
+		return zorder;
 	}
 
 	public void requestRepaintAfterMove(Window w, Rectangle originalPosition) {

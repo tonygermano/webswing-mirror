@@ -8,26 +8,31 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Insets;
 import java.awt.geom.AffineTransform;
 import java.awt.print.PageFormat;
+import java.awt.print.Pageable;
 import java.awt.print.Paper;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.DecimalFormat;
 
+import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.MediaSizeName;
+import javax.print.attribute.standard.PageRanges;
 
 import org.freehep.graphicsbase.util.UserProperties;
 import org.freehep.graphicsio.PageConstants;
 import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.webswing.ext.services.PdfService;
-import org.webswing.toolkit.WebPrinterJob;
 import org.webswing.toolkit.WebPrinterJobWrapper;
+import org.webswing.toolkit.util.DummyGraphics2D;
 import org.webswing.toolkit.util.Util;
 
 public class PdfServiceImpl implements PdfService {
 
 	private static PdfServiceImpl impl;
+	private static Graphics2D dummyG = new DummyGraphics2D();
 
 	public static PdfServiceImpl getInstance() {
 		if (impl == null) {
@@ -35,9 +40,40 @@ public class PdfServiceImpl implements PdfService {
 		}
 		return impl;
 	}
-
+	
 	@Override
-	public Graphics2D createPDFGraphics(OutputStream out, PageFormat format) {
+	public void printToPDF(OutputStream out, Pageable pageable, Printable printable, PrintRequestAttributeSet attribs) throws PrinterException, IOException {
+		PageFormat pageFormat = WebPrinterJobWrapper.toPageFormat(attribs);
+		Graphics2D resultPdf = createPDFGraphics(out, pageFormat);
+		
+		if (printable != null) {
+			int i = 0;
+			while (paintPdf(resultPdf, pageFormat, attribs, printable, i++) != Printable.NO_SUCH_PAGE) {
+			}
+		} else if (pageable != null) {
+			int no = pageable.getNumberOfPages();
+			for (int i = 0; i < no; i++) {
+				PageFormat pageablePageFormat = pageable.getPageFormat(i);
+				paintPdf(resultPdf, pageablePageFormat != null ? pageablePageFormat : pageFormat, attribs, pageable.getPrintable(i), i);
+			}
+		}
+		closePDFGraphics(resultPdf);
+	}
+
+	private int paintPdf(Graphics2D resultPdf, PageFormat pageFormat, PrintRequestAttributeSet attribs, Printable printable, int i) throws PrinterException {
+		if (isInRange(i, attribs)) {
+			if (printable != null && printable.print(dummyG, pageFormat, i) != Printable.NO_SUCH_PAGE) {
+				startPagePDFGraphics(resultPdf, pageFormat);
+				int result = printable.print(resultPdf, pageFormat, i);
+				endPagePDFGraphics(resultPdf);
+				return result;
+			}
+			return Printable.NO_SUCH_PAGE;
+		}
+		return printable.print(dummyG, pageFormat, i);
+	}
+	
+	private Graphics2D createPDFGraphics(OutputStream out, PageFormat format) {
 		UserProperties props = createPdfProperties(format);
 		PDFGraphics2D graphics = new WebPdfGraphics2D(out, getPageDimension(props));
 		graphics.setProperties(props);
@@ -46,8 +82,7 @@ public class PdfServiceImpl implements PdfService {
 		return graphics;
 	}
 
-	@Override
-	public void startPagePDFGraphics(Graphics2D pdfGrapthics, PageFormat format) {
+	private void startPagePDFGraphics(Graphics2D pdfGrapthics, PageFormat format) {
 		try {
 			PDFGraphics2D g = (PDFGraphics2D) pdfGrapthics;
 			UserProperties props = createPdfProperties(format);
@@ -58,6 +93,20 @@ public class PdfServiceImpl implements PdfService {
 			((PDFGraphics2D) pdfGrapthics).endExport();
 			throw new RuntimeException(e);
 		}
+	}
+	
+	private void endPagePDFGraphics(Graphics2D pdfGrapthics) {
+		try {
+			((PDFGraphics2D) pdfGrapthics).setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
+			((PDFGraphics2D) pdfGrapthics).closePage();
+		} catch (IOException e) {
+			((PDFGraphics2D) pdfGrapthics).endExport();
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void closePDFGraphics(Graphics2D pdfGrapthics) {
+		((PDFGraphics2D) pdfGrapthics).endExport();
 	}
 
 	private Dimension getPageDimension(UserProperties props) {
@@ -105,22 +154,18 @@ public class PdfServiceImpl implements PdfService {
 		}
 	}
 
-	@Override
-	public void endPagePDFGraphics(Graphics2D pdfGrapthics) {
-		try {
-			((PDFGraphics2D) pdfGrapthics).setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
-			((PDFGraphics2D) pdfGrapthics).closePage();
-		} catch (IOException e) {
-			((PDFGraphics2D) pdfGrapthics).endExport();
-			throw new RuntimeException(e);
+	private boolean isInRange(int i, PrintRequestAttributeSet attribs) {
+		PageRanges range = null;
+		if ((range = (PageRanges) attribs.get(PageRanges.class)) != null) {
+			if (range.contains(i + 1)) {
+				return true;
+			} else {
+				return false;
+			}
 		}
+		return true;
 	}
-
-	@Override
-	public void closePDFGraphics(Graphics2D pdfGrapthics) {
-		((PDFGraphics2D) pdfGrapthics).endExport();
-	}
-
+	
 	public static class WebPdfGraphics2D extends PDFGraphics2D {
 		public WebPdfGraphics2D(File file, Dimension size) throws FileNotFoundException {
 			super(file, size);

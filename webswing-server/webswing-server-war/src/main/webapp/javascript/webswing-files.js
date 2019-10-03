@@ -1,9 +1,11 @@
-define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jquery.fileupload'], function amdFactory($, html) {
-    "use strict";
+import htmlTemplate from './templates/upload.html'
+import 'blueimp-file-upload'
+"use strict";
 
-    return function FilesModule() {
+    export default function Files(util) {
         var module = this;
         var api;
+        var html;
         module.injects = api = {
             cfg: 'webswing.config',
             socketId: 'socket.uuid',
@@ -15,10 +17,11 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             close: close,
             download: download,
             link: link,
-            print: print
+            print: print,
+            redirect: redirect
         };
         module.ready = function () {
-            html = api.translate(html);
+            html = api.translate(htmlTemplate);
         };
 
         var jqXHR_fileupload = [];
@@ -32,6 +35,7 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
         var dropZone, fileUpload, uploadProgressBar, uploadProgress, cancelBtn, uploadBtn, fileInput;
         var autoUploadBar, autoFileupload, autoFileInput, cancelAutoUploadButton, autoUploadfileDialogTransferBarClientId;
         var autoSaveBar, autoSaveInput, cancelAutoSaveButton, autoSaveButton;
+        var linkDialog;
 
         function process(event) {
             if (event.eventType === 'AutoUpload') {
@@ -145,6 +149,8 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             autoSaveButton = autoSaveBar.find('button[data-id="autoSaveButton"]');
             cancelAutoSaveButton = autoSaveBar.find('button[data-id="cancelAutoSaveButton"]');
 
+            linkDialog = api.cfg.rootElement.find('div[data-id="downloadLinkDialog"]');
+
             // hide all
             uploadProgressBar.hide();
             autoUploadBar.hide();
@@ -153,6 +159,8 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
             autoSaveBar.detach();
             uploadBar.hide();
             uploadBar.detach();
+            linkDialog.hide();
+            linkDialog.detach();
 
             var autoJqUpload = autoFileupload.fileupload({
                 xhrFields: {
@@ -363,23 +371,92 @@ define(['jquery', 'text!templates/upload.html', 'jquery.iframe-transport', 'jque
         }
 
         function download(url) {
-            var hiddenIFrameID = 'hiddenDownloader'+url, iframe = document.getElementById(hiddenIFrameID);
-            if(iframe!=null){
-                iframe.parentNode.removeChild(iframe);
-            }
-            iframe = document.createElement('iframe');
-            iframe.id = hiddenIFrameID;
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-            iframe.src = api.cfg.connectionUrl + url;
+        	if (util.isIOS()) {
+        		var msg = {
+            		"title": "${files.downloadLink.download.title}",
+        			"message": "${files.downloadLink.download.message}",
+        			"buttonMessage": "${files.downloadLink.download.button}"
+        		};
+        		displayDownloadLinkDialog(msg, url);
+        	} else {
+        		var hiddenIFrameID = 'hiddenDownloader'+url, iframe = document.getElementById(hiddenIFrameID);
+        		if(iframe!=null){
+        			iframe.parentNode.removeChild(iframe);
+        		}
+        		iframe = document.createElement('iframe');
+        		iframe.id = hiddenIFrameID;
+        		iframe.style.display = 'none';
+        		document.body.appendChild(iframe);
+        		iframe.src = api.cfg.connectionUrl + url;
+        	}
         }
 
         function link(url) {
-            window.open(url, '_blank');
+        	if (util.isIOS()) {
+        		var msg = {
+            		"title": "${files.downloadLink.link.title}",
+        			"message": "${files.downloadLink.link.message}",
+        			"buttonMessage": "${files.downloadLink.link.button}"
+        		};
+        		displayDownloadLinkDialog(msg, url);
+        	} else {
+        		window.open(url, '_blank');
+        	}
         }
 
         function print(url) {
-            window.open(api.cfg.connectionUrl + 'print/viewer.html?file=' + encodeURIComponent(api.cfg.connectionUrl + url), '_blank');
+        	var finalUrl = api.cfg.connectionUrl + 'print/viewer.html?file=' + encodeURIComponent(api.cfg.connectionUrl + url);
+
+        	if (util.isIOS()) {
+        		var msg = {
+        			"title": "${files.downloadLink.print.title}",
+        			"message": "${files.downloadLink.print.message}",
+        			"buttonMessage": "${files.downloadLink.print.button}"
+        		};
+        		displayDownloadLinkDialog(msg, finalUrl);
+        	} else {
+        		window.open(finalUrl, '_blank');
+        	}
         }
-    };
-});
+
+        function redirect(url) {
+            window.location.href = url;
+        }
+
+        function displayDownloadLinkDialog(msg, url) {
+            if (linkDialog == null) {
+                setup(api);
+            }
+            if (linkDialog.closest(api.cfg.rootElement).length === 0) {
+                api.cfg.rootElement.append(linkDialog);
+            }
+
+            var title = linkDialog.find('div[data-id="title"]');
+            title.html(api.translate(msg.title));
+
+            var message = linkDialog.find('div[data-id="message"]');
+            message.html(api.translate(msg.message));
+
+            var linkBtn = linkDialog.find('button[data-id="downloadLinkButton"]');
+            linkBtn.html(api.translate(msg.buttonMessage));
+            linkBtn.off('click').on('click', function (event) {
+            	window.open(url, '_blank');
+            	closeDownloadLinkDialog();
+            }).blur();
+
+            var closeBtn = linkDialog.find('button[data-id="cancelDownloadLinkButton"]');
+            closeBtn.off('click').on('click', function (event) {
+                closeDownloadLinkDialog();
+            }).blur();
+
+            linkDialog.show();
+        }
+
+        function closeDownloadLinkDialog() {
+            if (linkDialog != null && linkDialog.closest(api.cfg.rootElement).length !== 0) {
+            	linkDialog.hide("fast");
+                linkDialog.detach();
+            }
+        }
+
+    }

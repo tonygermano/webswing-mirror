@@ -1,8 +1,11 @@
 package org.webswing.toolkit.api;
 
-import org.webswing.toolkit.api.clipboard.PasteRequestContext;
+import org.webswing.toolkit.api.action.WebWindow;
+import org.webswing.toolkit.api.action.WebActionListener;
 import org.webswing.toolkit.api.clipboard.BrowserTransferable;
+import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
+import org.webswing.toolkit.api.component.HtmlPanel;
 import org.webswing.toolkit.api.lifecycle.WebswingShutdownListener;
 import org.webswing.toolkit.api.security.WebswingUser;
 import org.webswing.toolkit.api.security.WebswingUserListener;
@@ -173,5 +176,39 @@ public interface WebswingApi {
 	 * Typically used for customized clipboard integration, while the built-in integration is disabled in configuration ("allowLocalClipboard" is false).
 	 */
 	public void sendClipboard();
+	
+	/**
+	 * Adds a WebswingBrowserActionListener to listen to javascript browser initiated events.
+	 * @param listener The listener to add
+	 */
+	public void addBrowserActionListener(WebActionListener listener);
+	
+	/**
+	 * Removed a WebswingBrowserActionListener.
+	 * @param listener The listener to remove
+	 */
+	public void removeBrowserActionListener(WebActionListener listener);
+	
+	/**
+	 * Sends an action event with optional data to the browser.
+	 * @param actionName name of action to be sent
+	 * @param data string encoded data
+	 * @param binaryData binary data
+	 */
+	public void sendActionEvent(String actionName, String data, byte[] binaryData);
+	
+	/**
+	 * Sends an action event to a WebWindow, with optional data to the browser.
+	 * @param webWindow window to recieve the action
+	 * @param actionName name of action to be sent
+	 * @param data string encoded data
+	 * @param binaryData binary data
+	 */
+	public void sendActionEvent(WebWindow webWindow, String actionName, String data, byte[] binaryData);
 
+	/**
+	 * Creates an HtmlPanel component.
+	 */
+	public HtmlPanel createHtmlPanel();
+	
 }

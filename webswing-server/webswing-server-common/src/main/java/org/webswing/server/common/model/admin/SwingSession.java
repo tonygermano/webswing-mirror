@@ -29,6 +29,7 @@ public class SwingSession implements Serializable {
 	private Map<Long,String> threadDumps;
 	private String applicationUrl;
 	private boolean loggingEnabled;
+	private String applicationPath;
 
 	public String getId() {
 		return id;
@@ -197,5 +198,12 @@ public class SwingSession implements Serializable {
 	public void setLoggingEnabled(boolean loggingEnabled) {
 		this.loggingEnabled = loggingEnabled;
 	}
-    
+
+	public void setApplicationPath(String applicationPath) {
+		this.applicationPath = applicationPath;
+	}
+
+	public String getApplicationPath() {
+		return applicationPath;
+	}
 }

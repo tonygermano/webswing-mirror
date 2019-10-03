@@ -1,27 +1,14 @@
 package org.webswing.dispatch;
 
-import netscape.javascript.JSObject;
-import org.webswing.Constants;
-import org.webswing.model.MsgIn;
-import org.webswing.model.c2s.*;
-import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
-import org.webswing.model.internal.OpenFileResultMsgInternal;
-import org.webswing.model.jslink.JSObjectMsg;
-import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
-import org.webswing.toolkit.FocusEventCause;
-import org.webswing.toolkit.WebClipboard;
-import org.webswing.toolkit.WebClipboardTransferable;
-import org.webswing.toolkit.WebDragSourceContextPeer;
-import org.webswing.toolkit.extra.DndEventHandler;
-import org.webswing.toolkit.jslink.WebJSObject;
-import org.webswing.toolkit.util.DeamonThreadFactory;
-import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Services;
-import org.webswing.toolkit.util.Util;
-
-import javax.swing.*;
 import java.applet.Applet;
-import java.awt.*;
+import java.awt.AWTEvent;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.IllegalComponentStateException;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -30,11 +17,48 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
+
+import org.webswing.Constants;
+import org.webswing.model.MsgIn;
+import org.webswing.model.c2s.ActionEventMsgIn;
+import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.c2s.CopyEventMsgIn;
+import org.webswing.model.c2s.FilesSelectedEventMsgIn;
+import org.webswing.model.c2s.KeyboardEventMsgIn;
+import org.webswing.model.c2s.MouseEventMsgIn;
+import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
+import org.webswing.model.c2s.PasteEventMsgIn;
+import org.webswing.model.c2s.SimpleEventMsgIn;
+import org.webswing.model.c2s.UploadEventMsgIn;
+import org.webswing.model.c2s.WindowEventMsgIn;
+import org.webswing.model.internal.OpenFileResultMsgInternal;
+import org.webswing.model.jslink.JSObjectMsg;
+import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
+import org.webswing.toolkit.FocusEventCause;
+import org.webswing.toolkit.WebClipboard;
+import org.webswing.toolkit.WebClipboardTransferable;
+import org.webswing.toolkit.WebDragSourceContextPeer;
+import org.webswing.toolkit.api.lifecycle.ShutdownReason;
+import org.webswing.toolkit.WebWindowPeer;
+import org.webswing.toolkit.extra.DndEventHandler;
+import org.webswing.toolkit.jslink.WebJSObject;
+import org.webswing.toolkit.util.DeamonThreadFactory;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
+
+import netscape.javascript.JSObject;
 
 @SuppressWarnings("restriction")
 public class WebEventDispatcher {
@@ -117,6 +141,12 @@ public class WebEventDispatcher {
 					if (event instanceof UploadEventMsgIn) {
 						handleUploadEvent((UploadEventMsgIn) event);
 					}
+					if (event instanceof WindowEventMsgIn) {
+						handleWindowEvent((WindowEventMsgIn) event);
+					}
+					if (event instanceof ActionEventMsgIn) {
+						Util.getWebToolkit().processApiEvent(event);
+					}
 				} catch (Throwable e) {
 					Logger.error("Failed to process event.", e);
 				}
@@ -128,8 +158,8 @@ public class WebEventDispatcher {
 		Logger.debug("WebEventDispatcher.dispatchMessage", message);
 		switch (message.getType()) {
 		case killSwing:
-			Logger.info("Received kill signal. Application shutting down.");
-			Util.getWebToolkit().exitSwing(0);
+			Logger.info("Received kill signal from Admin console. Application shutting down.");
+			Services.getConnectionService().scheduleShutdown(ShutdownReason.Admin);
 			break;
 		case deleteFile:
 			Util.getWebToolkit().getPaintDispatcher().notifyDeleteSelectedFile();
@@ -156,10 +186,15 @@ public class WebEventDispatcher {
 			boolean instantExit = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) == 0;
 			if (instantExit) {
 				Logger.warn("Exiting Application. Client has disconnected from web session. (swingSessionTimeout setting is 0 or less)");
-				Util.getWebToolkit().exitSwing(1);
+				Services.getConnectionService().scheduleShutdown(ShutdownReason.Inactivity);
 			}
 			break;
 		case hb:
+			break;
+		case requestComponentTree:
+			if (Util.isTestMode()) {
+				Util.getWebToolkit().getPaintDispatcher().requestComponentTree();
+			}
 			break;
 		}
 	}
@@ -209,7 +244,7 @@ public class WebEventDispatcher {
 		if (Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) {
 			c = Util.getWebToolkit().getWindowManager().getLockedToWindow();
 		} else {
-			c = Util.getWebToolkit().getWindowManager().getVisibleComponentOnPosition(event.getX(), event.getY());
+			c = Util.getWebToolkit().getWindowManager().getVisibleComponentOnPosition(event.getX(), event.getY(), event.getWinId());
 			if (relatedToLastEvent(event, lastMouseEvent) && !javaFXdragStarted.get() && !dndHandler.isDndInProgress() ) {
 				c = (Component) lastMouseEvent.getSource();
 				relatedToLastEvent=true;
@@ -556,6 +591,28 @@ public class WebEventDispatcher {
 		JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
 		if (dialog != null) {
 			dialog.cancelSelection();
+		}
+	}
+
+	public void handleWindowEvent(WindowEventMsgIn windowUpdate) {
+		WebWindowPeer win = Util.findWindowPeerById(windowUpdate.getId());
+
+		if (win == null) {
+			return;
+		}
+
+		synchronized (Util.getWebToolkit().getTreeLock()) {
+			synchronized (WebPaintDispatcher.webPaintLock) {
+				if (windowUpdate.isClose()) {
+					if (win.getTarget() instanceof Window) {
+						((Window) win.getTarget()).setVisible(false);
+					}
+				} else {
+					((Component) win.getTarget()).setLocation(windowUpdate.getX(), windowUpdate.getY());
+					((Component) win.getTarget()).setSize(windowUpdate.getWidth(), windowUpdate.getHeight());
+					win.notifyWindowAreaRepainted(new Rectangle(windowUpdate.getX(), windowUpdate.getY(), windowUpdate.getWidth(), windowUpdate.getY()));
+				}
+			}
 		}
 	}
 

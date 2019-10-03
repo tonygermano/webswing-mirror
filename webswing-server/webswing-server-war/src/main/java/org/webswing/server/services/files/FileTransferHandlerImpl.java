@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -112,7 +113,8 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 		response.setBufferSize(DEFAULT_BUFFER_SIZE);
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Length", String.valueOf(file.length()));
-		response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+		String encodedName= URLEncoder.encode(file.getName(), "UTF-8");
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedName + "\"; filename*=UTF-8\""+encodedName+"\"");
 		BufferedInputStream input = null;
 		BufferedOutputStream output = null;
 
@@ -164,6 +166,8 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 							log.error("Failed to send upload notification to app session. File:" + filename + " InstanceID:" + instance.getInstanceId());
 							f.delete();
 						} else {
+							resp.setContentType("application/json; charset=UTF-8");
+							resp.setCharacterEncoding("UTF-8");
 							resp.getWriter().write("{\"files\":[{\"name\":\"" + filename + "\"}]}"); // TODO size
 						}
 					}

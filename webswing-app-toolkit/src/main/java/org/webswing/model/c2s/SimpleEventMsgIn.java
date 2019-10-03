@@ -14,7 +14,8 @@ public class SimpleEventMsgIn implements MsgIn {
 		downloadFile,
 		deleteFile,
 		hb,
-		cancelFileSelection;
+		cancelFileSelection,
+		requestComponentTree
 	}
 
 	public SimpleEventMsgIn() {

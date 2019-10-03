@@ -11,62 +11,73 @@ import java.util.Set;
 
 import org.webswing.directdraw.model.DrawConstant;
 import org.webswing.directdraw.model.FontFaceConst;
+import org.webswing.directdraw.model.ImageConst;
 import org.webswing.directdraw.proto.Directdraw.DrawConstantProto;
 
 public class DrawConstantPool {
 
-    private LRUDrawConstantPoolCache pool;
-    private Set<String> registeredFonts=new HashSet<String>();
-    private Map<String,FontFaceConst> requestedFonts=new HashMap<String,FontFaceConst>();
-    
+	private static final int IMG_CACHE_SIZE = Integer.getInteger("webswing.ddImageCacheSize", 128);
+	private static final int CONSTANT_CACHE_SIZE = Integer.getInteger("webswing.ddConstCacheSize", 8192);
 
-    public DrawConstantPool(int size) {
-        pool = new LRUDrawConstantPoolCache(size);
-    }
+	private LRUDrawConstantPoolCache pool;
+	private LRUDrawConstantPoolCache imgPool;
+	private Set<String> registeredFonts = new HashSet<String>();
+	private Map<String, FontFaceConst> requestedFonts = new HashMap<String, FontFaceConst>();
+	private int poolOverflowCounter = 0;
+	private int imgPoolOverflowCounter = 0;
 
-    public DrawConstant<?> getCached(DrawConstant<?> constant) {
-        return pool.getOrAdd(constant);
-    }
+	public DrawConstantPool() {
+		pool = new LRUDrawConstantPoolCache(CONSTANT_CACHE_SIZE, 0, CONSTANT_CACHE_SIZE);
+		imgPool = new LRUDrawConstantPoolCache(IMG_CACHE_SIZE, CONSTANT_CACHE_SIZE, CONSTANT_CACHE_SIZE);
+	}
 
-    private void addToCache(DrawConstant<?> constant) {
-        pool.getOrAdd(constant);
-    }
+	public void resetCacheOverflowCounters() {
+		poolOverflowCounter = 0;
+		imgPoolOverflowCounter = 0;
+	}
 
-    private boolean isInCache(DrawConstant<?> constant) {
-        return pool.contains(constant);
-    }
-    
-    public int addToCache(List<DrawConstantProto> protos, DrawConstant<?> cons) {
+	public int addToCache(List<DrawConstantProto> protos, DrawConstant<?> cons) {
+		if (cons instanceof ImageConst) {
+			return addToCache(imgPool, protos, cons, imgPoolOverflowCounter++);
+		} else {
+			return addToCache(pool, protos, cons, poolOverflowCounter++);
+		}
+	}
+
+	private int addToCache(LRUDrawConstantPoolCache cache, List<DrawConstantProto> protos, DrawConstant<?> cons, int overflowCounter) {
+		if (overflowCounter >= cache.getCapacity()) {
+			cache.increaseCapacity();
+		}
 		int thisId;
-		if (!isInCache(cons)) {
+		if (!cache.contains(cons)) {
 			DrawConstant<?> cacheEntry = cons.toCacheEntry();
-			addToCache(cacheEntry);
+			cache.getOrAdd(cacheEntry);
 			DrawConstantProto.Builder proto = DrawConstantProto.newBuilder();
 			if (cons.getFieldName() != null) {
 				proto.setField(DrawConstantProto.Builder.getDescriptor().findFieldByName(cons.getFieldName()), cons.toMessage());
 			}
 			proto.setId(cacheEntry.getId());
 			protos.add(proto.build());
-			thisId=cacheEntry.getId();
+			thisId = cacheEntry.getId();
 		} else {
-			thisId=getCached(cons).getId();
+			thisId = cache.getOrAdd(cons).getId();
 		}
 		return thisId;
 	}
 
 	public synchronized boolean isFontRegistered(String file) {
-		if(requestedFonts.containsKey(file) || registeredFonts.contains(file)){
+		if (requestedFonts.containsKey(file) || registeredFonts.contains(file)) {
 			return true;
 		}
 		return false;
 	}
 
 	public synchronized void requestFont(String file, FontFaceConst fontFaceConst) {
-		requestedFonts.put(file, fontFaceConst);		
+		requestedFonts.put(file, fontFaceConst);
 	}
-	
-	public synchronized Collection<FontFaceConst> registerRequestedFonts(){
-		if(requestedFonts.size()>0){
+
+	public synchronized Collection<FontFaceConst> registerRequestedFonts() {
+		if (requestedFonts.size() > 0) {
 			Collection<FontFaceConst> result = new ArrayList<FontFaceConst>(requestedFonts.values());
 			registeredFonts.addAll(requestedFonts.keySet());
 			requestedFonts.clear();
@@ -74,5 +85,5 @@ public class DrawConstantPool {
 		}
 		return Collections.emptyList();
 	}
-    
+
 }

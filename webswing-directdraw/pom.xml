@@ -3,14 +3,14 @@
 	<parent>
 		<artifactId>webswing</artifactId>
 		<groupId>org.webswing</groupId>
-		<version>2.6.5</version>
+		<version>2.7</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>webswing-directdraw</artifactId>
 	<packaging>pom</packaging>
 	<modules>
 		<module>webswing-directdraw-swing</module>
-		<module>webswing-directdraw-server</module>
+		<module>webswing-directdraw-javascript</module>
 	</modules>
 	<build>
 		<plugins>
@@ -21,7 +21,7 @@
 					<source>1.8</source>
 					<target>1.8</target>
 					<compilerArguments>
-						<bootclasspath>${basedir}/../../lib/rt1.8.0_25.jar</bootclasspath>
+						<bootclasspath>${basedir}/../../lib/rt-1.8.jar</bootclasspath>
 					</compilerArguments>
 				</configuration>
 			</plugin>

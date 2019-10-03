@@ -1,6 +1,5 @@
-define(['jquery','webswing-util'], function amdFactory($, util) {
     "use strict";
-    return function LoginModule() {
+    export default function Login(util) {
         var module = this;
         var api;
         module.injects = api = {
@@ -56,5 +55,4 @@ define(['jquery','webswing-util'], function amdFactory($, util) {
         function getUser() {
             return user;
         }
-    };
-});
+    }

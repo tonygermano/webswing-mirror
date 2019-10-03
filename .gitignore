@@ -4,6 +4,10 @@
 target/
 dist/
 bin/
+lib/
+logs/
+node/
+node_modules/
 .settings/
 .project
 .classpath
@@ -28,3 +32,4 @@ audit.log*
 /.recommenders/
 *.unmodified_classes
 *.unmodified_classes.lock
+/tmp/

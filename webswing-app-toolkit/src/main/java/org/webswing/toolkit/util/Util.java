@@ -1,6 +1,7 @@
 package org.webswing.toolkit.util;
 
 import org.webswing.Constants;
+import org.webswing.component.HtmlPanelImpl.HtmlWindow;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.c2s.KeyboardEventMsgIn;
 import org.webswing.model.c2s.KeyboardEventMsgIn.KeyEventType;
@@ -12,6 +13,7 @@ import org.webswing.model.s2c.WindowPartialContentMsg;
 import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
+import org.webswing.toolkit.api.component.HtmlPanel;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -232,6 +234,30 @@ public class Util {
 		}
 		return null;
 	}
+	
+	public static Window findWindowById(String id) {
+		for (Window w : Window.getWindows()) {
+			Object peer = WebToolkit.targetToPeer(w);
+			if (peer != null && peer instanceof WebWindowPeer) {
+				if (((WebWindowPeer) peer).getGuid().equals(id)) {
+					return w;
+				}
+				
+			}
+		}
+		return null;
+	}
+	
+	public static WebWindowPeer findWindowPeerByHtmlPanel(HtmlPanel htmlPanel) {
+		for (Window w : Window.getWindows()) {
+			if (w instanceof HtmlWindow) {
+				if (((HtmlWindow) w).getTarget() == htmlPanel) {
+					return (WebWindowPeer) WebToolkit.targetToPeer(w);
+				}
+			}
+		}
+		return null;
+	}
 
 	public static Window[] getAllWindows() {
 		List<Window> windows = new ArrayList<>(Arrays.asList(Window.getWindows()));
@@ -261,13 +287,15 @@ public class Util {
 		return windowImages;
 	}
 
-	public static Map<String, Image> extractWindowWebImages(AppFrameMsgOut json, Map<String, Image> webImages) {
-		for (Iterator<WindowMsg> i = json.getWindows().iterator(); i.hasNext(); ) {
-			WindowMsg window = i.next();
-			WebWindowPeer w = findWindowPeerById(window.getId());
-			if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
-				Image webimageString = w.extractWebImage();
-				webImages.put(window.getId(), webimageString);
+	public static Map<String, Image> extractWindowWebImages(Set<String> updatedWindows, Map<String, Image> webImages) {
+		for (String windowId : updatedWindows) {
+			if (windowId.equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
+				continue;
+			}
+			WebWindowPeer w = findWindowPeerById(windowId);
+			if (w != null) {
+				Image webimage = w.extractWebImage();
+				webImages.put(windowId, webimage);
 			}
 		}
 		return webImages;
@@ -289,15 +317,17 @@ public class Util {
 
 	public static void encodeWindowWebImages(Map<String, Image> windowWebImages, AppFrameMsgOut json) {
 		for (WindowMsg window : json.getWindows()) {
-			if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
-				Image wi = windowWebImages.get(window.getId());
+			Image wi = windowWebImages.get(window.getId());
+			if (wi != null) {
 				window.setDirectDraw(Services.getDirectDrawService().buildWebImage(wi));
 			}
 		}
 	}
 
 	@SuppressWarnings("restriction")
-	public static AppFrameMsgOut fillJsonWithWindowsData(Map<String, Set<Rectangle>> currentAreasToUpdate, Map<String, List<Rectangle>> windowNonVisibleAreas) {
+	public static AppFrameMsgOut fillWithWindowsData(Map<String, Set<Rectangle>> currentAreasToUpdate) {
+		Map<String, List<Rectangle>> windowNonVisibleAreas = getWebToolkit().getWindowManager().extractNonVisibleAreas();
+		
 		AppFrameMsgOut json = new AppFrameMsgOut();
 		for (String windowId : currentAreasToUpdate.keySet()) {
 			WebWindowPeer ww = Util.findWindowPeerById(windowId);
@@ -314,6 +344,12 @@ public class Util {
 					window.setPosY(location.y);
 					window.setWidth(ww.getBounds().width);
 					window.setHeight(ww.getBounds().height);
+					if (ww.getTarget() instanceof Frame) {
+						window.setTitle(((Frame) ww.getTarget()).getTitle());
+					}
+					if (ww.getTarget() instanceof Component) {
+						window.setName(((Component) ww.getTarget()).getName());
+					}
 				}
 				List<Rectangle> toPaint = joinRectangles(getGrid(new ArrayList<Rectangle>(currentAreasToUpdate.get(windowId)), windowNonVisibleAreas.get(windowId)));
 				List<WindowPartialContentMsg> partialContentList = new ArrayList<WindowPartialContentMsg>();
@@ -331,6 +367,66 @@ public class Util {
 			}
 		}
 		return json;
+	}
+
+	public static AppFrameMsgOut fillWithCompositingWindowsData(Map<String, Set<Rectangle>> currentAreasToUpdate) {
+		AppFrameMsgOut frame = new AppFrameMsgOut();
+		List<String> zOrder = getWebToolkit().getWindowManager().getZOrder();
+		for (String windowId : zOrder) {
+			WebWindowPeer ww = findWindowPeerById(windowId);
+			if (ww != null) {
+				WindowMsg window = frame.getOrCreateWindowById(windowId);
+				Point location = ww.getLocationOnScreen();
+				window.setPosX(location.x);
+				window.setPosY(location.y);
+				window.setWidth(ww.getBounds().width);
+				window.setHeight(ww.getBounds().height);
+				if (ww.getTarget() instanceof Frame) {
+					window.setTitle(((Frame) ww.getTarget()).getTitle());
+					window.setState(((Frame) ww.getTarget()).getExtendedState());
+				}
+				if (ww.getTarget() instanceof Window) {
+					Window owner = ((Window) ww.getTarget()).getOwner();
+					if (owner != null) {
+						WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(owner);
+						if (peer != null && zOrder.contains(peer.getGuid())) {
+							// must be from current z-order windows, otherwise it could be SwingUtilities$SharedOwnerFrame
+							window.setOwnerId(peer.getGuid());
+						}
+					}
+				}
+				if (ww.getTarget() instanceof Component) {
+					window.setName(((Component) ww.getTarget()).getName());
+				}
+				if (ww.getTarget() instanceof HtmlWindow) {
+					window.setHtml(true);
+				}
+				window.setModalBlocked(ww.getTarget() instanceof Window && getWebToolkit().getWindowManager().isBlockedByModality((Window) ww.getTarget(), false));
+				
+				if (!isDD()) {
+					Set<Rectangle> rects = currentAreasToUpdate.get(windowId);
+					if (rects == null) {
+						window.setContent(Collections.emptyList());
+						continue;
+					}
+					
+					List<Rectangle> toPaint = joinRectangles(getGrid(new ArrayList<Rectangle>(rects), null));
+					List<WindowPartialContentMsg> partialContentList = new ArrayList<WindowPartialContentMsg>();
+					for (Rectangle r : toPaint) {
+						if (r.x < window.getWidth() && r.y < window.getHeight()) {
+							WindowPartialContentMsg content = new WindowPartialContentMsg();
+							content.setPositionX(r.x);
+							content.setPositionY(r.y);
+							content.setWidth(Math.min(r.width, window.getWidth() - r.x));
+							content.setHeight(Math.min(r.height, window.getHeight() - r.y));
+							partialContentList.add(content);
+						}
+					}
+					window.setContent(partialContentList);
+				}
+			}
+		}
+		return frame;
 	}
 
 	public static Map<String, Set<Rectangle>> postponeNonShowingAreas(Map<String, Set<Rectangle>> currentAreasToUpdate) {
@@ -576,7 +672,15 @@ public class Util {
 		boolean supportedDD = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, "true"));
 		return startDD && supportedDD;
 	}
-
+	
+	public static boolean isCompositingWM() {
+		return Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_COMPOSITING_WM, "false"));
+	}
+	
+	public static boolean isTestMode() {
+		return Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_TEST_MODE, "false"));
+	}
+	
 	public static void repaintAllWindow() {
 		synchronized (WebPaintDispatcher.webPaintLock) {
 			for (Window w : Util.getAllWindows()) {
@@ -661,7 +765,7 @@ public class Util {
 		ImageObserver observer = new ImageObserver() {
 			@Override
 			public synchronized boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
-				if ((infoflags & ImageObserver.ALLBITS) == ImageObserver.ALLBITS || (infoflags & ImageObserver.FRAMEBITS) == ImageObserver.FRAMEBITS){
+				if ((infoflags & ImageObserver.ALLBITS) == ImageObserver.ALLBITS || (infoflags & ImageObserver.FRAMEBITS) == ImageObserver.FRAMEBITS) {
 					notifyAll();
 				}
 				return true;
@@ -678,7 +782,7 @@ public class Util {
 			}
 		}
 	}
-
+	
 	public static File getTimestampedTransferFolder(String marker) {
 		String path = System.getProperty(Constants.SWING_START_SYS_PROP_TRANSFER_DIR, System.getProperty("user.dir") + "/upload");
 		path = path.split(File.pathSeparator)[0];
@@ -686,4 +790,5 @@ public class Util {
 		timestampFoleder.mkdirs();
 		return timestampFoleder;
 	}
+	
 }

@@ -10,11 +10,26 @@ public class LRUDrawConstantPoolCache {
     private DoubleLinkedListNode head;
     private DoubleLinkedListNode end;
     private int capacity;
+    private final int idOffset;
+    private final int maxSize;
     // reserve zero id for null constants
     private int nextId = 1;
 
-    public LRUDrawConstantPoolCache(int capacity) {
+    public LRUDrawConstantPoolCache(int capacity,int idOffset, int maxSize) {
         this.capacity = capacity;
+        this.idOffset = idOffset;
+        this.maxSize = maxSize;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void increaseCapacity(){
+        capacity*=2;
+        if(capacity>maxSize){
+            throw new RuntimeException("Directdraw: can not process more then "+maxSize+" constants in single frame. Check rendering of swing application.");
+        }
     }
 
     public synchronized boolean contains(DrawConstant<?> constant) {
@@ -28,14 +43,16 @@ public class LRUDrawConstantPoolCache {
             oldNode.makeHead();
             return oldNode.getVal();
         } else {
-            if (nextId >= capacity) {
-                // remove oldest node
-                map.remove(end.getVal());
-                end.remove();
-            }
             DoubleLinkedListNode newNode = new DoubleLinkedListNode(constant);
             newNode.makeHead();
-            newNode.setId(nextId++);
+            if (nextId >= capacity) {
+                // remove oldest node
+                int evictedId = map.remove(end.getVal()).getVal().getId();
+                end.remove();
+                newNode.setId(evictedId);
+            }else{
+                newNode.setId((nextId++) + idOffset);
+            }
             map.put(constant, newNode);
             return constant;
         }

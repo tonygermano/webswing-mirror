@@ -17,7 +17,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.GlobalUrlHandler;
 import org.webswing.server.base.PrimaryUrlHandler;
@@ -69,18 +69,23 @@ public class GlobalRestService extends BaseRestService {
 	protected List<BasicApplicationInfo> getPathsImpl() {
 		List<BasicApplicationInfo> result = new ArrayList<>();
 		for (SwingInstanceManager appManager : getGlobalHandler().getApplications()) {
-			BasicApplicationInfo app = new BasicApplicationInfo();
-			app.setPath(appManager.getPathMapping());
-			app.setUrl(appManager.getFullPathMapping());
-			app.setEnabled(appManager.isEnabled());
-			if(appManager.getConfig()!=null && appManager.getConfig().getSwingConfig()!=null) {
-				app.setName(appManager.getConfig().getSwingConfig().getName());
-			}
-			List<SwingInstance> allRunning = appManager.getSwingInstanceHolder().getAllInstances();
-			app.setRunningInstances(allRunning.size());
+			BasicApplicationInfo app = getBasicApplicationInfo(appManager);
 			result.add(app);
 		}
 		return result;
+	}
+
+	private BasicApplicationInfo getBasicApplicationInfo(SwingInstanceManager appManager) {
+		BasicApplicationInfo app = new BasicApplicationInfo();
+		app.setPath(appManager.getPathMapping());
+		app.setUrl(appManager.getFullPathMapping());
+		app.setEnabled(appManager.isEnabled());
+		if(appManager.getConfig()!=null && appManager.getConfig().getSwingConfig()!=null) {
+			app.setName(appManager.getConfig().getSwingConfig().getName());
+		}
+		List<SwingInstance> allRunning = appManager.getSwingInstanceHolder().getAllInstances();
+		app.setRunningInstances(allRunning.size());
+		return app;
 	}
 
 	@Override
@@ -157,13 +162,13 @@ public class GlobalRestService extends BaseRestService {
 	
 	@GET
 	@Path("/rest/logs/sessionApps")
-	public List<ApplicationInfoMsg> getAppsForSessionLogView() throws WsException {
+	public List<BasicApplicationInfo> getAppsForSessionLogView() throws WsException {
 		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
 		getHandler().checkMasterPermission(WebswingAction.rest_getApps);
 		
 		return getGlobalHandler().getApplications().stream()
 				.filter(app -> app.getConfig().getSwingConfig().isSessionLogging())
-				.map(app -> app.getApplicationInfoMsg())
+				.map(app -> getBasicApplicationInfo(app))
 				.collect(Collectors.toList());
 	}
 

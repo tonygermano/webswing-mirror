@@ -21,18 +21,24 @@ abstract public class WebFramePeer extends WebWindowPeer implements FramePeer {
 	public void setState(int paramInt) {
 		state = paramInt;
 		if (state == Frame.MAXIMIZED_BOTH) {
-			final JFrame f = (JFrame) target;
-			f.setLocation(0, 0);
-			final Dimension originalSize = f.getSize();
-			final Dimension newSize = Toolkit.getDefaultToolkit().getScreenSize();
-			if (!originalSize.equals(newSize)) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						f.setSize(newSize);
-                        Util.getWebToolkit().getWindowManager().requestRepaintAfterMove(f, new Rectangle(f.getX(), f.getY(), originalSize.width, originalSize.height));
-					}
+			if (Util.isCompositingWM()) {
+				SwingUtilities.invokeLater(() -> {
+					Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint((JFrame) target);
 				});
+			} else {
+				final JFrame f = (JFrame) target;
+				f.setLocation(0, 0);
+				final Dimension originalSize = f.getSize();
+				final Dimension newSize = Toolkit.getDefaultToolkit().getScreenSize();
+				if (!originalSize.equals(newSize)) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							f.setSize(newSize);
+							Util.getWebToolkit().getWindowManager().requestRepaintAfterMove(f, new Rectangle(f.getX(), f.getY(), originalSize.width, originalSize.height));
+						}
+					});
+				}
 			}
 		}
 	}

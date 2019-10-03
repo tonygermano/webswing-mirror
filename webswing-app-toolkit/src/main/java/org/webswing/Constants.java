@@ -17,6 +17,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_TRANSFER_DIR = "webswing.transfer.dir";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW = "webswing.directdraw";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED = "webswing.directdraw.supported";
+	public static final String SWING_START_SYS_PROP_COMPOSITING_WM = "webswing.compositingWindowManager";
 	public static final String SWING_START_SYS_PROP_ALLOW_DOWNLOAD = "webswing.allowDownload";
 	public static final String SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD = "webswing.allowAutoDownload";
 	public static final String SWING_START_SYS_PROP_ALLOW_UPLOAD = "webswing.allowUpload";
@@ -36,6 +37,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_MSG_API_TOPIC = "webswing.messagingApiTopicName";
 	public static final String SWING_START_SYS_PROP_CLASS_MODIFICATION_BLACKLIST = "webswing.classModificationBlacklist";
 	public static final String SWING_START_SYS_PROP_LOG_LEVEL = "webswing.logLevel";
+	public static final String SWING_START_SYS_PROP_TEST_MODE = "webswing.testMode";
 
 	public static final	String PRINTER_JOB_CLASS = "webswing.printerJobDelegate";
 
@@ -64,6 +66,7 @@ public interface Constants {
 	public static final String WAR_FILE_LOCATION = "webswing.warLocation";
 	public static final String ROOT_DIR_URI = "webswing.rootDirUri";
 	public static final String ROOT_DIR_PATH = "webswing.rootDir";
+	public static final String CONFIG_PATH = "webswing.configDir";
 	public static final String TEMP_DIR_PATH_BASE = "webswing.tempDirBase";
 	public static final String TEMP_DIR_PATH = "webswing.tempDirPath";
 	public static final String CREATE_NEW_TEMP = "webswing.createNewTemp";
@@ -74,6 +77,7 @@ public interface Constants {
 	public static final String DEFAULT_RECORDINGS_FOLDER = "${webswing.tempDirPath}recordings${webswing.appPath}/";
 	public static final String SERVER_HOST = "webswing.server.host";
 	public static final String SERVER_PORT = "webswing.server.port";
+	public static final String SERVER_CONTEXT_PATH = "webswing.server.contextPath";
 	public static final String SERVER_EMBEDED_FLAG = "webswing.server.embeded";
 	public static final String JMS_OVERAL_MEM_LIMIT = "webswing.jmsOveralMemoryLimit";
 	public static final String JMS_DEST_MEM_LIMIT = "webswing.jmsDestinationMemoryLimit";
@@ -117,6 +121,7 @@ public interface Constants {
 	public static final String HTTP_ATTR_ARGS = "X-webswing-args";
 	public static final String HTTP_ATTR_DEBUG_PORT = "X-webswing-debugPort";
 	public static final String HTTP_ATTR_CSRF_TOKEN_HEADER = "X-webswing-CSRFToken";
+	public static final String HTTP_PARAM_SECURITY_TOKEN_HEADER = "securityToken";
 
 	//integration-branding
 	public static final String BRANDING_PREFIX = "webswing.brandingPrefix";

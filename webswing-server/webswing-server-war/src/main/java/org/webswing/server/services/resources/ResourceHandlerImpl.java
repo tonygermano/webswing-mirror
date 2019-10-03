@@ -11,19 +11,23 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.base.AbstractUrlHandler;
+import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.security.api.SecurityContext;
+import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.util.ServerUtil;
 
 public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceHandler {
 	private static final Logger log = LoggerFactory.getLogger(ResourceHandlerImpl.class);
 
+	private final PrimaryUrlHandler parent;
 	private SecurityContext context;
 
-	public ResourceHandlerImpl(UrlHandler parent, SecurityContext context) {
+	public ResourceHandlerImpl(PrimaryUrlHandler parent, SecurityContext context) {
 		super(parent);
+		this.parent = parent;
 		this.context = context;
 	}
 
@@ -68,7 +72,12 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 		}
 
 		public boolean respondGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-			return false;
+			if(statusCode == HttpServletResponse.SC_NOT_FOUND){
+				return false;
+			}else{
+				resp.sendError(statusCode,message);
+				return true;
+			}
 		}
 
 		public boolean respondHead(HttpServletRequest req, HttpServletResponse resp) {
@@ -166,7 +175,7 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 			path = "/index.html";
 		}
 		if (isForbidden(path))
-			return new ErrorResult(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+			return new ErrorResult(HttpServletResponse.SC_NOT_FOUND, "Forbidden");
 
 		URL url = context.getWebResource(path + "/index.html");//check if this is folder with default index
 		if (url != null && !req.getPathInfo().endsWith("/")) {
@@ -179,6 +188,10 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 			return new ErrorResult(HttpServletResponse.SC_NOT_FOUND, "Not found");
 		}
 
+		if(isRestrictedAccess(path)){
+			return new ErrorResult(HttpServletResponse.SC_UNAUTHORIZED, "Access restricted.");
+		}
+
 		String mimeType = getMimeType(url.getPath());
 		try {
 			return new ResourceUrl(mimeType, url.openConnection());
@@ -186,6 +199,21 @@ public class ResourceHandlerImpl extends AbstractUrlHandler implements ResourceH
 			log.error("Failed to serve path " + path + " with resource " + url.toString(), e);
 			return new ErrorResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
+	}
+
+	private boolean isRestrictedAccess(String path) {
+		String lpath = path.toLowerCase();
+		for(String restricted :this.parent.getConfig().getRestrictedResources()){
+			if(!restricted.trim().isEmpty() && lpath.startsWith(restricted.toLowerCase())){
+				try {
+					checkPermission(WebswingAction.master_basic_access);
+				} catch (WsException e) {
+					log.warn("Accessing restricted resource path. Path '" +path+"' requires authentication. (matches restricted prefix '"+restricted+"')");
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	protected boolean isForbidden(String path) {

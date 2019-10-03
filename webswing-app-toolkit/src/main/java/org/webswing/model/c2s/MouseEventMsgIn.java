@@ -25,6 +25,7 @@ public class MouseEventMsgIn implements MsgIn, UserInputMsgIn {
 	private boolean alt;
 	private boolean shift;
 	private boolean meta;
+	private String winId;
 
 	public int getX() {
 		return x;
@@ -113,4 +114,13 @@ public class MouseEventMsgIn implements MsgIn, UserInputMsgIn {
 	public void setTimeMilis(int timeMilis) {
 		this.timeMilis = timeMilis;
 	}
+
+	public String getWinId() {
+		return winId;
+	}
+
+	public void setWinId(String winId) {
+		this.winId = winId;
+	}
+	
 }

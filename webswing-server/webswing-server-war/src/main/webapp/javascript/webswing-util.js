@@ -1,20 +1,16 @@
-define(['jquery', 'webswing-translate'], function Util($, Translate) {
-    "use strict";
-    $.fn.extend({
-        animateCss: function (animationName) {
-            var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-            this.addClass('animated ' + animationName).one(animationEnd, function () {
-                $(this).removeClass('animated ' + animationName);
-            });
-        }
-    });
+import Translate from "./webswing-translate";
 
-    var translate = new Translate().provides.translate;
+export default function Util(i18n){
+
+    var translateModule = new Translate(i18n.msg, i18n.langs);
+    translateModule.ready();
+    var translate = translateModule.provides.translate;
 
     return {
         webswingLogin: webswingLogin,
         webswingLogout: webswingLogout,
         isTouchDevice: isTouchDevice,
+        isIOS: isIOS,
         getImageString: getImageString,
         bindEvent: bindEvent,
         detectIE: detectIE,
@@ -29,8 +25,6 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
         dpr: Math.ceil(window.devicePixelRatio) || 1,
         getTimeZone: getTimeZone
     }
-
-
 
     function webswingLogin(baseUrl, element, loginData, successCallback) {
         $.ajax({
@@ -114,13 +108,37 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
     }
 
     function isTouchDevice() {
-        return !!('ontouchstart' in window);
+        // this check below works for touch devices AND notebooks with touch screen
+    //    	var result = false;
+    //    	if (window.PointerEvent && ('maxTouchPoints' in navigator)) {
+    //    		// if Pointer Events are supported, just check maxTouchPoints
+    //    		if (navigator.maxTouchPoints > 0) {
+    //    			result = true;
+    //    		}
+    //    	} else {
+    //    		// no Pointer Events...
+    //    		if (window.matchMedia && window.matchMedia("(any-pointer:coarse)").matches) {
+    //    			// check for any-pointer:coarse which mostly means touchscreen
+    //    			result = true;
+    //    		} else if (window.TouchEvent || ('ontouchstart' in window)) {
+    //    			// last resort - check for exposed touch events API / event handler
+    //    			result = true;
+    //    		}
+    //    	}
+    //    	return result;
+
+        // let's consider only mobile device as a touch device
+        return 'ontouchstart' in window;
+    }
+
+    function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     }
 
     function getImageString(data) {
         if (typeof data === 'object') {
             var binary = '';
-            var bytes = new Uint8Array(data.buffer, data.offset, data.limit - data.offset);
+            var bytes = data;
             for (var i = 0, l = bytes.byteLength; i < l; i++) {
                 binary += String.fromCharCode(bytes[i]);
             }
@@ -257,24 +275,24 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
         document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
         return ret;
     }
-    
+
     function getTimeZone() {
-    	var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    	
-    	if (timeZone) {
-    		return timeZone;
-    	}
-    	
-    	// IE, get offset in minutes
-    	return getTimeZoneFromOffset(new Date().getTimezoneOffset());
+        var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        if (timeZone) {
+            return timeZone;
+        }
+
+        // IE, get offset in minutes
+        return getTimeZoneFromOffset(new Date().getTimezoneOffset());
     }
-    
+
     function getTimeZoneFromOffset(offset) {
-    	return "GMT" + ((offset < 0 ? '+' : '-') + // Note the reversed sign!
-    			pad(parseInt(Math.abs(offset / 60)), 2) +
+        return "GMT" + ((offset < 0 ? '+' : '-') + // Note the reversed sign!
+                pad(parseInt(Math.abs(offset / 60)), 2) +
                 pad(Math.abs(offset % 60), 2));
     }
-    
+
     function pad(number, length) {
         var str = "" + number;
         while (str.length < length) {
@@ -282,5 +300,4 @@ define(['jquery', 'webswing-translate'], function Util($, Translate) {
         }
         return str;
     }
-    
-});
+}

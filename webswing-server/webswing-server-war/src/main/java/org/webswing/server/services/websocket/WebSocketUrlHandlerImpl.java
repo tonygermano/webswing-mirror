@@ -134,6 +134,12 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 				} else if (frame.getPixelsResponse() != null) {
 					PixelsAreaResponseMsgIn p = frame.getPixelsResponse();
 					send(r, p);
+				} else if (frame.getWindow() != null) {
+					WindowEventMsgIn w = frame.getWindow();
+					send(r, w);
+				} else if (frame.getAction() != null) {
+					ActionEventMsgIn a = frame.getAction();
+					send(r, a);
 				}
 			} else {
 				log.error("Unable to decode message: " + message);

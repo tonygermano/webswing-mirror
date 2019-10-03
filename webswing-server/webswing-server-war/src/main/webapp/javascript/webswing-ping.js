@@ -1,6 +1,5 @@
-define([], function amdFactory() {
     "use strict";
-    return function PingModule() {
+    export default function Ping() {
         var module = this;
         var api,intervalHandle;
         var worker, ping, severity, mute;
@@ -140,5 +139,4 @@ define([], function amdFactory() {
 
         }
 
-    };
-});
+    }

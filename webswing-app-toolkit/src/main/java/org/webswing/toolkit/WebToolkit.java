@@ -44,13 +44,16 @@ import java.awt.peer.TrayIconPeer;
 import java.awt.peer.WindowPeer;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -63,7 +66,9 @@ import org.webswing.model.Msg;
 import org.webswing.toolkit.api.WebswingMessagingApi;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingApiProvider;
+import org.webswing.toolkit.api.lifecycle.ShutdownReason;
 import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
 
@@ -384,6 +389,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		if (panel instanceof Applet) {
 			return super.createPanel(panel);
 		}
+		
 		WebPanelPeer localpanelPeer = createWebPanelPeer(panel);
 		targetCreatedPeer(panel, localpanelPeer);
 		return localpanelPeer;
@@ -707,6 +713,25 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	@SuppressWarnings("deprecation")
 	abstract public boolean deliverFocus(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) ;
+
+	public synchronized int executeOnBeforeShutdownListeners(final ShutdownReason reason){
+		ExecutorService executor = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing pre-shutdown thread"));
+		try {
+			long wait = Long.getLong(Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT, 3000);
+			Integer delay = executor.submit(new Callable<Integer>() {
+				@Override
+				public Integer call() throws Exception {
+					return api.fireBeforeShutdownListeners(reason);
+				}
+			}).get(wait, TimeUnit.MILLISECONDS);
+			return delay;
+		} catch (Exception e) {
+			Logger.error("Failed to execute before-shutdown listeners",e);
+		}finally {
+			executor.shutdownNow();
+		}
+		return 0;
+	}
 
 	public synchronized void exitSwing(final int i) {
 		if (!exiting) {

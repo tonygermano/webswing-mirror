@@ -32,6 +32,12 @@ public class DefaultInitializer implements Initializer {
 		File root = Main.getRootDir();
 		log.info("Using Root folder:" + root.getAbsolutePath());
 
+		// initialize config profile dir
+		File configProfile = Main.getConfigProfileDir();
+		if(!root.equals(configProfile)) {
+			log.info("Using Config profile folder:" + configProfile.getAbsolutePath());
+		}
+
 		// verify war file and convert to URI
 		validatePropertyFilePath(Constants.WAR_FILE_LOCATION, null);
 		log.info("Using War file:" + System.getProperty(Constants.WAR_FILE_LOCATION));
@@ -60,7 +66,7 @@ public class DefaultInitializer implements Initializer {
 					throw new FileNotFoundException("File " + uri.toString() + "not found.");
 				}
 			} catch (IllegalArgumentException e) {
-				File relativeConfigFile = new File(Main.getRootDir(), pathOrUri);
+				File relativeConfigFile = new File(Main.getConfigProfileDir(), pathOrUri);
 				File absoluteConfigFile = new File(pathOrUri);
 				if (relativeConfigFile.exists()) {
 					return relativeConfigFile.toURI().toString();

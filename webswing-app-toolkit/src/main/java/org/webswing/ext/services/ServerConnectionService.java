@@ -1,5 +1,7 @@
 package org.webswing.ext.services;
 
+import org.webswing.toolkit.api.lifecycle.ShutdownReason;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.TimeoutException;
@@ -15,4 +17,6 @@ public interface ServerConnectionService {
 	void resetInactivityTimers();
 
 	void messageApiPublish(Serializable o) throws IOException;
+
+	void scheduleShutdown(ShutdownReason admin);
 }

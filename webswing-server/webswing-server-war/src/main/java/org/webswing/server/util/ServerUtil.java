@@ -1,6 +1,5 @@
 package org.webswing.server.util;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -80,26 +79,6 @@ public class ServerUtil {
 			log.error("Failed to decode proto message:", e);
 			return null;
 		}
-	}
-
-	public static String getClientIp(WebSocketConnection r) {
-		String result = null;
-		if (r != null && r.getRequest() != null) {
-			result = r.getRequest().getHeader("X-Forwarded-For");
-			if (result == null) {
-				result = r.getRequest().getRemoteAddr();
-			}
-		}
-		return result;
-	}
-
-	public static String getClientIp(HttpServletRequest r) {
-		String result=null;
-		result=r.getHeader("X-Forwarded-For");
-		if(result==null){
-			result=r.getRemoteAddr();
-		}
-		return result;
 	}
 
 	public static String getClientOs(WebSocketConnection r) {

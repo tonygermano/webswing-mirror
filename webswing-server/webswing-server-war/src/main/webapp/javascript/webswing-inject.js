@@ -1,7 +1,6 @@
-define([], function amdFactory() {
 	"use strict";
 
-	return function Injector() {
+	export default function Injector() {
 		var api = this;
 		api.module = module;
 		api.injectAndVerify = injectAndVerify;
@@ -100,5 +99,4 @@ define([], function amdFactory() {
 				return this.message;
 			};
 		}
-	};
-});
+	}

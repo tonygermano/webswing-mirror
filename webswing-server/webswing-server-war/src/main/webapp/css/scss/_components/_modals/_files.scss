@@ -61,15 +61,16 @@
         }
     }
 
-
 	&-btn {
 	    @include rel('height', 90px);
-	    @include rel('padding', 55px 0px 14px 0px);
 	    @include border-radius(2px);
 	
 	    position: relative;
 	
-	    display: block;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
 	    width: 100%;
 	    background: none;
 	    border: 0;
@@ -97,10 +98,36 @@
 	
 	&-btn-icon {
         font-size: $large;
-        @include rel('top', 15px);
-        @include rel('left', 57px);
-        position: absolute;
+        
+        &:before {
+        	margin-right: 0;
+        }
     }
 }
 
+.ws-downloadlink {
+	@extend .ws-modal;
 
+    &-header {
+        @extend .ws-header;
+        text-align: left;
+    }
+    
+    &-content {
+        @include rel('margin', 0px);
+    }
+    
+    &-message {
+        @extend .ws-text;
+        @include rel('padding', 0px);
+        @include rel('margin', 20px 0px 20px 0px);
+
+        text-align: left;
+    }
+    
+    &-btnPanel {
+    	display: flex;
+    	justify-content: space-evenly;
+    }
+
+}

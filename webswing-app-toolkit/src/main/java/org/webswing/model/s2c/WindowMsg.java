@@ -11,10 +11,15 @@ public class WindowMsg implements Msg {
 	private List<WindowPartialContentMsg> content;
 	private byte[] directDraw;
 	private String title;
+	private String name;
 	private Integer posX;
 	private Integer posY;
 	private Integer width;
 	private Integer height;
+	private boolean html;
+	private boolean modalBlocked;
+	private String ownerId;
+	private Integer state;
 
 	public String getId() {
 		return id;
@@ -48,6 +53,14 @@ public class WindowMsg implements Msg {
 		this.title = title;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public Integer getPosX() {
 		return posX;
 	}
@@ -78,6 +91,38 @@ public class WindowMsg implements Msg {
 
 	public void setHeight(Integer height) {
 		this.height = height;
+	}
+
+	public boolean isHtml() {
+		return html;
+	}
+
+	public void setHtml(boolean html) {
+		this.html = html;
+	}
+
+	public boolean isModalBlocked() {
+		return modalBlocked;
+	}
+
+	public void setModalBlocked(boolean modalBlocked) {
+		this.modalBlocked = modalBlocked;
+	}
+
+	public String getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
+	}
+
+	public Integer getState() {
+		return state;
+	}
+
+	public void setState(Integer state) {
+		this.state = state;
 	}
 
 }

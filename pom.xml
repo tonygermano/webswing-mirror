@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.webswing</groupId>
     <artifactId>webswing</artifactId>
-    <version>2.6.5</version>
+    <version>2.7</version>
     <packaging>pom</packaging>
     <name>Webswing</name>
     <description>Webswing is a web server that allows to run any swing application inside your web browser using only pure HTML5.</description>
@@ -40,7 +40,6 @@
 
     <modules>
         <module>webswing-api</module>
-        <module>webswing-admin</module>
         <module>webswing-app-toolkit</module>
         <module>webswing-app-toolkit-fx</module>
         <module>webswing-app-toolkit-fx-java8</module>
@@ -50,8 +49,8 @@
         <module>webswing-app-launcher</module>
         <module>webswing-app-interface</module>
         <module>webswing-directdraw</module>
-        <module>webswing-demo</module>
         <module>webswing-server</module>
+        <module>webswing-security-modules</module>
         <module>webswing-assembly</module>
     </modules>
     <properties>
@@ -59,11 +58,12 @@
         <webswing-war-name>webswing-server</webswing-war-name>
         <jersey.version>2.27</jersey.version>
         <guice.version>4.1.0</guice.version>
-        <activemq.version>5.15.6</activemq.version>
-        <opensaml.version>3.3.1</opensaml.version>
+        <activemq.version>5.15.9</activemq.version>
         <bouncycastle.version>1.60</bouncycastle.version>
-        <jackson.databind.version>2.9.9.3</jackson.databind.version>
-        <jackson.annotations.version>2.9.9</jackson.annotations.version>
+        <jackson.databind.version>2.9.10</jackson.databind.version>
+        <jackson.annotations.version>2.9.10</jackson.annotations.version>
+        <jetty.version>9.4.18.v20190429</jetty.version>
+        <pac4j.version>3.8.1</pac4j.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -76,6 +76,11 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.12</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -106,26 +111,6 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>1.6.6</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opensaml</groupId>
-                <artifactId>opensaml-core</artifactId>
-                <version>${opensaml.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opensaml</groupId>
-                <artifactId>opensaml-saml-api</artifactId>
-                <version>${opensaml.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opensaml</groupId>
-                <artifactId>opensaml-saml-impl</artifactId>
-                <version>${opensaml.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opensaml</groupId>
-                <artifactId>opensaml-security-api</artifactId>
-                <version>${opensaml.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
@@ -182,6 +167,11 @@
                 <artifactId>guava</artifactId>
                 <version>24.1.1-jre</version>
             </dependency>
+            <dependency>
+				<groupId>org.pac4j</groupId>
+				<artifactId>pac4j-saml</artifactId>
+				<version>${pac4j.version}</version>
+			</dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -194,14 +184,12 @@
     </dependencies>
     <repositories>
         <repository>
-            <id>shibboleth</id>
-            <name>shiboleth (for opensaml)</name>
-            <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>mulesoft</id>
-            <name>mulesoft (for opensaml)</name>
-            <url>http://repository.mulesoft.org/releases/</url>
+            <id>webswing-3rd-party</id>
+            <name>shibolet,mulesoft,jre</name>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>https://dev.webswing.org/public/nexus/repository/webswing-3rd-parties/</url>
         </repository>
     </repositories>
     <build>
@@ -251,9 +239,6 @@
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>3.1.0</version>
                 </plugin>
-                <!-- If not declared here, correct transitive dependencies not available
-+                    in reporting, even with correct version declared there.
-+                 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
@@ -269,9 +254,56 @@
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>3.0.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>1.6.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>1.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>3.0.0-M1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>generate-file</id>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>java.jre</groupId>
+                            <artifactId>rt</artifactId>
+                            <version>1.8.0_25</version>
+                            <overWrite>true</overWrite>
+                            <destFileName>rt-1.8.jar</destFileName>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>java.jfxrt</groupId>
+                            <artifactId>jfxrt</artifactId>
+                            <version>1.8.0_40-b27</version>
+                            <overWrite>true</overWrite>
+                            <destFileName>jfxrt.jar</destFileName>
+                        </artifactItem>
+                    </artifactItems>
+                    <outputDirectory>lib</outputDirectory>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
@@ -342,61 +374,53 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>2.5.1</version>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
                 <inherited>false</inherited>
                 <executions>
                     <execution>
-                        <id>install-pngencoder</id>
+                        <id>install node and npm</id>
                         <goals>
-                            <goal>install-file</goal>
+                            <goal>install-node-and-npm</goal>
                         </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <groupId>com.objectplanet.image</groupId>
-                            <artifactId>pngencoder</artifactId>
-                            <version>1</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/pngencoder.jar</file>
-                            <generatePom>true</generatePom>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>install-java9-jdk.jsobject-modpatch</id>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <groupId>jdk.jsobject.modpatch</groupId>
-                            <artifactId>jdk.jsobject.modpatch</artifactId>
-                            <version>1</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/jdk.jsobject.modpatch</file>
-                            <generatePom>true</generatePom>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>install-java9-java.desktop-modpatch</id>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <groupId>java.desktop.modpatch</groupId>
-                            <artifactId>java.desktop.modpatch</artifactId>
-                            <version>1</version>
-                            <packaging>jar</packaging>
-                            <file>${basedir}/lib/java.desktop.modpatch</file>
-                            <generatePom>true</generatePom>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <nodeVersion>v10.16.0</nodeVersion>
+                </configuration>
             </plugin>
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <id>dev</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>pl.project13.maven</groupId>
+                        <artifactId>git-commit-id-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>generate-file</id>
+                            </execution>
+                            <execution>
+                                <id>manifest-properties</id>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>true</skipTests>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>release</id>
             <build>
@@ -449,17 +473,6 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.7</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
-                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>1.5</version>
@@ -479,6 +492,24 @@
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>central</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.7</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

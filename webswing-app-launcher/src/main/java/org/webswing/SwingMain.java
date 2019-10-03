@@ -1,22 +1,25 @@
 package org.webswing;
 
-import org.webswing.applet.AppletContainer;
-import org.webswing.toolkit.util.ClasspathUtil;
-import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Services;
-import org.webswing.toolkit.util.Util;
-
-import javax.swing.SwingUtilities;
 import java.applet.Applet;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.SwingUtilities;
+
+import org.webswing.applet.AppletContainer;
+import org.webswing.ext.services.ToolkitFXService;
+import org.webswing.toolkit.util.ClasspathUtil;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
 
 public class SwingMain {
 
@@ -101,7 +104,15 @@ public class SwingMain {
 				startup.invoke(null,new Runnable() {
 					@Override
 					public void run() {
-						//nothing to do here
+						try {
+							Class<?> toolkitFXServiceImplClass = swingLibClassLoader.loadClass("org.webswing.javafx.toolkit.ToolkitFXServiceImpl");
+							Method m = toolkitFXServiceImplClass.getMethod("getInstance");
+							Object instance = m.invoke(null);
+							ToolkitFXService toolkitFXServiceImpl = (ToolkitFXService) instance;
+							Services.initializeToolkitFXService(toolkitFXServiceImpl);
+						} catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+							Logger.error("Failed to initialize ToolkitFXServiceImpl", e);
+						}
 					}
 				});
 			} catch (IllegalAccessException |ClassNotFoundException|NoSuchMethodException  e) {

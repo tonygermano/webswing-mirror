@@ -48,7 +48,8 @@ abstract public class WebWindowPeer extends WebContainerPeer implements WindowPe
 	public void updateIconImages() {
 	}
 
-	public void setOpacity(float paramFloat) {
+	public void setOpacity(float o) {
+		this.opacity = o;
 	}
 
 	public void setOpaque(boolean paramBoolean) {

@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
@@ -453,6 +453,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		session.setApplet(LauncherType.Applet.equals(getAppConfig().getLauncherType()));
 		session.setApplication(getAppConfig().getName());
 		session.setApplicationUrl(manager.getFullPathMapping());
+		session.setApplicationPath(manager.getPathMapping());
 		session.setConnected(getConnectionId() != null);
 		WebSocketUserInfo info;
 		if (webConnection == null) {
@@ -584,6 +585,8 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_COMPOSITING_WM, appConfig.isCompositingWinManager());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TEST_MODE, appConfig.isTestMode());
 			swingConfig.addProperty(Constants.SWING_SESSION_TIMEOUT_SEC, appConfig.getSwingSessionTimeout());
 			swingConfig.addProperty(Constants.SWING_SESSION_TIMEOUT_IF_INACTIVE, appConfig.isTimeoutIfInactive());
 			swingConfig.addProperty("awt.toolkit", webToolkitClass);

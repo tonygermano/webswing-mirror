@@ -9,7 +9,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class WebTimer extends Timer {
-	static ScheduledExecutorService timer ;
+	static ScheduledExecutorService timer;
 	private ScheduledFuture<?> future;
 
 	protected WebTimer(final Runnable runnable) {
@@ -21,7 +21,7 @@ public class WebTimer extends Timer {
 		if (timer == null) {
 			timer = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing FX Timer"));
 		}
-		future= timer.scheduleAtFixedRate(runnable, 0, period, TimeUnit.MILLISECONDS);
+		future = timer.scheduleAtFixedRate(runnable, 0, period, TimeUnit.MILLISECONDS);
 		return 1; // need something non-zero to denote success.
 	}
 
@@ -36,5 +36,11 @@ public class WebTimer extends Timer {
 			future.cancel(false);
 			future = null;
 		}
+	}
+
+	protected void _pause(long timer) {
+	}
+
+	protected void _resume(long timer) {
 	}
 }

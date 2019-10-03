@@ -17,12 +17,15 @@ import java.util.List;
 
 public class ServerMain {
 
+	static Server server;
+
 	public static void main(String[] args) throws Exception {
 		Configuration config = ConfigurationImpl.parse(args);
 		System.out.println(config.toString());
 		System.setProperty(Constants.SERVER_EMBEDED_FLAG, "true");
 		System.setProperty(Constants.SERVER_PORT, config.getHttpPort());
 		System.setProperty(Constants.SERVER_HOST, config.getHost());
+		System.setProperty(Constants.SERVER_CONTEXT_PATH, config.getContextPath());
 		boolean isHttpsOnly = config.isHttps() && !config.isHttp();
 		System.setProperty(Constants.HTTPS_ONLY, System.getProperty(Constants.HTTPS_ONLY, ""+isHttpsOnly));
 		if (config.getConfigFile() != null) {
@@ -34,7 +37,7 @@ public class ServerMain {
 			}
 		}
 
-		Server server = new Server();
+		server = new Server();
 
 		List<Connector> connectors = new ArrayList<Connector>();
 		if (config.isHttp()) {
@@ -78,7 +81,7 @@ public class ServerMain {
 		server.setConnectors(connectors.toArray(new Connector[connectors.size()]));
 
 		WebAppContext webapp = new WebAppContext();
-		webapp.setContextPath("/");
+		webapp.setContextPath(System.getProperty(Constants.SERVER_CONTEXT_PATH,"/"));
 		webapp.setWar(System.getProperty(Constants.WAR_FILE_LOCATION));
 		webapp.setTempDirectory(new File(URI.create(System.getProperty(Constants.TEMP_DIR_PATH))));
 		webapp.setPersistTempDirectory(true);
@@ -99,7 +102,20 @@ public class ServerMain {
 			server.start();
 			server.join();
 		} catch (Exception e) {
+			Logger.error("Webswing Server initialization failed. Stopping the server.",e);
 			server.stop();
+		}
+		server=null;
+	}
+
+
+	public static void stopServer(){
+		if(server!=null){
+			try {
+				server.stop();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }
