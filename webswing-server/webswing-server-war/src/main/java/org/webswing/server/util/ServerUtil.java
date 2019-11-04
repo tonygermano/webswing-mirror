@@ -180,8 +180,12 @@ public class ServerUtil {
 			File file = new File(folder, resource);
 			if (file.isFile()) {
 				try {
-					result = file.toURI().toURL();
-				} catch (MalformedURLException e) {
+					String folderUrl = folder.getCanonicalPath();
+					String fileUrl = file.getCanonicalPath();
+					if(fileUrl.contains(folderUrl)){
+						result = file.toURI().toURL();
+					}
+				} catch (IOException e) {
 					log.error("Failed to get file from Folder.", e);
 				}
 			}

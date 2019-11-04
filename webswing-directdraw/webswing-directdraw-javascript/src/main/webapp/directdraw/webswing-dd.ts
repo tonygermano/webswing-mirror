@@ -187,8 +187,9 @@ export class DirectDraw {
         return window.btoa(binary);
     }
 
-    public static getImageData(data:Uint8Array) {
-        return "data:image/png;base64," + DirectDraw.toBase64(data);
+    public static getImageData(data: Uint8Array) {
+        const b64 = DirectDraw.toBase64(data);
+        return b64 ? "data:image/png;base64," + b64 : null;
     }
 
     public static fillRule(constant: IDrawConstantProto) {
@@ -942,11 +943,17 @@ export class DirectDraw {
                     const loadedImages = images.map((image) => {
                         return new Promise((resolveImg) => {
                             const img = new Image();
-                            img.onload = () => {
+                            const dataurl=DirectDraw.getImageData(image.data as Uint8Array);
+                            if(dataurl) {
+                                img.onload = () => {
+                                    image.data = img;
+                                    resolveImg();
+                                };
+                                img.src = dataurl
+                            }else{
                                 image.data = img;
                                 resolveImg();
-                            };
-                            img.src = DirectDraw.getImageData(image.data as Uint8Array);
+                            }
                         });
                     });
                     Promise.all(loadedImages).then(resolve);

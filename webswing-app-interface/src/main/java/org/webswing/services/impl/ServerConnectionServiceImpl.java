@@ -66,9 +66,9 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private MessageProducer mgsApiProducer;
 	private MessageConsumer mgsApiConsumer;
 
-	private Object delayedShutdownScheduleLock = new Object();
+	private final Object delayedShutdownScheduleLock = new Object();
 	private ScheduledFuture<?> delayedShutdownFuture;
-	private Boolean schedulingShutdown;
+	private boolean schedulingShutdown;
 	private AtomicBoolean terminated = new AtomicBoolean(false);
 
 
@@ -240,19 +240,22 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 	private void scheduleShutdown(ShutdownReason reason,Runnable shutdownlogic) {
 		synchronized (delayedShutdownScheduleLock) {
-			schedulingShutdown=true;
-			if (delayedShutdownFuture==null || delayedShutdownFuture.isDone()) {
-				int delaySeconds = Util.getWebToolkit().executeOnBeforeShutdownListeners(reason);
-				delayedShutdownFuture = exitScheduler.schedule(()->{
-					shutdownlogic.run();
-					terminated.set(true);
-					Util.getWebToolkit().exitSwing(0);
-				}, delaySeconds, TimeUnit.SECONDS);
-				Logger.info("(" + reason + ") Application Shutdown scheduled. (delayed by " + delayedShutdownFuture.getDelay(TimeUnit.SECONDS) + " seconds).");
-			} else {
-				Logger.info("(" + reason + ") Application Shutdown request ignored. Delayed shutdown already scheduled in " + delayedShutdownFuture.getDelay(TimeUnit.SECONDS) + " seconds.");
+			try {
+				schedulingShutdown = true;
+				if (delayedShutdownFuture == null || delayedShutdownFuture.isDone()) {
+					int delaySeconds = Util.getWebToolkit().executeOnBeforeShutdownListeners(reason);
+					delayedShutdownFuture = exitScheduler.schedule(() -> {
+						shutdownlogic.run();
+						terminated.set(true);
+						Util.getWebToolkit().exitSwing(0);
+					}, delaySeconds, TimeUnit.SECONDS);
+					Logger.info("(" + reason + ") Application Shutdown scheduled. (delayed by " + delayedShutdownFuture.getDelay(TimeUnit.SECONDS) + " seconds).");
+				} else {
+					Logger.info("(" + reason + ") Application Shutdown request ignored. Delayed shutdown already scheduled in " + delayedShutdownFuture.getDelay(TimeUnit.SECONDS) + " seconds.");
+				}
+			}finally{
+				schedulingShutdown=false;
 			}
-			schedulingShutdown=false;
 		}
 	}
 
@@ -277,20 +280,19 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 	@Override
 	public void resetInactivityTimers() {
-		if(schedulingShutdown){
-			//if resetInactivityTimers called from onBeforeShutdown listener, we need to defer execution, because the shutdown timer is not yet created.
-			exitScheduler.schedule(()->resetInactivityTimers(),1, TimeUnit.MILLISECONDS);
-		}else{
-			lastMessageTimestamp.getAndSet(System.currentTimeMillis());
-			lastUserInputTimestamp.getAndSet(System.currentTimeMillis());
-			synchronized (delayedShutdownScheduleLock) {
-				if(delayedShutdownFuture!=null && !delayedShutdownFuture.isDone()){
+		synchronized (delayedShutdownScheduleLock) {
+			if (schedulingShutdown) {
+				//if resetInactivityTimers called from onBeforeShutdown listener, we need to defer execution, because the shutdown timer is not yet created.
+				exitScheduler.schedule(() -> resetInactivityTimers(), 1, TimeUnit.MILLISECONDS);
+			} else {
+				lastMessageTimestamp.getAndSet(System.currentTimeMillis());
+				lastUserInputTimestamp.getAndSet(System.currentTimeMillis());
+				if (delayedShutdownFuture != null && !delayedShutdownFuture.isDone()) {
 					Logger.warn("Cancelling Delayed Application Shutdown expected in " + delayedShutdownFuture.getDelay(TimeUnit.SECONDS) + " seconds.");
 					delayedShutdownFuture.cancel(false);
 				}
 			}
 		}
-
 	}
 
 	private void sendJmsMessage(final Serializable o) throws JMSException {

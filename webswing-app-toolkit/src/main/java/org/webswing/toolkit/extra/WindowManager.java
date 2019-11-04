@@ -206,7 +206,7 @@ public class WindowManager {
 
 	@SuppressWarnings("deprecation")
 	public Component getVisibleComponentOnPosition(int x, int y, String winId) {
-		Component result = activeWindow;
+		Component result = null;
 		Window positionWin;
 		if (winId != null && winId.length() > 0) {
 			positionWin = Util.findWindowById(winId);

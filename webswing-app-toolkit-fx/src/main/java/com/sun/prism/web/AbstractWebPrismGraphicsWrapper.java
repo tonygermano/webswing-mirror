@@ -6,6 +6,7 @@ import com.sun.javafx.geom.RectBounds;
 import com.sun.javafx.geom.Rectangle;
 import com.sun.javafx.geom.Shape;
 import com.sun.javafx.geom.transform.BaseTransform;
+import com.sun.javafx.geom.transform.GeneralTransform3D;
 import com.sun.javafx.scene.text.GlyphList;
 import com.sun.javafx.sg.prism.NGCamera;
 import com.sun.javafx.sg.prism.NGLightBase;
@@ -446,4 +447,10 @@ public abstract class AbstractWebPrismGraphicsWrapper implements ReadbackGraphic
 		if (original instanceof ReadbackGraphics)
 			((ReadbackGraphics) original).releaseReadBackBuffer(view);
 	}
+
+	@Override
+	public void setPerspectiveTransform(GeneralTransform3D generalTransform3D) {
+		original.setPerspectiveTransform(generalTransform3D);
+	}
+
 }

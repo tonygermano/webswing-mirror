@@ -163,7 +163,7 @@ public class SwingProcessImpl implements SwingProcess {
 					try {
 						getCloseListener().onClose();
 					} catch (Exception e) {
-						log.error("Failed to call onClose on " + getCloseListener());
+						log.error("Failed to call onClose", e);
 					}
 				}
 				if (hasSessionLog) {

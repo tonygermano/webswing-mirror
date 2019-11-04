@@ -17,6 +17,13 @@
             dispose: dispose
         };
         module.ready = function () {
+            var params=api.cfg.pingParams;
+            if(params!=null){
+                count=params.count||count;
+                interval= params.interval||interval;
+                maxLatency=params.maxLatency||maxLatency;
+                notifyIf = params.notifyIf||notifyIf;
+            }
         };
 
         function start(){

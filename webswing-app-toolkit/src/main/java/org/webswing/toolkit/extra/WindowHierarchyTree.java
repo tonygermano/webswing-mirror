@@ -232,7 +232,7 @@ public class WindowHierarchyTree {
 	protected Window getVisibleWindowOnPosition(int x, int y) {
 		List<WindowHierarchyNode> clonedZOrder = (List<WindowHierarchyNode>) zOrder.clone();//to avoid concurrent modification exception
 		for (WindowHierarchyNode w : clonedZOrder) {
-			if (SwingUtilities.isRectangleContainingRectangle(w.getW().getBounds(), new Rectangle(x, y, 0, 0))) {
+			if (w.getW().getBounds().contains(x,y)) {
 				return w.getW();
 			}
 		}

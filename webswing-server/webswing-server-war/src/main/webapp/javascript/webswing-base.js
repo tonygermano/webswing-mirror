@@ -522,7 +522,9 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 				
 				if (newWindowOpened) {
 					windowOpened(windowImageHolders[win.id]);
-					performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
+					if (!api.cfg.mirrorMode) {
+						performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
+					}
 				}
 				
 				return Promise.resolve();
@@ -564,12 +566,14 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 				
 				if (newWindowOpened) {
 					windowOpened(canvasWin);
-					performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
+					if (!api.cfg.mirrorMode) {
+						performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
+					}
 				}
 				
 				if (typeof win.state !== 'undefined' && canvasWin.state != win.state) {
 					canvasWin.state = win.state;
-					if (win.state == JFRAME_MAXIMIZED_STATE && canvas.parentNode) {
+					if (!api.cfg.mirrorMode && win.state == JFRAME_MAXIMIZED_STATE && canvas.parentNode) {
 						// window has been maximized, we need to set its bounds according to its parent node (could be detached)
 						var rect = canvas.parentNode.getBoundingClientRect();
 						canvasWin.setBounds(0, 0, rect.width, rect.height);
@@ -717,7 +721,9 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         			
         			if (newWindowOpened) {
         				windowOpened(htmlOrCanvasWin);
-        				performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
+        				if (!api.cfg.mirrorMode) {
+        					performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
+        				}
         			}
         			
         			htmlOrCanvasElement.css({"z-index": (compositionBaseZIndex + index + 1), "width": win.width + 'px', "height": win.height + 'px'});
@@ -730,7 +736,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     				
     				if (!htmlOrCanvasWin.htmlWindow && typeof win.state !== 'undefined' && htmlOrCanvasWin.state != win.state) {
     					htmlOrCanvasWin.state = win.state;
-    					if (win.state == JFRAME_MAXIMIZED_STATE && htmlOrCanvasElement[0].parentNode) {
+    					if (!api.cfg.mirrorMode && win.state == JFRAME_MAXIMIZED_STATE && htmlOrCanvasElement[0].parentNode) {
     						// window has been maximized, we need to set its bounds according to its parent node (could be detached)
     						var rect = htmlOrCanvasElement[0].parentNode.getBoundingClientRect();
     						htmlOrCanvasWin.setBounds(0, 0, rect.width, rect.height);
@@ -771,7 +777,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 						overrideLocation = true;
 					}
 					
-					if (overrideLocation) {
+					if (!api.cfg.mirrorMode && overrideLocation) {
 						htmlOrCanvasWin.setLocation(winPosX, winPosY);
 					}
 				}

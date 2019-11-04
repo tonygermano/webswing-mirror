@@ -18,6 +18,7 @@ public class DrawConstantPool {
 
 	private static final int IMG_CACHE_SIZE = Integer.getInteger("webswing.ddImageCacheSize", 128);
 	private static final int CONSTANT_CACHE_SIZE = Integer.getInteger("webswing.ddConstCacheSize", 8192);
+	private static final int CONSTANT_CACHE_SIZE_MAX = Integer.getInteger("webswing.ddMaxConstCacheSize", 8192*32);
 
 	private LRUDrawConstantPoolCache pool;
 	private LRUDrawConstantPoolCache imgPool;
@@ -27,8 +28,8 @@ public class DrawConstantPool {
 	private int imgPoolOverflowCounter = 0;
 
 	public DrawConstantPool() {
-		pool = new LRUDrawConstantPoolCache(CONSTANT_CACHE_SIZE, 0, CONSTANT_CACHE_SIZE);
-		imgPool = new LRUDrawConstantPoolCache(IMG_CACHE_SIZE, CONSTANT_CACHE_SIZE, CONSTANT_CACHE_SIZE);
+		pool = new LRUDrawConstantPoolCache(CONSTANT_CACHE_SIZE, 0, CONSTANT_CACHE_SIZE_MAX);
+		imgPool = new LRUDrawConstantPoolCache(IMG_CACHE_SIZE, CONSTANT_CACHE_SIZE_MAX, CONSTANT_CACHE_SIZE_MAX);
 	}
 
 	public void resetCacheOverflowCounters() {

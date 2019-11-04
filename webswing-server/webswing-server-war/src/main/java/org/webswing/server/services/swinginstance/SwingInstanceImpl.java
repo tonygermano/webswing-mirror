@@ -234,7 +234,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 
 	public void sendToWeb(MsgOut o) {
 		EncodedMessage serialized = new EncodedMessage(o);
-		if (sessionRecorder!=null && sessionRecorder.isRecording()) {
+		if (sessionRecorder != null && sessionRecorder.isRecording()) {
 			sessionRecorder.saveFrame(serialized.getProtoMessage());
 		}
 		if (webConnection != null) {
@@ -349,16 +349,16 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				}
 			} else if (o instanceof JvmStatsMsgInternal) {
 				JvmStatsMsgInternal s = (JvmStatsMsgInternal) o;
-				
+
 				double cpuUsage = s.getCpuUsage();
-				
+
 				logStatValue(StatisticsLogger.MEMORY_ALLOCATED_METRIC, s.getHeapSize());
 				logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
 				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, cpuUsage);
 				logStatValue(StatisticsLogger.CPU_UTIL_SESSION_METRIC, cpuUsage);
 				logStatValue(StatisticsLogger.EDT_BLOCKED_SEC_METRIC, s.getEdtPingSeconds());
 				if (getAppConfig().isMonitorEdtEnabled()) {
-					if (s.getEdtPingSeconds() > Math.max(2,getAppConfig().getLoadingAnimationDelay())) {
+					if (s.getEdtPingSeconds() > Math.max(2, getAppConfig().getLoadingAnimationDelay())) {
 						sendToWeb(SimpleEventMsgOut.applicationBusy.buildMsgOut());
 					}
 				}
@@ -384,27 +384,32 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	}
 
 	private void close() {
-		if (config.isAutoLogout()) {
-			sendToWeb(SimpleEventMsgOut.shutDownAutoLogoutNotification.buildMsgOut());
-			if (webConnection != null) {
-				webConnection.logoutUser();
-			} else if (lastConnection != null) {
-				lastConnection.logoutUser();
+		try {
+			if (config.isAutoLogout()) {
+				sendToWeb(SimpleEventMsgOut.shutDownAutoLogoutNotification.buildMsgOut());
+				if (webConnection != null) {
+					webConnection.logoutUser();
+				} else if (lastConnection != null) {
+					lastConnection.logoutUser();
+				}
 			}
-		}
-		if (StringUtils.isNotBlank(config.getGoodbyeUrl())) {
-			String url = subs.replace(config.getGoodbyeUrl());
-			if (url.startsWith("/")) {
-				url = AbstractSecurityModule.getContextPath(manager.getServletContext()) + url;
+			if (StringUtils.isNotBlank(config.getGoodbyeUrl())) {
+				String url = subs.replace(config.getGoodbyeUrl());
+				if (url.startsWith("/")) {
+					url = AbstractSecurityModule.getContextPath(manager.getServletContext()) + url;
+				}
+				AppFrameMsgOut result = new AppFrameMsgOut();
+				result.setLinkAction(new LinkActionMsg(LinkActionType.redirect, url));
+				sendToWeb(result);
+			} else {
+				sendToWeb(SimpleEventMsgOut.shutDownNotification.buildMsgOut());
 			}
-			AppFrameMsgOut result = new AppFrameMsgOut();
-			result.setLinkAction(new LinkActionMsg(LinkActionType.redirect, url));
-			sendToWeb(result);
-		} else {
-			sendToWeb(SimpleEventMsgOut.shutDownNotification.buildMsgOut());
+			jvmConnection.close();
+		} catch (Throwable e){
+			log.error("Unexpected error while closing instance", e);
+		}finally {
+			notifyExiting();
 		}
-		jvmConnection.close();
-		notifyExiting();
 
 		if (process != null && config.isIsolatedFs() && config.isClearTransferDir()) {
 			String transferDir = process.getConfig().getProperties().get(Constants.SWING_START_SYS_PROP_TRANSFER_DIR);
@@ -427,7 +432,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			process.setProcessExitListener(null);
 		}
 		try {
-			if (sessionRecorder!=null && sessionRecorder.isRecording()) {
+			if (sessionRecorder != null && sessionRecorder.isRecording()) {
 				sessionRecorder.stopRecording();
 			}
 		} catch (WsException e) {
@@ -513,27 +518,39 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			boolean useJFX = config.isJavaFx();
 			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;
 			String webFxToolkitFactory = JAVA_FX_TOOLKIT_CLASS_NAME;
-			String javaFxBootClasspath ="";
+			String javaFxBootClasspath = "";
 			String javaFxAppClasspath = "";
 			String webGraphicsEnvClass = WEB_GRAPHICS_ENV_CLASS_NAME;
 			String j9modules = "";
 			if (javaVersion.startsWith("1.8")) {
 				webToolkitClass += "8";
-				webFxToolkitFactory +="8";
+				webFxToolkitFactory += "8";
 				webGraphicsEnvClass += "8";
 				if (useJFX) {
-					if(!new File(JAVA_FX_PATH).exists()){
-						log.warn("JavaFx library not found in '" + new File(JAVA_FX_PATH).getCanonicalPath() + "'. ");
-						useJFX = false;
+					File file = new File(JAVA_FX_PATH);
+					if (!file.exists()) {
+
+						//try resolve javafx path from jre executable
+						File jreRelative= new File(java, "../../lib/ext/jfxrt.jar");
+						File jdkRelative= new File(java, "../../jre/lib/ext/jfxrt.jar");
+						if (jreRelative.exists()) {
+							file = jreRelative;
+						} else if (jdkRelative.exists()) {
+							file = jdkRelative;
+						}else{
+							log.warn("JavaFx library not found in '" + file.getCanonicalPath() + "'. ");
+							useJFX = false;
+						}
+
 					}
-					javaFxBootClasspath += File.pathSeparator + CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME) + File.pathSeparator + CommonUtil.getBootClassPathForClass(webFxToolkitFactory) + File.pathSeparator + "\"" + new File(JAVA_FX_PATH).getCanonicalPath() + "\"";
+					javaFxBootClasspath += File.pathSeparator + CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME) + File.pathSeparator + CommonUtil.getBootClassPathForClass(webFxToolkitFactory) + File.pathSeparator + "\"" + file.getCanonicalPath() + "\"";
 				}
 			} else if (javaVersion.startsWith("11")) {
 				webToolkitClass += "11";
-				webFxToolkitFactory +="11";
+				webFxToolkitFactory += "11";
 				webGraphicsEnvClass += "11";
 				if (useJFX) {
-					javaFxAppClasspath += CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME,false) +";" + CommonUtil.getBootClassPathForClass(webFxToolkitFactory,false)+";";
+					javaFxAppClasspath += CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME, false) + ";" + CommonUtil.getBootClassPathForClass(webFxToolkitFactory, false) + ";";
 				}
 				j9modules = " --patch-module jdk.jsobject=" + CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_JSOBJECT_MODULE_MARKER);
 				j9modules += " --patch-module java.desktop=" + CommonUtil.getBootClassPathForClass(SHELL_FOLDER_MANAGER);
@@ -606,11 +623,11 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				swingConfig.addProperty("prism.lcdtext", "false");//PrismFontFactory
 				swingConfig.addProperty("javafx.live.resize", "false");//QuantumToolkit
 			}
-			
+
 			if (config.isSessionLogging()) {
-		        swingConfig.setLogAppender(createSessionLogAppender());
+				swingConfig.setLogAppender(createSessionLogAppender());
 			}
-			
+
 			switch (appConfig.getLauncherType()) {
 			case Applet:
 				AppletLauncherConfig applet = appConfig.getValueAs(LAUNCHER_CONFIG, AppletLauncherConfig.class);
@@ -682,46 +699,33 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		}
 		return f.getCanonicalPath();
 	}
-	
+
 	private Appender createSessionLogAppender() {
 		String logDir = LogReaderUtil.getSessionLogDir(subs, config);
-		
+
 		if (StringUtils.isNotBlank(logDir)) {
 			// make path relative for logger
 			logDir = new File("").toURI().relativize(new File(logDir).toURI()).getPath();
 		}
-		
+
 		String appUrlNormalized = LogReaderUtil.normalizeForFileName(manager.getApplicationInfoMsg().getUrl());
 		String sessionIdNormalized = LogReaderUtil.normalizeForFileName(this.getInstanceId());
 		String logFileName = logDir + "/webswing-" + sessionIdNormalized + "-" + appUrlNormalized + ".session.log";
 		String globPattern = "webswing-*-" + appUrlNormalized + ".session.log*";
-		
+
 		BuiltConfiguration logConfig = ConfigurationBuilderFactory.newConfigurationBuilder().build();
-		
+
 		String singleSize = subs.replace(config.getSessionLogFileSize());
 		long maxLogRollingSize = FileSize.parse(singleSize, DEFAULT_LOG_SIZE) / 2;
 		SizeBasedTriggeringPolicy sizeBasedPolicy = SizeBasedTriggeringPolicy.createPolicy(maxLogRollingSize + " B");
 		String maxSize = subs.replace(config.getSessionLogMaxFileSize());
-		
-		RollingFileAppender appender = RollingFileAppender.newBuilder()
-				.withName(SwingProcessImpl.class.getName())
-				.withFileName(logFileName)
-				.withFilePattern(logFileName + ".%i")
-				.withAppend(true)
-				.withLayout(PatternLayout.newBuilder().withPattern(Constants.SESSION_LOG_PATTERN).build())
-				.withPolicy(sizeBasedPolicy)
-				.withStrategy(DefaultRolloverStrategy.newBuilder()
-						.withMax("1")
-						.withConfig(logConfig)
-						.withCustomActions(new Action[] {
-								DeleteAction.createDeleteAction(logDir, false, 1, false, PathSortByModificationTime.createSorter(true), 
-										new PathCondition[] {IfFileName.createNameCondition(globPattern, null, IfAccumulatedFileSize.createFileSizeCondition(maxSize))}, null, logConfig)
-						})
-						.build())
-				.build();
-        appender.start();
-        
-        return appender;
+
+		RollingFileAppender appender = RollingFileAppender.newBuilder().withName(SwingProcessImpl.class.getName()).withFileName(logFileName).withFilePattern(logFileName + ".%i").withAppend(true).withLayout(PatternLayout.newBuilder().withPattern(Constants.SESSION_LOG_PATTERN).build()).withPolicy(sizeBasedPolicy).withStrategy(
+				DefaultRolloverStrategy.newBuilder().withMax("1").withConfig(logConfig)
+						.withCustomActions(new Action[] { DeleteAction.createDeleteAction(logDir, false, 1, false, PathSortByModificationTime.createSorter(true), new PathCondition[] { IfFileName.createNameCondition(globPattern, null, IfAccumulatedFileSize.createFileSizeCondition(maxSize)) }, null, logConfig) }).build()).build();
+		appender.start();
+
+		return appender;
 	}
 
 	@Override

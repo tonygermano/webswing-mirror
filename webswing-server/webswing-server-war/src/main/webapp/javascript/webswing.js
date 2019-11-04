@@ -204,6 +204,7 @@ export default function Webswing(i18n) {
                     debugLog: false,
                     traceLog: false,
                     touchMode: false,
+                    pingParams:{count : 6, interval : 5, maxLatency : 500, notifyIf : 3},
                     compositingWindowsListener: {
                     	windowOpening: function(htmlOrCanvasWindow) {},
                     	windowOpened: function(htmlOrCanvasWindow) {},
@@ -278,6 +279,7 @@ export default function Webswing(i18n) {
                     cfg.debugLog = options.debugLog != null ? JSON.parse(options.debugLog) : cfg.debugLog;
                     cfg.traceLog = options.traceLog != null ? JSON.parse(options.traceLog) : cfg.traceLog;
                     cfg.javaCallTimeout = options.javaCallTimeout != null ? parseInt(options.javaCallTimeout, 10) : cfg.javaCallTimeout;
+                    cfg.pingParams = options.pingParams != null ? options.pingParams : cfg.pingParams;
                     if (cfg.connectionUrl.substr(cfg.connectionUrl.length - 1) !== '/') {
                         cfg.connectionUrl = cfg.connectionUrl + '/';
                     }

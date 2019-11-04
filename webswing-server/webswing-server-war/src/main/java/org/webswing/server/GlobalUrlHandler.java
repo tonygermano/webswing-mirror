@@ -280,7 +280,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHa
 			return false;
 		}
 		File customFolderFile = resolveFile(customFolder);
-		if (customFolderFile.isDirectory() && new File(customFolderFile, "index.html").isFile()) {
+		if (customFolderFile!=null && customFolderFile.isDirectory() && new File(customFolderFile, "index.html").isFile()) {
 			return true;
 		}
 		return false;

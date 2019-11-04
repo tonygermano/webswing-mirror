@@ -10,11 +10,6 @@ public class WebPrismGraphicsWrapper11 extends AbstractWebPrismGraphicsWrapper {
 	}
 
 	@Override
-	public void setPerspectiveTransform(GeneralTransform3D generalTransform3D) {
-		original.setPerspectiveTransform(generalTransform3D);
-	}
-
-	@Override
 	public void setPixelScaleFactors(float v, float v1) {
 		original.setPixelScaleFactors(v,v1);
 	}
