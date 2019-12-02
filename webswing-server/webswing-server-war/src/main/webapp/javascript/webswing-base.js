@@ -571,12 +571,15 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 					}
 				}
 				
-				if (typeof win.state !== 'undefined' && canvasWin.state != win.state) {
+				if (typeof win.state !== 'undefined' && win.state == JFRAME_MAXIMIZED_STATE) {
 					canvasWin.state = win.state;
-					if (!api.cfg.mirrorMode && win.state == JFRAME_MAXIMIZED_STATE && canvas.parentNode) {
+					if (!api.cfg.mirrorMode && canvas.parentNode) {
 						// window has been maximized, we need to set its bounds according to its parent node (could be detached)
-						var rect = canvas.parentNode.getBoundingClientRect();
-						canvasWin.setBounds(0, 0, rect.width, rect.height);
+						var rectP = canvas.parentNode.getBoundingClientRect();
+						var rectC = canvas.getBoundingClientRect();
+						if (rectC.width != rectP.width || rectC.height != rectP.height) {
+							canvasWin.setBounds(0, 0, rectP.width, rectP.height);
+						}
 					}
 				}
 				
@@ -675,7 +678,14 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         			// we don't need to draw html window, also do not create canvas
         			ddPromise = Promise.resolve(null);
         		} else if (win.directDraw == null) {
-        			ddPromise = Promise.resolve(wih);
+        			// no render data
+        			if (wih == null) {
+        				// new window and no data -> do not process
+        				resolved();
+        				return;
+        			}
+        			
+       				ddPromise = Promise.resolve(wih);
         		} else if (typeof win.directDraw === 'string') {
         			ddPromise = directDraw.draw64(win.directDraw, wih);
         		} else {
@@ -734,12 +744,15 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     				
     				validateAndPositionWindow(htmlOrCanvasWin, win.posX, win.posY);
     				
-    				if (!htmlOrCanvasWin.htmlWindow && typeof win.state !== 'undefined' && htmlOrCanvasWin.state != win.state) {
+    				if (!htmlOrCanvasWin.htmlWindow && typeof win.state !== 'undefined' && win.state == JFRAME_MAXIMIZED_STATE) {
     					htmlOrCanvasWin.state = win.state;
-    					if (!api.cfg.mirrorMode && win.state == JFRAME_MAXIMIZED_STATE && htmlOrCanvasElement[0].parentNode) {
+    					if (!api.cfg.mirrorMode && htmlOrCanvasElement[0].parentNode) {
     						// window has been maximized, we need to set its bounds according to its parent node (could be detached)
-    						var rect = htmlOrCanvasElement[0].parentNode.getBoundingClientRect();
-    						htmlOrCanvasWin.setBounds(0, 0, rect.width, rect.height);
+    						var rectP = htmlOrCanvasElement[0].parentNode.getBoundingClientRect();
+    						var rectC = htmlOrCanvasElement[0].getBoundingClientRect();
+    						if (rectC.width != rectP.width || rectC.height != rectP.height) {
+    							htmlOrCanvasWin.setBounds(0, 0, rectP.width, rectP.height);
+    						}
     					}
     				}
         			

@@ -36,7 +36,7 @@
             }
             if (resizeCheck == null) {
                 resizeCheck = setInterval(function () {
-                    if (!api.cfg.mirror && !api.cfg.touchMode && canvas != null && (canvas.width() !== width() || canvas.height() !== height())) {
+                    if (!api.cfg.mirror && !api.cfg.touchMode && canvas != null && (Math.floor(canvas.width()) !== width() || Math.floor(canvas.height()) !== height())) {
                     	if (api.cfg.rootElement.is(".composition")) {
                     		// when using compositing window manager, the root canvas has 0 size
                     		// we need to do a handshake only if the root element has changed size
@@ -54,6 +54,7 @@
                     		get().style.width = w + 'px';
                     		get().style.height = h + 'px';
                     		get().getContext("2d").putImageData(snapshot, 0, 0);
+                    		api.sendHandshake();
                     	}
                     }
                 }, 500);
@@ -75,11 +76,11 @@
         }
 
         function width() {
-            return api.cfg.rootElement.width();
+            return Math.floor(api.cfg.rootElement.width());
         }
 
         function height() {
-            return api.cfg.rootElement.height();
+            return Math.floor(api.cfg.rootElement.height());
         }
         
         function get() {

@@ -29,7 +29,9 @@ public class IsolatedFsShellFolderManager extends PublicShellFolderManager {
 			roots.add(root);
 			if (i == 0) {
 				IsolatedFsShellFolderManager.root = root;
-				System.setProperty("user.home", root.getAbsolutePath());
+				if(Boolean.getBoolean(Constants.SWING_START_SYS_PROP_USE_SHARED_USER_HOME)) {
+					System.setProperty("user.home", root.getAbsolutePath());
+				}
 			}
 		}
 	}

@@ -14,6 +14,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_APP_HOME = "webswing.applicationHome";
 	public static final String SWING_START_SYS_PROP_CLASS_PATH = "webswing.classPath";
 	public static final String SWING_START_SYS_PROP_ISOLATED_FS = "webswing.isolatedFs";
+	public static final String SWING_START_SYS_PROP_USE_SHARED_USER_HOME = "webswing.useSharedUserHome";
 	public static final String SWING_START_SYS_PROP_TRANSFER_DIR = "webswing.transfer.dir";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW = "webswing.directdraw";
 	public static final String SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED = "webswing.directdraw.supported";

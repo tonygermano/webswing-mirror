@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 
 import org.webswing.Constants;
 import org.webswing.model.MsgIn;
@@ -543,6 +544,16 @@ public class WebEventDispatcher {
 							} else if (saveMode) {
 								fc.setSelectedFile(new File(Util.getTimestampedTransferFolder("autosave"), event.getFiles().get(0)));
 							}
+							
+							if (fc.getFileFilter() != null && fc.getSelectedFile() != null && !fc.getFileFilter().accept(fc.getSelectedFile())) {
+								for (FileFilter ff : fc.getChoosableFileFilters()) {
+									if (ff.accept(fc.getSelectedFile())) {
+										fc.setFileFilter(ff);
+										break;
+									}
+								}
+							}
+							
 							Logger.info("File selected :" + fc.getSelectedFile().getAbsoluteFile());
 						}
 						if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
