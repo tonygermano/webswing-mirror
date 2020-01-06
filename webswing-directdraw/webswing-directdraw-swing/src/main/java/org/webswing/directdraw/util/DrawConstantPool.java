@@ -18,7 +18,7 @@ public class DrawConstantPool {
 
 	private static final int IMG_CACHE_SIZE = Integer.getInteger("webswing.ddImageCacheSize", 128);
 	private static final int CONSTANT_CACHE_SIZE = Integer.getInteger("webswing.ddConstCacheSize", 8192);
-	private static final int CONSTANT_CACHE_SIZE_MAX = Integer.getInteger("webswing.ddMaxConstCacheSize", 8192*32);
+	public static final int CONSTANT_CACHE_SIZE_MAX = Integer.getInteger("webswing.ddMaxConstCacheSize", 8192*32);
 
 	private LRUDrawConstantPoolCache pool;
 	private LRUDrawConstantPoolCache imgPool;

@@ -20,6 +20,8 @@ public abstract class CompositeDrawConstantHolder<T> extends DrawConstant<T> {
 
 	public abstract void expandAndCacheConstants(List<DrawConstantProto> protos,DrawConstantPool cache);
 
+	public abstract int getExpandedConstantCount();
+
 	@Override
 	public String getFieldName() {
 		return null;

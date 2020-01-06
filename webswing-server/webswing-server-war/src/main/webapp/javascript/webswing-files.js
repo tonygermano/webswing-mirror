@@ -172,7 +172,7 @@ import 'blueimp-file-upload'
             });
             autoJqUpload.bind('fileuploadfail', fileuploadfail);
             autoJqUpload.bind('fileuploadprogressall', fileuploadprogressall);
-            autoJqUpload.bind('fileuploadadd', fileuploadadd);
+            autoJqUpload.bind('fileuploadadd', (e, data) => fileuploadadd(e,data,autoJqUpload));
             autoJqUpload.bind('fileuploaddone', fileuploaddone);
 
             var jqUpload = fileUpload.fileupload({
@@ -185,11 +185,11 @@ import 'blueimp-file-upload'
             });
             jqUpload.bind('fileuploadfail', fileuploadfail);
             jqUpload.bind('fileuploadprogressall', fileuploadprogressall);
-            jqUpload.bind('fileuploadadd', fileuploadadd);
+            jqUpload.bind('fileuploadadd', (e,data) => fileuploadadd(e,data,jqUpload));
             jqUpload.bind('fileuploaddone', fileuploaddone);
 
-            function fileuploadadd(e, data) {
-                data.form.fileupload({url: api.cfg.connectionUrl + 'file?uuid='+api.socketId()});
+            function fileuploadadd(e, data, fileuploadelement) {
+                fileuploadelement.url = api.cfg.connectionUrl + 'file?uuid='+api.socketId();
                 data.files.forEach(function (file) {
                     uploadingFiles.push(file.name);
                 });

@@ -72,6 +72,11 @@ public class GlyphListConst extends CompositeDrawConstantHolder<StringConstValue
 		}
 	}
 
+	@Override
+	public int getExpandedConstantCount() {
+		return value.string.length()+3;
+	}
+
 	public class StringConstValue {
 		String string;
 		Font font;

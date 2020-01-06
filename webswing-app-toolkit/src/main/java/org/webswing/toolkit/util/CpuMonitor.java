@@ -1,29 +1,50 @@
 package org.webswing.toolkit.util;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
+import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 public class CpuMonitor {
 	static long previousCPUTime = 0;
 	static long previousTime = 0;
 
+	static Method getProcessCpuTimeMethod;
+
 	static {
-		getCpuUtilization();
+        try {
+            Class<?> osMXBeanClass = Class.forName("com.sun.management.OperatingSystemMXBean");
+            getProcessCpuTimeMethod = osMXBeanClass.getMethod("getProcessCpuTime");
+        }
+        catch(ReflectiveOperationException sun) {
+            try {
+                Class<?> osMXBeanClass = Class.forName("com.ibm.lang.management.OperatingSystemMXBean");
+                getProcessCpuTimeMethod = osMXBeanClass.getMethod("getProcessCpuTime");
+            }
+            catch(ReflectiveOperationException ibm) {
+                getProcessCpuTimeMethod = null;
+                Logger.warn("Class not found to monitor CPU utilization. Monitoring CPU disabled.", sun);
+            }
+        }
 	}
 
 	public static double getCpuUtilization() {
+	    if(getProcessCpuTimeMethod == null) {
+	        return -1;
+	    }
+
 		try {
-			com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-			long currentCpuTime = operatingSystemMXBean.getProcessCpuTime();
-			
+		    OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
+            long currentCpuTime = (Long) getProcessCpuTimeMethod.invoke(osMXBean);
+
 			long now = ManagementFactory.getRuntimeMXBean().getUptime();
-			
+
 			long cpuTimeDelta = currentCpuTime - previousCPUTime;
 			previousCPUTime = currentCpuTime;
-			
+
 			long timeDelta = now - previousTime;
 			previousTime = now;
-			
+
 			int processors = Runtime.getRuntime().availableProcessors();
 			if (timeDelta == 0 || processors == 0) {
 				return 0;
@@ -31,10 +52,10 @@ public class CpuMonitor {
 			double cpuUsage = (double) TimeUnit.NANOSECONDS.toMillis(cpuTimeDelta) / (double) timeDelta;
 			cpuUsage = cpuUsage / processors;
 			return Math.max(0, cpuUsage) * 100;
-		} catch (NoClassDefFoundError e) {
-			Logger.warn("Class not found to monitor CPU utilization. Monitoring CPU disabled.", e);
+		} catch (ReflectiveOperationException e) {
+		    getProcessCpuTimeMethod = null;
+			Logger.warn("Failed to load CPU utilization. Monitoring CPU disabled.", e);
+			return -1;
 		}
-		
-		return 0;
 	}
 }

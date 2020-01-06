@@ -345,19 +345,18 @@ import html from './templates/touch.html';
         }
         
         function handleKeyup(event) {
-        	if (event.keyCode == 8) {
+        	if (event.keyCode == 8 || event.keyCode == 13) {
         		inputEvtQueue.push(getKBKey("keyup", event));
         	}
         	backspaceKeyDown = false;
         }
         
         function handleKeydown(event) {
-        	if (event.keyCode == 8) {
+        	if (event.keyCode == 8 || event.keyCode == 13) {
         		inputEvtQueue.push(getKBKey("keydown", event));
-        		backspaceKeyDown = true;
-        	} else {
-        		backspaceKeyDown = false;
         	}
+        	
+       		backspaceKeyDown = (event.keyCode == 8);
         }
         
         function handleCompositionStart(event) {

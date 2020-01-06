@@ -76,6 +76,16 @@ public class DrawInstruction implements Iterable<DrawConstant<?>> {
 	public String toString() {
 		return instruction.name();
 	}
-	
-	
+
+	public int getConstantCount() {
+		int result=0;
+		for (DrawConstant<?> c : args) {
+			if(c instanceof CompositeDrawConstantHolder){
+				result+=((CompositeDrawConstantHolder<?>) c).getExpandedConstantCount();
+			}else if(!(c instanceof IntegerConst) && c != DrawConstant.nullConst){
+				result++;
+			}
+		}
+		return result;
+	}
 }
