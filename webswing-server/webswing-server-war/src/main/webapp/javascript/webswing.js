@@ -204,14 +204,15 @@ export default function Webswing(i18n) {
                     debugLog: false,
                     traceLog: false,
                     touchMode: false,
-                    pingParams:{count : 6, interval : 5, maxLatency : 500, notifyIf : 3},
+                    pingParams: {count : 6, interval : 5, maxLatency : 500, notifyIf : 3},
                     compositingWindowsListener: {
                     	windowOpening: function(htmlOrCanvasWindow) {},
                     	windowOpened: function(htmlOrCanvasWindow) {},
                     	windowClosing: function(htmlOrCanvasWindow) {},
                     	windowClosed: function(htmlOrCanvasWindow) {},
                     	windowModalBlockedChanged: function(htmlOrCanvasWindow) {}
-                    }
+                    },
+                    hideTouchBar: false
                 };
             }
 
@@ -289,6 +290,7 @@ export default function Webswing(i18n) {
                     }
                     cfg.onReady = typeof options.onReady === 'function' ? options.onReady : cfg.onReady;
                     cfg.compositingWindowsListener = typeof options.compositingWindowsListener === 'object' ? options.compositingWindowsListener : cfg.compositingWindowsListener;
+                    cfg.hideTouchBar = options.hideTouchBar != null ? JSON.parse(options.hideTouchBar) : cfg.hideTouchBar;
                 }else{
                     return $.extend(true, [], cfg);
                 }

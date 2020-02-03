@@ -23,7 +23,8 @@ export default function Util(i18n){
         eraseCookie: eraseCookie,
         checkCookie: checkCookie,
         dpr: Math.ceil(window.devicePixelRatio) || 1,
-        getTimeZone: getTimeZone
+        getTimeZone: getTimeZone,
+        focusWithPreventScroll:focusWithPreventScroll
     }
 
     function webswingLogin(baseUrl, element, loginData, successCallback) {
@@ -299,5 +300,27 @@ export default function Util(i18n){
             str = '0' + str;
         }
         return str;
+    }
+
+    function focusWithPreventScroll(focusElement, selectInput){
+        if(focusElement){
+            var temppos = focusElement.style.position;
+            var templeft = focusElement.style.left;
+            var temptop = focusElement.style.top;
+            if(detectIE() && detectIE() <= 11){// prevent scroll does not work in IE
+                focusElement.style.position = 'fixed';
+                focusElement.style.left = '0px';
+                focusElement.style.top = '0px'
+            }
+            focusElement.focus({preventScroll: true});
+            if(selectInput){
+                focusElement.select();
+            }
+            if(detectIE() && detectIE() <= 11) {
+                focusElement.style.position = temppos;
+                focusElement.style.left = templeft;
+                focusElement.style.top = temptop;
+            }
+        }
     }
 }

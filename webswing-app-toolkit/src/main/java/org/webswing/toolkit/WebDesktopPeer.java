@@ -36,24 +36,25 @@ public class WebDesktopPeer implements DesktopPeer {
     @Override
     public void open(File file) throws IOException {
         Logger.info("WebDesktopPeer:open", file);
-        sendFile(file);
+        sendFile(file, false);
     }
 
     @Override
     public void edit(File file) throws IOException {
         Logger.info("WebDesktopPeer:edit", file);
-        sendFile(file);
+        sendFile(file,false);
     }
 
     @Override
     public void print(File file) throws IOException {
         Logger.info("WebDesktopPeer:print", file);
-        sendFile(file);
+        sendFile(file,true);
     }
 
-    private void sendFile(File file) {
+    private void sendFile(File file,boolean preview) {
         OpenFileResultMsgInternal f= new OpenFileResultMsgInternal();
         f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
+        f.setPreview(preview);
         f.setFile(file.getAbsoluteFile());
         Util.getWebToolkit().getPaintDispatcher().sendObject(f);
     }

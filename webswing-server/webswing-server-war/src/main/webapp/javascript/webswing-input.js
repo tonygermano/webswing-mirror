@@ -89,14 +89,14 @@
             resetInput();
             document.removeEventListener('mousedown', mouseDownEventHandler);
             document.removeEventListener('mouseout', mouseOutEventHandler);
-            
+
             document.removeEventListener('mousedown', handleMouseDown, false);
             document.removeEventListener('dblclick', handleDblClick, false);
             document.removeEventListener('mousemove', handleMouseMove, false);
             document.removeEventListener('mouseup', handleMouseUp, false);
             document.removeEventListener("wheel", handleWheel, false);
             document.removeEventListener('contextmenu', handleContextMenu);
-            
+
             document.removeEventListener("keydown", handleKeyDown, false);
             document.removeEventListener("keypress", handleKeyPress, false);
             document.removeEventListener("keyup", handleKeyUp, false);
@@ -110,7 +110,7 @@
             var input = api.getInput();
             resetInput();
             focusInput();
-            
+
             util.bindEvent(document, 'mousedown', handleMouseDown, false);
             util.bindEvent(document, 'dblclick', handleDblClick, false);
             util.bindEvent(document, 'mousemove', handleMouseMove, false);
@@ -127,7 +127,7 @@
 
             util.bindEvent(document, 'mousedown', mouseDownEventHandler);
             util.bindEvent(document, 'mouseout', mouseOutEventHandler);
-            
+
             var DEFAULT_FONT = '14px sans-serif';
             
             util.bindEvent(input, 'compositionstart', function(event) {
@@ -267,7 +267,7 @@
             
             mouseDown = mouseDown & ~Math.pow(2, evt.which);
             mouseDownCanvas = null;
-            
+
             return false;
         }
         
@@ -436,7 +436,7 @@
         }
 
         function mouseOutEventHandler(evt) {
-        	if (((evt.target && evt.target.matches && evt.target.matches("canvas.webswing-canvas")) 
+        	if (((evt.target && evt.target.matches && evt.target.matches("canvas.webswing-canvas"))
         			|| (evt.relatedTarget && evt.relatedTarget.matches && evt.relatedTarget.matches("canvas.webswing-canvas"))) || mouseDownCanvas != null) {
         		return;
         	}
@@ -475,7 +475,7 @@
             }
             
             var input = api.getInput();
-            
+
             if(util.detectIE() && util.detectIE() <= 11){
                 input.blur(); //fix issue when compositionend causes focus to be lost in IE
             }
@@ -484,11 +484,7 @@
             // In order to ensure that the browser will fire clipboard events, we always need to have something selected
             input.value = ' ';
             // set the style attributes as the focus/select cannot work well in IE
-            // input.style.top = sy +'px';
-            // input.style.left = sx +'px';
-            api.focusInput();
-            input.select();
-            // window.scrollTo(sx,sy);
+            util.focusWithPreventScroll(input, true)
         }
         function sentWordsUsingKeypressEvent(data) {
             for (var i = 0, length = data.length; i < length ;i++) {
@@ -508,7 +504,7 @@
                 rect = targetElement.parentNode.getBoundingClientRect();
             } else {
                 rect = api.getCanvas().getBoundingClientRect();
-            }         
+            }
             
             var winId;
             if (targetElement && targetElement.matches("canvas.webswing-canvas") && $(targetElement).data("id") && $(targetElement).data("id") != "canvas") {

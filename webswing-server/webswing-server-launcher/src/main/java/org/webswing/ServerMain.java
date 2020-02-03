@@ -42,6 +42,7 @@ public class ServerMain {
 		List<Connector> connectors = new ArrayList<Connector>();
 		if (config.isHttp()) {
 			HttpConfiguration http_config = new HttpConfiguration();
+			http_config.setSendServerVersion(false);
 			if (config.isHttps()) {
 				http_config.setSecurePort(Integer.parseInt(config.getHttpsPort()));
 			}
@@ -67,6 +68,8 @@ public class ServerMain {
 					sslContextFactory.setNeedClientAuth(config.isClientAuthEnabled());
 
 					HttpConfiguration https_config = new HttpConfiguration();
+					https_config.setSendServerVersion(false);
+
 					SecureRequestCustomizer src = new SecureRequestCustomizer();
 					https_config.addCustomizer(src);
 

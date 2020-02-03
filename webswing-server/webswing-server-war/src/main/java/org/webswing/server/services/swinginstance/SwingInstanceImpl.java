@@ -5,14 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -90,6 +88,7 @@ import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingMessagingApi;
 
 import main.Main;
+import org.webswing.toolkit.util.ClasspathUtil;
 
 public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListener {
 
@@ -343,7 +342,8 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				boolean success = fileHandler.registerFile(fr.getFile(), id, 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), false, fr.isWaitForFile(), fr.getOverwriteDetails());
 				if (success) {
 					AppFrameMsgOut f = new AppFrameMsgOut();
-					LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.file, id);
+					LinkActionType action = extension.equalsIgnoreCase(".pdf") && fr.isPreview() ? LinkActionType.print : LinkActionType.file;
+					LinkActionMsg linkAction = new LinkActionMsg(action, id);
 					f.setLinkAction(linkAction);
 					sendToWeb(f);
 				}
@@ -405,9 +405,9 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				sendToWeb(SimpleEventMsgOut.shutDownNotification.buildMsgOut());
 			}
 			jvmConnection.close();
-		} catch (Throwable e){
+		} catch (Throwable e) {
 			log.error("Unexpected error while closing instance", e);
-		}finally {
+		} finally {
 			notifyExiting();
 		}
 
@@ -519,7 +519,6 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			String webToolkitClass = WEB_TOOLKIT_CLASS_NAME;
 			String webFxToolkitFactory = JAVA_FX_TOOLKIT_CLASS_NAME;
 			String javaFxBootClasspath = "";
-			String javaFxAppClasspath = "";
 			String webGraphicsEnvClass = WEB_GRAPHICS_ENV_CLASS_NAME;
 			String j9modules = "";
 			if (javaVersion.startsWith("1.8")) {
@@ -531,13 +530,13 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 					if (!file.exists()) {
 
 						//try resolve javafx path from jre executable
-						File jreRelative= new File(java, "../../lib/ext/jfxrt.jar");
-						File jdkRelative= new File(java, "../../jre/lib/ext/jfxrt.jar");
+						File jreRelative = new File(java, "../../lib/ext/jfxrt.jar");
+						File jdkRelative = new File(java, "../../jre/lib/ext/jfxrt.jar");
 						if (jreRelative.exists()) {
 							file = jreRelative;
 						} else if (jdkRelative.exists()) {
 							file = jdkRelative;
-						}else{
+						} else {
 							log.warn("JavaFx library not found in '" + file.getCanonicalPath() + "'. ");
 							useJFX = false;
 						}
@@ -550,7 +549,16 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 				webFxToolkitFactory += "11";
 				webGraphicsEnvClass += "11";
 				if (useJFX) {
-					javaFxAppClasspath += CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME, false) + ";" + CommonUtil.getBootClassPathForClass(webFxToolkitFactory, false) + ";";
+					String javaFxToolkitCP = CommonUtil.getBootClassPathForClass(JAVA_FX_TOOLKIT_CLASS_NAME, false) + ";" + CommonUtil.getBootClassPathForClass(webFxToolkitFactory, false) + ";";
+					String jfxCp = subs.replace(CommonUtil.generateClassPathString(config.getJavaFxClassPathEntries()));
+					URL[] urls = ClasspathUtil.populateClassPath(swingConfig.getClassPath() + ";" + javaFxToolkitCP + ";" + jfxCp, homeDir);
+					swingConfig.setClassPath(Arrays.stream(urls).map(url -> {
+						try {
+							return new File(url.toURI()).getAbsolutePath();
+						} catch (URISyntaxException e) {
+							return url.getFile();
+						}
+					}).collect(Collectors.joining(File.pathSeparator)));
 				}
 				j9modules = " --patch-module jdk.jsobject=" + CommonUtil.getBootClassPathForClass(JAVA9_PATCHED_JSOBJECT_MODULE_MARKER);
 				j9modules += " --patch-module java.desktop=" + CommonUtil.getBootClassPathForClass(SHELL_FOLDER_MANAGER);
@@ -582,7 +590,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_ID, manager.getPathMapping());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.instanceId);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_HOME, getAbsolutePath(".", false));
-			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, javaFxAppClasspath + subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, subs.replace(CommonUtil.generateClassPathString(appConfig.getClassPathEntries())));
 			swingConfig.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 			swingConfig.addProperty(Constants.JMS_URL, System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT));
 

@@ -11,6 +11,7 @@ public class OpenFileResultMsgInternal implements MsgInternal {
 	private String clientId;
 	private boolean waitForFile;
 	private String overwriteDetails;
+	private boolean preview;
 
 	public File getFile() {
 		return file;
@@ -44,4 +45,11 @@ public class OpenFileResultMsgInternal implements MsgInternal {
 		this.overwriteDetails = overwriteDetails;
 	}
 
+	public boolean isPreview() {
+		return preview;
+	}
+
+	public void setPreview(boolean preview) {
+		this.preview = preview;
+	}
 }

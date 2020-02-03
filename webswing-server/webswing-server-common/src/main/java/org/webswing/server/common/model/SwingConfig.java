@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "compositingWinManager", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "loadingAnimationDelay", "allowStealSession", "autoLogout",
+@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "javaFxClassPathEntries", "compositingWinManager", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "loadingAnimationDelay", "allowStealSession", "autoLogout",
 		"goodbyeUrl", "sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
 public interface SwingConfig extends Config {
 
@@ -24,6 +24,12 @@ public interface SwingConfig extends Config {
 	public enum LauncherType {
 		Applet,
 		Desktop;
+	}
+	
+	public enum DockMode {
+		ALL,
+		MARKED,
+		NONE
 	}
 
 	@ConfigField(tab = ConfigGroup.General, label = "Name", description = "Application name.")
@@ -48,8 +54,14 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.General, label = "JavaFx Support", description = "Enables native or embeded JavaFx framework support.")
 	@ConfigFieldDefaultValueBoolean(false)
+	@ConfigFieldDiscriminator
 	public boolean isJavaFx();
-	
+
+	@ConfigField(tab = ConfigGroup.General, label = "JavaFX Classpath", description = "(Only valid for Java 11+) JavaFX jar libraries to be included in classpath. Supports ? and * wildcards.")
+	@ConfigFieldVariables(VariableSetName.SwingInstance)
+	public List<String> getJavaFxClassPathEntries();
+
+
 	@ConfigField(tab = ConfigGroup.General, label = "Compositing Window Manager", description = "Use window manager that provides an off-screen buffer for each window. Allows advanced window positioning when embedding and better communication integration. Recommended with DirectDraw rendering mode.")
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isCompositingWinManager();
@@ -268,6 +280,10 @@ public interface SwingConfig extends Config {
 			}
 			if(!config.isMonitorEdtEnabled()){
 				names.remove("loadingAnimationDelay");
+			}
+
+			if(!config.isJavaFx()){
+				names.remove("javaFxClassPathEntries");
 			}
 			return names;
 		}

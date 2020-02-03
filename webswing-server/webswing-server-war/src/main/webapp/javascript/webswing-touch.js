@@ -443,6 +443,9 @@ import html from './templates/touch.html';
         }
         
         function initTouchBar(config) {
+        	if (api.cfg.hideTouchBar) {
+        		return;
+        	}
             if (touchBar != null) {
             	return;
             }

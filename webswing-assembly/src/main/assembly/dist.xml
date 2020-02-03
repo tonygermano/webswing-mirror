@@ -45,10 +45,49 @@
 			</includes>
 		</fileSet>
 	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<includes>
+				<include>
+					org.webswing.security:webswing-saml2-security-module
+				</include>
+			</includes>
+			<useProjectArtifact>false</useProjectArtifact>
+			<useTransitiveDependencies>true</useTransitiveDependencies>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<outputFileNameMapping>${artifact.artifactId}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
+			<outputDirectory>security/saml2</outputDirectory>
+		</dependencySet>
+		<dependencySet>
+			<includes>
+				<include>
+					org.webswing.security:webswing-oidc-security-module
+				</include>
+			</includes>
+			<useProjectArtifact>false</useProjectArtifact>
+			<useTransitiveDependencies>true</useTransitiveDependencies>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<outputFileNameMapping>${artifact.artifactId}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
+			<outputDirectory>security/oidc</outputDirectory>
+		</dependencySet>
+		<dependencySet>
+			<includes>
+				<include>
+					org.webswing.security:webswing-shiro-security-module
+				</include>
+			</includes>
+			<useProjectArtifact>false</useProjectArtifact>
+			<useTransitiveDependencies>true</useTransitiveDependencies>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<outputFileNameMapping>${artifact.artifactId}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
+			<outputDirectory>security/database+property</outputDirectory>
+		</dependencySet>
+	</dependencySets>
 	<files>
 		<file>
 			<source>../LICENSE.txt</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
 	</files>
+
 </assembly>

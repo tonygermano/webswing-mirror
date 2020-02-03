@@ -341,10 +341,10 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             }
             if (data.focusEvent != null) {
                 var input = api.getInput();
-                
+
                 input.classList.remove('editable');
                 input.classList.remove('focused-with-caret');
-                
+                var focusElement;
                 if (data.focusEvent.type === 'focusWithCarretGained' && (data.focusEvent.x + data.focusEvent.w > 0) && (data.focusEvent.y + data.focusEvent.h > 0)) {
                     input.type = 'text';
                     updateInputPosition(input, data.focusEvent);
@@ -353,16 +353,18 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
                     	input.classList.add('editable');
                     }
                     api.touchInputFocusGained();
-                    api.focusInput();
+                    focusElement =input
                 } else if(data.focusEvent.type === 'focusPasswordGained'){
                     input.type = 'password';
                     updateInputPosition(input, data.focusEvent);
-                    api.focusInput();
+                    focusElement =input;
                 } else {
                     updateInputPosition(input, null);
                     input.value = '';
-                    api.getCanvas().focus({preventScroll: true});
+                    focusElement= api.getCanvas()
                 }
+
+                util.focusWithPreventScroll(focusElement);
             }
             if (data.cursorChange != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
                 $("canvas.webswing-canvas").each(function(i, canvas) {
@@ -381,7 +383,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             }
             if (data.closedWindow != null) {
             	var canvasWindow = windowImageHolders[data.closedWindow.id];
-            	
+
             	if (canvasWindow) {
             		if (compositingWM) {
             			windowClosing(canvasWindow);
@@ -391,10 +393,10 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
                             console.error(e);
                         }
             		}
-            		
+
             		$(canvasWindow.element).remove();
             		delete windowImageHolders[data.closedWindow.id];
-            		
+
             		if (compositingWM) {
             			windowClosed(canvasWindow);
             			try {
@@ -404,7 +406,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
                         }
             		}
             	}
-            	
+
             	delete closedWindows[data.closedWindow.id];
             }
             if (data.actionEvent != null && api.cfg.hasControl && !api.recordingPlayback) {
@@ -492,11 +494,11 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         function renderPngDrawComposedWindow(win, index) {
 			if (win.html) {
 				var newWindowOpened = false;
-				
+
 				if (windowImageHolders[win.id] == null) {
  					var htmlDiv = document.createElement("div");
  					htmlDiv.classList.add("webswing-html-canvas");
- 					
+
  					windowImageHolders[win.id] = new HtmlWindow(win.id, htmlDiv, win.name);
  					newWindowOpened = true;
  					$(htmlDiv).attr('data-id', win.id).css("position", "absolute");
@@ -508,9 +510,9 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 						api.cfg.rootElement.append(htmlDiv);
 					}
 				}
-				
+
 				var htmlDiv = windowImageHolders[win.id].element;
-				
+
 				$(htmlDiv).css({"z-index": (compositionBaseZIndex + index + 1), "width": win.width + 'px', "height": win.height + 'px'});
 				if ($(htmlDiv).is(".modal-blocked") != win.modalBlocked) {
 					$(htmlDiv).toggleClass("modal-blocked", win.modalBlocked);
@@ -519,26 +521,26 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 				if (isVisible(htmlDiv.parentNode)) {
 					$(htmlDiv).css({"left": win.posX + 'px', "top": win.posY + 'px'});
 				}
-				
+
 				if (newWindowOpened) {
 					windowOpened(windowImageHolders[win.id]);
 					if (!api.cfg.mirrorMode) {
 						performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
 					}
 				}
-				
+
 				return Promise.resolve();
 			} else {
 				var newWindowOpened = false;
-				
+
 				if (windowImageHolders[win.id] == null) {
 					var canvas = document.createElement("canvas");
 					canvas.classList.add("webswing-canvas");
-					
+
 					windowImageHolders[win.id] = new CanvasWindow(win.id, canvas, win.name, win.title);
 					newWindowOpened = true;
 					$(canvas).attr('data-id', win.id).css("position", "absolute");
-					
+
 					windowOpening(windowImageHolders[win.id]);
 					if (win.ownerId && windowImageHolders[win.ownerId] != null && windowImageHolders[win.ownerId].isRelocated()) {
 						windowImageHolders[win.ownerId].element.parentNode.append(canvas);
@@ -546,31 +548,31 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 						api.cfg.rootElement.append(canvas);
 					}
 				}
-				
+
 				var canvas = windowImageHolders[win.id].element;
 				var canvasWin = windowImageHolders[win.id];
-				
+
 				if ($(canvas).width() != win.width || $(canvas).height() != win.height) {
 					$(canvas).css({"width": win.width + 'px', "height": win.height + 'px'});
 					$(canvas).attr("width", win.width).attr("height", win.height);
 				}
-				
+
 				validateAndPositionWindow(canvasWin, win.posX, win.posY);
-				
+
 				// update z-order
 				$(canvas).css({"z-index": (compositionBaseZIndex + index + 1)});
 				if ($(canvas).is(".modal-blocked") != win.modalBlocked) {
 					$(canvas).toggleClass("modal-blocked", win.modalBlocked);
 					windowModalBlockedChanged(canvasWin);
 				}
-				
+
 				if (newWindowOpened) {
 					windowOpened(canvasWin);
 					if (!api.cfg.mirrorMode) {
 						performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
 					}
 				}
-				
+
 				if (typeof win.state !== 'undefined' && win.state == JFRAME_MAXIMIZED_STATE) {
 					canvasWin.state = win.state;
 					if (!api.cfg.mirrorMode && canvas.parentNode) {
@@ -582,7 +584,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 						}
 					}
 				}
-				
+
 				return renderPngDrawWindowInternal(win, canvas.getContext("2d"));
 			}
         }
@@ -712,7 +714,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         				if (windowImageHolders[win.id] == null) {
         					var htmlDiv = document.createElement("div");
         					htmlDiv.classList.add("webswing-html-canvas");
-        					
+
         					windowImageHolders[win.id] = new HtmlWindow(win.id, htmlDiv, win.name);
         					newWindowOpened = true;
         					$(htmlDiv).attr('data-id', win.id).css("position", "absolute");
@@ -725,25 +727,25 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         					}
         				}
         			}
-        			
+
         			var htmlOrCanvasElement = $(windowImageHolders[win.id].element);
         			var htmlOrCanvasWin = windowImageHolders[win.id];
-        			
+
         			if (newWindowOpened) {
         				windowOpened(htmlOrCanvasWin);
         				if (!api.cfg.mirrorMode) {
         					performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
         				}
         			}
-        			
+
         			htmlOrCanvasElement.css({"z-index": (compositionBaseZIndex + index + 1), "width": win.width + 'px', "height": win.height + 'px'});
     				if (htmlOrCanvasElement.is(".modal-blocked") != win.modalBlocked) {
     					htmlOrCanvasElement.toggleClass("modal-blocked", win.modalBlocked);
     					windowModalBlockedChanged(htmlOrCanvasWin);
     				}
-    				
+
     				validateAndPositionWindow(htmlOrCanvasWin, win.posX, win.posY);
-    				
+
     				if (!htmlOrCanvasWin.htmlWindow && typeof win.state !== 'undefined' && win.state == JFRAME_MAXIMIZED_STATE) {
     					htmlOrCanvasWin.state = win.state;
     					if (!api.cfg.mirrorMode && htmlOrCanvasElement[0].parentNode) {
@@ -755,7 +757,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     						}
     					}
     				}
-        			
+
         			resolved();
         		}, function (error) {
         			rejected(error);
@@ -775,12 +777,12 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         	if (isVisible(htmlOrCanvasWin.element.parentNode)) {
 				var winPosX = posX;
 				var winPosY = posY;
-				
+
 				if (!htmlOrCanvasWin.htmlWindow) {
 					var threshold = 40;
 					var overrideLocation = false;
 					var rect = htmlOrCanvasWin.element.parentNode.getBoundingClientRect();
-					
+
 					if (winPosX > rect.width - threshold) {
 						winPosX = rect.width - threshold;
 						overrideLocation = true;
@@ -789,12 +791,12 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 						winPosY = rect.height - threshold;
 						overrideLocation = true;
 					}
-					
+
 					if (!api.cfg.mirrorMode && overrideLocation) {
 						htmlOrCanvasWin.setLocation(winPosX, winPosY);
 					}
 				}
-				
+
 				$(htmlOrCanvasWin.element).css({"left": winPosX + 'px', "top": winPosY + 'px'});
 			}
         }
@@ -920,7 +922,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         CanvasWindow.prototype.isModalBlocked = function() {
         	return this.element.classList.contains('modal-blocked');
         };
-        
+
         CanvasWindow.prototype.setBounds = function(x, y, width, height) {
         	api.send({window: {id: this.id, x: Math.floor(x), y: Math.floor(y), width: Math.floor(width), height: Math.floor(height)}});
     	};
@@ -957,7 +959,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     			}
     		}
     	};
-    	
+
     	CanvasWindow.prototype.isRelocated = function() {
     		return this.element.parentNode != api.cfg.rootElement[0];
     	}
@@ -966,7 +968,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     		api.send({window: {id: this.id, close: true}});
     		closedWindows[this.id] = true;
     	};
-    	
+
     	CanvasWindow.prototype.performAction = function(options) {
     		performAction($.extend({"windowId": this.id}, options));
     	}
@@ -998,7 +1000,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     	HtmlWindow.prototype.performAction = function(options) {
     		performAction($.extend({"windowId": this.id}, options));
     	}
-    	
+
     	HtmlWindow.prototype.handleActionEvent = function(actionName, data, binaryData) {
         	// to be customized
         }
@@ -1010,7 +1012,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     	HtmlWindow.prototype.windowClosed = function() {
     		// to be customized
     	}
-    	
+
         function getWindows(canvasOnly) {
         	if (!compositingWM) {
         		// compositingWM only
