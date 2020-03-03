@@ -11,6 +11,8 @@
             dispose: dispose,
             get: get,
             getInput: getInput,
+            width: width,
+            height: height,
             focusInput: focusInput,
             getDesktopSize: getDesktopSize,
             processComponentTree: processComponentTree
@@ -21,10 +23,18 @@
         var resizeCheck;
         var lastRootWidth = 0;
         var lastRootHeight = 0;
+        var touchWidth = 0;
+        var touchHeight = 0;
 
         function create() {
             if (canvas == null) {
                 var dpr = util.dpr;
+                if (api.cfg.rootElement.parent().data("touch-width")) {
+                	touchWidth = api.cfg.rootElement.parent().data("touch-width");
+                }
+                if (api.cfg.rootElement.parent().data("touch-height")) {
+                	touchHeight = api.cfg.rootElement.parent().data("touch-height");
+                }
                 api.cfg.rootElement.append('<canvas data-id="canvas" style="display:block; width:' + width() + 'px;height:' + height() + 'px;" width="' + width() * dpr + '" height="' + height() * dpr + '" tabindex="-1"/>');
                 api.cfg.rootElement.append('<input data-id="input-handler" class="ws-input-hidden" type="text" autocorrect="off" autocapitalize="none" autocomplete="off" value="" />');
                 canvas = api.cfg.rootElement.find('canvas[data-id="canvas"]');
@@ -76,10 +86,24 @@
         }
 
         function width() {
+        	if (api.cfg.touchMode && touchWidth != 0) {
+        		return touchWidth;
+        	}
             return Math.floor(api.cfg.rootElement.width());
         }
 
         function height() {
+        	var offset = 0;
+        	
+        	if (api.cfg.touchMode && touchHeight != 0) {
+        		var touchBar = api.cfg.rootElement.parent().find('div[data-id="touchBar"]');
+        		if (touchBar.length) {
+        			offset += touchBar.height();
+        		}
+        		
+        		return touchHeight - offset;
+        	}
+        	
             return Math.floor(api.cfg.rootElement.height());
         }
         
@@ -108,6 +132,9 @@
         
         function getDesktopSize() {
         	if (api.cfg.rootElement.is(".composition")) {
+        		return {width: width(), height: height()};
+        	}
+        	if (api.cfg.touchMode && touchWidth != 0 && touchHeight != 0) {
         		return {width: width(), height: height()};
         	}
         	return {width: get().offsetWidth, height: get().offsetHeight};

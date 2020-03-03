@@ -15,6 +15,7 @@ export default function Util(i18n){
         bindEvent: bindEvent,
         detectIE: detectIE,
         detectFF: detectFF,
+        detectChrome: detectChrome,
         preventGhosts: preventGhosts,
         GUID: GUID,
         detectMac: detectMac,
@@ -152,6 +153,10 @@ export default function Util(i18n){
         if (el.addEventListener != null) {
             el.addEventListener(eventName, eventHandler);
         }
+    }
+
+    function detectChrome() {
+        return /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
     }
 
     function detectIE() {

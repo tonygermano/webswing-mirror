@@ -59,8 +59,8 @@ import 'blueimp-file-upload'
             uploadingFiles = [];
             uploadedFiles = [];
             autoUploadfileDialogTransferBarClientId.val(uuid);
-            autoFileInput.prop("multiple", data.isMultiSelection);
-            autoFileInput.attr("accept", data.filter);
+            autoFileInput().prop("multiple", data.isMultiSelection);
+            autoFileInput().attr("accept", data.filter);
             setProgressBarVisible(false);
             animateShow(autoUploadBar);
         }
@@ -92,8 +92,8 @@ import 'blueimp-file-upload'
 
             showOrHide(dropZone, data.allowUpload);
             showOrHide(cancelBtn, data.allowDownload || data.allowUpload || data.allowDelete);
-            fileInput.prop("multiple", data.isMultiSelection);
-            fileInput.attr("accept", data.filter);
+            fileInput().prop("multiple", data.isMultiSelection);
+            fileInput().attr("accept", data.filter);
             setProgressBarVisible(false);
             showOrHide(uploadBar, data.allowDownload || data.allowUpload || data.allowDelete);
         }
@@ -131,7 +131,7 @@ import 'blueimp-file-upload'
             dropZone = uploadBar.find('div[data-id="fileDropArea"]');
             fileUpload = uploadBar.find('form[data-id="fileupload"]');
             cancelBtn = uploadBar.find('button[data-id="cancelBtn"]');
-            fileInput = uploadBar.find('input[data-id="fileInput"]');
+            fileInput =()=> uploadBar.find('input[data-id="fileInput"]');
 
             uploadProgressBar = api.cfg.rootElement.find('div[data-id="fileDialogTransferProgressBar"]');
             uploadProgress = api.cfg.rootElement.find('div[data-id="progress"] .ws-progress-bar');
@@ -141,7 +141,7 @@ import 'blueimp-file-upload'
             autoUploadBar = api.cfg.rootElement.find('div[data-id="autoUploadBar"]');
             autoFileupload = autoUploadBar.find('form[data-id="autoFileupload"]');
             cancelAutoUploadButton = autoUploadBar.find('button[data-id="cancelAutoUploadButton"]');
-            autoFileInput = autoUploadBar.find('input[data-id="autoFileInput"]');
+            autoFileInput = ()=>autoUploadBar.find('input[data-id="autoFileInput"]');
             autoUploadfileDialogTransferBarClientId = autoUploadBar.find('input[data-id="autoUploadfileDialogTransferBarClientId"]');
 
             autoSaveBar = api.cfg.rootElement.find('div[data-id="autoSaveBar"]');

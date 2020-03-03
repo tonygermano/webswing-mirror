@@ -345,8 +345,13 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
                 input.classList.remove('editable');
                 input.classList.remove('focused-with-caret');
                 var focusElement;
-                if (data.focusEvent.type === 'focusWithCarretGained' && (data.focusEvent.x + data.focusEvent.w > 0) && (data.focusEvent.y + data.focusEvent.h > 0)) {
-                    input.type = 'text';
+                if ((data.focusEvent.type === 'focusWithCarretGained' || data.focusEvent.type === 'focusPasswordGained') && (data.focusEvent.x + data.focusEvent.w > 0) && (data.focusEvent.y + data.focusEvent.h > 0)) {
+                    if (data.focusEvent.type === 'focusPasswordGained') {
+                    	input.type = 'password';
+                    } else {
+                    	input.type = 'text';
+                    }
+                    
                     updateInputPosition(input, data.focusEvent);
                     input.classList.add('focused-with-caret');
                     if (data.focusEvent.editable) {
@@ -354,10 +359,6 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
                     }
                     api.touchInputFocusGained();
                     focusElement =input
-                } else if(data.focusEvent.type === 'focusPasswordGained'){
-                    input.type = 'password';
-                    updateInputPosition(input, data.focusEvent);
-                    focusElement =input;
                 } else {
                     updateInputPosition(input, null);
                     input.value = '';
@@ -659,7 +660,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
                             var dy = win.posY * dpr + sy;
                             var dw = sw;
                             var dh = sh;
-							if (dx <= context.canvas.width && dy <= context.canvas.height && dx + dw > 0 && dy + dh > 0) {
+							if (dx <= context.canvas.width && dy <= context.canvas.height && dx + dw > 0 && dy + dh > 0 && sw>0 && sh>0 && dw>0 && dh>0) {
                                 context.drawImage(canvas, sx, sy, sw, sh, dx, dy, dw, dh);
                             }
                         }
