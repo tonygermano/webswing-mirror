@@ -15,7 +15,8 @@ public class SimpleEventMsgIn implements MsgIn {
 		deleteFile,
 		hb,
 		cancelFileSelection,
-		requestComponentTree
+		requestComponentTree,
+		requestWindowSwitchList
 	}
 
 	public SimpleEventMsgIn() {

@@ -30,8 +30,12 @@ public class AppFrameMsgOut implements MsgOut {
 	private String sendTimestamp;
 	private List<ComponentTreeMsg> componentTree;
 	private ActionEventMsgOut actionEvent;
+	private AudioEventMsgOut audioEvent;
+	private WindowDockMsg dockAction;
 	private boolean directDraw;
 	private boolean compositingWM;
+	private AccessibilityMsg accessible;
+	private List<WindowSwitchMsg> windowSwitchList;
 
 	public AppFrameMsgOut() {
 	}
@@ -222,6 +226,38 @@ public class AppFrameMsgOut implements MsgOut {
 
 	public void setCompositingWM(boolean compositingWM) {
 		this.compositingWM = compositingWM;
+	}
+	
+	public AudioEventMsgOut getAudioEvent() {
+		return audioEvent;
+	}
+
+	public void setAudioEvent(AudioEventMsgOut audioEvent) {
+		this.audioEvent = audioEvent;
+	}
+
+	public WindowDockMsg getDockAction() {
+		return dockAction;
+	}
+
+	public void setDockAction(WindowDockMsg dockAction) {
+		this.dockAction = dockAction;
+	}
+	
+	public AccessibilityMsg getAccessible() {
+		return accessible;
+	}
+
+	public void setAccessible(AccessibilityMsg accessible) {
+		this.accessible = accessible;
+	}
+
+	public List<WindowSwitchMsg> getWindowSwitchList() {
+		return windowSwitchList;
+	}
+
+	public void setWindowSwitchList(List<WindowSwitchMsg> windowSwitchList) {
+		this.windowSwitchList = windowSwitchList;
 	}
 
 }

@@ -5,9 +5,8 @@ import java.util.Map;
 
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.ConfigContext;
-import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.model.exception.WsException;
-import org.webswing.server.model.exception.WsInitException;
+import org.webswing.server.services.rest.resources.model.MetaObject;
 
 public interface ConfigurationProvider {
 

@@ -4,7 +4,7 @@
     <parent>
         <artifactId>webswing</artifactId>
         <groupId>org.webswing</groupId>
-        <version>2.7.5</version>
+        <version>20.1</version>
         <relativePath>..</relativePath>
     </parent>
     <dependencies>

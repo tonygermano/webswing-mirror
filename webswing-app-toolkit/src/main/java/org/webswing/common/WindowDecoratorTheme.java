@@ -5,6 +5,8 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Window;
 
+import org.webswing.model.s2c.AccessibilityMsg;
+
 public interface WindowDecoratorTheme {
 
     public static final String DECORATION_THEME_IMPL_PROP = "org.webswing.window.theme.impl";
@@ -16,5 +18,12 @@ public interface WindowDecoratorTheme {
     void paintWindowDecoration(Graphics g, Object window, int w, int h);
 
     WindowActionType getAction(Window w, Point e);
+    
+    /**
+     * Returns AccessibilityMsg for a decoration button if mousePointer is over it, otherwise null.
+     */
+    default AccessibilityMsg getAccessible(Window window, WindowActionType action, Point mousePointer) {
+    	return null;
+    }
 
 }

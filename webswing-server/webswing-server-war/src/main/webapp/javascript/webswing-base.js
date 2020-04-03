@@ -10,15 +10,15 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             getSocketId: 'socket.uuid',
             send: 'socket.send',
             getCanvas: 'canvas.get',
-            getInput: 'canvas.getInput',
-            focusInput: 'canvas.focusInput',
             getDesktopSize: 'canvas.getDesktopSize',
             processComponentTree: 'canvas.processComponentTree',
             registerInput: 'input.register',
             sendInput: 'input.sendInput',
+            getPagePosition: 'input.getPagePosition',
+            registerUndockedCanvas: 'input.registerUndockedCanvas',
             registerTouch: 'touch.register',
+            initCanvas: 'canvas.init',
             touchCursorChanged: 'touch.cursorChanged',
-            touchInputFocusGained: 'touch.inputFocusGained',
             touchBarConfig: 'touch.touchBarConfig',
             getUser: 'login.user',
             login: 'login.login',
@@ -27,10 +27,13 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             getIdentity: 'identity.get',
             disposeIdentity: 'identity.dispose',
             getLocale: 'translate.getLocale',
+            translate: 'translate.translate',
             showDialog: 'dialog.show',
             showDialogBar: 'dialog.showBar',
             hideDialog: 'dialog.hide',
             hideDialogBar: 'dialog.hideBar',
+            showOverlay: 'dialog.showOverlay',
+            hideOverlay: 'dialog.hideOverlay',
             dialogBarContent: 'dialog.currentBar',
             currentDialog: 'dialog.current',
             startingDialog: 'dialog.content.startingDialog',
@@ -43,6 +46,8 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             continueOldSessionDialog: 'dialog.content.continueOldSessionDialog',
             inactivityTimeoutWarningDialog: 'dialog.content.inactivityTimeoutWarningDialog',
             applicationBusyDialog: 'dialog.content.applicationBusyDialog',
+            dockingVisibilityOverlay: 'dialog.content.dockingVisibilityOverlay',
+            dockingModalityOverlay: 'dialog.content.dockingModalityOverlay',
             processFileDialogEvent: 'files.process',
             closeFileDialog: 'files.close',
             openLink: 'files.link',
@@ -55,7 +60,11 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             playbackInfo: 'playback.playbackInfo',
             paintDoneCallback: 'base.paintDoneCallback',
             performAction: 'base.performAction',
-            handleActionEvent: 'base.handleActionEvent'
+            handleActionEvent: 'base.handleActionEvent',
+            handleAccessible: 'accessible.handleAccessible',
+            isAccessiblityEnabled: 'accessible.isEnabled',
+            showWindowSwitcher: 'accessible.showWindowSwitcher',
+            manageFocusEvent: 'focusManager.manageFocusEvent'
         };
         module.provides = {
             startApplication: startApplication,
@@ -71,7 +80,12 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             getWindows: getWindows,
             getWindowById: getWindowById,
             performAction: performAction,
-            handleActionEvent: handleActionEvent
+            handleActionEvent: handleActionEvent,
+            hasUndockedWindows: hasUndockedWindows,
+            getFocusedWindow: getFocusedWindow,
+            getAllWindows: getAllWindows,
+            getMainWindowVisibilityState: getMainWindowVisibilityState,
+            closeWindow: closeWindow
         };
         module.ready = function () {
             directDraw = new WebswingDirectDraw({logTrace: api.cfg.traceLog, logDebug: api.cfg.debugLog, ieVersion: api.cfg.ieVersion, dpr: util.dpr});
@@ -82,10 +96,13 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         var drawingQ = [];
         var warningTimeout = null;
         var windowImageHolders = {}; // <id> : <CanvasWindow/HtmlWindow>
+        var internalFrameWrapperHolders = {}; // <id> : <IFW element>
         var closedWindows = {}; // <id> : <boolean>, map of windows requested to be closed, rendering of windows in this map will be ignored, until message about closed window is received
         var directDraw;
         var compositingWM = false;
         var compositionBaseZIndex = 100;
+        var audio = {};
+        var focusedUndockedWindow = null;
         const JFRAME_MAXIMIZED_STATE = 6;
 
         function startApplication() {
@@ -97,6 +114,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         }
 
         function initialize(clientId, isMirror) {
+        	api.initCanvas();
             api.registerInput();
             if (!isMirror) {
             	api.registerTouch(api.touchBarConfig);
@@ -105,6 +123,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             if (!isMirror) {
                 window.addEventListener('hashchange', handshake);
             }
+            document.addEventListener("visibilitychange", visibilityChangeHandler);
             resetState();
             api.cfg.clientId = clientId;
             api.cfg.canPaint = true;
@@ -130,17 +149,38 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         }
 
         function resetState() {
+        	if (compositingWM) {
+    			for (var winId in windowImageHolders) {
+    				var win = windowImageHolders[winId];
+    				
+    				try {
+    					if (win.dockOwner) {
+    						// close any undocked popup windows
+    						win.preventDockClose = true;
+    						win.dockOwner.close();
+    					} else {
+    						$(win.element).remove();
+    					}
+        			} catch (err) {
+        				console.error(err);
+        			}
+    			}
+        	}
+        	$(".internal-frames-wrapper").remove();
+        	
             api.cfg.clientId = '';
             api.cfg.viewId = util.GUID();
             api.cfg.hasControl = false;
             api.cfg.mirrorMode = false;
             api.cfg.canPaint = false;
+            api.cfg.browserId = api.getIdentity();
             clearInterval(timer1);
             clearInterval(timer3);
             timer1 = setInterval(api.sendInput, 100);
             timer3 = setInterval(servletHeartbeat, 100000);
             compositingWM = false;
             windowImageHolders = {};
+            internalFrameWrapperHolders = {};
             closedWindows = {};
             directDraw.dispose();
             directDraw = new WebswingDirectDraw({logTrace: api.cfg.traceLog, logDebug: api.cfg.debugLog, ieVersion: api.cfg.ieVersion, dpr: util.dpr});
@@ -189,7 +229,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         }
 
         function handshake() {
-            api.sendInput(getHandShake(api.getCanvas()));
+            api.sendInput(getHandShake());
         }
 
         function dispose() {
@@ -200,6 +240,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             api.closeFileDialog();
             api.hideDialogBar();
             window.removeEventListener('beforeunload', beforeUnloadEventHandler);
+            document.removeEventListener("visibilitychange", visibilityChangeHandler);
             directDraw.dispose();
         }
         
@@ -281,6 +322,9 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             if (data.componentTree) {
             	api.processComponentTree(data.componentTree);
             }
+            if (data.windowSwitchList) {
+            	api.showWindowSwitcher($(getFocusedWindow().document).find(".webswing-element-content"), data.windowSwitchList);
+            }
         }
 
         function queuePaintingRequest(data) {
@@ -340,36 +384,15 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
                 copy(data.moveAction.sx, data.moveAction.sy, data.moveAction.dx, data.moveAction.dy, data.moveAction.width, data.moveAction.height, api.getCanvas().getContext("2d"));
             }
             if (data.focusEvent != null) {
-                var input = api.getInput();
-
-                input.classList.remove('editable');
-                input.classList.remove('focused-with-caret');
-                var focusElement;
-                if ((data.focusEvent.type === 'focusWithCarretGained' || data.focusEvent.type === 'focusPasswordGained') && (data.focusEvent.x + data.focusEvent.w > 0) && (data.focusEvent.y + data.focusEvent.h > 0)) {
-                    if (data.focusEvent.type === 'focusPasswordGained') {
-                    	input.type = 'password';
-                    } else {
-                    	input.type = 'text';
-                    }
-                    
-                    updateInputPosition(input, data.focusEvent);
-                    input.classList.add('focused-with-caret');
-                    if (data.focusEvent.editable) {
-                    	input.classList.add('editable');
-                    }
-                    api.touchInputFocusGained();
-                    focusElement =input
-                } else {
-                    updateInputPosition(input, null);
-                    input.value = '';
-                    focusElement= api.getCanvas()
-                }
-
-                util.focusWithPreventScroll(focusElement);
+                api.manageFocusEvent(data.focusEvent);
+            }
+            if (data.accessible != null) {
+            	api.handleAccessible(data.accessible, $(getFocusedWindow().document).find(".webswing-element-content"));
             }
             if (data.cursorChange != null && api.cfg.hasControl && !api.cfg.recordingPlayback) {
-                $("canvas.webswing-canvas").each(function(i, canvas) {
-                	canvas.style.cursor = getCursorStyle(data.cursorChange);
+                var element = compositingWM ? findCanvasWindowsById(data.cursorChange.winId) : $("canvas.webswing-canvas");
+                element.each(function(i, canvas) {
+                    canvas.style.cursor = getCursorStyle(data.cursorChange);
                 });
                 api.touchCursorChanged(data.cursorChange);
             }
@@ -383,32 +406,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
                 api.processFileDialogEvent(data.fileDialogEvent);
             }
             if (data.closedWindow != null) {
-            	var canvasWindow = windowImageHolders[data.closedWindow.id];
-
-            	if (canvasWindow) {
-            		if (compositingWM) {
-            			windowClosing(canvasWindow);
-            			try {
-            				canvasWindow.windowClosing();
-                        } catch (e) {
-                            console.error(e);
-                        }
-            		}
-
-            		$(canvasWindow.element).remove();
-            		delete windowImageHolders[data.closedWindow.id];
-
-            		if (compositingWM) {
-            			windowClosed(canvasWindow);
-            			try {
-            				canvasWindow.windowClosed();
-                        } catch (e) {
-                            console.error(e);
-                        }
-            		}
-            	}
-
-            	delete closedWindows[data.closedWindow.id];
+            	closeWindowInternal(data.closedWindow.id);
             }
             if (data.actionEvent != null && api.cfg.hasControl && !api.recordingPlayback) {
             	try {
@@ -421,8 +419,81 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
                     console.error(e);
                 }
             }
+            if (data.audioEvent != null) {
+            	switch (data.audioEvent.eventType) {
+	            	case "play": {
+	            		var clip = audio[data.audioEvent.id];
+	            		
+	            		if (!clip) {
+	            			// new clip
+	            			var blob = new Blob([data.audioEvent.data], { type: 'audio/mpeg' });
+	            			var url = window.URL.createObjectURL(blob);
+	            			
+	            			clip = new Audio();
+	            			clip.src = url;
+	            			clip.id = data.audioEvent.id;
+	            			clip.loopCount = data.audioEvent.loop || 0;
+	            			if (data.audioEvent.time != null && parseFloat(data.audioEvent.time) > 0) {
+	            				clip.currentTime = parseFloat(data.audioEvent.time);
+	            			}
+	            			clip.addEventListener('ended', audioEndedHandler);
+	            			
+	            			audio[data.audioEvent.id] = clip;
+	            			
+	            			clip.play();
+	            		} else {
+	            			// existing clip
+	            			// if a clip is running we ignore another play event
+	            			if (clip.paused) {
+	            				clip.loopCount = data.audioEvent.loop || 0;
+	            				if (data.audioEvent.time != null && parseFloat(data.audioEvent.time) > 0) {
+	            					clip.currentTime = parseFloat(data.audioEvent.time);
+	            				}
+	            				
+	            				clip.play();
+	            			}
+	            		}
+	        		    
+	            		break;
+	            	}
+	            	case "stop": {
+	            		var clip = audio[data.audioEvent.id];
+	            		
+	            		if (clip) {
+	            			clip.pause();
+	            		}
+	            		break;
+	            	}
+	            	case "update": {
+	            		var clip = audio[data.audioEvent.id];
+	            		
+	            		if (clip) {
+	            			if (data.audioEvent.time != null && parseFloat(data.audioEvent.time) > 0) {
+	            				clip.currentTime = parseFloat(data.audioEvent.time);
+	            			}
+	            		}
+	            		break;
+	            	}
+	            	case "dispose": {
+	            		var clip = audio[data.audioEvent.id];
+	            		
+	            		if (clip && clip.paused) {
+	            			delete audio[data.audioEvent.id];
+	            		}
+	            		break;
+	            	}
+            	}
+            }
+            if (data.dockAction != null && api.cfg.hasControl && !api.recordingPlayback) {
+            	var winCanvas = windowImageHolders[data.dockAction.windowId];
+            	if (winCanvas) {
+            		toggleDock(data.dockAction.windowId);
+            	}
+            }
             
             if (windowsData != null) {
+            	var winMap = {};
+            	
             	// first is always the background
             	for (var i in windowsData) {
             		var win = windowsData[i];
@@ -437,7 +508,23 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             				}
             			}
             			windowsData.splice(i, 1);
-            			break;
+            		} else if (win.internalWindows) {
+            			for (var j=0; j<win.internalWindows.length; j++) {
+    						winMap[win.internalWindows[j].id] = true;
+            			}
+            		}
+            		winMap[win.id] = true;
+            	}
+            	
+            	if (compositingWM) {
+            		// with CWM we always get all the windows, so if an already open window is missing in windowsData we should close it
+            		for (var winId in windowImageHolders) {
+            			var win = windowImageHolders[winId];
+            			
+            			if (!winMap[winId] && win.element && $(win.element).is(":not(.close-prevented)")) {
+            				console.log("closing obsolete window " + winId);
+            				closeWindowInternal(winId);
+            			}
             		}
             	}
             	
@@ -447,26 +534,132 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             			return renderWindow(window, compositingWM ? windowsData.length - index - 1 : index, data.directDraw);
             		}, errorHandler);
             	}, Promise.resolve()).then(function () {
+            		if (compositingWM) {
+            			// dispose of empty internal-frames-wrappers
+            			for (var id in internalFrameWrapperHolders) {
+            				var ifw = internalFrameWrapperHolders[id];
+            				if ($(ifw).is(":empty")) {
+            					$(ifw).remove();
+            				}
+            			}
+            		}
+            		
             		ack(data);
             		processNextQueuedFrame();
             	}, errorHandler);
+            	
+            	checkCanvasAccessibleInfo();
             } else {
                 processNextQueuedFrame();
             }
         }
+        
+        function checkCanvasAccessibleInfo() {
+        	var enabled = api.isAccessiblityEnabled();
+        	var canvasSelector = enabled ? ".webswing-element-content canvas.accessibility-off" : ".webswing-element-content canvas:not(.accessibility-off)";
+        	var rootSelector = enabled ? ".webswing-element-content.accessibility-off" : ".webswing-element-content:not(.accessibility-off)";
+        	
+        	jQuery(rootSelector).each(function() {
+        		setRootElementAccessibleInfo(jQuery(this), enabled);
+        	});
+        	jQuery(canvasSelector).each(function() {
+        		setCanvasAccessibleInfo(jQuery(this), enabled);
+        	});
+        	for (var winId in windowImageHolders) {
+    			var dockOwner = windowImageHolders[winId].dockOwner;
+        		if (dockOwner != null && dockOwner.document) {
+        			$(dockOwner.document).find(rootElementSelector).each(function() {
+        				setRootElementAccessibleInfo(jQuery(this), enabled);
+        			});
+    				$(dockOwner.document).find(canvasSelector).each(function() {
+    					setCanvasAccessibleInfo(jQuery(this), enabled);
+    				});
+    			}
+        	}
+        }
+        
+        function setRootElementAccessibleInfo(rootElement, enabled) {
+        	if (enabled) {
+        		rootElement.removeAttr("aria-label").removeClass("accessibility-off");
+        	} else {
+        		rootElement.attr("aria-label", api.translate("accessibility.turnOn")).addClass("accessibility-off");
+        	}
+        }
+        
+        function setCanvasAccessibleInfo(canvas, enabled) {
+        	if (enabled) {
+        		canvas.removeAttr("aria-label").removeAttr("role").removeClass("accessibility-off");
+        	} else {
+        		canvas.attr("role", "img").attr("aria-label", api.translate("accessibility.turnOn")).addClass("accessibility-off");
+        	}
+        }
+        
+        function audioEndedHandler(e) {
+        	var clip = e.srcElement;
+        	
+        	if (!clip) {
+        		return;
+        	}
+        	
+        	if (!clip.loopCount || clip.loopCount == 1) {
+        		clip.loopCount = 0;
+        		clip.currentTime = 0;
+        		clip.pause();
+        		return;
+        	}
+        	
+        	clip.loopCount = clip.loopCount - 1;
+        	clip.play();
+        }
 
-        function updateInputPosition(el, focusEvent) {
-            if (focusEvent == null) {
-                el.style.top = null;
-                el.style.left = null;
-                el.style.height = null;
-            } else {
-                var maxX = focusEvent.x + focusEvent.w;
-                var maxY = focusEvent.y + focusEvent.h;
-                el.style.top = Math.min(Math.max((focusEvent.y + focusEvent.caretY), focusEvent.y), maxY) + 'px';
-                el.style.left = Math.min(Math.max((focusEvent.x + focusEvent.caretX), focusEvent.x), maxX) + 'px';
-                el.style.height = focusEvent.caretH + 'px';
-            }
+        function closeWindow(id) {
+        	api.send({window: {id: id, close: true}});
+    		closedWindows[id] = true;
+        }
+        
+        function closeWindowInternal(id) {
+        	var canvasWindow = windowImageHolders[id];
+        	
+        	if (canvasWindow) {
+        		var winCloseEvent = new WindowCloseEvent(canvasWindow.id);
+        		
+        		if (compositingWM) {
+        			windowClosing(canvasWindow, winCloseEvent);
+        			try {
+        				canvasWindow.windowClosing(winCloseEvent);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                    
+                    if (canvasWindow.htmlWindow && winCloseEvent.isDefaultPrevented()) {
+            			$(canvasWindow.element).addClass("close-prevented");
+            			
+            			if (canvasWindow.element.ownerDocument.defaultView != window) {
+            				// dock undocked close-prevented HtmlWindows to main window
+            				api.cfg.rootElement.append($(canvasWindow.element).detach());
+            			}
+            		} else {
+            			if (canvasWindow.dockState == 'undocked' && canvasWindow.dockOwner) {
+            				canvasWindow.preventDockClose = true;
+            				canvasWindow.dockOwner.close();
+            			}
+            			$(canvasWindow.element).remove();
+            			delete windowImageHolders[id];
+            		}
+                    
+                    windowClosed(canvasWindow);
+                    try {
+                    	canvasWindow.windowClosed();
+                    } catch (e) {
+                    	console.error(e);
+                    }
+        		} else {
+        			$(canvasWindow.element).remove();
+        			delete windowImageHolders[id];
+        		}
+        	}
+        	
+        	delete closedWindows[id];
         }
 
         function renderWindow(win, index, directDraw) {
@@ -493,105 +686,34 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         }
         
         function renderPngDrawComposedWindow(win, index) {
-			if (win.html) {
-				var newWindowOpened = false;
-
-				if (windowImageHolders[win.id] == null) {
- 					var htmlDiv = document.createElement("div");
- 					htmlDiv.classList.add("webswing-html-canvas");
-
- 					windowImageHolders[win.id] = new HtmlWindow(win.id, htmlDiv, win.name);
- 					newWindowOpened = true;
- 					$(htmlDiv).attr('data-id', win.id).css("position", "absolute");
-
- 					windowOpening(windowImageHolders[win.id]);
- 					if (win.ownerId && windowImageHolders[win.ownerId] != null && windowImageHolders[win.ownerId].isRelocated()) {
-						windowImageHolders[win.ownerId].element.parentNode.append(htmlDiv);
-					} else {
-						api.cfg.rootElement.append(htmlDiv);
-					}
-				}
-
-				var htmlDiv = windowImageHolders[win.id].element;
-
-				$(htmlDiv).css({"z-index": (compositionBaseZIndex + index + 1), "width": win.width + 'px', "height": win.height + 'px'});
-				if ($(htmlDiv).is(".modal-blocked") != win.modalBlocked) {
-					$(htmlDiv).toggleClass("modal-blocked", win.modalBlocked);
-					windowModalBlockedChanged(windowImageHolders[win.id]);
-				}
-				if (isVisible(htmlDiv.parentNode)) {
-					$(htmlDiv).css({"left": win.posX + 'px', "top": win.posY + 'px'});
-				}
-
-				if (newWindowOpened) {
-					windowOpened(windowImageHolders[win.id]);
-					if (!api.cfg.mirrorMode) {
-						performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
-					}
-				}
-
+        	if ((win.type == 'basic' || win.type == 'html') && windowImageHolders[win.id] == null) {
+        		var canvas;
+        		
+        		if (win.type == 'basic') {
+        			canvas = document.createElement("canvas");
+        			canvas.classList.add("webswing-canvas");
+        		}
+        		
+				openNewComposedWindow(win, canvas);
+			}
+			
+			var htmlOrCanvasWin = windowImageHolders[win.id];
+			
+			handleWindowModalityAndBounds(win, htmlOrCanvasWin, index, true);
+			handleWindowState(win.state, htmlOrCanvasWin);
+			drawInternalWindows(win.internalWindows);
+        	
+			if (win.type == 'html') {
 				return Promise.resolve();
-			} else {
-				var newWindowOpened = false;
-
-				if (windowImageHolders[win.id] == null) {
-					var canvas = document.createElement("canvas");
-					canvas.classList.add("webswing-canvas");
-
-					windowImageHolders[win.id] = new CanvasWindow(win.id, canvas, win.name, win.title);
-					newWindowOpened = true;
-					$(canvas).attr('data-id', win.id).css("position", "absolute");
-
-					windowOpening(windowImageHolders[win.id]);
-					if (win.ownerId && windowImageHolders[win.ownerId] != null && windowImageHolders[win.ownerId].isRelocated()) {
-						windowImageHolders[win.ownerId].element.parentNode.append(canvas);
-					} else {
-						api.cfg.rootElement.append(canvas);
-					}
-				}
-
+			} else if (win.type == 'basic') {
 				var canvas = windowImageHolders[win.id].element;
-				var canvasWin = windowImageHolders[win.id];
-
-				if ($(canvas).width() != win.width || $(canvas).height() != win.height) {
-					$(canvas).css({"width": win.width + 'px', "height": win.height + 'px'});
-					$(canvas).attr("width", win.width).attr("height", win.height);
-				}
-
-				validateAndPositionWindow(canvasWin, win.posX, win.posY);
-
-				// update z-order
-				$(canvas).css({"z-index": (compositionBaseZIndex + index + 1)});
-				if ($(canvas).is(".modal-blocked") != win.modalBlocked) {
-					$(canvas).toggleClass("modal-blocked", win.modalBlocked);
-					windowModalBlockedChanged(canvasWin);
-				}
-
-				if (newWindowOpened) {
-					windowOpened(canvasWin);
-					if (!api.cfg.mirrorMode) {
-						performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
-					}
-				}
-
-				if (typeof win.state !== 'undefined' && win.state == JFRAME_MAXIMIZED_STATE) {
-					canvasWin.state = win.state;
-					if (!api.cfg.mirrorMode && canvas.parentNode) {
-						// window has been maximized, we need to set its bounds according to its parent node (could be detached)
-						var rectP = canvas.parentNode.getBoundingClientRect();
-						var rectC = canvas.getBoundingClientRect();
-						if (rectC.width != rectP.width || rectC.height != rectP.height) {
-							canvasWin.setBounds(0, 0, rectP.width, rectP.height);
-						}
-					}
-				}
-
 				return renderPngDrawWindowInternal(win, canvas.getContext("2d"));
 			}
         }
         
         function renderPngDrawWindowInternal(win, context) {
         	if (!win.content) {
+        		drawInternalWindows(win.internalWindows);
         		return Promise.resolve();
         	}
         	
@@ -609,13 +731,17 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 									context.drawImage(imageObj, win.posX + winContent.positionX, win.posY + winContent.positionY);
 								}
 								context.restore();
-								resolved();
+								
 								imageObj.onload = null;
 								imageObj.src = '';
 								if (imageObj.clearAttributes != null) {
 									imageObj.clearAttributes();
 								}
 								imageObj = null;
+								
+								drawInternalWindows(win.internalWindows);
+								
+								resolved();
 							};
 							imageObj.onload = function () {
 								// fix for ie - onload is fired before the image
@@ -646,7 +772,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 			    }
                 
 			    ddPromise.then(function (canvas) {
-			        windowImageHolders[win.id] = new CanvasWindow(win.id, canvas, win.name, win.title);
+			        windowImageHolders[win.id] = new CanvasWindow(win.id, win.ownerId, getOwnerParents(win.ownerId), canvas, false, win.name, win.title);
                     var dpr = util.dpr;
                     for (var x in win.content) {
                         var winContent = win.content[x];
@@ -677,7 +803,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         		var ddPromise;
         		var wih = windowImageHolders[win.id] != null ? windowImageHolders[win.id].element : null;
         		
-        		if (win.html) {
+        		if (win.type != 'basic') {
         			// we don't need to draw html window, also do not create canvas
         			ddPromise = Promise.resolve(null);
         		} else if (win.directDraw == null) {
@@ -696,74 +822,680 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         		}
         		
         		ddPromise.then(function (canvas) {
-        			var newWindowOpened = false;
+        			// new canvas window or html window is opening
+        			if ((canvas != null || win.type == 'html') && windowImageHolders[win.id] == null) {
+        				openNewComposedWindow(win, canvas);
+        			}
         			
-        			if (canvas != null) {
-        				if (windowImageHolders[win.id] == null) {
-        					windowImageHolders[win.id] = new CanvasWindow(win.id, canvas, win.name, win.title);
-        					newWindowOpened = true;
-        					$(canvas).attr('data-id', win.id).css("position", "absolute");
-
-        					windowOpening(windowImageHolders[win.id]);
-        					if (win.ownerId && windowImageHolders[win.ownerId] != null && windowImageHolders[win.ownerId].isRelocated()) {
-        						windowImageHolders[win.ownerId].element.parentNode.append(canvas);
-        					} else {
-        						api.cfg.rootElement.append(canvas);
-        					}
-        				}
-        			} else if (win.html) {
-        				if (windowImageHolders[win.id] == null) {
-        					var htmlDiv = document.createElement("div");
-        					htmlDiv.classList.add("webswing-html-canvas");
-
-        					windowImageHolders[win.id] = new HtmlWindow(win.id, htmlDiv, win.name);
-        					newWindowOpened = true;
-        					$(htmlDiv).attr('data-id', win.id).css("position", "absolute");
-
-        					windowOpening(windowImageHolders[win.id]);
-        					if (win.ownerId && windowImageHolders[win.ownerId] != null && windowImageHolders[win.ownerId].isRelocated()) {
-        						windowImageHolders[win.ownerId].element.parentNode.append(htmlDiv);
-        					} else {
-        						api.cfg.rootElement.append(htmlDiv);
-        					}
-        				}
-        			}
-
-        			var htmlOrCanvasElement = $(windowImageHolders[win.id].element);
         			var htmlOrCanvasWin = windowImageHolders[win.id];
-
-        			if (newWindowOpened) {
-        				windowOpened(htmlOrCanvasWin);
-        				if (!api.cfg.mirrorMode) {
-        					performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
-        				}
-        			}
-
-        			htmlOrCanvasElement.css({"z-index": (compositionBaseZIndex + index + 1), "width": win.width + 'px', "height": win.height + 'px'});
-    				if (htmlOrCanvasElement.is(".modal-blocked") != win.modalBlocked) {
-    					htmlOrCanvasElement.toggleClass("modal-blocked", win.modalBlocked);
-    					windowModalBlockedChanged(htmlOrCanvasWin);
-    				}
-
-    				validateAndPositionWindow(htmlOrCanvasWin, win.posX, win.posY);
-
-    				if (!htmlOrCanvasWin.htmlWindow && typeof win.state !== 'undefined' && win.state == JFRAME_MAXIMIZED_STATE) {
-    					htmlOrCanvasWin.state = win.state;
-    					if (!api.cfg.mirrorMode && htmlOrCanvasElement[0].parentNode) {
-    						// window has been maximized, we need to set its bounds according to its parent node (could be detached)
-    						var rectP = htmlOrCanvasElement[0].parentNode.getBoundingClientRect();
-    						var rectC = htmlOrCanvasElement[0].getBoundingClientRect();
-    						if (rectC.width != rectP.width || rectC.height != rectP.height) {
-    							htmlOrCanvasWin.setBounds(0, 0, rectP.width, rectP.height);
-    						}
-    					}
-    				}
-
+        			
+        			handleWindowModalityAndBounds(win, htmlOrCanvasWin, index, false);
+    				handleWindowState(win.state, htmlOrCanvasWin);
+    				drawInternalWindows(win.internalWindows);
+        			
         			resolved();
         		}, function (error) {
         			rejected(error);
         		});
         	});
+        }
+        
+        function openNewComposedWindow(win, canvas) {
+        	if (win.type == 'html') {
+				var htmlDiv = document.createElement("div");
+				htmlDiv.classList.add("webswing-html-canvas");
+				windowImageHolders[win.id] = new HtmlWindow(win.id, win.ownerId, getOwnerParents(win.ownerId), htmlDiv, win.name);
+			} else {
+				windowImageHolders[win.id] = new CanvasWindow(win.id, win.ownerId, getOwnerParents(win.ownerId), canvas, false, win.name, win.title);
+				windowImageHolders[win.id].dockMode = win.dockMode;
+			}
+			
+			var element = windowImageHolders[win.id].element;
+			var $element = $(element);
+			
+			$element.attr('data-id', win.id).css("position", "absolute");
+			if (win.ownerId) {
+				$element.attr('data-ownerid', win.ownerId);
+			}
+			
+			windowOpening(windowImageHolders[win.id]);
+			
+			if (win.dockMode == 'autoUndock') {
+				undockWindow(win.id, win.ownerId, win.title, windowImageHolders[win.id].element, win.posX, win.posY, win.width, win.height);
+        	} else if (win.ownerId && windowImageHolders[win.ownerId] != null && windowImageHolders[win.ownerId].isRelocated()) {
+				windowImageHolders[win.ownerId].element.parentNode.append(element);
+			} else {
+				api.cfg.rootElement.append(element);
+			}
+			
+			windowOpened(windowImageHolders[win.id]);
+			
+			if (!api.cfg.mirrorMode) {
+				performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
+			}
+        }
+        
+        function toggleDock(winId) {
+        	var canvasO = getWindowById(winId);
+        	if (!canvasO || canvasO.htmlWindow) {
+        		return;
+        	}
+        	if (canvasO.dockState == 'undocked') {
+        		canvasO.dock();
+        	} else {
+        		canvasO.undock();
+        	}
+        }
+        
+        function undockWindow(id, ownerId, title, element, posX, posY, width, height) {
+        	var pagePos;
+        	if (element.parentNode) {
+        		pagePos = element.parentNode.ownerDocument.defaultView.pagePosition;
+        	} else {
+        		pagePos = window.pagePosition;
+        	}
+        	if (!pagePos) {
+        		pagePos = {x: 0, y: 0};
+        	}
+			
+
+			var baseUrl = window.location.origin + window.location.pathname;
+			baseUrl = baseUrl.lastIndexOf('/') != baseUrl.length - 1 ? baseUrl + "/" : baseUrl;
+        	
+			var popup = window.open("", id, "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes," +
+					"width=" + width + "," +
+					"height=" + height + "," +
+					"top=" + (posY + pagePos.y) + "," +
+					"left=" + (posX + pagePos.x));
+
+			windowImageHolders[id].dockState = 'undocked';
+			windowImageHolders[id].dockOwner = popup;
+			windowImageHolders[id].preventDockClose = false;
+			
+			popup.document.title = title || "";
+			popup.document.body.style.margin = "0";
+			popup.document.body.style.width = "100%";
+			popup.document.body.style.height = "100%";
+			
+			var body = popup.document.body;
+			var wrapper = popup.document.createElement("div");
+			wrapper.classList.add("webswing-element");
+			
+			var content = popup.document.createElement("div");
+			content.classList.add("webswing-element-content");
+			content.classList.add("composition");
+			content.setAttribute("role", "application");
+			
+			wrapper.appendChild(content);
+			body.appendChild(wrapper);
+			
+			$(popup.document.head).append("<link rel='stylesheet' href='" + baseUrl + "css/style.css' type='text/css'>");
+			
+			var fonts = document.querySelectorAll("style[data-dd-ctx]");
+			for (var i=0; i<fonts.length; i++) {
+				var font = fonts[i].cloneNode();
+				font.innerHTML = fonts[i].innerHTML;
+				body.appendChild(font);
+			}
+			
+			setTimeout(function() {
+				// timeout to avoid race condition, the popup needs to be ready
+				var winHeightOffset = popup.outerHeight - popup.innerHeight - 9;
+				var winWidthOffset = popup.outerWidth - popup.innerWidth - 8;
+				popup.moveTo(posX + pagePos.x - winWidthOffset, posY + pagePos.y - winHeightOffset);
+				
+				var origRect = element.getBoundingClientRect();
+				
+	        	for (var winId in windowImageHolders) {
+	    			var canvasWin = windowImageHolders[winId];
+	    			if (winId == id || (canvasWin.isInParentHierarchy(id) && canvasWin.dockState != 'undocked')) {
+	    				// undock the canvas window and all of its child windows (with html windows)
+	    				var el = canvasWin.element;
+	    				var elRect = el.getBoundingClientRect();
+	    				var location = {x: elRect.left - origRect.left, y: elRect.top - origRect.top};
+	    				
+	    				if (el.parentNode) {
+	    					el.parentNode.removeChild(el);
+	    				}
+	    				
+	    				content.appendChild(el);
+	    				
+	    				$(el).css({"left": location.x + 'px', "top": location.y + 'px'});
+	    				if (!canvasWin.htmlWindow) {
+	    					canvasWin.setLocation(location.x, location.y);
+	    					canvasWin.ignoreNextPositioning = true;
+	    				}
+	    				
+	    				// undock also any internal frames wrapper divs that this window owns
+	    				for (var ifwId in internalFrameWrapperHolders) {
+            				var ifw = internalFrameWrapperHolders[ifwId];
+            				if ($(ifw).data("ownerid") == winId) {
+            					var intEl = ifw;
+            					var intElRect = intEl.getBoundingClientRect();
+            					var intLocation = {x: intElRect.left - elRect.left, y: intElRect.top - elRect.top};
+            					
+            					if (intEl.parentNode) {
+            						intEl.parentNode.removeChild(intEl);
+            					}
+            					
+            					content.appendChild(intEl);
+            					
+            					$(intEl).css({"left": intLocation.x + 'px', "top": intLocation.y + 'px'});
+            				}
+            			}
+	    			}
+	        	}
+	        	
+	        	api.registerUndockedCanvas(popup);
+	        	
+	        	checkUndockedModalBlocked();
+				
+				repaint();
+			}, 100);
+			
+			popup.onbeforeunload = function() {
+		        var winE = windowImageHolders[id];
+		        if (winE && !winE.preventDockClose) {
+		        	winE.close();
+		        }
+		        focusedUndockedWindow = null;
+		    };
+		    popup.addEventListener("blur", function() {
+		    	focusedUndockedWindow = null;
+		    });
+		    popup.addEventListener("focus", function() {
+		    	// try focus canvas window with highest z-index contained inside this popup
+		    	var maxZIndex = 0;
+		    	var topCanvasId = id;
+		    	$("canvas.webswing-canvas", $(popup.document)).each(function() {
+		    		var zIndex = parseInt($(this).css("z-index"));
+		    		if (zIndex > maxZIndex) {
+		    			maxZIndex = zIndex;
+		    			topCanvasId = $(this).data("id");
+		    		}
+		    	});
+		    	windowImageHolders[topCanvasId].requestFocus();
+		    	focusedUndockedWindow = popup;
+		    });
+		    popup.addEventListener("resize", function() {
+		    	if (popup.resizeTimer != null) {
+		    		clearTimeout(popup.resizeTimer);
+		    	}
+		    	popup.resizeTimer = setTimeout(function() {
+		    		popup.resizeTimer = null;
+		    		handleWindowState(windowImageHolders[id].state, windowImageHolders[id]);
+		    	}, 100);
+		    });
+        }
+        
+        function dockWindow(canvasWindow) {
+        	var ownerId = canvasWindow.ownerId;
+            var parentWin = api.cfg.rootElement[0].ownerDocument.defaultView;
+        	if (ownerId && windowImageHolders[ownerId] != null && windowImageHolders[ownerId].isRelocated()) {
+         		var parentElement = windowImageHolders[ownerId].element.parentNode;
+         		if (parentElement) {
+         			parentWin = parentElement.ownerDocument.defaultView;
+         		}
+         	}
+        	
+        	var popup = canvasWindow.dockOwner;
+        	var canvasWindowParent = canvasWindow.element.parentNode; // leave this reference here because canvasWindow.element.parentNode changes after it is docked
+        	
+        	for (var winId in windowImageHolders) {
+    			var canvasWin = windowImageHolders[winId];
+    			if (canvasWin.element.parentNode == canvasWindowParent) {
+    				var element = canvasWin.element;
+    	        	
+    	        	var left = 0;
+    	        	var top = 0;
+    	        	var rect = element.getBoundingClientRect();
+    	        	
+    	        	element.parentNode.removeChild(element);
+    	        	
+    	        	if (ownerId && windowImageHolders[ownerId] != null && windowImageHolders[ownerId].isRelocated()) {
+    	        		// dock back to window's parent if it is relocated (could be detached or undocked in another window)
+    	        		left = popup.screenX - parentWin.screenX + rect.left;
+    	        		top = popup.screenY - parentWin.screenY + rect.top;
+    	        		
+    					windowImageHolders[ownerId].element.parentNode.append(element);
+    				} else {
+    					// dock back to root parent (the base canvas location)
+    					var pagePos = popup.pagePosition;
+    					if (!pagePos) {
+    						pagePos = {x: 0, y: 0};
+    					}
+    					var parentPagePos = window.pagePosition;
+    					if (!parentPagePos) {
+    						parentPagePos = {x: 0, y: 0};
+    					}
+    					
+    					var origPos = {x: pagePos.x != 0 ? pagePos.x : popup.screenX, y: pagePos.y != 0 ? pagePos.y : popup.screenY};
+    					var rootRect = api.cfg.rootElement[0].getBoundingClientRect();
+    					left = origPos.x + rect.left - parentPagePos.x - rootRect.left;
+    					top = origPos.y + rect.top - parentPagePos.y - rootRect.top;
+    					
+    					api.cfg.rootElement.append(element);
+    				}
+    	        	
+    	        	$(canvasWin.element).css({"left": left + 'px', "top": top + 'px'});
+    	        	if (!canvasWin.htmlWindow) {
+    	        		canvasWin.setLocation(left, top);
+    	        	}
+    	        	
+    	        	// dock also any internal frames wrapper divs that this window owns
+    				for (var ifwId in internalFrameWrapperHolders) {
+        				var ifw = internalFrameWrapperHolders[ifwId];
+        				if ($(ifw).data("ownerid") == winId) {
+        					var left = 0;
+            	        	var top = 0;
+            	        	var rect = ifw.getBoundingClientRect();
+        					
+        					if (ownerId && windowImageHolders[ownerId] != null && windowImageHolders[ownerId].isRelocated()) {
+            	        		// dock back to window's parent if it is relocated (could be detached or undocked in another window)
+            	        		left = popup.screenX - parentWin.screenX + rect.left;
+            	        		top = popup.screenY - parentWin.screenY + rect.top;
+            	        		
+            					windowImageHolders[ownerId].element.parentNode.append(ifw);
+            				} else {
+            					// dock back to root parent (the base canvas location)
+            					var pagePos = popup.pagePosition;
+            					if (!pagePos) {
+            						pagePos = {x: 0, y: 0};
+            					}
+            					var parentPagePos = window.pagePosition;
+            					if (!parentPagePos) {
+            						parentPagePos = {x: 0, y: 0};
+            					}
+            					
+            					var origPos = {x: pagePos.x != 0 ? pagePos.x : popup.screenX, y: pagePos.y != 0 ? pagePos.y : popup.screenY};
+            					var rootRect = api.cfg.rootElement[0].getBoundingClientRect();
+            					left = origPos.x + rect.left - parentPagePos.x - rootRect.left;
+            					top = origPos.y + rect.top - parentPagePos.y - rootRect.top;
+            					
+            					api.cfg.rootElement.append(ifw);
+            				}
+        					
+        					$(ifw).css({"left": left + 'px', "top": top + 'px'});
+        				}
+        			}
+    			}
+    		}
+        	
+        	canvasWindow.dockState = 'docked';
+        	canvasWindow.dockOwner = null;
+        	
+        	canvasWindow.preventDockClose = true;
+        	focusedUndockedWindow = null;
+        	popup.close();
+        	
+        	checkUndockedModalBlocked();
+        }
+        
+        function visibilityChangeHandler(evt) {
+        	if (!hasUndockedWindows()) {
+        		return;
+        	}
+        	
+        	var hidden = document.visibilityState == "hidden";
+        	for (var winId in windowImageHolders) {
+        		var popup = windowImageHolders[winId].dockOwner;
+    			if (popup != null) {
+    				if (hidden) {
+    					api.showOverlay(popup, api.dockingVisibilityOverlay);
+    				} else {
+    					api.hideOverlay(popup, api.dockingVisibilityOverlay);
+    				}
+    			}
+        	}
+        }
+        
+        function checkUndockedModalBlocked() {
+        	var anyUndocked = false;
+        	var blockedWindows = [];
+        	var modalWindow = null;
+        	
+        	for (var winId in windowImageHolders) {
+        		var popup = windowImageHolders[winId].dockOwner;
+    			if (popup != null) {
+    				anyUndocked = true;
+    				
+    				if ($(popup.document).find(".webswing-canvas:not(.modal-blocked)").length == 0) {
+    					api.showOverlay(popup, api.dockingModalityOverlay);
+    	        		blockedWindows.push($(popup.document).find(".modality-overlay"));
+    	            } else {
+    	            	api.hideOverlay(popup, api.dockingModalityOverlay);
+    	            	modalWindow = popup;
+    	            }
+    			}
+        	}
+        	
+        	if (!anyUndocked) {
+        		api.hideOverlay(window, api.dockingModalityOverlay);
+        		return;
+        	}
+        	
+        	if (api.cfg.rootElement.find(".webswing-canvas:not([data-id=canvas])").length > 0 
+        			&& api.cfg.rootElement.find(".webswing-canvas:not(.modal-blocked):not([data-id=canvas])").length == 0) {
+        		api.showOverlay(window, api.dockingModalityOverlay);
+        		blockedWindows.push($(document).find(".modality-overlay"));
+    		} else {
+    			api.hideOverlay(window, api.dockingModalityOverlay);
+    		}
+        	
+        	if (blockedWindows.length > 0 && modalWindow != null) {
+        		for (var i = 0; i < blockedWindows.length; i++) {
+        			blockedWindows[i].find("button").on("click", function() {
+        				// this focuses a window, do not use focusManager here
+        				modalWindow.focus();
+        			});
+        		}
+        	}
+        }
+        
+        function hasUndockedWindows() {
+        	for (var winId in windowImageHolders) {
+    			if (windowImageHolders[winId].dockOwner != null) {
+    				return true;
+    			}
+        	}
+        	return false;
+        }
+        
+        function getFocusedWindow() {
+        	if (focusedUndockedWindow != null) {
+        		return focusedUndockedWindow;
+        	}
+        	return window;
+        }
+        
+        function getAllWindows() {
+        	var wins = [];
+        	
+        	for (var winId in windowImageHolders) {
+    			if (windowImageHolders[winId].dockOwner != null) {
+    				wins.push(windowImageHolders[winId].dockOwner);
+    			}
+        	}
+        	
+        	wins.push(window);
+        	
+        	return wins;
+        }
+        
+        function getMainWindowVisibilityState() {
+        	return document.visibilityState;
+        }
+        
+        function handleWindowModalityAndBounds(win, htmlOrCanvasWin, index, pngDraw) {
+        	var $element = $(htmlOrCanvasWin.element);
+        	
+			if (htmlOrCanvasWin.htmlWindow && $element.is(".close-prevented")) {
+				// call window listeners for close-prevented HtmlWindow
+				windowOpening(htmlOrCanvasWin);
+				$element.show().removeClass("close-prevented");
+				windowOpened(htmlOrCanvasWin);
+				if (!api.cfg.mirrorMode) {
+					performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
+				}
+			}
+        	
+        	if (pngDraw && win.type == 'basic') {
+				if (Math.abs($element.width() - win.width) >= 1 || Math.abs($element.height() - win.height) >= 1) {
+					$element.css({"width": win.width + 'px', "height": win.height + 'px'});
+					$element.attr("width", win.width).attr("height", win.height);
+				}
+        	}
+        	
+			$element.css({"z-index": (compositionBaseZIndex + index + 1), "width": win.width + 'px', "height": win.height + 'px'}).show();
+			if ($element.is(".modal-blocked") != win.modalBlocked) {
+				$element.toggleClass("modal-blocked", win.modalBlocked);
+				windowModalBlockedChanged(htmlOrCanvasWin);
+			}
+
+            if (isVisible(htmlOrCanvasWin.element.parentNode) && !htmlOrCanvasWin.ignoreNextPositioning) {
+            	$element.css({"left": win.posX + 'px', "top": win.posY + 'px'});
+            	htmlOrCanvasWin.validatePositionAndSize(win.posX, win.posY);
+            }
+            
+            htmlOrCanvasWin.ignoreNextPositioning = false;
+            
+            if (htmlOrCanvasWin.dockOwner != null) {
+            	var popup = htmlOrCanvasWin.dockOwner;
+            	var maxWidth = 0;
+            	var maxHeight = 0;
+            	$(popup.document).find("canvas.webswing-canvas:not(.internal)").each(function() {
+            		var rect = $(this)[0].getBoundingClientRect();
+            		if (rect.left + rect.width > maxWidth) {
+            			maxWidth = rect.left + rect.width;
+            		}
+            		if (rect.top + rect.height > maxHeight) {
+            			maxHeight = rect.top + rect.height;
+            		}
+            	});
+            	var deltaX = maxWidth - popup.innerWidth;
+            	var deltaY = maxHeight - popup.innerHeight;
+            	if (deltaX != 0 || deltaY != 0) {
+            		popup.resizeBy(deltaX, deltaY);
+            	}
+            }
+        }
+        
+        function handleWindowState(state, htmlOrCanvasWin) {
+        	if (htmlOrCanvasWin.htmlWindow || typeof state === 'undefined') {
+        		return;
+        	}
+        	
+        	htmlOrCanvasWin.state = state;
+        	
+        	if (state != JFRAME_MAXIMIZED_STATE || api.cfg.mirrorMode || !htmlOrCanvasWin.element.parentNode) {
+        		return;
+        	}
+        	
+			// window has been maximized, we need to set its bounds according to its parent node (could be detached)
+			var rectP = htmlOrCanvasWin.element.parentNode.getBoundingClientRect();
+			var rectC = htmlOrCanvasWin.element.getBoundingClientRect();
+			if (rectC.width != rectP.width || rectC.height != rectP.height) {
+				htmlOrCanvasWin.setBounds(0, 0, rectP.width, rectP.height);
+			}
+        }
+        
+        function drawInternalWindows(internalWindows) {
+        	if (!internalWindows || internalWindows.length == 0) {
+        		return;
+        	}
+        	
+			var intWins = [];
+        	
+			for (var i = internalWindows.length - 1; i >= 0; i--) {
+				var intWin = internalWindows[i];
+				
+				if (intWin.type == 'internalWrapper') {
+    				handleInternalWrapperWindow(intWin);
+    			} else if (intWin.type == 'internal' || intWin.type == 'internalHtml') {
+    				intWins.push(intWin);
+    			}
+			}
+			
+			var underlyingHtmlWindows = [];
+			for (var i = 0; i < intWins.length; i++) {
+				var intWin = intWins[i];
+				
+				if (intWin.type == 'internal') {
+					handleInternalWindow(intWin, i, underlyingHtmlWindows);
+				} else if (intWin.type == 'internalHtml') {
+					handleInternalHtmlWindow(intWin, i);
+					underlyingHtmlWindows.push(intWin);
+				}
+			}
+        }
+        
+        function handleInternalWrapperWindow(win) {
+        	var wrapper = internalFrameWrapperHolders[win.id];
+			if (!wrapper || wrapper == null) {
+				wrapper = $("<div class='internal-frames-wrapper' id='wrapper-" + win.id + "' />");
+				if (win.ownerId && windowImageHolders[win.ownerId] != null && windowImageHolders[win.ownerId].isRelocated()) {
+					windowImageHolders[win.ownerId].element.parentNode.append(wrapper[0]);
+				} else {
+					api.cfg.rootElement.append(wrapper);
+				}
+				internalFrameWrapperHolders[win.id] = wrapper[0];
+			} else {
+				wrapper = $(wrapper);
+			}
+			
+			wrapper.attr("data-ownerid", win.ownerId);
+			
+			if (windowImageHolders[win.ownerId]) {
+				var parent = $(windowImageHolders[win.ownerId].element);
+				wrapper.css({
+					"z-index": parent.css("z-index"),
+					"left": win.posX + "px",
+					"top": win.posY + "px",
+					"width": win.width + "px",
+					"height": win.height + "px"
+				});
+			}
+        }
+        
+        function handleInternalWindow(win, index, underlyingHtmlWindows) {
+        	var wrapper = internalFrameWrapperHolders[win.ownerId];
+        	if (!wrapper || wrapper == null) {
+        		// wait for the parent wrapper to be attached first and render this window in next cycle
+        		return;
+        	} else {
+        		wrapper = $(wrapper);
+        	}
+        	
+        	var canvas;
+        	
+        	if (windowImageHolders[win.id] == null) {
+        		canvas = document.createElement("canvas");
+				canvas.classList.add("webswing-canvas");
+				canvas.classList.add("internal");
+        		
+				windowImageHolders[win.id] = new CanvasWindow(win.id, win.ownerId, getOwnerParents(win.ownerId), canvas, true, win.name, win.title);
+				
+				$(canvas).attr('data-id', win.id).css("position", "absolute");
+				if (win.ownerId) {
+					$(canvas).attr('data-ownerid', win.ownerId);
+				}
+
+				wrapper.append(canvas);
+			} else {
+				canvas = windowImageHolders[win.id].element;
+			}
+        	
+        	var parentPos = wrapper.position();
+        	$(canvas).css({
+        		"z-index": (compositionBaseZIndex + index + 1),
+        		"left": (win.posX - parentPos.left) + "px",
+        		"top": (win.posY - parentPos.top) + "px",
+        		"width": win.width + "px",
+        		"height": win.height + "px"
+        	});
+        	$(canvas).attr("width", win.width * util.dpr).attr("height", win.height * util.dpr);
+        	
+			if ($(canvas).is(".modal-blocked") != win.modalBlocked) {
+				$(canvas).toggleClass("modal-blocked", win.modalBlocked);
+			}
+			
+			if (underlyingHtmlWindows.length > 0) {
+				var ownerCanvasId = wrapper.data("ownerid");
+				if (ownerCanvasId && windowImageHolders[ownerCanvasId] && windowImageHolders[ownerCanvasId].element) {
+					var src = windowImageHolders[ownerCanvasId].element;
+					var ctx = canvas.getContext("2d");
+					var pos = $(src).position();
+					
+					for (var i=0; i<underlyingHtmlWindows.length; i++) {
+						var int = findWindowIntersection(win, underlyingHtmlWindows[i]);
+						if (int && (int.x2 - int.x1 > 0) && (int.y2 - int.y1 > 0)) {
+							var width = (int.x2 - int.x1) * util.dpr;
+							var height = (int.y2 - int.y1) * util.dpr;
+							ctx.drawImage(src, (int.x1 - pos.left) * util.dpr, (int.y1 - pos.top) * util.dpr, width, height, (win.posX < int.x1 ? (int.x1 - win.posX) : 0) * util.dpr, (win.posY < int.y1 ? (int.y1 - win.posY) : 0) * util.dpr, width, height);
+						}
+					}
+				}
+			}
+        }
+        
+        function handleInternalHtmlWindow(win, index) {
+        	var wrapper = internalFrameWrapperHolders[win.ownerId];
+        	if (!wrapper || wrapper == null) {
+        		// wait for the parent wrapper to be attached first and render this window in next cycle
+        		return;
+        	} else {
+        		wrapper = $(wrapper);
+        	}
+        	
+        	var htmlDiv;
+        	var newWindowOpened = false;
+        	
+        	if (windowImageHolders[win.id] == null) {
+        		htmlDiv = document.createElement("div");
+				htmlDiv.classList.add("webswing-html-canvas");
+				
+				windowImageHolders[win.id] = new HtmlWindow(win.id, win.ownerId, getOwnerParents(win.ownerId), htmlDiv, win.name);
+				newWindowOpened = true;
+				$(htmlDiv).attr('data-id', win.id).css("position", "absolute");
+				if (win.ownerId) {
+					$(htmlDiv).attr('data-ownerid', win.ownerId);
+				}
+
+				windowOpening(windowImageHolders[win.id]);
+				
+        		wrapper.append(htmlDiv);
+        	} else {
+        		htmlDiv = windowImageHolders[win.id].element;
+        		if ($(htmlDiv).is(".close-prevented")) {
+        			newWindowOpened = true;
+        			windowOpening(windowImageHolders[win.id]);
+        			$(htmlDiv).removeClass("close-prevented").show();
+        		}
+        	}
+        	
+        	if (newWindowOpened) {
+				windowOpened(windowImageHolders[win.id]);
+				if (!api.cfg.mirrorMode) {
+					performActionInternal({ actionName: "", eventType: "init", data: "", binaryData: null, windowId: win.id });
+				}
+			}
+        	
+        	var parentPos = wrapper.position();
+        	$(htmlDiv).css({
+        		"z-index": (compositionBaseZIndex + index + 1),
+        		"left": (win.posX - parentPos.left) + "px",
+        		"top": (win.posY - parentPos.top) + "px",
+        		"width": win.width + "px",
+        		"height": win.height + "px"
+        	});
+        	$(htmlDiv).attr("width", win.width).attr("height", win.height).show();
+        	
+        	if ($(htmlDiv).is(".modal-blocked") != win.modalBlocked) {
+        		$(htmlDiv).toggleClass("modal-blocked", win.modalBlocked);
+        	}
+        }
+        
+        function findWindowIntersection(win1, win2) {
+        	var r1 = {x1: win1.posX, y1: win1.posY, x2: win1.posX + win1.width, y2: win1.posY + win1.height};
+        	var r2 = {x1: win2.posX, y1: win2.posY, x2: win2.posX + win2.width, y2: win2.posY + win2.height};
+        	
+        	[r1, r2] = [r1, r2].map(r => {
+        		return {x: [r.x1, r.x2].sort(sortNumber), y: [r.y1, r.y2].sort(sortNumber)};
+        	});
+
+        	const noIntersect = r2.x[0] > r1.x[1] || r2.x[1] < r1.x[0] ||
+        						r2.y[0] > r1.y[1] || r2.y[1] < r1.y[0];
+
+        	return noIntersect ? false : {
+        		x1: Math.max(r1.x[0], r2.x[0]), // _[0] is the lesser,
+        		y1: Math.max(r1.y[0], r2.y[0]), // _[1] is the greater
+        		x2: Math.min(r1.x[1], r2.x[1]),
+        		y2: Math.min(r1.y[1], r2.y[1])
+        	};
+        }
+        
+        function sortNumber(a, b) {
+        	return a - b;
         }
         
         function isVisible(element) {
@@ -774,32 +1506,74 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         	return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
         }
         
-        function validateAndPositionWindow(htmlOrCanvasWin, posX, posY) {
-        	if (isVisible(htmlOrCanvasWin.element.parentNode)) {
-				var winPosX = posX;
-				var winPosY = posY;
-
-				if (!htmlOrCanvasWin.htmlWindow) {
-					var threshold = 40;
-					var overrideLocation = false;
-					var rect = htmlOrCanvasWin.element.parentNode.getBoundingClientRect();
-
-					if (winPosX > rect.width - threshold) {
-						winPosX = rect.width - threshold;
-						overrideLocation = true;
-					}
-					if (winPosY > rect.height - threshold) {
-						winPosY = rect.height - threshold;
-						overrideLocation = true;
-					}
-
-					if (!api.cfg.mirrorMode && overrideLocation) {
-						htmlOrCanvasWin.setLocation(winPosX, winPosY);
-					}
+        function findCanvasWindowsById(winId) {
+        	var wins = $();
+        	
+        	for (var id in windowImageHolders) {
+    			var canvasWin = windowImageHolders[id];
+    			if (canvasWin.id == winId) {
+    				wins = wins.add($(canvasWin.element));
+    			}
+        	}
+        	
+        	for (var id in internalFrameWrapperHolders) {
+				var ifw = internalFrameWrapperHolders[id];
+				if ($(ifw).data("ownerid") == winId) {
+					wins = wins.add($(ifw));
 				}
-
-				$(htmlOrCanvasWin.element).css({"left": winPosX + 'px', "top": winPosY + 'px'});
 			}
+        	
+        	return wins;
+        }
+        
+        function validateAndPositionWindow(htmlOrCanvasWin, winPosX, winPosY) {
+			if (htmlOrCanvasWin.htmlWindow || api.cfg.mirrorMode) {
+				return;
+			}
+			
+			var threshold = 40;
+			var overrideLocation = false;
+			var rect = htmlOrCanvasWin.element.parentNode.getBoundingClientRect();
+			var rectE = htmlOrCanvasWin.element.getBoundingClientRect();
+			
+			if (winPosX > rect.width - threshold) {
+				winPosX = Math.max(0, rect.width - threshold);
+				overrideLocation = true;
+			}
+			if (winPosY > rect.height - threshold) {
+				winPosY = Math.max(0, rect.height - threshold);
+				overrideLocation = true;
+			}
+			if (winPosX < ((rectE.width - threshold) * (-1))) {
+				winPosX = ((rectE.width - threshold) * (-1));
+				overrideLocation = true;
+			}
+			if (winPosY < 0) {
+				winPosY = 0;
+				overrideLocation = true;
+			}
+			
+			if (overrideLocation) {
+				$(htmlOrCanvasWin.element).css({"left": winPosX + 'px', "top": winPosY + 'px'});
+				htmlOrCanvasWin.setLocation(winPosX, winPosY);
+			}
+        }
+        
+        function getOwnerParents(ownerId) {
+        	var ownerWin = windowImageHolders[ownerId];
+        	
+        	if (!ownerWin || ownerWin == null) {
+        		return [];
+        	}
+        	
+        	if (!ownerId) {
+        		return [];
+        	}
+        	
+        	var parents = ownerWin.parents.slice();
+        	parents.push(ownerId);
+        	
+        	return parents;
         }
 
         function adjustCanvasSize(canvas, width, height) {
@@ -843,16 +1617,19 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             }
         }
 
-        function getHandShake(canvas) {
+        function getHandShake() {
             var handshake = {
                 clientId: api.cfg.clientId,
-                browserId: api.getIdentity(),
+                browserId: api.cfg.browserId,
                 viewId: api.cfg.viewId,
                 connectionId: api.getSocketId(),
                 locale: api.getLocale(),
                 timeZone: util.getTimeZone(),
                 mirrored: api.cfg.mirrorMode,
                 directDrawSupported: api.cfg.typedArraysSupported && !(api.cfg.ieVersion && api.cfg.ieVersion <= 10),
+                dockingSupported: !api.cfg.ieVersion,
+                touchMode: api.cfg.touchMode,
+                accessiblityEnabled: api.isAccessiblityEnabled(),
                 url: window.location.href
             };
 
@@ -910,20 +1687,49 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             throw error;
         }
         
-        function CanvasWindow(id, element, name, title) {
+        function CanvasWindow(id, ownerId, parents, element, internal, name, title) {
         	this.id = id;
+        	this.ownerId = ownerId;
+        	this.parents = parents;
         	this.element = element;
         	this.name = name;
         	this.title = title;
         	this.htmlWindow = false;
+        	this.internal = internal;
         	this.state = 0;
+        	this.dockMode = 'none';
+        	this.dockState = 'docked';
+        	this.dockOwner = null;
         	this.webswingInstance = api.external;
+            this.validatePositionAndSize = function(x,y){
+                validateAndPositionWindow(this,x,y);
+            }
         }
+        
+        CanvasWindow.prototype.isInParentHierarchy = function(winId) {
+    		if (!this.parents || this.parents.length == 0) {
+    			return false;
+    		}
+    		for (var i=0; i<this.parents.length; i++) {
+    			if (this.parents[i] == winId) {
+    				return true;
+    			}
+    		}
+    		return false;
+    	};
         
         CanvasWindow.prototype.isModalBlocked = function() {
         	return this.element.classList.contains('modal-blocked');
         };
-
+        
+        CanvasWindow.prototype.getDockMode = function() {
+        	return this.dockMode;
+        };
+        
+        CanvasWindow.prototype.getDockState = function() {
+        	return this.dockState;
+        };
+        
         CanvasWindow.prototype.setBounds = function(x, y, width, height) {
         	api.send({window: {id: this.id, x: Math.floor(x), y: Math.floor(y), width: Math.floor(width), height: Math.floor(height)}});
     	};
@@ -960,16 +1766,40 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     			}
     		}
     	};
-
+    	
+    	CanvasWindow.prototype.undock = function() {
+    		if (this.dockMode == 'none' || this.dockState == 'undocked') {
+        		return;
+        	}
+    		
+    		var rect = this.element.getBoundingClientRect();
+    		undockWindow(this.id, this.ownerId, this.title, this.element, rect.left, rect.top, rect.width, rect.height);
+    	};
+    	
+    	CanvasWindow.prototype.dock = function() {
+    		if (this.dockMode == 'none' || this.dockState == 'docked' || this.dockOwner == null) {
+    			return;
+    		}
+    		
+    		dockWindow(this);
+    	};
+    	
+    	CanvasWindow.prototype.toggleDock = function() {
+    		toggleDock(this.id);
+    	};
+    	
     	CanvasWindow.prototype.isRelocated = function() {
     		return this.element.parentNode != api.cfg.rootElement[0];
     	}
     	
     	CanvasWindow.prototype.close = function() {
-    		api.send({window: {id: this.id, close: true}});
-    		closedWindows[this.id] = true;
+    		closeWindow(this.id);
     	};
-
+    	
+    	CanvasWindow.prototype.requestFocus = function() {
+    		api.send({window: {id: this.id, focus: true}});
+    	};
+    	
     	CanvasWindow.prototype.performAction = function(options) {
     		performAction($.extend({"windowId": this.id}, options));
     	}
@@ -978,7 +1808,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         	// to be customized
         }
     	
-    	CanvasWindow.prototype.windowClosing = function() {
+    	CanvasWindow.prototype.windowClosing = function(windowCloseEvent) {
     		// to be customized
     	}
     	
@@ -986,13 +1816,32 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     		// to be customized
     	}
     	
-    	function HtmlWindow(id, element, name) {
+    	function HtmlWindow(id, ownerId, parents, element, name) {
         	this.id = id;
+        	this.ownerId = ownerId;
+        	this.parents = parents;
         	this.element = element;
         	this.name = name;
         	this.htmlWindow = true;
+        	this.internal = false;
+        	this.dockMode = 'none';
         	this.webswingInstance = api.external;
+            this.validatePositionAndSize = function(x,y){
+                validateAndPositionWindow(this,x,y);
+            }
         }
+    	
+    	HtmlWindow.prototype.isInParentHierarchy = function(winId) {
+    		if (!this.parents || this.parents.length == 0) {
+    			return false;
+    		}
+    		for (var i=0; i<this.parents.length; i++) {
+    			if (this.parents[i] == winId) {
+    				return true;
+    			}
+    		}
+    		return false;
+    	};
     	
     	HtmlWindow.prototype.isModalBlocked = function() {
         	return this.element.classList.contains('modal-blocked');
@@ -1001,19 +1850,38 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     	HtmlWindow.prototype.performAction = function(options) {
     		performAction($.extend({"windowId": this.id}, options));
     	}
-
+    	
+    	HtmlWindow.prototype.dispose = function() {
+    		$(this.element).remove();
+    		delete windowImageHolders[this.id];
+    		repaint();
+    	}
+    	
     	HtmlWindow.prototype.handleActionEvent = function(actionName, data, binaryData) {
         	// to be customized
         }
     	
-    	HtmlWindow.prototype.windowClosing = function() {
+    	HtmlWindow.prototype.windowClosing = function(windowCloseEvent) {
     		// to be customized
     	}
     	
     	HtmlWindow.prototype.windowClosed = function() {
     		// to be customized
     	}
-
+    	
+    	function WindowCloseEvent(id) {
+    		this.id = id;
+    		this.defaultPrevented = false;
+    	}
+    	
+    	WindowCloseEvent.prototype.preventDefault = function() {
+    		this.defaultPrevented = true;
+    	}
+    	
+    	WindowCloseEvent.prototype.isDefaultPrevented = function() {
+    		return this.defaultPrevented;
+    	}
+    	
         function getWindows(canvasOnly) {
         	if (!compositingWM) {
         		// compositingWM only
@@ -1078,10 +1946,10 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             }
         }
         
-        function windowClosing(htmlOrCanvasWindow) {
+        function windowClosing(htmlOrCanvasWindow, windowCloseEvent) {
         	try {
         		if (api.cfg.compositingWindowsListener && api.cfg.compositingWindowsListener.windowClosing) {
-        			api.cfg.compositingWindowsListener.windowClosing(htmlOrCanvasWindow);
+        			api.cfg.compositingWindowsListener.windowClosing(htmlOrCanvasWindow, windowCloseEvent);
         		}
             } catch (e) {
                 console.error(e);
@@ -1106,6 +1974,8 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             } catch (e) {
                 console.error(e);
             }
+            
+            checkUndockedModalBlocked();
         }
         
         function handleActionEvent(actionName, data, binaryData) {

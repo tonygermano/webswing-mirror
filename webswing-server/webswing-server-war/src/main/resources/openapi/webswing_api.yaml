@@ -1,0 +1,1285 @@
+openapi: 3.0.2
+info:
+  title: Webswing REST API
+  description: The public REST API provided by Webswing Server
+  termsOfService: 'https://webswing.org/licensing/'
+  contact:
+    name: Webswing Limited
+    url: 'https://webswing.org/'
+  license:
+    name: Code licensed under GNU Affero General Public License version 3
+    url: 'https://www.gnu.org/licenses/agpl-3.0.en.html'
+  version:  API version
+servers:
+  - url: 'http://localhost:8080/webswing-server'
+    description: Default Server Path
+  - url: 'http://localhost:8080/webswing-server/swingset3'
+    description: Default Application Path for swingset3
+  - url: 'http://localhost:8080/webswing-server/netbeans'
+    description: Default Application Path for netbeans
+
+tags:
+  - name: 'Basic'
+    description: Server & Application API
+  - name: 'Manage Applications'
+    description: Server API
+  - name: 'Manage Configuration'
+    description: Server & Application API
+  - name: 'Manage Sessions'
+    description: Application API
+  - name: 'View Logs'
+    description: Server API
+paths:
+  # ============================================================================
+  # General info
+  # ============================================================================
+  #
+
+
+  #===========INFO============
+  '/rest/info':
+    get:
+      summary: Get Path Info
+      description:  Return detailed information of this Server or Application
+      tags:
+        - 'Basic'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationInfo'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getInfo
+
+
+  #===========PATHS============
+  '/rest/paths':
+    get:
+      summary: Get Available Applications
+      description:  Returns basic information about available applications
+      tags:
+        - 'Basic'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BasicApplicationInfo'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getPaths
+
+  #===========STATS============
+  '/rest/stats':
+    get:
+      summary: Get Aggregated Stats
+      description:  Stats are used to show usage graphs (CPU, MEM, Net)
+      tags:
+        - 'Basic'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stats'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getStats
+
+  #===========ALL SESSIONS============
+  '/rest/sessions':
+    get:
+      summary: Get All Sessions
+      description:  Returns all live and finished server sessions
+      tags:
+        - 'Basic'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sessions'
+              example:
+                sessions: []
+                closedSessions: []
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getSessions
+
+  #===========PERMISSIONS============
+  '/rest/permissions':
+    get:
+      summary: Get User Permissions
+      description:  Resolves if current user has permissions to perform selected actions
+      tags:
+        - 'Basic'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permissions'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getPermissions
+
+  #===========VERSION============
+  '/rest/adminConsoleUrl':
+    get:
+      summary: URL of admin console
+      description:  URL of admin console from server configuration
+      tags:
+        - 'Basic'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+              example:
+                'http://localhost:9004/admin/#/'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getAdminConsoleUrl
+
+  #===========VERSION============
+  '/rest/version':
+    get:
+      summary: Webswing Server Version
+      description:  Current Version of webswing using git-describe format
+      tags:
+        - 'Basic'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+              example:
+                '2.5.12-230-gad17bb9'
+      operationId: getVersion
+
+
+  #===========PING============
+  '/rest/ping':
+    get:
+      summary: Ping
+      description:  Returns empty response. Used for measuring network latency
+      tags:
+        - 'Basic'
+      responses:
+        '204':
+          description: OK
+      operationId: ping
+
+  #===========APPS============
+  '/apps':
+    get:
+      summary: Get Applications
+      description:  Returns applications current user has access to. Used for displaying application selector page
+      tags:
+        - 'Basic'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApplicationInfoMsg'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getApps
+
+
+  #===========MANIFEST============
+  '/manifest.json':
+    get:
+      summary: PWA manifest
+      tags:
+        - 'Basic'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manifest'
+      operationId: getManifest
+
+  #===========Icon============
+  '/appicon':
+    get:
+      summary: Get Application Icon
+      description:  Returns applications png file
+      tags:
+        - 'Basic'
+      responses:
+        '200':
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+      operationId: getIcon
+
+  # ============================================================================
+  # MANAGE APPS
+  # ============================================================================
+
+  #===========CREATE============
+  '/rest/create{appPath}':
+    parameters:
+      - $ref: '#/components/parameters/AppPathType'
+    get:
+      summary: Create Application
+      description:  Creates new application on defined path
+      tags:
+        - 'Manage Applications'
+      responses:
+        '204':
+          description: OK
+        '400':
+          description: '{appPath} is empty.'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+        '500':
+          description: Unable to create application - application already exists.
+      operationId: createApp
+
+  #===========REMOVE============
+  '/rest/remove{appPath}':
+    parameters:
+      - $ref: '#/components/parameters/AppPathType'
+    get:
+      summary: Remove Application
+      description:  Removes existing application on defined path
+      tags:
+        - 'Manage Applications'
+      responses:
+        '204':
+          description: OK
+        '400':
+          description: '{appPath} is invalid, or empty.'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+        '500':
+          description: Unable to remove application - application is running.
+      operationId: removeApp
+
+
+  #===========START============
+  '/rest/start{appPath}':
+    parameters:
+      - $ref: '#/components/parameters/AppPathType'
+    get:
+      summary: Enable Application
+      description:  Initialize application on defined path and make it accessible for users
+      tags:
+        - 'Manage Applications'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: '{appPath} is invalid, or empty.'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: startApp
+
+
+  #===========STOP============
+  '/rest/stop{appPath}':
+    parameters:
+      - $ref: '#/components/parameters/AppPathType'
+    get:
+      summary: Disable Application
+      description:  Stops the application configured on defined path and makes it unavailable for users
+      tags:
+        - 'Manage Applications'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: '{appPath} is invalid, or empty.'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: stopApp
+
+
+
+  # ============================================================================
+  # MANAGE CONFIG
+  # ============================================================================
+
+  #===========CONFIG============
+  '/rest/config':
+    get:
+      summary: Get Config
+      description:  Returns the saved configuration described by Meta-object
+      tags:
+        - 'Manage Configuration'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaObject'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getConfig
+    post:
+      summary: Set Config
+      description:  Saves the submitted configuration to persistent store
+      tags:
+        - 'Manage Configuration'
+      requestBody:
+        description: |
+          Generic map as free-form JSON object.
+          * key - string
+          * value - object
+
+          Set in HTTP Header and use charset UTF-8.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            example:
+              enabled: true
+              homeDir: '${user.dir}'
+              icon: null
+              langFolder: '${webswing.rootDir}/lang'
+              path: ''
+              security:
+                authorizationConfig:
+                  roles: []
+                  users: []
+                classPath: []
+                config:
+                  extension: []
+                  users:
+                    - username: admin
+                      password: '$hashed$s4k4394y8Lhmo_YRl4niJgvaOX9HpU5aTgk8YXcg1ws'
+                      roles:
+                        - admin
+                    - username: support
+                      password: '$hashed$s4k4394y8Lhmo_YRl4niJgvaOX9HpU5aTgk8YXcg1ws'
+                      roles:
+                        - support
+                module: EMBEDED
+              swingConfig: null
+              webFolder: ''
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: saveConfig
+
+
+  #===========VARIABLES SEARCH============
+  '/rest/variables/search/{type}':
+    parameters:
+      - $ref: '#/components/parameters/VariableType'
+    get:
+      summary: Find Variables
+      description: |
+        **Return list of first 10 variables whose start with, or contains given
+        string, the search sequence.**
+
+
+        Result contains only first 10 founded variables whose start, or contain
+        search sequence. Result is made, at first, from alphabetically sorted
+        group of finded variables, whose names start with search sequence. At
+        second, following another sorted group of finded variables, whose
+        names contains search sequence.
+      tags:
+        - 'Manage Configuration'
+      parameters:
+        - in: query
+          name: search
+          description: String sequence for search in variables.
+          required: true
+          allowEmptyValue: true
+          schema:
+            type: string
+            default: ''
+            nullable: false
+      responses:
+        '200':
+          description: 'JSON object with first 10 finded variables and their values.'
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+              example:
+                user.country: SK
+                user.home: 'C:\Users\Webswing'
+                user.language: sk
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+        '406':
+          description: 'If client send in its header Accept attribute with other MIME type value as application/json.'
+      operationId: searchVariables
+
+
+  #===========VARIABLES RESOLVE============
+  '/rest/variables/resolve/{type}':
+    parameters:
+      - $ref: '#/components/parameters/VariableType'
+    get:
+      summary: Resolve Variables.
+      description: Replaces all variables in a given string and returns the resolved string
+      tags:
+        - 'Manage Configuration'
+      parameters:
+        - in: query
+          name: resolve
+          description: String to resolve.
+          required: true
+          allowEmptyValue: true
+          schema:
+            type: string
+            default: ''
+            nullable: false
+      responses:
+        '200':
+          description: Returned only when variable exists.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: 'C:\webswing\webswing\webswing-server\webswing-server-war\target\demo/lang'
+        '204':
+          description: Missing resolve query parameter, or is null.
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+        '406':
+          description: 'If client send in its header Accept attribute with other MIME type value as text/plain.'
+      operationId: resolve
+
+
+  #===========META CONFIG============
+  '/rest/metaConfig':
+    post:
+      summary:  Describe Configuration
+      description:  Operation accepts a json object which is annotated with meta information required to generate configuration web UI
+      tags:
+        - 'Manage Configuration'
+      requestBody:
+        description: |
+          Generic map as free-form JSON object.
+          * key - string
+          * value - object
+
+          Set in HTTP Header and use charset UTF-8.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+      responses:
+        '200':
+          description: |
+            OK
+
+            Charset: UTF-8.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaObject'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getMeta
+
+
+  # ============================================================================
+  # MANAGE SESSIONS
+  # ============================================================================
+  #
+
+  #===========SESSION DETAILS============
+  '/rest/session/{id}':
+    parameters:
+      - in: path
+        name: id
+        description:  session id to work with
+        required: true
+        allowEmptyValue: false
+        schema:
+          type: string
+          nullable: false
+    get:
+      summary: Get Session details
+      description:  Returns details of single session
+      tags:
+        - 'Manage Sessions'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwingSession'
+        '204':
+          description: OK
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getSession
+    delete:
+      summary: Request session shutdown
+      description:  Requests clean session shutdown or forced session process kill if force parameter is true
+      tags:
+        - 'Manage Sessions'
+      parameters:
+        - in: query
+          name: force
+          description: Will be parsed as boolean.
+          required: false
+          allowEmptyValue: true
+          schema:
+            type: string
+            nullable: true
+      responses:
+        '204':
+          description: OK
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+        '500':
+          description: Instance with id not found.
+      operationId: shutdown
+
+
+  #===========SESSION METRICS============
+  '/rest/metrics/{uuid}':
+    parameters:
+      - in: path
+        name: uuid
+        description:  websocket connection id
+        required: true
+        allowEmptyValue: false
+        schema:
+          type: string
+          nullable: false
+    get:
+      summary: Get Session Metrics
+      description:  Returns session metrics for single session
+      tags:
+        - 'Manage Sessions'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwingSession'
+        '204':
+          description: OK
+      operationId: getMetrics
+
+
+  #===========SESSION RECORD============
+  '/rest/record/{id}':
+    parameters:
+      - in: path
+        name: id
+        description:  Instance Id
+        required: true
+        allowEmptyValue: false
+        schema:
+          type: string
+          nullable: false
+    get:
+      summary: Start Session Recording
+      description:  Requests server to start session recording
+      tags:
+        - 'Manage Sessions'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwingSession'
+        '204':
+          description: OK
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: startRecording
+
+
+  #===========THREAD DUMP============
+  '/rest/threadDump/{instanceId}':
+    parameters:
+      - in: path
+        name: instanceId
+        description:  description
+        required: true
+        allowEmptyValue: false
+        schema:
+          type: string
+          nullable: false
+    get:
+      summary: Get Thread Dump
+      description:  Returns content of existing thread dump specified by timestamp
+      tags:
+        - 'Manage Sessions'
+      parameters:
+        - in: query
+          name: timestamp
+          description:  timestamp when this threaddump was created
+          required: false
+          allowEmptyValue: false
+          schema:
+            type: string
+            nullable: false
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+        '404':
+          description: Not found.
+      operationId: getThreadDump
+    post:
+      summary:  Create Thread Dump
+      description:  Requests server to create a new thread dump for selected instance ID
+      tags:
+        - 'Manage Sessions'
+      responses:
+        '204':
+          description: OK
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+        '404':
+          description: Not found.
+      operationId: requestThreadDump
+
+
+  #===========CSRF TOKEN============
+  '/rest/CSRFToken':
+    get:
+      summary: CSRF Token
+      description:  Returns token required to establish websocket connection
+      tags:
+        - 'Manage Sessions'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+              example:
+                'Ce5R1E0RSmffU85Jqs4DUpyzERQVLQRgftu5C3qO+NE='
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: generateCsrfToken
+
+
+  #===========LIST SESSION LOGS============
+  '/rest/session/logs/instanceIds':
+    get:
+      summary: Get session-logging Instances
+      description:  Returns instanceIds with per-session logging enabled
+      tags:
+        - 'Manage Sessions'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getLogInstanceIds
+
+  #===========SESSION LOGS============
+  '/rest/session/logs':
+    get:
+      summary: Download Session Logs
+      description: Downloads logs file as a single zip file
+      tags:
+        - 'Manage Sessions'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      operationId: downloadSessionsLog
+
+    post:
+      summary:  Request Session Log Content
+      description:  Returns requested range of logs from defined session
+      tags:
+        - 'Manage Sessions'
+      requestBody:
+        description:  Log Request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogResponse'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+        '500':
+          description: Failed to read log file.
+      operationId: getSessionLogs
+  # ============================================================================
+  # VIEW LOGS
+  # ============================================================================
+  #
+
+  #===========LOGS============
+  '/rest/logs/{type}':
+    parameters:
+      - in: path
+        name: type
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Download Logs
+      description: Downloads logs file as a single zip file
+      tags:
+        - 'View Logs'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      operationId: downloadLog
+
+    post:
+      summary:  Request Log Content
+      description:  Returns requested range of logs from defined log type
+      tags:
+        - 'View Logs'
+      requestBody:
+        description:  Log Request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogResponse'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+        '500':
+          description: Failed to read log file.
+      operationId: getLogs
+
+  #===========SESSION LOGGING APPS============
+  '/rest/logs/sessionApps':
+    get:
+      summary: Get Session-Logging Applications
+      description:  Returns list of applications with per session logging enabled
+      tags:
+        - 'View Logs'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BasicApplicationInfo'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: getAppsForSessionLogView
+
+# ==============================================================================
+# COMPONENTS
+# ==============================================================================
+#
+components:
+  parameters:
+    # -------------------------------------------------------------------------
+    # VariableType
+    # -------------------------------------------------------------------------
+    #
+    VariableType:
+      in: path
+      name: type
+      description: Variable set type.
+      required: true
+      allowEmptyValue: false
+      schema:
+        type: string
+        enum:
+          - Basic
+          - SwingInstance
+          - SwingApp
+        default: Basic
+        nullable: false
+
+
+    # -------------------------------------------------------------------------
+    # AppPathType
+    # -------------------------------------------------------------------------
+    #
+    AppPathType:
+      in: path
+      name: appPath
+      description: |
+        Application path.
+
+        Parameter format (regular expression): **`appPath: .+?`**
+
+        Parameter must not be an empty string.
+      required: true
+      allowEmptyValue: true
+      schema:
+        type: string
+        nullable: true
+
+
+  schemas:
+    # --------------------------------------------------------------------------
+    # BasicApplicationInfo
+    # --------------------------------------------------------------------------
+    #
+    BasicApplicationInfo:
+      type: object
+      properties:
+        path:
+          type: string
+        url:
+          type: string
+        name:
+          type: string
+        runningInstances:
+          type: integer
+        enabled:
+          type: boolean
+
+
+    # --------------------------------------------------------------------------
+    # ApplicationInfo
+    # --------------------------------------------------------------------------
+    #
+    ApplicationInfo:
+      type: object
+      properties:
+        path:
+          type: string
+        url:
+          type: string
+        name:
+          type: string
+        runningInstances:
+          type: integer
+        enabled:
+          type: boolean
+        message:
+          type: string
+        icon:
+          type: string
+          format: byte
+        status:
+          $ref: '#/components/schemas/InstanceManagerStatus'
+        config:
+          type: object
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+        connectedInstances:
+          type: integer
+        maxRunningInstances:
+          type: integer
+        finishedInstances:
+          type: integer
+        stats:
+          type: object
+          additionalProperties:
+            type: number
+            additionalProperties:
+              type: number
+        warnings:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+
+    # --------------------------------------------------------------------------
+    # ApplicationInfoMsg
+    # --------------------------------------------------------------------------
+    #
+    ApplicationInfoMsg:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        base64Icon:
+          type: string
+          format: byte
+
+
+    # --------------------------------------------------------------------------
+    # InstanceManagerStatus
+    # --------------------------------------------------------------------------
+    #
+    InstanceManagerStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - Starting
+            - Running
+            - Stopped
+            - Stopping
+            - Error
+        error:
+          type: string
+        errorDetails:
+          type: string
+
+
+    # --------------------------------------------------------------------------
+    # LogRequest
+    # --------------------------------------------------------------------------
+    #
+    LogRequest:
+      type: object
+      properties:
+        backwards:
+          type: boolean
+        offset:
+          type: integer
+          format: int64
+        max:
+          type: integer
+          format: int64
+        instanceId:
+          type: string
+
+    # --------------------------------------------------------------------------
+    # LogResponse
+    # --------------------------------------------------------------------------
+    #
+    LogResponse:
+      type: object
+      properties:
+        startOffset:
+          type: integer
+          format: int64
+        endOffset:
+          type: integer
+          format: int64
+        log:
+          type: string
+
+
+    # --------------------------------------------------------------------------
+    # MetaField
+    # --------------------------------------------------------------------------
+    #
+    MetaField:
+      type: object
+      properties:
+        name:
+          type: string
+        tab:
+          type: string
+          enum:
+            - General
+            - Java
+            - Extensions
+            - Server
+            - Swing
+            - Session
+            - FeaturesgS
+        label:
+          type: string
+        description:
+          type: string
+        discriminator:
+          type: boolean
+        variables:
+          $ref: '#/components/schemas/VariableSetName'
+        presets:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
+          enum:
+            - String
+            - Number
+            - Boolean
+            - Object
+            - StringList
+            - StringMap
+            - ObjectList
+            - ObjectListAsTable
+            - ObjectMap
+            - Generic
+        tableColumns:
+          type: array
+          description: 'Self-embedded MetaField'
+          items:
+            $ref: '#/components/schemas/MetaField'
+        value:
+          type: object
+
+
+    # --------------------------------------------------------------------------
+    # MetaObject
+    # --------------------------------------------------------------------------
+    #
+    MetaObject:
+      type: object
+      properties:
+        message:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/MetaField'
+        data:
+          type: object
+          additionalProperties: {}
+
+    # --------------------------------------------------------------------------
+    # Sessions
+    # --------------------------------------------------------------------------
+    #
+    Sessions:
+      type: object
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SwingSession'
+        closedSessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SwingSession'
+        recordings:
+          type: array
+          items:
+            type: string
+
+    # --------------------------------------------------------------------------
+    # SwingSession
+    # --------------------------------------------------------------------------
+    #
+    SwingSession:
+      type: object
+      properties:
+        serialVersionUID:
+          type: integer
+          format: int64
+          default: 147477596803123012
+        id:
+          type: string
+        user:
+          type: string
+        userIp:
+          type: string
+        userOs:
+          type: string
+        userBrowser:
+          type: string
+        application:
+          type: string
+        applicationPath:
+          type: string
+        startedAt:
+          type: integer
+          format: int64
+        endedAt:
+          type: integer
+          format: int64
+        connected:
+          type: boolean
+        applet:
+          type: boolean
+        disconnectedSince:
+          type: integer
+          format: int64
+        recorded:
+          type: boolean
+        recordingFile:
+          type: string
+        stats:
+          type: string
+          additionalProperties: true
+        metrics:
+          type: object
+          additionalProperties:
+            type: number
+        status:
+          type: string
+          enum:
+            - NOT_STARTED
+            - EXITING
+            - RUNNING
+            - FORCE_KILLED
+            - FINISHED
+        warnings:
+          type: array
+          items:
+            type: string
+        warningHistory:
+          type: array
+          items:
+            type: string
+        threadDumps:
+          type: object
+          additionalProperties:
+            type: string
+        applicationUrl:
+          type: string
+        loggingEnabled:
+          type: boolean
+
+
+    # --------------------------------------------------------------------------
+    # VariableSetName
+    # --------------------------------------------------------------------------
+    #
+    VariableSetName:
+      type: string
+      enum:
+        - Basic
+        - SwingInstance
+        - SwingApp
+
+
+    # --------------------------------------------------------------------------
+    # Stats
+    # --------------------------------------------------------------------------
+    #
+    Stats:
+      type: object
+      additionalProperties:
+        type: object
+        additionalProperties:
+          type: number
+
+
+    # --------------------------------------------------------------------------
+    # Permissions
+    # --------------------------------------------------------------------------
+    #
+    Permissions:
+      description: |
+        Permissions map.
+        * key - string
+        * value - boolean
+      type: object
+      properties:
+        dashboard:
+          type: boolean
+        configView:
+          type: boolean
+        configSwingEdit:
+          type: boolean
+        sessions:
+          type: boolean
+        configEdit:
+          type: boolean
+          default: false
+        start:
+          type: boolean
+          default: false
+        stop:
+          type: boolean
+          default: false
+        remove:
+          type: boolean
+          default: false
+        create:
+          type: boolean
+          default: false
+        logsView:
+          type: boolean
+          default: false
+
+    # --------------------------------------------------------------------------
+    # Manifest
+    # --------------------------------------------------------------------------
+    #
+    Manifest:
+      description: 'PWA manifest'
+      type: object
+      properties:
+        short_name:
+          type: string
+        name:
+          type: string
+        icons:
+          type: array
+          items:
+            type: object
+            properties:
+              src:
+                type: string
+              type:
+                type: string
+                default: 'image/png'
+              sizes:
+                type: string
+        start_url:
+          type: string
+        background_color:
+          type: string
+        display:
+          type: string
+          default: 'fullscreen'
+        scope:
+          type: string
+        theme_color:
+          type: string

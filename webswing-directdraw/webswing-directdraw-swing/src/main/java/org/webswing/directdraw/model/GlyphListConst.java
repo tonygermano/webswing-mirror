@@ -28,7 +28,7 @@ public class GlyphListConst extends CompositeDrawConstantHolder<StringConstValue
 		int[] pts = new int[2 * chars.length];//(x,y) location per char
 		int minX = 0, minY = 0, maxX = 0, maxY = 0;//size of drawing area
 		int[] ids = new int[2 + chars.length]; //address of the drawing area size + address of locations constant + address of glyph constant per char
-		FontInfo fontInfo = DirectDrawUtils.getFontInfo(value.font, value.transform);
+		FontInfo fontInfo = DirectDrawUtils.getFontInfo(value.font);
 		String fontDescriptor = get(DirectDrawUtils.fontInfoDescriptor(value.font,fontInfo));//font description to use as part of key in cache
 		GlyphList gl = GlyphList.getInstance();
 		try {

@@ -9,8 +9,9 @@ export default function Clipboard(util) {
     module.injects = api = {
         cfg: 'webswing.config',
         send: 'socket.send',
-        focusInput: 'canvas.focusInput',
-            translate: 'translate.translate'
+        focusDefault: 'focusManager.focusDefault',
+        translate: 'translate.translate',
+        getFocusedWindow: 'base.getFocusedWindow'
     };
     module.provides = {
         cut: cut,
@@ -131,8 +132,12 @@ export default function Clipboard(util) {
         if (copyBar != null) {
             close();
         }
-        api.cfg.rootElement.append(html);
-        copyBar = api.cfg.rootElement.find('div[data-id="copyBar"]');
+
+        var doc = api.getFocusedWindow().document;
+        var rootElement = $(doc).find(".webswing-element-content");
+
+        rootElement.append(html);
+        copyBar = rootElement.find('div[data-id="copyBar"]');
 
         copyBar.wsEventData = data;
         var closeBtn = copyBar.find('button[data-id="closeBtn"]');
@@ -164,18 +169,18 @@ export default function Clipboard(util) {
         copyBtn.on('click', function (e) {
             if (util.isIOS()) {
                 try {
-                        var textarea = document.createElement('textarea');
+                    var textarea = doc.createElement('textarea');
                     textarea.setAttribute('readonly', true);
                     textarea.setAttribute('contenteditable', true);
                     textarea.style.position = 'fixed'; // prevent scroll from jumping to the bottom when focus is set.
                     textarea.value = " ";
 
-                        document.body.appendChild(textarea);
+                    doc.body.appendChild(textarea);
 
                     textarea.focus();
                     textarea.select();
 
-                        var range = document.createRange();
+                    var range = doc.createRange();
                     range.selectNodeContents(textarea);
 
                     var sel = window.getSelection();
@@ -183,12 +188,12 @@ export default function Clipboard(util) {
                     sel.addRange(range);
 
                     textarea.setSelectionRange(0, textarea.value.length);
-                        var result = document.execCommand('copy');
+                    var result = doc.execCommand('copy');
                 } finally {
-                        document.body.removeChild(textarea);
+                    doc.body.removeChild(textarea);
                 }
             } else {
-                    document.execCommand("copy");
+                doc.execCommand("copy");
             }
         });
 
@@ -258,70 +263,73 @@ export default function Clipboard(util) {
 
     }
 
-        function minimize() {
-            if (copyBar != null) {
-                copyBar.find('.ws-btn--selected').removeClass('ws-btn--selected');
-                copyBar.find('div[data-id="contentBar"]').slideUp('fast');
-                copyBar.minimized = true;
-            }
-            api.focusInput();
+    function minimize() {
+        if (copyBar != null) {
+            copyBar.find('.ws-btn--selected').removeClass('ws-btn--selected');
+            copyBar.find('div[data-id="contentBar"]').slideUp('fast');
+            copyBar.minimized = true;
         }
-        
-        function maximize() {
-            if (copyBar != null) {
-                copyBar.find('div[data-id="contentBar"]').slideDown('fast');
-                copyBar.minimized = false;
-            }
-        }
-        
-        function close() {
-            if (copyBar != null) {
-                copyBar.hide("fast");
-                copyBar.remove();
-                copyBar = null;
-            }
-            api.focusInput();
-        }
-        
-        function displayPasteDialog(requestCtx){
-            if (pasteDialog != null) {
-                closePasteDialog();
-            }
-            api.cfg.rootElement.append(pasteHtml);
-            pasteDialog = api.cfg.rootElement.find('div[data-id="pasteDialog"]');
-            
-            var title =pasteDialog.find('div[data-id="title"]');
-            title.html(api.translate(requestCtx.title));
+        api.focusDefault();
+    }
 
-            var message =pasteDialog.find('div[data-id="message"]');
-            message.html(api.translate(requestCtx.message));
+    function maximize() {
+        if (copyBar != null) {
+            copyBar.find('div[data-id="contentBar"]').slideDown('fast');
+            copyBar.minimized = false;
+        }
+    }
 
-            var textarea =pasteDialog.find('textarea[data-id="textarea"]');
-            textarea.focus();
-            textarea.on('paste', function (event) {
-                event.preventDefault();
-                event.stopPropagation();
-                paste(event, false);
-                closePasteDialog();
-                return false;
+    function close() {
+        if (copyBar != null) {
+            copyBar.hide("fast");
+            copyBar.remove();
+            copyBar = null;
+        }
+        api.focusDefault();
+    }
+
+    function displayPasteDialog(requestCtx) {
+        if (pasteDialog != null) {
+            closePasteDialog();
+        }
+
+        var rootElement = $(api.getFocusedWindow().document).find(".webswing-element-content");
+
+        rootElement.append(pasteHtml);
+        pasteDialog = rootElement.find('div[data-id="pasteDialog"]');
+
+        var title = pasteDialog.find('div[data-id="title"]');
+        title.html(api.translate(requestCtx.title));
+
+        var message = pasteDialog.find('div[data-id="message"]');
+        message.html(api.translate(requestCtx.message));
+
+        var textarea = pasteDialog.find('textarea[data-id="textarea"]');
+        textarea.focus();
+        textarea.on('paste', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            paste(event, false);
+            closePasteDialog();
+            return false;
+        });
+
+        var closeBtn = pasteDialog.find('button[data-id="closeBtn"]');
+        closeBtn.on('click', function (event) {
+            api.send({
+                paste: {}
             });
+            closePasteDialog();
+        });
+    }
 
-            var closeBtn= pasteDialog.find('button[data-id="closeBtn"]');
-            closeBtn.on('click', function (event) {
-                api.send({
-                    paste: {}
-                });
-                closePasteDialog();
-            });
+    function closePasteDialog() {
+        if (pasteDialog != null) {
+            pasteDialog.hide("fast");
+            pasteDialog.remove();
+            pasteDialog = null;
         }
-        
-        function closePasteDialog() {
-            if (pasteDialog != null) {
-                pasteDialog.hide("fast");
-                pasteDialog.remove();
-                pasteDialog = null;
-            }
-            api.focusInput();
-        }
+        api.focusDefault();
+    }
 
 }

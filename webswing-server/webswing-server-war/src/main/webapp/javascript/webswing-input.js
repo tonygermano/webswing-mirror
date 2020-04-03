@@ -7,32 +7,46 @@
         module.injects = api = {
             cfg: 'webswing.config',
             send: 'socket.send',
-            getInput: 'canvas.getInput',
-            focusInput: 'canvas.focusInput',
             getCanvas: 'canvas.get',
             cut: 'clipboard.cut',
             copy: 'clipboard.copy',
-            paste: 'clipboard.paste'
+            paste: 'clipboard.paste',
+            isAccessibilityEnabled: 'accessible.isEnabled',
+            toggleAccessibility: 'accessible.toggle',
+            focusInput: 'focusManager.focusInput'
         };
         module.provides = {
             register: register,
             sendInput: sendInput,
-            dispose: dispose
+            dispose: dispose,
+            getPagePosition: getPagePosition,
+            registerUndockedCanvas: registerUndockedCanvas,
+            updateFocusedHtmlCanvas: updateFocusedHtmlCanvas
         };
 
         module.ready = function () {
         };
 
         var registered = false;
+        var registeredListeners = [];
         var latestMouseMoveEvent = null;
         var latestMouseWheelEvent = null;
         var latestWindowResizeEvent = null;
         var latestKeyDownEvent = null;
         var mouseDown = 0;
+        var mouseDownButton = 0;
         var mouseDownCanvas = null;
         var inputEvtQueue = [];
         var pixelsScrolled = 0;
         var compositionInput = false;
+        var pagePosition = {}; // {<winId>: {x: <x>: y: <y>}}
+        var focusedHtmlCanvas = null;
+        var DEFAULT_FONT = '14px sans-serif';
+        var ctrlCounter = 0;
+        var lastCtrlKey = 0;
+        var ctrl3Timeout = null;
+        
+        var caretControlKeys = [33/*pgup*/, 34/*pgdown*/, 35/*end*/, 36/*home*/, 37/*left*/, 38/*up*/, 39/*right*/, 40/*down*/];
 
         function sendInput(message) {
             enqueueInputEvent();
@@ -80,134 +94,110 @@
             latestWindowResizeEvent = null;
             latestKeyDownEvent = null;
             mouseDown = 0;
-            mouseDownCanvas = null;
+            mouseDownButton = 0;
+            resetMouseDownCanvas();
             inputEvtQueue = [];
         }
 
         function dispose() {
             registered = false;
             resetInput();
-            document.removeEventListener('mousedown', mouseDownEventHandler);
-            document.removeEventListener('mouseout', mouseOutEventHandler);
-
-            document.removeEventListener('mousedown', handleMouseDown, false);
-            document.removeEventListener('dblclick', handleDblClick, false);
-            document.removeEventListener('mousemove', handleMouseMove, false);
-            document.removeEventListener('mouseup', handleMouseUp, false);
-            document.removeEventListener("wheel", handleWheel, false);
-            document.removeEventListener('contextmenu', handleContextMenu);
-
-            document.removeEventListener("keydown", handleKeyDown, false);
-            document.removeEventListener("keypress", handleKeyPress, false);
-            document.removeEventListener("keyup", handleKeyUp, false);
+            
+            for (var i=0; i<registeredListeners.length; i++) {
+            	var l = registeredListeners[i];
+            	if (l.useCapture) {
+            		l.target.removeEventListener(l.name, l.listener, l.useCapture);
+            	} else {
+            		l.target.removeEventListener(l.name, l.listener);
+            	}
+            }
+        }
+        
+        function getPagePosition(parentWinId) {
+        	if (!parentWinId) {
+        		return {x: 0, y: 0};
+        	}
+        	return pagePosition[parentWinId];
         }
 
+        function registerUndockedCanvas(win) {
+        	var inputE = win.document.createElement("input");
+        	inputE.classList.add("ws-input-hidden");
+        	inputE.setAttribute("autocorrect", "off");
+        	inputE.setAttribute("autocapitalize", "none");
+        	inputE.setAttribute("autocomplete", "off");
+        	inputE.setAttribute("data-id", "input-handler");
+        	win.document.querySelector('.webswing-element .webswing-element-content').appendChild(inputE);
+        	win.inputHandler = inputE;
+        	
+        	registerInternal(win.inputHandler, win.document, win);
+        }
+        
         function register() {
             if (registered) {
                 return;
             }
             
-            var input = api.getInput();
-            resetInput();
-            focusInput();
-
-            util.bindEvent(document, 'mousedown', handleMouseDown, false);
-            util.bindEvent(document, 'dblclick', handleDblClick, false);
-            util.bindEvent(document, 'mousemove', handleMouseMove, false);
-            util.bindEvent(document, 'mouseup', handleMouseUp, false);
-            util.bindEvent(document, "wheel", handleWheel, false);
-            util.bindEvent(document, 'contextmenu', handleContextMenu);
-
-            util.bindEvent(input, 'keydown', keyDownHandler, false);
-            util.bindEvent(document, 'keydown', handleKeyDown, false);
-            util.bindEvent(input, 'keypress', keyPressHandler, false);
-            util.bindEvent(document, 'keypress', handleKeyPress, false);
-            util.bindEvent(input, 'keyup', keyUpHandler, false);
-            util.bindEvent(document, 'keyup', handleKeyUp, false);
-
-            util.bindEvent(document, 'mousedown', mouseDownEventHandler);
-            util.bindEvent(document, 'mouseout', mouseOutEventHandler);
-
-            var DEFAULT_FONT = '14px sans-serif';
-            
-            util.bindEvent(input, 'compositionstart', function(event) {
-            	if (api.cfg.touchMode) {
-            		return;
-            	}
-            	
-                compositionInput = true;
-                var input=api.getInput();
-                $(input).addClass('ws-input-ime');
-                $(input).removeClass('ws-input-hidden');
-                input.style.font = DEFAULT_FONT;
-            }, false);
-            
-            util.bindEvent(input, 'compositionupdate', function(event) {
-            	if (api.cfg.touchMode) {
-            		return;
-            	}
-            	
-            	var input=api.getInput();
-            	var text = event.data;
-            	input.style.width = getTextWidth(text, DEFAULT_FONT)+'px';
-            }, false);
-            
-            util.bindEvent(input, 'compositionend', function (event) {
-            	if (api.cfg.touchMode) {
-            		return;
-            	}
-            	
-                var input = api.getInput();
-                $(input).addClass('ws-input-hidden');
-                $(input).removeClass('ws-input-ime');
-                input.style.width = '1px';
-                var isIE = api.cfg.ieVersion && api.cfg.ieVersion <= 11;
-                sentWordsUsingKeypressEvent(isIE ? event.target.value : event.data);
-                compositionInput = false;
-                focusInput();
-            }, false);
-            
-            util.bindEvent(input, 'input', function(event) {
-            	if (api.cfg.touchMode) {
-            		return;
-            	}
-            	
-                var input = api.getInput();
-                if(compositionInput || !input.value){
-                    return;
-                }
-                if (((!event.isComposing && event.inputType =='insertText' && event.data!=null)
-                    || (api.cfg.ieVersion && event.type ==="input"))
-                    && input.value != " "
-                ) {
-                   sentWordsUsingKeypressEvent(input.value)
-                    focusInput();
-                }
-            }, false);
-            
-            util.bindEvent(input, 'cut', function (event) {
-                event.preventDefault();
-                event.stopPropagation();
-                api.cut(event);
-                return false;
-            }, false);
-            util.bindEvent(input, 'copy', function (event) {
-                event.preventDefault();
-                event.stopPropagation();
-                api.copy(event);
-                return false;
-            }, false);
-            util.bindEvent(input, 'paste', function (event) {
-                event.preventDefault();
-                event.stopPropagation();
-                api.paste(event, false);
-                return false;
-            }, false);
+            registerInternal(document.querySelector(".ws-input-hidden"), document, window);
 
             registered = true;
         }
         
-        function handleMouseDown(evt) {
+        function registerInternal(input, doc, win) {
+            resetInput();
+            focusInput(input);
+
+            registerGlobalListener(doc, 'mousedown', (evt) => { handleMouseDown(evt, input)}, true);
+            registerGlobalListener(doc, 'dblclick', (evt) => { handleDblClick(evt, input)} );
+            registerGlobalListener(doc, 'mousemove', handleMouseMove);
+            registerGlobalListener(doc, 'mouseup', (evt) => { handleMouseUp(evt, input)} );
+            registerGlobalListener(doc, 'wheel', handleWheel);
+            registerGlobalListener(doc, 'contextmenu', handleContextMenu);
+            registerGlobalListener(doc, 'keydown', handleKeyDown);
+            registerGlobalListener(doc, 'keypress', handleKeyPress);
+            registerGlobalListener(doc, 'keyup', handleKeyUp);
+            registerGlobalListener(doc, 'compositionstart', (evt) => { handleCompositionStart(evt, input) });
+            registerGlobalListener(doc, 'compositionupdate', (evt) => { handleCompositionUpdate(evt, input) });
+            registerGlobalListener(doc, 'compositionend', (evt) => { handleCompositionEnd(evt, input) });
+            registerGlobalListener(doc, 'input', (evt) => { handleInput(evt, input) });
+            registerGlobalListener(doc, 'cut', handleCut);
+            registerGlobalListener(doc, 'copy', handleCopy);
+            registerGlobalListener(doc, 'paste', handlePaste);
+//            registerGlobalListener(doc, 'mousedown', mouseDownEventHandler); // this should not be needed
+            registerGlobalListener(doc, 'mouseout', (evt) => { mouseOutEventHandler(evt, input)} );
+            registerGlobalListener(doc, 'mouseover', mouseOverEventHandler);
+            registerGlobalListener(win, 'blur', (evt) => { setTimeout(()=>handleWindowBlur(evt.target),0) /* using the 'setTimout' to let the event pass the run loop*/} );
+        }
+        
+        function registerGlobalListener(target, eventName, listener, useCapture) {
+            util.bindEvent(target, eventName, listener, useCapture);
+            registeredListeners.push({target: target, name: eventName, listener: listener, useCapture: useCapture});
+        }
+
+        function updateFocusedHtmlCanvas(focusedElement) {
+            var htmlcanvas = isInsideWebswingHtmlCanvas(focusedElement);
+            if (htmlcanvas) {
+                if (focusedHtmlCanvas !== htmlcanvas) {
+                    console.log("send focus to HTMLPanel" + htmlcanvas);
+                    sendInput({
+                        focus: {
+                            htmlPanelId: htmlcanvas.getAttribute("data-id")
+                        }
+                    });
+                }
+                focusedHtmlCanvas = htmlcanvas;
+            } else {
+                focusedHtmlCanvas = null;
+            }
+        }
+
+        function handleWindowBlur(targetWindow) {
+            updateFocusedHtmlCanvas(targetWindow.document.activeElement)
+        }
+        
+        function handleMouseDown(evt, input) {
+            updateFocusedHtmlCanvas(evt.target);
+
         	if (isNotValidCanvasTarget(evt)) {
         		return;
         	}
@@ -216,12 +206,16 @@
             var mousePos = getMousePos(evt, 'mousedown', evt.target);
             latestMouseMoveEvent = null;
             enqueueInputEvent(mousePos);
-            focusInput();
+            focusInput(input);
             sendInput();
+            
+            evt.preventDefault();
+            evt.stopPropagation();
+            
             return false;
         }
         
-        function handleDblClick(evt) {
+        function handleDblClick(evt, input) {
         	if (isNotValidCanvasTarget(evt)) {
         		return;
         	}
@@ -229,8 +223,12 @@
             var mousePos = getMousePos(evt, 'dblclick', evt.target);
             latestMouseMoveEvent = null;
             enqueueInputEvent(mousePos);
-            focusInput();
+            focusInput(input);
             sendInput();
+            
+            evt.preventDefault();
+            evt.stopPropagation();
+            
             return false;
         }
         
@@ -252,7 +250,7 @@
             return false;
         }
         
-        function handleMouseUp(evt) {
+        function handleMouseUp(evt, input) {
         	// do this for the whole document, not only canvas
             var mousePos = getMousePos(evt, 'mouseup', evt.target);
             latestMouseMoveEvent = null;
@@ -260,14 +258,14 @@
             
             if (evt.target && evt.target.matches && evt.target.matches("canvas.webswing-canvas") && mouseDownCanvas != null) {
             	// focus input only in case mouse was pressed and released over canvas
-            	focusInput();
+            	focusInput(input);
         	}
             
             sendInput();
             
             mouseDown = mouseDown & ~Math.pow(2, evt.which);
-            mouseDownCanvas = null;
-
+            mouseDownButton = evt.which;
+            resetMouseDownCanvas();
             return false;
         }
         
@@ -302,7 +300,7 @@
         }
         
         function handleKeyDown(evt) {
-        	if (isNotValidCanvasTarget(evt)) {
+        	if (isNotValidCanvasTarget(evt) && isNotValidInputHandlerTarget(evt)) {
         		return;
         	}
         	
@@ -310,7 +308,7 @@
         }
         
         function handleKeyPress(evt) {
-        	if (isNotValidCanvasTarget(evt)) {
+        	if (isNotValidCanvasTarget(evt) && isNotValidInputHandlerTarget(evt)) {
         		return;
         	}
         	
@@ -318,11 +316,112 @@
         }
         
         function handleKeyUp(evt) {
-        	if (isNotValidCanvasTarget(evt)) {
+        	handleAccessibilityAccessKeys(evt);
+        	
+        	if (isNotValidCanvasTarget(evt) && isNotValidInputHandlerTarget(evt)) {
         		return;
         	}
         	
         	keyUpHandler(evt);
+        }
+        
+        function handleCompositionStart(event, input) {
+        	if (isNotValidInputHandlerTarget(event)) {
+        		return;
+        	}
+        	
+        	if (api.cfg.touchMode) {
+        		return;
+        	}
+        	
+        	compositionInput = true;
+        	$(input).addClass('ws-input-ime');
+        	$(input).removeClass('ws-input-hidden');
+        	input.style.font = DEFAULT_FONT;
+        }
+        
+        function handleCompositionUpdate(event, input) {
+        	if (isNotValidInputHandlerTarget(event)) {
+        		return;
+        	}
+        	
+        	if (api.cfg.touchMode) {
+        		return;
+        	}
+        	
+        	var text = event.data;
+        	input.style.width = getTextWidth(text, DEFAULT_FONT) + 'px';
+        }
+        
+        function handleCompositionEnd(event, input) {
+        	if (isNotValidInputHandlerTarget(event)) {
+        		return;
+        	}
+        	
+        	if (api.cfg.touchMode) {
+        		return;
+        	}
+        	
+        	$(input).addClass('ws-input-hidden');
+        	$(input).removeClass('ws-input-ime');
+        	input.style.width = '1px';
+        	var isIE = api.cfg.ieVersion && api.cfg.ieVersion <= 11;
+        	sentWordsUsingKeypressEvent(isIE ? event.target.value : event.data);
+        	compositionInput = false;
+        	focusInput(input);
+        }
+        
+        function handleInput(event, input) {
+        	if (isNotValidInputHandlerTarget(event)) {
+        		return;
+        	}
+        	
+        	if (api.cfg.touchMode) {
+        		return;
+        	}
+        	
+        	if (compositionInput || !input.value) {
+        		return;
+        	}
+        	if (((!event.isComposing && event.inputType =='insertText' && event.data != null)
+        			|| (api.cfg.ieVersion && event.type === "input"))
+        			&& input.value != " ") {
+        		sentWordsUsingKeypressEvent(input.value);
+        		focusInput(input);
+        	}
+        }
+        
+        function handleCut(event) {
+        	if (isNotValidInputHandlerTarget(event)) {
+        		return;
+        	}
+        	
+        	event.preventDefault();
+        	event.stopPropagation();
+        	api.cut(event);
+        	return false;
+        }
+        
+        function handleCopy(event) {
+        	if (isNotValidInputHandlerTarget(event)) {
+        		return;
+        	}
+        	
+        	event.preventDefault();
+        	event.stopPropagation();
+        	api.copy(event);
+        	return false;
+        }
+        
+        function handlePaste(event) {
+        	if (isNotValidInputHandlerTarget(event)) {
+        		return;
+        	}
+        	
+        	event.preventDefault();
+        	event.stopPropagation();
+        	api.paste(event, false);
+        	return false;
         }
         
         function keyDownHandler(event) {
@@ -339,7 +438,7 @@
 
             var kc = event.keyCode;
             if (functionKeys.indexOf(kc) != -1) {
-                if (!api.cfg.virtualKB) {
+                if (!api.cfg.virtualKB && !isInputCaretControl(event.keyCode, event.target)) {
                     event.preventDefault();
                     event.stopPropagation();
                 }
@@ -356,7 +455,7 @@
                 latestKeyDownEvent = keyevt;
 
                 //generate keypress event for alt+key events
-                if (keyevt.key.alt && functionKeys.indexOf(kc) == -1) {
+                if (!util.detectMac() && keyevt.key.alt && functionKeys.indexOf(kc) == -1) {
                     event.preventDefault();
                     event.stopPropagation();
                     keyevt = getKBKey('keypress', event);
@@ -371,6 +470,13 @@
             }
             return false;
         }
+        
+        function isInputCaretControl(kc, input) {
+        	if ($(input).is("[aria-hidden=true]")) {
+        		return false;
+        	}
+        	return caretControlKeys.indexOf(kc) != -1;
+        }
 
         function keyPressHandler(event) {
         	if (api.cfg.touchMode) {
@@ -379,13 +485,18 @@
         	
             var keyevt = getKBKey('keypress', event);
             if (!isClipboardEvent(keyevt)) { // cut copy paste handled separately
-                event.preventDefault();
-                event.stopPropagation();
+                    event.preventDefault();
+                    event.stopPropagation();
                 if (latestKeyDownEvent != null) {
                     latestKeyDownEvent.key.character = keyevt.key.character;
                 }
                 enqueueInputEvent(keyevt);
             }
+
+            if (util.detectMac()){
+                keyevt.key.alt = false
+            }
+
             return false;
         }
         
@@ -396,8 +507,10 @@
         	
         	var keyevt = getKBKey('keyup', event);
             if (!isClipboardEvent(keyevt)) { // cut copy paste handled separately
-                event.preventDefault();
-                event.stopPropagation();
+            	if (!api.cfg.virtualKB && !isInputCaretControl(event.keyCode, event.target)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+            	}
                 enqueueInputEvent(keyevt);
                 sendInput();
             }
@@ -430,23 +543,94 @@
             return Math.ceil(metrics.width) + 5;
         }
 
-        function mouseDownEventHandler(evt) {
-            mouseDown = mouseDown | Math.pow(2, evt.which);
-            mouseDownCanvas = (evt.target && evt.target.matches && evt.target.matches("canvas.webswing-canvas")) ? evt.target : null;
+        function isWebswingCanvas(e) {
+            return e && e.matches && e.matches("canvas.webswing-canvas");
+        }
+        
+        function isInputHandler(e) {
+        	return e && e.matches && (e.matches("input.ws-input-hidden") || e.matches("input.aria-element") || e.matches("textarea.aria-element"));
+        }
+        
+        function isInsideWebswingHtmlCanvas(e) {
+            while (e && e.matches && e !== window) {
+                if (e.matches("div.webswing-html-canvas")) {
+                   return e;
+                }
+                e = e.parentNode;
+            }
+            return false;
+        }
+        
+        function isAriaElement(e) {
+        	return e && e.matches && e.matches(".aria-element");
+        }
+        
+        function handleAccessibilityAccessKeys(event) {
+        	if (ctrl3Timeout != null) {
+        		clearTimeout(ctrl3Timeout);
+        		ctrl3Timeout = null;
+        	}
+        	
+        	var now = new Date().getTime();
+        	if (event.keyCode == 17) {
+        		// accessibility CTRL access key
+        		if (now - lastCtrlKey < 1000) {
+        			ctrlCounter++;
+        		} else {
+        			ctrlCounter = 0;
+        		}
+        		
+                lastCtrlKey = now;
+        	} else {
+        		ctrlCounter = 0;
+        	}
+        	
+        	if ((ctrlCounter + 1) == 3 && api.isAccessibilityEnabled()) {
+        		ctrl3Timeout = setTimeout(function() {
+        			ctrlCounter = 0;
+        			sendInput({
+        				event: {
+        					type: "requestWindowSwitchList"
+        				}
+        			});
+        		}, 1000);
+        	}
+        	
+        	if ((ctrlCounter + 1) == 5) {
+        		api.toggleAccessibility();
+        		ctrlCounter = 0;
+        	}
         }
 
-        function mouseOutEventHandler(evt) {
-        	if (((evt.target && evt.target.matches && evt.target.matches("canvas.webswing-canvas"))
-        			|| (evt.relatedTarget && evt.relatedTarget.matches && evt.relatedTarget.matches("canvas.webswing-canvas"))) || mouseDownCanvas != null) {
+        function setMouseDownCanvas(evt) {
+            mouseDownCanvas = isWebswingCanvas(evt.target) ? evt.target : null;
+            if (isWebswingCanvas(evt.target)) {
+                $('.webswing-html-canvas iframe').addClass('webswing-iframe-muted-while-dragging');
+            }
+        }
+
+        function resetMouseDownCanvas() {
+            mouseDownCanvas = null;
+            $('.webswing-html-canvas iframe').removeClass('webswing-iframe-muted-while-dragging');
+        }
+
+
+        function mouseDownEventHandler(evt) {
+            mouseDown = mouseDown | Math.pow(2, evt.which);
+            mouseDownButton = evt.which;
+            setMouseDownCanvas(evt);
+        }
+
+        function mouseOutEventHandler(evt, input) {
+        	if (isWebswingCanvas(evt.target) || isWebswingCanvas(evt.relatedTarget) || mouseDownCanvas != null) {
         		return;
         	}
         	
-        	mouseOutEventHandlerImpl(evt);
+        	mouseOutEventHandlerImpl(evt, input);
         }
         
-        function mouseOutEventHandlerImpl(evt) {
+        function mouseOutEventHandlerImpl(evt, input) {
             if (mouseDown!==0 && api.cfg.hasControl && api.cfg.canPaint && !api.cfg.mirrorMode && !api.cfg.touchMode && !compositionInput) {
-                // TODO is evt.target correct
                 var mousePos = getMousePos(evt, 'mouseup', evt.target);
                 // when a new web page pops after user click, mouseup will send twice
                 var canvasSize=api.getCanvas().getBoundingClientRect();
@@ -459,33 +643,46 @@
                 }
                 latestMouseMoveEvent = null;
                 enqueueInputEvent(mousePos);
-                focusInput();
+                focusInput(input);
                 sendInput();
             }
             mouseDown = 0;
+            mouseDownButton = 0;
+            resetMouseDownCanvas();
+        }
+        
+        function mouseOverEventHandler(evt) {
+        	var newMouseDown = Math.pow(2, evt.which);
+        	if (mouseDownButton != evt.which && mouseDown != newMouseDown) {
+        		// mouse has been released outside window (iframe)
+        		let mousePos = getMousePos(evt, 'mouseup', evt.target);
+        		// simulate release of previously pressed mouse button
+        		mousePos.mouse.buttons = mouseDown;
+        		mousePos.mouse.button = mouseDownButton;
+        		
+        		latestMouseMoveEvent = null;
+        		enqueueInputEvent(mousePos);
+        		
+        		sendInput();
+        		
+        		mouseDown = 0;
+        		mouseDownButton = 0;
+        		resetMouseDownCanvas();
+        	}
         }
         
         function isNotValidCanvasTarget(evt) {
-        	return !evt.target || !evt.target.matches || !evt.target.matches("canvas.webswing-canvas");
+        	return !(isWebswingCanvas(evt.target) || isAriaElement(evt.target));
+        }
+        
+        function isNotValidInputHandlerTarget(evt) {
+        	return !isInputHandler(evt.target);
         }
 
-        function focusInput() {
-            if (api.cfg.touchMode) {
-                return;
-            }
-            
-            var input = api.getInput();
-
-            if(util.detectIE() && util.detectIE() <= 11){
-                input.blur(); //fix issue when compositionend causes focus to be lost in IE
-            }
-            // scrollX , scrollY attributes on IE gives undefined, so changed to compatible pageXOffset,pageYOffset
-            let sx = window.pageXOffset, sy = window.pageYOffset;
-            // In order to ensure that the browser will fire clipboard events, we always need to have something selected
-            input.value = ' ';
-            // set the style attributes as the focus/select cannot work well in IE
-            util.focusWithPreventScroll(input, true)
+        function focusInput(input) {
+            api.focusInput(input);
         }
+        
         function sentWordsUsingKeypressEvent(data) {
             for (var i = 0, length = data.length; i < length ;i++) {
                 inputEvtQueue.push({
@@ -501,15 +698,28 @@
         function getMousePos(evt, type, targetElement) {
             var rect;
             if (targetElement && targetElement != null && targetElement.parentNode && targetElement.parentNode != null && targetElement.parentNode.getBoundingClientRect) {
-                rect = targetElement.parentNode.getBoundingClientRect();
+                if ($(targetElement).is(".internal")) {
+                	rect = targetElement.parentNode.parentNode.getBoundingClientRect();
+                } else {
+                	rect = targetElement.parentNode.getBoundingClientRect();
+                }
             } else {
                 rect = api.getCanvas().getBoundingClientRect();
             }
             
             var winId;
-            if (targetElement && targetElement.matches("canvas.webswing-canvas") && $(targetElement).data("id") && $(targetElement).data("id") != "canvas") {
+            if (targetElement && targetElement.matches && targetElement.matches("canvas.webswing-canvas") && $(targetElement).data("id") && $(targetElement).data("id") != "canvas") {
             	// for a composition canvas window send winId
-                winId = $(targetElement).data("id");
+            	if ($(targetElement).is(".internal")) {
+            		// internal window must use its parent as mouse events target
+            		if ($(targetElement.parentNode).data("ownerid")) {
+            			winId = $(targetElement.parentNode).data("ownerid");
+            		}
+            	} else {
+            		winId = $(targetElement).data("id");
+            		
+            		targetElement.ownerDocument.defaultView.pagePosition = {x: evt.screenX - evt.clientX, y: evt.screenY - evt.clientY};
+            	}
             }
 
             // return relative mouse position
@@ -533,7 +743,7 @@
             	mouseY = -1;
             }
             
-            if (type == 'mouseup' && targetElement && targetElement.matches && targetElement.closest(".webswing-html-canvas") != null) {
+            if (type == 'mouseup' && targetElement && targetElement.matches && !targetElement.matches("canvas.webswing-canvas") && targetElement.closest(".webswing-html-canvas") != null) {
             	// fix for mouseup over an HtmlWindow div content
             	rect = targetElement.closest(".webswing-html-canvas").parentNode.getBoundingClientRect();
             	

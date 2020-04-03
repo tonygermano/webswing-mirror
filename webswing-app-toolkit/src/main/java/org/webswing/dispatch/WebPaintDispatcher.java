@@ -1,95 +1,50 @@
 package org.webswing.dispatch;
 
-import org.webswing.Constants;
-import org.webswing.component.HtmlPanelImpl.HtmlWindow;
-import org.webswing.model.internal.ExitMsgInternal;
-import org.webswing.model.internal.OpenFileResultMsgInternal;
-import org.webswing.model.s2c.*;
-import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
-import org.webswing.model.s2c.LinkActionMsg.LinkActionType;
-import org.webswing.toolkit.WebCursor;
+import org.webswing.dispatch.AbstractPaintDispatcher;
+import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.model.s2c.WindowMoveActionMsg;
+import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
-import org.webswing.toolkit.api.clipboard.PasteRequestContext;
-import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
-import org.webswing.toolkit.extra.IsolatedFsShellFolderManager;
+import org.webswing.toolkit.api.component.HtmlPanel;
 import org.webswing.toolkit.extra.WebRepaintManager;
-import org.webswing.toolkit.util.DeamonThreadFactory;
+import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Services;
-import org.webswing.toolkit.util.ToolkitUtil;
 import org.webswing.toolkit.util.Util;
 
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.net.URI;
-import java.util.*;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class WebPaintDispatcher {
-
-	public static final Object webPaintLock = new Object();
-
-	private volatile Map<String, Set<Rectangle>> areasToUpdate = new HashMap<String, Set<Rectangle>>();
+public class WebPaintDispatcher extends AbstractPaintDispatcher {
 	private volatile WindowMoveActionMsg moveAction;
-	private volatile FocusEventMsg focusEvent;
-	private volatile boolean clientReadyToReceive = true;
-	private long lastReadyStateTime;
-	private JFileChooser fileChooserDialog;
-	private JDialog clipboardDialog;
-
-	private ScheduledExecutorService contentSender = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance("Webswing Paint Dispatcher"));
 
 	public WebPaintDispatcher() {
-		final Long ackTimeout = Long.getLong(Constants.PAINT_ACK_TIMEOUT, 5000);
-		Runnable sendUpdate = new Runnable() {
-
-			public void run() {
-				try {
-					AppFrameMsgOut json;
-					Map<String, Map<Integer, BufferedImage>> windowImages = null;
-					Map<String, Image> windowWebImages = null;
-					Map<String, Set<Rectangle>> currentAreasToUpdate = null;
+		Runnable sendUpdate = () -> {
+			try {
+				if (!isClientReadyToReceiveOrResetAfterTimedOut()) {
+					return;
+				}
+				AppFrameMsgOut json;
+				Map<String, Map<Integer, BufferedImage>> windowImages = null;
+				Map<String, Image> windowWebImages = null;
+				Map<String, Set<Rectangle>> currentAreasToUpdate;
 					synchronized (Util.getWebToolkit().getTreeLock()) {
 						synchronized (webPaintLock) {
-							if (!clientReadyToReceive) {
-								if (System.currentTimeMillis() - lastReadyStateTime > ackTimeout) {
-									Logger.debug("contentSender.readyToReceive re-enabled after timeout");
-									if (Util.isDD()) {
-										Services.getDirectDrawService().resetCache();
-									}
-									clientReadyToReceive = true;
-								}
-								return;
-							}
 							
 							WebRepaintManager.processDirtyComponents();
-							lastReadyStateTime = System.currentTimeMillis();
 							
-							currentAreasToUpdate = areasToUpdate;
-							areasToUpdate = Util.postponeNonShowingAreas(currentAreasToUpdate);
+							currentAreasToUpdate = popProcessableDirtyAreas();
 							
-							if ((Util.isCompositingWM() && currentAreasToUpdate.isEmpty()) 
-									|| (!Util.isCompositingWM() && currentAreasToUpdate.isEmpty() && moveAction == null)) {
+							if (currentAreasToUpdate.isEmpty() && !hasMoveAction()) {
 								return;
 							}
 							
-							if (Util.isCompositingWM()) {
-								json = Util.fillWithCompositingWindowsData(currentAreasToUpdate);
-							} else {
-								json = Util.fillWithWindowsData(currentAreasToUpdate);
-							}
+							json = Util.fillWithWindowsData(currentAreasToUpdate);
 							
 							if (Util.isDD()) {
 								windowWebImages = Util.extractWindowWebImages(currentAreasToUpdate.keySet(), new HashMap<>());
@@ -97,15 +52,9 @@ public class WebPaintDispatcher {
 								windowImages = Util.extractWindowImages(json, new HashMap<>());
 							}
 							
-							if (moveAction != null) {
-								json.setMoveAction(moveAction);
-								moveAction = null;
-							}
-							if (focusEvent != null) {
-								json.setFocusEvent(focusEvent);
-								focusEvent = null;
-							}
-							clientReadyToReceive = false;
+							fillMoveAction(json);
+							fillFocusEvent(json);
+							setClientNotReady();
 						}
 					}
 					Logger.trace("contentSender:paintJson", json);
@@ -126,178 +75,71 @@ public class WebPaintDispatcher {
 				} catch (Throwable e) {
 					Logger.error("contentSender:error", e);
 				}
-			}
 		};
 		Integer delay = Integer.getInteger("webswing.drawDelayMs", 33);
-		contentSender.scheduleWithFixedDelay(sendUpdate, delay, delay, TimeUnit.MILLISECONDS);
-	}
-
-	public void clientReadyToReceive() {
-		synchronized (webPaintLock) {
-			clientReadyToReceive = true;
-		}
-	}
-	
-	public void requestComponentTree() {
-		if (!Util.isTestMode()) {
-			return;
-		}
-		
-		AppFrameMsgOut f = new AppFrameMsgOut();
-		f.setComponentTree(ToolkitUtil.getComponentTree());
-		Logger.debug("WebPaintDispatcher:sendComponentTree");
-		sendObject(f);
-	}
-
-	public void sendObject(Serializable object) {
-		Logger.debug("WebPaintDispatcher:sendJsonObject", object);
-		Services.getConnectionService().sendObject(object);
+		getExecutorService().scheduleWithFixedDelay(sendUpdate, delay, delay, TimeUnit.MILLISECONDS);
 	}
 
 	public void notifyWindowAreaRepainted(String guid, Rectangle repaintedArea) {
-		synchronized (webPaintLock) {
-			if (validBounds(repaintedArea)) {
-				if (areasToUpdate.containsKey(guid)) {
-					Set<Rectangle> rset = areasToUpdate.get(guid);
-					rset.add(repaintedArea);
-				} else {
-					Set<Rectangle> rset = new HashSet<Rectangle>();
-					rset.add(repaintedArea);
-					areasToUpdate.put(guid, rset);
-				}
-				Logger.trace("WebPaintDispatcher:notifyWindowAreaRepainted", guid, repaintedArea);
-			}
-		}
+		addDirtyArea(guid, repaintedArea);
+	}
+	
+	public void notifyWindowAreaVisible(String guid, Rectangle visibleArea) {
+		addDirtyArea(guid, visibleArea);
 	}
 
 	public void notifyWindowBoundsChanged(String guid, Rectangle newBounds) {
-		synchronized (webPaintLock) {
-			if (validBounds(newBounds)) {
-				Set<Rectangle> rset;
-				if (areasToUpdate.containsKey(guid)) {
-					rset = areasToUpdate.get(guid);
-					rset.clear();
-				} else {
-					rset = new HashSet<Rectangle>();
-					areasToUpdate.put(guid, rset);
-				}
-				rset.add(newBounds);
-				Logger.trace("WebPaintDispatcher:notifyWindowBoundsChanged", guid, newBounds);
-			}
+		//TODO: do we need this?		addDirtyArea(guid, newBounds, true);
+	}
+
+	public void notifyWindowActivated(Window activeWindow) {
+		WebComponentPeer activeWindowPeer = (WebComponentPeer) WebToolkit.targetToPeer(activeWindow);
+		activeWindowPeer.updateWindowDecorationImage();
+		addDirtyArea(activeWindow);
+	}
+
+	public void notifyWindowDeactivated(Window oldActiveWindow) {
+		WebComponentPeer oldActiveWindowPeer = (WebComponentPeer) WebToolkit.targetToPeer(oldActiveWindow);
+		oldActiveWindowPeer.updateWindowDecorationImage();
+		addDirtyArea(oldActiveWindow);
+	}
+
+	public void notifyWindowZOrderChanged(Window w) {
+		w.repaint();
+		addDirtyArea(w);
+	}
+
+	public void notifyWindowMaximized(JFrame target) {
+		final JFrame f = target;
+		f.setLocation(0, 0);
+		final Dimension originalSize = f.getSize();
+		final Dimension newSize = Toolkit.getDefaultToolkit().getScreenSize();
+		if (!originalSize.equals(newSize)) {
+			SwingUtilities.invokeLater(() -> f.setSize(newSize));
 		}
 	}
 
-	private boolean validBounds(Rectangle newBounds) {
-		if (newBounds.width > 0 && newBounds.height > 0) {
-			return true;
+	public void notifyBackgroundAreaVisible(Rectangle toRepaint) {
+		addDirtyArea(WebToolkit.BACKGROUND_WINDOW_ID, toRepaint);
+	}
+
+	public void notifyWindowMoved(Window w, int zIndex, Rectangle from, Rectangle to) {
+		//just to notify that a window was moved, the moving handled by client
+		if (zIndex == 0 && w.getWidth() == from.width && w.getHeight() == from.height) {
+			synchronized (webPaintLock) {
+				if (!hasMoveAction()) {
+					setMoveAction(new WindowMoveActionMsg(from.x, from.y, to.x, to.y, from.width, from.height));
+					notifyRepaintOffScreenAreas(w, getMoveAction());
+				} else if (getMoveAction().getDx() == from.x && getMoveAction().getDy() == from.y && getMoveAction().getWidth() == from.width && getMoveAction().getHeight() == from.height) {
+					getMoveAction().setDx(to.x);
+					getMoveAction().setDy(to.y);
+					notifyRepaintOffScreenAreas(w, getMoveAction());
+				} else {
+					addDirtyArea(w);
+				}
+			}
 		} else {
-			return false;
-		}
-	}
-
-	public void notifyWindowClosed(String guid) {
-		synchronized (webPaintLock) {
-			areasToUpdate.remove(guid);
-		}
-		AppFrameMsgOut f = new AppFrameMsgOut();
-		WindowMsg fdEvent = new WindowMsg();
-		fdEvent.setId(guid);
-		f.setClosedWindow(fdEvent);
-		Logger.debug("WebPaintDispatcher:notifyWindowClosed", guid);
-		sendObject(f);
-	}
-
-	public void notifyWindowRepaint(Window w) {
-		Rectangle bounds = w.getBounds();
-		WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(w);
-		if(peer!=null){
-			notifyWindowAreaRepainted(peer.getGuid(), new Rectangle(0, 0, bounds.width, bounds.height));
-		}
-	}
-
-	@SuppressWarnings("restriction")
-	public void notifyWindowRepaintAll() {
-		notifyBackgroundRepainted(new Rectangle(Util.getWebToolkit().getScreenSize()));
-		for (Window w : Util.getAllWindows()) {
-			if (w.isShowing()) {
-				notifyWindowRepaint(w);
-			}
-		}
-	}
-
-	public void notifyBackgroundRepainted(Rectangle toRepaint) {
-		notifyWindowAreaRepainted(WebToolkit.BACKGROUND_WINDOW_ID, toRepaint);
-	}
-
-	public void notifyOpenLinkAction(URI uri) {
-		AppFrameMsgOut f = new AppFrameMsgOut();
-		LinkActionMsg linkAction = new LinkActionMsg(LinkActionType.url, uri.toString());
-		f.setLinkAction(linkAction);
-		Logger.info("WebPaintDispatcher:notifyOpenLinkAction", uri);
-		sendObject(f);
-	}
-
-	@SuppressWarnings("restriction")
-	public void resetWindowsPosition(int oldWidht, int oldHeight) {
-		for (Window w : Util.getAllWindows()) {
-			WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(w);
-			if (peer != null) {
-				Rectangle b = w.getBounds();
-				Dimension current = Util.getWebToolkit().getScreenSize();
-
-				if (w instanceof HtmlWindow) {
-					((HtmlWindow) w).updateBounds();
-				} else if (peer.getTarget() instanceof JFrame) {
-					JFrame frame = (JFrame) peer.getTarget();
-					//maximized window - auto resize
-					if (frame.getExtendedState() == Frame.MAXIMIZED_BOTH && !Util.isCompositingWM()) {
-						w.setLocation(0, 0);
-						w.setBounds(0, 0, current.width, current.height);
-					}
-				} else {
-					// move the window position to same position relative to
-					// previous size;
-					if (oldWidht != 0 && oldHeight != 0) {
-						int xCenterWinPoint = b.x + (b.width / 2);
-						int yCenterWinPoint = b.y + (b.height / 2);
-						boolean xCenterValid = b.width < oldWidht;
-						boolean yCenterValid = b.height < oldHeight;
-						double xrelative = (double) xCenterWinPoint / (double) oldWidht;
-						double yrelative = (double) yCenterWinPoint / (double) oldHeight;
-						int xCenterCurrent = (int) (current.width * xrelative);
-						int yCenterCurrent = (int) (current.height * yrelative);
-						int newx = xCenterCurrent - (b.width / 2);
-						int newy = yCenterCurrent - (b.height / 2);
-						if (xCenterValid || newx < b.x) {
-							b.x = newx >= 0 ? newx : 0;
-						}
-						if (yCenterValid || newy < b.y) {
-							b.y = newy >= 0 ? newy : 0;
-						}
-						w.setLocation(b.x, b.y);
-					}
-					peer.setBounds(b.x, b.y, b.width, b.height, 0);
-				}
-			}
-		}
-	}
-
-	public void notifyWindowMoved(Window w, Rectangle from, Rectangle to) {
-		synchronized (webPaintLock) {
-			if (Util.isCompositingWM()) {
-				notifyWindowRepaint(w);
-			} else {
-				if (moveAction == null) {
-					moveAction = new WindowMoveActionMsg(from.x, from.y, to.x, to.y, from.width, from.height);
-					notifyRepaintOffScreenAreas(w, moveAction);
-				} else if (moveAction.getDx() == from.x && moveAction.getDy() == from.y && moveAction.getWidth() == from.width && moveAction.getHeight() == from.height) {
-					moveAction.setDx(to.x);
-					moveAction.setDy(to.y);
-					notifyRepaintOffScreenAreas(w, moveAction);
-				} else {
-					notifyWindowRepaint(w);
-				}
-			}
+			addDirtyArea(w);
 		}
 	}
 
@@ -318,296 +160,62 @@ public class WebPaintDispatcher {
 			WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(w);
 			for (Rectangle r : toRepaint) {
 				r.setLocation(r.x - w.getX(), r.y - w.getY());
-				notifyWindowAreaRepainted(peer.getGuid(), r);
+				addDirtyArea(peer.getGuid(), r);
 			}
 		}
 	}
 
-	public void notifyCursorUpdate(Cursor cursor) {
-		notifyCursorUpdate(cursor, null);
+	public void registerWebContainer(Container container) {
+		throw new UnsupportedOperationException("Only supported when Composition Window Manager is enabled");
 	}
 
-	public void notifyCursorUpdate(Cursor cursor, Cursor overridenCursorName) {
-		String webcursorName = null;
-		Cursor webcursor = null;
-		if (overridenCursorName == null) {
-			switch (cursor.getType()) {
-			case Cursor.DEFAULT_CURSOR:
-				webcursorName = CursorChangeEventMsg.DEFAULT_CURSOR;
-				break;
-			case Cursor.HAND_CURSOR:
-				webcursorName = CursorChangeEventMsg.HAND_CURSOR;
-				break;
-			case Cursor.CROSSHAIR_CURSOR:
-				webcursorName = CursorChangeEventMsg.CROSSHAIR_CURSOR;
-				break;
-			case Cursor.MOVE_CURSOR:
-				webcursorName = CursorChangeEventMsg.MOVE_CURSOR;
-				break;
-			case Cursor.TEXT_CURSOR:
-				webcursorName = CursorChangeEventMsg.TEXT_CURSOR;
-				break;
-			case Cursor.WAIT_CURSOR:
-				webcursorName = CursorChangeEventMsg.WAIT_CURSOR;
-				break;
-			case Cursor.E_RESIZE_CURSOR:
-			case Cursor.W_RESIZE_CURSOR:
-				webcursorName = CursorChangeEventMsg.EW_RESIZE_CURSOR;
-				break;
-			case Cursor.N_RESIZE_CURSOR:
-			case Cursor.S_RESIZE_CURSOR:
-				webcursorName = CursorChangeEventMsg.NS_RESIZE_CURSOR;
-				break;
-			case Cursor.NW_RESIZE_CURSOR:
-			case Cursor.SE_RESIZE_CURSOR:
-				webcursorName = CursorChangeEventMsg.BACKSLASH_RESIZE_CURSOR;
-				break;
-			case Cursor.NE_RESIZE_CURSOR:
-			case Cursor.SW_RESIZE_CURSOR:
-				webcursorName = CursorChangeEventMsg.SLASH_RESIZE_CURSOR;
-				break;
-			case Cursor.CUSTOM_CURSOR:
-				webcursorName = cursor.getName();
-				break;
-			default:
-				webcursorName = CursorChangeEventMsg.DEFAULT_CURSOR;
-			}
-			webcursor = cursor;
-		} else {
-			webcursor = overridenCursorName;
-			webcursorName = overridenCursorName.getName();
-		}
-		if (!Util.getWebToolkit().getWindowManager().getCurrentCursor().equals(webcursorName)) {
-			AppFrameMsgOut f = new AppFrameMsgOut();
-			CursorChangeEventMsg cursorChange = new CursorChangeEventMsg(webcursorName);
-			if (webcursor instanceof WebCursor) {
-				WebCursor c = (WebCursor) webcursor;
-				BufferedImage img = c.getImage();
-				cursorChange.setB64img(Services.getImageService().getPngImage(img));
-				cursorChange.setX(c.getHotSpot() != null ? c.getHotSpot().x : 0);
-				cursorChange.setY(c.getHotSpot() != null ? c.getHotSpot().y : 0);
-				File file = Util.convertAndSaveCursor(img, cursorChange.getX(), cursorChange.getY());
-				if (file != null) {
-					cursorChange.setCurFile(file.getAbsolutePath());
-				}
-			}
-			f.setCursorChange(cursorChange);
-			Util.getWebToolkit().getWindowManager().setCurrentCursor(webcursorName);
-			Logger.debug("WebPaintDispatcher:notifyCursorUpdate", f);
-			sendObject(f);
-		}
+	public Map<Window, List<Container>> getRegisteredWebContainersAsMap() {
+		throw new UnsupportedOperationException("Only supported when Composition Window Manager is enabled");
 	}
 
-	public void notifyCopyEvent(WebswingClipboardData data) {
-		AppFrameMsgOut f = new AppFrameMsgOut();
-		CopyEventMsg copyEvent;
-		copyEvent = new CopyEventMsg(data.getText(), data.getHtml(), data.getImg(), data.getFiles(), false);
-		f.setCopyEvent(copyEvent);
-		Logger.debug("WebPaintDispatcher:notifyCopyEvent", f);
-		sendObject(f);
+	public void registerHtmlPanel(HtmlPanel hp) {
+		throw new UnsupportedOperationException("Only supported when Composition Window Manager is enabled");
 	}
 
-	public void notifyFileDialogActive(Window window) {
-		fileChooserDialog = Util.discoverFileChooser(window);
-		notifyFileDialogActive();
+	public Map<Window, List<HtmlPanel>> getRegisteredHtmlPanelsAsMap() {
+		throw new UnsupportedOperationException("Only supported when Composition Window Manager is enabled");
 	}
 
-	public void notifyFileDialogActive() {
-		if (!SwingUtilities.isEventDispatchThread()) {
-			SwingUtilities.invokeLater(new Runnable() {
-
-				@Override
-				public void run() {
-					notifyFileDialogActive();
-				}
-			});
-		} else {
-			if (fileChooserDialog != null) {
-				AppFrameMsgOut f = new AppFrameMsgOut();
-				FileDialogEventMsg fdEvent = new FileDialogEventMsg();
-				f.setFileDialogEvent(fdEvent);
-				FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fileChooserDialog);
-				if (fileChooserEventType == FileDialogEventType.AutoUpload && fileChooserDialog.getFileSelectionMode() == JFileChooser.DIRECTORIES_ONLY) {
-					//open dialog with auto upload enabled will automatically select the transfer folder
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								fileChooserDialog.setSelectedFile(new File(fileChooserDialog.getCurrentDirectory().getCanonicalPath()));
-								fileChooserDialog.approveSelection();
-							} catch (IOException e) {
-								fileChooserDialog.cancelSelection();
-							}
-						}
-					});
-					return;
-				}
-				fdEvent.setEventType(fileChooserEventType);
-				if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
-					fdEvent.setAllowDelete(false);
-					fdEvent.setAllowDownload(false);
-					fdEvent.setAllowUpload(false);
-					if (FileDialogEventType.AutoUpload == fileChooserEventType) {
-						fileChooserDialog.setCurrentDirectory(Util.getTimestampedTransferFolder("autoupload"));
-					}
-					Window d = SwingUtilities.getWindowAncestor(fileChooserDialog);
-					d.setBounds(0, 0, 1, 1);
-				}
-				fdEvent.setSelection(Util.getFileChooserSelection(fileChooserDialog));
-				fdEvent.addFilter(fileChooserDialog.getChoosableFileFilters());
-				fdEvent.setMultiSelection(fileChooserDialog.isMultiSelectionEnabled());
-				Logger.info("WebPaintDispatcher:notifyFileTransferBarActive " + fileChooserEventType.name());
-				sendObject(f);
-			}
-		}
-	}
-
-	public void notifyFileDialogHidden() {
-		AppFrameMsgOut f = new AppFrameMsgOut();
-		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
-		fdEvent.setEventType(FileDialogEventType.Close);
-		f.setFileDialogEvent(fdEvent);
-		Logger.info("WebPaintDispatcher:notifyFileTransferBarHidden " + FileDialogEventType.Close.name());
-		validateSelection(fileChooserDialog);
-		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD)) {
-			if (fileChooserDialog != null && fileChooserDialog.getDialogType() == JFileChooser.SAVE_DIALOG) {
-				try {
-					Field resultValueField = JFileChooser.class.getDeclaredField("returnValue");
-					resultValueField.setAccessible(true);
-					if (resultValueField.get(fileChooserDialog).equals(JFileChooser.APPROVE_OPTION)) {
-						File saveFile = fileChooserDialog.getSelectedFile();
-						if (saveFile != null) {
-							OpenFileResultMsgInternal msg = new OpenFileResultMsgInternal();
-							msg.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-							msg.setFile(saveFile);
-							msg.setWaitForFile(true);
-							if (saveFile.exists()) {
-								msg.setOverwriteDetails(saveFile.length() + "|" + saveFile.lastModified());
-							}
-							sendObject(msg);
-						}
-					}
-				} catch (Exception e) {
-					Logger.warn("Save file dialog's file monitoring failed: " + e.getMessage());
-				}
-			}
-		}
-		fileChooserDialog = null;
-		sendObject(f);
-	}
-
-	private void validateSelection(JFileChooser fileChooserDialog) {
-		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ISOLATED_FS) && fileChooserDialog != null) {
-
-			try {
-				if (fileChooserDialog.getSelectedFile() != null) {
-					if (!IsolatedFsShellFolderManager.isSubfolderOfRoots(fileChooserDialog.getSelectedFile())) {
-						throw new IOException("Invalid selection " + fileChooserDialog.getSelectedFile());
-					}
-				}
-				if (fileChooserDialog.getSelectedFiles() != null && fileChooserDialog.getSelectedFiles().length > 0) {
-					for (File selection : fileChooserDialog.getSelectedFiles()) {
-						if (!IsolatedFsShellFolderManager.isSubfolderOfRoots(selection)) {
-							throw new IOException("Invalid selection " + selection);
-						}
-					}
-				}
-			} catch (IOException e) {
-				Logger.error("Selection is outside isolated path",e);
-				fileChooserDialog.cancelSelection();
-			}
-		}
-	}
-
-	public JFileChooser getFileChooserDialog() {
-		return fileChooserDialog;
-	}
-
-	public void notifyDownloadSelectedFile() {
-		if (fileChooserDialog != null && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD)) {
-			File file = fileChooserDialog.getSelectedFile();
-			if (file != null && file.exists() && !file.isDirectory() && file.canRead()) {
-				OpenFileResultMsgInternal f = new OpenFileResultMsgInternal();
-				f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-				f.setFile(file);
-				Util.getWebToolkit().getPaintDispatcher().sendObject(f);
-			}
-		}
-	}
-
-	public void notifyDeleteSelectedFile() {
-		if (fileChooserDialog != null && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_DELETE)) {
-			File[] selected = fileChooserDialog.getSelectedFiles();
-			if ((selected == null || selected.length == 0) && fileChooserDialog.getSelectedFile() != null) {
-				selected = new File[] { fileChooserDialog.getSelectedFile() };
-			}
-			for (File f : selected) {
-				if (f.exists() && f.canWrite()) {
-					f.delete();
-				}
-			}
-			fileChooserDialog.rescanCurrentDirectory();
-		}
-	}
-
-	public void notifyApplicationExiting() {
-		notifyApplicationExiting(Integer.getInteger(Constants.SWING_START_SYS_PROP_WAIT_FOR_EXIT, 30000));
-	}
-
-	public void notifyApplicationExiting(int waitBeforeKill) {
-		ExitMsgInternal f = new ExitMsgInternal();
-		f.setWaitForExit(waitBeforeKill);
-		sendObject(f);
-		contentSender.shutdownNow();
-	}
-
-	public void notifyUrlRedirect(String url) {
-		AppFrameMsgOut result = new AppFrameMsgOut();
-		result.setLinkAction(new LinkActionMsg(LinkActionMsg.LinkActionType.redirect, url));
-		Util.getWebToolkit().getPaintDispatcher().sendObject(result);
-	}
-
-	public void requestBrowserClipboard(PasteRequestContext ctx) {
-		AppFrameMsgOut result = new AppFrameMsgOut();
-		PasteRequestMsg paste = new PasteRequestMsg();
-		paste.setTitle(ctx.getTitle());
-		paste.setMessage(ctx.getMessage());
-		result.setPasteRequest(paste);
-		Util.getWebToolkit().getPaintDispatcher().sendObject(result);
-
-		Window window = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
-		this.clipboardDialog = new JDialog(window, JDialog.DEFAULT_MODALITY_TYPE);
-		clipboardDialog.setBounds(new Rectangle(0, 0, 1, 1));
-		clipboardDialog.setVisible(true);//this call is blocking until dialog is closed
-	}
-
-	public boolean closePasteRequestDialog() {
-		if (clipboardDialog != null) {
-			boolean result = clipboardDialog.isVisible();
-			clipboardDialog.setVisible(false);
-			clipboardDialog.dispose();
-			return result;
-		}
-		return false;
-	}
-
-	public void notifyFocusEvent(FocusEventMsg msg) {
-		focusEvent = msg;
+	public HtmlPanel findHtmlPanelById(String id) {
+		throw new UnsupportedOperationException("Only supported when Composition Window Manager is enabled");
 	}
 	
-	public void notifyActionEvent(String windowId, String actionName, String data, byte[] binaryData) {
-		AppFrameMsgOut f = new AppFrameMsgOut();
-		
-		ActionEventMsgOut actionEvent = new ActionEventMsgOut();
-		actionEvent.setWindowId(windowId);
-		actionEvent.setActionName(actionName);
-		actionEvent.setData(data);
-		actionEvent.setBinaryData(binaryData);
-		
-		f.setActionEvent(actionEvent);
-		
-		Logger.debug("WebPaintDispatcher:notifyActionEvent", f);
-		sendObject(f);
+	public void notifyWindowDockAction(String windowId) {
+		throw new UnsupportedOperationException("Only supported when Composition Window Manager is enabled");
+	}
+
+	private void fillMoveAction(AppFrameMsgOut json) {
+		if (moveAction != null) {
+			json.setMoveAction(moveAction);
+			moveAction = null;
+		}
+	}
+
+	protected boolean hasMoveAction(){
+		return moveAction != null;
+	}
+
+	protected WindowMoveActionMsg getMoveAction() {
+		return moveAction;
+	}
+
+	protected void setMoveAction(WindowMoveActionMsg moveAction) {
+		this.moveAction = moveAction;
+	}
+
+	@Override
+	protected String getCurrentCursor(String winId) {
+		return WindowManager.getInstance().getCurrentCursor();
+	}
+
+	@Override
+	protected void setCurrentCursor(String winId, String cursor) {
+		WindowManager.getInstance().setCurrentCursor(cursor);
 	}
 	
 }

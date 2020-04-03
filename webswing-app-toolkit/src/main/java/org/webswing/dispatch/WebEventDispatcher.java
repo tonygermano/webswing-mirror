@@ -1,161 +1,39 @@
 package org.webswing.dispatch;
 
-import java.applet.Applet;
-import java.awt.AWTEvent;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.IllegalComponentStateException;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileFilter;
-
+import netscape.javascript.JSObject;
 import org.webswing.Constants;
-import org.webswing.model.MsgIn;
-import org.webswing.model.c2s.ActionEventMsgIn;
-import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
-import org.webswing.model.c2s.CopyEventMsgIn;
-import org.webswing.model.c2s.FilesSelectedEventMsgIn;
-import org.webswing.model.c2s.KeyboardEventMsgIn;
-import org.webswing.model.c2s.MouseEventMsgIn;
+import org.webswing.model.c2s.*;
 import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
-import org.webswing.model.c2s.PasteEventMsgIn;
-import org.webswing.model.c2s.SimpleEventMsgIn;
-import org.webswing.model.c2s.UploadEventMsgIn;
-import org.webswing.model.c2s.WindowEventMsgIn;
-import org.webswing.model.internal.OpenFileResultMsgInternal;
 import org.webswing.model.jslink.JSObjectMsg;
 import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
-import org.webswing.toolkit.FocusEventCause;
-import org.webswing.toolkit.WebClipboard;
-import org.webswing.toolkit.WebClipboardTransferable;
-import org.webswing.toolkit.WebDragSourceContextPeer;
+import org.webswing.toolkit.*;
+import org.webswing.toolkit.api.component.HtmlPanel;
 import org.webswing.toolkit.api.lifecycle.ShutdownReason;
-import org.webswing.toolkit.WebWindowPeer;
-import org.webswing.toolkit.extra.DndEventHandler;
+import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.jslink.WebJSObject;
-import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
 
-import netscape.javascript.JSObject;
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
+import java.applet.Applet;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-@SuppressWarnings("restriction")
-public class WebEventDispatcher {
+public class WebEventDispatcher extends AbstractEventDispatcher {
 
-	protected static final int CLICK_TOLERANCE = 2;
-	protected MouseEvent lastMouseEvent;
-	protected MouseEventInfo lastMousePressEvent;
-	protected Point lastMousePosition = new Point();
-	public static AtomicBoolean javaFXdragStarted = new AtomicBoolean(false);
-	private static Component lastEnteredWindow;
-	private static final DndEventHandler dndHandler = new DndEventHandler();
-	private HashMap<String, String> uploadMap = new HashMap<String, String>();
-	private ExecutorService eventDispatcher = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing Event Dispatcher"));
-
-	//release char map derives the event char for keyrelease event from previous keypressed events (keycode=char)
-	private static final HashMap<Integer, Integer> releaseCharMap = new HashMap<Integer, Integer>();
-	//these keycodes are assigned to different keys in browser
-	private static final List<Integer> nonStandardKeyCodes = Arrays.asList(KeyEvent.VK_KP_DOWN, KeyEvent.VK_KP_UP, KeyEvent.VK_KP_RIGHT, KeyEvent.VK_KP_LEFT);
-	private static final Map<Integer, Integer> convertedKeyCodes = new HashMap<Integer, Integer>();
-
-	static {
-		convertedKeyCodes.put(45, KeyEvent.VK_INSERT);//	Insert 155
-		convertedKeyCodes.put(46, KeyEvent.VK_DELETE);//	Delete 127
-		convertedKeyCodes.put(189, KeyEvent.VK_MINUS);//	Minus 45
-		convertedKeyCodes.put(187, KeyEvent.VK_EQUALS);//	Equals 61
-		convertedKeyCodes.put(219, KeyEvent.VK_OPEN_BRACKET);//	Open Bracket 91
-		convertedKeyCodes.put(221, KeyEvent.VK_CLOSE_BRACKET);//	Close Bracket 93
-		convertedKeyCodes.put(186, KeyEvent.VK_SEMICOLON);//	Semicolon 59
-		convertedKeyCodes.put(220, KeyEvent.VK_BACK_SLASH);//	Back Slash 92
-		convertedKeyCodes.put(226, KeyEvent.VK_BACK_SLASH);//	Back Slash 92
-		convertedKeyCodes.put(188, KeyEvent.VK_COMMA);//	Comma 44
-		convertedKeyCodes.put(190, KeyEvent.VK_PERIOD);//	Period 46
-		convertedKeyCodes.put(191, KeyEvent.VK_SLASH);//	Slash 47
-	}
-
-	public static final long doubleClickMaxDelay = Long.getLong(Constants.SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY, 750);
-
-	public void dispatchEvent(final MsgIn event) {
-		Logger.debug("WebEventDispatcher.dispatchEvent:", event);
-		eventDispatcher.submit(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					if (event instanceof MouseEventMsgIn) {
-						dispatchMouseEvent((MouseEventMsgIn) event);
-					}
-					if (event instanceof KeyboardEventMsgIn) {
-						dispatchKeyboardEvent((KeyboardEventMsgIn) event);
-					}
-					if (event instanceof ConnectionHandshakeMsgIn) {
-						final ConnectionHandshakeMsgIn handshake = (ConnectionHandshakeMsgIn) event;
-						Util.getWebToolkit().initSize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
-						Util.getWebToolkit().getPaintDispatcher().notifyFileDialogActive();
-						Util.getWebToolkit().getPaintDispatcher().closePasteRequestDialog();
-						Util.getWebToolkit().processApiEvent(handshake);
-						if (System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null) {
-							// resize and refresh the applet object exposed in javascript in case of page reload/session continue
-							Applet a = (Applet) WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
-							a.resize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
-							JSObject root = new WebJSObject(new JSObjectMsg("instanceObject"));
-							root.setMember("applet", a);
-						}
-					}
-					if (event instanceof SimpleEventMsgIn) {
-						SimpleEventMsgIn msg = (SimpleEventMsgIn) event;
-						dispatchMessage(msg);
-					}
-					if (event instanceof PasteEventMsgIn) {
-						PasteEventMsgIn paste = (PasteEventMsgIn) event;
-						handlePasteEvent(paste);
-					}
-					if (event instanceof CopyEventMsgIn) {
-						CopyEventMsgIn copy = (CopyEventMsgIn) event;
-						handleCopyEvent(copy);
-					}
-					if (event instanceof FilesSelectedEventMsgIn) {
-						handleFileSelectionEvent((FilesSelectedEventMsgIn) event);
-					}
-					if (event instanceof UploadEventMsgIn) {
-						handleUploadEvent((UploadEventMsgIn) event);
-					}
-					if (event instanceof WindowEventMsgIn) {
-						handleWindowEvent((WindowEventMsgIn) event);
-					}
-					if (event instanceof ActionEventMsgIn) {
-						Util.getWebToolkit().processApiEvent(event);
-					}
-				} catch (Throwable e) {
-					Logger.error("Failed to process event.", e);
-				}
-			}
-		});
-	}
-
-	private void dispatchMessage(SimpleEventMsgIn message) {
+	protected void dispatchMessage(SimpleEventMsgIn message) {
 		Logger.debug("WebEventDispatcher.dispatchMessage", message);
 		switch (message.getType()) {
 		case killSwing:
@@ -169,19 +47,16 @@ public class WebEventDispatcher {
 			Util.getWebToolkit().getPaintDispatcher().notifyDownloadSelectedFile();
 			break;
 		case cancelFileSelection:
-			handleAutoUploadCancelled();
+			JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
+			if (dialog != null) {
+				dialog.cancelSelection();
+			}
 			break;
 		case paintAck:
 			Util.getWebToolkit().getPaintDispatcher().clientReadyToReceive();
 			break;
 		case repaint:
-			if (Util.isDD()) {
-				Util.getWebToolkit().getPaintDispatcher().notifyBackgroundRepainted(new Rectangle(Util.getWebToolkit().getScreenSize()));
-				Services.getDirectDrawService().resetCache();
-				Util.repaintAllWindow();
-			} else {
-				Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaintAll();
-			}
+			Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaintAll();
 			break;
 		case unload:
 			boolean instantExit = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) == 0;
@@ -194,14 +69,17 @@ public class WebEventDispatcher {
 			break;
 		case requestComponentTree:
 			if (Util.isTestMode()) {
-				Util.getWebToolkit().getPaintDispatcher().requestComponentTree();
+				Util.getWebToolkit().getPaintDispatcher().notifyComponentTreeRequested();
 			}
+			break;
+		case requestWindowSwitchList:
+			Util.getWebToolkit().getPaintDispatcher().notifyWindowSwitchList();
 			break;
 		}
 	}
 
-	private void dispatchKeyboardEvent(KeyboardEventMsgIn event) {
-		Window w = (Window) Util.getWebToolkit().getWindowManager().getActiveWindow();
+	protected void dispatchKeyboardEvent(KeyboardEventMsgIn event) {
+		Window w = Util.getWebToolkit().getWindowManager().getActiveWindow();
 		if (w != null) {
 			long when = System.currentTimeMillis();
 			int modifiers = Util.getKeyModifiersAWTFlag(event);
@@ -211,18 +89,18 @@ public class WebEventDispatcher {
 			if (event.getKeycode() == 13) {// enter keycode
 				event.setKeycode(10);
 				character = 10;
-			} else if (convertedKeyCodes.containsKey(event.getKeycode()) && type != KeyEvent.KEY_TYPED) {
-				int converted = convertedKeyCodes.get(event.getKeycode());
+			} else if (CONVERTED_KEY_CODES.containsKey(event.getKeycode()) && type != KeyEvent.KEY_TYPED) {
+				int converted = CONVERTED_KEY_CODES.get(event.getKeycode());
 				event.setKeycode(converted);
 				character = (char) converted;
-			} else if (nonStandardKeyCodes.contains(event.getKeycode())) {
+			} else if (NON_STANDARD_KEY_CODES.contains(event.getKeycode())) {
 				event.setKeycode(0);
 			}
 			if (event.getType() == KeyboardEventMsgIn.KeyEventType.keydown) {
-				releaseCharMap.put(event.getKeycode(), event.getCharacter());
+				getReleaseCharMap().put(event.getKeycode(), event.getCharacter());
 			}
 			if (event.getType() == KeyboardEventMsgIn.KeyEventType.keyup) {
-				Integer c = releaseCharMap.get(event.getKeycode());
+				Integer c = getReleaseCharMap().get(event.getKeycode());
 				character = (char) (c == null ? event.getCharacter() : c);
 			}
 			if (type == KeyEvent.KEY_TYPED) {
@@ -231,11 +109,23 @@ public class WebEventDispatcher {
 			} else {
 				AWTEvent e = Util.createKeyEvent(src, type, when, modifiers, event.getKeycode(), character, KeyEvent.KEY_LOCATION_STANDARD);
 				dispatchKeyEventInSwing(w, e);
-				if ((event.getKeycode() == 32 ||event.getKeycode() == 9) && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && !event.isCtrl()) {// space keycode handle press
+				if ((event.getKeycode() == 32 || event.getKeycode() == 9) && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && !event.isCtrl()) {// space keycode handle press
 					event.setType(KeyboardEventMsgIn.KeyEventType.keypress);
 					dispatchKeyboardEvent(event);
 				}
 			}
+		}
+	}
+
+	@Override
+	protected void windowFocusEvent(WindowFocusMsgIn event) {
+		if (event.getHtmlPanelId() != null) {
+			HtmlPanel panel = Util.getWebToolkit().getPaintDispatcher().findHtmlPanelById(event.getHtmlPanelId());
+			if (panel != null) {
+				panel.requestFocusInWindow();
+			}
+		} else if (event.getWindowId() != null) {
+			WindowManager.getInstance().activateWindow(Util.findWindowById(event.getWindowId()));
 		}
 	}
 
@@ -246,19 +136,19 @@ public class WebEventDispatcher {
 			c = Util.getWebToolkit().getWindowManager().getLockedToWindow();
 		} else {
 			c = Util.getWebToolkit().getWindowManager().getVisibleComponentOnPosition(event.getX(), event.getY(), event.getWinId());
-			if (relatedToLastEvent(event, lastMouseEvent) && !javaFXdragStarted.get() && !dndHandler.isDndInProgress() ) {
-				c = (Component) lastMouseEvent.getSource();
-				relatedToLastEvent=true;
+			if (relatedToLastEvent(event) && !isJavaFXdragStarted() && !isDndInProgress()) {
+				c = (Component) getLastMouseEvent().getSource();
+				relatedToLastEvent = true;
 			}
 		}
 		if (c == null) {
 			if (Util.getWebToolkit().getPaintDispatcher() != null) {
-				Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR),null, null);
 			}
 			dispatchExitEvent(System.currentTimeMillis(), 0, -1, -1, event.getX(), event.getY());
 			return;
 		}
-		if (c != null && c.isShowing()) {
+		if (c.isShowing()) {
 			MouseEvent e = null;
 			int x = 0;
 			int y = 0;
@@ -269,8 +159,7 @@ public class WebEventDispatcher {
 				//in case the window closed in meantime, just ignore this event
 				return;
 			}
-			lastMousePosition.x = event.getX();
-			lastMousePosition.y = event.getY();
+			setLastMousePosition(event.getX(), event.getY());
 			long when = System.currentTimeMillis();
 			int modifiers = Util.getMouseModifiersAWTFlag(event);
 			int id = 0;
@@ -285,24 +174,24 @@ public class WebEventDispatcher {
 				id = event.getButtons() != 0 ? MouseEvent.MOUSE_DRAGGED : MouseEvent.MOUSE_MOVED;
 				buttons = 0; //in swing mouse move/drag has always MouseEvent.button==0
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
-				lastMouseEvent = e;
+				setLastMouseEvent(e);
 				dispatchMouseEventInSwing(c, e, relatedToLastEvent);
 				break;
 			case mouseup:
 				id = MouseEvent.MOUSE_RELEASED;
-				boolean popupTrigger = (buttons == 3) ? true : false;
+				boolean popupTrigger = buttons == 3;
 				clickcount = computeClickCount(x, y, buttons, false, event.getTimeMilis());
-				modifiers = modifiers & (((1 << 6) - 1) | (~((1 << 14) - 1)) | MouseEvent.CTRL_DOWN_MASK | MouseEvent.ALT_DOWN_MASK | MouseEvent.SHIFT_DOWN_MASK | MouseEvent.META_DOWN_MASK);
+				modifiers = modifiers & (((1 << 6) - 1) | (-(1 << 14)) | MouseEvent.CTRL_DOWN_MASK | MouseEvent.ALT_DOWN_MASK | MouseEvent.SHIFT_DOWN_MASK | MouseEvent.META_DOWN_MASK);
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
 				dispatchMouseEventInSwing(c, e, relatedToLastEvent);
-				if (lastMousePressEvent != null && Math.abs(lastMousePressEvent.x - x) < CLICK_TOLERANCE && Math.abs(lastMousePressEvent.y - y) < CLICK_TOLERANCE) {
+				if (isNearLastMousePressEvent(x, y)) {
 					e = new MouseEvent(c, MouseEvent.MOUSE_CLICKED, when, modifiers, x, y, event.getX(), event.getY(), clickcount, popupTrigger, buttons);
 					dispatchMouseEventInSwing(c, e, relatedToLastEvent);
-					lastMouseEvent = e;
-					lastMousePressEvent = MouseEventInfo.get(e, event.getTimeMilis());
+					setLastMouseEvent(e);
+					setLastMousePressEvent(e, event.getTimeMilis());
 				} else {
-					lastMouseEvent = e;
-					lastMousePressEvent = MouseEventInfo.get(e, event.getTimeMilis());
+					setLastMouseEvent(e);
+					setLastMousePressEvent(e, event.getTimeMilis());
 				}
 				break;
 			case mousedown:
@@ -310,8 +199,8 @@ public class WebEventDispatcher {
 				clickcount = computeClickCount(x, y, buttons, true, event.getTimeMilis());
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
 				dispatchMouseEventInSwing(c, e, relatedToLastEvent);
-				lastMousePressEvent = MouseEventInfo.get(e, event.getTimeMilis());
-				lastMouseEvent = e;
+				setLastMousePressEvent(e, event.getTimeMilis());
+				setLastMouseEvent(e);
 				break;
 			case mousewheel:
 				id = MouseEvent.MOUSE_WHEEL;
@@ -331,47 +220,52 @@ public class WebEventDispatcher {
 		}
 	}
 
-	private static boolean relatedToLastEvent(MouseEventMsgIn event, MouseEvent lastMouseEvent) {
-		return lastMouseEvent != null && (lastMouseEvent.getID() == MouseEvent.MOUSE_DRAGGED || lastMouseEvent.getID() == MouseEvent.MOUSE_PRESSED) && ((event.getType() == MouseEventType.mousemove && event.getButtons() != 0) || (event.getType() == MouseEventType.mouseup));
+	protected void handleActionEvent(ActionEventMsgIn event) {
+		Util.getWebToolkit().processApiEvent(event);
 	}
 
-	protected int computeClickCount(int x, int y, int button, boolean isPressed, int timeMilis) {
-		if (isPressed) {
-			if (lastMousePressEvent != null && lastMousePressEvent.type == MouseEvent.MOUSE_CLICKED && lastMousePressEvent.button == button && Math.abs(lastMousePressEvent.x - x) < CLICK_TOLERANCE && Math.abs(lastMousePressEvent.y - y) < CLICK_TOLERANCE) {
-				if (timeMilis - lastMousePressEvent.time < doubleClickMaxDelay) {
-					return lastMousePressEvent.clickcount + 1;
-				}
-			}
-		} else {
-			if (lastMousePressEvent != null && lastMousePressEvent.type == MouseEvent.MOUSE_PRESSED && lastMousePressEvent.button == button) {
-				return lastMousePressEvent.clickcount;
-			}
+	protected void dispatchHandshakeEvent(ConnectionHandshakeMsgIn event) {
+		PaintDispatcher paintDispatcher = Util.getWebToolkit().getPaintDispatcher();
+		
+		Util.getWebToolkit().initSize(event.getDesktopWidth(), event.getDesktopHeight());
+		paintDispatcher.notifyFileDialogActive();
+		paintDispatcher.closePasteRequestDialog();
+		Util.getWebToolkit().processApiEvent(event);
+		if (System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null) {
+			// resize and refresh the applet object exposed in javascript in case of page reload/session continue
+			Applet a = (Applet) WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
+			a.resize(event.getDesktopWidth(), event.getDesktopHeight());
+			JSObject root = new WebJSObject(new JSObjectMsg("instanceObject"));
+			root.setMember("applet", a);
 		}
-		return 1;
+		System.setProperty(Constants.SWING_START_SYS_PROP_TOUCH_MODE, event.isTouchMode() + "");
+		
+		boolean oldAccessibility = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ACCESSIBILITY_ENABLED, "false"));
+		System.setProperty(Constants.SWING_START_SYS_PROP_ACCESSIBILITY_ENABLED, event.isAccessiblityEnabled() + "");
+		if (event.isAccessiblityEnabled() && !oldAccessibility) {
+			paintDispatcher.notifyAccessibilityInfoUpdate();
+			paintDispatcher.clearAccessibilityInfoState();
+		}
 	}
 
-	private void handleCopyEvent(final CopyEventMsgIn copy) {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				if (copy.getType() != null) {
-					switch (copy.getType()) {
-					case copy:
-						dispatchCopyEvent();
-						break;
-					case cut:
-						dispatchCutEvent();
-						break;
-					case getFileFromClipboard:
-						handleClipboardFileDownload(copy);
-					}
+	protected void handleCopyEvent(final CopyEventMsgIn copy) {
+		SwingUtilities.invokeLater(() -> {
+			if (copy.getType() != null) {
+				switch (copy.getType()) {
+				case copy:
+					dispatchCopyEvent();
+					break;
+				case cut:
+					dispatchCutEvent();
+					break;
+				case getFileFromClipboard:
+					handleClipboardFileDownload(copy);
 				}
 			}
 		});
 	}
 
-	private void handleClipboardFileDownload(CopyEventMsgIn copy) {
+	protected void handleClipboardFileDownload(CopyEventMsgIn copy) {
 		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD)) {
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			if (clipboard.isDataFlavorAvailable(DataFlavor.javaFileListFlavor)) {
@@ -380,11 +274,8 @@ public class WebEventDispatcher {
 					for (Object o : files) {
 						File file = (File) o;
 						if (file.getAbsolutePath().equals(copy.getFile())) {
-							if (file != null && file.exists() && !file.isDirectory() && file.canRead()) {
-								OpenFileResultMsgInternal f = new OpenFileResultMsgInternal();
-								f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-								f.setFile(file);
-								Util.getWebToolkit().getPaintDispatcher().sendObject(f);
+							if (file.exists() && !file.isDirectory() && file.canRead()) {
+								Util.getWebToolkit().getPaintDispatcher().notifyFileRequested(file,false);
 							} else {
 								Logger.error("Failed to download file " + copy.getFile() + " from clipboard. File is not accessible or is a directory");
 							}
@@ -397,259 +288,120 @@ public class WebEventDispatcher {
 		}
 	}
 
-	private void handlePasteEvent(final PasteEventMsgIn paste) {
+	protected void handlePasteEvent(final PasteEventMsgIn paste) {
 		Logger.debug("WebEventDispatcher.handlePasteEvent", paste);
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				boolean clipboardRequested = Util.getWebToolkit().getPaintDispatcher().closePasteRequestDialog();
-				WebClipboardTransferable transferable = new WebClipboardTransferable(paste);
-				WebClipboard wc = (WebClipboard) Util.getWebToolkit().getSystemClipboard();
-				wc.setBrowserClipboard(transferable);
-				if (!transferable.isEmpty() && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD)) {
-					wc.setContents(transferable);
-				}
-				if (!clipboardRequested) {
-					WebEventDispatcher.this.dispatchPasteEvent(paste.isSpecial());
-				}
+		SwingUtilities.invokeLater(() -> {
+			boolean clipboardRequested = Util.getWebToolkit().getPaintDispatcher().closePasteRequestDialog();
+			WebClipboardTransferable transferable = new WebClipboardTransferable(paste);
+			WebClipboard wc = (WebClipboard) Util.getWebToolkit().getSystemClipboard();
+			wc.setBrowserClipboard(transferable);
+			if (!transferable.isEmpty() && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD)) {
+				wc.setContents(transferable);
+			}
+			if (!clipboardRequested) {
+				WebEventDispatcher.this.dispatchPasteEvent(paste.isSpecial());
 			}
 		});
 	}
 
-	private void dispatchPasteEvent(boolean special) {
-		KeyboardEventMsgIn event = new KeyboardEventMsgIn();
-		event.setType(KeyboardEventMsgIn.KeyEventType.keydown);
-		event.setCharacter(KeyEvent.VK_V);
-		event.setKeycode(KeyEvent.VK_V);// 'v'
-		event.setCtrl(true);
-		event.setShift(special);
-		dispatchKeyboardEvent(event);
-		event.setType(KeyboardEventMsgIn.KeyEventType.keyup);
-		dispatchKeyboardEvent(event);
-	}
-
-	private void dispatchCopyEvent() {
-		KeyboardEventMsgIn event = new KeyboardEventMsgIn();
-		event.setType(KeyboardEventMsgIn.KeyEventType.keydown);
-		event.setCharacter(KeyEvent.VK_C); // 'c'
-		event.setKeycode(KeyEvent.VK_C);
-		event.setCtrl(true);
-		dispatchKeyboardEvent(event);
-		event.setType(KeyboardEventMsgIn.KeyEventType.keyup);
-		dispatchKeyboardEvent(event);
-	}
-
-	private void dispatchCutEvent() {
-		KeyboardEventMsgIn event = new KeyboardEventMsgIn();
-		event.setType(KeyboardEventMsgIn.KeyEventType.keydown);
-		event.setCharacter(KeyEvent.VK_X);
-		event.setKeycode(KeyEvent.VK_X);// 'x'
-		event.setCtrl(true);
-		dispatchKeyboardEvent(event);
-		event.setType(KeyboardEventMsgIn.KeyEventType.keyup);
-		dispatchKeyboardEvent(event);
-	}
-
-	public Point getLastMousePosition() {
-		return lastMousePosition;
-	}
-
-	public void dragStart(WebDragSourceContextPeer peer, Transferable transferable, int actions, long[] formats) {
-		dndHandler.dragStart(peer, transferable, actions, formats);
-	}
-
-	public static void dispatchEventInSwing(final Component c, final AWTEvent e) {
-		Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
-		if (w.isEnabled()) {
-			Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
-			dispatchEnterExitEvents(w, e);
-			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
-		}
-	}
-
-	public static void dispatchKeyEventInSwing(final Component c, final AWTEvent e) {
-		Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
-		if (w.isEnabled()) {
-			if (dndHandler.isDndInProgress()) {
-				dndHandler.processMouseEvent(w, e);
-			} else {
-				dispatchEventInSwing(c,e);
-			}
-		}
-	}
-
-	public static void dispatchMouseEventInSwing(final Component c, final MouseEvent e, boolean relatedToPreviousEvent) {
-		Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
-		if (w.isEnabled()) {
-				w.setCursor(w.getCursor());// force cursor update
-			if ((!relatedToPreviousEvent &&Util.isWindowDecorationEvent(w, e)) || Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) {
-				Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
-				Util.getWebToolkit().getWindowManager().handleWindowDecorationEvent(w, (MouseEvent) e);
-			} else if (dndHandler.isDndInProgress() ) {
-				dndHandler.processMouseEvent(w, e);
-			} else {
-				dispatchEventInSwing(c,e);
-			}
-		}
-	}
-
-	private static void dispatchEnterExitEvents(Window w, AWTEvent e) {
-		if (e instanceof MouseEvent && lastEnteredWindow != w) {
-			MouseEvent oe = (MouseEvent) e;
-			dispatchExitEvent(oe.getWhen(), oe.getModifiersEx() | oe.getModifiers(), oe.getX(), oe.getY(), oe.getXOnScreen(), oe.getYOnScreen());
-			if (w != null) {
-				MouseEvent enterEvent = new MouseEvent(w, MouseEvent.MOUSE_ENTERED, oe.getWhen(), oe.getModifiersEx() | oe.getModifiers(), oe.getX(), oe.getY(), oe.getXOnScreen(), oe.getYOnScreen(), oe.getClickCount(), oe.isPopupTrigger(), oe.getButton());
-				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(enterEvent);
-			}
-			lastEnteredWindow = w;
-		}
-	}
-
-	private static void dispatchExitEvent(long when, int mod, int x, int y, int absX, int absY) {
-		if (lastEnteredWindow != null && lastEnteredWindow.isShowing()) {
-			MouseEvent exitEvent = new MouseEvent(lastEnteredWindow, MouseEvent.MOUSE_EXITED, when, mod, x, y, absX, absY, 0, false, 0);
-			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(exitEvent);
-			lastEnteredWindow = null;
-		}
-	}
-
-	private void handleFileSelectionEvent(final FilesSelectedEventMsgIn e) {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				JFileChooser fc = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
-				FilesSelectedEventMsgIn event = (FilesSelectedEventMsgIn) e;
-				if (fc != null) {
-					FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fc);
-					boolean saveMode = FileDialogEventType.AutoSave == fileChooserEventType;
-					fc.rescanCurrentDirectory();
-					if (event.getFiles() != null && event.getFiles().size() > 0) {
-						if (fc.isMultiSelectionEnabled()) {
-							List<File> arr = new ArrayList<File>();
-							for (int i = 0; i < event.getFiles().size(); i++) {
-								if (uploadMap.get(event.getFiles().get(i)) != null) {
-									arr.add(new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(i))));
-								} else if (saveMode) {
-									arr.add(new File(Util.getTimestampedTransferFolder("autosavemulti"), event.getFiles().get(i)));
-								}
-							}
-							fc.setSelectedFiles(arr.toArray(new File[arr.size()]));
-							Logger.info("Files selected :" + arr);
-						} else {
-							if (uploadMap.get(event.getFiles().get(0)) != null) {
-								File f = new File(fc.getCurrentDirectory(), uploadMap.get(event.getFiles().get(0)));
-								fc.setSelectedFile(f);
+	protected void handleFileSelectionEvent(final FilesSelectedEventMsgIn e) {
+		SwingUtilities.invokeLater(() -> {
+			JFileChooser fc = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
+			if (fc != null) {
+				FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(fc);
+				boolean saveMode = FileDialogEventType.AutoSave == fileChooserEventType;
+				fc.rescanCurrentDirectory();
+				if (e.getFiles() != null && e.getFiles().size() > 0) {
+					if (fc.isMultiSelectionEnabled()) {
+						List<File> arr = new ArrayList<File>();
+						for (int i = 0; i < e.getFiles().size(); i++) {
+							if (getFileUploadMap().get(e.getFiles().get(i)) != null) {
+								arr.add(new File(fc.getCurrentDirectory(), getFileUploadMap().get(e.getFiles().get(i))));
 							} else if (saveMode) {
-								fc.setSelectedFile(new File(Util.getTimestampedTransferFolder("autosave"), event.getFiles().get(0)));
+								arr.add(new File(Util.getTimestampedTransferFolder("autosavemulti"), e.getFiles().get(i)));
 							}
-							
-							if (fc.getFileFilter() != null && fc.getSelectedFile() != null && !fc.getFileFilter().accept(fc.getSelectedFile())) {
-								for (FileFilter ff : fc.getChoosableFileFilters()) {
-									if (ff.accept(fc.getSelectedFile())) {
-										fc.setFileFilter(ff);
-										break;
-									}
+						}
+						fc.setSelectedFiles(arr.toArray(new File[0]));
+						Logger.info("Files selected :" + arr);
+					} else {
+						if (getFileUploadMap().get(e.getFiles().get(0)) != null) {
+							File f = new File(fc.getCurrentDirectory(), getFileUploadMap().get(e.getFiles().get(0)));
+							fc.setSelectedFile(f);
+						} else if (saveMode) {
+							fc.setSelectedFile(new File(Util.getTimestampedTransferFolder("autosave"), e.getFiles().get(0)));
+						}
+
+						if (fc.getFileFilter() != null && fc.getSelectedFile() != null && !fc.getFileFilter().accept(fc.getSelectedFile())) {
+							for (FileFilter ff : fc.getChoosableFileFilters()) {
+								if (ff.accept(fc.getSelectedFile())) {
+									fc.setFileFilter(ff);
+									break;
 								}
 							}
-							
-							Logger.info("File selected :" + fc.getSelectedFile().getAbsoluteFile());
 						}
-						if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
-							fc.approveSelection();
-						}
-					} else {
-						if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
-							fc.cancelSelection();
-						}
+
+						Logger.info("File selected :" + (fc.getSelectedFile() != null ? fc.getSelectedFile().getAbsoluteFile() : null));
 					}
-				}
-				uploadMap.clear();
-			}
-		});
-	}
-
-	private void handleUploadEvent(final UploadEventMsgIn upload) {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
-				if (dialog != null) {
-					File currentDir = dialog.getCurrentDirectory();
-					File tempFile = new File(upload.getTempFileLocation());
-					String validfilename = Util.resolveUploadFilename(currentDir, upload.getFileName());
-					if (currentDir.canWrite() && tempFile.exists()) {
-						try {
-							Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
-							uploadMap.put(upload.getFileName(), validfilename);
-							Logger.info("File upload notification received: " + validfilename);
-						} catch (IOException e) {
-							Logger.error("Error while moving uploaded file '" + validfilename + "' to target folder: ", e);
-						}
-					} else {
-						Logger.error("Error while uploading file '" + validfilename + "'. " + (currentDir.canWrite() ? " Temp upload file " + tempFile.getAbsoluteFile() + " not found" : "Can not write to target folder " + currentDir.getAbsoluteFile()));
+					if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
+						fc.approveSelection();
 					}
 				} else {
-					Logger.error("Error while uploading file. FileChooser dialog instance not found");
+					if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
+						fc.cancelSelection();
+					}
 				}
+			}
+			getFileUploadMap().clear();
+		});
+	}
+
+	protected void handleUploadEvent(final UploadEventMsgIn upload) {
+		SwingUtilities.invokeLater(() -> {
+			JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
+			if (dialog != null) {
+				File currentDir = dialog.getCurrentDirectory();
+				File tempFile = new File(upload.getTempFileLocation());
+				String validfilename = Util.resolveUploadFilename(currentDir, upload.getFileName());
+				if (currentDir.canWrite() && tempFile.exists()) {
+					try {
+						Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
+						getFileUploadMap().put(upload.getFileName(), validfilename);
+						Logger.info("File upload notification received: " + validfilename);
+					} catch (IOException e) {
+						Logger.error("Error while moving uploaded file '" + validfilename + "' to target folder: ", e);
+					}
+				} else {
+					Logger.error("Error while uploading file '" + validfilename + "'. " + (currentDir.canWrite() ? " Temp upload file " + tempFile.getAbsoluteFile() + " not found" : "Can not write to target folder " + currentDir.getAbsoluteFile()));
+				}
+			} else {
+				Logger.error("Error while uploading file. FileChooser dialog instance not found");
 			}
 		});
 	}
 
-	public void handleAutoUploadCancelled() {
-		JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
-		if (dialog != null) {
-			dialog.cancelSelection();
-		}
-	}
+	protected void handleWindowEvent(WindowEventMsgIn windowUpdate) {
+		WebWindowPeer winPeer = Util.findWindowPeerById(windowUpdate.getId());
 
-	public void handleWindowEvent(WindowEventMsgIn windowUpdate) {
-		WebWindowPeer win = Util.findWindowPeerById(windowUpdate.getId());
-
-		if (win == null) {
+		if (winPeer == null) {
 			return;
 		}
 
 		synchronized (Util.getWebToolkit().getTreeLock()) {
 			synchronized (WebPaintDispatcher.webPaintLock) {
+				final Window win = ((Window) winPeer.getTarget());
 				if (windowUpdate.isClose()) {
-					if (win.getTarget() instanceof Window) {
-						((Window) win.getTarget()).setVisible(false);
+					Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+				} else if (windowUpdate.isFocus()) {
+					if (!Util.isFXWindow(win)) {
+						win.requestFocus();
 					}
 				} else {
-					((Component) win.getTarget()).setLocation(windowUpdate.getX(), windowUpdate.getY());
-					((Component) win.getTarget()).setSize(windowUpdate.getWidth(), windowUpdate.getHeight());
-					win.notifyWindowAreaRepainted(new Rectangle(windowUpdate.getX(), windowUpdate.getY(), windowUpdate.getWidth(), windowUpdate.getY()));
+					SwingUtilities.invokeLater(() -> {
+						win.setBounds(windowUpdate.getX(), windowUpdate.getY(), windowUpdate.getWidth(), windowUpdate.getHeight());
+					});
 				}
 			}
 		}
 	}
-
-	public static boolean isDndInProgress() {
-		return dndHandler.isDndInProgress();
-	}
-
-	protected static class MouseEventInfo {
-		final int x;
-		final int y;
-		final int type;
-		final int button;
-		final int clickcount;
-		final int time;
-
-		private MouseEventInfo(MouseEvent e, int time) {
-			this.x = e.getX();
-			this.y = e.getY();
-			this.type = e.getID();
-			this.clickcount = e.getClickCount();
-			this.button = e.getButton();
-			this.time = time;
-		}
-
-		public static MouseEventInfo get(MouseEvent e, int time) {
-			return new MouseEventInfo(e, time);
-		}
-	}
+	
 }

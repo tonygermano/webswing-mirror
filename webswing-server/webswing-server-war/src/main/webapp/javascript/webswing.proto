@@ -25,6 +25,50 @@ message AppFrameMsgOutProto {
     optional bool directDraw = 20;
     optional ActionEventMsgOutProto actionEvent = 21;
     optional bool compositingWM = 22;
+    optional AudioEventMsgOutProto audioEvent = 23;
+    optional WindowDockMsgProto dockAction = 24;
+	optional AccessibilityMsgProto accessible = 25;
+	repeated WindowSwitchMsgProto windowSwitchList = 26;
+}
+
+message AccessibilityMsgProto {
+	optional string id = 1;
+    optional string role = 2;
+    optional string text = 3;
+    optional string tooltip = 4;
+    optional string value = 5;
+    optional string description = 6;
+    optional string columnheader = 7;
+    optional bool password = 8;
+    optional bool toggle = 9;
+    optional sint32 selstart = 10;
+    optional sint32 selend = 11;
+    optional sint32 rowheight = 12;
+    optional sint32 rows = 13;
+    optional sint32 size = 14;
+    optional sint32 position = 15;
+    optional sint32 level = 16;
+    optional sint32 colindex = 17;
+    optional sint32 rowindex = 18;
+    optional sint32 colcount = 19;
+    optional sint32 rowcount = 20;
+    repeated string states = 21;
+    optional sint32 min = 22;
+    optional sint32 max = 23;
+    optional sint32 val = 24;
+    optional sint32 screenX = 25;
+    optional sint32 screenY = 26;
+    optional sint32 width = 27;
+    optional sint32 height = 28;
+    repeated AccessibilityHierarchyMsgProto hierarchy = 29;
+}
+
+message AccessibilityHierarchyMsgProto {
+	optional string id = 1;
+    optional string role = 2;
+    optional string text = 3;
+    optional sint32 position = 4;
+    optional sint32 size = 5;
 }
 
 message FocusEventMsgProto {
@@ -79,6 +123,7 @@ message CursorChangeEventMsgProto {
     optional sint32 x = 3;
     optional sint32 y = 4;
     optional string curFile = 5;
+    optional string winId = 6;
 }
 
 message CopyEventMsgProto {
@@ -111,6 +156,12 @@ message FileDialogEventMsgProto {
     }
 }
 
+message WindowSwitchMsg {
+	required string id = 1;
+	optional string title = 2;
+	optional bool modalBlocked = 3;
+}
+
 message WindowMsgProto {
     required string id = 1;
     repeated WindowPartialContentMsgProto content = 2;
@@ -121,10 +172,32 @@ message WindowMsgProto {
     optional uint32 width = 7;
     optional uint32 height = 8;
     optional string name = 9;
-    optional bool html = 10;
+    optional WindowTypeProto type = 10;
     optional bool modalBlocked = 11;
     optional string ownerId = 12;
     optional uint32 state = 13;
+    repeated WindowMsgProto internalWindows = 14;
+    optional DockModeProto dockMode = 15;
+    
+    enum WindowTypeProto {
+    	basic = 1;
+		html = 2;
+		internal = 3;
+		internalHtml = 4;
+		internalWrapper = 5;
+    }
+    
+    enum DockModeProto {
+    	none = 1;
+    	dockable = 2;
+    	autoUndock = 3;
+    }
+}
+
+message WindowSwitchMsgProto {
+	required string id = 1;
+	optional string title = 2;
+	optional bool modalBlocked = 3;
 }
 
 message WindowPartialContentMsgProto {
@@ -225,6 +298,12 @@ message InputEventMsgInProto {
     optional MouseEventMsgInProto mouse = 3;
     optional SimpleEventMsgInProto event = 4;
     optional TimestampsMsgInProto timestamps = 5;
+    optional WindowFocusMsgInProto focus = 6;
+}
+
+message WindowFocusMsgInProto {
+    optional string windowId = 1;
+    optional string htmlPanelId = 2;
 }
 
 message TimestampsMsgInProto {
@@ -249,6 +328,9 @@ message ConnectionHandshakeMsgInProto {
     optional string locale = 11;
     optional string url = 12;
     optional string timeZone = 14;
+    optional bool dockingSupported = 15;
+    optional bool touchMode = 16;
+    optional bool accessiblityEnabled = 17;
 }
 
 message ParamMsgProto {
@@ -325,6 +407,7 @@ message SimpleEventMsgInProto {
         hb = 6;
         cancelFileSelection = 7;
         requestComponentTree = 8;
+        requestWindowSwitchList = 9;
     }
 }
 
@@ -384,6 +467,7 @@ message WindowEventMsgInProto {
 	optional sint32 width = 4;
 	optional sint32 height = 5;
 	optional bool close = 6;
+	optional bool focus = 7;
 }
 
 message ActionEventMsgInProto {
@@ -404,4 +488,23 @@ message ActionEventMsgOutProto {
 	optional string data = 2;
 	optional bytes binaryData = 3;
 	optional string windowId = 4;
+}
+
+message AudioEventMsgOutProto {
+	optional string id = 1;
+	optional AudioEventTypeProto eventType = 2;
+	optional bytes data = 3;
+	optional float time = 4;
+	optional sint32 loop = 5;
+	
+	enum AudioEventTypeProto {
+    	play = 0;
+    	stop = 1;
+    	update = 2;
+    	dispose = 3;
+    }
+}
+
+message WindowDockMsgProto {
+    optional string windowId = 1;
 }

@@ -4,6 +4,7 @@ import java.applet.Applet;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,8 +32,15 @@ public class WebJSObject extends JSObject {
 	private static final Map<String, WeakReference<JSObjectMsg>> jsGarbageCollectionMap = new HashMap<String, WeakReference<JSObjectMsg>>();
 	private static final WeakValueHashMap<String, Object> javaReferences = new WeakValueHashMap<String, Object>();
 	private static boolean jsLinkAllowed = Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK);
+	private static String jsLinkWhitelistProp = System.getProperty(Constants.SWING_START_SYS_PROP_JSLINK_WHITELIST, "");
+	private static List<String> jsLinkWhitelist;
 	private static ScheduledExecutorService javaEvalThread = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing JsLink Processor"));
 	private JSObjectMsg jsThis;
+	
+	static {
+		jsLinkWhitelist = new ArrayList<>();
+		jsLinkWhitelist = Arrays.asList(jsLinkWhitelistProp.split(","));
+	}
 
 	public WebJSObject(JSObjectMsg jsThis) {
 		this.jsThis = jsThis;
@@ -151,7 +159,7 @@ public class WebJSObject extends JSObject {
 			public void run() {
 				if (jsLinkAllowed) {
 					Object javaRef = javaReferences.get(javaReq.getObjectId());
-					AppFrameMsgOut result = JsLinkUtil.callMatchingMethod(javaReq, javaRef);
+					AppFrameMsgOut result = JsLinkUtil.callMatchingMethod(javaReq, javaRef, jsLinkWhitelist);
 					Services.getConnectionService().sendObject(result);
 				} else {
 					Serializable result = JsLinkUtil.getErrorResponse(javaReq, "JsLink is not allowed for this application. Set the 'allowJsLink' to true in webswing.config to enable it.");

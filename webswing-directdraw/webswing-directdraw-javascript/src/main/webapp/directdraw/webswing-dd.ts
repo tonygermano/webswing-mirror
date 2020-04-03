@@ -400,9 +400,14 @@ export class DirectDraw {
         const clip = args[3];
 
         const buffer = this.canvasBuffer.pop();
-        return this.drawBin(webImageData, buffer!).then((imageCanvas)=> {
+        const webImage= WebImageProto.decode(webImageData);
+        const dpr = this.config.dpr;
+        if (buffer!==undefined && (buffer.width !== webImage.width * dpr || buffer.height !== webImage.height * dpr)) {
+            buffer.width = webImage.width * dpr;
+            buffer.height = webImage.height * dpr;
+        }
+        return this.drawWebImage(webImage, buffer!).then((imageCanvas)=> {
             ctx.save();
-            const dpr = this.config.dpr;
             if (this.path(ctx, clip)) {
                 ctx.clip(DirectDraw.fillRule(clip));
             }
@@ -480,18 +485,36 @@ export class DirectDraw {
         } else {
             let currentX=x;
             for (let i = 0;i<value.length;i++){
-                const c = value.charAt(i);
+                if(points[i+2]===0){
+                    continue;
+                }
+                const c = this.getCharGroup(i,value,points);
                 const canvasWidth = ctx.measureText(c).width;
-                ctx.save();
                 const scaleX = points[i+2] / canvasWidth;
-                ctx.scale(scaleX, 1);
-                ctx.fillText(c, currentX/scaleX, y);
+                ctx.save();
+                if(scaleX<=1) {
+                    ctx.scale(scaleX, 1);
+                    ctx.fillText(c, currentX / scaleX, y);
+                }else{
+                    ctx.fillText(c, currentX+((points[i+2] - canvasWidth)/2), y);
+                }
                 ctx.restore();
                 currentX+=points[i+2];
             }
         }
         ctx.restore();
     }
+
+    public getCharGroup(i:number, value:string, points:number[]){
+        let c = value.charAt(i);
+        let currentIndex = i+1;
+        while(value.length>currentIndex && points[currentIndex+2]===0){
+            c+=value.charAt(currentIndex);
+            currentIndex++
+        }
+        return c;
+    }
+
 
     public iprtSetFont(ctx:ICanvasCtx, args:IDrawConstantProto[]):ITransformProto|null {
         if (args[0] == null) {
@@ -998,20 +1021,6 @@ export class DirectDraw {
         });
     }
 
-    private waitForFont(fontName:string,resolve: ()=>void){
-        let timeout = (ms:number)=> new Promise((r)=>setTimeout(r,ms));
-        let start = new Date().getTime();
-        let pollFont = () => {
-            if (DirectDraw.isFontAvailable(fontName) || new Date().getTime()-start > 100) {
-                resolve();
-            } else {
-                timeout(5).then(pollFont);
-            }
-        }
-        pollFont();
-    }
-
-
     public dispose() {
         const styles = Array.from(document.body.getElementsByTagName("style"));
         const toRemove = [];
@@ -1039,6 +1048,19 @@ export class DirectDraw {
         return this.constantPoolCache;
     }
 
+    private waitForFont(fontName:string,resolve: ()=>void){
+        const timeout = (ms:number)=> new Promise((r)=>setTimeout(r,ms));
+        const start = new Date().getTime();
+        const pollFont = () => {
+            if (DirectDraw.isFontAvailable(fontName) || new Date().getTime()-start > 100) {
+                resolve();
+            } else {
+                timeout(5).then(pollFont);
+            }
+        }
+        pollFont();
+    }
+
     private drawWebImage(image: WebImageProto, targetCanvas?: HTMLCanvasElement): PromiseLike<HTMLCanvasElement> {
         return new Promise((resolve, reject) => {
             try {
@@ -1055,16 +1077,33 @@ export class DirectDraw {
         const renderStart = new Date().getTime();
         const dpr = this.config.dpr;
         if (targetCanvas != null) {
+            if (targetCanvas.width !== image.width * dpr || targetCanvas.height !== image.height * dpr) {
+                let buffer = this.canvasBuffer.pop();
+                if(buffer === undefined){
+                    buffer = document.createElement("canvas");
+                }
+                buffer.width = targetCanvas.width;
+                buffer.height = targetCanvas.height;
+                buffer.getContext("2d")!.drawImage(targetCanvas,0,0);
+
+                targetCanvas.width = image.width * dpr;
+                targetCanvas.height = image.height * dpr;
+                if(buffer.width>0 && buffer.height>0){
+                    targetCanvas.getContext("2d")!.drawImage(buffer,0,0);
+                }
+                this.canvasBuffer.push(buffer);
+            }
             newCanvas = targetCanvas;
         } else {
             newCanvas = document.createElement("canvas");
             newCanvas.classList.add("webswing-canvas");
             newCanvas.getContext("2d")!.scale(dpr, dpr);
-        }
-        if (newCanvas.width !== image.width * dpr || newCanvas.height !== image.height * dpr) {
             newCanvas.width = image.width * dpr;
             newCanvas.height = image.height * dpr;
         }
+        newCanvas.style.width = image.width+"px";
+        newCanvas.style.height = image.height+"px";
+
 
         const imageContext: IImageContext = {
             canvas: newCanvas,

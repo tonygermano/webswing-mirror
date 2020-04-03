@@ -8,6 +8,8 @@ import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Util;
 
 abstract public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
+	
+	private static final int VALIDATE_BOUNDS_THRESHOLD = 40;
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////// WebWindowPeer Implementation//////////////////////////////////////////////////
@@ -72,14 +74,13 @@ abstract public class WebWindowPeer extends WebContainerPeer implements WindowPe
 
 	public void setTitle(String title) {
 		updateWindowDecorationImage();
-		Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(this.getGuid(), new Rectangle(0, 0, getBounds().width, getInsets().top));
 	}
 
 	public void setResizable(boolean resizeable) {
 	}
 
 	protected Point validate(int x, int y, int w, int h) {
-		if (Boolean.getBoolean(Constants.SWING_SCREEN_VALIDATION_DISABLED)) {
+		if (Boolean.getBoolean(Constants.SWING_SCREEN_VALIDATION_DISABLED) || Util.isCompositingWM()) {
 			return new Point(x, y);
 		}
 
@@ -89,7 +90,7 @@ abstract public class WebWindowPeer extends WebContainerPeer implements WindowPe
 		}
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		Insets insets = this.getInsets();
-		if (screen.height < insets.top || screen.width < 40) {
+		if (screen.height < insets.top || screen.width < VALIDATE_BOUNDS_THRESHOLD) {
 			return result;
 		}
 
@@ -99,11 +100,11 @@ abstract public class WebWindowPeer extends WebContainerPeer implements WindowPe
 		if (y > (screen.height - insets.top)) {
 			result.y = screen.height - insets.top;
 		}
-		if (x < ((w - 40) * (-1))) {
-			result.x = (w - 40) * (-1);
+		if (x < ((w - VALIDATE_BOUNDS_THRESHOLD) * (-1))) {
+			result.x = (w - VALIDATE_BOUNDS_THRESHOLD) * (-1);
 		}
-		if (x > (screen.width - 40)) {
-			result.x = (screen.width - 40);
+		if (x > (screen.width - VALIDATE_BOUNDS_THRESHOLD)) {
+			result.x = (screen.width - VALIDATE_BOUNDS_THRESHOLD);
 		}
 		if ((target instanceof Frame) && ((Frame) target).getExtendedState() == Frame.MAXIMIZED_BOTH) {
 			result.x = 0;

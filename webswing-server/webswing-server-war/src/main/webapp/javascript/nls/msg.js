@@ -55,8 +55,10 @@ export var msg= {
         "dialog.touchSwitchMode.touch": "Do you want to switch to touch mode?",
         "dialog.touchSwitchMode.switchButton": "Switch",
         "dialog.touchSwitchMode.cancelButton": "Hide",
+        "dialog.overlay.docking.visibility": "Main Webswing window has been hidden. Please make sure the main window is visible to continue.",
+        "dialog.overlay.docking.modality": "This window is blocked by another modal window.",
+        "dialog.overlay.docking.focusWindow": "Show window",
         
-
         //  SELECTOR
         "selector.welcome": "Welcome,",
         "selector.message": ". Please select an application.",
@@ -111,6 +113,23 @@ export var msg= {
         "touch.cut": "Cut",
         "touch.paste": "Paste",
         "touch.keyboard": "Keyboard",
-        "touch.fullscreen": "Fullscreen"
+        "touch.fullscreen": "Fullscreen",
+        	
+        //   ACCESSIBILITY
+        "accessibility.turnOn": "To turn accessibility feature on or off press CTRL 5 times. To switch between windows press CTRL 3 times. To focus out of a table or text area press ESCAPE or SHIFT ESCAPE.",
+        "accessibility.turnedOn": "Accessibility turned on.",
+        "accessibility.turnedOff": "Accessibility turned off.",
+        "accessibility.window.button.toggleDock": "Toggle dock",
+        "accessibility.window.button.close": "Close",
+        "accessibility.window.button.restore": "Restore",
+        "accessibility.window.button.minimize": "Minimize",
+        "accessibility.window.button.maximize": "Maximize",
+        "accessibility.switcher.title": "Select Window",
+        "accessibility.switcher.cancel": "Cancel",
+        "accessibility.switcher.untitled": "untitled window",
+       	"accessibility.switcher.description": "Press Enter to activate selected window, press X to close the window.",
+       	"accessibility.switcher.modalBlocked": "(blocked by modal)",
+     	"accessibility.switcher.modalBlocked.description": "This window is blocked by another modal window. You cannot activate or close it."
+        
     }
 }

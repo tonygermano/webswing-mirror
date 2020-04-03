@@ -10,7 +10,9 @@ import 'blueimp-file-upload'
             cfg: 'webswing.config',
             socketId: 'socket.uuid',
             send: 'socket.send',
-            translate: 'translate.translate'
+            translate: 'translate.translate',
+            getFocusedWindow: 'base.getFocusedWindow',
+            focusDefault: 'focusManager.focusDefault'
         };
         module.provides = {
             process: process,
@@ -24,19 +26,9 @@ import 'blueimp-file-upload'
             html = api.translate(htmlTemplate);
         };
 
-        var jqXHR_fileupload = [];
-        var uploadingFiles = [];
-        var uploadedFiles = [];
-        var timeout;
-        var errorTimeout;
-        var closeAfterErrorTimeout;
-        var uploadBar, fileDialogTransferBarClientId, fileDialogErrorMessage;
-        var fileActionButtonGroup, fileDialogErrorMessageContent, deleteSelectedButton, downloadSelectedButton;
-        var dropZone, fileUpload, uploadProgressBar, uploadProgress, cancelBtn, uploadBtn, fileInput;
-        var autoUploadBar, autoFileupload, autoFileInput, cancelAutoUploadButton, autoUploadfileDialogTransferBarClientId;
-        var autoSaveBar, autoSaveInput, cancelAutoSaveButton, autoSaveButton;
-        var linkDialog;
-
+        var holderMap = {};
+        // <window>: {autoUpload, autoSave, open, close, download, link, print}
+        
         function process(event) {
             if (event.eventType === 'AutoUpload') {
                 autoUpload(event, api.socketId);
@@ -48,108 +40,104 @@ import 'blueimp-file-upload'
                 close();
             }
         }
+        
+        function getHolder() {
+        	var win = api.getFocusedWindow();
+        	
+        	// try cleanup
+        	for (var winName in holderMap) {
+        		if (!holderMap[winName].win || holderMap[winName].win.closed) {
+        			delete holderMap[winName];
+        		}
+        	}
+        	
+        	if (!holderMap[win.name]) {
+        		setup(win);
+        	}
+        	
+        	return holderMap[win.name];
+        }
 
         function autoUpload(data, uuid) {
-            if (autoUploadBar == null) {
-                setup(api);
-            }
-            if (autoUploadBar.closest(api.cfg.rootElement).length === 0) {
-                api.cfg.rootElement.append(autoUploadBar);
-            }
-            uploadingFiles = [];
-            uploadedFiles = [];
-            autoUploadfileDialogTransferBarClientId.val(uuid);
-            autoFileInput().prop("multiple", data.isMultiSelection);
-            autoFileInput().attr("accept", data.filter);
-            setProgressBarVisible(false);
-            animateShow(autoUploadBar);
+        	getHolder().autoUpload(data, uuid);
         }
 
         function autoSave(data, uuid) {
-            if (autoSaveBar == null) {
-                setup(api);
-            }
-            if (autoSaveBar.closest(api.cfg.rootElement).length === 0) {
-                api.cfg.rootElement.append(autoSaveBar);
-            }
-            autoSaveInput.val(data.selection);
-            animateShow(autoSaveBar);
+        	getHolder().autoSave(data, uuid);
         }
 
         function open(data, uuid) {
-            closeAfterErrorTimeout = false;
-            if (uploadBar == null) {
-                setup(api);
-            }
-            if (uploadBar.closest(api.cfg.rootElement).length === 0) {
-                api.cfg.rootElement.append(uploadBar);
-            }
-            fileDialogTransferBarClientId.val(uuid);
-
-            appendOrDetach(downloadSelectedButton, fileActionButtonGroup, data.allowDownload);
-            appendOrDetach(uploadBtn, fileActionButtonGroup, data.allowUpload);
-            appendOrDetach(deleteSelectedButton, fileActionButtonGroup, data.allowDelete);
-
-            showOrHide(dropZone, data.allowUpload);
-            showOrHide(cancelBtn, data.allowDownload || data.allowUpload || data.allowDelete);
-            fileInput().prop("multiple", data.isMultiSelection);
-            fileInput().attr("accept", data.filter);
-            setProgressBarVisible(false);
-            showOrHide(uploadBar, data.allowDownload || data.allowUpload || data.allowDelete);
+        	getHolder().open(data, uuid);
         }
 
         function close() {
-            if (uploadBar != null && uploadBar.closest(api.cfg.rootElement).length !== 0) {
-                if (!errorTimeout) {
-                    uploadBar.hide("fast");
-                    uploadBar.detach();
-                } else {
-                    closeAfterErrorTimeout = true;
-                }
-            }
-            if (autoUploadBar != null && autoUploadBar.closest(api.cfg.rootElement).length !== 0) {
-                autoUploadBar.hide("fast");
-                autoUploadBar.detach();
-            }
-            if (autoSaveBar != null && autoSaveBar.closest(api.cfg.rootElement).length !== 0) {
-                autoSaveBar.hide("fast");
-                autoSaveBar.detach();
-            }
+        	getHolder().close();
+        }
+        
+        function download(url) {
+        	getHolder().download(url);
         }
 
-        function setup() {
-            api.cfg.rootElement.append(html);
+        function link(url) {
+        	getHolder().link(url);
+        }
 
-            uploadBar = api.cfg.rootElement.find('div[data-id="uploadBar"]');
-            fileDialogTransferBarClientId = uploadBar.find('input[data-id="fileDialogTransferBarClientId"]');
+        function print(url) {
+        	getHolder().print(url);
+        }
+        
+        function redirect(url) {
+        	window.location.href = url;
+        }
 
-            fileActionButtonGroup = uploadBar.find('div[data-id="fileActionButtonGroup"]');
-            deleteSelectedButton = uploadBar.find('button[data-id="deleteSelectedButton"]');
-            downloadSelectedButton = uploadBar.find('button[data-id="downloadSelectedButton"]');
-            uploadBtn = uploadBar.find('div[data-id="fileUploadBtn"]');
+        function setup(win) {
+        	holderMap[win.name] = {};
+        	
+        	var fh = holderMap[win.name];
+        	fh.win = win;
+        	
+        	var doc = $(win.document);
+        	var rootElement = doc.find(".webswing-element-content");
+            rootElement.append(html);
+            
+            var jqXHR_fileupload = [];
+            var uploadingFiles = [];
+            var uploadedFiles = [];
+            var timeout;
+            var errorTimeout;
+            var closeAfterErrorTimeout;
+            
+            var uploadBar = rootElement.find('div[data-id="uploadBar"]');
+            var fileDialogTransferBarClientId = uploadBar.find('input[data-id="fileDialogTransferBarClientId"]');
 
-            dropZone = uploadBar.find('div[data-id="fileDropArea"]');
-            fileUpload = uploadBar.find('form[data-id="fileupload"]');
-            cancelBtn = uploadBar.find('button[data-id="cancelBtn"]');
-            fileInput =()=> uploadBar.find('input[data-id="fileInput"]');
+            var fileActionButtonGroup = uploadBar.find('div[data-id="fileActionButtonGroup"]');
+            var deleteSelectedButton = uploadBar.find('button[data-id="deleteSelectedButton"]');
+            var downloadSelectedButton = uploadBar.find('button[data-id="downloadSelectedButton"]');
+            var uploadBtn = uploadBar.find('div[data-id="fileUploadBtn"]');
 
-            uploadProgressBar = api.cfg.rootElement.find('div[data-id="fileDialogTransferProgressBar"]');
-            uploadProgress = api.cfg.rootElement.find('div[data-id="progress"] .ws-progress-bar');
-            fileDialogErrorMessage = api.cfg.rootElement.find('div[data-id="fileDialogErrorMessage"]');
-            fileDialogErrorMessageContent = api.cfg.rootElement.find('div[data-id="fileDialogErrorMessageContent"]');
+            var dropZone = uploadBar.find('div[data-id="fileDropArea"]');
+            var fileUpload = uploadBar.find('form[data-id="fileupload"]');
+            var cancelBtn = uploadBar.find('button[data-id="cancelBtn"]');
+            var getFileInput = ()=>uploadBar.find('input[data-id="fileInput"]');
 
-            autoUploadBar = api.cfg.rootElement.find('div[data-id="autoUploadBar"]');
-            autoFileupload = autoUploadBar.find('form[data-id="autoFileupload"]');
-            cancelAutoUploadButton = autoUploadBar.find('button[data-id="cancelAutoUploadButton"]');
-            autoFileInput = ()=>autoUploadBar.find('input[data-id="autoFileInput"]');
-            autoUploadfileDialogTransferBarClientId = autoUploadBar.find('input[data-id="autoUploadfileDialogTransferBarClientId"]');
+            var uploadProgressBar = rootElement.find('div[data-id="fileDialogTransferProgressBar"]');
+            var uploadProgress = rootElement.find('div[data-id="progress"] .ws-progress-bar');
+            var fileDialogErrorMessage = rootElement.find('div[data-id="fileDialogErrorMessage"]');
+            var fileDialogErrorMessageContent = rootElement.find('div[data-id="fileDialogErrorMessageContent"]');
 
-            autoSaveBar = api.cfg.rootElement.find('div[data-id="autoSaveBar"]');
-            autoSaveInput = autoSaveBar.find('input[data-id="autoSaveInput"]');
-            autoSaveButton = autoSaveBar.find('button[data-id="autoSaveButton"]');
-            cancelAutoSaveButton = autoSaveBar.find('button[data-id="cancelAutoSaveButton"]');
+            var autoUploadBar = rootElement.find('div[data-id="autoUploadBar"]');
+            var autoFileupload = autoUploadBar.find('form[data-id="autoFileupload"]');
+            var uploadAutoUploadButton = autoUploadBar.find('button[data-id="uploadAutoUploadButton"]');
+            var cancelAutoUploadButton = autoUploadBar.find('button[data-id="cancelAutoUploadButton"]');
+            var getAutoFileInput = ()=>autoUploadBar.find('input[data-id="autoFileInput"]');
+            var autoUploadfileDialogTransferBarClientId = autoUploadBar.find('input[data-id="autoUploadfileDialogTransferBarClientId"]');
 
-            linkDialog = api.cfg.rootElement.find('div[data-id="downloadLinkDialog"]');
+            var autoSaveBar = rootElement.find('div[data-id="autoSaveBar"]');
+            var autoSaveInput = autoSaveBar.find('input[data-id="autoSaveInput"]');
+            var autoSaveButton = autoSaveBar.find('button[data-id="autoSaveButton"]');
+            var cancelAutoSaveButton = autoSaveBar.find('button[data-id="cancelAutoSaveButton"]');
+
+            var linkDialog = rootElement.find('div[data-id="downloadLinkDialog"]');
 
             // hide all
             uploadProgressBar.hide();
@@ -226,22 +214,21 @@ import 'blueimp-file-upload'
             // data loaded
             function fileuploadprogressall(e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
-                var $jsProgressBar = $(".ws-progress-bar");
-                var $jsProgressText = $(".ws-progress-text");
+                var $jsProgressBar = rootElement.find(".ws-progress-bar");
+                var $jsProgressText = rootElement.find(".ws-progress-text");
                 $jsProgressBar.css('width', progress + '%');
                 $jsProgressText.find("em").text(progress + "%");
-
             }
 
             function fileuploaddone(e, data) {
-                var $jsProgressText = $(".ws-progress-text");
+                var $jsProgressText = rootElement.find(".ws-progress-text");
                 $jsProgressText.find("em").text(api.translate("files.progComplete"));
-                var finishedFile=data.result.files[0].name;
+                var finishedFile = data.result.files[0].name;
                 uploadedFiles.push(finishedFile);
                 uploadingFiles.splice(uploadingFiles.indexOf(finishedFile),1);
                 if (!errorTimeout && uploadingFiles.length==0) {
                     filesSelected(uploadedFiles);
-                    uploadedFiles=[]
+                    uploadedFiles=[];
                     setProgressBarVisible(false);
                     jqXHR_fileupload = [];
                 }
@@ -276,10 +263,14 @@ import 'blueimp-file-upload'
                 sendMessageEvent('downloadFile');
             });
 
-            api.cfg.rootElement.bind('drop', function (e) {
+            rootElement.bind('drop', function (e) {
                 e.preventDefault();
             });
 
+            uploadAutoUploadButton.bind('click', function(e) {
+            	getAutoFileInput().click();
+            });
+            
             autoSaveInput.bind('input', validateFilename);
 
             autoSaveButton.bind('click', function (e) {
@@ -289,42 +280,207 @@ import 'blueimp-file-upload'
                 }
             });
 
-
-
             function validateFilename() {
                 var fileString = autoSaveInput.val();
                 if (fileString.match(/^[a-zA-Z0-9. _-]*$/)) {
-                    fileDialogErrorMessageContent.html("");
-                    fileDialogErrorMessage.hide("fast");
+                	fileDialogErrorMessageContent.html("");
+                	fileDialogErrorMessage.hide("fast");
                     return true;
                 } else {
-                    fileDialogErrorMessageContent.html(api.translate('<p>${files.saveInvlidFilename}</p>'));
+                	fileDialogErrorMessageContent.html(api.translate('<p>${files.saveInvlidFilename}</p>'));
                     animateShow(fileDialogErrorMessage);
                     return false;
                 }
             }
+            
+            function setProgressBarVisible(bool) {
+                if (bool) {
+                    uploadProgress.css('width', '0%');
+                    uploadProgressBar.fadeIn(200);
+                } else {
+                    uploadProgressBar.fadeOut(200);
+                    uploadProgress.css('width', '0%');
+                }
+            }
+            
+            function displayDownloadLinkDialog(msg, url) {
+                if (linkDialog.closest(rootElement).length === 0) {
+                    rootElement.append(linkDialog);
+                }
 
-            api.cfg.rootElement.bind('dragover', function (e) {
+                var title = linkDialog.find('div[data-id="title"]');
+                title.html(api.translate(msg.title));
+
+                var message = linkDialog.find('div[data-id="message"]');
+                message.html(api.translate(msg.message));
+
+                var linkBtn = linkDialog.find('button[data-id="downloadLinkButton"]');
+                linkBtn.html(api.translate(msg.buttonMessage));
+                linkBtn.off('click').on('click', function (event) {
+                	window.open(url, '_blank');
+                	closeDownloadLinkDialog(linkDialog, rootElement);
+                }).blur();
+
+                var closeBtn = linkDialog.find('button[data-id="cancelDownloadLinkButton"]');
+                closeBtn.off('click').on('click', function (event) {
+                    closeDownloadLinkDialog(linkDialog, rootElement);
+                }).blur();
+
+                linkDialog.show();
+                if (doc.activeElement) {
+                	doc.activeElement.blur();
+                }
+               	linkBtn[0].focus();
+            }
+
+            function closeDownloadLinkDialog() {
+                if (linkDialog != null && linkDialog.closest(rootElement).length !== 0) {
+                	linkDialog.hide("fast");
+                    linkDialog.detach();
+                }
+            }
+
+            rootElement.bind('dragover', function (e) {
                 if (!timeout) {
-                    dropZone.addClass('ws-filebar-dropArea--ondrag');
+                	dropZone.addClass('ws-filebar-dropArea--ondrag');
                 } else {
                     clearTimeout(timeout);
                 }
 
                 timeout = setTimeout(function () {
-                    timeout = null;
-                    dropZone.removeClass('ws-filebar-dropArea--ondrag');
+                	timeout = null;
+                	dropZone.removeClass('ws-filebar-dropArea--ondrag');
                 }, 100);
             });
+            
+            fh.autoUpload = function(data, uuid) {
+            	if (autoUploadBar.closest(rootElement).length === 0) {
+            		rootElement.append(autoUploadBar);
+            	}
+            	uploadingFiles = [];
+            	uploadedFiles = [];
+            	autoUploadfileDialogTransferBarClientId.val(uuid);
+            	getAutoFileInput().prop("multiple", data.isMultiSelection);
+            	getAutoFileInput().attr("accept", data.filter);
+            	setProgressBarVisible(false);
+            	animateShow(autoUploadBar);
+            };
+            
+            fh.autoSave = function(data, uuid) {
+                if (autoSaveBar.closest(rootElement).length === 0) {
+                    rootElement.append(autoSaveBar);
+                }
+                autoSaveInput.val(data.selection);
+                animateShow(autoSaveBar);
+            };
 
+            fh.open = function(data, uuid) {
+            	closeAfterErrorTimeout = false;
+                if (uploadBar.closest(rootElement).length === 0) {
+                    rootElement.append(uploadBar);
+                }
+                fileDialogTransferBarClientId.val(uuid);
+
+                appendOrDetach(downloadSelectedButton, fileActionButtonGroup, data.allowDownload);
+                appendOrDetach(uploadBtn, fileActionButtonGroup, data.allowUpload);
+                appendOrDetach(deleteSelectedButton, fileActionButtonGroup, data.allowDelete);
+
+                showOrHide(dropZone, data.allowUpload);
+                showOrHide(cancelBtn, data.allowDownload || data.allowUpload || data.allowDelete);
+                getFileInput().prop("multiple", data.isMultiSelection);
+                getFileInput().attr("accept", data.filter);
+                setProgressBarVisible(false);
+                showOrHide(uploadBar, data.allowDownload || data.allowUpload || data.allowDelete);
+            };
+
+            fh.close = function() {
+                if (uploadBar != null && uploadBar.closest(rootElement).length !== 0) {
+                    if (!errorTimeout) {
+                    	uploadBar.hide("fast", function() {
+                    		api.focusDefault();
+                    	});
+                    	uploadBar.detach();
+                    } else {
+                    	closeAfterErrorTimeout = true;
+                    }
+                }
+                if (autoUploadBar != null && autoUploadBar.closest(rootElement).length !== 0) {
+                	autoUploadBar.hide("fast", function() {
+                		api.focusDefault();
+                	});
+                	autoUploadBar.detach();
+                }
+                if (autoSaveBar != null && autoSaveBar.closest(rootElement).length !== 0) {
+                	autoSaveBar.hide("fast", function() {
+                		api.focusDefault();
+                	});
+                	autoSaveBar.detach();
+                }
+            };
+            
+            fh.download = function(url) {
+            	if (util.isIOS()) {
+            		var msg = {
+                		"title": "${files.downloadLink.download.title}",
+            			"message": "${files.downloadLink.download.message}",
+            			"buttonMessage": "${files.downloadLink.download.button}"
+            		};
+            		displayDownloadLinkDialog(msg, url);
+            	} else {
+            		var hiddenIFrameID = 'hiddenDownloader' + url, iframe = doc[0].getElementById(hiddenIFrameID);
+            		if (iframe != null) {
+            			iframe.parentNode.removeChild(iframe);
+            		}
+            		iframe = doc[0].createElement('iframe');
+            		iframe.id = hiddenIFrameID;
+            		iframe.style.display = 'none';
+            		doc[0].body.appendChild(iframe);
+            		iframe.src = api.cfg.connectionUrl + url;
+            	}
+            }
+
+            fh.link = function(url) {
+            	if (util.isIOS()) {
+            		var msg = {
+                		"title": "${files.downloadLink.link.title}",
+            			"message": "${files.downloadLink.link.message}",
+            			"buttonMessage": "${files.downloadLink.link.button}"
+            		};
+            		displayDownloadLinkDialog(msg, url);
+            	} else {
+            		window.open(url, '_blank');
+            	}
+            };
+
+            fh.print = function(url) {
+            	var finalUrl = api.cfg.connectionUrl + 'print/viewer.html?file=' + encodeURIComponent(api.cfg.connectionUrl + url);
+
+            	if (util.isIOS()) {
+            		var msg = {
+            			"title": "${files.downloadLink.print.title}",
+            			"message": "${files.downloadLink.print.message}",
+            			"buttonMessage": "${files.downloadLink.print.button}"
+            		};
+            		displayDownloadLinkDialog(msg, finalUrl);
+            	} else {
+            		window.open(finalUrl, '_blank');
+            	}
+            };
         }
 
         function animateShow(element) {
-            element.show('fast');
+            element.show('fast', function() {
+            	var initFocus = element.find(".init-focus");
+            	if (initFocus.length) {
+            		initFocus[0].focus();
+            	}
+            });
         }
 
         function animateHide(element) {
-            element.hide('fast');
+            element.hide('fast', function() {
+            	api.focusDefault();
+            });
         }
 
         function showOrHide(element, bool) {
@@ -339,16 +495,6 @@ import 'blueimp-file-upload'
             element.detach();
             if (bool) {
                 parent.append(element);
-            }
-        }
-
-        function setProgressBarVisible(bool) {
-            if (bool) {
-                uploadProgress.css('width', '0%');
-                uploadProgressBar.fadeIn(200);
-            } else {
-                uploadProgressBar.fadeOut(200);
-                uploadProgress.css('width', '0%');
             }
         }
 
@@ -368,95 +514,6 @@ import 'blueimp-file-upload'
                     }
                 }]
             });
-        }
-
-        function download(url) {
-        	if (util.isIOS()) {
-        		var msg = {
-            		"title": "${files.downloadLink.download.title}",
-        			"message": "${files.downloadLink.download.message}",
-        			"buttonMessage": "${files.downloadLink.download.button}"
-        		};
-        		displayDownloadLinkDialog(msg, url);
-        	} else {
-        		var hiddenIFrameID = 'hiddenDownloader'+url, iframe = document.getElementById(hiddenIFrameID);
-        		if(iframe!=null){
-        			iframe.parentNode.removeChild(iframe);
-        		}
-        		iframe = document.createElement('iframe');
-        		iframe.id = hiddenIFrameID;
-        		iframe.style.display = 'none';
-        		document.body.appendChild(iframe);
-        		iframe.src = api.cfg.connectionUrl + url;
-        	}
-        }
-
-        function link(url) {
-        	if (util.isIOS()) {
-        		var msg = {
-            		"title": "${files.downloadLink.link.title}",
-        			"message": "${files.downloadLink.link.message}",
-        			"buttonMessage": "${files.downloadLink.link.button}"
-        		};
-        		displayDownloadLinkDialog(msg, url);
-        	} else {
-        		window.open(url, '_blank');
-        	}
-        }
-
-        function print(url) {
-        	var finalUrl = api.cfg.connectionUrl + 'print/viewer.html?file=' + encodeURIComponent(api.cfg.connectionUrl + url);
-
-        	if (util.isIOS()) {
-        		var msg = {
-        			"title": "${files.downloadLink.print.title}",
-        			"message": "${files.downloadLink.print.message}",
-        			"buttonMessage": "${files.downloadLink.print.button}"
-        		};
-        		displayDownloadLinkDialog(msg, finalUrl);
-        	} else {
-        		window.open(finalUrl, '_blank');
-        	}
-        }
-
-        function redirect(url) {
-            window.location.href = url;
-        }
-
-        function displayDownloadLinkDialog(msg, url) {
-            if (linkDialog == null) {
-                setup(api);
-            }
-            if (linkDialog.closest(api.cfg.rootElement).length === 0) {
-                api.cfg.rootElement.append(linkDialog);
-            }
-
-            var title = linkDialog.find('div[data-id="title"]');
-            title.html(api.translate(msg.title));
-
-            var message = linkDialog.find('div[data-id="message"]');
-            message.html(api.translate(msg.message));
-
-            var linkBtn = linkDialog.find('button[data-id="downloadLinkButton"]');
-            linkBtn.html(api.translate(msg.buttonMessage));
-            linkBtn.off('click').on('click', function (event) {
-            	window.open(url, '_blank');
-            	closeDownloadLinkDialog();
-            }).blur();
-
-            var closeBtn = linkDialog.find('button[data-id="cancelDownloadLinkButton"]');
-            closeBtn.off('click').on('click', function (event) {
-                closeDownloadLinkDialog();
-            }).blur();
-
-            linkDialog.show();
-        }
-
-        function closeDownloadLinkDialog() {
-            if (linkDialog != null && linkDialog.closest(api.cfg.rootElement).length !== 0) {
-            	linkDialog.hide("fast");
-                linkDialog.detach();
-            }
         }
 
     }

@@ -9,7 +9,6 @@ import org.webswing.Constants;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
-import org.webswing.server.common.model.admin.InstanceManagerStatus;
 import org.webswing.server.extension.ExtensionService;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationChangeEvent;
@@ -17,6 +16,7 @@ import org.webswing.server.services.config.ConfigurationChangeListener;
 import org.webswing.server.services.config.ConfigurationService;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.rest.RestService;
+import org.webswing.server.services.rest.resources.model.InstanceManagerStatus;
 import org.webswing.server.services.security.api.BuiltInModules;
 import org.webswing.server.services.security.api.WebswingSecurityConfig;
 import org.webswing.server.services.security.login.LoginHandlerService;
@@ -24,6 +24,7 @@ import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.security.modules.SecurityModuleService;
 import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.services.swingmanager.SwingInstanceManagerService;
+import org.webswing.server.util.ServerUtil;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -108,7 +109,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHa
 		loadApplications();
 		this.configService.registerChangeListener(this.changeListener);
 		super.init();
-		if (!InstanceManagerStatus.Status.Running.equals(getStatus().getStatus())) {
+		if (!InstanceManagerStatus.StatusEnum.RUNNING.equals(getStatus().getStatus())) {
 			throw new RuntimeException("Failed to start primary handler.");
 		}
 	}
@@ -135,7 +136,9 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHa
 	private void setSecurityHeaders(HttpServletRequest req, HttpServletResponse res) {
 		res.addHeader("Server", SERVERNAME);
 		if (!Boolean.getBoolean(Constants.DISABLE_HTTP_SECURITY_HEADERS)) {
-			res.addHeader("X-Frame-Options", "SAMEORIGIN");
+			if (!ServerUtil.isAdminUrlSameOrigin(getAdminUrl(), req.getHeader("Referer"))) {
+				res.addHeader("X-Frame-Options", "SAMEORIGIN");
+			}
 			res.addHeader("X-Content-Type-Options", "nosniff");
 			res.addHeader("X-XSS-Protection", "1; mode=block");
 			res.addHeader("Referrer-Policy", "strict-origin-when-cross-origin");

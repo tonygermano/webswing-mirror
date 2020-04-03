@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.WindowActionType;
+import org.webswing.toolkit.util.Util;
 
 public class WindowEventHandler {
 
@@ -68,8 +69,10 @@ public class WindowEventHandler {
 							if (frame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
 								frame.setExtendedState(JFrame.NORMAL);
 								o = previousSize.get(w);
-								moveWindow(w, o.x, o.y);
-								resizeWindow(w, o.width, o.height);
+								if(o!=null) {
+									moveWindow(w, o.x, o.y);
+									resizeWindow(w, o.width, o.height);
+								}
 							} else {
 								frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 								// bounds are handled by WebFramePeer.setState
@@ -100,12 +103,17 @@ public class WindowEventHandler {
 					lockedOnEvent = false;
 				}
 				break;
-			case move:
+			case dockUndock:
 				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
-					Window w = (Window) e.getSource();
-					previousSize.remove(w);
+					if (wat.equals(WindowActionType.dockUndock)) {
+						String winId = Util.getPeerForTarget(window) == null ? null : Util.getPeerForTarget(window).getGuid();
+						Util.getWebToolkit().getPaintDispatcher().notifyWindowDockAction(winId);
+					}
 					lockedOnEvent = false;
 				}
+				break;
+			case move:
+				handleMouseReleaseEvent(e);
 				if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
 					Window w = (Window) e.getSource();
 					moveWindow(w, e.getXOnScreen() - referenceMouseLocation.x, e.getYOnScreen() - referenceMouseLocation.y);
@@ -115,11 +123,7 @@ public class WindowEventHandler {
 				}
 				break;
 			case resizeUniTopLeft:
-				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
-					Window w = (Window) e.getSource();
-					previousSize.remove(w);
-					lockedOnEvent = false;
-				}
+				handleMouseReleaseEvent(e);
 				if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
 					Window w = (Window) e.getSource();
 					Rectangle wb = w.getBounds();
@@ -136,11 +140,7 @@ public class WindowEventHandler {
 				}
 				break;
 			case resizeUniTopRight:
-				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
-					Window w = (Window) e.getSource();
-					previousSize.remove(w);
-					lockedOnEvent = false;
-				}
+				handleMouseReleaseEvent(e);
 				if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
 					Window w = (Window) e.getSource();
 					Rectangle wb = w.getBounds();
@@ -157,11 +157,7 @@ public class WindowEventHandler {
 				}
 				break;
 			case resizeUniBottomLeft:
-				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
-					Window w = (Window) e.getSource();
-					previousSize.remove(w);
-					lockedOnEvent = false;
-				}
+				handleMouseReleaseEvent(e);
 				if (MouseEvent.MOUSE_DRAGGED == e.getID() ) {
 					Window w = (Window) e.getSource();
 					Rectangle wb = w.getBounds();
@@ -178,11 +174,7 @@ public class WindowEventHandler {
 				}
 				break;
 			case resizeUniBottomRight:
-				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
-					Window w = (Window) e.getSource();
-					previousSize.remove(w);
-					lockedOnEvent = false;
-				}
+				handleMouseReleaseEvent(e);
 				if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
 					Window w = (Window) e.getSource();
 					resizeWindow(w, e.getXOnScreen() - w.getX(), e.getYOnScreen() - w.getY());
@@ -192,11 +184,7 @@ public class WindowEventHandler {
 				}
 				break;
 			case resizeRight:
-				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
-					Window w = (Window) e.getSource();
-					previousSize.remove(w);
-					lockedOnEvent = false;
-				}
+				handleMouseReleaseEvent(e);
 				if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
 					Window w = (Window) e.getSource();
 					resizeWindow(w, e.getXOnScreen() - w.getX(), w.getSize().height);
@@ -206,11 +194,7 @@ public class WindowEventHandler {
 				}
 				break;
 			case resizeLeft:
-				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
-					Window w = (Window) e.getSource();
-					previousSize.remove(w);
-					lockedOnEvent = false;
-				}
+				handleMouseReleaseEvent(e);
 				if (MouseEvent.MOUSE_DRAGGED == e.getID() ) {
 					Window w = (Window) e.getSource();
 					Rectangle wb = w.getBounds();
@@ -224,11 +208,7 @@ public class WindowEventHandler {
 				}
 				break;
 			case resizeBottom:
-				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
-					Window w = (Window) e.getSource();
-					previousSize.remove(w);
-					lockedOnEvent = false;
-				}
+				handleMouseReleaseEvent(e);
 				if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
 					Window w = (Window) e.getSource();
 					resizeWindow(w, w.getSize().width, e.getYOnScreen() - w.getY());
@@ -238,11 +218,7 @@ public class WindowEventHandler {
 				}
 				break;
 			case resizeTop:
-				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
-					Window w = (Window) e.getSource();
-					previousSize.remove(w);
-					lockedOnEvent = false;
-				}
+				handleMouseReleaseEvent(e);
 				if (MouseEvent.MOUSE_DRAGGED == e.getID() ) {
 					Window w = (Window) e.getSource();
 					Rectangle wb = w.getBounds();
@@ -261,6 +237,14 @@ public class WindowEventHandler {
 		}
 	}
 
+	private void handleMouseReleaseEvent(MouseEvent e) {
+		if (MouseEvent.MOUSE_RELEASED == e.getID() && e.getButton() == 1) {
+			Window w = (Window) e.getSource();
+			previousSize.remove(w);
+			lockedOnEvent = false;
+		}
+	}
+
 	private Dimension getMinimumWindowSize(Window w) {
 		return w.getMinimumSize();
 	}
@@ -270,24 +254,14 @@ public class WindowEventHandler {
 	}
 
 	public void resizeWindow(final Window w, int width, int height) {
-		if (w instanceof JFrame) {
-			((JFrame) w).setExtendedState(JFrame.NORMAL);
-		}
-		final Dimension originalSize = w.getSize();
-		final Dimension newSize = new Dimension(width, height);
-		validateSize(w, newSize);
-		if (!originalSize.equals(newSize)) {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					w.setSize(newSize);
-					WindowManager.getInstance().requestRepaintAfterMove(w, new Rectangle(w.getX(), w.getY(), originalSize.width, originalSize.height));
-				}
-			});
-		}
+		resizeAndOrMoveWindow(w,null,width,height);
 	}
 
 	public void resizeAndMoveWindow(final Window w, final int x, final int y, int width, int height) {
+		resizeAndOrMoveWindow(w,new Point(x,y),width,height);
+	}
+
+	private void resizeAndOrMoveWindow(final Window w, Point location, int width, int height){
 		if (w instanceof JFrame) {
 			((JFrame) w).setExtendedState(JFrame.NORMAL);
 		}
@@ -295,12 +269,10 @@ public class WindowEventHandler {
 		final Dimension newSize = new Dimension(width, height);
 		validateSize(w, newSize);
 		if (!originalSize.equals(newSize)) {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					w.setSize(newSize);
-					w.setLocation(x, y);
-					WindowManager.getInstance().requestRepaintAfterMove(w, new Rectangle(w.getX(), w.getY(), originalSize.width, originalSize.height));
+			SwingUtilities.invokeLater(() -> {
+				w.setSize(newSize);
+				if(location!=null){
+					w.setLocation(location.x, location.y);
 				}
 			});
 		}

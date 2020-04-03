@@ -5,7 +5,7 @@ import java.util.*;
 import org.webswing.server.common.model.meta.*;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
-@ConfigFieldOrder({ "enabled", "path", "homeDir", "webFolder","restrictedResources", "langFolder", "icon", "security", "allowedCorsOrigins", "swingConfig" })
+@ConfigFieldOrder({ "enabled", "path", "homeDir", "webFolder","restrictedResources", "langFolder", "icon", "security", "allowedCorsOrigins","adminConsoleUrl", "swingConfig" })
 public interface SecuredPathConfig extends Config {
 
 	@ConfigField(label = "Enabled", description = "If true, application will be started automatically, when server starts.")
@@ -48,6 +48,9 @@ public interface SecuredPathConfig extends Config {
 	@ConfigField(label = "CORS Origins", description = "If you are embedding webswing to page on different domain, you have to enable Cross-origin resource sharing (CORS) by adding the domain in this list. Use * to allow all domains.")
 	@ConfigFieldDefaultValueGenerator("defaultFromOldProperty")
 	public List<String> getAllowedCorsOrigins();
+
+	@ConfigField(label = "Admin Console Url", description = "Admin console used to manage this server. If no value defined admin console is only allowed from same domain. This will setup CORS and security headers to allow management from specified domain.")
+	public String getAdminConsoleUrl();
 
 	@ConfigField(label = "Application")
 	@ConfigFieldDefaultValueObject

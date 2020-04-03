@@ -1,5 +1,6 @@
 package org.webswing.server.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
@@ -102,6 +103,28 @@ public class ServerUtil {
 			}
 		}
 		return null;
+	}
+
+	public static String domainFromUrl(String fullUrl) {
+		try {
+			URL url = new URL(fullUrl);
+			return url.getProtocol()+"://"+url.getHost()+(url.getPort()!=-1?":"+url.getPort():"");
+		} catch (MalformedURLException e) {
+			return null;
+		}
+	}
+	
+	public static boolean isAdminUrlSameOrigin(String adminUrl, String url) {
+		if (StringUtils.isBlank(adminUrl)) {
+			return false;
+		}
+		
+		if (adminUrl.startsWith("http")) {
+			return ServerUtil.domainFromUrl(adminUrl).equals(ServerUtil.domainFromUrl(url));
+		}
+		
+		// adminUrl is relative, consider it same origin
+		return true;
 	}
 
 	public static String getClientBrowser(WebSocketConnection r) {

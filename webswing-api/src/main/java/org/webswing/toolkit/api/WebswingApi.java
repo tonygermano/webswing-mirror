@@ -1,7 +1,12 @@
 package org.webswing.toolkit.api;
 
-import org.webswing.toolkit.api.action.WebWindow;
+import java.awt.Container;
+import java.awt.Window;
+
+import javax.swing.JComponent;
+
 import org.webswing.toolkit.api.action.WebActionListener;
+import org.webswing.toolkit.api.action.WebWindow;
 import org.webswing.toolkit.api.clipboard.BrowserTransferable;
 import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
@@ -208,7 +213,48 @@ public interface WebswingApi {
 
 	/**
 	 * Creates an HtmlPanel component.
+	 * Compositing window manager must be enabled in config.
+	 * @throws IllegalArgumentException if isCompositingWindowManager() returns false
 	 */
 	public HtmlPanel createHtmlPanel();
+	
+	/**
+	 * Creates an HtmlPanel component which is a part of given component and has a container parent.
+	 * Use this method to create an HtmlPanel inside a WebContainer parent container.
+	 * This is required for web container to correctly compute z-order of its child component canvases.
+	 * Compositing window manager must be enabled in config.
+	 * @throws IllegalArgumentException if isCompositingWindowManager() returns false
+	 */
+	public HtmlPanel createHtmlPanelForWebContainerComponent(Container webContainer, JComponent componentParentOfHtmlPanel);
+	
+	/**
+	 * Registers given container to be a parent web container and all of its child components will be rendered into separate canvases.
+	 * Compositing window manager must be enabled in config.
+	 * @throws IllegalArgumentException if isCompositingWindowManager() returns false
+	 */
+	public void registerWebContainer(Container container);
+	
+	/**
+	 * Is compositing window manager enabled?
+	 */
+	public boolean isCompositingWindowManager();
+	
+	/**
+	 * Is docking enabled for window?
+	 * Compositing window manager and docking mode in config must be enabled.
+	 */
+	public boolean isDockingEnabled(Window window);
+	
+	/**
+	 * Toggle the dock state of a window.
+	 * Compositing window manager must be enabled in config. Window must be allowed to change the dock state according to config.
+	 * @throws IllegalArgumentException if isCompositingWindowManager() or isDockingEnabled(window) returns false
+	 */
+	public void toggleWindowDock(Window window);
+	
+	/**
+	 * Is touch mode active?
+	 */
+	public boolean isTouchMode();
 	
 }

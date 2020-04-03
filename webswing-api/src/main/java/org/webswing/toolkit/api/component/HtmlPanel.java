@@ -9,6 +9,11 @@ public abstract class HtmlPanel extends JPanel implements WebWindow {
 
 	private static final long serialVersionUID = 1601744731001086393L;
 
+	@Override
+	public boolean isFocusTraversable() {
+		return true; // when html panel' content is interacted with switch swing focus to this component
+	}
+
 	public abstract void addWebWindowActionListener(WebWindowActionListener listener);
 	public abstract void removeWebWindowActionListener(WebWindowActionListener listener);
 	

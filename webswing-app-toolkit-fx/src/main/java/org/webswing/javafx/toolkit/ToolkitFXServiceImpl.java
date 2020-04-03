@@ -1,5 +1,6 @@
 package org.webswing.javafx.toolkit;
 
+import java.awt.Window;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,6 +11,7 @@ import java.util.Set;
 import javax.swing.JComponent;
 
 import org.webswing.ext.services.ToolkitFXService;
+import org.webswing.javafx.toolkit.adaper.WindowAdapter;
 import org.webswing.model.s2c.ComponentTreeMsg;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.ToolkitUtil;
@@ -66,6 +68,11 @@ public class ToolkitFXServiceImpl implements ToolkitFXService {
 		}
 		
 		return componentTree;
+	}
+	
+	@Override
+	public boolean isFXWindow(Window window) {
+		return window instanceof WindowAdapter;
 	}
 	
 	private ComponentTreeMsg createComponentTreeMsg(Node n) {

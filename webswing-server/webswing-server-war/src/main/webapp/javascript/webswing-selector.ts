@@ -35,10 +35,36 @@ loadTranslations().then(
                 url: 'apps',
                 success: function (data) {
                     loadPermissions(function (showAdmin:any) {
-                        show(data, showAdmin);
+                    	if (showAdmin) {
+                    		loadAdminConsoleUrl(function(adminConsoleUrl:any) {
+                    			if (adminConsoleUrl && adminConsoleUrl.length) {
+                    				show(data, true, adminConsoleUrl);
+                    			} else {
+                    				show(data, false);
+                    			}
+                    		});
+                    	} else {
+                    		show(data, false);
+                    	}
                     });
                 }
             });
+        }
+        
+        function loadAdminConsoleUrl(callback:any) {
+        	$.ajax({
+        		xhrFields: {
+        			withCredentials: true
+        		},
+        		type: 'GET',
+        		url: 'rest/adminConsoleUrl',
+        		success: function (data) {
+        			callback(data);
+        		},
+        		error: function () {
+        			callback(false);
+        		}
+        	});
         }
 
         function loadPermissions(callback:any) {
@@ -58,23 +84,29 @@ loadTranslations().then(
         }
 
 
-        function show(apps:any, showAdmin:any) {
-            var header:any = '<h1 class="ws-selector-title">${selector.welcome} <span>' + user + '</span>${selector.message}</h1>';
-            var links = (showAdmin ? '${selector.lang}  <a href="admin" id="admin">${selector.admin}</a> | ' : '') + '<a href="logout" id="logout">${selector.logout}</a>';
+        function show(apps:any, showAdmin:any, adminConsoleUrl?:string) {
+        	if (adminConsoleUrl && adminConsoleUrl.indexOf("http") == 0) {
+        		// if admin console is located on a different server send current webswing server URL as a parameter
+        		adminConsoleUrl += "?url=" + encodeURIComponent(window.location.href);
+        	}
+            var header:any = '<h1 id="commonDialog-title" class="ws-selector-title">${selector.welcome} <span>' + user + '</span>${selector.message}</h1>';
+            var links = '${selector.lang} '+(showAdmin ? ' <a href="' + adminConsoleUrl + '" id="admin">${selector.admin}</a> | ' : '') + '<a href="logout" id="logout">${selector.logout}</a>';
             var content;
             $('#commonDialog').addClass('ws-selector')
             if (apps == null || apps.length === 0) {
                 header = null;
-                content = '<p>${selector.noApp}</p>';
+                content = '<p id="commonDialog-title">${selector.noApp}</p>';
             } else {
                 content = '<div class="ws-selector-container">';
+                var counter = 0;
                 for (var i in apps) {
                     var app = apps[i];
                     content += '<div class="ws-selector-btn">'
-                        + '<a href="' + app.url + '">'
+                        + '<a href="' + app.url + '" role="button" aria-labelledby="selector-btn-' + counter + '">'
                         + '<img src="' + util.getImageString(app.base64Icon) + '" class="ws-selector-btn-thumb"/>'
-                        + '<div class="ws-selector-btn-label">' + app.name + '</div>'
+                        + '<div id="selector-btn-' + counter + '" class="ws-selector-btn-label">' + app.name + '</div>'
                         + '</a></div>';
+                    counter++;
                 }
                 content += '</div>';
             }

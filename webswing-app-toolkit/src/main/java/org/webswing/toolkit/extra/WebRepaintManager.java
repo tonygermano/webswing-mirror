@@ -67,6 +67,7 @@ public class WebRepaintManager extends RepaintManager {
 				dirty.put(c, new Rectangle(x, y, w, h));
 			}
 		}
+		Util.getWebToolkit().getPaintDispatcher().notifyNewDirtyRegionQueued();
 	}
 
 	@Override
@@ -89,23 +90,23 @@ public class WebRepaintManager extends RepaintManager {
 	}
 
 	public static void processDirtyComponents() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				if (RepaintManager.currentManager(null) instanceof WebRepaintManager) {
-					((WebRepaintManager) RepaintManager.currentManager(null)).process();
-				} else {
-					WebRepaintManager webRepaintManager = new WebRepaintManager(RepaintManager.currentManager(null));
-					RepaintManager.setCurrentManager(webRepaintManager);
-					for (Window w : Window.getWindows()) {
-						if (w.isShowing()) {
-							webRepaintManager.addDirtyRegion(w, w.getX(), w.getY(), w.getWidth(), w.getHeight());
-						}
+		if (!SwingUtilities.isEventDispatchThread()) {
+			SwingUtilities.invokeLater(() -> processDirtyComponents());
+		} else {
+			if (RepaintManager.currentManager(null) instanceof WebRepaintManager) {
+				((WebRepaintManager) RepaintManager.currentManager(null)).process();
+			} else {
+				RepaintManager newDelegate = Util.getWebToolkit().getPaintDispatcher().getDefaultRepaintManager();
+				WebRepaintManager webRepaintManager = new WebRepaintManager(newDelegate);
+				RepaintManager.setCurrentManager(webRepaintManager);
+				for (Window w : Window.getWindows()) {
+					if (w.isShowing()) {
+						webRepaintManager.addDirtyRegion(w, w.getX(), w.getY(), w.getWidth(), w.getHeight());
 					}
-					webRepaintManager.process();
 				}
+				webRepaintManager.process();
 			}
-		});
+		}
 	}
 
 	public void process() {

@@ -8,14 +8,16 @@
             repaint: 'base.repaint'
         };
         module.provides = {
+        	init: init,
             dispose: dispose,
             get: get,
-            getInput: getInput,
             width: width,
             height: height,
-            focusInput: focusInput,
             getDesktopSize: getDesktopSize,
             processComponentTree: processComponentTree
+        };
+        module.ready = function () {
+        	init();
         };
 
         var canvas;
@@ -26,7 +28,7 @@
         var touchWidth = 0;
         var touchHeight = 0;
 
-        function create() {
+        function init() {
             if (canvas == null) {
                 var dpr = util.dpr;
                 if (api.cfg.rootElement.parent().data("touch-width")) {
@@ -35,14 +37,15 @@
                 if (api.cfg.rootElement.parent().data("touch-height")) {
                 	touchHeight = api.cfg.rootElement.parent().data("touch-height");
                 }
-                api.cfg.rootElement.append('<canvas data-id="canvas" style="display:block; width:' + width() + 'px;height:' + height() + 'px;" width="' + width() * dpr + '" height="' + height() * dpr + '" tabindex="-1"/>');
-                api.cfg.rootElement.append('<input data-id="input-handler" class="ws-input-hidden" type="text" autocorrect="off" autocapitalize="none" autocomplete="off" value="" />');
+                api.cfg.rootElement.append('<canvas role="presentation" aria-hidden="true" data-id="canvas" style="display:block; width:' + width() + 'px;height:' + height() + 'px;" width="' + width() * dpr + '" height="' + height() * dpr + '" tabindex="-1"/>');
+                api.cfg.rootElement.append('<input role="presentation" aria-hidden="true" data-id="input-handler" class="ws-input-hidden" type="text" autocorrect="off" autocapitalize="none" autocomplete="off" value="" />');
                 canvas = api.cfg.rootElement.find('canvas[data-id="canvas"]');
                 canvas.addClass("webswing-canvas");
                 //canvas[0].getContext("2d").scale(dpr, dpr);
                 inputHandler = api.cfg.rootElement.find('input[data-id="input-handler"]');
                 lastRootWidth = width();
                 lastRootHeight = height();
+                api.cfg.rootElement.attr("role", "application");
             }
             if (resizeCheck == null) {
                 resizeCheck = setInterval(function () {
@@ -109,21 +112,9 @@
         
         function get() {
             if (canvas == null || resizeCheck != null) {
-                create();
+                init();
             }
             return canvas[0];
-        }
-        
-        function getInput() {
-            if (inputHandler == null) {
-                create();
-            }
-            return inputHandler[0];
-        }
-        
-        function focusInput() {
-        	var input = getInput();
-        	input.focus({preventScroll: true});
         }
         
         function processComponentTree(componentTree) {

@@ -146,7 +146,7 @@ public class JsLinkServiceImpl implements JsLinkService {
 	private static JavaObjectRefMsg toJavaObjectRef(Object arg) {
 		JavaObjectRefMsg result = new JavaObjectRefMsg();
 		Set<String> methods = new HashSet<String>();
-		for (Method m : arg.getClass().getMethods()) {
+		for (Method m : arg.getClass().getDeclaredMethods()) {
 			methods.add(m.getName());
 		}
 		result.setMethods(new ArrayList<String>(methods));

@@ -1,5 +1,6 @@
 package org.webswing.toolkit;
 
+import java.awt.Container;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
@@ -19,10 +20,11 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.swing.JComponent;
+
 import org.webswing.Constants;
 import org.webswing.component.HtmlPanelImpl;
-import org.webswing.component.HtmlPanelImpl.HtmlWindow;
-import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.dispatch.PaintDispatcher;
 import org.webswing.model.Msg;
 import org.webswing.model.c2s.ActionEventMsgIn;
 import org.webswing.model.c2s.ActionEventMsgIn.ActionEventType;
@@ -39,6 +41,7 @@ import org.webswing.toolkit.api.action.WebWindow;
 import org.webswing.toolkit.api.clipboard.BrowserTransferable;
 import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
+import org.webswing.toolkit.api.component.Dockable;
 import org.webswing.toolkit.api.component.HtmlPanel;
 import org.webswing.toolkit.api.lifecycle.OnBeforeShutdownEvent;
 import org.webswing.toolkit.api.lifecycle.ShutdownReason;
@@ -196,6 +199,7 @@ public class WebswingApiImpl implements WebswingApi {
 			if (action != null) {
 				if (action.getWindowId() != null) {
 					Window w = Util.findWindowById(action.getWindowId());
+					HtmlPanel hp = Util.findHtmlPanelById(action.getWindowId());
 
 					if (w != null && w instanceof WebWindow) {
 						if (action.getEventType() == ActionEventType.init) {
@@ -203,11 +207,11 @@ public class WebswingApiImpl implements WebswingApi {
 						} else {
 							((WebWindow) w).handleWebActionEvent(new WebActionEvent(action.getActionName(), action.getData(), action.getBinaryData()));
 						}
-					} else if (w != null && w instanceof HtmlWindow) {
+					} else if (hp != null) {
 						if (action.getEventType() == ActionEventType.init) {
-							((HtmlWindow) w).getTarget().handleWindowInitialized();
+							hp.handleWindowInitialized();
 						} else {
-							((HtmlWindow) w).getTarget().handleWebActionEvent(new WebActionEvent(action.getActionName(), action.getData(), action.getBinaryData()));
+							hp.handleWebActionEvent(new WebActionEvent(action.getActionName(), action.getData(), action.getBinaryData()));
 						}
 					} else if (action.getEventType() != ActionEventType.init) {
 						// fire the general listeners
@@ -421,7 +425,7 @@ public class WebswingApiImpl implements WebswingApi {
 	@Override
 	public void sendClipboard(WebswingClipboardData content) {
 		if (content != null) {
-			WebPaintDispatcher paintDispatcher = Util.getWebToolkit().getPaintDispatcher();
+			PaintDispatcher paintDispatcher = Util.getWebToolkit().getPaintDispatcher();
 			if (paintDispatcher != null) {
 				paintDispatcher.notifyCopyEvent(content);
 			}
@@ -434,7 +438,7 @@ public class WebswingApiImpl implements WebswingApi {
 		Transferable transferable = clipboard.getContents(null);
 		WebswingClipboardData content = WebClipboard.toWebswingClipboardData(transferable);
 		if (content != null) {
-			WebPaintDispatcher paintDispatcher = Util.getWebToolkit().getPaintDispatcher();
+			PaintDispatcher paintDispatcher = Util.getWebToolkit().getPaintDispatcher();
 			if (paintDispatcher != null) {
 				paintDispatcher.notifyCopyEvent(content);
 			}
@@ -467,24 +471,24 @@ public class WebswingApiImpl implements WebswingApi {
 			return;
 		}
 
-		WebWindowPeer peer = null;
+		String windowId = null;
 		if (webWindow instanceof HtmlPanel) {
-			peer = Util.findWindowPeerByHtmlPanel((HtmlPanel) webWindow);
+			windowId = System.identityHashCode(webWindow) + "";
 		}
 		if (webWindow instanceof Window) {
-			peer = (WebWindowPeer) WebToolkit.targetToPeer(webWindow);
+			windowId = ((WebWindowPeer) WebToolkit.targetToPeer(webWindow)).getGuid();
 		}
 
-		if (peer == null) {
+		if (windowId == null) {
 			sendActionEvent(actionName, data, binaryData);
 			return;
 		}
 
-		sendActionEvent(peer.getGuid(), actionName, data, binaryData);
+		sendActionEvent(windowId, actionName, data, binaryData);
 	}
 
 	private void sendActionEvent(String windowId, String actionName, String data, byte[] binaryData) {
-		WebPaintDispatcher paintDispatcher = Util.getWebToolkit().getPaintDispatcher();
+		PaintDispatcher paintDispatcher = Util.getWebToolkit().getPaintDispatcher();
 		if (paintDispatcher != null) {
 			paintDispatcher.notifyActionEvent(windowId, actionName, data, binaryData);
 		}
@@ -492,9 +496,70 @@ public class WebswingApiImpl implements WebswingApi {
 
 	@Override
 	public HtmlPanel createHtmlPanel() {
-		return new HtmlPanelImpl();
+		if (!isCompositingWindowManager()) {
+			throw new IllegalArgumentException("Not allowed to create HtmlPanel! Enable compositing window manager.");
+		}
+		HtmlPanel htmlPanel = new HtmlPanelImpl();
+		htmlPanel.setFocusable(true);
+		Util.getWebToolkit().getPaintDispatcher().registerHtmlPanel(htmlPanel);
+		return htmlPanel;
 	}
-
+	
+	@Override
+	public HtmlPanel createHtmlPanelForWebContainerComponent(Container webContainer, JComponent componentParentOfHtmlPanel) {
+		if (!isCompositingWindowManager()) {
+			throw new IllegalArgumentException("Not allowed to create HtmlPanel! Enable compositing window manager.");
+		}
+		HtmlPanel htmlPanel = new HtmlPanelImpl(webContainer, componentParentOfHtmlPanel);
+		Util.getWebToolkit().getPaintDispatcher().registerHtmlPanel(htmlPanel);
+		return htmlPanel;
+	}
+	
+	@Override
+	public void registerWebContainer(Container container) {
+		if (!isCompositingWindowManager()) {
+			throw new IllegalArgumentException("Not allowed to create web container! Enable compositing window manager.");
+		}
+		Util.getWebToolkit().getPaintDispatcher().registerWebContainer(container);
+	}
+	
+	@Override
+	public boolean isCompositingWindowManager() {
+		return Util.isCompositingWM();
+	}
+	
+	@Override
+	public boolean isDockingEnabled(Window window) {
+		if (!isCompositingWindowManager()) {
+			return false;
+		}
+		
+		switch (Util.getDockMode()) {
+			case "NONE":
+				return false;
+			case "ALL":
+				return true;
+			case "MARKED":
+				return window instanceof Dockable;
+			default: return false;
+		}
+	}
+	
+	@Override
+	public void toggleWindowDock(Window window) {
+		if (!isDockingEnabled(window)) {
+			throw new IllegalArgumentException("Not allowed to change dock state! Enable compositing window manager and docking mode in config.");
+		}
+		
+		String winId = Util.getPeerForTarget(window) == null ? null : Util.getPeerForTarget(window).getGuid();
+		Util.getWebToolkit().getPaintDispatcher().notifyWindowDockAction(winId);
+	}
+	
+	@Override
+	public boolean isTouchMode() {
+		return Util.isTouchMode();
+	}
+	
 	public class WebswingUrlStateChangeEventImpl implements WebswingUrlStateChangeEvent {
 
 		private String url;

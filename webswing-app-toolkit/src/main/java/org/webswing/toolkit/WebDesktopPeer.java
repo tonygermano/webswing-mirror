@@ -51,12 +51,8 @@ public class WebDesktopPeer implements DesktopPeer {
         sendFile(file,true);
     }
 
-    private void sendFile(File file,boolean preview) {
-        OpenFileResultMsgInternal f= new OpenFileResultMsgInternal();
-        f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-        f.setPreview(preview);
-        f.setFile(file.getAbsoluteFile());
-        Util.getWebToolkit().getPaintDispatcher().sendObject(f);
+    private void sendFile(File file, boolean preview) {
+        Util.getWebToolkit().getPaintDispatcher().notifyFileRequested(file,preview);
     }
 
     @Override

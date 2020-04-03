@@ -14,6 +14,8 @@ import Touch from './webswing-touch'
 import Injector from './webswing-inject'
 import Translate from './webswing-translate'
 import Ping from './webswing-ping'
+import Accessible from './webswing-accessible'
+import FocusManager from './webswing-focus'
 
 export default function Webswing(i18n) {
         "use strict";
@@ -100,8 +102,10 @@ export default function Webswing(i18n) {
             injector.module('jslink', new JsLink());
         	injector.module('clipboard', new Clipboard(util));
             injector.module('playback', new Playback());
-            injector.module('translate', new Translate());
+            injector.module('translate', new Translate(i18n.msg, i18n.langs));
             injector.module('ping', new Ping());
+            injector.module('accessible', new Accessible());
+            injector.module('focusManager', new FocusManager(util));
             var externalObj = {
                 start: 'webswing.start',
                 disconnect: 'webswing.disconnect',
@@ -144,6 +148,7 @@ export default function Webswing(i18n) {
                 disposeIdentity: 'identity.dispose',
                 disposeBase: 'base.dispose',
                 disposeCanvas: 'canvas.dispose',
+                disposeAccessible : 'accessible.dispose',
                 disposeTouch: 'touch.dispose',
                 disposeInput: 'input.dispose',
                 disposeSocket: 'socket.dispose',
@@ -258,6 +263,7 @@ export default function Webswing(i18n) {
                 api.disposeInput();
                 api.disposeTouch();
                 api.disposeCanvas();
+                api.disposeAccessible();
                 api.disposeSocket();
                 api.disposeCopyBar();
                 api.disposePing();

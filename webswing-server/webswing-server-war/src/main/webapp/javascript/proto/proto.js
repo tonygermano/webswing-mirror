@@ -82,6 +82,10 @@ $root.org = (function() {
                          * @property {boolean|null} [directDraw] AppFrameMsgOutProto directDraw
                          * @property {org.webswing.server.model.proto.IActionEventMsgOutProto|null} [actionEvent] AppFrameMsgOutProto actionEvent
                          * @property {boolean|null} [compositingWM] AppFrameMsgOutProto compositingWM
+                         * @property {org.webswing.server.model.proto.IAudioEventMsgOutProto|null} [audioEvent] AppFrameMsgOutProto audioEvent
+                         * @property {org.webswing.server.model.proto.IWindowDockMsgProto|null} [dockAction] AppFrameMsgOutProto dockAction
+                         * @property {org.webswing.server.model.proto.IAccessibilityMsgProto|null} [accessible] AppFrameMsgOutProto accessible
+                         * @property {Array.<org.webswing.server.model.proto.IWindowSwitchMsgProto>|null} [windowSwitchList] AppFrameMsgOutProto windowSwitchList
                          */
 
                         /**
@@ -96,6 +100,7 @@ $root.org = (function() {
                             this.applications = [];
                             this.windows = [];
                             this.componentTree = [];
+                            this.windowSwitchList = [];
                             if (properties)
                                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                                     if (properties[keys[i]] != null)
@@ -279,6 +284,38 @@ $root.org = (function() {
                         AppFrameMsgOutProto.prototype.compositingWM = false;
 
                         /**
+                         * AppFrameMsgOutProto audioEvent.
+                         * @member {org.webswing.server.model.proto.IAudioEventMsgOutProto|null|undefined} audioEvent
+                         * @memberof org.webswing.server.model.proto.AppFrameMsgOutProto
+                         * @instance
+                         */
+                        AppFrameMsgOutProto.prototype.audioEvent = null;
+
+                        /**
+                         * AppFrameMsgOutProto dockAction.
+                         * @member {org.webswing.server.model.proto.IWindowDockMsgProto|null|undefined} dockAction
+                         * @memberof org.webswing.server.model.proto.AppFrameMsgOutProto
+                         * @instance
+                         */
+                        AppFrameMsgOutProto.prototype.dockAction = null;
+
+                        /**
+                         * AppFrameMsgOutProto accessible.
+                         * @member {org.webswing.server.model.proto.IAccessibilityMsgProto|null|undefined} accessible
+                         * @memberof org.webswing.server.model.proto.AppFrameMsgOutProto
+                         * @instance
+                         */
+                        AppFrameMsgOutProto.prototype.accessible = null;
+
+                        /**
+                         * AppFrameMsgOutProto windowSwitchList.
+                         * @member {Array.<org.webswing.server.model.proto.IWindowSwitchMsgProto>} windowSwitchList
+                         * @memberof org.webswing.server.model.proto.AppFrameMsgOutProto
+                         * @instance
+                         */
+                        AppFrameMsgOutProto.prototype.windowSwitchList = $util.emptyArray;
+
+                        /**
                          * Creates a new AppFrameMsgOutProto instance using the specified properties.
                          * @function create
                          * @memberof org.webswing.server.model.proto.AppFrameMsgOutProto
@@ -349,6 +386,15 @@ $root.org = (function() {
                                 $root.org.webswing.server.model.proto.ActionEventMsgOutProto.encode(message.actionEvent, writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
                             if (message.compositingWM != null && message.hasOwnProperty("compositingWM"))
                                 writer.uint32(/* id 22, wireType 0 =*/176).bool(message.compositingWM);
+                            if (message.audioEvent != null && message.hasOwnProperty("audioEvent"))
+                                $root.org.webswing.server.model.proto.AudioEventMsgOutProto.encode(message.audioEvent, writer.uint32(/* id 23, wireType 2 =*/186).fork()).ldelim();
+                            if (message.dockAction != null && message.hasOwnProperty("dockAction"))
+                                $root.org.webswing.server.model.proto.WindowDockMsgProto.encode(message.dockAction, writer.uint32(/* id 24, wireType 2 =*/194).fork()).ldelim();
+                            if (message.accessible != null && message.hasOwnProperty("accessible"))
+                                $root.org.webswing.server.model.proto.AccessibilityMsgProto.encode(message.accessible, writer.uint32(/* id 25, wireType 2 =*/202).fork()).ldelim();
+                            if (message.windowSwitchList != null && message.windowSwitchList.length)
+                                for (var i = 0; i < message.windowSwitchList.length; ++i)
+                                    $root.org.webswing.server.model.proto.WindowSwitchMsgProto.encode(message.windowSwitchList[i], writer.uint32(/* id 26, wireType 2 =*/210).fork()).ldelim();
                             return writer;
                         };
 
@@ -441,6 +487,20 @@ $root.org = (function() {
                                     break;
                                 case 22:
                                     message.compositingWM = reader.bool();
+                                    break;
+                                case 23:
+                                    message.audioEvent = $root.org.webswing.server.model.proto.AudioEventMsgOutProto.decode(reader, reader.uint32());
+                                    break;
+                                case 24:
+                                    message.dockAction = $root.org.webswing.server.model.proto.WindowDockMsgProto.decode(reader, reader.uint32());
+                                    break;
+                                case 25:
+                                    message.accessible = $root.org.webswing.server.model.proto.AccessibilityMsgProto.decode(reader, reader.uint32());
+                                    break;
+                                case 26:
+                                    if (!(message.windowSwitchList && message.windowSwitchList.length))
+                                        message.windowSwitchList = [];
+                                    message.windowSwitchList.push($root.org.webswing.server.model.proto.WindowSwitchMsgProto.decode(reader, reader.uint32()));
                                     break;
                                 default:
                                     reader.skipType(tag & 7);
@@ -613,6 +673,31 @@ $root.org = (function() {
                             }
                             if (object.compositingWM != null)
                                 message.compositingWM = Boolean(object.compositingWM);
+                            if (object.audioEvent != null) {
+                                if (typeof object.audioEvent !== "object")
+                                    throw TypeError(".org.webswing.server.model.proto.AppFrameMsgOutProto.audioEvent: object expected");
+                                message.audioEvent = $root.org.webswing.server.model.proto.AudioEventMsgOutProto.fromObject(object.audioEvent);
+                            }
+                            if (object.dockAction != null) {
+                                if (typeof object.dockAction !== "object")
+                                    throw TypeError(".org.webswing.server.model.proto.AppFrameMsgOutProto.dockAction: object expected");
+                                message.dockAction = $root.org.webswing.server.model.proto.WindowDockMsgProto.fromObject(object.dockAction);
+                            }
+                            if (object.accessible != null) {
+                                if (typeof object.accessible !== "object")
+                                    throw TypeError(".org.webswing.server.model.proto.AppFrameMsgOutProto.accessible: object expected");
+                                message.accessible = $root.org.webswing.server.model.proto.AccessibilityMsgProto.fromObject(object.accessible);
+                            }
+                            if (object.windowSwitchList) {
+                                if (!Array.isArray(object.windowSwitchList))
+                                    throw TypeError(".org.webswing.server.model.proto.AppFrameMsgOutProto.windowSwitchList: array expected");
+                                message.windowSwitchList = [];
+                                for (var i = 0; i < object.windowSwitchList.length; ++i) {
+                                    if (typeof object.windowSwitchList[i] !== "object")
+                                        throw TypeError(".org.webswing.server.model.proto.AppFrameMsgOutProto.windowSwitchList: object expected");
+                                    message.windowSwitchList[i] = $root.org.webswing.server.model.proto.WindowSwitchMsgProto.fromObject(object.windowSwitchList[i]);
+                                }
+                            }
                             return message;
                         };
 
@@ -633,6 +718,7 @@ $root.org = (function() {
                                 object.applications = [];
                                 object.windows = [];
                                 object.componentTree = [];
+                                object.windowSwitchList = [];
                             }
                             if (options.defaults) {
                                 object.linkAction = null;
@@ -654,6 +740,9 @@ $root.org = (function() {
                                 object.directDraw = false;
                                 object.actionEvent = null;
                                 object.compositingWM = false;
+                                object.audioEvent = null;
+                                object.dockAction = null;
+                                object.accessible = null;
                             }
                             if (message.applications && message.applications.length) {
                                 object.applications = [];
@@ -708,6 +797,17 @@ $root.org = (function() {
                                 object.actionEvent = $root.org.webswing.server.model.proto.ActionEventMsgOutProto.toObject(message.actionEvent, options);
                             if (message.compositingWM != null && message.hasOwnProperty("compositingWM"))
                                 object.compositingWM = message.compositingWM;
+                            if (message.audioEvent != null && message.hasOwnProperty("audioEvent"))
+                                object.audioEvent = $root.org.webswing.server.model.proto.AudioEventMsgOutProto.toObject(message.audioEvent, options);
+                            if (message.dockAction != null && message.hasOwnProperty("dockAction"))
+                                object.dockAction = $root.org.webswing.server.model.proto.WindowDockMsgProto.toObject(message.dockAction, options);
+                            if (message.accessible != null && message.hasOwnProperty("accessible"))
+                                object.accessible = $root.org.webswing.server.model.proto.AccessibilityMsgProto.toObject(message.accessible, options);
+                            if (message.windowSwitchList && message.windowSwitchList.length) {
+                                object.windowSwitchList = [];
+                                for (var j = 0; j < message.windowSwitchList.length; ++j)
+                                    object.windowSwitchList[j] = $root.org.webswing.server.model.proto.WindowSwitchMsgProto.toObject(message.windowSwitchList[j], options);
+                            }
                             return object;
                         };
 
@@ -723,6 +823,927 @@ $root.org = (function() {
                         };
 
                         return AppFrameMsgOutProto;
+                    })();
+
+                    proto.AccessibilityMsgProto = (function() {
+
+                        /**
+                         * Properties of an AccessibilityMsgProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @interface IAccessibilityMsgProto
+                         * @property {string|null} [id] AccessibilityMsgProto id
+                         * @property {string|null} [role] AccessibilityMsgProto role
+                         * @property {string|null} [text] AccessibilityMsgProto text
+                         * @property {string|null} [tooltip] AccessibilityMsgProto tooltip
+                         * @property {string|null} [value] AccessibilityMsgProto value
+                         * @property {string|null} [description] AccessibilityMsgProto description
+                         * @property {string|null} [columnheader] AccessibilityMsgProto columnheader
+                         * @property {boolean|null} [password] AccessibilityMsgProto password
+                         * @property {boolean|null} [toggle] AccessibilityMsgProto toggle
+                         * @property {number|null} [selstart] AccessibilityMsgProto selstart
+                         * @property {number|null} [selend] AccessibilityMsgProto selend
+                         * @property {number|null} [rowheight] AccessibilityMsgProto rowheight
+                         * @property {number|null} [rows] AccessibilityMsgProto rows
+                         * @property {number|null} [size] AccessibilityMsgProto size
+                         * @property {number|null} [position] AccessibilityMsgProto position
+                         * @property {number|null} [level] AccessibilityMsgProto level
+                         * @property {number|null} [colindex] AccessibilityMsgProto colindex
+                         * @property {number|null} [rowindex] AccessibilityMsgProto rowindex
+                         * @property {number|null} [colcount] AccessibilityMsgProto colcount
+                         * @property {number|null} [rowcount] AccessibilityMsgProto rowcount
+                         * @property {Array.<string>|null} [states] AccessibilityMsgProto states
+                         * @property {number|null} [min] AccessibilityMsgProto min
+                         * @property {number|null} [max] AccessibilityMsgProto max
+                         * @property {number|null} [val] AccessibilityMsgProto val
+                         * @property {number|null} [screenX] AccessibilityMsgProto screenX
+                         * @property {number|null} [screenY] AccessibilityMsgProto screenY
+                         * @property {number|null} [width] AccessibilityMsgProto width
+                         * @property {number|null} [height] AccessibilityMsgProto height
+                         * @property {Array.<org.webswing.server.model.proto.IAccessibilityHierarchyMsgProto>|null} [hierarchy] AccessibilityMsgProto hierarchy
+                         */
+
+                        /**
+                         * Constructs a new AccessibilityMsgProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @classdesc Represents an AccessibilityMsgProto.
+                         * @implements IAccessibilityMsgProto
+                         * @constructor
+                         * @param {org.webswing.server.model.proto.IAccessibilityMsgProto=} [properties] Properties to set
+                         */
+                        function AccessibilityMsgProto(properties) {
+                            this.states = [];
+                            this.hierarchy = [];
+                            if (properties)
+                                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                                    if (properties[keys[i]] != null)
+                                        this[keys[i]] = properties[keys[i]];
+                        }
+
+                        /**
+                         * AccessibilityMsgProto id.
+                         * @member {string} id
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.id = "";
+
+                        /**
+                         * AccessibilityMsgProto role.
+                         * @member {string} role
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.role = "";
+
+                        /**
+                         * AccessibilityMsgProto text.
+                         * @member {string} text
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.text = "";
+
+                        /**
+                         * AccessibilityMsgProto tooltip.
+                         * @member {string} tooltip
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.tooltip = "";
+
+                        /**
+                         * AccessibilityMsgProto value.
+                         * @member {string} value
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.value = "";
+
+                        /**
+                         * AccessibilityMsgProto description.
+                         * @member {string} description
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.description = "";
+
+                        /**
+                         * AccessibilityMsgProto columnheader.
+                         * @member {string} columnheader
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.columnheader = "";
+
+                        /**
+                         * AccessibilityMsgProto password.
+                         * @member {boolean} password
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.password = false;
+
+                        /**
+                         * AccessibilityMsgProto toggle.
+                         * @member {boolean} toggle
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.toggle = false;
+
+                        /**
+                         * AccessibilityMsgProto selstart.
+                         * @member {number} selstart
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.selstart = 0;
+
+                        /**
+                         * AccessibilityMsgProto selend.
+                         * @member {number} selend
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.selend = 0;
+
+                        /**
+                         * AccessibilityMsgProto rowheight.
+                         * @member {number} rowheight
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.rowheight = 0;
+
+                        /**
+                         * AccessibilityMsgProto rows.
+                         * @member {number} rows
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.rows = 0;
+
+                        /**
+                         * AccessibilityMsgProto size.
+                         * @member {number} size
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.size = 0;
+
+                        /**
+                         * AccessibilityMsgProto position.
+                         * @member {number} position
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.position = 0;
+
+                        /**
+                         * AccessibilityMsgProto level.
+                         * @member {number} level
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.level = 0;
+
+                        /**
+                         * AccessibilityMsgProto colindex.
+                         * @member {number} colindex
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.colindex = 0;
+
+                        /**
+                         * AccessibilityMsgProto rowindex.
+                         * @member {number} rowindex
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.rowindex = 0;
+
+                        /**
+                         * AccessibilityMsgProto colcount.
+                         * @member {number} colcount
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.colcount = 0;
+
+                        /**
+                         * AccessibilityMsgProto rowcount.
+                         * @member {number} rowcount
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.rowcount = 0;
+
+                        /**
+                         * AccessibilityMsgProto states.
+                         * @member {Array.<string>} states
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.states = $util.emptyArray;
+
+                        /**
+                         * AccessibilityMsgProto min.
+                         * @member {number} min
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.min = 0;
+
+                        /**
+                         * AccessibilityMsgProto max.
+                         * @member {number} max
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.max = 0;
+
+                        /**
+                         * AccessibilityMsgProto val.
+                         * @member {number} val
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.val = 0;
+
+                        /**
+                         * AccessibilityMsgProto screenX.
+                         * @member {number} screenX
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.screenX = 0;
+
+                        /**
+                         * AccessibilityMsgProto screenY.
+                         * @member {number} screenY
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.screenY = 0;
+
+                        /**
+                         * AccessibilityMsgProto width.
+                         * @member {number} width
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.width = 0;
+
+                        /**
+                         * AccessibilityMsgProto height.
+                         * @member {number} height
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.height = 0;
+
+                        /**
+                         * AccessibilityMsgProto hierarchy.
+                         * @member {Array.<org.webswing.server.model.proto.IAccessibilityHierarchyMsgProto>} hierarchy
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         */
+                        AccessibilityMsgProto.prototype.hierarchy = $util.emptyArray;
+
+                        /**
+                         * Creates a new AccessibilityMsgProto instance using the specified properties.
+                         * @function create
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IAccessibilityMsgProto=} [properties] Properties to set
+                         * @returns {org.webswing.server.model.proto.AccessibilityMsgProto} AccessibilityMsgProto instance
+                         */
+                        AccessibilityMsgProto.create = function create(properties) {
+                            return new AccessibilityMsgProto(properties);
+                        };
+
+                        /**
+                         * Encodes the specified AccessibilityMsgProto message. Does not implicitly {@link org.webswing.server.model.proto.AccessibilityMsgProto.verify|verify} messages.
+                         * @function encode
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IAccessibilityMsgProto} message AccessibilityMsgProto message or plain object to encode
+                         * @param {$protobuf.Writer} [writer] Writer to encode to
+                         * @returns {$protobuf.Writer} Writer
+                         */
+                        AccessibilityMsgProto.encode = function encode(message, writer) {
+                            if (!writer)
+                                writer = $Writer.create();
+                            if (message.id != null && message.hasOwnProperty("id"))
+                                writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+                            if (message.role != null && message.hasOwnProperty("role"))
+                                writer.uint32(/* id 2, wireType 2 =*/18).string(message.role);
+                            if (message.text != null && message.hasOwnProperty("text"))
+                                writer.uint32(/* id 3, wireType 2 =*/26).string(message.text);
+                            if (message.tooltip != null && message.hasOwnProperty("tooltip"))
+                                writer.uint32(/* id 4, wireType 2 =*/34).string(message.tooltip);
+                            if (message.value != null && message.hasOwnProperty("value"))
+                                writer.uint32(/* id 5, wireType 2 =*/42).string(message.value);
+                            if (message.description != null && message.hasOwnProperty("description"))
+                                writer.uint32(/* id 6, wireType 2 =*/50).string(message.description);
+                            if (message.columnheader != null && message.hasOwnProperty("columnheader"))
+                                writer.uint32(/* id 7, wireType 2 =*/58).string(message.columnheader);
+                            if (message.password != null && message.hasOwnProperty("password"))
+                                writer.uint32(/* id 8, wireType 0 =*/64).bool(message.password);
+                            if (message.toggle != null && message.hasOwnProperty("toggle"))
+                                writer.uint32(/* id 9, wireType 0 =*/72).bool(message.toggle);
+                            if (message.selstart != null && message.hasOwnProperty("selstart"))
+                                writer.uint32(/* id 10, wireType 0 =*/80).sint32(message.selstart);
+                            if (message.selend != null && message.hasOwnProperty("selend"))
+                                writer.uint32(/* id 11, wireType 0 =*/88).sint32(message.selend);
+                            if (message.rowheight != null && message.hasOwnProperty("rowheight"))
+                                writer.uint32(/* id 12, wireType 0 =*/96).sint32(message.rowheight);
+                            if (message.rows != null && message.hasOwnProperty("rows"))
+                                writer.uint32(/* id 13, wireType 0 =*/104).sint32(message.rows);
+                            if (message.size != null && message.hasOwnProperty("size"))
+                                writer.uint32(/* id 14, wireType 0 =*/112).sint32(message.size);
+                            if (message.position != null && message.hasOwnProperty("position"))
+                                writer.uint32(/* id 15, wireType 0 =*/120).sint32(message.position);
+                            if (message.level != null && message.hasOwnProperty("level"))
+                                writer.uint32(/* id 16, wireType 0 =*/128).sint32(message.level);
+                            if (message.colindex != null && message.hasOwnProperty("colindex"))
+                                writer.uint32(/* id 17, wireType 0 =*/136).sint32(message.colindex);
+                            if (message.rowindex != null && message.hasOwnProperty("rowindex"))
+                                writer.uint32(/* id 18, wireType 0 =*/144).sint32(message.rowindex);
+                            if (message.colcount != null && message.hasOwnProperty("colcount"))
+                                writer.uint32(/* id 19, wireType 0 =*/152).sint32(message.colcount);
+                            if (message.rowcount != null && message.hasOwnProperty("rowcount"))
+                                writer.uint32(/* id 20, wireType 0 =*/160).sint32(message.rowcount);
+                            if (message.states != null && message.states.length)
+                                for (var i = 0; i < message.states.length; ++i)
+                                    writer.uint32(/* id 21, wireType 2 =*/170).string(message.states[i]);
+                            if (message.min != null && message.hasOwnProperty("min"))
+                                writer.uint32(/* id 22, wireType 0 =*/176).sint32(message.min);
+                            if (message.max != null && message.hasOwnProperty("max"))
+                                writer.uint32(/* id 23, wireType 0 =*/184).sint32(message.max);
+                            if (message.val != null && message.hasOwnProperty("val"))
+                                writer.uint32(/* id 24, wireType 0 =*/192).sint32(message.val);
+                            if (message.screenX != null && message.hasOwnProperty("screenX"))
+                                writer.uint32(/* id 25, wireType 0 =*/200).sint32(message.screenX);
+                            if (message.screenY != null && message.hasOwnProperty("screenY"))
+                                writer.uint32(/* id 26, wireType 0 =*/208).sint32(message.screenY);
+                            if (message.width != null && message.hasOwnProperty("width"))
+                                writer.uint32(/* id 27, wireType 0 =*/216).sint32(message.width);
+                            if (message.height != null && message.hasOwnProperty("height"))
+                                writer.uint32(/* id 28, wireType 0 =*/224).sint32(message.height);
+                            if (message.hierarchy != null && message.hierarchy.length)
+                                for (var i = 0; i < message.hierarchy.length; ++i)
+                                    $root.org.webswing.server.model.proto.AccessibilityHierarchyMsgProto.encode(message.hierarchy[i], writer.uint32(/* id 29, wireType 2 =*/234).fork()).ldelim();
+                            return writer;
+                        };
+
+                        /**
+                         * Decodes an AccessibilityMsgProto message from the specified reader or buffer.
+                         * @function decode
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @static
+                         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                         * @param {number} [length] Message length if known beforehand
+                         * @returns {org.webswing.server.model.proto.AccessibilityMsgProto} AccessibilityMsgProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        AccessibilityMsgProto.decode = function decode(reader, length) {
+                            if (!(reader instanceof $Reader))
+                                reader = $Reader.create(reader);
+                            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.org.webswing.server.model.proto.AccessibilityMsgProto();
+                            while (reader.pos < end) {
+                                var tag = reader.uint32();
+                                switch (tag >>> 3) {
+                                case 1:
+                                    message.id = reader.string();
+                                    break;
+                                case 2:
+                                    message.role = reader.string();
+                                    break;
+                                case 3:
+                                    message.text = reader.string();
+                                    break;
+                                case 4:
+                                    message.tooltip = reader.string();
+                                    break;
+                                case 5:
+                                    message.value = reader.string();
+                                    break;
+                                case 6:
+                                    message.description = reader.string();
+                                    break;
+                                case 7:
+                                    message.columnheader = reader.string();
+                                    break;
+                                case 8:
+                                    message.password = reader.bool();
+                                    break;
+                                case 9:
+                                    message.toggle = reader.bool();
+                                    break;
+                                case 10:
+                                    message.selstart = reader.sint32();
+                                    break;
+                                case 11:
+                                    message.selend = reader.sint32();
+                                    break;
+                                case 12:
+                                    message.rowheight = reader.sint32();
+                                    break;
+                                case 13:
+                                    message.rows = reader.sint32();
+                                    break;
+                                case 14:
+                                    message.size = reader.sint32();
+                                    break;
+                                case 15:
+                                    message.position = reader.sint32();
+                                    break;
+                                case 16:
+                                    message.level = reader.sint32();
+                                    break;
+                                case 17:
+                                    message.colindex = reader.sint32();
+                                    break;
+                                case 18:
+                                    message.rowindex = reader.sint32();
+                                    break;
+                                case 19:
+                                    message.colcount = reader.sint32();
+                                    break;
+                                case 20:
+                                    message.rowcount = reader.sint32();
+                                    break;
+                                case 21:
+                                    if (!(message.states && message.states.length))
+                                        message.states = [];
+                                    message.states.push(reader.string());
+                                    break;
+                                case 22:
+                                    message.min = reader.sint32();
+                                    break;
+                                case 23:
+                                    message.max = reader.sint32();
+                                    break;
+                                case 24:
+                                    message.val = reader.sint32();
+                                    break;
+                                case 25:
+                                    message.screenX = reader.sint32();
+                                    break;
+                                case 26:
+                                    message.screenY = reader.sint32();
+                                    break;
+                                case 27:
+                                    message.width = reader.sint32();
+                                    break;
+                                case 28:
+                                    message.height = reader.sint32();
+                                    break;
+                                case 29:
+                                    if (!(message.hierarchy && message.hierarchy.length))
+                                        message.hierarchy = [];
+                                    message.hierarchy.push($root.org.webswing.server.model.proto.AccessibilityHierarchyMsgProto.decode(reader, reader.uint32()));
+                                    break;
+                                default:
+                                    reader.skipType(tag & 7);
+                                    break;
+                                }
+                            }
+                            return message;
+                        };
+
+                        /**
+                         * Creates an AccessibilityMsgProto message from a plain object. Also converts values to their respective internal types.
+                         * @function fromObject
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @static
+                         * @param {Object.<string,*>} object Plain object
+                         * @returns {org.webswing.server.model.proto.AccessibilityMsgProto} AccessibilityMsgProto
+                         */
+                        AccessibilityMsgProto.fromObject = function fromObject(object) {
+                            if (object instanceof $root.org.webswing.server.model.proto.AccessibilityMsgProto)
+                                return object;
+                            var message = new $root.org.webswing.server.model.proto.AccessibilityMsgProto();
+                            if (object.id != null)
+                                message.id = String(object.id);
+                            if (object.role != null)
+                                message.role = String(object.role);
+                            if (object.text != null)
+                                message.text = String(object.text);
+                            if (object.tooltip != null)
+                                message.tooltip = String(object.tooltip);
+                            if (object.value != null)
+                                message.value = String(object.value);
+                            if (object.description != null)
+                                message.description = String(object.description);
+                            if (object.columnheader != null)
+                                message.columnheader = String(object.columnheader);
+                            if (object.password != null)
+                                message.password = Boolean(object.password);
+                            if (object.toggle != null)
+                                message.toggle = Boolean(object.toggle);
+                            if (object.selstart != null)
+                                message.selstart = object.selstart | 0;
+                            if (object.selend != null)
+                                message.selend = object.selend | 0;
+                            if (object.rowheight != null)
+                                message.rowheight = object.rowheight | 0;
+                            if (object.rows != null)
+                                message.rows = object.rows | 0;
+                            if (object.size != null)
+                                message.size = object.size | 0;
+                            if (object.position != null)
+                                message.position = object.position | 0;
+                            if (object.level != null)
+                                message.level = object.level | 0;
+                            if (object.colindex != null)
+                                message.colindex = object.colindex | 0;
+                            if (object.rowindex != null)
+                                message.rowindex = object.rowindex | 0;
+                            if (object.colcount != null)
+                                message.colcount = object.colcount | 0;
+                            if (object.rowcount != null)
+                                message.rowcount = object.rowcount | 0;
+                            if (object.states) {
+                                if (!Array.isArray(object.states))
+                                    throw TypeError(".org.webswing.server.model.proto.AccessibilityMsgProto.states: array expected");
+                                message.states = [];
+                                for (var i = 0; i < object.states.length; ++i)
+                                    message.states[i] = String(object.states[i]);
+                            }
+                            if (object.min != null)
+                                message.min = object.min | 0;
+                            if (object.max != null)
+                                message.max = object.max | 0;
+                            if (object.val != null)
+                                message.val = object.val | 0;
+                            if (object.screenX != null)
+                                message.screenX = object.screenX | 0;
+                            if (object.screenY != null)
+                                message.screenY = object.screenY | 0;
+                            if (object.width != null)
+                                message.width = object.width | 0;
+                            if (object.height != null)
+                                message.height = object.height | 0;
+                            if (object.hierarchy) {
+                                if (!Array.isArray(object.hierarchy))
+                                    throw TypeError(".org.webswing.server.model.proto.AccessibilityMsgProto.hierarchy: array expected");
+                                message.hierarchy = [];
+                                for (var i = 0; i < object.hierarchy.length; ++i) {
+                                    if (typeof object.hierarchy[i] !== "object")
+                                        throw TypeError(".org.webswing.server.model.proto.AccessibilityMsgProto.hierarchy: object expected");
+                                    message.hierarchy[i] = $root.org.webswing.server.model.proto.AccessibilityHierarchyMsgProto.fromObject(object.hierarchy[i]);
+                                }
+                            }
+                            return message;
+                        };
+
+                        /**
+                         * Creates a plain object from an AccessibilityMsgProto message. Also converts values to other types if specified.
+                         * @function toObject
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.AccessibilityMsgProto} message AccessibilityMsgProto
+                         * @param {$protobuf.IConversionOptions} [options] Conversion options
+                         * @returns {Object.<string,*>} Plain object
+                         */
+                        AccessibilityMsgProto.toObject = function toObject(message, options) {
+                            if (!options)
+                                options = {};
+                            var object = {};
+                            if (options.arrays || options.defaults) {
+                                object.states = [];
+                                object.hierarchy = [];
+                            }
+                            if (options.defaults) {
+                                object.id = "";
+                                object.role = "";
+                                object.text = "";
+                                object.tooltip = "";
+                                object.value = "";
+                                object.description = "";
+                                object.columnheader = "";
+                                object.password = false;
+                                object.toggle = false;
+                                object.selstart = 0;
+                                object.selend = 0;
+                                object.rowheight = 0;
+                                object.rows = 0;
+                                object.size = 0;
+                                object.position = 0;
+                                object.level = 0;
+                                object.colindex = 0;
+                                object.rowindex = 0;
+                                object.colcount = 0;
+                                object.rowcount = 0;
+                                object.min = 0;
+                                object.max = 0;
+                                object.val = 0;
+                                object.screenX = 0;
+                                object.screenY = 0;
+                                object.width = 0;
+                                object.height = 0;
+                            }
+                            if (message.id != null && message.hasOwnProperty("id"))
+                                object.id = message.id;
+                            if (message.role != null && message.hasOwnProperty("role"))
+                                object.role = message.role;
+                            if (message.text != null && message.hasOwnProperty("text"))
+                                object.text = message.text;
+                            if (message.tooltip != null && message.hasOwnProperty("tooltip"))
+                                object.tooltip = message.tooltip;
+                            if (message.value != null && message.hasOwnProperty("value"))
+                                object.value = message.value;
+                            if (message.description != null && message.hasOwnProperty("description"))
+                                object.description = message.description;
+                            if (message.columnheader != null && message.hasOwnProperty("columnheader"))
+                                object.columnheader = message.columnheader;
+                            if (message.password != null && message.hasOwnProperty("password"))
+                                object.password = message.password;
+                            if (message.toggle != null && message.hasOwnProperty("toggle"))
+                                object.toggle = message.toggle;
+                            if (message.selstart != null && message.hasOwnProperty("selstart"))
+                                object.selstart = message.selstart;
+                            if (message.selend != null && message.hasOwnProperty("selend"))
+                                object.selend = message.selend;
+                            if (message.rowheight != null && message.hasOwnProperty("rowheight"))
+                                object.rowheight = message.rowheight;
+                            if (message.rows != null && message.hasOwnProperty("rows"))
+                                object.rows = message.rows;
+                            if (message.size != null && message.hasOwnProperty("size"))
+                                object.size = message.size;
+                            if (message.position != null && message.hasOwnProperty("position"))
+                                object.position = message.position;
+                            if (message.level != null && message.hasOwnProperty("level"))
+                                object.level = message.level;
+                            if (message.colindex != null && message.hasOwnProperty("colindex"))
+                                object.colindex = message.colindex;
+                            if (message.rowindex != null && message.hasOwnProperty("rowindex"))
+                                object.rowindex = message.rowindex;
+                            if (message.colcount != null && message.hasOwnProperty("colcount"))
+                                object.colcount = message.colcount;
+                            if (message.rowcount != null && message.hasOwnProperty("rowcount"))
+                                object.rowcount = message.rowcount;
+                            if (message.states && message.states.length) {
+                                object.states = [];
+                                for (var j = 0; j < message.states.length; ++j)
+                                    object.states[j] = message.states[j];
+                            }
+                            if (message.min != null && message.hasOwnProperty("min"))
+                                object.min = message.min;
+                            if (message.max != null && message.hasOwnProperty("max"))
+                                object.max = message.max;
+                            if (message.val != null && message.hasOwnProperty("val"))
+                                object.val = message.val;
+                            if (message.screenX != null && message.hasOwnProperty("screenX"))
+                                object.screenX = message.screenX;
+                            if (message.screenY != null && message.hasOwnProperty("screenY"))
+                                object.screenY = message.screenY;
+                            if (message.width != null && message.hasOwnProperty("width"))
+                                object.width = message.width;
+                            if (message.height != null && message.hasOwnProperty("height"))
+                                object.height = message.height;
+                            if (message.hierarchy && message.hierarchy.length) {
+                                object.hierarchy = [];
+                                for (var j = 0; j < message.hierarchy.length; ++j)
+                                    object.hierarchy[j] = $root.org.webswing.server.model.proto.AccessibilityHierarchyMsgProto.toObject(message.hierarchy[j], options);
+                            }
+                            return object;
+                        };
+
+                        /**
+                         * Converts this AccessibilityMsgProto to JSON.
+                         * @function toJSON
+                         * @memberof org.webswing.server.model.proto.AccessibilityMsgProto
+                         * @instance
+                         * @returns {Object.<string,*>} JSON object
+                         */
+                        AccessibilityMsgProto.prototype.toJSON = function toJSON() {
+                            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                        };
+
+                        return AccessibilityMsgProto;
+                    })();
+
+                    proto.AccessibilityHierarchyMsgProto = (function() {
+
+                        /**
+                         * Properties of an AccessibilityHierarchyMsgProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @interface IAccessibilityHierarchyMsgProto
+                         * @property {string|null} [id] AccessibilityHierarchyMsgProto id
+                         * @property {string|null} [role] AccessibilityHierarchyMsgProto role
+                         * @property {string|null} [text] AccessibilityHierarchyMsgProto text
+                         * @property {number|null} [position] AccessibilityHierarchyMsgProto position
+                         * @property {number|null} [size] AccessibilityHierarchyMsgProto size
+                         */
+
+                        /**
+                         * Constructs a new AccessibilityHierarchyMsgProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @classdesc Represents an AccessibilityHierarchyMsgProto.
+                         * @implements IAccessibilityHierarchyMsgProto
+                         * @constructor
+                         * @param {org.webswing.server.model.proto.IAccessibilityHierarchyMsgProto=} [properties] Properties to set
+                         */
+                        function AccessibilityHierarchyMsgProto(properties) {
+                            if (properties)
+                                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                                    if (properties[keys[i]] != null)
+                                        this[keys[i]] = properties[keys[i]];
+                        }
+
+                        /**
+                         * AccessibilityHierarchyMsgProto id.
+                         * @member {string} id
+                         * @memberof org.webswing.server.model.proto.AccessibilityHierarchyMsgProto
+                         * @instance
+                         */
+                        AccessibilityHierarchyMsgProto.prototype.id = "";
+
+                        /**
+                         * AccessibilityHierarchyMsgProto role.
+                         * @member {string} role
+                         * @memberof org.webswing.server.model.proto.AccessibilityHierarchyMsgProto
+                         * @instance
+                         */
+                        AccessibilityHierarchyMsgProto.prototype.role = "";
+
+                        /**
+                         * AccessibilityHierarchyMsgProto text.
+                         * @member {string} text
+                         * @memberof org.webswing.server.model.proto.AccessibilityHierarchyMsgProto
+                         * @instance
+                         */
+                        AccessibilityHierarchyMsgProto.prototype.text = "";
+
+                        /**
+                         * AccessibilityHierarchyMsgProto position.
+                         * @member {number} position
+                         * @memberof org.webswing.server.model.proto.AccessibilityHierarchyMsgProto
+                         * @instance
+                         */
+                        AccessibilityHierarchyMsgProto.prototype.position = 0;
+
+                        /**
+                         * AccessibilityHierarchyMsgProto size.
+                         * @member {number} size
+                         * @memberof org.webswing.server.model.proto.AccessibilityHierarchyMsgProto
+                         * @instance
+                         */
+                        AccessibilityHierarchyMsgProto.prototype.size = 0;
+
+                        /**
+                         * Creates a new AccessibilityHierarchyMsgProto instance using the specified properties.
+                         * @function create
+                         * @memberof org.webswing.server.model.proto.AccessibilityHierarchyMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IAccessibilityHierarchyMsgProto=} [properties] Properties to set
+                         * @returns {org.webswing.server.model.proto.AccessibilityHierarchyMsgProto} AccessibilityHierarchyMsgProto instance
+                         */
+                        AccessibilityHierarchyMsgProto.create = function create(properties) {
+                            return new AccessibilityHierarchyMsgProto(properties);
+                        };
+
+                        /**
+                         * Encodes the specified AccessibilityHierarchyMsgProto message. Does not implicitly {@link org.webswing.server.model.proto.AccessibilityHierarchyMsgProto.verify|verify} messages.
+                         * @function encode
+                         * @memberof org.webswing.server.model.proto.AccessibilityHierarchyMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IAccessibilityHierarchyMsgProto} message AccessibilityHierarchyMsgProto message or plain object to encode
+                         * @param {$protobuf.Writer} [writer] Writer to encode to
+                         * @returns {$protobuf.Writer} Writer
+                         */
+                        AccessibilityHierarchyMsgProto.encode = function encode(message, writer) {
+                            if (!writer)
+                                writer = $Writer.create();
+                            if (message.id != null && message.hasOwnProperty("id"))
+                                writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+                            if (message.role != null && message.hasOwnProperty("role"))
+                                writer.uint32(/* id 2, wireType 2 =*/18).string(message.role);
+                            if (message.text != null && message.hasOwnProperty("text"))
+                                writer.uint32(/* id 3, wireType 2 =*/26).string(message.text);
+                            if (message.position != null && message.hasOwnProperty("position"))
+                                writer.uint32(/* id 4, wireType 0 =*/32).sint32(message.position);
+                            if (message.size != null && message.hasOwnProperty("size"))
+                                writer.uint32(/* id 5, wireType 0 =*/40).sint32(message.size);
+                            return writer;
+                        };
+
+                        /**
+                         * Decodes an AccessibilityHierarchyMsgProto message from the specified reader or buffer.
+                         * @function decode
+                         * @memberof org.webswing.server.model.proto.AccessibilityHierarchyMsgProto
+                         * @static
+                         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                         * @param {number} [length] Message length if known beforehand
+                         * @returns {org.webswing.server.model.proto.AccessibilityHierarchyMsgProto} AccessibilityHierarchyMsgProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        AccessibilityHierarchyMsgProto.decode = function decode(reader, length) {
+                            if (!(reader instanceof $Reader))
+                                reader = $Reader.create(reader);
+                            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.org.webswing.server.model.proto.AccessibilityHierarchyMsgProto();
+                            while (reader.pos < end) {
+                                var tag = reader.uint32();
+                                switch (tag >>> 3) {
+                                case 1:
+                                    message.id = reader.string();
+                                    break;
+                                case 2:
+                                    message.role = reader.string();
+                                    break;
+                                case 3:
+                                    message.text = reader.string();
+                                    break;
+                                case 4:
+                                    message.position = reader.sint32();
+                                    break;
+                                case 5:
+                                    message.size = reader.sint32();
+                                    break;
+                                default:
+                                    reader.skipType(tag & 7);
+                                    break;
+                                }
+                            }
+                            return message;
+                        };
+
+                        /**
+                         * Creates an AccessibilityHierarchyMsgProto message from a plain object. Also converts values to their respective internal types.
+                         * @function fromObject
+                         * @memberof org.webswing.server.model.proto.AccessibilityHierarchyMsgProto
+                         * @static
+                         * @param {Object.<string,*>} object Plain object
+                         * @returns {org.webswing.server.model.proto.AccessibilityHierarchyMsgProto} AccessibilityHierarchyMsgProto
+                         */
+                        AccessibilityHierarchyMsgProto.fromObject = function fromObject(object) {
+                            if (object instanceof $root.org.webswing.server.model.proto.AccessibilityHierarchyMsgProto)
+                                return object;
+                            var message = new $root.org.webswing.server.model.proto.AccessibilityHierarchyMsgProto();
+                            if (object.id != null)
+                                message.id = String(object.id);
+                            if (object.role != null)
+                                message.role = String(object.role);
+                            if (object.text != null)
+                                message.text = String(object.text);
+                            if (object.position != null)
+                                message.position = object.position | 0;
+                            if (object.size != null)
+                                message.size = object.size | 0;
+                            return message;
+                        };
+
+                        /**
+                         * Creates a plain object from an AccessibilityHierarchyMsgProto message. Also converts values to other types if specified.
+                         * @function toObject
+                         * @memberof org.webswing.server.model.proto.AccessibilityHierarchyMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.AccessibilityHierarchyMsgProto} message AccessibilityHierarchyMsgProto
+                         * @param {$protobuf.IConversionOptions} [options] Conversion options
+                         * @returns {Object.<string,*>} Plain object
+                         */
+                        AccessibilityHierarchyMsgProto.toObject = function toObject(message, options) {
+                            if (!options)
+                                options = {};
+                            var object = {};
+                            if (options.defaults) {
+                                object.id = "";
+                                object.role = "";
+                                object.text = "";
+                                object.position = 0;
+                                object.size = 0;
+                            }
+                            if (message.id != null && message.hasOwnProperty("id"))
+                                object.id = message.id;
+                            if (message.role != null && message.hasOwnProperty("role"))
+                                object.role = message.role;
+                            if (message.text != null && message.hasOwnProperty("text"))
+                                object.text = message.text;
+                            if (message.position != null && message.hasOwnProperty("position"))
+                                object.position = message.position;
+                            if (message.size != null && message.hasOwnProperty("size"))
+                                object.size = message.size;
+                            return object;
+                        };
+
+                        /**
+                         * Converts this AccessibilityHierarchyMsgProto to JSON.
+                         * @function toJSON
+                         * @memberof org.webswing.server.model.proto.AccessibilityHierarchyMsgProto
+                         * @instance
+                         * @returns {Object.<string,*>} JSON object
+                         */
+                        AccessibilityHierarchyMsgProto.prototype.toJSON = function toJSON() {
+                            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                        };
+
+                        return AccessibilityHierarchyMsgProto;
                     })();
 
                     proto.FocusEventMsgProto = (function() {
@@ -1689,6 +2710,7 @@ $root.org = (function() {
                          * @property {number|null} [x] CursorChangeEventMsgProto x
                          * @property {number|null} [y] CursorChangeEventMsgProto y
                          * @property {string|null} [curFile] CursorChangeEventMsgProto curFile
+                         * @property {string|null} [winId] CursorChangeEventMsgProto winId
                          */
 
                         /**
@@ -1747,6 +2769,14 @@ $root.org = (function() {
                         CursorChangeEventMsgProto.prototype.curFile = "";
 
                         /**
+                         * CursorChangeEventMsgProto winId.
+                         * @member {string} winId
+                         * @memberof org.webswing.server.model.proto.CursorChangeEventMsgProto
+                         * @instance
+                         */
+                        CursorChangeEventMsgProto.prototype.winId = "";
+
+                        /**
                          * Creates a new CursorChangeEventMsgProto instance using the specified properties.
                          * @function create
                          * @memberof org.webswing.server.model.proto.CursorChangeEventMsgProto
@@ -1779,6 +2809,8 @@ $root.org = (function() {
                                 writer.uint32(/* id 4, wireType 0 =*/32).sint32(message.y);
                             if (message.curFile != null && message.hasOwnProperty("curFile"))
                                 writer.uint32(/* id 5, wireType 2 =*/42).string(message.curFile);
+                            if (message.winId != null && message.hasOwnProperty("winId"))
+                                writer.uint32(/* id 6, wireType 2 =*/50).string(message.winId);
                             return writer;
                         };
 
@@ -1815,6 +2847,9 @@ $root.org = (function() {
                                 case 5:
                                     message.curFile = reader.string();
                                     break;
+                                case 6:
+                                    message.winId = reader.string();
+                                    break;
                                 default:
                                     reader.skipType(tag & 7);
                                     break;
@@ -1850,6 +2885,8 @@ $root.org = (function() {
                                 message.y = object.y | 0;
                             if (object.curFile != null)
                                 message.curFile = String(object.curFile);
+                            if (object.winId != null)
+                                message.winId = String(object.winId);
                             return message;
                         };
 
@@ -1878,6 +2915,7 @@ $root.org = (function() {
                                 object.x = 0;
                                 object.y = 0;
                                 object.curFile = "";
+                                object.winId = "";
                             }
                             if (message.cursor != null && message.hasOwnProperty("cursor"))
                                 object.cursor = message.cursor;
@@ -1889,6 +2927,8 @@ $root.org = (function() {
                                 object.y = message.y;
                             if (message.curFile != null && message.hasOwnProperty("curFile"))
                                 object.curFile = message.curFile;
+                            if (message.winId != null && message.hasOwnProperty("winId"))
+                                object.winId = message.winId;
                             return object;
                         };
 
@@ -2598,6 +3638,187 @@ $root.org = (function() {
                         return FileDialogEventMsgProto;
                     })();
 
+                    proto.WindowSwitchMsg = (function() {
+
+                        /**
+                         * Properties of a WindowSwitchMsg.
+                         * @memberof org.webswing.server.model.proto
+                         * @interface IWindowSwitchMsg
+                         * @property {string} id WindowSwitchMsg id
+                         * @property {string|null} [title] WindowSwitchMsg title
+                         * @property {boolean|null} [modalBlocked] WindowSwitchMsg modalBlocked
+                         */
+
+                        /**
+                         * Constructs a new WindowSwitchMsg.
+                         * @memberof org.webswing.server.model.proto
+                         * @classdesc Represents a WindowSwitchMsg.
+                         * @implements IWindowSwitchMsg
+                         * @constructor
+                         * @param {org.webswing.server.model.proto.IWindowSwitchMsg=} [properties] Properties to set
+                         */
+                        function WindowSwitchMsg(properties) {
+                            if (properties)
+                                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                                    if (properties[keys[i]] != null)
+                                        this[keys[i]] = properties[keys[i]];
+                        }
+
+                        /**
+                         * WindowSwitchMsg id.
+                         * @member {string} id
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsg
+                         * @instance
+                         */
+                        WindowSwitchMsg.prototype.id = "";
+
+                        /**
+                         * WindowSwitchMsg title.
+                         * @member {string} title
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsg
+                         * @instance
+                         */
+                        WindowSwitchMsg.prototype.title = "";
+
+                        /**
+                         * WindowSwitchMsg modalBlocked.
+                         * @member {boolean} modalBlocked
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsg
+                         * @instance
+                         */
+                        WindowSwitchMsg.prototype.modalBlocked = false;
+
+                        /**
+                         * Creates a new WindowSwitchMsg instance using the specified properties.
+                         * @function create
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsg
+                         * @static
+                         * @param {org.webswing.server.model.proto.IWindowSwitchMsg=} [properties] Properties to set
+                         * @returns {org.webswing.server.model.proto.WindowSwitchMsg} WindowSwitchMsg instance
+                         */
+                        WindowSwitchMsg.create = function create(properties) {
+                            return new WindowSwitchMsg(properties);
+                        };
+
+                        /**
+                         * Encodes the specified WindowSwitchMsg message. Does not implicitly {@link org.webswing.server.model.proto.WindowSwitchMsg.verify|verify} messages.
+                         * @function encode
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsg
+                         * @static
+                         * @param {org.webswing.server.model.proto.IWindowSwitchMsg} message WindowSwitchMsg message or plain object to encode
+                         * @param {$protobuf.Writer} [writer] Writer to encode to
+                         * @returns {$protobuf.Writer} Writer
+                         */
+                        WindowSwitchMsg.encode = function encode(message, writer) {
+                            if (!writer)
+                                writer = $Writer.create();
+                            writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+                            if (message.title != null && message.hasOwnProperty("title"))
+                                writer.uint32(/* id 2, wireType 2 =*/18).string(message.title);
+                            if (message.modalBlocked != null && message.hasOwnProperty("modalBlocked"))
+                                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.modalBlocked);
+                            return writer;
+                        };
+
+                        /**
+                         * Decodes a WindowSwitchMsg message from the specified reader or buffer.
+                         * @function decode
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsg
+                         * @static
+                         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                         * @param {number} [length] Message length if known beforehand
+                         * @returns {org.webswing.server.model.proto.WindowSwitchMsg} WindowSwitchMsg
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        WindowSwitchMsg.decode = function decode(reader, length) {
+                            if (!(reader instanceof $Reader))
+                                reader = $Reader.create(reader);
+                            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.org.webswing.server.model.proto.WindowSwitchMsg();
+                            while (reader.pos < end) {
+                                var tag = reader.uint32();
+                                switch (tag >>> 3) {
+                                case 1:
+                                    message.id = reader.string();
+                                    break;
+                                case 2:
+                                    message.title = reader.string();
+                                    break;
+                                case 3:
+                                    message.modalBlocked = reader.bool();
+                                    break;
+                                default:
+                                    reader.skipType(tag & 7);
+                                    break;
+                                }
+                            }
+                            if (!message.hasOwnProperty("id"))
+                                throw $util.ProtocolError("missing required 'id'", { instance: message });
+                            return message;
+                        };
+
+                        /**
+                         * Creates a WindowSwitchMsg message from a plain object. Also converts values to their respective internal types.
+                         * @function fromObject
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsg
+                         * @static
+                         * @param {Object.<string,*>} object Plain object
+                         * @returns {org.webswing.server.model.proto.WindowSwitchMsg} WindowSwitchMsg
+                         */
+                        WindowSwitchMsg.fromObject = function fromObject(object) {
+                            if (object instanceof $root.org.webswing.server.model.proto.WindowSwitchMsg)
+                                return object;
+                            var message = new $root.org.webswing.server.model.proto.WindowSwitchMsg();
+                            if (object.id != null)
+                                message.id = String(object.id);
+                            if (object.title != null)
+                                message.title = String(object.title);
+                            if (object.modalBlocked != null)
+                                message.modalBlocked = Boolean(object.modalBlocked);
+                            return message;
+                        };
+
+                        /**
+                         * Creates a plain object from a WindowSwitchMsg message. Also converts values to other types if specified.
+                         * @function toObject
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsg
+                         * @static
+                         * @param {org.webswing.server.model.proto.WindowSwitchMsg} message WindowSwitchMsg
+                         * @param {$protobuf.IConversionOptions} [options] Conversion options
+                         * @returns {Object.<string,*>} Plain object
+                         */
+                        WindowSwitchMsg.toObject = function toObject(message, options) {
+                            if (!options)
+                                options = {};
+                            var object = {};
+                            if (options.defaults) {
+                                object.id = "";
+                                object.title = "";
+                                object.modalBlocked = false;
+                            }
+                            if (message.id != null && message.hasOwnProperty("id"))
+                                object.id = message.id;
+                            if (message.title != null && message.hasOwnProperty("title"))
+                                object.title = message.title;
+                            if (message.modalBlocked != null && message.hasOwnProperty("modalBlocked"))
+                                object.modalBlocked = message.modalBlocked;
+                            return object;
+                        };
+
+                        /**
+                         * Converts this WindowSwitchMsg to JSON.
+                         * @function toJSON
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsg
+                         * @instance
+                         * @returns {Object.<string,*>} JSON object
+                         */
+                        WindowSwitchMsg.prototype.toJSON = function toJSON() {
+                            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                        };
+
+                        return WindowSwitchMsg;
+                    })();
+
                     proto.WindowMsgProto = (function() {
 
                         /**
@@ -2613,10 +3834,12 @@ $root.org = (function() {
                          * @property {number|null} [width] WindowMsgProto width
                          * @property {number|null} [height] WindowMsgProto height
                          * @property {string|null} [name] WindowMsgProto name
-                         * @property {boolean|null} [html] WindowMsgProto html
+                         * @property {org.webswing.server.model.proto.WindowMsgProto.WindowTypeProto|null} [type] WindowMsgProto type
                          * @property {boolean|null} [modalBlocked] WindowMsgProto modalBlocked
                          * @property {string|null} [ownerId] WindowMsgProto ownerId
                          * @property {number|null} [state] WindowMsgProto state
+                         * @property {Array.<org.webswing.server.model.proto.IWindowMsgProto>|null} [internalWindows] WindowMsgProto internalWindows
+                         * @property {org.webswing.server.model.proto.WindowMsgProto.DockModeProto|null} [dockMode] WindowMsgProto dockMode
                          */
 
                         /**
@@ -2629,6 +3852,7 @@ $root.org = (function() {
                          */
                         function WindowMsgProto(properties) {
                             this.content = [];
+                            this.internalWindows = [];
                             if (properties)
                                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                                     if (properties[keys[i]] != null)
@@ -2708,12 +3932,12 @@ $root.org = (function() {
                         WindowMsgProto.prototype.name = "";
 
                         /**
-                         * WindowMsgProto html.
-                         * @member {boolean} html
+                         * WindowMsgProto type.
+                         * @member {org.webswing.server.model.proto.WindowMsgProto.WindowTypeProto} type
                          * @memberof org.webswing.server.model.proto.WindowMsgProto
                          * @instance
                          */
-                        WindowMsgProto.prototype.html = false;
+                        WindowMsgProto.prototype.type = 1;
 
                         /**
                          * WindowMsgProto modalBlocked.
@@ -2738,6 +3962,22 @@ $root.org = (function() {
                          * @instance
                          */
                         WindowMsgProto.prototype.state = 0;
+
+                        /**
+                         * WindowMsgProto internalWindows.
+                         * @member {Array.<org.webswing.server.model.proto.IWindowMsgProto>} internalWindows
+                         * @memberof org.webswing.server.model.proto.WindowMsgProto
+                         * @instance
+                         */
+                        WindowMsgProto.prototype.internalWindows = $util.emptyArray;
+
+                        /**
+                         * WindowMsgProto dockMode.
+                         * @member {org.webswing.server.model.proto.WindowMsgProto.DockModeProto} dockMode
+                         * @memberof org.webswing.server.model.proto.WindowMsgProto
+                         * @instance
+                         */
+                        WindowMsgProto.prototype.dockMode = 1;
 
                         /**
                          * Creates a new WindowMsgProto instance using the specified properties.
@@ -2781,14 +4021,19 @@ $root.org = (function() {
                                 writer.uint32(/* id 8, wireType 0 =*/64).uint32(message.height);
                             if (message.name != null && message.hasOwnProperty("name"))
                                 writer.uint32(/* id 9, wireType 2 =*/74).string(message.name);
-                            if (message.html != null && message.hasOwnProperty("html"))
-                                writer.uint32(/* id 10, wireType 0 =*/80).bool(message.html);
+                            if (message.type != null && message.hasOwnProperty("type"))
+                                writer.uint32(/* id 10, wireType 0 =*/80).int32(message.type);
                             if (message.modalBlocked != null && message.hasOwnProperty("modalBlocked"))
                                 writer.uint32(/* id 11, wireType 0 =*/88).bool(message.modalBlocked);
                             if (message.ownerId != null && message.hasOwnProperty("ownerId"))
                                 writer.uint32(/* id 12, wireType 2 =*/98).string(message.ownerId);
                             if (message.state != null && message.hasOwnProperty("state"))
                                 writer.uint32(/* id 13, wireType 0 =*/104).uint32(message.state);
+                            if (message.internalWindows != null && message.internalWindows.length)
+                                for (var i = 0; i < message.internalWindows.length; ++i)
+                                    $root.org.webswing.server.model.proto.WindowMsgProto.encode(message.internalWindows[i], writer.uint32(/* id 14, wireType 2 =*/114).fork()).ldelim();
+                            if (message.dockMode != null && message.hasOwnProperty("dockMode"))
+                                writer.uint32(/* id 15, wireType 0 =*/120).int32(message.dockMode);
                             return writer;
                         };
 
@@ -2840,7 +4085,7 @@ $root.org = (function() {
                                     message.name = reader.string();
                                     break;
                                 case 10:
-                                    message.html = reader.bool();
+                                    message.type = reader.int32();
                                     break;
                                 case 11:
                                     message.modalBlocked = reader.bool();
@@ -2850,6 +4095,14 @@ $root.org = (function() {
                                     break;
                                 case 13:
                                     message.state = reader.uint32();
+                                    break;
+                                case 14:
+                                    if (!(message.internalWindows && message.internalWindows.length))
+                                        message.internalWindows = [];
+                                    message.internalWindows.push($root.org.webswing.server.model.proto.WindowMsgProto.decode(reader, reader.uint32()));
+                                    break;
+                                case 15:
+                                    message.dockMode = reader.int32();
                                     break;
                                 default:
                                     reader.skipType(tag & 7);
@@ -2902,14 +4155,58 @@ $root.org = (function() {
                                 message.height = object.height >>> 0;
                             if (object.name != null)
                                 message.name = String(object.name);
-                            if (object.html != null)
-                                message.html = Boolean(object.html);
+                            switch (object.type) {
+                            case "basic":
+                            case 1:
+                                message.type = 1;
+                                break;
+                            case "html":
+                            case 2:
+                                message.type = 2;
+                                break;
+                            case "internal":
+                            case 3:
+                                message.type = 3;
+                                break;
+                            case "internalHtml":
+                            case 4:
+                                message.type = 4;
+                                break;
+                            case "internalWrapper":
+                            case 5:
+                                message.type = 5;
+                                break;
+                            }
                             if (object.modalBlocked != null)
                                 message.modalBlocked = Boolean(object.modalBlocked);
                             if (object.ownerId != null)
                                 message.ownerId = String(object.ownerId);
                             if (object.state != null)
                                 message.state = object.state >>> 0;
+                            if (object.internalWindows) {
+                                if (!Array.isArray(object.internalWindows))
+                                    throw TypeError(".org.webswing.server.model.proto.WindowMsgProto.internalWindows: array expected");
+                                message.internalWindows = [];
+                                for (var i = 0; i < object.internalWindows.length; ++i) {
+                                    if (typeof object.internalWindows[i] !== "object")
+                                        throw TypeError(".org.webswing.server.model.proto.WindowMsgProto.internalWindows: object expected");
+                                    message.internalWindows[i] = $root.org.webswing.server.model.proto.WindowMsgProto.fromObject(object.internalWindows[i]);
+                                }
+                            }
+                            switch (object.dockMode) {
+                            case "none":
+                            case 1:
+                                message.dockMode = 1;
+                                break;
+                            case "dockable":
+                            case 2:
+                                message.dockMode = 2;
+                                break;
+                            case "autoUndock":
+                            case 3:
+                                message.dockMode = 3;
+                                break;
+                            }
                             return message;
                         };
 
@@ -2926,8 +4223,10 @@ $root.org = (function() {
                             if (!options)
                                 options = {};
                             var object = {};
-                            if (options.arrays || options.defaults)
+                            if (options.arrays || options.defaults) {
                                 object.content = [];
+                                object.internalWindows = [];
+                            }
                             if (options.defaults) {
                                 object.id = "";
                                 if (options.bytes === String)
@@ -2943,10 +4242,11 @@ $root.org = (function() {
                                 object.width = 0;
                                 object.height = 0;
                                 object.name = "";
-                                object.html = false;
+                                object.type = options.enums === String ? "basic" : 1;
                                 object.modalBlocked = false;
                                 object.ownerId = "";
                                 object.state = 0;
+                                object.dockMode = options.enums === String ? "none" : 1;
                             }
                             if (message.id != null && message.hasOwnProperty("id"))
                                 object.id = message.id;
@@ -2969,14 +4269,21 @@ $root.org = (function() {
                                 object.height = message.height;
                             if (message.name != null && message.hasOwnProperty("name"))
                                 object.name = message.name;
-                            if (message.html != null && message.hasOwnProperty("html"))
-                                object.html = message.html;
+                            if (message.type != null && message.hasOwnProperty("type"))
+                                object.type = options.enums === String ? $root.org.webswing.server.model.proto.WindowMsgProto.WindowTypeProto[message.type] : message.type;
                             if (message.modalBlocked != null && message.hasOwnProperty("modalBlocked"))
                                 object.modalBlocked = message.modalBlocked;
                             if (message.ownerId != null && message.hasOwnProperty("ownerId"))
                                 object.ownerId = message.ownerId;
                             if (message.state != null && message.hasOwnProperty("state"))
                                 object.state = message.state;
+                            if (message.internalWindows && message.internalWindows.length) {
+                                object.internalWindows = [];
+                                for (var j = 0; j < message.internalWindows.length; ++j)
+                                    object.internalWindows[j] = $root.org.webswing.server.model.proto.WindowMsgProto.toObject(message.internalWindows[j], options);
+                            }
+                            if (message.dockMode != null && message.hasOwnProperty("dockMode"))
+                                object.dockMode = options.enums === String ? $root.org.webswing.server.model.proto.WindowMsgProto.DockModeProto[message.dockMode] : message.dockMode;
                             return object;
                         };
 
@@ -2991,7 +4298,224 @@ $root.org = (function() {
                             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
                         };
 
+                        /**
+                         * WindowTypeProto enum.
+                         * @name org.webswing.server.model.proto.WindowMsgProto.WindowTypeProto
+                         * @enum {string}
+                         * @property {number} basic=1 basic value
+                         * @property {number} html=2 html value
+                         * @property {number} internal=3 internal value
+                         * @property {number} internalHtml=4 internalHtml value
+                         * @property {number} internalWrapper=5 internalWrapper value
+                         */
+                        WindowMsgProto.WindowTypeProto = (function() {
+                            var valuesById = {}, values = Object.create(valuesById);
+                            values[valuesById[1] = "basic"] = 1;
+                            values[valuesById[2] = "html"] = 2;
+                            values[valuesById[3] = "internal"] = 3;
+                            values[valuesById[4] = "internalHtml"] = 4;
+                            values[valuesById[5] = "internalWrapper"] = 5;
+                            return values;
+                        })();
+
+                        /**
+                         * DockModeProto enum.
+                         * @name org.webswing.server.model.proto.WindowMsgProto.DockModeProto
+                         * @enum {string}
+                         * @property {number} none=1 none value
+                         * @property {number} dockable=2 dockable value
+                         * @property {number} autoUndock=3 autoUndock value
+                         */
+                        WindowMsgProto.DockModeProto = (function() {
+                            var valuesById = {}, values = Object.create(valuesById);
+                            values[valuesById[1] = "none"] = 1;
+                            values[valuesById[2] = "dockable"] = 2;
+                            values[valuesById[3] = "autoUndock"] = 3;
+                            return values;
+                        })();
+
                         return WindowMsgProto;
+                    })();
+
+                    proto.WindowSwitchMsgProto = (function() {
+
+                        /**
+                         * Properties of a WindowSwitchMsgProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @interface IWindowSwitchMsgProto
+                         * @property {string} id WindowSwitchMsgProto id
+                         * @property {string|null} [title] WindowSwitchMsgProto title
+                         * @property {boolean|null} [modalBlocked] WindowSwitchMsgProto modalBlocked
+                         */
+
+                        /**
+                         * Constructs a new WindowSwitchMsgProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @classdesc Represents a WindowSwitchMsgProto.
+                         * @implements IWindowSwitchMsgProto
+                         * @constructor
+                         * @param {org.webswing.server.model.proto.IWindowSwitchMsgProto=} [properties] Properties to set
+                         */
+                        function WindowSwitchMsgProto(properties) {
+                            if (properties)
+                                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                                    if (properties[keys[i]] != null)
+                                        this[keys[i]] = properties[keys[i]];
+                        }
+
+                        /**
+                         * WindowSwitchMsgProto id.
+                         * @member {string} id
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsgProto
+                         * @instance
+                         */
+                        WindowSwitchMsgProto.prototype.id = "";
+
+                        /**
+                         * WindowSwitchMsgProto title.
+                         * @member {string} title
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsgProto
+                         * @instance
+                         */
+                        WindowSwitchMsgProto.prototype.title = "";
+
+                        /**
+                         * WindowSwitchMsgProto modalBlocked.
+                         * @member {boolean} modalBlocked
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsgProto
+                         * @instance
+                         */
+                        WindowSwitchMsgProto.prototype.modalBlocked = false;
+
+                        /**
+                         * Creates a new WindowSwitchMsgProto instance using the specified properties.
+                         * @function create
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IWindowSwitchMsgProto=} [properties] Properties to set
+                         * @returns {org.webswing.server.model.proto.WindowSwitchMsgProto} WindowSwitchMsgProto instance
+                         */
+                        WindowSwitchMsgProto.create = function create(properties) {
+                            return new WindowSwitchMsgProto(properties);
+                        };
+
+                        /**
+                         * Encodes the specified WindowSwitchMsgProto message. Does not implicitly {@link org.webswing.server.model.proto.WindowSwitchMsgProto.verify|verify} messages.
+                         * @function encode
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IWindowSwitchMsgProto} message WindowSwitchMsgProto message or plain object to encode
+                         * @param {$protobuf.Writer} [writer] Writer to encode to
+                         * @returns {$protobuf.Writer} Writer
+                         */
+                        WindowSwitchMsgProto.encode = function encode(message, writer) {
+                            if (!writer)
+                                writer = $Writer.create();
+                            writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+                            if (message.title != null && message.hasOwnProperty("title"))
+                                writer.uint32(/* id 2, wireType 2 =*/18).string(message.title);
+                            if (message.modalBlocked != null && message.hasOwnProperty("modalBlocked"))
+                                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.modalBlocked);
+                            return writer;
+                        };
+
+                        /**
+                         * Decodes a WindowSwitchMsgProto message from the specified reader or buffer.
+                         * @function decode
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsgProto
+                         * @static
+                         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                         * @param {number} [length] Message length if known beforehand
+                         * @returns {org.webswing.server.model.proto.WindowSwitchMsgProto} WindowSwitchMsgProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        WindowSwitchMsgProto.decode = function decode(reader, length) {
+                            if (!(reader instanceof $Reader))
+                                reader = $Reader.create(reader);
+                            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.org.webswing.server.model.proto.WindowSwitchMsgProto();
+                            while (reader.pos < end) {
+                                var tag = reader.uint32();
+                                switch (tag >>> 3) {
+                                case 1:
+                                    message.id = reader.string();
+                                    break;
+                                case 2:
+                                    message.title = reader.string();
+                                    break;
+                                case 3:
+                                    message.modalBlocked = reader.bool();
+                                    break;
+                                default:
+                                    reader.skipType(tag & 7);
+                                    break;
+                                }
+                            }
+                            if (!message.hasOwnProperty("id"))
+                                throw $util.ProtocolError("missing required 'id'", { instance: message });
+                            return message;
+                        };
+
+                        /**
+                         * Creates a WindowSwitchMsgProto message from a plain object. Also converts values to their respective internal types.
+                         * @function fromObject
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsgProto
+                         * @static
+                         * @param {Object.<string,*>} object Plain object
+                         * @returns {org.webswing.server.model.proto.WindowSwitchMsgProto} WindowSwitchMsgProto
+                         */
+                        WindowSwitchMsgProto.fromObject = function fromObject(object) {
+                            if (object instanceof $root.org.webswing.server.model.proto.WindowSwitchMsgProto)
+                                return object;
+                            var message = new $root.org.webswing.server.model.proto.WindowSwitchMsgProto();
+                            if (object.id != null)
+                                message.id = String(object.id);
+                            if (object.title != null)
+                                message.title = String(object.title);
+                            if (object.modalBlocked != null)
+                                message.modalBlocked = Boolean(object.modalBlocked);
+                            return message;
+                        };
+
+                        /**
+                         * Creates a plain object from a WindowSwitchMsgProto message. Also converts values to other types if specified.
+                         * @function toObject
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.WindowSwitchMsgProto} message WindowSwitchMsgProto
+                         * @param {$protobuf.IConversionOptions} [options] Conversion options
+                         * @returns {Object.<string,*>} Plain object
+                         */
+                        WindowSwitchMsgProto.toObject = function toObject(message, options) {
+                            if (!options)
+                                options = {};
+                            var object = {};
+                            if (options.defaults) {
+                                object.id = "";
+                                object.title = "";
+                                object.modalBlocked = false;
+                            }
+                            if (message.id != null && message.hasOwnProperty("id"))
+                                object.id = message.id;
+                            if (message.title != null && message.hasOwnProperty("title"))
+                                object.title = message.title;
+                            if (message.modalBlocked != null && message.hasOwnProperty("modalBlocked"))
+                                object.modalBlocked = message.modalBlocked;
+                            return object;
+                        };
+
+                        /**
+                         * Converts this WindowSwitchMsgProto to JSON.
+                         * @function toJSON
+                         * @memberof org.webswing.server.model.proto.WindowSwitchMsgProto
+                         * @instance
+                         * @returns {Object.<string,*>} JSON object
+                         */
+                        WindowSwitchMsgProto.prototype.toJSON = function toJSON() {
+                            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                        };
+
+                        return WindowSwitchMsgProto;
                     })();
 
                     proto.WindowPartialContentMsgProto = (function() {
@@ -5057,6 +6581,7 @@ $root.org = (function() {
                          * @property {org.webswing.server.model.proto.IMouseEventMsgInProto|null} [mouse] InputEventMsgInProto mouse
                          * @property {org.webswing.server.model.proto.ISimpleEventMsgInProto|null} [event] InputEventMsgInProto event
                          * @property {org.webswing.server.model.proto.ITimestampsMsgInProto|null} [timestamps] InputEventMsgInProto timestamps
+                         * @property {org.webswing.server.model.proto.IWindowFocusMsgInProto|null} [focus] InputEventMsgInProto focus
                          */
 
                         /**
@@ -5115,6 +6640,14 @@ $root.org = (function() {
                         InputEventMsgInProto.prototype.timestamps = null;
 
                         /**
+                         * InputEventMsgInProto focus.
+                         * @member {org.webswing.server.model.proto.IWindowFocusMsgInProto|null|undefined} focus
+                         * @memberof org.webswing.server.model.proto.InputEventMsgInProto
+                         * @instance
+                         */
+                        InputEventMsgInProto.prototype.focus = null;
+
+                        /**
                          * Creates a new InputEventMsgInProto instance using the specified properties.
                          * @function create
                          * @memberof org.webswing.server.model.proto.InputEventMsgInProto
@@ -5148,6 +6681,8 @@ $root.org = (function() {
                                 $root.org.webswing.server.model.proto.SimpleEventMsgInProto.encode(message.event, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                             if (message.timestamps != null && message.hasOwnProperty("timestamps"))
                                 $root.org.webswing.server.model.proto.TimestampsMsgInProto.encode(message.timestamps, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                            if (message.focus != null && message.hasOwnProperty("focus"))
+                                $root.org.webswing.server.model.proto.WindowFocusMsgInProto.encode(message.focus, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                             return writer;
                         };
 
@@ -5183,6 +6718,9 @@ $root.org = (function() {
                                     break;
                                 case 5:
                                     message.timestamps = $root.org.webswing.server.model.proto.TimestampsMsgInProto.decode(reader, reader.uint32());
+                                    break;
+                                case 6:
+                                    message.focus = $root.org.webswing.server.model.proto.WindowFocusMsgInProto.decode(reader, reader.uint32());
                                     break;
                                 default:
                                     reader.skipType(tag & 7);
@@ -5229,6 +6767,11 @@ $root.org = (function() {
                                     throw TypeError(".org.webswing.server.model.proto.InputEventMsgInProto.timestamps: object expected");
                                 message.timestamps = $root.org.webswing.server.model.proto.TimestampsMsgInProto.fromObject(object.timestamps);
                             }
+                            if (object.focus != null) {
+                                if (typeof object.focus !== "object")
+                                    throw TypeError(".org.webswing.server.model.proto.InputEventMsgInProto.focus: object expected");
+                                message.focus = $root.org.webswing.server.model.proto.WindowFocusMsgInProto.fromObject(object.focus);
+                            }
                             return message;
                         };
 
@@ -5251,6 +6794,7 @@ $root.org = (function() {
                                 object.mouse = null;
                                 object.event = null;
                                 object.timestamps = null;
+                                object.focus = null;
                             }
                             if (message.handshake != null && message.hasOwnProperty("handshake"))
                                 object.handshake = $root.org.webswing.server.model.proto.ConnectionHandshakeMsgInProto.toObject(message.handshake, options);
@@ -5262,6 +6806,8 @@ $root.org = (function() {
                                 object.event = $root.org.webswing.server.model.proto.SimpleEventMsgInProto.toObject(message.event, options);
                             if (message.timestamps != null && message.hasOwnProperty("timestamps"))
                                 object.timestamps = $root.org.webswing.server.model.proto.TimestampsMsgInProto.toObject(message.timestamps, options);
+                            if (message.focus != null && message.hasOwnProperty("focus"))
+                                object.focus = $root.org.webswing.server.model.proto.WindowFocusMsgInProto.toObject(message.focus, options);
                             return object;
                         };
 
@@ -5277,6 +6823,167 @@ $root.org = (function() {
                         };
 
                         return InputEventMsgInProto;
+                    })();
+
+                    proto.WindowFocusMsgInProto = (function() {
+
+                        /**
+                         * Properties of a WindowFocusMsgInProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @interface IWindowFocusMsgInProto
+                         * @property {string|null} [windowId] WindowFocusMsgInProto windowId
+                         * @property {string|null} [htmlPanelId] WindowFocusMsgInProto htmlPanelId
+                         */
+
+                        /**
+                         * Constructs a new WindowFocusMsgInProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @classdesc Represents a WindowFocusMsgInProto.
+                         * @implements IWindowFocusMsgInProto
+                         * @constructor
+                         * @param {org.webswing.server.model.proto.IWindowFocusMsgInProto=} [properties] Properties to set
+                         */
+                        function WindowFocusMsgInProto(properties) {
+                            if (properties)
+                                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                                    if (properties[keys[i]] != null)
+                                        this[keys[i]] = properties[keys[i]];
+                        }
+
+                        /**
+                         * WindowFocusMsgInProto windowId.
+                         * @member {string} windowId
+                         * @memberof org.webswing.server.model.proto.WindowFocusMsgInProto
+                         * @instance
+                         */
+                        WindowFocusMsgInProto.prototype.windowId = "";
+
+                        /**
+                         * WindowFocusMsgInProto htmlPanelId.
+                         * @member {string} htmlPanelId
+                         * @memberof org.webswing.server.model.proto.WindowFocusMsgInProto
+                         * @instance
+                         */
+                        WindowFocusMsgInProto.prototype.htmlPanelId = "";
+
+                        /**
+                         * Creates a new WindowFocusMsgInProto instance using the specified properties.
+                         * @function create
+                         * @memberof org.webswing.server.model.proto.WindowFocusMsgInProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IWindowFocusMsgInProto=} [properties] Properties to set
+                         * @returns {org.webswing.server.model.proto.WindowFocusMsgInProto} WindowFocusMsgInProto instance
+                         */
+                        WindowFocusMsgInProto.create = function create(properties) {
+                            return new WindowFocusMsgInProto(properties);
+                        };
+
+                        /**
+                         * Encodes the specified WindowFocusMsgInProto message. Does not implicitly {@link org.webswing.server.model.proto.WindowFocusMsgInProto.verify|verify} messages.
+                         * @function encode
+                         * @memberof org.webswing.server.model.proto.WindowFocusMsgInProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IWindowFocusMsgInProto} message WindowFocusMsgInProto message or plain object to encode
+                         * @param {$protobuf.Writer} [writer] Writer to encode to
+                         * @returns {$protobuf.Writer} Writer
+                         */
+                        WindowFocusMsgInProto.encode = function encode(message, writer) {
+                            if (!writer)
+                                writer = $Writer.create();
+                            if (message.windowId != null && message.hasOwnProperty("windowId"))
+                                writer.uint32(/* id 1, wireType 2 =*/10).string(message.windowId);
+                            if (message.htmlPanelId != null && message.hasOwnProperty("htmlPanelId"))
+                                writer.uint32(/* id 2, wireType 2 =*/18).string(message.htmlPanelId);
+                            return writer;
+                        };
+
+                        /**
+                         * Decodes a WindowFocusMsgInProto message from the specified reader or buffer.
+                         * @function decode
+                         * @memberof org.webswing.server.model.proto.WindowFocusMsgInProto
+                         * @static
+                         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                         * @param {number} [length] Message length if known beforehand
+                         * @returns {org.webswing.server.model.proto.WindowFocusMsgInProto} WindowFocusMsgInProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        WindowFocusMsgInProto.decode = function decode(reader, length) {
+                            if (!(reader instanceof $Reader))
+                                reader = $Reader.create(reader);
+                            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.org.webswing.server.model.proto.WindowFocusMsgInProto();
+                            while (reader.pos < end) {
+                                var tag = reader.uint32();
+                                switch (tag >>> 3) {
+                                case 1:
+                                    message.windowId = reader.string();
+                                    break;
+                                case 2:
+                                    message.htmlPanelId = reader.string();
+                                    break;
+                                default:
+                                    reader.skipType(tag & 7);
+                                    break;
+                                }
+                            }
+                            return message;
+                        };
+
+                        /**
+                         * Creates a WindowFocusMsgInProto message from a plain object. Also converts values to their respective internal types.
+                         * @function fromObject
+                         * @memberof org.webswing.server.model.proto.WindowFocusMsgInProto
+                         * @static
+                         * @param {Object.<string,*>} object Plain object
+                         * @returns {org.webswing.server.model.proto.WindowFocusMsgInProto} WindowFocusMsgInProto
+                         */
+                        WindowFocusMsgInProto.fromObject = function fromObject(object) {
+                            if (object instanceof $root.org.webswing.server.model.proto.WindowFocusMsgInProto)
+                                return object;
+                            var message = new $root.org.webswing.server.model.proto.WindowFocusMsgInProto();
+                            if (object.windowId != null)
+                                message.windowId = String(object.windowId);
+                            if (object.htmlPanelId != null)
+                                message.htmlPanelId = String(object.htmlPanelId);
+                            return message;
+                        };
+
+                        /**
+                         * Creates a plain object from a WindowFocusMsgInProto message. Also converts values to other types if specified.
+                         * @function toObject
+                         * @memberof org.webswing.server.model.proto.WindowFocusMsgInProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.WindowFocusMsgInProto} message WindowFocusMsgInProto
+                         * @param {$protobuf.IConversionOptions} [options] Conversion options
+                         * @returns {Object.<string,*>} Plain object
+                         */
+                        WindowFocusMsgInProto.toObject = function toObject(message, options) {
+                            if (!options)
+                                options = {};
+                            var object = {};
+                            if (options.defaults) {
+                                object.windowId = "";
+                                object.htmlPanelId = "";
+                            }
+                            if (message.windowId != null && message.hasOwnProperty("windowId"))
+                                object.windowId = message.windowId;
+                            if (message.htmlPanelId != null && message.hasOwnProperty("htmlPanelId"))
+                                object.htmlPanelId = message.htmlPanelId;
+                            return object;
+                        };
+
+                        /**
+                         * Converts this WindowFocusMsgInProto to JSON.
+                         * @function toJSON
+                         * @memberof org.webswing.server.model.proto.WindowFocusMsgInProto
+                         * @instance
+                         * @returns {Object.<string,*>} JSON object
+                         */
+                        WindowFocusMsgInProto.prototype.toJSON = function toJSON() {
+                            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                        };
+
+                        return WindowFocusMsgInProto;
                     })();
 
                     proto.TimestampsMsgInProto = (function() {
@@ -5498,6 +7205,9 @@ $root.org = (function() {
                          * @property {string|null} [locale] ConnectionHandshakeMsgInProto locale
                          * @property {string|null} [url] ConnectionHandshakeMsgInProto url
                          * @property {string|null} [timeZone] ConnectionHandshakeMsgInProto timeZone
+                         * @property {boolean|null} [dockingSupported] ConnectionHandshakeMsgInProto dockingSupported
+                         * @property {boolean|null} [touchMode] ConnectionHandshakeMsgInProto touchMode
+                         * @property {boolean|null} [accessiblityEnabled] ConnectionHandshakeMsgInProto accessiblityEnabled
                          */
 
                         /**
@@ -5629,6 +7339,30 @@ $root.org = (function() {
                         ConnectionHandshakeMsgInProto.prototype.timeZone = "";
 
                         /**
+                         * ConnectionHandshakeMsgInProto dockingSupported.
+                         * @member {boolean} dockingSupported
+                         * @memberof org.webswing.server.model.proto.ConnectionHandshakeMsgInProto
+                         * @instance
+                         */
+                        ConnectionHandshakeMsgInProto.prototype.dockingSupported = false;
+
+                        /**
+                         * ConnectionHandshakeMsgInProto touchMode.
+                         * @member {boolean} touchMode
+                         * @memberof org.webswing.server.model.proto.ConnectionHandshakeMsgInProto
+                         * @instance
+                         */
+                        ConnectionHandshakeMsgInProto.prototype.touchMode = false;
+
+                        /**
+                         * ConnectionHandshakeMsgInProto accessiblityEnabled.
+                         * @member {boolean} accessiblityEnabled
+                         * @memberof org.webswing.server.model.proto.ConnectionHandshakeMsgInProto
+                         * @instance
+                         */
+                        ConnectionHandshakeMsgInProto.prototype.accessiblityEnabled = false;
+
+                        /**
                          * Creates a new ConnectionHandshakeMsgInProto instance using the specified properties.
                          * @function create
                          * @memberof org.webswing.server.model.proto.ConnectionHandshakeMsgInProto
@@ -5681,6 +7415,12 @@ $root.org = (function() {
                                 writer.uint32(/* id 13, wireType 2 =*/106).string(message.browserId);
                             if (message.timeZone != null && message.hasOwnProperty("timeZone"))
                                 writer.uint32(/* id 14, wireType 2 =*/114).string(message.timeZone);
+                            if (message.dockingSupported != null && message.hasOwnProperty("dockingSupported"))
+                                writer.uint32(/* id 15, wireType 0 =*/120).bool(message.dockingSupported);
+                            if (message.touchMode != null && message.hasOwnProperty("touchMode"))
+                                writer.uint32(/* id 16, wireType 0 =*/128).bool(message.touchMode);
+                            if (message.accessiblityEnabled != null && message.hasOwnProperty("accessiblityEnabled"))
+                                writer.uint32(/* id 17, wireType 0 =*/136).bool(message.accessiblityEnabled);
                             return writer;
                         };
 
@@ -5746,6 +7486,15 @@ $root.org = (function() {
                                 case 14:
                                     message.timeZone = reader.string();
                                     break;
+                                case 15:
+                                    message.dockingSupported = reader.bool();
+                                    break;
+                                case 16:
+                                    message.touchMode = reader.bool();
+                                    break;
+                                case 17:
+                                    message.accessiblityEnabled = reader.bool();
+                                    break;
                                 default:
                                     reader.skipType(tag & 7);
                                     break;
@@ -5802,6 +7551,12 @@ $root.org = (function() {
                                 message.url = String(object.url);
                             if (object.timeZone != null)
                                 message.timeZone = String(object.timeZone);
+                            if (object.dockingSupported != null)
+                                message.dockingSupported = Boolean(object.dockingSupported);
+                            if (object.touchMode != null)
+                                message.touchMode = Boolean(object.touchMode);
+                            if (object.accessiblityEnabled != null)
+                                message.accessiblityEnabled = Boolean(object.accessiblityEnabled);
                             return message;
                         };
 
@@ -5834,6 +7589,9 @@ $root.org = (function() {
                                 object.url = "";
                                 object.browserId = "";
                                 object.timeZone = "";
+                                object.dockingSupported = false;
+                                object.touchMode = false;
+                                object.accessiblityEnabled = false;
                             }
                             if (message.clientId != null && message.hasOwnProperty("clientId"))
                                 object.clientId = message.clientId;
@@ -5866,6 +7624,12 @@ $root.org = (function() {
                                 object.browserId = message.browserId;
                             if (message.timeZone != null && message.hasOwnProperty("timeZone"))
                                 object.timeZone = message.timeZone;
+                            if (message.dockingSupported != null && message.hasOwnProperty("dockingSupported"))
+                                object.dockingSupported = message.dockingSupported;
+                            if (message.touchMode != null && message.hasOwnProperty("touchMode"))
+                                object.touchMode = message.touchMode;
+                            if (message.accessiblityEnabled != null && message.hasOwnProperty("accessiblityEnabled"))
+                                object.accessiblityEnabled = message.accessiblityEnabled;
                             return object;
                         };
 
@@ -7246,6 +9010,10 @@ $root.org = (function() {
                             case 8:
                                 message.type = 8;
                                 break;
+                            case "requestWindowSwitchList":
+                            case 9:
+                                message.type = 9;
+                                break;
                             }
                             return message;
                         };
@@ -7294,6 +9062,7 @@ $root.org = (function() {
                          * @property {number} hb=6 hb value
                          * @property {number} cancelFileSelection=7 cancelFileSelection value
                          * @property {number} requestComponentTree=8 requestComponentTree value
+                         * @property {number} requestWindowSwitchList=9 requestWindowSwitchList value
                          */
                         SimpleEventMsgInProto.SimpleEventTypeProto = (function() {
                             var valuesById = {}, values = Object.create(valuesById);
@@ -7306,6 +9075,7 @@ $root.org = (function() {
                             values[valuesById[6] = "hb"] = 6;
                             values[valuesById[7] = "cancelFileSelection"] = 7;
                             values[valuesById[8] = "requestComponentTree"] = 8;
+                            values[valuesById[9] = "requestWindowSwitchList"] = 9;
                             return values;
                         })();
 
@@ -8568,6 +10338,7 @@ $root.org = (function() {
                          * @property {number|null} [width] WindowEventMsgInProto width
                          * @property {number|null} [height] WindowEventMsgInProto height
                          * @property {boolean|null} [close] WindowEventMsgInProto close
+                         * @property {boolean|null} [focus] WindowEventMsgInProto focus
                          */
 
                         /**
@@ -8634,6 +10405,14 @@ $root.org = (function() {
                         WindowEventMsgInProto.prototype.close = false;
 
                         /**
+                         * WindowEventMsgInProto focus.
+                         * @member {boolean} focus
+                         * @memberof org.webswing.server.model.proto.WindowEventMsgInProto
+                         * @instance
+                         */
+                        WindowEventMsgInProto.prototype.focus = false;
+
+                        /**
                          * Creates a new WindowEventMsgInProto instance using the specified properties.
                          * @function create
                          * @memberof org.webswing.server.model.proto.WindowEventMsgInProto
@@ -8669,6 +10448,8 @@ $root.org = (function() {
                                 writer.uint32(/* id 5, wireType 0 =*/40).sint32(message.height);
                             if (message.close != null && message.hasOwnProperty("close"))
                                 writer.uint32(/* id 6, wireType 0 =*/48).bool(message.close);
+                            if (message.focus != null && message.hasOwnProperty("focus"))
+                                writer.uint32(/* id 7, wireType 0 =*/56).bool(message.focus);
                             return writer;
                         };
 
@@ -8708,6 +10489,9 @@ $root.org = (function() {
                                 case 6:
                                     message.close = reader.bool();
                                     break;
+                                case 7:
+                                    message.focus = reader.bool();
+                                    break;
                                 default:
                                     reader.skipType(tag & 7);
                                     break;
@@ -8740,6 +10524,8 @@ $root.org = (function() {
                                 message.height = object.height | 0;
                             if (object.close != null)
                                 message.close = Boolean(object.close);
+                            if (object.focus != null)
+                                message.focus = Boolean(object.focus);
                             return message;
                         };
 
@@ -8763,6 +10549,7 @@ $root.org = (function() {
                                 object.width = 0;
                                 object.height = 0;
                                 object.close = false;
+                                object.focus = false;
                             }
                             if (message.id != null && message.hasOwnProperty("id"))
                                 object.id = message.id;
@@ -8776,6 +10563,8 @@ $root.org = (function() {
                                 object.height = message.height;
                             if (message.close != null && message.hasOwnProperty("close"))
                                 object.close = message.close;
+                            if (message.focus != null && message.hasOwnProperty("focus"))
+                                object.focus = message.focus;
                             return object;
                         };
 
@@ -9248,6 +11037,408 @@ $root.org = (function() {
                         };
 
                         return ActionEventMsgOutProto;
+                    })();
+
+                    proto.AudioEventMsgOutProto = (function() {
+
+                        /**
+                         * Properties of an AudioEventMsgOutProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @interface IAudioEventMsgOutProto
+                         * @property {string|null} [id] AudioEventMsgOutProto id
+                         * @property {org.webswing.server.model.proto.AudioEventMsgOutProto.AudioEventTypeProto|null} [eventType] AudioEventMsgOutProto eventType
+                         * @property {Uint8Array|null} [data] AudioEventMsgOutProto data
+                         * @property {number|null} [time] AudioEventMsgOutProto time
+                         * @property {number|null} [loop] AudioEventMsgOutProto loop
+                         */
+
+                        /**
+                         * Constructs a new AudioEventMsgOutProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @classdesc Represents an AudioEventMsgOutProto.
+                         * @implements IAudioEventMsgOutProto
+                         * @constructor
+                         * @param {org.webswing.server.model.proto.IAudioEventMsgOutProto=} [properties] Properties to set
+                         */
+                        function AudioEventMsgOutProto(properties) {
+                            if (properties)
+                                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                                    if (properties[keys[i]] != null)
+                                        this[keys[i]] = properties[keys[i]];
+                        }
+
+                        /**
+                         * AudioEventMsgOutProto id.
+                         * @member {string} id
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgOutProto
+                         * @instance
+                         */
+                        AudioEventMsgOutProto.prototype.id = "";
+
+                        /**
+                         * AudioEventMsgOutProto eventType.
+                         * @member {org.webswing.server.model.proto.AudioEventMsgOutProto.AudioEventTypeProto} eventType
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgOutProto
+                         * @instance
+                         */
+                        AudioEventMsgOutProto.prototype.eventType = 0;
+
+                        /**
+                         * AudioEventMsgOutProto data.
+                         * @member {Uint8Array} data
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgOutProto
+                         * @instance
+                         */
+                        AudioEventMsgOutProto.prototype.data = $util.newBuffer([]);
+
+                        /**
+                         * AudioEventMsgOutProto time.
+                         * @member {number} time
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgOutProto
+                         * @instance
+                         */
+                        AudioEventMsgOutProto.prototype.time = 0;
+
+                        /**
+                         * AudioEventMsgOutProto loop.
+                         * @member {number} loop
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgOutProto
+                         * @instance
+                         */
+                        AudioEventMsgOutProto.prototype.loop = 0;
+
+                        /**
+                         * Creates a new AudioEventMsgOutProto instance using the specified properties.
+                         * @function create
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgOutProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IAudioEventMsgOutProto=} [properties] Properties to set
+                         * @returns {org.webswing.server.model.proto.AudioEventMsgOutProto} AudioEventMsgOutProto instance
+                         */
+                        AudioEventMsgOutProto.create = function create(properties) {
+                            return new AudioEventMsgOutProto(properties);
+                        };
+
+                        /**
+                         * Encodes the specified AudioEventMsgOutProto message. Does not implicitly {@link org.webswing.server.model.proto.AudioEventMsgOutProto.verify|verify} messages.
+                         * @function encode
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgOutProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IAudioEventMsgOutProto} message AudioEventMsgOutProto message or plain object to encode
+                         * @param {$protobuf.Writer} [writer] Writer to encode to
+                         * @returns {$protobuf.Writer} Writer
+                         */
+                        AudioEventMsgOutProto.encode = function encode(message, writer) {
+                            if (!writer)
+                                writer = $Writer.create();
+                            if (message.id != null && message.hasOwnProperty("id"))
+                                writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+                            if (message.eventType != null && message.hasOwnProperty("eventType"))
+                                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.eventType);
+                            if (message.data != null && message.hasOwnProperty("data"))
+                                writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.data);
+                            if (message.time != null && message.hasOwnProperty("time"))
+                                writer.uint32(/* id 4, wireType 5 =*/37).float(message.time);
+                            if (message.loop != null && message.hasOwnProperty("loop"))
+                                writer.uint32(/* id 5, wireType 0 =*/40).sint32(message.loop);
+                            return writer;
+                        };
+
+                        /**
+                         * Decodes an AudioEventMsgOutProto message from the specified reader or buffer.
+                         * @function decode
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgOutProto
+                         * @static
+                         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                         * @param {number} [length] Message length if known beforehand
+                         * @returns {org.webswing.server.model.proto.AudioEventMsgOutProto} AudioEventMsgOutProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        AudioEventMsgOutProto.decode = function decode(reader, length) {
+                            if (!(reader instanceof $Reader))
+                                reader = $Reader.create(reader);
+                            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.org.webswing.server.model.proto.AudioEventMsgOutProto();
+                            while (reader.pos < end) {
+                                var tag = reader.uint32();
+                                switch (tag >>> 3) {
+                                case 1:
+                                    message.id = reader.string();
+                                    break;
+                                case 2:
+                                    message.eventType = reader.int32();
+                                    break;
+                                case 3:
+                                    message.data = reader.bytes();
+                                    break;
+                                case 4:
+                                    message.time = reader.float();
+                                    break;
+                                case 5:
+                                    message.loop = reader.sint32();
+                                    break;
+                                default:
+                                    reader.skipType(tag & 7);
+                                    break;
+                                }
+                            }
+                            return message;
+                        };
+
+                        /**
+                         * Creates an AudioEventMsgOutProto message from a plain object. Also converts values to their respective internal types.
+                         * @function fromObject
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgOutProto
+                         * @static
+                         * @param {Object.<string,*>} object Plain object
+                         * @returns {org.webswing.server.model.proto.AudioEventMsgOutProto} AudioEventMsgOutProto
+                         */
+                        AudioEventMsgOutProto.fromObject = function fromObject(object) {
+                            if (object instanceof $root.org.webswing.server.model.proto.AudioEventMsgOutProto)
+                                return object;
+                            var message = new $root.org.webswing.server.model.proto.AudioEventMsgOutProto();
+                            if (object.id != null)
+                                message.id = String(object.id);
+                            switch (object.eventType) {
+                            case "play":
+                            case 0:
+                                message.eventType = 0;
+                                break;
+                            case "stop":
+                            case 1:
+                                message.eventType = 1;
+                                break;
+                            case "update":
+                            case 2:
+                                message.eventType = 2;
+                                break;
+                            case "dispose":
+                            case 3:
+                                message.eventType = 3;
+                                break;
+                            }
+                            if (object.data != null)
+                                if (typeof object.data === "string")
+                                    $util.base64.decode(object.data, message.data = $util.newBuffer($util.base64.length(object.data)), 0);
+                                else if (object.data.length)
+                                    message.data = object.data;
+                            if (object.time != null)
+                                message.time = Number(object.time);
+                            if (object.loop != null)
+                                message.loop = object.loop | 0;
+                            return message;
+                        };
+
+                        /**
+                         * Creates a plain object from an AudioEventMsgOutProto message. Also converts values to other types if specified.
+                         * @function toObject
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgOutProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.AudioEventMsgOutProto} message AudioEventMsgOutProto
+                         * @param {$protobuf.IConversionOptions} [options] Conversion options
+                         * @returns {Object.<string,*>} Plain object
+                         */
+                        AudioEventMsgOutProto.toObject = function toObject(message, options) {
+                            if (!options)
+                                options = {};
+                            var object = {};
+                            if (options.defaults) {
+                                object.id = "";
+                                object.eventType = options.enums === String ? "play" : 0;
+                                if (options.bytes === String)
+                                    object.data = "";
+                                else {
+                                    object.data = [];
+                                    if (options.bytes !== Array)
+                                        object.data = $util.newBuffer(object.data);
+                                }
+                                object.time = 0;
+                                object.loop = 0;
+                            }
+                            if (message.id != null && message.hasOwnProperty("id"))
+                                object.id = message.id;
+                            if (message.eventType != null && message.hasOwnProperty("eventType"))
+                                object.eventType = options.enums === String ? $root.org.webswing.server.model.proto.AudioEventMsgOutProto.AudioEventTypeProto[message.eventType] : message.eventType;
+                            if (message.data != null && message.hasOwnProperty("data"))
+                                object.data = options.bytes === String ? $util.base64.encode(message.data, 0, message.data.length) : options.bytes === Array ? Array.prototype.slice.call(message.data) : message.data;
+                            if (message.time != null && message.hasOwnProperty("time"))
+                                object.time = options.json && !isFinite(message.time) ? String(message.time) : message.time;
+                            if (message.loop != null && message.hasOwnProperty("loop"))
+                                object.loop = message.loop;
+                            return object;
+                        };
+
+                        /**
+                         * Converts this AudioEventMsgOutProto to JSON.
+                         * @function toJSON
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgOutProto
+                         * @instance
+                         * @returns {Object.<string,*>} JSON object
+                         */
+                        AudioEventMsgOutProto.prototype.toJSON = function toJSON() {
+                            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                        };
+
+                        /**
+                         * AudioEventTypeProto enum.
+                         * @name org.webswing.server.model.proto.AudioEventMsgOutProto.AudioEventTypeProto
+                         * @enum {string}
+                         * @property {number} play=0 play value
+                         * @property {number} stop=1 stop value
+                         * @property {number} update=2 update value
+                         * @property {number} dispose=3 dispose value
+                         */
+                        AudioEventMsgOutProto.AudioEventTypeProto = (function() {
+                            var valuesById = {}, values = Object.create(valuesById);
+                            values[valuesById[0] = "play"] = 0;
+                            values[valuesById[1] = "stop"] = 1;
+                            values[valuesById[2] = "update"] = 2;
+                            values[valuesById[3] = "dispose"] = 3;
+                            return values;
+                        })();
+
+                        return AudioEventMsgOutProto;
+                    })();
+
+                    proto.WindowDockMsgProto = (function() {
+
+                        /**
+                         * Properties of a WindowDockMsgProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @interface IWindowDockMsgProto
+                         * @property {string|null} [windowId] WindowDockMsgProto windowId
+                         */
+
+                        /**
+                         * Constructs a new WindowDockMsgProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @classdesc Represents a WindowDockMsgProto.
+                         * @implements IWindowDockMsgProto
+                         * @constructor
+                         * @param {org.webswing.server.model.proto.IWindowDockMsgProto=} [properties] Properties to set
+                         */
+                        function WindowDockMsgProto(properties) {
+                            if (properties)
+                                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                                    if (properties[keys[i]] != null)
+                                        this[keys[i]] = properties[keys[i]];
+                        }
+
+                        /**
+                         * WindowDockMsgProto windowId.
+                         * @member {string} windowId
+                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
+                         * @instance
+                         */
+                        WindowDockMsgProto.prototype.windowId = "";
+
+                        /**
+                         * Creates a new WindowDockMsgProto instance using the specified properties.
+                         * @function create
+                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IWindowDockMsgProto=} [properties] Properties to set
+                         * @returns {org.webswing.server.model.proto.WindowDockMsgProto} WindowDockMsgProto instance
+                         */
+                        WindowDockMsgProto.create = function create(properties) {
+                            return new WindowDockMsgProto(properties);
+                        };
+
+                        /**
+                         * Encodes the specified WindowDockMsgProto message. Does not implicitly {@link org.webswing.server.model.proto.WindowDockMsgProto.verify|verify} messages.
+                         * @function encode
+                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IWindowDockMsgProto} message WindowDockMsgProto message or plain object to encode
+                         * @param {$protobuf.Writer} [writer] Writer to encode to
+                         * @returns {$protobuf.Writer} Writer
+                         */
+                        WindowDockMsgProto.encode = function encode(message, writer) {
+                            if (!writer)
+                                writer = $Writer.create();
+                            if (message.windowId != null && message.hasOwnProperty("windowId"))
+                                writer.uint32(/* id 1, wireType 2 =*/10).string(message.windowId);
+                            return writer;
+                        };
+
+                        /**
+                         * Decodes a WindowDockMsgProto message from the specified reader or buffer.
+                         * @function decode
+                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
+                         * @static
+                         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                         * @param {number} [length] Message length if known beforehand
+                         * @returns {org.webswing.server.model.proto.WindowDockMsgProto} WindowDockMsgProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        WindowDockMsgProto.decode = function decode(reader, length) {
+                            if (!(reader instanceof $Reader))
+                                reader = $Reader.create(reader);
+                            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.org.webswing.server.model.proto.WindowDockMsgProto();
+                            while (reader.pos < end) {
+                                var tag = reader.uint32();
+                                switch (tag >>> 3) {
+                                case 1:
+                                    message.windowId = reader.string();
+                                    break;
+                                default:
+                                    reader.skipType(tag & 7);
+                                    break;
+                                }
+                            }
+                            return message;
+                        };
+
+                        /**
+                         * Creates a WindowDockMsgProto message from a plain object. Also converts values to their respective internal types.
+                         * @function fromObject
+                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
+                         * @static
+                         * @param {Object.<string,*>} object Plain object
+                         * @returns {org.webswing.server.model.proto.WindowDockMsgProto} WindowDockMsgProto
+                         */
+                        WindowDockMsgProto.fromObject = function fromObject(object) {
+                            if (object instanceof $root.org.webswing.server.model.proto.WindowDockMsgProto)
+                                return object;
+                            var message = new $root.org.webswing.server.model.proto.WindowDockMsgProto();
+                            if (object.windowId != null)
+                                message.windowId = String(object.windowId);
+                            return message;
+                        };
+
+                        /**
+                         * Creates a plain object from a WindowDockMsgProto message. Also converts values to other types if specified.
+                         * @function toObject
+                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.WindowDockMsgProto} message WindowDockMsgProto
+                         * @param {$protobuf.IConversionOptions} [options] Conversion options
+                         * @returns {Object.<string,*>} Plain object
+                         */
+                        WindowDockMsgProto.toObject = function toObject(message, options) {
+                            if (!options)
+                                options = {};
+                            var object = {};
+                            if (options.defaults)
+                                object.windowId = "";
+                            if (message.windowId != null && message.hasOwnProperty("windowId"))
+                                object.windowId = message.windowId;
+                            return object;
+                        };
+
+                        /**
+                         * Converts this WindowDockMsgProto to JSON.
+                         * @function toJSON
+                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
+                         * @instance
+                         * @returns {Object.<string,*>} JSON object
+                         */
+                        WindowDockMsgProto.prototype.toJSON = function toJSON() {
+                            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                        };
+
+                        return WindowDockMsgProto;
                     })();
 
                     return proto;

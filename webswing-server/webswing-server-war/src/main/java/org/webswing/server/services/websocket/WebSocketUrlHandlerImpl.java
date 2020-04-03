@@ -14,13 +14,14 @@ import org.webswing.model.c2s.*;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
 import org.webswing.model.jslink.JsResultMsg;
 import org.webswing.model.s2c.AppFrameMsgOut;
-import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.EncodedMessage;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.services.rest.resources.model.ApplicationInfoMsg;
+import org.webswing.server.model.ModelConversionFactory;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.security.login.SecuredPathHandler;
@@ -66,7 +67,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 			AppFrameMsgOut appInfo = new AppFrameMsgOut();
 			ApplicationInfoMsg applicationInfoMsg = instanceManager.getApplicationInfoMsg();
 			if (applicationInfoMsg != null) {
-				appInfo.setApplications(Arrays.asList(applicationInfoMsg));
+				appInfo.setApplications(Arrays.asList(ModelConversionFactory.convertAIM(applicationInfoMsg)));
 			}
 			appInfo.setSessionId(r.uuid());
 			EncodedMessage encoded = new EncodedMessage(appInfo);
@@ -114,6 +115,8 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 							send(r, evt.getEvent());
 						} else if (evt.getTimestamps() != null) {
 							send(r, evt.getTimestamps());
+						} else if (evt.getFocus() != null) {
+							send(r, evt.getFocus());
 						}
 					}
 				} else if (frame.getPaste() != null) {

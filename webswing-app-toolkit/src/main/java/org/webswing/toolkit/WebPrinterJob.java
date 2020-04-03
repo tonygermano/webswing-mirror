@@ -108,14 +108,9 @@ public class WebPrinterJob extends PrinterJob {
 		} catch (Exception e) {
 			Logger.error("Failed to save print pdf file to location " + f.getAbsolutePath(), e);
 		}
-		PrinterJobResultMsgInternal printResult = new PrinterJobResultMsgInternal();
-		printResult.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-		printResult.setTempFile(true);
-		printResult.setId(id);
-		printResult.setPdfFile(f);
-		Util.getWebToolkit().getPaintDispatcher().sendObject(printResult);
+		Util.getWebToolkit().getPaintDispatcher().notifyPrintPdfFile(id, f);
 	}
-	
+
 	@Override
 	public void setCopies(int copies) {
 	}

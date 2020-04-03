@@ -1,12 +1,10 @@
 package org.webswing.toolkit.extra;
 
 import org.webswing.common.WindowActionType;
-import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.model.s2c.AccessibilityMsg;
 import org.webswing.model.s2c.CursorChangeEventMsg;
 import org.webswing.toolkit.FocusEventCause;
-import org.webswing.toolkit.WebComponentPeer;
-import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
 
@@ -54,15 +52,11 @@ public class WindowManager {
 					activeWindow = w;
 					if (activeWindow != null) {
 						WindowEvent gainedFocusWindowEvent = new WindowEvent(activeWindow, WindowEvent.WINDOW_GAINED_FOCUS, activeWindow, 0, 0);
-						WebEventDispatcher.dispatchEventInSwing(activeWindow, gainedFocusWindowEvent);
-						WebComponentPeer activeWindowPeer = (WebComponentPeer) WebToolkit.targetToPeer(activeWindow);
-						activeWindowPeer.updateWindowDecorationImage();
-						Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(activeWindow);
+						Util.getWebToolkit().getEventDispatcher().dispatchEventInSwing(activeWindow, gainedFocusWindowEvent);
+						Util.getWebToolkit().getPaintDispatcher().notifyWindowActivated(activeWindow);
 					}
 					if (oldActiveWindow != null) {
-						WebComponentPeer oldActiveWindowPeer = (WebComponentPeer) WebToolkit.targetToPeer(oldActiveWindow);
-						oldActiveWindowPeer.updateWindowDecorationImage();
-						Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(oldActiveWindow);
+						Util.getWebToolkit().getPaintDispatcher().notifyWindowDeactivated(oldActiveWindow);
 					}
 					if(	Util.discoverFileChooser(oldActiveWindow) != null){
 						Util.getWebToolkit().getPaintDispatcher().notifyFileDialogHidden();
@@ -115,8 +109,9 @@ public class WindowManager {
 	public boolean activateWindow(Window w, Component newFocusOwner, int x, int y, boolean tmp, boolean focusedWindowChangeAllowed, FocusEventCause cause) {
 		boolean success = false;
 		boolean newWindow = false;
+		
 		if (!zorder.contains(w)) {
-			if(w.getClass().getName().contains("JLightweightFrame")){
+			if (w.getClass().getName().contains("JLightweightFrame")) {
 				return false;
 			}
 			zorder.addWindow(w);
@@ -132,10 +127,8 @@ public class WindowManager {
 			return false;
 		}
 
-
 		if (focusedWindowChangeAllowed || activeWindow == w) {
-
-			if(w.isFocusableWindow()) {
+			if( w.isFocusableWindow()) {
 				success = deliverFocus(w, newFocusOwner, tmp, cause);
 			}
 
@@ -145,8 +138,8 @@ public class WindowManager {
 				bringToFront(null);
 			}
 		}
+		
 		return success;
-
 	}
 	
 	public boolean isBlockedByModality(Window w, boolean newWindow) {
@@ -232,8 +225,16 @@ public class WindowManager {
 	}
 
 	public void handleWindowDecorationEvent(Window w, MouseEvent e) {
-		WindowActionType wat = Services.getImageService().getWindowDecorationTheme().getAction(w, new Point(e.getX(), e.getY()));
+		Point mousePointer = new Point(e.getX(), e.getY());
+		WindowActionType wat = Services.getImageService().getWindowDecorationTheme().getAction(w, mousePointer);
 		eventhandler.handle(wat, e);
+		
+		if (wat.isButtonActionType()) {
+			AccessibilityMsg accessibilityMsg = Services.getImageService().getWindowDecorationTheme().getAccessible(w, wat, mousePointer);
+			if (accessibilityMsg != null) {
+				Util.getWebToolkit().getPaintDispatcher().notifyAccessibilityInfoUpdate(accessibilityMsg);
+			}
+		}
 	}
 
 	public boolean isLockedToWindowDecorationHandler() {

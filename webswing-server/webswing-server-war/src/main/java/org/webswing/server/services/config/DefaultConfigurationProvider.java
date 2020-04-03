@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,12 +15,13 @@ import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.ConfigContext;
-import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.common.util.WebswingObjectMapper;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.model.exception.WsInitException;
+import org.webswing.server.services.rest.resources.model.MetaObject;
+import org.webswing.server.model.ModelConversionFactory;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 
 public class DefaultConfigurationProvider implements ConfigurationProvider {
@@ -137,7 +139,13 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 		}
 		SecuredPathConfig securedPathConfig = toSecuredPathConfig(path, json);
 		try {
-			MetaObject result = ConfigUtil.getConfigMetadata(securedPathConfig, cl, ctx);
+			org.webswing.server.common.model.meta.MetaObject mo = ConfigUtil.getConfigMetadata(securedPathConfig, cl, ctx);
+			MetaObject result = new MetaObject();
+			result.setFields(mo.getFields().stream()
+			.map(p -> ModelConversionFactory.convertMF(p))
+			.collect(Collectors.toList()));
+			
+			result.setMessage(mo.getMessage());
 			result.setData(json);
 			return result;
 		} catch (Exception e) {
@@ -145,7 +153,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider {
 			throw new WsException("Failed to generate configuration descriptor.");
 		}
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	protected synchronized void loadConfiguration() throws WsInitException {
 		try {

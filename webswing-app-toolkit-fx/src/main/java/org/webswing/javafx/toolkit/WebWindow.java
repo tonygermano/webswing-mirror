@@ -1,13 +1,19 @@
 package org.webswing.javafx.toolkit;
 
 import com.sun.glass.ui.*;
+
+import javafx.stage.Modality;
+
 import org.webswing.javafx.toolkit.adaper.JDialogAdapter;
 import org.webswing.javafx.toolkit.adaper.JFrameAdapter;
 import org.webswing.javafx.toolkit.adaper.JWindowAdapter;
 import org.webswing.javafx.toolkit.adaper.WindowAdapter;
 import org.webswing.javafx.toolkit.util.WebFxUtil;
+import org.webswing.toolkit.util.Logger;
 
 import javax.swing.SwingUtilities;
+
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -15,6 +21,9 @@ import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,10 +54,18 @@ public class WebWindow extends Window {
 	@Override
 	protected long _createWindow(long ownerPtr, long screenPtr, int mask) {
 		WindowAdapter parent = windowRegister.containsKey(ownerPtr) ? windowRegister.get(ownerPtr).w : null;
+		
 		boolean titled = (mask & Window.TITLED) != 0;
-		if ((mask & Window.UTILITY) != 0) {
+		boolean utility = (mask & Window.UTILITY) != 0;
+		boolean popup = (mask & Window.POPUP) != 0;
+		boolean minimizable = (mask & Window.MINIMIZABLE) != 0;
+		boolean maximizable = (mask & Window.MAXIMIZABLE) != 0;
+		boolean probablyDialog = !popup && !utility && !minimizable && !maximizable && parent != null;
+		
+		if (utility || probablyDialog) {
 			w = new JDialogAdapter((java.awt.Window) parent, titled);
-		} else if ((mask & Window.POPUP) != 0) {
+			tryResolveModality();
+		} else if (popup) {
 			w = new JWindowAdapter((java.awt.Window) parent);
 		} else {
 			w = new JFrameAdapter(titled);
@@ -111,6 +128,30 @@ public class WebWindow extends Window {
 		int id = System.identityHashCode(w);
 		windowRegister.put((long) id, this);
 		return id;
+	}
+	
+	private void tryResolveModality() {
+		SwingUtilities.invokeLater(() -> {
+			try {
+				Class windowStageClass = Class.forName("com.sun.javafx.tk.quantum.WindowStage");
+				Method findWindowStageMethod = windowStageClass.getDeclaredMethod("findWindowStage", Window.class);
+				findWindowStageMethod.setAccessible(true);
+				Object windowStage = findWindowStageMethod.invoke(null, WebWindow.this);
+				if (windowStage != null) {
+					Field modalityField = windowStageClass.getDeclaredField("modality");
+					modalityField.setAccessible(true);
+					Modality modality = (Modality) modalityField.get(windowStage);
+					if (modality != null) {
+						if (w instanceof JDialogAdapter) {
+							((JDialogAdapter) w).setModalityType(modality == Modality.APPLICATION_MODAL ? ModalityType.APPLICATION_MODAL : ModalityType.MODELESS);
+						}
+					}
+				}
+			} catch (Exception e) {
+				// ignore
+				Logger.warn("Could not resolve modality for WebWindow.");
+			}
+		});
 	}
 
 	private WebFxView getWebView() {

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>webswing-security-modules</artifactId>
         <groupId>org.webswing.security</groupId>
-        <version>2.7.5</version>
+        <version>20.1</version>
         <relativePath>..</relativePath>
     </parent>
     <dependencies>
@@ -31,6 +31,11 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.cryptacular</groupId>
+            <artifactId>cryptacular</artifactId>
+            <version>1.2.4</version>
         </dependency>
 
         <dependency>

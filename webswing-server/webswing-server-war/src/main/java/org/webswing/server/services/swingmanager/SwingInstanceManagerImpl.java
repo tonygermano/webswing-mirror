@@ -3,7 +3,6 @@ package org.webswing.server.services.swingmanager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
-import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.server.base.PrimaryUrlHandler;
 import org.webswing.server.base.UrlHandler;
@@ -16,6 +15,7 @@ import org.webswing.server.services.files.FileTransferHandler;
 import org.webswing.server.services.files.FileTransferHandlerService;
 import org.webswing.server.services.resources.ResourceHandlerService;
 import org.webswing.server.services.rest.RestService;
+import org.webswing.server.services.rest.resources.model.ApplicationInfoMsg;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.AuthorizationConfig;
 import org.webswing.server.services.security.api.WebswingAction;
@@ -111,13 +111,16 @@ public class SwingInstanceManagerImpl extends PrimaryUrlHandler implements Swing
 			return;
 		}
 		try {
-			SwingInstance instance;
-			if (handshake.isMirrored()) {
-				instance = instanceHolder.findInstanceByInstanceId(handshake.getClientId());
-			} else {
-				String ownerId = ServerUtil.resolveOwnerIdForSessionMode(r, handshake, getSwingConfig());
-				instance = instanceHolder.findInstanceByOwnerId(ownerId);
+			SwingInstance instance = instanceHolder.findInstanceByConnectionId(r.uuid());
+			if (instance == null) {
+				if (handshake.isMirrored()) {
+					instance = instanceHolder.findInstanceByInstanceId(handshake.getClientId());
+				} else {
+					String ownerId = ServerUtil.resolveOwnerIdForSessionMode(r, handshake, getSwingConfig());
+					instance = instanceHolder.findInstanceByOwnerId(ownerId);
+				}
 			}
+
 			if (instance != null) {
 				instance.connectSwingInstance(r, handshake);
 			} else {

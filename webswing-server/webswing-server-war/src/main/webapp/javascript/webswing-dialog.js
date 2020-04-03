@@ -14,7 +14,10 @@ import networkHtml  from './templates/network.html'
             logout: 'login.logout',
             translate: 'translate.translate',
             mutePingWarning: 'ping.mutePingWarning',
-            switchMode: 'touch.switchMode'
+            switchMode: 'touch.switchMode',
+            getFocusedWindow: 'base.getFocusedWindow',
+            getMainWindowVisibilityState: 'base.getMainWindowVisibilityState',
+            focusDefault: 'focusManager.focusDefault'
         };
         module.provides = {
             show: show,
@@ -24,15 +27,14 @@ import networkHtml  from './templates/network.html'
             currentBar: currentBar,
             showBar: showBar,
             hideBar: hideBar,
-            showNetworkBar:showNetworkBar,
-            hideNetworkBar:hideNetworkBar
+            showNetworkBar: showNetworkBar,
+            hideNetworkBar: hideNetworkBar,
+            showOverlay: showOverlay,
+            hideOverlay: hideOverlay
         };
 
-        var currentContent;
-        var dialog, content, header, backdrop, spinnerTimer;
-
-        var currentContentBar;
-        var bar, barContent, barHeader;
+        var dialogMap = {}; // <window>: {dialog, content, header, currentContent}
+        var barMap = {}; // <window>: {bar, barContent, barHeader, currentContentBar}
 
         var networkBar;
 
@@ -64,10 +66,16 @@ import networkHtml  from './templates/network.html'
                         },
                         'dialogHide_click':hideBar,
                         'continueMsg_mouseenter': function(){
-                            currentContentBar.focused=true;
+                        	var winBar = getBar();
+                        	if (winBar && winBar.currentContentBar) {
+                        		winBar.currentContentBar.focused = true;
+                        	}
                         },
                         'continueMsg_mouseleave': function(){
-                            currentContentBar.focused=false;
+                        	var winBar = getBar();
+                        	if (winBar && winBar.currentContentBar) {
+                        		winBar.currentContentBar.focused = false;
+                        	}
                         }
                     }
                 },
@@ -130,12 +138,20 @@ import networkHtml  from './templates/network.html'
                 			api.switchMode(false, true);
                 		}
                     }
+                },
+                dockingVisibilityOverlay: {
+                	type: 'visibility-overlay',
+                	content: '<div class="visibility-overlay"><div class="visibility-message">${dialog.overlay.docking.visibility}</div></div>'
+                },
+                dockingModalityOverlay: {
+                	type: 'modality-overlay',
+                	content: '<div class="modality-overlay"><div class="modality-message">${dialog.overlay.docking.modality}<div class="modality-button"><button>${dialog.overlay.docking.focusWindow}</button></div></div></div>'
                 }
             };
         }
 
         function messageDialog(msg, withSpinner) {
-            var content = '<p>${' + msg + '}</p>';
+            var content = '<p id="commonDialog-description">${' + msg + '}</p>';
             if (withSpinner) {
                 content = '<div class="ws-spinner"><div class="ws-spinner-dot-1"></div> <div class="ws-spinner-dot-2"></div></div>' + content;
             }
@@ -146,7 +162,7 @@ import networkHtml  from './templates/network.html'
 
         function finalMessageDialog(msg) {
             return {
-                content: '<p>${' + msg + '}</p>',
+                content: '<p id="commonDialog-description">${' + msg + '}</p>',
                 buttons: [{
                     label: '<span class="ws-icon-certificate"></class> ${dialog.finalB1}',
                     action: function () {
@@ -163,7 +179,7 @@ import networkHtml  from './templates/network.html'
 
         function retryMessageDialog(msg) {
             return {
-                content: '<p>${' + msg + '}</p>',
+                content: '<p id="commonDialog-description">${' + msg + '}</p>',
                 buttons: [{
                     label: '<span class="ws-icon-arrows-cw"></class> ${dialog.retryB1}',
                     action: function () {
@@ -179,26 +195,55 @@ import networkHtml  from './templates/network.html'
         }
 
         function setup() {
-            api.cfg.rootElement.append(html);
-            backdrop = api.cfg.rootElement.find('div[data-id="commonDialogBackDrop"]');
-            dialog = api.cfg.rootElement.find('div[data-id="commonDialog"]');
-            content = dialog.find('div[data-id="content"]');
-            header = dialog.find('div[data-id="header"]');
+        	// try cleanup
+        	for (var winName in dialogMap) {
+        		if (!dialogMap[winName].win || dialogMap[winName].win.closed) {
+        			delete dialogMap[winName];
+        		}
+        	}
+        	for (var winName in barMap) {
+        		if (!barMap[winName].win || barMap[winName].win.closed) {
+        			delete barMap[winName];
+        		}
+        	}
+        	
+        	var win = api.getFocusedWindow();
+        	
+        	if (dialogMap[win.name]) {
+        		return;
+        	}
+        	
+        	dialogMap[win.name] = {win: win};
+        	barMap[win.name] = {win: win};
+        	
+        	var winDlg = dialogMap[win.name];
+        	var winBar = barMap[win.name];
+        	
+        	var rootElement = $(win.document).find(".webswing-element-content");
+        	
+            rootElement.append(html);
+            winDlg.dialog = rootElement.find('div[data-id="commonDialog"]');
+            winDlg.content = winDlg.dialog.find('div[data-id="content"]');
+            winDlg.header = winDlg.dialog.find('div[data-id="header"]');
 
-            bar = api.cfg.rootElement.find('div[data-id="commonBar"]');
-            barContent = bar.find('div[data-id="content"]');
-            barHeader = bar.find('div[data-id="header"]');
-            bar.hide();
+            winBar.bar = rootElement.find('div[data-id="commonBar"]');
+            winBar.barContent = winBar.bar.find('div[data-id="content"]');
+            winBar.barHeader = winBar.bar.find('div[data-id="header"]');
+            winBar.bar.hide();
 
+            var spinnerTimer;
+            
             $(document).ajaxStart(function () {
                 spinnerTimer = setTimeout(function () {
-                    if (dialog.is(":visible")) {
-                        $('#ajaxProgress').slideDown('fast');
+                    if (winDlg.dialog.is(":visible")) {
+                        rootElement.find('#ajaxProgress').slideDown('fast');
                     }
                 }, 200);
             }).ajaxComplete(function () {
-                clearTimeout(spinnerTimer);
-                $('#ajaxProgress').hide();
+            	if (spinnerTimer) {
+            		clearTimeout(spinnerTimer);
+            	}
+                rootElement.find('#ajaxProgress').hide();
             });
         }
 
@@ -206,27 +251,32 @@ import networkHtml  from './templates/network.html'
             if (msg == null) {
                 return;
             }
-            if (dialog == null) {
-                setup();
+            
+            var winDlg = getDialog();
+            
+            winDlg.currentContent = msg;
+            generateContent(msg, winDlg.dialog, winDlg.header, winDlg.content);
+            winDlg.dialog.slideDown('fast');
+            
+            var initFocus = winDlg.dialog.find(".init-focus");
+            if (initFocus.length) {
+            	initFocus[0].focus();
             }
-            currentContent = msg;
-            generateContent(msg, dialog, header, content);
-            backdrop.show();
-            dialog.slideDown('fast');
-            return content;
+            
+            return winDlg.content;
         }
 
         function showBar(msg) {
             if (msg == null) {
                 return;
             }
-            if (bar == null) {
-                setup();
-            }
-            currentContentBar = msg;
-            generateContent(msg, bar, barHeader, barContent);
-            bar.slideDown('fast');
-            return barContent;
+            
+            var winBar = getBar();
+            
+            winBar.currentContentBar = msg;
+            generateContent(msg, winBar.bar, winBar.barHeader, winBar.barContent);
+            winBar.bar.slideDown('fast');
+            return winBar.barContent;
         }
 
         function generateContent(msg, dialog, header, content) {
@@ -249,11 +299,16 @@ import networkHtml  from './templates/network.html'
                 element.bind(e.substring(e.lastIndexOf('_') + 1), msg.events[e]);
             }
 
-            for (var b in msg.buttons) {
-                var btn = msg.buttons[b];
-                var button = $('<button class="ws-btn">' + api.translate(btn.label) + '</button><span> </span>');
-                button.on('click', btn.action);
-                content.append(button);
+            if (msg.buttons) {
+            	for (var i=0; i<msg.buttons.length; i++) {
+            		var btn = msg.buttons[i];
+            		var button = $('<button class="ws-btn">' + api.translate(btn.label) + '</button><span> </span>');
+            		if (i == 0) {
+            			button.addClass("init-focus");
+            		}
+            		button.on('click', btn.action);
+            		content.append(button);
+            	}
             }
 
             if (dialog.is(":visible")) {
@@ -261,39 +316,96 @@ import networkHtml  from './templates/network.html'
             }
         }
 
-
         function hide() {
-            currentContent = null;
-            content.html('');
-            dialog.fadeOut('fast');
-            backdrop.fadeOut('fast');
+        	var winDlg = getDialog();
+        	
+        	if (!winDlg) {
+        		return;
+        	}
+        	
+        	winDlg.currentContent = null;
+            winDlg.content.html('');
+            winDlg.dialog.fadeOut('fast', function() {
+            	api.focusDefault();
+            });
         }
 
         function hideBar() {
-            currentContentBar = null;
-            barContent.html('');
-            bar.fadeOut('fast');
+        	var winBar = getBar();
+        	
+        	if (!winBar) {
+        		return;
+        	}
+        	
+        	winBar.currentContentBar = null;
+        	winBar.barContent.html('');
+        	winBar.bar.fadeOut('fast');
         }
 
         function current() {
-            return currentContent;
+        	var winDlg = getDialog();
+        	
+        	if (!winDlg) {
+        		return null;
+        	}
+        	
+            return winDlg.currentContent;
         }
 
         function currentBar() {
-            return currentContentBar;
+        	var winBar = getBar();
+        	
+        	if (!winBar) {
+        		return null;
+        	}
+        	
+            return winBar.currentContentBar;
+        }
+        
+        function getDialog() {
+        	var win = api.getFocusedWindow();
+        	
+        	if (!dialogMap[win.name]) {
+        		setup();
+        	}
+        	
+        	return dialogMap[win.name];
+        }
+        
+        function getBar() {
+        	var win = api.getFocusedWindow();
+        	
+        	if (!barMap[win.name]) {
+        		setup();
+        	}
+        	
+        	return barMap[win.name];
         }
 
         function showNetworkBar(msg) {
+            var doc = api.getFocusedWindow().document;
+            var rootElement = $(doc).find(".webswing-element-content");
+            
+            if (networkBar != null && !$.contains(doc, networkBar[0])) {
+           		hideNetworkBar();
+            }
+            	
             if (networkBar == null) {
-                api.cfg.rootElement.append(api.translate(networkHtml));
-                networkBar = api.cfg.rootElement.find('div[data-id="networkBar"]');
+                rootElement.append(api.translate(networkHtml));
+                networkBar = rootElement.find('div[data-id="networkBar"]');
                 networkBar.find('a[data-id="hide"]').on('click', function (evt) {
                     api.mutePingWarning(msg.severity);
                     hideNetworkBar();
                 });
             }
-            networkBar.find('span[data-id="message"]').html(api.translate(msg.content));
-            networkBar.show("fast");
+            
+            var translatedMsg = api.translate(msg.content);
+            var msgElement = networkBar.find('span[data-id="message"]');
+            if (msgElement.html() != translatedMsg) {
+            	// if we replace the same message again and again, it will trigger screen reader to read it again
+            	msgElement.html(translatedMsg);
+            }
+           	networkBar.show("fast");
         }
 
         function hideNetworkBar() {
@@ -303,4 +415,42 @@ import networkHtml  from './templates/network.html'
                 networkBar = null;
             }
         }
+        
+        function showOverlay(win, msg) {
+        	var overlay = $(win.document).find(".webswing-element-content ." + msg.type);
+        	
+        	if (overlay.length == 0) {
+        		overlay = $(api.translate(msg.content));
+        		$(win.document).find('.webswing-element-content').append(overlay);
+        	}
+        	
+        	overlay.addClass("active");
+        	
+        	if (msg.type == 'visibility-overlay') {
+        		$(win.document).find(".webswing-element-content").addClass("webswing-disabled");
+        		$(win.document).find(".modality-overlay").addClass("suppressed");
+        	} else if (msg.type == 'modality-overlay') {
+        		overlay.toggleClass("suppressed", api.getMainWindowVisibilityState() == 'hidden');
+				overlay.find("button").off("click");
+        	}
+        }
+        
+        function hideOverlay(win, msg) {
+        	var overlay = $(win.document).find(".webswing-element-content ." + msg.type);
+        	
+        	if (overlay.length == 0) {
+        		return;
+        	}
+        	
+        	overlay.removeClass("active");
+        	
+        	if (msg.type == 'visibility-overlay') {
+        		$(win.document).find(".webswing-element-content").removeClass("webswing-disabled");
+        		$(win.document).find(".modality-overlay").removeClass("suppressed");
+        	} else if (msg.type == 'modality-overlay') {
+        		overlay.removeClass("suppressed", api.getMainWindowVisibilityState() == 'hidden');
+        		overlay.find("button").off("click");
+        	}
+        }
+        
     }

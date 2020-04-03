@@ -82,6 +82,18 @@ export namespace org {
 
                         /** AppFrameMsgOutProto compositingWM */
                         compositingWM?: (boolean|null);
+
+                        /** AppFrameMsgOutProto audioEvent */
+                        audioEvent?: (org.webswing.server.model.proto.IAudioEventMsgOutProto|null);
+
+                        /** AppFrameMsgOutProto dockAction */
+                        dockAction?: (org.webswing.server.model.proto.IWindowDockMsgProto|null);
+
+                        /** AppFrameMsgOutProto accessible */
+                        accessible?: (org.webswing.server.model.proto.IAccessibilityMsgProto|null);
+
+                        /** AppFrameMsgOutProto windowSwitchList */
+                        windowSwitchList?: (org.webswing.server.model.proto.IWindowSwitchMsgProto[]|null);
                     }
 
                     /** Represents an AppFrameMsgOutProto. */
@@ -159,6 +171,18 @@ export namespace org {
                         /** AppFrameMsgOutProto compositingWM. */
                         public compositingWM: boolean;
 
+                        /** AppFrameMsgOutProto audioEvent. */
+                        public audioEvent?: (org.webswing.server.model.proto.IAudioEventMsgOutProto|null);
+
+                        /** AppFrameMsgOutProto dockAction. */
+                        public dockAction?: (org.webswing.server.model.proto.IWindowDockMsgProto|null);
+
+                        /** AppFrameMsgOutProto accessible. */
+                        public accessible?: (org.webswing.server.model.proto.IAccessibilityMsgProto|null);
+
+                        /** AppFrameMsgOutProto windowSwitchList. */
+                        public windowSwitchList: org.webswing.server.model.proto.IWindowSwitchMsgProto[];
+
                         /**
                          * Creates a new AppFrameMsgOutProto instance using the specified properties.
                          * @param [properties] Properties to set
@@ -201,6 +225,330 @@ export namespace org {
 
                         /**
                          * Converts this AppFrameMsgOutProto to JSON.
+                         * @returns JSON object
+                         */
+                        public toJSON(): { [k: string]: any };
+                    }
+
+                    /** Properties of an AccessibilityMsgProto. */
+                    interface IAccessibilityMsgProto {
+
+                        /** AccessibilityMsgProto id */
+                        id?: (string|null);
+
+                        /** AccessibilityMsgProto role */
+                        role?: (string|null);
+
+                        /** AccessibilityMsgProto text */
+                        text?: (string|null);
+
+                        /** AccessibilityMsgProto tooltip */
+                        tooltip?: (string|null);
+
+                        /** AccessibilityMsgProto value */
+                        value?: (string|null);
+
+                        /** AccessibilityMsgProto description */
+                        description?: (string|null);
+
+                        /** AccessibilityMsgProto columnheader */
+                        columnheader?: (string|null);
+
+                        /** AccessibilityMsgProto password */
+                        password?: (boolean|null);
+
+                        /** AccessibilityMsgProto toggle */
+                        toggle?: (boolean|null);
+
+                        /** AccessibilityMsgProto selstart */
+                        selstart?: (number|null);
+
+                        /** AccessibilityMsgProto selend */
+                        selend?: (number|null);
+
+                        /** AccessibilityMsgProto rowheight */
+                        rowheight?: (number|null);
+
+                        /** AccessibilityMsgProto rows */
+                        rows?: (number|null);
+
+                        /** AccessibilityMsgProto size */
+                        size?: (number|null);
+
+                        /** AccessibilityMsgProto position */
+                        position?: (number|null);
+
+                        /** AccessibilityMsgProto level */
+                        level?: (number|null);
+
+                        /** AccessibilityMsgProto colindex */
+                        colindex?: (number|null);
+
+                        /** AccessibilityMsgProto rowindex */
+                        rowindex?: (number|null);
+
+                        /** AccessibilityMsgProto colcount */
+                        colcount?: (number|null);
+
+                        /** AccessibilityMsgProto rowcount */
+                        rowcount?: (number|null);
+
+                        /** AccessibilityMsgProto states */
+                        states?: (string[]|null);
+
+                        /** AccessibilityMsgProto min */
+                        min?: (number|null);
+
+                        /** AccessibilityMsgProto max */
+                        max?: (number|null);
+
+                        /** AccessibilityMsgProto val */
+                        val?: (number|null);
+
+                        /** AccessibilityMsgProto screenX */
+                        screenX?: (number|null);
+
+                        /** AccessibilityMsgProto screenY */
+                        screenY?: (number|null);
+
+                        /** AccessibilityMsgProto width */
+                        width?: (number|null);
+
+                        /** AccessibilityMsgProto height */
+                        height?: (number|null);
+
+                        /** AccessibilityMsgProto hierarchy */
+                        hierarchy?: (org.webswing.server.model.proto.IAccessibilityHierarchyMsgProto[]|null);
+                    }
+
+                    /** Represents an AccessibilityMsgProto. */
+                    class AccessibilityMsgProto implements IAccessibilityMsgProto {
+
+                        /**
+                         * Constructs a new AccessibilityMsgProto.
+                         * @param [properties] Properties to set
+                         */
+                        constructor(properties?: org.webswing.server.model.proto.IAccessibilityMsgProto);
+
+                        /** AccessibilityMsgProto id. */
+                        public id: string;
+
+                        /** AccessibilityMsgProto role. */
+                        public role: string;
+
+                        /** AccessibilityMsgProto text. */
+                        public text: string;
+
+                        /** AccessibilityMsgProto tooltip. */
+                        public tooltip: string;
+
+                        /** AccessibilityMsgProto value. */
+                        public value: string;
+
+                        /** AccessibilityMsgProto description. */
+                        public description: string;
+
+                        /** AccessibilityMsgProto columnheader. */
+                        public columnheader: string;
+
+                        /** AccessibilityMsgProto password. */
+                        public password: boolean;
+
+                        /** AccessibilityMsgProto toggle. */
+                        public toggle: boolean;
+
+                        /** AccessibilityMsgProto selstart. */
+                        public selstart: number;
+
+                        /** AccessibilityMsgProto selend. */
+                        public selend: number;
+
+                        /** AccessibilityMsgProto rowheight. */
+                        public rowheight: number;
+
+                        /** AccessibilityMsgProto rows. */
+                        public rows: number;
+
+                        /** AccessibilityMsgProto size. */
+                        public size: number;
+
+                        /** AccessibilityMsgProto position. */
+                        public position: number;
+
+                        /** AccessibilityMsgProto level. */
+                        public level: number;
+
+                        /** AccessibilityMsgProto colindex. */
+                        public colindex: number;
+
+                        /** AccessibilityMsgProto rowindex. */
+                        public rowindex: number;
+
+                        /** AccessibilityMsgProto colcount. */
+                        public colcount: number;
+
+                        /** AccessibilityMsgProto rowcount. */
+                        public rowcount: number;
+
+                        /** AccessibilityMsgProto states. */
+                        public states: string[];
+
+                        /** AccessibilityMsgProto min. */
+                        public min: number;
+
+                        /** AccessibilityMsgProto max. */
+                        public max: number;
+
+                        /** AccessibilityMsgProto val. */
+                        public val: number;
+
+                        /** AccessibilityMsgProto screenX. */
+                        public screenX: number;
+
+                        /** AccessibilityMsgProto screenY. */
+                        public screenY: number;
+
+                        /** AccessibilityMsgProto width. */
+                        public width: number;
+
+                        /** AccessibilityMsgProto height. */
+                        public height: number;
+
+                        /** AccessibilityMsgProto hierarchy. */
+                        public hierarchy: org.webswing.server.model.proto.IAccessibilityHierarchyMsgProto[];
+
+                        /**
+                         * Creates a new AccessibilityMsgProto instance using the specified properties.
+                         * @param [properties] Properties to set
+                         * @returns AccessibilityMsgProto instance
+                         */
+                        public static create(properties?: org.webswing.server.model.proto.IAccessibilityMsgProto): org.webswing.server.model.proto.AccessibilityMsgProto;
+
+                        /**
+                         * Encodes the specified AccessibilityMsgProto message. Does not implicitly {@link org.webswing.server.model.proto.AccessibilityMsgProto.verify|verify} messages.
+                         * @param message AccessibilityMsgProto message or plain object to encode
+                         * @param [writer] Writer to encode to
+                         * @returns Writer
+                         */
+                        public static encode(message: org.webswing.server.model.proto.IAccessibilityMsgProto, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                        /**
+                         * Decodes an AccessibilityMsgProto message from the specified reader or buffer.
+                         * @param reader Reader or buffer to decode from
+                         * @param [length] Message length if known beforehand
+                         * @returns AccessibilityMsgProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): org.webswing.server.model.proto.AccessibilityMsgProto;
+
+                        /**
+                         * Creates an AccessibilityMsgProto message from a plain object. Also converts values to their respective internal types.
+                         * @param object Plain object
+                         * @returns AccessibilityMsgProto
+                         */
+                        public static fromObject(object: { [k: string]: any }): org.webswing.server.model.proto.AccessibilityMsgProto;
+
+                        /**
+                         * Creates a plain object from an AccessibilityMsgProto message. Also converts values to other types if specified.
+                         * @param message AccessibilityMsgProto
+                         * @param [options] Conversion options
+                         * @returns Plain object
+                         */
+                        public static toObject(message: org.webswing.server.model.proto.AccessibilityMsgProto, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                        /**
+                         * Converts this AccessibilityMsgProto to JSON.
+                         * @returns JSON object
+                         */
+                        public toJSON(): { [k: string]: any };
+                    }
+
+                    /** Properties of an AccessibilityHierarchyMsgProto. */
+                    interface IAccessibilityHierarchyMsgProto {
+
+                        /** AccessibilityHierarchyMsgProto id */
+                        id?: (string|null);
+
+                        /** AccessibilityHierarchyMsgProto role */
+                        role?: (string|null);
+
+                        /** AccessibilityHierarchyMsgProto text */
+                        text?: (string|null);
+
+                        /** AccessibilityHierarchyMsgProto position */
+                        position?: (number|null);
+
+                        /** AccessibilityHierarchyMsgProto size */
+                        size?: (number|null);
+                    }
+
+                    /** Represents an AccessibilityHierarchyMsgProto. */
+                    class AccessibilityHierarchyMsgProto implements IAccessibilityHierarchyMsgProto {
+
+                        /**
+                         * Constructs a new AccessibilityHierarchyMsgProto.
+                         * @param [properties] Properties to set
+                         */
+                        constructor(properties?: org.webswing.server.model.proto.IAccessibilityHierarchyMsgProto);
+
+                        /** AccessibilityHierarchyMsgProto id. */
+                        public id: string;
+
+                        /** AccessibilityHierarchyMsgProto role. */
+                        public role: string;
+
+                        /** AccessibilityHierarchyMsgProto text. */
+                        public text: string;
+
+                        /** AccessibilityHierarchyMsgProto position. */
+                        public position: number;
+
+                        /** AccessibilityHierarchyMsgProto size. */
+                        public size: number;
+
+                        /**
+                         * Creates a new AccessibilityHierarchyMsgProto instance using the specified properties.
+                         * @param [properties] Properties to set
+                         * @returns AccessibilityHierarchyMsgProto instance
+                         */
+                        public static create(properties?: org.webswing.server.model.proto.IAccessibilityHierarchyMsgProto): org.webswing.server.model.proto.AccessibilityHierarchyMsgProto;
+
+                        /**
+                         * Encodes the specified AccessibilityHierarchyMsgProto message. Does not implicitly {@link org.webswing.server.model.proto.AccessibilityHierarchyMsgProto.verify|verify} messages.
+                         * @param message AccessibilityHierarchyMsgProto message or plain object to encode
+                         * @param [writer] Writer to encode to
+                         * @returns Writer
+                         */
+                        public static encode(message: org.webswing.server.model.proto.IAccessibilityHierarchyMsgProto, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                        /**
+                         * Decodes an AccessibilityHierarchyMsgProto message from the specified reader or buffer.
+                         * @param reader Reader or buffer to decode from
+                         * @param [length] Message length if known beforehand
+                         * @returns AccessibilityHierarchyMsgProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): org.webswing.server.model.proto.AccessibilityHierarchyMsgProto;
+
+                        /**
+                         * Creates an AccessibilityHierarchyMsgProto message from a plain object. Also converts values to their respective internal types.
+                         * @param object Plain object
+                         * @returns AccessibilityHierarchyMsgProto
+                         */
+                        public static fromObject(object: { [k: string]: any }): org.webswing.server.model.proto.AccessibilityHierarchyMsgProto;
+
+                        /**
+                         * Creates a plain object from an AccessibilityHierarchyMsgProto message. Also converts values to other types if specified.
+                         * @param message AccessibilityHierarchyMsgProto
+                         * @param [options] Conversion options
+                         * @returns Plain object
+                         */
+                        public static toObject(message: org.webswing.server.model.proto.AccessibilityHierarchyMsgProto, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                        /**
+                         * Converts this AccessibilityHierarchyMsgProto to JSON.
                          * @returns JSON object
                          */
                         public toJSON(): { [k: string]: any };
@@ -605,6 +953,9 @@ export namespace org {
 
                         /** CursorChangeEventMsgProto curFile */
                         curFile?: (string|null);
+
+                        /** CursorChangeEventMsgProto winId */
+                        winId?: (string|null);
                     }
 
                     /** Represents a CursorChangeEventMsgProto. */
@@ -630,6 +981,9 @@ export namespace org {
 
                         /** CursorChangeEventMsgProto curFile. */
                         public curFile: string;
+
+                        /** CursorChangeEventMsgProto winId. */
+                        public winId: string;
 
                         /**
                          * Creates a new CursorChangeEventMsgProto instance using the specified properties.
@@ -953,6 +1307,84 @@ export namespace org {
                         }
                     }
 
+                    /** Properties of a WindowSwitchMsg. */
+                    interface IWindowSwitchMsg {
+
+                        /** WindowSwitchMsg id */
+                        id: string;
+
+                        /** WindowSwitchMsg title */
+                        title?: (string|null);
+
+                        /** WindowSwitchMsg modalBlocked */
+                        modalBlocked?: (boolean|null);
+                    }
+
+                    /** Represents a WindowSwitchMsg. */
+                    class WindowSwitchMsg implements IWindowSwitchMsg {
+
+                        /**
+                         * Constructs a new WindowSwitchMsg.
+                         * @param [properties] Properties to set
+                         */
+                        constructor(properties?: org.webswing.server.model.proto.IWindowSwitchMsg);
+
+                        /** WindowSwitchMsg id. */
+                        public id: string;
+
+                        /** WindowSwitchMsg title. */
+                        public title: string;
+
+                        /** WindowSwitchMsg modalBlocked. */
+                        public modalBlocked: boolean;
+
+                        /**
+                         * Creates a new WindowSwitchMsg instance using the specified properties.
+                         * @param [properties] Properties to set
+                         * @returns WindowSwitchMsg instance
+                         */
+                        public static create(properties?: org.webswing.server.model.proto.IWindowSwitchMsg): org.webswing.server.model.proto.WindowSwitchMsg;
+
+                        /**
+                         * Encodes the specified WindowSwitchMsg message. Does not implicitly {@link org.webswing.server.model.proto.WindowSwitchMsg.verify|verify} messages.
+                         * @param message WindowSwitchMsg message or plain object to encode
+                         * @param [writer] Writer to encode to
+                         * @returns Writer
+                         */
+                        public static encode(message: org.webswing.server.model.proto.IWindowSwitchMsg, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                        /**
+                         * Decodes a WindowSwitchMsg message from the specified reader or buffer.
+                         * @param reader Reader or buffer to decode from
+                         * @param [length] Message length if known beforehand
+                         * @returns WindowSwitchMsg
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): org.webswing.server.model.proto.WindowSwitchMsg;
+
+                        /**
+                         * Creates a WindowSwitchMsg message from a plain object. Also converts values to their respective internal types.
+                         * @param object Plain object
+                         * @returns WindowSwitchMsg
+                         */
+                        public static fromObject(object: { [k: string]: any }): org.webswing.server.model.proto.WindowSwitchMsg;
+
+                        /**
+                         * Creates a plain object from a WindowSwitchMsg message. Also converts values to other types if specified.
+                         * @param message WindowSwitchMsg
+                         * @param [options] Conversion options
+                         * @returns Plain object
+                         */
+                        public static toObject(message: org.webswing.server.model.proto.WindowSwitchMsg, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                        /**
+                         * Converts this WindowSwitchMsg to JSON.
+                         * @returns JSON object
+                         */
+                        public toJSON(): { [k: string]: any };
+                    }
+
                     /** Properties of a WindowMsgProto. */
                     interface IWindowMsgProto {
 
@@ -983,8 +1415,8 @@ export namespace org {
                         /** WindowMsgProto name */
                         name?: (string|null);
 
-                        /** WindowMsgProto html */
-                        html?: (boolean|null);
+                        /** WindowMsgProto type */
+                        type?: (org.webswing.server.model.proto.WindowMsgProto.WindowTypeProto|null);
 
                         /** WindowMsgProto modalBlocked */
                         modalBlocked?: (boolean|null);
@@ -994,6 +1426,12 @@ export namespace org {
 
                         /** WindowMsgProto state */
                         state?: (number|null);
+
+                        /** WindowMsgProto internalWindows */
+                        internalWindows?: (org.webswing.server.model.proto.IWindowMsgProto[]|null);
+
+                        /** WindowMsgProto dockMode */
+                        dockMode?: (org.webswing.server.model.proto.WindowMsgProto.DockModeProto|null);
                     }
 
                     /** Represents a WindowMsgProto. */
@@ -1032,8 +1470,8 @@ export namespace org {
                         /** WindowMsgProto name. */
                         public name: string;
 
-                        /** WindowMsgProto html. */
-                        public html: boolean;
+                        /** WindowMsgProto type. */
+                        public type: org.webswing.server.model.proto.WindowMsgProto.WindowTypeProto;
 
                         /** WindowMsgProto modalBlocked. */
                         public modalBlocked: boolean;
@@ -1043,6 +1481,12 @@ export namespace org {
 
                         /** WindowMsgProto state. */
                         public state: number;
+
+                        /** WindowMsgProto internalWindows. */
+                        public internalWindows: org.webswing.server.model.proto.IWindowMsgProto[];
+
+                        /** WindowMsgProto dockMode. */
+                        public dockMode: org.webswing.server.model.proto.WindowMsgProto.DockModeProto;
 
                         /**
                          * Creates a new WindowMsgProto instance using the specified properties.
@@ -1086,6 +1530,103 @@ export namespace org {
 
                         /**
                          * Converts this WindowMsgProto to JSON.
+                         * @returns JSON object
+                         */
+                        public toJSON(): { [k: string]: any };
+                    }
+
+                    namespace WindowMsgProto {
+
+                        /** WindowTypeProto enum. */
+                        enum WindowTypeProto {
+                            basic = 1,
+                            html = 2,
+                            internal = 3,
+                            internalHtml = 4,
+                            internalWrapper = 5
+                        }
+
+                        /** DockModeProto enum. */
+                        enum DockModeProto {
+                            none = 1,
+                            dockable = 2,
+                            autoUndock = 3
+                        }
+                    }
+
+                    /** Properties of a WindowSwitchMsgProto. */
+                    interface IWindowSwitchMsgProto {
+
+                        /** WindowSwitchMsgProto id */
+                        id: string;
+
+                        /** WindowSwitchMsgProto title */
+                        title?: (string|null);
+
+                        /** WindowSwitchMsgProto modalBlocked */
+                        modalBlocked?: (boolean|null);
+                    }
+
+                    /** Represents a WindowSwitchMsgProto. */
+                    class WindowSwitchMsgProto implements IWindowSwitchMsgProto {
+
+                        /**
+                         * Constructs a new WindowSwitchMsgProto.
+                         * @param [properties] Properties to set
+                         */
+                        constructor(properties?: org.webswing.server.model.proto.IWindowSwitchMsgProto);
+
+                        /** WindowSwitchMsgProto id. */
+                        public id: string;
+
+                        /** WindowSwitchMsgProto title. */
+                        public title: string;
+
+                        /** WindowSwitchMsgProto modalBlocked. */
+                        public modalBlocked: boolean;
+
+                        /**
+                         * Creates a new WindowSwitchMsgProto instance using the specified properties.
+                         * @param [properties] Properties to set
+                         * @returns WindowSwitchMsgProto instance
+                         */
+                        public static create(properties?: org.webswing.server.model.proto.IWindowSwitchMsgProto): org.webswing.server.model.proto.WindowSwitchMsgProto;
+
+                        /**
+                         * Encodes the specified WindowSwitchMsgProto message. Does not implicitly {@link org.webswing.server.model.proto.WindowSwitchMsgProto.verify|verify} messages.
+                         * @param message WindowSwitchMsgProto message or plain object to encode
+                         * @param [writer] Writer to encode to
+                         * @returns Writer
+                         */
+                        public static encode(message: org.webswing.server.model.proto.IWindowSwitchMsgProto, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                        /**
+                         * Decodes a WindowSwitchMsgProto message from the specified reader or buffer.
+                         * @param reader Reader or buffer to decode from
+                         * @param [length] Message length if known beforehand
+                         * @returns WindowSwitchMsgProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): org.webswing.server.model.proto.WindowSwitchMsgProto;
+
+                        /**
+                         * Creates a WindowSwitchMsgProto message from a plain object. Also converts values to their respective internal types.
+                         * @param object Plain object
+                         * @returns WindowSwitchMsgProto
+                         */
+                        public static fromObject(object: { [k: string]: any }): org.webswing.server.model.proto.WindowSwitchMsgProto;
+
+                        /**
+                         * Creates a plain object from a WindowSwitchMsgProto message. Also converts values to other types if specified.
+                         * @param message WindowSwitchMsgProto
+                         * @param [options] Conversion options
+                         * @returns Plain object
+                         */
+                        public static toObject(message: org.webswing.server.model.proto.WindowSwitchMsgProto, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                        /**
+                         * Converts this WindowSwitchMsgProto to JSON.
                          * @returns JSON object
                          */
                         public toJSON(): { [k: string]: any };
@@ -1911,6 +2452,9 @@ export namespace org {
 
                         /** InputEventMsgInProto timestamps */
                         timestamps?: (org.webswing.server.model.proto.ITimestampsMsgInProto|null);
+
+                        /** InputEventMsgInProto focus */
+                        focus?: (org.webswing.server.model.proto.IWindowFocusMsgInProto|null);
                     }
 
                     /** Represents an InputEventMsgInProto. */
@@ -1936,6 +2480,9 @@ export namespace org {
 
                         /** InputEventMsgInProto timestamps. */
                         public timestamps?: (org.webswing.server.model.proto.ITimestampsMsgInProto|null);
+
+                        /** InputEventMsgInProto focus. */
+                        public focus?: (org.webswing.server.model.proto.IWindowFocusMsgInProto|null);
 
                         /**
                          * Creates a new InputEventMsgInProto instance using the specified properties.
@@ -1979,6 +2526,78 @@ export namespace org {
 
                         /**
                          * Converts this InputEventMsgInProto to JSON.
+                         * @returns JSON object
+                         */
+                        public toJSON(): { [k: string]: any };
+                    }
+
+                    /** Properties of a WindowFocusMsgInProto. */
+                    interface IWindowFocusMsgInProto {
+
+                        /** WindowFocusMsgInProto windowId */
+                        windowId?: (string|null);
+
+                        /** WindowFocusMsgInProto htmlPanelId */
+                        htmlPanelId?: (string|null);
+                    }
+
+                    /** Represents a WindowFocusMsgInProto. */
+                    class WindowFocusMsgInProto implements IWindowFocusMsgInProto {
+
+                        /**
+                         * Constructs a new WindowFocusMsgInProto.
+                         * @param [properties] Properties to set
+                         */
+                        constructor(properties?: org.webswing.server.model.proto.IWindowFocusMsgInProto);
+
+                        /** WindowFocusMsgInProto windowId. */
+                        public windowId: string;
+
+                        /** WindowFocusMsgInProto htmlPanelId. */
+                        public htmlPanelId: string;
+
+                        /**
+                         * Creates a new WindowFocusMsgInProto instance using the specified properties.
+                         * @param [properties] Properties to set
+                         * @returns WindowFocusMsgInProto instance
+                         */
+                        public static create(properties?: org.webswing.server.model.proto.IWindowFocusMsgInProto): org.webswing.server.model.proto.WindowFocusMsgInProto;
+
+                        /**
+                         * Encodes the specified WindowFocusMsgInProto message. Does not implicitly {@link org.webswing.server.model.proto.WindowFocusMsgInProto.verify|verify} messages.
+                         * @param message WindowFocusMsgInProto message or plain object to encode
+                         * @param [writer] Writer to encode to
+                         * @returns Writer
+                         */
+                        public static encode(message: org.webswing.server.model.proto.IWindowFocusMsgInProto, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                        /**
+                         * Decodes a WindowFocusMsgInProto message from the specified reader or buffer.
+                         * @param reader Reader or buffer to decode from
+                         * @param [length] Message length if known beforehand
+                         * @returns WindowFocusMsgInProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): org.webswing.server.model.proto.WindowFocusMsgInProto;
+
+                        /**
+                         * Creates a WindowFocusMsgInProto message from a plain object. Also converts values to their respective internal types.
+                         * @param object Plain object
+                         * @returns WindowFocusMsgInProto
+                         */
+                        public static fromObject(object: { [k: string]: any }): org.webswing.server.model.proto.WindowFocusMsgInProto;
+
+                        /**
+                         * Creates a plain object from a WindowFocusMsgInProto message. Also converts values to other types if specified.
+                         * @param message WindowFocusMsgInProto
+                         * @param [options] Conversion options
+                         * @returns Plain object
+                         */
+                        public static toObject(message: org.webswing.server.model.proto.WindowFocusMsgInProto, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                        /**
+                         * Converts this WindowFocusMsgInProto to JSON.
                          * @returns JSON object
                          */
                         public toJSON(): { [k: string]: any };
@@ -2112,6 +2731,15 @@ export namespace org {
 
                         /** ConnectionHandshakeMsgInProto timeZone */
                         timeZone?: (string|null);
+
+                        /** ConnectionHandshakeMsgInProto dockingSupported */
+                        dockingSupported?: (boolean|null);
+
+                        /** ConnectionHandshakeMsgInProto touchMode */
+                        touchMode?: (boolean|null);
+
+                        /** ConnectionHandshakeMsgInProto accessiblityEnabled */
+                        accessiblityEnabled?: (boolean|null);
                     }
 
                     /** Represents a ConnectionHandshakeMsgInProto. */
@@ -2164,6 +2792,15 @@ export namespace org {
 
                         /** ConnectionHandshakeMsgInProto timeZone. */
                         public timeZone: string;
+
+                        /** ConnectionHandshakeMsgInProto dockingSupported. */
+                        public dockingSupported: boolean;
+
+                        /** ConnectionHandshakeMsgInProto touchMode. */
+                        public touchMode: boolean;
+
+                        /** ConnectionHandshakeMsgInProto accessiblityEnabled. */
+                        public accessiblityEnabled: boolean;
 
                         /**
                          * Creates a new ConnectionHandshakeMsgInProto instance using the specified properties.
@@ -2784,7 +3421,8 @@ export namespace org {
                             deleteFile = 5,
                             hb = 6,
                             cancelFileSelection = 7,
-                            requestComponentTree = 8
+                            requestComponentTree = 8,
+                            requestWindowSwitchList = 9
                         }
                     }
 
@@ -3313,6 +3951,9 @@ export namespace org {
 
                         /** WindowEventMsgInProto close */
                         close?: (boolean|null);
+
+                        /** WindowEventMsgInProto focus */
+                        focus?: (boolean|null);
                     }
 
                     /** Represents a WindowEventMsgInProto. */
@@ -3341,6 +3982,9 @@ export namespace org {
 
                         /** WindowEventMsgInProto close. */
                         public close: boolean;
+
+                        /** WindowEventMsgInProto focus. */
+                        public focus: boolean;
 
                         /**
                          * Creates a new WindowEventMsgInProto instance using the specified properties.
@@ -3567,6 +4211,173 @@ export namespace org {
 
                         /**
                          * Converts this ActionEventMsgOutProto to JSON.
+                         * @returns JSON object
+                         */
+                        public toJSON(): { [k: string]: any };
+                    }
+
+                    /** Properties of an AudioEventMsgOutProto. */
+                    interface IAudioEventMsgOutProto {
+
+                        /** AudioEventMsgOutProto id */
+                        id?: (string|null);
+
+                        /** AudioEventMsgOutProto eventType */
+                        eventType?: (org.webswing.server.model.proto.AudioEventMsgOutProto.AudioEventTypeProto|null);
+
+                        /** AudioEventMsgOutProto data */
+                        data?: (Uint8Array|null);
+
+                        /** AudioEventMsgOutProto time */
+                        time?: (number|null);
+
+                        /** AudioEventMsgOutProto loop */
+                        loop?: (number|null);
+                    }
+
+                    /** Represents an AudioEventMsgOutProto. */
+                    class AudioEventMsgOutProto implements IAudioEventMsgOutProto {
+
+                        /**
+                         * Constructs a new AudioEventMsgOutProto.
+                         * @param [properties] Properties to set
+                         */
+                        constructor(properties?: org.webswing.server.model.proto.IAudioEventMsgOutProto);
+
+                        /** AudioEventMsgOutProto id. */
+                        public id: string;
+
+                        /** AudioEventMsgOutProto eventType. */
+                        public eventType: org.webswing.server.model.proto.AudioEventMsgOutProto.AudioEventTypeProto;
+
+                        /** AudioEventMsgOutProto data. */
+                        public data: Uint8Array;
+
+                        /** AudioEventMsgOutProto time. */
+                        public time: number;
+
+                        /** AudioEventMsgOutProto loop. */
+                        public loop: number;
+
+                        /**
+                         * Creates a new AudioEventMsgOutProto instance using the specified properties.
+                         * @param [properties] Properties to set
+                         * @returns AudioEventMsgOutProto instance
+                         */
+                        public static create(properties?: org.webswing.server.model.proto.IAudioEventMsgOutProto): org.webswing.server.model.proto.AudioEventMsgOutProto;
+
+                        /**
+                         * Encodes the specified AudioEventMsgOutProto message. Does not implicitly {@link org.webswing.server.model.proto.AudioEventMsgOutProto.verify|verify} messages.
+                         * @param message AudioEventMsgOutProto message or plain object to encode
+                         * @param [writer] Writer to encode to
+                         * @returns Writer
+                         */
+                        public static encode(message: org.webswing.server.model.proto.IAudioEventMsgOutProto, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                        /**
+                         * Decodes an AudioEventMsgOutProto message from the specified reader or buffer.
+                         * @param reader Reader or buffer to decode from
+                         * @param [length] Message length if known beforehand
+                         * @returns AudioEventMsgOutProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): org.webswing.server.model.proto.AudioEventMsgOutProto;
+
+                        /**
+                         * Creates an AudioEventMsgOutProto message from a plain object. Also converts values to their respective internal types.
+                         * @param object Plain object
+                         * @returns AudioEventMsgOutProto
+                         */
+                        public static fromObject(object: { [k: string]: any }): org.webswing.server.model.proto.AudioEventMsgOutProto;
+
+                        /**
+                         * Creates a plain object from an AudioEventMsgOutProto message. Also converts values to other types if specified.
+                         * @param message AudioEventMsgOutProto
+                         * @param [options] Conversion options
+                         * @returns Plain object
+                         */
+                        public static toObject(message: org.webswing.server.model.proto.AudioEventMsgOutProto, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                        /**
+                         * Converts this AudioEventMsgOutProto to JSON.
+                         * @returns JSON object
+                         */
+                        public toJSON(): { [k: string]: any };
+                    }
+
+                    namespace AudioEventMsgOutProto {
+
+                        /** AudioEventTypeProto enum. */
+                        enum AudioEventTypeProto {
+                            play = 0,
+                            stop = 1,
+                            update = 2,
+                            dispose = 3
+                        }
+                    }
+
+                    /** Properties of a WindowDockMsgProto. */
+                    interface IWindowDockMsgProto {
+
+                        /** WindowDockMsgProto windowId */
+                        windowId?: (string|null);
+                    }
+
+                    /** Represents a WindowDockMsgProto. */
+                    class WindowDockMsgProto implements IWindowDockMsgProto {
+
+                        /**
+                         * Constructs a new WindowDockMsgProto.
+                         * @param [properties] Properties to set
+                         */
+                        constructor(properties?: org.webswing.server.model.proto.IWindowDockMsgProto);
+
+                        /** WindowDockMsgProto windowId. */
+                        public windowId: string;
+
+                        /**
+                         * Creates a new WindowDockMsgProto instance using the specified properties.
+                         * @param [properties] Properties to set
+                         * @returns WindowDockMsgProto instance
+                         */
+                        public static create(properties?: org.webswing.server.model.proto.IWindowDockMsgProto): org.webswing.server.model.proto.WindowDockMsgProto;
+
+                        /**
+                         * Encodes the specified WindowDockMsgProto message. Does not implicitly {@link org.webswing.server.model.proto.WindowDockMsgProto.verify|verify} messages.
+                         * @param message WindowDockMsgProto message or plain object to encode
+                         * @param [writer] Writer to encode to
+                         * @returns Writer
+                         */
+                        public static encode(message: org.webswing.server.model.proto.IWindowDockMsgProto, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                        /**
+                         * Decodes a WindowDockMsgProto message from the specified reader or buffer.
+                         * @param reader Reader or buffer to decode from
+                         * @param [length] Message length if known beforehand
+                         * @returns WindowDockMsgProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): org.webswing.server.model.proto.WindowDockMsgProto;
+
+                        /**
+                         * Creates a WindowDockMsgProto message from a plain object. Also converts values to their respective internal types.
+                         * @param object Plain object
+                         * @returns WindowDockMsgProto
+                         */
+                        public static fromObject(object: { [k: string]: any }): org.webswing.server.model.proto.WindowDockMsgProto;
+
+                        /**
+                         * Creates a plain object from a WindowDockMsgProto message. Also converts values to other types if specified.
+                         * @param message WindowDockMsgProto
+                         * @param [options] Conversion options
+                         * @returns Plain object
+                         */
+                        public static toObject(message: org.webswing.server.model.proto.WindowDockMsgProto, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                        /**
+                         * Converts this WindowDockMsgProto to JSON.
                          * @returns JSON object
                          */
                         public toJSON(): { [k: string]: any };

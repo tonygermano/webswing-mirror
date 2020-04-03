@@ -1,5 +1,6 @@
 package org.webswing.server.services.stats;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -12,19 +13,19 @@ public interface StatisticsReader {
 	
 	Map<String, List<Aggregation>> summaryRulesMap = new HashMap<>();
 
-	Map<String, Map<Long, Number>> getSummaryStats();
+	Map<String, Map<String, BigDecimal>> getSummaryStats();
 
 	Map<String,List<String>> getSummaryWarnings();
 
 	/**
 	 * @return Map &lt; name_of_metric, Map &lt; timestamp, value &gt; &gt;
 	 */
-	Map<String, Map<Long, Number>> getInstanceStats(String instance);
+	Map<String, ?> getInstanceStats(String instance);
 
 	/**
 	 * @return Map &lt; name_of_metric, value &gt;
 	 */
-	Map<String, Number> getInstanceMetrics(String clientId);
+	Map<String, ? extends Number> getInstanceMetrics(String clientId);
 
 	List<String> getInstanceWarnings(String instance);
 

@@ -1,5 +1,6 @@
 package org.webswing.model.s2c;
 
+import java.awt.Point;
 import java.util.List;
 
 import org.webswing.model.Msg;
@@ -7,6 +8,21 @@ import org.webswing.model.Msg;
 public class WindowMsg implements Msg {
 
 	private static final long serialVersionUID = -523823816533325842L;
+	
+	public enum WindowType {
+		basic,
+		html,
+		internal,
+		internalHtml,
+		internalWrapper;
+	}
+	
+	public enum DockMode {
+		none,
+		dockable,
+		autoUndock
+	}
+	
 	private String id;
 	private List<WindowPartialContentMsg> content;
 	private byte[] directDraw;
@@ -16,10 +32,35 @@ public class WindowMsg implements Msg {
 	private Integer posY;
 	private Integer width;
 	private Integer height;
-	private boolean html;
+	private WindowType type = WindowType.basic;
 	private boolean modalBlocked;
 	private String ownerId;
 	private Integer state;
+	private List<WindowMsg> internalWindows;
+	private DockMode dockMode = DockMode.none;
+
+	public WindowMsg() {
+	}
+	
+	public WindowMsg(String id, String name, Point location, Integer width, Integer height, WindowType type, boolean modalBlocked, String ownerId) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.posX = location.x;
+		this.posY = location.y;
+		this.width = width;
+		this.height = height;
+		this.type = type;
+		this.modalBlocked = modalBlocked;
+		this.ownerId = ownerId;
+	}
+	
+	public void setBounds(Integer posX, Integer posY, Integer width, Integer height) {
+		this.posX = posX;
+		this.posY = posY;
+		this.width = width;
+		this.height = height;
+	}
 
 	public String getId() {
 		return id;
@@ -93,14 +134,6 @@ public class WindowMsg implements Msg {
 		this.height = height;
 	}
 
-	public boolean isHtml() {
-		return html;
-	}
-
-	public void setHtml(boolean html) {
-		this.html = html;
-	}
-
 	public boolean isModalBlocked() {
 		return modalBlocked;
 	}
@@ -123,6 +156,30 @@ public class WindowMsg implements Msg {
 
 	public void setState(Integer state) {
 		this.state = state;
+	}
+
+	public WindowType getType() {
+		return type;
+	}
+
+	public void setType(WindowType type) {
+		this.type = type;
+	}
+
+	public List<WindowMsg> getInternalWindows() {
+		return internalWindows;
+	}
+
+	public void setInternalWindows(List<WindowMsg> internalWindows) {
+		this.internalWindows = internalWindows;
+	}
+
+	public DockMode getDockMode() {
+		return dockMode;
+	}
+
+	public void setDockMode(DockMode dockMode) {
+		this.dockMode = dockMode;
 	}
 
 }

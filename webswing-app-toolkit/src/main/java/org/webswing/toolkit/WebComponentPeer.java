@@ -3,6 +3,21 @@ package org.webswing.toolkit;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.BufferCapabilities.FlipContents;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.SystemColor;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ComponentEvent;
 import java.awt.event.PaintEvent;
 import java.awt.image.BufferedImage;
@@ -20,11 +35,10 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import org.webswing.applet.WebAppletContext;
 import org.webswing.common.GraphicsWrapper;
 import org.webswing.common.WindowActionType;
-import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.model.s2c.CursorChangeEventMsg;
 import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.ge.WebGraphicsConfig;
@@ -110,6 +124,8 @@ abstract public class WebComponentPeer implements ComponentPeer {
 				Graphics g = windowDecorationImage.getGraphics();
 				Services.getImageService().getWindowDecorationTheme().paintWindowDecoration(g, target, w, h);
 				g.dispose();
+
+				Util.getWebToolkit().getPaintDispatcher().notifyWindowDecorationUpdated(this.getGuid(), getBounds(),((WebWindowPeer)this).getInsets());
 			}
 		}
 	}
@@ -155,11 +171,8 @@ abstract public class WebComponentPeer implements ComponentPeer {
 	private Color foreground;
 	private Font font;
 	protected float opacity;
+	private String currentCursor= CursorChangeEventMsg.DEFAULT_CURSOR;
 
-	public static WebComponentPeer getPeerForTarget(Object paramObject) {
-		WebComponentPeer localWObjectPeer = (WebComponentPeer) WebToolkit.targetToPeer(paramObject);
-		return localWObjectPeer;
-	}
 
 	public WebComponentPeer(Component t) {
 		this.target = t;
@@ -432,23 +445,31 @@ abstract public class WebComponentPeer implements ComponentPeer {
 	}
 
 	public void updateCursorImmediately() {
-		if (WebEventDispatcher.isDndInProgress()) {
-			Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(null, DndEventHandler.getCurrentDropTargetCursorName());
+		if (Util.getWebToolkit().getEventDispatcher().isDndInProgress()) {
+			notifyCursorUpdate(null, DndEventHandler.getCurrentDropTargetCursorName());
 		} else {
 			Point location = Util.getWebToolkit().getEventDispatcher().getLastMousePosition();
-			if (location != null && target instanceof Window) {
+			if (location != null && target instanceof Window ) {
 				Window window = (Window) target;
-				boolean b = Util.isWindowDecorationPosition(window, location);
-				if (b) {
-					WindowActionType wat = Services.getImageService().getWindowDecorationTheme().getAction(window, new Point(location.x - window.getX(), location.y - window.getY()));
-					Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(wat.getCursor());
-				} else {
-					Component component = SwingUtilities.getDeepestComponentAt(window, location.x - window.getX(), location.y - window.getY());
-					component = component == null ? window : component;
-					Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(component.getCursor());
+				Window windowOnLocation = WindowManager.getInstance().getVisibleWindowOnPosition(location.x, location.y);
+				if(window==windowOnLocation || Util.isCompositingWM()){
+					if(WindowManager.getInstance().isBlockedByModality(window,false)) {
+						notifyCursorUpdate(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR),null);
+					}else if (Util.isWindowDecorationPosition(window, location)) {
+						WindowActionType wat = Services.getImageService().getWindowDecorationTheme().getAction(window, new Point(location.x - window.getX(), location.y - window.getY()));
+						notifyCursorUpdate(wat.getCursor(),null);
+					} else {
+						Component component = SwingUtilities.getDeepestComponentAt(window, location.x - window.getX(), location.y - window.getY());
+						component = component == null ? window : component;
+						notifyCursorUpdate(component.getCursor(),null);
+					}
 				}
 			}
 		}
+	}
+
+	private void notifyCursorUpdate(Cursor c,Cursor overridenCursor){
+		Util.getWebToolkit().getPaintDispatcher().notifyCursorUpdate(c,overridenCursor,this.getGuid());
 	}
 
 	public boolean isFocusable() {
@@ -566,11 +587,11 @@ abstract public class WebComponentPeer implements ComponentPeer {
 		}
 	}
 
-	public void notifyWindowAreaRepainted(Rectangle r) {
-		if (r == null) {
-			r = getBounds();
-		}
-		Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(getGuid(), r);
+	public String getCurrentCursor() {
+		return currentCursor;
 	}
 
+	public void setCurrentCursor(String currentCursor) {
+		this.currentCursor = currentCursor;
+	}
 }

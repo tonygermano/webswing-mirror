@@ -1,42 +1,14 @@
 package org.webswing.server.services.rest.resources;
 
-import java.io.File;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.apache.commons.lang3.StringUtils;
-import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.PrimaryUrlHandler;
-import org.webswing.server.common.model.SecuredPathConfig;
-import org.webswing.server.common.model.admin.ApplicationInfo;
-import org.webswing.server.common.model.admin.BasicApplicationInfo;
-import org.webswing.server.common.model.admin.Manifest;
-import org.webswing.server.common.model.admin.Manifest.IconDef;
-import org.webswing.server.common.model.admin.Sessions;
-import org.webswing.server.common.model.admin.SwingSession;
-import org.webswing.server.common.model.rest.LogResponse;
-import org.webswing.server.common.model.rest.SessionLogRequest;
-import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.services.config.ConfigurationService;
+import org.webswing.server.services.rest.resources.api.BasicApi;
+import org.webswing.server.services.rest.resources.api.ManageConfigurationApi;
+import org.webswing.server.services.rest.resources.api.ManageSessionsApi;
+import org.webswing.server.services.rest.resources.model.*;
 import org.webswing.server.services.security.api.WebswingAction;
 import org.webswing.server.services.stats.StatisticsLoggerService;
 import org.webswing.server.services.stats.logger.InstanceStats;
@@ -45,283 +17,386 @@ import org.webswing.server.services.swingmanager.SwingInstanceManager;
 import org.webswing.server.util.LogReaderUtil;
 import org.webswing.server.util.LoggerStatisticsUtil;
 
-@Path("")
-@Produces(MediaType.APPLICATION_JSON)
-public class SwingAppRestService extends BaseRestService {
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Context;
+import java.io.File;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+
+public class SwingAppRestService implements BasicApi, ManageConfigurationApi, ManageSessionsApi {
 
 	@Inject SwingInstanceManager manager;
 	@Inject PrimaryUrlHandler handler;
 	@Inject ConfigurationService configService;
 	@Inject StatisticsLoggerService loggerService;
+	@Context HttpServletResponse response;
+	//====================================================
+	// Basic API
+	//====================================================
 
 	@Override
-	protected List<ApplicationInfoMsg> getAppsImpl() {
-		return Arrays.asList(manager.getApplicationInfoMsg());
-	}
-
-	@Override
-	protected ApplicationInfo getAppInfoImpl() {
-		ApplicationInfo app = super.getAppInfoImpl();
-		app.setName(handler.getSwingConfig().getName());
-		List<SwingInstance> allRunning = manager.getSwingInstanceHolder().getAllInstances();
-		app.setRunningInstances(allRunning.size());
-		int connected = 0;
-		for (SwingInstance si : allRunning) {
-			if (si.getConnectionId() != null) {
-				connected++;
-			}
-		}
-		app.setConnectedInstances(connected);
-		app.setFinishedInstances(manager.getSwingInstanceHolder().getAllClosedInstances().size());
-		int maxRunningInstances = handler.getSwingConfig().getMaxClients();
-		app.setMaxRunningInstances(maxRunningInstances);
-		app.setStats(manager.getStatsReader().getSummaryStats());
-		app.setWarnings(manager.getStatsReader().getSummaryWarnings());
-		return app;
-	}
-
-	@Override
-	protected List<BasicApplicationInfo> getPathsImpl() {
-		BasicApplicationInfo app = new BasicApplicationInfo();
-		app.setPath(manager.getPathMapping());
-		app.setUrl(manager.getFullPathMapping());
-		app.setEnabled(manager.isEnabled());
-		app.setName(handler.getSwingConfig().getName());
-		List<SwingInstance> allRunning = manager.getSwingInstanceHolder().getAllInstances();
-		app.setRunningInstances(allRunning.size());
-		return Arrays.asList(app);
-	}
-
-	@GET
-	@Path("/start")
-	public Response start() throws WsException {
-		getHandler().checkMasterPermission(WebswingAction.rest_startApp);
-		if (!getHandler().isEnabled()) {
-			getHandler().initConfiguration();
-		}
-		return Response.ok().build();
-	}
-
-	@GET
-	@Path("/stop")
-	public Response stop() throws WsException {
-		getHandler().checkMasterPermission(WebswingAction.rest_stopApp);
-		if (getHandler().isEnabled()) {
-			getHandler().disable();
-		}
-		return Response.ok().build();
-	}
-
-	@GET
-	@Path("/appicon")
-	@Produces("image/png")
-	public Response appicon() throws WsException {
-		// must be accessible without login for manifest.json
-//		getHandler().checkPermissionLocalOrMaster(WebswingAction.websocket_connect);
-
-		CacheControl cc = new CacheControl();
-		cc.setMaxAge(60*60);
-		cc.setPrivate(true);
-		File icon = handler.resolveFile(handler.getConfig().getIcon());
-		byte[] image = CommonUtil.loadImage(icon);
-		return Response.ok(image).cacheControl(cc).build();
-	}
-
-	@GET
-	@Path("/rest/sessions")
-	public Sessions getSessions() throws WsException {
-		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
-		Set<String> localRecordingFiles=new HashSet<>();
-		Sessions result = new Sessions();
-		for (SwingInstance si : manager.getSwingInstanceHolder().getAllInstances()) {
-			SwingSession session = si.toSwingSession(false);
-			result.getSessions().add(session);
-			if(session.getRecordingFile()!=null){
-				localRecordingFiles.add(session.getRecordingFile());
-			}
-		}
-		for (SwingInstance si : manager.getSwingInstanceHolder().getAllClosedInstances()) {
-			SwingSession session = si.toSwingSession(false);
-			result.getClosedSessions().add(session);
-			if(session.getRecordingFile()!=null){
-				localRecordingFiles.add(session.getRecordingFile());
-			}
-		}
-
-		List<String> externalRecordings=new ArrayList<>();
-		if(manager.getRecordingsDirPath()!=null) {
-			File recordingsDir = new File(URI.create(manager.getRecordingsDirPath()));
-			if (recordingsDir.exists() && recordingsDir.isDirectory() && recordingsDir.canRead())
-				for (File rFile : recordingsDir.listFiles()) {
-					if (!localRecordingFiles.contains(rFile.getName())) {
-						externalRecordings.add(rFile.getName());
-					}
-
-				}
-			result.setRecordings(externalRecordings);
-		}
-		return result;
-	}
-
-	@GET
-	@Path("/rest/session/{id}")
-	public SwingSession getSession(@PathParam("id") String id) throws WsException {
-		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
-		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
-		if (instance != null) {
-			return instance.toSwingSession(true);
-		}
-		return null;
-	}
-	
-	@GET
-    @Path("/rest/metrics/{uuid}")
-    public SwingSession getMetrics(@PathParam("uuid") String uuid) throws WsException {
-		getHandler().checkPermissionLocalOrMaster(WebswingAction.websocket_connect);
-		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByConnectionId(uuid);
-        if (instance != null && getHandler().getUser().getUserId().equals(instance.getUserId())) {
-            return instance.toSwingSession(true);
-        }
-        return null;
-    }
-
-	@GET
-	@Path("/rest/record/{id}")
-	public SwingSession startRecording(@PathParam("id") String id) throws WsException {
-		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_startRecording);
-		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
-		if (instance != null) {
-			if(instance.isRecording()){
-				instance.stopRecording();
-			}else {
-				instance.startRecording();
-			}
-			return instance.toSwingSession(true);
-		}
-		return null;
-	}
-
-	@GET
-	@Path("/rest/threadDump/{path}")
-	@Produces("text/plain")
-	public String getThreadDump(@PathParam("path") String id, @QueryParam("id") String timestamp) throws WsException {
-		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getThreadDump);
-		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
-		if (instance != null) {
-			return instance.getThreadDump(timestamp);
-		} else {
-			List<SwingInstance> instaces = manager.getSwingInstanceHolder().getAllClosedInstances();//closed instances can have multiple instances for same id, need to manually check all
-			for (SwingInstance i : instaces) {
-				if (id.equals(i.getInstanceId())) {
-					String td = i.getThreadDump(timestamp);
-					if (td != null) {
-						return td;
-					}
+	public ApplicationInfo getInfo() throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getAppInfo);
+			ApplicationInfo app = BaseRestUtil.getAppInfoImpl(getHandler());
+			app.setName(handler.getSwingConfig().getName());
+			List<SwingInstance> allRunning = manager.getSwingInstanceHolder().getAllInstances();
+			app.setRunningInstances(allRunning.size());
+			int connected = 0;
+			for (SwingInstance si : allRunning) {
+				if (si.getConnectionId() != null) {
+					connected++;
 				}
 			}
-			throw new WsException("Not found", 404);
+			app.setConnectedInstances(connected);
+			app.setFinishedInstances(manager.getSwingInstanceHolder().getAllClosedInstances().size());
+			int maxRunningInstances = handler.getSwingConfig().getMaxClients();
+			app.setMaxRunningInstances(maxRunningInstances);
+			app.setStats(manager.getStatsReader().getSummaryStats());
+			app.setWarnings(manager.getStatsReader().getSummaryWarnings());
+			return app;
+		} catch (WsException e) {
+			throw new RestException(e);
 		}
 	}
 
-	@POST
-	@Path("/rest/threadDump/{path}")
-	public void requestThreadDump(@PathParam("path") String id) throws WsException {
-		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_requestThreadDump);
-		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
-		if (instance != null) {
-			instance.requestThreadDump();
+	@Override
+	public List<BasicApplicationInfo> getPaths() throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getPaths);
+			BasicApplicationInfo app = new BasicApplicationInfo();
+			app.setPath(manager.getPathMapping());
+			app.setUrl(manager.getFullPathMapping());
+			app.setEnabled(manager.isEnabled());
+			app.setName(handler.getSwingConfig().getName());
+			List<SwingInstance> allRunning = manager.getSwingInstanceHolder().getAllInstances();
+			app.setRunningInstances(allRunning.size());
+			return Arrays.asList(app);
+		} catch (WsException e) {
+			throw new RestException(e);
 		}
 	}
 
-	@DELETE
-	@Path("/rest/session/{id}")
-	public void shutdown(@PathParam("id") String id, @QueryParam("force") String forceKill) throws WsException {
-		boolean force = Boolean.parseBoolean(forceKill);
-		if (force) {
-			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_sessionShutdown);
-		} else {
-			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_sessionShutdownForce);
+	@Override
+	public Sessions getSessions() throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
+			Set<String> localRecordingFiles = new HashSet<>();
+			Sessions result = new Sessions();
+			manager.getSwingInstanceHolder().getAllInstances().stream().map(si -> si.toSwingSession(false)).forEach(session -> {
+				result.getSessions().add(session);
+				if (session.getRecordingFile() != null) {
+					localRecordingFiles.add(session.getRecordingFile());
+				}
+			});
+			manager.getSwingInstanceHolder().getAllClosedInstances().stream().map(si -> si.toSwingSession(false)).forEach(session -> {
+				result.getClosedSessions().add(session);
+				if (session.getRecordingFile() != null) {
+					localRecordingFiles.add(session.getRecordingFile());
+				}
+			});
+
+			List<String> externalRecordings = new ArrayList<>();
+			if (manager.getRecordingsDirPath() != null) {
+				File recordingsDir = new File(URI.create(manager.getRecordingsDirPath()));
+				if (recordingsDir.exists() && recordingsDir.isDirectory() && recordingsDir.canRead())
+					for (File rFile : recordingsDir.listFiles()) {
+						if (!localRecordingFiles.contains(rFile.getName())) {
+							externalRecordings.add(rFile.getName());
+						}
+
+					}
+				result.setRecordings(externalRecordings);
+			}
+			return result;
+		} catch (WsException e) {
+			throw new RestException(e);
 		}
-		SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
-		if (instance != null) {
-			instance.shutdown(force);
-		} else {
-			throw new WsException("Instance with id " + id + " not found.");
+	}
+
+	@Override
+	public Permissions getPermissions() throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.master_basic_access);
+			return BaseRestUtil.getPermissions(handler);
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
+
+	@Override
+	public List<ApplicationInfoMsg> getApps() throws RestException {
+		try {
+			getHandler().checkPermission(WebswingAction.rest_getApps);
+			List<ApplicationInfoMsg> result = new ArrayList<>();
+			if (manager.isEnabled() && manager.isUserAuthorized()) {
+				ApplicationInfoMsg applicationInfoMsg = manager.getApplicationInfoMsg();
+				if (applicationInfoMsg != null) {
+					result.add(applicationInfoMsg);
+				}
+			}
+			return result;
+		} catch (WsException e) {
+			throw new RestException(e);
 		}
 	}
 	
-	@POST
-	@Path("/rest/logs/session")
-	public LogResponse getLogs(SessionLogRequest request) throws WsException {
-		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
-		
-		if (StringUtils.isBlank(request.getInstanceId())) {
+	@Override
+	public String getAdminConsoleUrl() throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getAppInfo);
+			return getHandler().getAdminUrl();
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
+
+	@Override
+	public String getVersion() throws RestException {
+		return BaseRestUtil.getVersion();
+	}
+
+	@Override
+	public void ping() throws RestException {
+	}
+
+	@Override
+	public Map<String, Map<String, BigDecimal>> getStats() throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getStats);
+
+			List<InstanceStats> allStats = new ArrayList<InstanceStats>(manager.getStatsReader().getAllInstanceStats());
+			allStats.addAll(loggerService.getServerLogger().getAllInstanceStats()); // merge with server stats (to include server CPU usage)
+
+			return LoggerStatisticsUtil.mergeSummaryInstanceStats(allStats);
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
+
+	//====================================================
+	// Manage Configuration Api
+	//====================================================
+
+	@Override
+	public MetaObject getConfig() throws RestException {
+		return BaseRestUtil.getConfig(getHandler(), getConfigService());
+	}
+
+	@Override
+	public MetaObject getMeta(Map<String, Object> requestBody) throws RestException {
+		return BaseRestUtil.getMeta(requestBody, getHandler(), getConfigService());
+	}
+
+	@Override
+	public void saveConfig(Map<String, Object> config) throws RestException {
+		try {
+			getHandler().checkMasterPermission(WebswingAction.rest_setConfig);
+			getConfigService().setConfiguration(getHandler().getPathMapping(), config);
+		} catch (Exception e) {
+			throw new RestException(e);
+		}
+	}
+
+	@Override
+	public String resolve(String type, String resolve) throws RestException {
+		return BaseRestUtil.resolve(type, resolve, getHandler());
+	}
+
+	@Override
+	public Map<String, String> searchVariables(String type, String search) throws RestException {
+		return BaseRestUtil.searchVariables(type, search, getHandler());
+	}
+
+	//====================================================
+	// Manage Sessions Api
+	//====================================================
+
+	@Override
+	public SwingSession getSession(String id) throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getSession);
+			SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
+			if (instance != null) {
+				return instance.toSwingSession(true);
+			}
 			return null;
+		} catch (WsException e) {
+			throw new RestException(e);
 		}
-		
-		return LogReaderUtil.readSessionLog(getAppInfo().getUrl(), getSessionLogsDir(), request);
 	}
-	
-	@GET
-	@Path("/rest/logs/session")
-	public Response downloadLog() throws WsException {
-		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
-		Response.ResponseBuilder builder = Response.ok(LogReaderUtil.getZippedSessionLog(getSessionLogsDir(), getAppInfo().getUrl()), MediaType.APPLICATION_OCTET_STREAM);
-		builder.header("content-disposition", "attachment; filename = " + LogReaderUtil.normalizeForFileName(getAppInfo().getName()) + "_session_logs.zip");
-		return builder.build();
-    }
-	
-	@GET
-	@Path("/rest/logs/session/instanceIds")
-	public List<String> getLogInstanceIds() throws WsException {
-		getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
-		return LogReaderUtil.readSessionLogInstanceIds(getSessionLogsDir(), getAppInfo().getUrl());
+
+	@Override
+	public SwingSession getMetrics(String uuid) throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.websocket_connect);
+			SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByConnectionId(uuid);
+			if (instance != null && getHandler().getUser().getUserId().equals(instance.getUserId())) {
+				return instance.toSwingSession(true);
+			}
+			return null;
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
+
+	@Override
+	public SwingSession startRecording(String id) throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_startRecording);
+			SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
+			if (instance != null) {
+				if (instance.isRecording()) {
+					instance.stopRecording();
+				} else {
+					instance.startRecording();
+				}
+				return instance.toSwingSession(true);
+			}
+			return null;
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
+
+	@Override
+	public String getThreadDump(String instanceId, String timestamp) throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getThreadDump);
+			SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(instanceId);
+			if (instance != null) {
+				return instance.getThreadDump(timestamp);
+			} else {
+				List<SwingInstance> instaces = manager.getSwingInstanceHolder().getAllClosedInstances();//closed instances can have multiple instances for same id, need to manually check all
+				for (SwingInstance i : instaces) {
+					if (instanceId.equals(i.getInstanceId())) {
+						String td = i.getThreadDump(timestamp);
+						if (td != null) {
+							return td;
+						}
+					}
+				}
+				throw new RestException("Not found", 404);
+			}
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
+
+	@Override
+	public void requestThreadDump(String id) throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_requestThreadDump);
+			SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
+			if (instance != null) {
+				instance.requestThreadDump();
+			}
+
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
+
+	@Override
+	public void shutdown(String id, String forceKill) throws RestException {
+		try {
+			boolean force = Boolean.parseBoolean(forceKill);
+			if (force) {
+				getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_sessionShutdown);
+			} else {
+				getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_sessionShutdownForce);
+			}
+			SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(id);
+			if (instance != null) {
+				instance.shutdown(force);
+			} else {
+				throw new WsException("Instance with id " + id + " not found.");
+			}
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
+
+	@Override
+	public LogResponse getSessionLogs(LogRequest request) throws RestException {
+		try {
+			getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
+
+			if (StringUtils.isBlank(request.getInstanceId())) {
+				return null;
+			}
+
+			return LogReaderUtil.readSessionLog(getInfo().getUrl(), getSessionLogsDir(), request);
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
+
+	@Override
+	public List<String> getLogInstanceIds() throws RestException {
+		try {
+			getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
+			return LogReaderUtil.readSessionLogInstanceIds(getSessionLogsDir(), getInfo().getUrl());
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
 	}
 
 	private String getSessionLogsDir() {
 		return LogReaderUtil.getSessionLogDir(VariableSubstitutor.forSwingApp(manager.getConfig()), manager.getConfig().getSwingConfig());
 	}
-	
-	@GET
-	@Path("/rest/stats")
-	public Map<String, Map<Long, Number>> getStats() throws WsException {
-		getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getStats);
-		
-		List<InstanceStats> allStats = new ArrayList<InstanceStats>(manager.getStatsReader().getAllInstanceStats());
-		allStats.addAll(loggerService.getServerLogger().getAllInstanceStats()); // merge with server stats (to include server CPU usage)
-		
-		return LoggerStatisticsUtil.mergeSummaryInstanceStats(allStats);
-	}
-	
-	@GET
-	@Path("/manifest.json")
-	@Produces("application/json")
-	public Manifest manifest() throws WsException {
-		// must be accessible without login
-		SecuredPathConfig config = handler.getConfig();
 
-		String color = "#FFFFFF";
-
-		Manifest manifest = new Manifest();
-		manifest.setName(config.getSwingConfig().getName());
-		manifest.setShort_name(manifest.getName());
-		manifest.setIcon(new IconDef(getHandler().getFullPathMapping() + "/appicon", "256x256")); // this is just a hardcoded value, not real size
-		manifest.setStart_url(getHandler().getFullPathMapping());
-		manifest.setScope(getHandler().getFullPathMapping());
-		manifest.setBackground_color(color);
-		manifest.setDisplay("fullscreen");
-		manifest.setTheme_color(color);
-
-		return manifest;
+	@Override
+	public File downloadSessionsLog() throws RestException {
+		try {
+			getHandler().checkMasterPermission(WebswingAction.rest_viewLogs);
+			File result = LogReaderUtil.getZippedSessionLog(getSessionLogsDir(), getInfo().getUrl());
+			response.setHeader("content-disposition", "attachment; filename = " + LogReaderUtil.normalizeForFileName(getInfo().getName()) + "_session_logs.zip");
+			return result;
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
 	}
 
 	@Override
-	protected PrimaryUrlHandler getHandler() {
+	public String generateCsrfToken() throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.websocket_connect);
+			return getHandler().generateCsrfToken();
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
+
+	@Override
+	public Manifest getManifest() throws RestException {
+		return BaseRestUtil.getManifest(getHandler());
+	}
+
+	@Override
+	public File getIcon() throws RestException {
+		// must be accessible without login for manifest.json
+		//		getHandler().checkPermissionLocalOrMaster(WebswingAction.websocket_connect);
+		File icon = handler.resolveFile(handler.getConfig().getIcon());
+		if (icon == null) {
+			try {
+				icon = new File(SwingAppRestService.class.getClassLoader().getResource("images/java.png").toURI());
+			} catch (URISyntaxException e) {
+				// ignore
+			}
+		}
+		response.setHeader("Cache-Control", "public, max-age=120");
+		return icon;
+	}
+
+	private PrimaryUrlHandler getHandler() {
 		return handler;
 	}
 
-	@Override
-	protected ConfigurationService getConfigService() {
+	private ConfigurationService getConfigService() {
 		return configService;
 	}
 

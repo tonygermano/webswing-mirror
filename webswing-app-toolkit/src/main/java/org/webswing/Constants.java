@@ -26,6 +26,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_TRANSPARENT_FILE_SAVE = "webswing.transparentFileSave";
 	public static final String SWING_START_SYS_PROP_ALLOW_DELETE = "webswing.allowDelete";
 	public static final String SWING_START_SYS_PROP_ALLOW_JSLINK = "webswing.allowJsLink";
+	public static final String SWING_START_SYS_PROP_JSLINK_WHITELIST = "webswing.jsLinkWhitelist";
 	public static final String SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD = "webswing.allowLocalClipboard";
 	public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutSec";
 	public static final String SWING_SESSION_TIMEOUT_SEC_IF_FILECHOOSER_ACTIVE = "webswing.sessionTimeoutSecIfFileChooserActive";
@@ -39,6 +40,13 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_CLASS_MODIFICATION_BLACKLIST = "webswing.classModificationBlacklist";
 	public static final String SWING_START_SYS_PROP_LOG_LEVEL = "webswing.logLevel";
 	public static final String SWING_START_SYS_PROP_TEST_MODE = "webswing.testMode";
+	public static final String SWING_START_SYS_PROP_EVENT_DISPATCHER_CLASS= "webswing.eventDispatcherClass";
+	public static final String SWING_START_SYS_PROP_PAINT_DISPATCHER_CLASS = "webswing.paintDispatcherClass";
+	public static final String SWING_START_SYS_PROP_DOCK_MODE = "webswing.dockMode";
+	public static final String SWING_START_SYS_PROP_TOUCH_MODE = "webswing.touchMode";
+	public static final String SWING_START_SYS_PROP_ACCESSIBILITY_ENABLED = "webswing.accessibilityEnabled";
+	public static final String SWING_START_SYS_PROP_FONT_CONFIG = "webswing.fontConfig";
+
 
 	public static final	String PRINTER_JOB_CLASS = "webswing.printerJobDelegate";
 
@@ -90,6 +98,7 @@ public interface Constants {
 	public static final String HTTPS_ONLY = "webswing.httpsOnly";
 	public static final String DISABLE_HTTP_SECURITY_HEADERS = "webswing.disableHttpSecurityHeaders";
 	public static final String LINK_COOKIE_TO_IP = "webswing.linkCookieToIpAddress";
+	public static final String COOKIE_SAMESITE = "webswing.cookieSameSite";
 
 	// logging properties
 	public static final String LOGS_DIR_PATH = "webswing.logsDir";

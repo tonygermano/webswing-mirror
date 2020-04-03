@@ -128,11 +128,19 @@ public class JsLinkUtil {
 		return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq, new OperationNotSupportedException(error)));
 	}
 
-	public static AppFrameMsgOut callMatchingMethod(JavaEvalRequestMsgIn javaReq, Object javaRef) {
+	public static AppFrameMsgOut callMatchingMethod(JavaEvalRequestMsgIn javaReq, Object javaRef, List<String> jsLinkWhitelist) {
 		if (javaRef != null) {
 			Exception exception = null;
 			List<Method> candidates = new ArrayList<Method>();
-			for (Method m : javaRef.getClass().getMethods()) {
+			Class<?> cls = javaRef.getClass();
+			
+			if (!isObjectClassAllowed(cls.getCanonicalName(), jsLinkWhitelist)) {
+				exception = new RuntimeException("Public method named " + javaReq.getMethod() + " with " + javaReq.getParams().size() + " parameters in class " + javaRef.getClass().getCanonicalName() + " is not allowed to be executed due to whitelist!");
+				Logger.error("Error while calling java from javascript:", exception);
+				return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq, exception));
+			}
+			
+			for (Method m : cls.getDeclaredMethods()) {
 				int requestParamCount = javaReq.getParams() != null ? javaReq.getParams().size() : 0;
 				if (m.getName().equals(javaReq.getMethod()) && m.getParameterTypes().length == requestParamCount) {
 					candidates.add(m);
@@ -163,5 +171,19 @@ public class JsLinkUtil {
 			Logger.error("Error while calling java from javascript:", e);
 			return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq, e));
 		}
+	}
+
+	private static boolean isObjectClassAllowed(String cls, List<String> jsLinkWhitelist) {
+		if (jsLinkWhitelist == null || jsLinkWhitelist.isEmpty()) {
+			return false;
+		}
+		
+		for (String entry : jsLinkWhitelist) {
+			if (cls.matches(entry.replace(".", "\\.").replace("*", ".*"))) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }

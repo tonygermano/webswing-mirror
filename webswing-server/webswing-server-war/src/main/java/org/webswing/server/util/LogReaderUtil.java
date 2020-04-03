@@ -26,11 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.common.model.SwingConfig;
-import org.webswing.server.common.model.rest.LogRequest;
-import org.webswing.server.common.model.rest.LogResponse;
-import org.webswing.server.common.model.rest.SessionLogRequest;
 import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.services.rest.resources.model.LogRequest;
+import org.webswing.server.services.rest.resources.model.LogResponse;
 
 import com.google.common.collect.Lists;
 
@@ -45,7 +44,7 @@ public class LogReaderUtil {
 		return readLogInternal(f, request);
 	}
 	
-	public static LogResponse readSessionLog(String appUrl, String logDir, SessionLogRequest request) throws WsException {
+	public static LogResponse readSessionLog(String appUrl, String logDir, LogRequest request) throws WsException {
 		String appUrlNormalized = LogReaderUtil.normalizeForFileName(appUrl);
 		String sessionIdNormalized = LogReaderUtil.normalizeForFileName(request.getInstanceId());
 		String logName = "webswing-" + sessionIdNormalized + "-" + appUrlNormalized + ".session.log";
@@ -96,13 +95,13 @@ public class LogReaderUtil {
 
 	private static long getStartIndex(long fileSize, LogRequest r) {
 		long offset = r.getOffset() == -1 ? (fileSize - 1) : r.getOffset();
-		if (r.isBackwards()) {
+		if (r.getBackwards()) {
 			return offset - Math.min(offset, r.getMax());
 		} else {
 			return offset;
 		}
 	}
-	
+
 	private static LogResponse readLogInternal(File f, LogRequest request) throws WsException {
 		RandomAccessFile fileHandler = null;
 		try {
@@ -191,15 +190,23 @@ public class LogReaderUtil {
 		return text.replaceAll("\\W+", "_");
 	}
 	
-	public static InputStream getZippedLog(String type) throws WsException {
+	public static File getZippedLog(String type) throws WsException {
 		return zipFiles(Lists.newArrayList(findLogFile(type)), type);
 	}
 	
-	public static InputStream getZippedSessionLog(String logDir, String appUrl) throws WsException {
+	public static File getZippedSessionLog(String logDir, String appUrl) throws WsException {
+			return zipFiles(findSessionLogFiles(logDir, appUrl), normalizeForFileName(appUrl) + "_session");
+	}
+	
+	public static File getZippedLogFile(String type) throws WsException {
+		return zipFiles(Lists.newArrayList(findLogFile(type)), type);
+	}
+	
+	public static File getZippedSessionLogFile(String logDir, String appUrl) throws WsException {
 		return zipFiles(findSessionLogFiles(logDir, appUrl), normalizeForFileName(appUrl) + "_session");
 	}
 	
-	private static InputStream zipFiles(List<File> files, String zipFileName) throws WsException {
+	private static File zipFiles(List<File> files, String zipFileName) throws WsException {
 		String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
 		File zip = new File(URI.create(tempDir + zipFileName + ".zip"));
 		
@@ -221,7 +228,7 @@ public class LogReaderUtil {
 				}
 			});
 			
-			return new FileInputStream(zip);
+			return zip;
 		} catch (IOException e) {
 			log.error("Failed to zip the log file.", e);
 		}

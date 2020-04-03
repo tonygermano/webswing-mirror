@@ -1,11 +1,9 @@
 package org.webswing.javafx.toolkit;
 
 import com.sun.glass.ui.SystemClipboard;
-import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.toolkit.util.Util;
 
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by vikto on 07-Mar-17.
@@ -27,7 +25,7 @@ public class WebFxDnD extends SystemClipboard {
 	protected void pushToSystem(HashMap<String, Object> cacheData, int supportedActions) {
 		this.data = cacheData;
 		this.actions = supportedActions;
-		WebEventDispatcher.javaFXdragStarted.getAndSet(true);
+		Util.getWebToolkit().getEventDispatcher().setJavaFXdragStarted(true);
 	}
 
 	@Override

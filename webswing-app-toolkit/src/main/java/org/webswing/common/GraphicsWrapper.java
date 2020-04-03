@@ -2,6 +2,7 @@ package org.webswing.common;
 
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.toolkit.WebComponentPeer;
+import org.webswing.toolkit.util.Util;
 
 import java.awt.*;
 import java.awt.RenderingHints.Key;
@@ -38,7 +39,7 @@ public class GraphicsWrapper extends Graphics2D {
 
 	private void addDirtyRectangleArea(Rectangle r) {
 		if(r==null){
-			rootPaintComponent.notifyWindowAreaRepainted(null);
+			notifyWindowAreaRepainted(null);
 		}else{
 			Rectangle clip = getClipBounds();
 			if(clip!=null) {
@@ -47,9 +48,16 @@ public class GraphicsWrapper extends Graphics2D {
 			if (r.width > 0 && r.height > 0) {
 				Rectangle dirtyArea = getTransform().createTransformedShape(r).getBounds();
 				dirtyArea.translate(offset.x, offset.y);
-				rootPaintComponent.notifyWindowAreaRepainted(dirtyArea);
+				notifyWindowAreaRepainted(dirtyArea);
 			}
 		}
+	}
+
+	private void notifyWindowAreaRepainted(Rectangle r) {
+		if (r == null) {
+			r = rootPaintComponent.getBounds();
+		}
+		Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(rootPaintComponent.getGuid(), r);
 	}
 
 	public WebComponentPeer getRootPaintComponent() {

@@ -60,6 +60,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.webswing.Constants;
+import org.webswing.dispatch.EventDispatcher;
+import org.webswing.dispatch.PaintDispatcher;
+import org.webswing.dispatch.CwmPaintDispatcher;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.model.Msg;
@@ -84,8 +87,8 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	public static final String BACKGROUND_WINDOW_ID = "BG";
 	private static Object TREELOCK = null;
 
-	private WebEventDispatcher eventDispatcher;
-	private WebPaintDispatcher paintDispatcher;
+	private EventDispatcher eventDispatcher;
+	private PaintDispatcher paintDispatcher;
 	private WebswingApiImpl api = new WebswingApiImpl();
 	private WebswingMessagingApiImpl msgapi = new WebswingMessagingApiImpl();
 
@@ -110,7 +113,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 				Logger.error("Failed to create Desktop folder: " + path);
 			}
 		}
-		
+
 		installFonts();
 	}
 
@@ -135,21 +138,28 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	}
 
 	public void startDispatchers() {
-		eventDispatcher = new WebEventDispatcher();
-		paintDispatcher = new WebPaintDispatcher();
+		eventDispatcher = Util.instantiateClass(EventDispatcher.class, Constants.SWING_START_SYS_PROP_EVENT_DISPATCHER_CLASS, WebEventDispatcher.class.getName());
+		if(eventDispatcher==null){
+			Logger.fatal("EventDispatcher not initialized. Exiting.");
+			System.exit(1);
+		}
+
+		Class<? extends PaintDispatcher> defaultPaintDispatcher = Util.isCompositingWM() ? CwmPaintDispatcher.class : WebPaintDispatcher.class;
+		paintDispatcher = Util.instantiateClass(PaintDispatcher.class, Constants.SWING_START_SYS_PROP_PAINT_DISPATCHER_CLASS, defaultPaintDispatcher.getName());
+		if(paintDispatcher==null){
+			Logger.fatal("PaintDispatcher not initialized. Exiting.");
+			System.exit(1);
+		}
+
+		Logger.info("Webswing Event Dispatcher: "+eventDispatcher.getClass().getName());
+		Logger.info("Webswing Paint Dispatcher: "+paintDispatcher.getClass().getName());
 	}
 
 	public void initSize(final Integer width, final Integer height) {
 		final Integer desktopWidth = Math.max(Constants.SWING_SCREEN_WIDTH_MIN, width);
 		final Integer desktopHeight = Math.max(Constants.SWING_SCREEN_HEIGHT_MIN, height);
 		if (!SwingUtilities.isEventDispatchThread()) {
-			SwingUtilities.invokeLater(new Runnable() {
-
-				@Override
-				public void run() {
-					initSize(desktopWidth, desktopHeight);
-				}
-			});
+			SwingUtilities.invokeLater(() -> initSize(desktopWidth, desktopHeight));
 		} else {
 			int oldWidht = screenWidth;
 			int oldHeight = screenHeight;
@@ -158,9 +168,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 			displayChanged();
 			resetGC();
 			Util.resetWindowsGC(screenWidth, screenHeight);
-			getPaintDispatcher().clientReadyToReceive();
-			getPaintDispatcher().resetWindowsPosition(oldWidht, oldHeight);// in case windows moved out of screen by resizing screen.
-			getPaintDispatcher().notifyWindowRepaintAll();
+			getPaintDispatcher().notifyScreenSizeChanged(oldWidht, oldHeight,screenWidth, screenHeight);
 		}
 	}
 
@@ -168,11 +176,11 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		return windowManager;
 	}
 
-	public WebEventDispatcher getEventDispatcher() {
+	public EventDispatcher getEventDispatcher() {
 		return eventDispatcher;
 	}
 
-	public WebPaintDispatcher getPaintDispatcher() {
+	public PaintDispatcher getPaintDispatcher() {
 		return paintDispatcher;
 	}
 
@@ -389,7 +397,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		if (panel instanceof Applet) {
 			return super.createPanel(panel);
 		}
-		
+
 		WebPanelPeer localpanelPeer = createWebPanelPeer(panel);
 		targetCreatedPeer(panel, localpanelPeer);
 		return localpanelPeer;

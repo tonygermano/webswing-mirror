@@ -5,6 +5,7 @@ import org.webswing.server.common.model.meta.*;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -12,7 +13,8 @@ import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
 @ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "javaFxClassPathEntries", "compositingWinManager", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "loadingAnimationDelay", "allowStealSession", "autoLogout",
-		"goodbyeUrl", "sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowJsLink", "allowLocalClipboard", "allowServerPrinting","recordingsFolder" })
+		"goodbyeUrl", "sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowJsLink", "jsLinkWhitelist", "allowLocalClipboard", "allowServerPrinting","recordingsFolder",
+		"dockMode"})
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
@@ -64,6 +66,7 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.General, label = "Compositing Window Manager", description = "Use window manager that provides an off-screen buffer for each window. Allows advanced window positioning when embedding and better communication integration. Recommended with DirectDraw rendering mode.")
 	@ConfigFieldDefaultValueBoolean(false)
+	@ConfigFieldDiscriminator
 	public boolean isCompositingWinManager();
 
 	@ConfigField(tab = ConfigGroup.General, label = "Enable Debug Mode", description = "Enables remote debug for this application. To start the application in debug mode use '?debugPort=8000' url param.")
@@ -212,7 +215,12 @@ public interface SwingConfig extends Config {
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow JsLink", description = "If enabled, the JSLink feature will be enabled, allowing application to invoke javascript and vice versa. (See netscape.javascript.JSObject)")
 	@ConfigFieldDefaultValueBoolean(true)
+	@ConfigFieldDiscriminator
 	public boolean isAllowJsLink();
+	
+	@ConfigField(tab = ConfigGroup.Features, label = "JsLink White List", description = "List of allowed Java classes. Calls to declared methods of these classes are allowed via JsLink. Supports trailing * wildcard. Use single * entry to allow any class. Leave empty to disallow everything. E.g. org.webswing.*")
+	@ConfigFieldDefaultValueGenerator("defaultJsLinkWhitelistValue")
+	public List<String> getJsLinkWhitelist();
 
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow Local Clipboard", description = "Enables built-in integration of client's local clipboard. Due to browser security limitations clipboard toolbar is displayed.")
 	@ConfigFieldDefaultValueBoolean(true)
@@ -221,6 +229,10 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow Server Printing", description = "Enables native printing on devices configured on server's OS. If disabled a pdf is generated and sent to client browser.")
 	@ConfigFieldDefaultValueBoolean(false)
 	boolean isAllowServerPrinting();
+	
+	@ConfigField(tab = ConfigGroup.Features, label = "Docking Mode", description = "Select the mode for undocking windows to a separate browser window: 1.ALL: all windows can be undocked. 2.MARKED: only windows marked with Dockable interface can be undocked. 3.NONE: disable undocking")
+	@ConfigFieldDefaultValueString("ALL")
+	public DockMode getDockMode();
 
 	@Deprecated
 	/*
@@ -232,6 +244,10 @@ public interface SwingConfig extends Config {
 	@ConfigFieldVariables(VariableSetName.SwingApp)
 	@ConfigFieldDefaultValueString(Constants.DEFAULT_RECORDINGS_FOLDER)
 	String getRecordingsFolder();
+	
+	public static List<String> defaultJsLinkWhitelistValue(SwingConfig config) {
+		return Arrays.asList("*");
+	}
 
 	public static class SwingConfigurationMetadataGenerator extends MetadataGenerator<SwingConfig> {
 		@Override
@@ -281,10 +297,17 @@ public interface SwingConfig extends Config {
 			if(!config.isMonitorEdtEnabled()){
 				names.remove("loadingAnimationDelay");
 			}
+			if (!config.isCompositingWinManager()) {
+				names.remove("dockMode");
+			}
+			if (!config.isAllowJsLink()) {
+				names.remove("jsLinkWhitelist");
+			}
 
 			if(!config.isJavaFx()){
 				names.remove("javaFxClassPathEntries");
 			}
+
 			return names;
 		}
 

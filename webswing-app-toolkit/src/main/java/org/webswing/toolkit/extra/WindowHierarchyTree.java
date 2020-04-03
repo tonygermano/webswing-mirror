@@ -23,7 +23,7 @@ public class WindowHierarchyTree {
 	private LinkedList<WindowHierarchyNode> alwaysOnTopZOrder = new LinkedList<WindowHierarchyNode>();
 	private LinkedList<WindowHierarchyNode> regularZOrder = new LinkedList<WindowHierarchyNode>();
 	private LinkedList<WindowHierarchyNode> zOrder = new LinkedList<WindowHierarchyNode>();
-
+	
 	private ArrayDeque<Window> modalsStack = new ArrayDeque<>();
 
 	protected void bringToFront(Window w) {
@@ -50,7 +50,7 @@ public class WindowHierarchyTree {
 			Logger.error("Window not registered. Not able to bring to front.", w);
 		}
 	}
-
+	
 	protected void addWindow(Window window) {
 		if (!lookup.containsKey(window)) {
 			WindowHierarchyNode parentNode = lookup.get(window.getParent());
@@ -71,7 +71,6 @@ public class WindowHierarchyTree {
 				rebuildZOrder(false);
 			}
 			window.repaint();
-			Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(window);
 		} else {
 			Logger.error("Window already registered in hierarchy tree", window);
 		}
@@ -141,28 +140,22 @@ public class WindowHierarchyTree {
 		zOrder.addAll(regularZOrder);
 
 		if (repaintChildren) {
-			if (lastWindowAlwaysOnTop != null) {
-				for (WindowHierarchyNode node : alwaysOnTopZOrder) {
-					if (node == lastWindowAlwaysOnTop) {
-						break;
-					} else {
-						node.getW().repaint();
-						Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(node.getW());
-					}
-				}
-			}
-			if (lastWindowRegular != null) {
-				for (WindowHierarchyNode node : regularZOrder) {
-					if (node == lastWindowRegular) {
-						break;
-					} else {
-						node.getW().repaint();
-						Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(node.getW());
-					}
+			repaintChildren(lastWindowAlwaysOnTop, alwaysOnTopZOrder);
+			repaintChildren(lastWindowRegular, regularZOrder);
+		}
+
+	}
+
+	private void repaintChildren(WindowHierarchyNode lastWindow, LinkedList<WindowHierarchyNode> zOrder) {
+		if (lastWindow != null) {
+			for (WindowHierarchyNode node : zOrder) {
+				if (node == lastWindow) {
+					break;
+				} else {
+					Util.getWebToolkit().getPaintDispatcher().notifyWindowZOrderChanged(node.getW());
 				}
 			}
 		}
-
 	}
 
 	private void buildAlwaysOnTopZOrderList(List<WindowHierarchyNode> resultList, boolean inheritedAlwaysOnTop, WindowHierarchyNode currentNode) {
@@ -276,12 +269,7 @@ public class WindowHierarchyTree {
 		requestRepaintUnderlying(zOrder.indexOf(lookup.get(w)) + 1, originalPosition);
 		Rectangle newPosition = w.getBounds();
 		if (originalPosition.x != newPosition.x || originalPosition.y != newPosition.y) {
-			//just to notify that a window was moved, the moving handled by client
-			if (zOrder.indexOf(lookup.get(w)) == 0 && w.getWidth() == originalPosition.width && w.getHeight() == originalPosition.height) {
-				Util.getWebToolkit().getPaintDispatcher().notifyWindowMoved(w, originalPosition, newPosition);
-			} else {
-				Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(w);
-			}
+			Util.getWebToolkit().getPaintDispatcher().notifyWindowMoved(w,zOrder.indexOf(lookup.get(w)), originalPosition, newPosition);
 		}
 	}
 
@@ -292,12 +280,12 @@ public class WindowHierarchyTree {
 			Rectangle boundsCopy = new Rectangle(bounds);
 			SwingUtilities.computeIntersection(uBounds.x, uBounds.y, uBounds.width, uBounds.height, boundsCopy);
 			WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(underlying);
-			Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaRepainted(peer.getGuid(), new Rectangle(boundsCopy.x - uBounds.x, boundsCopy.y - uBounds.y, boundsCopy.width, boundsCopy.height));
+			Util.getWebToolkit().getPaintDispatcher().notifyWindowAreaVisible(peer.getGuid(), new Rectangle(boundsCopy.x - uBounds.x, boundsCopy.y - uBounds.y, boundsCopy.width, boundsCopy.height));
 		}
 		Rectangle boundsCopy = new Rectangle(bounds);
 		Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
 		SwingUtilities.computeIntersection(0, 0, screensize.width, screensize.height, boundsCopy);
-		Util.getWebToolkit().getPaintDispatcher().notifyBackgroundRepainted(boundsCopy);
+		Util.getWebToolkit().getPaintDispatcher().notifyBackgroundAreaVisible(boundsCopy);
 	}
 
 	protected boolean isInSameModalBranch(Window active, Window current) {

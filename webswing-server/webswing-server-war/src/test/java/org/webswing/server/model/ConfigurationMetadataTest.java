@@ -3,9 +3,7 @@ package org.webswing.server.model;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.math.BigInteger;
 import java.net.URL;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

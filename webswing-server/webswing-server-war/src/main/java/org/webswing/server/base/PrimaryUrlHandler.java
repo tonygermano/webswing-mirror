@@ -7,14 +7,14 @@ import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.SwingConfig;
-import org.webswing.server.common.model.admin.InstanceManagerStatus;
-import org.webswing.server.common.model.admin.InstanceManagerStatus.Status;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.model.exception.WsInitException;
 import org.webswing.server.services.config.ConfigurationService;
+import org.webswing.server.services.rest.resources.model.InstanceManagerStatus;
+import org.webswing.server.services.rest.resources.model.InstanceManagerStatus.StatusEnum;
 import org.webswing.server.services.security.api.SecurityContext;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.api.WebswingSecurityConfig;
@@ -81,7 +81,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	public abstract  List<SwingInstanceManager> getApplications();
 
  	public synchronized void initConfiguration() {
-		status.setStatus(Status.Starting);
+		status.setStatus(StatusEnum.STARTING);
 		String path = StringUtils.isEmpty(getPathMapping()) ? "/" : getPathMapping();
 		config = configService.getConfiguration(path);
 		WebswingSecurityConfig securityConfig = getSecurityConfig();
@@ -101,7 +101,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 			if (securityModule != null) {
 				securityModule.init();
 			}
-			status.setStatus(Status.Running);
+			status.setStatus(StatusEnum.RUNNING);
 			enabled = true;
 		} catch (Exception e) {
 			securityModule = securityModuleService.createNoAccess(WebswingAuthenticationException.CONFIG_ERROR, this, securityConfig);
@@ -110,7 +110,7 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	}
 
 	public synchronized void disable() {
-		status.setStatus(Status.Stopping);
+		status.setStatus(StatusEnum.STOPPING);
 		enabled = false;
 		try {
 			killAll();
@@ -120,14 +120,14 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		} finally {
 			this.securityModule = securityModuleService.createNoAccess(null, this, null);//no access until real SM is initialized
 		}
-		status.setStatus(Status.Stopped);
+		status.setStatus(StatusEnum.STOPPED);
 	}
 
 	protected void killAll() {//to be implemented in subclass
 	}
 
 	private void setStatusError(Throwable e) {
-		status.setStatus(Status.Error);
+		status.setStatus(StatusEnum.ERROR);
 		status.setError(e.getMessage());
 		StringWriter out = new StringWriter();
 		PrintWriter stacktrace = new PrintWriter(out);
@@ -203,7 +203,17 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 		}
 	}
 
+	/**
+	 * Returns resolved admin URL form configuration. This can be either full or relative URL.
+	 */
+	public String getAdminUrl() {
+		return varSubs.replace(getConfig().getAdminConsoleUrl());
+	}
+
 	public boolean isOriginAllowed(String header) {
+ 		if (ServerUtil.isAdminUrlSameOrigin(getAdminUrl(), header)) {
+ 			return true;
+		}
 		List<String> allowedCorsOrigins = getConfig().getAllowedCorsOrigins();
 		if (allowedCorsOrigins == null || allowedCorsOrigins.size() == 0) {
 			return false;

@@ -11,6 +11,16 @@ public class WindowPartialContentMsg implements Msg {
 	private Integer height;
 	private byte[] base64Content;
 
+	public WindowPartialContentMsg() {
+	}
+	
+	public WindowPartialContentMsg(Integer positionX, Integer positionY, Integer width, Integer height) {
+		this.positionX = positionX;
+		this.positionY = positionY;
+		this.width = width;
+		this.height = height;
+	}
+	
 	public Integer getPositionX() {
 		return positionX;
 	}

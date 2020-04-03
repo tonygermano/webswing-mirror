@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.peer.KeyboardFocusManagerPeer;
 
 import org.webswing.model.s2c.FocusEventMsg;
+import org.webswing.toolkit.api.component.HtmlPanel;
 import org.webswing.toolkit.util.Util;
 
 import javax.swing.JPasswordField;
@@ -60,7 +61,7 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 	private static FocusEventMsg getFocusEvent(){
 		Component o = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
 		FocusEventMsg msg = new FocusEventMsg();
-		if (o != null && o.isShowing()) {
+		if (o != null && o.isShowing() && !(o instanceof HtmlPanel)) {
 			msg.setType(FocusEventMsg.FocusEventType.focusGained);
 			Point l = o.getLocationOnScreen();
 			msg.setX(l.x);

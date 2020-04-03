@@ -235,14 +235,14 @@ public class Tests {
 
 		vg.setFont(embedded);
 		vg.drawString(test, 10, 25);
-
-		vg.setFont(new Font("Symbol", Font.PLAIN, 12));
+		Font symbol = new Font("Symbol", Font.PLAIN, 12);
+		vg.setFont(symbol);
 		vg.drawString("ABC abc 123 .,!", 10, 40);
 
 		vg.setFont(new Font("ZapfDingbats", Font.PLAIN, 12));
 		vg.drawString("ABC abc 123 .,!", 10, 55);
 
-		String ucs = "\u03b1 \u03b2 \u03b3 \u263a \u2665 \u2729 \u270c";
+		String ucs = "\u03b1 \u03b2 \u03b3 \u263a \u2665 \u2729 \u270c ";
 		vg.setFont(serif);
 		vg.drawString(ucs, 10, 70);
 		vg.setFont(sansserif);
@@ -261,8 +261,16 @@ public class Tests {
 			AffineTransform t = AffineTransform.getRotateInstance(Math.toRadians(10 * i));
 			double s = 1.0 + i / 20.0;
 			t.scale(fw / s, fh / s);
-			vg.setFont(font.deriveFont(t));
-			vg.drawString(text, 300, 40);
+			if(i<10){
+				Graphics2D ng= (Graphics2D) vg.create();
+				ng.setTransform(AffineTransform.getRotateInstance(Math.toRadians(10 * i),300, 40));
+				ng.setFont(embedded);
+				ng.drawString(ucs, 300, 40);
+				ng.dispose();
+			}else{
+				vg.setFont(i<15?embedded.deriveFont(t):font.deriveFont(t));
+				vg.drawString(text, 300, 40);
+			}
 		}
 
 		vg.setColor(Color.BLUE);

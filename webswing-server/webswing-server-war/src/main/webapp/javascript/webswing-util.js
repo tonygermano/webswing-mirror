@@ -24,8 +24,7 @@ export default function Util(i18n){
         eraseCookie: eraseCookie,
         checkCookie: checkCookie,
         dpr: Math.ceil(window.devicePixelRatio) || 1,
-        getTimeZone: getTimeZone,
-        focusWithPreventScroll:focusWithPreventScroll
+        getTimeZone: getTimeZone
     }
 
     function webswingLogin(baseUrl, element, loginData, successCallback) {
@@ -149,10 +148,14 @@ export default function Util(i18n){
         return 'data:image/png;base64,' + data;
     }
 
-    function bindEvent(el, eventName, eventHandler) {
+    function bindEvent(el, eventName, eventHandler, useCapture) {
         if (el.addEventListener != null) {
-            el.addEventListener(eventName, eventHandler);
+            el.addEventListener(eventName, eventHandler, useCapture);
         }
+    }
+
+    function detectChrome() {
+        return /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
     }
 
     function detectChrome() {
@@ -306,26 +309,5 @@ export default function Util(i18n){
         }
         return str;
     }
-
-    function focusWithPreventScroll(focusElement, selectInput){
-        if(focusElement){
-            var temppos = focusElement.style.position;
-            var templeft = focusElement.style.left;
-            var temptop = focusElement.style.top;
-            if(detectIE() && detectIE() <= 11){// prevent scroll does not work in IE
-                focusElement.style.position = 'fixed';
-                focusElement.style.left = '0px';
-                focusElement.style.top = '0px'
-            }
-            focusElement.focus({preventScroll: true});
-            if(selectInput){
-                focusElement.select();
-            }
-            if(detectIE() && detectIE() <= 11) {
-                focusElement.style.position = temppos;
-                focusElement.style.left = templeft;
-                focusElement.style.top = temptop;
-            }
-        }
-    }
+    
 }

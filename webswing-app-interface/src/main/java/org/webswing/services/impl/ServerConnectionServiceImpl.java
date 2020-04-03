@@ -1,5 +1,46 @@
 package org.webswing.services.impl;
 
+import java.awt.Component;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.management.LockInfo;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MonitorInfo;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.jms.Connection;
+import javax.jms.DeliveryMode;
+import javax.jms.ExceptionListener;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.Topic;
+import javax.swing.SwingUtilities;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.io.FileUtils;
 import org.webswing.Constants;
@@ -12,6 +53,7 @@ import org.webswing.model.internal.JvmStatsMsgInternal;
 import org.webswing.model.internal.ThreadDumpMsgInternal;
 import org.webswing.model.internal.ThreadDumpRequestMsgInternal;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
+import org.webswing.model.s2c.AccessibilityMsg;
 import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.toolkit.api.WebswingMessagingApi;
 import org.webswing.toolkit.api.WebswingUtil;
@@ -21,24 +63,8 @@ import org.webswing.toolkit.util.CpuMonitor;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AccessibilityUtil;
 import org.webswing.util.CheckSerializedSize;
-
-import javax.jms.*;
-import javax.swing.SwingUtilities;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.IllegalStateException;
-import java.lang.management.*;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Viktor_Meszaros This class is needed to achieve classpath isolation for swing application, all functionality dependent on external libs is implemented here.
@@ -70,7 +96,6 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private ScheduledFuture<?> delayedShutdownFuture;
 	private boolean schedulingShutdown;
 	private AtomicBoolean terminated = new AtomicBoolean(false);
-
 
 	public static ServerConnectionServiceImpl getInstance() {
 		if (impl == null) {
@@ -163,6 +188,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 				}
 			}
 		};
+		
+		AccessibilityUtil.registerAccessibilityListeners();
 	}
 
 	public void initialize() {
@@ -363,6 +390,16 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		}
 	}
 
+	@Override
+	public AccessibilityMsg getAccessibilityInfo() {
+		return AccessibilityUtil.getAccessibilityInfo();
+	}
+	
+	@Override
+	public AccessibilityMsg getAccessibilityInfo(Component c, int x, int y) {
+		return AccessibilityUtil.getAccessibilityInfo(c, x, y);
+	}
+	
 	public void onMessage(Message msg) {
 		try {
 			lastMessageTimestamp.getAndSet(System.currentTimeMillis());

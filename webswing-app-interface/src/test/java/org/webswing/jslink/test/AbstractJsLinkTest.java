@@ -1,5 +1,6 @@
 package org.webswing.jslink.test;
 
+import java.awt.Component;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
@@ -18,6 +19,7 @@ import org.webswing.ext.services.JsLinkService;
 import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.model.c2s.InputEventsFrameMsgIn;
 import org.webswing.model.jslink.JavaEvalRequestMsgIn;
+import org.webswing.model.s2c.AccessibilityMsg;
 import org.webswing.services.impl.JsLinkServiceImpl;
 import org.webswing.toolkit.api.lifecycle.ShutdownReason;
 import org.webswing.toolkit.jslink.WebJSObject;
@@ -32,6 +34,7 @@ import netscape.javascript.JSObject;
 public abstract class AbstractJsLinkTest {
 	static {
 		System.setProperty(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, "true");
+		System.setProperty(Constants.SWING_START_SYS_PROP_JSLINK_WHITELIST, "*");
 	}
 	private static final ObjectMapper mapper = new ObjectMapper();
 	ScriptEngine engine = null;
@@ -87,6 +90,16 @@ public abstract class AbstractJsLinkTest {
 			@Override
 			public void scheduleShutdown(ShutdownReason admin) {
 
+			}
+			
+			@Override
+			public AccessibilityMsg getAccessibilityInfo() {
+				return null;
+			}
+			
+			@Override
+			public AccessibilityMsg getAccessibilityInfo(Component c, int x, int y) {
+				return null;
 			}
 
 		};

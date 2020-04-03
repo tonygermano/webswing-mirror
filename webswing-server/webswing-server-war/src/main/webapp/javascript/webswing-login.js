@@ -20,10 +20,17 @@
         var user;
 
         function login(successCallback) {
+            var surl
+            try {
+                surl = window.top.location.href
+            } catch (e) {
+                surl = window.location.href
+            }
             var loginData = {
                 securityToken: api.cfg.securityToken,
                 realm: api.cfg.realm,
-                successUrl: window.top.location.href
+                successUrl: surl 
+
             };
             var dialogContent = function () {
                 return api.showDialog(api.emptyMessage);

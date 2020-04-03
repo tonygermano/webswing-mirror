@@ -2,17 +2,23 @@ package org.webswing.server.services.rest;
 
 import org.glassfish.jersey.internal.MapPropertiesDelegate;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.jersey.internal.inject.ReferencingFactory;
+import org.glassfish.jersey.internal.util.collection.Ref;
+import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.*;
 import org.glassfish.jersey.server.internal.ContainerUtils;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
+import org.glassfish.jersey.server.spi.RequestScopedInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.base.AbstractUrlHandler;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.services.rest.resources.RestException;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.*;
@@ -20,6 +26,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -32,6 +39,16 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 	private static final Logger log = LoggerFactory.getLogger(RestUrlHandlerImpl.class);
 
 	private ApplicationHandler appHandler;
+
+	private static final Type REQUEST_TYPE = (new GenericType<Ref<HttpServletRequest>>() {
+	}).getType();
+	private static final Type RESPONSE_TYPE = (new GenericType<Ref<HttpServletResponse>>() {
+	}).getType();
+	private static final RequestScopedInitializerProvider requestScopedInitializer = context -> (RequestScopedInitializer) injectionManager -> {
+		injectionManager.<Ref<HttpServletRequest>>getInstance(REQUEST_TYPE).set(context.getHttpServletRequest());
+		injectionManager.<Ref<HttpServletResponse>>getInstance(RESPONSE_TYPE).set(context.getHttpServletResponse());
+	};
+	;
 
 	public RestUrlHandlerImpl(UrlHandler parent, AbstractBinder binder, Class... resources) {
 		super(parent);
@@ -73,10 +90,21 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 			requestContext.setEntityStream(request.getInputStream());
 			addRequestHeaders(request, requestContext);
 			requestContext.setWriter(responseWriter);
+			requestContext.setRequestScopedInitializer(requestScopedInitializer.get(new RequestContextProvider() {
+				@Override
+				public HttpServletRequest getHttpServletRequest() {
+					return request;
+				}
+
+				@Override
+				public HttpServletResponse getHttpServletResponse() {
+					return response;
+				}
+			}));
 			appHandler.handle(requestContext);
 			return responseWriter.isServed();
 		} catch (final Exception e) {
-			log.error("Rest API call failed.",e);
+			log.error("Rest API call failed.", e);
 			throw new WsException(e.getMessage(), e);
 		}
 	}
@@ -191,6 +219,9 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 				response.setContentLength((int) contentLength);
 			}
 
+			//disable cache by default
+			response.setHeader("Cache-Control", "private, max-age=0");
+			
 			//write headers
 			final MultivaluedMap<String, String> headers = responseContext.getStringHeaders();
 			for (final Map.Entry<String, List<String>> e : headers.entrySet()) {
@@ -267,9 +298,9 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 	}
 
 	@Provider
-	public static class WsExceptionMapper implements ExceptionMapper<WsException> {
+	public static class RestExceptionMapper implements ExceptionMapper<RestException> {
 		@Override
-		public Response toResponse(WsException ex) {
+		public Response toResponse(RestException ex) {
 			return Response.status(ex.getReponseCode()).entity(ex.getMessage()).type("text/plain").build();
 		}
 	}
@@ -277,6 +308,22 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 	private class RestConfiguration extends ResourceConfig {
 		public RestConfiguration(AbstractBinder binder, Class[] resources) {
 			// setup jersey's hk2 dependency injection
+			register(new AbstractBinder() {
+				@Override
+				protected void configure() {
+					// request
+					bindFactory(HttpServletRequestReferencingFactory.class).to(HttpServletRequest.class).proxy(true).proxyForSameScope(false).in(RequestScoped.class);
+
+					bindFactory(ReferencingFactory.referenceFactory()).to(new GenericType<Ref<HttpServletRequest>>() {
+					}).in(RequestScoped.class);
+
+					// response
+					bindFactory(HttpServletResponseReferencingFactory.class).to(HttpServletResponse.class).proxy(true).proxyForSameScope(false).in(RequestScoped.class);
+					bindFactory(ReferencingFactory.referenceFactory()).to(new GenericType<Ref<HttpServletResponse>>() {
+					}).in(RequestScoped.class);
+				}
+			});
+
 			register(new Feature() {
 				@Override
 				public boolean configure(FeatureContext context) {
@@ -291,8 +338,32 @@ public class RestUrlHandlerImpl extends AbstractUrlHandler implements Container,
 			}
 
 			//register providers
-			register(WsExceptionMapper.class);
+			register(RestExceptionMapper.class);
 		}
 	}
 
+	private static class HttpServletResponseReferencingFactory extends ReferencingFactory<HttpServletResponse> {
+
+		@Inject
+		public HttpServletResponseReferencingFactory(final javax.inject.Provider<Ref<HttpServletResponse>> referenceFactory) {
+			super(referenceFactory);
+		}
+	}
+
+	private static class HttpServletRequestReferencingFactory extends ReferencingFactory<HttpServletRequest> {
+
+		@Inject
+		public HttpServletRequestReferencingFactory(final javax.inject.Provider<Ref<HttpServletRequest>> referenceFactory) {
+			super(referenceFactory);
+		}
+	}
+
+	public interface RequestContextProvider {
+		HttpServletRequest getHttpServletRequest();
+		HttpServletResponse getHttpServletResponse();
+	}
+
+	public interface RequestScopedInitializerProvider {
+		RequestScopedInitializer get(RequestContextProvider context);
+	}
 }

@@ -2,6 +2,7 @@ package org.webswing.toolkit.ge;
 
 import java.awt.GraphicsDevice;
 
+import org.webswing.Constants;
 import org.webswing.toolkit.WebToolkit;
 
 import sun.awt.FontConfiguration;
@@ -43,7 +44,7 @@ public abstract class WebGraphicsEnvironment extends sun.java2d.SunGraphicsEnvir
 	}
 	
 	public static boolean hasFontConfiguration(){
-		if(System.getProperty("sun.awt.fontconfig")!=null){
+		if(System.getProperty(Constants.SWING_START_SYS_PROP_FONT_CONFIG)!=null){
 			return true;
 		}else{
 			return false;

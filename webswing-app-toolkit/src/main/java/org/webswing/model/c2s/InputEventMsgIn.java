@@ -10,6 +10,7 @@ public class InputEventMsgIn implements MsgIn {
 	private MouseEventMsgIn mouse;
 	private SimpleEventMsgIn event;
 	private TimestampsMsgIn timestamps;
+	private WindowFocusMsgIn focus;
 
 	public ConnectionHandshakeMsgIn getHandshake() {
 		return handshake;
@@ -51,4 +52,11 @@ public class InputEventMsgIn implements MsgIn {
 		this.timestamps = timestamps;
 	}
 
+	public WindowFocusMsgIn getFocus() {
+		return focus;
+	}
+
+	public void setFocus(WindowFocusMsgIn focus) {
+		this.focus = focus;
+	}
 }

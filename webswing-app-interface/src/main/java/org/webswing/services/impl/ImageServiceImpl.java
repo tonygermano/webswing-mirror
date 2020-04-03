@@ -98,28 +98,8 @@ public class ImageServiceImpl implements ImageService {
 
 	public WindowDecoratorTheme getWindowDecorationTheme() {
 		if (windowDecorationTheme == null) {
-			String implClassName = System.getProperty(WindowDecoratorTheme.DECORATION_THEME_IMPL_PROP, WindowDecoratorTheme.DECORATION_THEME_IMPL_DEFAULT);
-			Class<?> implclass = null;
-			try {
-				implclass = ImageServiceImpl.class.getClassLoader().loadClass(implClassName);
-			} catch (ClassNotFoundException e) {
-				Logger.error("ImageService: WindowDecoratorTheme class not found", e);
-				try {
-					implclass = ImageServiceImpl.class.getClassLoader().loadClass(WindowDecoratorTheme.DECORATION_THEME_IMPL_DEFAULT);
-				} catch (ClassNotFoundException e1) {
-					Logger.fatal("ImageService: Fatal error:Default decoration theme not found.");
-					System.exit(1);
-				}
-			}
-			if (WindowDecoratorTheme.class.isAssignableFrom(implclass)) {
-				try {
-					this.windowDecorationTheme = (WindowDecoratorTheme) implclass.newInstance();
-				} catch (Exception e) {
-					Logger.fatal("ImageService: exception when creating instance of " + implclass.getCanonicalName(), e);
-					System.exit(1);
-				}
-			} else {
-				Logger.fatal("ImageService: Fatal error: Decoration theme not instance of WindowDecoratorThemeIfc:" + implclass.getCanonicalName());
+			this.windowDecorationTheme = Util.instantiateClass(WindowDecoratorTheme.class, WindowDecoratorTheme.DECORATION_THEME_IMPL_PROP, WindowDecoratorTheme.DECORATION_THEME_IMPL_DEFAULT, ImageServiceImpl.class.getClassLoader());
+			if (windowDecorationTheme == null) {
 				System.exit(1);
 			}
 		}

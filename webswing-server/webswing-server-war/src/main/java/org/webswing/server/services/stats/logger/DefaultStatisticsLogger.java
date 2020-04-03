@@ -1,5 +1,6 @@
 package org.webswing.server.services.stats.logger;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -76,7 +77,7 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 	}
 
 	@Override
-	public Map<String, Map<Long, Number>> getSummaryStats() {
+	public Map<String, Map<String, BigDecimal>> getSummaryStats() {
 		SummaryStats stats = new SummaryStats();
 		for (String name : summaryRulesMap.keySet()) {
 			List<Aggregation> summaryAggreg = summaryRulesMap.get(name);
@@ -109,7 +110,7 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 	}
 
 	@Override
-	public Map<String, Number> getInstanceMetrics(String instance) {
+	public Map<String, ? extends Number> getInstanceMetrics(String instance) {
 		InstanceStats stats = instanceMap.get(instance);
 		if (stats != null) {
 			return stats.getMetrics();

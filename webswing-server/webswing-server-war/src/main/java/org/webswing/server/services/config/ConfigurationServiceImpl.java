@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.meta.ConfigContext;
-import org.webswing.server.common.model.meta.MetaObject;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.extension.ExtensionClassLoader;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.model.exception.WsInitException;
+import org.webswing.server.services.rest.resources.model.MetaObject;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;

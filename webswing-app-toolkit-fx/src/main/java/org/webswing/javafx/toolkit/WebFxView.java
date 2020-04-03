@@ -31,7 +31,6 @@ import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
-import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.ext.services.ToolkitFXService;
 import org.webswing.javafx.toolkit.adaper.WindowAdapter;
 import org.webswing.javafx.toolkit.util.WebFxUtil;
@@ -188,7 +187,7 @@ public class WebFxView extends View {
 				MouseWheelEvent we = (MouseWheelEvent) e;
 				eventHandler.handleScrollEvent(this, time, e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), 0, -we.getPreciseWheelRotation(), modifiers, 1, 1, 1, 1, 1, 1);
 			} else {
-				if (WebEventDispatcher.javaFXdragStarted.get()) {
+				if (Util.getWebToolkit().getEventDispatcher().isJavaFXdragStarted()) {
 					if (e.getID() != MouseEvent.MOUSE_WHEEL) {
 						if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_RELEASED) {
 							try {
@@ -201,7 +200,7 @@ public class WebFxView extends View {
 							}catch (Exception ex){
 								Logger.debug("Exception on event",ex);
 							}finally {
-								WebEventDispatcher.javaFXdragStarted.set(false);
+								Util.getWebToolkit().getEventDispatcher().setJavaFXdragStarted(false);
 								setDragCursor(-1);
 							}
 						} else if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_DRAGGED) {
@@ -219,7 +218,7 @@ public class WebFxView extends View {
 							notifyDragEnter(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
 						} else {
 							notifyDragEnd(mapDropAction(e.getModifiersEx()));
-							WebEventDispatcher.javaFXdragStarted.set(false);
+							Util.getWebToolkit().getEventDispatcher().setJavaFXdragStarted(false);
 							setDragCursor(-1);
 						}
 					}
@@ -228,7 +227,7 @@ public class WebFxView extends View {
 					if (button == com.sun.glass.events.MouseEvent.BUTTON_RIGHT && type == com.sun.glass.events.MouseEvent.DOWN) {
 						eventHandler.handleMenuEvent(this, e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), false);
 					}
-					if (WebEventDispatcher.javaFXdragStarted.get()) {//drag initiated by this event
+					if (Util.getWebToolkit().getEventDispatcher().isJavaFXdragStarted()) {//drag initiated by this event
 						notifyDragStart(button, e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen());
 					}
 				}
@@ -356,7 +355,7 @@ public class WebFxView extends View {
 	protected void _scheduleRepaint(long ptr) {
 		if (getWindow() != null) {
 			Window win = ((WebWindow) getWindow()).w.getThis();
-			Util.getWebToolkit().getPaintDispatcher().notifyWindowRepaint(win);
+			win.repaint();
 		}
 	}
 

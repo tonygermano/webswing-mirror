@@ -6,6 +6,7 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.servlet.Cookie.SameSiteOptions;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.webswing.Constants;
@@ -20,7 +21,13 @@ public class WebswingWebSessionManager extends DefaultWebSessionManager {
 		String proxypath = System.getProperty(Constants.REVERSE_PROXY_CONTEXT_PATH, "").replaceAll("[^A-Za-z0-9]", "_");
 		Cookie cookie = new SimpleCookie(WEBSWING_SESSION_ID + proxypath);
 		cookie.setHttpOnly(true); //more secure, protects against XSS attacks
-		cookie.setSecure(Boolean.getBoolean(Constants.HTTPS_ONLY));
+		
+		boolean serverIsHttpsOnly = Boolean.getBoolean(Constants.HTTPS_ONLY);
+		cookie.setSecure(serverIsHttpsOnly);
+		if (serverIsHttpsOnly) {
+			cookie.setSameSite(SameSiteOptions.valueOf(System.getProperty(Constants.COOKIE_SAMESITE, "NONE").toUpperCase()));
+		}
+		
 		setSessionIdCookie(cookie);
 	}
 

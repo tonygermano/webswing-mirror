@@ -1,5 +1,6 @@
 package org.webswing.server.services.stats.logger;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,11 +12,11 @@ import java.util.Map;
 import java.util.Set;
 
 public class SummaryStats {
-	private Map<String, Map<Long, Number>> metricsLog = new HashMap<>();
+	private Map<String, Map<String, BigDecimal>> metricsLog = new HashMap<>();
 
 	public void aggregate(Collection<InstanceStats> instances, String name, Aggregation aggregation) {
 		Set<Long> timestamps = new HashSet<>();
-		Map<Long,Number> metric = new LinkedHashMap<>();
+		Map<String,BigDecimal> metric = new LinkedHashMap<>();
 		for (InstanceStats instance : instances) {
 			Map<Long, Number> valueMap = instance.getStatistics().get(name);
 			if (valueMap != null) {
@@ -30,12 +31,12 @@ public class SummaryStats {
 					values.add(valueMap.get(key));
 				}
 			}
-			metric.put(key, calculateValue(aggregation, values));
+			metric.put(key.toString(), calculateValue(aggregation, values));
 		}
 		metricsLog.put(name+"."+aggregation.name(), metric);
 	}
 
-	private Number calculateValue(Aggregation rule, List<Number> list) {
+	private BigDecimal calculateValue(Aggregation rule, List<Number> list) {
 		//store value
 		Number result = 0;
 		if (list != null && list.size() > 0) {
@@ -59,10 +60,10 @@ public class SummaryStats {
 				result = result.doubleValue() / list.size();
 			}
 		}
-		return result;
+		return new BigDecimal(result.toString());
 	}
 
-	public Map<String, Map<Long, Number>> getStatistics() {
+	public Map<String, Map<String, BigDecimal>> getStatistics() {
 		return metricsLog;
 	}
 

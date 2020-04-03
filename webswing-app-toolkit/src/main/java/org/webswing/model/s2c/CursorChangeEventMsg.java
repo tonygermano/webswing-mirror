@@ -20,6 +20,7 @@ public class CursorChangeEventMsg implements Msg {
 	private String curFile;
 	private int x;
 	private int y;
+	private String winId;
 
 	public CursorChangeEventMsg() {
 	}
@@ -67,5 +68,13 @@ public class CursorChangeEventMsg implements Msg {
 
 	public void setCurFile(String curFile) {
 		this.curFile = curFile;
+	}
+
+	public String getWinId() {
+		return winId;
+	}
+
+	public void setWinId(String winId) {
+		this.winId = winId;
 	}
 }

@@ -7,7 +7,6 @@ import html from './templates/touch.html';
             cfg: 'webswing.config',
             send: 'socket.send',
             sendHandshake: 'base.handshake',
-            getInput: 'canvas.getInput',
             getCanvas: 'canvas.get',
             getRootWidth: 'canvas.width',
             getRootHeight: 'canvas.height',
@@ -16,7 +15,10 @@ import html from './templates/touch.html';
             repaint: 'base.repaint',
             showBar: 'dialog.showBar',
             touchSwitchModeMouseDialog: 'dialog.content.touchSwitchModeMouseDialog',
-            touchSwitchModeTouchDialog: 'dialog.content.touchSwitchModeTouchDialog'
+            touchSwitchModeTouchDialog: 'dialog.content.touchSwitchModeTouchDialog',
+            hasUndockedWindows: 'base.hasUndockedWindows',
+            focusInput: 'focusManager.focusInput',
+            focusDefault: 'focusManager.focusDefault'
         };
         module.provides = {
             register: register,
@@ -79,13 +81,13 @@ import html from './templates/touch.html';
         var currentConfig = null;
         var lastRootWidth = 0;
         var lastRootHeight = 0;
-        
+
         function touchBarConfig() {
         	return {
         		buttons: {
         			defaultButtons: {
         				toggleMode: {
-        					label: '<span class="ws-button-toggle-mode ws-icon-mouse-pointer"></span>',
+        					label: '<span class="ws-button-toggle-mode ws-icon-mouse-pointer" role="button"></span>',
         					title: '${touch.controlMode}',
         					enabled: true,
         					hidden: false,
@@ -94,7 +96,7 @@ import html from './templates/touch.html';
         					}
             			},
             			switchToDesktop: {
-            				label: '<span class="ws-button-switch-to-desktop ws-icon-desktop"></span>',
+            				label: '<span class="ws-button-switch-to-desktop ws-icon-desktop" role="button"></span>',
             				title: '${touch.desktopMode}',
             				enabled: true,
             				hidden: true,
@@ -103,7 +105,7 @@ import html from './templates/touch.html';
             				}
             			},
             			copy: {
-        					label: '<span class="ws-icon-docs"></span>',
+        					label: '<span class="ws-icon-docs" role="button"></span>',
         					title: '${touch.copy}',
         					enabled: true,
         					hidden: false,
@@ -112,7 +114,7 @@ import html from './templates/touch.html';
         					}
             			},
             			cut: {
-    	        			label: '<span class="ws-icon-scissors"></span>',
+    	        			label: '<span class="ws-icon-scissors" role="button"></span>',
     	        			title: '${touch.cut}',
     	        			enabled: true,
     	        			hidden: false,
@@ -121,7 +123,7 @@ import html from './templates/touch.html';
     	        			}
     	        		},
     	        		paste: {
-    	        			label: '<span class="ws-icon-paste"></span>',
+    	        			label: '<span class="ws-icon-paste" role="button"></span>',
     	        			title: '${touch.paste}',
     	        			enabled: true,
     	        			hidden: false,
@@ -130,7 +132,7 @@ import html from './templates/touch.html';
     	        			}
     	        		},
     	        		keyboard: {
-    	        			label: '<span class="ws-icon-keyboard"></span>',
+    	        			label: '<span class="ws-icon-keyboard" role="button"></span>',
     	        			title: '${touch.keyboard}',
     	        			enabled: true,
     	        			hidden: false,
@@ -139,7 +141,7 @@ import html from './templates/touch.html';
     	        			}
     	        		},
     	        		fullscreen: {
-    	        			label: '<span class="ws-button-toggle-fullscreen ws-icon-resize-full"></span>',
+    	        			label: '<span class="ws-button-toggle-fullscreen ws-icon-resize-full" role="button"></span>',
     	        			title: '${touch.fullscreen}',
     	        			enabled: !util.isIOS(),
     	        			hidden: false,
@@ -164,10 +166,10 @@ import html from './templates/touch.html';
             currentConfig = config;
             
             $(document).on("touchstart", function(event) {
-            	if (isNotValidCanvasTarget(event.target)) {
+            	if (isNotValidCanvasTarget(event.target) || api.hasUndockedWindows()) {
             		return;
             	}
-            	
+
             	if (!registered && !switchModeDontAsk && !switchModeRequested) {
             		// ask to switch to touch
             		switchModeRequested = true;
@@ -182,7 +184,7 @@ import html from './templates/touch.html';
             	if (isNotValidCanvasTarget(event.target)) {
             		return;
             	}
-            	
+
             	if (registered && !switchModeDontAsk && !switchModeRequested && !isProbablyTouchBook) {
             		// ask to switch to mouse
             		switchModeRequested = true;
@@ -200,7 +202,7 @@ import html from './templates/touch.html';
         		return;
         	}
         	
-            input = $(api.getInput());
+            input = $(document.querySelector(".ws-input-hidden"));
             
             document.addEventListener("touchstart", function(evt) {
             	if (isNotValidCanvasTarget(evt.target)) {
@@ -265,7 +267,7 @@ import html from './templates/touch.html';
             };
             
             input.blur();
-            canvas.focus({preventScroll: true});
+            api.focusDefault();
             
             console.log("initialized touch.");
             
@@ -276,11 +278,11 @@ import html from './templates/touch.html';
             
             lastRootWidth = api.cfg.rootElement.width();
     		lastRootHeight = api.cfg.rootElement.height();
-    		
-    		api.sendHandshake();
-        	
+
+            api.sendHandshake();
+
             initTouchBar(config);
-            
+
             var initScale = Math.min(document.body.offsetWidth / api.getRootWidth(), (document.body.offsetHeight - touchBar.height()) / api.getRootHeight());
             $(canvas).data("scale", initScale);
             $(canvas).data("minscale", initScale);
@@ -343,7 +345,7 @@ import html from './templates/touch.html';
         		$("#fake-input").remove();
         		if (!input.is(':focus')) {
         			if (focusCounter == 0) {
-        				input[0].focus({preventScroll: true});
+        				api.focusInput(input[0]);
         				focusCounter++;
         			}
         		} else {
@@ -365,7 +367,7 @@ import html from './templates/touch.html';
         	focusCounter = 0;
         	input.val('');
         	$("#fake-input").remove();
-        	canvas.focus({preventScroll: true});
+        	api.focusDefault();
         	// force canvas repaint
         	repaint();
         }
@@ -767,7 +769,7 @@ import html from './templates/touch.html';
         			eventMsg.push(createMouseEvent(evt.target, 'mouseup', tx, ty, 3));
         			
         			api.send({events: eventMsg});
-        			canvas.focus({preventScroll: true});
+        			api.focusDefault();
         			
         			cancelAnimateDrag();
         			animateLongPressOut(tx, ty);
@@ -829,7 +831,7 @@ import html from './templates/touch.html';
         		cursor.data("originX", cursorX);
         		cursor.data("originY", cursorY);
         		var relatedCanvas = getPointerRelatedCanvas(cursorX, cursorY);
-        		
+
         		longPressStartTimeout = setTimeout(function() {
         			animateLongPress(cursorX, cursorY);
         		}, 50);
@@ -844,7 +846,7 @@ import html from './templates/touch.html';
         			eventMsg.push(createMouseEvent(relatedCanvas, 'mouseup', cursorX, cursorY, 3));
         			
         			api.send({events: eventMsg});
-        			canvas.focus({preventScroll: true});
+        			api.focusDefault();
         			
         			animateLongPressOut(cursorX, cursorY);
         		}, tapDelayThreshold);
@@ -878,12 +880,12 @@ import html from './templates/touch.html';
         		var diff = (dist - lastScaleDist) * scaleSpeed;
         		
         		lastScaleDist = dist;
-        		
+
         		var canvasDiameter = Math.hypot(canvas.width, canvas.height);
         		var scale = diff / canvasDiameter;
         		var lastScale = $(canvas).data("scale") || 1.0;
         		var minScale = $(canvas).data("minscale") || 1.0
-        		
+
         		scale = Math.min(Math.max(minScale, lastScale + scale), maxScale);
         		
         		var originX = (evt.touches[0].clientX + evt.touches[1].clientX) / 2;
@@ -1039,7 +1041,7 @@ import html from './templates/touch.html';
         			var eventMsg = [];
         			eventMsg.push(createMouseEvent(relatedCanvas, 'mousedown', x, y, 1));
         			eventMsg.push(createMouseEvent(relatedCanvas, 'mouseup', x, y, 1));
-        			
+
         			if ($(relatedCanvas).closest(".webswing-html-canvas").length) {
         				// simulate browser mouse click on HtmlPanel (does not work for iframe)
         				var mouseClick = new MouseEvent("click", {
@@ -1115,7 +1117,7 @@ import html from './templates/touch.html';
         	var touches = evt.changedTouches;
         	var coords = getPointerCoords(touches[0].clientX, touches[0].clientY);
         	var relatedCanvas = getPointerRelatedCanvas(coords.x, coords.y);
-        	
+
         	handleEndDefault(evt, relatedCanvas, coords.x, coords.y);
         	handleDragMoveEnd(relatedCanvas, coords.x, coords.y);
         }
@@ -1168,7 +1170,7 @@ import html from './templates/touch.html';
         		var me = createMouseEvent(relatedCanvas, 'mouseup', x, y, 1);
         		
         		api.send({events: [me]});
-        		canvas.focus({preventScroll: true});
+        		api.focusDefault();
         		
         		dragging = false;
         	}
@@ -1245,18 +1247,18 @@ import html from './templates/touch.html';
         	if (!target) {
         		return true;
         	}
-        	
-        	if (target.matches("canvas.webswing-canvas") || target.matches(".webswing-html-canvas")) {
+
+        	if (target.matches && (target.matches("canvas.webswing-canvas") || target.matches(".webswing-html-canvas"))) {
         		return false;
         	}
-        	
+
         	if ($(target).closest(".webswing-html-canvas").length) {
         		return false;
         	}
-        	
+
         	return true;
         }
-        
+
         function getPointerCoords(touchX, touchY) {
         	var parent = api.cfg.rootElement;
     		var pHeight = parent.height();
@@ -1275,7 +1277,7 @@ import html from './templates/touch.html';
         function getPointerRelatedCanvas(px, py) {
         	return document.elementFromPoint(px, py);
         }
-        
+
         function doScaleCanvas(scale) {
         	if (!scalingEnabled) {
         		return;
@@ -1285,7 +1287,7 @@ import html from './templates/touch.html';
     			clearTimeout(scaleHideTimer);
     			scaleHideTimer = null;
     		}
-        	
+
         	if (scale == 1.0) {
         		$(canvas).css({"transform": "scale(" + scale + ")", "transform-origin": ""});
         	} else {
@@ -1376,7 +1378,7 @@ import html from './templates/touch.html';
             } else {
                 rect = api.getCanvas().getBoundingClientRect();
             }
-            
+
             var winId;
             if (targetElement && targetElement.matches("canvas.webswing-canvas") && $(targetElement).data("id") && $(targetElement).data("id") != "canvas") {
             	// for a composition canvas window send winId
@@ -1393,17 +1395,17 @@ import html from './templates/touch.html';
             // return relative mouse position
             var mouseX = Math.round(x - rect.left);
             var mouseY = Math.round(y - rect.top);
-            
+
             if (type == 'mouseup' && (!targetElement || !targetElement.matches || !targetElement.matches("canvas.webswing-canvas"))) {
             	// fix for detached composition canvas windows that might overlay same coordinates space, when clicked outside a canvas
             	mouseX = -1;
             	mouseY = -1;
             }
-            
+
             if (type == 'mouseup' && targetElement && targetElement.matches && !targetElement.matches("canvas.webswing-canvas") && targetElement.closest(".webswing-html-canvas") != null) {
             	// fix for mouseup over an HtmlWindow div content
             	rect = targetElement.closest(".webswing-html-canvas").parentNode.getBoundingClientRect();
-            	
+
             	mouseX = Math.round(x - rect.left);
             	mouseY = Math.round(y - rect.top);
             }
@@ -1475,7 +1477,7 @@ import html from './templates/touch.html';
         
         function showKeyboard() {
 			input.addClass('focused-with-caret editable');
-			input[0].focus({preventScroll: true});
+			api.focusInput(input[0]);
         }
         
         function hideKeyboard() {
@@ -1501,11 +1503,11 @@ import html from './templates/touch.html';
             			$(canvas).data("scale", minScale);
             			doScaleCanvas(minScale);
             		}
-            		
+
             		lastRootWidth = api.cfg.rootElement.width();
             		lastRootHeight = api.cfg.rootElement.height();
             	}
-            	
+
             	if (sizeChanged) {
             		if (input.is(".focused-with-caret.editable")) {
             			if (!widthChanged && (h - $(canvas).height()) < 100) {

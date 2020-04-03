@@ -12,6 +12,7 @@ public class WindowEventMsgIn implements MsgIn {
 	private int width;
 	private int height;
 	private boolean close;
+	private boolean focus;
 	
 	public String getId() {
 		return id;
@@ -59,6 +60,14 @@ public class WindowEventMsgIn implements MsgIn {
 
 	public void setClose(boolean close) {
 		this.close = close;
+	}
+
+	public boolean isFocus() {
+		return focus;
+	}
+
+	public void setFocus(boolean focus) {
+		this.focus = focus;
 	}
 
 }

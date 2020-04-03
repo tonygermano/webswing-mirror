@@ -4,6 +4,7 @@ import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -56,9 +57,8 @@ import org.webswing.model.s2c.SimpleEventMsgOut;
 import org.webswing.server.common.model.AppletLauncherConfig;
 import org.webswing.server.common.model.DesktopLauncherConfig;
 import org.webswing.server.common.model.SwingConfig;
+import org.webswing.server.common.model.SwingConfig.DockMode;
 import org.webswing.server.common.model.SwingConfig.LauncherType;
-import org.webswing.server.common.model.admin.SwingInstanceStatus;
-import org.webswing.server.common.model.admin.SwingSession;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.EncodedMessage;
@@ -69,6 +69,8 @@ import org.webswing.server.services.jvmconnection.JvmConnectionService;
 import org.webswing.server.services.jvmconnection.JvmListener;
 import org.webswing.server.services.recorder.SessionRecorder;
 import org.webswing.server.services.recorder.SessionRecorderService;
+import org.webswing.server.model.SwingInstanceStatus;
+import org.webswing.server.services.rest.resources.model.SwingSession;
 import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.modules.AbstractSecurityModule;
 import org.webswing.server.services.stats.StatisticsLogger;
@@ -90,6 +92,8 @@ import org.webswing.toolkit.api.WebswingMessagingApi;
 import main.Main;
 import org.webswing.toolkit.util.ClasspathUtil;
 
+import com.google.common.base.Joiner;
+
 public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListener {
 
 	private static final long serialVersionUID = -4640770499863974871L;
@@ -103,6 +107,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	private static final String JAVA_FX_PATH = System.getProperty("java.home") + "/lib/ext/jfxrt.jar";
 	private static final String JAVA_FX_TOOLKIT_CLASS_NAME = "org.webswing.javafx.toolkit.WebsinwgFxToolkitFactory";
 	private static final long DEFAULT_LOG_SIZE = 10 * 1024 * 1024; // 10 MB
+	private static final String JACCESS_JAR_PATH = System.getProperty("java.home") + "/lib/ext/jaccess.jar";
 
 	private static final Logger log = LoggerFactory.getLogger(SwingInstance.class);
 	private final String instanceId;
@@ -173,6 +178,9 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 
 	private boolean connectPrimaryWebSession(WebSocketConnection resource) {
 		if (resource != null) {
+			if (this.mirroredWebConnection != null && StringUtils.equals(resource.uuid(), this.mirroredWebConnection.uuid())) {
+				disconnectMirroredWebSession(); // prevent same connection to be primary and mirrored at the same time
+			}
 			if (this.webConnection != null && config.isAllowStealSession()) {
 				synchronized (this.webConnection) {
 					this.webConnection.broadcastMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut());
@@ -213,6 +221,9 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 
 	private void connectMirroredWebSession(WebSocketConnection resource) {
 		if (resource != null) {
+			if (this.webConnection != null && StringUtils.equals(resource.uuid(), this.webConnection.uuid())) {
+				disconnectPrimaryWebSession(); // prevent same connection to be primary and mirrored at the same time
+			}
 			if (this.mirroredWebConnection != null) {
 				synchronized (this.mirroredWebConnection) {
 					this.mirroredWebConnection.broadcastMessage(SimpleEventMsgOut.sessionStolenNotification.buildMsgOut());
@@ -466,20 +477,23 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		} else {
 			info = webConnection.getUserInfo();
 		}
-		session.setDisconnectedSince(info.getDisconnectedSince());
+		if(info.getDisconnectedSince() != null)
+			session.setDisconnectedSince(info.getDisconnectedSince().getTime());
 		session.setUser(info.getUserId());
 		session.setUserIp(info.getUserIp());
 		session.setUserOs(info.getUserOs());
 		session.setUserBrowser(info.getUserBrowser());
 
-		session.setStartedAt(getStartedAt());
-		session.setEndedAt(getEndedAt());
-		session.setStatus(getStatus());
+		if(getStartedAt() != null)
+			session.setStartedAt(getStartedAt().getTime());
+		if(getEndedAt() != null)
+			session.setEndedAt(getEndedAt().getTime());
+		session.setStatus(SwingSession.StatusEnum.valueOf(getStatus().toString()));
 		StatisticsReader statReader = manager.getStatsReader();
 		if (stats) {
-			session.setStats(statReader.getInstanceStats(this.getInstanceId()));
+			session.setStats((Map<String, Object>) statReader.getInstanceStats(this.getInstanceId()));
 		}
-		session.setMetrics(statReader.getInstanceMetrics(this.getInstanceId()));
+		session.setMetrics((Map<String, BigDecimal>) statReader.getInstanceMetrics(this.getInstanceId()));
 		session.setWarnings(statReader.getInstanceWarnings(this.getInstanceId()));
 		if (isRunning()) {
 			session.setWarningHistory(statReader.getInstanceWarningHistory(this.getInstanceId()));
@@ -581,11 +595,19 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			if (useJFX) {
 				bootCp += javaFxBootClasspath;
 			}
-
+			
+			if (javaVersion.startsWith("1.8")) {
+				if (!new File(JACCESS_JAR_PATH).exists()) {
+					log.warn("Java access.jar not found in '" + new File(JACCESS_JAR_PATH).getCanonicalPath() + "'. ");
+				} else {
+					bootCp += File.pathSeparatorChar + "\"" + new File(JACCESS_JAR_PATH).getCanonicalPath() + "\"";
+				}
+			}
+			
 			int debugPort = websocket.getUserInfo().getDebugPort();
 			String debug = appConfig.isDebug() && (debugPort != 0) ? " -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=" + debugPort + ",server=y,suspend=y " : "";
 			String vmArgs = appConfig.getVmArgs() == null ? "" : subs.replace(appConfig.getVmArgs());
-			swingConfig.setJvmArgs(j9modules + bootCp + debug + " -noverify " + vmArgs);
+			swingConfig.setJvmArgs(j9modules + bootCp + debug + " -Djavax.sound.sampled.Clip=org.webswing.audio.AudioMixerProvider " + " -noverify " + vmArgs);
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID, this.getInstanceId());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_APP_ID, manager.getPathMapping());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JMS_ID, this.instanceId);
@@ -605,8 +627,12 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE, appConfig.isAllowDelete());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD, appConfig.isAllowLocalClipboard());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK, appConfig.isAllowJsLink());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_JSLINK_WHITELIST, Joiner.on(',').join(appConfig.getJsLinkWhitelist()));
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_INITIAL_URL, handshake.getUrl());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_MSG_API_TOPIC, WebswingMessagingApi.MSG_API_SHARED_TOPIC + manager.getFullPathMapping());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DOCK_MODE, handshake.isDockingSupported() ? appConfig.getDockMode().name() : DockMode.NONE.name());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TOUCH_MODE, handshake.isTouchMode());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ACCESSIBILITY_ENABLED, handshake.isAccessiblityEnabled());
 
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported());
@@ -619,7 +645,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			swingConfig.addProperty("java.awt.graphicsenv", webGraphicsEnvClass);
 			swingConfig.addProperty("java.awt.printerjob", WEB_PRINTER_JOB_CLASS_NAME);
 			swingConfig.addProperty(Constants.PRINTER_JOB_CLASS, appConfig.isAllowServerPrinting() ? PrinterJob.getPrinterJob().getClass().getCanonicalName() : "org.webswing.toolkit.WebPrinterJob");
-			swingConfig.addProperty("sun.awt.fontconfig", FontUtils.createFontConfiguration(appConfig, subs));
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_FONT_CONFIG, FontUtils.createFontConfiguration(appConfig, subs));
 			swingConfig.addProperty(Constants.SWING_SCREEN_WIDTH, ((screenWidth == null) ? Constants.SWING_SCREEN_WIDTH_MIN : screenWidth));
 			swingConfig.addProperty(Constants.SWING_SCREEN_HEIGHT, ((screenHeight == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : screenHeight));
 
@@ -833,10 +859,10 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		warningHistoryLog = current;
 	}
 
-	private Map<Long, String> toMap(Map<Long, ThreadDumpMsgInternal> dumps) {
-		LinkedHashMap<Long, String> result = new LinkedHashMap<>();
+	private Map<String, String> toMap(Map<Long, ThreadDumpMsgInternal> dumps) {
+		LinkedHashMap<String, String> result = new LinkedHashMap<>();
 		for (ThreadDumpMsgInternal dump : dumps.values()) {
-			result.put(dump.getTimestamp(), dump.getReason());
+			result.put(Long.toString(dump.getTimestamp()), dump.getReason());
 		}
 		return result;
 	}

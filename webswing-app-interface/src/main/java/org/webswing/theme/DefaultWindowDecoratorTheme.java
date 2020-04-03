@@ -19,6 +19,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -30,8 +31,10 @@ import org.apache.commons.io.IOUtils;
 import org.webswing.Constants;
 import org.webswing.common.WindowActionType;
 import org.webswing.common.WindowDecoratorTheme;
-import org.webswing.toolkit.util.Util;
+import org.webswing.model.s2c.AccessibilityMsg;
+import org.webswing.toolkit.api.component.Dockable;
 import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Util;
 
 public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 	private static final String DEFAULT_THEME = "Murrine";
@@ -52,6 +55,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		BufferedImage TOP_LEFT;
 		BufferedImage TITLE;
 		BufferedImage MENU;
+		BufferedImage DOCK_UNDOCK;
 		BufferedImage HIDE;
 		BufferedImage MAXIMIZE;
 		BufferedImage CLOSE;
@@ -93,6 +97,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 				TOP_LEFT = readImage("top-left-active");
 				TITLE = readImage("title-1-active");
 				MENU = readImage("menu-active");
+				DOCK_UNDOCK = readImage("shade-active");
 				HIDE = readImage("hide-active");
 				MAXIMIZE = readImage("maximize-active");
 				CLOSE = readImage("close-active");
@@ -115,6 +120,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 				TOP_LEFT = readImage("top-left-inactive");
 				TITLE = readImage("title-1-inactive");
 				MENU = readImage("menu-inactive");
+				DOCK_UNDOCK = readImage("shade-inactive");
 				HIDE = readImage("hide-inactive");
 				MAXIMIZE = readImage("maximize-inactive");
 				CLOSE = readImage("close-inactive");
@@ -247,6 +253,8 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		x -= is.CLOSE.getWidth();
 		g.drawImage(is.CLOSE, x, y + (is.TITLE.getHeight() - is.CLOSE.getHeight()) / 2, null);
 
+		int lastWidth = is.CLOSE.getWidth();
+		
 		// Dialogs can be RESIZABLE too, at least on Linux/Unix
 		if (isMinMaxButtonVisible(window)) {
 			x -= BUTTON_SPACING + is.MAXIMIZE.getWidth();
@@ -254,6 +262,13 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 
 			x -= BUTTON_SPACING + is.HIDE.getWidth();
 			g.drawImage(is.HIDE, x, y + (is.TITLE.getHeight() - is.HIDE.getHeight()) / 2, null);
+			
+			lastWidth = is.HIDE.getWidth();
+		}
+		
+		if (isDockButtonVisible(window)) {
+			x -= BUTTON_SPACING + lastWidth;
+			g.drawImage(is.DOCK_UNDOCK, x, y + (is.TITLE.getHeight() - is.DOCK_UNDOCK.getHeight()) / 2, null);
 		}
 
 		x = xOffset;
@@ -262,6 +277,15 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		g.drawImage(is.BOTTOM_RIGHT, xOffset + w - is.BOTTOM_RIGHT.getWidth(), y - is.BOTTOM_RIGHT.getHeight(), null);
 
 		insets = new Insets(is.TITLE.getHeight(), is.LEFT.getWidth(), is.BOTTOM.getHeight(), is.RIGHT.getWidth());
+	}
+	
+	private Rectangle getUndockRect(Window w) {
+		ImageSet is = (w != null && w.equals(Util.getWebToolkit().getWindowManager().getActiveWindow())) ? active : inactive;
+		int x = w.getWidth() - BUTTON_SPACING - is.CLOSE.getWidth() - BUTTON_SPACING - is.DOCK_UNDOCK.getWidth();
+		if (isMinMaxButtonVisible(w)) {
+			x = x - BUTTON_SPACING - is.MAXIMIZE.getWidth() - BUTTON_SPACING - is.HIDE.getWidth();
+		}
+		return new Rectangle(x, 0 + (is.TITLE.getHeight() - is.DOCK_UNDOCK.getHeight()) / 2, is.DOCK_UNDOCK.getWidth(), is.DOCK_UNDOCK.getHeight());
 	}
 
 	private Rectangle getHideRect(Window w) {
@@ -309,6 +333,9 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		Rectangle eventPoint = new Rectangle((int) e.getX(), (int) e.getY(), 1, 1);
 		Insets i = w.getInsets();
 
+		if (isDockButtonVisible(w) && SwingUtilities.isRectangleContainingRectangle(getUndockRect(w), eventPoint)) {
+			return WindowActionType.dockUndock;
+		}
 		// Dialogs can be RESIZABLE too, at least on Linux/Unix
 		if (isMinMaxButtonVisible(w)) {
 			if (SwingUtilities.isRectangleContainingRectangle(getHideRect(w), eventPoint)) {
@@ -348,16 +375,73 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 			if (e.getY() < i.bottom) {
 				return WindowActionType.resizeTop;
 			}
-			
 		}
+		
 		if (e.getY() < i.top) {
 			// move
 			return WindowActionType.move;
 		}
+		
 		return WindowActionType.cursorChanged;
-
 	}
+	
+	@Override
+	public AccessibilityMsg getAccessible(Window window, WindowActionType action, Point mousePointer) {
+		AccessibilityMsg result = new AccessibilityMsg();
+		
+		if (!action.isButtonActionType()) {
+			return null;
+		}
+		
+		result.setId(System.identityHashCode(window) + "-" + action.name());
+		result.setRole("decorationbutton"); // not a real ARIA role
+		
+		List<String> states = new ArrayList<>();
+		states.add("ENABLED");
+		result.setStates(states);
 
+		Rectangle rect = null;
+		
+		switch (action) {
+			case dockUndock:
+				rect = getUndockRect(window);
+				result.setText("accessibility.window.button.toggleDock");
+				break;
+			case close:
+				rect = getCloseRect(window);
+				result.setText("accessibility.window.button.close");
+				break;
+			case maximize:
+				rect = getMaximizeRect(window);
+				if (window instanceof Frame) {
+					if ((((Frame) window).getExtendedState() & Frame.MAXIMIZED_BOTH) != 0) {
+						// maximized
+						result.setText("accessibility.window.button.restore");
+					} else {
+						// not maximized
+						result.setText("accessibility.window.button.maximize");
+					}
+				}
+				break;
+			case minimize:
+				rect = getHideRect(window);
+				result.setText("accessibility.window.button.minimize");
+				break;
+			default:
+				break;
+		}
+		
+		if (rect != null) {
+			Point loc = window.getLocationOnScreen();
+			result.setScreenX(loc.x + rect.x);
+			result.setScreenY(loc.y + rect.y);
+			result.setWidth(rect.width);
+			result.setHeight(rect.height);
+		}
+		
+		return result;
+	}
+	
 	public boolean isMinMaxButtonVisible(Object w) {
 		return (w instanceof Frame) && ((Frame) w).isResizable();
 	}
@@ -366,4 +450,17 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		return (w instanceof Dialog && ((Dialog) w).isResizable()) || (w instanceof Frame) && ((Frame) w).isResizable();
 	}
 
+	private boolean isDockButtonVisible(Object w) {
+		switch (Util.getDockMode()) {
+			case "NONE":
+				return false;
+			case "ALL":
+				return true;
+			case "MARKED":
+				return w instanceof Dockable;
+			default:
+				return false;
+		}
+	}
+	
 }

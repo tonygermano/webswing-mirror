@@ -5,7 +5,7 @@
     <parent>
         <artifactId>webswing-server</artifactId>
         <groupId>org.webswing</groupId>
-        <version>2.7.5</version>
+        <version>20.1</version>
         <relativePath>..</relativePath>
     </parent>
     <dependencies>
@@ -52,6 +52,10 @@
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>activemq-openwire-legacy</artifactId>
+                    <groupId>org.apache.activemq</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -130,6 +134,82 @@
     <build>
         <finalName>${webswing-war-name}</finalName>
         <plugins>
+<!--         OpenAPI Plugin to generate API -->
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>4.1.1</version>
+                <executions>
+                <!--         Execution to generate API -->
+                    <execution>
+                       <id>api</id>
+                        <goals>
+                          <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/webswing_api.yaml</inputSpec>
+                            <output>${project.basedir}</output>
+                            <apiPackage>org.webswing.server.services.rest.resources.api</apiPackage>
+                            <modelPackage>org.webswing.server.services.rest.resources.model</modelPackage>
+                            <generatorName>jaxrs-cxf</generatorName>
+                            <templateDirectory>${project.basedir}/src/main/resources/openapi/</templateDirectory>
+                            <configOptions>
+                                <sourceFolder>/src/main/java/</sourceFolder>
+                                <useBeanValidation>false</useBeanValidation>
+                                <generatePom>false</generatePom>
+                                <useSwaggerAnnotations>false</useSwaggerAnnotations>
+                                <implFolder>tmp</implFolder>
+                            </configOptions>
+                            <generateApiTests>false</generateApiTests>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                        </configuration>
+                    </execution>
+                    <!--         Execution to generate Model (DTO) -->
+                    <execution>
+                        <id>model</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/webswing_api.yaml</inputSpec>
+                            <output>${project.basedir}</output>
+                            <apiPackage>tmp</apiPackage>
+                            <generateApis>false</generateApis>
+                            <modelPackage>org.webswing.server.services.rest.resources.model</modelPackage>
+                            <generatorName>jaxrs-spec</generatorName>
+                            <templateDirectory>${project.basedir}/src/main/resources/openapi/</templateDirectory>
+                            <configOptions>
+                                <sourceFolder>/src/main/java/</sourceFolder>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useBeanValidation>false</useBeanValidation>
+                                <generatePom>false</generatePom>
+                                <useSwaggerAnnotations>false</useSwaggerAnnotations>
+                            </configOptions>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <delete dir="${project.basedir}/src/main/java/temp" />
+                                <delete dir="${project.basedir}/src/test/java/org/webswing/server/services/rest/resources/api" />
+                                <delete dir="${project.basedir}/src/main/java/org/webswing/server/services/rest/resources/api/impl" />
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -200,7 +280,7 @@
                 <executions>
                     <execution>
                         <id>npm install</id>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>npm</goal>
                         </goals>
@@ -210,7 +290,7 @@
                     </execution>
                     <execution>
                         <id>npm build</id>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>npm</goal>
                         </goals>
@@ -310,7 +390,7 @@
                         <executions>
                             <execution>
                                 <id>npm build</id>
-                                <phase>package</phase>
+                                <phase>prepare-package</phase>
                                 <goals>
                                     <goal>npm</goal>
                                 </goals>

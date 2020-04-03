@@ -4,8 +4,8 @@ import org.webswing.model.MsgIn;
 import org.webswing.model.MsgOut;
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
 import org.webswing.server.common.model.SwingConfig;
-import org.webswing.server.common.model.admin.SwingSession;
 import org.webswing.server.model.exception.WsException;
+import org.webswing.server.services.rest.resources.model.SwingSession;
 import org.webswing.server.services.websocket.WebSocketConnection;
 
 public interface SwingInstance {

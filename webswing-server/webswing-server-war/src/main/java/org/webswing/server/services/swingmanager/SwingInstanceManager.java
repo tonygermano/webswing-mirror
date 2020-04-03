@@ -3,9 +3,9 @@ package org.webswing.server.services.swingmanager;
 import java.io.File;
 
 import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
-import org.webswing.model.s2c.ApplicationInfoMsg;
 import org.webswing.server.base.UrlHandler;
 import org.webswing.server.common.model.SecuredPathConfig;
+import org.webswing.server.services.rest.resources.model.ApplicationInfoMsg;
 import org.webswing.server.services.security.login.SecuredPathHandler;
 import org.webswing.server.services.stats.StatisticsReader;
 import org.webswing.server.services.swinginstance.SwingInstance;

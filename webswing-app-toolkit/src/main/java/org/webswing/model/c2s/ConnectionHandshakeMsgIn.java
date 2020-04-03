@@ -21,6 +21,9 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 	private String url;
 	private boolean mirrored;
 	private boolean directDrawSupported;
+	private boolean dockingSupported;
+	private boolean touchMode;
+	private boolean accessiblityEnabled;
 	private List<ParamMsg> params;
 
 	public String getClientId() {
@@ -134,4 +137,29 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+
+	public boolean isDockingSupported() {
+		return dockingSupported;
+	}
+
+	public void setDockingSupported(boolean dockingSupported) {
+		this.dockingSupported = dockingSupported;
+	}
+
+	public boolean isTouchMode() {
+		return touchMode;
+	}
+
+	public void setTouchMode(boolean touchMode) {
+		this.touchMode = touchMode;
+	}
+
+	public boolean isAccessiblityEnabled() {
+		return accessiblityEnabled;
+	}
+
+	public void setAccessiblityEnabled(boolean accessiblityEnabled) {
+		this.accessiblityEnabled = accessiblityEnabled;
+	}
+	
 }

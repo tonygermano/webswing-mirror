@@ -13,13 +13,13 @@ export default function Translate(translationMsg, langs) {
         if (langs != null && Object.keys(langs).length > 1) {
             var locale = getLocale();
             var onchange = "localStorage.setItem('webswingLang',this.options.item(this.selectedIndex).value);location.reload();"
-            var selector = '<select class="webswing-lang-selector" onchange="' + onchange + '">';
+            var selector = '<select class="webswing-lang-selector" aria-labelledby="selector-label" onchange="' + onchange + '">';
             for (var key in langs) {
                 var selected = locale == key ? 'selected' : '';
                 selector += '<option ' + selected + ' value="' + key + '">' + langs[key] + '</option>';
             }
             selector += '</select>'
-            msg['selector.lang'] = '${selector.lang.label}' + selector;
+            msg['selector.lang'] = '<span id="selector-label">${selector.lang.label}</span>' + selector;
         } else {
             msg['selector.lang'] = '';
         }

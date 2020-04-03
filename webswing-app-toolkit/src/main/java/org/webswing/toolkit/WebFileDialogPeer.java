@@ -77,9 +77,9 @@ abstract public class WebFileDialogPeer extends WebWindowPeer implements FileDia
 			@Override
 			public void run() {
 				if (dialog.getMode() == FileDialog.LOAD) {
-					fc.showOpenDialog(null);
+					fc.showOpenDialog(dialog.getOwner());
 				} else {
-					fc.showSaveDialog(null);
+					fc.showSaveDialog(dialog.getOwner());
 				}
 			}
 		}).start();

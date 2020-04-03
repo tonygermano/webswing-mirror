@@ -6,3 +6,8 @@ webswing-server/webswing-server-war/src/main/webapp/javascript/proto/proto.d.ts 
 webswing-server/webswing-server-war/src/main/webapp/javascript/proto/proto.js text eol=lf
 webswing-server/webswing-server-war/src/main/webapp/css/style.css text eol=lf
 webswing-server/webswing-server-war/src/main/webapp/css/style.css.map text eol=lf
+webswing-server/webswing-server-war/src/main/webapp/css/style.css.map text eol=lf
+webswing-server/webswing-server-war/.openapi-generator/webswing_api.yaml.sha256 text eol=lf
+webswing-server/webswing-server-war/src/main/java/org/webswing/server/services/rest/resources/model/* text eol=lf
+webswing-server/webswing-server-war/src/main/resources/openapi/*.mustache text eol=lf
+webswing-server/webswing-server-war/src/main/java/org/webswing/server/services/rest/resources/api/* text eol=lf

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.services.security.SecurityManagerService;
 import org.webswing.server.services.startup.StartupService;
+import org.webswing.toolkit.util.GitRepositoryState;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -32,7 +33,7 @@ public class WebswingServlet extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
-		log.info("Initializing Webswing...");
+		log.info("Initializing Webswing " + GitRepositoryState.getInstance().getDescribe());
 		Module servletModule = new Module() {
 			public void configure(Binder binder) {
 				binder.bind(ServletContext.class).toInstance(getServletContext());

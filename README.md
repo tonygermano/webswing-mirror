@@ -15,11 +15,11 @@ We use [bitbucket issues](https://bitbucket.org/meszarv/webswing/issues) for tra
 
 ## Links
 
-[Webswing Website](http://www.webswing.org)
+[Webswing Website](https://www.webswing.org)
 
-[Documentation](http://webswing.org/docs/version-2.5/)
+[Documentation](https://webswing.org/docs/)
 
-[Last snapshot builds](http://builds.webswing.org/)
+[Downloads](https://www.webswing.org/downloads)
 
 [Webswing Promo Video - Youtube](https://youtu.be/IpYlyCRZcxc)
 
