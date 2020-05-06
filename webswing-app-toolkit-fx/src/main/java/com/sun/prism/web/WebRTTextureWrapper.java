@@ -22,13 +22,13 @@ public class WebRTTextureWrapper extends WebTextureWrapper implements RTTexture 
 
 	@Override
 	public boolean readPixels(Buffer pixels) {
-		textureLookup.put(System.identityHashCode(pixels),this);
+		dirtyAreaTracker.registerTextureForPixelBuffer(this,pixels);
 		return original.readPixels(pixels);
 	}
 
 	@Override
 	public boolean readPixels(Buffer pixels, int x, int y, int width, int height) {
-		textureLookup.put(System.identityHashCode(pixels),this);
+		dirtyAreaTracker.registerTextureForPixelBuffer(this,pixels);
 		return original.readPixels(pixels, x, y, width, height);
 	}
 

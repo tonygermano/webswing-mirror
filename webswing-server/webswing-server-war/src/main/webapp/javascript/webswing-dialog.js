@@ -325,9 +325,11 @@ import networkHtml  from './templates/network.html'
         	
         	winDlg.currentContent = null;
             winDlg.content.html('');
-            winDlg.dialog.fadeOut('fast', function() {
-            	api.focusDefault();
-            });
+            if (winDlg.dialog && winDlg.dialog.is(":visible")) {
+            	winDlg.dialog.fadeOut('fast', function() {
+            		api.focusDefault();
+            	});
+            }
         }
 
         function hideBar() {

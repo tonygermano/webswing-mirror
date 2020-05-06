@@ -96,6 +96,7 @@ export var msg= {
         "files.cancel": "Cancel",
         "files.progress": "Progress:",
         "files.progComplete": "Complete",
+        "files.uploadComplete": "Upload complete",
         "files.downloadLink.link.title": "Open link",
         "files.downloadLink.link.message": "Please click the button below to open link.",
         "files.downloadLink.link.button": "Open",

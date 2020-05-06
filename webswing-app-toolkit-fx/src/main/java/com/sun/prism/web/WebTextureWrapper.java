@@ -5,16 +5,17 @@ import com.sun.prism.Image;
 import com.sun.prism.MediaFrame;
 import com.sun.prism.PixelFormat;
 import com.sun.prism.Texture;
+import org.webswing.javafx.toolkit.util.DirtyAreaTracker;
 
 import java.nio.Buffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebTextureWrapper implements Texture {
-	public static final ConcurrentHashMap<Integer,WebTextureWrapper> textureLookup=new ConcurrentHashMap<>();
+
+	public static final DirtyAreaTracker dirtyAreaTracker = new DirtyAreaTracker();
 
 	private final Texture original;
-	private Set<RectBounds> dirtyAreas =Collections.synchronizedSet(new HashSet<>());
 
 	public WebTextureWrapper(Texture original) {
 		this.original = original;
@@ -198,11 +199,7 @@ public class WebTextureWrapper implements Texture {
 	}
 
 	public void dirty(RectBounds clip) {
-		dirtyAreas.add(clip);
-	}
-
-	public Set<RectBounds> getDirtyAreas() {
-		return dirtyAreas;
+		dirtyAreaTracker.addDirtyArea(this,clip);
 	}
 
 	public Texture getOriginal() {

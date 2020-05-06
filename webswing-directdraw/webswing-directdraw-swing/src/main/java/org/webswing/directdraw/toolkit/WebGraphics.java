@@ -4,12 +4,14 @@ import org.webswing.directdraw.util.RenderUtil;
 import org.webswing.directdraw.util.XorModeComposite;
 
 import java.awt.*;
+import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
+import java.text.Bidi;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -153,7 +155,9 @@ public class WebGraphics extends AbstractVectorGraphics {
 			return;
 		}
 		Font font = getFont();
-		if (thisImage.getContext().requestFont(font)) {
+		if(Bidi.requiresBidi(string.toCharArray(),0,string.length())){
+			new TextLayout(string,font,getFontRenderContext()).draw(this,(int)x,(int)y);
+		} else if (thisImage.getContext().requestFont(font)) {
 			thisImage.addInstruction(this, dif.drawString(string, x, y, getClip(), getFontMetrics()));
 		} else {
 			thisImage.addInstruction(this, dif.drawGlyphList(string, font, x, y, getTransform(), getClip()));

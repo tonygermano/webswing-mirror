@@ -383,16 +383,7 @@ public class WebFxView extends View {
 			
 			Window win = ((WebWindow) getWindow()).w.getThis();
 			RepaintManager rm = RepaintManager.currentManager(win);
-			WebTextureWrapper texture = WebTextureWrapper.textureLookup.get(System.identityHashCode(pixels.getPixels()));
-			Set<RectBounds> tmpBounds = new HashSet<>();
-			if (texture != null) {
-				synchronized (texture.getDirtyAreas()) {
-					tmpBounds.addAll(texture.getDirtyAreas());
-					texture.getDirtyAreas().clear();
-				}
-				WebTextureWrapper.textureLookup.clear();
-			}
-
+			Set<RectBounds> tmpBounds =WebTextureWrapper.dirtyAreaTracker.popDirtyAreasForBuffer(pixels.getPixels());
 			BufferedImage previous = this.image;
 			this.image = WebFxUtil.pixelsToImage(this.tmp, pixels);
 			if (previous != null && this.image != null && previous.getWidth() == this.image.getWidth() && previous.getHeight() == this.image.getHeight() && previous.getType() == this.image.getType()) {

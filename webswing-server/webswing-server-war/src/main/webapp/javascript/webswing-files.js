@@ -124,6 +124,8 @@ import 'blueimp-file-upload'
             var uploadProgress = rootElement.find('div[data-id="progress"] .ws-progress-bar');
             var fileDialogErrorMessage = rootElement.find('div[data-id="fileDialogErrorMessage"]');
             var fileDialogErrorMessageContent = rootElement.find('div[data-id="fileDialogErrorMessageContent"]');
+            var fileDialogSuccessMessage = rootElement.find('div[data-id="fileDialogSuccessMessage"]');
+            var fileDialogSuccessMessageContent = rootElement.find('div[data-id="fileDialogSuccessMessageContent"]');
 
             var autoUploadBar = rootElement.find('div[data-id="autoUploadBar"]');
             var autoFileupload = autoUploadBar.find('form[data-id="autoFileupload"]');
@@ -177,6 +179,9 @@ import 'blueimp-file-upload'
             jqUpload.bind('fileuploaddone', fileuploaddone);
 
             function fileuploadadd(e, data, fileuploadelement) {
+            	fileDialogSuccessMessageContent.html("");
+            	fileDialogSuccessMessage.hide("fast");
+            	
                 fileuploadelement.url = api.cfg.connectionUrl + 'file?uuid='+api.socketId();
                 data.files.forEach(function (file) {
                     uploadingFiles.push(file.name);
@@ -188,17 +193,17 @@ import 'blueimp-file-upload'
             function fileuploadfail(e, data) {
                 setProgressBarVisible(false);
                 if (data.jqXHR.statusText != 'abort') {
+                	fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
                     if (!errorTimeout) {
-                        fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
                         animateShow(fileDialogErrorMessage);
                     } else {
-                        fileDialogErrorMessageContent.append('<p>' + data.jqXHR.responseText + '</p>');
                         clearTimeout(errorTimeout);
                     }
                     data.files.forEach(function (file) {
                         var index = uploadingFiles.indexOf(file.name);
                         uploadingFiles.splice(index, 1);
                     });
+                    checkUploadingFinished();
                     errorTimeout = setTimeout(function () {
                         errorTimeout = null;
                         fileDialogErrorMessageContent.html("");
@@ -226,14 +231,25 @@ import 'blueimp-file-upload'
                 var finishedFile = data.result.files[0].name;
                 uploadedFiles.push(finishedFile);
                 uploadingFiles.splice(uploadingFiles.indexOf(finishedFile),1);
-                if (!errorTimeout && uploadingFiles.length==0) {
+                checkUploadingFinished();
+            }
+
+            function checkUploadingFinished() {
+            	if (uploadingFiles.length == 0) {
+            		if (uploadedFiles.length > 0) {
+            			fileDialogSuccessMessageContent.html(api.translate('<p>${files.uploadComplete}</p>'));
+                    	animateShow(fileDialogSuccessMessage);
+            		}
+            		
                     filesSelected(uploadedFiles);
-                    uploadedFiles=[];
-                    setProgressBarVisible(false);
+                    uploadedFiles = [];
+                    setTimeout(function() {
+                    	setProgressBarVisible(false);
+                    }, 5000);
                     jqXHR_fileupload = [];
                 }
             }
-
+            
             function isEqual(array1,array2){
                 return array1.length === array2.length && array1.sort().every(function(value, index) { return value === array2.sort()[index]});
             }
@@ -390,6 +406,10 @@ import 'blueimp-file-upload'
                 getFileInput().prop("multiple", data.isMultiSelection);
                 getFileInput().attr("accept", data.filter);
                 setProgressBarVisible(false);
+                
+                fileDialogSuccessMessageContent.html("");
+            	fileDialogSuccessMessage.hide("fast");
+                
                 showOrHide(uploadBar, data.allowDownload || data.allowUpload || data.allowDelete);
             };
 
