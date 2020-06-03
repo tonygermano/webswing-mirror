@@ -1,6 +1,7 @@
 package org.webswing.toolkit.extra;
 
 import java.awt.Dialog;
+import java.awt.Dialog.ModalExclusionType;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -8,6 +9,7 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.util.*;
 
+import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import org.webswing.toolkit.WebToolkit;
@@ -111,7 +113,10 @@ public class WindowHierarchyTree {
 	private Window findSuccessor(Window window) {
 		WindowHierarchyNode node = lookup.get(window);
 		if (modalsStack.size()>0){
-			return modalsStack.peek();
+			Window modalWindow = modalsStack.peek();
+			if(modalWindow instanceof Dialog && !((Dialog) modalWindow).getModalityType().equals(ModalityType.DOCUMENT_MODAL)) {
+				return modalWindow;			
+			}
 		}
 		if (node.getParent() != null) {
 			return node.getParent().getW();

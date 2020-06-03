@@ -264,7 +264,7 @@
             sendInput();
             
             mouseDown = mouseDown & ~Math.pow(2, evt.which);
-            mouseDownButton = evt.which;
+            mouseDownButton = 0;
             resetMouseDownCanvas();
             return false;
         }
@@ -548,7 +548,7 @@
         }
         
         function isInputHandler(e) {
-        	return e && e.matches && (e.matches("input.ws-input-hidden") || e.matches("input.aria-element") || e.matches("textarea.aria-element"));
+        	return e && e.matches && (e.matches("input.ws-input-hidden") || e.matches("input.ws-input-ime") || e.matches("input.aria-element") || e.matches("textarea.aria-element"));
         }
         
         function isInsideWebswingHtmlCanvas(e) {
@@ -653,7 +653,7 @@
         
         function mouseOverEventHandler(evt) {
         	var newMouseDown = Math.pow(2, evt.which);
-        	if (mouseDownButton != evt.which && mouseDown != newMouseDown) {
+        	if (mouseDownButton !== 0 && mouseDownButton != evt.which && mouseDown != newMouseDown) {
         		// mouse has been released outside window (iframe)
         		let mousePos = getMousePos(evt, 'mouseup', evt.target);
         		// simulate release of previously pressed mouse button

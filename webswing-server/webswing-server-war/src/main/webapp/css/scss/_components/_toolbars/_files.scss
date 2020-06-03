@@ -37,7 +37,15 @@
 		padding: 0;
 		cursor: pointer;
 		opacity: 0;
-		filter: alpha(opacity = 0); 
+		filter: alpha(opacity = 0);
+		z-index: -1;
+        width: 0;
+        height: 0;
+	}
+
+	&-uploadform {
+        width: 0;
+        height: 0;
 	}
 
 }

@@ -59,14 +59,19 @@
                     			api.sendHandshake();
                     		}
                     	} else {
-                    		var snapshot = get().getContext("2d").getImageData(0, 0, get().width, get().height);
+                            var snapshot =null
+                            if(get().width!==0 && get().height !== 0){
+                                snapshot = get().getContext("2d").getImageData(0, 0, get().width, get().height);
+                            }
                     		var w = width();
                     		var h = height();
                     		get().width = w * dpr;
                     		get().height = h * dpr;
                     		get().style.width = w + 'px';
                     		get().style.height = h + 'px';
-                    		get().getContext("2d").putImageData(snapshot, 0, 0);
+                    		if(snapshot!=null){
+                                get().getContext("2d").putImageData(snapshot, 0, 0);
+                            }
                     		api.sendHandshake();
                     	}
                     }

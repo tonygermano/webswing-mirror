@@ -113,6 +113,26 @@ paths:
         '401':
           description: User is not allowed to execute the action in this REST service.
       operationId: getSessions
+      
+  #===========ACTIVE SESSIONS============
+  '/rest/activeSessionsCount':
+    get:
+      summary: Get Number of Active Sessions
+      description:  Returns count of all live application sessions
+      tags:
+        - 'Basic'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: integer
+              example:
+                '10'
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+      operationId: activeSessionsCount
 
   #===========PERMISSIONS============
   '/rest/permissions':

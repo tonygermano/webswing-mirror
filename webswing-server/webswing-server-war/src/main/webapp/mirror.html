@@ -38,18 +38,40 @@
             securityToken: getParam('securityToken'),
             realm: getParam('realm'),
             debugLog: getParam('debugLog'),
-            // readyState: onLogin()
+            readyState: onLogin()
         }
     }
-    // TODO: postMessinging height for iframe
-    // function onLogin() {
-    //     addEventListener("load", function(event) {
-    //         window.setInterval(function(){
-    //             canvasHeight = document.body.offsetHeight + 'px';
-    //             parent.postMessage({'height': canvasHeight}, '*');
-    //         }, 5000);
-    //     });
-    // };
+    
+    var lastWidth = 0;
+    var lastHeight = 0;
+    
+    function onLogin() {
+        addEventListener("load", function(event) {
+            window.setInterval(function() {
+            	var width = 0;
+            	var height = 0;
+            	
+            	var canvases = document.querySelectorAll('.webswing-element-content canvas');
+            	for (var i=0; i<canvases.length; i++) {
+            		var canvas = canvases[i];
+            		var rect = canvas.getBoundingClientRect();
+            		if (rect.bottom > height) {
+            			height = rect.bottom;
+            		}
+            		if (rect.right > width) {
+            			width = rect.right;
+            		}
+            	}
+            	
+            	if (width != lastWidth || height != lastHeight) {
+	                window.parent.postMessage({'height': height, 'width': width}, '*');
+            	}
+            	
+            	lastWidth = width;
+            	lastHeight = height;
+            }, 500);
+        });
+    };
 
     function getParam(name) {
         name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");

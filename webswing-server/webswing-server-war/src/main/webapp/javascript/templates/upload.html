@@ -108,14 +108,12 @@
 		<div data-id="fileActionButtonGroup" class="ws-btn-group">
 			<button data-id="downloadSelectedButton" class="ws-btn ws-btn--xs ws-icon-download-cloud" title="${files.downloadTtip}"> ${files.download}</button>
 			<div data-id="fileUploadBtn" class="ws-btn ws-btn--xs ws-filebar-upload ">
-				<form data-id="fileupload">
-					<input data-id="fileDialogTransferBarClientId" name="uuid" type="hidden">
-					<div>
-						<span><span class="ws-icon-upload-cloud"> </span>${files.upload}</span>
-						<input accept="" data-id="fileInput" name="files[]" class="ws-filebar-inputupload" type="file">
-					</div>
-				</form>
+				<span><span class="ws-icon-upload-cloud"> </span>${files.upload}</span>
 			</div>
+			<form class="ws-filebar-uploadform" data-id="fileupload">
+				<input data-id="fileDialogTransferBarClientId" name="uuid" type="hidden">
+				<input accept="" data-id="fileInput" name="files[]" class="ws-filebar-inputupload" type="file">
+			</form>
 			<button data-id="deleteSelectedButton" class="ws-btn ws-btn--xs ws-icon-trash-empty" title="${files.deleteTtip}"> ${files.delete}</button>
 		</div>
 		<button data-id="cancelBtn" class="ws-btn ws-btn--xs ws-right ws-icon-cancel-circled"> ${files.cancel}</button>

@@ -197,30 +197,32 @@ public class WebswingApiImpl implements WebswingApi {
 		} else if (msg instanceof ActionEventMsgIn) {
 			ActionEventMsgIn action = (ActionEventMsgIn) msg;
 			if (action != null) {
-				if (action.getWindowId() != null) {
-					Window w = Util.findWindowById(action.getWindowId());
-					HtmlPanel hp = Util.findHtmlPanelById(action.getWindowId());
-
-					if (w != null && w instanceof WebWindow) {
-						if (action.getEventType() == ActionEventType.init) {
-							((WebWindow) w).handleWindowInitialized();
-						} else {
-							((WebWindow) w).handleWebActionEvent(new WebActionEvent(action.getActionName(), action.getData(), action.getBinaryData()));
+				apiProcessor.submit(() -> {
+					if (action.getWindowId() != null) {
+						Window w = Util.findWindowById(action.getWindowId());
+						HtmlPanel hp = Util.findHtmlPanelById(action.getWindowId());
+						
+						if (w != null && w instanceof WebWindow) {
+							if (action.getEventType() == ActionEventType.init) {
+								((WebWindow) w).handleWindowInitialized();
+							} else {
+								((WebWindow) w).handleWebActionEvent(new WebActionEvent(action.getActionName(), action.getData(), action.getBinaryData()));
+							}
+						} else if (hp != null) {
+							if (action.getEventType() == ActionEventType.init) {
+								hp.handleWindowInitialized();
+							} else {
+								hp.handleWebActionEvent(new WebActionEvent(action.getActionName(), action.getData(), action.getBinaryData()));
+							}
+						} else if (action.getEventType() != ActionEventType.init) {
+							// fire the general listeners
+							// don't fire for init event type
+							fireBrowserActionListener(new WebActionEvent(action.getActionName(), action.getData(), action.getBinaryData()));
 						}
-					} else if (hp != null) {
-						if (action.getEventType() == ActionEventType.init) {
-							hp.handleWindowInitialized();
-						} else {
-							hp.handleWebActionEvent(new WebActionEvent(action.getActionName(), action.getData(), action.getBinaryData()));
-						}
-					} else if (action.getEventType() != ActionEventType.init) {
-						// fire the general listeners
-						// don't fire for init event type
+					} else {
 						fireBrowserActionListener(new WebActionEvent(action.getActionName(), action.getData(), action.getBinaryData()));
 					}
-				} else {
-					fireBrowserActionListener(new WebActionEvent(action.getActionName(), action.getData(), action.getBinaryData()));
-				}
+				});
 			}
 		}
 	}

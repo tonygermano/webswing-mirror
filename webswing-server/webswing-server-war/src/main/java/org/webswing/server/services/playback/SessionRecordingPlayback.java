@@ -42,12 +42,12 @@ public class SessionRecordingPlayback {
 			this.conn = r;
 			this.recordingFile = recordingFile;
 			fis = new FileInputStream(recordingFile);
-			int version = readInt(fis);
+			Integer version = readInt(fis);
 			if (SessionRecordingHeader.version == version) {
 				SessionRecordingHeader h = (SessionRecordingHeader) readObject(fis);
 				this.header = h;
-				while (readInt(fis) != 0) {
-					int length = readInt(fis);
+				while (readInt(fis) != null) {
+					Integer length = readInt(fis);
 					fis.skip(length);
 					numberOfFrames++;
 				}
@@ -72,8 +72,8 @@ public class SessionRecordingPlayback {
 		try {
 			fis.close();
 			fis = new FileInputStream(recordingFile);
-			readInt(fis);
-			readObject(fis);
+			readInt(fis);// version
+			readObject(fis);// header
 		} catch (Exception e) {
 			log.error("Failed to reset recording file. ", e);
 		}
@@ -94,8 +94,8 @@ public class SessionRecordingPlayback {
 	}
 
 	private static byte[] readFrame(FileInputStream fis) throws IOException {
-		int length = readInt(fis);
-		if (length == 0) {
+		Integer length = readInt(fis);
+		if (length == null || length == 0) {
 			return null;
 		} else {
 			byte[] bytes = new byte[length];
@@ -107,13 +107,13 @@ public class SessionRecordingPlayback {
 		}
 	}
 
-	private static int readInt(FileInputStream fis) throws IOException {
+	private static Integer readInt(FileInputStream fis) throws IOException {
 		byte[] b = new byte[4];
 		int length = fis.read(b);
 		if (4 == length) {
 			return b[3] & 0xFF | (b[2] & 0xFF) << 8 | (b[1] & 0xFF) << 16 | (b[0] & 0xFF) << 24;
 		} else if (length < 1) {
-			return 0;
+			return null;
 		} else {
 			throw new IOException("Unexpected end of file. Integer expected.");
 		}
@@ -121,7 +121,7 @@ public class SessionRecordingPlayback {
 
 	private static Object readObject(FileInputStream fis) throws IOException {
 		readInt(fis);//delay
-		int headerLength = readInt(fis);
+		Integer headerLength = readInt(fis);
 		byte[] headerBytes = new byte[headerLength];
 		if (headerLength == fis.read(headerBytes)) {
 			ByteArrayInputStream bis = new ByteArrayInputStream(headerBytes);
@@ -155,7 +155,7 @@ public class SessionRecordingPlayback {
 		if (currentFrame < allowedFrame && currentFrame < numberOfFrames) {
 			try {
 				currentFrame++;
-				int delay = readInt(fis);
+				Integer delay = readInt(fis);
 				byte[] b = readFrame(fis);
 				final AppFrameMsgOut frame = ServerUtil.decodePlaybackProto(b);
 				PlaybackInfoMsg playback = new PlaybackInfoMsg();

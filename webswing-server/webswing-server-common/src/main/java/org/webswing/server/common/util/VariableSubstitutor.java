@@ -1,10 +1,13 @@
 package org.webswing.server.common.util;
 
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.text.StrLookup;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.webswing.Constants;
@@ -47,12 +50,27 @@ public class VariableSubstitutor {
 		}
 		if (customArgs != null) {
 			result.put(Constants.SESSION_CUSTOMARGS_SUBSTITUTE, customArgs);
+			try {
+				Map<String, Object> map = WebswingObjectMapper.get().readValue(customArgs, Map.class);
+				flatten(Constants.SESSION_CUSTOMARGS_SUBSTITUTE, map.entrySet().stream()).forEach(e -> result.put(e.getKey(), String.valueOf(e.getValue())));
+			} catch (JsonProcessingException e) {
+				//ignore
+			}
 		}
-		if (config != null) {
-			result.put(Constants.APP_HOME_FOLDER_SUBSTITUTE, config.getHomeDir());
-			result.put(Constants.APP_CONTEXT_PATH_SUBSTITUTE, config.getPath());
-		}
-		return new VariableSubstitutor(result);
+
+		VariableSubstitutor substitutor = forSwingApp(config);
+		substitutor.extendCustomVars(result);
+		return substitutor;
+	}
+
+	private static Stream<Entry<String, Object>> flatten(String prefix, Stream<Entry<String, Object>> stream) {
+		return stream.flatMap(entry -> {
+			if (entry.getValue() !=null && entry.getValue() instanceof Map) {
+				return flatten(prefix + "." +entry.getKey(), ((Map<String, Object>)entry.getValue()).entrySet().stream());
+			} else {
+				return Stream.of(new AbstractMap.SimpleEntry<>(prefix + "." +entry.getKey(),entry.getValue()));
+			}
+		});
 	}
 
 	public static VariableSubstitutor forSwingApp(SecuredPathConfig config) {
@@ -63,6 +81,7 @@ public class VariableSubstitutor {
 		}
 		return new VariableSubstitutor(result);
 	}
+
 
 	public VariableSubstitutor(Map<String, String> customVars) {
 		this.customVars = customVars;
@@ -99,6 +118,10 @@ public class VariableSubstitutor {
 		}
 		result.putAll(customVars);
 		return result;
+	}
+
+	private void extendCustomVars(Map<String, String> customVars){
+		this.customVars.putAll(customVars);
 	}
 
 }

@@ -287,6 +287,10 @@ import 'blueimp-file-upload'
             	getAutoFileInput().click();
             });
             
+            uploadBtn.bind('click', function(e) {
+            	getFileInput().click();
+            });
+            
             autoSaveInput.bind('input', validateFilename);
 
             autoSaveButton.bind('click', function (e) {

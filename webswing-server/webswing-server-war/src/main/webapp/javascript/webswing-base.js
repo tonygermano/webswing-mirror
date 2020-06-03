@@ -568,7 +568,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         	for (var winId in windowImageHolders) {
     			var dockOwner = windowImageHolders[winId].dockOwner;
         		if (dockOwner != null && dockOwner.document) {
-        			$(dockOwner.document).find(rootElementSelector).each(function() {
+        			$(dockOwner.document).find(rootSelector).each(function() {
         				setRootElementAccessibleInfo(jQuery(this), enabled);
         			});
     				$(dockOwner.document).find(canvasSelector).each(function() {

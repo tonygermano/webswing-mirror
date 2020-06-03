@@ -142,5 +142,10 @@ public interface Constants {
 	
 	public static final String SESSION_LOG_PATTERN = "%d %-5p [%t] (%F:%L) %m%n";
 
-	;
+	// stats properties
+	public static final String STATS_INTERVAL = "webswing.stats.interval";
+	public static final String STATS_HISTORY = "webswing.stats.historySize";
+	public static final String STATS_WARN_MEMUSAGE_TRESHOLD = "webswing.stats.memUsageWarn";
+	public static final String STATS_WARN_LATENCY_TRESHOLD = "webswing.stats.latencyWarn";
+	public static final String STATS_WARN_PING_TRESHOLD = "webswing.stats.pingWarn";
 }

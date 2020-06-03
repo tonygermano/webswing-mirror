@@ -136,9 +136,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHa
 	private void setSecurityHeaders(HttpServletRequest req, HttpServletResponse res) {
 		res.addHeader("Server", SERVERNAME);
 		if (!Boolean.getBoolean(Constants.DISABLE_HTTP_SECURITY_HEADERS)) {
-			if (!ServerUtil.isAdminUrlSameOrigin(getAdminUrl(), req.getHeader("Referer"))) {
-				res.addHeader("X-Frame-Options", "SAMEORIGIN");
-			}
+			res.addHeader("X-Frame-Options", "SAMEORIGIN");
 			res.addHeader("X-Content-Type-Options", "nosniff");
 			res.addHeader("X-XSS-Protection", "1; mode=block");
 			res.addHeader("Referrer-Policy", "strict-origin-when-cross-origin");

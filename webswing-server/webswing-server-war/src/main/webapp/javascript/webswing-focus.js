@@ -15,11 +15,31 @@
         };
         
         function manageFocusEvent(focusEvent) {
+        	manageFocusEventRetry(focusEvent, 0);
+        }
+        
+        function manageFocusEventRetry(focusEvent, retryCount) {
         	var doc = $(api.getFocusedWindow().document);
-        	
         	var input = doc.find(".ws-input-hidden")[0];
-            
-            input.classList.remove('editable');
+        	
+        	if (input) {
+        		doManageFocusEvent(focusEvent);
+        		return;
+        	}
+        	
+    		// in some cases there is a race condition on input being available right after window is undocked
+    		if (retryCount < 4) {
+	    		setTimeout(function() {
+	    			manageFocusEventRetry(focusEvent, retryCount + 1);
+	    		}, 50);
+    		}
+        }
+        
+        function doManageFocusEvent(focusEvent) {
+        	var doc = $(api.getFocusedWindow().document);
+        	var input = doc.find(".ws-input-hidden")[0];
+        	
+        	input.classList.remove('editable');
             input.classList.remove('focused-with-caret');
             
             if ((focusEvent.type === 'focusWithCarretGained' || focusEvent.type === 'focusPasswordGained') && (focusEvent.x + focusEvent.w > 0) && (focusEvent.y + focusEvent.h > 0)) {

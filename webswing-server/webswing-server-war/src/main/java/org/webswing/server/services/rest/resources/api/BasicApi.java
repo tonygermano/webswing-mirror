@@ -25,6 +25,14 @@ import java.math.BigDecimal;
 public interface BasicApi  {
 
     /**
+     * Get Number of Active Sessions
+     */
+    @GET
+    @Path("/rest/activeSessionsCount")
+    @Produces({ "text/plain" })
+    public Integer activeSessionsCount() throws RestException;
+
+    /**
      * URL of admin console
      */
     @GET

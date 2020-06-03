@@ -75,6 +75,16 @@ public class GlobalRestService implements BasicApi, ManageApplicationsApi, Manag
 			throw new RestException(e);
 		}
 	}
+	
+	@Override
+	public Integer activeSessionsCount() throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getStats);
+			return getGlobalHandler().getApplications().stream().mapToInt(m -> m.getSwingInstanceHolder().getRunningInstacesCount()).sum();
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
 
 	@Override
 	public Permissions getPermissions() throws RestException {
@@ -339,4 +349,5 @@ public class GlobalRestService implements BasicApi, ManageApplicationsApi, Manag
 	private ConfigurationService getConfigService() {
 		return configService;
 	}
+
 }

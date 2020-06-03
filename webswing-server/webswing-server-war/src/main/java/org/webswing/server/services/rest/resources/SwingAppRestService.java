@@ -116,6 +116,16 @@ public class SwingAppRestService implements BasicApi, ManageConfigurationApi, Ma
 			throw new RestException(e);
 		}
 	}
+	
+	@Override
+	public Integer activeSessionsCount() throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_getStats);
+			return manager.getSwingInstanceHolder().getRunningInstacesCount();
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
 
 	@Override
 	public Permissions getPermissions() throws RestException {

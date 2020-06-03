@@ -211,9 +211,6 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 	}
 
 	public boolean isOriginAllowed(String header) {
- 		if (ServerUtil.isAdminUrlSameOrigin(getAdminUrl(), header)) {
- 			return true;
-		}
 		List<String> allowedCorsOrigins = getConfig().getAllowedCorsOrigins();
 		if (allowedCorsOrigins == null || allowedCorsOrigins.size() == 0) {
 			return false;

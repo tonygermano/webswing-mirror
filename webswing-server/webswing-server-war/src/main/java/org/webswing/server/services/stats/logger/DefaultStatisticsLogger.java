@@ -10,13 +10,20 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
 import org.webswing.server.services.stats.StatisticsLogger;
 
 public class DefaultStatisticsLogger implements StatisticsLogger {
+	
+	private static final long STATS_INTERVAL = Long.getLong(Constants.STATS_INTERVAL, 10);
+	private static final int STATS_HISTORY_LIMIT = Integer.getInteger(Constants.STATS_HISTORY, 60);
+	private static final double STATS_WARN_MEMUSAGE = Double.valueOf(System.getProperty(Constants.STATS_WARN_MEMUSAGE_TRESHOLD, ""+0.8));
+	private static final int STATS_WARN_LATENCY_TRESHOLD = Integer.getInteger(Constants.STATS_WARN_LATENCY_TRESHOLD, 700);
+	private static final int STATS_WARN_PING_TRESHOLD = Integer.getInteger(Constants.STATS_WARN_PING_TRESHOLD, 500);
 
 	private static final Logger log = LoggerFactory.getLogger(DefaultStatisticsLogger.class);
-	private static final MetricRule DEFAULT_RULE_AVG = new MetricRule(Aggregation.AVG, TimeUnit.SECONDS.toMillis(10), 60);
-	private static final MetricRule DEFAULT_RULE_AVG_PER_SEC = new MetricRule(Aggregation.AVG_PER_SEC, TimeUnit.SECONDS.toMillis(10), 60);
+	private static final MetricRule DEFAULT_RULE_AVG = new MetricRule(Aggregation.AVG, TimeUnit.SECONDS.toMillis(STATS_INTERVAL), STATS_HISTORY_LIMIT);
+	private static final MetricRule DEFAULT_RULE_AVG_PER_SEC = new MetricRule(Aggregation.AVG_PER_SEC, TimeUnit.SECONDS.toMillis(STATS_INTERVAL), STATS_HISTORY_LIMIT);
 	private static final MetricRule DEFAULT_RULE_FLAG = new MetricRule(Aggregation.AVG_PER_SEC, 0, 1);
 	private static final Map<String, MetricRule> rules = new HashMap<>();
 	private static final Map<String, WarningRule> warningRules = new HashMap<>();
@@ -27,9 +34,9 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 		rules.put(WEBSOCKET_CONNECTED, DEFAULT_RULE_FLAG);
 		rules.put(EDT_BLOCKED_SEC_METRIC, DEFAULT_RULE_FLAG);
 
-		warningRules.put(MEMORY_USED_METRIC, WarningRule.memoryUtilizationRule(0.8));
-		warningRules.put(LATENCY, WarningRule.thresholdRule(LATENCY, 700));
-		warningRules.put(LATENCY_PING, WarningRule.thresholdRule(LATENCY_PING, 500));
+		warningRules.put(MEMORY_USED_METRIC, WarningRule.memoryUtilizationRule(STATS_WARN_MEMUSAGE));
+		warningRules.put(LATENCY, WarningRule.thresholdRule(LATENCY, STATS_WARN_LATENCY_TRESHOLD));
+		warningRules.put(LATENCY_PING, WarningRule.thresholdRule(LATENCY_PING, STATS_WARN_PING_TRESHOLD));
 		warningRules.put(WEBSOCKET_CONNECTED, WarningRule.thresholdRule(WEBSOCKET_CONNECTED, 2, "WebSocket connection failed. Falling back to long-polling."));
 		warningRules.put(EDT_BLOCKED_SEC_METRIC, WarningRule.thresholdRule(EDT_BLOCKED_SEC_METRIC, 10, "EDT blocked for %d seconds. See Thread dump for details."));
 
