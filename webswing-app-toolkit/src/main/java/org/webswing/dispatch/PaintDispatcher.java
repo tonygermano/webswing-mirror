@@ -1,19 +1,26 @@
 package org.webswing.dispatch;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.io.File;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.RepaintManager;
+
+import org.webswing.audio.AudioClip;
 import org.webswing.model.s2c.AccessibilityMsg;
 import org.webswing.model.s2c.FocusEventMsg;
 import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.api.component.HtmlPanel;
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.RepaintManager;
-import java.awt.*;
-import java.io.File;
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
 
 public interface PaintDispatcher {
 
@@ -75,10 +82,15 @@ public interface PaintDispatcher {
 
 	void notifyNewDirtyRegionQueued();
 
-	void notifyAudioEventDispose(String id);
-	void notifyAudioEventUpdate(String id, Float time, Integer loop);
-	void notifyAudioEventStop(String id);
-	void notifyAudioEventPlay(String id, byte[] data, Float time, Integer loop);
+	void notifyAudioEventDispose(AudioClip clip);
+	void notifyAudioEventUpdate(AudioClip clip, Float time, Integer loop);
+	void notifyAudioEventStop(AudioClip clip);
+	void notifyAudioEventPlay(AudioClip clip, byte[] data, Float time, Integer loop);
+	AudioClip findAudioClip(String id);
 
 	void notifyWindowDockAction(String windowId);
+
+	void registerFileChooserWindows(JFileChooser fileChooser, Window parent);
+
+	JFileChooser findRegisteredFileChooser(Window w);
 }

@@ -13,12 +13,13 @@ import java.util.Map;
 
 @ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
 @ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "javaFxClassPathEntries", "compositingWinManager", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "loadingAnimationDelay", "allowStealSession", "autoLogout",
-		"goodbyeUrl", "sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowJsLink", "jsLinkWhitelist", "allowLocalClipboard", "allowServerPrinting","recordingsFolder",
+		"goodbyeUrl", "allowStatisticsLogging", "sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowJsLink", "jsLinkWhitelist", "allowLocalClipboard", "allowServerPrinting","recordingsFolder",
 		"dockMode"})
 public interface SwingConfig extends Config {
 
 	public enum SessionMode {
 		ALWAYS_NEW_SESSION,
+		CONTINUE_FOR_TAB,
 		CONTINUE_FOR_BROWSER,
 		CONTINUE_FOR_USER;
 	}
@@ -62,7 +63,6 @@ public interface SwingConfig extends Config {
 	@ConfigField(tab = ConfigGroup.General, label = "JavaFX Classpath", description = "(Only valid for Java 11+) JavaFX jar libraries to be included in classpath. Supports ? and * wildcards.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	public List<String> getJavaFxClassPathEntries();
-
 
 	@ConfigField(tab = ConfigGroup.General, label = "Compositing Window Manager", description = "Use window manager that provides an off-screen buffer for each window. Allows advanced window positioning when embedding and better communication integration. Recommended with DirectDraw rendering mode.")
 	@ConfigFieldDefaultValueBoolean(false)
@@ -114,7 +114,7 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueNumber(1)
 	public int getMaxClients();
 
-	@ConfigField(tab = ConfigGroup.Session, label = "Session Mode", description = "Select session behavior when user reconnects to application. 1.ALWAYS_NEW_SESSION: New application is started for every Webswing session. (Session timeout will be set to 0) 2.CONTINUE_FOR_BROWSER: Webswing session can be resumed in the same browser after connection is terminated (Session timeout applies). 3.CONTINUE_FOR_USER: Application session can be resumed by the same user from any computer after the connection is terminated(Session timeout applies).")
+	@ConfigField(tab = ConfigGroup.Session, label = "Session Mode", description = "Select session behavior when user reconnects to application. 1.ALWAYS_NEW_SESSION: New application is started for every Webswing session. (Session timeout will be set to 0) 2.CONTINUE_FOR_TAB: Webswing session can be resumed within the same browser tab after connection is terminated or user refresh the page. (Session timeout applies)  3.CONTINUE_FOR_BROWSER: Webswing session can be resumed in the same browser after connection is terminated (Session timeout applies). 4.CONTINUE_FOR_USER: Application session can be resumed by the same user from any computer after the connection is terminated(Session timeout applies).")
 	@ConfigFieldDefaultValueString("CONTINUE_FOR_BROWSER")
 	public SessionMode getSessionMode();
 
@@ -148,6 +148,10 @@ public interface SwingConfig extends Config {
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("")
 	String getGoodbyeUrl();
+	
+	@ConfigField(tab = ConfigGroup.Session, label = "Statistics Logging", description = "If enabled, statistics will be logged for sessions.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isAllowStatisticsLogging();
 	
 	@ConfigField(tab = ConfigGroup.Logging, label = "Session logging", description = "If enabled, sessions are logged into a separate log file.")
 	@ConfigFieldDefaultValueBoolean(false)

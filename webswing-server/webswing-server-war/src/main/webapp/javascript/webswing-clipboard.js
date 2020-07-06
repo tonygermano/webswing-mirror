@@ -22,7 +22,6 @@ export default function Clipboard(util) {
         dispose: close
     };
     module.ready = function () {
-        document.addEventListener("copy", copy);
         html = api.translate(htmlTemplate);
         pasteHtml = api.translate(pasteHtmlTemplate);
     };

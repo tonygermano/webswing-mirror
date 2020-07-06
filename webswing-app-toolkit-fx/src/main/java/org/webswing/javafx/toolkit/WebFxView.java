@@ -203,7 +203,7 @@ public class WebFxView extends View {
 								Util.getWebToolkit().getEventDispatcher().setJavaFXdragStarted(false);
 								setDragCursor(-1);
 							}
-						} else if (e.getButton() == MouseEvent.BUTTON1 && e.getID() == MouseEvent.MOUSE_DRAGGED) {
+						} else if ((e.getModifiersEx()& MouseEvent.BUTTON1_DOWN_MASK) == MouseEvent.BUTTON1_DOWN_MASK && e.getID() == MouseEvent.MOUSE_DRAGGED) {
 							try {
 								int cursorid = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
 								setDragCursor(cursorid);

@@ -16,5 +16,11 @@ module.exports = webpackMerge(commonConfig, {
     path: DESTINATION,
     filename: "js/index.js"
   },
-  plugins: []
+  plugins: [new HtmlWebpackPlugin({
+    template: "index.html",
+    inject: true,
+    templateParameters: {
+      __WEBSWING_URL: ".."
+    }
+  }),]
 });

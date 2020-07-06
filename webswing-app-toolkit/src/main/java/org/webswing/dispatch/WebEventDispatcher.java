@@ -1,25 +1,13 @@
 package org.webswing.dispatch;
 
-import netscape.javascript.JSObject;
-import org.webswing.Constants;
-import org.webswing.model.c2s.*;
-import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
-import org.webswing.model.jslink.JSObjectMsg;
-import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
-import org.webswing.toolkit.*;
-import org.webswing.toolkit.api.component.HtmlPanel;
-import org.webswing.toolkit.api.lifecycle.ShutdownReason;
-import org.webswing.toolkit.extra.WindowManager;
-import org.webswing.toolkit.jslink.WebJSObject;
-import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Services;
-import org.webswing.toolkit.util.Util;
-
-import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileFilter;
 import java.applet.Applet;
-import java.awt.*;
+import java.awt.AWTEvent;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Frame;
+import java.awt.IllegalComponentStateException;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.KeyEvent;
@@ -30,6 +18,41 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
+
+import org.webswing.Constants;
+import org.webswing.audio.AudioClip;
+import org.webswing.model.c2s.ActionEventMsgIn;
+import org.webswing.model.c2s.AudioEventMsgIn;
+import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
+import org.webswing.model.c2s.CopyEventMsgIn;
+import org.webswing.model.c2s.FilesSelectedEventMsgIn;
+import org.webswing.model.c2s.KeyboardEventMsgIn;
+import org.webswing.model.c2s.MouseEventMsgIn;
+import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
+import org.webswing.model.c2s.PasteEventMsgIn;
+import org.webswing.model.c2s.SimpleEventMsgIn;
+import org.webswing.model.c2s.UploadEventMsgIn;
+import org.webswing.model.c2s.WindowEventMsgIn;
+import org.webswing.model.c2s.WindowFocusMsgIn;
+import org.webswing.model.jslink.JSObjectMsg;
+import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
+import org.webswing.toolkit.FocusEventCause;
+import org.webswing.toolkit.WebClipboard;
+import org.webswing.toolkit.WebClipboardTransferable;
+import org.webswing.toolkit.WebWindowPeer;
+import org.webswing.toolkit.api.component.HtmlPanel;
+import org.webswing.toolkit.api.lifecycle.ShutdownReason;
+import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.toolkit.jslink.WebJSObject;
+import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
+
+import netscape.javascript.JSObject;
 
 public class WebEventDispatcher extends AbstractEventDispatcher {
 
@@ -88,6 +111,7 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 			Component src = w.getFocusOwner() == null ? w : w.getFocusOwner();
 			if (event.getKeycode() == 13) {// enter keycode
 				event.setKeycode(10);
+				event.setCharacter(10);
 				character = 10;
 			} else if (CONVERTED_KEY_CODES.containsKey(event.getKeycode()) && type != KeyEvent.KEY_TYPED) {
 				int converted = CONVERTED_KEY_CODES.get(event.getKeycode());
@@ -178,6 +202,10 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 				dispatchMouseEventInSwing(c, e, relatedToLastEvent);
 				break;
 			case mouseup:
+				if (buttons == 0) {
+					// a button must be specified for this event
+					break;
+				}
 				id = MouseEvent.MOUSE_RELEASED;
 				boolean popupTrigger = buttons == 3;
 				clickcount = computeClickCount(x, y, buttons, false, event.getTimeMilis());
@@ -195,6 +223,10 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 				}
 				break;
 			case mousedown:
+				if (buttons == 0) {
+					// a button must be specified for this event
+					break;
+				}
 				id = MouseEvent.MOUSE_PRESSED;
 				clickcount = computeClickCount(x, y, buttons, true, event.getTimeMilis());
 				e = new MouseEvent(c, id, when, modifiers, x, y, event.getX(), event.getY(), clickcount, false, buttons);
@@ -391,10 +423,17 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 				final Window win = ((Window) winPeer.getTarget());
 				if (windowUpdate.isClose()) {
 					Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+				} else if (windowUpdate.isMaximize()) {
+					if (win instanceof Frame) {
+						Frame frame = (Frame) win;
+						frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+					}
 				} else if (windowUpdate.isFocus()) {
 					if (!Util.isFXWindow(win)) {
 						win.requestFocus();
 					}
+				} else if (windowUpdate.getToggleUndecorated() != null) {
+					winPeer.setUndecoratedOverride(windowUpdate.getToggleUndecorated());
 				} else {
 					SwingUtilities.invokeLater(() -> {
 						win.setBounds(windowUpdate.getX(), windowUpdate.getY(), windowUpdate.getWidth(), windowUpdate.getHeight());
@@ -402,6 +441,18 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 				}
 			}
 		}
+	}
+	
+	@Override
+	protected void handleAudioEvent(AudioEventMsgIn event) {
+		AudioClip clip = Util.getWebToolkit().getPaintDispatcher().findAudioClip(event.getId());
+		
+		if (clip == null) {
+			Logger.warn("Audio clip [" + event.getId() + "] not found. Cannot notify on playback end.");
+			return;
+		}
+		
+		clip.notifyPlaybackStopped();
 	}
 	
 }

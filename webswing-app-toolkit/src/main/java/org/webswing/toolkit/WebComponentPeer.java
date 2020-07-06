@@ -33,6 +33,7 @@ import java.util.UUID;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
 import org.webswing.common.GraphicsWrapper;
@@ -107,27 +108,36 @@ abstract public class WebComponentPeer implements ComponentPeer {
 	}
 
 	public void updateWindowDecorationImage() {
-		if (target != null && (target instanceof JDialog || target instanceof JFrame) && isInitialized()) {
-			if ((target instanceof JFrame && ((JFrame) target).isUndecorated()) || (target instanceof JDialog && ((JDialog) target).isUndecorated())) {
-				// window decoration is not painted
-			} else {
-				int w, h;
-				if (Util.isDD()) {
-					w = webImage.getWidth(null);
-					h = webImage.getHeight(null);
-					windowDecorationImage = Services.getDirectDrawService().createImage(w, h);
-				} else {
-					w = image.getWidth();
-					h = image.getHeight();
-					windowDecorationImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-				}
-				Graphics g = windowDecorationImage.getGraphics();
-				Services.getImageService().getWindowDecorationTheme().paintWindowDecoration(g, target, w, h);
-				g.dispose();
-
-				Util.getWebToolkit().getPaintDispatcher().notifyWindowDecorationUpdated(this.getGuid(), getBounds(),((WebWindowPeer)this).getInsets());
-			}
+		if (target == null || !(target instanceof JDialog || target instanceof JFrame) || !isInitialized()) {
+			return;
 		}
+
+		if (isUndecorated()) {
+			// window decoration is not painted
+			if (windowDecorationImage != null) {
+				if (Util.isDD()) {
+					Services.getDirectDrawService().resetImage(windowDecorationImage);
+				}
+				windowDecorationImage = null;
+			}
+			return;
+		}
+		
+		int w, h;
+		if (Util.isDD()) {
+			w = webImage.getWidth(null);
+			h = webImage.getHeight(null);
+			windowDecorationImage = Services.getDirectDrawService().createImage(w, h);
+		} else {
+			w = image.getWidth();
+			h = image.getHeight();
+			windowDecorationImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		}
+		Graphics g = windowDecorationImage.getGraphics();
+		Services.getImageService().getWindowDecorationTheme().paintWindowDecoration(g, target, w, h);
+		g.dispose();
+
+		Util.getWebToolkit().getPaintDispatcher().notifyWindowDecorationUpdated(this.getGuid(), getBounds(),((WebWindowPeer)this).getInsets());
 	}
 
 	private boolean isInitialized() {
@@ -148,6 +158,29 @@ abstract public class WebComponentPeer implements ComponentPeer {
 			}
 		}
 		return result;
+	}
+	
+	protected boolean isUndecorated() {
+		if (target == null) {
+			return true;
+		}
+		
+		if (target instanceof JWindow) {
+			return true;
+		}
+		
+		if ((target instanceof JFrame && ((JFrame) target).isUndecorated()) || (target instanceof JDialog && ((JDialog) target).isUndecorated())) {
+			return true;
+		}
+		
+		if (this instanceof WebWindowPeer) {
+			WebWindowPeer webPeer = (WebWindowPeer) this;
+			if (webPeer.getUndecoratedOverride() != null) {
+				return webPeer.getUndecoratedOverride();
+			}
+		}
+		
+		return false;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////

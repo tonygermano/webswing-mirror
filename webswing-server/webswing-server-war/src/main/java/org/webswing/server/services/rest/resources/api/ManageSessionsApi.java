@@ -98,5 +98,12 @@ public interface ManageSessionsApi  {
     @Path("/rest/record/{id}")
     @Produces({ "application/json" })
     public SwingSession startRecording(@PathParam("id") String id) throws RestException;
+
+    /**
+     * Set statistics logging value
+     */
+    @POST
+    @Path("/rest/toggleStatisticsLogging/{instanceId}/{enabled}")
+    public void toggleStatisticsLogging(@PathParam("instanceId") String instanceId, @PathParam("enabled") Boolean enabled) throws RestException;
 }
 

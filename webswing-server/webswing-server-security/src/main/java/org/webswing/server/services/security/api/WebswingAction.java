@@ -33,6 +33,7 @@ public enum WebswingAction {
 	rest_removeApp(AccessType.admin),
 	rest_getThreadDump(AccessType.admin),
 	rest_requestThreadDump(AccessType.admin),
+	rest_toggleStatisticsLogging(AccessType.admin),
 	rest_viewLogs(AccessType.admin, AccessType.support),
 	rest_getApps(AccessType.admin, AccessType.support, AccessType.basic),
 	//Security 

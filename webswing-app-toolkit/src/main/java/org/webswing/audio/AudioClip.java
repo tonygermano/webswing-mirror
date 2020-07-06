@@ -2,8 +2,9 @@ package org.webswing.audio;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -12,6 +13,7 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.Control;
 import javax.sound.sampled.Control.Type;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 
@@ -26,6 +28,8 @@ public class AudioClip implements Clip, DataLine {
 	private int loopCount;
 	
 	private float timePosition = 0;
+	
+	private List<LineListener> listeners = new ArrayList<>();
 
 	public AudioClip(AudioMixer mixer, DataLine.Info info) {
 	}
@@ -43,6 +47,13 @@ public class AudioClip implements Clip, DataLine {
 		}
 		
 		open = true;
+		
+		if (!listeners.isEmpty()) {
+			LineEvent event = new LineEvent(this, LineEvent.Type.OPEN, getLongFramePosition());
+			for (LineListener listener : listeners) {
+				listener.update(event);
+			}
+		}
 	}
 	
 	@Override
@@ -54,6 +65,13 @@ public class AudioClip implements Clip, DataLine {
 		this.data = Arrays.copyOf(audioData, audioData.length);
 		
 		open = true;
+		
+		if (!listeners.isEmpty()) {
+			LineEvent event = new LineEvent(this, LineEvent.Type.OPEN, getLongFramePosition());
+			for (LineListener listener : listeners) {
+				listener.update(event);
+			}
+		}
 	}
 	
 	@Override
@@ -62,12 +80,19 @@ public class AudioClip implements Clip, DataLine {
 			throw new IllegalStateException("Clip is already open!");
 		}
 		open = true;
+		
+		if (!listeners.isEmpty()) {
+			LineEvent event = new LineEvent(this, LineEvent.Type.OPEN, getLongFramePosition());
+			for (LineListener listener : listeners) {
+				listener.update(event);
+			}
+		}
 	}
 	
 	@Override
 	public void setMicrosecondPosition(long microseconds) {
 		timePosition = microseconds / 1_000_000.0f;
-		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventUpdate(id, timePosition, loopCount);
+		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventUpdate(this, timePosition, loopCount);
 	}
 	
 	@Override
@@ -86,7 +111,14 @@ public class AudioClip implements Clip, DataLine {
 			return;
 		}
 		
-		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventPlay(id, data, timePosition, 0);
+		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventPlay(this, data, timePosition, 0);
+		
+		if (!listeners.isEmpty()) {
+			LineEvent event = new LineEvent(this, LineEvent.Type.START, getLongFramePosition());
+			for (LineListener listener : listeners) {
+				listener.update(event);
+			}
+		}
 	}
 	
 	@Override
@@ -96,7 +128,15 @@ public class AudioClip implements Clip, DataLine {
 		}
 		
 		loopCount = count;
-		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventPlay(id, data, timePosition, loopCount);
+		
+		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventPlay(this, data, timePosition, loopCount);
+		
+		if (!listeners.isEmpty()) {
+			LineEvent event = new LineEvent(this, LineEvent.Type.START, getLongFramePosition());
+			for (LineListener listener : listeners) {
+				listener.update(event);
+			}
+		}
 	}
 
 	@Override
@@ -105,7 +145,9 @@ public class AudioClip implements Clip, DataLine {
 			return;
 		}
 		
-		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventStop(id);
+		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventStop(this);
+		
+		notifyPlaybackStopped();
 	}
 
 	@Override
@@ -118,7 +160,37 @@ public class AudioClip implements Clip, DataLine {
 		
 		open = false;
 		
-		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventDispose(id);
+		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventDispose(this);
+		
+		if (!listeners.isEmpty()) {
+			LineEvent event = new LineEvent(this, LineEvent.Type.CLOSE, getLongFramePosition());
+			for (LineListener listener : listeners) {
+				listener.update(event);
+			}
+		}
+	}
+	
+	@Override
+	public void addLineListener(LineListener listener) {
+		listeners.add(listener);
+	}
+	
+	@Override
+	public void removeLineListener(LineListener listener) {
+		listeners.remove(listener);
+	}
+	
+	public String getId() {
+		return id;
+	}
+	
+	public void notifyPlaybackStopped() {
+		if (!listeners.isEmpty()) {
+			LineEvent event = new LineEvent(this, LineEvent.Type.STOP, getLongFramePosition());
+			for (LineListener listener : listeners) {
+				listener.update(event);
+			}
+		}
 	}
 
 	@Override
@@ -206,16 +278,8 @@ public class AudioClip implements Clip, DataLine {
 	public Control getControl(Type control) {
 		return null;
 	}
-
-	@Override
-	public void addLineListener(LineListener listener) {
-	}
-
-	@Override
-	public void removeLineListener(LineListener listener) {
-	}
 	
-    private static byte[] toByteArray(InputStream is) throws IOException{
+    private static byte[] toByteArray(AudioInputStream is) throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
         	int reads = is.read();
         	
@@ -223,6 +287,8 @@ public class AudioClip implements Clip, DataLine {
         		baos.write(reads);
         		reads = is.read();
         	}
+        	
+       		is.close();
         	
         	return baos.toByteArray();
         }

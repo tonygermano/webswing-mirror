@@ -4,6 +4,7 @@ import java.awt.Container;
 import java.awt.Window;
 
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 
 import org.webswing.toolkit.api.action.WebActionListener;
 import org.webswing.toolkit.api.action.WebWindow;
@@ -256,5 +257,14 @@ public interface WebswingApi {
 	 * Is touch mode active?
 	 */
 	public boolean isTouchMode();
-	
+
+
+	/**
+	 * Register JFileChooser that should show Webswing integration toolbar if embedded in custom window.
+	 * Transparent mode is not available in case of custom window.
+	 * @param fileChooser instance of file chooser
+	 * @param parent custom window that contains this filechooser
+	 */
+	public void registerCustomFileChooser(JFileChooser fileChooser, Window parent);
+
 }

@@ -34,6 +34,8 @@ public interface SwingInstance {
 	void webSessionDisconnected(String connectionId);
 
 	void logStatValue(String name, Number value);
+	
+	boolean isStatisticsLoggingEnabled();
 
 	SwingSession toSwingSession(boolean stats);
 
@@ -48,6 +50,8 @@ public interface SwingInstance {
 	String getThreadDump(String id);
 
 	void requestThreadDump();
+	
+	void toggleStatisticsLogging(boolean enabled);
 
 	String getUserId();
 }

@@ -18113,6 +18113,15 @@ public final class Webswing {
      */
     com.google.protobuf.ByteString
         getSelectionBytes();
+
+    /**
+     * <code>optional bool customDialog = 8;</code>
+     */
+    boolean hasCustomDialog();
+    /**
+     * <code>optional bool customDialog = 8;</code>
+     */
+    boolean getCustomDialog();
   }
   /**
    * Protobuf type {@code org.webswing.server.model.proto.FileDialogEventMsgProto}
@@ -18134,6 +18143,7 @@ public final class Webswing {
       filter_ = "";
       isMultiSelection_ = false;
       selection_ = "";
+      customDialog_ = false;
     }
 
     @java.lang.Override
@@ -18202,6 +18212,11 @@ public final class Webswing {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000040;
               selection_ = bs;
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000080;
+              customDialog_ = input.readBool();
               break;
             }
             default: {
@@ -18506,6 +18521,21 @@ public final class Webswing {
       }
     }
 
+    public static final int CUSTOMDIALOG_FIELD_NUMBER = 8;
+    private boolean customDialog_;
+    /**
+     * <code>optional bool customDialog = 8;</code>
+     */
+    public boolean hasCustomDialog() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional bool customDialog = 8;</code>
+     */
+    public boolean getCustomDialog() {
+      return customDialog_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -18545,6 +18575,9 @@ public final class Webswing {
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 7, selection_);
       }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeBool(8, customDialog_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -18579,6 +18612,10 @@ public final class Webswing {
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, selection_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(8, customDialog_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -18630,6 +18667,11 @@ public final class Webswing {
         result = result && getSelection()
             .equals(other.getSelection());
       }
+      result = result && (hasCustomDialog() == other.hasCustomDialog());
+      if (hasCustomDialog()) {
+        result = result && (getCustomDialog()
+            == other.getCustomDialog());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -18672,6 +18714,11 @@ public final class Webswing {
       if (hasSelection()) {
         hash = (37 * hash) + SELECTION_FIELD_NUMBER;
         hash = (53 * hash) + getSelection().hashCode();
+      }
+      if (hasCustomDialog()) {
+        hash = (37 * hash) + CUSTOMDIALOG_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getCustomDialog());
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -18820,6 +18867,8 @@ public final class Webswing {
         bitField0_ = (bitField0_ & ~0x00000020);
         selection_ = "";
         bitField0_ = (bitField0_ & ~0x00000040);
+        customDialog_ = false;
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
 
@@ -18876,6 +18925,10 @@ public final class Webswing {
           to_bitField0_ |= 0x00000040;
         }
         result.selection_ = selection_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.customDialog_ = customDialog_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -18949,6 +19002,9 @@ public final class Webswing {
           bitField0_ |= 0x00000040;
           selection_ = other.selection_;
           onChanged();
+        }
+        if (other.hasCustomDialog()) {
+          setCustomDialog(other.getCustomDialog());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -19296,6 +19352,38 @@ public final class Webswing {
   }
   bitField0_ |= 0x00000040;
         selection_ = value;
+        onChanged();
+        return this;
+      }
+
+      private boolean customDialog_ ;
+      /**
+       * <code>optional bool customDialog = 8;</code>
+       */
+      public boolean hasCustomDialog() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional bool customDialog = 8;</code>
+       */
+      public boolean getCustomDialog() {
+        return customDialog_;
+      }
+      /**
+       * <code>optional bool customDialog = 8;</code>
+       */
+      public Builder setCustomDialog(boolean value) {
+        bitField0_ |= 0x00000080;
+        customDialog_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool customDialog = 8;</code>
+       */
+      public Builder clearCustomDialog() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        customDialog_ = false;
         onChanged();
         return this;
       }
@@ -20383,6 +20471,15 @@ public final class Webswing {
      * <code>optional .org.webswing.server.model.proto.WindowMsgProto.DockModeProto dockMode = 15;</code>
      */
     org.webswing.server.model.proto.Webswing.WindowMsgProto.DockModeProto getDockMode();
+
+    /**
+     * <code>optional .org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto classType = 16;</code>
+     */
+    boolean hasClassType();
+    /**
+     * <code>optional .org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto classType = 16;</code>
+     */
+    org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto getClassType();
   }
   /**
    * Protobuf type {@code org.webswing.server.model.proto.WindowMsgProto}
@@ -20412,6 +20509,7 @@ public final class Webswing {
       state_ = 0;
       internalWindows_ = java.util.Collections.emptyList();
       dockMode_ = 1;
+      classType_ = 1;
     }
 
     @java.lang.Override
@@ -20536,6 +20634,18 @@ public final class Webswing {
               } else {
                 bitField0_ |= 0x00001000;
                 dockMode_ = rawValue;
+              }
+              break;
+            }
+            case 128: {
+              int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
+              org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto value = org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(16, rawValue);
+              } else {
+                bitField0_ |= 0x00002000;
+                classType_ = rawValue;
               }
               break;
             }
@@ -20695,6 +20805,141 @@ public final class Webswing {
     }
 
     /**
+     * Protobuf enum {@code org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto}
+     */
+    public enum WindowClassTypeProto
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>other = 1;</code>
+       */
+      other(1),
+      /**
+       * <code>Window = 2;</code>
+       */
+      Window(2),
+      /**
+       * <code>JWindow = 3;</code>
+       */
+      JWindow(3),
+      /**
+       * <code>Dialog = 4;</code>
+       */
+      Dialog(4),
+      /**
+       * <code>JDialog = 5;</code>
+       */
+      JDialog(5),
+      /**
+       * <code>Frame = 6;</code>
+       */
+      Frame(6),
+      /**
+       * <code>JFrame = 7;</code>
+       */
+      JFrame(7),
+      ;
+
+      /**
+       * <code>other = 1;</code>
+       */
+      public static final int other_VALUE = 1;
+      /**
+       * <code>Window = 2;</code>
+       */
+      public static final int Window_VALUE = 2;
+      /**
+       * <code>JWindow = 3;</code>
+       */
+      public static final int JWindow_VALUE = 3;
+      /**
+       * <code>Dialog = 4;</code>
+       */
+      public static final int Dialog_VALUE = 4;
+      /**
+       * <code>JDialog = 5;</code>
+       */
+      public static final int JDialog_VALUE = 5;
+      /**
+       * <code>Frame = 6;</code>
+       */
+      public static final int Frame_VALUE = 6;
+      /**
+       * <code>JFrame = 7;</code>
+       */
+      public static final int JFrame_VALUE = 7;
+
+
+      public final int getNumber() {
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static WindowClassTypeProto valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static WindowClassTypeProto forNumber(int value) {
+        switch (value) {
+          case 1: return other;
+          case 2: return Window;
+          case 3: return JWindow;
+          case 4: return Dialog;
+          case 5: return JDialog;
+          case 6: return Frame;
+          case 7: return JFrame;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<WindowClassTypeProto>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          WindowClassTypeProto> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<WindowClassTypeProto>() {
+              public WindowClassTypeProto findValueByNumber(int number) {
+                return WindowClassTypeProto.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return org.webswing.server.model.proto.Webswing.WindowMsgProto.getDescriptor().getEnumTypes().get(1);
+      }
+
+      private static final WindowClassTypeProto[] VALUES = values();
+
+      public static WindowClassTypeProto valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private WindowClassTypeProto(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto)
+    }
+
+    /**
      * Protobuf enum {@code org.webswing.server.model.proto.WindowMsgProto.DockModeProto}
      */
     public enum DockModeProto
@@ -20770,7 +21015,7 @@ public final class Webswing {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return org.webswing.server.model.proto.Webswing.WindowMsgProto.getDescriptor().getEnumTypes().get(1);
+        return org.webswing.server.model.proto.Webswing.WindowMsgProto.getDescriptor().getEnumTypes().get(2);
       }
 
       private static final DockModeProto[] VALUES = values();
@@ -21171,6 +21416,23 @@ public final class Webswing {
       return result == null ? org.webswing.server.model.proto.Webswing.WindowMsgProto.DockModeProto.none : result;
     }
 
+    public static final int CLASSTYPE_FIELD_NUMBER = 16;
+    private int classType_;
+    /**
+     * <code>optional .org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto classType = 16;</code>
+     */
+    public boolean hasClassType() {
+      return ((bitField0_ & 0x00002000) == 0x00002000);
+    }
+    /**
+     * <code>optional .org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto classType = 16;</code>
+     */
+    public org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto getClassType() {
+      @SuppressWarnings("deprecation")
+      org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto result = org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto.valueOf(classType_);
+      return result == null ? org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto.other : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -21240,6 +21502,9 @@ public final class Webswing {
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         output.writeEnum(15, dockMode_);
       }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        output.writeEnum(16, classType_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -21304,6 +21569,10 @@ public final class Webswing {
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(15, dockMode_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(16, classType_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -21388,6 +21657,10 @@ public final class Webswing {
       if (hasDockMode()) {
         result = result && dockMode_ == other.dockMode_;
       }
+      result = result && (hasClassType() == other.hasClassType());
+      if (hasClassType()) {
+        result = result && classType_ == other.classType_;
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -21459,6 +21732,10 @@ public final class Webswing {
       if (hasDockMode()) {
         hash = (37 * hash) + DOCKMODE_FIELD_NUMBER;
         hash = (53 * hash) + dockMode_;
+      }
+      if (hasClassType()) {
+        hash = (37 * hash) + CLASSTYPE_FIELD_NUMBER;
+        hash = (53 * hash) + classType_;
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -21633,6 +21910,8 @@ public final class Webswing {
         }
         dockMode_ = 1;
         bitField0_ = (bitField0_ & ~0x00004000);
+        classType_ = 1;
+        bitField0_ = (bitField0_ & ~0x00008000);
         return this;
       }
 
@@ -21731,6 +22010,10 @@ public final class Webswing {
           to_bitField0_ |= 0x00001000;
         }
         result.dockMode_ = dockMode_;
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+          to_bitField0_ |= 0x00002000;
+        }
+        result.classType_ = classType_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -21878,6 +22161,9 @@ public final class Webswing {
         }
         if (other.hasDockMode()) {
           setDockMode(other.getDockMode());
+        }
+        if (other.hasClassType()) {
+          setClassType(other.getClassType());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -22998,6 +23284,43 @@ public final class Webswing {
       public Builder clearDockMode() {
         bitField0_ = (bitField0_ & ~0x00004000);
         dockMode_ = 1;
+        onChanged();
+        return this;
+      }
+
+      private int classType_ = 1;
+      /**
+       * <code>optional .org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto classType = 16;</code>
+       */
+      public boolean hasClassType() {
+        return ((bitField0_ & 0x00008000) == 0x00008000);
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto classType = 16;</code>
+       */
+      public org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto getClassType() {
+        @SuppressWarnings("deprecation")
+        org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto result = org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto.valueOf(classType_);
+        return result == null ? org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto.other : result;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto classType = 16;</code>
+       */
+      public Builder setClassType(org.webswing.server.model.proto.Webswing.WindowMsgProto.WindowClassTypeProto value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00008000;
+        classType_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto classType = 16;</code>
+       */
+      public Builder clearClassType() {
+        bitField0_ = (bitField0_ & ~0x00008000);
+        classType_ = 1;
         onChanged();
         return this;
       }
@@ -31785,6 +32108,19 @@ public final class Webswing {
      * <code>optional .org.webswing.server.model.proto.ActionEventMsgInProto action = 11;</code>
      */
     org.webswing.server.model.proto.Webswing.ActionEventMsgInProtoOrBuilder getActionOrBuilder();
+
+    /**
+     * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+     */
+    boolean hasAudio();
+    /**
+     * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+     */
+    org.webswing.server.model.proto.Webswing.AudioEventMsgInProto getAudio();
+    /**
+     * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+     */
+    org.webswing.server.model.proto.Webswing.AudioEventMsgInProtoOrBuilder getAudioOrBuilder();
   }
   /**
    * <pre>
@@ -31967,6 +32303,19 @@ public final class Webswing {
                 action_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000200;
+              break;
+            }
+            case 98: {
+              org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000400) == 0x00000400)) {
+                subBuilder = audio_.toBuilder();
+              }
+              audio_ = input.readMessage(org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(audio_);
+                audio_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000400;
               break;
             }
             default: {
@@ -32250,6 +32599,27 @@ public final class Webswing {
       return action_ == null ? org.webswing.server.model.proto.Webswing.ActionEventMsgInProto.getDefaultInstance() : action_;
     }
 
+    public static final int AUDIO_FIELD_NUMBER = 12;
+    private org.webswing.server.model.proto.Webswing.AudioEventMsgInProto audio_;
+    /**
+     * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+     */
+    public boolean hasAudio() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+     */
+    public org.webswing.server.model.proto.Webswing.AudioEventMsgInProto getAudio() {
+      return audio_ == null ? org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.getDefaultInstance() : audio_;
+    }
+    /**
+     * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+     */
+    public org.webswing.server.model.proto.Webswing.AudioEventMsgInProtoOrBuilder getAudioOrBuilder() {
+      return audio_ == null ? org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.getDefaultInstance() : audio_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -32296,6 +32666,9 @@ public final class Webswing {
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         output.writeMessage(11, getAction());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeMessage(12, getAudio());
       }
       unknownFields.writeTo(output);
     }
@@ -32349,6 +32722,10 @@ public final class Webswing {
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(11, getAction());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(12, getAudio());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -32418,6 +32795,11 @@ public final class Webswing {
         result = result && getAction()
             .equals(other.getAction());
       }
+      result = result && (hasAudio() == other.hasAudio());
+      if (hasAudio()) {
+        result = result && getAudio()
+            .equals(other.getAudio());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -32472,6 +32854,10 @@ public final class Webswing {
       if (hasAction()) {
         hash = (37 * hash) + ACTION_FIELD_NUMBER;
         hash = (53 * hash) + getAction().hashCode();
+      }
+      if (hasAudio()) {
+        hash = (37 * hash) + AUDIO_FIELD_NUMBER;
+        hash = (53 * hash) + getAudio().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -32616,6 +33002,7 @@ public final class Webswing {
           getPixelsResponseFieldBuilder();
           getWindowFieldBuilder();
           getActionFieldBuilder();
+          getAudioFieldBuilder();
         }
       }
       @java.lang.Override
@@ -32687,6 +33074,12 @@ public final class Webswing {
           actionBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000400);
+        if (audioBuilder_ == null) {
+          audio_ = null;
+        } else {
+          audioBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -32804,6 +33197,14 @@ public final class Webswing {
         } else {
           result.action_ = actionBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        if (audioBuilder_ == null) {
+          result.audio_ = audio_;
+        } else {
+          result.audio_ = audioBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -32908,6 +33309,9 @@ public final class Webswing {
         }
         if (other.hasAction()) {
           mergeAction(other.getAction());
+        }
+        if (other.hasAudio()) {
+          mergeAudio(other.getAudio());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -34357,6 +34761,124 @@ public final class Webswing {
           action_ = null;
         }
         return actionBuilder_;
+      }
+
+      private org.webswing.server.model.proto.Webswing.AudioEventMsgInProto audio_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.webswing.server.model.proto.Webswing.AudioEventMsgInProto, org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.Builder, org.webswing.server.model.proto.Webswing.AudioEventMsgInProtoOrBuilder> audioBuilder_;
+      /**
+       * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+       */
+      public boolean hasAudio() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+       */
+      public org.webswing.server.model.proto.Webswing.AudioEventMsgInProto getAudio() {
+        if (audioBuilder_ == null) {
+          return audio_ == null ? org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.getDefaultInstance() : audio_;
+        } else {
+          return audioBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+       */
+      public Builder setAudio(org.webswing.server.model.proto.Webswing.AudioEventMsgInProto value) {
+        if (audioBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          audio_ = value;
+          onChanged();
+        } else {
+          audioBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+       */
+      public Builder setAudio(
+          org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.Builder builderForValue) {
+        if (audioBuilder_ == null) {
+          audio_ = builderForValue.build();
+          onChanged();
+        } else {
+          audioBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+       */
+      public Builder mergeAudio(org.webswing.server.model.proto.Webswing.AudioEventMsgInProto value) {
+        if (audioBuilder_ == null) {
+          if (((bitField0_ & 0x00000800) == 0x00000800) &&
+              audio_ != null &&
+              audio_ != org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.getDefaultInstance()) {
+            audio_ =
+              org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.newBuilder(audio_).mergeFrom(value).buildPartial();
+          } else {
+            audio_ = value;
+          }
+          onChanged();
+        } else {
+          audioBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+       */
+      public Builder clearAudio() {
+        if (audioBuilder_ == null) {
+          audio_ = null;
+          onChanged();
+        } else {
+          audioBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
+        return this;
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+       */
+      public org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.Builder getAudioBuilder() {
+        bitField0_ |= 0x00000800;
+        onChanged();
+        return getAudioFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+       */
+      public org.webswing.server.model.proto.Webswing.AudioEventMsgInProtoOrBuilder getAudioOrBuilder() {
+        if (audioBuilder_ != null) {
+          return audioBuilder_.getMessageOrBuilder();
+        } else {
+          return audio_ == null ?
+              org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.getDefaultInstance() : audio_;
+        }
+      }
+      /**
+       * <code>optional .org.webswing.server.model.proto.AudioEventMsgInProto audio = 12;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.webswing.server.model.proto.Webswing.AudioEventMsgInProto, org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.Builder, org.webswing.server.model.proto.Webswing.AudioEventMsgInProtoOrBuilder> 
+          getAudioFieldBuilder() {
+        if (audioBuilder_ == null) {
+          audioBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.webswing.server.model.proto.Webswing.AudioEventMsgInProto, org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.Builder, org.webswing.server.model.proto.Webswing.AudioEventMsgInProtoOrBuilder>(
+                  getAudio(),
+                  getParentForChildren(),
+                  isClean());
+          audio_ = null;
+        }
+        return audioBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -37987,6 +38509,20 @@ public final class Webswing {
      * <code>optional bool accessiblityEnabled = 17;</code>
      */
     boolean getAccessiblityEnabled();
+
+    /**
+     * <code>optional string tabId = 18;</code>
+     */
+    boolean hasTabId();
+    /**
+     * <code>optional string tabId = 18;</code>
+     */
+    java.lang.String getTabId();
+    /**
+     * <code>optional string tabId = 18;</code>
+     */
+    com.google.protobuf.ByteString
+        getTabIdBytes();
   }
   /**
    * Protobuf type {@code org.webswing.server.model.proto.ConnectionHandshakeMsgInProto}
@@ -38018,6 +38554,7 @@ public final class Webswing {
       dockingSupported_ = false;
       touchMode_ = false;
       accessiblityEnabled_ = false;
+      tabId_ = "";
     }
 
     @java.lang.Override
@@ -38140,6 +38677,12 @@ public final class Webswing {
             case 136: {
               bitField0_ |= 0x00008000;
               accessiblityEnabled_ = input.readBool();
+              break;
+            }
+            case 146: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00010000;
+              tabId_ = bs;
               break;
             }
             default: {
@@ -38696,6 +39239,48 @@ public final class Webswing {
       return accessiblityEnabled_;
     }
 
+    public static final int TABID_FIELD_NUMBER = 18;
+    private volatile java.lang.Object tabId_;
+    /**
+     * <code>optional string tabId = 18;</code>
+     */
+    public boolean hasTabId() {
+      return ((bitField0_ & 0x00010000) == 0x00010000);
+    }
+    /**
+     * <code>optional string tabId = 18;</code>
+     */
+    public java.lang.String getTabId() {
+      java.lang.Object ref = tabId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          tabId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string tabId = 18;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTabIdBytes() {
+      java.lang.Object ref = tabId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        tabId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -38760,6 +39345,9 @@ public final class Webswing {
       }
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
         output.writeBool(17, accessiblityEnabled_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 18, tabId_);
       }
       unknownFields.writeTo(output);
     }
@@ -38828,6 +39416,9 @@ public final class Webswing {
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(17, accessiblityEnabled_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(18, tabId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -38927,6 +39518,11 @@ public final class Webswing {
         result = result && (getAccessiblityEnabled()
             == other.getAccessiblityEnabled());
       }
+      result = result && (hasTabId() == other.hasTabId());
+      if (hasTabId()) {
+        result = result && getTabId()
+            .equals(other.getTabId());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -39010,6 +39606,10 @@ public final class Webswing {
         hash = (37 * hash) + ACCESSIBLITYENABLED_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
             getAccessiblityEnabled());
+      }
+      if (hasTabId()) {
+        hash = (37 * hash) + TABID_FIELD_NUMBER;
+        hash = (53 * hash) + getTabId().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -39183,6 +39783,8 @@ public final class Webswing {
         bitField0_ = (bitField0_ & ~0x00008000);
         accessiblityEnabled_ = false;
         bitField0_ = (bitField0_ & ~0x00010000);
+        tabId_ = "";
+        bitField0_ = (bitField0_ & ~0x00020000);
         return this;
       }
 
@@ -39284,6 +39886,10 @@ public final class Webswing {
           to_bitField0_ |= 0x00008000;
         }
         result.accessiblityEnabled_ = accessiblityEnabled_;
+        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
+          to_bitField0_ |= 0x00010000;
+        }
+        result.tabId_ = tabId_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -39424,6 +40030,11 @@ public final class Webswing {
         }
         if (other.hasAccessiblityEnabled()) {
           setAccessiblityEnabled(other.getAccessiblityEnabled());
+        }
+        if (other.hasTabId()) {
+          bitField0_ |= 0x00020000;
+          tabId_ = other.tabId_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -40599,6 +41210,82 @@ public final class Webswing {
       public Builder clearAccessiblityEnabled() {
         bitField0_ = (bitField0_ & ~0x00010000);
         accessiblityEnabled_ = false;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object tabId_ = "";
+      /**
+       * <code>optional string tabId = 18;</code>
+       */
+      public boolean hasTabId() {
+        return ((bitField0_ & 0x00020000) == 0x00020000);
+      }
+      /**
+       * <code>optional string tabId = 18;</code>
+       */
+      public java.lang.String getTabId() {
+        java.lang.Object ref = tabId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            tabId_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string tabId = 18;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTabIdBytes() {
+        java.lang.Object ref = tabId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          tabId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string tabId = 18;</code>
+       */
+      public Builder setTabId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00020000;
+        tabId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string tabId = 18;</code>
+       */
+      public Builder clearTabId() {
+        bitField0_ = (bitField0_ & ~0x00020000);
+        tabId_ = getDefaultInstance().getTabId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string tabId = 18;</code>
+       */
+      public Builder setTabIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00020000;
+        tabId_ = value;
         onChanged();
         return this;
       }
@@ -46145,6 +46832,14 @@ public final class Webswing {
        * <code>requestWindowSwitchList = 9;</code>
        */
       requestWindowSwitchList(9),
+      /**
+       * <code>enableStatisticsLogging = 10;</code>
+       */
+      enableStatisticsLogging(10),
+      /**
+       * <code>disableStatisticsLogging = 11;</code>
+       */
+      disableStatisticsLogging(11),
       ;
 
       /**
@@ -46187,6 +46882,14 @@ public final class Webswing {
        * <code>requestWindowSwitchList = 9;</code>
        */
       public static final int requestWindowSwitchList_VALUE = 9;
+      /**
+       * <code>enableStatisticsLogging = 10;</code>
+       */
+      public static final int enableStatisticsLogging_VALUE = 10;
+      /**
+       * <code>disableStatisticsLogging = 11;</code>
+       */
+      public static final int disableStatisticsLogging_VALUE = 11;
 
 
       public final int getNumber() {
@@ -46213,6 +46916,8 @@ public final class Webswing {
           case 7: return cancelFileSelection;
           case 8: return requestComponentTree;
           case 9: return requestWindowSwitchList;
+          case 10: return enableStatisticsLogging;
+          case 11: return disableStatisticsLogging;
           default: return null;
         }
       }
@@ -52757,6 +53462,24 @@ public final class Webswing {
      * <code>optional bool focus = 7;</code>
      */
     boolean getFocus();
+
+    /**
+     * <code>optional bool maximize = 8;</code>
+     */
+    boolean hasMaximize();
+    /**
+     * <code>optional bool maximize = 8;</code>
+     */
+    boolean getMaximize();
+
+    /**
+     * <code>optional bool toggleUndecorated = 9;</code>
+     */
+    boolean hasToggleUndecorated();
+    /**
+     * <code>optional bool toggleUndecorated = 9;</code>
+     */
+    boolean getToggleUndecorated();
   }
   /**
    * Protobuf type {@code org.webswing.server.model.proto.WindowEventMsgInProto}
@@ -52778,6 +53501,8 @@ public final class Webswing {
       height_ = 0;
       close_ = false;
       focus_ = false;
+      maximize_ = false;
+      toggleUndecorated_ = false;
     }
 
     @java.lang.Override
@@ -52838,6 +53563,16 @@ public final class Webswing {
             case 56: {
               bitField0_ |= 0x00000040;
               focus_ = input.readBool();
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000080;
+              maximize_ = input.readBool();
+              break;
+            }
+            case 72: {
+              bitField0_ |= 0x00000100;
+              toggleUndecorated_ = input.readBool();
               break;
             }
             default: {
@@ -53005,6 +53740,36 @@ public final class Webswing {
       return focus_;
     }
 
+    public static final int MAXIMIZE_FIELD_NUMBER = 8;
+    private boolean maximize_;
+    /**
+     * <code>optional bool maximize = 8;</code>
+     */
+    public boolean hasMaximize() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional bool maximize = 8;</code>
+     */
+    public boolean getMaximize() {
+      return maximize_;
+    }
+
+    public static final int TOGGLEUNDECORATED_FIELD_NUMBER = 9;
+    private boolean toggleUndecorated_;
+    /**
+     * <code>optional bool toggleUndecorated = 9;</code>
+     */
+    public boolean hasToggleUndecorated() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional bool toggleUndecorated = 9;</code>
+     */
+    public boolean getToggleUndecorated() {
+      return toggleUndecorated_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -53039,6 +53804,12 @@ public final class Webswing {
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeBool(7, focus_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeBool(8, maximize_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeBool(9, toggleUndecorated_);
       }
       unknownFields.writeTo(output);
     }
@@ -53075,6 +53846,14 @@ public final class Webswing {
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(7, focus_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(8, maximize_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(9, toggleUndecorated_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -53127,6 +53906,16 @@ public final class Webswing {
         result = result && (getFocus()
             == other.getFocus());
       }
+      result = result && (hasMaximize() == other.hasMaximize());
+      if (hasMaximize()) {
+        result = result && (getMaximize()
+            == other.getMaximize());
+      }
+      result = result && (hasToggleUndecorated() == other.hasToggleUndecorated());
+      if (hasToggleUndecorated()) {
+        result = result && (getToggleUndecorated()
+            == other.getToggleUndecorated());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -53167,6 +53956,16 @@ public final class Webswing {
         hash = (37 * hash) + FOCUS_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
             getFocus());
+      }
+      if (hasMaximize()) {
+        hash = (37 * hash) + MAXIMIZE_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getMaximize());
+      }
+      if (hasToggleUndecorated()) {
+        hash = (37 * hash) + TOGGLEUNDECORATED_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getToggleUndecorated());
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -53315,6 +54114,10 @@ public final class Webswing {
         bitField0_ = (bitField0_ & ~0x00000020);
         focus_ = false;
         bitField0_ = (bitField0_ & ~0x00000040);
+        maximize_ = false;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        toggleUndecorated_ = false;
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
 
@@ -53371,6 +54174,14 @@ public final class Webswing {
           to_bitField0_ |= 0x00000040;
         }
         result.focus_ = focus_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.maximize_ = maximize_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.toggleUndecorated_ = toggleUndecorated_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -53442,6 +54253,12 @@ public final class Webswing {
         }
         if (other.hasFocus()) {
           setFocus(other.getFocus());
+        }
+        if (other.hasMaximize()) {
+          setMaximize(other.getMaximize());
+        }
+        if (other.hasToggleUndecorated()) {
+          setToggleUndecorated(other.getToggleUndecorated());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -53740,6 +54557,70 @@ public final class Webswing {
         onChanged();
         return this;
       }
+
+      private boolean maximize_ ;
+      /**
+       * <code>optional bool maximize = 8;</code>
+       */
+      public boolean hasMaximize() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional bool maximize = 8;</code>
+       */
+      public boolean getMaximize() {
+        return maximize_;
+      }
+      /**
+       * <code>optional bool maximize = 8;</code>
+       */
+      public Builder setMaximize(boolean value) {
+        bitField0_ |= 0x00000080;
+        maximize_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool maximize = 8;</code>
+       */
+      public Builder clearMaximize() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        maximize_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean toggleUndecorated_ ;
+      /**
+       * <code>optional bool toggleUndecorated = 9;</code>
+       */
+      public boolean hasToggleUndecorated() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional bool toggleUndecorated = 9;</code>
+       */
+      public boolean getToggleUndecorated() {
+        return toggleUndecorated_;
+      }
+      /**
+       * <code>optional bool toggleUndecorated = 9;</code>
+       */
+      public Builder setToggleUndecorated(boolean value) {
+        bitField0_ |= 0x00000100;
+        toggleUndecorated_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool toggleUndecorated = 9;</code>
+       */
+      public Builder clearToggleUndecorated() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        toggleUndecorated_ = false;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -53788,6 +54669,677 @@ public final class Webswing {
 
     @java.lang.Override
     public org.webswing.server.model.proto.Webswing.WindowEventMsgInProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface AudioEventMsgInProtoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.webswing.server.model.proto.AudioEventMsgInProto)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional string id = 1;</code>
+     */
+    boolean hasId();
+    /**
+     * <code>optional string id = 1;</code>
+     */
+    java.lang.String getId();
+    /**
+     * <code>optional string id = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getIdBytes();
+
+    /**
+     * <code>optional bool stop = 2;</code>
+     */
+    boolean hasStop();
+    /**
+     * <code>optional bool stop = 2;</code>
+     */
+    boolean getStop();
+  }
+  /**
+   * Protobuf type {@code org.webswing.server.model.proto.AudioEventMsgInProto}
+   */
+  public  static final class AudioEventMsgInProto extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:org.webswing.server.model.proto.AudioEventMsgInProto)
+      AudioEventMsgInProtoOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use AudioEventMsgInProto.newBuilder() to construct.
+    private AudioEventMsgInProto(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private AudioEventMsgInProto() {
+      id_ = "";
+      stop_ = false;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private AudioEventMsgInProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000001;
+              id_ = bs;
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              stop_ = input.readBool();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_AudioEventMsgInProto_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_AudioEventMsgInProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.class, org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int ID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object id_;
+    /**
+     * <code>optional string id = 1;</code>
+     */
+    public boolean hasId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional string id = 1;</code>
+     */
+    public java.lang.String getId() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          id_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string id = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getIdBytes() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        id_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int STOP_FIELD_NUMBER = 2;
+    private boolean stop_;
+    /**
+     * <code>optional bool stop = 2;</code>
+     */
+    public boolean hasStop() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional bool stop = 2;</code>
+     */
+    public boolean getStop() {
+      return stop_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, id_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBool(2, stop_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, id_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(2, stop_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.webswing.server.model.proto.Webswing.AudioEventMsgInProto)) {
+        return super.equals(obj);
+      }
+      org.webswing.server.model.proto.Webswing.AudioEventMsgInProto other = (org.webswing.server.model.proto.Webswing.AudioEventMsgInProto) obj;
+
+      boolean result = true;
+      result = result && (hasId() == other.hasId());
+      if (hasId()) {
+        result = result && getId()
+            .equals(other.getId());
+      }
+      result = result && (hasStop() == other.hasStop());
+      if (hasStop()) {
+        result = result && (getStop()
+            == other.getStop());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId().hashCode();
+      }
+      if (hasStop()) {
+        hash = (37 * hash) + STOP_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getStop());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.webswing.server.model.proto.Webswing.AudioEventMsgInProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.webswing.server.model.proto.AudioEventMsgInProto}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.webswing.server.model.proto.AudioEventMsgInProto)
+        org.webswing.server.model.proto.Webswing.AudioEventMsgInProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_AudioEventMsgInProto_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_AudioEventMsgInProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.class, org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.Builder.class);
+      }
+
+      // Construct using org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        id_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        stop_ = false;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.webswing.server.model.proto.Webswing.internal_static_org_webswing_server_model_proto_AudioEventMsgInProto_descriptor;
+      }
+
+      @java.lang.Override
+      public org.webswing.server.model.proto.Webswing.AudioEventMsgInProto getDefaultInstanceForType() {
+        return org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.webswing.server.model.proto.Webswing.AudioEventMsgInProto build() {
+        org.webswing.server.model.proto.Webswing.AudioEventMsgInProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.webswing.server.model.proto.Webswing.AudioEventMsgInProto buildPartial() {
+        org.webswing.server.model.proto.Webswing.AudioEventMsgInProto result = new org.webswing.server.model.proto.Webswing.AudioEventMsgInProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.id_ = id_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.stop_ = stop_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.webswing.server.model.proto.Webswing.AudioEventMsgInProto) {
+          return mergeFrom((org.webswing.server.model.proto.Webswing.AudioEventMsgInProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.webswing.server.model.proto.Webswing.AudioEventMsgInProto other) {
+        if (other == org.webswing.server.model.proto.Webswing.AudioEventMsgInProto.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          bitField0_ |= 0x00000001;
+          id_ = other.id_;
+          onChanged();
+        }
+        if (other.hasStop()) {
+          setStop(other.getStop());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.webswing.server.model.proto.Webswing.AudioEventMsgInProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.webswing.server.model.proto.Webswing.AudioEventMsgInProto) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object id_ = "";
+      /**
+       * <code>optional string id = 1;</code>
+       */
+      public boolean hasId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional string id = 1;</code>
+       */
+      public java.lang.String getId() {
+        java.lang.Object ref = id_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            id_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string id = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getIdBytes() {
+        java.lang.Object ref = id_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          id_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string id = 1;</code>
+       */
+      public Builder setId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        id_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string id = 1;</code>
+       */
+      public Builder clearId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        id_ = getDefaultInstance().getId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string id = 1;</code>
+       */
+      public Builder setIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        id_ = value;
+        onChanged();
+        return this;
+      }
+
+      private boolean stop_ ;
+      /**
+       * <code>optional bool stop = 2;</code>
+       */
+      public boolean hasStop() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional bool stop = 2;</code>
+       */
+      public boolean getStop() {
+        return stop_;
+      }
+      /**
+       * <code>optional bool stop = 2;</code>
+       */
+      public Builder setStop(boolean value) {
+        bitField0_ |= 0x00000002;
+        stop_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool stop = 2;</code>
+       */
+      public Builder clearStop() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        stop_ = false;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:org.webswing.server.model.proto.AudioEventMsgInProto)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.webswing.server.model.proto.AudioEventMsgInProto)
+    private static final org.webswing.server.model.proto.Webswing.AudioEventMsgInProto DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.webswing.server.model.proto.Webswing.AudioEventMsgInProto();
+    }
+
+    public static org.webswing.server.model.proto.Webswing.AudioEventMsgInProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<AudioEventMsgInProto>
+        PARSER = new com.google.protobuf.AbstractParser<AudioEventMsgInProto>() {
+      @java.lang.Override
+      public AudioEventMsgInProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new AudioEventMsgInProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<AudioEventMsgInProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<AudioEventMsgInProto> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.webswing.server.model.proto.Webswing.AudioEventMsgInProto getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -57831,6 +59383,11 @@ public final class Webswing {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_org_webswing_server_model_proto_WindowEventMsgInProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_webswing_server_model_proto_AudioEventMsgInProto_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_org_webswing_server_model_proto_AudioEventMsgInProto_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_org_webswing_server_model_proto_ActionEventMsgInProto_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -57944,192 +59501,203 @@ public final class Webswing {
       "tMsgProto\022\014\n\004text\030\001 \001(\t\022\014\n\004html\030\002 \001(\t\022\013\n" +
       "\003img\030\003 \001(\014\022\r\n\005files\030\004 \003(\t\022\r\n\005other\030\005 \001(\010" +
       "\"6\n\024PasteRequestMsgProto\022\r\n\005title\030\001 \001(\t\022" +
-      "\017\n\007message\030\002 \001(\t\"\314\002\n\027FileDialogEventMsgP" +
+      "\017\n\007message\030\002 \001(\t\"\342\002\n\027FileDialogEventMsgP" +
       "roto\022d\n\teventType\030\001 \002(\0162Q.org.webswing.s" +
       "erver.model.proto.FileDialogEventMsgProt" +
       "o.FileDialogEventTypeProto\022\025\n\rallowDownl" +
       "oad\030\002 \001(\010\022\023\n\013allowUpload\030\003 \001(\010\022\023\n\013allowD" +
       "elete\030\004 \001(\010\022\016\n\006filter\030\005 \001(\t\022\030\n\020isMultiSe" +
-      "lection\030\006 \001(\010\022\021\n\tselection\030\007 \001(\t\"M\n\030File" +
-      "DialogEventTypeProto\022\010\n\004Open\020\000\022\t\n\005Close\020" +
-      "\001\022\016\n\nAutoUpload\020\002\022\014\n\010AutoSave\020\003\"B\n\017Windo" +
-      "wSwitchMsg\022\n\n\002id\030\001 \002(\t\022\r\n\005title\030\002 \001(\t\022\024\n" +
-      "\014modalBlocked\030\003 \001(\010\"\216\005\n\016WindowMsgProto\022\n" +
-      "\n\002id\030\001 \002(\t\022N\n\007content\030\002 \003(\0132=.org.webswi" +
-      "ng.server.model.proto.WindowPartialConte" +
-      "ntMsgProto\022\022\n\ndirectDraw\030\003 \001(\014\022\r\n\005title\030" +
-      "\004 \001(\t\022\014\n\004posX\030\005 \001(\021\022\014\n\004posY\030\006 \001(\021\022\r\n\005wid" +
-      "th\030\007 \001(\r\022\016\n\006height\030\010 \001(\r\022\014\n\004name\030\t \001(\t\022M" +
-      "\n\004type\030\n \001(\0162?.org.webswing.server.model" +
-      ".proto.WindowMsgProto.WindowTypeProto\022\024\n" +
-      "\014modalBlocked\030\013 \001(\010\022\017\n\007ownerId\030\014 \001(\t\022\r\n\005" +
-      "state\030\r \001(\r\022H\n\017internalWindows\030\016 \003(\0132/.o" +
-      "rg.webswing.server.model.proto.WindowMsg" +
-      "Proto\022O\n\010dockMode\030\017 \001(\0162=.org.webswing.s" +
-      "erver.model.proto.WindowMsgProto.DockMod" +
-      "eProto\"[\n\017WindowTypeProto\022\t\n\005basic\020\001\022\010\n\004" +
-      "html\020\002\022\014\n\010internal\020\003\022\020\n\014internalHtml\020\004\022\023" +
-      "\n\017internalWrapper\020\005\"7\n\rDockModeProto\022\010\n\004" +
-      "none\020\001\022\014\n\010dockable\020\002\022\016\n\nautoUndock\020\003\"G\n\024" +
-      "WindowSwitchMsgProto\022\n\n\002id\030\001 \002(\t\022\r\n\005titl" +
-      "e\030\002 \001(\t\022\024\n\014modalBlocked\030\003 \001(\010\"z\n\034WindowP" +
-      "artialContentMsgProto\022\021\n\tpositionX\030\001 \001(\021" +
-      "\022\021\n\tpositionY\030\002 \001(\021\022\r\n\005width\030\003 \001(\r\022\016\n\006he" +
-      "ight\030\004 \001(\r\022\025\n\rbase64Content\030\005 \001(\014\"\211\003\n\030Js" +
-      "EvalRequestMsgOutProto\022\025\n\rcorrelationId\030" +
-      "\001 \001(\t\022\024\n\014thisObjectId\030\002 \001(\t\022^\n\004type\030\003 \001(" +
-      "\0162P.org.webswing.server.model.proto.JsEv" +
-      "alRequestMsgOutProto.JsEvalRequestTypePr" +
-      "oto\022\022\n\nevalString\030\004 \001(\t\022@\n\006params\030\005 \003(\0132" +
-      "0.org.webswing.server.model.proto.JsPara" +
-      "mMsgProto\022\022\n\ngarbageIds\030\006 \003(\t\"v\n\026JsEvalR" +
-      "equestTypeProto\022\010\n\004eval\020\000\022\010\n\004call\020\001\022\r\n\ts" +
-      "etMember\020\002\022\r\n\tgetMember\020\003\022\020\n\014deleteMembe" +
-      "r\020\004\022\013\n\007setSlot\020\005\022\013\n\007getSlot\020\006\"\366\001\n\017JsPara" +
-      "mMsgProto\022\021\n\tprimitive\030\001 \001(\t\022C\n\010jsObject" +
-      "\030\002 \001(\01321.org.webswing.server.model.proto" +
-      ".JSObjectMsgProto\022J\n\njavaObject\030\003 \001(\01326." +
-      "org.webswing.server.model.proto.JavaObje" +
-      "ctRefMsgProto\022?\n\005array\030\004 \003(\01320.org.websw" +
-      "ing.server.model.proto.JsParamMsgProto\"\036" +
-      "\n\020JSObjectMsgProto\022\n\n\002id\030\001 \001(\t\"4\n\025JavaOb" +
-      "jectRefMsgProto\022\n\n\002id\030\001 \001(\t\022\017\n\007methods\030\002" +
-      " \003(\t\"y\n\020JsResultMsgProto\022\025\n\rcorrelationI" +
-      "d\030\001 \001(\t\022\r\n\005error\030\002 \001(\t\022?\n\005value\030\003 \001(\01320." +
+      "lection\030\006 \001(\010\022\021\n\tselection\030\007 \001(\t\022\024\n\014cust" +
+      "omDialog\030\010 \001(\010\"M\n\030FileDialogEventTypePro" +
+      "to\022\010\n\004Open\020\000\022\t\n\005Close\020\001\022\016\n\nAutoUpload\020\002\022" +
+      "\014\n\010AutoSave\020\003\"B\n\017WindowSwitchMsg\022\n\n\002id\030\001" +
+      " \002(\t\022\r\n\005title\030\002 \001(\t\022\024\n\014modalBlocked\030\003 \001(" +
+      "\010\"\323\006\n\016WindowMsgProto\022\n\n\002id\030\001 \002(\t\022N\n\007cont" +
+      "ent\030\002 \003(\0132=.org.webswing.server.model.pr" +
+      "oto.WindowPartialContentMsgProto\022\022\n\ndire" +
+      "ctDraw\030\003 \001(\014\022\r\n\005title\030\004 \001(\t\022\014\n\004posX\030\005 \001(" +
+      "\021\022\014\n\004posY\030\006 \001(\021\022\r\n\005width\030\007 \001(\r\022\016\n\006height" +
+      "\030\010 \001(\r\022\014\n\004name\030\t \001(\t\022M\n\004type\030\n \001(\0162?.org" +
+      ".webswing.server.model.proto.WindowMsgPr" +
+      "oto.WindowTypeProto\022\024\n\014modalBlocked\030\013 \001(" +
+      "\010\022\017\n\007ownerId\030\014 \001(\t\022\r\n\005state\030\r \001(\r\022H\n\017int" +
+      "ernalWindows\030\016 \003(\0132/.org.webswing.server" +
+      ".model.proto.WindowMsgProto\022O\n\010dockMode\030" +
+      "\017 \001(\0162=.org.webswing.server.model.proto." +
+      "WindowMsgProto.DockModeProto\022W\n\tclassTyp" +
+      "e\030\020 \001(\0162D.org.webswing.server.model.prot" +
+      "o.WindowMsgProto.WindowClassTypeProto\"[\n" +
+      "\017WindowTypeProto\022\t\n\005basic\020\001\022\010\n\004html\020\002\022\014\n" +
+      "\010internal\020\003\022\020\n\014internalHtml\020\004\022\023\n\017interna" +
+      "lWrapper\020\005\"j\n\024WindowClassTypeProto\022\t\n\005ot" +
+      "her\020\001\022\n\n\006Window\020\002\022\013\n\007JWindow\020\003\022\n\n\006Dialog" +
+      "\020\004\022\013\n\007JDialog\020\005\022\t\n\005Frame\020\006\022\n\n\006JFrame\020\007\"7" +
+      "\n\rDockModeProto\022\010\n\004none\020\001\022\014\n\010dockable\020\002\022" +
+      "\016\n\nautoUndock\020\003\"G\n\024WindowSwitchMsgProto\022" +
+      "\n\n\002id\030\001 \002(\t\022\r\n\005title\030\002 \001(\t\022\024\n\014modalBlock" +
+      "ed\030\003 \001(\010\"z\n\034WindowPartialContentMsgProto" +
+      "\022\021\n\tpositionX\030\001 \001(\021\022\021\n\tpositionY\030\002 \001(\021\022\r" +
+      "\n\005width\030\003 \001(\r\022\016\n\006height\030\004 \001(\r\022\025\n\rbase64C" +
+      "ontent\030\005 \001(\014\"\211\003\n\030JsEvalRequestMsgOutProt" +
+      "o\022\025\n\rcorrelationId\030\001 \001(\t\022\024\n\014thisObjectId" +
+      "\030\002 \001(\t\022^\n\004type\030\003 \001(\0162P.org.webswing.serv" +
+      "er.model.proto.JsEvalRequestMsgOutProto." +
+      "JsEvalRequestTypeProto\022\022\n\nevalString\030\004 \001" +
+      "(\t\022@\n\006params\030\005 \003(\01320.org.webswing.server" +
+      ".model.proto.JsParamMsgProto\022\022\n\ngarbageI" +
+      "ds\030\006 \003(\t\"v\n\026JsEvalRequestTypeProto\022\010\n\004ev" +
+      "al\020\000\022\010\n\004call\020\001\022\r\n\tsetMember\020\002\022\r\n\tgetMemb" +
+      "er\020\003\022\020\n\014deleteMember\020\004\022\013\n\007setSlot\020\005\022\013\n\007g" +
+      "etSlot\020\006\"\366\001\n\017JsParamMsgProto\022\021\n\tprimitiv" +
+      "e\030\001 \001(\t\022C\n\010jsObject\030\002 \001(\01321.org.webswing" +
+      ".server.model.proto.JSObjectMsgProto\022J\n\n" +
+      "javaObject\030\003 \001(\01326.org.webswing.server.m" +
+      "odel.proto.JavaObjectRefMsgProto\022?\n\005arra" +
+      "y\030\004 \003(\01320.org.webswing.server.model.prot" +
+      "o.JsParamMsgProto\"\036\n\020JSObjectMsgProto\022\n\n" +
+      "\002id\030\001 \001(\t\"4\n\025JavaObjectRefMsgProto\022\n\n\002id" +
+      "\030\001 \001(\t\022\017\n\007methods\030\002 \003(\t\"y\n\020JsResultMsgPr" +
+      "oto\022\025\n\rcorrelationId\030\001 \001(\t\022\r\n\005error\030\002 \001(" +
+      "\t\022?\n\005value\030\003 \001(\01320.org.webswing.server.m" +
+      "odel.proto.JsParamMsgProto\"6\n\024PlaybackIn" +
+      "foMsgProto\022\017\n\007current\030\001 \001(\r\022\r\n\005total\030\002 \001" +
+      "(\r\"a\n\034PixelsAreaRequestMsgOutProto\022\025\n\rco" +
+      "rrelationId\030\001 \001(\t\022\t\n\001x\030\002 \001(\r\022\t\n\001y\030\003 \001(\r\022" +
+      "\t\n\001w\030\004 \001(\r\022\t\n\001h\030\005 \001(\r\"\231\007\n\032InputEventsFra" +
+      "meMsgInProto\022E\n\006events\030\001 \003(\01325.org.websw" +
+      "ing.server.model.proto.InputEventMsgInPr" +
+      "oto\022D\n\005paste\030\002 \001(\01325.org.webswing.server" +
+      ".model.proto.PasteEventMsgInProto\022B\n\004cop" +
+      "y\030\003 \001(\01324.org.webswing.server.model.prot" +
+      "o.CopyEventMsgInProto\022F\n\006upload\030\004 \001(\01326." +
+      "org.webswing.server.model.proto.UploadEv" +
+      "entMsgInProto\022O\n\010selected\030\005 \001(\0132=.org.we" +
+      "bswing.server.model.proto.FilesSelectedE" +
+      "ventMsgInProto\022E\n\njsResponse\030\006 \001(\01321.org" +
+      ".webswing.server.model.proto.JsResultMsg" +
+      "Proto\022O\n\013javaRequest\030\007 \001(\0132:.org.webswin" +
+      "g.server.model.proto.JavaEvalRequestMsgI" +
+      "nProto\022L\n\010playback\030\010 \001(\0132:.org.webswing." +
+      "server.model.proto.PlaybackCommandMsgInP" +
+      "roto\022U\n\016pixelsResponse\030\t \001(\0132=.org.websw" +
+      "ing.server.model.proto.PixelsAreaRespons" +
+      "eMsgInProto\022F\n\006window\030\n \001(\01326.org.webswi" +
+      "ng.server.model.proto.WindowEventMsgInPr" +
+      "oto\022F\n\006action\030\013 \001(\01326.org.webswing.serve" +
+      "r.model.proto.ActionEventMsgInProto\022D\n\005a" +
+      "udio\030\014 \001(\01325.org.webswing.server.model.p" +
+      "roto.AudioEventMsgInProto\"\317\003\n\024InputEvent" +
+      "MsgInProto\022Q\n\thandshake\030\001 \001(\0132>.org.webs" +
+      "wing.server.model.proto.ConnectionHandsh" +
+      "akeMsgInProto\022E\n\003key\030\002 \001(\01328.org.webswin" +
+      "g.server.model.proto.KeyboardEventMsgInP" +
+      "roto\022D\n\005mouse\030\003 \001(\01325.org.webswing.serve" +
+      "r.model.proto.MouseEventMsgInProto\022E\n\005ev" +
+      "ent\030\004 \001(\01326.org.webswing.server.model.pr" +
+      "oto.SimpleEventMsgInProto\022I\n\ntimestamps\030" +
+      "\005 \001(\01325.org.webswing.server.model.proto." +
+      "TimestampsMsgInProto\022E\n\005focus\030\006 \001(\01326.or" +
+      "g.webswing.server.model.proto.WindowFocu" +
+      "sMsgInProto\">\n\025WindowFocusMsgInProto\022\020\n\010" +
+      "windowId\030\001 \001(\t\022\023\n\013htmlPanelId\030\002 \001(\t\"j\n\024T" +
+      "imestampsMsgInProto\022\026\n\016startTimestamp\030\001 " +
+      "\001(\t\022\025\n\rsendTimestamp\030\002 \001(\t\022\025\n\rrenderingT" +
+      "ime\030\003 \001(\t\022\014\n\004ping\030\004 \001(\r\"\275\003\n\035ConnectionHa" +
+      "ndshakeMsgInProto\022\020\n\010clientId\030\001 \001(\t\022\024\n\014c" +
+      "onnectionId\030\002 \001(\t\022\016\n\006viewId\030\003 \001(\t\022\021\n\tbro" +
+      "wserId\030\r \001(\t\022\024\n\014desktopWidth\030\004 \001(\r\022\025\n\rde" +
+      "sktopHeight\030\005 \001(\r\022\027\n\017applicationName\030\006 \001" +
+      "(\t\022\020\n\010mirrored\030\007 \001(\010\022\033\n\023directDrawSuppor" +
+      "ted\030\010 \001(\010\022\024\n\014documentBase\030\t \001(\t\022>\n\006param" +
+      "s\030\n \003(\0132..org.webswing.server.model.prot" +
+      "o.ParamMsgProto\022\016\n\006locale\030\013 \001(\t\022\013\n\003url\030\014" +
+      " \001(\t\022\020\n\010timeZone\030\016 \001(\t\022\030\n\020dockingSupport" +
+      "ed\030\017 \001(\010\022\021\n\ttouchMode\030\020 \001(\010\022\033\n\023accessibl" +
+      "ityEnabled\030\021 \001(\010\022\r\n\005tabId\030\022 \001(\t\",\n\rParam" +
+      "MsgProto\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"\212\002" +
+      "\n\027KeyboardEventMsgInProto\022X\n\004type\030\001 \001(\0162" +
+      "J.org.webswing.server.model.proto.Keyboa" +
+      "rdEventMsgInProto.KeyEventTypeProto\022\021\n\tc" +
+      "haracter\030\002 \001(\021\022\017\n\007keycode\030\003 \001(\021\022\013\n\003alt\030\004" +
+      " \001(\010\022\014\n\004ctrl\030\005 \001(\010\022\r\n\005shift\030\006 \001(\010\022\014\n\004met" +
+      "a\030\007 \001(\010\"9\n\021KeyEventTypeProto\022\014\n\010keypress" +
+      "\020\000\022\013\n\007keydown\020\001\022\t\n\005keyup\020\002\"\364\002\n\024MouseEven" +
+      "tMsgInProto\022W\n\004type\030\001 \001(\0162I.org.webswing" +
+      ".server.model.proto.MouseEventMsgInProto" +
+      ".MouseEventTypeProto\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001" +
+      "(\021\022\022\n\nwheelDelta\030\004 \001(\021\022\016\n\006button\030\005 \001(\021\022\014" +
+      "\n\004ctrl\030\006 \001(\010\022\013\n\003alt\030\007 \001(\010\022\r\n\005shift\030\010 \001(\010" +
+      "\022\014\n\004meta\030\t \001(\010\022\017\n\007buttons\030\n \001(\021\022\021\n\ttimeM" +
+      "ilis\030\013 \001(\021\022\r\n\005winId\030\014 \001(\t\"^\n\023MouseEventT" +
+      "ypeProto\022\r\n\tmousemove\020\000\022\r\n\tmousedown\020\001\022\013" +
+      "\n\007mouseup\020\002\022\016\n\nmousewheel\020\003\022\014\n\010dblclick\020" +
+      "\004\"\303\001\n\023CopyEventMsgInProto\022X\n\004type\030\001 \001(\0162" +
+      "J.org.webswing.server.model.proto.CopyEv" +
+      "entMsgInProto.CopyEventMsgTypeProto\022\014\n\004f" +
+      "ile\030\002 \001(\t\"D\n\025CopyEventMsgTypeProto\022\010\n\004co" +
+      "py\020\000\022\007\n\003cut\020\001\022\030\n\024getFileFromClipboard\020\002\"" +
+      "P\n\024PasteEventMsgInProto\022\014\n\004text\030\001 \001(\t\022\014\n" +
+      "\004html\030\002 \001(\t\022\013\n\003img\030\003 \001(\t\022\017\n\007special\030\004 \001(" +
+      "\010\"\366\002\n\025SimpleEventMsgInProto\022Y\n\004type\030\001 \001(" +
+      "\0162K.org.webswing.server.model.proto.Simp" +
+      "leEventMsgInProto.SimpleEventTypeProto\"\201" +
+      "\002\n\024SimpleEventTypeProto\022\n\n\006unload\020\000\022\r\n\tk" +
+      "illSwing\020\001\022\014\n\010paintAck\020\002\022\013\n\007repaint\020\003\022\020\n" +
+      "\014downloadFile\020\004\022\016\n\ndeleteFile\020\005\022\006\n\002hb\020\006\022" +
+      "\027\n\023cancelFileSelection\020\007\022\030\n\024requestCompo" +
+      "nentTree\020\010\022\033\n\027requestWindowSwitchList\020\t\022" +
+      "\033\n\027enableStatisticsLogging\020\n\022\034\n\030disableS" +
+      "tatisticsLogging\020\013\"-\n\034FilesSelectedEvent" +
+      "MsgInProto\022\r\n\005files\030\001 \003(\t\"C\n\025UploadEvent" +
+      "MsgInProto\022\020\n\010fileName\030\002 \001(\t\022\030\n\020tempFile" +
+      "Location\030\003 \001(\t\"\226\001\n\031JavaEvalRequestMsgInP" +
+      "roto\022\025\n\rcorrelationId\030\001 \001(\t\022\020\n\010objectId\030" +
+      "\002 \001(\t\022\016\n\006method\030\003 \001(\t\022@\n\006params\030\004 \003(\01320." +
       "org.webswing.server.model.proto.JsParamM" +
-      "sgProto\"6\n\024PlaybackInfoMsgProto\022\017\n\007curre" +
-      "nt\030\001 \001(\r\022\r\n\005total\030\002 \001(\r\"a\n\034PixelsAreaReq" +
-      "uestMsgOutProto\022\025\n\rcorrelationId\030\001 \001(\t\022\t" +
-      "\n\001x\030\002 \001(\r\022\t\n\001y\030\003 \001(\r\022\t\n\001w\030\004 \001(\r\022\t\n\001h\030\005 \001" +
-      "(\r\"\323\006\n\032InputEventsFrameMsgInProto\022E\n\006eve" +
-      "nts\030\001 \003(\01325.org.webswing.server.model.pr" +
-      "oto.InputEventMsgInProto\022D\n\005paste\030\002 \001(\0132" +
-      "5.org.webswing.server.model.proto.PasteE" +
-      "ventMsgInProto\022B\n\004copy\030\003 \001(\01324.org.websw" +
-      "ing.server.model.proto.CopyEventMsgInPro" +
-      "to\022F\n\006upload\030\004 \001(\01326.org.webswing.server" +
-      ".model.proto.UploadEventMsgInProto\022O\n\010se" +
-      "lected\030\005 \001(\0132=.org.webswing.server.model" +
-      ".proto.FilesSelectedEventMsgInProto\022E\n\nj" +
-      "sResponse\030\006 \001(\01321.org.webswing.server.mo" +
-      "del.proto.JsResultMsgProto\022O\n\013javaReques" +
-      "t\030\007 \001(\0132:.org.webswing.server.model.prot" +
-      "o.JavaEvalRequestMsgInProto\022L\n\010playback\030" +
-      "\010 \001(\0132:.org.webswing.server.model.proto." +
-      "PlaybackCommandMsgInProto\022U\n\016pixelsRespo" +
-      "nse\030\t \001(\0132=.org.webswing.server.model.pr" +
-      "oto.PixelsAreaResponseMsgInProto\022F\n\006wind" +
-      "ow\030\n \001(\01326.org.webswing.server.model.pro" +
-      "to.WindowEventMsgInProto\022F\n\006action\030\013 \001(\013" +
-      "26.org.webswing.server.model.proto.Actio" +
-      "nEventMsgInProto\"\317\003\n\024InputEventMsgInProt" +
-      "o\022Q\n\thandshake\030\001 \001(\0132>.org.webswing.serv" +
-      "er.model.proto.ConnectionHandshakeMsgInP" +
-      "roto\022E\n\003key\030\002 \001(\01328.org.webswing.server." +
-      "model.proto.KeyboardEventMsgInProto\022D\n\005m" +
-      "ouse\030\003 \001(\01325.org.webswing.server.model.p" +
-      "roto.MouseEventMsgInProto\022E\n\005event\030\004 \001(\013" +
-      "26.org.webswing.server.model.proto.Simpl" +
-      "eEventMsgInProto\022I\n\ntimestamps\030\005 \001(\01325.o" +
-      "rg.webswing.server.model.proto.Timestamp" +
-      "sMsgInProto\022E\n\005focus\030\006 \001(\01326.org.webswin" +
-      "g.server.model.proto.WindowFocusMsgInPro" +
-      "to\">\n\025WindowFocusMsgInProto\022\020\n\010windowId\030" +
-      "\001 \001(\t\022\023\n\013htmlPanelId\030\002 \001(\t\"j\n\024Timestamps" +
-      "MsgInProto\022\026\n\016startTimestamp\030\001 \001(\t\022\025\n\rse" +
-      "ndTimestamp\030\002 \001(\t\022\025\n\rrenderingTime\030\003 \001(\t" +
-      "\022\014\n\004ping\030\004 \001(\r\"\256\003\n\035ConnectionHandshakeMs" +
-      "gInProto\022\020\n\010clientId\030\001 \001(\t\022\024\n\014connection" +
-      "Id\030\002 \001(\t\022\016\n\006viewId\030\003 \001(\t\022\021\n\tbrowserId\030\r " +
-      "\001(\t\022\024\n\014desktopWidth\030\004 \001(\r\022\025\n\rdesktopHeig" +
-      "ht\030\005 \001(\r\022\027\n\017applicationName\030\006 \001(\t\022\020\n\010mir" +
-      "rored\030\007 \001(\010\022\033\n\023directDrawSupported\030\010 \001(\010" +
-      "\022\024\n\014documentBase\030\t \001(\t\022>\n\006params\030\n \003(\0132." +
-      ".org.webswing.server.model.proto.ParamMs" +
-      "gProto\022\016\n\006locale\030\013 \001(\t\022\013\n\003url\030\014 \001(\t\022\020\n\010t" +
-      "imeZone\030\016 \001(\t\022\030\n\020dockingSupported\030\017 \001(\010\022" +
-      "\021\n\ttouchMode\030\020 \001(\010\022\033\n\023accessiblityEnable" +
-      "d\030\021 \001(\010\",\n\rParamMsgProto\022\014\n\004name\030\001 \001(\t\022\r" +
-      "\n\005value\030\002 \001(\t\"\212\002\n\027KeyboardEventMsgInProt" +
-      "o\022X\n\004type\030\001 \001(\0162J.org.webswing.server.mo" +
-      "del.proto.KeyboardEventMsgInProto.KeyEve" +
-      "ntTypeProto\022\021\n\tcharacter\030\002 \001(\021\022\017\n\007keycod" +
-      "e\030\003 \001(\021\022\013\n\003alt\030\004 \001(\010\022\014\n\004ctrl\030\005 \001(\010\022\r\n\005sh" +
-      "ift\030\006 \001(\010\022\014\n\004meta\030\007 \001(\010\"9\n\021KeyEventTypeP" +
-      "roto\022\014\n\010keypress\020\000\022\013\n\007keydown\020\001\022\t\n\005keyup" +
-      "\020\002\"\364\002\n\024MouseEventMsgInProto\022W\n\004type\030\001 \001(" +
-      "\0162I.org.webswing.server.model.proto.Mous" +
-      "eEventMsgInProto.MouseEventTypeProto\022\t\n\001" +
-      "x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\022\n\nwheelDelta\030\004 \001(\021\022\016" +
-      "\n\006button\030\005 \001(\021\022\014\n\004ctrl\030\006 \001(\010\022\013\n\003alt\030\007 \001(" +
-      "\010\022\r\n\005shift\030\010 \001(\010\022\014\n\004meta\030\t \001(\010\022\017\n\007button" +
-      "s\030\n \001(\021\022\021\n\ttimeMilis\030\013 \001(\021\022\r\n\005winId\030\014 \001(" +
-      "\t\"^\n\023MouseEventTypeProto\022\r\n\tmousemove\020\000\022" +
-      "\r\n\tmousedown\020\001\022\013\n\007mouseup\020\002\022\016\n\nmousewhee" +
-      "l\020\003\022\014\n\010dblclick\020\004\"\303\001\n\023CopyEventMsgInProt" +
-      "o\022X\n\004type\030\001 \001(\0162J.org.webswing.server.mo" +
-      "del.proto.CopyEventMsgInProto.CopyEventM" +
-      "sgTypeProto\022\014\n\004file\030\002 \001(\t\"D\n\025CopyEventMs" +
-      "gTypeProto\022\010\n\004copy\020\000\022\007\n\003cut\020\001\022\030\n\024getFile" +
-      "FromClipboard\020\002\"P\n\024PasteEventMsgInProto\022" +
-      "\014\n\004text\030\001 \001(\t\022\014\n\004html\030\002 \001(\t\022\013\n\003img\030\003 \001(\t" +
-      "\022\017\n\007special\030\004 \001(\010\"\273\002\n\025SimpleEventMsgInPr" +
-      "oto\022Y\n\004type\030\001 \001(\0162K.org.webswing.server." +
-      "model.proto.SimpleEventMsgInProto.Simple" +
-      "EventTypeProto\"\306\001\n\024SimpleEventTypeProto\022" +
-      "\n\n\006unload\020\000\022\r\n\tkillSwing\020\001\022\014\n\010paintAck\020\002" +
-      "\022\013\n\007repaint\020\003\022\020\n\014downloadFile\020\004\022\016\n\ndelet" +
-      "eFile\020\005\022\006\n\002hb\020\006\022\027\n\023cancelFileSelection\020\007" +
-      "\022\030\n\024requestComponentTree\020\010\022\033\n\027requestWin" +
-      "dowSwitchList\020\t\"-\n\034FilesSelectedEventMsg" +
-      "InProto\022\r\n\005files\030\001 \003(\t\"C\n\025UploadEventMsg" +
-      "InProto\022\020\n\010fileName\030\002 \001(\t\022\030\n\020tempFileLoc" +
-      "ation\030\003 \001(\t\"\226\001\n\031JavaEvalRequestMsgInProt" +
-      "o\022\025\n\rcorrelationId\030\001 \001(\t\022\020\n\010objectId\030\002 \001" +
-      "(\t\022\016\n\006method\030\003 \001(\t\022@\n\006params\030\004 \003(\01320.org" +
-      ".webswing.server.model.proto.JsParamMsgP" +
-      "roto\"\327\001\n\031PlaybackCommandMsgInProto\022`\n\007co" +
-      "mmand\030\001 \001(\0162O.org.webswing.server.model." +
-      "proto.PlaybackCommandMsgInProto.Playback" +
-      "CommandProto\"X\n\024PlaybackCommandProto\022\t\n\005" +
-      "reset\020\000\022\010\n\004play\020\001\022\010\n\004stop\020\002\022\010\n\004step\020\003\022\n\n" +
-      "\006step10\020\004\022\013\n\007step100\020\005\"E\n\034PixelsAreaResp" +
-      "onseMsgInProto\022\025\n\rcorrelationId\030\001 \001(\t\022\016\n" +
-      "\006pixels\030\002 \001(\t\"\234\002\n\025ComponentTreeMsgProto\022" +
-      "\025\n\rcomponentType\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\r\n\005" +
-      "value\030\003 \001(\t\022\017\n\007screenX\030\004 \001(\021\022\017\n\007screenY\030" +
-      "\005 \001(\021\022\r\n\005width\030\006 \001(\021\022\016\n\006height\030\007 \001(\021\022\017\n\007" +
-      "enabled\030\010 \001(\010\022\017\n\007visible\030\t \001(\010\022J\n\ncompon" +
-      "ents\030\n \003(\01326.org.webswing.server.model.p" +
-      "roto.ComponentTreeMsgProto\022\016\n\006hidden\030\013 \001" +
-      "(\010\022\020\n\010selected\030\014 \001(\010\"v\n\025WindowEventMsgIn" +
-      "Proto\022\n\n\002id\030\001 \001(\t\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021\022" +
-      "\r\n\005width\030\004 \001(\021\022\016\n\006height\030\005 \001(\021\022\r\n\005close\030" +
-      "\006 \001(\010\022\r\n\005focus\030\007 \001(\010\"\353\001\n\025ActionEventMsgI" +
-      "nProto\022\022\n\nactionName\030\001 \001(\t\022\014\n\004data\030\002 \001(\t" +
-      "\022\022\n\nbinaryData\030\003 \001(\014\022\020\n\010windowId\030\004 \001(\t\022^" +
-      "\n\teventType\030\005 \001(\0162K.org.webswing.server." +
-      "model.proto.ActionEventMsgInProto.Action" +
-      "EventTypeProto\"*\n\024ActionEventTypeProto\022\010" +
-      "\n\004init\020\000\022\010\n\004user\020\001\"`\n\026ActionEventMsgOutP" +
-      "roto\022\022\n\nactionName\030\001 \001(\t\022\014\n\004data\030\002 \001(\t\022\022" +
-      "\n\nbinaryData\030\003 \001(\014\022\020\n\010windowId\030\004 \001(\t\"\360\001\n" +
-      "\025AudioEventMsgOutProto\022\n\n\002id\030\001 \001(\t\022]\n\tev" +
-      "entType\030\002 \001(\0162J.org.webswing.server.mode" +
-      "l.proto.AudioEventMsgOutProto.AudioEvent" +
-      "TypeProto\022\014\n\004data\030\003 \001(\014\022\014\n\004time\030\004 \001(\002\022\014\n" +
-      "\004loop\030\005 \001(\021\"B\n\023AudioEventTypeProto\022\010\n\004pl" +
-      "ay\020\000\022\010\n\004stop\020\001\022\n\n\006update\020\002\022\013\n\007dispose\020\003\"" +
-      "&\n\022WindowDockMsgProto\022\020\n\010windowId\030\001 \001(\t*" +
-      "\315\002\n\026SimpleEventMsgOutProto\022\035\n\031applicatio" +
-      "nAlreadyRunning\020\000\022\030\n\024shutDownNotificatio" +
-      "n\020\001\022\036\n\032tooManyClientsNotification\020\002\022\026\n\022c" +
-      "ontinueOldSession\020\003\022\026\n\022configurationErro" +
-      "r\020\004\022\035\n\031sessionStolenNotification\020\005\022\026\n\022un" +
-      "authorizedAccess\020\006\022\"\n\036shutDownAutoLogout" +
-      "Notification\020\007\022\031\n\025sessionTimeoutWarning\020" +
-      "\010\022\037\n\033sessionTimedOutNotification\020\t\022\023\n\017ap" +
-      "plicationBusy\020\n"
+      "sgProto\"\327\001\n\031PlaybackCommandMsgInProto\022`\n" +
+      "\007command\030\001 \001(\0162O.org.webswing.server.mod" +
+      "el.proto.PlaybackCommandMsgInProto.Playb" +
+      "ackCommandProto\"X\n\024PlaybackCommandProto\022" +
+      "\t\n\005reset\020\000\022\010\n\004play\020\001\022\010\n\004stop\020\002\022\010\n\004step\020\003" +
+      "\022\n\n\006step10\020\004\022\013\n\007step100\020\005\"E\n\034PixelsAreaR" +
+      "esponseMsgInProto\022\025\n\rcorrelationId\030\001 \001(\t" +
+      "\022\016\n\006pixels\030\002 \001(\t\"\234\002\n\025ComponentTreeMsgPro" +
+      "to\022\025\n\rcomponentType\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022" +
+      "\r\n\005value\030\003 \001(\t\022\017\n\007screenX\030\004 \001(\021\022\017\n\007scree" +
+      "nY\030\005 \001(\021\022\r\n\005width\030\006 \001(\021\022\016\n\006height\030\007 \001(\021\022" +
+      "\017\n\007enabled\030\010 \001(\010\022\017\n\007visible\030\t \001(\010\022J\n\ncom" +
+      "ponents\030\n \003(\01326.org.webswing.server.mode" +
+      "l.proto.ComponentTreeMsgProto\022\016\n\006hidden\030" +
+      "\013 \001(\010\022\020\n\010selected\030\014 \001(\010\"\243\001\n\025WindowEventM" +
+      "sgInProto\022\n\n\002id\030\001 \001(\t\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 " +
+      "\001(\021\022\r\n\005width\030\004 \001(\021\022\016\n\006height\030\005 \001(\021\022\r\n\005cl" +
+      "ose\030\006 \001(\010\022\r\n\005focus\030\007 \001(\010\022\020\n\010maximize\030\010 \001" +
+      "(\010\022\031\n\021toggleUndecorated\030\t \001(\010\"0\n\024AudioEv" +
+      "entMsgInProto\022\n\n\002id\030\001 \001(\t\022\014\n\004stop\030\002 \001(\010\"" +
+      "\353\001\n\025ActionEventMsgInProto\022\022\n\nactionName\030" +
+      "\001 \001(\t\022\014\n\004data\030\002 \001(\t\022\022\n\nbinaryData\030\003 \001(\014\022" +
+      "\020\n\010windowId\030\004 \001(\t\022^\n\teventType\030\005 \001(\0162K.o" +
+      "rg.webswing.server.model.proto.ActionEve" +
+      "ntMsgInProto.ActionEventTypeProto\"*\n\024Act" +
+      "ionEventTypeProto\022\010\n\004init\020\000\022\010\n\004user\020\001\"`\n" +
+      "\026ActionEventMsgOutProto\022\022\n\nactionName\030\001 " +
+      "\001(\t\022\014\n\004data\030\002 \001(\t\022\022\n\nbinaryData\030\003 \001(\014\022\020\n" +
+      "\010windowId\030\004 \001(\t\"\360\001\n\025AudioEventMsgOutProt" +
+      "o\022\n\n\002id\030\001 \001(\t\022]\n\teventType\030\002 \001(\0162J.org.w" +
+      "ebswing.server.model.proto.AudioEventMsg" +
+      "OutProto.AudioEventTypeProto\022\014\n\004data\030\003 \001" +
+      "(\014\022\014\n\004time\030\004 \001(\002\022\014\n\004loop\030\005 \001(\021\"B\n\023AudioE" +
+      "ventTypeProto\022\010\n\004play\020\000\022\010\n\004stop\020\001\022\n\n\006upd" +
+      "ate\020\002\022\013\n\007dispose\020\003\"&\n\022WindowDockMsgProto" +
+      "\022\020\n\010windowId\030\001 \001(\t*\315\002\n\026SimpleEventMsgOut" +
+      "Proto\022\035\n\031applicationAlreadyRunning\020\000\022\030\n\024" +
+      "shutDownNotification\020\001\022\036\n\032tooManyClients" +
+      "Notification\020\002\022\026\n\022continueOldSession\020\003\022\026" +
+      "\n\022configurationError\020\004\022\035\n\031sessionStolenN" +
+      "otification\020\005\022\026\n\022unauthorizedAccess\020\006\022\"\n" +
+      "\036shutDownAutoLogoutNotification\020\007\022\031\n\025ses" +
+      "sionTimeoutWarning\020\010\022\037\n\033sessionTimedOutN" +
+      "otification\020\t\022\023\n\017applicationBusy\020\n"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -58208,7 +59776,7 @@ public final class Webswing {
     internal_static_org_webswing_server_model_proto_FileDialogEventMsgProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_webswing_server_model_proto_FileDialogEventMsgProto_descriptor,
-        new java.lang.String[] { "EventType", "AllowDownload", "AllowUpload", "AllowDelete", "Filter", "IsMultiSelection", "Selection", });
+        new java.lang.String[] { "EventType", "AllowDownload", "AllowUpload", "AllowDelete", "Filter", "IsMultiSelection", "Selection", "CustomDialog", });
     internal_static_org_webswing_server_model_proto_WindowSwitchMsg_descriptor =
       getDescriptor().getMessageTypes().get(11);
     internal_static_org_webswing_server_model_proto_WindowSwitchMsg_fieldAccessorTable = new
@@ -58220,7 +59788,7 @@ public final class Webswing {
     internal_static_org_webswing_server_model_proto_WindowMsgProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_webswing_server_model_proto_WindowMsgProto_descriptor,
-        new java.lang.String[] { "Id", "Content", "DirectDraw", "Title", "PosX", "PosY", "Width", "Height", "Name", "Type", "ModalBlocked", "OwnerId", "State", "InternalWindows", "DockMode", });
+        new java.lang.String[] { "Id", "Content", "DirectDraw", "Title", "PosX", "PosY", "Width", "Height", "Name", "Type", "ModalBlocked", "OwnerId", "State", "InternalWindows", "DockMode", "ClassType", });
     internal_static_org_webswing_server_model_proto_WindowSwitchMsgProto_descriptor =
       getDescriptor().getMessageTypes().get(13);
     internal_static_org_webswing_server_model_proto_WindowSwitchMsgProto_fieldAccessorTable = new
@@ -58280,7 +59848,7 @@ public final class Webswing {
     internal_static_org_webswing_server_model_proto_InputEventsFrameMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_webswing_server_model_proto_InputEventsFrameMsgInProto_descriptor,
-        new java.lang.String[] { "Events", "Paste", "Copy", "Upload", "Selected", "JsResponse", "JavaRequest", "Playback", "PixelsResponse", "Window", "Action", });
+        new java.lang.String[] { "Events", "Paste", "Copy", "Upload", "Selected", "JsResponse", "JavaRequest", "Playback", "PixelsResponse", "Window", "Action", "Audio", });
     internal_static_org_webswing_server_model_proto_InputEventMsgInProto_descriptor =
       getDescriptor().getMessageTypes().get(23);
     internal_static_org_webswing_server_model_proto_InputEventMsgInProto_fieldAccessorTable = new
@@ -58304,7 +59872,7 @@ public final class Webswing {
     internal_static_org_webswing_server_model_proto_ConnectionHandshakeMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_webswing_server_model_proto_ConnectionHandshakeMsgInProto_descriptor,
-        new java.lang.String[] { "ClientId", "ConnectionId", "ViewId", "BrowserId", "DesktopWidth", "DesktopHeight", "ApplicationName", "Mirrored", "DirectDrawSupported", "DocumentBase", "Params", "Locale", "Url", "TimeZone", "DockingSupported", "TouchMode", "AccessiblityEnabled", });
+        new java.lang.String[] { "ClientId", "ConnectionId", "ViewId", "BrowserId", "DesktopWidth", "DesktopHeight", "ApplicationName", "Mirrored", "DirectDrawSupported", "DocumentBase", "Params", "Locale", "Url", "TimeZone", "DockingSupported", "TouchMode", "AccessiblityEnabled", "TabId", });
     internal_static_org_webswing_server_model_proto_ParamMsgProto_descriptor =
       getDescriptor().getMessageTypes().get(27);
     internal_static_org_webswing_server_model_proto_ParamMsgProto_fieldAccessorTable = new
@@ -58382,27 +59950,33 @@ public final class Webswing {
     internal_static_org_webswing_server_model_proto_WindowEventMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_webswing_server_model_proto_WindowEventMsgInProto_descriptor,
-        new java.lang.String[] { "Id", "X", "Y", "Width", "Height", "Close", "Focus", });
-    internal_static_org_webswing_server_model_proto_ActionEventMsgInProto_descriptor =
+        new java.lang.String[] { "Id", "X", "Y", "Width", "Height", "Close", "Focus", "Maximize", "ToggleUndecorated", });
+    internal_static_org_webswing_server_model_proto_AudioEventMsgInProto_descriptor =
       getDescriptor().getMessageTypes().get(40);
+    internal_static_org_webswing_server_model_proto_AudioEventMsgInProto_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_org_webswing_server_model_proto_AudioEventMsgInProto_descriptor,
+        new java.lang.String[] { "Id", "Stop", });
+    internal_static_org_webswing_server_model_proto_ActionEventMsgInProto_descriptor =
+      getDescriptor().getMessageTypes().get(41);
     internal_static_org_webswing_server_model_proto_ActionEventMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_webswing_server_model_proto_ActionEventMsgInProto_descriptor,
         new java.lang.String[] { "ActionName", "Data", "BinaryData", "WindowId", "EventType", });
     internal_static_org_webswing_server_model_proto_ActionEventMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(41);
+      getDescriptor().getMessageTypes().get(42);
     internal_static_org_webswing_server_model_proto_ActionEventMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_webswing_server_model_proto_ActionEventMsgOutProto_descriptor,
         new java.lang.String[] { "ActionName", "Data", "BinaryData", "WindowId", });
     internal_static_org_webswing_server_model_proto_AudioEventMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(42);
+      getDescriptor().getMessageTypes().get(43);
     internal_static_org_webswing_server_model_proto_AudioEventMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_webswing_server_model_proto_AudioEventMsgOutProto_descriptor,
         new java.lang.String[] { "Id", "EventType", "Data", "Time", "Loop", });
     internal_static_org_webswing_server_model_proto_WindowDockMsgProto_descriptor =
-      getDescriptor().getMessageTypes().get(43);
+      getDescriptor().getMessageTypes().get(44);
     internal_static_org_webswing_server_model_proto_WindowDockMsgProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_webswing_server_model_proto_WindowDockMsgProto_descriptor,

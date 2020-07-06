@@ -37,6 +37,7 @@ public class InteractiveServerLauncher {
 				System.clearProperty(Constants.CONFIG_PATH);
 				System.clearProperty(Constants.CONFIG_FILE_PATH);
 				System.clearProperty(Constants.TEMP_DIR_PATH);
+				System.clearProperty(Constants.HTTPS_ONLY);
 
 				String root = System.getProperty(Constants.ROOT_DIR_PATH);
 				if (root == null) {

@@ -46,6 +46,7 @@ public interface Constants {
 	public static final String SWING_START_SYS_PROP_TOUCH_MODE = "webswing.touchMode";
 	public static final String SWING_START_SYS_PROP_ACCESSIBILITY_ENABLED = "webswing.accessibilityEnabled";
 	public static final String SWING_START_SYS_PROP_FONT_CONFIG = "webswing.fontConfig";
+	public static final String SWING_START_SYS_PROP_STATISTICS_LOGGING_ENABLED = "webswing.statisticsLoggingEnabled";
 
 
 	public static final	String PRINTER_JOB_CLASS = "webswing.printerJobDelegate";

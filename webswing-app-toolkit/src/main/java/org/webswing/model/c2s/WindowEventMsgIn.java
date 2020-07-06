@@ -13,6 +13,8 @@ public class WindowEventMsgIn implements MsgIn {
 	private int height;
 	private boolean close;
 	private boolean focus;
+	private boolean maximize;
+	private Boolean toggleUndecorated;
 	
 	public String getId() {
 		return id;
@@ -68,6 +70,22 @@ public class WindowEventMsgIn implements MsgIn {
 
 	public void setFocus(boolean focus) {
 		this.focus = focus;
+	}
+
+	public boolean isMaximize() {
+		return maximize;
+	}
+
+	public void setMaximize(boolean maximize) {
+		this.maximize = maximize;
+	}
+
+	public Boolean getToggleUndecorated() {
+		return toggleUndecorated;
+	}
+
+	public void setToggleUndecorated(Boolean toggleUndecorated) {
+		this.toggleUndecorated = toggleUndecorated;
 	}
 
 }

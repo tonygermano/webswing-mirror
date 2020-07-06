@@ -1217,6 +1217,9 @@ export namespace org {
 
                         /** FileDialogEventMsgProto selection */
                         selection?: (string|null);
+
+                        /** FileDialogEventMsgProto customDialog */
+                        customDialog?: (boolean|null);
                     }
 
                     /** Represents a FileDialogEventMsgProto. */
@@ -1248,6 +1251,9 @@ export namespace org {
 
                         /** FileDialogEventMsgProto selection. */
                         public selection: string;
+
+                        /** FileDialogEventMsgProto customDialog. */
+                        public customDialog: boolean;
 
                         /**
                          * Creates a new FileDialogEventMsgProto instance using the specified properties.
@@ -1432,6 +1438,9 @@ export namespace org {
 
                         /** WindowMsgProto dockMode */
                         dockMode?: (org.webswing.server.model.proto.WindowMsgProto.DockModeProto|null);
+
+                        /** WindowMsgProto classType */
+                        classType?: (org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto|null);
                     }
 
                     /** Represents a WindowMsgProto. */
@@ -1487,6 +1496,9 @@ export namespace org {
 
                         /** WindowMsgProto dockMode. */
                         public dockMode: org.webswing.server.model.proto.WindowMsgProto.DockModeProto;
+
+                        /** WindowMsgProto classType. */
+                        public classType: org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto;
 
                         /**
                          * Creates a new WindowMsgProto instance using the specified properties.
@@ -1544,6 +1556,17 @@ export namespace org {
                             internal = 3,
                             internalHtml = 4,
                             internalWrapper = 5
+                        }
+
+                        /** WindowClassTypeProto enum. */
+                        enum WindowClassTypeProto {
+                            other = 1,
+                            Window = 2,
+                            JWindow = 3,
+                            Dialog = 4,
+                            JDialog = 5,
+                            Frame = 6,
+                            JFrame = 7
                         }
 
                         /** DockModeProto enum. */
@@ -2344,6 +2367,9 @@ export namespace org {
 
                         /** InputEventsFrameMsgInProto action */
                         action?: (org.webswing.server.model.proto.IActionEventMsgInProto|null);
+
+                        /** InputEventsFrameMsgInProto audio */
+                        audio?: (org.webswing.server.model.proto.IAudioEventMsgInProto|null);
                     }
 
                     /** Represents an InputEventsFrameMsgInProto. */
@@ -2387,6 +2413,9 @@ export namespace org {
 
                         /** InputEventsFrameMsgInProto action. */
                         public action?: (org.webswing.server.model.proto.IActionEventMsgInProto|null);
+
+                        /** InputEventsFrameMsgInProto audio. */
+                        public audio?: (org.webswing.server.model.proto.IAudioEventMsgInProto|null);
 
                         /**
                          * Creates a new InputEventsFrameMsgInProto instance using the specified properties.
@@ -2740,6 +2769,9 @@ export namespace org {
 
                         /** ConnectionHandshakeMsgInProto accessiblityEnabled */
                         accessiblityEnabled?: (boolean|null);
+
+                        /** ConnectionHandshakeMsgInProto tabId */
+                        tabId?: (string|null);
                     }
 
                     /** Represents a ConnectionHandshakeMsgInProto. */
@@ -2801,6 +2833,9 @@ export namespace org {
 
                         /** ConnectionHandshakeMsgInProto accessiblityEnabled. */
                         public accessiblityEnabled: boolean;
+
+                        /** ConnectionHandshakeMsgInProto tabId. */
+                        public tabId: string;
 
                         /**
                          * Creates a new ConnectionHandshakeMsgInProto instance using the specified properties.
@@ -3422,7 +3457,9 @@ export namespace org {
                             hb = 6,
                             cancelFileSelection = 7,
                             requestComponentTree = 8,
-                            requestWindowSwitchList = 9
+                            requestWindowSwitchList = 9,
+                            enableStatisticsLogging = 10,
+                            disableStatisticsLogging = 11
                         }
                     }
 
@@ -3954,6 +3991,12 @@ export namespace org {
 
                         /** WindowEventMsgInProto focus */
                         focus?: (boolean|null);
+
+                        /** WindowEventMsgInProto maximize */
+                        maximize?: (boolean|null);
+
+                        /** WindowEventMsgInProto toggleUndecorated */
+                        toggleUndecorated?: (boolean|null);
                     }
 
                     /** Represents a WindowEventMsgInProto. */
@@ -3985,6 +4028,12 @@ export namespace org {
 
                         /** WindowEventMsgInProto focus. */
                         public focus: boolean;
+
+                        /** WindowEventMsgInProto maximize. */
+                        public maximize: boolean;
+
+                        /** WindowEventMsgInProto toggleUndecorated. */
+                        public toggleUndecorated: boolean;
 
                         /**
                          * Creates a new WindowEventMsgInProto instance using the specified properties.
@@ -4028,6 +4077,78 @@ export namespace org {
 
                         /**
                          * Converts this WindowEventMsgInProto to JSON.
+                         * @returns JSON object
+                         */
+                        public toJSON(): { [k: string]: any };
+                    }
+
+                    /** Properties of an AudioEventMsgInProto. */
+                    interface IAudioEventMsgInProto {
+
+                        /** AudioEventMsgInProto id */
+                        id?: (string|null);
+
+                        /** AudioEventMsgInProto stop */
+                        stop?: (boolean|null);
+                    }
+
+                    /** Represents an AudioEventMsgInProto. */
+                    class AudioEventMsgInProto implements IAudioEventMsgInProto {
+
+                        /**
+                         * Constructs a new AudioEventMsgInProto.
+                         * @param [properties] Properties to set
+                         */
+                        constructor(properties?: org.webswing.server.model.proto.IAudioEventMsgInProto);
+
+                        /** AudioEventMsgInProto id. */
+                        public id: string;
+
+                        /** AudioEventMsgInProto stop. */
+                        public stop: boolean;
+
+                        /**
+                         * Creates a new AudioEventMsgInProto instance using the specified properties.
+                         * @param [properties] Properties to set
+                         * @returns AudioEventMsgInProto instance
+                         */
+                        public static create(properties?: org.webswing.server.model.proto.IAudioEventMsgInProto): org.webswing.server.model.proto.AudioEventMsgInProto;
+
+                        /**
+                         * Encodes the specified AudioEventMsgInProto message. Does not implicitly {@link org.webswing.server.model.proto.AudioEventMsgInProto.verify|verify} messages.
+                         * @param message AudioEventMsgInProto message or plain object to encode
+                         * @param [writer] Writer to encode to
+                         * @returns Writer
+                         */
+                        public static encode(message: org.webswing.server.model.proto.IAudioEventMsgInProto, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                        /**
+                         * Decodes an AudioEventMsgInProto message from the specified reader or buffer.
+                         * @param reader Reader or buffer to decode from
+                         * @param [length] Message length if known beforehand
+                         * @returns AudioEventMsgInProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): org.webswing.server.model.proto.AudioEventMsgInProto;
+
+                        /**
+                         * Creates an AudioEventMsgInProto message from a plain object. Also converts values to their respective internal types.
+                         * @param object Plain object
+                         * @returns AudioEventMsgInProto
+                         */
+                        public static fromObject(object: { [k: string]: any }): org.webswing.server.model.proto.AudioEventMsgInProto;
+
+                        /**
+                         * Creates a plain object from an AudioEventMsgInProto message. Also converts values to other types if specified.
+                         * @param message AudioEventMsgInProto
+                         * @param [options] Conversion options
+                         * @returns Plain object
+                         */
+                        public static toObject(message: org.webswing.server.model.proto.AudioEventMsgInProto, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                        /**
+                         * Converts this AudioEventMsgInProto to JSON.
                          * @returns JSON object
                          */
                         public toJSON(): { [k: string]: any };

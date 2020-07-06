@@ -309,6 +309,20 @@ public class SwingAppRestService implements BasicApi, ManageConfigurationApi, Ma
 			throw new RestException(e);
 		}
 	}
+	
+	@Override
+	public void toggleStatisticsLogging(String instanceId, Boolean enabled) throws RestException {
+		try {
+			getHandler().checkPermissionLocalOrMaster(WebswingAction.rest_toggleStatisticsLogging);
+			SwingInstance instance = manager.getSwingInstanceHolder().findInstanceByInstanceId(instanceId);
+			if (instance != null) {
+				instance.toggleStatisticsLogging(enabled);
+			}
+			
+		} catch (WsException e) {
+			throw new RestException(e);
+		}
+	}
 
 	@Override
 	public void shutdown(String id, String forceKill) throws RestException {

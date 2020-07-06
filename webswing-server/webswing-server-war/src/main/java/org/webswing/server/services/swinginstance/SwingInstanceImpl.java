@@ -132,6 +132,8 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	private Date endedAt = null;
 	private List<String> warningHistoryLog;
 	private Map<Long, ThreadDumpMsgInternal> threadDumps = new ConcurrentHashMap<>();
+	
+	private Boolean statisticsLoggingEnabled; // unset if null -> take default value from config
 
 	public SwingInstanceImpl(SwingInstanceManager manager, FileTransferHandler fileHandler, SwingProcessService processService, JvmConnectionService connectionService, SessionRecorderService recorderService, ConnectionHandshakeMsgIn h, SwingConfig config, WebSocketConnection websocket) throws WsException {
 		this.manager = manager;
@@ -196,7 +198,6 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			}
 		}
 		return false;
-
 	}
 
 	private void disconnectPrimaryWebSession() {
@@ -250,8 +251,10 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		if (webConnection != null) {
 			synchronized (webConnection) {
 				webConnection.broadcastMessage(serialized);
-				int length = serialized.getLength(webConnection.isBinary());
-				logStatValue(StatisticsLogger.OUTBOUND_SIZE_METRIC, length);
+				if (isStatisticsLoggingEnabled()) {
+					int length = serialized.getLength(webConnection.isBinary());
+					logStatValue(StatisticsLogger.OUTBOUND_SIZE_METRIC, length);
+				}
 			}
 		}
 		if (mirroredWebConnection != null) {
@@ -291,12 +294,17 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	}
 
 	private void processTimestampMessage(TimestampsMsgIn h) {
+		if (!isStatisticsLoggingEnabled()) {
+			return;
+		}
+		
 		if (StringUtils.isNotEmpty(h.getSendTimestamp())) {
 			long currentTime = System.currentTimeMillis();
 			long sendTime = Long.parseLong(h.getSendTimestamp());
 			if (StringUtils.isNotEmpty(h.getRenderingTime()) && StringUtils.isNotEmpty(h.getStartTimestamp())) {
 				long renderingTime = Long.parseLong(h.getRenderingTime());
 				long startTime = Long.parseLong(h.getStartTimestamp());
+				
 				logStatValue(StatisticsLogger.LATENCY_SERVER_RENDERING, sendTime - startTime);
 				logStatValue(StatisticsLogger.LATENCY_CLIENT_RENDERING, renderingTime);
 				logStatValue(StatisticsLogger.LATENCY, currentTime - startTime);
@@ -361,13 +369,15 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			} else if (o instanceof JvmStatsMsgInternal) {
 				JvmStatsMsgInternal s = (JvmStatsMsgInternal) o;
 
-				double cpuUsage = s.getCpuUsage();
-
-				logStatValue(StatisticsLogger.MEMORY_ALLOCATED_METRIC, s.getHeapSize());
-				logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
-				logStatValue(StatisticsLogger.CPU_UTIL_METRIC, cpuUsage);
-				logStatValue(StatisticsLogger.CPU_UTIL_SESSION_METRIC, cpuUsage);
-				logStatValue(StatisticsLogger.EDT_BLOCKED_SEC_METRIC, s.getEdtPingSeconds());
+				if (isStatisticsLoggingEnabled()) {
+					double cpuUsage = s.getCpuUsage();
+					
+					logStatValue(StatisticsLogger.MEMORY_ALLOCATED_METRIC, s.getHeapSize());
+					logStatValue(StatisticsLogger.MEMORY_USED_METRIC, s.getHeapSizeUsed());
+					logStatValue(StatisticsLogger.CPU_UTIL_METRIC, cpuUsage);
+					logStatValue(StatisticsLogger.CPU_UTIL_SESSION_METRIC, cpuUsage);
+					logStatValue(StatisticsLogger.EDT_BLOCKED_SEC_METRIC, s.getEdtPingSeconds());
+				}
 				if (getAppConfig().isMonitorEdtEnabled()) {
 					if (s.getEdtPingSeconds() > Math.max(2, getAppConfig().getLoadingAnimationDelay())) {
 						sendToWeb(SimpleEventMsgOut.applicationBusy.buildMsgOut());
@@ -504,6 +514,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		session.setRecordingFile(getRecordingFile());
 		session.setThreadDumps(toMap(threadDumps));
 		session.setLoggingEnabled(getAppConfig().isSessionLogging());
+		session.setStatisticsLoggingEnabled(isStatisticsLoggingEnabled());
 
 		return session;
 	}
@@ -633,6 +644,7 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DOCK_MODE, handshake.isDockingSupported() ? appConfig.getDockMode().name() : DockMode.NONE.name());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_TOUCH_MODE, handshake.isTouchMode());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_ACCESSIBILITY_ENABLED, handshake.isAccessiblityEnabled());
+			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_STATISTICS_LOGGING_ENABLED, isStatisticsLoggingEnabled());
 
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW, appConfig.isDirectdraw());
 			swingConfig.addProperty(Constants.SWING_START_SYS_PROP_DIRECTDRAW_SUPPORTED, handshake.isDirectDrawSupported());
@@ -844,6 +856,9 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 	}
 
 	public void logStatValue(String name, Number value) {
+		if (!isStatisticsLoggingEnabled()) {
+			return;
+		}
 		if (StringUtils.isNotEmpty(name)) {
 			manager.logStatValue(this.getInstanceId(), name, value);
 		}
@@ -928,4 +943,26 @@ public class SwingInstanceImpl implements Serializable, SwingInstance, JvmListen
 		return name.substring(lastIndexOf);
 	}
 
+	@Override
+	public boolean isStatisticsLoggingEnabled() {
+		if (statisticsLoggingEnabled != null) {
+			return statisticsLoggingEnabled;
+		}
+		return config.isAllowStatisticsLogging();
+	}
+	
+	@Override
+	public void toggleStatisticsLogging(boolean enabled) {
+		if (statisticsLoggingEnabled == null && enabled == isStatisticsLoggingEnabled()) {
+			// ignore when toggle to same as current value
+			return;
+		}
+		
+		statisticsLoggingEnabled = enabled;
+		
+		SimpleEventMsgIn simpleEventMsgIn = new SimpleEventMsgIn();
+		simpleEventMsgIn.setType(enabled ? SimpleEventType.enableStatisticsLogging : SimpleEventType.disableStatisticsLogging);
+		sendToSwing(null, simpleEventMsgIn);
+	}
+	
 }

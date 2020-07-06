@@ -666,6 +666,11 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	}
 
 	@Override
+	public int getMaximumCursorColors() throws HeadlessException {
+		return Integer.MAX_VALUE;
+	}
+
+	@Override
 	public boolean getLockingKeyState(int keyCode) throws UnsupportedOperationException {
 		return false;
 	}

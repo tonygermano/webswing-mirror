@@ -697,6 +697,38 @@ paths:
           description: Not found.
       operationId: requestThreadDump
 
+    #===========STATISTICS LOGGING============
+  '/rest/toggleStatisticsLogging/{instanceId}/{enabled}':
+    parameters:
+      - in: path
+        name: instanceId
+        description:  instance id
+        required: true
+        allowEmptyValue: false
+        schema:
+          type: string
+          nullable: false
+      - in: path
+        name: enabled
+        description:  enabled flag
+        required: true
+        allowEmptyValue: false
+        schema:
+          type: boolean
+          nullable: false
+    post:
+      summary:  Set statistics logging value
+      description:  Sets current value of statistics logging for this session
+      tags:
+        - 'Manage Sessions'
+      responses:
+        '204':
+          description: OK
+        '401':
+          description: User is not allowed to execute the action in this REST service.
+        '404':
+          description: Not found.
+      operationId: toggleStatisticsLogging
 
   #===========CSRF TOKEN============
   '/rest/CSRFToken':
@@ -1203,6 +1235,8 @@ components:
         applicationUrl:
           type: string
         loggingEnabled:
+          type: boolean
+        statisticsLoggingEnabled:
           type: boolean
 
 

@@ -4,10 +4,6 @@ import java.awt.Container;
 import java.awt.Insets;
 import java.awt.peer.ContainerPeer;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JWindow;
-
 import org.webswing.toolkit.util.Services;
 
 abstract public class WebContainerPeer extends WebComponentPeer implements ContainerPeer {
@@ -17,15 +13,13 @@ abstract public class WebContainerPeer extends WebComponentPeer implements Conta
 	}
 
 	public Insets getInsets() {
-		if (target != null && target instanceof JWindow) {
-			return new Insets(0, 0, 0, 0);
-		} else if (target != null && ((target instanceof JFrame && ((JFrame) target).isUndecorated()) || (target instanceof JDialog && ((JDialog) target).isUndecorated()))) {
+		if (isUndecorated()) {
 			return new Insets(0, 0, 0, 0);
 		} else {
 			return Services.getImageService().getWindowDecorationTheme().getInsets();
 		}
 	}
-
+	
 	public void beginValidate() {
 	}
 

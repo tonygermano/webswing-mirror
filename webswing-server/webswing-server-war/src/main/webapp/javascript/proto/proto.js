@@ -3360,6 +3360,7 @@ $root.org = (function() {
                          * @property {string|null} [filter] FileDialogEventMsgProto filter
                          * @property {boolean|null} [isMultiSelection] FileDialogEventMsgProto isMultiSelection
                          * @property {string|null} [selection] FileDialogEventMsgProto selection
+                         * @property {boolean|null} [customDialog] FileDialogEventMsgProto customDialog
                          */
 
                         /**
@@ -3434,6 +3435,14 @@ $root.org = (function() {
                         FileDialogEventMsgProto.prototype.selection = "";
 
                         /**
+                         * FileDialogEventMsgProto customDialog.
+                         * @member {boolean} customDialog
+                         * @memberof org.webswing.server.model.proto.FileDialogEventMsgProto
+                         * @instance
+                         */
+                        FileDialogEventMsgProto.prototype.customDialog = false;
+
+                        /**
                          * Creates a new FileDialogEventMsgProto instance using the specified properties.
                          * @function create
                          * @memberof org.webswing.server.model.proto.FileDialogEventMsgProto
@@ -3470,6 +3479,8 @@ $root.org = (function() {
                                 writer.uint32(/* id 6, wireType 0 =*/48).bool(message.isMultiSelection);
                             if (message.selection != null && message.hasOwnProperty("selection"))
                                 writer.uint32(/* id 7, wireType 2 =*/58).string(message.selection);
+                            if (message.customDialog != null && message.hasOwnProperty("customDialog"))
+                                writer.uint32(/* id 8, wireType 0 =*/64).bool(message.customDialog);
                             return writer;
                         };
 
@@ -3511,6 +3522,9 @@ $root.org = (function() {
                                     break;
                                 case 7:
                                     message.selection = reader.string();
+                                    break;
+                                case 8:
+                                    message.customDialog = reader.bool();
                                     break;
                                 default:
                                     reader.skipType(tag & 7);
@@ -3564,6 +3578,8 @@ $root.org = (function() {
                                 message.isMultiSelection = Boolean(object.isMultiSelection);
                             if (object.selection != null)
                                 message.selection = String(object.selection);
+                            if (object.customDialog != null)
+                                message.customDialog = Boolean(object.customDialog);
                             return message;
                         };
 
@@ -3588,6 +3604,7 @@ $root.org = (function() {
                                 object.filter = "";
                                 object.isMultiSelection = false;
                                 object.selection = "";
+                                object.customDialog = false;
                             }
                             if (message.eventType != null && message.hasOwnProperty("eventType"))
                                 object.eventType = options.enums === String ? $root.org.webswing.server.model.proto.FileDialogEventMsgProto.FileDialogEventTypeProto[message.eventType] : message.eventType;
@@ -3603,6 +3620,8 @@ $root.org = (function() {
                                 object.isMultiSelection = message.isMultiSelection;
                             if (message.selection != null && message.hasOwnProperty("selection"))
                                 object.selection = message.selection;
+                            if (message.customDialog != null && message.hasOwnProperty("customDialog"))
+                                object.customDialog = message.customDialog;
                             return object;
                         };
 
@@ -3840,6 +3859,7 @@ $root.org = (function() {
                          * @property {number|null} [state] WindowMsgProto state
                          * @property {Array.<org.webswing.server.model.proto.IWindowMsgProto>|null} [internalWindows] WindowMsgProto internalWindows
                          * @property {org.webswing.server.model.proto.WindowMsgProto.DockModeProto|null} [dockMode] WindowMsgProto dockMode
+                         * @property {org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto|null} [classType] WindowMsgProto classType
                          */
 
                         /**
@@ -3980,6 +4000,14 @@ $root.org = (function() {
                         WindowMsgProto.prototype.dockMode = 1;
 
                         /**
+                         * WindowMsgProto classType.
+                         * @member {org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto} classType
+                         * @memberof org.webswing.server.model.proto.WindowMsgProto
+                         * @instance
+                         */
+                        WindowMsgProto.prototype.classType = 1;
+
+                        /**
                          * Creates a new WindowMsgProto instance using the specified properties.
                          * @function create
                          * @memberof org.webswing.server.model.proto.WindowMsgProto
@@ -4034,6 +4062,8 @@ $root.org = (function() {
                                     $root.org.webswing.server.model.proto.WindowMsgProto.encode(message.internalWindows[i], writer.uint32(/* id 14, wireType 2 =*/114).fork()).ldelim();
                             if (message.dockMode != null && message.hasOwnProperty("dockMode"))
                                 writer.uint32(/* id 15, wireType 0 =*/120).int32(message.dockMode);
+                            if (message.classType != null && message.hasOwnProperty("classType"))
+                                writer.uint32(/* id 16, wireType 0 =*/128).int32(message.classType);
                             return writer;
                         };
 
@@ -4103,6 +4133,9 @@ $root.org = (function() {
                                     break;
                                 case 15:
                                     message.dockMode = reader.int32();
+                                    break;
+                                case 16:
+                                    message.classType = reader.int32();
                                     break;
                                 default:
                                     reader.skipType(tag & 7);
@@ -4207,6 +4240,36 @@ $root.org = (function() {
                                 message.dockMode = 3;
                                 break;
                             }
+                            switch (object.classType) {
+                            case "other":
+                            case 1:
+                                message.classType = 1;
+                                break;
+                            case "Window":
+                            case 2:
+                                message.classType = 2;
+                                break;
+                            case "JWindow":
+                            case 3:
+                                message.classType = 3;
+                                break;
+                            case "Dialog":
+                            case 4:
+                                message.classType = 4;
+                                break;
+                            case "JDialog":
+                            case 5:
+                                message.classType = 5;
+                                break;
+                            case "Frame":
+                            case 6:
+                                message.classType = 6;
+                                break;
+                            case "JFrame":
+                            case 7:
+                                message.classType = 7;
+                                break;
+                            }
                             return message;
                         };
 
@@ -4247,6 +4310,7 @@ $root.org = (function() {
                                 object.ownerId = "";
                                 object.state = 0;
                                 object.dockMode = options.enums === String ? "none" : 1;
+                                object.classType = options.enums === String ? "other" : 1;
                             }
                             if (message.id != null && message.hasOwnProperty("id"))
                                 object.id = message.id;
@@ -4284,6 +4348,8 @@ $root.org = (function() {
                             }
                             if (message.dockMode != null && message.hasOwnProperty("dockMode"))
                                 object.dockMode = options.enums === String ? $root.org.webswing.server.model.proto.WindowMsgProto.DockModeProto[message.dockMode] : message.dockMode;
+                            if (message.classType != null && message.hasOwnProperty("classType"))
+                                object.classType = options.enums === String ? $root.org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto[message.classType] : message.classType;
                             return object;
                         };
 
@@ -4315,6 +4381,30 @@ $root.org = (function() {
                             values[valuesById[3] = "internal"] = 3;
                             values[valuesById[4] = "internalHtml"] = 4;
                             values[valuesById[5] = "internalWrapper"] = 5;
+                            return values;
+                        })();
+
+                        /**
+                         * WindowClassTypeProto enum.
+                         * @name org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto
+                         * @enum {string}
+                         * @property {number} other=1 other value
+                         * @property {number} Window=2 Window value
+                         * @property {number} JWindow=3 JWindow value
+                         * @property {number} Dialog=4 Dialog value
+                         * @property {number} JDialog=5 JDialog value
+                         * @property {number} Frame=6 Frame value
+                         * @property {number} JFrame=7 JFrame value
+                         */
+                        WindowMsgProto.WindowClassTypeProto = (function() {
+                            var valuesById = {}, values = Object.create(valuesById);
+                            values[valuesById[1] = "other"] = 1;
+                            values[valuesById[2] = "Window"] = 2;
+                            values[valuesById[3] = "JWindow"] = 3;
+                            values[valuesById[4] = "Dialog"] = 4;
+                            values[valuesById[5] = "JDialog"] = 5;
+                            values[valuesById[6] = "Frame"] = 6;
+                            values[valuesById[7] = "JFrame"] = 7;
                             return values;
                         })();
 
@@ -6209,6 +6299,7 @@ $root.org = (function() {
                          * @property {org.webswing.server.model.proto.IPixelsAreaResponseMsgInProto|null} [pixelsResponse] InputEventsFrameMsgInProto pixelsResponse
                          * @property {org.webswing.server.model.proto.IWindowEventMsgInProto|null} [window] InputEventsFrameMsgInProto window
                          * @property {org.webswing.server.model.proto.IActionEventMsgInProto|null} [action] InputEventsFrameMsgInProto action
+                         * @property {org.webswing.server.model.proto.IAudioEventMsgInProto|null} [audio] InputEventsFrameMsgInProto audio
                          */
 
                         /**
@@ -6316,6 +6407,14 @@ $root.org = (function() {
                         InputEventsFrameMsgInProto.prototype.action = null;
 
                         /**
+                         * InputEventsFrameMsgInProto audio.
+                         * @member {org.webswing.server.model.proto.IAudioEventMsgInProto|null|undefined} audio
+                         * @memberof org.webswing.server.model.proto.InputEventsFrameMsgInProto
+                         * @instance
+                         */
+                        InputEventsFrameMsgInProto.prototype.audio = null;
+
+                        /**
                          * Creates a new InputEventsFrameMsgInProto instance using the specified properties.
                          * @function create
                          * @memberof org.webswing.server.model.proto.InputEventsFrameMsgInProto
@@ -6362,6 +6461,8 @@ $root.org = (function() {
                                 $root.org.webswing.server.model.proto.WindowEventMsgInProto.encode(message.window, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                             if (message.action != null && message.hasOwnProperty("action"))
                                 $root.org.webswing.server.model.proto.ActionEventMsgInProto.encode(message.action, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
+                            if (message.audio != null && message.hasOwnProperty("audio"))
+                                $root.org.webswing.server.model.proto.AudioEventMsgInProto.encode(message.audio, writer.uint32(/* id 12, wireType 2 =*/98).fork()).ldelim();
                             return writer;
                         };
 
@@ -6417,6 +6518,9 @@ $root.org = (function() {
                                     break;
                                 case 11:
                                     message.action = $root.org.webswing.server.model.proto.ActionEventMsgInProto.decode(reader, reader.uint32());
+                                    break;
+                                case 12:
+                                    message.audio = $root.org.webswing.server.model.proto.AudioEventMsgInProto.decode(reader, reader.uint32());
                                     break;
                                 default:
                                     reader.skipType(tag & 7);
@@ -6498,6 +6602,11 @@ $root.org = (function() {
                                     throw TypeError(".org.webswing.server.model.proto.InputEventsFrameMsgInProto.action: object expected");
                                 message.action = $root.org.webswing.server.model.proto.ActionEventMsgInProto.fromObject(object.action);
                             }
+                            if (object.audio != null) {
+                                if (typeof object.audio !== "object")
+                                    throw TypeError(".org.webswing.server.model.proto.InputEventsFrameMsgInProto.audio: object expected");
+                                message.audio = $root.org.webswing.server.model.proto.AudioEventMsgInProto.fromObject(object.audio);
+                            }
                             return message;
                         };
 
@@ -6527,6 +6636,7 @@ $root.org = (function() {
                                 object.pixelsResponse = null;
                                 object.window = null;
                                 object.action = null;
+                                object.audio = null;
                             }
                             if (message.events && message.events.length) {
                                 object.events = [];
@@ -6553,6 +6663,8 @@ $root.org = (function() {
                                 object.window = $root.org.webswing.server.model.proto.WindowEventMsgInProto.toObject(message.window, options);
                             if (message.action != null && message.hasOwnProperty("action"))
                                 object.action = $root.org.webswing.server.model.proto.ActionEventMsgInProto.toObject(message.action, options);
+                            if (message.audio != null && message.hasOwnProperty("audio"))
+                                object.audio = $root.org.webswing.server.model.proto.AudioEventMsgInProto.toObject(message.audio, options);
                             return object;
                         };
 
@@ -7208,6 +7320,7 @@ $root.org = (function() {
                          * @property {boolean|null} [dockingSupported] ConnectionHandshakeMsgInProto dockingSupported
                          * @property {boolean|null} [touchMode] ConnectionHandshakeMsgInProto touchMode
                          * @property {boolean|null} [accessiblityEnabled] ConnectionHandshakeMsgInProto accessiblityEnabled
+                         * @property {string|null} [tabId] ConnectionHandshakeMsgInProto tabId
                          */
 
                         /**
@@ -7363,6 +7476,14 @@ $root.org = (function() {
                         ConnectionHandshakeMsgInProto.prototype.accessiblityEnabled = false;
 
                         /**
+                         * ConnectionHandshakeMsgInProto tabId.
+                         * @member {string} tabId
+                         * @memberof org.webswing.server.model.proto.ConnectionHandshakeMsgInProto
+                         * @instance
+                         */
+                        ConnectionHandshakeMsgInProto.prototype.tabId = "";
+
+                        /**
                          * Creates a new ConnectionHandshakeMsgInProto instance using the specified properties.
                          * @function create
                          * @memberof org.webswing.server.model.proto.ConnectionHandshakeMsgInProto
@@ -7421,6 +7542,8 @@ $root.org = (function() {
                                 writer.uint32(/* id 16, wireType 0 =*/128).bool(message.touchMode);
                             if (message.accessiblityEnabled != null && message.hasOwnProperty("accessiblityEnabled"))
                                 writer.uint32(/* id 17, wireType 0 =*/136).bool(message.accessiblityEnabled);
+                            if (message.tabId != null && message.hasOwnProperty("tabId"))
+                                writer.uint32(/* id 18, wireType 2 =*/146).string(message.tabId);
                             return writer;
                         };
 
@@ -7495,6 +7618,9 @@ $root.org = (function() {
                                 case 17:
                                     message.accessiblityEnabled = reader.bool();
                                     break;
+                                case 18:
+                                    message.tabId = reader.string();
+                                    break;
                                 default:
                                     reader.skipType(tag & 7);
                                     break;
@@ -7557,6 +7683,8 @@ $root.org = (function() {
                                 message.touchMode = Boolean(object.touchMode);
                             if (object.accessiblityEnabled != null)
                                 message.accessiblityEnabled = Boolean(object.accessiblityEnabled);
+                            if (object.tabId != null)
+                                message.tabId = String(object.tabId);
                             return message;
                         };
 
@@ -7592,6 +7720,7 @@ $root.org = (function() {
                                 object.dockingSupported = false;
                                 object.touchMode = false;
                                 object.accessiblityEnabled = false;
+                                object.tabId = "";
                             }
                             if (message.clientId != null && message.hasOwnProperty("clientId"))
                                 object.clientId = message.clientId;
@@ -7630,6 +7759,8 @@ $root.org = (function() {
                                 object.touchMode = message.touchMode;
                             if (message.accessiblityEnabled != null && message.hasOwnProperty("accessiblityEnabled"))
                                 object.accessiblityEnabled = message.accessiblityEnabled;
+                            if (message.tabId != null && message.hasOwnProperty("tabId"))
+                                object.tabId = message.tabId;
                             return object;
                         };
 
@@ -9014,6 +9145,14 @@ $root.org = (function() {
                             case 9:
                                 message.type = 9;
                                 break;
+                            case "enableStatisticsLogging":
+                            case 10:
+                                message.type = 10;
+                                break;
+                            case "disableStatisticsLogging":
+                            case 11:
+                                message.type = 11;
+                                break;
                             }
                             return message;
                         };
@@ -9063,6 +9202,8 @@ $root.org = (function() {
                          * @property {number} cancelFileSelection=7 cancelFileSelection value
                          * @property {number} requestComponentTree=8 requestComponentTree value
                          * @property {number} requestWindowSwitchList=9 requestWindowSwitchList value
+                         * @property {number} enableStatisticsLogging=10 enableStatisticsLogging value
+                         * @property {number} disableStatisticsLogging=11 disableStatisticsLogging value
                          */
                         SimpleEventMsgInProto.SimpleEventTypeProto = (function() {
                             var valuesById = {}, values = Object.create(valuesById);
@@ -9076,6 +9217,8 @@ $root.org = (function() {
                             values[valuesById[7] = "cancelFileSelection"] = 7;
                             values[valuesById[8] = "requestComponentTree"] = 8;
                             values[valuesById[9] = "requestWindowSwitchList"] = 9;
+                            values[valuesById[10] = "enableStatisticsLogging"] = 10;
+                            values[valuesById[11] = "disableStatisticsLogging"] = 11;
                             return values;
                         })();
 
@@ -10339,6 +10482,8 @@ $root.org = (function() {
                          * @property {number|null} [height] WindowEventMsgInProto height
                          * @property {boolean|null} [close] WindowEventMsgInProto close
                          * @property {boolean|null} [focus] WindowEventMsgInProto focus
+                         * @property {boolean|null} [maximize] WindowEventMsgInProto maximize
+                         * @property {boolean|null} [toggleUndecorated] WindowEventMsgInProto toggleUndecorated
                          */
 
                         /**
@@ -10413,6 +10558,22 @@ $root.org = (function() {
                         WindowEventMsgInProto.prototype.focus = false;
 
                         /**
+                         * WindowEventMsgInProto maximize.
+                         * @member {boolean} maximize
+                         * @memberof org.webswing.server.model.proto.WindowEventMsgInProto
+                         * @instance
+                         */
+                        WindowEventMsgInProto.prototype.maximize = false;
+
+                        /**
+                         * WindowEventMsgInProto toggleUndecorated.
+                         * @member {boolean} toggleUndecorated
+                         * @memberof org.webswing.server.model.proto.WindowEventMsgInProto
+                         * @instance
+                         */
+                        WindowEventMsgInProto.prototype.toggleUndecorated = false;
+
+                        /**
                          * Creates a new WindowEventMsgInProto instance using the specified properties.
                          * @function create
                          * @memberof org.webswing.server.model.proto.WindowEventMsgInProto
@@ -10450,6 +10611,10 @@ $root.org = (function() {
                                 writer.uint32(/* id 6, wireType 0 =*/48).bool(message.close);
                             if (message.focus != null && message.hasOwnProperty("focus"))
                                 writer.uint32(/* id 7, wireType 0 =*/56).bool(message.focus);
+                            if (message.maximize != null && message.hasOwnProperty("maximize"))
+                                writer.uint32(/* id 8, wireType 0 =*/64).bool(message.maximize);
+                            if (message.toggleUndecorated != null && message.hasOwnProperty("toggleUndecorated"))
+                                writer.uint32(/* id 9, wireType 0 =*/72).bool(message.toggleUndecorated);
                             return writer;
                         };
 
@@ -10492,6 +10657,12 @@ $root.org = (function() {
                                 case 7:
                                     message.focus = reader.bool();
                                     break;
+                                case 8:
+                                    message.maximize = reader.bool();
+                                    break;
+                                case 9:
+                                    message.toggleUndecorated = reader.bool();
+                                    break;
                                 default:
                                     reader.skipType(tag & 7);
                                     break;
@@ -10526,6 +10697,10 @@ $root.org = (function() {
                                 message.close = Boolean(object.close);
                             if (object.focus != null)
                                 message.focus = Boolean(object.focus);
+                            if (object.maximize != null)
+                                message.maximize = Boolean(object.maximize);
+                            if (object.toggleUndecorated != null)
+                                message.toggleUndecorated = Boolean(object.toggleUndecorated);
                             return message;
                         };
 
@@ -10550,6 +10725,8 @@ $root.org = (function() {
                                 object.height = 0;
                                 object.close = false;
                                 object.focus = false;
+                                object.maximize = false;
+                                object.toggleUndecorated = false;
                             }
                             if (message.id != null && message.hasOwnProperty("id"))
                                 object.id = message.id;
@@ -10565,6 +10742,10 @@ $root.org = (function() {
                                 object.close = message.close;
                             if (message.focus != null && message.hasOwnProperty("focus"))
                                 object.focus = message.focus;
+                            if (message.maximize != null && message.hasOwnProperty("maximize"))
+                                object.maximize = message.maximize;
+                            if (message.toggleUndecorated != null && message.hasOwnProperty("toggleUndecorated"))
+                                object.toggleUndecorated = message.toggleUndecorated;
                             return object;
                         };
 
@@ -10580,6 +10761,167 @@ $root.org = (function() {
                         };
 
                         return WindowEventMsgInProto;
+                    })();
+
+                    proto.AudioEventMsgInProto = (function() {
+
+                        /**
+                         * Properties of an AudioEventMsgInProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @interface IAudioEventMsgInProto
+                         * @property {string|null} [id] AudioEventMsgInProto id
+                         * @property {boolean|null} [stop] AudioEventMsgInProto stop
+                         */
+
+                        /**
+                         * Constructs a new AudioEventMsgInProto.
+                         * @memberof org.webswing.server.model.proto
+                         * @classdesc Represents an AudioEventMsgInProto.
+                         * @implements IAudioEventMsgInProto
+                         * @constructor
+                         * @param {org.webswing.server.model.proto.IAudioEventMsgInProto=} [properties] Properties to set
+                         */
+                        function AudioEventMsgInProto(properties) {
+                            if (properties)
+                                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                                    if (properties[keys[i]] != null)
+                                        this[keys[i]] = properties[keys[i]];
+                        }
+
+                        /**
+                         * AudioEventMsgInProto id.
+                         * @member {string} id
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgInProto
+                         * @instance
+                         */
+                        AudioEventMsgInProto.prototype.id = "";
+
+                        /**
+                         * AudioEventMsgInProto stop.
+                         * @member {boolean} stop
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgInProto
+                         * @instance
+                         */
+                        AudioEventMsgInProto.prototype.stop = false;
+
+                        /**
+                         * Creates a new AudioEventMsgInProto instance using the specified properties.
+                         * @function create
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgInProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IAudioEventMsgInProto=} [properties] Properties to set
+                         * @returns {org.webswing.server.model.proto.AudioEventMsgInProto} AudioEventMsgInProto instance
+                         */
+                        AudioEventMsgInProto.create = function create(properties) {
+                            return new AudioEventMsgInProto(properties);
+                        };
+
+                        /**
+                         * Encodes the specified AudioEventMsgInProto message. Does not implicitly {@link org.webswing.server.model.proto.AudioEventMsgInProto.verify|verify} messages.
+                         * @function encode
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgInProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.IAudioEventMsgInProto} message AudioEventMsgInProto message or plain object to encode
+                         * @param {$protobuf.Writer} [writer] Writer to encode to
+                         * @returns {$protobuf.Writer} Writer
+                         */
+                        AudioEventMsgInProto.encode = function encode(message, writer) {
+                            if (!writer)
+                                writer = $Writer.create();
+                            if (message.id != null && message.hasOwnProperty("id"))
+                                writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+                            if (message.stop != null && message.hasOwnProperty("stop"))
+                                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.stop);
+                            return writer;
+                        };
+
+                        /**
+                         * Decodes an AudioEventMsgInProto message from the specified reader or buffer.
+                         * @function decode
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgInProto
+                         * @static
+                         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                         * @param {number} [length] Message length if known beforehand
+                         * @returns {org.webswing.server.model.proto.AudioEventMsgInProto} AudioEventMsgInProto
+                         * @throws {Error} If the payload is not a reader or valid buffer
+                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                         */
+                        AudioEventMsgInProto.decode = function decode(reader, length) {
+                            if (!(reader instanceof $Reader))
+                                reader = $Reader.create(reader);
+                            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.org.webswing.server.model.proto.AudioEventMsgInProto();
+                            while (reader.pos < end) {
+                                var tag = reader.uint32();
+                                switch (tag >>> 3) {
+                                case 1:
+                                    message.id = reader.string();
+                                    break;
+                                case 2:
+                                    message.stop = reader.bool();
+                                    break;
+                                default:
+                                    reader.skipType(tag & 7);
+                                    break;
+                                }
+                            }
+                            return message;
+                        };
+
+                        /**
+                         * Creates an AudioEventMsgInProto message from a plain object. Also converts values to their respective internal types.
+                         * @function fromObject
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgInProto
+                         * @static
+                         * @param {Object.<string,*>} object Plain object
+                         * @returns {org.webswing.server.model.proto.AudioEventMsgInProto} AudioEventMsgInProto
+                         */
+                        AudioEventMsgInProto.fromObject = function fromObject(object) {
+                            if (object instanceof $root.org.webswing.server.model.proto.AudioEventMsgInProto)
+                                return object;
+                            var message = new $root.org.webswing.server.model.proto.AudioEventMsgInProto();
+                            if (object.id != null)
+                                message.id = String(object.id);
+                            if (object.stop != null)
+                                message.stop = Boolean(object.stop);
+                            return message;
+                        };
+
+                        /**
+                         * Creates a plain object from an AudioEventMsgInProto message. Also converts values to other types if specified.
+                         * @function toObject
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgInProto
+                         * @static
+                         * @param {org.webswing.server.model.proto.AudioEventMsgInProto} message AudioEventMsgInProto
+                         * @param {$protobuf.IConversionOptions} [options] Conversion options
+                         * @returns {Object.<string,*>} Plain object
+                         */
+                        AudioEventMsgInProto.toObject = function toObject(message, options) {
+                            if (!options)
+                                options = {};
+                            var object = {};
+                            if (options.defaults) {
+                                object.id = "";
+                                object.stop = false;
+                            }
+                            if (message.id != null && message.hasOwnProperty("id"))
+                                object.id = message.id;
+                            if (message.stop != null && message.hasOwnProperty("stop"))
+                                object.stop = message.stop;
+                            return object;
+                        };
+
+                        /**
+                         * Converts this AudioEventMsgInProto to JSON.
+                         * @function toJSON
+                         * @memberof org.webswing.server.model.proto.AudioEventMsgInProto
+                         * @instance
+                         * @returns {Object.<string,*>} JSON object
+                         */
+                        AudioEventMsgInProto.prototype.toJSON = function toJSON() {
+                            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                        };
+
+                        return AudioEventMsgInProto;
                     })();
 
                     proto.ActionEventMsgInProto = (function() {

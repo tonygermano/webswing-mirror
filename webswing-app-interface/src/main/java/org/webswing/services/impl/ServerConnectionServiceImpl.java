@@ -48,6 +48,8 @@ import org.webswing.ext.services.ServerConnectionService;
 import org.webswing.model.MsgIn;
 import org.webswing.model.SyncMsg;
 import org.webswing.model.UserInputMsgIn;
+import org.webswing.model.c2s.SimpleEventMsgIn;
+import org.webswing.model.c2s.SimpleEventMsgIn.SimpleEventType;
 import org.webswing.model.internal.ApiEventMsgInternal;
 import org.webswing.model.internal.JvmStatsMsgInternal;
 import org.webswing.model.internal.ThreadDumpMsgInternal;
@@ -96,6 +98,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private ScheduledFuture<?> delayedShutdownFuture;
 	private boolean schedulingShutdown;
 	private AtomicBoolean terminated = new AtomicBoolean(false);
+	
+	private Boolean statisticsLoggingEnabled; // unset if null -> take default value from config (system property)
 
 	public static ServerConnectionServiceImpl getInstance() {
 		if (impl == null) {
@@ -321,7 +325,14 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 			}
 		}
 	}
-
+	
+	private boolean isStatisticsLoggingEnabled() {
+		if (statisticsLoggingEnabled != null) {
+			return statisticsLoggingEnabled;
+		}
+		return Boolean.getBoolean(Constants.SWING_START_SYS_PROP_STATISTICS_LOGGING_ENABLED);
+	}
+	
 	private void sendJmsMessage(final Serializable o) throws JMSException {
 		try {
 			jmsSender.submit(new Callable<Object>() {
@@ -429,6 +440,14 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					if (omsg.getObject() instanceof UserInputMsgIn) {
 						lastUserInputTimestamp.getAndSet(System.currentTimeMillis());
 					}
+					if (omsg.getObject() instanceof SimpleEventMsgIn) {
+						SimpleEventMsgIn simpleEvent = (SimpleEventMsgIn) omsg.getObject();
+						if (simpleEvent.getType() == SimpleEventType.enableStatisticsLogging) {
+							statisticsLoggingEnabled = true;
+						} else if (simpleEvent.getType() == SimpleEventType.disableStatisticsLogging) {
+							statisticsLoggingEnabled = false;
+						}
+					}
 					if (Util.getWebToolkit().getEventDispatcher() != null) {//ignore events if WebToolkit is not ready yet
 						Util.getWebToolkit().getEventDispatcher().dispatchEvent((MsgIn) omsg.getObject());
 					}
@@ -450,11 +469,15 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 
 	private JvmStatsMsgInternal getStats(int edtPing) {
 		JvmStatsMsgInternal result = new JvmStatsMsgInternal();
-		int mb = 1024 * 1024;
-		Runtime runtime = Runtime.getRuntime();
-		result.setHeapSize(runtime.maxMemory() / mb);
-		result.setHeapSizeUsed((runtime.totalMemory() - runtime.freeMemory()) / mb);
-		result.setCpuUsage(CpuMonitor.getCpuUtilization());
+		
+		if (isStatisticsLoggingEnabled()) {
+			int mb = 1024 * 1024;
+			Runtime runtime = Runtime.getRuntime();
+			result.setHeapSize(runtime.maxMemory() / mb);
+			result.setHeapSizeUsed((runtime.totalMemory() - runtime.freeMemory()) / mb);
+			result.setCpuUsage(CpuMonitor.getCpuUtilization());
+		}
+		
 		result.setEdtPingSeconds(edtPing);
 		return result;
 	}

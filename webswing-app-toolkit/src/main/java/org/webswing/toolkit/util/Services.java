@@ -77,7 +77,7 @@ public class Services {
 	
 	public static ToolkitFXService getToolkitFXService() {
 		if (toolkitFXService == null) {
-			Logger.warn("ToolkitFXService service has not been initialized. Ignoring...");
+			Logger.debug("ToolkitFXService service has not been initialized. Ignoring...");
 		}
 		return toolkitFXService;
 	}

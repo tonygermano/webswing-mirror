@@ -628,7 +628,7 @@ export class DirectDraw {
                 ptrnCanvas.width = anchor.w;
                 ptrnCanvas.height = anchor.h;
                 const ptrnContext = ptrnCanvas.getContext("2d")!;
-                ptrnContext.fillRect(0, 0, anchor.w, anchor.h);
+                ptrnContext.clearRect(0, 0, anchor.w, anchor.h);
                 ptrnContext.fillStyle = ptrnContext.createPattern(preloadedImage, 'repeat')!;
                 ptrnContext.setTransform(anchor.w / preloadedImage.width, 0, 0, anchor.h / preloadedImage.height, ax, ay);
                 ptrnContext.fillRect(-ax * preloadedImage.width / anchor.w, -ay * preloadedImage.height / anchor.h, preloadedImage.width,

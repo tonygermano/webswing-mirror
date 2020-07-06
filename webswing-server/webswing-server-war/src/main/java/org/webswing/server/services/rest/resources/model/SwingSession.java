@@ -71,6 +71,7 @@ public enum StatusEnum {
   private  Map<String, String> threadDumps = new HashMap<String, String>();
   private  String applicationUrl;
   private  Boolean loggingEnabled;
+  private  Boolean statisticsLoggingEnabled;
 
   /**
    **/
@@ -440,6 +441,22 @@ public enum StatusEnum {
     this.loggingEnabled = loggingEnabled;
   }
 
+  /**
+   **/
+  public SwingSession statisticsLoggingEnabled(Boolean statisticsLoggingEnabled) {
+    this.statisticsLoggingEnabled = statisticsLoggingEnabled;
+    return this;
+  }
+
+  
+  @JsonProperty("statisticsLoggingEnabled")
+  public Boolean getStatisticsLoggingEnabled() {
+    return statisticsLoggingEnabled;
+  }
+  public void setStatisticsLoggingEnabled(Boolean statisticsLoggingEnabled) {
+    this.statisticsLoggingEnabled = statisticsLoggingEnabled;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -472,12 +489,13 @@ public enum StatusEnum {
         Objects.equals(this.warningHistory, swingSession.warningHistory) &&
         Objects.equals(this.threadDumps, swingSession.threadDumps) &&
         Objects.equals(this.applicationUrl, swingSession.applicationUrl) &&
-        Objects.equals(this.loggingEnabled, swingSession.loggingEnabled);
+        Objects.equals(this.loggingEnabled, swingSession.loggingEnabled) &&
+        Objects.equals(this.statisticsLoggingEnabled, swingSession.statisticsLoggingEnabled);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(serialVersionUID, id, user, userIp, userOs, userBrowser, application, applicationPath, startedAt, endedAt, connected, applet, disconnectedSince, recorded, recordingFile, stats, metrics, status, warnings, warningHistory, threadDumps, applicationUrl, loggingEnabled);
+    return Objects.hash(serialVersionUID, id, user, userIp, userOs, userBrowser, application, applicationPath, startedAt, endedAt, connected, applet, disconnectedSince, recorded, recordingFile, stats, metrics, status, warnings, warningHistory, threadDumps, applicationUrl, loggingEnabled, statisticsLoggingEnabled);
   }
 
   @Override
@@ -508,6 +526,7 @@ public enum StatusEnum {
     sb.append("    threadDumps: ").append(toIndentedString(threadDumps)).append("\n");
     sb.append("    applicationUrl: ").append(toIndentedString(applicationUrl)).append("\n");
     sb.append("    loggingEnabled: ").append(toIndentedString(loggingEnabled)).append("\n");
+    sb.append("    statisticsLoggingEnabled: ").append(toIndentedString(statisticsLoggingEnabled)).append("\n");
     sb.append("}");
     return sb.toString();
   }

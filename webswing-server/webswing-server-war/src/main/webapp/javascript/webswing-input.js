@@ -403,10 +403,6 @@
         }
         
         function handleCopy(event) {
-        	if (isNotValidInputHandlerTarget(event)) {
-        		return;
-        	}
-        	
         	event.preventDefault();
         	event.stopPropagation();
         	api.copy(event);

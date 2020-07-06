@@ -92,6 +92,9 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 				if (event instanceof WindowEventMsgIn) {
 					handleWindowEvent((WindowEventMsgIn) event);
 				}
+				if (event instanceof AudioEventMsgIn) {
+					handleAudioEvent((AudioEventMsgIn) event);
+				}
 				if (event instanceof ActionEventMsgIn) {
 					handleActionEvent((ActionEventMsgIn)event);
 				}
@@ -123,6 +126,8 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 	protected abstract void handleUploadEvent(UploadEventMsgIn event);
 
 	protected abstract void handleWindowEvent(WindowEventMsgIn event);
+	
+	protected abstract void handleAudioEvent(AudioEventMsgIn event);
 
 	protected abstract void handleActionEvent(ActionEventMsgIn event);
 

@@ -16,7 +16,9 @@ public class SimpleEventMsgIn implements MsgIn {
 		hb,
 		cancelFileSelection,
 		requestComponentTree,
-		requestWindowSwitchList
+		requestWindowSwitchList,
+		enableStatisticsLogging,
+		disableStatisticsLogging
 	}
 
 	public SimpleEventMsgIn() {

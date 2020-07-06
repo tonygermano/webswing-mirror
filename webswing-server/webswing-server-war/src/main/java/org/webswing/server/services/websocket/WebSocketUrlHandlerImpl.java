@@ -140,6 +140,9 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 				} else if (frame.getWindow() != null) {
 					WindowEventMsgIn w = frame.getWindow();
 					send(r, w);
+				} else if (frame.getAudio() != null) {
+					AudioEventMsgIn a = frame.getAudio();
+					send(r, a);
 				} else if (frame.getAction() != null) {
 					ActionEventMsgIn a = frame.getAction();
 					send(r, a);
@@ -148,7 +151,7 @@ public class WebSocketUrlHandlerImpl implements WebSocketUrlHandler {
 				log.error("Unable to decode message: " + message);
 			}
 			SwingInstance instance = instanceManager.getSwingInstanceHolder().findInstanceByConnectionId(r.uuid());
-			if (instance != null) {
+			if (instance != null && instance.isStatisticsLoggingEnabled()) {
 				instance.logStatValue(StatisticsLogger.INBOUND_SIZE_METRIC, length);
 			}
 		} catch (Exception e) {

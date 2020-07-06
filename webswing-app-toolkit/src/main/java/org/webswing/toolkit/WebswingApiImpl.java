@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 
 import org.webswing.Constants;
 import org.webswing.component.HtmlPanelImpl;
@@ -561,7 +562,12 @@ public class WebswingApiImpl implements WebswingApi {
 	public boolean isTouchMode() {
 		return Util.isTouchMode();
 	}
-	
+
+	@Override
+	public void registerCustomFileChooser(JFileChooser fileChooser, Window parent) {
+		Util.getWebToolkit().getPaintDispatcher().registerFileChooserWindows(fileChooser,parent);
+	}
+
 	public class WebswingUrlStateChangeEventImpl implements WebswingUrlStateChangeEvent {
 
 		private String url;

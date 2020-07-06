@@ -52,7 +52,7 @@ public class CpuMonitor {
 			double cpuUsage = (double) TimeUnit.NANOSECONDS.toMillis(cpuTimeDelta) / (double) timeDelta;
 			cpuUsage = cpuUsage / processors;
 			return Math.max(0, cpuUsage) * 100;
-		} catch (ReflectiveOperationException e) {
+		} catch (Throwable e) {
 		    getProcessCpuTimeMethod = null;
 			Logger.warn("Failed to load CPU utilization. Monitoring CPU disabled.", e);
 			return -1;

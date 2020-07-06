@@ -5,7 +5,7 @@ import java.util.*;
 import org.webswing.server.common.model.meta.*;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
 
-@ConfigFieldOrder({ "enabled", "path", "homeDir", "webFolder","restrictedResources", "langFolder", "icon", "security", "allowedCorsOrigins","adminConsoleUrl", "swingConfig" })
+@ConfigFieldOrder({ "enabled", "path", "homeDir", "webFolder","restrictedResources", "langFolder", "icon", "security", "allowedCorsOrigins","adminConsoleUrl", "serverStatisticsLogging", "swingConfig" })
 public interface SecuredPathConfig extends Config {
 
 	@ConfigField(label = "Enabled", description = "If true, application will be started automatically, when server starts.")
@@ -52,6 +52,10 @@ public interface SecuredPathConfig extends Config {
 	@ConfigField(label = "Admin Console Url", description = "Admin console used to manage this server. If no value defined admin console is only allowed from same domain. This will setup CORS and security headers to allow management from specified domain.")
 	public String getAdminConsoleUrl();
 
+	@ConfigField(label = "Statistics Logging", description = "If enabled, statistics will be logged for server.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isServerStatisticsLogging();
+	
 	@ConfigField(label = "Application")
 	@ConfigFieldDefaultValueObject
 	SwingConfig getSwingConfig();

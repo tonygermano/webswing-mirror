@@ -383,6 +383,8 @@ import 'blueimp-file-upload'
             	getAutoFileInput().prop("multiple", data.isMultiSelection);
             	getAutoFileInput().attr("accept", data.filter);
             	setProgressBarVisible(false);
+                fileDialogErrorMessageContent.html("");
+                fileDialogErrorMessage.hide("fast");
             	animateShow(autoUploadBar);
             };
             
@@ -391,6 +393,8 @@ import 'blueimp-file-upload'
                     rootElement.append(autoSaveBar);
                 }
                 autoSaveInput.val(data.selection);
+                fileDialogErrorMessageContent.html("");
+                fileDialogErrorMessage.hide("fast");
                 animateShow(autoSaveBar);
             };
 
@@ -406,7 +410,7 @@ import 'blueimp-file-upload'
                 appendOrDetach(deleteSelectedButton, fileActionButtonGroup, data.allowDelete);
 
                 showOrHide(dropZone, data.allowUpload);
-                showOrHide(cancelBtn, data.allowDownload || data.allowUpload || data.allowDelete);
+                showOrHide(cancelBtn, (data.allowDownload || data.allowUpload || data.allowDelete) && !data.customDialog );
                 getFileInput().prop("multiple", data.isMultiSelection);
                 getFileInput().attr("accept", data.filter);
                 setProgressBarVisible(false);

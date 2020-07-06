@@ -147,6 +147,8 @@ message FileDialogEventMsgProto {
     optional string filter = 5;
     optional bool isMultiSelection = 6;
     optional string selection = 7;
+    optional bool customDialog = 8;
+
 
     enum FileDialogEventTypeProto {
         Open = 0;
@@ -178,6 +180,7 @@ message WindowMsgProto {
     optional uint32 state = 13;
     repeated WindowMsgProto internalWindows = 14;
     optional DockModeProto dockMode = 15;
+    optional WindowClassTypeProto classType = 16;
     
     enum WindowTypeProto {
     	basic = 1;
@@ -186,6 +189,16 @@ message WindowMsgProto {
 		internalHtml = 4;
 		internalWrapper = 5;
     }
+    
+    enum WindowClassTypeProto {
+		other = 1;
+		Window = 2;
+		JWindow = 3;
+		Dialog = 4;
+		JDialog = 5;
+		Frame = 6;
+		JFrame = 7;
+	}
     
     enum DockModeProto {
     	none = 1;
@@ -290,6 +303,7 @@ message InputEventsFrameMsgInProto {
     optional PixelsAreaResponseMsgInProto pixelsResponse = 9;
     optional WindowEventMsgInProto window = 10;
     optional ActionEventMsgInProto action = 11;
+    optional AudioEventMsgInProto audio = 12;
 }
 
 message InputEventMsgInProto {
@@ -331,6 +345,7 @@ message ConnectionHandshakeMsgInProto {
     optional bool dockingSupported = 15;
     optional bool touchMode = 16;
     optional bool accessiblityEnabled = 17;
+    optional string tabId = 18;
 }
 
 message ParamMsgProto {
@@ -408,6 +423,8 @@ message SimpleEventMsgInProto {
         cancelFileSelection = 7;
         requestComponentTree = 8;
         requestWindowSwitchList = 9;
+        enableStatisticsLogging = 10;
+        disableStatisticsLogging = 11;
     }
 }
 
@@ -468,6 +485,13 @@ message WindowEventMsgInProto {
 	optional sint32 height = 5;
 	optional bool close = 6;
 	optional bool focus = 7;
+	optional bool maximize = 8;
+	optional bool toggleUndecorated = 9;
+}
+
+message AudioEventMsgInProto {
+	optional string id = 1;
+	optional bool stop = 2;
 }
 
 message ActionEventMsgInProto {

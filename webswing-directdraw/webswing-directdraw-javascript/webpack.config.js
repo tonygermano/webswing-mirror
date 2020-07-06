@@ -62,7 +62,13 @@ module.exports = {
     ]
   },
 
-  plugins: [
+  plugins: [new HtmlWebpackPlugin({
+    template: "index.html",
+    inject: true,
+    templateParameters: {
+      __WEBSWING_URL: ".."
+    }
+  }),
     new ExtractTextPlugin("css/style.css"),
     new webpack.ProvidePlugin({
       $: "jquery",

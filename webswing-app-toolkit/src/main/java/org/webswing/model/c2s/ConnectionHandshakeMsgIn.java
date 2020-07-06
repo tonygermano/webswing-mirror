@@ -11,6 +11,7 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 	private String clientId;
 	private String browserId;
 	private String viewId;
+	private String tabId;
 	private String connectionId;
 	private Integer desktopWidth;
 	private Integer desktopHeight;
@@ -161,5 +162,12 @@ public class ConnectionHandshakeMsgIn implements MsgIn {
 	public void setAccessiblityEnabled(boolean accessiblityEnabled) {
 		this.accessiblityEnabled = accessiblityEnabled;
 	}
-	
+
+	public String getTabId() {
+		return tabId;
+	}
+
+	public void setTabId(String tabId) {
+		this.tabId = tabId;
+	}
 }

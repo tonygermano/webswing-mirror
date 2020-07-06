@@ -5,7 +5,7 @@
     <parent>
         <artifactId>webswing-server</artifactId>
         <groupId>org.webswing</groupId>
-        <version>20.1.2</version>
+        <version>20.1.3</version>
         <relativePath>..</relativePath>
     </parent>
     <dependencies>
@@ -365,7 +365,7 @@
                         </executions>
                         <configuration>
                             <mainClass>org.webswing.dev.server.InteractiveServerLauncher</mainClass>
-                            <commandlineArgs>-example default-all-apps -ctx /webswing-server</commandlineArgs>
+                            <commandlineArgs>-example default-all-apps -j jetty.properties -ctx /webswing-server</commandlineArgs>
                             <!-- use "interactive -example benchmark ... " to select a different default example after startup -->
                             <addOutputToClasspath>false</addOutputToClasspath>
                             <additionalClasspathElements>

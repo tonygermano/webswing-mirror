@@ -1,5 +1,6 @@
 package org.webswing.audio;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -7,6 +8,8 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class AudioFileReader extends javax.sound.sampled.spi.AudioFileReader {
@@ -34,21 +37,37 @@ public class AudioFileReader extends javax.sound.sampled.spi.AudioFileReader {
 
 	@Override
 	public AudioInputStream getAudioInputStream(InputStream stream) throws UnsupportedAudioFileException, IOException {
-		return new AudioInputStream(stream, fileFormat.getFormat(), 0);
+		return new AudioInputStream(stream, fileFormat.getFormat(), AudioSystem.NOT_SPECIFIED);
 	}
 
 	@Override
 	public AudioInputStream getAudioInputStream(URL url) throws UnsupportedAudioFileException, IOException {
-		try (InputStream stream = url.openStream()) {
-			return getAudioInputStream(stream);
-		}
+		final InputStream urlStream = url.openStream();
+        try {
+            return getAudioInputStream(new BufferedInputStream(urlStream));
+        } catch (final Throwable e) {
+        	try {
+        		urlStream.close();
+        	} catch (IOException e2) {
+        		// ignore
+        	}
+            throw e;
+        }
 	}
 
 	@Override
 	public AudioInputStream getAudioInputStream(File file) throws UnsupportedAudioFileException, IOException {
-		try (InputStream stream = new FileInputStream(file)) {
-			return getAudioInputStream(stream);
-		}
+		final InputStream fileStream = new FileInputStream(file);
+        try {
+            return getAudioInputStream(new BufferedInputStream(fileStream));
+        } catch (final Throwable e) {
+            try {
+            	fileStream.close();
+            } catch (IOException e2) {
+            	// ignore
+            }
+            throw e;
+        }
 	}
 
 }

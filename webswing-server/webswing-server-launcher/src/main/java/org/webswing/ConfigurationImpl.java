@@ -128,7 +128,8 @@ public class ConfigurationImpl extends Configuration {
 
     private void readPropertyFile(String filename) throws IOException {
         Properties prop = new Properties();
-        InputStream inputStream = new FileInputStream(new File(filename));
+        File file = new File(System.getProperty(Constants.CONFIG_PATH,".")+File.separator+filename);
+        InputStream inputStream = new FileInputStream(file);
         prop.load(inputStream);
         setHost(prop.getProperty(PREFIX + ".server.host"));
 

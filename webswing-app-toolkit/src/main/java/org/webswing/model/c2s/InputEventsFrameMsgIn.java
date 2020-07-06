@@ -15,6 +15,7 @@ public class InputEventsFrameMsgIn implements MsgIn {
 	private FilesSelectedEventMsgIn selected;
 	private PlaybackCommandMsgIn playback;
 	private WindowEventMsgIn window;
+	private AudioEventMsgIn audio;
 	private ActionEventMsgIn action;
 	
 	private JsResultMsg jsResponse;// java2js call return value
@@ -99,6 +100,14 @@ public class InputEventsFrameMsgIn implements MsgIn {
 
 	public void setAction(ActionEventMsgIn action) {
 		this.action = action;
+	}
+
+	public AudioEventMsgIn getAudio() {
+		return audio;
+	}
+
+	public void setAudio(AudioEventMsgIn audio) {
+		this.audio = audio;
 	}
 	
 }

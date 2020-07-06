@@ -57,6 +57,7 @@ import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
 import org.webswing.model.s2c.WindowMsg;
 import org.webswing.model.s2c.WindowMsg.DockMode;
+import org.webswing.model.s2c.WindowMsg.WindowClassType;
 import org.webswing.model.s2c.WindowMsg.WindowType;
 import org.webswing.model.s2c.WindowPartialContentMsg;
 import org.webswing.model.s2c.WindowSwitchMsg;
@@ -65,6 +66,7 @@ import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.api.component.Dockable;
 import org.webswing.toolkit.api.component.HtmlPanel;
+import org.webswing.toolkit.api.file.WebswingFileChooserUtil;
 
 public class Util {
 
@@ -416,7 +418,8 @@ public class Util {
 				window.setName(((Component) ww.getTarget()).getName());
 			}
 			
-			fillDockMode(ww, window);
+			fillClassType(ww.getTarget(), window);
+			fillDockMode(ww.getTarget(), window);
 			
 			boolean modalBlocked = ww.getTarget() instanceof Window && getWebToolkit().getWindowManager().isBlockedByModality((Window) ww.getTarget(), false);
 			window.setModalBlocked(modalBlocked);
@@ -535,18 +538,57 @@ public class Util {
 		}
 	}
 	
-	private static void fillDockMode(WebWindowPeer ww, WindowMsg window) {
+	private static void fillClassType(Object windowTarget, WindowMsg window) {
+		if (windowTarget instanceof JFrame) {
+			window.setClassType(WindowClassType.JFrame);
+			return;
+		}
+		if (windowTarget instanceof JDialog) {
+			window.setClassType(WindowClassType.JDialog);
+			return;
+		}
+		if (windowTarget instanceof JWindow) {
+			window.setClassType(WindowClassType.JWindow);
+			return;
+		}
+		if (windowTarget instanceof Frame) {
+			window.setClassType(WindowClassType.Frame);
+			return;
+		}
+		if (windowTarget instanceof Dialog) {
+			window.setClassType(WindowClassType.Dialog);
+			return;
+		}
+		if (windowTarget instanceof Window) {
+			window.setClassType(WindowClassType.Window);
+			return;
+		}
+	}
+	
+	private static void fillDockMode(Object windowTarget, WindowMsg window) {
+		// must be a Window
+		if (!(windowTarget instanceof Window)) {
+			window.setDockMode(DockMode.none);
+			return;
+		}
+		
+		// must not be a JWindow
+		if (windowTarget instanceof JWindow) {
+			window.setDockMode(DockMode.none);
+			return;
+		}
+		
 		switch (getDockMode()) {
 			case "ALL" :
-				if (ww.getTarget() instanceof Dockable) {
-					window.setDockMode(((Dockable) ww.getTarget()).isAutoUndock() ? DockMode.autoUndock : DockMode.dockable);
+				if (windowTarget instanceof Dockable) {
+					window.setDockMode(((Dockable) windowTarget).isAutoUndock() ? DockMode.autoUndock : DockMode.dockable);
 				} else {
 					window.setDockMode(DockMode.dockable);
 				}
 				break;
 			case "MARKED":
-				if (ww.getTarget() instanceof Dockable) {
-					window.setDockMode(((Dockable) ww.getTarget()).isAutoUndock() ? DockMode.autoUndock : DockMode.dockable);
+				if (windowTarget instanceof Dockable) {
+					window.setDockMode(((Dockable) windowTarget).isAutoUndock() ? DockMode.autoUndock : DockMode.dockable);
 				}
 				break;
 			case "NONE":
@@ -772,11 +814,13 @@ public class Util {
 			if (pane != null) {
 				Component[] coms = pane.getComponents();
 				if (coms != null && coms.length > 0 && coms[0] instanceof JFileChooser) {
-					return (JFileChooser) coms[0];
+					JFileChooser chooser = (JFileChooser) coms[0];
+					chooser.putClientProperty(WebswingFileChooserUtil.CUSTOM_FILE_CHOOSER, false);
+					return chooser;
 				}
 			}
 		}
-		return null;
+		return getWebToolkit().getPaintDispatcher().findRegisteredFileChooser(w);
 	}
 
 	public static String resolveUploadFilename(File currentDir, String fileName) {
@@ -874,6 +918,10 @@ public class Util {
 
 	public static FileDialogEventType getFileChooserEventType(JFileChooser fileChooserDialog) {
 		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ISOLATED_FS)) {
+			if(Boolean.TRUE.equals(fileChooserDialog.getClientProperty(WebswingFileChooserUtil.CUSTOM_FILE_CHOOSER)) || fileChooserDialog.getClientProperty(WebswingFileChooserUtil.ALLOW_DELETE_OVERRIDE)!=null || fileChooserDialog.getClientProperty(WebswingFileChooserUtil.ALLOW_UPLOAD_OVERRIDE)!=null || fileChooserDialog.getClientProperty(
+					WebswingFileChooserUtil.ALLOW_DOWNLOAD_OVERRIDE)!=null){
+				return FileDialogEventType.Open;
+			}
 			if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_TRANSPARENT_FILE_OPEN) && fileChooserDialog.getDialogType() == JFileChooser.OPEN_DIALOG) {
 				return FileDialogEventType.AutoUpload;
 			}

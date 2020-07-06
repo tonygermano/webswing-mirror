@@ -166,6 +166,8 @@ public class ServerUtil {
 			return user;
 		case CONTINUE_FOR_BROWSER:
 			return user + h.getBrowserId();
+		case CONTINUE_FOR_TAB:
+			return user + h.getTabId();
 		case ALWAYS_NEW_SESSION:
 		default:
 			return user + h.getBrowserId() + h.getViewId();

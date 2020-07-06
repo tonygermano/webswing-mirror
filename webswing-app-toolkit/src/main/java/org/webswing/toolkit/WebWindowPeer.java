@@ -5,11 +5,16 @@ import java.awt.peer.WindowPeer;
 
 import org.webswing.Constants;
 import org.webswing.toolkit.extra.WindowManager;
+import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+
+import sun.java2d.InvalidPipeException;
 
 abstract public class WebWindowPeer extends WebContainerPeer implements WindowPeer {
 	
 	private static final int VALIDATE_BOUNDS_THRESHOLD = 40;
+	
+	private Boolean undecoratedOverride;
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////// WebWindowPeer Implementation//////////////////////////////////////////////////
@@ -118,5 +123,22 @@ abstract public class WebWindowPeer extends WebContainerPeer implements WindowPe
 
 	public void updateAlwaysOnTopState() {
 	}
-
+	
+	public void setUndecoratedOverride(boolean undecorated) {
+		this.undecoratedOverride = undecorated;
+		
+		if (target instanceof Window) {
+			Window win = (Window) target;
+			try {
+				replaceSurfaceData(win.getX(), win.getY(), win.getWidth(), win.getHeight());
+			} catch (InvalidPipeException e) {
+				Logger.error("WebWindowPeer:setUndecoratedOverride", e);
+			}
+		}
+	}
+	
+	public Boolean getUndecoratedOverride() {
+		return undecoratedOverride;
+	}
+	
 }

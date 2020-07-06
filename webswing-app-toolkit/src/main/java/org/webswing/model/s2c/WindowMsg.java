@@ -17,6 +17,16 @@ public class WindowMsg implements Msg {
 		internalWrapper;
 	}
 	
+	public enum WindowClassType {
+		other,
+		Window,
+		JWindow,
+		Dialog,
+		JDialog,
+		Frame,
+		JFrame;
+	}
+	
 	public enum DockMode {
 		none,
 		dockable,
@@ -38,6 +48,7 @@ public class WindowMsg implements Msg {
 	private Integer state;
 	private List<WindowMsg> internalWindows;
 	private DockMode dockMode = DockMode.none;
+	private WindowClassType classType = WindowClassType.other;
 
 	public WindowMsg() {
 	}
@@ -180,6 +191,14 @@ public class WindowMsg implements Msg {
 
 	public void setDockMode(DockMode dockMode) {
 		this.dockMode = dockMode;
+	}
+
+	public WindowClassType getClassType() {
+		return classType;
+	}
+
+	public void setClassType(WindowClassType classType) {
+		this.classType = classType;
 	}
 
 }
