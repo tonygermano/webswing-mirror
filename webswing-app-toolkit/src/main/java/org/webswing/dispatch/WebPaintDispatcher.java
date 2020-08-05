@@ -1,6 +1,22 @@
 package org.webswing.dispatch;
 
-import org.webswing.dispatch.AbstractPaintDispatcher;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.WindowMoveActionMsg;
 import org.webswing.toolkit.WebComponentPeer;
@@ -11,14 +27,6 @@ import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class WebPaintDispatcher extends AbstractPaintDispatcher {
 	private volatile WindowMoveActionMsg moveAction;
@@ -185,7 +193,8 @@ public class WebPaintDispatcher extends AbstractPaintDispatcher {
 		throw new UnsupportedOperationException("Only supported when Composition Window Manager is enabled");
 	}
 	
-	public void notifyWindowDockAction(String windowId) {
+	@Override
+	public void notifyWindowDockStateChanged() {
 		throw new UnsupportedOperationException("Only supported when Composition Window Manager is enabled");
 	}
 

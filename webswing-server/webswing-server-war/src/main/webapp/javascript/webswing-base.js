@@ -14,7 +14,6 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
             processComponentTree: 'canvas.processComponentTree',
             registerInput: 'input.register',
             sendInput: 'input.sendInput',
-            getPagePosition: 'input.getPagePosition',
             registerUndockedCanvas: 'input.registerUndockedCanvas',
             registerTouch: 'touch.register',
             initCanvas: 'canvas.init',
@@ -104,7 +103,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         var audio = {};
         var focusedUndockedWindow = null;
         var dockResizeInterval = 250;
-        var ignoreDockResizeTimestamp = 0;
+        var popupStartupResizeInterval = 1000;
         const JFRAME_MAXIMIZED_STATE = 6;
 
         function startApplication() {
@@ -489,12 +488,6 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 	            	}
             	}
             }
-            if (data.dockAction != null && api.cfg.hasControl && !api.recordingPlayback) {
-            	var winCanvas = windowImageHolders[data.dockAction.windowId];
-            	if (winCanvas) {
-            		toggleDock(data.dockAction.windowId);
-            	}
-            }
             
             if (windowsData != null) {
             	var winMap = {};
@@ -560,15 +553,12 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         }
         
         function dockResize() {
-        	if (new Date().getTime() - ignoreDockResizeTimestamp < dockResizeInterval) {
-        		return;
-        	}
-        	
-        	var popups = {};
+        	var popups = [];
+        	var now = new Date().getTime();
 			for (var winId in windowImageHolders) {
 				// go through each undocked popup only once
 				var popup = windowImageHolders[winId].dockOwner;
-				if (popup && popup != null && !popups[popup]) {
+				if (popup && popup != null && popups.indexOf(popup) === -1 && (now - popup.createTime > popupStartupResizeInterval) && (now - popup.ignoreDockResizeTimestamp > dockResizeInterval)) {
 					popups[popup] = true;
 	            	var maxWidth = 0;
 	            	var maxHeight = 0;
@@ -650,7 +640,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         }
 
         function closeWindow(id) {
-        	api.send({window: {id: id, close: true}});
+        	api.send({window: {id: id, eventType: 'close'}});
     		closedWindows[id] = true;
         }
         
@@ -737,6 +727,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 			
 			var htmlOrCanvasWin = windowImageHolders[win.id];
 			
+			handleWindowDockState(win.dockState, htmlOrCanvasWin);
 			handleWindowModalityAndBounds(win, htmlOrCanvasWin, index, true);
 			handleWindowState(win.state, htmlOrCanvasWin);
 			drawInternalWindows(win.internalWindows);
@@ -867,6 +858,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         			
         			var htmlOrCanvasWin = windowImageHolders[win.id];
         			
+        			handleWindowDockState(win.dockState, htmlOrCanvasWin);
         			handleWindowModalityAndBounds(win, htmlOrCanvasWin, index, false);
     				handleWindowState(win.state, htmlOrCanvasWin);
     				drawInternalWindows(win.internalWindows);
@@ -886,6 +878,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 			} else {
 				windowImageHolders[win.id] = new CanvasWindow(win.id, win.ownerId, getOwnerParents(win.ownerId), canvas, false, win.name, win.title, win.classType);
 				windowImageHolders[win.id].dockMode = win.dockMode;
+				windowImageHolders[win.id].dockState = win.dockState;
 			}
 			
 			var element = windowImageHolders[win.id].element;
@@ -898,7 +891,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 			
 			windowOpening(windowImageHolders[win.id]);
 			
-			if (windowImageHolders[win.id].dockMode == 'autoUndock') {
+			if (windowImageHolders[win.id].dockMode == 'autoUndock' || windowImageHolders[win.id].dockState == 'undocked') {
 				undockWindow(win.id, win.ownerId, win.title, windowImageHolders[win.id].element, win.posX, win.posY, win.width, win.height, function() {
 					windowOpened(windowImageHolders[win.id]);
 				});
@@ -915,25 +908,14 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 			}
         }
         
-        function toggleDock(winId) {
-        	var canvasO = getWindowById(winId);
-        	if (!canvasO || canvasO.htmlWindow) {
-        		return;
-        	}
-        	if (canvasO.dockState == 'undocked') {
-        		canvasO.dock();
-        	} else {
-        		canvasO.undock();
-        	}
-        }
-        
         function undockWindow(id, ownerId, title, element, posX, posY, width, height, callback) {
-        	var pagePos;
+        	var ownerWin;
         	if (element.parentNode) {
-        		pagePos = element.parentNode.ownerDocument.defaultView.pagePosition;
+        		ownerWin = element.parentNode.ownerDocument.defaultView;
         	} else {
-        		pagePos = window.pagePosition;
+        		ownerWin = window;
         	}
+        	var pagePos = ownerWin.pagePosition;
         	if (!pagePos) {
         		pagePos = {x: 0, y: 0};
         	}
@@ -947,9 +929,11 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 					"top=" + (posY + pagePos.y) + "," +
 					"left=" + (posX + pagePos.x));
 
-			windowImageHolders[id].dockState = 'undocked';
 			windowImageHolders[id].dockOwner = popup;
 			windowImageHolders[id].preventDockClose = false;
+			
+			popup.createTime = new Date().getTime();
+			popup.ignoreDockResizeTimestamp = new Date().getTime();
 			
 			popup.document.title = title || "";
 			popup.document.body.style.margin = "0";
@@ -981,7 +965,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 				// timeout to avoid race condition, the popup needs to be ready
 				var winHeightOffset = popup.outerHeight - popup.innerHeight - 9;
 				var winWidthOffset = popup.outerWidth - popup.innerWidth - 8;
-				popup.moveTo(posX + pagePos.x - winWidthOffset, posY + pagePos.y - winHeightOffset);
+				popup.moveBy(0 - winWidthOffset, 0 - winHeightOffset);
 				
 				var origRect = element.getBoundingClientRect();
 				
@@ -1068,13 +1052,20 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 		    	focusedUndockedWindow = popup;
 		    });
 		    popup.addEventListener("resize", function() {
-		    	ignoreDockResizeTimestamp = new Date().getTime();
+		    	popup.ignoreDockResizeTimestamp = new Date().getTime();
 		    	if (popup.resizeTimer != null) {
 		    		clearTimeout(popup.resizeTimer);
 		    	}
 		    	popup.resizeTimer = setTimeout(function() {
 		    		popup.resizeTimer = null;
-		    		handleWindowState(windowImageHolders[id].state, windowImageHolders[id]);
+		    		
+		    		// auto resize canvas to parent window
+		    		var winE = windowImageHolders[id];
+		    		var rectP = winE.element.parentNode.getBoundingClientRect();
+					var rectC = winE.element.getBoundingClientRect();
+					if (rectC.width != rectP.width || rectC.height != rectP.height) {
+						winE.setBounds(0, 0, rectP.width, rectP.height);
+					}
 		    	}, 100);
 		    });
         }
@@ -1108,6 +1099,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     	        		left = popup.screenX - parentWin.screenX + rect.left;
     	        		top = popup.screenY - parentWin.screenY + rect.top;
     	        		
+    	        		$(canvasWin.element).css({"left": left + 'px', "top": top + 'px'});
     					windowImageHolders[ownerId].element.parentNode.append(element);
     				} else {
     					// dock back to root parent (the base canvas location)
@@ -1125,10 +1117,10 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     					left = origPos.x + rect.left - parentPagePos.x - rootRect.left;
     					top = origPos.y + rect.top - parentPagePos.y - rootRect.top;
     					
+    					$(canvasWin.element).css({"left": left + 'px', "top": top + 'px'});
     					api.cfg.rootElement.append(element);
     				}
     	        	
-    	        	$(canvasWin.element).css({"left": left + 'px', "top": top + 'px'});
     	        	if (!canvasWin.htmlWindow) {
     	        		canvasWin.setLocation(left, top);
     	        	}
@@ -1172,7 +1164,6 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     			}
     		}
         	
-        	canvasWindow.dockState = 'docked';
         	canvasWindow.dockOwner = null;
         	
         	canvasWindow.preventDockClose = true;
@@ -1328,6 +1319,24 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 			if (rectC.width != rectP.width || rectC.height != rectP.height) {
 				htmlOrCanvasWin.setBounds(0, 0, rectP.width, rectP.height);
 			}
+        }
+        
+        function handleWindowDockState(dockState, htmlOrCanvasWin) {
+        	if (htmlOrCanvasWin.htmlWindow || typeof dockState === 'undefined') {
+        		return;
+        	}
+        	
+        	if (htmlOrCanvasWin.dockState === dockState) {
+        		return;
+        	}
+        	
+        	htmlOrCanvasWin.dockState = dockState;
+        	if (dockState === 'undocked') {
+        		var rect = htmlOrCanvasWin.element.getBoundingClientRect();
+        		undockWindow(htmlOrCanvasWin.id, htmlOrCanvasWin.ownerId, htmlOrCanvasWin.title, htmlOrCanvasWin.element, rect.left, rect.top, rect.width, rect.height);
+        	} else {
+        		dockWindow(htmlOrCanvasWin);
+        	}
         }
         
         function drawInternalWindows(internalWindows) {
@@ -1812,8 +1821,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
         		return;
         	}
     		
-    		var rect = this.element.getBoundingClientRect();
-    		undockWindow(this.id, this.ownerId, this.title, this.element, rect.left, rect.top, rect.width, rect.height);
+    		api.send({window: {id: this.id, eventType: 'undock'}});
     	};
     	
     	CanvasWindow.prototype.dock = function() {
@@ -1821,19 +1829,27 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     			return;
     		}
     		
-    		dockWindow(this);
+    		api.send({window: {id: this.id, eventType: 'dock'}});
     	};
     	
     	CanvasWindow.prototype.toggleDock = function() {
-    		toggleDock(this.id);
+    		if (this.dockState == 'docked') {
+    			this.undock();
+    		} else {
+    			this.dock();
+    		}
     	};
     	
     	CanvasWindow.prototype.maximize = function() {
-    		api.send({window: {id: this.id, maximize: true}});
+    		api.send({window: {id: this.id, eventType: 'maximize'}});
     	};
     	
     	CanvasWindow.prototype.setUndecorated = function(undecorated) {
-   			api.send({window: {id: this.id, toggleUndecorated: undecorated}});
+    		if (undecorated) {
+    			api.send({window: {id: this.id, eventType: 'undecorate'}});
+    		} else {
+    			api.send({window: {id: this.id, eventType: 'decorate'}});
+    		}
     	};
     	
     	CanvasWindow.prototype.isRelocated = function() {
@@ -1845,7 +1861,7 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
     	};
     	
     	CanvasWindow.prototype.requestFocus = function() {
-    		api.send({window: {id: this.id, focus: true}});
+    		api.send({window: {id: this.id, eventType: 'focus'}});
     	};
     	
     	CanvasWindow.prototype.performAction = function(options) {

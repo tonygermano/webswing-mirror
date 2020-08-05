@@ -254,6 +254,20 @@ public interface WebswingApi {
 	public void toggleWindowDock(Window window);
 	
 	/**
+	 * Toggle the dock state of a window.
+	 * Compositing window manager must be enabled in config. Window must be allowed to change the dock state according to config.
+	 * @throws IllegalArgumentException if isCompositingWindowManager() or isDockingEnabled(window) returns false
+	 */
+	public void toggleWindowDock(Window window, boolean undocked);
+	
+	/**
+	 * Check whether window is in undocked state.
+	 * Compositing window manager must be enabled in config.
+	 * @throws IllegalArgumentException if isCompositingWindowManager() returns false
+	 */
+	public boolean isUndocked(Window window);
+	
+	/**
 	 * Is touch mode active?
 	 */
 	public boolean isTouchMode();

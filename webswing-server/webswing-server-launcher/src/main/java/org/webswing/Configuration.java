@@ -1,5 +1,7 @@
 package org.webswing;
 
+import java.io.File;
+
 public abstract class Configuration {
 
     private static Configuration singleton = new ConfigurationImpl();
@@ -25,6 +27,8 @@ public abstract class Configuration {
     public abstract boolean isClientAuthEnabled();
 
     public abstract String getConfigFile();
+    
+    public abstract File resolveConfigFile(String filename);
 
     public abstract String getContextPath();
 

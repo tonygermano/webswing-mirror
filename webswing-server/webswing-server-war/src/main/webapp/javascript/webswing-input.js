@@ -19,7 +19,6 @@
             register: register,
             sendInput: sendInput,
             dispose: dispose,
-            getPagePosition: getPagePosition,
             registerUndockedCanvas: registerUndockedCanvas,
             updateFocusedHtmlCanvas: updateFocusedHtmlCanvas
         };
@@ -33,6 +32,7 @@
         var latestMouseWheelEvent = null;
         var latestWindowResizeEvent = null;
         var latestKeyDownEvent = null;
+        var latestKeyDownEventSendTimeout = null;
         var mouseDown = 0;
         var mouseDownButton = 0;
         var mouseDownCanvas = null;
@@ -76,10 +76,6 @@
                     inputEvtQueue.push(latestWindowResizeEvent);
                     latestWindowResizeEvent = null;
                 }
-                if (latestKeyDownEvent != null) {
-                    inputEvtQueue.push(latestKeyDownEvent);
-                    latestKeyDownEvent = null;
-                }
                 if (message != null) {
                     if (JSON.stringify(inputEvtQueue[inputEvtQueue.length - 1]) !== JSON.stringify(message)) {
                         inputEvtQueue.push(message);
@@ -93,6 +89,7 @@
             latestMouseWheelEvent = null;
             latestWindowResizeEvent = null;
             latestKeyDownEvent = null;
+            latestKeyDownEventSendTimeout = null;
             mouseDown = 0;
             mouseDownButton = 0;
             resetMouseDownCanvas();
@@ -113,13 +110,6 @@
             }
         }
         
-        function getPagePosition(parentWinId) {
-        	if (!parentWinId) {
-        		return {x: 0, y: 0};
-        	}
-        	return pagePosition[parentWinId];
-        }
-
         function registerUndockedCanvas(win) {
         	var inputE = win.document.createElement("input");
         	inputE.classList.add("ws-input-hidden");
@@ -192,7 +182,9 @@
         }
 
         function handleWindowBlur(targetWindow) {
-            updateFocusedHtmlCanvas(targetWindow.document.activeElement)
+        	if (targetWindow !== null) {
+        		updateFocusedHtmlCanvas(targetWindow.document.activeElement)
+        	}
         }
         
         function handleMouseDown(evt, input) {
@@ -445,10 +437,18 @@
                 if (isCtrlCmd(keyevt) && !keyevt.key.alt) {
                     event.preventDefault();
                 }
-                if (latestKeyDownEvent != null) {
-                    enqueueInputEvent();//so we dont lose the previous keydown
+
+                if(latestKeyDownEvent!=null){
+                    enqueueInputEvent(latestKeyDownEvent);
+                    latestKeyDownEvent=null;
+                    clearTimeout(latestKeyDownEventSendTimeout);
+                    latestKeyDownEventSendTimeout=null
                 }
                 latestKeyDownEvent = keyevt;
+                latestKeyDownEventSendTimeout = setTimeout(function(){
+                    enqueueInputEvent(latestKeyDownEvent);
+                    latestKeyDownEvent=null;
+                },100);
 
                 //generate keypress event for alt+key events
                 if (!util.detectMac() && keyevt.key.alt && functionKeys.indexOf(kc) == -1) {
@@ -485,6 +485,10 @@
                     event.stopPropagation();
                 if (latestKeyDownEvent != null) {
                     latestKeyDownEvent.key.character = keyevt.key.character;
+                    enqueueInputEvent(latestKeyDownEvent);
+                    latestKeyDownEvent=null;
+                    clearTimeout(latestKeyDownEventSendTimeout);
+                    latestKeyDownEventSendTimeout=null
                 }
                 enqueueInputEvent(keyevt);
             }
@@ -500,8 +504,15 @@
         	if (api.cfg.touchMode) {
         		return;
         	}
-        	
-        	var keyevt = getKBKey('keyup', event);
+            var keyevt = getKBKey('keyup', event);
+
+            if(latestKeyDownEvent!=null && latestKeyDownEvent.key.keycode === keyevt.key.keycode){
+                enqueueInputEvent(latestKeyDownEvent);
+                latestKeyDownEvent=null;
+                clearTimeout(latestKeyDownEventSendTimeout);
+                latestKeyDownEventSendTimeout=null
+            }
+
             if (!isClipboardEvent(keyevt)) { // cut copy paste handled separately
             	if (!api.cfg.virtualKB && !isInputCaretControl(event.keyCode, event.target)) {
                     event.preventDefault();

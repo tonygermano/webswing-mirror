@@ -55,16 +55,17 @@ public class ServerMain {
 			if (config.isHttps() && config.getTruststore() != null && !config.getTruststore().isEmpty() && config.getKeystore() != null && config.getKeystore().isEmpty()) {
 				Logger.error("SSL configuration is invalid. Please specify the location of truststore and keystore files.");
 			} else {
-				File relativeDir = new File(System.getProperty(Constants.CONFIG_PATH,"."));
-				if (!new File(relativeDir,config.getTruststore()).exists()) {
-					Logger.error("SSL configuration is invalid. Truststore file " + new File(config.getTruststore()).getAbsolutePath() + " does not exist.");
-				} else if (!new File(relativeDir,config.getKeystore()).exists()) {
-					Logger.error("SSL configuration is invalid. Keystore file " + new File(config.getKeystore()).getAbsolutePath() + " does not exist.");
+				File keyStoreFile = config.resolveConfigFile(config.getKeystore());
+				File trustStoreFile = config.resolveConfigFile(config.getTruststore());
+				if (!trustStoreFile.exists()) {
+					Logger.error("SSL configuration is invalid. Truststore file " + trustStoreFile.getAbsolutePath() + " does not exist.");
+				} else if (!keyStoreFile.exists()) {
+					Logger.error("SSL configuration is invalid. Keystore file " + keyStoreFile.getAbsolutePath() + " does not exist.");
 				} else {
 					SslContextFactory sslContextFactory = new SslContextFactory();
-					sslContextFactory.setKeyStorePath(new File(relativeDir,config.getKeystore()).getAbsolutePath());
+					sslContextFactory.setKeyStorePath(keyStoreFile.getAbsolutePath());
 					sslContextFactory.setKeyStorePassword(config.getKeystorePassword());
-					sslContextFactory.setTrustStorePath(new File(relativeDir,config.getTruststore()).getAbsolutePath());
+					sslContextFactory.setTrustStorePath(trustStoreFile.getAbsolutePath());
 					sslContextFactory.setTrustStorePassword(config.getTruststorePassword());
 					sslContextFactory.setNeedClientAuth(config.isClientAuthEnabled());
 

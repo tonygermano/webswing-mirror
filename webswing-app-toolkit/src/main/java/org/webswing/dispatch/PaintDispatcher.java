@@ -41,6 +41,7 @@ public interface PaintDispatcher {
 	void notifyBackgroundAreaVisible(Rectangle toRepaint);
 	void notifyScreenSizeChanged(int oldWidht, int oldHeight, int screenWidth, int screenHeight);
 	void notifyWindowMoved(Window w,int zIndex,  Rectangle from, Rectangle to);
+	void notifyWindowDockStateChanged();
 	void notifyWindowSwitchList();
 
 	void notifyFocusEvent(FocusEventMsg msg);
@@ -87,8 +88,6 @@ public interface PaintDispatcher {
 	void notifyAudioEventStop(AudioClip clip);
 	void notifyAudioEventPlay(AudioClip clip, byte[] data, Float time, Integer loop);
 	AudioClip findAudioClip(String id);
-
-	void notifyWindowDockAction(String windowId);
 
 	void registerFileChooserWindows(JFileChooser fileChooser, Window parent);
 

@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.peer.WindowPeer;
 
 import org.webswing.Constants;
+import org.webswing.toolkit.api.component.Dockable;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
@@ -15,6 +16,7 @@ abstract public class WebWindowPeer extends WebContainerPeer implements WindowPe
 	private static final int VALIDATE_BOUNDS_THRESHOLD = 40;
 	
 	private Boolean undecoratedOverride;
+	private boolean undocked;
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////// WebWindowPeer Implementation//////////////////////////////////////////////////
@@ -23,6 +25,10 @@ abstract public class WebWindowPeer extends WebContainerPeer implements WindowPe
 		Font font = t.getFont();
 		if (font == null) {
 			t.setFont(WebToolkit.defaultFont);
+		}
+		
+		if (t instanceof Dockable && ((Dockable) t).isAutoUndock()) {
+			setUndocked(true);
 		}
 	}
 
@@ -139,6 +145,16 @@ abstract public class WebWindowPeer extends WebContainerPeer implements WindowPe
 	
 	public Boolean getUndecoratedOverride() {
 		return undecoratedOverride;
+	}
+
+	public boolean isUndocked() {
+		return undocked;
+	}
+
+	public void setUndocked(boolean undocked) {
+		this.undocked = undocked;
+		updateWindowDecorationImage();
+		Util.getWebToolkit().getPaintDispatcher().notifyWindowDockStateChanged();
 	}
 	
 }

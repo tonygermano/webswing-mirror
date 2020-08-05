@@ -11,10 +11,17 @@ public class WindowEventMsgIn implements MsgIn {
 	private int y;
 	private int width;
 	private int height;
-	private boolean close;
-	private boolean focus;
-	private boolean maximize;
-	private Boolean toggleUndecorated;
+	private WindowEventType eventType;
+	
+	public enum WindowEventType {
+		close,
+		focus,
+		maximize,
+		undecorate,
+		decorate,
+		undock,
+		dock
+	}
 	
 	public String getId() {
 		return id;
@@ -56,36 +63,12 @@ public class WindowEventMsgIn implements MsgIn {
 		this.height = height;
 	}
 
-	public boolean isClose() {
-		return close;
+	public WindowEventType getEventType() {
+		return eventType;
 	}
 
-	public void setClose(boolean close) {
-		this.close = close;
-	}
-
-	public boolean isFocus() {
-		return focus;
-	}
-
-	public void setFocus(boolean focus) {
-		this.focus = focus;
-	}
-
-	public boolean isMaximize() {
-		return maximize;
-	}
-
-	public void setMaximize(boolean maximize) {
-		this.maximize = maximize;
-	}
-
-	public Boolean getToggleUndecorated() {
-		return toggleUndecorated;
-	}
-
-	public void setToggleUndecorated(Boolean toggleUndecorated) {
-		this.toggleUndecorated = toggleUndecorated;
+	public void setEventType(WindowEventType eventType) {
+		this.eventType = eventType;
 	}
 
 }

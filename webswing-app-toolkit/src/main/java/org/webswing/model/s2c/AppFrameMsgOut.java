@@ -31,7 +31,6 @@ public class AppFrameMsgOut implements MsgOut {
 	private List<ComponentTreeMsg> componentTree;
 	private ActionEventMsgOut actionEvent;
 	private AudioEventMsgOut audioEvent;
-	private WindowDockMsg dockAction;
 	private boolean directDraw;
 	private boolean compositingWM;
 	private AccessibilityMsg accessible;
@@ -236,14 +235,6 @@ public class AppFrameMsgOut implements MsgOut {
 		this.audioEvent = audioEvent;
 	}
 
-	public WindowDockMsg getDockAction() {
-		return dockAction;
-	}
-
-	public void setDockAction(WindowDockMsg dockAction) {
-		this.dockAction = dockAction;
-	}
-	
 	public AccessibilityMsg getAccessible() {
 		return accessible;
 	}

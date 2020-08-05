@@ -83,7 +83,6 @@ $root.org = (function() {
                          * @property {org.webswing.server.model.proto.IActionEventMsgOutProto|null} [actionEvent] AppFrameMsgOutProto actionEvent
                          * @property {boolean|null} [compositingWM] AppFrameMsgOutProto compositingWM
                          * @property {org.webswing.server.model.proto.IAudioEventMsgOutProto|null} [audioEvent] AppFrameMsgOutProto audioEvent
-                         * @property {org.webswing.server.model.proto.IWindowDockMsgProto|null} [dockAction] AppFrameMsgOutProto dockAction
                          * @property {org.webswing.server.model.proto.IAccessibilityMsgProto|null} [accessible] AppFrameMsgOutProto accessible
                          * @property {Array.<org.webswing.server.model.proto.IWindowSwitchMsgProto>|null} [windowSwitchList] AppFrameMsgOutProto windowSwitchList
                          */
@@ -292,14 +291,6 @@ $root.org = (function() {
                         AppFrameMsgOutProto.prototype.audioEvent = null;
 
                         /**
-                         * AppFrameMsgOutProto dockAction.
-                         * @member {org.webswing.server.model.proto.IWindowDockMsgProto|null|undefined} dockAction
-                         * @memberof org.webswing.server.model.proto.AppFrameMsgOutProto
-                         * @instance
-                         */
-                        AppFrameMsgOutProto.prototype.dockAction = null;
-
-                        /**
                          * AppFrameMsgOutProto accessible.
                          * @member {org.webswing.server.model.proto.IAccessibilityMsgProto|null|undefined} accessible
                          * @memberof org.webswing.server.model.proto.AppFrameMsgOutProto
@@ -388,13 +379,11 @@ $root.org = (function() {
                                 writer.uint32(/* id 22, wireType 0 =*/176).bool(message.compositingWM);
                             if (message.audioEvent != null && message.hasOwnProperty("audioEvent"))
                                 $root.org.webswing.server.model.proto.AudioEventMsgOutProto.encode(message.audioEvent, writer.uint32(/* id 23, wireType 2 =*/186).fork()).ldelim();
-                            if (message.dockAction != null && message.hasOwnProperty("dockAction"))
-                                $root.org.webswing.server.model.proto.WindowDockMsgProto.encode(message.dockAction, writer.uint32(/* id 24, wireType 2 =*/194).fork()).ldelim();
                             if (message.accessible != null && message.hasOwnProperty("accessible"))
-                                $root.org.webswing.server.model.proto.AccessibilityMsgProto.encode(message.accessible, writer.uint32(/* id 25, wireType 2 =*/202).fork()).ldelim();
+                                $root.org.webswing.server.model.proto.AccessibilityMsgProto.encode(message.accessible, writer.uint32(/* id 24, wireType 2 =*/194).fork()).ldelim();
                             if (message.windowSwitchList != null && message.windowSwitchList.length)
                                 for (var i = 0; i < message.windowSwitchList.length; ++i)
-                                    $root.org.webswing.server.model.proto.WindowSwitchMsgProto.encode(message.windowSwitchList[i], writer.uint32(/* id 26, wireType 2 =*/210).fork()).ldelim();
+                                    $root.org.webswing.server.model.proto.WindowSwitchMsgProto.encode(message.windowSwitchList[i], writer.uint32(/* id 25, wireType 2 =*/202).fork()).ldelim();
                             return writer;
                         };
 
@@ -492,12 +481,9 @@ $root.org = (function() {
                                     message.audioEvent = $root.org.webswing.server.model.proto.AudioEventMsgOutProto.decode(reader, reader.uint32());
                                     break;
                                 case 24:
-                                    message.dockAction = $root.org.webswing.server.model.proto.WindowDockMsgProto.decode(reader, reader.uint32());
-                                    break;
-                                case 25:
                                     message.accessible = $root.org.webswing.server.model.proto.AccessibilityMsgProto.decode(reader, reader.uint32());
                                     break;
-                                case 26:
+                                case 25:
                                     if (!(message.windowSwitchList && message.windowSwitchList.length))
                                         message.windowSwitchList = [];
                                     message.windowSwitchList.push($root.org.webswing.server.model.proto.WindowSwitchMsgProto.decode(reader, reader.uint32()));
@@ -678,11 +664,6 @@ $root.org = (function() {
                                     throw TypeError(".org.webswing.server.model.proto.AppFrameMsgOutProto.audioEvent: object expected");
                                 message.audioEvent = $root.org.webswing.server.model.proto.AudioEventMsgOutProto.fromObject(object.audioEvent);
                             }
-                            if (object.dockAction != null) {
-                                if (typeof object.dockAction !== "object")
-                                    throw TypeError(".org.webswing.server.model.proto.AppFrameMsgOutProto.dockAction: object expected");
-                                message.dockAction = $root.org.webswing.server.model.proto.WindowDockMsgProto.fromObject(object.dockAction);
-                            }
                             if (object.accessible != null) {
                                 if (typeof object.accessible !== "object")
                                     throw TypeError(".org.webswing.server.model.proto.AppFrameMsgOutProto.accessible: object expected");
@@ -741,7 +722,6 @@ $root.org = (function() {
                                 object.actionEvent = null;
                                 object.compositingWM = false;
                                 object.audioEvent = null;
-                                object.dockAction = null;
                                 object.accessible = null;
                             }
                             if (message.applications && message.applications.length) {
@@ -799,8 +779,6 @@ $root.org = (function() {
                                 object.compositingWM = message.compositingWM;
                             if (message.audioEvent != null && message.hasOwnProperty("audioEvent"))
                                 object.audioEvent = $root.org.webswing.server.model.proto.AudioEventMsgOutProto.toObject(message.audioEvent, options);
-                            if (message.dockAction != null && message.hasOwnProperty("dockAction"))
-                                object.dockAction = $root.org.webswing.server.model.proto.WindowDockMsgProto.toObject(message.dockAction, options);
                             if (message.accessible != null && message.hasOwnProperty("accessible"))
                                 object.accessible = $root.org.webswing.server.model.proto.AccessibilityMsgProto.toObject(message.accessible, options);
                             if (message.windowSwitchList && message.windowSwitchList.length) {
@@ -3859,6 +3837,7 @@ $root.org = (function() {
                          * @property {number|null} [state] WindowMsgProto state
                          * @property {Array.<org.webswing.server.model.proto.IWindowMsgProto>|null} [internalWindows] WindowMsgProto internalWindows
                          * @property {org.webswing.server.model.proto.WindowMsgProto.DockModeProto|null} [dockMode] WindowMsgProto dockMode
+                         * @property {org.webswing.server.model.proto.WindowMsgProto.DockStateProto|null} [dockState] WindowMsgProto dockState
                          * @property {org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto|null} [classType] WindowMsgProto classType
                          */
 
@@ -4000,6 +3979,14 @@ $root.org = (function() {
                         WindowMsgProto.prototype.dockMode = 1;
 
                         /**
+                         * WindowMsgProto dockState.
+                         * @member {org.webswing.server.model.proto.WindowMsgProto.DockStateProto} dockState
+                         * @memberof org.webswing.server.model.proto.WindowMsgProto
+                         * @instance
+                         */
+                        WindowMsgProto.prototype.dockState = 1;
+
+                        /**
                          * WindowMsgProto classType.
                          * @member {org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto} classType
                          * @memberof org.webswing.server.model.proto.WindowMsgProto
@@ -4062,8 +4049,10 @@ $root.org = (function() {
                                     $root.org.webswing.server.model.proto.WindowMsgProto.encode(message.internalWindows[i], writer.uint32(/* id 14, wireType 2 =*/114).fork()).ldelim();
                             if (message.dockMode != null && message.hasOwnProperty("dockMode"))
                                 writer.uint32(/* id 15, wireType 0 =*/120).int32(message.dockMode);
+                            if (message.dockState != null && message.hasOwnProperty("dockState"))
+                                writer.uint32(/* id 16, wireType 0 =*/128).int32(message.dockState);
                             if (message.classType != null && message.hasOwnProperty("classType"))
-                                writer.uint32(/* id 16, wireType 0 =*/128).int32(message.classType);
+                                writer.uint32(/* id 17, wireType 0 =*/136).int32(message.classType);
                             return writer;
                         };
 
@@ -4135,6 +4124,9 @@ $root.org = (function() {
                                     message.dockMode = reader.int32();
                                     break;
                                 case 16:
+                                    message.dockState = reader.int32();
+                                    break;
+                                case 17:
                                     message.classType = reader.int32();
                                     break;
                                 default:
@@ -4240,6 +4232,16 @@ $root.org = (function() {
                                 message.dockMode = 3;
                                 break;
                             }
+                            switch (object.dockState) {
+                            case "docked":
+                            case 1:
+                                message.dockState = 1;
+                                break;
+                            case "undocked":
+                            case 2:
+                                message.dockState = 2;
+                                break;
+                            }
                             switch (object.classType) {
                             case "other":
                             case 1:
@@ -4310,6 +4312,7 @@ $root.org = (function() {
                                 object.ownerId = "";
                                 object.state = 0;
                                 object.dockMode = options.enums === String ? "none" : 1;
+                                object.dockState = options.enums === String ? "docked" : 1;
                                 object.classType = options.enums === String ? "other" : 1;
                             }
                             if (message.id != null && message.hasOwnProperty("id"))
@@ -4348,6 +4351,8 @@ $root.org = (function() {
                             }
                             if (message.dockMode != null && message.hasOwnProperty("dockMode"))
                                 object.dockMode = options.enums === String ? $root.org.webswing.server.model.proto.WindowMsgProto.DockModeProto[message.dockMode] : message.dockMode;
+                            if (message.dockState != null && message.hasOwnProperty("dockState"))
+                                object.dockState = options.enums === String ? $root.org.webswing.server.model.proto.WindowMsgProto.DockStateProto[message.dockState] : message.dockState;
                             if (message.classType != null && message.hasOwnProperty("classType"))
                                 object.classType = options.enums === String ? $root.org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto[message.classType] : message.classType;
                             return object;
@@ -4421,6 +4426,20 @@ $root.org = (function() {
                             values[valuesById[1] = "none"] = 1;
                             values[valuesById[2] = "dockable"] = 2;
                             values[valuesById[3] = "autoUndock"] = 3;
+                            return values;
+                        })();
+
+                        /**
+                         * DockStateProto enum.
+                         * @name org.webswing.server.model.proto.WindowMsgProto.DockStateProto
+                         * @enum {string}
+                         * @property {number} docked=1 docked value
+                         * @property {number} undocked=2 undocked value
+                         */
+                        WindowMsgProto.DockStateProto = (function() {
+                            var valuesById = {}, values = Object.create(valuesById);
+                            values[valuesById[1] = "docked"] = 1;
+                            values[valuesById[2] = "undocked"] = 2;
                             return values;
                         })();
 
@@ -10480,10 +10499,7 @@ $root.org = (function() {
                          * @property {number|null} [y] WindowEventMsgInProto y
                          * @property {number|null} [width] WindowEventMsgInProto width
                          * @property {number|null} [height] WindowEventMsgInProto height
-                         * @property {boolean|null} [close] WindowEventMsgInProto close
-                         * @property {boolean|null} [focus] WindowEventMsgInProto focus
-                         * @property {boolean|null} [maximize] WindowEventMsgInProto maximize
-                         * @property {boolean|null} [toggleUndecorated] WindowEventMsgInProto toggleUndecorated
+                         * @property {org.webswing.server.model.proto.WindowEventMsgInProto.WindowEventTypeProto|null} [eventType] WindowEventMsgInProto eventType
                          */
 
                         /**
@@ -10542,36 +10558,12 @@ $root.org = (function() {
                         WindowEventMsgInProto.prototype.height = 0;
 
                         /**
-                         * WindowEventMsgInProto close.
-                         * @member {boolean} close
+                         * WindowEventMsgInProto eventType.
+                         * @member {org.webswing.server.model.proto.WindowEventMsgInProto.WindowEventTypeProto} eventType
                          * @memberof org.webswing.server.model.proto.WindowEventMsgInProto
                          * @instance
                          */
-                        WindowEventMsgInProto.prototype.close = false;
-
-                        /**
-                         * WindowEventMsgInProto focus.
-                         * @member {boolean} focus
-                         * @memberof org.webswing.server.model.proto.WindowEventMsgInProto
-                         * @instance
-                         */
-                        WindowEventMsgInProto.prototype.focus = false;
-
-                        /**
-                         * WindowEventMsgInProto maximize.
-                         * @member {boolean} maximize
-                         * @memberof org.webswing.server.model.proto.WindowEventMsgInProto
-                         * @instance
-                         */
-                        WindowEventMsgInProto.prototype.maximize = false;
-
-                        /**
-                         * WindowEventMsgInProto toggleUndecorated.
-                         * @member {boolean} toggleUndecorated
-                         * @memberof org.webswing.server.model.proto.WindowEventMsgInProto
-                         * @instance
-                         */
-                        WindowEventMsgInProto.prototype.toggleUndecorated = false;
+                        WindowEventMsgInProto.prototype.eventType = 0;
 
                         /**
                          * Creates a new WindowEventMsgInProto instance using the specified properties.
@@ -10607,14 +10599,8 @@ $root.org = (function() {
                                 writer.uint32(/* id 4, wireType 0 =*/32).sint32(message.width);
                             if (message.height != null && message.hasOwnProperty("height"))
                                 writer.uint32(/* id 5, wireType 0 =*/40).sint32(message.height);
-                            if (message.close != null && message.hasOwnProperty("close"))
-                                writer.uint32(/* id 6, wireType 0 =*/48).bool(message.close);
-                            if (message.focus != null && message.hasOwnProperty("focus"))
-                                writer.uint32(/* id 7, wireType 0 =*/56).bool(message.focus);
-                            if (message.maximize != null && message.hasOwnProperty("maximize"))
-                                writer.uint32(/* id 8, wireType 0 =*/64).bool(message.maximize);
-                            if (message.toggleUndecorated != null && message.hasOwnProperty("toggleUndecorated"))
-                                writer.uint32(/* id 9, wireType 0 =*/72).bool(message.toggleUndecorated);
+                            if (message.eventType != null && message.hasOwnProperty("eventType"))
+                                writer.uint32(/* id 6, wireType 0 =*/48).int32(message.eventType);
                             return writer;
                         };
 
@@ -10652,16 +10638,7 @@ $root.org = (function() {
                                     message.height = reader.sint32();
                                     break;
                                 case 6:
-                                    message.close = reader.bool();
-                                    break;
-                                case 7:
-                                    message.focus = reader.bool();
-                                    break;
-                                case 8:
-                                    message.maximize = reader.bool();
-                                    break;
-                                case 9:
-                                    message.toggleUndecorated = reader.bool();
+                                    message.eventType = reader.int32();
                                     break;
                                 default:
                                     reader.skipType(tag & 7);
@@ -10693,14 +10670,36 @@ $root.org = (function() {
                                 message.width = object.width | 0;
                             if (object.height != null)
                                 message.height = object.height | 0;
-                            if (object.close != null)
-                                message.close = Boolean(object.close);
-                            if (object.focus != null)
-                                message.focus = Boolean(object.focus);
-                            if (object.maximize != null)
-                                message.maximize = Boolean(object.maximize);
-                            if (object.toggleUndecorated != null)
-                                message.toggleUndecorated = Boolean(object.toggleUndecorated);
+                            switch (object.eventType) {
+                            case "close":
+                            case 0:
+                                message.eventType = 0;
+                                break;
+                            case "focus":
+                            case 1:
+                                message.eventType = 1;
+                                break;
+                            case "maximize":
+                            case 2:
+                                message.eventType = 2;
+                                break;
+                            case "undecorate":
+                            case 3:
+                                message.eventType = 3;
+                                break;
+                            case "decorate":
+                            case 4:
+                                message.eventType = 4;
+                                break;
+                            case "undock":
+                            case 5:
+                                message.eventType = 5;
+                                break;
+                            case "dock":
+                            case 6:
+                                message.eventType = 6;
+                                break;
+                            }
                             return message;
                         };
 
@@ -10723,10 +10722,7 @@ $root.org = (function() {
                                 object.y = 0;
                                 object.width = 0;
                                 object.height = 0;
-                                object.close = false;
-                                object.focus = false;
-                                object.maximize = false;
-                                object.toggleUndecorated = false;
+                                object.eventType = options.enums === String ? "close" : 0;
                             }
                             if (message.id != null && message.hasOwnProperty("id"))
                                 object.id = message.id;
@@ -10738,14 +10734,8 @@ $root.org = (function() {
                                 object.width = message.width;
                             if (message.height != null && message.hasOwnProperty("height"))
                                 object.height = message.height;
-                            if (message.close != null && message.hasOwnProperty("close"))
-                                object.close = message.close;
-                            if (message.focus != null && message.hasOwnProperty("focus"))
-                                object.focus = message.focus;
-                            if (message.maximize != null && message.hasOwnProperty("maximize"))
-                                object.maximize = message.maximize;
-                            if (message.toggleUndecorated != null && message.hasOwnProperty("toggleUndecorated"))
-                                object.toggleUndecorated = message.toggleUndecorated;
+                            if (message.eventType != null && message.hasOwnProperty("eventType"))
+                                object.eventType = options.enums === String ? $root.org.webswing.server.model.proto.WindowEventMsgInProto.WindowEventTypeProto[message.eventType] : message.eventType;
                             return object;
                         };
 
@@ -10759,6 +10749,30 @@ $root.org = (function() {
                         WindowEventMsgInProto.prototype.toJSON = function toJSON() {
                             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
                         };
+
+                        /**
+                         * WindowEventTypeProto enum.
+                         * @name org.webswing.server.model.proto.WindowEventMsgInProto.WindowEventTypeProto
+                         * @enum {string}
+                         * @property {number} close=0 close value
+                         * @property {number} focus=1 focus value
+                         * @property {number} maximize=2 maximize value
+                         * @property {number} undecorate=3 undecorate value
+                         * @property {number} decorate=4 decorate value
+                         * @property {number} undock=5 undock value
+                         * @property {number} dock=6 dock value
+                         */
+                        WindowEventMsgInProto.WindowEventTypeProto = (function() {
+                            var valuesById = {}, values = Object.create(valuesById);
+                            values[valuesById[0] = "close"] = 0;
+                            values[valuesById[1] = "focus"] = 1;
+                            values[valuesById[2] = "maximize"] = 2;
+                            values[valuesById[3] = "undecorate"] = 3;
+                            values[valuesById[4] = "decorate"] = 4;
+                            values[valuesById[5] = "undock"] = 5;
+                            values[valuesById[6] = "dock"] = 6;
+                            return values;
+                        })();
 
                         return WindowEventMsgInProto;
                     })();
@@ -11640,147 +11654,6 @@ $root.org = (function() {
                         })();
 
                         return AudioEventMsgOutProto;
-                    })();
-
-                    proto.WindowDockMsgProto = (function() {
-
-                        /**
-                         * Properties of a WindowDockMsgProto.
-                         * @memberof org.webswing.server.model.proto
-                         * @interface IWindowDockMsgProto
-                         * @property {string|null} [windowId] WindowDockMsgProto windowId
-                         */
-
-                        /**
-                         * Constructs a new WindowDockMsgProto.
-                         * @memberof org.webswing.server.model.proto
-                         * @classdesc Represents a WindowDockMsgProto.
-                         * @implements IWindowDockMsgProto
-                         * @constructor
-                         * @param {org.webswing.server.model.proto.IWindowDockMsgProto=} [properties] Properties to set
-                         */
-                        function WindowDockMsgProto(properties) {
-                            if (properties)
-                                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                                    if (properties[keys[i]] != null)
-                                        this[keys[i]] = properties[keys[i]];
-                        }
-
-                        /**
-                         * WindowDockMsgProto windowId.
-                         * @member {string} windowId
-                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
-                         * @instance
-                         */
-                        WindowDockMsgProto.prototype.windowId = "";
-
-                        /**
-                         * Creates a new WindowDockMsgProto instance using the specified properties.
-                         * @function create
-                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
-                         * @static
-                         * @param {org.webswing.server.model.proto.IWindowDockMsgProto=} [properties] Properties to set
-                         * @returns {org.webswing.server.model.proto.WindowDockMsgProto} WindowDockMsgProto instance
-                         */
-                        WindowDockMsgProto.create = function create(properties) {
-                            return new WindowDockMsgProto(properties);
-                        };
-
-                        /**
-                         * Encodes the specified WindowDockMsgProto message. Does not implicitly {@link org.webswing.server.model.proto.WindowDockMsgProto.verify|verify} messages.
-                         * @function encode
-                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
-                         * @static
-                         * @param {org.webswing.server.model.proto.IWindowDockMsgProto} message WindowDockMsgProto message or plain object to encode
-                         * @param {$protobuf.Writer} [writer] Writer to encode to
-                         * @returns {$protobuf.Writer} Writer
-                         */
-                        WindowDockMsgProto.encode = function encode(message, writer) {
-                            if (!writer)
-                                writer = $Writer.create();
-                            if (message.windowId != null && message.hasOwnProperty("windowId"))
-                                writer.uint32(/* id 1, wireType 2 =*/10).string(message.windowId);
-                            return writer;
-                        };
-
-                        /**
-                         * Decodes a WindowDockMsgProto message from the specified reader or buffer.
-                         * @function decode
-                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
-                         * @static
-                         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                         * @param {number} [length] Message length if known beforehand
-                         * @returns {org.webswing.server.model.proto.WindowDockMsgProto} WindowDockMsgProto
-                         * @throws {Error} If the payload is not a reader or valid buffer
-                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                         */
-                        WindowDockMsgProto.decode = function decode(reader, length) {
-                            if (!(reader instanceof $Reader))
-                                reader = $Reader.create(reader);
-                            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.org.webswing.server.model.proto.WindowDockMsgProto();
-                            while (reader.pos < end) {
-                                var tag = reader.uint32();
-                                switch (tag >>> 3) {
-                                case 1:
-                                    message.windowId = reader.string();
-                                    break;
-                                default:
-                                    reader.skipType(tag & 7);
-                                    break;
-                                }
-                            }
-                            return message;
-                        };
-
-                        /**
-                         * Creates a WindowDockMsgProto message from a plain object. Also converts values to their respective internal types.
-                         * @function fromObject
-                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
-                         * @static
-                         * @param {Object.<string,*>} object Plain object
-                         * @returns {org.webswing.server.model.proto.WindowDockMsgProto} WindowDockMsgProto
-                         */
-                        WindowDockMsgProto.fromObject = function fromObject(object) {
-                            if (object instanceof $root.org.webswing.server.model.proto.WindowDockMsgProto)
-                                return object;
-                            var message = new $root.org.webswing.server.model.proto.WindowDockMsgProto();
-                            if (object.windowId != null)
-                                message.windowId = String(object.windowId);
-                            return message;
-                        };
-
-                        /**
-                         * Creates a plain object from a WindowDockMsgProto message. Also converts values to other types if specified.
-                         * @function toObject
-                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
-                         * @static
-                         * @param {org.webswing.server.model.proto.WindowDockMsgProto} message WindowDockMsgProto
-                         * @param {$protobuf.IConversionOptions} [options] Conversion options
-                         * @returns {Object.<string,*>} Plain object
-                         */
-                        WindowDockMsgProto.toObject = function toObject(message, options) {
-                            if (!options)
-                                options = {};
-                            var object = {};
-                            if (options.defaults)
-                                object.windowId = "";
-                            if (message.windowId != null && message.hasOwnProperty("windowId"))
-                                object.windowId = message.windowId;
-                            return object;
-                        };
-
-                        /**
-                         * Converts this WindowDockMsgProto to JSON.
-                         * @function toJSON
-                         * @memberof org.webswing.server.model.proto.WindowDockMsgProto
-                         * @instance
-                         * @returns {Object.<string,*>} JSON object
-                         */
-                        WindowDockMsgProto.prototype.toJSON = function toJSON() {
-                            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-                        };
-
-                        return WindowDockMsgProto;
                     })();
 
                     return proto;

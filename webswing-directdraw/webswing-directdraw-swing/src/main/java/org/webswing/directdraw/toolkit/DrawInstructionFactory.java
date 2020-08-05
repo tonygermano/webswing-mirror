@@ -117,15 +117,17 @@ public class DrawInstructionFactory {
 	protected DrawConstant<?> getPaintConstant(Paint p) {
 		if (p instanceof Color) {
 			return new ColorConst(ctx, (Color) p);
-		} else if (p instanceof GradientPaint) {
+		} else if (p instanceof TexturePaint) {
+			return new TextureConst(ctx, (TexturePaint) p);
+		}if (p instanceof GradientPaint) {
 			return new GradientConst(ctx, (GradientPaint) p);
-		} else if (p instanceof LinearGradientPaint) {
+		} else if(Boolean.getBoolean("directdraw.serverSideGradients")){
+			throw new UnsupportedOperationException();
+		}else if (p instanceof LinearGradientPaint) {
 			return new LinearGradientConst(ctx, (LinearGradientPaint) p);
 		} else if (p instanceof RadialGradientPaint) {
 			return new RadialGradientConst(ctx, (RadialGradientPaint) p);
-		} else if (p instanceof TexturePaint) {
-			return new TextureConst(ctx, (TexturePaint) p);
-		}
+		} else
 		throw new UnsupportedOperationException();
 	}
 

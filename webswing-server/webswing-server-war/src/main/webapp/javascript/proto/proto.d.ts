@@ -86,9 +86,6 @@ export namespace org {
                         /** AppFrameMsgOutProto audioEvent */
                         audioEvent?: (org.webswing.server.model.proto.IAudioEventMsgOutProto|null);
 
-                        /** AppFrameMsgOutProto dockAction */
-                        dockAction?: (org.webswing.server.model.proto.IWindowDockMsgProto|null);
-
                         /** AppFrameMsgOutProto accessible */
                         accessible?: (org.webswing.server.model.proto.IAccessibilityMsgProto|null);
 
@@ -173,9 +170,6 @@ export namespace org {
 
                         /** AppFrameMsgOutProto audioEvent. */
                         public audioEvent?: (org.webswing.server.model.proto.IAudioEventMsgOutProto|null);
-
-                        /** AppFrameMsgOutProto dockAction. */
-                        public dockAction?: (org.webswing.server.model.proto.IWindowDockMsgProto|null);
 
                         /** AppFrameMsgOutProto accessible. */
                         public accessible?: (org.webswing.server.model.proto.IAccessibilityMsgProto|null);
@@ -1439,6 +1433,9 @@ export namespace org {
                         /** WindowMsgProto dockMode */
                         dockMode?: (org.webswing.server.model.proto.WindowMsgProto.DockModeProto|null);
 
+                        /** WindowMsgProto dockState */
+                        dockState?: (org.webswing.server.model.proto.WindowMsgProto.DockStateProto|null);
+
                         /** WindowMsgProto classType */
                         classType?: (org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto|null);
                     }
@@ -1496,6 +1493,9 @@ export namespace org {
 
                         /** WindowMsgProto dockMode. */
                         public dockMode: org.webswing.server.model.proto.WindowMsgProto.DockModeProto;
+
+                        /** WindowMsgProto dockState. */
+                        public dockState: org.webswing.server.model.proto.WindowMsgProto.DockStateProto;
 
                         /** WindowMsgProto classType. */
                         public classType: org.webswing.server.model.proto.WindowMsgProto.WindowClassTypeProto;
@@ -1574,6 +1574,12 @@ export namespace org {
                             none = 1,
                             dockable = 2,
                             autoUndock = 3
+                        }
+
+                        /** DockStateProto enum. */
+                        enum DockStateProto {
+                            docked = 1,
+                            undocked = 2
                         }
                     }
 
@@ -3986,17 +3992,8 @@ export namespace org {
                         /** WindowEventMsgInProto height */
                         height?: (number|null);
 
-                        /** WindowEventMsgInProto close */
-                        close?: (boolean|null);
-
-                        /** WindowEventMsgInProto focus */
-                        focus?: (boolean|null);
-
-                        /** WindowEventMsgInProto maximize */
-                        maximize?: (boolean|null);
-
-                        /** WindowEventMsgInProto toggleUndecorated */
-                        toggleUndecorated?: (boolean|null);
+                        /** WindowEventMsgInProto eventType */
+                        eventType?: (org.webswing.server.model.proto.WindowEventMsgInProto.WindowEventTypeProto|null);
                     }
 
                     /** Represents a WindowEventMsgInProto. */
@@ -4023,17 +4020,8 @@ export namespace org {
                         /** WindowEventMsgInProto height. */
                         public height: number;
 
-                        /** WindowEventMsgInProto close. */
-                        public close: boolean;
-
-                        /** WindowEventMsgInProto focus. */
-                        public focus: boolean;
-
-                        /** WindowEventMsgInProto maximize. */
-                        public maximize: boolean;
-
-                        /** WindowEventMsgInProto toggleUndecorated. */
-                        public toggleUndecorated: boolean;
+                        /** WindowEventMsgInProto eventType. */
+                        public eventType: org.webswing.server.model.proto.WindowEventMsgInProto.WindowEventTypeProto;
 
                         /**
                          * Creates a new WindowEventMsgInProto instance using the specified properties.
@@ -4080,6 +4068,20 @@ export namespace org {
                          * @returns JSON object
                          */
                         public toJSON(): { [k: string]: any };
+                    }
+
+                    namespace WindowEventMsgInProto {
+
+                        /** WindowEventTypeProto enum. */
+                        enum WindowEventTypeProto {
+                            close = 0,
+                            focus = 1,
+                            maximize = 2,
+                            undecorate = 3,
+                            decorate = 4,
+                            undock = 5,
+                            dock = 6
+                        }
                     }
 
                     /** Properties of an AudioEventMsgInProto. */
@@ -4436,72 +4438,6 @@ export namespace org {
                             update = 2,
                             dispose = 3
                         }
-                    }
-
-                    /** Properties of a WindowDockMsgProto. */
-                    interface IWindowDockMsgProto {
-
-                        /** WindowDockMsgProto windowId */
-                        windowId?: (string|null);
-                    }
-
-                    /** Represents a WindowDockMsgProto. */
-                    class WindowDockMsgProto implements IWindowDockMsgProto {
-
-                        /**
-                         * Constructs a new WindowDockMsgProto.
-                         * @param [properties] Properties to set
-                         */
-                        constructor(properties?: org.webswing.server.model.proto.IWindowDockMsgProto);
-
-                        /** WindowDockMsgProto windowId. */
-                        public windowId: string;
-
-                        /**
-                         * Creates a new WindowDockMsgProto instance using the specified properties.
-                         * @param [properties] Properties to set
-                         * @returns WindowDockMsgProto instance
-                         */
-                        public static create(properties?: org.webswing.server.model.proto.IWindowDockMsgProto): org.webswing.server.model.proto.WindowDockMsgProto;
-
-                        /**
-                         * Encodes the specified WindowDockMsgProto message. Does not implicitly {@link org.webswing.server.model.proto.WindowDockMsgProto.verify|verify} messages.
-                         * @param message WindowDockMsgProto message or plain object to encode
-                         * @param [writer] Writer to encode to
-                         * @returns Writer
-                         */
-                        public static encode(message: org.webswing.server.model.proto.IWindowDockMsgProto, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                        /**
-                         * Decodes a WindowDockMsgProto message from the specified reader or buffer.
-                         * @param reader Reader or buffer to decode from
-                         * @param [length] Message length if known beforehand
-                         * @returns WindowDockMsgProto
-                         * @throws {Error} If the payload is not a reader or valid buffer
-                         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                         */
-                        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): org.webswing.server.model.proto.WindowDockMsgProto;
-
-                        /**
-                         * Creates a WindowDockMsgProto message from a plain object. Also converts values to their respective internal types.
-                         * @param object Plain object
-                         * @returns WindowDockMsgProto
-                         */
-                        public static fromObject(object: { [k: string]: any }): org.webswing.server.model.proto.WindowDockMsgProto;
-
-                        /**
-                         * Creates a plain object from a WindowDockMsgProto message. Also converts values to other types if specified.
-                         * @param message WindowDockMsgProto
-                         * @param [options] Conversion options
-                         * @returns Plain object
-                         */
-                        public static toObject(message: org.webswing.server.model.proto.WindowDockMsgProto, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-                        /**
-                         * Converts this WindowDockMsgProto to JSON.
-                         * @returns JSON object
-                         */
-                        public toJSON(): { [k: string]: any };
                     }
                 }
             }

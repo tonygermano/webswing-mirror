@@ -57,6 +57,7 @@ import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
 import org.webswing.model.s2c.WindowMsg;
 import org.webswing.model.s2c.WindowMsg.DockMode;
+import org.webswing.model.s2c.WindowMsg.DockState;
 import org.webswing.model.s2c.WindowMsg.WindowClassType;
 import org.webswing.model.s2c.WindowMsg.WindowType;
 import org.webswing.model.s2c.WindowPartialContentMsg;
@@ -420,6 +421,7 @@ public class Util {
 			
 			fillClassType(ww.getTarget(), window);
 			fillDockMode(ww.getTarget(), window);
+			window.setDockState(ww.isUndocked() ? DockState.undocked : DockState.docked);
 			
 			boolean modalBlocked = ww.getTarget() instanceof Window && getWebToolkit().getWindowManager().isBlockedByModality((Window) ww.getTarget(), false);
 			window.setModalBlocked(modalBlocked);
@@ -871,6 +873,24 @@ public class Util {
 			return "NONE";
 		}
 		return System.getProperty(Constants.SWING_START_SYS_PROP_DOCK_MODE, "NONE");
+	}
+	
+	public static boolean isWindowUndocked(Window window) {
+		WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(window);
+		if (peer == null) {
+			throw new IllegalArgumentException("Cannot find web window peer!");
+		}
+		
+		return peer.isUndocked();
+	}
+	
+	public static void toggleWindowDock(Window window, boolean undock) {
+		WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(window);
+		if (peer == null) {
+			throw new IllegalArgumentException("Cannot find web window peer!");
+		}
+		
+		peer.setUndocked(undock);
 	}
 	
 	public static boolean isTouchMode() {

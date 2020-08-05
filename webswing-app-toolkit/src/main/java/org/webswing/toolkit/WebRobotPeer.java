@@ -1,27 +1,27 @@
 package org.webswing.toolkit;
 
+import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.awt.peer.RobotPeer;
+import java.util.HashSet;
+import java.util.UUID;
+
 import org.webswing.model.c2s.KeyboardEventMsgIn;
 import org.webswing.model.c2s.MouseEventMsgIn;
 import org.webswing.model.c2s.PixelsAreaResponseMsgIn;
-import org.webswing.model.c2s.SimpleEventMsgIn;
 import org.webswing.model.s2c.AppFrameMsgOut;
 import org.webswing.model.s2c.PixelsAreaRequestMsgOut;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
-
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.awt.peer.RobotPeer;
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.nio.Buffer;
-import java.util.HashSet;
-import java.util.UUID;
-import java.util.concurrent.TimeoutException;
 
 public class WebRobotPeer implements RobotPeer {
 
@@ -37,15 +37,8 @@ public class WebRobotPeer implements RobotPeer {
 
 	@Override
 	public void mouseMove(int x, int y) {
-		Point oldPos = mousePos;
 		mousePos = getValidPoint(x, y);
-		double diffx = (oldPos.x - mousePos.x) / 10;
-		double diffy = (oldPos.y - mousePos.y) / 10;
-		for (int i = 0; i < 10; i++) {
-			int sx = (int) Math.round(oldPos.x + (diffx * i));
-			int sy = (int) Math.round(oldPos.y + (diffy * i));
-			sendMouseEvent(MouseEventMsgIn.MouseEventType.mousemove, 0, new Point(sx, sy));
-		}
+		sendMouseEvent(MouseEventMsgIn.MouseEventType.mousemove, 0, mousePos);
 	}
 
 	@Override

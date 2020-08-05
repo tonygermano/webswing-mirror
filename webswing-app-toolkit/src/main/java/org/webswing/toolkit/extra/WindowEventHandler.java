@@ -103,25 +103,35 @@ public class WindowEventHandler {
 					lockedOnEvent = false;
 				}
 				break;
-			case dockUndock:
+			case dock:
 				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
-					if (wat.equals(WindowActionType.dockUndock)) {
-						String winId = Util.getPeerForTarget(window) == null ? null : Util.getPeerForTarget(window).getGuid();
-						Util.getWebToolkit().getPaintDispatcher().notifyWindowDockAction(winId);
+					if (wat.equals(WindowActionType.dock)) {
+						Util.toggleWindowDock(window, false);
 					}
 					lockedOnEvent = false;
 				}
 				break;
-			case move:
-				handleMouseReleaseEvent(e);
-				if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
-					Window w = (Window) e.getSource();
-					moveWindow(w, e.getXOnScreen() - referenceMouseLocation.x, e.getYOnScreen() - referenceMouseLocation.y);
-				}
-				if (e.getSource() instanceof JFrame) {
-					((JFrame) e.getSource()).setExtendedState(JFrame.NORMAL);
+			case undock:
+				if (MouseEvent.MOUSE_RELEASED == e.getID() && ((MouseEvent) e).getButton() == 1) {
+					if (wat.equals(WindowActionType.undock)) {
+						Util.toggleWindowDock(window, true);
+					}
+					lockedOnEvent = false;
 				}
 				break;
+			case move: {
+				handleMouseReleaseEvent(e);
+				Window w = (Window) e.getSource();
+				if (w != null && !Util.isWindowUndocked(w)) {
+					if (MouseEvent.MOUSE_DRAGGED == e.getID()) {
+						moveWindow(w, e.getXOnScreen() - referenceMouseLocation.x, e.getYOnScreen() - referenceMouseLocation.y);
+					}
+					if (e.getSource() instanceof JFrame) {
+						((JFrame) e.getSource()).setExtendedState(JFrame.NORMAL);
+					}
+				}
+				break;
+			}
 			case resizeUniTopLeft:
 				handleMouseReleaseEvent(e);
 				if (MouseEvent.MOUSE_DRAGGED == e.getID()) {

@@ -26,9 +26,8 @@ message AppFrameMsgOutProto {
     optional ActionEventMsgOutProto actionEvent = 21;
     optional bool compositingWM = 22;
     optional AudioEventMsgOutProto audioEvent = 23;
-    optional WindowDockMsgProto dockAction = 24;
-	optional AccessibilityMsgProto accessible = 25;
-	repeated WindowSwitchMsgProto windowSwitchList = 26;
+	optional AccessibilityMsgProto accessible = 24;
+	repeated WindowSwitchMsgProto windowSwitchList = 25;
 }
 
 message AccessibilityMsgProto {
@@ -180,7 +179,8 @@ message WindowMsgProto {
     optional uint32 state = 13;
     repeated WindowMsgProto internalWindows = 14;
     optional DockModeProto dockMode = 15;
-    optional WindowClassTypeProto classType = 16;
+    optional DockStateProto dockState = 16;
+    optional WindowClassTypeProto classType = 17;
     
     enum WindowTypeProto {
     	basic = 1;
@@ -204,6 +204,11 @@ message WindowMsgProto {
     	none = 1;
     	dockable = 2;
     	autoUndock = 3;
+    }
+    
+    enum DockStateProto {
+    	docked = 1;
+    	undocked = 2;
     }
 }
 
@@ -483,10 +488,17 @@ message WindowEventMsgInProto {
 	optional sint32 y = 3;
 	optional sint32 width = 4;
 	optional sint32 height = 5;
-	optional bool close = 6;
-	optional bool focus = 7;
-	optional bool maximize = 8;
-	optional bool toggleUndecorated = 9;
+	optional WindowEventTypeProto eventType = 6;
+	
+	enum WindowEventTypeProto {
+		close = 0;
+		focus = 1;
+		maximize = 2;
+		undecorate = 3;
+		decorate = 4;
+		undock = 5;
+		dock = 6;
+    }
 }
 
 message AudioEventMsgInProto {
@@ -527,8 +539,4 @@ message AudioEventMsgOutProto {
     	update = 2;
     	dispose = 3;
     }
-}
-
-message WindowDockMsgProto {
-    optional string windowId = 1;
 }

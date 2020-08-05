@@ -55,7 +55,8 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		BufferedImage TOP_LEFT;
 		BufferedImage TITLE;
 		BufferedImage MENU;
-		BufferedImage DOCK_UNDOCK;
+		BufferedImage DOCK;
+		BufferedImage UNDOCK;
 		BufferedImage HIDE;
 		BufferedImage MAXIMIZE;
 		BufferedImage CLOSE;
@@ -97,7 +98,8 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 				TOP_LEFT = readImage("top-left-active");
 				TITLE = readImage("title-1-active");
 				MENU = readImage("menu-active");
-				DOCK_UNDOCK = readImage("shade-active");
+				UNDOCK = readImage("shade-active");
+				DOCK = readImage("stick-active");
 				HIDE = readImage("hide-active");
 				MAXIMIZE = readImage("maximize-active");
 				CLOSE = readImage("close-active");
@@ -120,7 +122,8 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 				TOP_LEFT = readImage("top-left-inactive");
 				TITLE = readImage("title-1-inactive");
 				MENU = readImage("menu-inactive");
-				DOCK_UNDOCK = readImage("shade-inactive");
+				UNDOCK = readImage("shade-inactive");
+				DOCK = readImage("stick-inactive");
 				HIDE = readImage("hide-inactive");
 				MAXIMIZE = readImage("maximize-inactive");
 				CLOSE = readImage("close-inactive");
@@ -250,25 +253,33 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		g.drawString(title, x, y + (is.TITLE.getHeight() - (int) lineMetricsHeight) / 2 + (int) lineMetricsHeight);
 
 		x = xOffset + w - BUTTON_SPACING;
-		x -= is.CLOSE.getWidth();
-		g.drawImage(is.CLOSE, x, y + (is.TITLE.getHeight() - is.CLOSE.getHeight()) / 2, null);
-
-		int lastWidth = is.CLOSE.getWidth();
+		
+		boolean firstButton = true;
+		
+		if (isCloseButtonVisible(window)) {
+			x -= is.CLOSE.getWidth();
+			g.drawImage(is.CLOSE, x, y + (is.TITLE.getHeight() - is.CLOSE.getHeight()) / 2, null);
+			firstButton = false;
+		}
 		
 		// Dialogs can be RESIZABLE too, at least on Linux/Unix
 		if (isMinMaxButtonVisible(window)) {
-			x -= BUTTON_SPACING + is.MAXIMIZE.getWidth();
+			x -= (firstButton ? 0 : BUTTON_SPACING) + is.MAXIMIZE.getWidth();
 			g.drawImage(is.MAXIMIZE, x, y + (is.TITLE.getHeight() - is.MAXIMIZE.getHeight()) / 2, null);
 
 			x -= BUTTON_SPACING + is.HIDE.getWidth();
 			g.drawImage(is.HIDE, x, y + (is.TITLE.getHeight() - is.HIDE.getHeight()) / 2, null);
 			
-			lastWidth = is.HIDE.getWidth();
+			firstButton = false;
 		}
 		
-		if (isDockButtonVisible(window)) {
-			x -= BUTTON_SPACING + lastWidth;
-			g.drawImage(is.DOCK_UNDOCK, x, y + (is.TITLE.getHeight() - is.DOCK_UNDOCK.getHeight()) / 2, null);
+		if (isDockButtonVisible(window) && window instanceof Window) {
+			boolean undocked = Util.isWindowUndocked((Window) window);
+			BufferedImage img = undocked ? is.DOCK : is.UNDOCK;
+			x -= (firstButton ? 0 : BUTTON_SPACING) + img.getWidth();
+			
+			g.drawImage(img, x, y + (is.TITLE.getHeight() - img.getHeight()) / 2, null);
+			firstButton = false;
 		}
 
 		x = xOffset;
@@ -279,25 +290,37 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		insets = new Insets(is.TITLE.getHeight(), is.LEFT.getWidth(), is.BOTTOM.getHeight(), is.RIGHT.getWidth());
 	}
 	
-	private Rectangle getUndockRect(Window w) {
+	private Rectangle getDockUndockRect(Window w) {
 		ImageSet is = (w != null && w.equals(Util.getWebToolkit().getWindowManager().getActiveWindow())) ? active : inactive;
-		int x = w.getWidth() - BUTTON_SPACING - is.CLOSE.getWidth() - BUTTON_SPACING - is.DOCK_UNDOCK.getWidth();
+		boolean undocked = Util.isWindowUndocked(w);
+		BufferedImage img = undocked ? is.DOCK : is.UNDOCK;
+		
+		int x = w.getWidth() - BUTTON_SPACING - img.getWidth();
+		if (isCloseButtonVisible(w)) {
+			x = x - BUTTON_SPACING - is.CLOSE.getWidth();
+		}
 		if (isMinMaxButtonVisible(w)) {
 			x = x - BUTTON_SPACING - is.MAXIMIZE.getWidth() - BUTTON_SPACING - is.HIDE.getWidth();
 		}
-		return new Rectangle(x, 0 + (is.TITLE.getHeight() - is.DOCK_UNDOCK.getHeight()) / 2, is.DOCK_UNDOCK.getWidth(), is.DOCK_UNDOCK.getHeight());
+		return new Rectangle(x, 0 + (is.TITLE.getHeight() - img.getHeight()) / 2, img.getWidth(), img.getHeight());
 	}
 
 	private Rectangle getHideRect(Window w) {
 		ImageSet is = (w != null && w.equals(Util.getWebToolkit().getWindowManager().getActiveWindow())) ? active : inactive;
-		int x = w.getWidth() - BUTTON_SPACING - is.CLOSE.getWidth() - BUTTON_SPACING - is.MAXIMIZE.getWidth() - BUTTON_SPACING - is.HIDE.getWidth();
+		int x = w.getWidth() - BUTTON_SPACING - is.MAXIMIZE.getWidth() - BUTTON_SPACING - is.HIDE.getWidth();
+		if (isCloseButtonVisible(w)) {
+			x = x - BUTTON_SPACING - is.CLOSE.getWidth();
+		}
 		return new Rectangle(x, 0 + (is.TITLE.getHeight() - is.HIDE.getHeight()) / 2, is.HIDE.getWidth(), is.HIDE.getHeight());
 	}
 
 	private Rectangle getMaximizeRect(Window w) {
 		ImageSet is = (w != null && w.equals(Util.getWebToolkit().getWindowManager().getActiveWindow())) ? active : inactive;
-		int x = w.getWidth() - BUTTON_SPACING - is.CLOSE.getWidth() - BUTTON_SPACING - is.MAXIMIZE.getWidth();
-		return new Rectangle(x, 0 + (is.TITLE.getHeight() - is.CLOSE.getHeight()) / 2, is.CLOSE.getWidth(), is.CLOSE.getHeight());
+		int x = w.getWidth() - BUTTON_SPACING - is.MAXIMIZE.getWidth();
+		if (isCloseButtonVisible(w)) {
+			x = x - BUTTON_SPACING - is.CLOSE.getWidth();
+		}
+		return new Rectangle(x, 0 + (is.TITLE.getHeight() - is.MAXIMIZE.getHeight()) / 2, is.MAXIMIZE.getWidth(), is.MAXIMIZE.getHeight());
 	}
 
 	private Rectangle getCloseRect(Window w) {
@@ -332,9 +355,9 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 	public WindowActionType getAction(Window w, Point e) {
 		Rectangle eventPoint = new Rectangle((int) e.getX(), (int) e.getY(), 1, 1);
 		Insets i = w.getInsets();
-
-		if (isDockButtonVisible(w) && SwingUtilities.isRectangleContainingRectangle(getUndockRect(w), eventPoint)) {
-			return WindowActionType.dockUndock;
+		
+		if (isDockButtonVisible(w) && SwingUtilities.isRectangleContainingRectangle(getDockUndockRect(w), eventPoint)) {
+			return Util.isWindowUndocked(w) ? WindowActionType.dock : WindowActionType.undock;
 		}
 		// Dialogs can be RESIZABLE too, at least on Linux/Unix
 		if (isMinMaxButtonVisible(w)) {
@@ -345,7 +368,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 				return WindowActionType.maximize;
 			}
 		}
-		if (SwingUtilities.isRectangleContainingRectangle(getCloseRect(w), eventPoint)) {
+		if (isCloseButtonVisible(w) && SwingUtilities.isRectangleContainingRectangle(getCloseRect(w), eventPoint)) {
 			return WindowActionType.close;
 		}
 
@@ -403,8 +426,12 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		Rectangle rect = null;
 		
 		switch (action) {
-			case dockUndock:
-				rect = getUndockRect(window);
+			case dock:
+				rect = getDockUndockRect(window);
+				result.setText("accessibility.window.button.toggleDock");
+				break;
+			case undock:
+				rect = getDockUndockRect(window);
 				result.setText("accessibility.window.button.toggleDock");
 				break;
 			case close:
@@ -443,10 +470,23 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 	}
 	
 	public boolean isMinMaxButtonVisible(Object w) {
+		if (w instanceof Window && Util.isWindowUndocked((Window) w)) {
+			return false;
+		}
 		return (w instanceof Frame) && ((Frame) w).isResizable();
+	}
+	
+	public boolean isCloseButtonVisible(Object w) {
+		if (w instanceof Window && Util.isWindowUndocked((Window) w)) {
+			return false;
+		}
+		return true;
 	}
 
 	public boolean canResize(Window w) {
+		if (Util.isWindowUndocked(w)) {
+			return false;
+		}
 		return (w instanceof Dialog && ((Dialog) w).isResizable()) || (w instanceof Frame) && ((Frame) w).isResizable();
 	}
 

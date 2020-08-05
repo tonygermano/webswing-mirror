@@ -144,7 +144,7 @@ public class WindowManager {
 	
 	public boolean isBlockedByModality(Window w, boolean newWindow) {
 		//if active window is in modal branch and requested window is not modalExclude type 
-		if (zorder.isInModalBranch(activeWindow) && !(w instanceof sun.awt.ModalExclude)) {
+		if (zorder.isInModalBranch(activeWindow) && !(w instanceof sun.awt.ModalExclude)&& w.getModalExclusionType()==Dialog.ModalExclusionType.NO_EXCLUDE) {
 			// if fullModal (not document_modal) branch
 			if (zorder.isInFullModalBranch(activeWindow)) {
 				//don't allow activation outside modal dialog ancestor's tree 

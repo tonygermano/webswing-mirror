@@ -7,7 +7,8 @@ public enum WindowActionType {
 	close,
 	minimize,
 	maximize,
-	dockUndock,
+	dock,
+	undock,
 	move,
 	resizeBottom(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR)),
 	resizeTop(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR)),
@@ -32,7 +33,7 @@ public enum WindowActionType {
 	}
 	
 	public boolean isButtonActionType() {
-		return this == close || this == minimize || this == maximize || this == dockUndock;
+		return this == close || this == minimize || this == maximize || this == dock || this == undock;
 	}
 	
 }

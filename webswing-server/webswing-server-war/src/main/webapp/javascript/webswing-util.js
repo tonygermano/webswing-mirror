@@ -133,7 +133,17 @@ export default function Util(i18n){
     }
 
     function isIOS() {
-        return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    	var platforms = [
+    	    'iPad Simulator',
+    	    'iPhone Simulator',
+    	    'iPod Simulator',
+    	    'iPad',
+    	    'iPhone',
+    	    'iPod'
+    	];
+    	return (platforms.indexOf(navigator.platform) !== -1)
+    	  // iPad on iOS 13 detection
+    	  || (navigator.userAgent.indexOf("Mac") !== -1 && "ontouchend" in document)
     }
 
     function getImageString(data) {

@@ -367,7 +367,7 @@ import html from './templates/touch.html';
         	focusCounter = 0;
         	input.val('');
         	$("#fake-input").remove();
-        	api.focusDefault();
+//        	api.focusDefault();
         	// force canvas repaint
         	repaint();
         }

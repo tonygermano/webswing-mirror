@@ -33,6 +33,11 @@ public class WindowMsg implements Msg {
 		autoUndock
 	}
 	
+	public enum DockState {
+		docked,
+		undocked
+	}
+	
 	private String id;
 	private List<WindowPartialContentMsg> content;
 	private byte[] directDraw;
@@ -48,6 +53,7 @@ public class WindowMsg implements Msg {
 	private Integer state;
 	private List<WindowMsg> internalWindows;
 	private DockMode dockMode = DockMode.none;
+	private DockState dockState = DockState.docked;
 	private WindowClassType classType = WindowClassType.other;
 
 	public WindowMsg() {
@@ -199,6 +205,14 @@ public class WindowMsg implements Msg {
 
 	public void setClassType(WindowClassType classType) {
 		this.classType = classType;
+	}
+
+	public DockState getDockState() {
+		return dockState;
+	}
+
+	public void setDockState(DockState dockState) {
+		this.dockState = dockState;
 	}
 
 }

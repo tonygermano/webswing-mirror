@@ -421,19 +421,37 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 		synchronized (Util.getWebToolkit().getTreeLock()) {
 			synchronized (WebPaintDispatcher.webPaintLock) {
 				final Window win = ((Window) winPeer.getTarget());
-				if (windowUpdate.isClose()) {
-					Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
-				} else if (windowUpdate.isMaximize()) {
-					if (win instanceof Frame) {
-						Frame frame = (Frame) win;
-						frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+				if (windowUpdate.getEventType() != null) {
+					switch (windowUpdate.getEventType()) {
+					case close:
+						Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+						break;
+					case decorate:
+						winPeer.setUndecoratedOverride(false);
+						break;
+					case undecorate:
+						winPeer.setUndecoratedOverride(true);
+						break;
+					case dock:
+						winPeer.setUndocked(false);
+						break;
+					case undock:
+						winPeer.setUndocked(true);
+						break;
+					case focus:
+						if (!Util.isFXWindow(win)) {
+							win.requestFocus();
+						}
+						break;
+					case maximize:
+						if (win instanceof Frame) {
+							Frame frame = (Frame) win;
+							frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+						}
+						break;
+					default:
+						break;
 					}
-				} else if (windowUpdate.isFocus()) {
-					if (!Util.isFXWindow(win)) {
-						win.requestFocus();
-					}
-				} else if (windowUpdate.getToggleUndecorated() != null) {
-					winPeer.setUndecoratedOverride(windowUpdate.getToggleUndecorated());
 				} else {
 					SwingUtilities.invokeLater(() -> {
 						win.setBounds(windowUpdate.getX(), windowUpdate.getY(), windowUpdate.getWidth(), windowUpdate.getHeight());

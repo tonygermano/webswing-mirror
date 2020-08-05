@@ -1,7 +1,27 @@
 package org.webswing.dispatch;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.image.BufferedImage;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.swing.JFrame;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
+
 import org.webswing.model.s2c.AppFrameMsgOut;
-import org.webswing.model.s2c.WindowDockMsg;
 import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
@@ -9,15 +29,6 @@ import org.webswing.toolkit.api.component.HtmlPanel;
 import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CwmPaintDispatcher extends AbstractPaintDispatcher {
 
@@ -189,18 +200,10 @@ public class CwmPaintDispatcher extends AbstractPaintDispatcher {
 		scheduleSendUpdate();
 	}
 	
-	public void notifyWindowDockAction(String windowId) {
-		AppFrameMsgOut f = new AppFrameMsgOut();
-		
-		WindowDockMsg dockMsg = new WindowDockMsg();
-		dockMsg.setWindowId(windowId);
-		
-		f.setDockAction(dockMsg);
-		
-		Logger.debug("WebPaintDispatcher:notifyWindowDock", f);
-		sendObject(f);
+	public void notifyWindowDockStateChanged() {
+		scheduleSendUpdate();
 	}
-
+	
 	public void registerWebContainer(Container container) {
 		synchronized (CwmPaintDispatcher.webPaintLock) {
 			registeredContainers.put(container, null);

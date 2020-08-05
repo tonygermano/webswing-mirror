@@ -155,7 +155,7 @@ public class WebGraphics extends AbstractVectorGraphics {
 			return;
 		}
 		Font font = getFont();
-		if(Bidi.requiresBidi(string.toCharArray(),0,string.length())){
+		if(Boolean.getBoolean("directdraw.drawStringAsPath") || Bidi.requiresBidi(string.toCharArray(),0,string.length())){
 			new TextLayout(string,font,getFontRenderContext()).draw(this,(int)x,(int)y);
 		} else if (thisImage.getContext().requestFont(font)) {
 			thisImage.addInstruction(this, dif.drawString(string, x, y, getClip(), getFontMetrics()));

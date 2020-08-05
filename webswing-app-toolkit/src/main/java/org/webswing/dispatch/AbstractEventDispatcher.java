@@ -8,6 +8,7 @@ import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.util.DeamonThreadFactory;
 import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+import sun.awt.UngrabEvent;
 
 import javax.swing.SwingUtilities;
 import java.awt.*;
@@ -202,6 +203,9 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 			Util.getWebToolkit().getPaintDispatcher().notifyAccessibilityInfoUpdate(c, e.getXOnScreen(), e.getYOnScreen());
 			if ((!relatedToPreviousEvent && Util.isWindowDecorationEvent(w, e)) || Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) {
 				Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
+				if(e.getID()==MouseEvent.MOUSE_PRESSED) {
+					dispatchEventInSwing(c, new UngrabEvent(c));
+				}
 				Util.getWebToolkit().getWindowManager().handleWindowDecorationEvent(w, (MouseEvent) e);
 			} else if (isDndInProgress()) {
 				getDndHandler().processMouseEvent(w, e);

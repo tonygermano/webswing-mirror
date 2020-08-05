@@ -147,7 +147,9 @@ export default function Clipboard(util) {
 
         /* TEXT TAB */
         var copyBtn = copyBar.find('button[data-id="text"]');
-        if (api.cfg.isMac) {
+        if (util.isIOS()) {
+        	copyBtn.text("Copy to clipboard");
+        } else if (api.cfg.isMac) {
             var macCopyMsg = $('<p>Copy to clipboard with CMD+C</p>');
             copyBtn.after(macCopyMsg);
             copyBtn.remove();
@@ -169,7 +171,7 @@ export default function Clipboard(util) {
             if (util.isIOS()) {
                 try {
                     var textarea = doc.createElement('textarea');
-                    textarea.setAttribute('readonly', true);
+                    textarea.setAttribute('readonly', false);
                     textarea.setAttribute('contenteditable', true);
                     textarea.style.position = 'fixed'; // prevent scroll from jumping to the bottom when focus is set.
                     textarea.value = " ";

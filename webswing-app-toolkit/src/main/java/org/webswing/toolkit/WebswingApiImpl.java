@@ -549,13 +549,30 @@ public class WebswingApiImpl implements WebswingApi {
 	}
 	
 	@Override
+	public void toggleWindowDock(Window window, boolean undock) {
+		if (!isDockingEnabled(window)) {
+			throw new IllegalArgumentException("Not allowed to change dock state! Enable compositing window manager and docking mode in config.");
+		}
+		
+		Util.toggleWindowDock(window, undock);
+	}
+	
+	@Override
 	public void toggleWindowDock(Window window) {
 		if (!isDockingEnabled(window)) {
 			throw new IllegalArgumentException("Not allowed to change dock state! Enable compositing window manager and docking mode in config.");
 		}
 		
-		String winId = Util.getPeerForTarget(window) == null ? null : Util.getPeerForTarget(window).getGuid();
-		Util.getWebToolkit().getPaintDispatcher().notifyWindowDockAction(winId);
+		Util.toggleWindowDock(window, !Util.isWindowUndocked(window));
+	}
+	
+	@Override
+	public boolean isUndocked(Window window) {
+		if (!isCompositingWindowManager()) {
+			throw new IllegalArgumentException("Not allowed to check dock state of a window! Enable compositing window manager.");
+		}
+		
+		return Util.isWindowUndocked(window);
 	}
 	
 	@Override

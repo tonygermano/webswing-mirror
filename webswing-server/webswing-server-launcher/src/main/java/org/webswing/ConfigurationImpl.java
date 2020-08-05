@@ -1,5 +1,6 @@
 package org.webswing;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -128,7 +129,8 @@ public class ConfigurationImpl extends Configuration {
 
     private void readPropertyFile(String filename) throws IOException {
         Properties prop = new Properties();
-        File file = new File(System.getProperty(Constants.CONFIG_PATH,".")+File.separator+filename);
+        
+        File file = resolveConfigFile(filename);
         InputStream inputStream = new FileInputStream(file);
         prop.load(inputStream);
         setHost(prop.getProperty(PREFIX + ".server.host"));
@@ -254,5 +256,14 @@ public class ConfigurationImpl extends Configuration {
     public void setClientAuthEnabled(boolean clientAuthEnabled) {
         this.clientAuthEnabled = clientAuthEnabled;
     }
+
+	@Override
+	public File resolveConfigFile(String filename) {
+		File file = new File(filename);
+		if (!(file.isAbsolute() && file.exists())) {
+			file = new File(System.getProperty(Constants.CONFIG_PATH), filename);
+		}
+		return file;
+	}
 
 }

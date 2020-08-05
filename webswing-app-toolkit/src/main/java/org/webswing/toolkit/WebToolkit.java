@@ -718,6 +718,11 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		}
 	}
 
+	@Override
+	public boolean isModalExclusionTypeSupported(Dialog.ModalExclusionType exclusionType) {
+		return true;
+	}
+
 	abstract public boolean webConpoenentPeerUpdateGraphicsData();
 
 	abstract public SurfaceData webComponentPeerReplaceSurfaceData(SurfaceManager mgr);
