@@ -210,6 +210,7 @@ abstract public class WebComponentPeer implements ComponentPeer {
 	public WebComponentPeer(Component t) {
 		this.target = t;
 		this.paintArea = new RepaintArea();
+		WebToolkit.registerPeer(t, this);
 		if (((Component) this.target).isVisible()) {
 			show();
 		}

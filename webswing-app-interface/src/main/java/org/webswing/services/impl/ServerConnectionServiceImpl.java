@@ -495,8 +495,10 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 		final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 		final ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(threadMXBean.getAllThreadIds(), true, true);
 		for (ThreadInfo threadInfo : threadInfos) {
-			dump.append(threadInfoToString(threadInfo));
-			dump.append("\n");
+			if(threadInfo!=null) {
+				dump.append(threadInfoToString(threadInfo));
+				dump.append("\n");
+			}
 		}
 		dump.toString();
 

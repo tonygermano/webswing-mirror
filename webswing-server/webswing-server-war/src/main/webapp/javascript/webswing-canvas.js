@@ -49,7 +49,7 @@
             }
             if (resizeCheck == null) {
                 resizeCheck = setInterval(function () {
-                    if (!api.cfg.mirror && !api.cfg.touchMode && canvas != null && (Math.floor(canvas.width()) !== width() || Math.floor(canvas.height()) !== height())) {
+                    if (!api.cfg.mirror && !api.cfg.touchMode && canvas != null && (Math.round(canvas.width()) !== width() || Math.round(canvas.height()) !== height())) {
                     	if (api.cfg.rootElement.is(".composition")) {
                     		// when using compositing window manager, the root canvas has 0 size
                     		// we need to do a handshake only if the root element has changed size

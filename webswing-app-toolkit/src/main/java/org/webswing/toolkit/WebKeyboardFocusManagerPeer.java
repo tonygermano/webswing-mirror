@@ -71,18 +71,20 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 			msg.setH(b.height);
 			if (o instanceof JTextComponent) {
 				JTextComponent tc = (JTextComponent) o;
-				int position = tc.getCaretPosition();
-				try {
-					Rectangle location = tc.modelToView(position);
-					if (location != null) {
-						msg.setType(FocusEventMsg.FocusEventType.focusWithCarretGained);
-						msg.setCaretX(location.x);
-						msg.setCaretY(location.y);
-						msg.setCaretH(location.height);
-						msg.setEditable(tc.isEditable());
+				if (tc.isEditable() && tc.getWidth() > 0 && tc.getHeight() > 0) {
+					int position = tc.getCaretPosition();
+					try {
+						Rectangle location = tc.modelToView(position);
+						if (location != null) {
+							msg.setType(FocusEventMsg.FocusEventType.focusWithCarretGained);
+							msg.setCaretX(location.x);
+							msg.setCaretY(location.y);
+							msg.setCaretH(location.height);
+							msg.setEditable(tc.isEditable());
+						}
+					} catch (BadLocationException e) {
+						e.printStackTrace();
 					}
-				} catch (BadLocationException e) {
-					e.printStackTrace();
 				}
 			}
 			if(o instanceof JPasswordField){

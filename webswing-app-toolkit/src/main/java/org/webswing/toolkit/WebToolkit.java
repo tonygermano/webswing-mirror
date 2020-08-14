@@ -16,32 +16,7 @@ import java.awt.font.TextAttribute;
 import java.awt.im.InputMethodHighlight;
 import java.awt.im.spi.InputMethodDescriptor;
 import java.awt.image.ColorModel;
-import java.awt.peer.ButtonPeer;
-import java.awt.peer.CheckboxMenuItemPeer;
-import java.awt.peer.CheckboxPeer;
-import java.awt.peer.ChoicePeer;
-import java.awt.peer.DesktopPeer;
-import java.awt.peer.DialogPeer;
-import java.awt.peer.FileDialogPeer;
-import java.awt.peer.FontPeer;
-import java.awt.peer.FramePeer;
-import java.awt.peer.KeyboardFocusManagerPeer;
-import java.awt.peer.LabelPeer;
-import java.awt.peer.ListPeer;
-import java.awt.peer.MenuBarPeer;
-import java.awt.peer.MenuItemPeer;
-import java.awt.peer.MenuPeer;
-import java.awt.peer.MouseInfoPeer;
-import java.awt.peer.PanelPeer;
-import java.awt.peer.PopupMenuPeer;
-import java.awt.peer.RobotPeer;
-import java.awt.peer.ScrollPanePeer;
-import java.awt.peer.ScrollbarPeer;
-import java.awt.peer.SystemTrayPeer;
-import java.awt.peer.TextAreaPeer;
-import java.awt.peer.TextFieldPeer;
-import java.awt.peer.TrayIconPeer;
-import java.awt.peer.WindowPeer;
+import java.awt.peer.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
@@ -367,15 +342,17 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	public FramePeer createFrame(Frame frame) throws HeadlessException {
 		WebFramePeer localWFramePeer = createWebFramePeer(frame);
-		targetCreatedPeer(frame, localWFramePeer);
 		return localWFramePeer;
+	}
+
+	public static void registerPeer(Component target, ComponentPeer peer){
+		targetCreatedPeer(target,peer);
 	}
 
 	abstract WebFramePeer createWebFramePeer(Frame frame) throws HeadlessException;
 
 	public DialogPeer createDialog(Dialog paramDialog) throws HeadlessException {
 		WebDialogPeer localdialogPeer = createWebDialogPeer(paramDialog);
-		targetCreatedPeer(paramDialog, localdialogPeer);
 		return localdialogPeer;
 	}
 
@@ -387,7 +364,6 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	public WindowPeer createWindow(Window paramWindow) throws HeadlessException {
 		WebWindowPeer localwindowPeer = createWebWindowPeer(paramWindow);
-		targetCreatedPeer(paramWindow, localwindowPeer);
 		return localwindowPeer;
 	}
 
@@ -399,7 +375,6 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		}
 
 		WebPanelPeer localpanelPeer = createWebPanelPeer(panel);
-		targetCreatedPeer(panel, localpanelPeer);
 		return localpanelPeer;
 	}
 

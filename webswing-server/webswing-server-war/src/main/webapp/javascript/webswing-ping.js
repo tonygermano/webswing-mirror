@@ -30,10 +30,20 @@
             mute = 0;
             ping = getArrayWithLimitedLength(count);
             var connectionUrl=api.cfg.connectionUrl;
-            if (connectionUrl.indexOf('http') != 0) {
+            if (connectionUrl.toLowerCase().indexOf('http') !== 0) { //if relative url
                 var host = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '')
-                connectionUrl = host + connectionUrl;
+                var path = api.cfg.connectionUrl;
+                if (path.indexOf('/') !== 0) {//if relative path
+                    var currentPath = document.location.pathname;
+                    if(currentPath.lastIndexOf('/') === currentPath.length - 1 ){ //current path ends with /
+                        path = currentPath + path;
+                    }else{ //otherwise remove the path after last /
+                        path = currentPath.substring(0,currentPath.lastIndexOf('/')+1)+ path;
+                    }
+                }
+                connectionUrl = host + path;
             }
+
             var blobURL = URL.createObjectURL(new Blob(['onmessage=(', PingMonitor.toString(), ')("' + connectionUrl + '",' + interval + ')'], {type: 'application/javascript'}));
             worker = new Worker(blobURL);
             worker.onmessage = function (e) {
