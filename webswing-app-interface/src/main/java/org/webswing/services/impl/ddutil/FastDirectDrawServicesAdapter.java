@@ -62,7 +62,7 @@ public class FastDirectDrawServicesAdapter extends DirectDrawServicesAdapter {
 			missingFonts.add(font.getFontName());
 			String fontFamily = font.getFamily();
 			if (fontFamily.startsWith("Dialog") || fontFamily.startsWith("Monospaced") || fontFamily.startsWith("Serif") || fontFamily.startsWith("SansSerif")) {
-				log.warn("Logical font " + fontFamily + " not defined in font configuration. Using default browser counterpart.");
+				log.warn("Logical font " + font.getFontName() + " not defined in font configuration. Using default browser counterpart.");
 			} else {
 				log.warn("Font " + font.getFontName() + " not defined in font configuration. Falling back to glyph rendering.");
 			}

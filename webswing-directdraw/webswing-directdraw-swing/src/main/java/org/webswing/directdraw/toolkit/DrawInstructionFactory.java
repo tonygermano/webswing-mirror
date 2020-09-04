@@ -121,7 +121,7 @@ public class DrawInstructionFactory {
 			return new TextureConst(ctx, (TexturePaint) p);
 		}if (p instanceof GradientPaint) {
 			return new GradientConst(ctx, (GradientPaint) p);
-		} else if(Boolean.getBoolean("directdraw.serverSideGradients")){
+		} else if(Boolean.getBoolean(DirectDraw.SERVER_SIDE_GRADIENTS)){
 			throw new UnsupportedOperationException();
 		}else if (p instanceof LinearGradientPaint) {
 			return new LinearGradientConst(ctx, (LinearGradientPaint) p);

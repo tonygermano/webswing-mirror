@@ -17,6 +17,8 @@ import javax.swing.text.JTextComponent;
 @SuppressWarnings("restriction")
 public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 
+	private static boolean optimizeCaret = Boolean.getBoolean("webswing.optimizeCaret");
+
 	private static CaretListener caretListener = new CaretListener() {
 		@Override
 		public void caretUpdate(CaretEvent e) {
@@ -72,6 +74,9 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 			if (o instanceof JTextComponent) {
 				JTextComponent tc = (JTextComponent) o;
 				if (tc.isEditable() && tc.getWidth() > 0 && tc.getHeight() > 0) {
+					if(optimizeCaret && !(tc.getCaret() instanceof  WebCaretWrapper)){
+						tc.setCaret(new WebCaretWrapper(tc.getCaret()));
+					}
 					int position = tc.getCaretPosition();
 					try {
 						Rectangle location = tc.modelToView(position);

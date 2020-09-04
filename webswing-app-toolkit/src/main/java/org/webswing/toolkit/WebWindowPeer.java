@@ -152,6 +152,10 @@ abstract public class WebWindowPeer extends WebContainerPeer implements WindowPe
 	}
 
 	public void setUndocked(boolean undocked) {
+		if ("NONE".equals(Util.getDockMode())) {
+			return;
+		}
+		
 		this.undocked = undocked;
 		updateWindowDecorationImage();
 		Util.getWebToolkit().getPaintDispatcher().notifyWindowDockStateChanged();

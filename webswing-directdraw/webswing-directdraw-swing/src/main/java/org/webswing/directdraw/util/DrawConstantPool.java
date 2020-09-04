@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.webswing.directdraw.DirectDraw;
 import org.webswing.directdraw.model.DrawConstant;
 import org.webswing.directdraw.model.FontFaceConst;
 import org.webswing.directdraw.model.ImageConst;
@@ -67,7 +68,7 @@ public class DrawConstantPool {
 	}
 
 	public synchronized boolean isFontRegistered(String file) {
-		if (requestedFonts.containsKey(file) || registeredFonts.contains(file)) {
+		if (requestedFonts.containsKey(file) || registeredFonts.contains(file) || Boolean.getBoolean(DirectDraw.FONTS_PROVIDED)) {
 			return true;
 		}
 		return false;

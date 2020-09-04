@@ -2900,6 +2900,7 @@ $root.org = (function() {
                      * @property {org.webswing.directdraw.proto.FontProto.StyleProto|null} [style] FontProto style
                      * @property {number|null} [size] FontProto size
                      * @property {org.webswing.directdraw.proto.ITransformProto|null} [transform] FontProto transform
+                     * @property {boolean|null} [fontProvided] FontProto fontProvided
                      */
 
                     /**
@@ -2950,6 +2951,14 @@ $root.org = (function() {
                     FontProto.prototype.transform = null;
 
                     /**
+                     * FontProto fontProvided.
+                     * @member {boolean} fontProvided
+                     * @memberof org.webswing.directdraw.proto.FontProto
+                     * @instance
+                     */
+                    FontProto.prototype.fontProvided = false;
+
+                    /**
                      * Decodes a FontProto message from the specified reader or buffer.
                      * @function decode
                      * @memberof org.webswing.directdraw.proto.FontProto
@@ -2978,6 +2987,9 @@ $root.org = (function() {
                                 break;
                             case 4:
                                 message.transform = $root.org.webswing.directdraw.proto.TransformProto.decode(reader, reader.uint32());
+                                break;
+                            case 5:
+                                message.fontProvided = reader.bool();
                                 break;
                             default:
                                 reader.skipType(tag & 7);
@@ -3028,6 +3040,8 @@ $root.org = (function() {
                                 throw TypeError(".org.webswing.directdraw.proto.FontProto.transform: object expected");
                             message.transform = $root.org.webswing.directdraw.proto.TransformProto.fromObject(object.transform);
                         }
+                        if (object.fontProvided != null)
+                            message.fontProvided = Boolean(object.fontProvided);
                         return message;
                     };
 
@@ -3049,6 +3063,7 @@ $root.org = (function() {
                             object.style = options.enums === String ? "NORMAL" : 0;
                             object.size = 0;
                             object.transform = null;
+                            object.fontProvided = false;
                         }
                         if (message.family != null && message.hasOwnProperty("family"))
                             object.family = message.family;
@@ -3058,6 +3073,8 @@ $root.org = (function() {
                             object.size = message.size;
                         if (message.transform != null && message.hasOwnProperty("transform"))
                             object.transform = $root.org.webswing.directdraw.proto.TransformProto.toObject(message.transform, options);
+                        if (message.fontProvided != null && message.hasOwnProperty("fontProvided"))
+                            object.fontProvided = message.fontProvided;
                         return object;
                     };
 

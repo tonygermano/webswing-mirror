@@ -415,6 +415,9 @@ public class Util {
 				window.setTitle(((Frame) ww.getTarget()).getTitle());
 				window.setState(((Frame) ww.getTarget()).getExtendedState());
 			}
+			if (ww.getTarget() instanceof Dialog) {
+				window.setTitle(((Dialog) ww.getTarget()).getTitle());
+			}
 			if (ww.getTarget() instanceof Component) {
 				window.setName(((Component) ww.getTarget()).getName());
 			}

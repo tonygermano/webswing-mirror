@@ -115,7 +115,7 @@ public class WebWindow extends Window {
 			public void windowGainedFocus(WindowEvent windowEvent) {
 				notifyFocus(com.sun.glass.events.WindowEvent.FOCUS_GAINED);
 				if (getWebView() != null) {
-					getWebView().canvas.requestFocus();
+					getWebView().canvas.requestFocusInWindow();
 				}
 			}
 

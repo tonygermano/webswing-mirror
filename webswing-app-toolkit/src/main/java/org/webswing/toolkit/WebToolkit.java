@@ -60,6 +60,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	public static final Font defaultFont = new Font("Dialog", 0, 12);
 
 	public static final String BACKGROUND_WINDOW_ID = "BG";
+	private static final int DEFAULT_SCREEN_RESOLUTION = Integer.getInteger("webswing.screenResolution", 96);
 	private static Object TREELOCK = null;
 
 	private EventDispatcher eventDispatcher;
@@ -480,7 +481,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	}
 
 	public int getScreenResolution() throws HeadlessException {
-		return 72;
+		return DEFAULT_SCREEN_RESOLUTION;
 	}
 
 	public ColorModel getColorModel() throws HeadlessException {

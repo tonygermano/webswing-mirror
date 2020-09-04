@@ -23,6 +23,7 @@ public class FontConst extends ImmutableDrawConstantHolder<Font> {
 		FontProto.Builder model = FontProto.newBuilder();
 		String fileName=getContext().getServices().getFileForFont(getValue());
 		model.setFamily(DirectDrawUtils.fontNameFromFile(fileName,getValue()));
+		model.setFontProvided(Boolean.getBoolean(DirectDraw.FONTS_PROVIDED));
 		model.setSize(value.getSize());
 		model.setStyle(StyleProto.valueOf(value.getStyle()));
 		if (value.isTransformed()) {

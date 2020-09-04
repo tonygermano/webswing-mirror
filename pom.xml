@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.webswing</groupId>
     <artifactId>webswing</artifactId>
-    <version>20.1.5</version>
+    <version>20.1.6</version>
     <packaging>pom</packaging>
     <name>Webswing</name>
     <description>Webswing is a web server that allows to run any swing application inside your web browser using only pure HTML5.</description>
@@ -56,7 +56,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <webswing-war-name>webswing-server</webswing-war-name>
-        <jersey.version>2.27</jersey.version>
+        <jersey.version>2.31</jersey.version>
         <guice.version>4.1.0</guice.version>
         <activemq.version>5.15.9</activemq.version>
         <bouncycastle.version>1.60</bouncycastle.version>
@@ -105,7 +105,7 @@
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-web</artifactId>
-                <version>1.5.3</version>
+                <version>1.6.0</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

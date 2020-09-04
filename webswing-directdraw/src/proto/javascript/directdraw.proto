@@ -144,6 +144,7 @@ message FontProto {
     optional StyleProto style = 2;
     optional uint32 size = 3;
     optional TransformProto transform = 4;
+    optional bool fontProvided = 5;
 
     enum StyleProto {
         NORMAL = 0;

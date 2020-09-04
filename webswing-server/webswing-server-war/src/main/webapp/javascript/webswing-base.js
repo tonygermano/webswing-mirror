@@ -967,6 +967,9 @@ import { DirectDraw as WebswingDirectDraw} from "webswing-directdraw-javascript"
 
 			$(popup.document.head).append("<link rel='stylesheet' href='" + baseUrl + "css/style.css' type='text/css'>");
 
+			//to allow directdraw.fontProvided
+			$(popup.document.head).append("<link rel='stylesheet' href='" + baseUrl + "css/custom.css' type='text/css'>");
+
 			var fonts = document.querySelectorAll("style[data-dd-ctx]");
 			for (var i=0; i<fonts.length; i++) {
 				var font = fonts[i].cloneNode();

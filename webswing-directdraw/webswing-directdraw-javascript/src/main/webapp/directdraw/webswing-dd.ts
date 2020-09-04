@@ -538,7 +538,7 @@ export class DirectDraw {
         }
         let fontFamily = font.family;
         if (font.family !== 'sans-serif' && font.family !== 'serif' && font.family !== 'monospace') {
-            fontFamily = "\"" + this.ctxId + font.family + "\"";
+            fontFamily = "\"" + (font.fontProvided ? '' : this.ctxId) + font.family + "\"";
         }
         ctx.font = style + " " + font.size + "px " + fontFamily;
         return font.transform!;

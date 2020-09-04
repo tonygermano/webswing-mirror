@@ -1083,6 +1083,9 @@ export namespace org {
 
                     /** FontProto transform */
                     transform?: (org.webswing.directdraw.proto.ITransformProto|null);
+
+                    /** FontProto fontProvided */
+                    fontProvided?: (boolean|null);
                 }
 
                 /** Represents a FontProto. */
@@ -1105,6 +1108,9 @@ export namespace org {
 
                     /** FontProto transform. */
                     public transform?: (org.webswing.directdraw.proto.ITransformProto|null);
+
+                    /** FontProto fontProvided. */
+                    public fontProvided: boolean;
 
                     /**
                      * Decodes a FontProto message from the specified reader or buffer.

@@ -12,6 +12,10 @@ import org.webswing.directdraw.util.DrawConstantPool;
 
 public class DirectDraw {
 
+	public static final String SERVER_SIDE_GRADIENTS = "directdraw.serverSideGradients";
+	public static final String DRAW_STRING_AS_PATH = "directdraw.drawStringAsPath";
+	public static final String FONTS_PROVIDED = "directdraw.fontsProvided";
+
 	private DirectDrawServicesAdapter services = new DirectDrawServicesAdapter();
 	private DrawInstructionFactory instructionFactory = new DrawInstructionFactory(this);
 

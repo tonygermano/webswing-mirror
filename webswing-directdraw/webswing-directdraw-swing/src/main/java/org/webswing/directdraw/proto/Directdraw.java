@@ -15771,6 +15771,15 @@ public final class Directdraw {
      * <code>optional .org.webswing.directdraw.proto.TransformProto transform = 4;</code>
      */
     org.webswing.directdraw.proto.Directdraw.TransformProtoOrBuilder getTransformOrBuilder();
+
+    /**
+     * <code>optional bool fontProvided = 5;</code>
+     */
+    boolean hasFontProvided();
+    /**
+     * <code>optional bool fontProvided = 5;</code>
+     */
+    boolean getFontProvided();
   }
   /**
    * Protobuf type {@code org.webswing.directdraw.proto.FontProto}
@@ -15788,6 +15797,7 @@ public final class Directdraw {
       family_ = "";
       style_ = 0;
       size_ = 0;
+      fontProvided_ = false;
     }
 
     @java.lang.Override
@@ -15848,6 +15858,11 @@ public final class Directdraw {
                 transform_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000008;
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              fontProvided_ = input.readBool();
               break;
             }
             default: {
@@ -16086,6 +16101,21 @@ public final class Directdraw {
       return transform_ == null ? org.webswing.directdraw.proto.Directdraw.TransformProto.getDefaultInstance() : transform_;
     }
 
+    public static final int FONTPROVIDED_FIELD_NUMBER = 5;
+    private boolean fontProvided_;
+    /**
+     * <code>optional bool fontProvided = 5;</code>
+     */
+    public boolean hasFontProvided() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional bool fontProvided = 5;</code>
+     */
+    public boolean getFontProvided() {
+      return fontProvided_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -16116,6 +16146,9 @@ public final class Directdraw {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeMessage(4, getTransform());
       }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBool(5, fontProvided_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -16139,6 +16172,10 @@ public final class Directdraw {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, getTransform());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(5, fontProvided_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -16175,6 +16212,11 @@ public final class Directdraw {
         result = result && getTransform()
             .equals(other.getTransform());
       }
+      result = result && (hasFontProvided() == other.hasFontProvided());
+      if (hasFontProvided()) {
+        result = result && (getFontProvided()
+            == other.getFontProvided());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -16201,6 +16243,11 @@ public final class Directdraw {
       if (hasTransform()) {
         hash = (37 * hash) + TRANSFORM_FIELD_NUMBER;
         hash = (53 * hash) + getTransform().hashCode();
+      }
+      if (hasFontProvided()) {
+        hash = (37 * hash) + FONTPROVIDED_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getFontProvided());
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -16348,6 +16395,8 @@ public final class Directdraw {
           transformBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000008);
+        fontProvided_ = false;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -16396,6 +16445,10 @@ public final class Directdraw {
         } else {
           result.transform_ = transformBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.fontProvided_ = fontProvided_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -16458,6 +16511,9 @@ public final class Directdraw {
         }
         if (other.hasTransform()) {
           mergeTransform(other.getTransform());
+        }
+        if (other.hasFontProvided()) {
+          setFontProvided(other.getFontProvided());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -16753,6 +16809,38 @@ public final class Directdraw {
           transform_ = null;
         }
         return transformBuilder_;
+      }
+
+      private boolean fontProvided_ ;
+      /**
+       * <code>optional bool fontProvided = 5;</code>
+       */
+      public boolean hasFontProvided() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional bool fontProvided = 5;</code>
+       */
+      public boolean getFontProvided() {
+        return fontProvided_;
+      }
+      /**
+       * <code>optional bool fontProvided = 5;</code>
+       */
+      public Builder setFontProvided(boolean value) {
+        bitField0_ |= 0x00000010;
+        fontProvided_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool fontProvided = 5;</code>
+       */
+      public Builder clearFontProvided() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        fontProvided_ = false;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -23079,46 +23167,46 @@ public final class Directdraw {
       "bswing.directdraw.proto.PathProto.Segmen" +
       "tTypeProto\022\016\n\006points\030\003 \003(\002\"F\n\020SegmentTyp" +
       "eProto\022\010\n\004MOVE\020\000\022\010\n\004LINE\020\001\022\010\n\004QUAD\020\002\022\t\n\005" +
-      "CUBIC\020\003\022\t\n\005CLOSE\020\004\"\365\001\n\tFontProto\022\016\n\006fami" +
+      "CUBIC\020\003\022\t\n\005CLOSE\020\004\"\213\002\n\tFontProto\022\016\n\006fami" +
       "ly\030\001 \002(\t\022B\n\005style\030\002 \001(\01623.org.webswing.d" +
       "irectdraw.proto.FontProto.StyleProto\022\014\n\004" +
       "size\030\003 \001(\r\022@\n\ttransform\030\004 \001(\0132-.org.webs" +
-      "wing.directdraw.proto.TransformProto\"D\n\n" +
-      "StyleProto\022\n\n\006NORMAL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006I" +
-      "TALIC\020\002\022\021\n\rBOLDANDITALIC\020\003\"\346\002\n\013StrokePro" +
-      "to\022\r\n\005width\030\001 \002(\002\022\022\n\nmiterLimit\030\002 \001(\002\022H\n" +
-      "\004join\030\003 \001(\0162:.org.webswing.directdraw.pr" +
-      "oto.StrokeProto.StrokeJoinProto\022F\n\003cap\030\004" +
-      " \001(\01629.org.webswing.directdraw.proto.Str" +
-      "okeProto.StrokeCapProto\022\014\n\004dash\030\005 \003(\002\022\022\n" +
-      "\ndashOffset\030\006 \001(\002\"A\n\017StrokeJoinProto\022\016\n\n" +
-      "JOIN_MITER\020\000\022\016\n\nJOIN_ROUND\020\001\022\016\n\nJOIN_BEV" +
-      "EL\020\002\"=\n\016StrokeCapProto\022\014\n\010CAP_BUTT\020\000\022\r\n\t" +
-      "CAP_ROUND\020\001\022\016\n\nCAP_SQUARE\020\002\"\266\001\n\023LinearGr" +
-      "adientProto\022\016\n\006xStart\030\001 \002(\021\022\016\n\006yStart\030\002 " +
-      "\002(\021\022\014\n\004xEnd\030\003 \002(\021\022\014\n\004yEnd\030\004 \002(\021\022\016\n\006color" +
-      "s\030\005 \003(\007\022\021\n\tfractions\030\006 \003(\002\022@\n\006repeat\030\007 \002" +
-      "(\01620.org.webswing.directdraw.proto.Cycli" +
-      "cMethodProto\"\314\001\n\023RadialGradientProto\022\017\n\007" +
-      "xCenter\030\001 \002(\021\022\017\n\007yCenter\030\002 \002(\021\022\016\n\006xFocus" +
-      "\030\003 \002(\021\022\016\n\006yFocus\030\004 \002(\021\022\016\n\006radius\030\005 \002(\021\022\016" +
-      "\n\006colors\030\006 \003(\007\022\021\n\tfractions\030\007 \003(\002\022@\n\006rep" +
-      "eat\030\010 \002(\01620.org.webswing.directdraw.prot" +
-      "o.CyclicMethodProto\"\035\n\013PointsProto\022\016\n\006po" +
-      "ints\030\001 \003(\021\"\266\002\n\016CompositeProto\022N\n\004type\030\001 " +
-      "\002(\0162@.org.webswing.directdraw.proto.Comp" +
-      "ositeProto.CompositeTypeProto\022\020\n\005alpha\030\002" +
-      " \001(\002:\0011\022\r\n\005color\030\003 \001(\007\"\262\001\n\022CompositeType" +
-      "Proto\022\t\n\005CLEAR\020\001\022\007\n\003SRC\020\002\022\007\n\003DST\020\t\022\014\n\010SR" +
-      "C_OVER\020\003\022\014\n\010DST_OVER\020\004\022\n\n\006SRC_IN\020\005\022\n\n\006DS" +
-      "T_IN\020\006\022\013\n\007SRC_OUT\020\007\022\013\n\007DST_OUT\020\010\022\014\n\010SRC_" +
-      "ATOP\020\n\022\014\n\010DST_ATOP\020\013\022\007\n\003XOR\020\014\022\014\n\010XOR_MOD" +
-      "E\020\r\"\207\001\n\014TextureProto\0228\n\005image\030\001 \002(\0132).or" +
-      "g.webswing.directdraw.proto.ImageProto\022=" +
-      "\n\006anchor\030\002 \002(\0132-.org.webswing.directdraw" +
-      ".proto.RectangleProto*:\n\021CyclicMethodPro" +
-      "to\022\014\n\010NO_CYCLE\020\000\022\013\n\007REFLECT\020\001\022\n\n\006REPEAT\020" +
-      "\002"
+      "wing.directdraw.proto.TransformProto\022\024\n\014" +
+      "fontProvided\030\005 \001(\010\"D\n\nStyleProto\022\n\n\006NORM" +
+      "AL\020\000\022\013\n\007OBLIQUE\020\001\022\n\n\006ITALIC\020\002\022\021\n\rBOLDAND" +
+      "ITALIC\020\003\"\346\002\n\013StrokeProto\022\r\n\005width\030\001 \002(\002\022" +
+      "\022\n\nmiterLimit\030\002 \001(\002\022H\n\004join\030\003 \001(\0162:.org." +
+      "webswing.directdraw.proto.StrokeProto.St" +
+      "rokeJoinProto\022F\n\003cap\030\004 \001(\01629.org.webswin" +
+      "g.directdraw.proto.StrokeProto.StrokeCap" +
+      "Proto\022\014\n\004dash\030\005 \003(\002\022\022\n\ndashOffset\030\006 \001(\002\"" +
+      "A\n\017StrokeJoinProto\022\016\n\nJOIN_MITER\020\000\022\016\n\nJO" +
+      "IN_ROUND\020\001\022\016\n\nJOIN_BEVEL\020\002\"=\n\016StrokeCapP" +
+      "roto\022\014\n\010CAP_BUTT\020\000\022\r\n\tCAP_ROUND\020\001\022\016\n\nCAP" +
+      "_SQUARE\020\002\"\266\001\n\023LinearGradientProto\022\016\n\006xSt" +
+      "art\030\001 \002(\021\022\016\n\006yStart\030\002 \002(\021\022\014\n\004xEnd\030\003 \002(\021\022" +
+      "\014\n\004yEnd\030\004 \002(\021\022\016\n\006colors\030\005 \003(\007\022\021\n\tfractio" +
+      "ns\030\006 \003(\002\022@\n\006repeat\030\007 \002(\01620.org.webswing." +
+      "directdraw.proto.CyclicMethodProto\"\314\001\n\023R" +
+      "adialGradientProto\022\017\n\007xCenter\030\001 \002(\021\022\017\n\007y" +
+      "Center\030\002 \002(\021\022\016\n\006xFocus\030\003 \002(\021\022\016\n\006yFocus\030\004" +
+      " \002(\021\022\016\n\006radius\030\005 \002(\021\022\016\n\006colors\030\006 \003(\007\022\021\n\t" +
+      "fractions\030\007 \003(\002\022@\n\006repeat\030\010 \002(\01620.org.we" +
+      "bswing.directdraw.proto.CyclicMethodProt" +
+      "o\"\035\n\013PointsProto\022\016\n\006points\030\001 \003(\021\"\266\002\n\016Com" +
+      "positeProto\022N\n\004type\030\001 \002(\0162@.org.webswing" +
+      ".directdraw.proto.CompositeProto.Composi" +
+      "teTypeProto\022\020\n\005alpha\030\002 \001(\002:\0011\022\r\n\005color\030\003" +
+      " \001(\007\"\262\001\n\022CompositeTypeProto\022\t\n\005CLEAR\020\001\022\007" +
+      "\n\003SRC\020\002\022\007\n\003DST\020\t\022\014\n\010SRC_OVER\020\003\022\014\n\010DST_OV" +
+      "ER\020\004\022\n\n\006SRC_IN\020\005\022\n\n\006DST_IN\020\006\022\013\n\007SRC_OUT\020" +
+      "\007\022\013\n\007DST_OUT\020\010\022\014\n\010SRC_ATOP\020\n\022\014\n\010DST_ATOP" +
+      "\020\013\022\007\n\003XOR\020\014\022\014\n\010XOR_MODE\020\r\"\207\001\n\014TexturePro" +
+      "to\0228\n\005image\030\001 \002(\0132).org.webswing.directd" +
+      "raw.proto.ImageProto\022=\n\006anchor\030\002 \002(\0132-.o" +
+      "rg.webswing.directdraw.proto.RectanglePr" +
+      "oto*:\n\021CyclicMethodProto\022\014\n\010NO_CYCLE\020\000\022\013" +
+      "\n\007REFLECT\020\001\022\n\n\006REPEAT\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -23221,7 +23309,7 @@ public final class Directdraw {
     internal_static_org_webswing_directdraw_proto_FontProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_org_webswing_directdraw_proto_FontProto_descriptor,
-        new java.lang.String[] { "Family", "Style", "Size", "Transform", });
+        new java.lang.String[] { "Family", "Style", "Size", "Transform", "FontProvided", });
     internal_static_org_webswing_directdraw_proto_StrokeProto_descriptor =
       getDescriptor().getMessageTypes().get(15);
     internal_static_org_webswing_directdraw_proto_StrokeProto_fieldAccessorTable = new

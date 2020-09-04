@@ -355,9 +355,13 @@ public class DirectDrawUtils {
 		if (fileName != null) {
 			File f = new File(fileName);
 			if (f.exists()) {
-				String name = fileName.hashCode() + new File(fileName).getName();
-				name = name.length() > 20 ? name.substring(0, 20) : name; //IE will ignore the font if name is longer than 31 chars 
-				return name;
+				if(Boolean.getBoolean(DirectDraw.FONTS_PROVIDED)){
+					return new File(fileName).getName();
+				}else {
+					String name = fileName.hashCode() + new File(fileName).getName();
+					name = name.length() > 20 ? name.substring(0, 20) : name; //IE will ignore the font if name is longer than 31 chars
+					return name;
+				}
 			} else {
 				return fileName;
 			}
