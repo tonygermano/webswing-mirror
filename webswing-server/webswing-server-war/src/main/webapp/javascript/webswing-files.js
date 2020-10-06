@@ -376,15 +376,16 @@ import 'blueimp-file-upload'
             fh.autoUpload = function(data, uuid) {
             	if (autoUploadBar.closest(rootElement).length === 0) {
             		rootElement.append(autoUploadBar);
+                    setProgressBarVisible(false);
+                    fileDialogErrorMessageContent.html("");
+                    fileDialogErrorMessage.hide("fast");
             	}
             	uploadingFiles = [];
             	uploadedFiles = [];
             	autoUploadfileDialogTransferBarClientId.val(uuid);
             	getAutoFileInput().prop("multiple", data.isMultiSelection);
             	getAutoFileInput().attr("accept", data.filter);
-            	setProgressBarVisible(false);
-                fileDialogErrorMessageContent.html("");
-                fileDialogErrorMessage.hide("fast");
+
             	animateShow(autoUploadBar);
             };
             
@@ -402,6 +403,10 @@ import 'blueimp-file-upload'
             	closeAfterErrorTimeout = false;
                 if (uploadBar.closest(rootElement).length === 0) {
                     rootElement.append(uploadBar);
+                    setProgressBarVisible(false);
+
+                    fileDialogSuccessMessageContent.html("");
+                    fileDialogSuccessMessage.hide("fast");
                 }
                 fileDialogTransferBarClientId.val(uuid);
 
@@ -413,11 +418,7 @@ import 'blueimp-file-upload'
                 showOrHide(cancelBtn, (data.allowDownload || data.allowUpload || data.allowDelete) && !data.customDialog );
                 getFileInput().prop("multiple", data.isMultiSelection);
                 getFileInput().attr("accept", data.filter);
-                setProgressBarVisible(false);
-                
-                fileDialogSuccessMessageContent.html("");
-            	fileDialogSuccessMessage.hide("fast");
-                
+
                 showOrHide(uploadBar, data.allowDownload || data.allowUpload || data.allowDelete);
             };
 

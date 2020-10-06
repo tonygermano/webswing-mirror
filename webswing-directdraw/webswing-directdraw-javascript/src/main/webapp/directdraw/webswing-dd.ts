@@ -1252,17 +1252,14 @@ export class DirectDraw {
 
             ctx.wrapped = true;
             ctx.boundingBox = null;
-            const emptyBBox = {
-                minX: 99999999999,
-                minY: 99999999999,
-                maxX: -99999999999,
-                maxY: -99999999999
+            const emptyBBox = () => {
+                return {minX: 99999999999, minY: 99999999999, maxX: -99999999999, maxY: -99999999999}
             }
-            ctx.pathBBox = emptyBBox;
+            ctx.pathBBox = emptyBBox();
             // track bounding boxes of changed areas:
             const beginPathOriginal = ctx.beginPath;
             ctx.beginPath = function () {
-                this.pathBBox = emptyBBox;
+                this.pathBBox = emptyBBox();
                 return beginPathOriginal.call(this);
             };
             const setTransformOriginal = ctx.setTransform;
@@ -1287,7 +1284,7 @@ export class DirectDraw {
 
             const fillTextOriginal = ctx.fillText;
             ctx.fillText = function (text: string, x: number, y: number, maxWidth?: number) {
-                this.pathBBox = emptyBBox;
+                this.pathBBox = emptyBBox();
                 const width = maxWidth || this.measureText(text).width;
                 const height = this.measureText("M").width * 2;// approximation
                 this.updateMinMax(x - 3, y - height * 0.7);
@@ -1346,7 +1343,7 @@ export class DirectDraw {
 
             const drawImageOriginal = ctx.drawImage;
             ctx.drawImage = function (image: HTMLImageElement | HTMLCanvasElement, dx: number, dy: number, dw?: number, dh?: number, sx?: number, sy?: number, sw?: number, sh?: number) {
-                this.pathBBox = emptyBBox;
+                this.pathBBox = emptyBBox();
                 this.setBoundingBox();
                 return drawImageOriginal.call(this, image, dx, dy, dw, dh, sx, sy, sw, sh);
             };

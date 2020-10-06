@@ -1,20 +1,6 @@
 package org.webswing.theme;
 
-import java.awt.Color;
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Transparency;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -245,7 +231,7 @@ public class DefaultWindowDecoratorTheme implements WindowDecoratorTheme {
 		g.drawImage(getIcon(window), menuRect.x, menuRect.y, menuRect.width, menuRect.height, null);
 
 		String title = getTitle(window)==null?"":getTitle(window);
-		g.setFont(UIManager.getFont("TitledBorder.font"));
+		g.setFont(UIManager.getFont("TitledBorder.font").deriveFont(Font.PLAIN,12));
 		float lineMetricsHeight = g.getFontMetrics().getLineMetrics(title, g).getHeight();
 
 		x += is.MENU.getWidth() + BUTTON_SPACING;

@@ -56,7 +56,7 @@
     "escodegen": "^1.9.1"
   },
   "dependencies": {
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "jquery-ui": "^1.12.1",
     "bootstrap-sass": "^3.1.1",
     "atmosphere.js": "^2.3.8",

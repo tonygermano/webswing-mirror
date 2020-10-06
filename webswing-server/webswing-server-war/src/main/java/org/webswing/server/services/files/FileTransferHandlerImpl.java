@@ -113,7 +113,7 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 		response.setBufferSize(DEFAULT_BUFFER_SIZE);
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Length", String.valueOf(file.length()));
-		String encodedName= URLEncoder.encode(file.getName(), "UTF-8");
+		String encodedName= URLEncoder.encode(file.getName(), "UTF-8").replaceAll("\\+","%20");
 		response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedName + "\"; filename*=UTF-8''"+encodedName);
 		BufferedInputStream input = null;
 		BufferedOutputStream output = null;

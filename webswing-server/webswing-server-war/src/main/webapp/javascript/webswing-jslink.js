@@ -66,6 +66,7 @@
         function serializeObject(object) {
             var jsResponse = {};
             if (object == null) {
+                jsResponse.value=null;
                 return jsResponse;
             } else if (Object.prototype.toString.call(object) === '[object Error]') {
                 jsResponse.error = object.toString();

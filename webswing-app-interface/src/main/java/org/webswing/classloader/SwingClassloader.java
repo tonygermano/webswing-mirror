@@ -165,29 +165,12 @@ public class SwingClassloader extends URLClassLoader {
 	private String[] ignored_packages;
 	private ClassModificationRegister modRegister= new ClassModificationRegister();
 	private ClassLoaderRepository repository;
-	private final URLClassLoader repoClassLoader;
+	private final FallbackURLClassLoader repoClassLoader;
 
 	public SwingClassloader(URL[] classpath, ClassLoader parent) {
 		super(new URL[] {}, parent);
 		this.ignored_packages = new String[] { "org.webswing.special.", "org.webswing.model.", "org.webswing.toolkit.", "netscape.javascript." };
-		this.repoClassLoader = new URLClassLoader(classpath) {
-
-			@Override
-			public URL findResource(String name) {
-				// This is to prevent ClassCircularityError caused by custom jar URLStreamHandler (ie. in netbeans platform apps)
-				URL unsafe = super.findResource(name);
-				if (originalJarHandler != null && unsafe != null && unsafe.getProtocol().startsWith("jar")) {
-					try {
-						URL safeurl = new URL(null, unsafe.toString(), originalJarHandler);
-						return safeurl;
-					} catch (MalformedURLException e) {
-						Logger.error("Converting " + unsafe.toString() + " to safe url failed", e);
-					}
-				}
-				return unsafe;
-			}
-
-		};
+		this.repoClassLoader = new FallbackURLClassLoader(classpath);
 		this.repository = new ClassLoaderRepository(repoClassLoader);
 	}
 
@@ -220,56 +203,7 @@ public class SwingClassloader extends URLClassLoader {
 				/*
 				 * Fourth try: Special request?
 				 */
-				byte[] bytes=null;
-
-				if (class_name.indexOf("$$BCEL$$") >= 0) {
-					bytes = createClass(class_name).getBytes();
-				} else { // Fifth try: Load classes via repository
-					try {
-						if(modRegister.canSkipModification(class_name)) {
-							if(class_name.lastIndexOf(".")>0) {
-								definePackage(class_name.substring(0, class_name.lastIndexOf(".")));
-							}
-							bytes=loadClassBytes(class_name);
-						}else {
-							JavaClass clazz = repository.loadClass(class_name);
-							clazz = modifyClass(clazz);
-							repository.removeClass(clazz);
-							bytes = clazz.getBytes();
-						}
-						modRegister.notifyClassLoaded(class_name);
-					} catch (ClassNotFoundException e) {
-						//in case the class was loaded from external source using defineClass (ie. remote EJB stub)
-						cl = findLoadedClass(class_name);
-						if (cl != null) {
-							if (resolve) {
-								resolveClass(cl);
-							}
-							return cl;
-						} else {
-							throw new ClassNotFoundException(class_name);
-						}
-					}
-				}
-				if (bytes != null) {
-					java.security.Permissions perms = new java.security.Permissions();
-					perms.add(SecurityConstants.ALL_PERMISSION);
-					String classFilePath = repoClassLoader.getResource(class_name.replace('.', '/') + ".class").toExternalForm();
-					int jarSeparatorIndex = classFilePath.lastIndexOf('!');
-					boolean inJar = classFilePath.startsWith("jar:");
-					classFilePath = jarSeparatorIndex > 0 && inJar ? classFilePath.substring(4, jarSeparatorIndex) : classFilePath;
-					CodeSource source = null;
-					try {
-						source = new CodeSource(new URL(classFilePath), new Certificate[] {});
-					} catch (MalformedURLException e) {
-						Logger.fatal("Exception resolving code source:", e);
-						// should not happen
-					}
-					ProtectionDomain allPermDomain = new java.security.ProtectionDomain(source, perms);
-					cl = defineClass(class_name, bytes, 0, bytes.length, allPermDomain);
-				} else {
-					cl = Class.forName(class_name);
-				}
+				cl=findClass(class_name);
 			}
 			if (resolve) {
 				resolveClass(cl);
@@ -515,6 +449,58 @@ public class SwingClassloader extends URLClassLoader {
 		return repoClassLoader.getResources(name);
 	}
 
+	@Override
+	protected Class<?> findClass(String class_name) throws ClassNotFoundException {
+		Class<?> cl;
+		byte[] bytes=null;
+
+		if (class_name.indexOf("$$BCEL$$") >= 0) {
+			bytes = createClass(class_name).getBytes();
+		} else { // Fifth try: Load classes via repository
+			try {
+				if(modRegister.canSkipModification(class_name)) {
+					if(class_name.lastIndexOf(".")>0) {
+						definePackage(class_name.substring(0, class_name.lastIndexOf(".")));
+					}
+					bytes=loadClassBytes(class_name);
+				}else {
+					JavaClass clazz = repository.loadClass(class_name);
+					clazz = modifyClass(clazz);
+					repository.removeClass(clazz);
+					bytes = clazz.getBytes();
+				}
+				modRegister.notifyClassLoaded(class_name);
+			} catch (ClassNotFoundException e) {
+				//in case the class was loaded from external source using defineClass (ie. remote EJB stub)
+				cl = findLoadedClass(class_name);
+				if (cl != null) {
+					return cl;
+				} else {
+					throw new ClassNotFoundException(class_name);
+				}
+			}
+		}
+		if (bytes != null) {
+			java.security.Permissions perms = new java.security.Permissions();
+			perms.add(SecurityConstants.ALL_PERMISSION);
+			String classFilePath = repoClassLoader.getResource(class_name.replace('.', '/') + ".class").toExternalForm();
+			int jarSeparatorIndex = classFilePath.lastIndexOf('!');
+			boolean inJar = classFilePath.startsWith("jar:");
+			classFilePath = jarSeparatorIndex > 0 && inJar ? classFilePath.substring(4, jarSeparatorIndex) : classFilePath;
+			CodeSource source = null;
+			try {
+				source = new CodeSource(new URL(classFilePath), new Certificate[] {});
+			} catch (MalformedURLException e) {
+				Logger.fatal("Exception resolving code source:", e);
+				// should not happen
+			}
+			ProtectionDomain allPermDomain = new java.security.ProtectionDomain(source, perms);
+			cl = defineClass(class_name, bytes, 0, bytes.length, allPermDomain);
+		} else {
+			cl = Class.forName(class_name);
+		}
+		return cl;
+	}
 
 	public byte[] loadClassBytes(String className) throws ClassNotFoundException {
 		String classFile = className.replace('.', '/');
@@ -563,4 +549,28 @@ public class SwingClassloader extends URLClassLoader {
 		return result;
 	}
 
+	private static class FallbackURLClassLoader extends URLClassLoader{
+
+		public FallbackURLClassLoader(URL[] urls) {
+			super(urls);
+		}
+
+		@Override
+		public URL findResource(String name) {
+			// This is to prevent ClassCircularityError caused by custom jar URLStreamHandler (ie. in netbeans platform apps)
+			URL unsafe = super.findResource(name);
+			if (originalJarHandler != null && unsafe != null && unsafe.getProtocol().startsWith("jar")) {
+				try {
+					URL safeurl = new URL(null, unsafe.toString(), originalJarHandler);
+					return safeurl;
+				} catch (MalformedURLException e) {
+					Logger.error("Converting " + unsafe.toString() + " to safe url failed", e);
+				}
+			}
+			return unsafe;
+		}
+
+
+
+	}
 }
