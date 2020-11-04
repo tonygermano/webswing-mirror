@@ -31,6 +31,8 @@ public interface Constants {
 	public static final String SWING_SESSION_TIMEOUT_SEC = "webswing.sessionTimeoutSec";
 	public static final String SWING_SESSION_TIMEOUT_SEC_IF_FILECHOOSER_ACTIVE = "webswing.sessionTimeoutSecIfFileChooserActive";
 	public static final String SWING_SESSION_TIMEOUT_IF_INACTIVE = "webswing.sessionTimeoutIfInactive";
+	public static final String EDT_TIMEOUT_SECONDS = "webswing.edtTimeout";
+	public static final int EDT_TIMEOUT_SECONDS_DEFAULT = 10;
 	public static final String SWING_START_SYS_PROP_SYNC_TIMEOUT = "webswing.syncCallTimeout";
 	public static final String SWING_START_SYS_PROP_THEME = "webswing.theme";
 	public static final String SWING_START_SYS_PROP_WAIT_FOR_EXIT = "webswing.waitForExit";

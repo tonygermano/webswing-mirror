@@ -76,6 +76,7 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 	private static ServerConnectionServiceImpl impl;
 	private static ActiveMQConnectionFactory connectionFactory;
 	private static long syncTimeout = Long.getLong(Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT, 3000);
+	private static final int EDT_TIMEOUT_SECONDS = Integer.getInteger(Constants.EDT_TIMEOUT_SECONDS, Constants.EDT_TIMEOUT_SECONDS_DEFAULT);
 
 	private String messageApiSharedTopicName;
 	private Connection connection;
@@ -174,8 +175,8 @@ public class ServerConnectionServiceImpl implements MessageListener, ServerConne
 					}
 					if (!terminated.get()) {
 						sendObject(getStats(pingEventDispatchThread.get()));
-						if (pingEventDispatchThread.getAndIncrement() == 10) {//if value is not reset after 10 seconds - EDT is stuck
-							Logger.warn("Application is not responding for 10 seconds. Thread dump generated . ");
+						if (pingEventDispatchThread.getAndIncrement() == EDT_TIMEOUT_SECONDS) {//if value is not reset after 10 seconds - EDT is stuck
+							Logger.warn("Application is not responding for "+EDT_TIMEOUT_SECONDS+" seconds. Thread dump generated . ");
 							sendObject(getThreadDumpMsg("Application not responding"));
 						} else {
 							SwingUtilities.invokeLater(new Runnable() {

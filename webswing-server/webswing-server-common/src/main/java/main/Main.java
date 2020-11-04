@@ -200,7 +200,6 @@ public class Main {
 			File file = new File(tempDirPath + File.separator + name).getAbsoluteFile();
 			if (!file.exists()) {
 				file.createNewFile();
-				file.deleteOnExit();
 				input = jarFile.getInputStream(jarEntry);
 				output = new FileOutputStream(file);
 				int readCount;

@@ -40,6 +40,15 @@ public class RedirectedMethods {
 		return SwingMain.swingLibClassLoader;
 	}
 
+	public static ClassLoader getPlatformClassLoader() {
+		return SwingMain.swingLibClassLoader;
+	}
+
+	// This is only for IntelliJ IDEA
+	public static ClassLoader getPlatformLoaderParentIfOnJdk9() {
+		return SwingMain.swingLibClassLoader;
+	}
+
 	public static URL getSystemResource(String name) {
 		return SwingMain.swingLibClassLoader.getResource(name);
 	}

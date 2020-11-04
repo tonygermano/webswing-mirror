@@ -107,6 +107,10 @@ abstract public class WebComponentPeer implements ComponentPeer {
 		return Services.getDirectDrawService().extractWebImage(webImage);
 	}
 
+	public long getHWnd() {
+		return 1;
+	}
+
 	public void updateWindowDecorationImage() {
 		if (target == null || !(target instanceof JDialog || target instanceof JFrame) || !isInitialized()) {
 			return;

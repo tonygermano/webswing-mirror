@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>webswing</artifactId>
 		<groupId>org.webswing</groupId>
-		<version>20.1.7</version>
+		<version>20.1.8</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<dependencies>
@@ -48,7 +48,6 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>24.1.1-jre</version>
 		</dependency>
 		<dependency>
 			<groupId>com.objectplanet.image</groupId>

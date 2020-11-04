@@ -91,6 +91,8 @@ public class SwingClassloader extends URLClassLoader {
 
 		Builder<String, String> methodReplacementBuilder = new ImmutableBiMap.Builder<String, String>();
 		methodReplacementBuilder.put("java.lang.ClassLoader getSystemClassLoader ()Ljava/lang/ClassLoader;", "org.webswing.special.RedirectedMethods getSystemClassLoader ()Ljava/lang/ClassLoader;");
+		methodReplacementBuilder.put("java.lang.ClassLoader getPlatformClassLoader ()Ljava/lang/ClassLoader;", "org.webswing.special.RedirectedMethods getPlatformClassLoader ()Ljava/lang/ClassLoader;");
+		methodReplacementBuilder.put("com.intellij.openapi.util.ClassLoaderUtil getPlatformLoaderParentIfOnJdk9 ()Ljava/lang/ClassLoader;", "org.webswing.special.RedirectedMethods getPlatformLoaderParentIfOnJdk9 ()Ljava/lang/ClassLoader;");
 		methodReplacementBuilder.put("java.lang.ClassLoader getSystemResource (Ljava/lang/String;)Ljava/net/URL;", "org.webswing.special.RedirectedMethods getSystemResource (Ljava/lang/String;)Ljava/net/URL;");
 		methodReplacementBuilder.put("java.lang.ClassLoader getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;", "org.webswing.special.RedirectedMethods getSystemResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;");
 		methodReplacementBuilder.put("java.lang.ClassLoader getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;", "org.webswing.special.RedirectedMethods getSystemResources (Ljava/lang/String;)Ljava/util/Enumeration;");
@@ -199,6 +201,7 @@ public class SwingClassloader extends URLClassLoader {
 					}
 				}
 			}
+
 			if (cl == null) {
 				/*
 				 * Fourth try: Special request?

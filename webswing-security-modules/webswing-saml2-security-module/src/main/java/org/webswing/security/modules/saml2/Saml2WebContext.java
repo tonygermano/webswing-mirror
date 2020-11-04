@@ -1,18 +1,20 @@
 package org.webswing.security.modules.saml2;
 
-import org.pac4j.core.context.Cookie;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.J2ESessionStore;
-import org.pac4j.core.context.session.SessionStore;
-import org.pac4j.core.exception.TechnicalException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.pac4j.core.context.Cookie;
+import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.JEESessionStore;
+import org.pac4j.core.context.session.SessionStore;
+import org.pac4j.core.exception.TechnicalException;
 
 public class Saml2WebContext implements WebContext {
 
@@ -30,7 +32,7 @@ public class Saml2WebContext implements WebContext {
 		this.request = request;
 		this.response = response;
 		if (sessionStore == null) {
-			this.sessionStore = new J2ESessionStore();
+			this.sessionStore = new JEESessionStore();
 		} else {
 			this.sessionStore = sessionStore;
 		}
@@ -42,13 +44,13 @@ public class Saml2WebContext implements WebContext {
 	}
 
 	@Override
-	public String getRequestParameter(final String name) {
-		return this.request.getParameter(name);
+	public Optional<String> getRequestParameter(final String name) {
+		return Optional.ofNullable(this.request.getParameter(name));
 	}
 
 	@Override
-	public Object getRequestAttribute(final String name) {
-		return this.request.getAttribute(name);
+	public Optional<Object> getRequestAttribute(final String name) {
+		return Optional.ofNullable(this.request.getAttribute(name));
 	}
 
 	@Override
@@ -62,13 +64,13 @@ public class Saml2WebContext implements WebContext {
 	}
 
 	@Override
-	public String getRequestHeader(final String name) {
+	public Optional<String> getRequestHeader(final String name) {
 		final Enumeration<String> names = request.getHeaderNames();
 		if (names != null) {
 			while (names.hasMoreElements()) {
 				final String headerName = names.nextElement();
 				if (headerName != null && headerName.equalsIgnoreCase(name)) {
-					return this.request.getHeader(headerName);
+					return Optional.ofNullable(this.request.getHeader(headerName));
 				}
 			}
 		}
@@ -103,12 +105,12 @@ public class Saml2WebContext implements WebContext {
 		return this.response;
 	}
 
-	@Override
+	
 	public void writeResponseContent(final String content) {
 		this.content += content;
 	}
 
-	@Override
+	
 	public void setResponseStatus(final int code) {
 		if (response != null) {
 			this.response.setStatus(code);

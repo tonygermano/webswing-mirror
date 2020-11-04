@@ -451,7 +451,7 @@
                 },100);
 
                 //generate keypress event for alt+key events
-                if (!util.detectMac() && keyevt.key.alt && functionKeys.indexOf(kc) == -1) {
+                if (!util.detectMac() && !keyevt.key.ctrl && keyevt.key.alt && functionKeys.indexOf(kc) == -1) {
                     event.preventDefault();
                     event.stopPropagation();
                     keyevt = getKBKey('keypress', event);

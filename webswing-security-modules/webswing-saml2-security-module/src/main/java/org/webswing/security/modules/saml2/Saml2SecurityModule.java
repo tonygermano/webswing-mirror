@@ -1,18 +1,33 @@
 package org.webswing.security.modules.saml2;
 
-import main.Main;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.client.utils.URIUtils;
 import org.opensaml.saml.common.xml.SAMLConstants;
-import org.pac4j.core.context.J2EContext;
+import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
-import org.pac4j.core.exception.HttpAction;
+import org.pac4j.core.exception.http.FoundAction;
+import org.pac4j.core.exception.http.HttpAction;
+import org.pac4j.core.exception.http.OkAction;
+import org.pac4j.core.exception.http.RedirectionAction;
+import org.pac4j.core.exception.http.StatusAction;
+import org.pac4j.core.exception.http.WithLocationAction;
+import org.pac4j.core.http.adapter.JEEHttpActionAdapter;
 import org.pac4j.core.logout.handler.LogoutHandler;
 import org.pac4j.core.profile.definition.CommonProfileDefinition;
 import org.pac4j.saml.client.SAML2Client;
@@ -26,15 +41,7 @@ import org.webswing.server.services.security.api.AbstractWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.modules.AbstractExtendableSecurityModule;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
+import main.Main;
 
 public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2SecurityModuleConfig> {
 	private static final Logger log = LoggerFactory.getLogger(Saml2SecurityModule.class);
@@ -153,7 +160,13 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 			sendPartialHtml(request, response, "errorPartial.html", exception);
 		} else {
 			WebContext context = new Saml2WebContext(request, response, store);
-			String url = client.getRedirectActionBuilder().redirect(context).getLocation();
+//			String url = client.getRedirectActionBuilder().redirect(context).getLocation();
+			RedirectionAction ra = client.getRedirectionActionBuilder().getRedirectionAction(context).get();
+			String url = "";
+			if(ra instanceof WithLocationAction) {
+				url = ((WithLocationAction) ra).getLocation();
+			}
+			
 			URIBuilder urlBuilder = null;
 			try {
 				urlBuilder = new URIBuilder(url);
@@ -181,8 +194,8 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 		if (!StringUtils.isEmpty(samlResponse)) {
 			try {
 				WebContext webCtx = new Saml2WebContext(request, store);
-				SAML2Credentials cred = client.getCredentials(webCtx);
-				SAML2Profile profile = client.getUserProfile(cred, webCtx);
+				SAML2Credentials cred = client.getCredentials(webCtx).get();
+				SAML2Profile profile = (SAML2Profile) client.getUserProfile(cred, webCtx).get();
 				logSuccess(request, profile.getId());
 				return new Saml2User(profile, profile.getId(), profile.getAttributes(), userAttributeName, rolesAttributeName);
 			} catch (Exception e1) {
@@ -217,15 +230,13 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 	}
 
 	private void serveSpMetadata(HttpServletRequest request, HttpServletResponse response) {
-		J2EContext ctx = new J2EContext(request, response);
+		JEEContext ctx = new JEEContext(request, response);
 		try {
 			String content = client.getServiceProviderMetadataResolver().getMetadata();
-			ctx.setResponseStatus(HttpStatus.SC_OK);
+			JEEHttpActionAdapter.INSTANCE.adapt(new OkAction(content), ctx);
 			ctx.setResponseContentType("application/xml");
-			ctx.writeResponseContent(content);
-		} catch (IOException e) {
-			ctx.setResponseStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-			ctx.writeResponseContent("Failed to generate SP metadata xml");
+		} catch (Exception e) {
+			JEEHttpActionAdapter.INSTANCE.adapt(new StatusAction(HttpStatus.SC_INTERNAL_SERVER_ERROR), ctx);
 			log.error("Failed to generate SP metadata xml", e);
 		}
 	}
@@ -234,7 +245,13 @@ public class Saml2SecurityModule extends AbstractExtendableSecurityModule<Saml2S
 	public void doLogout(HttpServletRequest request, HttpServletResponse response, AbstractWebswingUser user) throws ServletException, IOException {
 		if (getConfig().isSingleLogout() && user instanceof Saml2User) {
 			WebContext context = new Saml2WebContext(request, response, store);
-			String url = client.getLogoutActionBuilder().getLogoutAction(context, ((Saml2User) user).getProfile(), null).getLocation();
+			
+			RedirectionAction ra = client.getLogoutActionBuilder().getLogoutAction(context, ((Saml2User) user).getProfile(), null).get();
+			String url = "";
+			if(ra instanceof FoundAction) {
+				url = ((FoundAction) ra).getLocation();
+			}
+			
 			sendRedirect(request, response, url);
 		} else {
 			String logoutUrl = replaceVar(getConfig().getLogoutUrl());

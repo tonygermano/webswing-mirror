@@ -37,18 +37,30 @@ public class FastDirectDrawServicesAdapter extends DirectDrawServicesAdapter {
 	@Override
 	public long computeHash(Image subImage) {
 		final StreamingXXHash64 shash = hashfactory.newStreamingHash64(seed);
-		final ByteBuffer byteBuffer = ByteBuffer.allocate(subImage.getWidth(null) * 4);
-		final IntBuffer intBuffer = byteBuffer.asIntBuffer();
 		ImageConsumerAdapter ic = new ImageConsumerAdapter() {
 			@Override
 			public void setPixels(int x, int y, int w, int h, ColorModel model, int[] pixels, int off, int scansize) {
+				final ByteBuffer byteBuffer = ByteBuffer.allocate(subImage.getWidth(null) * 4);
+				final IntBuffer intBuffer = byteBuffer.asIntBuffer();
 				intBuffer.rewind();
 				intBuffer.put(pixels, off, scansize);
 				shash.update(byteBuffer.array(), 0, scansize * 4);
 			}
 
+			@Override
 			public void setPixels(int x, int y, int w, int h, ColorModel model, byte[] pixels, int off, int scansize) {
 				shash.update(pixels, 0, scansize);
+			}
+			
+			@Override
+			public void setDimensions(int width, int height) {
+				final ByteBuffer byteBuffer = ByteBuffer.allocate(8);
+                                final IntBuffer intBuffer = byteBuffer.asIntBuffer();
+				intBuffer.rewind();
+                                intBuffer.put(width);
+                                intBuffer.put(height);
+				
+				shash.update(byteBuffer.array(), 0, 8);
 			}
 		};
 		subImage.getSource().startProduction(ic);

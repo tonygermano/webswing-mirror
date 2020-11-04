@@ -38,7 +38,7 @@ public class DefaultStatisticsLogger implements StatisticsLogger {
 		warningRules.put(LATENCY, WarningRule.thresholdRule(LATENCY, STATS_WARN_LATENCY_TRESHOLD));
 		warningRules.put(LATENCY_PING, WarningRule.thresholdRule(LATENCY_PING, STATS_WARN_PING_TRESHOLD));
 		warningRules.put(WEBSOCKET_CONNECTED, WarningRule.thresholdRule(WEBSOCKET_CONNECTED, 2, "WebSocket connection failed. Falling back to long-polling."));
-		warningRules.put(EDT_BLOCKED_SEC_METRIC, WarningRule.thresholdRule(EDT_BLOCKED_SEC_METRIC, 10, "EDT blocked for %d seconds. See Thread dump for details."));
+		warningRules.put(EDT_BLOCKED_SEC_METRIC, WarningRule.thresholdRule(EDT_BLOCKED_SEC_METRIC, 10, "EDT blocked for %d seconds."));
 
 		summaryRulesMap.put(MEMORY_ALLOCATED_METRIC, Arrays.asList(Aggregation.SUM));
 		summaryRulesMap.put(MEMORY_USED_METRIC, Arrays.asList(Aggregation.SUM));

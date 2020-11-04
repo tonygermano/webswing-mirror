@@ -8,6 +8,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +43,7 @@ public class DirectDrawServicesAdapter {
 		return Base64.encodeBase64String(bytes);
 	}
 
-	public long computeHash(Image subImage) {
+	public long computeHash(Image subImage) {                 
 		ImageConsumerAdapter ic = new ImageConsumerAdapter() {
 			@Override
 			public void setPixels(int x, int y, int w, int h, ColorModel model, int[] pixels, int off, int scansize) {
@@ -49,11 +51,18 @@ public class DirectDrawServicesAdapter {
 					hash = hash * 31 + pixels[i];
 				}
 			}
+                        
 			@Override
 			public void setPixels(int x, int y, int w, int h, ColorModel model, byte[] pixels, int off, int scansize) {
 				for (int i = off; i < off + scansize; i++) {
 					hash = hash * 31 + pixels[i];
 				}
+			}
+                        
+                        @Override
+			public void setDimensions(int width, int height) {
+                                hash = hash * 31 + width;
+                                hash = hash * 31 + height;
 			}
 		};
 		subImage.getSource().startProduction(ic);

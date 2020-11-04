@@ -5,7 +5,7 @@
     <parent>
         <artifactId>webswing-security-modules</artifactId>
         <groupId>org.webswing.security</groupId>
-        <version>20.1.7</version>
+        <version>20.1.8</version>
         <relativePath>..</relativePath>
     </parent>
     <dependencies>
@@ -27,10 +27,11 @@
         <dependency>
             <groupId>org.pac4j</groupId>
             <artifactId>pac4j-saml</artifactId>
+            <version>4.1.0</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.opensaml</groupId>
-                    <artifactId>opensaml-storage-impl</artifactId>
+                    <artifactId>hibernate-core</artifactId>
+                    <groupId>org.hibernate</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -45,20 +46,6 @@
         </dependency>
 
         <dependency>
-            <!--https://snyk.io/vuln/SNYK-JAVA-ORGSPRINGFRAMEWORK-460644-->
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>5.0.6.RELEASE</version>
-        </dependency>
-
-        <dependency>
-            <!--https://snyk.io/vuln/SNYK-JAVA-ORGAPACHESANTUARIO-460281-->
-            <groupId>org.apache.santuario</groupId>
-            <artifactId>xmlsec</artifactId>
-            <version>2.1.4</version>
-        </dependency>
-
-        <dependency>
             <!-- https://snyk.io/vuln/SNYK-JAVA-COMBEUST-174815 -->
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
@@ -66,11 +53,12 @@
         </dependency>
 
         <dependency>
-            <!--https://snyk.io/vuln/SNYK-JAVA-CHQOSLOGBACK-31407-->
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
+            <!--https://snyk.io/vuln/SNYK-JAVA-COMGOOGLEGUAVA-1015415-->
+            <groupId> com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>30.0-jre</version>
         </dependency>
+
     </dependencies>
 
     <build>

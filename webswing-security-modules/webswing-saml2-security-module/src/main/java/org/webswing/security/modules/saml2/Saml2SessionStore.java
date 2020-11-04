@@ -3,6 +3,7 @@ package org.webswing.security.modules.saml2;
 import org.pac4j.core.context.session.SessionStore;
 import org.webswing.server.services.security.api.SecurityContext;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class Saml2SessionStore implements SessionStore<Saml2WebContext> {
@@ -25,8 +26,8 @@ public class Saml2SessionStore implements SessionStore<Saml2WebContext> {
 	}
 
 	@Override
-	public Object get(Saml2WebContext context, String key) {
-		return sc.getFromSecuritySession(key);
+	public Optional<Object> get(Saml2WebContext context, String key) {
+		return Optional.ofNullable(sc.getFromSecuritySession(key));
 	}
 
 	@Override
@@ -40,13 +41,13 @@ public class Saml2SessionStore implements SessionStore<Saml2WebContext> {
 	}
 
 	@Override
-	public Object getTrackableSession(Saml2WebContext context) {
-		return null;
+	public Optional<Object> getTrackableSession(Saml2WebContext context) {
+		return Optional.empty();
 	}
 
 	@Override
-	public SessionStore<Saml2WebContext> buildFromTrackableSession(Saml2WebContext context, Object trackableSession) {
-		return null;
+	public Optional<SessionStore<Saml2WebContext>> buildFromTrackableSession(Saml2WebContext context, Object trackableSession) {
+		return Optional.empty();
 	}
 
 	@Override
