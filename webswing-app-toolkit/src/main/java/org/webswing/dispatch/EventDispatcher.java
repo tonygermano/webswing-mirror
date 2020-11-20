@@ -1,15 +1,18 @@
 package org.webswing.dispatch;
 
-import org.webswing.model.MsgIn;
-import org.webswing.toolkit.WebDragSourceContextPeer;
-
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.datatransfer.Transferable;
+import java.io.Serializable;
+
+import org.webswing.model.app.in.ServerToAppFrameMsgIn;
+import org.webswing.model.appframe.in.AppFrameMsgIn;
+import org.webswing.toolkit.WebDragSourceContextPeer;
 
 public interface EventDispatcher {
-	void dispatchEvent(final MsgIn event);
+	
+	void dispatchEvent(final AppFrameMsgIn msg);
 
 	void dispatchEventInSwing(final Component c, final AWTEvent e);
 
@@ -22,4 +25,10 @@ public interface EventDispatcher {
 	boolean isJavaFXdragStarted();
 
 	void setJavaFXdragStarted(boolean b);
+
+	void onMessage(ServerToAppFrameMsgIn msg, AppFrameMsgIn frame);
+
+	long getLastEventTimestamp(boolean userEventOnly);
+
+	void resetLastEventTimestamp();
 }

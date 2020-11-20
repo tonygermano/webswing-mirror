@@ -1,11 +1,63 @@
 package org.webswing.dispatch;
 
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.SecondaryLoop;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.WeakHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
+
 import org.webswing.Constants;
 import org.webswing.audio.AudioClip;
-import org.webswing.model.internal.ExitMsgInternal;
-import org.webswing.model.internal.OpenFileResultMsgInternal;
-import org.webswing.model.internal.PrinterJobResultMsgInternal;
-import org.webswing.model.s2c.*;
+import org.webswing.model.app.out.AppToServerFrameMsgOut;
+import org.webswing.model.app.out.ExitMsgOut;
+import org.webswing.model.app.out.JvmStatsMsgOut;
+import org.webswing.model.app.out.SessionDataMsgOut;
+import org.webswing.model.app.out.ThreadDumpMsgOut;
+import org.webswing.model.appframe.out.AccessibilityMsgOut;
+import org.webswing.model.appframe.out.ActionEventMsgOut;
+import org.webswing.model.appframe.out.AppFrameMsgOut;
+import org.webswing.model.appframe.out.AudioEventMsgOut;
+import org.webswing.model.appframe.out.CopyEventMsgOut;
+import org.webswing.model.appframe.out.CursorChangeEventMsgOut;
+import org.webswing.model.appframe.out.FileDialogEventMsgOut;
+import org.webswing.model.appframe.out.FocusEventMsgOut;
+import org.webswing.model.appframe.out.LinkActionMsgOut;
+import org.webswing.model.appframe.out.LinkActionMsgOut.LinkActionType;
+import org.webswing.model.appframe.out.PasteRequestMsgOut;
+import org.webswing.model.appframe.out.SimpleEventMsgOut;
+import org.webswing.model.appframe.out.WindowMsgOut;
 import org.webswing.toolkit.WebCursor;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
@@ -13,31 +65,17 @@ import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.api.file.WebswingFileChooserUtil;
 import org.webswing.toolkit.extra.IsolatedFsShellFolderManager;
-import org.webswing.toolkit.util.*;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.ToolkitUtil;
+import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
+import org.webswing.util.CpuMonitor;
+import org.webswing.util.DeamonThreadFactory;
 
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-public abstract class AbstractPaintDispatcher implements PaintDispatcher{
+public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 	private volatile Map<String, Set<Rectangle>> areasToUpdate = new HashMap<>();
-	private volatile FocusEventMsg focusEvent;
-	private volatile AccessibilityMsg accessible;
+	private volatile FocusEventMsgOut focusEvent;
+	private volatile AccessibilityMsgOut accessible;
 	private AtomicBoolean clientReadyToReceive = new AtomicBoolean(true);
 	private final Long ackTimeout = Long.getLong(Constants.PAINT_ACK_TIMEOUT, 5000);
 	private long lastReadyStateTime;
@@ -50,10 +88,10 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 	private Component accessibilityComponent;
 	private Integer accessibilityX;
 	private Integer accessibilityY;
-
+	
 	private WeakHashMap<Window, WeakReference<JFileChooser>> registeredFileChooserWindows = new WeakHashMap<>();
 	private FileChooserShowingListener fileChooserVisibilityListener = new FileChooserShowingListener();
-	
+
 	private WeakHashMap<String, WeakReference<AudioClip>> registeredAudioClips = new WeakHashMap<>();
 	private SecondaryLoop clipboardDialogLoop;
 
@@ -86,15 +124,20 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 			addDirtyArea(guid, new Rectangle(0, bounds.height - insets.bottom, bounds.width, insets.bottom));//bottom
 		}
 	}
-
+	
 	public void notifyWindowClosed(String guid) {
 		removeDirtyArea(guid);
+		
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
-		WindowMsg fdEvent = new WindowMsg();
+		WindowMsgOut fdEvent = new WindowMsgOut();
 		fdEvent.setId(guid);
 		f.setClosedWindow(fdEvent);
-		Logger.debug("WebPaintDispatcher:notifyWindowClosed", guid);
-		sendObject(f);
+		
+		AppLogger.debug("WebPaintDispatcher:notifyWindowClosed", guid);
+		
+		sendObject(msgOut, f);
 	}
 
 	@SuppressWarnings("restriction")
@@ -110,10 +153,11 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 				}
 			}
 		}
-
 	}
 
 	public void notifyActionEvent(String windowId, String actionName, String data, byte[] binaryData) {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
 
 		ActionEventMsgOut actionEvent = new ActionEventMsgOut();
@@ -124,26 +168,35 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 
 		f.setActionEvent(actionEvent);
 
-		Logger.debug("WebPaintDispatcher:notifyActionEvent", f);
-		sendObject(f);
+		AppLogger.debug("WebPaintDispatcher:notifyActionEvent", f);
+		
+		sendObject(msgOut, f);
 	}
 
 
 	public void notifyOpenLinkAction(URI uri) {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
-		LinkActionMsg linkAction = new LinkActionMsg(LinkActionMsg.LinkActionType.url, uri.toString());
+		LinkActionMsgOut linkAction = new LinkActionMsgOut(LinkActionMsgOut.LinkActionType.url, uri.toString());
 		f.setLinkAction(linkAction);
-		Logger.info("WebPaintDispatcher:notifyOpenLinkAction", uri);
-		sendObject(f);
+		
+		AppLogger.info("WebPaintDispatcher:notifyOpenLinkAction", uri);
+		
+		sendObject(msgOut, f);
 	}
 
 	public void notifyCopyEvent(WebswingClipboardData data) {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
-		CopyEventMsg copyEvent;
-		copyEvent = new CopyEventMsg(data.getText(), data.getHtml(), data.getImg(), data.getFiles(), false);
+		CopyEventMsgOut copyEvent;
+		copyEvent = new CopyEventMsgOut(data.getText(), data.getHtml(), data.getImg(), data.getFiles(), false);
 		f.setCopyEvent(copyEvent);
-		Logger.debug("WebPaintDispatcher:notifyCopyEvent", f);
-		sendObject(f);
+		
+		AppLogger.debug("WebPaintDispatcher:notifyCopyEvent", f);
+		
+		sendObject(msgOut, f);
 	}
 
 	public void notifyFileDialogActive(Window window) {
@@ -156,11 +209,18 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 			SwingUtilities.invokeLater(this::notifyFileDialogActive);
 		} else {
 			if (getFileChooserDialog() != null) {
+				AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+				
 				AppFrameMsgOut f = new AppFrameMsgOut();
-				FileDialogEventMsg fdEvent = new FileDialogEventMsg(getFileChooserDialog());
+				
+				boolean allowDownload = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD));
+				boolean allowUpload = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD));
+				boolean allowDelete = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE));
+				
+				FileDialogEventMsgOut fdEvent = new FileDialogEventMsgOut(getFileChooserDialog(), allowDownload, allowUpload, allowDelete);
 				f.setFileDialogEvent(fdEvent);
-				FileDialogEventMsg.FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(getFileChooserDialog());
-				if (fileChooserEventType == FileDialogEventMsg.FileDialogEventType.AutoUpload && getFileChooserDialog().getFileSelectionMode() == JFileChooser.DIRECTORIES_ONLY) {
+				FileDialogEventMsgOut.FileDialogEventType fileChooserEventType = Util.getFileChooserEventType(getFileChooserDialog());
+				if (fileChooserEventType == FileDialogEventMsgOut.FileDialogEventType.AutoUpload && getFileChooserDialog().getFileSelectionMode() == JFileChooser.DIRECTORIES_ONLY) {
 					//open dialog with auto upload enabled will automatically select the transfer folder
 					SwingUtilities.invokeLater(() -> {
 						try {
@@ -173,11 +233,11 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 					return;
 				}
 				fdEvent.setEventType(fileChooserEventType);
-				if (FileDialogEventMsg.FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventMsg.FileDialogEventType.AutoSave == fileChooserEventType) {
+				if (FileDialogEventMsgOut.FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventMsgOut.FileDialogEventType.AutoSave == fileChooserEventType) {
 					fdEvent.setAllowDelete(false);
 					fdEvent.setAllowDownload(false);
 					fdEvent.setAllowUpload(false);
-					if (FileDialogEventMsg.FileDialogEventType.AutoUpload == fileChooserEventType) {
+					if (FileDialogEventMsgOut.FileDialogEventType.AutoUpload == fileChooserEventType) {
 						getFileChooserDialog().setCurrentDirectory(Util.getTimestampedTransferFolder("autoupload"));
 					}
 					Window d = SwingUtilities.getWindowAncestor(getFileChooserDialog());
@@ -191,19 +251,31 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 				fdEvent.setSelection(Util.getFileChooserSelection(getFileChooserDialog()));
 				fdEvent.addFilter(getFileChooserDialog().getChoosableFileFilters());
 				fdEvent.setMultiSelection(getFileChooserDialog().isMultiSelectionEnabled());
-				Logger.info("WebPaintDispatcher:notifyFileTransferBarActive " + fileChooserEventType.name());
-				sendObject(f);
+
+				AppLogger.info("WebPaintDispatcher:notifyFileTransferBarActive " + fileChooserEventType.name());
+				
+				sendObject(msgOut, f);
 			}
 		}
 	}
 
 	public void notifyFileDialogHidden() {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
-		FileDialogEventMsg fdEvent = new FileDialogEventMsg();
-		fdEvent.setEventType(FileDialogEventMsg.FileDialogEventType.Close);
+		
+		boolean allowDownload = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD));
+		boolean allowUpload = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_UPLOAD));
+		boolean allowDelete = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ALLOW_DELETE));
+		
+		FileDialogEventMsgOut fdEvent = new FileDialogEventMsgOut(null, allowDownload, allowUpload, allowDelete);
+		fdEvent.setEventType(FileDialogEventMsgOut.FileDialogEventType.Close);
 		f.setFileDialogEvent(fdEvent);
-		Logger.info("WebPaintDispatcher:notifyFileTransferBarHidden " + FileDialogEventMsg.FileDialogEventType.Close.name());
+		
+		AppLogger.info("WebPaintDispatcher:notifyFileTransferBarHidden " + FileDialogEventMsgOut.FileDialogEventType.Close.name());
+		
 		validateSelection(getFileChooserDialog());
+		
 		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_AUTO_DOWNLOAD)) {
 			if (getFileChooserDialog() != null && getFileChooserDialog().getDialogType() == JFileChooser.SAVE_DIALOG) {
 				try {
@@ -212,33 +284,48 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 					if (resultValueField.get(getFileChooserDialog()).equals(JFileChooser.APPROVE_OPTION)) {
 						File saveFile = getFileChooserDialog().getSelectedFile();
 						if (saveFile != null) {
-							OpenFileResultMsgInternal msg = new OpenFileResultMsgInternal();
-							msg.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-							msg.setFile(saveFile);
-							msg.setWaitForFile(true);
+							String fileId = createHashedFileId(saveFile.getName(), saveFile.length());
+							String overwriteDetails = null;
 							if (saveFile.exists()) {
-								msg.setOverwriteDetails(saveFile.length() + "|" + saveFile.lastModified());
+								overwriteDetails = saveFile.length() + "|" + saveFile.lastModified();
 							}
-							sendObject(msg);
+							
+							boolean registered = Services.getDataStoreService().registerFileWhenReady(saveFile, fileId, 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), overwriteDetails);
+							
+							if (registered) {
+								AppToServerFrameMsgOut saveMsgOut = new AppToServerFrameMsgOut();
+								AppFrameMsgOut frame = new AppFrameMsgOut();
+								frame.setLinkAction(new LinkActionMsgOut(LinkActionType.file, fileId));
+								
+								sendObject(saveMsgOut, frame);
+							}
 						}
 					}
 				} catch (Exception e) {
-					Logger.warn("Save file dialog's file monitoring failed: " + e.getMessage());
+					AppLogger.warn("Save file dialog's file monitoring failed: " + e.getMessage());
 				}
 			}
 		}
 		setFileChooserDialog(null);
-		sendObject(f);
+		
+		sendObject(msgOut, f);
 	}
 
 	public void notifyDownloadSelectedFile() {
 		if (getFileChooserDialog() != null && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_DOWNLOAD)) {
 			File file = getFileChooserDialog().getSelectedFile();
 			if (file != null && file.exists() && !file.isDirectory() && file.canRead()) {
-				OpenFileResultMsgInternal f = new OpenFileResultMsgInternal();
-				f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-				f.setFile(file);
-				sendObject(f);
+				String fileId = createHashedFileId(file.getName(), file.length());
+				
+				boolean registered = Services.getDataStoreService().registerFile(file, fileId, 30, TimeUnit.MINUTES, getUserId(), getInstanceId());
+				
+				if (registered) {
+					AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+					AppFrameMsgOut frame = new AppFrameMsgOut();
+					frame.setLinkAction(new LinkActionMsgOut(LinkActionType.file, fileId));
+					
+					sendObject(msgOut, frame);
+				}
 			}
 		}
 	}
@@ -252,9 +339,10 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 			if (selected != null) {
 				for (File f : selected) {
 					if (f.exists() && f.canWrite()) {
-						boolean deleted=f.delete();
-						if(!deleted){
-							Logger.info("notifyDeleteSelectedFile: Failed to delete file:"+f.getAbsolutePath());
+						// FIXME delete in dataStore ?
+						boolean deleted = f.delete();
+						if (!deleted){
+							AppLogger.info("notifyDeleteSelectedFile: Failed to delete file:" + f.getAbsolutePath());
 						}
 					}
 				}
@@ -264,21 +352,62 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 	}
 
 	@Override
-	public void notifyFileRequested(File file,boolean preview) {
-		OpenFileResultMsgInternal f = new OpenFileResultMsgInternal();
-		f.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-		f.setFile(file.getAbsoluteFile());
-		f.setPreview(preview);
-		sendObject(f);
+	public void notifyFileRequested(File file, boolean preview) {
+		file = file.getAbsoluteFile();
+		String fileId = createHashedFileId(file.getName(), file.length());
+		
+		boolean registered = Services.getDataStoreService().registerFile(file, fileId, 30, TimeUnit.MINUTES, getUserId(), getInstanceId());
+		
+		if (registered) {
+			AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+			String extension = getFileExtension(file.getName());
+			LinkActionType actionType = preview && extension.equalsIgnoreCase(".pdf") ? LinkActionType.print : LinkActionType.file;
+			
+			AppFrameMsgOut frame = new AppFrameMsgOut();
+			frame.setLinkAction(new LinkActionMsgOut(actionType, fileId));
+			
+			sendObject(msgOut, frame);
+		}
 	}
 
-	public void notifyPrintPdfFile(String id, File f) {
-		PrinterJobResultMsgInternal printResult = new PrinterJobResultMsgInternal();
-		printResult.setClientId(System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID));
-		printResult.setTempFile(true);
-		printResult.setId(id);
-		printResult.setPdfFile(f);
-		sendObject(printResult);
+	public void notifyPrintPdfFile(ByteArrayOutputStream out) {
+		String id = createHashedFileId(UUID.randomUUID().toString() + ".pdf", out.size());
+		
+		boolean registered = Services.getDataStoreService().registerData(out.toByteArray(), id, 30, TimeUnit.MINUTES, getUserId(), getInstanceId(), true);
+		
+		if (registered) {
+			AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+			AppFrameMsgOut frame = new AppFrameMsgOut();
+			frame.setLinkAction(new LinkActionMsgOut(LinkActionType.print, id));
+			
+			sendObject(msgOut, frame);
+		}
+	}
+	
+	private String getInstanceId() {
+		return System.getProperty(Constants.SWING_START_SYS_PROP_INSTANCE_ID);
+	}
+	
+	private String getUserId() {
+		return System.getProperty(Constants.SWING_START_SYS_PROP_USER_ID);
+	}
+	
+	private String createHashedFileId(String name, long length) {
+		String hashedName = name;
+		String hashedUserId = getUserId();
+		String hashedSize = length + "";
+		hashedName = Base64.getUrlEncoder().encodeToString(hashedName.getBytes(StandardCharsets.UTF_8));
+		hashedUserId = Base64.getUrlEncoder().encodeToString(hashedUserId.getBytes(StandardCharsets.UTF_8));
+		hashedSize = Base64.getUrlEncoder().encodeToString(hashedSize.getBytes(StandardCharsets.UTF_8));
+		return hashedName + "_" + hashedUserId + "_" + hashedSize;
+	}
+	
+	private String getFileExtension(String name) {
+		int lastIndexOf = name.lastIndexOf(".");
+		if (lastIndexOf == -1) {
+			return "";
+		}
+		return name.substring(lastIndexOf);
 	}
 
 	public void notifyApplicationExiting() {
@@ -286,25 +415,37 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 	}
 
 	public void notifyApplicationExiting(int waitBeforeKill) {
-		ExitMsgInternal f = new ExitMsgInternal();
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
+		ExitMsgOut f = new ExitMsgOut();
 		f.setWaitForExit(waitBeforeKill);
-		sendObject(f);
+		
+		msgOut.setExit(f);
+		
+		sendObject(msgOut, null);
+		
 		getExecutorService().shutdownNow();
 	}
 
 	public void notifyUrlRedirect(String url) {
-		AppFrameMsgOut result = new AppFrameMsgOut();
-		result.setLinkAction(new LinkActionMsg(LinkActionMsg.LinkActionType.redirect, url));
-		sendObject(result);
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
+		AppFrameMsgOut f = new AppFrameMsgOut();
+		f.setLinkAction(new LinkActionMsgOut(LinkActionMsgOut.LinkActionType.redirect, url));
+		
+		sendObject(msgOut, f);
 	}
 
 	public void requestBrowserClipboard(PasteRequestContext ctx) {
-		AppFrameMsgOut result = new AppFrameMsgOut();
-		PasteRequestMsg paste = new PasteRequestMsg();
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
+		AppFrameMsgOut f = new AppFrameMsgOut();
+		PasteRequestMsgOut paste = new PasteRequestMsgOut();
 		paste.setTitle(ctx.getTitle());
 		paste.setMessage(ctx.getMessage());
-		result.setPasteRequest(paste);
-		sendObject(result);
+		f.setPasteRequest(paste);
+		
+		sendObject(msgOut, f);
 
 
 		if(clipboardDialogLoop != null) {
@@ -315,12 +456,10 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 		clipboardDialogLoop.enter(); // this call is blocking until paste request dialog is closed
 	}
 
-
 	public boolean closePasteRequestDialog() {
 		if (clipboardDialogLoop != null) {
 			return clipboardDialogLoop.exit();
 		}
-
 		return false;
 	}
 
@@ -328,18 +467,27 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 		if (!Util.isTestMode()) {
 			return;
 		}
+		
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		f.setComponentTree(ToolkitUtil.getComponentTree());
-		Logger.debug("WebPaintDispatcher:sendComponentTree");
-		sendObject(f);
+		
+		AppLogger.debug("WebPaintDispatcher:sendComponentTree");
+		
+		sendObject(msgOut, f);
 	}
 
 	@Override
 	public void notifyWindowSwitchList() {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		f.setWindowSwitchList(Util.getWindowSwitchList());
-		Logger.debug("WebPaintDispatcher:notifyWindowSwitchList");
-		sendObject(f);
+		
+		AppLogger.debug("WebPaintDispatcher:notifyWindowSwitchList");
+		
+		sendObject(msgOut, f);
 	}
 
 	protected ScheduledExecutorService getExecutorService(){
@@ -349,17 +497,16 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 		return this.executorService;
 	}
 
-	protected void sendObject(Serializable object) {
-		Logger.debug("WebPaintDispatcher:sendJsonObject", object);
-		Services.getConnectionService().sendObject(object);
+	protected void sendObject(AppToServerFrameMsgOut msgOut, AppFrameMsgOut frame) {
+		AppLogger.debug("WebPaintDispatcher:sendJsonObject", msgOut);
+		Services.getConnectionService().sendObject(msgOut, frame);
 	}
-
 
 	protected boolean isClientReadyToReceiveOrResetAfterTimedOut() {
 		synchronized (webPaintLock) {
 			if (!clientReadyToReceive.get()) {
 				if (System.currentTimeMillis() - lastReadyStateTime > ackTimeout) {
-					Logger.debug("paintDispatcher.clientReadyToReceive re-enabled after timeout");
+					AppLogger.debug("paintDispatcher.clientReadyToReceive re-enabled after timeout");
 					if (Util.isDD()) {
 						Services.getDirectDrawService().resetCache();
 					}
@@ -408,7 +555,7 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 					rset.add(repaintedArea);
 					areasToUpdate.put(guid, rset);
 				}
-				Logger.trace("WebPaintDispatcher:addDirtyArea", guid, repaintedArea);
+				AppLogger.trace("WebPaintDispatcher:addDirtyArea", guid, repaintedArea);
 			}
 		}
 	}
@@ -437,28 +584,28 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 			focusEvent = null;
 		}
 	}
-
-	public void notifyFocusEvent(FocusEventMsg msg) {
+	
+	public void notifyFocusEvent(FocusEventMsgOut msg) {
 		focusEvent = msg;
 		notifyAccessibilityInfoUpdate();
 	}
-
+	
 	public void notifyAccessibilityInfoUpdate(Component a, int x, int y) {
 		if (!Util.isAccessibilityEnabled()) {
 			return;
 		}
-
+		
 		synchronized (accessibilityLock) {
 			accessibilityComponent = a;
 			accessibilityX = x;
 			accessibilityY = y;
-
+			
 			if (accessibilityUpdateScheduled) {
 				return;
 			}
 			accessibilityUpdateScheduled = true;
 		}
-
+		
 		SwingUtilities.invokeLater(() -> {
 			processAccessibility();
 		});
@@ -468,23 +615,23 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 		if (!Util.isAccessibilityEnabled()) {
 			return;
 		}
-
+		
 		synchronized (accessibilityLock) {
 			accessibilityComponent = null;
 			accessibilityX = null;
 			accessibilityY = null;
-
+			
 			if (accessibilityUpdateScheduled) {
 				return;
 			}
 			accessibilityUpdateScheduled = true;
 		}
-
+		
 		SwingUtilities.invokeLater(() -> {
 			processAccessibility();
 		});
 	}
-
+	
 	private void processAccessibility() {
 		synchronized (accessibilityLock) {
 			if (accessibilityComponent != null) {
@@ -495,28 +642,31 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 			accessibilityUpdateScheduled = false;
 		}
 	}
-
+	
 	@Override
 	public void clearAccessibilityInfoState() {
 		accessible = null;
 	}
-
+	
 	@Override
-	public void notifyAccessibilityInfoUpdate(AccessibilityMsg msg) {
+	public void notifyAccessibilityInfoUpdate(AccessibilityMsgOut msg) {
 		sendNotifyAccessibilityInfoUpdate(msg);
 	}
-
-	private void sendNotifyAccessibilityInfoUpdate(AccessibilityMsg newAccessible) {
+	
+	private void sendNotifyAccessibilityInfoUpdate(AccessibilityMsgOut newAccessible) {
 		if (newAccessible == null || (accessible != null && newAccessible.equals(accessible))) {
 			return;
 		}
 		accessible = newAccessible;
-
+		
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		f.setAccessible(accessible);
-
-		Logger.debug("WebPaintDispatcher:sendNotifyAccessibilityInfo", f);
-		sendObject(f);
+		
+		AppLogger.debug("WebPaintDispatcher:sendNotifyAccessibilityInfo", f);
+		
+		sendObject(msgOut, f);
 	}
 
 	public JFileChooser getFileChooserDialog() {
@@ -540,50 +690,50 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 		Cursor webcursor = null;
 		if (overridenCursorName == null) {
 			if (cursor == null) {
-				webcursorName = CursorChangeEventMsg.DEFAULT_CURSOR;
+				webcursorName = CursorChangeEventMsgOut.DEFAULT_CURSOR;
 
 			} else {
-				switch (cursor.getType()) {
-				case Cursor.DEFAULT_CURSOR:
-					webcursorName = CursorChangeEventMsg.DEFAULT_CURSOR;
-					break;
-				case Cursor.HAND_CURSOR:
-					webcursorName = CursorChangeEventMsg.HAND_CURSOR;
-					break;
-				case Cursor.CROSSHAIR_CURSOR:
-					webcursorName = CursorChangeEventMsg.CROSSHAIR_CURSOR;
-					break;
-				case Cursor.MOVE_CURSOR:
-					webcursorName = CursorChangeEventMsg.MOVE_CURSOR;
-					break;
-				case Cursor.TEXT_CURSOR:
-					webcursorName = CursorChangeEventMsg.TEXT_CURSOR;
-					break;
-				case Cursor.WAIT_CURSOR:
-					webcursorName = CursorChangeEventMsg.WAIT_CURSOR;
-					break;
-				case Cursor.E_RESIZE_CURSOR:
-				case Cursor.W_RESIZE_CURSOR:
-					webcursorName = CursorChangeEventMsg.EW_RESIZE_CURSOR;
-					break;
-				case Cursor.N_RESIZE_CURSOR:
-				case Cursor.S_RESIZE_CURSOR:
-					webcursorName = CursorChangeEventMsg.NS_RESIZE_CURSOR;
-					break;
-				case Cursor.NW_RESIZE_CURSOR:
-				case Cursor.SE_RESIZE_CURSOR:
-					webcursorName = CursorChangeEventMsg.BACKSLASH_RESIZE_CURSOR;
-					break;
-				case Cursor.NE_RESIZE_CURSOR:
-				case Cursor.SW_RESIZE_CURSOR:
-					webcursorName = CursorChangeEventMsg.SLASH_RESIZE_CURSOR;
-					break;
-				case Cursor.CUSTOM_CURSOR:
-					webcursorName = cursor.getName();
-					break;
-				default:
-					webcursorName = CursorChangeEventMsg.DEFAULT_CURSOR;
-				}
+			switch (cursor.getType()) {
+			case Cursor.DEFAULT_CURSOR:
+				webcursorName = CursorChangeEventMsgOut.DEFAULT_CURSOR;
+				break;
+			case Cursor.HAND_CURSOR:
+				webcursorName = CursorChangeEventMsgOut.HAND_CURSOR;
+				break;
+			case Cursor.CROSSHAIR_CURSOR:
+				webcursorName = CursorChangeEventMsgOut.CROSSHAIR_CURSOR;
+				break;
+			case Cursor.MOVE_CURSOR:
+				webcursorName = CursorChangeEventMsgOut.MOVE_CURSOR;
+				break;
+			case Cursor.TEXT_CURSOR:
+				webcursorName = CursorChangeEventMsgOut.TEXT_CURSOR;
+				break;
+			case Cursor.WAIT_CURSOR:
+				webcursorName = CursorChangeEventMsgOut.WAIT_CURSOR;
+				break;
+			case Cursor.E_RESIZE_CURSOR:
+			case Cursor.W_RESIZE_CURSOR:
+				webcursorName = CursorChangeEventMsgOut.EW_RESIZE_CURSOR;
+				break;
+			case Cursor.N_RESIZE_CURSOR:
+			case Cursor.S_RESIZE_CURSOR:
+				webcursorName = CursorChangeEventMsgOut.NS_RESIZE_CURSOR;
+				break;
+			case Cursor.NW_RESIZE_CURSOR:
+			case Cursor.SE_RESIZE_CURSOR:
+				webcursorName = CursorChangeEventMsgOut.BACKSLASH_RESIZE_CURSOR;
+				break;
+			case Cursor.NE_RESIZE_CURSOR:
+			case Cursor.SW_RESIZE_CURSOR:
+				webcursorName = CursorChangeEventMsgOut.SLASH_RESIZE_CURSOR;
+				break;
+			case Cursor.CUSTOM_CURSOR:
+				webcursorName = cursor.getName();
+				break;
+			default:
+				webcursorName = CursorChangeEventMsgOut.DEFAULT_CURSOR;
+			}
 			}
 			webcursor = cursor;
 		} else {
@@ -592,8 +742,9 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 		}
 		String currentCursor = getCurrentCursor(winId);
 		if (currentCursor != null && !currentCursor.equals(webcursorName)) {
-			AppFrameMsgOut f = new AppFrameMsgOut();
-			CursorChangeEventMsg cursorChange = new CursorChangeEventMsg(webcursorName);
+			AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+			
+			CursorChangeEventMsgOut cursorChange = new CursorChangeEventMsgOut(webcursorName);
 			cursorChange.setWinId(winId);
 			if (webcursor instanceof WebCursor) {
 				WebCursor c = (WebCursor) webcursor;
@@ -601,15 +752,27 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 				cursorChange.setB64img(Services.getImageService().getPngImage(img));
 				cursorChange.setX(c.getHotSpot() != null ? c.getHotSpot().x : 0);
 				cursorChange.setY(c.getHotSpot() != null ? c.getHotSpot().y : 0);
-				File file = Util.convertAndSaveCursor(img, cursorChange.getX(), cursorChange.getY());
-				if (file != null) {
-					cursorChange.setCurFile(file.getAbsolutePath());
+				
+				byte[] converted = Util.convertCursor(img, cursorChange.getX(), cursorChange.getY());
+				if (converted != null) {
+					int id = Arrays.hashCode(converted);
+					String fileId = createHashedFileId("c" + id + ".cur", converted.length) ;
+					
+					if (!Services.getDataStoreService().dataExists("transfer", fileId)) {
+						Services.getDataStoreService().registerData(converted, fileId, 1, TimeUnit.DAYS, getUserId(), getInstanceId(), false);
+					}
+					cursorChange.setCurFile(fileId);
 				}
 			}
-			f.setCursorChange(cursorChange);
+			
 			setCurrentCursor(winId, webcursorName);
-			Logger.debug("WebPaintDispatcher:notifyCursorUpdate", f);
-			sendObject(f);
+			
+			AppLogger.debug("WebPaintDispatcher:notifyCursorUpdate", cursorChange);
+			
+			AppFrameMsgOut appFrame = new AppFrameMsgOut();
+			appFrame.setCursorChangeEvent(cursorChange);
+			
+			sendObject(msgOut, appFrame);
 		}
 	}
 
@@ -634,62 +797,132 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher{
 					}
 				}
 			} catch (IOException e) {
-				Logger.error("Selection is outside isolated path", e);
+				AppLogger.error("Selection is outside isolated path", e);
 				fileChooserDialog.cancelSelection();
 			}
 		}
 	}
 
 	public void notifyAudioEventPlay(AudioClip clip, byte[] data, Float time, Integer loop) {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		f.setAudioEvent(new AudioEventMsgOut(clip.getId(), AudioEventMsgOut.AudioEventType.play, data, time, loop));
 
-		Logger.debug("WebPaintDispatcher:notifyAudioEvent play");
-		sendObject(f);
+		AppLogger.debug("WebPaintDispatcher:notifyAudioEvent play");
 		
+		sendObject(msgOut, f);
+
 		registerAudioClip(clip);
 	}
 
 	public void notifyAudioEventStop(AudioClip clip) {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		f.setAudioEvent(new AudioEventMsgOut(clip.getId(), AudioEventMsgOut.AudioEventType.stop));
 
-		Logger.debug("WebPaintDispatcher:notifyAudioEvent stop");
-		sendObject(f);
+		AppLogger.debug("WebPaintDispatcher:notifyAudioEvent stop");
+		
+		sendObject(msgOut, f);
 	}
 
 	public void notifyAudioEventUpdate(AudioClip clip, Float time, Integer loop) {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		f.setAudioEvent(new AudioEventMsgOut(clip.getId(), AudioEventMsgOut.AudioEventType.update, time, loop));
 
-		Logger.debug("WebPaintDispatcher:notifyAudioEvent update");
-		sendObject(f);
+		AppLogger.debug("WebPaintDispatcher:notifyAudioEvent update");
 		
+		sendObject(msgOut, f);
+
 		registerAudioClip(clip);
 	}
 
 	public void notifyAudioEventDispose(AudioClip clip) {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
 		AppFrameMsgOut f = new AppFrameMsgOut();
 		f.setAudioEvent(new AudioEventMsgOut(clip.getId(), AudioEventMsgOut.AudioEventType.dispose));
 
-		Logger.debug("WebPaintDispatcher:notifyAudioEvent dispose");
-		sendObject(f);
+		AppLogger.debug("WebPaintDispatcher:notifyAudioEvent dispose");
 		
+		sendObject(msgOut, f);
+
 		registeredAudioClips.remove(clip.getId());
 	}
+	
+	public void notifyThreadDumpCreated(String reason) {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
+		ThreadDumpMsgOut msg = new ThreadDumpMsgOut();
+		msg.setTimestamp(System.currentTimeMillis());
+		msg.setReason(reason);
+		msg.setDumpId(Util.saveThreadDump(reason));
+		
+		msgOut.setThreadDump(msg);
+		
+		sendObject(msgOut, null);
+	}
 
+	@Override
+	public void notifyNewSessionStats(int edtUnresponsivenessSeconds) {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
+		JvmStatsMsgOut msg = new JvmStatsMsgOut();
+		if (Util.getWebToolkit().isStatisticsLoggingEnabled()) {
+			int mb = 1024 * 1024;
+			Runtime runtime = Runtime.getRuntime();
+			msg.setHeapSize(runtime.maxMemory() / mb);
+			msg.setHeapSizeUsed((runtime.totalMemory() - runtime.freeMemory()) / mb);
+			msg.setCpuUsage(CpuMonitor.getCpuUtilization());
+		}
+		msg.setEdtPingSeconds(edtUnresponsivenessSeconds);
+		
+		msgOut.setJvmStats(msg);
+		
+		sendObject(msgOut, null);
+	}
+	
+	@Override
+	public void notifySessionDataChanged() {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		
+		SessionDataMsgOut msg = new SessionDataMsgOut(Util.isApplet(), Util.isSessionLoggingEnabled(), Util.getWebToolkit().isRecording(), 
+				Util.getWebToolkit().getRecordingFileName(), Util.getWebToolkit().isStatisticsLoggingEnabled());
+		msgOut.setSessionData(msg);
+		
+		sendObject(msgOut, null);
+	}
+	
+	@Override
+	public void notifySessionTimeoutWarning() {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		AppFrameMsgOut f = SimpleEventMsgOut.sessionTimeoutWarning.buildMsgOut();
+		
+		sendObject(msgOut, f);
+	}
+
+	@Override
+	public void notifySessionTimedOut() {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		AppFrameMsgOut f = SimpleEventMsgOut.sessionTimedOutNotification.buildMsgOut();
+		
+		sendObject(msgOut, f);
+	}
 	private void registerAudioClip(AudioClip clip) {
 		if (!registeredAudioClips.containsKey(clip.getId())) {
 			registeredAudioClips.put(clip.getId(), new WeakReference<AudioClip>(clip));
 			return;
 		}
-		
+
 		WeakReference<AudioClip> wr = registeredAudioClips.get(clip.getId());
 		if (wr == null || wr.get() == null) {
 			registeredAudioClips.put(clip.getId(), new WeakReference<AudioClip>(clip));
 		}
 	}
-	
+
 	public AudioClip findAudioClip(String id) {
 		WeakReference<AudioClip> wr = registeredAudioClips.get(id);
 		if (wr != null && wr.get() != null) {

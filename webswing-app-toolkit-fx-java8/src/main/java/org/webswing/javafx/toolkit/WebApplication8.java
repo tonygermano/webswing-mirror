@@ -1,22 +1,14 @@
 package org.webswing.javafx.toolkit;
 
-import com.sun.glass.ui.Pixels;
-
-import com.sun.glass.ui.Robot;
-
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+import com.sun.glass.ui.Pixels;
+import com.sun.glass.ui.Robot;
 import com.sun.glass.ui.Screen;
-
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class WebApplication8 extends AbstractWebApplication {
 

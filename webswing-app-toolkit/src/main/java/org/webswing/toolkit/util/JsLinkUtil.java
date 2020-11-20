@@ -7,34 +7,38 @@ import java.util.UUID;
 
 import javax.naming.OperationNotSupportedException;
 
-import netscape.javascript.JSException;
-
-import org.webswing.model.jslink.JSObjectMsg;
-import org.webswing.model.jslink.JavaEvalRequestMsgIn;
-import org.webswing.model.jslink.JsEvalRequestMsgOut;
-import org.webswing.model.jslink.JsEvalRequestMsgOut.JsEvalRequestType;
-import org.webswing.model.jslink.JsParamMsg;
-import org.webswing.model.jslink.JsResultMsg;
-import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.model.appframe.in.AppFrameMsgIn;
+import org.webswing.model.appframe.in.JSObjectMsgIn;
+import org.webswing.model.appframe.in.JavaEvalRequestMsgIn;
+import org.webswing.model.appframe.in.JsParamMsgIn;
+import org.webswing.model.appframe.in.JsResultMsgIn;
+import org.webswing.model.appframe.out.AppFrameMsgOut;
+import org.webswing.model.appframe.out.JsEvalRequestMsgOut;
+import org.webswing.model.appframe.out.JsEvalRequestMsgOut.JsEvalRequestType;
+import org.webswing.model.appframe.out.JsParamMsgOut;
+import org.webswing.model.appframe.out.JsResultMsgOut;
 import org.webswing.toolkit.jslink.WebJSObject;
+import org.webswing.util.AppLogger;
+
+import netscape.javascript.JSException;
 
 public class JsLinkUtil {
 
-	public static AppFrameMsgOut generateEvalRequest(JSObjectMsg jsThis, String s) {
+	public static AppFrameMsgOut generateEvalRequest(JSObjectMsgIn jsThis, String s) {
 		JsEvalRequestMsgOut msg = new JsEvalRequestMsgOut();
 		msg.setType(JsEvalRequestType.eval);
 		msg.setEvalString(s);
 		return generateAppFrame(msg);
 	}
 
-	public static AppFrameMsgOut generateCallRequest(JSObjectMsg jsThis, String methodName, Object[] args) {
+	public static AppFrameMsgOut generateCallRequest(JSObjectMsgIn jsThis, String methodName, Object[] args) {
 		try {
 			JsEvalRequestMsgOut msg = new JsEvalRequestMsgOut();
 			msg.setType(JsEvalRequestType.call);
 			msg.setThisObjectId(jsThis == null ? null : jsThis.getId());
 			msg.setEvalString(methodName);
 			if (args != null && args.length > 0) {
-				List<JsParamMsg> params = new ArrayList<JsParamMsg>();
+				List<JsParamMsgOut> params = new ArrayList<JsParamMsgOut>();
 				for (Object arg : args) {
 					params.add(Services.getJsLinkService().generateParam(arg));
 				}
@@ -42,12 +46,12 @@ public class JsLinkUtil {
 			}
 			return generateAppFrame(msg);
 		} catch (Exception e) {
-			Logger.error("Failed to generate js Call request:", e);
+			AppLogger.error("Failed to generate js Call request:", e);
 			throw new JSException("Failed to generate js Call request:" + e.getMessage());
 		}
 	}
 
-	public static AppFrameMsgOut generateGetMemberRequest(JSObjectMsg jsThis, String name) {
+	public static AppFrameMsgOut generateGetMemberRequest(JSObjectMsgIn jsThis, String name) {
 		JsEvalRequestMsgOut msg = new JsEvalRequestMsgOut();
 		msg.setType(JsEvalRequestType.getMember);
 		msg.setEvalString(name);
@@ -55,25 +59,25 @@ public class JsLinkUtil {
 		return generateAppFrame(msg);
 	}
 
-	public static AppFrameMsgOut generateSetMemberRequest(JSObjectMsg jsThis, String name, Object value) {
+	public static AppFrameMsgOut generateSetMemberRequest(JSObjectMsgIn jsThis, String name, Object value) {
 		try {
 			JsEvalRequestMsgOut msg = new JsEvalRequestMsgOut();
 			msg.setType(JsEvalRequestType.setMember);
 			msg.setThisObjectId(jsThis == null ? null : jsThis.getId());
 			msg.setEvalString(name);
 			if (value != null) {
-				List<JsParamMsg> params = new ArrayList<JsParamMsg>();
+				List<JsParamMsgOut> params = new ArrayList<JsParamMsgOut>();
 				params.add(Services.getJsLinkService().generateParam(value));
 				msg.setParams(params);
 			}
 			return generateAppFrame(msg);
 		} catch (Exception e) {
-			Logger.error("Failed to generate js Call request:", e);
+			AppLogger.error("Failed to generate js Call request:", e);
 			throw new JSException("Failed to generate js Call request:" + e.getMessage());
 		}
 	}
 
-	public static AppFrameMsgOut generateRemoveMemberRequest(JSObjectMsg jsThis, String name) {
+	public static AppFrameMsgOut generateRemoveMemberRequest(JSObjectMsgIn jsThis, String name) {
 		JsEvalRequestMsgOut msg = new JsEvalRequestMsgOut();
 		msg.setType(JsEvalRequestType.deleteMember);
 		msg.setThisObjectId(jsThis == null ? null : jsThis.getId());
@@ -81,26 +85,26 @@ public class JsLinkUtil {
 		return generateAppFrame(msg);
 	}
 
-	public static AppFrameMsgOut generateSetSlotRequest(JSObjectMsg jsThis, int index, Object value) {
+	public static AppFrameMsgOut generateSetSlotRequest(JSObjectMsgIn jsThis, int index, Object value) {
 		AppFrameMsgOut msg = generateSetMemberRequest(jsThis, "" + index, value);
 		msg.getJsRequest().setType(JsEvalRequestType.setSlot);
 		return msg;
 	}
 
-	public static AppFrameMsgOut generateGetSlotRequest(JSObjectMsg jsThis, int index) {
+	public static AppFrameMsgOut generateGetSlotRequest(JSObjectMsgIn jsThis, int index) {
 		AppFrameMsgOut msg = generateGetMemberRequest(jsThis, "" + index);
 		msg.getJsRequest().setType(JsEvalRequestType.getSlot);
 		return msg;
 	}
 
-	public static Object parseResponse(Object result) throws JSException {
-		if (result instanceof JsResultMsg) {
-			JsResultMsg param = (JsResultMsg) result;
+	public static Object parseResponse(AppFrameMsgIn result) throws JSException {
+		if (result.getJsResponse() != null) {
+			JsResultMsgIn param = result.getJsResponse();
 			if (param.getError() != null) {
 				throw new JSException(param.getError());
 			} else {
 				if (param.getValue() != null) {
-					JsParamMsg value = param.getValue();
+					JsParamMsgIn value = param.getValue();
 					return Services.getJsLinkService().parseValue(value);
 				} else {
 					return null;
@@ -118,14 +122,14 @@ public class JsLinkUtil {
 		return msgout;
 	}
 
-	private static AppFrameMsgOut generateAppFrame(JsResultMsg msg) {
+	private static AppFrameMsgOut generateAppFrame(JsResultMsgOut msg) {
 		AppFrameMsgOut msgout = new AppFrameMsgOut();
 		msgout.setJavaResponse(msg);
 		return msgout;
 	}
 
-	public static AppFrameMsgOut getErrorResponse(JavaEvalRequestMsgIn javaReq, String error) {
-		return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq, new OperationNotSupportedException(error)));
+	public static AppFrameMsgOut getErrorResponse(String correlationId, String error) {
+		return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(correlationId, new OperationNotSupportedException(error)));
 	}
 
 	public static AppFrameMsgOut callMatchingMethod(JavaEvalRequestMsgIn javaReq, Object javaRef, List<String> jsLinkWhitelist) {
@@ -136,8 +140,8 @@ public class JsLinkUtil {
 			
 			if (!isObjectClassAllowed(cls.getCanonicalName(), jsLinkWhitelist)) {
 				exception = new RuntimeException("Public method named " + javaReq.getMethod() + " with " + javaReq.getParams().size() + " parameters in class " + javaRef.getClass().getCanonicalName() + " is not allowed to be executed due to whitelist!");
-				Logger.error("Error while calling java from javascript:", exception);
-				return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq, exception));
+				AppLogger.error("Error while calling java from javascript:", exception);
+				return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq.getCorrelationId(), exception));
 			}
 			
 			for (Method m : cls.getDeclaredMethods()) {
@@ -152,10 +156,10 @@ public class JsLinkUtil {
 						Object[] params = Services.getJsLinkService().getCompatibleParams(javaReq, m);
 						try {
 							Object result = m.invoke(javaRef, params);
-							return generateAppFrame(Services.getJsLinkService().generateJavaResult(javaReq, result));
+							return generateAppFrame(Services.getJsLinkService().generateJavaResult(javaReq.getCorrelationId(), result));
 						} catch (Exception invEx) {
-							Logger.error("Error while calling java from javascript:", invEx);
-							return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq, invEx));
+							AppLogger.error("Error while calling java from javascript:", invEx);
+							return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq.getCorrelationId(), invEx));
 						}
 					} catch (Exception x) {
 						exception = new RuntimeException("Parameters of method " + javaReq.getMethod() + " are not compatible with request.", x);
@@ -164,12 +168,12 @@ public class JsLinkUtil {
 			} else {
 				exception = new RuntimeException("Public method named " + javaReq.getMethod() + " with " + javaReq.getParams().size() + " parameters not found in class " + javaRef.getClass().getCanonicalName());
 			}
-			Logger.error("Error while calling java from javascript:", exception);
-			return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq, exception));
+			AppLogger.error("Error while calling java from javascript:", exception);
+			return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq.getCorrelationId(), exception));
 		} else {
 			NullPointerException e = new NullPointerException("Caller object reference is not valid any more.  Make sure you keep a reference to Java objects sent to Javascript to prevent from being garbage collected. ");
-			Logger.error("Error while calling java from javascript:", e);
-			return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq, e));
+			AppLogger.error("Error while calling java from javascript:", e);
+			return generateAppFrame(Services.getJsLinkService().generateJavaErrorResult(javaReq.getCorrelationId(), e));
 		}
 	}
 

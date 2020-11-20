@@ -1,9 +1,5 @@
 package org.webswing.server.common.model;
 
-import org.webswing.Constants;
-import org.webswing.server.common.model.meta.*;
-import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
-
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,18 +7,31 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-@ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
-@ConfigFieldOrder({ "name", "theme", "fontConfig", "directdraw", "javaFx", "javaFxClassPathEntries", "compositingWinManager", "debug", "userDir", "jreExecutable", "javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "maxClients", "sessionMode", "swingSessionTimeout", "timeoutIfInactive", "monitorEdtEnabled", "loadingAnimationDelay", "allowStealSession", "autoLogout",
-		"goodbyeUrl", "allowStatisticsLogging", "sessionLogging", "loggingDirectory", "sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", "transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "uploadMaxSize", "allowJsLink", "jsLinkWhitelist", "allowLocalClipboard", "allowServerPrinting","recordingsFolder",
-		"dockMode"})
-public interface SwingConfig extends Config {
+import org.webswing.server.common.model.meta.ConfigField;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueGenerator;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
+import org.webswing.server.common.model.meta.ConfigFieldDiscriminator;
+import org.webswing.server.common.model.meta.ConfigFieldEditorType;
+import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
+import org.webswing.server.common.model.meta.ConfigFieldOrder;
+import org.webswing.server.common.model.meta.ConfigFieldPresets;
+import org.webswing.server.common.model.meta.ConfigFieldVariables;
+import org.webswing.server.common.model.meta.ConfigGroup;
+import org.webswing.server.common.model.meta.ConfigType;
+import org.webswing.server.common.model.meta.MetadataGenerator;
+import org.webswing.server.common.model.meta.VariableSetName;
 
-	public enum SessionMode {
-		ALWAYS_NEW_SESSION,
-		CONTINUE_FOR_TAB,
-		CONTINUE_FOR_BROWSER,
-		CONTINUE_FOR_USER;
-	}
+@ConfigType(metadataGenerator = SwingConfig.SwingConfigurationMetadataGenerator.class)
+//NOTE: if you change these names, please see also MigrationConfigurationProvider
+@ConfigFieldOrder({ "homeDir", "theme", "fontConfig", "directdraw", "javaFx", "javaFxClassPathEntries", "compositingWinManager", "debug", "userDir", "jreExecutable", 
+	"javaVersion", "classPathEntries", "vmArgs", "launcherType", "launcherConfig", "swingSessionTimeout", "timeoutIfInactive",  "sessionLogging", 
+	"sessionLogFileSize", "sessionLogMaxFileSize", "isolatedFs", "allowUpload", "allowDelete", "allowDownload", "allowAutoDownload", 
+	"transparentFileOpen", "transparentFileSave", "transferDir", "clearTransferDir", "allowJsLink", "jsLinkWhitelist", "allowLocalClipboard", "allowServerPrinting",
+	"dockMode", "allowStatisticsLogging"})
+public interface SwingConfig extends Config {
 
 	public enum LauncherType {
 		Applet,
@@ -34,11 +43,13 @@ public interface SwingConfig extends Config {
 		MARKED,
 		NONE
 	}
-
-	@ConfigField(tab = ConfigGroup.General, label = "Name", description = "Application name.")
+	
+	// FIXME better description for this and homeDir in SecuredPathConfig
+	@ConfigField(label = "Home Folder", description = "Application's home directory. This will be the base directory of any relative classpath entries specified.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
-	@ConfigFieldDefaultValueString("My Application")
-	public String getName();
+	@ConfigFieldDiscriminator // FIXME why discriminator ?
+	@ConfigFieldDefaultValueString("${user.dir}")
+	public String getHomeDir();
 
 	@ConfigField(tab = ConfigGroup.General, label = "Theme", description = "Select one of the default window decoration themes or a enter path to a XFWM4 theme folder.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
@@ -110,14 +121,6 @@ public interface SwingConfig extends Config {
 	@ConfigFieldEditorType(editor = EditorType.Object)
 	public Map<String, Object> getLauncherConfig();
 
-	@ConfigField(tab = ConfigGroup.Session, label = "Max. Connections", description = "Maximum number of allowed simultaneous connections for this application.")
-	@ConfigFieldDefaultValueNumber(1)
-	public int getMaxClients();
-
-	@ConfigField(tab = ConfigGroup.Session, label = "Session Mode", description = "Select session behavior when user reconnects to application. 1.ALWAYS_NEW_SESSION: New application is started for every Webswing session. (Session timeout will be set to 0) 2.CONTINUE_FOR_TAB: Webswing session can be resumed within the same browser tab after connection is terminated or user refresh the page. (Session timeout applies)  3.CONTINUE_FOR_BROWSER: Webswing session can be resumed in the same browser after connection is terminated (Session timeout applies). 4.CONTINUE_FOR_USER: Application session can be resumed by the same user from any computer after the connection is terminated(Session timeout applies).")
-	@ConfigFieldDefaultValueString("CONTINUE_FOR_BROWSER")
-	public SessionMode getSessionMode();
-
 	@ConfigField(tab = ConfigGroup.Session, label = "Session Timeout", description = "Specifies how long (seconds) will be the application left running after the user closes the browser. User can reconnect in this interval and continue in last session.")
 	@ConfigFieldDefaultValueNumber(300)
 	public int getSwingSessionTimeout();
@@ -126,42 +129,10 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isTimeoutIfInactive();
 
-	@ConfigField(tab = ConfigGroup.Session, label = "Monitor App Responsiveness", description = "If True, Webswing will display a progress animation if Swing's Event Dispatch thread is not responding.")
-	@ConfigFieldDefaultValueBoolean(true)
-	@ConfigFieldDiscriminator
-	public boolean isMonitorEdtEnabled();
-
-	@ConfigField(tab = ConfigGroup.Session, label = "Loading Animation delay", description = "If EDT thread is blocked for more then defined delay in seconds, dialog with loading animation is displayed appears. Delay must be  >= 2 seconds.")
-	@ConfigFieldDefaultValueNumber(2)
-	int getLoadingAnimationDelay();
-
-	@ConfigField(tab = ConfigGroup.Session, label = "Session Stealing", description = "If enabled, and session mode 'CONTINUE_FOR_USER' is selected, user can resume Webswing session even if the connection is open in other browser. Former browser window will be disconnected.")
-	@ConfigFieldDefaultValueBoolean(true)
-	public boolean isAllowStealSession();
-
-	@ConfigField(tab = ConfigGroup.Session, label = "Auto Logout", description = "If enabled, user is automatically logged out after the application finished.")
-	@ConfigFieldDefaultValueBoolean(true)
-	@ConfigFieldDiscriminator
-	public boolean isAutoLogout();
-
-	@ConfigField(tab = ConfigGroup.Session, label = "Goodbye URL", description = "Absolute or relative URL to redirect to, when application exits. Use '/' to navigate back to Application selector.")
-	@ConfigFieldVariables(VariableSetName.SwingInstance)
-	@ConfigFieldDefaultValueString("")
-	String getGoodbyeUrl();
-	
-	@ConfigField(tab = ConfigGroup.Session, label = "Statistics Logging", description = "If enabled, statistics will be logged for sessions.")
-	@ConfigFieldDefaultValueBoolean(true)
-	public boolean isAllowStatisticsLogging();
-	
 	@ConfigField(tab = ConfigGroup.Logging, label = "Session logging", description = "If enabled, sessions are logged into a separate log file.")
 	@ConfigFieldDefaultValueBoolean(false)
 	@ConfigFieldDiscriminator
 	public boolean isSessionLogging();
-	
-	@ConfigField(tab = ConfigGroup.Logging, label = "Logging Directory", description = "Session logging directory. Path where session logs will be stored.")
-	@ConfigFieldVariables(VariableSetName.SwingInstance)
-	@ConfigFieldDefaultValueString("${webswing.logsDir:-logs/}")
-	public String getLoggingDirectory();
 	
 	@ConfigField(tab = ConfigGroup.Logging, label = "Maximum Session Logs Size", description = "Maximum size of all session log files. After file size is exceeded, old log files are deleted.")
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
@@ -172,6 +143,10 @@ public interface SwingConfig extends Config {
 	@ConfigFieldVariables(VariableSetName.SwingInstance)
 	@ConfigFieldDefaultValueString("${webswing.sessionLog.size:-10MB}")
 	public String getSessionLogFileSize();
+	
+	@ConfigField(tab = ConfigGroup.Logging, label = "Statistics Logging", description = "If enabled, statistics will be logged for sessions.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isAllowStatisticsLogging();
 	
 	@ConfigField(tab = ConfigGroup.Features, label = "Isolated Filesystem", description = "If true, every file chooser dialog will be restricted to access only the home directory of current application.")
 	@ConfigFieldDefaultValueBoolean(false)
@@ -213,10 +188,6 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(true)
 	public boolean isClearTransferDir();
 
-	@ConfigField(tab = ConfigGroup.Features, label = "Upload Size Limit", description = "Maximum size of upload for single file (in MB). Set 0 for unlimited size.")
-	@ConfigFieldDefaultValueNumber(5)
-	public double getUploadMaxSize();
-
 	@ConfigField(tab = ConfigGroup.Features, label = "Allow JsLink", description = "If enabled, the JSLink feature will be enabled, allowing application to invoke javascript and vice versa. (See netscape.javascript.JSObject)")
 	@ConfigFieldDefaultValueBoolean(true)
 	@ConfigFieldDiscriminator
@@ -244,11 +215,6 @@ public interface SwingConfig extends Config {
 	*/
 	public List<String> getAllowedCorsOrigins();
 
-	@ConfigField(tab = ConfigGroup.Features, label = "Recordings Folder", description = "Folder to be used to store session recording files for this application. Session recording can be initiated in admin console or by user using ?recording=true url parameter.")
-	@ConfigFieldVariables(VariableSetName.SwingApp)
-	@ConfigFieldDefaultValueString(Constants.DEFAULT_RECORDINGS_FOLDER)
-	String getRecordingsFolder();
-	
 	public static List<String> defaultJsLinkWhitelistValue(SwingConfig config) {
 		return Arrays.asList("*");
 	}
@@ -290,16 +256,9 @@ public interface SwingConfig extends Config {
 				names.remove("transparentFileOpen");
 				names.remove("clearTransferDir");
 			}
-			if (config.isAutoLogout()) {
-				names.remove("goodbyeUrl");
-			}
 			if (!config.isSessionLogging()) {
-				names.remove("loggingDirectory");
 				names.remove("sessionLogMaxFileSize");
 				names.remove("sessionLogFileSize");
-			}
-			if(!config.isMonitorEdtEnabled()){
-				names.remove("loadingAnimationDelay");
 			}
 			if (!config.isCompositingWinManager()) {
 				names.remove("dockMode");

@@ -1,10 +1,13 @@
 package org.webswing.toolkit;
 
 import java.applet.Applet;
-import java.awt.*;
+import java.awt.AWTEvent;
+import java.awt.AWTException;
+import java.awt.BufferCapabilities;
 import java.awt.BufferCapabilities.FlipContents;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -39,14 +42,14 @@ import javax.swing.SwingUtilities;
 import org.webswing.common.GraphicsWrapper;
 import org.webswing.common.WindowActionType;
 import org.webswing.dispatch.WebPaintDispatcher;
-import org.webswing.model.s2c.CursorChangeEventMsg;
+import org.webswing.model.appframe.out.CursorChangeEventMsgOut;
 import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.ge.WebGraphicsConfig;
 import org.webswing.toolkit.util.DummyGraphics2D;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 import sun.awt.AWTAccessor;
 import sun.awt.PaintEventDispatcher;
@@ -208,7 +211,7 @@ abstract public class WebComponentPeer implements ComponentPeer {
 	private Color foreground;
 	private Font font;
 	protected float opacity;
-	private String currentCursor= CursorChangeEventMsg.DEFAULT_CURSOR;
+	private String currentCursor = CursorChangeEventMsgOut.DEFAULT_CURSOR;
 
 
 	public WebComponentPeer(Component t) {
@@ -303,7 +306,7 @@ abstract public class WebComponentPeer implements ComponentPeer {
 				try {
 					replaceSurfaceData(validPosition.x, validPosition.y, w, h);
 				} catch (InvalidPipeException e) {
-					Logger.error("WebComponentPeer:setBounds", e);
+					AppLogger.error("WebComponentPeer:setBounds", e);
 				}
 				notifyWindowBoundsChanged(new Rectangle(0, 0, w, h));
 			}

@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webswing.Constants;
-import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.common.service.security.AuthenticatedWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
 import org.webswing.server.services.security.modules.AbstractSecurityModule;
@@ -21,7 +21,7 @@ public class AnonymSecurityModule extends AbstractSecurityModule<WebswingSecurit
 	}
 
 	@Override
-	protected AbstractWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException {
+	protected AuthenticatedWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException {
 		Map<String, Object> loginRequest = getLoginRequest(request);
 		String userId = loginRequest == null ? anonymUserName : (String) loginRequest.getOrDefault(Constants.HTTP_PARAM_SECURITY_TOKEN_HEADER, anonymUserName);
 		logSuccess(request, userId + (anonymUserName.equals(userId) ? "" : "(" + anonymUserName + ")"));

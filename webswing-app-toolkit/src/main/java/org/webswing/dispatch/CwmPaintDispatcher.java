@@ -21,14 +21,16 @@ import javax.swing.PopupFactory;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
-import org.webswing.model.s2c.AppFrameMsgOut;
+import org.webswing.model.app.out.AppToServerFrameMsgOut;
+import org.webswing.model.appframe.out.AppFrameMsgOut;
+import org.webswing.model.appframe.out.WindowDockMsgOut;
 import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.api.component.HtmlPanel;
 import org.webswing.toolkit.extra.WebRepaintManager;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 public class CwmPaintDispatcher extends AbstractPaintDispatcher {
 
@@ -43,7 +45,7 @@ public class CwmPaintDispatcher extends AbstractPaintDispatcher {
 			try {
 				isClientReadyToReceiveOrResetAfterTimedOut();
 			} catch (Exception e) {
-				Logger.error("readyToReceiveMonitor:failed",e);
+				AppLogger.error("readyToReceiveMonitor:failed",e);
 			}
 		};
 		getExecutorService().scheduleWithFixedDelay(readyToReceiveMonitor, 1, 1, TimeUnit.SECONDS);
@@ -58,7 +60,7 @@ public class CwmPaintDispatcher extends AbstractPaintDispatcher {
 					popupTypeField.setAccessible(true);
 					popupTypeField.set(this,2);
 				} catch (Exception e) {
-					Logger.warn("Failed to force Heavyweight popup for CWM mode.",e);
+					AppLogger.warn("Failed to force Heavyweight popup for CWM mode.",e);
 				}
 				return super.getPopup(owner, contents, x, y);
 			}
@@ -118,7 +120,9 @@ public class CwmPaintDispatcher extends AbstractPaintDispatcher {
 
 	private void sendUpdate() {
 		try {
-			AppFrameMsgOut json;
+			AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+
+			AppFrameMsgOut frame;
 			Map<String, Map<Integer, BufferedImage>> windowImages = null;
 			Map<String, Image> windowWebImages = null;
 			Map<String, Set<Rectangle>> currentAreasToUpdate;
@@ -126,39 +130,40 @@ public class CwmPaintDispatcher extends AbstractPaintDispatcher {
 				synchronized (webPaintLock) {
 					currentAreasToUpdate = popProcessableDirtyAreas();
 
-					json = Util.fillWithCompositingWindowsData(currentAreasToUpdate);
+					frame = Util.fillWithCompositingWindowsData(currentAreasToUpdate);
 
 					if (!currentAreasToUpdate.isEmpty()) {
 						if (Util.isDD()) {
 							windowWebImages = Util.extractWindowWebImages(currentAreasToUpdate.keySet(), new HashMap<>());
 						} else {
-							windowImages = Util.extractWindowImages(json, new HashMap<>());
+							windowImages = Util.extractWindowImages(frame, new HashMap<>());
 						}
 					}
 
-					fillFocusEvent(json);
+					fillFocusEvent(frame);
 					setClientNotReady();
 					sendUpdateScheduled.set(false);
 				}
 			}
-			Logger.trace("contentSender:paintJson", json);
+			AppLogger.trace("contentSender:paintJson", frame);
 			if (!currentAreasToUpdate.isEmpty()) {
 				if (Util.isDD()) {
-					Logger.trace("contentSender:pngWebImageEncodingStart", json.hashCode());
-					Util.encodeWindowWebImages(windowWebImages, json);
-					Logger.trace("contentSender:pngWebImageEncodingDone", json.hashCode());
+					AppLogger.trace("contentSender:pngWebImageEncodingStart", frame.hashCode());
+					Util.encodeWindowWebImages(windowWebImages, frame);
+					AppLogger.trace("contentSender:pngWebImageEncodingDone", frame.hashCode());
 				} else {
-					Logger.trace("contentSender:pngEncodingStart", json.hashCode());
-					Util.encodeWindowImages(windowImages, json);
-					Logger.trace("contentSender:pngEncodingDone", json.hashCode());
+					AppLogger.trace("contentSender:pngEncodingStart", frame.hashCode());
+					Util.encodeWindowImages(windowImages, frame);
+					AppLogger.trace("contentSender:pngEncodingDone", frame.hashCode());
 				}
 			}
-			json.setDirectDraw(Util.isDD());
-			json.setCompositingWM(Util.isCompositingWM());
-			json.setSendTimestamp("" + System.currentTimeMillis());
-			sendObject(json);
+			frame.setDirectDraw(Util.isDD());
+			frame.setCompositingWM(Util.isCompositingWM());
+			frame.setSendTimestamp("" + System.currentTimeMillis());
+
+			sendObject(msgOut, frame);
 		} catch (Throwable e) {
-			Logger.error("contentSender:error", e);
+			AppLogger.error("contentSender:error", e);
 		}
 	}
 
@@ -203,7 +208,7 @@ public class CwmPaintDispatcher extends AbstractPaintDispatcher {
 	public void notifyWindowDockStateChanged() {
 		scheduleSendUpdate();
 	}
-	
+
 	public void registerWebContainer(Container container) {
 		synchronized (CwmPaintDispatcher.webPaintLock) {
 			registeredContainers.put(container, null);

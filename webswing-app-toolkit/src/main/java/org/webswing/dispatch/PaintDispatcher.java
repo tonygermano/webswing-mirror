@@ -6,6 +6,7 @@ import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Window;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
@@ -16,8 +17,8 @@ import javax.swing.JFrame;
 import javax.swing.RepaintManager;
 
 import org.webswing.audio.AudioClip;
-import org.webswing.model.s2c.AccessibilityMsg;
-import org.webswing.model.s2c.FocusEventMsg;
+import org.webswing.model.appframe.out.AccessibilityMsgOut;
+import org.webswing.model.appframe.out.FocusEventMsgOut;
 import org.webswing.toolkit.api.clipboard.PasteRequestContext;
 import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.api.component.HtmlPanel;
@@ -44,9 +45,9 @@ public interface PaintDispatcher {
 	void notifyWindowDockStateChanged();
 	void notifyWindowSwitchList();
 
-	void notifyFocusEvent(FocusEventMsg msg);
+	void notifyFocusEvent(FocusEventMsgOut msg);
 	void notifyAccessibilityInfoUpdate(Component a, int x, int y);
-	void notifyAccessibilityInfoUpdate(AccessibilityMsg msg);
+	void notifyAccessibilityInfoUpdate(AccessibilityMsgOut msg);
 	void notifyAccessibilityInfoUpdate();
 	void clearAccessibilityInfoState();
 
@@ -65,7 +66,7 @@ public interface PaintDispatcher {
 	void notifyDownloadSelectedFile();
 	void notifyDeleteSelectedFile();
 	void notifyFileRequested(File file, boolean preview);
-	void notifyPrintPdfFile(String id, File f);
+	void notifyPrintPdfFile(ByteArrayOutputStream out);
 	JFileChooser getFileChooserDialog();
 
 	void notifyApplicationExiting();
@@ -88,6 +89,14 @@ public interface PaintDispatcher {
 	void notifyAudioEventStop(AudioClip clip);
 	void notifyAudioEventPlay(AudioClip clip, byte[] data, Float time, Integer loop);
 	AudioClip findAudioClip(String id);
+
+	void notifyThreadDumpCreated(String reason);
+
+	void notifySessionTimeoutWarning();
+	void notifySessionTimedOut();
+
+	void notifyNewSessionStats(int edtUnresponsivenessSeconds);
+	void notifySessionDataChanged();
 
 	void registerFileChooserWindows(JFileChooser fileChooser, Window parent);
 

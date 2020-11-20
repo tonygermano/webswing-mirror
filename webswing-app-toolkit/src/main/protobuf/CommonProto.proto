@@ -1,0 +1,49 @@
+syntax = "proto2";
+option java_package = "org.webswing.model.common.proto";
+package commonProto; // javascript namespace
+
+/* =================== COMMON ====================*/
+
+message ParamMsgInProto {
+	optional string name = 1;
+	optional string value = 2;
+}
+
+message SimpleEventMsgInProto {
+    optional SimpleEventTypeProto type = 1;
+
+    enum SimpleEventTypeProto {
+        unload = 0;
+        killSwing = 1;
+        paintAck = 2;
+        repaint = 3;
+        downloadFile = 4;
+        deleteFile = 5;
+        cancelFileSelection = 6;
+        requestComponentTree = 7;
+        requestWindowSwitchList = 8;
+        enableStatisticsLogging = 9;
+        disableStatisticsLogging = 10;
+        toggleRecording = 11;
+    }
+}
+
+message ConnectionHandshakeMsgInProto {
+    optional string clientId = 1;
+    optional string viewId = 2;
+    optional string browserId = 3;
+    optional uint32 desktopWidth = 4;
+    optional uint32 desktopHeight = 5;
+    optional string applicationName = 6;
+    optional bool mirrored = 7;
+    optional bool directDrawSupported = 8;
+    optional string documentBase = 9;
+    repeated ParamMsgInProto params = 10;
+    optional string locale = 11;
+    optional string url = 12;
+    optional string timeZone = 13;
+    optional bool dockingSupported = 14;
+    optional bool touchMode = 15;
+    optional bool accessiblityEnabled = 16;
+    optional string tabId = 17;
+}

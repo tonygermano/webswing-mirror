@@ -7,15 +7,20 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 public class WindowHierarchyTree {
 
@@ -49,7 +54,7 @@ public class WindowHierarchyTree {
 				bringToFront(node.getParent().getW());
 			}
 		} else {
-			Logger.error("Window not registered. Not able to bring to front.", w);
+			AppLogger.error("Window not registered. Not able to bring to front.", w);
 		}
 	}
 	
@@ -74,7 +79,7 @@ public class WindowHierarchyTree {
 			}
 			window.repaint();
 		} else {
-			Logger.error("Window already registered in hierarchy tree", window);
+			AppLogger.error("Window already registered in hierarchy tree", window);
 		}
 	}
 
@@ -106,7 +111,7 @@ public class WindowHierarchyTree {
 				WindowManager.getInstance().activateWindow(successor);
 			}
 		} else {
-			Logger.debug("Window not registered. Could not remove.", window);
+			AppLogger.debug("Window not registered. Could not remove.", window);
 		}
 	}
 

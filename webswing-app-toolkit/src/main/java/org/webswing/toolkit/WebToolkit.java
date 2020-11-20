@@ -1,8 +1,49 @@
 package org.webswing.toolkit;
 
 import java.applet.Applet;
-import java.awt.*;
+import java.awt.AWTException;
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Checkbox;
+import java.awt.CheckboxMenuItem;
+import java.awt.Choice;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Desktop;
+import java.awt.Dialog;
 import java.awt.Dialog.ModalityType;
+import java.awt.Dimension;
+import java.awt.FileDialog;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.JobAttributes;
+import java.awt.KeyboardFocusManager;
+import java.awt.Label;
+import java.awt.List;
+import java.awt.Menu;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.PageAttributes;
+import java.awt.Panel;
+import java.awt.Point;
+import java.awt.PopupMenu;
+import java.awt.PrintJob;
+import java.awt.RenderingHints;
+import java.awt.Robot;
+import java.awt.ScrollPane;
+import java.awt.Scrollbar;
+import java.awt.SystemTray;
+import java.awt.TextArea;
+import java.awt.TextField;
+import java.awt.TrayIcon;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
@@ -11,44 +52,88 @@ import java.awt.dnd.DragSource;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.dnd.MouseDragGestureRecognizer;
 import java.awt.dnd.peer.DragSourceContextPeer;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowEvent;
 import java.awt.font.TextAttribute;
 import java.awt.im.InputMethodHighlight;
 import java.awt.im.spi.InputMethodDescriptor;
 import java.awt.image.ColorModel;
-import java.awt.peer.*;
+import java.awt.peer.ButtonPeer;
+import java.awt.peer.CheckboxMenuItemPeer;
+import java.awt.peer.CheckboxPeer;
+import java.awt.peer.ChoicePeer;
+import java.awt.peer.ComponentPeer;
+import java.awt.peer.DesktopPeer;
+import java.awt.peer.DialogPeer;
+import java.awt.peer.FileDialogPeer;
+import java.awt.peer.FontPeer;
+import java.awt.peer.FramePeer;
+import java.awt.peer.KeyboardFocusManagerPeer;
+import java.awt.peer.LabelPeer;
+import java.awt.peer.ListPeer;
+import java.awt.peer.MenuBarPeer;
+import java.awt.peer.MenuItemPeer;
+import java.awt.peer.MenuPeer;
+import java.awt.peer.MouseInfoPeer;
+import java.awt.peer.PanelPeer;
+import java.awt.peer.PopupMenuPeer;
+import java.awt.peer.RobotPeer;
+import java.awt.peer.ScrollPanePeer;
+import java.awt.peer.ScrollbarPeer;
+import java.awt.peer.SystemTrayPeer;
+import java.awt.peer.TextAreaPeer;
+import java.awt.peer.TextFieldPeer;
+import java.awt.peer.TrayIconPeer;
+import java.awt.peer.WindowPeer;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.Serializable;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 
 import org.webswing.Constants;
+import org.webswing.dispatch.CwmPaintDispatcher;
 import org.webswing.dispatch.EventDispatcher;
 import org.webswing.dispatch.PaintDispatcher;
-import org.webswing.dispatch.CwmPaintDispatcher;
+import org.webswing.dispatch.SessionWatchdog;
 import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.dispatch.WebSessionWatchdog;
 import org.webswing.model.Msg;
-import org.webswing.toolkit.api.WebswingMessagingApi;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingApiProvider;
 import org.webswing.toolkit.api.lifecycle.ShutdownReason;
 import org.webswing.toolkit.extra.WindowManager;
-import org.webswing.toolkit.util.DeamonThreadFactory;
-import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.listener.WebToolkitStartupListener;
+import org.webswing.toolkit.util.EvaluationProperties;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
+import org.webswing.util.DeamonThreadFactory;
+import org.webswing.util.SessionRecorder;
 
 import sun.awt.SunToolkit;
 import sun.awt.image.SurfaceManager;
@@ -65,11 +150,13 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	private EventDispatcher eventDispatcher;
 	private PaintDispatcher paintDispatcher;
+	private SessionWatchdog sessionWatchdog;
 	private WebswingApiImpl api = new WebswingApiImpl();
-	private WebswingMessagingApiImpl msgapi = new WebswingMessagingApiImpl();
 
 	private WindowManager windowManager = WindowManager.getInstance();
 	private ClassLoader swingClassLoader;
+	private SessionRecorder sessionRecorder;
+	private java.util.List<WebToolkitStartupListener> startupListeners = Collections.synchronizedList(new ArrayList<>());
 
 	public void init() {
 		try {
@@ -80,13 +167,13 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 				initDisplayMethod.invoke(null, false);
 			}
 		} catch (Exception e) {
-			Logger.error("Failed to init X11 display: ", e.getMessage());
+			AppLogger.error("Failed to init X11 display: ", e.getMessage());
 		}
 		if (System.getProperty("os.name", "").startsWith("Windows")) {
 			String path = System.getenv("USERPROFILE") + "\\Desktop";
 			File desktopFolder = new File(path);
 			if (!desktopFolder.exists() && !desktopFolder.mkdir()) {
-				Logger.error("Failed to create Desktop folder: " + path);
+				AppLogger.error("Failed to create Desktop folder: " + path);
 			}
 		}
 
@@ -109,26 +196,52 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 				}
 			}
 		} catch (Exception e) {
-			Logger.error("Failed to install fonts", e);
+			AppLogger.error("Failed to install fonts", e);
 		}
 	}
 
 	public void startDispatchers() {
 		eventDispatcher = Util.instantiateClass(EventDispatcher.class, Constants.SWING_START_SYS_PROP_EVENT_DISPATCHER_CLASS, WebEventDispatcher.class.getName());
 		if(eventDispatcher==null){
-			Logger.fatal("EventDispatcher not initialized. Exiting.");
+			AppLogger.fatal("EventDispatcher not initialized. Exiting.");
 			System.exit(1);
 		}
 
 		Class<? extends PaintDispatcher> defaultPaintDispatcher = Util.isCompositingWM() ? CwmPaintDispatcher.class : WebPaintDispatcher.class;
 		paintDispatcher = Util.instantiateClass(PaintDispatcher.class, Constants.SWING_START_SYS_PROP_PAINT_DISPATCHER_CLASS, defaultPaintDispatcher.getName());
 		if(paintDispatcher==null){
-			Logger.fatal("PaintDispatcher not initialized. Exiting.");
+			AppLogger.fatal("PaintDispatcher not initialized. Exiting.");
 			System.exit(1);
 		}
 
-		Logger.info("Webswing Event Dispatcher: "+eventDispatcher.getClass().getName());
-		Logger.info("Webswing Paint Dispatcher: "+paintDispatcher.getClass().getName());
+		sessionWatchdog = Util.instantiateClass(SessionWatchdog.class, Constants.SWING_START_SYS_PROP_SESSION_WATCHDOG_CLASS, WebSessionWatchdog.class.getName());
+		if (sessionWatchdog == null) {
+			AppLogger.fatal("SessionWatchdog not initialized. Exiting.");
+			System.exit(1);
+		}
+
+		AppLogger.info("Webswing Event Dispatcher: "+eventDispatcher.getClass().getName());
+		AppLogger.info("Webswing Paint Dispatcher: "+paintDispatcher.getClass().getName());
+		AppLogger.info("Session Watchdog: " + sessionWatchdog.getClass().getName());
+		
+		for (WebToolkitStartupListener l : startupListeners) {
+			l.dispatchersStarted();
+		}
+		
+		initSessionRecorder();
+		getPaintDispatcher().notifySessionDataChanged();
+	}
+	
+	private void initSessionRecorder() {
+		sessionRecorder = new SessionRecorder(System.getProperty(Constants.SWING_START_SYS_PROP_INSTANCE_ID));
+		
+		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_RECORDING)) {
+			try {
+				sessionRecorder.startRecording();
+			} catch (Exception e) {
+				AppLogger.error("Could not initialize recording!", e);
+			}
+		}
 	}
 
 	public void initSize(final Integer width, final Integer height) {
@@ -147,6 +260,14 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 			getPaintDispatcher().notifyScreenSizeChanged(oldWidht, oldHeight,screenWidth, screenHeight);
 		}
 	}
+	
+	public void addStartupListener(WebToolkitStartupListener listener) {
+		startupListeners.add(listener);
+	}
+	
+	public void removeStartupListener(WebToolkitStartupListener listener) {
+		startupListeners.remove(listener);
+	}
 
 	public WindowManager getWindowManager() {
 		return windowManager;
@@ -158,6 +279,57 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	public PaintDispatcher getPaintDispatcher() {
 		return paintDispatcher;
+	}
+
+	public SessionWatchdog getSessionWatchdog() {
+		return sessionWatchdog;
+	}
+	
+	public boolean isRecording() {
+		return sessionRecorder != null && sessionRecorder.isRecording();
+	}
+	
+	public void recordFrame(byte[] appFrameMsgOut) {
+		if (sessionRecorder != null && sessionRecorder.isRecording()) {
+			sessionRecorder.saveFrame(appFrameMsgOut);
+		}
+	}
+	
+	public void toggleRecording() {
+		if (sessionRecorder == null) {
+			AppLogger.error("Could not toggle session recording, session recorder not initialized!");
+			return;
+		}
+		
+		try {
+			if (sessionRecorder.isRecording()) {
+				sessionRecorder.stopRecording();
+			} else {
+				sessionRecorder.startRecording();
+				// force repaint
+				getPaintDispatcher().notifyWindowRepaintAll();
+			}
+			getPaintDispatcher().notifySessionDataChanged();
+		} catch (Exception e) {
+			AppLogger.error("Could not toggle session recording!", e);
+		}
+	}
+	
+	public void stopRecording() {
+		try {
+			if (sessionRecorder != null && sessionRecorder.isRecording()) {
+				sessionRecorder.stopRecording();
+			}
+		} catch (Exception e) {
+			AppLogger.error("Failed to stop recording!", e);
+		}
+	}
+	
+	public String getRecordingFileName() {
+		if (sessionRecorder == null) {
+			return null;
+		}
+		return sessionRecorder.getFileName();
 	}
 
 	// ////////////////////////////////////////////////////////////////////////////////////////////
@@ -308,7 +480,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 				xpStyleEnabledField.setAccessible(true);
 				xpStyleEnabledField.setBoolean(null, true);
 			} catch (Exception e) {
-				Logger.debug("Failed to set xpStyleEnabled to true", e);
+				AppLogger.debug("Failed to set xpStyleEnabled to true", e);
 			}
 		}
 
@@ -705,13 +877,12 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 
 	abstract public int shouldNativelyFocusHeavyweight(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) ;
 
-	@SuppressWarnings("deprecation")
 	abstract public boolean deliverFocus(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) ;
 
 	public synchronized int executeOnBeforeShutdownListeners(final ShutdownReason reason){
 		ExecutorService executor = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing pre-shutdown thread"));
 		try {
-			long wait = Long.getLong(Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT, 3000);
+			long wait = Long.getLong(Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT, Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT_DEFAULT_VALUE);
 			Integer delay = executor.submit(new Callable<Integer>() {
 				@Override
 				public Integer call() throws Exception {
@@ -720,7 +891,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 			}).get(wait, TimeUnit.MILLISECONDS);
 			return delay;
 		} catch (Exception e) {
-			Logger.error("Failed to execute before-shutdown listeners",e);
+			AppLogger.error("Failed to execute before-shutdown listeners",e);
 		}finally {
 			executor.shutdownNow();
 		}
@@ -735,6 +906,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 				public void run() {
 					//tell server to kill this application after defined time
 					try {
+						stopRecording();
 						getPaintDispatcher().notifyApplicationExiting();
 						api.fireShutdownListeners();
 					} catch (Exception e) {
@@ -785,21 +957,8 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		return api;
 	}
 
-	@Override
-	public WebswingMessagingApi getMessagingApi() {
-		return msgapi;
-	}
-
 	public void processApiEvent(Msg event) {
 		api.processEvent(event);
-	}
-
-	public boolean messageApiHasListenerForClass(String msgtype) {
-		return msgapi.hasListenerForClass(msgtype);
-	}
-
-	public void messageApiProcessMessage(Serializable object) {
-		msgapi.processMessage(object);
 	}
 
 	@Override
@@ -814,4 +973,139 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	public ClassLoader getSwingClassLoader() {
 		return swingClassLoader;
 	}
+
+	public boolean isStatisticsLoggingEnabled() {
+		return Boolean.getBoolean(Constants.SWING_START_SYS_PROP_STATISTICS_LOGGING_ENABLED);
+	}
+
+	public void setStatisticsLoggingEnabled(boolean enabled) {
+		System.setProperty(Constants.SWING_START_SYS_PROP_STATISTICS_LOGGING_ENABLED, String.valueOf(enabled));
+		getPaintDispatcher().notifySessionDataChanged();
+	}
+
+	public void showEvaluationWindow() {
+		EvaluationProperties props = Util.getEvaluationProps();
+		
+		long timeout = props.getTimeout();
+		String url = props.getLinkUrl();
+		boolean hasUrl = url != null && url.trim().length() > 0;
+		boolean hasDismissText = props.getDismissText() != null && props.getDismissText().trim().length() > 0;
+		
+		JFrame evalWin = new JFrame();
+		evalWin.setAlwaysOnTop(true);
+		evalWin.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		evalWin.setSize(getDefaultToolkit().getScreenSize().width, props.getHeight());
+		evalWin.setLocation(0, 0);
+		evalWin.setUndecorated(true);
+		evalWin.getContentPane().setBackground(new Color(247, 215, 218));
+		evalWin.getRootPane().setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+		
+		Timer resizeTimer = new Timer(true);
+		resizeTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				evalWin.setSize(getDefaultToolkit().getScreenSize().width, props.getHeight());
+			}
+		}, 250, 250);
+		
+		JLabel label = new JLabel(props.getMainText());
+		label.setHorizontalAlignment(JLabel.CENTER);
+		label.setFont(label.getFont().deriveFont(16f));
+		label.setForeground(new Color(102,38,48));
+		
+		JLabel counter = new JLabel();
+		counter.setHorizontalAlignment(JLabel.CENTER);
+		counter.setText(TimeUnit.MILLISECONDS.toSeconds(timeout) + "");
+		counter.setFont(label.getFont().deriveFont(20f));
+		counter.setForeground(new Color(102, 38, 48));
+		
+		JPanel leftPanel = new JPanel();
+		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.X_AXIS));
+		leftPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
+		leftPanel.setOpaque(false);
+		leftPanel.add(label);
+		
+		JPanel rightPanel = new JPanel();
+		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.X_AXIS));
+		rightPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
+		rightPanel.setOpaque(false);
+		rightPanel.add(counter);
+		
+		if (hasUrl) {
+			JButton linkButton = new JButton();
+		    linkButton.setText(props.getLinkText());
+		    linkButton.setHorizontalAlignment(SwingConstants.LEFT);
+		    linkButton.setFont(label.getFont().deriveFont(16f));
+		    linkButton.setForeground(new Color(102, 38, 48));
+		    linkButton.setBorderPainted(false);
+		    linkButton.setMargin(new Insets(0, 5, 0, 5));
+		    linkButton.setOpaque(false);
+		    linkButton.setContentAreaFilled(false);
+		    linkButton.setFocusPainted(false);
+	    	linkButton.setToolTipText(url);
+	    	linkButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+	    	linkButton.addActionListener((event) -> {
+	    		if (Desktop.isDesktopSupported()) {
+	    			try {
+	    				Desktop.getDesktop().browse(URI.create(url));
+	    			} catch (IOException e) {
+	    				// ignore
+	    			}
+	    		}
+	    	});
+	    	
+	    	leftPanel.add(linkButton);
+	    }
+		
+		JButton dismissButton = new JButton();
+		
+		if (hasDismissText) {
+			dismissButton.setText(props.getDismissText());
+			dismissButton.setHorizontalAlignment(SwingConstants.LEFT);
+			dismissButton.setFont(label.getFont().deriveFont(16f));
+			dismissButton.setForeground(new Color(102, 38, 48));
+			dismissButton.setBorderPainted(false);
+			dismissButton.setMargin(new Insets(0, 5, 0, 5));
+			dismissButton.setOpaque(false);
+			dismissButton.setContentAreaFilled(false);
+			dismissButton.setFocusPainted(false);
+			dismissButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			dismissButton.addActionListener((event) -> {
+				evalWin.dispose();
+				resizeTimer.cancel();
+			});
+			dismissButton.setVisible(false);
+			
+			rightPanel.add(dismissButton);
+		}
+		
+		evalWin.getContentPane().setLayout(new BorderLayout());
+		evalWin.getContentPane().add(leftPanel, BorderLayout.WEST);
+		evalWin.getContentPane().add(rightPanel, BorderLayout.EAST);
+		
+		evalWin.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentShown(ComponentEvent e) {
+				long end = System.currentTimeMillis() + timeout;
+				Timer timer = new Timer(true);
+				timer.scheduleAtFixedRate(new TimerTask() {
+					@Override
+					public void run() {
+						counter.setText((TimeUnit.MILLISECONDS.toSeconds(end - System.currentTimeMillis()) + 1) + "");
+						
+						if (System.currentTimeMillis() > end) {
+							timer.cancel();
+							counter.setVisible(false);
+							if (hasDismissText) {
+								dismissButton.setVisible(true);
+							}
+						}
+					}
+				}, 250, 250);
+			}
+		});
+		
+		evalWin.setVisible(true);
+	}
+
 }

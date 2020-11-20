@@ -10,7 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.common.service.security.AbstractWebswingUser;
+import org.webswing.server.common.service.security.AuthenticatedWebswingUser;
 import org.webswing.server.services.security.api.LoginResponseClosedException;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.extension.api.BuiltInModuleExtensions;
@@ -100,12 +101,12 @@ public abstract class AbstractExtendableSecurityModule<T extends WebswingExtenda
 	}
 
 	@Override
-	public AbstractWebswingUser doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public AuthenticatedWebswingUser doLogin(HttpServletRequest request, HttpServletResponse response, String securedPath) throws IOException {
 		for (SecurityModuleExtension<?> extension : extensions) {
 			try {
-				AbstractWebswingUser result = extension.doSufficientPreValidation(this, request, response);
+				AuthenticatedWebswingUser result = extension.doSufficientPreValidation(this, request, response);
 				if (result != null) {
-					onAuthenticationSuccess(result, request, response);
+					onAuthenticationSuccess(result, request, response, securedPath);
 					return result;
 				} else {
 					continue;
@@ -118,7 +119,7 @@ public abstract class AbstractExtendableSecurityModule<T extends WebswingExtenda
 			}
 		}
 
-		return super.doLogin(request, response);
+		return super.doLogin(request, response, securedPath);
 	}
 
 	@Override
@@ -135,7 +136,7 @@ public abstract class AbstractExtendableSecurityModule<T extends WebswingExtenda
 	}
 
 	@Override
-	protected void postVerify(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) throws LoginResponseClosedException, WebswingAuthenticationException {
+	protected void postVerify(AuthenticatedWebswingUser user, HttpServletRequest request, HttpServletResponse response) throws LoginResponseClosedException, WebswingAuthenticationException {
 		for (SecurityModuleExtension<?> extension : extensions) {
 			try {
 				extension.doRequiredPostValidation(this, user, request, response);
@@ -148,7 +149,7 @@ public abstract class AbstractExtendableSecurityModule<T extends WebswingExtenda
 	}
 
 	@Override
-	protected AbstractWebswingUser decorateUser(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) {
+	protected AuthenticatedWebswingUser decorateUser(AuthenticatedWebswingUser user, HttpServletRequest request, HttpServletResponse response) {
 		for (SecurityModuleExtension<?> extension : extensions) {
 			user = extension.decorateUser(user, request, response);
 		}

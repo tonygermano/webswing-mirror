@@ -1,6 +1,5 @@
 package org.webswing;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,8 +12,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.webswing.toolkit.util.GitRepositoryState;
-import org.webswing.toolkit.util.Logger;
+import org.webswing.util.AppLogger;
+import org.webswing.util.GitRepositoryState;
 
 public class ConfigurationImpl extends Configuration {
 
@@ -34,6 +33,7 @@ public class ConfigurationImpl extends Configuration {
     private boolean clientAuthEnabled = false;
 
     private String configFile;
+    private String propFile;
 
     private String contextPath="/";
 
@@ -48,7 +48,7 @@ public class ConfigurationImpl extends Configuration {
         options.addOption("p", "port", true, "Http port where the web server will listen. If 0 http is disabled. (8080)");
         options.addOption("ctx", "contextpath", true, "Context path where Webswing is deployed.(/)");
 
-        options.addOption("s", "sslport", true, "Https port where the web server will listen. If 0 http is disabled. (0)");
+        options.addOption("s", "sslport", true, "Https port where the web server will listen. If 0 https is disabled. (0)");
         options.addOption("ts", "truststore", true, "Truststore file location for ssl configuration ");
         options.addOption("tp", "truststorepwd", true, "Truststore password");
         options.addOption("ks", "keystore", true, "Keystore file location for ssl configuration");
@@ -56,11 +56,11 @@ public class ConfigurationImpl extends Configuration {
 
         options.addOption("t", "temp", true, "The folder where temp folder will be created for the server. (./tmp)");
         options.addOption("tc", "tempclean", true, "Delete the content of temp folder. (true)");
-
         options.addOption("d", true, "Create new temp folder for every instance (false)");
 
         options.addOption("j", "jetty", true, "Jetty startup configuration file. (./jetty.properties)");
         options.addOption("c", "config", true, "Configuration file name. (<webswing-server.war path>/webswing.config)");
+        options.addOption("pf", "propertiesfile", true, "Properties file name. (<webswing-server.war path>/webswing.properties)");
 
         try {
             // parse the command line arguments
@@ -88,8 +88,8 @@ public class ConfigurationImpl extends Configuration {
 
             if (line.getOptionValue('s') != null) {
                 String value = line.getOptionValue('s');
-                cimpl.setHttp(value.equals("0") ? false : true);
-                cimpl.setHttpPort(value);
+                cimpl.setHttps(value.equals("0") ? false : true);
+                cimpl.setHttpsPort(value);
             }
 
             if (line.getOptionValue("ts") != null) {
@@ -115,14 +115,18 @@ public class ConfigurationImpl extends Configuration {
             if (line.getOptionValue('c') != null) {
                 cimpl.setConfigFile(line.getOptionValue('c'));
             }
+            
+            if (line.getOptionValue("pf") != null) {
+            	cimpl.setPropertiesFile(line.getOptionValue("pf"));
+            }
 
-            // NOTE: -d and -t are parsed in main.Main
+            // NOTE: -d, -t and -tc are parsed in main.Main
         } catch (ParseException exp) {
-            Logger.debug(exp.getMessage());
+            AppLogger.debug(exp.getMessage());
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(PREFIX, options);
         } catch (IOException e) {
-            Logger.error("Server configuration failed.", e);
+            AppLogger.error("Server configuration failed.", e);
         }
         return cimpl;
     }
@@ -225,6 +229,11 @@ public class ConfigurationImpl extends Configuration {
     }
 
     @Override
+    public String getPropertiesFile() {
+    	return propFile;
+    }
+    
+    @Override
     public String getContextPath() {
         return contextPath;
     }
@@ -236,11 +245,15 @@ public class ConfigurationImpl extends Configuration {
     public void setConfigFile(String configFile) {
         this.configFile = configFile;
     }
+    
+    public void setPropertiesFile(String propFile) {
+		this.propFile = propFile;
+	}
 
     @Override
     public String toString() {
         return "########################Server Configuration ################################\n" + " host=" + host + "\n http=" + http + "\n httpPort=" + httpPort + "\n https=" + https + "\n httpsPort=" + httpsPort + "\n truststore=" + truststore + "\n truststorePassword=***" + "\n keystore=" + keystore + "\n keystorePassword=***"
-                + "\n configFile=" + configFile + "\n contextPath=" + contextPath + "\n version=" + GitRepositoryState.getInstance().getDescribe() +  "\n########################Server Configuration End#############################\n";
+                + "\n configFile=" + configFile + "\n propertiesFile=" + propFile + "\n contextPath=" + contextPath + "\n version=" + GitRepositoryState.getInstance().getDescribe() +  "\n########################Server Configuration End#############################\n";
     }
 
     /**

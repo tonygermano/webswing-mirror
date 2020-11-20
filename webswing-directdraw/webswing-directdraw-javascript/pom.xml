@@ -3,7 +3,7 @@
     <parent>
         <artifactId>webswing-directdraw</artifactId>
         <groupId>org.webswing</groupId>
-        <version>20.1.8</version>
+        <version>20.2</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>webswing-directdraw-javascript</artifactId>
@@ -16,7 +16,13 @@
         </dependency>
         <dependency>
             <groupId>org.webswing</groupId>
-            <artifactId>webswing-app-interface</artifactId>
+            <artifactId>webswing-app-services</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.webswing</groupId>
+            <artifactId>webswing-app-toolkit</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>

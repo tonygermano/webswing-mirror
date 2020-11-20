@@ -1,9 +1,10 @@
 package org.webswing.javafx.toolkit;
 
-import com.sun.glass.ui.SystemClipboard;
+import java.util.HashMap;
+
 import org.webswing.toolkit.util.Util;
 
-import java.util.HashMap;
+import com.sun.glass.ui.SystemClipboard;
 
 /**
  * Created by vikto on 07-Mar-17.

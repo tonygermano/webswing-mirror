@@ -8,13 +8,12 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
-import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
 import org.webswing.toolkit.WebDragSourceContextPeer;
 import org.webswing.toolkit.WebDropTargetContextPeer;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 @SuppressWarnings("restriction")
 public class DndEventHandler {
@@ -78,7 +77,7 @@ public class DndEventHandler {
 				break;
 			}
 		} catch (Exception e) {
-			Logger.debug("Failed to load DnD cursor", e);
+			AppLogger.debug("Failed to load DnD cursor", e);
 		}
 	}
 

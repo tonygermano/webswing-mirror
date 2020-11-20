@@ -1,20 +1,25 @@
 package org.webswing.toolkit.extra;
 
-import org.webswing.common.WindowActionType;
-import org.webswing.dispatch.WebPaintDispatcher;
-import org.webswing.model.s2c.AccessibilityMsg;
-import org.webswing.model.s2c.CursorChangeEventMsg;
-import org.webswing.toolkit.FocusEventCause;
-import org.webswing.toolkit.util.Services;
-import org.webswing.toolkit.util.Util;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.SwingUtilities;
+
+import org.webswing.common.WindowActionType;
+import org.webswing.dispatch.WebPaintDispatcher;
+import org.webswing.model.appframe.out.AccessibilityMsgOut;
+import org.webswing.model.appframe.out.CursorChangeEventMsgOut;
+import org.webswing.toolkit.FocusEventCause;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
 
 @SuppressWarnings("restriction")
 public class WindowManager {
@@ -23,7 +28,7 @@ public class WindowManager {
 	protected WindowHierarchyTree zorder = new WindowHierarchyTree();
     protected Window activeWindow = null;
 	private WindowEventHandler eventhandler = new WindowEventHandler();
-	private String currentCursor = CursorChangeEventMsg.DEFAULT_CURSOR;
+	private String currentCursor = CursorChangeEventMsgOut.DEFAULT_CURSOR;
 
 	protected WindowManager() {
 	}
@@ -230,7 +235,7 @@ public class WindowManager {
 		eventhandler.handle(wat, e);
 		
 		if (wat.isButtonActionType()) {
-			AccessibilityMsg accessibilityMsg = Services.getImageService().getWindowDecorationTheme().getAccessible(w, wat, mousePointer);
+			AccessibilityMsgOut accessibilityMsg = Services.getImageService().getWindowDecorationTheme().getAccessible(w, wat, mousePointer);
 			if (accessibilityMsg != null) {
 				Util.getWebToolkit().getPaintDispatcher().notifyAccessibilityInfoUpdate(accessibilityMsg);
 			}

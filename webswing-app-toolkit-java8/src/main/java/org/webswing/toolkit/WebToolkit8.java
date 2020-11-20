@@ -2,8 +2,9 @@ package org.webswing.toolkit;
 
 import org.webswing.applet.WebAppletContext;
 import org.webswing.toolkit.ge.WebGraphicsEnvironment;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
+
 import sun.awt.CausedFocusEvent;
 import sun.awt.LightweightFrame;
 import sun.awt.SunToolkit;
@@ -109,7 +110,7 @@ public class WebToolkit8 extends WebToolkit {
             Integer result2 = (Integer) m2.invoke(null, heavyweight, descendant, temporary, focusedWindowChangeAllowed, time, CausedFocusEvent.Cause.valueOf(cause.name()));
             return result2;
         } catch (Exception e) {
-            Logger.debug("Failed to invoke processSynchronousLightweightTransfer on KeyboardFocusManager. Check your java version.", e);
+            AppLogger.debug("Failed to invoke processSynchronousLightweightTransfer on KeyboardFocusManager. Check your java version.", e);
             return 0;
         }
     }

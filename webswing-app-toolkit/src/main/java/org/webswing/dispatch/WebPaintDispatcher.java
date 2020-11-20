@@ -17,19 +17,20 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import org.webswing.model.s2c.AppFrameMsgOut;
-import org.webswing.model.s2c.WindowMoveActionMsg;
+import org.webswing.model.app.out.AppToServerFrameMsgOut;
+import org.webswing.model.appframe.out.AppFrameMsgOut;
+import org.webswing.model.appframe.out.WindowMoveActionMsgOut;
 import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.api.component.HtmlPanel;
 import org.webswing.toolkit.extra.WebRepaintManager;
 import org.webswing.toolkit.extra.WindowManager;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 public class WebPaintDispatcher extends AbstractPaintDispatcher {
-	private volatile WindowMoveActionMsg moveAction;
+	private volatile WindowMoveActionMsgOut moveAction;
 
 	public WebPaintDispatcher() {
 		Runnable sendUpdate = () -> {
@@ -37,7 +38,10 @@ public class WebPaintDispatcher extends AbstractPaintDispatcher {
 				if (!isClientReadyToReceiveOrResetAfterTimedOut()) {
 					return;
 				}
-				AppFrameMsgOut json;
+
+				AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+
+				AppFrameMsgOut frame;
 				Map<String, Map<Integer, BufferedImage>> windowImages = null;
 				Map<String, Image> windowWebImages = null;
 				Map<String, Set<Rectangle>> currentAreasToUpdate;
@@ -52,36 +56,37 @@ public class WebPaintDispatcher extends AbstractPaintDispatcher {
 								return;
 							}
 							
-							json = Util.fillWithWindowsData(currentAreasToUpdate);
+							frame = Util.fillWithWindowsData(currentAreasToUpdate);
 							
 							if (Util.isDD()) {
 								windowWebImages = Util.extractWindowWebImages(currentAreasToUpdate.keySet(), new HashMap<>());
 							} else {
-								windowImages = Util.extractWindowImages(json, new HashMap<>());
+								windowImages = Util.extractWindowImages(frame, new HashMap<>());
 							}
 							
-							fillMoveAction(json);
-							fillFocusEvent(json);
+							fillMoveAction(frame);
+							fillFocusEvent(frame);
 							setClientNotReady();
 						}
 					}
-					Logger.trace("contentSender:paintJson", json);
+					AppLogger.trace("contentSender:paintJson", frame);
 					if (Util.isDD()) {
-						Logger.trace("contentSender:pngWebImageEncodingStart", json.hashCode());
-						Util.encodeWindowWebImages(windowWebImages, json);
-						Logger.trace("contentSender:pngWebImageEncodingDone", json.hashCode());
+						AppLogger.trace("contentSender:pngWebImageEncodingStart", frame.hashCode());
+						Util.encodeWindowWebImages(windowWebImages, frame);
+						AppLogger.trace("contentSender:pngWebImageEncodingDone", frame.hashCode());
 					} else {
-						Logger.trace("contentSender:pngEncodingStart", json.hashCode());
-						Util.encodeWindowImages(windowImages, json);
-						Logger.trace("contentSender:pngEncodingDone", json.hashCode());
+						AppLogger.trace("contentSender:pngEncodingStart", frame.hashCode());
+						Util.encodeWindowImages(windowImages, frame);
+						AppLogger.trace("contentSender:pngEncodingDone", frame.hashCode());
 					}
 					
-					json.setDirectDraw(Util.isDD());
-					json.setCompositingWM(Util.isCompositingWM());
-					json.setSendTimestamp("" + System.currentTimeMillis());
-					sendObject(json);
+					frame.setDirectDraw(Util.isDD());
+					frame.setCompositingWM(Util.isCompositingWM());
+					frame.setSendTimestamp("" + System.currentTimeMillis());
+
+					sendObject(msgOut, frame);
 				} catch (Throwable e) {
-					Logger.error("contentSender:error", e);
+					AppLogger.error("contentSender:error", e);
 				}
 		};
 		Integer delay = Integer.getInteger("webswing.drawDelayMs", 33);
@@ -136,7 +141,7 @@ public class WebPaintDispatcher extends AbstractPaintDispatcher {
 		if (zIndex == 0 && w.getWidth() == from.width && w.getHeight() == from.height) {
 			synchronized (webPaintLock) {
 				if (!hasMoveAction()) {
-					setMoveAction(new WindowMoveActionMsg(from.x, from.y, to.x, to.y, from.width, from.height));
+					setMoveAction(new WindowMoveActionMsgOut(from.x, from.y, to.x, to.y, from.width, from.height));
 					notifyRepaintOffScreenAreas(w, getMoveAction());
 				} else if (getMoveAction().getDx() == from.x && getMoveAction().getDy() == from.y && getMoveAction().getWidth() == from.width && getMoveAction().getHeight() == from.height) {
 					getMoveAction().setDx(to.x);
@@ -152,7 +157,7 @@ public class WebPaintDispatcher extends AbstractPaintDispatcher {
 	}
 
 	@SuppressWarnings("restriction")
-	private void notifyRepaintOffScreenAreas(Window w, WindowMoveActionMsg m) {
+	private void notifyRepaintOffScreenAreas(Window w, WindowMoveActionMsgOut m) {
 		Rectangle screen = new Rectangle(Util.getWebToolkit().getScreenSize());
 		Rectangle before = new Rectangle(m.getSx(), m.getSy(), m.getWidth(), m.getHeight());
 		Rectangle after = new Rectangle(m.getDx(), m.getDy(), m.getWidth(), m.getHeight());
@@ -209,11 +214,11 @@ public class WebPaintDispatcher extends AbstractPaintDispatcher {
 		return moveAction != null;
 	}
 
-	protected WindowMoveActionMsg getMoveAction() {
+	protected WindowMoveActionMsgOut getMoveAction() {
 		return moveAction;
 	}
 
-	protected void setMoveAction(WindowMoveActionMsg moveAction) {
+	protected void setMoveAction(WindowMoveActionMsgOut moveAction) {
 		this.moveAction = moveAction;
 	}
 

@@ -5,10 +5,8 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.webswing.Constants;
 import org.webswing.server.common.model.Config;
 import org.webswing.server.common.model.meta.ConfigField;
 import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
@@ -25,7 +23,8 @@ import org.webswing.server.common.model.meta.MetadataGenerator;
 import org.webswing.server.common.model.meta.VariableSetName;
 import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.services.security.api.WebswingSecurityConfig.WebswingSecurityMetadataGenerator;
-import org.webswing.toolkit.util.ClasspathUtil;
+import org.webswing.util.ClasspathUtil;
+import org.webswing.Constants;
 
 @ConfigType(metadataGenerator = WebswingSecurityMetadataGenerator.class)
 @ConfigFieldOrder({ "classPath", "module", "config", "authorizationConfig" })

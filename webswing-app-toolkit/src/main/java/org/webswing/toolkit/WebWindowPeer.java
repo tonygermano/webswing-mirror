@@ -1,13 +1,22 @@
 package org.webswing.toolkit;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.peer.WindowPeer;
+import java.util.logging.Logger;
 
 import org.webswing.Constants;
 import org.webswing.toolkit.api.component.Dockable;
 import org.webswing.toolkit.extra.WindowManager;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 import sun.java2d.InvalidPipeException;
 
@@ -138,7 +147,7 @@ abstract public class WebWindowPeer extends WebContainerPeer implements WindowPe
 			try {
 				replaceSurfaceData(win.getX(), win.getY(), win.getWidth(), win.getHeight());
 			} catch (InvalidPipeException e) {
-				Logger.error("WebWindowPeer:setUndecoratedOverride", e);
+				AppLogger.error("WebWindowPeer:setUndecoratedOverride", e);
 			}
 		}
 	}

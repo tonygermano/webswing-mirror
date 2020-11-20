@@ -7,10 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
-import org.webswing.Constants;
-import org.webswing.model.internal.OpenFileResultMsgInternal;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 public class WebDesktopPeer implements DesktopPeer {
 
@@ -35,24 +33,24 @@ public class WebDesktopPeer implements DesktopPeer {
 
     @Override
     public void open(File file) throws IOException {
-        Logger.info("WebDesktopPeer:open", file);
+        AppLogger.info("WebDesktopPeer:open", file);
         sendFile(file, false);
     }
 
     @Override
     public void edit(File file) throws IOException {
-        Logger.info("WebDesktopPeer:edit", file);
-        sendFile(file,false);
+        AppLogger.info("WebDesktopPeer:edit", file);
+        sendFile(file, false);
     }
 
     @Override
     public void print(File file) throws IOException {
-        Logger.info("WebDesktopPeer:print", file);
-        sendFile(file,true);
+        AppLogger.info("WebDesktopPeer:print", file);
+        sendFile(file, true);
     }
 
     private void sendFile(File file, boolean preview) {
-        Util.getWebToolkit().getPaintDispatcher().notifyFileRequested(file,preview);
+        Util.getWebToolkit().getPaintDispatcher().notifyFileRequested(file, preview);
     }
 
     @Override

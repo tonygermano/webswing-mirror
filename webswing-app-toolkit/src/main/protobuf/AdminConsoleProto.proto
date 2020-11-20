@@ -1,0 +1,319 @@
+syntax = "proto2";
+option java_package = "org.webswing.model.adminconsole.proto";
+
+/* =================== ADMIN CONSOLE -> SERVER ====================*/
+
+message AdminConsoleFrameMsgInProto {
+	optional ToggleRecordingMsgInProto toggleRecording = 1;
+	optional ShutdownMsgInProto shutdown = 2;
+	optional RequestThreadDumpMsgInProto requestThreadDump = 4;
+	optional GetThreadDumpMsgInProto getThreadDump = 5;
+	optional GetInstanceCountsStatsWarningsMsgInProto getInstanceCountsStatsWarnings = 6;
+	optional GetSwingSessionsMsgInProto getSwingSessions = 7;
+	optional GetServerInfoMsgInProto getServerInfo = 8;
+	optional ToggleStatisticsLoggingMsgInProto toggleStatisticsLogging = 9;
+	optional AdminConsoleHandshakeMsgInProto handshake = 10;
+	optional GetConfigMsgInProto getConfig = 11;
+	optional GetMetaMsgInProto getMeta = 12;
+	optional ResolveConfigMsgInProto resolveConfig = 13;
+	optional SaveConfigMsgInProto saveConfig = 14;
+	optional SearchVariablesMsgInProto searchVariables = 15;
+	optional StartAppMsgInProto startApp = 16;
+	optional StopAppMsgInProto stopApp = 17;
+	optional CreateAppMsgInProto createApp = 18;
+	optional RemoveAppMsgInProto removeApp = 19;
+}
+
+message AdminConsoleHandshakeMsgInProto {
+	optional string secretMessage = 1;
+}
+
+message ToggleRecordingMsgInProto {
+	optional string path = 1;
+	optional string instanceId = 2;
+}
+
+message ToggleStatisticsLoggingMsgInProto {
+	optional string path = 1;
+	optional string instanceId = 2;
+	optional bool enabled = 3;
+}
+
+message ShutdownMsgInProto {
+	optional string path = 1;
+	optional string instanceId = 2;
+	optional bool force = 3;
+}
+
+message RequestThreadDumpMsgInProto {
+	optional string path = 1;
+	optional string instanceId = 2;
+}
+
+message GetThreadDumpMsgInProto {
+	optional string path = 1;
+	optional string instanceId = 2;
+	optional string timestamp = 3;
+	optional string correlationId = 4;
+}
+
+message GetInstanceCountsStatsWarningsMsgInProto {
+	optional string path = 1;
+	optional string correlationId = 2;
+}
+
+message GetSwingSessionsMsgInProto {
+	optional string path = 1;
+	optional string correlationId = 2;
+}
+
+message GetServerInfoMsgInProto {
+}
+
+message GetConfigMsgInProto {
+	optional string path = 1;
+	optional string correlationId = 2;
+}
+
+message GetMetaMsgInProto {
+	optional string path = 1;
+	optional bytes serverConfig = 2;
+	repeated AppConfigMsgInProto appConfigs = 3;
+	optional string correlationId = 4;
+}
+
+message AppConfigMsgInProto {
+	optional bytes appConfig = 1;
+	optional string sessionPoolId = 2;
+}
+
+message ResolveConfigMsgInProto {
+	optional string path = 1;
+	optional string type = 2;
+	optional string resolve = 3;
+	optional string user = 4;
+	optional string sessionPoolId = 5;
+	optional string correlationId = 6;
+}
+
+message SaveConfigMsgInProto {
+	optional string path = 1;
+	optional bytes serverConfig = 2;
+	optional bool saveAppConfigs = 3;
+	repeated AppConfigMsgInProto appConfigs = 4;
+	optional string correlationId = 5;
+}
+
+message SearchVariablesMsgInProto {
+	optional string path = 1;
+	optional string type = 2;
+	optional string search = 3;
+	optional string user = 4;
+	optional string sessionPoolId = 5;
+	optional string correlationId = 6;
+}
+
+message StartAppMsgInProto {
+	optional string path = 1;
+}
+
+message StopAppMsgInProto {
+	optional string path = 1;
+}
+
+message CreateAppMsgInProto {
+	optional string path = 1;
+}
+
+message RemoveAppMsgInProto {
+	optional string path = 1;
+}
+
+/* =================== SERVER -> ADMIN CONSOLE ====================*/
+
+message AdminConsoleFrameMsgOutProto {
+	optional string path = 1;
+	optional ThreadDumpMsgOutProto threadDump = 2;
+	optional InstanceCountsStatsWarningsMsgOutProto instanceCountsStatsWarnings = 3;
+	optional SwingSessionsMsgOutProto swingSessions = 4;
+	repeated RegisterInstanceMsgOutProto registerInstances = 5;
+	optional ServerInfoMsgOutProto serverInfo = 6;
+	optional ConfigMsgOutProto config = 7;
+	optional MetaMsgOutProto meta = 8;
+	optional ResolveConfigMsgOutProto resolveConfig = 9;
+	optional SearchVariablesMsgOutProto searchVariables = 10;
+	optional SaveConfigResultMsgOutProto saveConfigResult = 11;
+	optional AccessTokenCreatedMsgOutProto accessTokenCreated = 12;
+}
+
+message InstanceCountsStatsWarningsMsgOutProto {
+	optional sint32 runningCount = 1;
+	optional sint32 connectedCount = 2;
+	optional sint32 closedCount = 3;
+	repeated StatEntryMsgOutProto summaryStats = 4;
+	repeated SummaryWarningMsgOutProto summaryWarnings = 5;
+	optional string correlationId = 6;
+}
+
+message StatEntryMsgOutProto {
+	optional string metric = 1;
+	repeated MetricMsgOutProto stats = 2;
+}
+
+message MetricMsgOutProto {
+	optional string key = 1;
+	optional sint64 value = 2;
+	optional sint32 aggregatedCount = 3;
+}
+
+message SummaryWarningMsgOutProto {
+	optional string instanceId = 1;
+	repeated string warnings = 2;
+}
+
+message SwingSessionsMsgOutProto {
+	repeated SwingSessionMsgOutProto runningSessions = 1;
+	repeated SwingSessionMsgOutProto closedSessions = 2;
+	optional string correlationId = 3;
+}
+
+message SwingSessionMsgOutProto {
+
+	enum StatusEnumProto {
+		NOT_STARTED = 1; 
+		EXITING = 2;
+		RUNNING = 3;
+		FORCE_KILLED = 4;
+		FINISHED = 5;
+    }
+	
+	optional StatusEnumProto status = 1;
+	optional string instanceId = 2;
+	optional string user = 3;
+	optional string userIp = 4;
+	optional string userOs = 5;
+	optional string userBrowser = 6;
+	optional string application = 7;
+	optional string applicationPath = 8;
+	optional sint64 startedAt = 9;
+	optional sint64 endedAt = 10;
+	optional bool connected = 11;
+	optional bool applet = 12;
+	optional sint64 disconnectedSince = 13;
+	optional bool recorded = 14;
+	optional string recordingFile = 15;
+	optional bool loggingEnabled = 16;
+	optional bool statisticsLoggingEnabled = 17;
+	
+	repeated string warnings = 18;
+	repeated string warningHistory = 19;
+	repeated ThreadDumpMsgOutProto threadDumps = 20;
+	
+	repeated MetricMsgOutProto metrics = 21;
+	repeated StatEntryMsgOutProto stats = 22;
+}
+
+message ThreadDumpMsgOutProto {
+	optional sint64 timestamp = 1;
+	optional string content = 2;
+	optional string reason = 3;
+	optional string instanceId = 4;
+	optional string correlationId = 5;
+}
+
+message RegisterInstanceMsgOutProto {
+	optional string instanceId = 1;
+	optional bool register = 2;
+	optional string path = 3;
+}
+
+message ServerInfoMsgOutProto {
+	repeated ApplicationInfoMsgOutProto appInfos = 1;
+	repeated SessionPoolInfoMsgOutProto spInfos = 2;
+	optional sint32 instances = 3;
+	optional sint32 users = 4;
+	optional string id = 5;
+	optional bool cluster = 6;
+}
+
+message ApplicationInfoMsgOutProto {
+	optional string path = 1;
+	optional bytes byteIcon = 2;
+	optional string name = 3;
+	optional bool enabled = 4;
+	optional sint32 maxClients = 5;
+	optional InstanceManagerStatusMsgOutProto instanceManagerStatus = 6;
+}
+
+message SessionPoolInfoMsgOutProto {
+	optional string id = 1;
+	optional sint32 maxInstances = 2;
+	optional sint32 priority = 3;
+	repeated string connectedServers = 4;
+	repeated SessionPoolAppMsgOutProto appInstances = 5;
+}
+
+message SessionPoolAppMsgOutProto {
+	optional string path = 1;
+	optional sint32 instanceCount = 2;
+}
+
+message ConfigMsgOutProto {
+	optional bytes serverConfig = 1;
+	optional string serverError = 2;
+	repeated AppConfigMsgOutProto appConfigs = 3;
+	optional string correlationId = 4;
+}
+
+message MetaMsgOutProto {
+	optional bytes serverConfig = 1;
+	optional string serverError = 2;
+	repeated AppConfigMsgOutProto appConfigs = 3;
+	optional string correlationId = 4;
+}
+
+message AppConfigMsgOutProto {
+	optional bytes appConfig = 1;
+	optional string error = 2;
+	optional string sessionPoolId = 3;
+}
+
+message ResolveConfigMsgOutProto {
+	repeated MapMsgOutProto resolved = 1;
+	optional string correlationId = 2;
+}
+
+message SearchVariablesMsgOutProto {
+	repeated MapMsgOutProto variables = 1;
+	optional string correlationId = 2;
+}
+
+message MapMsgOutProto {
+	optional string key = 1;
+	optional string value = 2;
+}
+
+message InstanceManagerStatusMsgOutProto {
+	optional string status = 1;
+	optional string error = 2;
+	optional string errorDetails = 3;
+}
+
+message SaveConfigResultMsgOutProto {
+	optional bool serverResult = 1;
+	optional string serverError = 2;
+	repeated SaveConfigAppResultMsgOutProto appResults = 3;
+	optional string correlationId = 4;
+}
+
+message SaveConfigAppResultMsgOutProto {
+	optional bool result = 1;
+	optional string sessionPoolId = 2;
+	optional string error = 3;
+}
+
+message AccessTokenCreatedMsgOutProto {
+	optional string refreshToken = 1;
+	optional string accessId = 2;
+	optional sint64 expiration = 3;
+}

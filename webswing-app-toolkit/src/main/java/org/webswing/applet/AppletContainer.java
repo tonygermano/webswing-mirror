@@ -7,12 +7,12 @@ import java.util.Map;
 
 import javax.swing.JFrame;
 
-import netscape.javascript.JSObject;
-
 import org.webswing.Constants;
-import org.webswing.model.jslink.JSObjectMsg;
+import org.webswing.model.appframe.in.JSObjectMsgIn;
 import org.webswing.toolkit.jslink.WebJSObject;
-import org.webswing.toolkit.util.Logger;
+import org.webswing.util.AppLogger;
+
+import netscape.javascript.JSObject;
 
 public class AppletContainer extends JFrame {
 
@@ -30,7 +30,7 @@ public class AppletContainer extends JFrame {
 		try {
 			applet = (Applet) appletClazz.getConstructor().newInstance();
 		} catch (Exception e) {
-			Logger.error("Failed to instantiate Applet class" + appletClazz.getCanonicalName(), e);
+			AppLogger.error("Failed to instantiate Applet class" + appletClazz.getCanonicalName(), e);
 		}
 		stub = new WebAppletStub(this, props);
 		context = new WebAppletContext(this);
@@ -41,7 +41,7 @@ public class AppletContainer extends JFrame {
 	public void start() {
 		applet.init();
 		WebJSObject.createJavaReference(applet, System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
-		JSObject root = new WebJSObject(new JSObjectMsg("instanceObject"));
+		JSObject root = new WebJSObject(new JSObjectMsgIn("instanceObject"));
 		root.setMember("applet", WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS)));
 		active = true;
 		applet.start();

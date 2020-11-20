@@ -1,7 +1,6 @@
 package org.webswing.toolkit.jslink;
 
 import java.applet.Applet;
-import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,38 +14,41 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeoutException;
 
-import netscape.javascript.JSException;
-import netscape.javascript.JSObject;
-
 import org.webswing.Constants;
-import org.webswing.model.jslink.JSObjectMsg;
-import org.webswing.model.jslink.JavaEvalRequestMsgIn;
-import org.webswing.model.s2c.AppFrameMsgOut;
-import org.webswing.toolkit.util.DeamonThreadFactory;
+import org.webswing.model.SyncObjectResponse;
+import org.webswing.model.app.out.AppToServerFrameMsgOut;
+import org.webswing.model.appframe.in.AppFrameMsgIn;
+import org.webswing.model.appframe.in.JSObjectMsgIn;
+import org.webswing.model.appframe.in.JavaEvalRequestMsgIn;
+import org.webswing.model.appframe.out.AppFrameMsgOut;
 import org.webswing.toolkit.util.JsLinkUtil;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.WeakValueHashMap;
+import org.webswing.util.DeamonThreadFactory;
+
+import netscape.javascript.JSException;
+import netscape.javascript.JSObject;
 
 public class WebJSObject extends JSObject {
 
-	private static final Map<String, WeakReference<JSObjectMsg>> jsGarbageCollectionMap = new HashMap<String, WeakReference<JSObjectMsg>>();
+	private static final Map<String, WeakReference<JSObjectMsgIn>> jsGarbageCollectionMap = new HashMap<String, WeakReference<JSObjectMsgIn>>();
 	private static final WeakValueHashMap<String, Object> javaReferences = new WeakValueHashMap<String, Object>();
 	private static boolean jsLinkAllowed = Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK);
 	private static String jsLinkWhitelistProp = System.getProperty(Constants.SWING_START_SYS_PROP_JSLINK_WHITELIST, "");
 	private static List<String> jsLinkWhitelist;
 	private static ScheduledExecutorService javaEvalThread = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing JsLink Processor"));
-	private JSObjectMsg jsThis;
+	private JSObjectMsgIn jsThis;
 	
 	static {
 		jsLinkWhitelist = new ArrayList<>();
 		jsLinkWhitelist = Arrays.asList(jsLinkWhitelistProp.split(","));
 	}
 
-	public WebJSObject(JSObjectMsg jsThis) {
+	public WebJSObject(JSObjectMsgIn jsThis) {
 		this.jsThis = jsThis;
 		if (jsThis != null) {
 			synchronized (jsGarbageCollectionMap) {
-				jsGarbageCollectionMap.put(jsThis.getId() + "", new WeakReference<JSObjectMsg>(jsThis));
+				jsGarbageCollectionMap.put(jsThis.getId() + "", new WeakReference<JSObjectMsgIn>(jsThis));
 			}
 		}
 	}
@@ -97,11 +99,15 @@ public class WebJSObject extends JSObject {
 		return new WebJSObject(null);
 	}
 
-	private static Object sendJsRequest(AppFrameMsgOut msg) {
+	private static Object sendJsRequest(AppFrameMsgOut frame) {
 		try {
-			Object result = Services.getConnectionService().sendObjectSync(msg, msg.getJsRequest().getCorrelationId());
-			Object parsedResult = JsLinkUtil.parseResponse(result);
-			return parsedResult;
+			AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+			SyncObjectResponse result = Services.getConnectionService().sendObjectSync(msgOut, frame, frame.getJsRequest().getCorrelationId());
+			if (result.getFrame() != null) {
+				AppFrameMsgIn frameIn = result.getFrame();
+				return JsLinkUtil.parseResponse(frameIn);
+			}
+			return null;
 		} catch (TimeoutException e) {
 			throw new JSException(e.getMessage());
 		} catch (Exception e) {
@@ -123,7 +129,7 @@ public class WebJSObject extends JSObject {
 		return result;
 	}
 
-	public JSObjectMsg getThisId() {
+	public JSObjectMsgIn getThisId() {
 		return jsThis;
 	}
 
@@ -154,19 +160,21 @@ public class WebJSObject extends JSObject {
 
 	public static Future<?> evaluateJava(final JavaEvalRequestMsgIn javaReq) {
 		return javaEvalThread.submit(new Runnable() {
-
 			@Override
 			public void run() {
+				AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+				AppFrameMsgOut frame;
+				
 				if (jsLinkAllowed) {
 					Object javaRef = javaReferences.get(javaReq.getObjectId());
-					AppFrameMsgOut result = JsLinkUtil.callMatchingMethod(javaReq, javaRef, jsLinkWhitelist);
-					Services.getConnectionService().sendObject(result);
+					frame = JsLinkUtil.callMatchingMethod(javaReq, javaRef, jsLinkWhitelist);
 				} else {
-					Serializable result = JsLinkUtil.getErrorResponse(javaReq, "JsLink is not allowed for this application. Set the 'allowJsLink' to true in webswing.config to enable it.");
-					Services.getConnectionService().sendObject(result);
+					frame = JsLinkUtil.getErrorResponse(javaReq.getCorrelationId(), "JsLink is not allowed for this application. Set the 'allowJsLink' to true in webswing.config to enable it.");
 				}
+				
+				Services.getConnectionService().sendObject(msgOut, frame);
 			}
 		});
-
 	}
+	
 }

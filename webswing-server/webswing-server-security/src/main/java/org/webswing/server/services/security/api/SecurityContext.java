@@ -1,12 +1,21 @@
 package org.webswing.server.services.security.api;
 
+import java.net.URL;
+
 import org.webswing.server.common.model.meta.ConfigContext;
 
 /**
  * Context for {@link WebswingSecurityModule} stored in {@link WebswingSecurityModuleConfig} that provides access to resources and Webswing specific services.
  */
-public interface SecurityContext extends ConfigContext{
+public interface SecurityContext extends ConfigContext {
 
+	/**
+	 * Returns URL of static web resource if exists. 
+	 * @param resource resource path relative to web context
+	 * @return URL or null 
+	 */
+	URL getWebResource(String resource);
+	
 	/**
 	 * Retrieves object from session if exists.
 	 * @param attributeName name of session attribute

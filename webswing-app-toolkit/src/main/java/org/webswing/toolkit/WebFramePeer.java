@@ -1,10 +1,13 @@
 package org.webswing.toolkit;
 
-import org.webswing.toolkit.util.Util;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Frame;
+import java.awt.MenuBar;
+import java.awt.Rectangle;
 import java.awt.peer.FramePeer;
+
+import javax.swing.JFrame;
+
+import org.webswing.toolkit.util.Util;
 
 abstract public class WebFramePeer extends WebWindowPeer implements FramePeer {
 

@@ -1,25 +1,27 @@
 import {org} from "../proto/dd";
-import WebImageProto = org.webswing.directdraw.proto.WebImageProto;
-import IDrawConstantProto = org.webswing.directdraw.proto.IDrawConstantProto;
-import IImageProto = org.webswing.directdraw.proto.IImageProto;
-import IGlyphProto = org.webswing.directdraw.proto.IGlyphProto;
-import IFontFaceProto = org.webswing.directdraw.proto.IFontFaceProto;
-import IDrawInstructionProto = org.webswing.directdraw.proto.IDrawInstructionProto;
-import InstructionProto = org.webswing.directdraw.proto.DrawInstructionProto.InstructionProto;
-import CompositeTypeProto = org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto;
-import SegmentTypeProto = org.webswing.directdraw.proto.PathProto.SegmentTypeProto;
-import IRectangleProto = org.webswing.directdraw.proto.IRectangleProto;
-import StyleProto = org.webswing.directdraw.proto.FontProto.StyleProto;
-import ITransformProto = org.webswing.directdraw.proto.ITransformProto;
-import StrokeCapProto = org.webswing.directdraw.proto.StrokeProto.StrokeCapProto;
-import StrokeJoinProto = org.webswing.directdraw.proto.StrokeProto.StrokeJoinProto;
-import ArcTypeProto = org.webswing.directdraw.proto.ArcProto.ArcTypeProto;
-import CyclicMethodProto = org.webswing.directdraw.proto.CyclicMethodProto;
-import ILinearGradientProto = org.webswing.directdraw.proto.ILinearGradientProto;
-import IRadialGradientProto = org.webswing.directdraw.proto.IRadialGradientProto;
-import IEllipseProto = org.webswing.directdraw.proto.IEllipseProto;
-import IRoundRectangleProto = org.webswing.directdraw.proto.IRoundRectangleProto;
-import IArcProto = org.webswing.directdraw.proto.IArcProto;
+interface WebImageProto extends org.webswing.directdraw.proto.WebImageProto {}
+interface IDrawConstantProto extends org.webswing.directdraw.proto.IDrawConstantProto {}
+interface IImageProto extends org.webswing.directdraw.proto.IImageProto {}
+interface IGlyphProto extends org.webswing.directdraw.proto.IGlyphProto {}
+interface IFontFaceProto extends org.webswing.directdraw.proto.IFontFaceProto {}
+interface IDrawInstructionProto extends org.webswing.directdraw.proto.IDrawInstructionProto {}
+interface IRectangleProto extends org.webswing.directdraw.proto.IRectangleProto {}
+interface ITransformProto extends org.webswing.directdraw.proto.ITransformProto {}
+interface IRadialGradientProto extends org.webswing.directdraw.proto.IRadialGradientProto {}
+interface ILinearGradientProto extends org.webswing.directdraw.proto.ILinearGradientProto {}
+interface IEllipseProto extends org.webswing.directdraw.proto.IEllipseProto {}
+interface IRoundRectangleProto extends org.webswing.directdraw.proto.IRoundRectangleProto {}
+interface IArcProto extends org.webswing.directdraw.proto.IArcProto {}
+const InstructionProto = org.webswing.directdraw.proto.DrawInstructionProto.InstructionProto;
+const CompositeTypeProto = org.webswing.directdraw.proto.CompositeProto.CompositeTypeProto ;
+const SegmentTypeProto = org.webswing.directdraw.proto.PathProto.SegmentTypeProto ;
+const StyleProto = org.webswing.directdraw.proto.FontProto.StyleProto ;
+const StrokeCapProto = org.webswing.directdraw.proto.StrokeProto.StrokeCapProto ;
+const StrokeJoinProto = org.webswing.directdraw.proto.StrokeProto.StrokeJoinProto ;
+const ArcTypeProto = org.webswing.directdraw.proto.ArcProto.ArcTypeProto ;
+const CyclicMethodProto = org.webswing.directdraw.proto.CyclicMethodProto ;
+
+
 
 interface IDirectDrawOptions {
     logDebug?: boolean,
@@ -268,7 +270,7 @@ export class DirectDraw {
     }
 
     public drawBin(data: Uint8Array, targetCanvas?: HTMLCanvasElement): PromiseLike<HTMLCanvasElement> {
-        return this.drawWebImage(WebImageProto.decode(data), targetCanvas);
+        return this.drawWebImage(org.webswing.directdraw.proto.WebImageProto.decode(data), targetCanvas);
     }
 
     public drawProto(data: WebImageProto, targetCanvas?: HTMLCanvasElement): PromiseLike<HTMLCanvasElement> {
@@ -400,7 +402,7 @@ export class DirectDraw {
         const clip = args[3];
 
         const buffer = this.canvasBuffer.pop();
-        const webImage= WebImageProto.decode(webImageData);
+        const webImage= org.webswing.directdraw.proto.WebImageProto.decode(webImageData);
         const dpr = this.config.dpr;
         if (buffer!==undefined && (buffer.width !== webImage.width * dpr || buffer.height !== webImage.height * dpr)) {
             buffer.width = webImage.width * dpr;

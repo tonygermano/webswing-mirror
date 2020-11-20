@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.Map;
 
 import org.webswing.Constants;
-import org.webswing.toolkit.util.Logger;
+import org.webswing.util.AppLogger;
 
 public class WebAppletStub implements AppletStub {
 
@@ -31,7 +31,7 @@ public class WebAppletStub implements AppletStub {
 		try {
 			return new URL(docBase);
 		} catch (MalformedURLException e) {
-			Logger.error("Applet DocumentBase property is invalid " + docBase + ":", e);
+			AppLogger.error("Applet DocumentBase property is invalid " + docBase + ":", e);
 			return null;
 		}
 	}
@@ -42,7 +42,7 @@ public class WebAppletStub implements AppletStub {
 		try {
 			return new File(currentDir).toURI().toURL();
 		} catch (MalformedURLException e) {
-			Logger.error("Applet CodeBase is invalid " + currentDir + ":", e);
+			AppLogger.error("Applet CodeBase is invalid " + currentDir + ":", e);
 			return null;
 		}
 	}

@@ -3,15 +3,18 @@
 	<parent>
 		<artifactId>webswing</artifactId>
 		<groupId>org.webswing</groupId>
-		<version>20.1.8</version>
+		<version>20.2</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>webswing-server</artifactId>
 	<packaging>pom</packaging>
 	<modules>
 		<module>webswing-server-common</module>
+		<module>webswing-sessionpool-api</module>
+		<module>webswing-server-api</module>
 		<module>webswing-server-security</module>
 		<module>webswing-server-launcher</module>
+		<module>webswing-server-frontend</module>
 		<module>webswing-server-war</module>
 	</modules>
 </project>

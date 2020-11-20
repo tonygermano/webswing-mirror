@@ -1,12 +1,38 @@
 package org.webswing.server.common.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 
-import org.webswing.server.common.model.meta.*;
+import org.webswing.server.common.model.meta.ConfigField;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueBoolean;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueNumber;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueObject;
+import org.webswing.server.common.model.meta.ConfigFieldDefaultValueString;
+import org.webswing.server.common.model.meta.ConfigFieldDiscriminator;
+import org.webswing.server.common.model.meta.ConfigFieldEditorType;
 import org.webswing.server.common.model.meta.ConfigFieldEditorType.EditorType;
+import org.webswing.server.common.model.meta.ConfigFieldOrder;
+import org.webswing.server.common.model.meta.ConfigFieldVariables;
+import org.webswing.server.common.model.meta.ConfigType;
+import org.webswing.server.common.model.meta.MetadataGenerator;
+import org.webswing.server.common.model.meta.VariableSetName;
 
-@ConfigFieldOrder({ "enabled", "path", "homeDir", "webFolder","restrictedResources", "langFolder", "icon", "security", "allowedCorsOrigins","adminConsoleUrl", "serverStatisticsLogging", "swingConfig" })
+@ConfigType(metadataGenerator = SecuredPathConfig.SecuredPathConfigurationMetadataGenerator.class)
+// NOTE: if you change these names, please see also MigrationConfigurationProvider
+@ConfigFieldOrder({ "enabled", "path", "name", "webHomeDir", "webFolder", "restrictedResources", "langFolder", "icon", "security", "allowedCorsOrigins", "adminConsoleUrl",
+		"uploadMaxSize", "maxClients", "sessionMode", "monitorEdtEnabled", "loadingAnimationDelay", "allowStealSession", "autoLogout", "goodbyeUrl",
+		"dataStore" })
 public interface SecuredPathConfig extends Config {
+
+	public enum SessionMode {
+		ALWAYS_NEW_SESSION,
+		CONTINUE_FOR_TAB,
+		CONTINUE_FOR_BROWSER,
+		CONTINUE_FOR_USER;
+	}
 
 	@ConfigField(label = "Enabled", description = "If true, application will be started automatically, when server starts.")
 	@ConfigFieldDefaultValueBoolean(true)
@@ -15,11 +41,16 @@ public interface SecuredPathConfig extends Config {
 	@ConfigField(label = "Context Path", description = "Url context path where the application will be deployed.")
 	public String getPath();
 
-	@ConfigField(label = "Home Folder", description = "Application's home directory. Application instances will be executed from this directory. This will also be the base directory of any relative classpath entries specified.")
-	@ConfigFieldVariables
-	@ConfigFieldDiscriminator
+	@ConfigField(label = "Name", description = "Application name.")
+	@ConfigFieldVariables(VariableSetName.SwingApp)
+	@ConfigFieldDefaultValueString("My Application")
+	public String getName();
+
+	@ConfigField(label = "Web Home Folder", description = "Application's home directory for web-related content. This will be the base directory of any relative classpath entries specified.")
+	@ConfigFieldVariables(VariableSetName.SwingApp)
+	@ConfigFieldDiscriminator // FIXME why discriminator ?
 	@ConfigFieldDefaultValueString("${user.dir}")
-	public String getHomeDir();
+	public String getWebHomeDir();
 
 	@ConfigField(label = "Web Folder", description = "Folder to be used to store customized static web files like HTML, CSS or Javascript.")
 	@ConfigFieldVariables(VariableSetName.SwingApp)
@@ -46,25 +77,67 @@ public interface SecuredPathConfig extends Config {
 	public Map<String, Object> getSecurity();
 
 	@ConfigField(label = "CORS Origins", description = "If you are embedding webswing to page on different domain, you have to enable Cross-origin resource sharing (CORS) by adding the domain in this list. Use * to allow all domains.")
-	@ConfigFieldDefaultValueGenerator("defaultFromOldProperty")
 	public List<String> getAllowedCorsOrigins();
 
-	@ConfigField(label = "Admin Console Url", description = "Admin console used to manage this server. If no value defined admin console is only allowed from same domain. This will setup CORS and security headers to allow management from specified domain.")
+	@ConfigField(label = "Admin Console Url", description = "Admin console used to manage this server.")
 	public String getAdminConsoleUrl();
 
-	@ConfigField(label = "Statistics Logging", description = "If enabled, statistics will be logged for server.")
-	@ConfigFieldDefaultValueBoolean(true)
-	public boolean isServerStatisticsLogging();
-	
-	@ConfigField(label = "Application")
-	@ConfigFieldDefaultValueObject
-	SwingConfig getSwingConfig();
+	@ConfigField(label = "Upload Size Limit", description = "Maximum size of upload for single file (in MB). Set 0 for unlimited size.")
+	@ConfigFieldDefaultValueNumber(5)
+	public double getUploadMaxSize();
 
-	public static  List<String> defaultFromOldProperty(SecuredPathConfig config) {
-		return config.getSwingConfig()!=null? config.getSwingConfig().getAllowedCorsOrigins(): Collections.emptyList();
+	@ConfigField(label = "Session Mode", description = "Select session behavior when user reconnects to application. 1.ALWAYS_NEW_SESSION: New application is started for every Webswing session. (Session timeout will be set to 0) 2.CONTINUE_FOR_TAB: Webswing session can be resumed within the same browser tab after connection is terminated or user refresh the page. (Session timeout applies)  3.CONTINUE_FOR_BROWSER: Webswing session can be resumed in the same browser after connection is terminated (Session timeout applies). 4.CONTINUE_FOR_USER: Application session can be resumed by the same user from any computer after the connection is terminated(Session timeout applies).")
+	@ConfigFieldDefaultValueString("CONTINUE_FOR_BROWSER")
+	public SessionMode getSessionMode();
+	
+	@ConfigField(label = "Max. Connections", description = "Maximum number of allowed simultaneous connections for this application.")
+	@ConfigFieldDefaultValueNumber(1)
+	public int getMaxClients();
+
+	@ConfigField(label = "Monitor App Responsiveness", description = "If True, Webswing will display a progress animation if Swing's Event Dispatch thread is not responding.")
+	@ConfigFieldDefaultValueBoolean(true)
+	@ConfigFieldDiscriminator
+	public boolean isMonitorEdtEnabled();
+
+	@ConfigField(label = "Loading Animation delay", description = "If EDT thread is blocked for more then defined delay in seconds, dialog with loading animation is displayed appears. Delay must be  >= 2 seconds.")
+	@ConfigFieldDefaultValueNumber(2)
+	int getLoadingAnimationDelay();
+
+	@ConfigField(label = "Session Stealing", description = "If enabled, and session mode 'CONTINUE_FOR_USER' is selected, user can resume Webswing session even if the connection is open in other browser. Former browser window will be disconnected.")
+	@ConfigFieldDefaultValueBoolean(true)
+	public boolean isAllowStealSession();
+
+	@ConfigField(label = "Auto Logout", description = "If enabled, user is automatically logged out after the application finished.")
+	@ConfigFieldDefaultValueBoolean(true)
+	@ConfigFieldDiscriminator
+	public boolean isAutoLogout();
+
+	@ConfigField(label = "Goodbye URL", description = "Absolute or relative URL to redirect to, when application exits. Use '/' to navigate back to Application selector.")
+	@ConfigFieldVariables(VariableSetName.SwingApp)
+	@ConfigFieldDefaultValueString("")
+	String getGoodbyeUrl();
+
+	@ConfigField(label = "Data Store")
+	@ConfigFieldEditorType(editor = EditorType.Object, className = "org.webswing.server.common.datastore.WebswingDataStoreConfig")
+	@ConfigFieldDefaultValueObject(HashMap.class)
+	public Map<String, Object> getDataStore();
+	
+	public static class SecuredPathConfigurationMetadataGenerator extends MetadataGenerator<SecuredPathConfig> {
+
+		@Override
+		protected LinkedHashSet<String> getPropertyNames(SecuredPathConfig config, ClassLoader cl) throws Exception {
+			LinkedHashSet<String> names = super.getPropertyNames(config, cl);
+
+			if (config.isAutoLogout()) {
+				names.remove("goodbyeUrl");
+			}
+			if (!config.isMonitorEdtEnabled()) {
+				names.remove("loadingAnimationDelay");
+			}
+
+			return names;
+		}
+
 	}
 
 }
-
-
-

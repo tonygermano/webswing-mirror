@@ -27,16 +27,4 @@ public class WebswingUtil {
 		}
 	}
 
-	/**
-	 * Inter-session messaging api following pub/sub pattern for easy communication of swing instances.
-	 * @return Webswing Messaging API instance or null if not running in Webswing app container.
-	 */
-	public static WebswingMessagingApi getWebswingMessagingApi() {
-		if (isWebswing()) {
-			return ((WebswingApiProvider) Toolkit.getDefaultToolkit()).getMessagingApi();
-		} else {
-			return null;
-		}
-	}
-
 }

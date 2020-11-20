@@ -1,14 +1,14 @@
 package org.webswing.server.services.security.modules.embeded;
 
-import org.apache.commons.lang3.StringUtils;
-import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingAuthenticationException;
-import org.webswing.server.services.security.modules.AbstractUserPasswordSecurityModule;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.webswing.server.common.service.security.AuthenticatedWebswingUser;
+import org.webswing.server.services.security.api.WebswingAuthenticationException;
+import org.webswing.server.services.security.modules.AbstractUserPasswordSecurityModule;
 
 public class EmbededSecurityModule extends AbstractUserPasswordSecurityModule<EmbededSecurityModuleConfig> {
 
@@ -33,7 +33,7 @@ public class EmbededSecurityModule extends AbstractUserPasswordSecurityModule<Em
 	}
 
 	@Override
-	public AbstractWebswingUser verifyUserPassword(String user, String password) throws WebswingAuthenticationException {
+	public AuthenticatedWebswingUser verifyUserPassword(String user, String password) throws WebswingAuthenticationException {
 		if (userMap.containsKey(user)) {
 			EmbededWebswingUser current = userMap.get(user);
 			if(current.getPassword().startsWith(HashUtil.PREFIX)){

@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.common.service.security.AuthenticatedWebswingUser;
 import org.webswing.server.services.security.api.WebswingAuthenticationException;
 import org.webswing.server.services.security.extension.api.WebswingExtendableSecurityModuleConfig;
 
@@ -40,12 +40,12 @@ public abstract class AbstractUserPasswordSecurityModule<T extends WebswingExten
 	}
 
 	@Override
-	protected AbstractWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException {
+	protected AuthenticatedWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException {
 		String username = getUserName(request);
 		String password = getPassword(request);
 		if (username != null || password != null) {
 			try {
-				AbstractWebswingUser user = verifyUserPassword(username, password);
+				AuthenticatedWebswingUser user = verifyUserPassword(username, password);
 				if (user != null) {
 					logSuccess(request, user.getUserId());
 				}
@@ -68,10 +68,10 @@ public abstract class AbstractUserPasswordSecurityModule<T extends WebswingExten
 	}
 
 	/**
-	 * Check if username and password is valid. If it is valid return an instance of {@link AbstractWebswingUser}
+	 * Check if username and password is valid. If it is valid return an instance of {@link AuthenticatedWebswingUser}
 	 * otherwise throw {@link WebswingAuthenticationException}.
 	 * 
 	 * @throws WebswingAuthenticationException if authentication failed.
 	 */
-	public abstract AbstractWebswingUser verifyUserPassword(String user, String password) throws WebswingAuthenticationException;
+	public abstract AuthenticatedWebswingUser verifyUserPassword(String user, String password) throws WebswingAuthenticationException;
 }

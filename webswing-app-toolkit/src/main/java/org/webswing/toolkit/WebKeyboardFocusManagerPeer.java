@@ -1,11 +1,11 @@
 package org.webswing.toolkit;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.peer.KeyboardFocusManagerPeer;
-
-import org.webswing.model.s2c.FocusEventMsg;
-import org.webswing.toolkit.api.component.HtmlPanel;
-import org.webswing.toolkit.util.Util;
 
 import javax.swing.JPasswordField;
 import javax.swing.SwingUtilities;
@@ -13,6 +13,10 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
+
+import org.webswing.model.appframe.out.FocusEventMsgOut;
+import org.webswing.toolkit.api.component.HtmlPanel;
+import org.webswing.toolkit.util.Util;
 
 @SuppressWarnings("restriction")
 public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
@@ -60,11 +64,11 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 		});
 	}
 
-	private static FocusEventMsg getFocusEvent(){
+	private static FocusEventMsgOut getFocusEvent(){
 		Component o = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-		FocusEventMsg msg = new FocusEventMsg();
+		FocusEventMsgOut msg = new FocusEventMsgOut();
 		if (o != null && o.isShowing() && !(o instanceof HtmlPanel)) {
-			msg.setType(FocusEventMsg.FocusEventType.focusGained);
+			msg.setType(FocusEventMsgOut.FocusEventType.focusGained);
 			Point l = o.getLocationOnScreen();
 			msg.setX(l.x);
 			msg.setY(l.y);
@@ -81,7 +85,7 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 					try {
 						Rectangle location = tc.modelToView(position);
 						if (location != null) {
-							msg.setType(FocusEventMsg.FocusEventType.focusWithCarretGained);
+						msg.setType(FocusEventMsgOut.FocusEventType.focusWithCarretGained);
 							msg.setCaretX(location.x);
 							msg.setCaretY(location.y);
 							msg.setCaretH(location.height);
@@ -93,10 +97,10 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 				}
 			}
 			if(o instanceof JPasswordField){
-				msg.setType(FocusEventMsg.FocusEventType.focusPasswordGained);
+				msg.setType(FocusEventMsgOut.FocusEventType.focusPasswordGained);
 			}
 		} else {
-			msg.setType(FocusEventMsg.FocusEventType.focusLost);
+			msg.setType(FocusEventMsgOut.FocusEventType.focusLost);
 		}
 		return msg;
 	}

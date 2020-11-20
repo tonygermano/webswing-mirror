@@ -1,17 +1,24 @@
 package com.sun.prism.web;
 
-import com.sun.glass.ui.Screen;
-import com.sun.prism.*;
-import com.sun.prism.impl.BaseResourceFactory;
-import com.sun.prism.impl.TextureResourcePool;
-import com.sun.prism.impl.VertexBuffer;
-import com.sun.prism.impl.shape.BasicShapeRep;
-import com.sun.prism.j2d.J2DPresentable;
-import com.sun.prism.j2d.J2DPrismGraphics;
-import com.sun.prism.shape.ShapeRep;
-
 import java.util.Map;
 import java.util.WeakHashMap;
+
+import com.sun.glass.ui.Screen;
+import com.sun.prism.Image;
+import com.sun.prism.MediaFrame;
+import com.sun.prism.Mesh;
+import com.sun.prism.MeshView;
+import com.sun.prism.PhongMaterial;
+import com.sun.prism.PixelFormat;
+import com.sun.prism.Presentable;
+import com.sun.prism.PresentableState;
+import com.sun.prism.RTTexture;
+import com.sun.prism.ResourceFactory;
+import com.sun.prism.Texture;
+import com.sun.prism.impl.BaseResourceFactory;
+import com.sun.prism.impl.TextureResourcePool;
+import com.sun.prism.impl.shape.BasicShapeRep;
+import com.sun.prism.shape.ShapeRep;
 
 public class WebResourceFactory extends BaseResourceFactory {
 	private static ShapeRep theRep = new BasicShapeRep();

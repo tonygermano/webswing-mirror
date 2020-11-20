@@ -1,15 +1,21 @@
 package org.webswing.toolkit.extra;
 
-import org.webswing.Constants;
-import org.webswing.toolkit.util.Logger;
-import sun.awt.shell.PublicShellFolderManager;
-import sun.awt.shell.ShellFolder;
-
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.webswing.Constants;
+import org.webswing.util.AppLogger;
+
+import sun.awt.shell.PublicShellFolderManager;
+import sun.awt.shell.ShellFolder;
 
 @SuppressWarnings("restriction")
 public class IsolatedFsShellFolderManager extends PublicShellFolderManager {
@@ -100,9 +106,9 @@ public class IsolatedFsShellFolderManager extends PublicShellFolderManager {
 		if (!f.getAbsoluteFile().exists()) {
 			boolean done = f.mkdirs();
 			if (done) {
-				Logger.error("Isolated filesystem folder " + f.getAbsolutePath() + "not found. Make sure the folder is unique for each session (use ${user} variable) or disable the 'Clear Upload Folder' option in configuration.");
+				AppLogger.error("Isolated filesystem folder " + f.getAbsolutePath() + "not found. Make sure the folder is unique for each session (use ${user} variable) or disable the 'Clear Upload Folder' option in configuration.");
 			} else {
-				Logger.error("Isolated filesystem folder " + f.getAbsolutePath() + " could not be created. Make sure the path is valid and the process has write access.");
+				AppLogger.error("Isolated filesystem folder " + f.getAbsolutePath() + " could not be created. Make sure the path is valid and the process has write access.");
 			}
 		}
 		return f;
@@ -156,7 +162,7 @@ public class IsolatedFsShellFolderManager extends PublicShellFolderManager {
 	private Image getImage(String imageFile, String key) {
 		try (InputStream resource = ClassLoader.getSystemResourceAsStream(imageFile)) {
 			if (resource == null) {
-				Logger.debug("IsolatedFsShellFolderManager.get("+key+"): Webswing platform image "+imageFile+" not found." );
+				AppLogger.debug("IsolatedFsShellFolderManager.get("+key+"): Webswing platform image "+imageFile+" not found." );
 				return null;
 			}
 
@@ -170,7 +176,7 @@ public class IsolatedFsShellFolderManager extends PublicShellFolderManager {
 				return Toolkit.getDefaultToolkit().createImage(out.toByteArray());
 			}
 		} catch (IOException ioe) {
-			Logger.error("IsolatedFsShellFolderManager.getImage("+imageFile+"): "+ioe.toString());
+			AppLogger.error("IsolatedFsShellFolderManager.getImage("+imageFile+"): "+ioe.toString());
 		}
 		return null;
 	}

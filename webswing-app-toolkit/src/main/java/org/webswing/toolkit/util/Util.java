@@ -21,70 +21,81 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.WritableRaster;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.management.LockInfo;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MonitorInfo;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URI;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JWindow;
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
 
 import org.webswing.Constants;
 import org.webswing.component.HtmlPanelImpl;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.ext.services.ToolkitFXService;
-import org.webswing.model.c2s.KeyboardEventMsgIn;
-import org.webswing.model.c2s.KeyboardEventMsgIn.KeyEventType;
-import org.webswing.model.c2s.MouseEventMsgIn;
-import org.webswing.model.s2c.AppFrameMsgOut;
-import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
-import org.webswing.model.s2c.WindowMsg;
-import org.webswing.model.s2c.WindowMsg.DockMode;
-import org.webswing.model.s2c.WindowMsg.DockState;
-import org.webswing.model.s2c.WindowMsg.WindowClassType;
-import org.webswing.model.s2c.WindowMsg.WindowType;
-import org.webswing.model.s2c.WindowPartialContentMsg;
-import org.webswing.model.s2c.WindowSwitchMsg;
+import org.webswing.model.appframe.in.KeyboardEventMsgIn;
+import org.webswing.model.appframe.in.KeyboardEventMsgIn.KeyEventType;
+import org.webswing.model.appframe.in.MouseEventMsgIn;
+import org.webswing.model.appframe.out.AppFrameMsgOut;
+import org.webswing.model.appframe.out.FileDialogEventMsgOut.FileDialogEventType;
+import org.webswing.model.appframe.out.WindowMsgOut;
+import org.webswing.model.appframe.out.WindowMsgOut.DockMode;
+import org.webswing.model.appframe.out.WindowMsgOut.WindowClassType;
+import org.webswing.model.appframe.out.WindowMsgOut.WindowType;
+import org.webswing.model.appframe.out.WindowPartialContentMsgOut;
+import org.webswing.model.appframe.out.WindowSwitchMsgOut;
 import org.webswing.toolkit.WebComponentPeer;
 import org.webswing.toolkit.WebToolkit;
 import org.webswing.toolkit.WebWindowPeer;
 import org.webswing.toolkit.api.component.Dockable;
 import org.webswing.toolkit.api.component.HtmlPanel;
 import org.webswing.toolkit.api.file.WebswingFileChooserUtil;
+import org.webswing.util.AppLogger;
 
 public class Util {
+	
+	private static boolean evaluation;
+	private static EvaluationProperties evaluationProps;
 
-	public static File convertAndSaveCursor(BufferedImage img, int x, int y) {
-		String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
+	public static byte[] convertCursor(BufferedImage img, int x, int y) {
 		try {
-			byte[] bytes = convertToIco(img, x, y);
-			int id = Arrays.hashCode(bytes);
-			File f = new File(URI.create(tempDir + "/c" + id + ".cur"));
-			if (!f.exists()) {
-				FileOutputStream output = new FileOutputStream(f);
-				output.write(bytes);
-				output.close();
-			}
-			return f;
+			return convertToIco(img, x, y);
 		} catch (Exception e) {
-			Logger.error("Failed to save cursor to file.", e);
+			AppLogger.error("Failed to convert cursor.", e);
 		}
 		return null;
 	}
@@ -140,6 +151,42 @@ public class Util {
 		CONTROL_MAP.put(66, '\u0002');
 		CONTROL_MAP.put(77, '\r');
 	}
+	
+	static {
+		Properties evalProps = new Properties();
+		ClassLoader cl = Util.class.getClassLoader();
+		if (cl == null){
+			cl = ClassLoader.getSystemClassLoader();
+		}
+		try (InputStream is = cl.getResourceAsStream("toolkit.properties")) {
+			evalProps.load(is);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// ignore this exception, the file is not present in non-evaluation version
+		}
+		
+		evaluation = Boolean.parseBoolean(evalProps.getProperty("webswing.evaluation", "false"));
+		
+		long evaluationTimeout = 0;
+		try {
+			evaluationTimeout = Long.parseLong(evalProps.getProperty("webswing.evaluation.timeout", "0"));
+		} catch (NumberFormatException e) {
+			// ignore
+		}
+		
+		int height = 70;
+		try {
+			height = Integer.parseInt(evalProps.getProperty("webswing.evaluation.height", "70"));
+		} catch (NumberFormatException e) {
+			// ignore
+		}
+		
+		if (evaluation) {
+			evaluationProps = new EvaluationProperties(evaluation, evalProps.getProperty("webswing.evaluation.mainText"), 
+					evalProps.getProperty("webswing.evaluation.linkText"), evalProps.getProperty("webswing.evaluation.linkUrl"),
+					evaluationTimeout, evalProps.getProperty("webswing.evaluation.dismissText"), height);
+		}
+	}
 
 	public static int getMouseButtonsAWTFlag(int button) {
 		switch (button) {
@@ -189,7 +236,7 @@ public class Util {
 			ios.close();
 			os.close();
 		} catch (IOException e) {
-			Logger.error("Util:savePngImage", e);
+			AppLogger.error("Util:savePngImage", e);
 		}
 	}
 
@@ -306,14 +353,14 @@ public class Util {
 	}
 
 	public static Map<String, Map<Integer, BufferedImage>> extractWindowImages(AppFrameMsgOut json, Map<String, Map<Integer, BufferedImage>> windowImages) {
-		for (WindowMsg window : json.getWindows()) {
+		for (WindowMsgOut window : json.getWindows()) {
 			WebWindowPeer w = findWindowPeerById(window.getId());
 			if (window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
 				windowImages.put(window.getId(), new HashMap<Integer, BufferedImage>());// background image is handled on client
 			} else {
 				Map<Integer, BufferedImage> imageMap = new HashMap<Integer, BufferedImage>();
 				for (int i = 0; i < window.getContent().size(); i++) {
-					WindowPartialContentMsg wpc = window.getContent().get(i);
+					WindowPartialContentMsgOut wpc = window.getContent().get(i);
 					imageMap.put(i, w.extractBufferedImage(new Rectangle(wpc.getPositionX(), wpc.getPositionY(), wpc.getWidth(), wpc.getHeight())));
 				}
 				windowImages.put(window.getId(), imageMap);
@@ -337,11 +384,11 @@ public class Util {
 	}
 
 	public static void encodeWindowImages(Map<String, Map<Integer, BufferedImage>> windowImages, AppFrameMsgOut json) {
-		for (WindowMsg window : json.getWindows()) {
+		for (WindowMsgOut window : json.getWindows()) {
 			if (!window.getId().equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
 				Map<Integer, BufferedImage> imageMap = windowImages.get(window.getId());
 				for (int i = 0; i < window.getContent().size(); i++) {
-					WindowPartialContentMsg c = window.getContent().get(i);
+					WindowPartialContentMsgOut c = window.getContent().get(i);
 					if (imageMap.containsKey(i)) {
 						c.setBase64Content(Services.getImageService().getPngImage(imageMap.get(i)));
 					}
@@ -351,7 +398,7 @@ public class Util {
 	}
 
 	public static void encodeWindowWebImages(Map<String, Image> windowWebImages, AppFrameMsgOut json) {
-		for (WindowMsg window : json.getWindows()) {
+		for (WindowMsgOut window : json.getWindows()) {
 			Image wi = windowWebImages.get(window.getId());
 			if (wi != null) {
 				window.setDirectDraw(Services.getDirectDrawService().buildWebImage(wi));
@@ -367,7 +414,7 @@ public class Util {
 		for (String windowId : currentAreasToUpdate.keySet()) {
 			WebWindowPeer ww = Util.findWindowPeerById(windowId);
 			if (ww != null || windowId.equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
-				WindowMsg window = json.getOrCreateWindowById(windowId);
+				WindowMsgOut window = json.getOrCreateWindowById(windowId);
 				if (windowId.equals(WebToolkit.BACKGROUND_WINDOW_ID)) {
 					window.setPosX(0);
 					window.setPosY(0);
@@ -398,7 +445,7 @@ public class Util {
 		List<String> zOrder = getWebToolkit().getWindowManager().getZOrder();
 		Map<Window, List<Container>> webContainers = getWebToolkit().getPaintDispatcher().getRegisteredWebContainersAsMap();
 		Map<Window, List<HtmlPanel>> htmlPanels = getWebToolkit().getPaintDispatcher().getRegisteredHtmlPanelsAsMap();
-		Map<Container, Map<JComponent, WindowMsg>> htmlWebComponentsMap = new HashMap<>();
+		Map<Container, Map<JComponent, WindowMsgOut>> htmlWebComponentsMap = new HashMap<>();
 		
 		for (String windowId : zOrder) {
 			WebWindowPeer ww = findWindowPeerById(windowId);
@@ -406,7 +453,7 @@ public class Util {
 				continue;
 			}
 			
-			WindowMsg window = new WindowMsg();
+			WindowMsgOut window = new WindowMsgOut();
 			window.setId(windowId);
 			
 			Point location = ww.getLocationOnScreen();
@@ -424,8 +471,8 @@ public class Util {
 			
 			fillClassType(ww.getTarget(), window);
 			fillDockMode(ww.getTarget(), window);
-			window.setDockState(ww.isUndocked() ? DockState.undocked : DockState.docked);
-			
+			window.setDockState(ww.isUndocked() ? WindowMsgOut.DockState.undocked : WindowMsgOut.DockState.docked);
+
 			boolean modalBlocked = ww.getTarget() instanceof Window && getWebToolkit().getWindowManager().isBlockedByModality((Window) ww.getTarget(), false);
 			window.setModalBlocked(modalBlocked);
 			
@@ -456,24 +503,24 @@ public class Util {
 		return frame;
 	}
 	
-	private static void createPartialContentMsgs(WindowMsg window, List<Rectangle> toPaint) {
-		List<WindowPartialContentMsg> partialContentList = new ArrayList<WindowPartialContentMsg>();
+	private static void createPartialContentMsgs(WindowMsgOut window, List<Rectangle> toPaint) {
+		List<WindowPartialContentMsgOut> partialContentList = new ArrayList<WindowPartialContentMsgOut>();
 		for (Rectangle r : toPaint) {
 			if (r.x < window.getWidth() && r.y < window.getHeight()) {
-				WindowPartialContentMsg content = new WindowPartialContentMsg(r.x, r.y, Math.min(r.width, window.getWidth() - r.x), Math.min(r.height, window.getHeight() - r.y));
+				WindowPartialContentMsgOut content = new WindowPartialContentMsgOut(r.x, r.y, Math.min(r.width, window.getWidth() - r.x), Math.min(r.height, window.getHeight() - r.y));
 				partialContentList.add(content);
 			}
 		}
 		window.setContent(partialContentList);
 	}
 
-	private static void handleHtmlPanels(Map<Window, List<HtmlPanel>> htmlPanels, WebWindowPeer ww, WindowMsg window, AppFrameMsgOut frame, Map<Container, Map<JComponent, WindowMsg>> htmlWebComponentsMap) {
+	private static void handleHtmlPanels(Map<Window, List<HtmlPanel>> htmlPanels, WebWindowPeer ww, WindowMsgOut window, AppFrameMsgOut frame, Map<Container, Map<JComponent, WindowMsgOut>> htmlWebComponentsMap) {
 		for (HtmlPanel htmlPanel : htmlPanels.get(ww.getTarget())) {
 			if (!htmlPanel.isShowing()) {
 				continue;
 			}
 			
-			WindowMsg htmlWin = new WindowMsg(System.identityHashCode(htmlPanel) + "", htmlPanel.getName(), htmlPanel.getLocationOnScreen(), htmlPanel.getBounds().width, htmlPanel.getBounds().height, WindowType.html, window.isModalBlocked(), window.getId());
+			WindowMsgOut htmlWin = new WindowMsgOut(System.identityHashCode(htmlPanel) + "", htmlPanel.getName(), htmlPanel.getLocationOnScreen(), htmlPanel.getBounds().width, htmlPanel.getBounds().height, WindowType.html, window.isModalBlocked(), window.getId());
 			if (!isDD()) {
 				htmlWin.setContent(Collections.emptyList());
 			}
@@ -495,7 +542,7 @@ public class Util {
 		}
 	}
 	
-	private static void handleWebContainers(List<Container> containers, WindowMsg window, AppFrameMsgOut frame, Map<Container, Map<JComponent, WindowMsg>> htmlWebComponentsMap) {
+	private static void handleWebContainers(List<Container> containers, WindowMsgOut window, AppFrameMsgOut frame, Map<Container, Map<JComponent, WindowMsgOut>> htmlWebComponentsMap) {
 		// sort according to hierarchy
 		Collections.sort(containers, (o1, o2) -> {
 			return o1.isAncestorOf(o2) ? 1 : (o2.isAncestorOf(o1) ? -1 : 0);
@@ -507,7 +554,7 @@ public class Util {
 			}
 			
 			// handle wrapper
-			WindowMsg containerWin = new WindowMsg(System.identityHashCode(container) + "", container.getName(), container.getLocationOnScreen(), container.getBounds().width, container.getBounds().height, WindowType.internalWrapper, window.isModalBlocked(), window.getId());
+			WindowMsgOut containerWin = new WindowMsgOut(System.identityHashCode(container) + "", container.getName(), container.getLocationOnScreen(), container.getBounds().width, container.getBounds().height, WindowType.internalWrapper, window.isModalBlocked(), window.getId());
 			if (!isDD()) {
 				containerWin.setContent(Collections.emptyList());
 			}
@@ -518,7 +565,7 @@ public class Util {
 			window.getInternalWindows().add(containerWin);
 			
 			// handle child components
-			Map<JComponent, WindowMsg> htmlComponents = htmlWebComponentsMap.get(container);
+			Map<JComponent, WindowMsgOut> htmlComponents = htmlWebComponentsMap.get(container);
 			for (Component c : container.getComponents()) {
 				if (!c.isShowing()) {
 					continue;
@@ -526,13 +573,13 @@ public class Util {
 				
 				if (htmlComponents != null && htmlComponents.containsKey(c)) {
 					// if component contains a registered HtmlPanel
-					WindowMsg htmlWin = htmlComponents.get(c);
+					WindowMsgOut htmlWin = htmlComponents.get(c);
 					htmlWin.setOwnerId(containerWin.getId());
 					htmlWin.setType(WindowType.internalHtml);
 					window.getInternalWindows().add(htmlWin);
 				}
 				
-				WindowMsg componentWin = new WindowMsg(System.identityHashCode(c) + "", c.getName(), c.getLocationOnScreen(), c.getBounds().width, c.getBounds().height, WindowType.internal, containerWin.isModalBlocked(), containerWin.getId());
+				WindowMsgOut componentWin = new WindowMsgOut(System.identityHashCode(c) + "", c.getName(), c.getLocationOnScreen(), c.getBounds().width, c.getBounds().height, WindowType.internal, containerWin.isModalBlocked(), containerWin.getId());
 				
 				if (!isDD()) {
 					componentWin.setContent(Collections.emptyList());
@@ -543,7 +590,7 @@ public class Util {
 		}
 	}
 	
-	private static void fillClassType(Object windowTarget, WindowMsg window) {
+	private static void fillClassType(Object windowTarget, WindowMsgOut window) {
 		if (windowTarget instanceof JFrame) {
 			window.setClassType(WindowClassType.JFrame);
 			return;
@@ -570,7 +617,7 @@ public class Util {
 		}
 	}
 	
-	private static void fillDockMode(Object windowTarget, WindowMsg window) {
+	private static void fillDockMode(Object windowTarget, WindowMsgOut window) {
 		// must be a Window
 		if (!(windowTarget instanceof Window)) {
 			window.setDockMode(DockMode.none);
@@ -582,7 +629,6 @@ public class Util {
 			window.setDockMode(DockMode.none);
 			return;
 		}
-		
 		switch (getDockMode()) {
 			case "ALL" :
 				if (windowTarget instanceof Dockable) {
@@ -803,7 +849,7 @@ public class Util {
 				}
 				RepaintManager.currentManager(w).setDoubleBufferMaximumSize(new Dimension(width, height));
 			} catch (Exception e) {
-				Logger.error("Util:resetWindowsGC", e);
+				AppLogger.error("Util:resetWindowsGC", e);
 			}
 		}
 	}
@@ -883,19 +929,19 @@ public class Util {
 		if (peer == null) {
 			throw new IllegalArgumentException("Cannot find web window peer!");
 		}
-		
+
 		return peer.isUndocked();
 	}
-	
+
 	public static void toggleWindowDock(Window window, boolean undock) {
 		WebWindowPeer peer = (WebWindowPeer) WebToolkit.targetToPeer(window);
 		if (peer == null) {
 			throw new IllegalArgumentException("Cannot find web window peer!");
 		}
-		
+
 		peer.setUndocked(undock);
 	}
-	
+
 	public static boolean isTouchMode() {
 		return Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_TOUCH_MODE, "false"));
 	}
@@ -903,7 +949,7 @@ public class Util {
 	public static boolean isAccessibilityEnabled() {
 		return Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ACCESSIBILITY_ENABLED, "false"));
 	}
-	
+
 	public static void repaintAllWindow() {
 		synchronized (WebPaintDispatcher.webPaintLock) {
 			for (Window w : Util.getAllWindows()) {
@@ -934,7 +980,7 @@ public class Util {
 			f.setAccessible(true);
 			f.set(e, keycode);
 		} catch (Exception e1) {
-			Logger.error("Failed to update extendedKeyCode of KeyEvent", e);
+			AppLogger.error("Failed to update extendedKeyCode of KeyEvent", e);
 		}
 		return e;
 	}
@@ -981,7 +1027,7 @@ public class Util {
 			peer.setAccessible(true);
 			return (WebComponentPeer) peer.get(comp);
 		} catch (Exception e) {
-			Logger.error("Failed to read peer of component " + comp, e);
+			AppLogger.error("Failed to read peer of component " + comp, e);
 			return null;
 		}
 	}
@@ -1037,14 +1083,14 @@ public class Util {
 			}
 		}
 	}
-	
+
 	public static boolean isFXWindow(Window w) {
 		ToolkitFXService toolkitFXService = Services.getToolkitFXService();
-		
+
 		if (toolkitFXService == null) {
 			return false;
 		}
-		
+
 		return toolkitFXService.isFXWindow(w);
 	}
 
@@ -1077,11 +1123,11 @@ public class Util {
 		try {
 			implclass = cl.loadClass(implClassName);
 		} catch (ClassNotFoundException e) {
-			Logger.error(ifc.getSimpleName() + ": Implementation class not found", e);
+			AppLogger.error(ifc.getSimpleName() + ": Implementation class not found", e);
 			try {
 				implclass = cl.loadClass(fallbackClassName);
 			} catch (ClassNotFoundException e1) {
-				Logger.fatal(ifc.getSimpleName() + ": Fatal error:Default implementation class not found.", e1);
+				AppLogger.fatal(ifc.getSimpleName() + ": Fatal error:Default implementation class not found.", e1);
 				return null;
 			}
 		}
@@ -1089,40 +1135,154 @@ public class Util {
 			try {
 				return (T) implclass.getDeclaredConstructor().newInstance();
 			} catch (Exception e) {
-				Logger.fatal(ifc.getSimpleName() + ": exception when creating instance of " + implclass.getCanonicalName(), e);
+				AppLogger.fatal(ifc.getSimpleName() + ": exception when creating instance of " + implclass.getCanonicalName(), e);
 			}
 		} else {
-			Logger.fatal(ifc.getSimpleName() + ": Fatal error: Implementation is not assignable to base class:" + implclass.getCanonicalName());
+			AppLogger.fatal(ifc.getSimpleName() + ": Fatal error: Implementation is not assignable to base class:" + implclass.getCanonicalName());
 		}
 		return null;
 	}
+
+	public static String saveThreadDump(String reason) {
+		final StringBuilder dump = new StringBuilder();
+		final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+		final ThreadInfo[] threadInfos = threadMXBean.getThreadInfo(threadMXBean.getAllThreadIds(), true, true);
+		for (ThreadInfo threadInfo : threadInfos) {
+			if(threadInfo!=null) {
+				dump.append(threadInfoToString(threadInfo));
+				dump.append("\n");
+			}
+		}
+		
+		try {
+			String instanceId = System.getProperty(Constants.SWING_START_SYS_PROP_INSTANCE_ID);
+			String timestamp = new SimpleDateFormat("yy.MM.dd.HH.mm.ss").format(new Date());
+			String dumpName = "ThreadDump-" + timestamp + "-" + URLEncoder.encode(instanceId + "-" + reason, "UTF-8") + ".txt";
 	
-	public static List<WindowSwitchMsg> getWindowSwitchList() {
-		List<WindowSwitchMsg> list = new ArrayList<>();
+			try (InputStream is = new ByteArrayInputStream(dump.toString().getBytes(StandardCharsets.UTF_8))) {
+				Services.getDataStoreService().storeData("threadDump", dumpName, is, false);
+			}
+			
+			return dumpName;
+		} catch (Exception e) {
+			AppLogger.error("Failed to save thread dump. ", e);
+		}
 		
+		return null;
+	}
+
+	private static String threadInfoToString(ThreadInfo ti) {
+		StringBuilder sb = new StringBuilder("\"" + ti.getThreadName() + "\"" + " Id=" + ti.getThreadId() + " " + ti.getThreadState());
+		if (ti.getLockName() != null) {
+			sb.append(" on " + ti.getLockName());
+		}
+		if (ti.getLockOwnerName() != null) {
+			sb.append(" owned by \"" + ti.getLockOwnerName() + "\" Id=" + ti.getLockOwnerId());
+		}
+		if (ti.isSuspended()) {
+			sb.append(" (suspended)");
+		}
+		if (ti.isInNative()) {
+			sb.append(" (in native)");
+		}
+		sb.append('\n');
+		int i = 0;
+		StackTraceElement[] stackTrace = ti.getStackTrace();
+		for (; i < stackTrace.length; i++) {
+			StackTraceElement ste = stackTrace[i];
+			sb.append("\tat " + ste.toString());
+			sb.append('\n');
+			if (i == 0 && ti.getLockInfo() != null) {
+				Thread.State ts = ti.getThreadState();
+				switch (ts) {
+				case BLOCKED:
+					sb.append("\t-  blocked on " + ti.getLockInfo());
+					sb.append('\n');
+					break;
+				case WAITING:
+					sb.append("\t-  waiting on " + ti.getLockInfo());
+					sb.append('\n');
+					break;
+				case TIMED_WAITING:
+					sb.append("\t-  waiting on " + ti.getLockInfo());
+					sb.append('\n');
+					break;
+				default:
+				}
+			}
+
+			MonitorInfo[] lockedMonitors = ti.getLockedMonitors();
+			for (MonitorInfo mi : lockedMonitors) {
+				if (mi.getLockedStackDepth() == i) {
+					sb.append("\t-  locked " + mi);
+					sb.append('\n');
+				}
+			}
+		}
+		if (i < stackTrace.length) {
+			sb.append("\t...");
+			sb.append('\n');
+		}
+
+		LockInfo[] locks = ti.getLockedSynchronizers();
+		if (locks.length > 0) {
+			sb.append("\n\tNumber of locked synchronizers = " + locks.length);
+			sb.append('\n');
+			for (LockInfo li : locks) {
+				sb.append("\t- " + li);
+				sb.append('\n');
+			}
+		}
+		sb.append('\n');
+		return sb.toString();
+	}
+
+	public static List<WindowSwitchMsgOut> getWindowSwitchList() {
+		List<WindowSwitchMsgOut> list = new ArrayList<>();
+
 		List<String> zOrder = getWebToolkit().getWindowManager().getZOrder();
-		
+
 		for (String windowId : zOrder) {
 			WebWindowPeer ww = findWindowPeerById(windowId);
 			if (ww == null) {
 				continue;
 			}
-			
-			WindowSwitchMsg window = new WindowSwitchMsg();
+
+			WindowSwitchMsgOut window = new WindowSwitchMsgOut();
 			window.setId(windowId);
-			
+
 			if (ww.getTarget() instanceof Frame) {
 				window.setTitle(((Frame) ww.getTarget()).getTitle());
 			} else if (ww.getTarget() instanceof Dialog) {
 				window.setTitle(((Dialog) ww.getTarget()).getTitle());
 			}
-			
+
 			window.setModalBlocked(ww.getTarget() instanceof Window && getWebToolkit().getWindowManager().isBlockedByModality((Window) ww.getTarget(), false));
-			
+
 			list.add(window);
 		}
-		
+
 		return list;
+	}
+
+	public static boolean isApplet() {
+		return Boolean.getBoolean(Constants.SWING_START_SYS_PROP_IS_APPLET);
+	}
+	
+	public static boolean isSessionLoggingEnabled() {
+		return Boolean.getBoolean(Constants.SWING_START_SYS_PROP_SESSION_LOGGING_ENABLED);
+	}
+	
+	public static String getDataStoreConfigString() {
+		return System.getProperty(Constants.SWING_START_SYS_PROP_DATA_STORE_CONFIG);
+	}
+	
+	public static boolean isEvaluation() {
+		return evaluation;
+	}
+
+	public static EvaluationProperties getEvaluationProps() {
+		return evaluationProps;
 	}
 	
 }

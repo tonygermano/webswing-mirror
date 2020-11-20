@@ -5,245 +5,57 @@
     <parent>
         <artifactId>webswing-server</artifactId>
         <groupId>org.webswing</groupId>
-        <version>20.1.8</version>
+        <version>20.2</version>
         <relativePath>..</relativePath>
     </parent>
     <dependencies>
-        <dependency>
+		<dependency>
             <groupId>org.webswing</groupId>
-            <artifactId>webswing-server-security</artifactId>
+            <artifactId>webswing-server-api</artifactId>
             <version>${project.parent.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <dependency>
+		<dependency>
+            <groupId>org.webswing</groupId>
+            <artifactId>webswing-sessionpool-api</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+		<dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-multibindings</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>atmosphere-runtime</artifactId>
-            <version>2.4.30</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>activemq-openwire-legacy</artifactId>
-                    <groupId>org.apache.activemq</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.13.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.13.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-web</artifactId>
-            <version>2.13.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.13.2</version>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.inject</groupId>
-            <artifactId>jersey-hk2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.2.12</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-            <version>2.2.8-b01</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.2.8-b01</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1.1</version>
         </dependency>
     </dependencies>
 
     <build>
         <finalName>${webswing-war-name}</finalName>
         <plugins>
-<!--         OpenAPI Plugin to generate API -->
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>4.1.1</version>
-                <executions>
-                <!--         Execution to generate API -->
-                    <execution>
-                       <id>api</id>
-                        <goals>
-                          <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/openapi/webswing_api.yaml</inputSpec>
-                            <output>${project.basedir}</output>
-                            <apiPackage>org.webswing.server.services.rest.resources.api</apiPackage>
-                            <modelPackage>org.webswing.server.services.rest.resources.model</modelPackage>
-                            <generatorName>jaxrs-cxf</generatorName>
-                            <templateDirectory>${project.basedir}/src/main/resources/openapi/</templateDirectory>
-                            <configOptions>
-                                <sourceFolder>/src/main/java/</sourceFolder>
-                                <useBeanValidation>false</useBeanValidation>
-                                <generatePom>false</generatePom>
-                                <useSwaggerAnnotations>false</useSwaggerAnnotations>
-                                <implFolder>tmp</implFolder>
-                            </configOptions>
-                            <generateApiTests>false</generateApiTests>
-                            <generateSupportingFiles>false</generateSupportingFiles>
-                        </configuration>
-                    </execution>
-                    <!--         Execution to generate Model (DTO) -->
-                    <execution>
-                        <id>model</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/openapi/webswing_api.yaml</inputSpec>
-                            <output>${project.basedir}</output>
-                            <apiPackage>tmp</apiPackage>
-                            <generateApis>false</generateApis>
-                            <modelPackage>org.webswing.server.services.rest.resources.model</modelPackage>
-                            <generatorName>jaxrs-spec</generatorName>
-                            <templateDirectory>${project.basedir}/src/main/resources/openapi/</templateDirectory>
-                            <configOptions>
-                                <sourceFolder>/src/main/java/</sourceFolder>
-                                <interfaceOnly>true</interfaceOnly>
-                                <useBeanValidation>false</useBeanValidation>
-                                <generatePom>false</generatePom>
-                                <useSwaggerAnnotations>false</useSwaggerAnnotations>
-                            </configOptions>
-                            <generateSupportingFiles>false</generateSupportingFiles>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
-                <executions>
-                    <execution>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <delete dir="${project.basedir}/src/main/java/temp" />
-                                <delete dir="${project.basedir}/src/test/java/org/webswing/server/services/rest/resources/api" />
-                                <delete dir="${project.basedir}/src/main/java/org/webswing/server/services/rest/resources/api/impl" />
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.github.os72</groupId>
-                <artifactId>protoc-jar-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <addSources>main</addSources>
-                            <outputDirectory>src/main/java</outputDirectory>
-                            <cleanOutputFolder>false</cleanOutputFolder>
-                            <includeDirectories>
-                                <include>src/main/webapp/javascript</include>
-                            </includeDirectories>
-                            <inputDirectories>
-                                <include>src/main/webapp/javascript</include>
-                            </inputDirectories>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -260,7 +72,6 @@
                 <configuration>
                     <attachClasses>true</attachClasses>
                     <warSourceDirectory>src/main/webapp</warSourceDirectory>
-                    <warSourceExcludes>javascript/,css/</warSourceExcludes>
                     <packagingExcludes>**</packagingExcludes>
                     <archive>
                         <manifest>
@@ -280,35 +91,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>npm install</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>install --unsafe-perm=true --allow-root</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm build</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>run build</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <installDirectory>${project.basedir}/../..</installDirectory>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -320,8 +102,9 @@
                         <configuration>
                             <target>
                                 <copy todir="${project.build.directory}/${project.build.finalName}">
+                                    <fileset dir="${project.basedir}/../webswing-server-frontend/target/webswing-server-frontend/" includes="**" />
                                     <fileset dir="${project.basedir}/../webswing-server-common/target/classes/" includes="main/*.class" />
-                                    <fileset dir="${project.basedir}/../../webswing-app-interface/target" includes="WEB-INF/swing-lib/*.jar" />
+                                    <fileset dir="${project.basedir}/../../webswing-app-services/target" includes="WEB-INF/swing-lib/*.jar" />
                                     <fileset dir="${project.basedir}/../../webswing-app-launcher/target" includes="WEB-INF/swing-boot/*.jar" />
                                     <fileset dir="${project.basedir}/../webswing-server-launcher/target" includes="WEB-INF/server-lib/*.jar" />
                                 </copy>
@@ -333,7 +116,27 @@
                     </execution>
                 </executions>
             </plugin>
-
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/resources</directory>
+									<include>webswing.properties</include>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
     </build>
     <profiles>
@@ -342,16 +145,6 @@
             <id>dev</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>npm install</id>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
@@ -385,28 +178,5 @@
             </build>
         </profile>
         <!-- =========================================RELEASE BUILD PROFILE================================== -->
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>npm build</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run build-prod</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 </project>

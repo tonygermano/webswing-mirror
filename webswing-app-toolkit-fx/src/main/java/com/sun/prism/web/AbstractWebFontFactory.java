@@ -3,8 +3,6 @@ package com.sun.prism.web;
 import com.sun.javafx.font.FontFactory;
 import com.sun.javafx.font.PGFont;
 
-import java.io.InputStream;
-
 public abstract class AbstractWebFontFactory implements FontFactory {
 	private final FontFactory fontFactory;
 

@@ -1,7 +1,6 @@
 package org.webswing.dev.server;
 
 import main.Main;
-import org.webswing.Constants;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +11,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.webswing.Constants;
 
 public class InteractiveServerLauncher {
 
@@ -36,6 +37,7 @@ public class InteractiveServerLauncher {
 				//reset settings
 				System.clearProperty(Constants.CONFIG_PATH);
 				System.clearProperty(Constants.CONFIG_FILE_PATH);
+				System.clearProperty(Constants.PROPERTIES_FILE_PATH);
 				System.clearProperty(Constants.TEMP_DIR_PATH);
 				System.clearProperty(Constants.HTTPS_ONLY);
 

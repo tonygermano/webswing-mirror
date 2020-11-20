@@ -1,17 +1,10 @@
 package org.webswing.dispatch;
 
-import org.webswing.Constants;
-import org.webswing.model.MsgIn;
-import org.webswing.model.c2s.*;
-import org.webswing.toolkit.WebDragSourceContextPeer;
-import org.webswing.toolkit.extra.DndEventHandler;
-import org.webswing.toolkit.util.DeamonThreadFactory;
-import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Util;
-import sun.awt.UngrabEvent;
-
-import javax.swing.SwingUtilities;
-import java.awt.*;
+import java.awt.AWTEvent;
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -22,8 +15,39 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.swing.SwingUtilities;
+
+import org.webswing.Constants;
+import org.webswing.model.app.in.ServerToAppFrameMsgIn;
+import org.webswing.model.appframe.in.ActionEventMsgIn;
+import org.webswing.model.appframe.in.AppFrameMsgIn;
+import org.webswing.model.appframe.in.AudioEventMsgIn;
+import org.webswing.model.appframe.in.CopyEventMsgIn;
+import org.webswing.model.appframe.in.FilesSelectedEventMsgIn;
+import org.webswing.model.appframe.in.KeyboardEventMsgIn;
+import org.webswing.model.appframe.in.MouseEventMsgIn;
+import org.webswing.model.appframe.in.PasteEventMsgIn;
+import org.webswing.model.appframe.in.UploadEventMsgIn;
+import org.webswing.model.appframe.in.WindowEventMsgIn;
+import org.webswing.model.appframe.in.WindowFocusMsgIn;
+import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
+import org.webswing.model.common.in.SimpleEventMsgIn;
+import org.webswing.toolkit.WebDragSourceContextPeer;
+import org.webswing.toolkit.extra.DndEventHandler;
+import org.webswing.toolkit.jslink.WebJSObject;
+import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
+import org.webswing.util.DeamonThreadFactory;
+
+import sun.awt.UngrabEvent;
 
 public abstract class AbstractEventDispatcher implements EventDispatcher {
+
+	private AtomicLong lastMessageTimestamp = new AtomicLong(System.currentTimeMillis());
+	private AtomicLong lastUserInputTimestamp = new AtomicLong(System.currentTimeMillis());
+
 	private MouseEvent lastMouseEvent;
 	private WebEventDispatcher.MouseEventInfo lastMousePressEvent;
 	private Point lastMousePosition = new Point();
@@ -62,48 +86,81 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 		this.dndHandler = new DndEventHandler();
 	}
 
-	public void dispatchEvent(final MsgIn event) {
-		Logger.debug("WebEventDispatcher.dispatchEvent:", event);
+	public void onMessage(ServerToAppFrameMsgIn msgIn, AppFrameMsgIn frame) {
+		try {
+			lastMessageTimestamp.getAndSet(System.currentTimeMillis());
+			if (msgIn != null) {
+				if (msgIn.getThreadDumpRequest() != null) {
+					Util.getWebToolkit().getSessionWatchdog().requestThreadDump();
+				}
+				if (msgIn.getApiEvent() != null) {
+					Util.getWebToolkit().processApiEvent(msgIn.getApiEvent());
+				}
+				if (msgIn.getHandshake() != null) {
+					dispatchHandshakeEvent(msgIn.getHandshake());
+				}
+				if (msgIn.getEvents() != null) {
+					msgIn.getEvents().forEach(this::dispatchMessage);
+				}
+				if (frame != null) {
+					if (frame.getJavaRequest() != null) {
+						WebJSObject.evaluateJava(frame.getJavaRequest());
+					}
+					dispatchEvent(frame);
+				}
+			}
+		} catch (Exception e) {
+			AppLogger.error("AbstractEventDispatcher.onMessage", e);
+		}
+	}
+
+	@Override
+	public void resetLastEventTimestamp() {
+		lastUserInputTimestamp.getAndSet(System.currentTimeMillis());
+	}
+
+	public void dispatchEvent(final AppFrameMsgIn msg) {
+		AppLogger.debug("AbstractEventDispatcher.dispatchEvent:", msg);
 		eventDispatcher.submit(() -> {
 			try {
-				if (event instanceof MouseEventMsgIn) {
-					dispatchMouseEvent((MouseEventMsgIn) event);
+				if (msg.getEvents() != null) {
+					msg.getEvents().forEach(inputEvent -> {
+						if (inputEvent.getMouse() != null) {
+							resetLastEventTimestamp();
+							dispatchMouseEvent(inputEvent.getMouse());
+						}
+						if (inputEvent.getKey() != null) {
+							resetLastEventTimestamp();
+							dispatchKeyboardEvent(inputEvent.getKey());
+						}
+						if (inputEvent.getFocus() != null) {
+							windowFocusEvent(inputEvent.getFocus());
+						}
+					});
 				}
-				if (event instanceof KeyboardEventMsgIn) {
-					dispatchKeyboardEvent((KeyboardEventMsgIn) event);
+				if (msg.getPaste() != null) {
+					handlePasteEvent(msg.getPaste());
 				}
-				if (event instanceof ConnectionHandshakeMsgIn) {
-					dispatchHandshakeEvent((ConnectionHandshakeMsgIn) event);
+				if (msg.getCopy() != null) {
+					handleCopyEvent(msg.getCopy());
 				}
-				if (event instanceof SimpleEventMsgIn) {
-					dispatchMessage((SimpleEventMsgIn) event);
+				if (msg.getSelected() != null) {
+					handleFileSelectionEvent(msg.getSelected());
 				}
-				if (event instanceof PasteEventMsgIn) {
-					handlePasteEvent((PasteEventMsgIn) event);
+				if (msg.getUpload() != null) {
+					handleUploadEvent(msg.getUpload());
 				}
-				if (event instanceof CopyEventMsgIn) {
-					handleCopyEvent((CopyEventMsgIn) event);
+				if (msg.getWindow() != null) {
+					handleWindowEvent(msg.getWindow());
 				}
-				if (event instanceof FilesSelectedEventMsgIn) {
-					handleFileSelectionEvent((FilesSelectedEventMsgIn) event);
+				if (msg.getAudio() != null) {
+					handleAudioEvent(msg.getAudio());
 				}
-				if (event instanceof UploadEventMsgIn) {
-					handleUploadEvent((UploadEventMsgIn) event);
-				}
-				if (event instanceof WindowEventMsgIn) {
-					handleWindowEvent((WindowEventMsgIn) event);
-				}
-				if (event instanceof AudioEventMsgIn) {
-					handleAudioEvent((AudioEventMsgIn) event);
-				}
-				if (event instanceof ActionEventMsgIn) {
-					handleActionEvent((ActionEventMsgIn)event);
-				}
-				if (event instanceof WindowFocusMsgIn) {
-					windowFocusEvent((WindowFocusMsgIn)event);
+				if (msg.getAction() != null) {
+					handleActionEvent(msg.getAction());
 				}
 			} catch (Throwable e) {
-				Logger.error("Failed to process event.", e);
+				AppLogger.error("Failed to process event.", e);
 			}
 		});
 	}
@@ -114,7 +171,7 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 
 	protected abstract void dispatchKeyboardEvent(KeyboardEventMsgIn event);
 
-	protected abstract void dispatchHandshakeEvent(ConnectionHandshakeMsgIn event);
+	protected abstract void dispatchHandshakeEvent(ConnectionHandshakeMsgIn handshake);
 
 	protected abstract void dispatchMessage(SimpleEventMsgIn event);
 
@@ -127,7 +184,7 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 	protected abstract void handleUploadEvent(UploadEventMsgIn event);
 
 	protected abstract void handleWindowEvent(WindowEventMsgIn event);
-	
+
 	protected abstract void handleAudioEvent(AudioEventMsgIn event);
 
 	protected abstract void handleActionEvent(ActionEventMsgIn event);
@@ -135,7 +192,7 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 	public void dispatchEventInSwing(final Component c, final AWTEvent e) {
 		Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
 		if (w.isEnabled()) {
-			Logger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
+			AppLogger.debug("WebEventDispatcher.dispatchEventInSwing:postSystemQueue", e);
 			dispatchEnterExitEvents(w, e);
 			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(e);
 		}
@@ -202,7 +259,7 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 			w.setCursor(w.getCursor());// force cursor update
 			Util.getWebToolkit().getPaintDispatcher().notifyAccessibilityInfoUpdate(c, e.getXOnScreen(), e.getYOnScreen());
 			if ((!relatedToPreviousEvent && Util.isWindowDecorationEvent(w, e)) || Util.getWebToolkit().getWindowManager().isLockedToWindowDecorationHandler()) {
-				Logger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
+				AppLogger.debug("WebEventDispatcher.dispatchEventInSwing:windowManagerHandle", e);
 				if(e.getID()==MouseEvent.MOUSE_PRESSED) {
 					dispatchEventInSwing(c, new UngrabEvent(c));
 				}
@@ -317,6 +374,13 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 			setLastEnteredWindow(null);
 		}
 	}
+
+	@Override
+	public long getLastEventTimestamp(boolean userEventOnly) {
+		return userEventOnly ? lastUserInputTimestamp.get() : lastMessageTimestamp.get();
+	}
+
+
 
 	protected static class MouseEventInfo {
 		final int x;

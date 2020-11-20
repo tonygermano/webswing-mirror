@@ -1,6 +1,7 @@
 package org.webswing.toolkit.ge;
 
 import org.webswing.Constants;
+
 import sun.awt.FontConfiguration;
 
 @SuppressWarnings("restriction")

@@ -6,6 +6,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.webswing.server.common.service.security.AbstractWebswingUser;
+import org.webswing.server.common.service.security.AuthenticatedWebswingUser;
 import org.webswing.server.services.security.modules.AbstractExtendableSecurityModule;
 import org.webswing.server.services.security.modules.AbstractSecurityModule;
 
@@ -13,7 +15,7 @@ import org.webswing.server.services.security.modules.AbstractSecurityModule;
  * <p>
  * Main interface used by Webswing server responsible for user authentication. 
  * Implementations handle the full authentication process from serving the login page, parsing credentials, validation of credentials 
- * to creation of {@link AbstractWebswingUser} instance. It is recommended to extend {@link AbstractSecurityModule} or {@link AbstractExtendableSecurityModule}
+ * to creation of {@link AuthenticatedWebswingUser} instance. It is recommended to extend {@link AbstractSecurityModule} or {@link AbstractExtendableSecurityModule}
  * instead of implementing this interface directly.
  * </p>
  * There is always exactly one instance of {@link WebswingSecurityModule} per swing application handling all login requests
@@ -39,17 +41,18 @@ public interface WebswingSecurityModule {
 	 * <b>HTTP Request has invalid credentials.</b> - responds with login page displaying error message with status 401 (UNAUTHORIZED) and returns null.
 	 * </li>
 	 * <li>
-	 * <b>HTTP Request has valid credentials.</b> - responds with status 200 (OK) and returns instance of {@link AbstractWebswingUser}.
+	 * <b>HTTP Request has valid credentials.</b> - responds with status 200 (OK) and returns instance of {@link AuthenticatedWebswingUser}.
 	 * </li>
 	 * </ul>
 	 *
 	 * @param request The HTTP request from servlet container
 	 * @param response The HTTP response from servlet container
+	 * @param securedPath secured path of this login request
 	 * @return instance of user or null if user is not resolved
 	 * @throws ServletException thrown when sending the http response fails
 	 * @throws IOException thrown when sending the http response fails
 	 */
-	AbstractWebswingUser doLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
+	AuthenticatedWebswingUser doLogin(HttpServletRequest request, HttpServletResponse response, String securedPath) throws ServletException, IOException;
 
 	/**
 	 * This method is triggered by Webswing when a HTTP request is received on URL <blockquote>/{app_path}/logout</blockquote> 

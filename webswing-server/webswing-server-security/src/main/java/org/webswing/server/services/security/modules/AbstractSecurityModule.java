@@ -1,25 +1,38 @@
 package org.webswing.server.services.security.modules;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheResolver;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.webswing.Constants;
-import org.webswing.server.common.util.CommonUtil;
-import org.webswing.server.common.util.WebswingObjectMapper;
-import org.webswing.server.services.security.api.*;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.webswing.server.common.service.security.AbstractWebswingUser;
+import org.webswing.server.common.service.security.AuthenticatedWebswingUser;
+import org.webswing.server.common.service.security.impl.WebswingSecuritySubject;
+import org.webswing.server.common.util.ServerUtil;
+import org.webswing.server.common.util.WebswingObjectMapper;
+import org.webswing.server.services.security.api.LoginResponseClosedException;
+import org.webswing.server.services.security.api.WebswingAuthenticationException;
+import org.webswing.server.services.security.api.WebswingSecurityModule;
+import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
+
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheResolver;
 
 /**
  * <p>
@@ -102,17 +115,17 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	}
 
 	@Override
-	public AbstractWebswingUser doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public AuthenticatedWebswingUser doLogin(HttpServletRequest request, HttpServletResponse response, String securedPath) throws IOException {
 		try {
 			Map<String, Object> msg = getLoginRequest(request);
 			if (msg != null) {
 				config.getContext().setToSecuritySession(LOGIN_REQUEST_MSG, msg);
 			}
 			preVerify(request, response);
-			AbstractWebswingUser user = authenticate(request);
+			AuthenticatedWebswingUser user = authenticate(request);
 			if (user != null) {
 				postVerify(user, request, response);
-				onAuthenticationSuccess(user, request, response);
+				onAuthenticationSuccess(user, request, response, securedPath);
 				return decorateUser(user, request, response);
 			}
 			onAuthenticationFailed(request, response, null);
@@ -155,14 +168,14 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	/**
 	 * See {@link AbstractExtendableSecurityModule}
 	 */
-	protected AbstractWebswingUser decorateUser(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) {
+	protected AuthenticatedWebswingUser decorateUser(AuthenticatedWebswingUser user, HttpServletRequest request, HttpServletResponse response) {
 		return user;
 	}
 
 	/**
 	 * See {@link AbstractExtendableSecurityModule}
 	 */
-	protected void postVerify(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) throws LoginResponseClosedException, WebswingAuthenticationException {
+	protected void postVerify(AuthenticatedWebswingUser user, HttpServletRequest request, HttpServletResponse response) throws LoginResponseClosedException, WebswingAuthenticationException {
 	}
 
 	/**
@@ -172,7 +185,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	}
 
 	/**
-	 * Check if request has any login credentials. If it does and they are valid return an instance of {@link AbstractWebswingUser}
+	 * Check if request has any login credentials. If it does and they are valid return an instance of {@link AuthenticatedWebswingUser}
 	 * otherwise throw {@link WebswingAuthenticationException}.
 	 * If no credentials are present return null.
 	 *
@@ -180,7 +193,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	 * @return authenticated user or null
 	 * @throws WebswingAuthenticationException if authentication failed.
 	 */
-	protected abstract AbstractWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException;
+	protected abstract AuthenticatedWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException;
 
 	/**
 	 * If the login request is not Ajax call and a {@link #SUCCESS_URL} was sent with first request,
@@ -190,9 +203,13 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	 * @param response login response
 	 * @throws IOException if fails to respond
 	 */
-	protected void onAuthenticationSuccess(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	protected void onAuthenticationSuccess(AuthenticatedWebswingUser user, HttpServletRequest request, HttpServletResponse response, String securedPath) throws IOException {
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setHeader("webswingUsername", user.getUserId());
+		
+		WebswingSecuritySubject subject = WebswingSecuritySubject.get();
+		subject.login(response, securedPath, user);
+		
 		if (!isAjax(request)) {
 			Map<String, Object> msg = getLoginRequest(request);
 			if (msg != null && msg.containsKey(SUCCESS_URL)) {
@@ -214,6 +231,9 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 	 */
 	protected void onAuthenticationFailed(HttpServletRequest request, HttpServletResponse response, WebswingAuthenticationException exception) throws IOException {
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		
+		WebswingSecuritySubject.get().saveLoginSession(response);
+		
 		if (isAjax(request)) {
 			serveLoginPartial(request, response, exception);
 		} else {
@@ -273,7 +293,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 				throw new IOException("Failed to send login redirect message", e);
 			}
 		} else {
-			sendHttpRedirect(request, response, url);
+			ServerUtil.sendHttpRedirect(request, response, url);
 		}
 	}
 
@@ -324,7 +344,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 			Writer w = new OutputStreamWriter(response.getOutputStream());
 			Writer tempw = new StringWriter();
 			processTemplate(tempw, template, extendedVars);
-			defaultVars.put("partialHtml", Base64.getEncoder().encodeToString(tempw.toString().getBytes()));
+			defaultVars.put("partialHtml", Base64.getEncoder().encodeToString(tempw.toString().getBytes(StandardCharsets.UTF_8)));
 			processTemplate(w, "default.html", extendedVars);
 		}
 	}
@@ -452,36 +472,6 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 			ipAddress = r.getRemoteAddr();
 		}
 		auditLog.info("{} | {} | {} | {} | {} | {} | {}", new Object[] { status, username, reason, path, protocol, ipAddress, module });
-	}
-
-	public static void sendHttpRedirect(HttpServletRequest req, HttpServletResponse resp, String relativeUrl) throws IOException {
-		String proto = req.getHeader("X-Forwarded-Proto");
-		String host = req.getHeader("X-Forwarded-Host");
-		if (StringUtils.startsWithIgnoreCase(relativeUrl, "http://") || StringUtils.startsWithIgnoreCase(relativeUrl, "https://")) {
-			resp.sendRedirect(relativeUrl);
-		} else if (StringUtils.isNotEmpty(proto) && StringUtils.isNotEmpty(host)) {
-			if (!StringUtils.startsWith(relativeUrl, "/")) {
-				String requestPath = getContextPath(req.getServletContext()) + CommonUtil.toPath(req.getPathInfo());
-				String requestPathBase = requestPath.startsWith("/") ? requestPath : "/" + requestPath;
-				requestPathBase = requestPath.substring(0, requestPath.lastIndexOf("/") + 1);
-				relativeUrl = requestPathBase + relativeUrl;
-			}
-			resp.sendRedirect(proto + "://" + host + relativeUrl);
-		} else {
-			resp.sendRedirect(relativeUrl);
-		}
-	}
-
-	public static String getContextPath(ServletContext ctx) {
-		String contextPath = ctx.getContextPath();
-		String contextPathExplicit = System.getProperty(Constants.REVERSE_PROXY_CONTEXT_PATH);
-		if (contextPathExplicit != null) {
-			return CommonUtil.toPath(contextPathExplicit);
-		} else if (contextPath != null && !contextPath.equals("/") && !contextPath.equals("")) {
-			return CommonUtil.toPath(contextPath);
-		} else {
-			return "";
-		}
 	}
 
 }

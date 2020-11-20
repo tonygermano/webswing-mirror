@@ -28,6 +28,8 @@ public abstract class Configuration {
 
     public abstract String getConfigFile();
     
+    public abstract String getPropertiesFile();
+    
     public abstract File resolveConfigFile(String filename);
 
     public abstract String getContextPath();

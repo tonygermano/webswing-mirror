@@ -15,8 +15,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.swing.JFileChooser;
@@ -25,21 +28,21 @@ import javax.swing.filechooser.FileFilter;
 
 import org.webswing.Constants;
 import org.webswing.audio.AudioClip;
-import org.webswing.model.c2s.ActionEventMsgIn;
-import org.webswing.model.c2s.AudioEventMsgIn;
-import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
-import org.webswing.model.c2s.CopyEventMsgIn;
-import org.webswing.model.c2s.FilesSelectedEventMsgIn;
-import org.webswing.model.c2s.KeyboardEventMsgIn;
-import org.webswing.model.c2s.MouseEventMsgIn;
-import org.webswing.model.c2s.MouseEventMsgIn.MouseEventType;
-import org.webswing.model.c2s.PasteEventMsgIn;
-import org.webswing.model.c2s.SimpleEventMsgIn;
-import org.webswing.model.c2s.UploadEventMsgIn;
-import org.webswing.model.c2s.WindowEventMsgIn;
-import org.webswing.model.c2s.WindowFocusMsgIn;
-import org.webswing.model.jslink.JSObjectMsg;
-import org.webswing.model.s2c.FileDialogEventMsg.FileDialogEventType;
+import org.webswing.model.appframe.in.ActionEventMsgIn;
+import org.webswing.model.appframe.in.AudioEventMsgIn;
+import org.webswing.model.appframe.in.CopyEventMsgIn;
+import org.webswing.model.appframe.in.FilesSelectedEventMsgIn;
+import org.webswing.model.appframe.in.JSObjectMsgIn;
+import org.webswing.model.appframe.in.KeyboardEventMsgIn;
+import org.webswing.model.appframe.in.MouseEventMsgIn;
+import org.webswing.model.appframe.in.MouseEventMsgIn.MouseEventType;
+import org.webswing.model.appframe.in.PasteEventMsgIn;
+import org.webswing.model.appframe.in.UploadEventMsgIn;
+import org.webswing.model.appframe.in.WindowEventMsgIn;
+import org.webswing.model.appframe.in.WindowFocusMsgIn;
+import org.webswing.model.appframe.out.FileDialogEventMsgOut.FileDialogEventType;
+import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
+import org.webswing.model.common.in.SimpleEventMsgIn;
 import org.webswing.toolkit.FocusEventCause;
 import org.webswing.toolkit.WebClipboard;
 import org.webswing.toolkit.WebClipboardTransferable;
@@ -48,20 +51,20 @@ import org.webswing.toolkit.api.component.HtmlPanel;
 import org.webswing.toolkit.api.lifecycle.ShutdownReason;
 import org.webswing.toolkit.extra.WindowManager;
 import org.webswing.toolkit.jslink.WebJSObject;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 import netscape.javascript.JSObject;
 
 public class WebEventDispatcher extends AbstractEventDispatcher {
 
 	protected void dispatchMessage(SimpleEventMsgIn message) {
-		Logger.debug("WebEventDispatcher.dispatchMessage", message);
+		AppLogger.debug("WebEventDispatcher.dispatchMessage", message);
 		switch (message.getType()) {
 		case killSwing:
-			Logger.info("Received kill signal from Admin console. Application shutting down.");
-			Services.getConnectionService().scheduleShutdown(ShutdownReason.Admin);
+			AppLogger.info("Received kill signal from Admin console. Application shutting down.");
+			Util.getWebToolkit().getSessionWatchdog().scheduleShutdown(ShutdownReason.Admin);
 			break;
 		case deleteFile:
 			Util.getWebToolkit().getPaintDispatcher().notifyDeleteSelectedFile();
@@ -84,11 +87,9 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 		case unload:
 			boolean instantExit = Integer.parseInt(System.getProperty(Constants.SWING_SESSION_TIMEOUT_SEC, "300")) == 0;
 			if (instantExit) {
-				Logger.warn("Exiting Application. Client has disconnected from web session. (swingSessionTimeout setting is 0 or less)");
-				Services.getConnectionService().scheduleShutdown(ShutdownReason.Inactivity);
+				AppLogger.warn("Exiting Application. Client has disconnected from web session. (swingSessionTimeout setting is 0 or less)");
+				Util.getWebToolkit().getSessionWatchdog().scheduleShutdown(ShutdownReason.Inactivity);
 			}
-			break;
-		case hb:
 			break;
 		case requestComponentTree:
 			if (Util.isTestMode()) {
@@ -97,6 +98,15 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 			break;
 		case requestWindowSwitchList:
 			Util.getWebToolkit().getPaintDispatcher().notifyWindowSwitchList();
+			break;
+		case enableStatisticsLogging:
+			Util.getWebToolkit().setStatisticsLoggingEnabled(true);
+			break;
+		case disableStatisticsLogging:
+			Util.getWebToolkit().setStatisticsLoggingEnabled(false);
+			break;
+		case toggleRecording:
+			Util.getWebToolkit().toggleRecording();
 			break;
 		}
 	}
@@ -256,25 +266,26 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 		Util.getWebToolkit().processApiEvent(event);
 	}
 
-	protected void dispatchHandshakeEvent(ConnectionHandshakeMsgIn event) {
+	@Override
+	protected void dispatchHandshakeEvent(ConnectionHandshakeMsgIn handshake) {
 		PaintDispatcher paintDispatcher = Util.getWebToolkit().getPaintDispatcher();
 		
-		Util.getWebToolkit().initSize(event.getDesktopWidth(), event.getDesktopHeight());
+		Util.getWebToolkit().initSize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
 		paintDispatcher.notifyFileDialogActive();
 		paintDispatcher.closePasteRequestDialog();
-		Util.getWebToolkit().processApiEvent(event);
+		Util.getWebToolkit().processApiEvent(handshake);
 		if (System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS) != null) {
 			// resize and refresh the applet object exposed in javascript in case of page reload/session continue
 			Applet a = (Applet) WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
-			a.resize(event.getDesktopWidth(), event.getDesktopHeight());
-			JSObject root = new WebJSObject(new JSObjectMsg("instanceObject"));
+			a.resize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
+			JSObject root = new WebJSObject(new JSObjectMsgIn("instanceObject"));
 			root.setMember("applet", a);
 		}
-		System.setProperty(Constants.SWING_START_SYS_PROP_TOUCH_MODE, event.isTouchMode() + "");
+		System.setProperty(Constants.SWING_START_SYS_PROP_TOUCH_MODE, handshake.isTouchMode() + "");
 		
 		boolean oldAccessibility = Boolean.valueOf(System.getProperty(Constants.SWING_START_SYS_PROP_ACCESSIBILITY_ENABLED, "false"));
-		System.setProperty(Constants.SWING_START_SYS_PROP_ACCESSIBILITY_ENABLED, event.isAccessiblityEnabled() + "");
-		if (event.isAccessiblityEnabled() && !oldAccessibility) {
+		System.setProperty(Constants.SWING_START_SYS_PROP_ACCESSIBILITY_ENABLED, handshake.isAccessiblityEnabled() + "");
+		if (handshake.isAccessiblityEnabled() && !oldAccessibility) {
 			paintDispatcher.notifyAccessibilityInfoUpdate();
 			paintDispatcher.clearAccessibilityInfoState();
 		}
@@ -307,21 +318,21 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 						File file = (File) o;
 						if (file.getAbsolutePath().equals(copy.getFile())) {
 							if (file.exists() && !file.isDirectory() && file.canRead()) {
-								Util.getWebToolkit().getPaintDispatcher().notifyFileRequested(file,false);
+								Util.getWebToolkit().getPaintDispatcher().notifyFileRequested(file, false);
 							} else {
-								Logger.error("Failed to download file " + copy.getFile() + " from clipboard. File is not accessible or is a directory");
+								AppLogger.error("Failed to download file " + copy.getFile() + " from clipboard. File is not accessible or is a directory");
 							}
 						}
 					}
 				} catch (Exception e) {
-					Logger.error("Failed to download file " + copy.getFile() + " from clipboard.", e);
+					AppLogger.error("Failed to download file " + copy.getFile() + " from clipboard.", e);
 				}
 			}
 		}
 	}
 
 	protected void handlePasteEvent(final PasteEventMsgIn paste) {
-		Logger.debug("WebEventDispatcher.handlePasteEvent", paste);
+		AppLogger.debug("WebEventDispatcher.handlePasteEvent", paste);
 		SwingUtilities.invokeLater(() -> {
 			boolean clipboardRequested = Util.getWebToolkit().getPaintDispatcher().closePasteRequestDialog();
 			WebClipboardTransferable transferable = new WebClipboardTransferable(paste);
@@ -354,7 +365,7 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 							}
 						}
 						fc.setSelectedFiles(arr.toArray(new File[0]));
-						Logger.info("Files selected :" + arr);
+						AppLogger.info("Files selected :" + arr);
 					} else {
 						if (getFileUploadMap().get(e.getFiles().get(0)) != null) {
 							File f = new File(fc.getCurrentDirectory(), getFileUploadMap().get(e.getFiles().get(0)));
@@ -372,7 +383,7 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 							}
 						}
 
-						Logger.info("File selected :" + (fc.getSelectedFile() != null ? fc.getSelectedFile().getAbsoluteFile() : null));
+						AppLogger.info("File selected :" + (fc.getSelectedFile() != null ? fc.getSelectedFile().getAbsoluteFile() : null));
 					}
 					if (FileDialogEventType.AutoUpload == fileChooserEventType || FileDialogEventType.AutoSave == fileChooserEventType) {
 						fc.approveSelection();
@@ -392,23 +403,54 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 			JFileChooser dialog = Util.getWebToolkit().getPaintDispatcher().getFileChooserDialog();
 			if (dialog != null) {
 				File currentDir = dialog.getCurrentDirectory();
-				File tempFile = new File(upload.getTempFileLocation());
-				String validfilename = Util.resolveUploadFilename(currentDir, upload.getFileName());
-				if (currentDir.canWrite() && tempFile.exists()) {
+				
+				String fileId = upload.getFileId();
+				
+				if (currentDir.canWrite() && Services.getDataStoreService().dataExists("transfer", fileId)) {
+					// FIXME -> move this to some Util class (same is in FileTransferHandler, AbstractPaintDispatcher)
+					String fileName = "";
 					try {
-						Services.getImageService().moveFile(tempFile, new File(currentDir, validfilename));
-						getFileUploadMap().put(upload.getFileName(), validfilename);
-						Logger.info("File upload notification received: " + validfilename);
-					} catch (IOException e) {
-						Logger.error("Error while moving uploaded file '" + validfilename + "' to target folder: ", e);
+						String[] fileData = fileId.split("_");
+						if (fileData != null) {
+							if (fileData.length > 0) {
+								fileName = decodeHashedFileData(fileData[0]);
+							}
+						}
+					} catch (Exception e) {
+						AppLogger.error("Failed to decode file data [" + fileId + "]!", e);
+						return;
+					}
+					
+					String validFilename = Util.resolveUploadFilename(currentDir, fileName);
+					
+					try (InputStream is = Services.getDataStoreService().readData("transfer", fileId)) {
+						if (is == null) {
+							AppLogger.error("Failed to read file data [" + fileId + "]!");
+							return;
+						}
+						
+						Services.getDataStoreService().writeStreamToFile(is, new File(currentDir, validFilename));
+						
+						getFileUploadMap().put(fileName, validFilename);
+						
+						AppLogger.info("File upload notification received: " + validFilename);
+					} catch (Exception e) {
+						AppLogger.error("Error while moving uploaded file '" + validFilename + "' to target folder: ", e);
 					}
 				} else {
-					Logger.error("Error while uploading file '" + validfilename + "'. " + (currentDir.canWrite() ? " Temp upload file " + tempFile.getAbsoluteFile() + " not found" : "Can not write to target folder " + currentDir.getAbsoluteFile()));
+					AppLogger.error("Error while uploading file '" + fileId + "'. " + (currentDir.canWrite() ? " Upload file " + fileId + " not found" : "Can not write to target folder " + currentDir.getAbsoluteFile()));
 				}
 			} else {
-				Logger.error("Error while uploading file. FileChooser dialog instance not found");
+				AppLogger.error("Error while uploading file. FileChooser dialog instance not found");
 			}
 		});
+	}
+	
+	private String decodeHashedFileData(String data) {
+//		try {
+//			return new String(Base64.getUrlDecoder().decode(data.getBytes("UTF-8")), "UTF-8");
+//		}
+		return new String(Base64.getUrlDecoder().decode(data.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
 	}
 
 	protected void handleWindowEvent(WindowEventMsgIn windowUpdate) {
@@ -466,7 +508,7 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 		AudioClip clip = Util.getWebToolkit().getPaintDispatcher().findAudioClip(event.getId());
 		
 		if (clip == null) {
-			Logger.warn("Audio clip [" + event.getId() + "] not found. Cannot notify on playback end.");
+			AppLogger.warn("Audio clip [" + event.getId() + "] not found. Cannot notify on playback end.");
 			return;
 		}
 		

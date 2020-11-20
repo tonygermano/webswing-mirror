@@ -3,26 +3,26 @@ package org.webswing.ext.services;
 import java.awt.Component;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import org.webswing.model.s2c.AccessibilityMsg;
-import org.webswing.toolkit.api.lifecycle.ShutdownReason;
+import org.webswing.model.SyncObjectResponse;
+import org.webswing.model.app.out.AppToServerFrameMsgOut;
+import org.webswing.model.appframe.out.AccessibilityMsgOut;
+import org.webswing.model.appframe.out.AppFrameMsgOut;
 
 public interface ServerConnectionService {
 
-	void sendObject(Serializable jsonPaintRequest);
+	void reconnect(String reconnectUrl);
+	
+	void sendObject(AppToServerFrameMsgOut msgOut, AppFrameMsgOut frame);
 
-	Object sendObjectSync(Serializable o, String correlationId) throws TimeoutException, IOException;
+	SyncObjectResponse sendObjectSync(AppToServerFrameMsgOut msgOut, AppFrameMsgOut frame, String correlationId) throws TimeoutException, Exception;
 
-	void disconnect();
+	AccessibilityMsgOut getAccessibilityInfo();
 
-	void resetInactivityTimers();
-
-	void messageApiPublish(Serializable o) throws IOException;
-
-	void scheduleShutdown(ShutdownReason admin);
-
-	AccessibilityMsg getAccessibilityInfo();
-
-	AccessibilityMsg getAccessibilityInfo(Component c, int x, int y);
+	AccessibilityMsgOut getAccessibilityInfo(Component c, int x, int y);
+	
+	Map<String, Serializable> deserializeUserAttributes(byte[] data) throws IOException;
+	
 }

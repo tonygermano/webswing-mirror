@@ -1,64 +1,88 @@
 package main;
 
 import java.awt.Toolkit;
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.security.ProtectionDomain;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.webswing.Constants;
-import org.webswing.toolkit.WebToolkit;
-
-import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
-import static java.nio.file.StandardWatchEventKinds.*;
 
 public class Main {
 
 	private static ClassLoader defaultCL;
 
-	@SuppressWarnings("restriction")
-	public static void main(String[] args) {
-		boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_CLIENT_ID) != null;
+	public static void main(String[] mainArgs) {
+		boolean client = System.getProperty(Constants.SWING_START_SYS_PROP_INSTANCE_ID) != null;
+		boolean sessionpool = false;
+		boolean admin = false;
+		
+		String[] args = mainArgs;
+		if (args != null) {
+			List<String> argsList = new ArrayList<>();
+			for (String arg : args) {
+				if ("-sessionpool".equals(arg)) {
+					sessionpool = true;
+				} else if ("-admin".equals(arg)) {
+					admin = true;
+				} else {
+					argsList.add(arg);
+				}
+			}
+			args = argsList.toArray(new String[0]);
+		}
 
 		try {
-			initializeDefaultSystemProperties();
-
-			System.setProperty(Constants.CREATE_NEW_TEMP, getCreateNewTemp(args));
-			System.setProperty(Constants.CLEAN_TEMP, getBoolParam(args, "-tc", true));
-
 			ProtectionDomain domain = Main.class.getProtectionDomain();
 			URL location = domain.getCodeSource().getLocation();
-			System.setProperty(Constants.WAR_FILE_LOCATION, location.toExternalForm());
+			String warLocation = location.toExternalForm();
+			
+			System.setProperty(Constants.CREATE_NEW_TEMP, getCreateNewTemp(args));
+			System.setProperty(Constants.CLEAN_TEMP, getBoolParam(args, "-tc", true));
+			System.setProperty(Constants.WAR_FILE_LOCATION, warLocation);
 
 			List<URL> urls = new ArrayList<URL>();
 			if (client) {
 				populateClasspathFromDir("WEB-INF/swing-lib", urls);
 				initializeExtLibServices(urls);
+				
+				Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+				defaultToolkit.getClass().getMethod("init").invoke(defaultToolkit);
+				
 				retainOnlyLauncherUrl(urls);
+			} else if (sessionpool) {
+				populateClasspathFromDir("WEB-INF/sessionpool-lib", urls);
+			} else if (admin) {
+				populateClasspathFromDir("WEB-INF/server-lib", urls);
 			} else {
 				initTempDirPath(args);
 				populateClasspathFromDir("WEB-INF/server-lib", urls);
 			}
+			
 			defaultCL = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
 			Thread.currentThread().setContextClassLoader(defaultCL);
 			Class<?> mainClass;
 			if (client) {
 				mainClass = defaultCL.loadClass("org.webswing.SwingMain");
+			} else if (sessionpool) {
+				mainClass = defaultCL.loadClass("org.webswing.cluster.sessionpool.SessionPoolMain");
 			} else {
 				try {
 					mainClass = defaultCL.loadClass("org.webswing.ServerMain");
@@ -86,22 +110,6 @@ public class Main {
 			System.err.println("Uncaught exception.");
 			e.printStackTrace();
 			System.exit(1);
-		}
-	}
-
-	public static void initializeDefaultSystemProperties() {
-		try {
-			InputStream propFile = Main.class.getClassLoader().getResourceAsStream("WEB-INF/classes/webswing.properties");
-			Properties p = new Properties(System.getProperties());
-			p.load(propFile);
-
-			for (Map.Entry<Object, Object> prop : p.entrySet()) {
-				if (!System.getProperties().containsKey(prop.getKey()))
-					System.getProperties().put(prop.getKey(), prop.getValue());
-			}
-
-		} catch (Exception e) {
-			//file does not exist, do nothing
 		}
 	}
 
@@ -143,8 +151,8 @@ public class Main {
 		ClassLoader extLibClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), parent);
 		Class<?> classLoaderUtilClass = extLibClassLoader.loadClass("org.webswing.util.ClassLoaderUtil");
 		Method initializeServicesMethod = classLoaderUtilClass.getMethod("initializeServices");
+		Thread.currentThread().setContextClassLoader(extLibClassLoader);
 		initializeServicesMethod.invoke(null);
-		((WebToolkit) Toolkit.getDefaultToolkit()).init();
 	}
 
 	private static void populateClasspathFromDir(String dir, List<URL> urls) throws IOException {

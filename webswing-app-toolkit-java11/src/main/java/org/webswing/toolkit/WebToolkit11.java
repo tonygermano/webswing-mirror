@@ -1,19 +1,32 @@
 package org.webswing.toolkit;
 
-import java.applet.*;
-import java.awt.*;
+import java.applet.Applet;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.KeyboardFocusManager;
+import java.awt.Panel;
+import java.awt.Window;
 import java.awt.event.FocusEvent;
-import java.awt.peer.*;
+import java.awt.peer.FramePeer;
+import java.awt.peer.KeyboardFocusManagerPeer;
 import java.lang.reflect.Method;
 
 import org.webswing.applet.WebAppletContext;
-import org.webswing.toolkit.ge.*;
-import org.webswing.toolkit.util.Logger;
+import org.webswing.toolkit.ge.WebGraphicsEnvironment;
 import org.webswing.toolkit.util.Util;
-import sun.awt.*;
-import sun.awt.datatransfer.*;
-import sun.awt.image.*;
-import sun.java2d.*;
+import org.webswing.util.AppLogger;
+
+import sun.awt.LightweightFrame;
+import sun.awt.SunToolkit;
+import sun.awt.datatransfer.DataTransferer;
+import sun.awt.image.SurfaceManager;
+import sun.java2d.SurfaceData;
 
 public class WebToolkit11 extends WebToolkit {
 	private KeyboardFocusManagerPeer kfmp;
@@ -87,7 +100,7 @@ public class WebToolkit11 extends WebToolkit {
 			Integer result2 = (Integer) m2.invoke(null, heavyweight, descendant, temporary, focusedWindowChangeAllowed, time, FocusEvent.Cause.valueOf(cause.name()));
 			return result2;
 		} catch (Exception e) {
-			Logger.debug("Failed to invoke processSynchronousLightweightTransfer on KeyboardFocusManager. Check your java version.", e);
+			AppLogger.debug("Failed to invoke processSynchronousLightweightTransfer on KeyboardFocusManager. Check your java version.", e);
 			return 0;
 		}
 	}
@@ -122,7 +135,6 @@ public class WebToolkit11 extends WebToolkit {
 
 	@Override
 	public FramePeer createLightweightFrame(LightweightFrame arg0) throws HeadlessException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

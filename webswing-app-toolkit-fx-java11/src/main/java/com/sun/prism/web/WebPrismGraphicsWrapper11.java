@@ -1,6 +1,5 @@
 package com.sun.prism.web;
 
-import com.sun.javafx.geom.transform.GeneralTransform3D;
 import com.sun.prism.Graphics;
 
 public class WebPrismGraphicsWrapper11 extends AbstractWebPrismGraphicsWrapper {

@@ -1,14 +1,5 @@
 package org.webswing.toolkit;
 
-import org.webswing.Constants;
-import org.webswing.toolkit.api.clipboard.PasteRequestContext;
-import org.webswing.toolkit.api.clipboard.BrowserTransferable;
-import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
-import org.webswing.toolkit.util.Logger;
-import org.webswing.toolkit.util.Services;
-import org.webswing.toolkit.util.Util;
-
-import javax.swing.SwingUtilities;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.datatransfer.Clipboard;
@@ -20,6 +11,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
+
+import org.webswing.Constants;
+import org.webswing.toolkit.api.clipboard.BrowserTransferable;
+import org.webswing.toolkit.api.clipboard.PasteRequestContext;
+import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
+import org.webswing.toolkit.util.Services;
+import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
+
 public class WebClipboard extends Clipboard {
 	private static DataFlavor htmlDf;
 	private static DataFlavor plaintxtDf;
@@ -30,7 +31,7 @@ public class WebClipboard extends Clipboard {
 			htmlDf = new DataFlavor("text/html;class=java.lang.String");
 			plaintxtDf = new DataFlavor("text/plain;class=java.lang.String");
 		} catch (ClassNotFoundException e) {
-			Logger.error("initialization error:", e);
+			AppLogger.error("initialization error:", e);
 		}
 	}
 
@@ -74,7 +75,7 @@ public class WebClipboard extends Clipboard {
 					Object transferData = contents.getTransferData(HTML_FLAVOR);
 					data.setHtml(transferData.toString());
 				} catch (Exception e) {
-					Logger.error("WebClipboard:setContent:HTML", e);
+					AppLogger.error("WebClipboard:setContent:HTML", e);
 				}
 			}
 
@@ -82,13 +83,13 @@ public class WebClipboard extends Clipboard {
 				try {
 					data.setText((String) contents.getTransferData(DataFlavor.stringFlavor));
 				} catch (Exception e) {
-					Logger.error("WebClipboard:setContent:Plain", e);
+					AppLogger.error("WebClipboard:setContent:Plain", e);
 				}
 			} else if(contents.isDataFlavorSupported(plaintxtDf)) {
 				try {
 					data.setText((String) contents.getTransferData(plaintxtDf));
 				} catch (Exception e) {
-					Logger.error("WebClipboard:setContent:text/plain", e);
+					AppLogger.error("WebClipboard:setContent:text/plain", e);
 				}
 			}
 			if (contents.isDataFlavorSupported(DataFlavor.imageFlavor)) {
@@ -102,7 +103,7 @@ public class WebClipboard extends Clipboard {
 						data.setImg(Services.getImageService().getPngImage(result));
 					}
 				} catch (Exception e) {
-					Logger.error("WebClipboard:setContent:Image", e);
+					AppLogger.error("WebClipboard:setContent:Image", e);
 				}
 			}
 			if (contents.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
@@ -128,7 +129,7 @@ public class WebClipboard extends Clipboard {
 						data.setFiles(files);
 					}
 				} catch (Exception e) {
-					Logger.error("WebClipboard:setContent:Files", e);
+					AppLogger.error("WebClipboard:setContent:Files", e);
 				}
 			}
 		}
@@ -179,7 +180,7 @@ public class WebClipboard extends Clipboard {
 					return browserClipboard;
 				}
 			} catch (Exception e) {
-				Logger.error("Failed to process paste request.",e);
+				AppLogger.error("Failed to process paste request.",e);
 			}
 			return null;
 		}

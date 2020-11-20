@@ -1,15 +1,18 @@
 package org.webswing.server.services.security.extension.api;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
-import org.webswing.server.services.security.api.AbstractWebswingUser;
+import org.webswing.server.common.service.security.AuthenticatedWebswingUser;
 
-public class WebswingUserDecorator extends AbstractWebswingUser {
+public class WebswingUserDecorator extends AuthenticatedWebswingUser {
 
-	private final AbstractWebswingUser user;
+	private static final long serialVersionUID = 5175691012719235120L;
+	
+	private final AuthenticatedWebswingUser user;
 
-	public WebswingUserDecorator(AbstractWebswingUser user) {
+	public WebswingUserDecorator(AuthenticatedWebswingUser user) {
 		this.user = user;
 	}
 
@@ -17,10 +20,25 @@ public class WebswingUserDecorator extends AbstractWebswingUser {
 	public String getUserId() {
 		return user.getUserId();
 	}
+	
+	@Override
+	public List<String> getUserRoles() {
+		return user.getUserRoles();
+	}
+	
+	@Override
+	public List<String> getUserPermissions() {
+		return user.getUserPermissions();
+	}
 
 	@Override
 	public Map<String, Serializable> getUserAttributes() {
 		return user.getUserAttributes();
+	}
+	
+	@Override
+	public Map<String, Serializable> getUserSessionAttributes() {
+		return user.getUserSessionAttributes();
 	}
 
 	@Override

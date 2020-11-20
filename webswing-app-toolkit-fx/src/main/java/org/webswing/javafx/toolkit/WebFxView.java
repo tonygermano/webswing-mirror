@@ -22,7 +22,6 @@ import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,9 +33,9 @@ import javax.swing.SwingUtilities;
 import org.webswing.ext.services.ToolkitFXService;
 import org.webswing.javafx.toolkit.adaper.WindowAdapter;
 import org.webswing.javafx.toolkit.util.WebFxUtil;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 import com.sun.glass.events.KeyEvent;
 import com.sun.glass.ui.Clipboard;
@@ -198,7 +197,7 @@ public class WebFxView extends View {
 									notifyDragEnd(currentAction);
 								}
 							}catch (Exception ex){
-								Logger.debug("Exception on event",ex);
+								AppLogger.debug("Exception on event",ex);
 							}finally {
 								Util.getWebToolkit().getEventDispatcher().setJavaFXdragStarted(false);
 								setDragCursor(-1);
@@ -208,7 +207,7 @@ public class WebFxView extends View {
 								int cursorid = notifyDragOver(e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), mapDropAction(e.getModifiersEx()));
 								setDragCursor(cursorid);
 							} catch (Exception ex) {
-								Logger.debug("Exception on event",ex);
+								AppLogger.debug("Exception on event",ex);
 								setDragCursor(0);
 							}
 						} else if (e.getID() == MouseEvent.MOUSE_EXITED) {
@@ -390,7 +389,7 @@ public class WebFxView extends View {
 
 				long start = System.currentTimeMillis();
 				Set<RectBounds> diff = WebFxUtil.findUpdateAreas(this.image, previous, tmpBounds);
-				Logger.debug("WebFxView#_uploadPixels: Compared in " + (System.currentTimeMillis() - start) + "ms, diff: " + diff.size());
+				AppLogger.debug("WebFxView#_uploadPixels: Compared in " + (System.currentTimeMillis() - start) + "ms, diff: " + diff.size());
 
 				for (RectBounds r : diff) {
 					rm.addDirtyRegion(win, (int) Math.floor(r.getMinX()) + win.getInsets().left, (int) Math.floor(r.getMinY()) + win.getInsets().top, (int) Math.ceil(r.getWidth()), (int) Math.ceil(r.getHeight()));
@@ -437,11 +436,11 @@ public class WebFxView extends View {
 					Stage stage = (Stage) fxStage.get(glassStage);
 					toolkitFXService.registerStage(stage);
 				} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException e) {
-					Logger.warn("Exception while looking for Stages!", e);
+					AppLogger.warn("Exception while looking for Stages!", e);
 				}
 			}
 		} catch (Exception e) {
-			Logger.error("Exception while looking for Stages!", e);
+			AppLogger.error("Exception while looking for Stages!", e);
 		}
 	}
 

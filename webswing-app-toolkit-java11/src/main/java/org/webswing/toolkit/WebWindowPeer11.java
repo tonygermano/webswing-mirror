@@ -1,6 +1,7 @@
 package org.webswing.toolkit;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.FocusEvent;
 
 public class WebWindowPeer11 extends WebWindowPeer {

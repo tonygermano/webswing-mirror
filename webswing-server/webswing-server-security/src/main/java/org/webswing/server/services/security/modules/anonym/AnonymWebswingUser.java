@@ -2,16 +2,23 @@ package org.webswing.server.services.security.modules.anonym;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingAction;
+import org.webswing.server.common.model.security.WebswingAction;
+import org.webswing.server.common.service.security.AuthenticatedWebswingUser;
 
-public class AnonymWebswingUser extends AbstractWebswingUser {
+import com.google.common.collect.Lists;
+
+public class AnonymWebswingUser extends AuthenticatedWebswingUser {
+	
+	private static final long serialVersionUID = 1157215452456795382L;
+	
 	private String userId;
+	private List<String> roles = Lists.newArrayList(WebswingAction.AccessType.basic.name());
 
 	public AnonymWebswingUser(String userIdParam) {
-		this.userId=userIdParam;
+		this.userId = userIdParam;
 	}
 
 	@Override
@@ -20,7 +27,17 @@ public class AnonymWebswingUser extends AbstractWebswingUser {
 	}
 
 	@Override
+	public List<String> getUserRoles() {
+		return roles;
+	}
+	
+	@Override
 	public Map<String, Serializable> getUserAttributes() {
+		return Collections.emptyMap();
+	}
+	
+	@Override
+	public Map<String, Serializable> getUserSessionAttributes() {
 		return Collections.emptyMap();
 	}
 
@@ -32,4 +49,5 @@ public class AnonymWebswingUser extends AbstractWebswingUser {
 	public boolean isAuthenticated() {
 		return true;
 	}
+	
 };

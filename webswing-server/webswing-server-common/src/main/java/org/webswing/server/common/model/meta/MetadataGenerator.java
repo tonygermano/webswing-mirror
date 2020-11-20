@@ -90,31 +90,12 @@ public class MetadataGenerator<T> {
 						try {
 							Object value = getValue(config, cl, propertyName, readMethod);
 							MetaField metadata = new MetaField();
-							metadata.setName(fieldName);
-							metadata.setTab(getTab(config, cl, propertyName, readMethod));
-							metadata.setLabel(getLabel(config, cl, propertyName, readMethod));
-							metadata.setDescription(getDescription(config, cl, propertyName, readMethod));
-							metadata.setVariables(isVariables(config, cl, propertyName, readMethod));
-							metadata.setDiscriminator(isDiscriminator(config, cl, propertyName, readMethod));
-							metadata.setPresets(getPresets(config, cl, propertyName, readMethod));
-							metadata.setType(getEditorType(config, cl, propertyName, readMethod));
-							if (EditorType.ObjectListAsTable.equals(metadata.getType())) {
-								metadata.setTableColumns(getColumnsDefinitions(config, cl, propertyName, readMethod));
-							}
-							metadata.setValue(value);
+							setMetadataProperties(metadata, fieldName, config, cl, propertyName, readMethod, value, false);
 							return metadata;
 						} catch (Exception e) {
 							log.error("Failed to generate metadata for field '" + fieldName + "' in object " + config.getClass().getName(), e);
 							MetaField metadata = new MetaField();
-							metadata.setName(fieldName);
-							metadata.setTab(getTab(config, cl, propertyName, readMethod));
-							metadata.setLabel(getLabel(config, cl, propertyName, readMethod));
-							metadata.setDescription(getDescription(config, cl, propertyName, readMethod));
-							metadata.setVariables(isVariables(config, cl, propertyName, readMethod));
-							metadata.setDiscriminator(isDiscriminator(config, cl, propertyName, readMethod));
-							metadata.setPresets(getPresets(config, cl, propertyName, readMethod));
-							metadata.setType(EditorType.Generic);
-							metadata.setValue(getSafeValue(config, readMethod));
+							setMetadataProperties(metadata, fieldName, config, cl, propertyName, readMethod, null, true);
 							return metadata;
 						}
 					}
@@ -122,6 +103,27 @@ public class MetadataGenerator<T> {
 			}
 		}
 		return null;
+	}
+	
+	private void setMetadataProperties(MetaField metadata, String fieldName, T config, ClassLoader cl, String propertyName, Method readMethod, Object value, boolean safeMode) throws Exception {
+		metadata.setName(fieldName);
+		metadata.setTab(getTab(config, cl, propertyName, readMethod));
+		metadata.setLabel(getLabel(config, cl, propertyName, readMethod));
+		metadata.setDescription(getDescription(config, cl, propertyName, readMethod));
+		metadata.setVariables(isVariables(config, cl, propertyName, readMethod));
+		metadata.setDiscriminator(isDiscriminator(config, cl, propertyName, readMethod));
+		metadata.setPresets(getPresets(config, cl, propertyName, readMethod));
+
+		if (safeMode) {
+			metadata.setType(EditorType.Generic);
+			metadata.setValue(getSafeValue(config, readMethod));
+		} else {
+			metadata.setType(getEditorType(config, cl, propertyName, readMethod));
+			if (EditorType.ObjectListAsTable.equals(metadata.getType())) {
+				metadata.setTableColumns(getColumnsDefinitions(config, cl, propertyName, readMethod));
+			}
+			metadata.setValue(value);
+		}
 	}
 
 	protected List<MetaField> getColumnsDefinitions(T config, ClassLoader cl, String propertyName, Method readMethod) throws Exception {
@@ -189,7 +191,7 @@ public class MetadataGenerator<T> {
 		return meta;
 	}
 
-	protected Object getMetaObjectList(T config, ClassLoader cl, String propertyName, Method readMethod, List<?> value) throws Exception {
+	protected List<MetaObject> getMetaObjectList(T config, ClassLoader cl, String propertyName, Method readMethod, List<?> value) throws Exception {
 		Class<?> type = getExplicitType(config, cl, propertyName, readMethod, value);
 		if (type == null) {
 			type = getReturnTypeGeneric(readMethod, 0);

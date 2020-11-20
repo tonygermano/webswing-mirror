@@ -16,10 +16,10 @@ import javax.swing.SwingUtilities;
 
 import org.webswing.applet.AppletContainer;
 import org.webswing.ext.services.ToolkitFXService;
-import org.webswing.toolkit.util.ClasspathUtil;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
+import org.webswing.util.ClasspathUtil;
 
 public class SwingMain {
 
@@ -46,8 +46,11 @@ public class SwingMain {
 				startSwingApp(args);
 			}
 
+			if (Util.isEvaluation()) {
+				Util.getWebToolkit().showEvaluationWindow();
+			}
 		} catch (Exception e) {
-			Logger.fatal("SwingMain:main", e);
+			AppLogger.fatal("SwingMain:main", e);
 			System.exit(1);
 		}
 	}
@@ -73,7 +76,7 @@ public class SwingMain {
 			AppletContainer ac = new AppletContainer(appletClazz, props);
 			ac.start();
 		} else {
-			Logger.error("Error in SwingMain: " + appletClazz.getCanonicalName() + " class is not a subclass of Applet");
+			AppLogger.error("Error in SwingMain: " + appletClazz.getCanonicalName() + " class is not a subclass of Applet");
 		}
 	}
 
@@ -111,12 +114,12 @@ public class SwingMain {
 							ToolkitFXService toolkitFXServiceImpl = (ToolkitFXService) instance;
 							Services.initializeToolkitFXService(toolkitFXServiceImpl);
 						} catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-							Logger.error("Failed to initialize ToolkitFXServiceImpl", e);
+							AppLogger.error("Failed to initialize ToolkitFXServiceImpl", e);
 						}
 					}
 				});
 			} catch (IllegalAccessException |ClassNotFoundException|NoSuchMethodException  e) {
-				Logger.error("Failed to initialize Javafx Platform",e);
+				AppLogger.error("Failed to initialize Javafx Platform",e);
 			}
 		}
 	}
@@ -131,7 +134,7 @@ public class SwingMain {
 			cl.setAccessible(true);
 			cl.set(q, Thread.currentThread().getContextClassLoader());
 		} catch (Exception e) {
-			Logger.error("Error in SwingMain: EventQueue thread - setting context class loader failed.", e);
+			AppLogger.error("Error in SwingMain: EventQueue thread - setting context class loader failed.", e);
 		}
 	}
 

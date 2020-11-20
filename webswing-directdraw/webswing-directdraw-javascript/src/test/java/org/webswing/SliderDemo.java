@@ -50,7 +50,6 @@ public class SliderDemo extends JPanel {
 	public class ResourceManager {
 
 		public String getString(String string) {
-			// TODO Auto-generated method stub
 			return string;
 		}
 

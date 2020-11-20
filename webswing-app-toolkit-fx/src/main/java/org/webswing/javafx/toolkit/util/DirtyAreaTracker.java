@@ -1,13 +1,14 @@
 package org.webswing.javafx.toolkit.util;
 
+import java.nio.Buffer;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
 import com.sun.javafx.geom.RectBounds;
 import com.sun.prism.web.WebTextureWrapper;
-
-import java.lang.ref.WeakReference;
-import java.nio.Buffer;
-import java.security.Key;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DirtyAreaTracker {
 	public final Map<Buffer, Set<RectBounds>> areasByBufferLookup=Collections.synchronizedMap(new WeakHashMap<>());

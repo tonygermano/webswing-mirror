@@ -1,13 +1,14 @@
 package org.webswing.server.services.security.modules.noaccess;
 
-import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingAuthenticationException;
-import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
-import org.webswing.server.services.security.modules.AbstractSecurityModule;
+import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.webswing.server.common.service.security.AuthenticatedWebswingUser;
+import org.webswing.server.services.security.api.WebswingAuthenticationException;
+import org.webswing.server.services.security.api.WebswingSecurityModuleConfig;
+import org.webswing.server.services.security.modules.AbstractSecurityModule;
 
 public class NoAccessSecurityModule extends AbstractSecurityModule<WebswingSecurityModuleConfig> {
 
@@ -19,7 +20,7 @@ public class NoAccessSecurityModule extends AbstractSecurityModule<WebswingSecur
 	}
 
 	@Override
-	protected AbstractWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException {
+	protected AuthenticatedWebswingUser authenticate(HttpServletRequest request) throws WebswingAuthenticationException {
 		throw new WebswingAuthenticationException("${" + msg + "}");
 	}
 

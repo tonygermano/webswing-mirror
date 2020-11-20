@@ -1,11 +1,5 @@
 package org.webswing.javafx.toolkit.util;
 
-import com.sun.glass.ui.Pixels;
-import com.sun.javafx.geom.RectBounds;
-import org.w3c.dom.css.Rect;
-import org.webswing.toolkit.util.DeamonThreadFactory;
-import org.webswing.toolkit.util.Logger;
-
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
@@ -16,7 +10,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.webswing.util.AppLogger;
+import org.webswing.util.DeamonThreadFactory;
+
+import com.sun.glass.ui.Pixels;
+import com.sun.javafx.geom.RectBounds;
 
 /**
  * Created by vikto on 06-Mar-17.
@@ -106,7 +109,7 @@ public class WebFxUtil {
 										break areaCompare;
 									}
 								} catch (Exception e) {
-									Logger.error("failed to comapare: offset" + offset + "|" + x + "|" + y + "|" + width + "|" + height + "| size" + imgData.length);
+									AppLogger.error("failed to comapare: offset" + offset + "|" + x + "|" + y + "|" + width + "|" + height + "| size" + imgData.length);
 								}
 							}
 						}
@@ -122,7 +125,7 @@ public class WebFxUtil {
 			try {
 				completeResult.addAll(f.get());
 			} catch (Exception e) {
-				Logger.error("failed to compare pixels", e);
+				AppLogger.error("failed to compare pixels", e);
 			}
 		}
 		return completeResult;

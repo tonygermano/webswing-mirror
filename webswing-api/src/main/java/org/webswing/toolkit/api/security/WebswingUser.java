@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Representation of user logged-in to Webswing through web interface. 
  */
-public interface WebswingUser{
+public interface WebswingUser {
 
 	/**
 	 * @return Unique user id

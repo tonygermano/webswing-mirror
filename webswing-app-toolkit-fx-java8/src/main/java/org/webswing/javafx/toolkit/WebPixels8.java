@@ -1,9 +1,9 @@
 package org.webswing.javafx.toolkit;
 
-import com.sun.glass.ui.Pixels;
-
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+
+import com.sun.glass.ui.Pixels;
 
 public class WebPixels8 extends Pixels {
 	public WebPixels8(int width, int height, ByteBuffer data) {

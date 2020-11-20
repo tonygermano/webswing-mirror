@@ -1,0 +1,165 @@
+syntax = "proto2";
+option java_package = "org.webswing.model.appframe.proto";
+package appFrameProtoIn; // javascript namespace
+
+/* =================== BROWSER -> APP ====================*/
+
+message AppFrameMsgInProto {
+    repeated InputEventMsgInProto events = 1;
+    optional PasteEventMsgInProto paste = 2;
+    optional CopyEventMsgInProto copy = 3;
+    optional UploadEventMsgInProto upload = 4;
+    optional FilesSelectedEventMsgInProto selected = 5;
+    optional JsResultMsgInProto jsResponse = 6;
+    optional JavaEvalRequestMsgInProto javaRequest = 7;
+    optional PixelsAreaResponseMsgInProto pixelsResponse = 8;
+    optional WindowEventMsgInProto window = 9;
+    optional ActionEventMsgInProto action = 10;
+    optional AudioEventMsgInProto audio = 11;
+}
+
+message InputEventMsgInProto {
+    optional KeyboardEventMsgInProto key = 1;
+    optional MouseEventMsgInProto mouse = 2;
+    optional WindowFocusMsgInProto focus = 3;
+}
+
+message WindowFocusMsgInProto {
+    optional string windowId = 1;
+    optional string htmlPanelId = 2;
+}
+
+message KeyboardEventMsgInProto {
+    optional KeyEventTypeProto type = 1;
+    optional sint32 character = 2;
+    optional sint32 keycode = 3;
+    optional bool alt = 4;
+    optional bool ctrl = 5;
+    optional bool shift = 6;
+    optional bool meta = 7;
+
+    enum KeyEventTypeProto {
+        keypress = 0;
+        keydown = 1;
+        keyup = 2;
+    }
+}
+
+message MouseEventMsgInProto {
+    optional MouseEventTypeProto type = 1;
+    optional sint32 x = 2;
+    optional sint32 y = 3;
+    optional sint32 wheelDelta = 4;
+    optional sint32 button = 5;
+    optional bool ctrl = 6;
+    optional bool alt = 7;
+    optional bool shift = 8;
+    optional bool meta = 9;
+    optional sint32 buttons = 10;
+    optional sint32 timeMilis = 11;
+    optional string winId = 12;
+
+    enum MouseEventTypeProto {
+        mousemove = 0;
+        mousedown = 1;
+        mouseup = 2;
+        mousewheel = 3;
+        dblclick = 4;
+    }
+}
+
+message CopyEventMsgInProto {
+    optional CopyEventMsgTypeProto type = 1;
+    optional string file = 2;
+    enum CopyEventMsgTypeProto {
+        copy = 0;
+        cut = 1;
+        getFileFromClipboard = 2;
+    }
+}
+
+message PasteEventMsgInProto {
+    optional string text = 1;
+    optional string html = 2;
+    optional string img = 3;
+    optional bool special = 4;
+}
+
+message FilesSelectedEventMsgInProto {
+    repeated string files = 1;
+}
+
+message UploadEventMsgInProto {
+    optional string fileId = 1;
+}
+
+message JavaEvalRequestMsgInProto {
+    optional string correlationId = 1;
+    optional string objectId = 2;
+    optional string method = 3;
+    repeated JsParamMsgInProto params = 4;
+}
+
+message JsResultMsgInProto {
+    optional string correlationId = 1;
+    optional string error = 2;
+    optional JsParamMsgInProto value = 3;
+}
+
+message JsParamMsgInProto {
+    optional string primitive = 1;
+    optional JSObjectMsgInProto jsObject = 2;
+    optional JavaObjectRefMsgInProto javaObject = 3;
+    repeated JsParamMsgInProto array = 4;
+}
+
+message JavaObjectRefMsgInProto {
+    optional string id = 1;
+    repeated string methods = 2;
+}
+
+message JSObjectMsgInProto {
+    optional string id = 1;
+}
+
+message PixelsAreaResponseMsgInProto {
+    optional string correlationId = 1;
+    optional string pixels = 2;
+}
+
+message WindowEventMsgInProto {
+	optional string id = 1;
+	optional sint32 x = 2;
+	optional sint32 y = 3;
+	optional sint32 width = 4;
+	optional sint32 height = 5;
+    optional WindowEventTypeProto eventType = 6;
+
+    enum WindowEventTypeProto {
+        close = 0;
+        focus = 1;
+        maximize = 2;
+        undecorate = 3;
+        decorate = 4;
+        undock = 5;
+        dock = 6;
+    }
+}
+
+message AudioEventMsgInProto {
+	optional string id = 1;
+	optional bool stop = 2;
+}
+
+message ActionEventMsgInProto {
+	optional string actionName = 1;
+	optional string data = 2;
+	optional bytes binaryData = 3;
+	optional string windowId = 4;
+	optional ActionEventTypeProto eventType = 5;
+
+    enum ActionEventTypeProto {
+    	init = 0;
+    	user = 1;
+    }
+}

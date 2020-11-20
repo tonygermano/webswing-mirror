@@ -1,18 +1,5 @@
 package org.webswing.javafx.toolkit;
 
-import com.sun.glass.ui.*;
-
-import javafx.stage.Modality;
-
-import org.webswing.javafx.toolkit.adaper.JDialogAdapter;
-import org.webswing.javafx.toolkit.adaper.JFrameAdapter;
-import org.webswing.javafx.toolkit.adaper.JWindowAdapter;
-import org.webswing.javafx.toolkit.adaper.WindowAdapter;
-import org.webswing.javafx.toolkit.util.WebFxUtil;
-import org.webswing.toolkit.util.Logger;
-
-import javax.swing.SwingUtilities;
-
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -22,11 +9,27 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.SwingUtilities;
+
+import org.webswing.javafx.toolkit.adaper.JDialogAdapter;
+import org.webswing.javafx.toolkit.adaper.JFrameAdapter;
+import org.webswing.javafx.toolkit.adaper.JWindowAdapter;
+import org.webswing.javafx.toolkit.adaper.WindowAdapter;
+import org.webswing.javafx.toolkit.util.WebFxUtil;
+import org.webswing.util.AppLogger;
+
+import com.sun.glass.ui.Cursor;
+import com.sun.glass.ui.Pixels;
+import com.sun.glass.ui.Screen;
+import com.sun.glass.ui.View;
+import com.sun.glass.ui.Window;
+
+import javafx.stage.Modality;
 
 /**
  * Created by vikto on 01-Mar-17.
@@ -149,7 +152,7 @@ public class WebWindow extends Window {
 				}
 			} catch (Exception e) {
 				// ignore
-				Logger.warn("Could not resolve modality for WebWindow.");
+				AppLogger.warn("Could not resolve modality for WebWindow.");
 			}
 		});
 	}

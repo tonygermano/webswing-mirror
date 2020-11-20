@@ -1,16 +1,17 @@
 package org.webswing.server.services.security.extension.accessmapping;
 
-import org.apache.commons.lang3.StringUtils;
-import org.webswing.server.services.security.api.AbstractWebswingUser;
-import org.webswing.server.services.security.api.WebswingAction;
-import org.webswing.server.services.security.extension.api.SecurityModuleExtension;
-import org.webswing.server.services.security.extension.api.WebswingUserDecorator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.webswing.server.common.model.security.WebswingAction;
+import org.webswing.server.common.service.security.AuthenticatedWebswingUser;
+import org.webswing.server.services.security.extension.api.SecurityModuleExtension;
+import org.webswing.server.services.security.extension.api.WebswingUserDecorator;
 
 public class AccessMappingSecurityExtension extends SecurityModuleExtension<AccessMappingExtensionConfig> {
 
@@ -24,8 +25,10 @@ public class AccessMappingSecurityExtension extends SecurityModuleExtension<Acce
 	}
 
 	@Override
-	public AbstractWebswingUser decorateUser(AbstractWebswingUser user, HttpServletRequest request, HttpServletResponse response) {
+	public AuthenticatedWebswingUser decorateUser(AuthenticatedWebswingUser user, HttpServletRequest request, HttpServletResponse response) {
 		return new WebswingUserDecorator(user) {
+			private static final long serialVersionUID = -3360930503393350015L;
+
 			@Override
 			public boolean isPermitted(String permission) {
 				WebswingAction.AccessType[] validAccessTypes;

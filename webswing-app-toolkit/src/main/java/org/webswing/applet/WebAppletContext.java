@@ -15,8 +15,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 import sun.awt.image.URLImageSource;
 import sun.misc.Ref;
@@ -68,7 +68,7 @@ public class WebAppletContext implements AppletContext {
 		try {
 			Util.getWebToolkit().getPaintDispatcher().notifyOpenLinkAction(url.toURI());
 		} catch (URISyntaxException e) {
-			Logger.error("AppletContext.showDocument failed.", e);
+			AppLogger.error("AppletContext.showDocument failed.", e);
 		}
 	}
 
@@ -77,13 +77,13 @@ public class WebAppletContext implements AppletContext {
 		try {
 			Util.getWebToolkit().getPaintDispatcher().notifyOpenLinkAction(url.toURI());
 		} catch (URISyntaxException e) {
-			Logger.error("AppletContext.showDocument failed.", e);
+			AppLogger.error("AppletContext.showDocument failed.", e);
 		}
 	}
 
 	@Override
 	public void showStatus(String status) {
-		Logger.info("Applet status: " + status);
+		AppLogger.info("Applet status: " + status);
 	}
 
 	@Override

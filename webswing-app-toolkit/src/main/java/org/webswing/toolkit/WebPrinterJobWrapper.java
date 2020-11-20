@@ -1,7 +1,13 @@
 package org.webswing.toolkit;
 
-import org.webswing.Constants;
-import org.webswing.toolkit.util.WebPrintDialog;
+import java.awt.AWTError;
+import java.awt.HeadlessException;
+import java.awt.print.PageFormat;
+import java.awt.print.Pageable;
+import java.awt.print.Paper;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 
 import javax.print.DocFlavor;
 import javax.print.PrintService;
@@ -9,11 +15,15 @@ import javax.print.PrintServiceLookup;
 import javax.print.attribute.AttributeSet;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.*;
+import javax.print.attribute.standard.Media;
+import javax.print.attribute.standard.MediaPrintableArea;
+import javax.print.attribute.standard.MediaSize;
+import javax.print.attribute.standard.MediaSizeName;
+import javax.print.attribute.standard.OrientationRequested;
 import javax.swing.JOptionPane;
-import java.awt.AWTError;
-import java.awt.HeadlessException;
-import java.awt.print.*;
+
+import org.webswing.Constants;
+import org.webswing.toolkit.util.WebPrintDialog;
 
 public class WebPrinterJobWrapper extends PrinterJob {
 	public static final int DPI = 72;

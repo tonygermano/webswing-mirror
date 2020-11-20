@@ -4,10 +4,15 @@
     <parent>
         <artifactId>webswing-server</artifactId>
         <groupId>org.webswing</groupId>
-        <version>20.1.8</version>
+        <version>20.2</version>
         <relativePath>..</relativePath>
     </parent>
     <dependencies>
+        <dependency>
+            <groupId>org.webswing</groupId>
+            <artifactId>webswing-api</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.webswing</groupId>
             <artifactId>webswing-server-common</artifactId>

@@ -40,18 +40,18 @@ public class CommonUtil {
 					return iconMap.get(DEFAULT);
 				} else {
 					BufferedImage defaultIcon = ImageIO.read(CommonUtil.class.getClassLoader().getResourceAsStream("images/java.png"));
-					byte[] b64icon = getPngImage(defaultIcon);
-					iconMap.put(DEFAULT, b64icon);
-					return b64icon;
+					byte[] byteIcon = getPngImage(defaultIcon);
+					iconMap.put(DEFAULT, byteIcon);
+					return byteIcon;
 				}
 			} else {
 				if (iconMap.containsKey(icon)) {
 					return iconMap.get(icon);
 				} else {
 					BufferedImage defaultIcon = ImageIO.read(new File(icon));
-					byte[] b64icon = getPngImage(defaultIcon);
-					iconMap.put(icon, b64icon);
-					return b64icon;
+					byte[] byteIcon = getPngImage(defaultIcon);
+					iconMap.put(icon, byteIcon);
+					return byteIcon;
 				}
 			}
 		} catch (IOException e) {

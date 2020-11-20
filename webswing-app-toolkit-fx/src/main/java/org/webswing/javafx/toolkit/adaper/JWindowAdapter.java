@@ -1,9 +1,9 @@
 package org.webswing.javafx.toolkit.adaper;
 
+import java.awt.Window;
+
 import javax.swing.JDialog;
 import javax.swing.JRootPane;
-import javax.swing.JWindow;
-import java.awt.Window;
 
 public class JWindowAdapter extends JDialog implements WindowAdapter {
 	public JWindowAdapter(Window parent) {

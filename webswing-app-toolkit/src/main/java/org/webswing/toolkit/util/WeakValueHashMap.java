@@ -1,5 +1,7 @@
 package org.webswing.toolkit.util;
 
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,8 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
 
 // inspired by http://www.java2s.com/Code/Java/Collections-Data-Structure/WeakValueHashMap.htm
 // own implementation

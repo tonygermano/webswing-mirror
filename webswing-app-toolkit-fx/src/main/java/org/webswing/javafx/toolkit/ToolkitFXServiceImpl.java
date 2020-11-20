@@ -12,9 +12,9 @@ import javax.swing.JComponent;
 
 import org.webswing.ext.services.ToolkitFXService;
 import org.webswing.javafx.toolkit.adaper.WindowAdapter;
-import org.webswing.model.s2c.ComponentTreeMsg;
-import org.webswing.toolkit.util.Logger;
+import org.webswing.model.appframe.out.ComponentTreeMsgOut;
 import org.webswing.toolkit.util.ToolkitUtil;
+import org.webswing.util.AppLogger;
 
 import javafx.embed.swing.JFXPanel;
 import javafx.embed.swing.SwingNode;
@@ -56,8 +56,8 @@ public class ToolkitFXServiceImpl implements ToolkitFXService {
 	}
 	
 	@Override
-	public List<ComponentTreeMsg> requestNodeTree(Object node) {
-		List<ComponentTreeMsg> componentTree = new ArrayList<ComponentTreeMsg>();
+	public List<ComponentTreeMsgOut> requestNodeTree(Object node) {
+		List<ComponentTreeMsgOut> componentTree = new ArrayList<ComponentTreeMsgOut>();
 		
 		if (node != null && node instanceof Node) {
 			componentTree.add(createComponentTreeMsg((Node) node));
@@ -75,8 +75,8 @@ public class ToolkitFXServiceImpl implements ToolkitFXService {
 		return window instanceof WindowAdapter;
 	}
 	
-	private ComponentTreeMsg createComponentTreeMsg(Node n) {
-		ComponentTreeMsg msg = createComponentTreeMsgFromNode(n);
+	private ComponentTreeMsgOut createComponentTreeMsg(Node n) {
+		ComponentTreeMsgOut msg = createComponentTreeMsgFromNode(n);
 		
 		if (ignoreChildren.contains(ToolkitUtil.getComponentType(n))) {
 			return msg;
@@ -92,7 +92,7 @@ public class ToolkitFXServiceImpl implements ToolkitFXService {
 				try {
 					msg.setComponents(ToolkitUtil.getComponentTree(swingComponent));
 				} catch (Exception e) {
-					Logger.warn("Error while creating Swing component tree for SwingNode!", e);
+					AppLogger.warn("Error while creating Swing component tree for SwingNode!", e);
 				}
 			}
 		}
@@ -100,8 +100,8 @@ public class ToolkitFXServiceImpl implements ToolkitFXService {
 		return msg;
 	}
 	
-	private ComponentTreeMsg createComponentTreeMsgFromNode(Node n) {
-		ComponentTreeMsg msg = new ComponentTreeMsg();
+	private ComponentTreeMsgOut createComponentTreeMsgFromNode(Node n) {
+		ComponentTreeMsgOut msg = new ComponentTreeMsgOut();
 		
 		msg.setComponentType(ToolkitUtil.getComponentType(n));
 		msg.setName(n.getId());

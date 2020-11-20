@@ -1,0 +1,69 @@
+package org.webswing.model.app.in;
+
+import java.util.List;
+
+import org.webswing.model.MsgIn;
+import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
+import org.webswing.model.common.in.SimpleEventMsgIn;
+
+public class ServerToAppFrameMsgIn implements MsgIn {
+
+	private static final long serialVersionUID = -7029550828562961792L;
+
+	private ThreadDumpRequestMsgIn threadDumpRequest;
+	private ApiEventMsgIn apiEvent;
+	private ApiCallResultMsgIn apiCallResult;
+	private ConnectionHandshakeMsgIn handshake;
+	private List<SimpleEventMsgIn> events;
+	
+	private byte[] appFrameMsgIn;
+	
+	public byte[] getAppFrameMsgIn() {
+		return appFrameMsgIn;
+	}
+	
+	public void setAppFrameMsgIn(byte[] appFrameMsgIn) {
+		this.appFrameMsgIn = appFrameMsgIn;
+	}
+	
+	public ThreadDumpRequestMsgIn getThreadDumpRequest() {
+		return threadDumpRequest;
+	}
+	
+	public void setThreadDumpRequest(ThreadDumpRequestMsgIn threadDumpRequest) {
+		this.threadDumpRequest = threadDumpRequest;
+	}
+	
+	public ApiEventMsgIn getApiEvent() {
+		return apiEvent;
+	}
+	
+	public void setApiEvent(ApiEventMsgIn apiEvent) {
+		this.apiEvent = apiEvent;
+	}
+
+	public ConnectionHandshakeMsgIn getHandshake() {
+		return handshake;
+	}
+
+	public void setHandshake(ConnectionHandshakeMsgIn handshake) {
+		this.handshake = handshake;
+	}
+
+	public ApiCallResultMsgIn getApiCallResult() {
+		return apiCallResult;
+	}
+
+	public void setApiCallResult(ApiCallResultMsgIn apiCallResult) {
+		this.apiCallResult = apiCallResult;
+	}
+
+	public List<SimpleEventMsgIn> getEvents() {
+		return events;
+	}
+
+	public void setEvents(List<SimpleEventMsgIn> events) {
+		this.events = events;
+	}
+
+}

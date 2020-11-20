@@ -1,17 +1,21 @@
 package org.webswing.server.common.util;
 
-import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.text.StrLookup;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.webswing.Constants;
 import org.webswing.server.common.model.SecuredPathConfig;
+import org.webswing.server.common.model.SwingConfig;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class VariableSubstitutor {
 
@@ -22,22 +26,22 @@ public class VariableSubstitutor {
 		return new VariableSubstitutor(new HashMap<String, String>());
 	}
 
-	public static VariableSubstitutor forSwingInstance(SecuredPathConfig config, String user, Map<String, Serializable> userAttributes, String sessionId, String clientIp, String locale, String timeZone, String customArgs) {
+	public static VariableSubstitutor forSwingInstance(SwingConfig config, String user, Map<String, String> userAttributes, String instanceId, String clientIp, String locale, String timeZone, String customArgs) {
 		Map<String, String> result = new HashMap<String, String>();
 		if (user != null) {
 			result.put(Constants.USER_NAME_SUBSTITUTE, user);
 		}
 		if (userAttributes != null) {
-			for (Entry<String, Serializable> e : userAttributes.entrySet()) {
+			for (Entry<String, String> e : userAttributes.entrySet()) {
 				try {
-					result.put(Constants.USER_NAME_SUBSTITUTE + "." + e.getKey(), e.getValue().toString());
+					result.put(Constants.USER_NAME_SUBSTITUTE + "." + e.getKey(), e.getValue());
 				} catch (Exception e1) {
 					//ignore
 				}
 			}
 		}
-		if (sessionId != null) {
-			result.put(Constants.SESSION_ID_SUBSTITUTE, sessionId);
+		if (instanceId != null) {
+			result.put(Constants.INSTANCE_ID_SUBSTITUTE, instanceId);
 		}
 		if (clientIp != null) {
 			result.put(Constants.SESSION_IP_SUBSTITUTE, clientIp);
@@ -58,7 +62,7 @@ public class VariableSubstitutor {
 			}
 		}
 
-		VariableSubstitutor substitutor = forSwingApp(config);
+		VariableSubstitutor substitutor = basic();
 		substitutor.extendCustomVars(result);
 		return substitutor;
 	}
@@ -76,7 +80,7 @@ public class VariableSubstitutor {
 	public static VariableSubstitutor forSwingApp(SecuredPathConfig config) {
 		Map<String, String> result = new HashMap<String, String>();
 		if (config != null) {
-			result.put(Constants.APP_HOME_FOLDER_SUBSTITUTE, config.getHomeDir());
+			result.put(Constants.APP_HOME_FOLDER_SUBSTITUTE, config.getWebHomeDir());
 			result.put(Constants.APP_CONTEXT_PATH_SUBSTITUTE, config.getPath());
 		}
 		return new VariableSubstitutor(result);
@@ -110,7 +114,7 @@ public class VariableSubstitutor {
 		return subs.replace(string);
 	}
 
-	public Map<String, String> getVariableMap() {
+	private Map<String, String> getVariableMap() {
 		Map<String, String> result = new HashMap<String, String>();
 		result.putAll(System.getenv());
 		for (final String name : System.getProperties().stringPropertyNames()) {
@@ -122,6 +126,62 @@ public class VariableSubstitutor {
 
 	private void extendCustomVars(Map<String, String> customVars){
 		this.customVars.putAll(customVars);
+	}
+
+	public Map<String, String> searchVariables(String searchSequence) {
+		final int VARIABLES_RESULT_COUNT = 10;
+		if (searchSequence == null) {
+			searchSequence = "";
+		}
+
+		// transform search sequence - this is case insensitive search
+		searchSequence = searchSequence.toLowerCase();
+
+		// alphabetically sorted variables, whose name (key of the map entry) starts with search sequence
+		Map<String, String> searchResultStartBy = new TreeMap<>();
+		// alphabetically sorted variables, whose name (key of the map entry) contains search sequence
+		Map<String, String> searchResultContains = new TreeMap<>();
+
+		// first, sort all existing variables by alphabetically order,
+		// because empty search string - getting list of first 10th variables, not first 10th found unordered variables
+		SortedMap<String, String> variables = new TreeMap<>(getVariableMap());
+
+		for (Map.Entry<String, String> variable : variables.entrySet()) {
+			if (searchResultStartBy.size() + searchResultContains.size() == VARIABLES_RESULT_COUNT) {
+				break;
+			}
+
+			// search in variable names
+			//
+			String variableLowerCase = variable.getKey().toLowerCase();
+
+			if (variableLowerCase.startsWith(searchSequence)) {
+				searchResultStartBy.put(variable.getKey(), variable.getValue());
+				continue;
+			}
+			if (variableLowerCase.contains(searchSequence)) {
+				searchResultContains.put(variable.getKey(), variable.getValue());
+				continue;
+			}
+
+			// search in variable values
+			//
+			String valueLowerCase = variable.getValue().toLowerCase();
+
+			if (valueLowerCase.contains(searchSequence)) {
+				searchResultContains.put(variable.getKey(), variable.getValue());
+				//noinspection UnnecessaryContinue
+				continue;
+			}
+		}
+
+		// all results, ordered and sorted per result category
+		Map<String, String> allResults = new LinkedHashMap<>();
+
+		allResults.putAll(searchResultStartBy);
+		allResults.putAll(searchResultContains);
+
+		return allResults;
 	}
 
 }

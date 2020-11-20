@@ -7,11 +7,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.util.UUID;
 
 import javax.print.PrintService;
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -21,11 +17,9 @@ import javax.print.attribute.standard.MediaPrintableArea;
 import javax.print.attribute.standard.MediaSizeName;
 import javax.print.attribute.standard.OrientationRequested;
 
-import org.webswing.Constants;
-import org.webswing.model.internal.PrinterJobResultMsgInternal;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 public class WebPrinterJob extends PrinterJob {
 	private PrintRequestAttributeSet attribs = new HashPrintRequestAttributeSet();
@@ -93,22 +87,12 @@ public class WebPrinterJob extends PrinterJob {
 			Services.getPdfService().printToPDF(out, pageable, printable, attribs);
 			servePDF(out);
 		} catch (IOException e) {
-			Logger.error("IOException while printing to PDF!", e);
+			AppLogger.error("IOException while printing to PDF!", e);
 		}
 	}
 	
 	private void servePDF(ByteArrayOutputStream out) {
-		String tempDir = System.getProperty(Constants.TEMP_DIR_PATH);
-		String id = UUID.randomUUID().toString();
-		File f = new File(URI.create(tempDir + "/" + id + ".pdf"));
-		try {
-			FileOutputStream output = new FileOutputStream(f);
-			out.writeTo(output);
-			output.close();
-		} catch (Exception e) {
-			Logger.error("Failed to save print pdf file to location " + f.getAbsolutePath(), e);
-		}
-		Util.getWebToolkit().getPaintDispatcher().notifyPrintPdfFile(id, f);
+		Util.getWebToolkit().getPaintDispatcher().notifyPrintPdfFile(out);
 	}
 
 	@Override

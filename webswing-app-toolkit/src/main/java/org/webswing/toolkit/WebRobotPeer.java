@@ -11,17 +11,21 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.awt.peer.RobotPeer;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
 
-import org.webswing.model.c2s.KeyboardEventMsgIn;
-import org.webswing.model.c2s.MouseEventMsgIn;
-import org.webswing.model.c2s.PixelsAreaResponseMsgIn;
-import org.webswing.model.s2c.AppFrameMsgOut;
-import org.webswing.model.s2c.PixelsAreaRequestMsgOut;
-import org.webswing.toolkit.util.Logger;
+import org.webswing.model.SyncObjectResponse;
+import org.webswing.model.app.out.AppToServerFrameMsgOut;
+import org.webswing.model.appframe.in.AppFrameMsgIn;
+import org.webswing.model.appframe.in.InputEventMsgIn;
+import org.webswing.model.appframe.in.KeyboardEventMsgIn;
+import org.webswing.model.appframe.in.MouseEventMsgIn;
+import org.webswing.model.appframe.out.AppFrameMsgOut;
+import org.webswing.model.appframe.out.PixelsAreaRequestMsgOut;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
 
 public class WebRobotPeer implements RobotPeer {
 
@@ -81,22 +85,28 @@ public class WebRobotPeer implements RobotPeer {
 	@Override
 	public int[] getRGBPixels(Rectangle bounds) {
 		BufferedImage resultImage = new BufferedImage(bounds.width, bounds.height, BufferedImage.TYPE_INT_ARGB);
-		AppFrameMsgOut msg = new AppFrameMsgOut();
+		AppFrameMsgOut frameOut = new AppFrameMsgOut();
 		PixelsAreaRequestMsgOut pixelsRequest = new PixelsAreaRequestMsgOut();
 		pixelsRequest.setCorrelationId(UUID.randomUUID().toString());
 		pixelsRequest.setX(bounds.x);
 		pixelsRequest.setY(bounds.y);
 		pixelsRequest.setW(bounds.width);
 		pixelsRequest.setH(bounds.height);
-		msg.setPixelsRequest(pixelsRequest);
+		frameOut.setPixelsRequest(pixelsRequest);
 		try {
-			PixelsAreaResponseMsgIn result = (PixelsAreaResponseMsgIn) Services.getConnectionService().sendObjectSync(msg, pixelsRequest.getCorrelationId());
-			Image image = Services.getImageService().readFromDataUrl(result.getPixels());
-			Graphics g = resultImage.getGraphics();
-			g.drawImage(image, 0, 0, null);
-			g.dispose();
+			AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+			SyncObjectResponse result = Services.getConnectionService().sendObjectSync(msgOut, frameOut, pixelsRequest.getCorrelationId());
+			if (result.getFrame() != null) {
+				AppFrameMsgIn frame = result.getFrame();
+				if (frame != null && frame.getPixelsResponse() != null) {
+					Image image = Services.getImageService().readFromDataUrl(frame.getPixelsResponse().getPixels());
+					Graphics g = resultImage.getGraphics();
+					g.drawImage(image, 0, 0, null);
+					g.dispose();
+				}
+			}
 		} catch (Exception e) {
-			Logger.error("Failed to get pixels area from browser.", e);
+			AppLogger.error("Failed to get pixels area from browser.", e);
 		}
 		return ((DataBufferInt) resultImage.getRaster().getDataBuffer()).getData();
 	}
@@ -106,6 +116,7 @@ public class WebRobotPeer implements RobotPeer {
 	}
 
 	private void sendKeyEvent(KeyboardEventMsgIn.KeyEventType type, int keycode) {
+		AppFrameMsgIn msgIn = new AppFrameMsgIn();
 		KeyboardEventMsgIn kme = new KeyboardEventMsgIn();
 		kme.setType(type);
 		kme.setShift(isShift());
@@ -115,10 +126,14 @@ public class WebRobotPeer implements RobotPeer {
 		kme.setKeycode(keycode);
 		int character = (!isShift() && (keycode >= 65 && keycode <= 90)) ? keycode + 32 : keycode;
 		kme.setCharacter(character);
-		Util.getWebToolkit().getEventDispatcher().dispatchEvent(kme);
+		InputEventMsgIn input = new InputEventMsgIn();
+		input.setKey(kme);
+		msgIn.setEvents(Arrays.asList(input));
+		Util.getWebToolkit().getEventDispatcher().dispatchEvent(msgIn);
 	}
 
 	private void sendMouseEvent(MouseEventMsgIn.MouseEventType type, int wheelDelta, Point mousePos) {
+		AppFrameMsgIn msgIn = new AppFrameMsgIn();
 		MouseEventMsgIn mme = new MouseEventMsgIn();
 		mme.setShift(isShift());
 		mme.setAlt(isAlt());
@@ -130,7 +145,10 @@ public class WebRobotPeer implements RobotPeer {
 		mme.setWheelDelta(wheelDelta);
 		mme.setX(mousePos.x);
 		mme.setY(mousePos.y);
-		Util.getWebToolkit().getEventDispatcher().dispatchEvent(mme);
+		InputEventMsgIn input = new InputEventMsgIn();
+		input.setMouse(mme);
+		msgIn.setEvents(Arrays.asList(input));
+		Util.getWebToolkit().getEventDispatcher().dispatchEvent(msgIn);
 	}
 
 	private boolean isMeta() {
@@ -184,4 +202,5 @@ public class WebRobotPeer implements RobotPeer {
 		}
 		return 0;
 	}
+
 }

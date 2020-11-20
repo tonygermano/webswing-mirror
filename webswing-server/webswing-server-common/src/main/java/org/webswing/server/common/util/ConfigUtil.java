@@ -3,6 +3,8 @@ package org.webswing.server.common.util;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -13,10 +15,12 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.server.common.model.Config;
@@ -258,7 +262,28 @@ public class ConfigUtil {
 			throw new IllegalArgumentException("Could not convert number [" + number + "] of type [" + number.getClass().getName() + "] to unknown target class [" + targetClass.getName() + "]");
 		}
 	}
-
+	
+	public static Map<String, Object> fixPaths(File config, Map<String, Object> json) throws IOException {
+		Map<String, Object> result = new LinkedHashMap<String, Object>();
+		boolean changed = false;
+		for (String key : json.keySet()) {
+			String path = CommonUtil.toPath(key).toLowerCase();
+			path = StringUtils.isEmpty(path) ? "/" : path;
+			result.put(path, json.get(key));
+			if (!StringUtils.equals(path, key)) {
+				changed = true;
+			}
+		}
+		if (changed) {
+			try {
+				WebswingObjectMapper.get().writerWithDefaultPrettyPrinter().writeValue(config, result);
+			} catch (IOException e) {
+				log.error("Failed save fixed paths in configuration file. ", e);
+			}
+		}
+		return result;
+	}
+	
 	private static void raiseOverflowException(Number number, Class targetClass) {
 		throw new IllegalArgumentException("Could not convert number [" + number + "] of type [" + number.getClass().getName() + "] to target class [" + targetClass.getName() + "]: overflow");
 	}

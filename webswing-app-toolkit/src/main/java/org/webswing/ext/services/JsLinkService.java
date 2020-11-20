@@ -2,21 +2,22 @@ package org.webswing.ext.services;
 
 import java.lang.reflect.Method;
 
-import netscape.javascript.JSException;
+import org.webswing.model.appframe.in.JavaEvalRequestMsgIn;
+import org.webswing.model.appframe.in.JsParamMsgIn;
+import org.webswing.model.appframe.out.JsParamMsgOut;
+import org.webswing.model.appframe.out.JsResultMsgOut;
 
-import org.webswing.model.jslink.JavaEvalRequestMsgIn;
-import org.webswing.model.jslink.JsParamMsg;
-import org.webswing.model.jslink.JsResultMsg;
+import netscape.javascript.JSException;
 
 public interface JsLinkService {
 
-	public JsParamMsg generateParam(Object arg) throws Exception;
+	public JsParamMsgOut generateParam(Object arg) throws Exception;
 
-	public JsResultMsg generateJavaResult(JavaEvalRequestMsgIn javaReq, Object result) throws Exception;
+	public JsResultMsgOut generateJavaResult(String correlationId, Object result) throws Exception;
 
-	public JsResultMsg generateJavaErrorResult(JavaEvalRequestMsgIn javaReq, Throwable result);
+	public JsResultMsgOut generateJavaErrorResult(String correlationId, Throwable result);
 
-	public Object parseValue(JsParamMsg value) throws JSException;
+	public Object parseValue(JsParamMsgIn value) throws JSException;
 
 	public Object[] getCompatibleParams(JavaEvalRequestMsgIn javaReq, Method m) throws Exception;
 

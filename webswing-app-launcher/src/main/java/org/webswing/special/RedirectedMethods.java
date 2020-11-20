@@ -15,7 +15,7 @@ import javax.swing.JDesktopPane;
 import org.webswing.SwingMain;
 import org.webswing.toolkit.WebPrintService;
 import org.webswing.toolkit.WebPrinterJobWrapper;
-import org.webswing.toolkit.util.Logger;
+import org.webswing.util.AppLogger;
 
 public class RedirectedMethods {
 
@@ -68,7 +68,7 @@ public class RedirectedMethods {
 
 	public static void putClientProperty(JDesktopPane target, Object key, Object value) {
 		if ("JDesktopPane.dragMode".equals(key) && "outline".equals(value)) {
-			Logger.warn("Outline drag mode for JDesktop pane is not supported in Webswing.");
+			AppLogger.warn("Outline drag mode for JDesktop pane is not supported in Webswing.");
 		} else {
 			target.putClientProperty(key, value);
 		}

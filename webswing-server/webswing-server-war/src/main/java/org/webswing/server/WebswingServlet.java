@@ -1,15 +1,6 @@
 package org.webswing.server;
 
-import com.google.inject.*;
-import com.google.inject.Module;
-import com.google.inject.util.Modules;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.webswing.Constants;
-import org.webswing.server.services.security.SecurityManagerService;
-import org.webswing.server.services.startup.StartupService;
-import org.webswing.toolkit.util.GitRepositoryState;
+import java.io.IOException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -18,7 +9,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.webswing.server.api.GlobalUrlHandler;
+import org.webswing.server.api.services.sessionpool.SessionPoolHolderService;
+import org.webswing.server.api.services.startup.StartupService;
+import org.webswing.server.common.service.security.SecurityManagerService;
+import org.webswing.server.services.sessionpool.impl.LocalSessionPoolConnector;
+import org.webswing.util.GitRepositoryState;
+
+import com.google.inject.Binder;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 
 @WebServlet(asyncSupported = true, displayName = "WebswingServlet", urlPatterns = { "/*" })
 @MultipartConfig(fileSizeThreshold = 5242880)
@@ -41,28 +45,24 @@ public class WebswingServlet extends HttpServlet {
 		};
 				
 		try {
-			Injector injector;
-			Module enterpriseModule = createEnterpriseModule();
-			if(enterpriseModule == null) {
-				injector = Guice.createInjector(servletModule, new WebswingServerModule());
-			} else {
-				Module overriddenModule = Modules.override(new WebswingServerModule()).with(enterpriseModule);
-				injector = Guice.createInjector(Modules.combine(servletModule,overriddenModule ));
-			}
+			Injector injector = Guice.createInjector(servletModule, new WebswingServerModule());
 				
 			this.startup = injector.getInstance(StartupService.class);
 			this.startup.start();
 			this.securityManager = injector.getInstance(SecurityManagerService.class);
-			this.securityManager.start();
 			this.handler = injector.getInstance(GlobalUrlHandler.class);
 			this.handler.init();
+			
+			// initialize local session pool
+			SessionPoolHolderService sessionPoolHolder = injector.getInstance(SessionPoolHolderService.class);
+			sessionPoolHolder.registerSessionPool(injector.getInstance(LocalSessionPoolConnector.class));
 		} catch (Exception e) {
 			log.error("Initialization of Webswing failed. ", e);
 			destroy();
 			throw new ServletException("Webswing failed to start!", e);
 		}
 	}
-
+	
 	public void handleRequest(HttpServletRequest req, HttpServletResponse res) {
 		securityManager.secure(handler, req, res);
 	}
@@ -74,9 +74,6 @@ public class WebswingServlet extends HttpServlet {
 		}
 		if (this.startup != null) {
 			this.startup.stop();
-		}
-		if (this.securityManager != null) {
-			this.securityManager.stop();
 		}
 	}
 
@@ -120,16 +117,4 @@ public class WebswingServlet extends HttpServlet {
 		return handler.getLastModified(req);
 	}
 	
-	private Module createEnterpriseModule(){
-		try {
-			Class<?> moduleClass = WebswingServerModule.class.getClassLoader().loadClass(Constants.ENTERPRISE_MODULE);
-			Module module = (AbstractModule) moduleClass.newInstance();
-			log.info("Webswing Enterprise module intialized.");
-			return module;
-		} catch (Throwable e) {
-			log.debug("Enterprise module not available. "+e.getMessage());
-			return null;
-		}
-
-	}
 }

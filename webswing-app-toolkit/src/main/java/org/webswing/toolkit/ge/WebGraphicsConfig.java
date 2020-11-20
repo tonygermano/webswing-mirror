@@ -1,6 +1,11 @@
 package org.webswing.toolkit.ge;
 
-import java.awt.*;
+import java.awt.AWTException;
+import java.awt.Component;
+import java.awt.GraphicsDevice;
+import java.awt.Image;
+import java.awt.ImageCapabilities;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.VolatileImage;

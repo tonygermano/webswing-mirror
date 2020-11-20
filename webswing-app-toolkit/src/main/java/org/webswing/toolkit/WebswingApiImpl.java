@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.Transferable;
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -12,7 +13,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,13 +27,15 @@ import org.webswing.Constants;
 import org.webswing.component.HtmlPanelImpl;
 import org.webswing.dispatch.PaintDispatcher;
 import org.webswing.model.Msg;
-import org.webswing.model.c2s.ActionEventMsgIn;
-import org.webswing.model.c2s.ActionEventMsgIn.ActionEventType;
-import org.webswing.model.c2s.ConnectionHandshakeMsgIn;
-import org.webswing.model.internal.ApiCallMsgInternal;
-import org.webswing.model.internal.ApiCallMsgInternal.ApiMethod;
-import org.webswing.model.internal.ApiEventMsgInternal;
-import org.webswing.model.internal.ApiEventMsgInternal.ApiEventType;
+import org.webswing.model.SyncObjectResponse;
+import org.webswing.model.app.in.ApiEventMsgIn;
+import org.webswing.model.app.in.ApiEventMsgIn.ApiEventType;
+import org.webswing.model.app.out.ApiCallMsgOut;
+import org.webswing.model.app.out.ApiCallMsgOut.ApiMethod;
+import org.webswing.model.app.out.AppToServerFrameMsgOut;
+import org.webswing.model.appframe.in.ActionEventMsgIn;
+import org.webswing.model.appframe.in.ActionEventMsgIn.ActionEventType;
+import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingApiException;
 import org.webswing.toolkit.api.action.WebActionEvent;
@@ -53,11 +55,11 @@ import org.webswing.toolkit.api.security.WebswingUserListener;
 import org.webswing.toolkit.api.url.WebswingUrlState;
 import org.webswing.toolkit.api.url.WebswingUrlStateChangeEvent;
 import org.webswing.toolkit.api.url.WebswingUrlStateChangeListener;
-import org.webswing.toolkit.util.DeamonThreadFactory;
-import org.webswing.toolkit.util.GitRepositoryState;
-import org.webswing.toolkit.util.Logger;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
+import org.webswing.util.AppLogger;
+import org.webswing.util.DeamonThreadFactory;
+import org.webswing.util.GitRepositoryState;
 
 public class WebswingApiImpl implements WebswingApi {
 	private final List<WebswingShutdownListener> shutdownListeners = Collections.synchronizedList(new ArrayList<WebswingShutdownListener>());
@@ -82,9 +84,14 @@ public class WebswingApiImpl implements WebswingApi {
 	@Override
 	public Boolean primaryUserHasRole(String role) throws WebswingApiException {
 		try {
-			return apiCall(ApiMethod.HasRole, role);
+			String result = apiCall(ApiMethod.HasRole, role);
+			if (result == null) {
+				throw new WebswingApiException("No result from api call!");
+			}
+			
+			return Boolean.parseBoolean(result);
 		} catch (WebswingApiException e) {
-			Logger.error("Failed to resolve role assignemnt.", e);
+			AppLogger.error("Failed to resolve role assignemnt.", e);
 			throw e;
 		}
 	}
@@ -92,9 +99,14 @@ public class WebswingApiImpl implements WebswingApi {
 	@Override
 	public Boolean primaryUserIsPermitted(String permission) throws WebswingApiException {
 		try {
-			return apiCall(ApiMethod.IsPermitted, permission);
+			String result = apiCall(ApiMethod.IsPermitted, permission);
+			if (result == null) {
+				throw new WebswingApiException("No result from api call!");
+			}
+			
+			return Boolean.parseBoolean(result);
 		} catch (WebswingApiException e) {
-			Logger.error("Failed to resolve role assignemnt.", e);
+			AppLogger.error("Failed to resolve role assignemnt.", e);
 			throw e;
 		}
 	}
@@ -130,17 +142,21 @@ public class WebswingApiImpl implements WebswingApi {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T> T apiCall(ApiMethod m, Serializable... args) throws WebswingApiException {
-		ApiCallMsgInternal msg = new ApiCallMsgInternal();
+	private String apiCall(ApiMethod m, String... args) throws WebswingApiException {
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		ApiCallMsgOut msg = new ApiCallMsgOut();
 		msg.setMethod(m);
-		msg.setArgs(args);
+		msg.setArgs(Arrays.asList(args));
+		msgOut.setApiCall(msg);
 		try {
-			ApiCallMsgInternal result = (ApiCallMsgInternal) Services.getConnectionService().sendObjectSync(msg, msg.getCorrelationId());
-			return ((T) result.getResult());
+			SyncObjectResponse resultFrame = Services.getConnectionService().sendObjectSync(msgOut, null, msg.getCorrelationId());
+			if (resultFrame.getMsgIn() != null && resultFrame.getMsgIn().getApiCallResult() != null) {
+				return resultFrame.getMsgIn().getApiCallResult().getResult();
+			}
 		} catch (Exception e) {
 			throw new WebswingApiException("API call failed.", e);
 		}
+		return null;
 	}
 
 	void processEvent(final Msg msg) {
@@ -158,20 +174,20 @@ public class WebswingApiImpl implements WebswingApi {
 							try {
 								WebswingApiImpl.this.fireUrlChangeListener(stateChangeEvent);
 							} catch (Exception e) {
-								Logger.error("Processing URL change api event failed.", e);
+								AppLogger.error("Processing URL change api event failed.", e);
 							}
 						}
 					}
 				});
 			}
-		} else if (msg instanceof ApiEventMsgInternal) {
-			final ApiEventMsgInternal event = (ApiEventMsgInternal) msg;
+		} else if (msg instanceof ApiEventMsgIn) {
+			final ApiEventMsgIn event = (ApiEventMsgIn) msg;
 			apiProcessor.submit(new Runnable() {
 				@Override
 				public void run() {
 					synchronized (userConnectionListeners) {
 						try {
-							UserEvent e = new UserEvent(new WebswingUserInfo(event.getArgs()));
+							UserEvent e = new UserEvent(new WebswingUserInfo(event.getUserId(), event.getArgs()));
 							switch (event.getEvent()) {
 							case UserConnected:
 								primaryUser = e.getUser();
@@ -190,7 +206,7 @@ public class WebswingApiImpl implements WebswingApi {
 							}
 							WebswingApiImpl.this.fireUserListener(event.getEvent(), e);
 						} catch (Exception e) {
-							Logger.error("Processing User api event failed.", e);
+							AppLogger.error("Processing User api event failed.", e);
 						}
 					}
 				}
@@ -254,7 +270,7 @@ public class WebswingApiImpl implements WebswingApi {
 					return new WebswingUrlState(path);
 				}
 			} catch (UnsupportedEncodingException e) {
-				Logger.error("Failed to decode url", e);
+				AppLogger.error("Failed to decode url", e);
 			}
 		}
 		return new WebswingUrlState();
@@ -267,14 +283,14 @@ public class WebswingApiImpl implements WebswingApi {
 	void fireShutdownListeners() {
 		synchronized (shutdownListeners) {
 			if (shutdownListeners.size() == 0) {
-				Logger.info("No shutdown listener found. Using default shutdown procedure.");
+				AppLogger.info("No shutdown listener found. Using default shutdown procedure.");
 				Util.getWebToolkit().defaultShutdownProcedure();
 			} else {
 				for (WebswingShutdownListener l : shutdownListeners) {
 					try {
 						l.onShutdown();
 					} catch (Exception e) {
-						Logger.error("Shutdown Listener failed.", e);
+						AppLogger.error("Shutdown Listener failed.", e);
 					}
 				}
 			}
@@ -288,7 +304,7 @@ public class WebswingApiImpl implements WebswingApi {
 				try {
 					maxDelay= Math.max(l.onBeforeShutdown(new OnBeforeShutdownEvent(reason)),maxDelay);
 				} catch (Exception e) {
-					Logger.error("Before Shutdown Listener failed.", e);
+					AppLogger.error("Before Shutdown Listener failed.", e);
 				}
 			}
 			return maxDelay;
@@ -316,7 +332,7 @@ public class WebswingApiImpl implements WebswingApi {
 						break;
 					}
 				} catch (Exception e) {
-					Logger.error("User Listener failed.", e);
+					AppLogger.error("User Listener failed.", e);
 				}
 			}
 		}
@@ -328,7 +344,7 @@ public class WebswingApiImpl implements WebswingApi {
 				try {
 					l.onUrlStateChange(event);
 				} catch (Exception e) {
-					Logger.error("Url change Listener failed.", e);
+					AppLogger.error("Url change Listener failed.", e);
 				}
 			}
 		}
@@ -340,7 +356,7 @@ public class WebswingApiImpl implements WebswingApi {
 				try {
 					l.actionPerformed(actionEvent);
 				} catch (Exception e) {
-					Logger.error("Browser action listener failed.", e);
+					AppLogger.error("Browser action listener failed.", e);
 				}
 			}
 		}
@@ -378,7 +394,7 @@ public class WebswingApiImpl implements WebswingApi {
 				}
 			}
 		} catch (UnsupportedEncodingException e) {
-			Logger.error("Failed to encode URL state.", e);
+			AppLogger.error("Failed to encode URL state.", e);
 		}
 		if (!fireChangeEvent) {
 			this.state = state;
@@ -400,7 +416,7 @@ public class WebswingApiImpl implements WebswingApi {
 
 	@Override
 	public void resetInactivityTimeout() {
-		Services.getConnectionService().resetInactivityTimers();
+		Util.getWebToolkit().getSessionWatchdog().resetInactivityTimers();
 	}
 
 	@Override
@@ -615,13 +631,18 @@ public class WebswingApiImpl implements WebswingApi {
 
 	public class WebswingUserInfo implements WebswingUser {
 		private String userId;
-		private HashMap<String, Serializable> userAttributes;
+		private Map<String, Serializable> userAttributes = Collections.emptyMap();
 
-		@SuppressWarnings("unchecked")
-		WebswingUserInfo(Serializable... attribs) {
+		WebswingUserInfo(String userId, byte[] attribs) {
 			super();
-			this.userId = (String) attribs[0];
-			this.userAttributes = (HashMap<String, Serializable>) attribs[1];
+			this.userId = userId;
+			if (attribs != null) {
+				try {
+					this.userAttributes = Services.getConnectionService().deserializeUserAttributes(attribs);
+				} catch (IOException e) {
+					AppLogger.error("Could not deserialize user attributes!", e);
+				}
+			}
 		}
 
 		@Override

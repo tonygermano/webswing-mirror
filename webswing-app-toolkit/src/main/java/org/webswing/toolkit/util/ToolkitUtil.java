@@ -6,15 +6,15 @@ import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.webswing.model.s2c.ComponentTreeMsg;
+import org.webswing.model.appframe.out.ComponentTreeMsgOut;
 
 public class ToolkitUtil {
 	
 	/**
 	 * Return the whole component tree (Swing) and node tree (JavaFX), if available.
 	 */
-	public static List<ComponentTreeMsg> getComponentTree() {
-		List<ComponentTreeMsg> tree = new ArrayList<ComponentTreeMsg>();
+	public static List<ComponentTreeMsgOut> getComponentTree() {
+		List<ComponentTreeMsgOut> tree = new ArrayList<ComponentTreeMsgOut>();
 		
 		tree.addAll(getComponentTree(null));
 		
@@ -28,8 +28,8 @@ public class ToolkitUtil {
 	/**
 	 * Return the given Component's Swing component tree from ToolkitService.
 	 */
-	public static List<ComponentTreeMsg> getComponentTree(Component root) {
-		List<ComponentTreeMsg> componentTree = new ArrayList<ComponentTreeMsg>();
+	public static List<ComponentTreeMsgOut> getComponentTree(Component root) {
+		List<ComponentTreeMsgOut> componentTree = new ArrayList<ComponentTreeMsgOut>();
 		
 		if (root == null) {
 			Window[] windows = Util.getAllWindows();
@@ -46,14 +46,14 @@ public class ToolkitUtil {
 	/**
 	 * Return the whole JavaFX node tree from ToolkitFXService.
 	 */
-	public static List<ComponentTreeMsg> getNodeTree() {
+	public static List<ComponentTreeMsgOut> getNodeTree() {
 		return getNodeTree(null);
 	}
 	
 	/**
 	 * Return the given Node's JavaFX node tree from ToolkitFXService.
 	 */
-	public static List<ComponentTreeMsg> getNodeTree(Object node) {
+	public static List<ComponentTreeMsgOut> getNodeTree(Object node) {
 		return Services.getToolkitFXService().requestNodeTree(node);
 	}
 	
@@ -67,10 +67,11 @@ public class ToolkitUtil {
 		return cls.getSimpleName();
 	}
 	
-	private static ComponentTreeMsg createComponentTreeMsg(Component c) {
-		ComponentTreeMsg msg = ComponentTreeMsg.fromComponent(c);
+	private static ComponentTreeMsgOut createComponentTreeMsg(Component c) {
+		String cType = getComponentType(c);
+		ComponentTreeMsgOut msg = ComponentTreeMsgOut.fromComponent(c, cType);
 		
-		if (getComponentType(c).equalsIgnoreCase("JFXPanel")) {
+		if (cType.equalsIgnoreCase("JFXPanel")) {
 			msg.setComponents(getNodeTree(c));
 		} else if (c instanceof Container) {
 			synchronized (c.getTreeLock()) {
