@@ -344,7 +344,7 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 			Writer w = new OutputStreamWriter(response.getOutputStream());
 			Writer tempw = new StringWriter();
 			processTemplate(tempw, template, extendedVars);
-			defaultVars.put("partialHtml", Base64.getEncoder().encodeToString(tempw.toString().getBytes(StandardCharsets.UTF_8)));
+			defaultVars.put("partialHtml", new String(Base64.getEncoder().encode(tempw.toString().getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
 			processTemplate(w, "default.html", extendedVars);
 		}
 	}

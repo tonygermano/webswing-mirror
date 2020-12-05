@@ -102,6 +102,30 @@ public final class ServerAppFrameProto {
      */
     org.webswing.model.common.proto.CommonProto.SimpleEventMsgInProtoOrBuilder getEventsOrBuilder(
         int index);
+
+    /**
+     * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+     */
+    java.util.List<org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto> 
+        getTimestampsList();
+    /**
+     * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+     */
+    org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto getTimestamps(int index);
+    /**
+     * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+     */
+    int getTimestampsCount();
+    /**
+     * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+     */
+    java.util.List<? extends org.webswing.model.common.proto.CommonProto.TimestampsMsgInProtoOrBuilder> 
+        getTimestampsOrBuilderList();
+    /**
+     * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+     */
+    org.webswing.model.common.proto.CommonProto.TimestampsMsgInProtoOrBuilder getTimestampsOrBuilder(
+        int index);
   }
   /**
    * Protobuf type {@code ServerToAppFrameMsgInProto}
@@ -118,6 +142,7 @@ public final class ServerAppFrameProto {
     private ServerToAppFrameMsgInProto() {
       appFrameMsgIn_ = com.google.protobuf.ByteString.EMPTY;
       events_ = java.util.Collections.emptyList();
+      timestamps_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -210,6 +235,15 @@ public final class ServerAppFrameProto {
                   input.readMessage(org.webswing.model.common.proto.CommonProto.SimpleEventMsgInProto.PARSER, extensionRegistry));
               break;
             }
+            case 58: {
+              if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
+                timestamps_ = new java.util.ArrayList<org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto>();
+                mutable_bitField0_ |= 0x00000040;
+              }
+              timestamps_.add(
+                  input.readMessage(org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.PARSER, extensionRegistry));
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -227,6 +261,9 @@ public final class ServerAppFrameProto {
       } finally {
         if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
           events_ = java.util.Collections.unmodifiableList(events_);
+        }
+        if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
+          timestamps_ = java.util.Collections.unmodifiableList(timestamps_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -380,6 +417,41 @@ public final class ServerAppFrameProto {
       return events_.get(index);
     }
 
+    public static final int TIMESTAMPS_FIELD_NUMBER = 7;
+    private java.util.List<org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto> timestamps_;
+    /**
+     * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+     */
+    public java.util.List<org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto> getTimestampsList() {
+      return timestamps_;
+    }
+    /**
+     * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+     */
+    public java.util.List<? extends org.webswing.model.common.proto.CommonProto.TimestampsMsgInProtoOrBuilder> 
+        getTimestampsOrBuilderList() {
+      return timestamps_;
+    }
+    /**
+     * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+     */
+    public int getTimestampsCount() {
+      return timestamps_.size();
+    }
+    /**
+     * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+     */
+    public org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto getTimestamps(int index) {
+      return timestamps_.get(index);
+    }
+    /**
+     * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+     */
+    public org.webswing.model.common.proto.CommonProto.TimestampsMsgInProtoOrBuilder getTimestampsOrBuilder(
+        int index) {
+      return timestamps_.get(index);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -411,6 +483,9 @@ public final class ServerAppFrameProto {
       }
       for (int i = 0; i < events_.size(); i++) {
         output.writeMessage(6, events_.get(i));
+      }
+      for (int i = 0; i < timestamps_.size(); i++) {
+        output.writeMessage(7, timestamps_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -444,6 +519,10 @@ public final class ServerAppFrameProto {
       for (int i = 0; i < events_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, events_.get(i));
+      }
+      for (int i = 0; i < timestamps_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(7, timestamps_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -488,6 +567,8 @@ public final class ServerAppFrameProto {
       }
       result = result && getEventsList()
           .equals(other.getEventsList());
+      result = result && getTimestampsList()
+          .equals(other.getTimestampsList());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -522,6 +603,10 @@ public final class ServerAppFrameProto {
       if (getEventsCount() > 0) {
         hash = (37 * hash) + EVENTS_FIELD_NUMBER;
         hash = (53 * hash) + getEventsList().hashCode();
+      }
+      if (getTimestampsCount() > 0) {
+        hash = (37 * hash) + TIMESTAMPS_FIELD_NUMBER;
+        hash = (53 * hash) + getTimestampsList().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -656,6 +741,7 @@ public final class ServerAppFrameProto {
           getApiCallResultFieldBuilder();
           getHandshakeFieldBuilder();
           getEventsFieldBuilder();
+          getTimestampsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -692,6 +778,12 @@ public final class ServerAppFrameProto {
           bitField0_ = (bitField0_ & ~0x00000020);
         } else {
           eventsBuilder_.clear();
+        }
+        if (timestampsBuilder_ == null) {
+          timestamps_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000040);
+        } else {
+          timestampsBuilder_.clear();
         }
         return this;
       }
@@ -765,6 +857,15 @@ public final class ServerAppFrameProto {
           result.events_ = events_;
         } else {
           result.events_ = eventsBuilder_.build();
+        }
+        if (timestampsBuilder_ == null) {
+          if (((bitField0_ & 0x00000040) == 0x00000040)) {
+            timestamps_ = java.util.Collections.unmodifiableList(timestamps_);
+            bitField0_ = (bitField0_ & ~0x00000040);
+          }
+          result.timestamps_ = timestamps_;
+        } else {
+          result.timestamps_ = timestampsBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -853,6 +954,32 @@ public final class ServerAppFrameProto {
                    getEventsFieldBuilder() : null;
             } else {
               eventsBuilder_.addAllMessages(other.events_);
+            }
+          }
+        }
+        if (timestampsBuilder_ == null) {
+          if (!other.timestamps_.isEmpty()) {
+            if (timestamps_.isEmpty()) {
+              timestamps_ = other.timestamps_;
+              bitField0_ = (bitField0_ & ~0x00000040);
+            } else {
+              ensureTimestampsIsMutable();
+              timestamps_.addAll(other.timestamps_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.timestamps_.isEmpty()) {
+            if (timestampsBuilder_.isEmpty()) {
+              timestampsBuilder_.dispose();
+              timestampsBuilder_ = null;
+              timestamps_ = other.timestamps_;
+              bitField0_ = (bitField0_ & ~0x00000040);
+              timestampsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getTimestampsFieldBuilder() : null;
+            } else {
+              timestampsBuilder_.addAllMessages(other.timestamps_);
             }
           }
         }
@@ -1631,6 +1758,246 @@ public final class ServerAppFrameProto {
           events_ = null;
         }
         return eventsBuilder_;
+      }
+
+      private java.util.List<org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto> timestamps_ =
+        java.util.Collections.emptyList();
+      private void ensureTimestampsIsMutable() {
+        if (!((bitField0_ & 0x00000040) == 0x00000040)) {
+          timestamps_ = new java.util.ArrayList<org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto>(timestamps_);
+          bitField0_ |= 0x00000040;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto, org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.Builder, org.webswing.model.common.proto.CommonProto.TimestampsMsgInProtoOrBuilder> timestampsBuilder_;
+
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public java.util.List<org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto> getTimestampsList() {
+        if (timestampsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(timestamps_);
+        } else {
+          return timestampsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public int getTimestampsCount() {
+        if (timestampsBuilder_ == null) {
+          return timestamps_.size();
+        } else {
+          return timestampsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto getTimestamps(int index) {
+        if (timestampsBuilder_ == null) {
+          return timestamps_.get(index);
+        } else {
+          return timestampsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public Builder setTimestamps(
+          int index, org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto value) {
+        if (timestampsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureTimestampsIsMutable();
+          timestamps_.set(index, value);
+          onChanged();
+        } else {
+          timestampsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public Builder setTimestamps(
+          int index, org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.Builder builderForValue) {
+        if (timestampsBuilder_ == null) {
+          ensureTimestampsIsMutable();
+          timestamps_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          timestampsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public Builder addTimestamps(org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto value) {
+        if (timestampsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureTimestampsIsMutable();
+          timestamps_.add(value);
+          onChanged();
+        } else {
+          timestampsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public Builder addTimestamps(
+          int index, org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto value) {
+        if (timestampsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureTimestampsIsMutable();
+          timestamps_.add(index, value);
+          onChanged();
+        } else {
+          timestampsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public Builder addTimestamps(
+          org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.Builder builderForValue) {
+        if (timestampsBuilder_ == null) {
+          ensureTimestampsIsMutable();
+          timestamps_.add(builderForValue.build());
+          onChanged();
+        } else {
+          timestampsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public Builder addTimestamps(
+          int index, org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.Builder builderForValue) {
+        if (timestampsBuilder_ == null) {
+          ensureTimestampsIsMutable();
+          timestamps_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          timestampsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public Builder addAllTimestamps(
+          java.lang.Iterable<? extends org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto> values) {
+        if (timestampsBuilder_ == null) {
+          ensureTimestampsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, timestamps_);
+          onChanged();
+        } else {
+          timestampsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public Builder clearTimestamps() {
+        if (timestampsBuilder_ == null) {
+          timestamps_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000040);
+          onChanged();
+        } else {
+          timestampsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public Builder removeTimestamps(int index) {
+        if (timestampsBuilder_ == null) {
+          ensureTimestampsIsMutable();
+          timestamps_.remove(index);
+          onChanged();
+        } else {
+          timestampsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.Builder getTimestampsBuilder(
+          int index) {
+        return getTimestampsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public org.webswing.model.common.proto.CommonProto.TimestampsMsgInProtoOrBuilder getTimestampsOrBuilder(
+          int index) {
+        if (timestampsBuilder_ == null) {
+          return timestamps_.get(index);  } else {
+          return timestampsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public java.util.List<? extends org.webswing.model.common.proto.CommonProto.TimestampsMsgInProtoOrBuilder> 
+           getTimestampsOrBuilderList() {
+        if (timestampsBuilder_ != null) {
+          return timestampsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(timestamps_);
+        }
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.Builder addTimestampsBuilder() {
+        return getTimestampsFieldBuilder().addBuilder(
+            org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.Builder addTimestampsBuilder(
+          int index) {
+        return getTimestampsFieldBuilder().addBuilder(
+            index, org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .commonProto.TimestampsMsgInProto timestamps = 7;</code>
+       */
+      public java.util.List<org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.Builder> 
+           getTimestampsBuilderList() {
+        return getTimestampsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto, org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.Builder, org.webswing.model.common.proto.CommonProto.TimestampsMsgInProtoOrBuilder> 
+          getTimestampsFieldBuilder() {
+        if (timestampsBuilder_ == null) {
+          timestampsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto, org.webswing.model.common.proto.CommonProto.TimestampsMsgInProto.Builder, org.webswing.model.common.proto.CommonProto.TimestampsMsgInProtoOrBuilder>(
+                  timestamps_,
+                  ((bitField0_ & 0x00000040) == 0x00000040),
+                  getParentForChildren(),
+                  isClean());
+          timestamps_ = null;
+        }
+        return timestampsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -10088,7 +10455,7 @@ public final class ServerAppFrameProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\031ServerAppFrameProto.proto\032\021CommonProto" +
-      ".proto\"\267\002\n\032ServerToAppFrameMsgInProto\022\025\n" +
+      ".proto\"\356\002\n\032ServerToAppFrameMsgInProto\022\025\n" +
       "\rappFrameMsgIn\030\001 \001(\014\0227\n\021threadDumpReques" +
       "t\030\002 \001(\0132\034.ThreadDumpRequestMsgInProto\022%\n" +
       "\010apiEvent\030\003 \001(\0132\023.ApiEventMsgInProto\022/\n\r" +
@@ -10096,37 +10463,39 @@ public final class ServerAppFrameProto {
       "Proto\022=\n\thandshake\030\005 \001(\0132*.commonProto.C" +
       "onnectionHandshakeMsgInProto\0222\n\006events\030\006" +
       " \003(\0132\".commonProto.SimpleEventMsgInProto" +
-      "\"\035\n\033ThreadDumpRequestMsgInProto\"\333\001\n\022ApiE" +
-      "ventMsgInProto\022\016\n\006userId\030\001 \001(\t\0224\n\005event\030" +
-      "\002 \001(\0162%.ApiEventMsgInProto.ApiEventTypeP" +
-      "roto\022\014\n\004args\030\003 \001(\014\"q\n\021ApiEventTypeProto\022" +
-      "\021\n\rUserConnected\020\000\022\024\n\020UserDisconnected\020\001" +
-      "\022\027\n\023MirrorViewConnected\020\002\022\032\n\026MirrorViewD" +
-      "isconnected\020\003\"@\n\027ApiCallResultMsgInProto" +
-      "\022\025\n\rcorrelationId\030\001 \001(\t\022\016\n\006result\030\002 \001(\t\"" +
-      "\252\002\n\033AppToServerFrameMsgOutProto\022\026\n\016appFr" +
-      "ameMsgOut\030\001 \001(\014\022*\n\nthreadDump\030\002 \001(\0132\026.Th" +
-      "readDumpMsgOutProto\022\036\n\004exit\030\003 \001(\0132\020.Exit" +
-      "MsgOutProto\022$\n\007apiCall\030\004 \001(\0132\023.ApiCallMs" +
-      "gOutProto\022&\n\010jvmStats\030\005 \001(\0132\024.JvmStatsMs" +
-      "gOutProto\022+\n\thandshake\030\006 \001(\0132\030.AppHandsh" +
-      "akeMsgOutProto\022,\n\013sessionData\030\007 \001(\0132\027.Se" +
-      "ssionDataMsgOutProto\"0\n\027AppHandshakeMsgO" +
-      "utProto\022\025\n\rsecretMessage\030\001 \001(\t\"J\n\025Thread" +
-      "DumpMsgOutProto\022\021\n\ttimestamp\030\001 \001(\022\022\016\n\006du" +
-      "mpId\030\002 \001(\t\022\016\n\006reason\030\003 \001(\t\"&\n\017ExitMsgOut" +
-      "Proto\022\023\n\013waitForExit\030\001 \001(\021\"\235\001\n\022ApiCallMs" +
-      "gOutProto\022\025\n\rcorrelationId\030\001 \001(\t\0222\n\006meth" +
-      "od\030\002 \001(\0162\".ApiCallMsgOutProto.ApiMethodP" +
-      "roto\022\014\n\004args\030\003 \003(\t\".\n\016ApiMethodProto\022\013\n\007" +
-      "HasRole\020\000\022\017\n\013IsPermitted\020\001\"g\n\023JvmStatsMs" +
-      "gOutProto\022\020\n\010heapSize\030\001 \001(\001\022\024\n\014heapSizeU" +
-      "sed\030\002 \001(\001\022\020\n\010cpuUsage\030\003 \001(\001\022\026\n\016edtPingSe" +
-      "conds\030\004 \001(\021\"\223\001\n\026SessionDataMsgOutProto\022\016" +
-      "\n\006applet\030\001 \001(\010\022\035\n\025sessionLoggingEnabled\030" +
-      "\002 \001(\010\022\021\n\trecording\030\003 \001(\010\022\025\n\rrecordingFil" +
-      "e\030\004 \001(\t\022 \n\030statisticsLoggingEnabled\030\005 \001(" +
-      "\010B\036\n\034org.webswing.model.app.proto"
+      "\0225\n\ntimestamps\030\007 \003(\0132!.commonProto.Times" +
+      "tampsMsgInProto\"\035\n\033ThreadDumpRequestMsgI" +
+      "nProto\"\333\001\n\022ApiEventMsgInProto\022\016\n\006userId\030" +
+      "\001 \001(\t\0224\n\005event\030\002 \001(\0162%.ApiEventMsgInProt" +
+      "o.ApiEventTypeProto\022\014\n\004args\030\003 \001(\014\"q\n\021Api" +
+      "EventTypeProto\022\021\n\rUserConnected\020\000\022\024\n\020Use" +
+      "rDisconnected\020\001\022\027\n\023MirrorViewConnected\020\002" +
+      "\022\032\n\026MirrorViewDisconnected\020\003\"@\n\027ApiCallR" +
+      "esultMsgInProto\022\025\n\rcorrelationId\030\001 \001(\t\022\016" +
+      "\n\006result\030\002 \001(\t\"\252\002\n\033AppToServerFrameMsgOu" +
+      "tProto\022\026\n\016appFrameMsgOut\030\001 \001(\014\022*\n\nthread" +
+      "Dump\030\002 \001(\0132\026.ThreadDumpMsgOutProto\022\036\n\004ex" +
+      "it\030\003 \001(\0132\020.ExitMsgOutProto\022$\n\007apiCall\030\004 " +
+      "\001(\0132\023.ApiCallMsgOutProto\022&\n\010jvmStats\030\005 \001" +
+      "(\0132\024.JvmStatsMsgOutProto\022+\n\thandshake\030\006 " +
+      "\001(\0132\030.AppHandshakeMsgOutProto\022,\n\013session" +
+      "Data\030\007 \001(\0132\027.SessionDataMsgOutProto\"0\n\027A" +
+      "ppHandshakeMsgOutProto\022\025\n\rsecretMessage\030" +
+      "\001 \001(\t\"J\n\025ThreadDumpMsgOutProto\022\021\n\ttimest" +
+      "amp\030\001 \001(\022\022\016\n\006dumpId\030\002 \001(\t\022\016\n\006reason\030\003 \001(" +
+      "\t\"&\n\017ExitMsgOutProto\022\023\n\013waitForExit\030\001 \001(" +
+      "\021\"\235\001\n\022ApiCallMsgOutProto\022\025\n\rcorrelationI" +
+      "d\030\001 \001(\t\0222\n\006method\030\002 \001(\0162\".ApiCallMsgOutP" +
+      "roto.ApiMethodProto\022\014\n\004args\030\003 \003(\t\".\n\016Api" +
+      "MethodProto\022\013\n\007HasRole\020\000\022\017\n\013IsPermitted\020" +
+      "\001\"g\n\023JvmStatsMsgOutProto\022\020\n\010heapSize\030\001 \001" +
+      "(\001\022\024\n\014heapSizeUsed\030\002 \001(\001\022\020\n\010cpuUsage\030\003 \001" +
+      "(\001\022\026\n\016edtPingSeconds\030\004 \001(\021\"\223\001\n\026SessionDa" +
+      "taMsgOutProto\022\016\n\006applet\030\001 \001(\010\022\035\n\025session" +
+      "LoggingEnabled\030\002 \001(\010\022\021\n\trecording\030\003 \001(\010\022" +
+      "\025\n\rrecordingFile\030\004 \001(\t\022 \n\030statisticsLogg" +
+      "ingEnabled\030\005 \001(\010B\036\n\034org.webswing.model.a" +
+      "pp.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10146,7 +10515,7 @@ public final class ServerAppFrameProto {
     internal_static_ServerToAppFrameMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ServerToAppFrameMsgInProto_descriptor,
-        new java.lang.String[] { "AppFrameMsgIn", "ThreadDumpRequest", "ApiEvent", "ApiCallResult", "Handshake", "Events", });
+        new java.lang.String[] { "AppFrameMsgIn", "ThreadDumpRequest", "ApiEvent", "ApiCallResult", "Handshake", "Events", "Timestamps", });
     internal_static_ThreadDumpRequestMsgInProto_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_ThreadDumpRequestMsgInProto_fieldAccessorTable = new

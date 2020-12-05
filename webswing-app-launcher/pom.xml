@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>webswing</artifactId>
 		<groupId>org.webswing</groupId>
-		<version>20.2</version>
+		<version>20.2.1</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<dependencies>
@@ -31,6 +31,11 @@
 		<dependency>
 			<groupId>org.webswing</groupId>
 			<artifactId>webswing-app-toolkit-java11</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webswing</groupId>
+			<artifactId>modpatch-jdk-jsobject</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

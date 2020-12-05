@@ -4,7 +4,6 @@ import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.datatransfer.Transferable;
-import java.io.Serializable;
 
 import org.webswing.model.app.in.ServerToAppFrameMsgIn;
 import org.webswing.model.appframe.in.AppFrameMsgIn;
@@ -31,4 +30,6 @@ public interface EventDispatcher {
 	long getLastEventTimestamp(boolean userEventOnly);
 
 	void resetLastEventTimestamp();
+	
+	void resetLastMessageTimestamp();
 }

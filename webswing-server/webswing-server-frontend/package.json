@@ -18,7 +18,8 @@
     "proto-ts-in": "pbts -o src/main/webapp/javascript/proto/proto.in.d.ts src/main/webapp/javascript/proto/proto.in.js",
     "proto-ts-out": "pbts -o src/main/webapp/javascript/proto/proto.out.d.ts src/main/webapp/javascript/proto/proto.out.js",
     "proto-ts-frame": "pbts -o src/main/webapp/javascript/proto/proto.frame.d.ts src/main/webapp/javascript/proto/proto.frame.js",
-    "proto-ts-common": "pbts -o src/main/webapp/javascript/proto/proto.common.d.ts src/main/webapp/javascript/proto/proto.common.js"
+    "proto-ts-common": "pbts -o src/main/webapp/javascript/proto/proto.common.d.ts src/main/webapp/javascript/proto/proto.common.js",
+    "license-report": "license-report --output=html --only=prod 2>&1| tee target/3rd-party-js-report.html"
   },
   "keywords": [
     "webswing"
@@ -49,6 +50,7 @@
     "html-webpack-plugin": "^3.2.0",
     "http-server": "^0.12.1",
     "jsdoc": "^3.5.5",
+    "license-report": "^4.3.0",
     "node-sass": "^4.13.1",
     "npm-run-all": "^4.1.5",
     "regenerator-runtime": "^0.13.3",

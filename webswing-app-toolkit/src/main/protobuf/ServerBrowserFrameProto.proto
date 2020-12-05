@@ -9,16 +9,9 @@ import 'CommonProto.proto';
 message BrowserToServerFrameMsgInProto {
 	optional bytes appFrameMsgIn = 1;
 	optional commonProto.ConnectionHandshakeMsgInProto handshake = 2;
-	repeated TimestampsMsgInProto timestamps = 3;
+	repeated commonProto.TimestampsMsgInProto timestamps = 3;
 	repeated commonProto.SimpleEventMsgInProto events = 4;
 	optional PlaybackCommandMsgInProto playback = 5;
-}
-
-message TimestampsMsgInProto {
-    optional string startTimestamp = 1;
-    optional string sendTimestamp = 2;
-    optional string renderingTime = 3;
-    optional uint32 ping = 4;
 }
 
 message PlaybackCommandMsgInProto {

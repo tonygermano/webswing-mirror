@@ -5,7 +5,8 @@ import { appFrameProtoOut } from "./proto/proto.out";
 export const canvasInjectable = {
     cfg: 'webswing.config' as const,
     sendHandshake: 'base.handshake' as const,
-    repaint: 'base.repaint' as const
+    repaint: 'base.repaint' as const,
+    touchBarEnabled: 'touch.touchBarEnabled' as const
 }
 
 export interface ICanvasService {
@@ -118,8 +119,8 @@ export class CanvasModule extends ModuleDef<typeof canvasInjectable, ICanvasServ
         let offset = 0;
 
         if (this.api.cfg.touchMode && this.touchHeight !== 0) {
-            const touchBar = this.api.cfg.rootElement.parent().find('div[data-id="touchBar"]');
-            if (touchBar.length) {
+            if (this.api.touchBarEnabled()) {
+                const touchBar = this.api.cfg.rootElement.parent().find('div[data-id="touchBar"]');
                 offset += touchBar.height()!;
             }
 

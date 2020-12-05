@@ -446,7 +446,7 @@ public class SwingProcessImpl implements SwingProcess {
 		String appUrlNormalized = ServerUtil.normalizeForFileName(params.pathMapping);
 		String instanceIdNormalized = ServerUtil.normalizeForFileName(params.instanceId);
 		String logFileName = logDir + "/webswing-" + instanceIdNormalized + "-" + appUrlNormalized + (StringUtils.isNotBlank(pid) ? ("-" + pid) : "") + ".session.log";
-		String globPattern = "webswing-*-" + appUrlNormalized + ".session.log*";
+		String globPattern = "webswing-*-" + appUrlNormalized + (StringUtils.isNotBlank(pid) ? "-*-" : "") + ".session.log*";
 
 		BuiltConfiguration logConfig = ConfigurationBuilderFactory.newConfigurationBuilder().build();
 

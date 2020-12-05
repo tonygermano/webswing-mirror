@@ -29,7 +29,7 @@ public class RoundRobinLoadBalanceResolver implements LoadBalanceResolver {
 					firstPool = sp;
 				}
 				
-				if (sp.accepts(path, config)) {
+				if (sp.accepts(path)) {
 					return sp;
 				}
 				

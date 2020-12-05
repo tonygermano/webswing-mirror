@@ -13,6 +13,7 @@ import org.webswing.server.api.services.application.AppPathHandler;
 import org.webswing.server.api.services.rest.AbstractGlobalRestHandler;
 import org.webswing.server.common.model.security.WebswingAction;
 import org.webswing.server.common.util.ServerUtil;
+import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -69,7 +70,7 @@ public class GlobalRestHandlerImpl extends AbstractGlobalRestHandler {
 				return true;
 			}
 			case "/adminConsoleUrl": {
-				String url = handler.getConfig().getAdminConsoleUrl();
+				String url = VariableSubstitutor.basic().replace(handler.getConfig().getAdminConsoleUrl());
 				if (StringUtils.isNotBlank(url)) {
 					if (!url.endsWith("/")) {
 						url += "/";
@@ -89,8 +90,8 @@ public class GlobalRestHandlerImpl extends AbstractGlobalRestHandler {
 			return true;
 		}
 		
-		String url = handler.getConfig().getAdminConsoleUrl();
-		if (StringUtils.isNotBlank(url) && ServerUtil.domainFromUrl(url).equals(header)) {
+		String url = VariableSubstitutor.basic().replace(handler.getConfig().getAdminConsoleUrl());
+		if (StringUtils.isNotBlank(url) && url.toLowerCase().startsWith("http") && ServerUtil.domainFromUrl(url).equals(header)) {
 			return true;
 		}
 		

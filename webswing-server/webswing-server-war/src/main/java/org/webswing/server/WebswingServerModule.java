@@ -1,19 +1,7 @@
 package org.webswing.server;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-
-import javax.jms.IllegalStateException;
-
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webswing.Constants;
 import org.webswing.server.api.GlobalUrlHandler;
 import org.webswing.server.api.base.WebswingService;
 import org.webswing.server.api.services.application.AppPathHandlerFactory;
@@ -63,8 +51,6 @@ public class WebswingServerModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
-		initializeDefaultSystemProperties();
-
 		bind(Initializer.class).to(DefaultInitializer.class).asEagerSingleton();
 		bind(ExtensionClassLoader.class).asEagerSingleton();
 		bind(GlobalUrlHandler.class);
@@ -94,50 +80,6 @@ public class WebswingServerModule extends AbstractModule {
 		requestStaticInjection(BrowserWebSocketConfigurator.class);
 		requestStaticInjection(ApplicationWebSocketConfigurator.class);
 		requestStaticInjection(AdminConsoleWebSocketConfigurator.class);
-	}
-
-	private void initializeDefaultSystemProperties() {
-		try {
-			String propFilePath = System.getProperty(Constants.PROPERTIES_FILE_PATH);
-			File propFile = null;
-			if (propFilePath != null) {
-				propFile = new File(URI.create(propFilePath));
-			} else {
-				propFile = new File(new URI(DefaultInitializer.getValidURI(Constants.DEFAULT_PROPERTIES_FILE_NAME)));
-			}
-			
-			Properties p = new Properties(System.getProperties());
-			try (InputStream propFileStream = new FileInputStream(propFile)) {
-				p.load(propFileStream);
-			}
-			
-			// set the system properties
-			for (Map.Entry<Object, Object> prop : p.entrySet()) {
-				if (!System.getProperties().containsKey(prop.getKey())) {
-					System.getProperties().put(prop.getKey(), prop.getValue());
-				}
-			}
-			
-			System.setProperty(Constants.WEBSWING_SERVER_ID, UUID.randomUUID().toString());
-			
-			log.info("Starting webswing server with id [" + System.getProperty(Constants.WEBSWING_SERVER_ID) + "]...");
-			
-			if (StringUtils.isBlank(System.getProperty(Constants.WEBSWING_CONNECTION_SECRET))) {
-				log.error("Missing " + Constants.WEBSWING_CONNECTION_SECRET + " system property!");
-				System.exit(-1);
-			}
-			
-			if (StringUtils.equalsIgnoreCase(System.getProperty(Constants.WEBSWING_CONNECTION_SECRET), Constants.WEBSWING_CONNECTION_SECRET_DEFAULT)) {
-				String msg = "Please change " + Constants.WEBSWING_CONNECTION_SECRET + " system property to a non-default value in production!";
-				log.error(msg, new IllegalStateException(msg));
-			}
-		} catch (Exception e) {
-			log.error("Exception occurred during initialization of System Properties", e);
-		}
-		
-		if (System.getProperty(Constants.SERVER_WEBSOCKET_URL) == null) {
-			throw new RuntimeException("Failed to initialized server! Missing " + Constants.SERVER_WEBSOCKET_URL + " property!");
-		}
 	}
 
 }

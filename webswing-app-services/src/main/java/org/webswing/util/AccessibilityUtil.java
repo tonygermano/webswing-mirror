@@ -1,5 +1,6 @@
 package org.webswing.util;
 
+import java.awt.AWTEvent;
 import java.awt.AWTKeyStroke;
 import java.awt.Component;
 import java.awt.Container;
@@ -8,8 +9,12 @@ import java.awt.Dimension;
 import java.awt.IllegalComponentStateException;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.AWTEventListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +30,7 @@ import javax.accessibility.AccessibleState;
 import javax.accessibility.AccessibleStateSet;
 import javax.accessibility.AccessibleText;
 import javax.accessibility.AccessibleValue;
+import javax.swing.FocusManager;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -65,9 +71,7 @@ import org.webswing.model.appframe.out.AccessibilityMsgOut;
 import org.webswing.model.appframe.out.FileDialogEventMsgOut.FileDialogEventType;
 import org.webswing.toolkit.util.Util;
 
-import com.sun.java.accessibility.util.AWTEventMonitor;
 import com.sun.java.accessibility.util.AccessibilityEventMonitor;
-import com.sun.java.accessibility.util.EventQueueMonitor;
 import com.sun.java.accessibility.util.Translator;
 
 @SuppressWarnings("restriction")
@@ -147,47 +151,61 @@ public class AccessibilityUtil {
 	}
 	
 	public static void registerAccessibilityListeners() {
+		FocusManager.getCurrentManager().addPropertyChangeListener("focusOwner", new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				Util.getWebToolkit().getPaintDispatcher().notifyAccessibilityInfoUpdate();
+			}
+		});
 		AccessibilityEventMonitor.addPropertyChangeListener(evt -> {
 			switch (evt.getPropertyName()) {
+				case AccessibleContext.ACCESSIBLE_STATE_PROPERTY:
 				case AccessibleContext.ACCESSIBLE_SELECTION_PROPERTY:
 				case AccessibleContext.ACCESSIBLE_VALUE_PROPERTY:
 				case AccessibleContext.ACCESSIBLE_ACTIVE_DESCENDANT_PROPERTY:
+					// does not work on Linux
 					Util.getWebToolkit().getPaintDispatcher().notifyAccessibilityInfoUpdate();
 				break;
 			}
 		});
+		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+			@Override
+			public void eventDispatched(AWTEvent event) {
+				Util.getWebToolkit().getPaintDispatcher().notifyAccessibilityInfoUpdate();
+			}
+		}, AWTEvent.FOCUS_EVENT_MASK);
 	}
-
+	
 	public static AccessibilityMsgOut getAccessibilityInfo() {
-		Component c = AWTEventMonitor.getComponentWithFocus();
-		if (c != null && c instanceof Accessible) {
-			Accessible a = Translator.getAccessible(c);
-			return getAccessibilityInfo(a);
+		Component c = FocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+		Accessible a = null;
+		
+		if (c != null) {
+			if (c instanceof Accessible) {
+				a = (Accessible) c;
+			} else {
+				a = Translator.getAccessible(c);
+			}
 		}
-		return getAccessibilityInfo(null);
+		
+		return getAccessibilityInfo(a);
 	}
 	
 	public static AccessibilityMsgOut getAccessibilityInfo(Component c, int x, int y) {
 		Point p = new Point(x, y);
 		SwingUtilities.convertPointFromScreen(p, c);
 		Component deepC = SwingUtilities.getDeepestComponentAt(c, p.x, p.y);
-		Accessible aChild = getAccessibleAt(x, y);
-		Accessible a = aChild;
-		if (deepC != null && deepC instanceof Accessible) {
-			a = (Accessible) deepC;
-		}
-		if (a == null && c instanceof Accessible) {
-			a = (Accessible) c;
-		}
-		return getAccessibilityInfo(a);
-	}
+		Accessible a = null;
 
-	private static Accessible getAccessibleAt(int x, int y) {
-		Accessible a = EventQueueMonitor.getAccessibleAt(new Point(x, y));
-		if (a != null) {
-			return a;
+		if (deepC != null) {
+			if (deepC instanceof Accessible) {
+				a = (Accessible) deepC;
+			} else {
+				a = Translator.getAccessible(deepC);
+			}
 		}
-		return null;
+		
+		return getAccessibilityInfo(a);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

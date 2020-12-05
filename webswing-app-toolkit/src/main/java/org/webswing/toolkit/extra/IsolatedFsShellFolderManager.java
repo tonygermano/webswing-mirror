@@ -118,7 +118,7 @@ public class IsolatedFsShellFolderManager extends PublicShellFolderManager {
 	public ShellFolder createShellFolder(File paramFile) throws FileNotFoundException {
 		try {
 			if (isSubfolderOfRoots(paramFile)) {
-				return super.createShellFolder(paramFile);
+				return new WebswingShellFolder(paramFile);
 			} else {
 				throw new FileNotFoundException("Path is outside the allowed Webswing Filesystem isolation folder. (" + paramFile.getCanonicalPath() + ")");
 			}

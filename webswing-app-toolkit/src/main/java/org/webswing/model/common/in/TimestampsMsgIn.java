@@ -1,8 +1,9 @@
-package org.webswing.model.browser.in;
+package org.webswing.model.common.in;
 
+import org.webswing.model.CommonMsg;
 import org.webswing.model.MsgIn;
 
-public class TimestampsMsgIn implements MsgIn {
+public class TimestampsMsgIn implements MsgIn, CommonMsg {
 	private static final long serialVersionUID = 4931319415647368965L;
 
 	private String startTimestamp;

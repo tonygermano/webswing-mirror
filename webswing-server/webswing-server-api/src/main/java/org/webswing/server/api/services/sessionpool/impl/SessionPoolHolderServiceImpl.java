@@ -651,12 +651,14 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 		if (!handshake.isMirrored()) {
 			// check if there is a room for another instance
 			int maxClients = instanceInfo.getConfig().getMaxClients();
-			int runningConnectedInstances = (int) sessionPools.values().stream()
-					.map(sp -> sp.getInstancesRunningAndConnectedInSessionPool(path))
-					.collect(Collectors.summarizingInt(i -> i)).getSum();
-			if (runningConnectedInstances >= maxClients) {
-				r.sendMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
-				return;
+			if (maxClients >= 0) {
+				int runningConnectedInstances = (int) sessionPools.values().stream()
+						.map(sp -> sp.getInstancesRunningAndConnectedInSessionPool(path))
+						.collect(Collectors.summarizingInt(i -> i)).getSum();
+				if (runningConnectedInstances >= maxClients) {
+					r.sendMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
+					return;
+				}
 			}
 		}
 		

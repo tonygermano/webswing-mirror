@@ -33,12 +33,12 @@ import org.webswing.model.appframe.out.LinkActionMsgOut;
 import org.webswing.model.appframe.out.LinkActionMsgOut.LinkActionType;
 import org.webswing.model.appframe.out.SimpleEventMsgOut;
 import org.webswing.model.browser.in.BrowserToServerFrameMsgIn;
-import org.webswing.model.browser.in.TimestampsMsgIn;
 import org.webswing.model.browser.out.ConnectionInfoMsgOut;
 import org.webswing.model.browser.out.ServerToBrowserFrameMsgOut;
 import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
 import org.webswing.model.common.in.SimpleEventMsgIn;
 import org.webswing.model.common.in.SimpleEventMsgIn.SimpleEventType;
+import org.webswing.model.common.in.TimestampsMsgIn;
 import org.webswing.server.api.model.ProcessStatusEnum;
 import org.webswing.server.api.services.sessionpool.ServerSessionPoolConnector;
 import org.webswing.server.api.services.swinginstance.ConnectedSwingInstance;
@@ -327,14 +327,13 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 	public void handleBrowserMessage(BrowserWebSocketConnection r, BrowserToServerFrameMsgIn msgIn) {
 		if (msgIn.getTimestamps() != null) {
 			msgIn.getTimestamps().forEach(this::processTimestampMessage);
-			// if only timestamps are received then do not send anything to app
-			return;
 		}
 		
 		ServerToAppFrameMsgIn frameIn = new ServerToAppFrameMsgIn();
 		frameIn.setAppFrameMsgIn(msgIn.getAppFrameMsgIn());
 		frameIn.setHandshake(msgIn.getHandshake());
 		frameIn.setEvents(msgIn.getEvents());
+		frameIn.setTimestamps(msgIn.getTimestamps());
 		
 		if (msgIn.getEvents() != null) {
 			msgIn.getEvents().forEach(m -> {

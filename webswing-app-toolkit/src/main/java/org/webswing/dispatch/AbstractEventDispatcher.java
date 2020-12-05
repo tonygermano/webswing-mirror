@@ -88,7 +88,7 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 
 	public void onMessage(ServerToAppFrameMsgIn msgIn, AppFrameMsgIn frame) {
 		try {
-			lastMessageTimestamp.getAndSet(System.currentTimeMillis());
+			resetLastMessageTimestamp();
 			if (msgIn != null) {
 				if (msgIn.getThreadDumpRequest() != null) {
 					Util.getWebToolkit().getSessionWatchdog().requestThreadDump();
@@ -101,6 +101,9 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 				}
 				if (msgIn.getEvents() != null) {
 					msgIn.getEvents().forEach(this::dispatchMessage);
+				}
+				if (msgIn.getTimestamps() != null) {
+					// do nothing, this needs to be received so that resetLastMessageTimestamp() gets called
 				}
 				if (frame != null) {
 					if (frame.getJavaRequest() != null) {
@@ -117,6 +120,11 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 	@Override
 	public void resetLastEventTimestamp() {
 		lastUserInputTimestamp.getAndSet(System.currentTimeMillis());
+	}
+	
+	@Override
+	public void resetLastMessageTimestamp() {
+		lastMessageTimestamp.getAndSet(System.currentTimeMillis());
 	}
 
 	public void dispatchEvent(final AppFrameMsgIn msg) {
@@ -244,12 +252,12 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 	protected void dispatchKeyEventInSwing(final Component c, final AWTEvent e) {
 		Window w = (Window) (c instanceof Window ? c : SwingUtilities.windowForComponent(c));
 		if (w.isEnabled()) {
-			Util.getWebToolkit().getPaintDispatcher().notifyAccessibilityInfoUpdate();
 			if (isDndInProgress()) {
 				getDndHandler().processMouseEvent(w, e);
 			} else {
 				dispatchEventInSwing(c, e);
 			}
+			Util.getWebToolkit().getPaintDispatcher().notifyAccessibilityInfoUpdate();
 		}
 	}
 

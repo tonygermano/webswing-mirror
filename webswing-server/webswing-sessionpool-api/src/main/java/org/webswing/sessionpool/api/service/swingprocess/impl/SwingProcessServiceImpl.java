@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -219,7 +221,7 @@ public class SwingProcessServiceImpl implements SwingProcessService {
 			processConfig.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
 			processConfig.addProperty(Constants.JMS_URL, System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT));
 			processConfig.addProperty(Constants.SWING_START_SYS_PROP_WEBSOCKET_URL, startupParams.getWebsocketUrl());			
-			processConfig.addProperty(Constants.WEBSWING_CONNECTION_SECRET, startupParams.getAppConnectionSecret());			
+			processConfig.addProperty(Constants.WEBSWING_CONNECTION_SECRET, serializeAppConnectionSecret(startupParams.getAppConnectionSecret()));			
 			processConfig.addProperty(Constants.SWING_START_SYS_PROP_DATA_STORE_CONFIG, startupParams.getDataStoreConfig());
 
 			processConfig.addProperty(Constants.SWING_START_SYS_PROP_THEME, startupParams.getSubs().replace(startupParams.getAppConfig().getTheme()));
@@ -369,6 +371,10 @@ public class SwingProcessServiceImpl implements SwingProcessService {
 			this.pathMapping = pathMapping;
 			this.sessionLogDir = sessionLogDir;
 		}
+	}
+	
+	private String serializeAppConnectionSecret(String secret) {
+		return new String(Base64.getEncoder().encode(secret.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
 	}
 	
 	private String getSessionLogDir() {

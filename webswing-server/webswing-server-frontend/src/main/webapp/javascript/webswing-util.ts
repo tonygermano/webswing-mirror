@@ -378,6 +378,24 @@ export function getTimeZone() {
     return getTimeZoneFromOffset(new Date().getTimezoneOffset());
 }
 
+export function fixConnectionUrl(connectionUrl: string) {
+    // change relative URL to full URL
+    if (connectionUrl.toLowerCase().indexOf('http') !== 0) { // if relative url
+        const host = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+        let path = connectionUrl;
+        if (path.indexOf('/') !== 0) {// if relative path
+            const currentPath = document.location.pathname;
+            if (currentPath.lastIndexOf('/') === currentPath.length - 1 ) { // current path ends with /
+                path = currentPath + path;
+            } else { // otherwise remove the path after last /
+                path = currentPath.substring(0,currentPath.lastIndexOf('/') + 1) + path;
+            }
+        }
+        connectionUrl = host + path;
+    }
+    return connectionUrl;
+}
+
 function getTimeZoneFromOffset(offset: number) {
     return "GMT" + ((offset < 0 ? '+' : '-') + // Note the reversed sign!
         pad(Math.abs(offset / 60), 2) +

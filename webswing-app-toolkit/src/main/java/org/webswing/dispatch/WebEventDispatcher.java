@@ -57,6 +57,9 @@ import org.webswing.util.AppLogger;
 
 import netscape.javascript.JSObject;
 
+import static java.awt.event.KeyEvent.KEY_LOCATION_NUMPAD;
+import static java.awt.event.KeyEvent.KEY_LOCATION_STANDARD;
+
 public class WebEventDispatcher extends AbstractEventDispatcher {
 
 	protected void dispatchMessage(SimpleEventMsgIn message) {
@@ -141,7 +144,8 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 				AWTEvent e = new KeyEvent(src, KeyEvent.KEY_TYPED, when, modifiers, 0, (char) event.getCharacter());
 				dispatchKeyEventInSwing(w, e);
 			} else {
-				AWTEvent e = Util.createKeyEvent(src, type, when, modifiers, event.getKeycode(), character, KeyEvent.KEY_LOCATION_STANDARD);
+				int keyLocation = event.getKeycode() >= 96 && event.getKeycode() <= 111 ? KEY_LOCATION_NUMPAD : KEY_LOCATION_STANDARD;
+				AWTEvent e = Util.createKeyEvent(src, type, when, modifiers, event.getKeycode(), character, keyLocation);
 				dispatchKeyEventInSwing(w, e);
 				if ((event.getKeycode() == 32 || event.getKeycode() == 9 || event.getKeycode() == 8) && event.getType() == KeyboardEventMsgIn.KeyEventType.keydown && !event.isCtrl()) {// space keycode handle press
 					event.setType(KeyboardEventMsgIn.KeyEventType.keypress);

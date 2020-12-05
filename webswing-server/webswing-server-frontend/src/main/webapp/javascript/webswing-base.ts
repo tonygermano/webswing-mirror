@@ -2,7 +2,7 @@ import { appFrameProtoOut } from "./proto/proto.out";
 import { appFrameProtoIn } from "./proto/proto.in";
 import { commonProto } from "./proto/proto.common";
 import { DirectDraw as WebswingDirectDraw } from "webswing-directdraw-javascript";
-import { getDpr, GUID, getImageString, getTimeZone } from './webswing-util';
+import { getDpr, GUID, getImageString, getTimeZone, fixConnectionUrl } from './webswing-util';
 import { ModuleDef, IInjected } from "./webswing-inject";
 import { AppFrame } from "./webswing-socket";
 
@@ -1003,21 +1003,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 			pagePos = { x: 0, y: 0 };
 		}
 
-
-		let baseUrl = this.api.cfg.connectionUrl;
-		if (baseUrl.toLowerCase().indexOf('http') !== 0) { // if relative url
-			const host = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '')
-			let path = this.api.cfg.connectionUrl;
-			if (path.indexOf('/') !== 0) {// if relative path
-				const currentPath = document.location.pathname;
-				if(currentPath.lastIndexOf('/') === currentPath.length - 1 ){ // current path ends with /
-					path = currentPath + path;
-				}else{ // otherwise remove the path after last /
-					path = currentPath.substring(0,currentPath.lastIndexOf('/')+1)+ path;
-				}
-			}
-			baseUrl = host + path;
-		}
+		let baseUrl = fixConnectionUrl(this.api.cfg.connectionUrl);
 		baseUrl = baseUrl.lastIndexOf('/') !== baseUrl.length - 1 ? baseUrl + "/" : baseUrl;
 
 		const popup = window.open("", id, "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes," +
@@ -1151,11 +1137,11 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 			// try focus canvas window with highest z-index contained inside this popup
 			let maxZIndex = 0;
 			let topCanvasId = id;
-			$("canvas.webswing-canvas", $(popup.document)).each(() => {
-				const zIndex = parseInt($(this).css("z-index"), 10);
+			$("canvas.webswing-canvas", $(popup.document)).each((_, el) => {
+				const zIndex = parseInt($(el).css("z-index"), 10);
 				if (zIndex > maxZIndex) {
 					maxZIndex = zIndex;
-					topCanvasId = $(this).data("id");
+					topCanvasId = $(el).data("id");
 				}
 			});
 			if (this.windowImageHolders[topCanvasId]) {

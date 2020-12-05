@@ -26,8 +26,6 @@ public class WebSocketUrlLoaderServiceImpl implements WebSocketUrlLoaderService 
 	
 	private static final Logger log = LoggerFactory.getLogger(WebSocketUrlLoaderServiceImpl.class);
 
-	private File propertiesFile;
-	
 	private WebSocketUrlLoaderType loaderType;
 	private long reloadInterval;
 	private WebSocketUrlLoader loader;
@@ -39,16 +37,10 @@ public class WebSocketUrlLoaderServiceImpl implements WebSocketUrlLoaderService 
 	private Timer reloadTimer = new Timer(true);
 	
 	public WebSocketUrlLoaderServiceImpl() {
-		init();
 	}
 	
-	public WebSocketUrlLoaderServiceImpl(File propertiesFile) {
-		this.propertiesFile = propertiesFile;
-		
-		init();
-	}
-	
-	private void init() {
+	@Override
+	public void init(File propertiesFile) {
 		reloadInterval = Long.parseLong(System.getProperty(Constants.WEBSOCKET_URL_LOADER_INTERVAL, Constants.WEBSOCKET_URL_LOADER_INTERVAL_DEFAULT + ""));
 		
 		String loaderProp = System.getProperty(Constants.WEBSOCKET_URL_LOADER_TYPE, WebSocketUrlLoaderType.propertyFile.name());

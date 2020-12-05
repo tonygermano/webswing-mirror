@@ -5,7 +5,7 @@
     <parent>
         <artifactId>webswing-server</artifactId>
         <groupId>org.webswing</groupId>
-        <version>20.2</version>
+        <version>20.2.1</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -67,6 +67,16 @@
                             <arguments>run build</arguments>
                         </configuration>
                     </execution>
+                    <!-- <execution>
+                        <id>npm license report</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run license-report</arguments>
+                        </configuration>
+                    </execution> -->
                 </executions>
                 <configuration>
                     <installDirectory>${project.basedir}/../..</installDirectory>

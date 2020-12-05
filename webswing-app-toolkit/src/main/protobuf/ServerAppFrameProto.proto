@@ -12,6 +12,7 @@ message ServerToAppFrameMsgInProto {
     optional ApiCallResultMsgInProto apiCallResult = 4;
     optional commonProto.ConnectionHandshakeMsgInProto handshake = 5;
     repeated commonProto.SimpleEventMsgInProto events = 6;
+    repeated commonProto.TimestampsMsgInProto timestamps = 7;
 }
 
 message ThreadDumpRequestMsgInProto {

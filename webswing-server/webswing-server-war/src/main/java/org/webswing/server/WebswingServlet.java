@@ -1,7 +1,15 @@
 package org.webswing.server;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 
+import javax.jms.IllegalStateException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -10,8 +18,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.Constants;
 import org.webswing.server.api.GlobalUrlHandler;
 import org.webswing.server.api.services.sessionpool.SessionPoolHolderService;
 import org.webswing.server.api.services.startup.StartupService;
@@ -46,6 +56,8 @@ public class WebswingServlet extends HttpServlet {
 				
 		try {
 			Injector injector = Guice.createInjector(servletModule, new WebswingServerModule());
+			
+			initializeDefaultSystemProperties();
 				
 			this.startup = injector.getInstance(StartupService.class);
 			this.startup.start();
@@ -60,6 +72,43 @@ public class WebswingServlet extends HttpServlet {
 			log.error("Initialization of Webswing failed. ", e);
 			destroy();
 			throw new ServletException("Webswing failed to start!", e);
+		}
+	}
+	
+	private void initializeDefaultSystemProperties() {
+		try {
+			File propFile = new File(URI.create(System.getProperty(Constants.PROPERTIES_FILE_PATH)));
+			Properties p = new Properties(System.getProperties());
+			try (InputStream propFileStream = new FileInputStream(propFile)) {
+				p.load(propFileStream);
+			}
+			
+			// set the system properties
+			for (Map.Entry<Object, Object> prop : p.entrySet()) {
+				if (!System.getProperties().containsKey(prop.getKey())) {
+					System.getProperties().put(prop.getKey(), prop.getValue());
+				}
+			}
+			
+			System.setProperty(Constants.WEBSWING_SERVER_ID, UUID.randomUUID().toString());
+			
+			log.info("Starting webswing server with id [" + System.getProperty(Constants.WEBSWING_SERVER_ID) + "]...");
+			
+			if (StringUtils.isBlank(System.getProperty(Constants.WEBSWING_CONNECTION_SECRET))) {
+				log.error("Missing " + Constants.WEBSWING_CONNECTION_SECRET + " system property!");
+				System.exit(-1);
+			}
+			
+			if (StringUtils.equalsIgnoreCase(System.getProperty(Constants.WEBSWING_CONNECTION_SECRET), Constants.WEBSWING_CONNECTION_SECRET_DEFAULT)) {
+				String msg = "Please change " + Constants.WEBSWING_CONNECTION_SECRET + " system property to a non-default value in production!";
+				log.error(msg, new IllegalStateException(msg));
+			}
+		} catch (Exception e) {
+			log.error("Exception occurred during initialization of System Properties", e);
+		}
+		
+		if (System.getProperty(Constants.SERVER_WEBSOCKET_URL) == null) {
+			throw new RuntimeException("Failed to initialized server! Missing " + Constants.SERVER_WEBSOCKET_URL + " property!");
 		}
 	}
 	

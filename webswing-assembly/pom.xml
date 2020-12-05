@@ -3,7 +3,7 @@
     <parent>
         <artifactId>webswing</artifactId>
         <groupId>org.webswing</groupId>
-        <version>20.2</version>
+        <version>20.2.1</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>webswing-assembly</artifactId>
@@ -14,26 +14,6 @@
             <artifactId>webswing-server-war</artifactId>
             <version>${project.version}</version>
             <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.webswing.security</groupId>
-            <artifactId>webswing-saml2-security-module</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webswing.security</groupId>
-            <artifactId>webswing-oidc-security-module</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webswing.security</groupId>
-            <artifactId>webswing-shiro-security-module</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webswing.security</groupId>
-            <artifactId>webswing-onetimeurl-security-extension</artifactId>
-            <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 

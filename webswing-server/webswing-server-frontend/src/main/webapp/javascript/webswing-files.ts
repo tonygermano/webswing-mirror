@@ -476,7 +476,7 @@ export class FilesModule extends ModuleDef<typeof filesInjectable, IFilesService
                     "message": "${files.downloadLink.download.message}",
                     "buttonMessage": "${files.downloadLink.download.button}"
                 };
-                displayDownloadLinkDialog(msg, url);
+                displayDownloadLinkDialog(msg, this.getFileUrl(url));
             } else {
                 const hiddenIFrameID = 'hiddenDownloader' + url;
                 let iframe = doc[0].getElementById(hiddenIFrameID) as HTMLIFrameElement;

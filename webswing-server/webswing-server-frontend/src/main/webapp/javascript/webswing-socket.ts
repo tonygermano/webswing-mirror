@@ -3,7 +3,7 @@ import { appFrameProtoOut } from "./proto/proto.out";
 import { appFrameProtoIn } from "./proto/proto.in";
 import { serverBrowserFrameProto } from "./proto/proto.frame";
 import { commonProto } from "./proto/proto.common";
-import { getToken } from './webswing-util';
+import { fixConnectionUrl, getToken } from './webswing-util';
 
 export const socketInjectable = {
     cfg: 'webswing.config' as const,
@@ -35,7 +35,7 @@ type AppFrameOut = appFrameProtoOut.IAppFrameMsgOutProto & {
     receivedTimestamp?: number
 }
 type HandshakeMessage = commonProto.IConnectionHandshakeMsgInProto
-type TimestampsMessage = serverBrowserFrameProto.ITimestampsMsgInProto
+type TimestampsMessage = commonProto.ITimestampsMsgInProto
 type PlaybackCommandMessage = serverBrowserFrameProto.IPlaybackCommandMsgInProto
 type SimpleEventMessage = commonProto.ISimpleEventMsgInProto
 type AppFrameIn = appFrameProtoIn.IAppFrameMsgInProto
@@ -140,7 +140,8 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
     }
 
     private connectWebSocket() {
-        const wsBaseUrl = this.api.cfg.connectionUrl.replace(/(http)(s)?\:\/\//, "ws$2://");
+        const connectionUrl = fixConnectionUrl(this.api.cfg.connectionUrl);
+        const wsBaseUrl = connectionUrl.replace(/(http)(s)?\:\/\//, "ws$2://");
         let url = wsBaseUrl + 'async/swing-bin';
         if (this.api.cfg.recordingPlayback) {
             url = wsBaseUrl + 'async/swing-play';

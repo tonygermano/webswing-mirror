@@ -11,6 +11,7 @@ import org.webswing.server.api.GlobalUrlHandler;
 import org.webswing.server.api.base.PrimaryUrlHandler;
 import org.webswing.server.api.services.rest.AbstractAppRestHandler;
 import org.webswing.server.common.util.ServerUtil;
+import org.webswing.server.common.util.VariableSubstitutor;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.util.GitRepositoryState;
 
@@ -99,8 +100,8 @@ public class AppRestHandlerImpl extends AbstractAppRestHandler {
 			return true;
 		}
 		
-		String url = global.getConfig().getAdminConsoleUrl();
-		if (StringUtils.isNotBlank(url) && ServerUtil.domainFromUrl(url).equals(header)) {
+		String url = VariableSubstitutor.basic().replace(global.getConfig().getAdminConsoleUrl());
+		if (StringUtils.isNotBlank(url) && url.toLowerCase().startsWith("http") && ServerUtil.domainFromUrl(url).equals(header)) {
 			return true;
 		}
 		

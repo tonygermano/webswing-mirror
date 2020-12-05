@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>webswing-server</artifactId>
 		<groupId>org.webswing</groupId>
-		<version>20.2</version>
+		<version>20.2.1</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<dependencies>
@@ -33,6 +33,16 @@
             <artifactId>javax-websocket-server-impl</artifactId>
             <version>${jetty.version}</version>
         </dependency>
+		<dependency>
+			<groupId>org.webswing</groupId>
+			<artifactId>modpatch-java-desktop</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webswing</groupId>
+			<artifactId>modpatch-jdk-jsobject</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>webswing-server-launcher</finalName>

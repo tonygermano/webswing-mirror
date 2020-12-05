@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>webswing-server</artifactId>
 		<groupId>org.webswing</groupId>
-		<version>20.2</version>
+		<version>20.2.1</version>
 		<relativePath>..</relativePath>
 	</parent>
     <dependencies>
@@ -18,12 +18,12 @@
                     <artifactId>rt-win-shell</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>jdk.jsobject.modpatch</groupId>
-                    <artifactId>jdk.jsobject.modpatch</artifactId>
+                    <groupId>modpatch-jdk-jsobject</groupId>
+                    <artifactId>org.webswing</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>java.desktop.modpatch</groupId>
-                    <artifactId>java.desktop.modpatch</artifactId>
+                    <groupId>modpatch-java-desktop</groupId>
+                    <artifactId>org.webswing</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -1,4 +1,5 @@
 import { ModuleDef } from "./webswing-inject";
+import { fixConnectionUrl } from "./webswing-util";
 
 export const pingInjectable = {
     cfg: 'webswing.config' as const,
@@ -55,20 +56,7 @@ export class PingModule extends ModuleDef<typeof pingInjectable, IPingService> {
     public start() {
         this.mute = 0;
         this.ping = getArrayWithLimitedLength(this.count);
-        let connectionUrl = this.api.cfg.connectionUrl;
-        if (connectionUrl.toLowerCase().indexOf('http') !== 0) { // if relative url
-            const host = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '')
-            let path = this.api.cfg.connectionUrl;
-            if (path.indexOf('/') !== 0) {// if relative path
-                const currentPath = document.location.pathname;
-                if(currentPath.lastIndexOf('/') === currentPath.length - 1 ){ // current path ends with /
-                    path = currentPath + path;
-                }else{ // otherwise remove the path after last /
-                    path = currentPath.substring(0,currentPath.lastIndexOf('/')+1)+ path;
-                }
-            }
-            connectionUrl = host + path;
-        }
+        const connectionUrl = fixConnectionUrl(this.api.cfg.connectionUrl);
         const blobURL = URL.createObjectURL(new Blob(['onmessage=(', PingMonitor.toString(), ')("' + connectionUrl + '",' + this.interval + ')'], { type: 'application/javascript' }));
         this.worker = new Worker(blobURL);
         this.worker.onmessage = (e) => {

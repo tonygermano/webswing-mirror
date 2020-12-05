@@ -161,7 +161,6 @@ public class Util {
 		try (InputStream is = cl.getResourceAsStream("toolkit.properties")) {
 			evalProps.load(is);
 		} catch (Exception e) {
-			e.printStackTrace();
 			// ignore this exception, the file is not present in non-evaluation version
 		}
 		
@@ -974,7 +973,7 @@ public class Util {
 	}
 
 	public static AWTEvent createKeyEvent(Component src, int type, long when, int modifiers, int keycode, char character, int keyLocationStandard) {
-		KeyEvent e = new KeyEvent(src, type, when, modifiers, keycode, character, KeyEvent.KEY_LOCATION_STANDARD);
+		KeyEvent e = new KeyEvent(src, type, when, modifiers, keycode, character, keyLocationStandard);
 		try {
 			java.lang.reflect.Field f = KeyEvent.class.getDeclaredField("extendedKeyCode");
 			f.setAccessible(true);

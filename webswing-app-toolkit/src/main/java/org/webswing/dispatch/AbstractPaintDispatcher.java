@@ -15,7 +15,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -396,9 +395,9 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 		String hashedName = name;
 		String hashedUserId = getUserId();
 		String hashedSize = length + "";
-		hashedName = Base64.getUrlEncoder().encodeToString(hashedName.getBytes(StandardCharsets.UTF_8));
-		hashedUserId = Base64.getUrlEncoder().encodeToString(hashedUserId.getBytes(StandardCharsets.UTF_8));
-		hashedSize = Base64.getUrlEncoder().encodeToString(hashedSize.getBytes(StandardCharsets.UTF_8));
+		hashedName = new String(Base64.getUrlEncoder().encode(hashedName.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+		hashedUserId = new String(Base64.getUrlEncoder().encode(hashedUserId.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+		hashedSize = new String(Base64.getUrlEncoder().encode(hashedSize.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
 		return hashedName + "_" + hashedUserId + "_" + hashedSize;
 	}
 	

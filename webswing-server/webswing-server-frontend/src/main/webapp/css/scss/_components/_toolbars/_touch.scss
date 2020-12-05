@@ -1,3 +1,7 @@
+div[data-id="touchBar"] {
+	display: none;
+}
+
 .ws-touchbar {
 	@extend .ws-toolbar;
 	

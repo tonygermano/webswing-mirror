@@ -87,7 +87,7 @@ public class ServerMain {
 				} else if (!keyStoreFile.exists()) {
 					AppLogger.error("SSL configuration is invalid. Keystore file " + keyStoreFile.getAbsolutePath() + " does not exist.");
 				} else {
-					SslContextFactory sslContextFactory = new SslContextFactory();
+					SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
 					sslContextFactory.setKeyStorePath(keyStoreFile.getAbsolutePath());
 					sslContextFactory.setKeyStorePassword(config.getKeystorePassword());
 					sslContextFactory.setTrustStorePath(trustStoreFile.getAbsolutePath());

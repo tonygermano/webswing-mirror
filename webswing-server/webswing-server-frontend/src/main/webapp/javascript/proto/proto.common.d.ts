@@ -320,4 +320,88 @@ export namespace commonProto {
          */
         public toJSON(): { [k: string]: any };
     }
+
+    /** Properties of a TimestampsMsgInProto. */
+    interface ITimestampsMsgInProto {
+
+        /** TimestampsMsgInProto startTimestamp */
+        startTimestamp?: (string|null);
+
+        /** TimestampsMsgInProto sendTimestamp */
+        sendTimestamp?: (string|null);
+
+        /** TimestampsMsgInProto renderingTime */
+        renderingTime?: (string|null);
+
+        /** TimestampsMsgInProto ping */
+        ping?: (number|null);
+    }
+
+    /** Represents a TimestampsMsgInProto. */
+    class TimestampsMsgInProto implements ITimestampsMsgInProto {
+
+        /**
+         * Constructs a new TimestampsMsgInProto.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: commonProto.ITimestampsMsgInProto);
+
+        /** TimestampsMsgInProto startTimestamp. */
+        public startTimestamp: string;
+
+        /** TimestampsMsgInProto sendTimestamp. */
+        public sendTimestamp: string;
+
+        /** TimestampsMsgInProto renderingTime. */
+        public renderingTime: string;
+
+        /** TimestampsMsgInProto ping. */
+        public ping: number;
+
+        /**
+         * Creates a new TimestampsMsgInProto instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns TimestampsMsgInProto instance
+         */
+        public static create(properties?: commonProto.ITimestampsMsgInProto): commonProto.TimestampsMsgInProto;
+
+        /**
+         * Encodes the specified TimestampsMsgInProto message. Does not implicitly {@link commonProto.TimestampsMsgInProto.verify|verify} messages.
+         * @param message TimestampsMsgInProto message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: commonProto.ITimestampsMsgInProto, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a TimestampsMsgInProto message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns TimestampsMsgInProto
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): commonProto.TimestampsMsgInProto;
+
+        /**
+         * Creates a TimestampsMsgInProto message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns TimestampsMsgInProto
+         */
+        public static fromObject(object: { [k: string]: any }): commonProto.TimestampsMsgInProto;
+
+        /**
+         * Creates a plain object from a TimestampsMsgInProto message. Also converts values to other types if specified.
+         * @param message TimestampsMsgInProto
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: commonProto.TimestampsMsgInProto, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this TimestampsMsgInProto to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
 }

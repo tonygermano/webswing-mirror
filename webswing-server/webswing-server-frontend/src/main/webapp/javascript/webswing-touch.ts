@@ -30,12 +30,14 @@ export interface ITouchService {
 	'touch.cursorChanged': (cursorMsg: appFrameProtoOut.ICursorChangeEventMsgOutProto) => void,
 	'touch.inputFocusGained': () => void,
 	'touch.touchBarConfig': ITouchBarConfig,
+	'touch.touchBarEnabled': () => boolean,
 	'touch.switchMode': (doSwitch: boolean, dontAsk: boolean) => void,
 	'touch.dispose': () => void
 }
 
 interface ITouchBarConfig {
-	scalingEnabled: boolean
+	scalingEnabled: boolean,
+	staticScaleEnabled: boolean,
 	buttons: {
 		left: IButton[]
 		center: IButton[]
@@ -103,6 +105,7 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 	private touchpadMode = false;
 	private fullscreenButton?: JQuery<HTMLElement>;
 	private scalingEnabled = true;
+	private staticScaleEnabled = false;
 	private switchModeRequested = false;
 	private switchModeDontAsk = false;
 	private switchModeAlreadySwitched = false;
@@ -118,6 +121,7 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 			'touch.cursorChanged': this.cursorChanged,
 			'touch.inputFocusGained': this.inputFocusGained,
 			'touch.touchBarConfig': this.touchBarConfig(),
+			'touch.touchBarEnabled': () => this.touchBar != null,
 			'touch.switchMode': this.switchMode,
 			'touch.dispose': this.dispose
 		}
@@ -195,14 +199,15 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 				center: [],
 				right: []
 			},
-			scalingEnabled: true
+			scalingEnabled: false,
+			staticScaleEnabled: false
 		};
 	}
 
 	private register(config: ITouchBarConfig) {
 		this.canvas = this.api.getCanvas();
 
-		this.doRegister(config);
+		this.doRegister(config, false);
 
 		this.currentConfig = config;
 
@@ -238,7 +243,7 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 		}, false);
 	}
 
-	private doRegister(config: ITouchBarConfig | null, force?: boolean) {
+	private doRegister(config: ITouchBarConfig | null, force: boolean) {
 		if (this.registered || (!isTouchDevice() && !force)) {
 			return;
 		}
@@ -290,14 +295,12 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 		this.lastRootWidth = this.api.cfg.rootElement.width()!;
 		this.lastRootHeight = this.api.cfg.rootElement.height()!;
 
-		this.api.sendHandshake();
-
-		this.initTouchBar(config);
-
-		const initScale = Math.min(document.body.offsetWidth / this.api.getRootWidth(), (document.body.offsetHeight - this.touchBar?.height()!) / this.api.getRootHeight());
-		$(this.canvas!).data("scale", initScale);
-		$(this.canvas!).data("minscale", initScale);
-		this.doScaleCanvas(initScale);
+		this.api.cfg.rootElement.parent().append(html);
+		if (!this.api.cfg.hideTouchBar) {
+			this.initTouchBar(config);
+		}
+		this.initMisc(config);
+		this.initScale();
 	}
 
 	private dispose() {
@@ -314,8 +317,6 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 		this.api.cfg.rootElementWrapper.removeClass("touch");
 
 		if (this.input) {
-
-
 			this.input[0].removeEventListener("focus", this.handleInputFocus);
 			this.input[0].removeEventListener("blur", this.handleInputBlur);
 
@@ -362,9 +363,9 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 					this.focusCounter++;
 				}
 			} else {
-				if (this.input.val() === "") {
-					this.input.val(" ");
-					this.input.select();
+				if (this.input!.val() === "") {
+					this.input![0].value = " ";
+					this.input![0].selectionStart = this.input![0].selectionEnd = this.input![0].value.length;
 				}
 			}
 			this.correctInputPosition();
@@ -391,13 +392,25 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 		}
 		this.backspaceKeyDown = false;
 	}
-
+	
 	private handleKeydown = (event: KeyboardEvent) => {
 		if (event.keyCode === 8 || event.keyCode === 13) {
 			this.inputEvtQueue.push(this.getKBKey(KeyEventType.keydown, event));
 		}
-
+		
 		this.backspaceKeyDown = (event.keyCode === 8);
+		
+		if (event.keyCode === 8 && this.input![0].value.length === 1) {
+			// ignore this event when the last character is going to be deleted
+			// instead set the value of the input to default " "
+			// this fixes problems with different keyboard implementations that do not send any event when backspace is pressed in empty input
+			this.input![0].value = " ";
+			this.input![0].selectionStart = this.input![0].selectionEnd = this.input![0].value.length;
+			event.preventDefault();
+  			event.stopPropagation();
+			return false;
+		}
+		return true;
 	}
 
 	private handleCompositionStart = (event: CompositionEvent) => {
@@ -433,6 +446,19 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 				}
 			} else {
 				this.sendBackspace();
+
+				if (this.input![0].value.length === 0) {
+					// prevent this event when the last character has been deleted
+					// set the value of the input to default " "
+					// this fixes problems with different keyboard implementations that do not send any event when backspace is pressed in empty input
+					this.input![0].value = " ";
+					setTimeout(() => {
+						this.input![0].selectionStart = this.input![0].selectionEnd = this.input![0].value.length;
+					}, 1);
+					event.preventDefault();
+					event.stopPropagation();
+					return;
+				}
 			}
 		}
 
@@ -481,23 +507,13 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 	}
 
 	private initTouchBar(config: ITouchBarConfig | null) {
-		if (this.api.cfg.hideTouchBar) {
-			return;
-		}
 		if (this.touchBar != null) {
 			return;
 		}
 
 		const root = this.api.cfg.rootElement.parent();
-
-		root.append(html);
-
 		this.touchBar = root.find('div[data-id="touchBar"]');
 		if (config) {
-			if (config.scalingEnabled) {
-				this.scalingEnabled = true;
-			}
-
 			if (config.buttons) {
 				const buttonContainer = this.touchBar.find(".ws-toolbar-container");
 				const defButtons = config.buttons.defaultButtons;
@@ -518,13 +534,38 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 			}
 		}
 
+		this.cursor = $("#ws-cursor");
+		this.touchBar.show();
+	}
+	
+	private initMisc(config: ITouchBarConfig | null) {
+		if (config) {
+			this.scalingEnabled = config.scalingEnabled;
+			this.staticScaleEnabled = config.staticScaleEnabled;
+		}
+		
 		$("#ws-canvas-scale .scale-restore").click(() => {
 			this.doScaleCanvas(1.0);
 		});
+	}
 
-		this.cursor = $("#ws-cursor");
+	private initScale() {
+		let touchBarHeight = 0;
+		if (this.touchBar && this.touchBar != null) {
+			touchBarHeight = this.touchBar.height()!;
+		}
 
-		this.touchBar.show();
+		const initScale = Math.min(document.body.offsetWidth / this.api.getRootWidth(), (document.body.offsetHeight - touchBarHeight) / this.api.getRootHeight());
+		
+		if (this.scalingEnabled) {
+			$(this.canvas!).data("scale", initScale);
+			$(this.canvas!).data("minscale", initScale);
+			this.doScaleCanvas(initScale);
+		} else if (this.staticScaleEnabled) {
+			// init static viewport scale
+			const vp = document.querySelector("meta[name='viewport']");
+			vp!.setAttribute("content", "width=device-width, user-scalable=no, initial-scale=" + initScale + ", maximum-scale=" + initScale);
+		}
 	}
 
 	private appendButtonsToBar(buttons: IButton[], container: JQuery<HTMLElement>) {
@@ -610,6 +651,7 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 		if (this.currentMode === "mouse") {
 			// switch to touch
 			this.doRegister(this.currentConfig, true);
+			this.api.sendHandshake();
 
 			// if first time switched => mouse mode was original mode => device is probably a notebook with touch screen
 			if (!this.switchModeAlreadySwitched || this.isProbablyTouchBook) {
@@ -1403,6 +1445,11 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 
 		const scale = $(this.canvas!).data("scale") || 1.0;
 
+		if (mouseX !== -1 && mouseY !== -1 && targetElement && targetElement.parentElement) {
+			mouseX += targetElement.parentElement.scrollLeft;
+			mouseY += targetElement.parentElement.scrollTop;
+		}
+
 		return {
 			mouse: {
 				x: Math.round(mouseX / scale),
@@ -1491,11 +1538,13 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 
 		if (!this.api.cfg.mirror && this.canvas != null) {
 			if (this.lastRootWidth !== this.api.cfg.rootElement.width() || this.lastRootHeight !== this.api.cfg.rootElement.height()) {
-				const minScale = Math.min(document.body.offsetWidth / this.api.getRootWidth(), (document.body.offsetHeight - this.touchBar?.height()!) / this.api.getRootHeight());
-				$(this.canvas).data("minscale", minScale);
-				if (minScale > $(this.canvas).data("scale")) {
-					$(this.canvas).data("scale", minScale);
-					this.doScaleCanvas(minScale);
+				if (this.scalingEnabled) {
+					const minScale = Math.min(document.body.offsetWidth / this.api.getRootWidth(), (document.body.offsetHeight - this.touchBar?.height()!) / this.api.getRootHeight());
+					$(this.canvas).data("minscale", minScale);
+					if (minScale > $(this.canvas).data("scale")) {
+						$(this.canvas).data("scale", minScale);
+						this.doScaleCanvas(minScale);
+					}
 				}
 
 				this.lastRootWidth = this.api.cfg.rootElement.width()!;
@@ -1545,7 +1594,9 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 			this.repaintTimeout = undefined;
 		}
 		if (new Date().getTime() - this.lastRepaint < 500) {
-			this.repaintTimeout = setTimeout(this.repaint, 250);
+			this.repaintTimeout = setTimeout(() => {
+				this.repaint();
+			}, 250);
 			return;
 		}
 		this.api.repaint();

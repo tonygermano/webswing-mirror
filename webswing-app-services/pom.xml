@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>webswing</artifactId>
 		<groupId>org.webswing</groupId>
-		<version>20.2</version>
+		<version>20.2.1</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<dependencies>
@@ -13,6 +13,12 @@
 			<artifactId>webswing-app-toolkit</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>modpatch-jdk-jsobject</artifactId>
+					<groupId>org.webswing</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.webswing</groupId>
@@ -28,6 +34,12 @@
 			<groupId>org.webswing</groupId>
 			<artifactId>webswing-server-common</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>modpatch-jdk-jsobject</artifactId>
+					<groupId>org.webswing</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>javax.websocket</groupId>

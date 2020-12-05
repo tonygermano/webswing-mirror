@@ -6,8 +6,6 @@ import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -178,10 +176,10 @@ public class FileTransferHandlerImpl extends AbstractUrlHandler implements FileT
 	}
 	
 	private String createHashedUploadFileId(String fileName, String fileSize) {
-		String hashedName = Base64.getUrlEncoder().encodeToString(fileName.getBytes(StandardCharsets.UTF_8));;
+		String hashedName = new String(Base64.getUrlEncoder().encode(fileName.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
 		String hashedUserId = getUser() != null ? getUser().getUserId() : "null";
-		String hashedSize = Base64.getUrlEncoder().encodeToString(fileSize.getBytes(StandardCharsets.UTF_8));
-		hashedUserId = Base64.getUrlEncoder().encodeToString(hashedUserId.getBytes(StandardCharsets.UTF_8));
+		String hashedSize = new String(Base64.getUrlEncoder().encode(fileSize.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+		hashedUserId = new String(Base64.getUrlEncoder().encode(hashedUserId.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
 		return hashedName + "_" + hashedUserId + "_" + hashedSize;
 	}
 

@@ -232,9 +232,8 @@ public abstract class PrimaryUrlHandler extends AbstractUrlHandler implements Se
 			return true;
 		}
 		
-		String url = getConfig().getAdminConsoleUrl();
-		if (StringUtils.isNotBlank(url) && ServerUtil.domainFromUrl(url).equals(header)) {
-			// FIXME do we need this?
+		String url = VariableSubstitutor.basic().replace(getConfig().getAdminConsoleUrl());
+		if (StringUtils.isNotBlank(url) && url.toLowerCase().startsWith("http") && ServerUtil.domainFromUrl(url).equals(header)) {
 			return true;
 		}
 		

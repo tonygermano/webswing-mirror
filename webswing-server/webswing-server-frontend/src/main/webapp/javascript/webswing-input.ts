@@ -162,7 +162,7 @@ export class InputModule extends ModuleDef<typeof inputInjectable, IInputService
         this.registerGlobalListener(doc, 'dblclick', (evt) => this.handleDblClick(evt, input));
         this.registerGlobalListener(doc, 'mousemove', (evt) => this.handleMouseMove(evt));
         this.registerGlobalListener(doc, 'mouseup', (evt) => this.handleMouseUp(evt, input));
-        this.registerGlobalListener(doc, 'wheel', (evt) => this.handleWheel(evt));
+        this.registerGlobalListener(doc.querySelector(".webswing-element") as HTMLElement, 'wheel', (evt: WheelEvent) => this.handleWheel(evt));
         this.registerGlobalListener(doc, 'contextmenu', (evt) => this.handleContextMenu(evt));
         this.registerGlobalListener(doc, 'keydown', (evt) => this.handleKeyDown(evt));
         this.registerGlobalListener(doc, 'keypress', (evt) => this.handleKeyPress(evt));
@@ -297,7 +297,7 @@ export class InputModule extends ModuleDef<typeof inputInjectable, IInputService
             }
             this.latestMouseWheelEvent = mousePos;
         }
-        // evt.preventDefault();
+        evt.preventDefault();
         evt.stopPropagation();
         return false;
     }
@@ -660,6 +660,12 @@ export class InputModule extends ModuleDef<typeof inputInjectable, IInputService
     }
 
     private mouseOverEventHandler(evt: MouseEvent) {
+    	const target = evt.target as Element;
+        if (target && target.matches && (target.matches("#canvas-overlay") || target.matches(".canvas-component"))) {
+        	// ignore for canvas-overlay shown in test tool
+        	return;
+        }
+    	
         const newMouseDown = Math.pow(2, evt.which);
         if (this.mouseDownButton !== 0 && this.mouseDownButton !== evt.which && this.mouseDown !== newMouseDown) {
             // mouse has been released outside window (iframe)
@@ -728,11 +734,11 @@ export class InputModule extends ModuleDef<typeof inputInjectable, IInputService
         let mouseY = Math.round(evt.clientY - rect.top);
 
         let delta = 0;
-        if (evt instanceof WheelEvent && type === MouseEventType.mousewheel) {
+        if (evt.type === 'wheel' && type === MouseEventType.mousewheel) {
             if (detectFF()) {
-                delta = -Math.max(-1, Math.min(1, (-evt.deltaY * 100)));
+                delta = -Math.max(-1, Math.min(1, (-(evt as WheelEvent).deltaY * 100)));
             } else if (detectIE() <= 11) {
-                delta = -Math.max(-1, Math.min(1, (-evt.deltaY)));
+                delta = -Math.max(-1, Math.min(1, (-(evt as WheelEvent).deltaY)));
             } else {
                 delta = -Math.max(-1, Math.min(1, ((evt as any).wheelDelta || -evt.detail)));
             }

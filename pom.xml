@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.webswing</groupId>
     <artifactId>webswing</artifactId>
-    <version>20.2</version>
+    <version>20.2.1</version>
     <packaging>pom</packaging>
     <name>Webswing</name>
     <description>Webswing is a web server that allows to run any swing application inside your web browser using only pure HTML5.</description>
@@ -22,8 +22,8 @@
         <developer>
             <name>Viktor Meszaros</name>
             <email>viktor.meszaros@webswing.org</email>
-            <organization>Nimirium Ltd.</organization>
-            <organizationUrl>http://www.webswing.org</organizationUrl>
+            <organization>Webswing Ltd.</organization>
+            <organizationUrl>https://www.webswing.org</organizationUrl>
         </developer>
     </developers>
 
@@ -51,6 +51,7 @@
         <module>webswing-directdraw</module>
         <module>webswing-server</module>
         <module>webswing-assembly</module>
+        <module>webswing-modpatch</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -61,7 +62,7 @@
         <bouncycastle.version>1.61</bouncycastle.version>
         <jackson.databind.version>2.10.0</jackson.databind.version>
         <jackson.annotations.version>2.10.0</jackson.annotations.version>
-        <jetty.version>9.4.33.v20201020</jetty.version>
+        <jetty.version>9.4.35.v20201120</jetty.version>
         <log4j.version>2.13.2</log4j.version>
     </properties>
     <dependencyManagement>

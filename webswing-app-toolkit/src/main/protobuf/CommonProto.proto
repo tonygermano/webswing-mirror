@@ -47,3 +47,10 @@ message ConnectionHandshakeMsgInProto {
     optional bool accessiblityEnabled = 16;
     optional string tabId = 17;
 }
+
+message TimestampsMsgInProto {
+    optional string startTimestamp = 1;
+    optional string sendTimestamp = 2;
+    optional string renderingTime = 3;
+    optional uint32 ping = 4;
+}

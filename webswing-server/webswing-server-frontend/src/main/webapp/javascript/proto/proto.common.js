@@ -864,6 +864,205 @@ $root.commonProto = (function() {
         return ConnectionHandshakeMsgInProto;
     })();
 
+    commonProto.TimestampsMsgInProto = (function() {
+
+        /**
+         * Properties of a TimestampsMsgInProto.
+         * @memberof commonProto
+         * @interface ITimestampsMsgInProto
+         * @property {string|null} [startTimestamp] TimestampsMsgInProto startTimestamp
+         * @property {string|null} [sendTimestamp] TimestampsMsgInProto sendTimestamp
+         * @property {string|null} [renderingTime] TimestampsMsgInProto renderingTime
+         * @property {number|null} [ping] TimestampsMsgInProto ping
+         */
+
+        /**
+         * Constructs a new TimestampsMsgInProto.
+         * @memberof commonProto
+         * @classdesc Represents a TimestampsMsgInProto.
+         * @implements ITimestampsMsgInProto
+         * @constructor
+         * @param {commonProto.ITimestampsMsgInProto=} [properties] Properties to set
+         */
+        function TimestampsMsgInProto(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * TimestampsMsgInProto startTimestamp.
+         * @member {string} startTimestamp
+         * @memberof commonProto.TimestampsMsgInProto
+         * @instance
+         */
+        TimestampsMsgInProto.prototype.startTimestamp = "";
+
+        /**
+         * TimestampsMsgInProto sendTimestamp.
+         * @member {string} sendTimestamp
+         * @memberof commonProto.TimestampsMsgInProto
+         * @instance
+         */
+        TimestampsMsgInProto.prototype.sendTimestamp = "";
+
+        /**
+         * TimestampsMsgInProto renderingTime.
+         * @member {string} renderingTime
+         * @memberof commonProto.TimestampsMsgInProto
+         * @instance
+         */
+        TimestampsMsgInProto.prototype.renderingTime = "";
+
+        /**
+         * TimestampsMsgInProto ping.
+         * @member {number} ping
+         * @memberof commonProto.TimestampsMsgInProto
+         * @instance
+         */
+        TimestampsMsgInProto.prototype.ping = 0;
+
+        /**
+         * Creates a new TimestampsMsgInProto instance using the specified properties.
+         * @function create
+         * @memberof commonProto.TimestampsMsgInProto
+         * @static
+         * @param {commonProto.ITimestampsMsgInProto=} [properties] Properties to set
+         * @returns {commonProto.TimestampsMsgInProto} TimestampsMsgInProto instance
+         */
+        TimestampsMsgInProto.create = function create(properties) {
+            return new TimestampsMsgInProto(properties);
+        };
+
+        /**
+         * Encodes the specified TimestampsMsgInProto message. Does not implicitly {@link commonProto.TimestampsMsgInProto.verify|verify} messages.
+         * @function encode
+         * @memberof commonProto.TimestampsMsgInProto
+         * @static
+         * @param {commonProto.ITimestampsMsgInProto} message TimestampsMsgInProto message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        TimestampsMsgInProto.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.startTimestamp != null && message.hasOwnProperty("startTimestamp"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.startTimestamp);
+            if (message.sendTimestamp != null && message.hasOwnProperty("sendTimestamp"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.sendTimestamp);
+            if (message.renderingTime != null && message.hasOwnProperty("renderingTime"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.renderingTime);
+            if (message.ping != null && message.hasOwnProperty("ping"))
+                writer.uint32(/* id 4, wireType 0 =*/32).uint32(message.ping);
+            return writer;
+        };
+
+        /**
+         * Decodes a TimestampsMsgInProto message from the specified reader or buffer.
+         * @function decode
+         * @memberof commonProto.TimestampsMsgInProto
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {commonProto.TimestampsMsgInProto} TimestampsMsgInProto
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        TimestampsMsgInProto.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.commonProto.TimestampsMsgInProto();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.startTimestamp = reader.string();
+                    break;
+                case 2:
+                    message.sendTimestamp = reader.string();
+                    break;
+                case 3:
+                    message.renderingTime = reader.string();
+                    break;
+                case 4:
+                    message.ping = reader.uint32();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Creates a TimestampsMsgInProto message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof commonProto.TimestampsMsgInProto
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {commonProto.TimestampsMsgInProto} TimestampsMsgInProto
+         */
+        TimestampsMsgInProto.fromObject = function fromObject(object) {
+            if (object instanceof $root.commonProto.TimestampsMsgInProto)
+                return object;
+            var message = new $root.commonProto.TimestampsMsgInProto();
+            if (object.startTimestamp != null)
+                message.startTimestamp = String(object.startTimestamp);
+            if (object.sendTimestamp != null)
+                message.sendTimestamp = String(object.sendTimestamp);
+            if (object.renderingTime != null)
+                message.renderingTime = String(object.renderingTime);
+            if (object.ping != null)
+                message.ping = object.ping >>> 0;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a TimestampsMsgInProto message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof commonProto.TimestampsMsgInProto
+         * @static
+         * @param {commonProto.TimestampsMsgInProto} message TimestampsMsgInProto
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        TimestampsMsgInProto.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.startTimestamp = "";
+                object.sendTimestamp = "";
+                object.renderingTime = "";
+                object.ping = 0;
+            }
+            if (message.startTimestamp != null && message.hasOwnProperty("startTimestamp"))
+                object.startTimestamp = message.startTimestamp;
+            if (message.sendTimestamp != null && message.hasOwnProperty("sendTimestamp"))
+                object.sendTimestamp = message.sendTimestamp;
+            if (message.renderingTime != null && message.hasOwnProperty("renderingTime"))
+                object.renderingTime = message.renderingTime;
+            if (message.ping != null && message.hasOwnProperty("ping"))
+                object.ping = message.ping;
+            return object;
+        };
+
+        /**
+         * Converts this TimestampsMsgInProto to JSON.
+         * @function toJSON
+         * @memberof commonProto.TimestampsMsgInProto
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        TimestampsMsgInProto.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return TimestampsMsgInProto;
+    })();
+
     return commonProto;
 })();
 

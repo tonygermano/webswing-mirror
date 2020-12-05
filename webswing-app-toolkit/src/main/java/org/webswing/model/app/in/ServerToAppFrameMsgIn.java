@@ -5,6 +5,7 @@ import java.util.List;
 import org.webswing.model.MsgIn;
 import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
 import org.webswing.model.common.in.SimpleEventMsgIn;
+import org.webswing.model.common.in.TimestampsMsgIn;
 
 public class ServerToAppFrameMsgIn implements MsgIn {
 
@@ -15,6 +16,7 @@ public class ServerToAppFrameMsgIn implements MsgIn {
 	private ApiCallResultMsgIn apiCallResult;
 	private ConnectionHandshakeMsgIn handshake;
 	private List<SimpleEventMsgIn> events;
+	private List<TimestampsMsgIn> timestamps;
 	
 	private byte[] appFrameMsgIn;
 	
@@ -64,6 +66,14 @@ public class ServerToAppFrameMsgIn implements MsgIn {
 
 	public void setEvents(List<SimpleEventMsgIn> events) {
 		this.events = events;
+	}
+
+	public List<TimestampsMsgIn> getTimestamps() {
+		return timestamps;
+	}
+
+	public void setTimestamps(List<TimestampsMsgIn> timestamps) {
+		this.timestamps = timestamps;
 	}
 
 }

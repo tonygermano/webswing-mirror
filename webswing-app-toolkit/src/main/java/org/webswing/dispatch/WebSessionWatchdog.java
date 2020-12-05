@@ -198,6 +198,7 @@ public class WebSessionWatchdog implements SessionWatchdog {
 				exitScheduler.schedule(this::resetInactivityTimers, 1, TimeUnit.MILLISECONDS);
 			} else {
 				Util.getWebToolkit().getEventDispatcher().resetLastEventTimestamp();
+				Util.getWebToolkit().getEventDispatcher().resetLastMessageTimestamp();
 				if (delayedShutdownFuture != null && !delayedShutdownFuture.isDone()) {
 					AppLogger.warn("Cancelling Delayed Application Shutdown expected in " + delayedShutdownFuture.getDelay(TimeUnit.SECONDS) + " seconds.");
 					delayedShutdownFuture.cancel(false);

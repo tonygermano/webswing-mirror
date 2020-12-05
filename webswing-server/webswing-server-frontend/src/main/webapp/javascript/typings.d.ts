@@ -5,7 +5,8 @@ interface GlobalEventHandlersEventMap {// extend lib.dom.d.ts
     'touchleave': TouchEvent
     "copy": ClipboardEvent;
     "cut": ClipboardEvent;
-    "paste": ClipboardEvent
+    "paste": ClipboardEvent;
+    "wheel": WheelEvent;
 }
 
 declare module '*.html' {

@@ -129,7 +129,7 @@ public interface SwingConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(false)
 	public boolean isTimeoutIfInactive();
 
-	@ConfigField(tab = ConfigGroup.Logging, label = "Session logging", description = "If enabled, sessions are logged into a separate log file.")
+	@ConfigField(tab = ConfigGroup.Logging, label = "Session Logging", description = "If enabled, sessions are logged into a separate log file.")
 	@ConfigFieldDefaultValueBoolean(false)
 	@ConfigFieldDiscriminator
 	public boolean isSessionLogging();

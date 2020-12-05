@@ -1,6 +1,8 @@
 package org.webswing.util;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import org.apache.bcel.classfile.JavaClass;
@@ -8,6 +10,7 @@ import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.InstructionList;
+import org.webswing.Constants;
 import org.webswing.classloader.SwingClassLoaderFactory;
 import org.webswing.ext.services.ImageService;
 import org.webswing.ext.services.PdfService;
@@ -30,6 +33,8 @@ public class ClassLoaderUtil {
 	 */
 	public static void initializeServices() {
 		serviceClassLoader = Thread.currentThread().getContextClassLoader();
+		
+		initSystemProperties();
 		
 		ImageService imageService = ImageServiceImpl.getInstance();
 		SwingClassLoaderFactoryService classloaderService = SwingClassLoaderFactory.getInstance();
@@ -112,6 +117,13 @@ public class ClassLoaderUtil {
 	
 	public static ClassLoader getServiceClassLoader() {
 		return serviceClassLoader;
+	}
+	
+	private static void initSystemProperties() {
+		// connection secret comes as base64, it needs to be deserialized first, then it is used in JwtUtil
+		String connectionSecretSerialized = System.getProperty(Constants.WEBSWING_CONNECTION_SECRET);
+		String connectionSecretDeserialized = new String(Base64.getDecoder().decode(connectionSecretSerialized.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+		System.setProperty(Constants.WEBSWING_CONNECTION_SECRET, connectionSecretDeserialized);
 	}
 
 }

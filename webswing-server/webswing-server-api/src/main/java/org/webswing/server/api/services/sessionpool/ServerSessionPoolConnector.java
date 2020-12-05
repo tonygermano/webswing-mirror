@@ -174,10 +174,8 @@ public abstract class ServerSessionPoolConnector {
 		return false;
 	}
 
-	public final boolean accepts(String path, SecuredPathConfig config) {
-		int maxClients = config.getMaxClients();
-
-		if (maxClients == 0 || !canCreateNewInstance()) {
+	public final boolean accepts(String path) {
+		if (!canCreateNewInstance()) {
 			return false;
 		}
 
@@ -284,7 +282,7 @@ public abstract class ServerSessionPoolConnector {
 		String configString = null;
 		try {
 			String serialized = WebswingObjectMapper.get().writeValueAsString(dataStoreConfig);
-			configString = Base64.getEncoder().encodeToString(serialized.getBytes(StandardCharsets.UTF_8));
+			configString = new String(Base64.getEncoder().encode(serialized.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
 		} catch (JsonProcessingException e) {
 			log.error("Error while serializing dataStore configuration!", e);
 		}
