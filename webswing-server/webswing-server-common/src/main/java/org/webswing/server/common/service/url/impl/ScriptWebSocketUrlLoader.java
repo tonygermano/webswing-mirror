@@ -39,10 +39,6 @@ public class ScriptWebSocketUrlLoader implements WebSocketUrlLoader {
 	}
 
 	@Override
-	public void initialize() {
-	}
-
-	@Override
 	public Set<String> reload() {
 		loadFromScript();
 		

@@ -156,6 +156,8 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
     	
     	if (reconnectScheduled.get()) {
     		resetTimer();
+    	} else {
+    		interruptReconnect.set(false);
     	}
     	
     	reconnectTimer.schedule(new TimerTask() {

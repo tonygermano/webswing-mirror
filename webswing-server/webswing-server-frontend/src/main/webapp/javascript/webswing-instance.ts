@@ -39,8 +39,10 @@ interface IInstanceContext {
     rootElementWrapper: JQuery<HTMLElement>;
     rootElement: JQuery<HTMLElement>;
     autoStart: boolean;
+    autoReconnect: number | null;
     args: string | null;
     connectionUrl: string;
+    mirrorConnectionUrl: string | null;
     mirror: boolean;
     recordingPlayback: boolean;
     typedArraysSupported: boolean;
@@ -117,8 +119,10 @@ export class WebswingInstanceModule extends ModuleDef<typeof webswingInstanceInj
             rootElementWrapper: setupRootElement(this.rootElement),
             rootElement: setupRootElementContent(this.rootElement),
             autoStart: false,
+            autoReconnect: null,
             args: null,
             connectionUrl: location.origin + location.pathname,
+            mirrorConnectionUrl: null,
             mirror: false,
             recordingPlayback: false,
             typedArraysSupported: isArrayBufferSupported(),
@@ -165,6 +169,8 @@ export class WebswingInstanceModule extends ModuleDef<typeof webswingInstanceInj
             this.api.startPing();
             this.api.showDialog(this.api.dialogs.initializingDialog);
             this.api.connect();
+        }, () => {
+            this.api.showDialog(this.api.dialogs.disconnectedDialog);
         });
     }
 
@@ -196,6 +202,7 @@ export class WebswingInstanceModule extends ModuleDef<typeof webswingInstanceInj
         options = options != null ? options : readOptions(cfg.rootElementWrapper);
         if (options != null) {
             cfg.autoStart = options.autoStart != null ? JSON.parse(options.autoStart) : cfg.autoStart;
+            cfg.autoReconnect = options.autoReconnect != null ? JSON.parse(options.autoReconnect) : cfg.autoReconnect;
             cfg.securityToken = options.securityToken != null ? options.securityToken : cfg.securityToken;
             cfg.realm = options.realm != null ? options.realm : cfg.realm;
             cfg.args = options.args != null ? options.args : cfg.args;
@@ -203,6 +210,7 @@ export class WebswingInstanceModule extends ModuleDef<typeof webswingInstanceInj
             cfg.clientId = options.clientId != null ? options.clientId : cfg.clientId;
             cfg.mirror = options.mirrorMode != null ? JSON.parse(options.mirrorMode) : cfg.mirror;
             cfg.connectionUrl = options.connectionUrl != null ? options.connectionUrl : cfg.connectionUrl;
+            cfg.mirrorConnectionUrl = options.mirrorConnectionUrl != null ? options.mirrorConnectionUrl : cfg.mirrorConnectionUrl;
             cfg.debugPort = options.debugPort != null ? options.debugPort : cfg.debugPort;
             cfg.debugLog = options.debugLog != null ? JSON.parse(options.debugLog) : cfg.debugLog;
             cfg.traceLog = options.traceLog != null ? JSON.parse(options.traceLog) : cfg.traceLog;
@@ -210,6 +218,9 @@ export class WebswingInstanceModule extends ModuleDef<typeof webswingInstanceInj
             cfg.pingParams = options.pingParams != null ? options.pingParams : cfg.pingParams;
             if (cfg.connectionUrl.substr(cfg.connectionUrl.length - 1) !== '/') {
                 cfg.connectionUrl = cfg.connectionUrl + '/';
+            }
+            if (cfg.mirrorConnectionUrl != null && cfg.mirrorConnectionUrl.substr(cfg.mirrorConnectionUrl.length - 1) !== '/') {
+                cfg.mirrorConnectionUrl = cfg.mirrorConnectionUrl + '/';
             }
             if (options.recordingPlayback != null) {
                 cfg.recordingPlayback = options.recordingPlayback;

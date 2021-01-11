@@ -2,9 +2,9 @@ package org.webswing.model.adminconsole.out;
 
 import java.util.List;
 
-import org.webswing.model.MsgIn;
+import org.webswing.model.MsgOut;
 
-public class AdminConsoleFrameMsgOut implements MsgIn {
+public class AdminConsoleFrameMsgOut implements MsgOut {
 
 	private static final long serialVersionUID = 3253892297375570414L;
 
@@ -20,6 +20,7 @@ public class AdminConsoleFrameMsgOut implements MsgIn {
 	private SearchVariablesMsgOut searchVariables;
 	private SaveConfigResultMsgOut saveConfigResult;
 	private AccessTokenCreatedMsgOut accessTokenCreated;
+	private MirrorFrameMsgOut mirrorFrame;
 	
 	public String getPath() {
 		return path;
@@ -115,6 +116,14 @@ public class AdminConsoleFrameMsgOut implements MsgIn {
 
 	public void setAccessTokenCreated(AccessTokenCreatedMsgOut accessTokenCreated) {
 		this.accessTokenCreated = accessTokenCreated;
+	}
+
+	public MirrorFrameMsgOut getMirrorFrame() {
+		return mirrorFrame;
+	}
+
+	public void setMirrorFrame(MirrorFrameMsgOut mirrorFrame) {
+		this.mirrorFrame = mirrorFrame;
 	}
 
 }

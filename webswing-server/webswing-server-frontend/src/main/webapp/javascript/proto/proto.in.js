@@ -2873,6 +2873,7 @@ $root.appFrameProtoIn = (function() {
          * @interface IAudioEventMsgInProto
          * @property {string|null} [id] AudioEventMsgInProto id
          * @property {boolean|null} [stop] AudioEventMsgInProto stop
+         * @property {boolean|null} [ping] AudioEventMsgInProto ping
          */
 
         /**
@@ -2907,6 +2908,14 @@ $root.appFrameProtoIn = (function() {
         AudioEventMsgInProto.prototype.stop = false;
 
         /**
+         * AudioEventMsgInProto ping.
+         * @member {boolean} ping
+         * @memberof appFrameProtoIn.AudioEventMsgInProto
+         * @instance
+         */
+        AudioEventMsgInProto.prototype.ping = false;
+
+        /**
          * Creates a new AudioEventMsgInProto instance using the specified properties.
          * @function create
          * @memberof appFrameProtoIn.AudioEventMsgInProto
@@ -2934,6 +2943,8 @@ $root.appFrameProtoIn = (function() {
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
             if (message.stop != null && message.hasOwnProperty("stop"))
                 writer.uint32(/* id 2, wireType 0 =*/16).bool(message.stop);
+            if (message.ping != null && message.hasOwnProperty("ping"))
+                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.ping);
             return writer;
         };
 
@@ -2953,6 +2964,8 @@ $root.appFrameProtoIn = (function() {
                 message.id = String(object.id);
             if (object.stop != null)
                 message.stop = Boolean(object.stop);
+            if (object.ping != null)
+                message.ping = Boolean(object.ping);
             return message;
         };
 
@@ -2972,11 +2985,14 @@ $root.appFrameProtoIn = (function() {
             if (options.defaults) {
                 object.id = "";
                 object.stop = false;
+                object.ping = false;
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
             if (message.stop != null && message.hasOwnProperty("stop"))
                 object.stop = message.stop;
+            if (message.ping != null && message.hasOwnProperty("ping"))
+                object.ping = message.ping;
             return object;
         };
 

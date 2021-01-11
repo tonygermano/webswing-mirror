@@ -61,6 +61,7 @@ export const msg = {
         "dialog.overlay.docking.visibility": "Main Webswing window has been hidden. Please make sure the main window is visible to continue.",
         "dialog.overlay.docking.modality": "This window is blocked by another modal window.",
         "dialog.overlay.docking.focusWindow": "Show window",
+        "dialog.autoReconnect": "Reconnecting...",
 
         //  SELECTOR
         "selector.welcome": "Welcome,",

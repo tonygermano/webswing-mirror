@@ -24,6 +24,7 @@ public class AdminConsoleFrameMsgIn implements MsgIn {
 	private StopAppMsgIn stopApp;
 	private CreateAppMsgIn createApp;
 	private RemoveAppMsgIn removeApp;
+	private MirrorFrameMsgIn mirrorFrame;
 	
 	public AdminConsoleHandshakeMsgIn getHandshake() {
 		return handshake;
@@ -167,6 +168,14 @@ public class AdminConsoleFrameMsgIn implements MsgIn {
 
 	public void setRemoveApp(RemoveAppMsgIn removeApp) {
 		this.removeApp = removeApp;
+	}
+
+	public MirrorFrameMsgIn getMirrorFrame() {
+		return mirrorFrame;
+	}
+
+	public void setMirrorFrame(MirrorFrameMsgIn mirrorFrame) {
+		this.mirrorFrame = mirrorFrame;
 	}
 
 }

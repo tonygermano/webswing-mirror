@@ -116,7 +116,7 @@
                 }
             }
         };
-        xmlhttp.open("GET", baseUrl + "rest/adminConsoleToken?token=" + localStorage.getItem("webswing_aclt"), true);
+        xmlhttp.open("GET", baseUrl + "rest/adminConsoleToken", true);
         xmlhttp.withCredentials = true;
         xmlhttp.send();
     }

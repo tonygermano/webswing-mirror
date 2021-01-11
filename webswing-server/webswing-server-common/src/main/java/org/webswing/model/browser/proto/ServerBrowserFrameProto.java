@@ -3036,6 +3036,15 @@ public final class ServerBrowserFrameProto {
      */
     com.google.protobuf.ByteString
         getSessionPoolIdBytes();
+
+    /**
+     * <code>optional bool autoLogout = 3;</code>
+     */
+    boolean hasAutoLogout();
+    /**
+     * <code>optional bool autoLogout = 3;</code>
+     */
+    boolean getAutoLogout();
   }
   /**
    * Protobuf type {@code serverBrowserFrameProto.ConnectionInfoMsgOutProto}
@@ -3052,6 +3061,7 @@ public final class ServerBrowserFrameProto {
     private ConnectionInfoMsgOutProto() {
       serverId_ = "";
       sessionPoolId_ = "";
+      autoLogout_ = false;
     }
 
     @java.lang.Override
@@ -3088,6 +3098,11 @@ public final class ServerBrowserFrameProto {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
               sessionPoolId_ = bs;
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              autoLogout_ = input.readBool();
               break;
             }
             default: {
@@ -3207,6 +3222,21 @@ public final class ServerBrowserFrameProto {
       }
     }
 
+    public static final int AUTOLOGOUT_FIELD_NUMBER = 3;
+    private boolean autoLogout_;
+    /**
+     * <code>optional bool autoLogout = 3;</code>
+     */
+    public boolean hasAutoLogout() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional bool autoLogout = 3;</code>
+     */
+    public boolean getAutoLogout() {
+      return autoLogout_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3227,6 +3257,9 @@ public final class ServerBrowserFrameProto {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, sessionPoolId_);
       }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBool(3, autoLogout_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3241,6 +3274,10 @@ public final class ServerBrowserFrameProto {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, sessionPoolId_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(3, autoLogout_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3268,6 +3305,11 @@ public final class ServerBrowserFrameProto {
         result = result && getSessionPoolId()
             .equals(other.getSessionPoolId());
       }
+      result = result && (hasAutoLogout() == other.hasAutoLogout());
+      if (hasAutoLogout()) {
+        result = result && (getAutoLogout()
+            == other.getAutoLogout());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -3286,6 +3328,11 @@ public final class ServerBrowserFrameProto {
       if (hasSessionPoolId()) {
         hash = (37 * hash) + SESSIONPOOLID_FIELD_NUMBER;
         hash = (53 * hash) + getSessionPoolId().hashCode();
+      }
+      if (hasAutoLogout()) {
+        hash = (37 * hash) + AUTOLOGOUT_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getAutoLogout());
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -3424,6 +3471,8 @@ public final class ServerBrowserFrameProto {
         bitField0_ = (bitField0_ & ~0x00000001);
         sessionPoolId_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
+        autoLogout_ = false;
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
 
@@ -3460,6 +3509,10 @@ public final class ServerBrowserFrameProto {
           to_bitField0_ |= 0x00000002;
         }
         result.sessionPoolId_ = sessionPoolId_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.autoLogout_ = autoLogout_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3518,6 +3571,9 @@ public final class ServerBrowserFrameProto {
           bitField0_ |= 0x00000002;
           sessionPoolId_ = other.sessionPoolId_;
           onChanged();
+        }
+        if (other.hasAutoLogout()) {
+          setAutoLogout(other.getAutoLogout());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3700,6 +3756,38 @@ public final class ServerBrowserFrameProto {
         onChanged();
         return this;
       }
+
+      private boolean autoLogout_ ;
+      /**
+       * <code>optional bool autoLogout = 3;</code>
+       */
+      public boolean hasAutoLogout() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional bool autoLogout = 3;</code>
+       */
+      public boolean getAutoLogout() {
+        return autoLogout_;
+      }
+      /**
+       * <code>optional bool autoLogout = 3;</code>
+       */
+      public Builder setAutoLogout(boolean value) {
+        bitField0_ |= 0x00000004;
+        autoLogout_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool autoLogout = 3;</code>
+       */
+      public Builder clearAutoLogout() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        autoLogout_ = false;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3800,9 +3888,10 @@ public final class ServerBrowserFrameProto {
       "serFrameMsgOutProto\022\026\n\016appFrameMsgOut\030\001 " +
       "\001(\014\022J\n\016connectionInfo\030\002 \001(\01322.serverBrow" +
       "serFrameProto.ConnectionInfoMsgOutProto\"" +
-      "D\n\031ConnectionInfoMsgOutProto\022\020\n\010serverId" +
-      "\030\001 \001(\t\022\025\n\rsessionPoolId\030\002 \001(\tB\"\n org.web" +
-      "swing.model.browser.proto"
+      "X\n\031ConnectionInfoMsgOutProto\022\020\n\010serverId" +
+      "\030\001 \001(\t\022\025\n\rsessionPoolId\030\002 \001(\t\022\022\n\nautoLog" +
+      "out\030\003 \001(\010B\"\n org.webswing.model.browser." +
+      "proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3840,7 +3929,7 @@ public final class ServerBrowserFrameProto {
     internal_static_serverBrowserFrameProto_ConnectionInfoMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_serverBrowserFrameProto_ConnectionInfoMsgOutProto_descriptor,
-        new java.lang.String[] { "ServerId", "SessionPoolId", });
+        new java.lang.String[] { "ServerId", "SessionPoolId", "AutoLogout", });
     org.webswing.model.common.proto.CommonProto.getDescriptor();
   }
 

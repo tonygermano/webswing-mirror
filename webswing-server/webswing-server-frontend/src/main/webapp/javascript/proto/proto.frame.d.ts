@@ -251,6 +251,9 @@ export namespace serverBrowserFrameProto {
 
         /** ConnectionInfoMsgOutProto sessionPoolId */
         sessionPoolId?: (string|null);
+
+        /** ConnectionInfoMsgOutProto autoLogout */
+        autoLogout?: (boolean|null);
     }
 
     /** Represents a ConnectionInfoMsgOutProto. */
@@ -267,6 +270,9 @@ export namespace serverBrowserFrameProto {
 
         /** ConnectionInfoMsgOutProto sessionPoolId. */
         public sessionPoolId: string;
+
+        /** ConnectionInfoMsgOutProto autoLogout. */
+        public autoLogout: boolean;
 
         /**
          * Creates a new ConnectionInfoMsgOutProto instance using the specified properties.

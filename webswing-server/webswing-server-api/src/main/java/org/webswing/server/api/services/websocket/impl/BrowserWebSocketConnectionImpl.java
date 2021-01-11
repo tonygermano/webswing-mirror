@@ -33,7 +33,7 @@ import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
 import org.webswing.server.api.services.application.AppPathHandler;
 import org.webswing.server.api.services.sessionpool.SessionPoolHolderService;
 import org.webswing.server.api.services.swinginstance.ConnectedSwingInstance;
-import org.webswing.server.api.services.websocket.BrowserWebSocketConnection;
+import org.webswing.server.api.services.websocket.PrimaryWebSocketConnection;
 import org.webswing.server.api.services.websocket.WebSocketService;
 import org.webswing.server.api.services.websocket.WebSocketUserInfo;
 import org.webswing.server.api.services.websocket.util.BrowserWebSocketConfigurator;
@@ -50,7 +50,7 @@ import org.webswing.server.model.exception.WsException;
 import com.google.inject.Inject;
 
 @ServerEndpoint(value = "/{appPath}/async/swing-bin", configurator = BrowserWebSocketConfigurator.class)
-public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection implements BrowserWebSocketConnection {
+public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection implements PrimaryWebSocketConnection {
 	
 	private static final Logger log = LoggerFactory.getLogger(BrowserWebSocketConnectionImpl.class);
 
@@ -147,7 +147,7 @@ public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection 
 			if (frame.getHandshake() != null) {
 				if (currentInstance) {
 					// resend handshake to instance
-					instance.handleBrowserMessage(this, frame);
+					instance.handleBrowserMessage(frame);
 				} else {
 					// instance not yet connected, try connect with handshake
 					// this also handles reconnect
@@ -163,7 +163,7 @@ public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection 
 				return;
 			}
 			
-			instance.handleBrowserMessage(this, frame);
+			instance.handleBrowserMessage(frame);
 			
 			sessionPoolHolderService.logStatValue(instance.getInstanceId(), path, StatisticsLogger.INBOUND_SIZE_METRIC, frameWithLength.getValue());
 		} catch (IOException e) {
@@ -226,22 +226,15 @@ public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection 
 	
 	@Override
 	public void sendMessage(ServerToBrowserFrameMsgOut msgOut) {
-		sendMessage(msgOut, true);
-	}
-	
-	@Override
-	public void sendMessage(ServerToBrowserFrameMsgOut msgOut, boolean logStats) {
 		try {
 			byte[] encoded = protoMapper.encodeProto(msgOut);
 			super.sendMessage(encoded);
 			
-			if (logStats) {
-				if (instance == null) {
-					// not yet connected
-					return;
-				}
-				sessionPoolHolderService.logStatValue(instance.getInstanceId(), path, StatisticsLogger.OUTBOUND_SIZE_METRIC, encoded.length);
+			if (instance == null) {
+				// not yet connected
+				return;
 			}
+			sessionPoolHolderService.logStatValue(instance.getInstanceId(), path, StatisticsLogger.OUTBOUND_SIZE_METRIC, encoded.length);
 		} catch (IOException e) {
 			log.error("Error sending msg to browser [" + session.getId() + "]!", e);
 		}

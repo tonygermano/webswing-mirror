@@ -251,6 +251,19 @@ public final class AdminConsoleProto {
      * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProtoOrBuilder getRemoveAppOrBuilder();
+
+    /**
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     */
+    boolean hasMirrorFrame();
+    /**
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     */
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto getMirrorFrame();
+    /**
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     */
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder getMirrorFrameOrBuilder();
   }
   /**
    * Protobuf type {@code AdminConsoleFrameMsgInProto}
@@ -523,6 +536,19 @@ public final class AdminConsoleProto {
                 removeApp_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00020000;
+              break;
+            }
+            case 162: {
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00040000) == 0x00040000)) {
+                subBuilder = mirrorFrame_.toBuilder();
+              }
+              mirrorFrame_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(mirrorFrame_);
+                mirrorFrame_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00040000;
               break;
             }
             default: {
@@ -936,6 +962,27 @@ public final class AdminConsoleProto {
       return removeApp_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto.getDefaultInstance() : removeApp_;
     }
 
+    public static final int MIRRORFRAME_FIELD_NUMBER = 20;
+    private org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto mirrorFrame_;
+    /**
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     */
+    public boolean hasMirrorFrame() {
+      return ((bitField0_ & 0x00040000) == 0x00040000);
+    }
+    /**
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     */
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto getMirrorFrame() {
+      return mirrorFrame_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.getDefaultInstance() : mirrorFrame_;
+    }
+    /**
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     */
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder getMirrorFrameOrBuilder() {
+      return mirrorFrame_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.getDefaultInstance() : mirrorFrame_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1003,6 +1050,9 @@ public final class AdminConsoleProto {
       }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
         output.writeMessage(19, getRemoveApp());
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        output.writeMessage(20, getMirrorFrame());
       }
       unknownFields.writeTo(output);
     }
@@ -1084,6 +1134,10 @@ public final class AdminConsoleProto {
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(19, getRemoveApp());
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(20, getMirrorFrame());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1191,6 +1245,11 @@ public final class AdminConsoleProto {
         result = result && getRemoveApp()
             .equals(other.getRemoveApp());
       }
+      result = result && (hasMirrorFrame() == other.hasMirrorFrame());
+      if (hasMirrorFrame()) {
+        result = result && getMirrorFrame()
+            .equals(other.getMirrorFrame());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1273,6 +1332,10 @@ public final class AdminConsoleProto {
       if (hasRemoveApp()) {
         hash = (37 * hash) + REMOVEAPP_FIELD_NUMBER;
         hash = (53 * hash) + getRemoveApp().hashCode();
+      }
+      if (hasMirrorFrame()) {
+        hash = (37 * hash) + MIRRORFRAME_FIELD_NUMBER;
+        hash = (53 * hash) + getMirrorFrame().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -1420,6 +1483,7 @@ public final class AdminConsoleProto {
           getStopAppFieldBuilder();
           getCreateAppFieldBuilder();
           getRemoveAppFieldBuilder();
+          getMirrorFrameFieldBuilder();
         }
       }
       @java.lang.Override
@@ -1533,6 +1597,12 @@ public final class AdminConsoleProto {
           removeAppBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00020000);
+        if (mirrorFrameBuilder_ == null) {
+          mirrorFrame_ = null;
+        } else {
+          mirrorFrameBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00040000);
         return this;
       }
 
@@ -1705,6 +1775,14 @@ public final class AdminConsoleProto {
         } else {
           result.removeApp_ = removeAppBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
+          to_bitField0_ |= 0x00040000;
+        }
+        if (mirrorFrameBuilder_ == null) {
+          result.mirrorFrame_ = mirrorFrame_;
+        } else {
+          result.mirrorFrame_ = mirrorFrameBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1807,6 +1885,9 @@ public final class AdminConsoleProto {
         }
         if (other.hasRemoveApp()) {
           mergeRemoveApp(other.getRemoveApp());
+        }
+        if (other.hasMirrorFrame()) {
+          mergeMirrorFrame(other.getMirrorFrame());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3960,6 +4041,124 @@ public final class AdminConsoleProto {
           removeApp_ = null;
         }
         return removeAppBuilder_;
+      }
+
+      private org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto mirrorFrame_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder> mirrorFrameBuilder_;
+      /**
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       */
+      public boolean hasMirrorFrame() {
+        return ((bitField0_ & 0x00040000) == 0x00040000);
+      }
+      /**
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto getMirrorFrame() {
+        if (mirrorFrameBuilder_ == null) {
+          return mirrorFrame_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.getDefaultInstance() : mirrorFrame_;
+        } else {
+          return mirrorFrameBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       */
+      public Builder setMirrorFrame(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto value) {
+        if (mirrorFrameBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          mirrorFrame_ = value;
+          onChanged();
+        } else {
+          mirrorFrameBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00040000;
+        return this;
+      }
+      /**
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       */
+      public Builder setMirrorFrame(
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder builderForValue) {
+        if (mirrorFrameBuilder_ == null) {
+          mirrorFrame_ = builderForValue.build();
+          onChanged();
+        } else {
+          mirrorFrameBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00040000;
+        return this;
+      }
+      /**
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       */
+      public Builder mergeMirrorFrame(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto value) {
+        if (mirrorFrameBuilder_ == null) {
+          if (((bitField0_ & 0x00040000) == 0x00040000) &&
+              mirrorFrame_ != null &&
+              mirrorFrame_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.getDefaultInstance()) {
+            mirrorFrame_ =
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.newBuilder(mirrorFrame_).mergeFrom(value).buildPartial();
+          } else {
+            mirrorFrame_ = value;
+          }
+          onChanged();
+        } else {
+          mirrorFrameBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00040000;
+        return this;
+      }
+      /**
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       */
+      public Builder clearMirrorFrame() {
+        if (mirrorFrameBuilder_ == null) {
+          mirrorFrame_ = null;
+          onChanged();
+        } else {
+          mirrorFrameBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00040000);
+        return this;
+      }
+      /**
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder getMirrorFrameBuilder() {
+        bitField0_ |= 0x00040000;
+        onChanged();
+        return getMirrorFrameFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder getMirrorFrameOrBuilder() {
+        if (mirrorFrameBuilder_ != null) {
+          return mirrorFrameBuilder_.getMessageOrBuilder();
+        } else {
+          return mirrorFrame_ == null ?
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.getDefaultInstance() : mirrorFrame_;
+        }
+      }
+      /**
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder> 
+          getMirrorFrameFieldBuilder() {
+        if (mirrorFrameBuilder_ == null) {
+          mirrorFrameBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder>(
+                  getMirrorFrame(),
+                  getParentForChildren(),
+                  isClean());
+          mirrorFrame_ = null;
+        }
+        return mirrorFrameBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -19818,6 +20017,1185 @@ public final class AdminConsoleProto {
 
   }
 
+  public interface MirrorFrameMsgInProtoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:MirrorFrameMsgInProto)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional bytes frame = 1;</code>
+     */
+    boolean hasFrame();
+    /**
+     * <code>optional bytes frame = 1;</code>
+     */
+    com.google.protobuf.ByteString getFrame();
+
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    boolean hasInstanceId();
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    java.lang.String getInstanceId();
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getInstanceIdBytes();
+
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    boolean hasSessionId();
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    java.lang.String getSessionId();
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getSessionIdBytes();
+
+    /**
+     * <code>optional string token = 4;</code>
+     */
+    boolean hasToken();
+    /**
+     * <code>optional string token = 4;</code>
+     */
+    java.lang.String getToken();
+    /**
+     * <code>optional string token = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getTokenBytes();
+
+    /**
+     * <code>optional bool connect = 5;</code>
+     */
+    boolean hasConnect();
+    /**
+     * <code>optional bool connect = 5;</code>
+     */
+    boolean getConnect();
+
+    /**
+     * <code>optional bool disconnect = 6;</code>
+     */
+    boolean hasDisconnect();
+    /**
+     * <code>optional bool disconnect = 6;</code>
+     */
+    boolean getDisconnect();
+  }
+  /**
+   * Protobuf type {@code MirrorFrameMsgInProto}
+   */
+  public  static final class MirrorFrameMsgInProto extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:MirrorFrameMsgInProto)
+      MirrorFrameMsgInProtoOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use MirrorFrameMsgInProto.newBuilder() to construct.
+    private MirrorFrameMsgInProto(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private MirrorFrameMsgInProto() {
+      frame_ = com.google.protobuf.ByteString.EMPTY;
+      instanceId_ = "";
+      sessionId_ = "";
+      token_ = "";
+      connect_ = false;
+      disconnect_ = false;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private MirrorFrameMsgInProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              bitField0_ |= 0x00000001;
+              frame_ = input.readBytes();
+              break;
+            }
+            case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000002;
+              instanceId_ = bs;
+              break;
+            }
+            case 26: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000004;
+              sessionId_ = bs;
+              break;
+            }
+            case 34: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000008;
+              token_ = bs;
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              connect_ = input.readBool();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000020;
+              disconnect_ = input.readBool();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_MirrorFrameMsgInProto_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_MirrorFrameMsgInProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.class, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int FRAME_FIELD_NUMBER = 1;
+    private com.google.protobuf.ByteString frame_;
+    /**
+     * <code>optional bytes frame = 1;</code>
+     */
+    public boolean hasFrame() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional bytes frame = 1;</code>
+     */
+    public com.google.protobuf.ByteString getFrame() {
+      return frame_;
+    }
+
+    public static final int INSTANCEID_FIELD_NUMBER = 2;
+    private volatile java.lang.Object instanceId_;
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    public boolean hasInstanceId() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    public java.lang.String getInstanceId() {
+      java.lang.Object ref = instanceId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          instanceId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getInstanceIdBytes() {
+      java.lang.Object ref = instanceId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        instanceId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int SESSIONID_FIELD_NUMBER = 3;
+    private volatile java.lang.Object sessionId_;
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    public boolean hasSessionId() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    public java.lang.String getSessionId() {
+      java.lang.Object ref = sessionId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          sessionId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSessionIdBytes() {
+      java.lang.Object ref = sessionId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        sessionId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int TOKEN_FIELD_NUMBER = 4;
+    private volatile java.lang.Object token_;
+    /**
+     * <code>optional string token = 4;</code>
+     */
+    public boolean hasToken() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional string token = 4;</code>
+     */
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          token_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string token = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int CONNECT_FIELD_NUMBER = 5;
+    private boolean connect_;
+    /**
+     * <code>optional bool connect = 5;</code>
+     */
+    public boolean hasConnect() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional bool connect = 5;</code>
+     */
+    public boolean getConnect() {
+      return connect_;
+    }
+
+    public static final int DISCONNECT_FIELD_NUMBER = 6;
+    private boolean disconnect_;
+    /**
+     * <code>optional bool disconnect = 6;</code>
+     */
+    public boolean hasDisconnect() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional bool disconnect = 6;</code>
+     */
+    public boolean getDisconnect() {
+      return disconnect_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, frame_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, instanceId_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, sessionId_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, token_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBool(5, connect_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBool(6, disconnect_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, frame_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, instanceId_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, sessionId_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, token_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(5, connect_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(6, disconnect_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto)) {
+        return super.equals(obj);
+      }
+      org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto other = (org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto) obj;
+
+      boolean result = true;
+      result = result && (hasFrame() == other.hasFrame());
+      if (hasFrame()) {
+        result = result && getFrame()
+            .equals(other.getFrame());
+      }
+      result = result && (hasInstanceId() == other.hasInstanceId());
+      if (hasInstanceId()) {
+        result = result && getInstanceId()
+            .equals(other.getInstanceId());
+      }
+      result = result && (hasSessionId() == other.hasSessionId());
+      if (hasSessionId()) {
+        result = result && getSessionId()
+            .equals(other.getSessionId());
+      }
+      result = result && (hasToken() == other.hasToken());
+      if (hasToken()) {
+        result = result && getToken()
+            .equals(other.getToken());
+      }
+      result = result && (hasConnect() == other.hasConnect());
+      if (hasConnect()) {
+        result = result && (getConnect()
+            == other.getConnect());
+      }
+      result = result && (hasDisconnect() == other.hasDisconnect());
+      if (hasDisconnect()) {
+        result = result && (getDisconnect()
+            == other.getDisconnect());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasFrame()) {
+        hash = (37 * hash) + FRAME_FIELD_NUMBER;
+        hash = (53 * hash) + getFrame().hashCode();
+      }
+      if (hasInstanceId()) {
+        hash = (37 * hash) + INSTANCEID_FIELD_NUMBER;
+        hash = (53 * hash) + getInstanceId().hashCode();
+      }
+      if (hasSessionId()) {
+        hash = (37 * hash) + SESSIONID_FIELD_NUMBER;
+        hash = (53 * hash) + getSessionId().hashCode();
+      }
+      if (hasToken()) {
+        hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+        hash = (53 * hash) + getToken().hashCode();
+      }
+      if (hasConnect()) {
+        hash = (37 * hash) + CONNECT_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getConnect());
+      }
+      if (hasDisconnect()) {
+        hash = (37 * hash) + DISCONNECT_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getDisconnect());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code MirrorFrameMsgInProto}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:MirrorFrameMsgInProto)
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_MirrorFrameMsgInProto_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_MirrorFrameMsgInProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.class, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder.class);
+      }
+
+      // Construct using org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        frame_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        instanceId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000002);
+        sessionId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
+        token_ = "";
+        bitField0_ = (bitField0_ & ~0x00000008);
+        connect_ = false;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        disconnect_ = false;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_MirrorFrameMsgInProto_descriptor;
+      }
+
+      @java.lang.Override
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto getDefaultInstanceForType() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto build() {
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto buildPartial() {
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto result = new org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.frame_ = frame_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.instanceId_ = instanceId_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.sessionId_ = sessionId_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.token_ = token_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.connect_ = connect_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.disconnect_ = disconnect_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto) {
+          return mergeFrom((org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto other) {
+        if (other == org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.getDefaultInstance()) return this;
+        if (other.hasFrame()) {
+          setFrame(other.getFrame());
+        }
+        if (other.hasInstanceId()) {
+          bitField0_ |= 0x00000002;
+          instanceId_ = other.instanceId_;
+          onChanged();
+        }
+        if (other.hasSessionId()) {
+          bitField0_ |= 0x00000004;
+          sessionId_ = other.sessionId_;
+          onChanged();
+        }
+        if (other.hasToken()) {
+          bitField0_ |= 0x00000008;
+          token_ = other.token_;
+          onChanged();
+        }
+        if (other.hasConnect()) {
+          setConnect(other.getConnect());
+        }
+        if (other.hasDisconnect()) {
+          setDisconnect(other.getDisconnect());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private com.google.protobuf.ByteString frame_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes frame = 1;</code>
+       */
+      public boolean hasFrame() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional bytes frame = 1;</code>
+       */
+      public com.google.protobuf.ByteString getFrame() {
+        return frame_;
+      }
+      /**
+       * <code>optional bytes frame = 1;</code>
+       */
+      public Builder setFrame(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        frame_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes frame = 1;</code>
+       */
+      public Builder clearFrame() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        frame_ = getDefaultInstance().getFrame();
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object instanceId_ = "";
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public boolean hasInstanceId() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public java.lang.String getInstanceId() {
+        java.lang.Object ref = instanceId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            instanceId_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getInstanceIdBytes() {
+        java.lang.Object ref = instanceId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          instanceId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public Builder setInstanceId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        instanceId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public Builder clearInstanceId() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        instanceId_ = getDefaultInstance().getInstanceId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public Builder setInstanceIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        instanceId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object sessionId_ = "";
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public boolean hasSessionId() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public java.lang.String getSessionId() {
+        java.lang.Object ref = sessionId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            sessionId_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSessionIdBytes() {
+        java.lang.Object ref = sessionId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          sessionId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public Builder setSessionId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        sessionId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public Builder clearSessionId() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        sessionId_ = getDefaultInstance().getSessionId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public Builder setSessionIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        sessionId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object token_ = "";
+      /**
+       * <code>optional string token = 4;</code>
+       */
+      public boolean hasToken() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional string token = 4;</code>
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            token_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string token = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string token = 4;</code>
+       */
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string token = 4;</code>
+       */
+      public Builder clearToken() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        token_ = getDefaultInstance().getToken();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string token = 4;</code>
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        token_ = value;
+        onChanged();
+        return this;
+      }
+
+      private boolean connect_ ;
+      /**
+       * <code>optional bool connect = 5;</code>
+       */
+      public boolean hasConnect() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional bool connect = 5;</code>
+       */
+      public boolean getConnect() {
+        return connect_;
+      }
+      /**
+       * <code>optional bool connect = 5;</code>
+       */
+      public Builder setConnect(boolean value) {
+        bitField0_ |= 0x00000010;
+        connect_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool connect = 5;</code>
+       */
+      public Builder clearConnect() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        connect_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean disconnect_ ;
+      /**
+       * <code>optional bool disconnect = 6;</code>
+       */
+      public boolean hasDisconnect() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional bool disconnect = 6;</code>
+       */
+      public boolean getDisconnect() {
+        return disconnect_;
+      }
+      /**
+       * <code>optional bool disconnect = 6;</code>
+       */
+      public Builder setDisconnect(boolean value) {
+        bitField0_ |= 0x00000020;
+        disconnect_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool disconnect = 6;</code>
+       */
+      public Builder clearDisconnect() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        disconnect_ = false;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:MirrorFrameMsgInProto)
+    }
+
+    // @@protoc_insertion_point(class_scope:MirrorFrameMsgInProto)
+    private static final org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto();
+    }
+
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<MirrorFrameMsgInProto>
+        PARSER = new com.google.protobuf.AbstractParser<MirrorFrameMsgInProto>() {
+      @java.lang.Override
+      public MirrorFrameMsgInProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new MirrorFrameMsgInProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<MirrorFrameMsgInProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<MirrorFrameMsgInProto> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface AdminConsoleFrameMsgOutProtoOrBuilder extends
       // @@protoc_insertion_point(interface_extends:AdminConsoleFrameMsgOutProto)
       com.google.protobuf.MessageOrBuilder {
@@ -19989,6 +21367,19 @@ public final class AdminConsoleProto {
      * <code>optional .AccessTokenCreatedMsgOutProto accessTokenCreated = 12;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.AccessTokenCreatedMsgOutProtoOrBuilder getAccessTokenCreatedOrBuilder();
+
+    /**
+     * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+     */
+    boolean hasMirrorFrame();
+    /**
+     * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+     */
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto getMirrorFrame();
+    /**
+     * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+     */
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProtoOrBuilder getMirrorFrameOrBuilder();
   }
   /**
    * Protobuf type {@code AdminConsoleFrameMsgOutProto}
@@ -20174,6 +21565,19 @@ public final class AdminConsoleProto {
                 accessTokenCreated_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000400;
+              break;
+            }
+            case 106: {
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000800) == 0x00000800)) {
+                subBuilder = mirrorFrame_.toBuilder();
+              }
+              mirrorFrame_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(mirrorFrame_);
+                mirrorFrame_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000800;
               break;
             }
             default: {
@@ -20499,6 +21903,27 @@ public final class AdminConsoleProto {
       return accessTokenCreated_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.AccessTokenCreatedMsgOutProto.getDefaultInstance() : accessTokenCreated_;
     }
 
+    public static final int MIRRORFRAME_FIELD_NUMBER = 13;
+    private org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto mirrorFrame_;
+    /**
+     * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+     */
+    public boolean hasMirrorFrame() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+     */
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto getMirrorFrame() {
+      return mirrorFrame_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.getDefaultInstance() : mirrorFrame_;
+    }
+    /**
+     * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+     */
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProtoOrBuilder getMirrorFrameOrBuilder() {
+      return mirrorFrame_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.getDefaultInstance() : mirrorFrame_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -20548,6 +21973,9 @@ public final class AdminConsoleProto {
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         output.writeMessage(12, getAccessTokenCreated());
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeMessage(13, getMirrorFrame());
       }
       unknownFields.writeTo(output);
     }
@@ -20604,6 +22032,10 @@ public final class AdminConsoleProto {
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(12, getAccessTokenCreated());
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(13, getMirrorFrame());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -20678,6 +22110,11 @@ public final class AdminConsoleProto {
         result = result && getAccessTokenCreated()
             .equals(other.getAccessTokenCreated());
       }
+      result = result && (hasMirrorFrame() == other.hasMirrorFrame());
+      if (hasMirrorFrame()) {
+        result = result && getMirrorFrame()
+            .equals(other.getMirrorFrame());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -20736,6 +22173,10 @@ public final class AdminConsoleProto {
       if (hasAccessTokenCreated()) {
         hash = (37 * hash) + ACCESSTOKENCREATED_FIELD_NUMBER;
         hash = (53 * hash) + getAccessTokenCreated().hashCode();
+      }
+      if (hasMirrorFrame()) {
+        hash = (37 * hash) + MIRRORFRAME_FIELD_NUMBER;
+        hash = (53 * hash) + getMirrorFrame().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -20876,6 +22317,7 @@ public final class AdminConsoleProto {
           getSearchVariablesFieldBuilder();
           getSaveConfigResultFieldBuilder();
           getAccessTokenCreatedFieldBuilder();
+          getMirrorFrameFieldBuilder();
         }
       }
       @java.lang.Override
@@ -20949,6 +22391,12 @@ public final class AdminConsoleProto {
           accessTokenCreatedBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000800);
+        if (mirrorFrameBuilder_ == null) {
+          mirrorFrame_ = null;
+        } else {
+          mirrorFrameBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
 
@@ -21070,6 +22518,14 @@ public final class AdminConsoleProto {
         } else {
           result.accessTokenCreated_ = accessTokenCreatedBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        if (mirrorFrameBuilder_ == null) {
+          result.mirrorFrame_ = mirrorFrame_;
+        } else {
+          result.mirrorFrame_ = mirrorFrameBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -21179,6 +22635,9 @@ public final class AdminConsoleProto {
         }
         if (other.hasAccessTokenCreated()) {
           mergeAccessTokenCreated(other.getAccessTokenCreated());
+        }
+        if (other.hasMirrorFrame()) {
+          mergeMirrorFrame(other.getMirrorFrame());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -22704,6 +24163,124 @@ public final class AdminConsoleProto {
           accessTokenCreated_ = null;
         }
         return accessTokenCreatedBuilder_;
+      }
+
+      private org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto mirrorFrame_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProtoOrBuilder> mirrorFrameBuilder_;
+      /**
+       * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+       */
+      public boolean hasMirrorFrame() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      /**
+       * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto getMirrorFrame() {
+        if (mirrorFrameBuilder_ == null) {
+          return mirrorFrame_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.getDefaultInstance() : mirrorFrame_;
+        } else {
+          return mirrorFrameBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+       */
+      public Builder setMirrorFrame(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto value) {
+        if (mirrorFrameBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          mirrorFrame_ = value;
+          onChanged();
+        } else {
+          mirrorFrameBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00001000;
+        return this;
+      }
+      /**
+       * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+       */
+      public Builder setMirrorFrame(
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.Builder builderForValue) {
+        if (mirrorFrameBuilder_ == null) {
+          mirrorFrame_ = builderForValue.build();
+          onChanged();
+        } else {
+          mirrorFrameBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00001000;
+        return this;
+      }
+      /**
+       * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+       */
+      public Builder mergeMirrorFrame(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto value) {
+        if (mirrorFrameBuilder_ == null) {
+          if (((bitField0_ & 0x00001000) == 0x00001000) &&
+              mirrorFrame_ != null &&
+              mirrorFrame_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.getDefaultInstance()) {
+            mirrorFrame_ =
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.newBuilder(mirrorFrame_).mergeFrom(value).buildPartial();
+          } else {
+            mirrorFrame_ = value;
+          }
+          onChanged();
+        } else {
+          mirrorFrameBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00001000;
+        return this;
+      }
+      /**
+       * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+       */
+      public Builder clearMirrorFrame() {
+        if (mirrorFrameBuilder_ == null) {
+          mirrorFrame_ = null;
+          onChanged();
+        } else {
+          mirrorFrameBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00001000);
+        return this;
+      }
+      /**
+       * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.Builder getMirrorFrameBuilder() {
+        bitField0_ |= 0x00001000;
+        onChanged();
+        return getMirrorFrameFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProtoOrBuilder getMirrorFrameOrBuilder() {
+        if (mirrorFrameBuilder_ != null) {
+          return mirrorFrameBuilder_.getMessageOrBuilder();
+        } else {
+          return mirrorFrame_ == null ?
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.getDefaultInstance() : mirrorFrame_;
+        }
+      }
+      /**
+       * <code>optional .MirrorFrameMsgOutProto mirrorFrame = 13;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProtoOrBuilder> 
+          getMirrorFrameFieldBuilder() {
+        if (mirrorFrameBuilder_ == null) {
+          mirrorFrameBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProtoOrBuilder>(
+                  getMirrorFrame(),
+                  getParentForChildren(),
+                  isClean());
+          mirrorFrame_ = null;
+        }
+        return mirrorFrameBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -48727,6 +50304,932 @@ public final class AdminConsoleProto {
 
   }
 
+  public interface MirrorFrameMsgOutProtoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:MirrorFrameMsgOutProto)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional bytes frame = 1;</code>
+     */
+    boolean hasFrame();
+    /**
+     * <code>optional bytes frame = 1;</code>
+     */
+    com.google.protobuf.ByteString getFrame();
+
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    boolean hasInstanceId();
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    java.lang.String getInstanceId();
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getInstanceIdBytes();
+
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    boolean hasSessionId();
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    java.lang.String getSessionId();
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getSessionIdBytes();
+
+    /**
+     * <code>optional bool disconnect = 4;</code>
+     */
+    boolean hasDisconnect();
+    /**
+     * <code>optional bool disconnect = 4;</code>
+     */
+    boolean getDisconnect();
+  }
+  /**
+   * Protobuf type {@code MirrorFrameMsgOutProto}
+   */
+  public  static final class MirrorFrameMsgOutProto extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:MirrorFrameMsgOutProto)
+      MirrorFrameMsgOutProtoOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use MirrorFrameMsgOutProto.newBuilder() to construct.
+    private MirrorFrameMsgOutProto(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private MirrorFrameMsgOutProto() {
+      frame_ = com.google.protobuf.ByteString.EMPTY;
+      instanceId_ = "";
+      sessionId_ = "";
+      disconnect_ = false;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private MirrorFrameMsgOutProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              bitField0_ |= 0x00000001;
+              frame_ = input.readBytes();
+              break;
+            }
+            case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000002;
+              instanceId_ = bs;
+              break;
+            }
+            case 26: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000004;
+              sessionId_ = bs;
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              disconnect_ = input.readBool();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_MirrorFrameMsgOutProto_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_MirrorFrameMsgOutProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.class, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int FRAME_FIELD_NUMBER = 1;
+    private com.google.protobuf.ByteString frame_;
+    /**
+     * <code>optional bytes frame = 1;</code>
+     */
+    public boolean hasFrame() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional bytes frame = 1;</code>
+     */
+    public com.google.protobuf.ByteString getFrame() {
+      return frame_;
+    }
+
+    public static final int INSTANCEID_FIELD_NUMBER = 2;
+    private volatile java.lang.Object instanceId_;
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    public boolean hasInstanceId() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    public java.lang.String getInstanceId() {
+      java.lang.Object ref = instanceId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          instanceId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string instanceId = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getInstanceIdBytes() {
+      java.lang.Object ref = instanceId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        instanceId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int SESSIONID_FIELD_NUMBER = 3;
+    private volatile java.lang.Object sessionId_;
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    public boolean hasSessionId() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    public java.lang.String getSessionId() {
+      java.lang.Object ref = sessionId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          sessionId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string sessionId = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSessionIdBytes() {
+      java.lang.Object ref = sessionId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        sessionId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DISCONNECT_FIELD_NUMBER = 4;
+    private boolean disconnect_;
+    /**
+     * <code>optional bool disconnect = 4;</code>
+     */
+    public boolean hasDisconnect() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional bool disconnect = 4;</code>
+     */
+    public boolean getDisconnect() {
+      return disconnect_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, frame_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, instanceId_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, sessionId_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBool(4, disconnect_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, frame_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, instanceId_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, sessionId_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, disconnect_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto)) {
+        return super.equals(obj);
+      }
+      org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto other = (org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto) obj;
+
+      boolean result = true;
+      result = result && (hasFrame() == other.hasFrame());
+      if (hasFrame()) {
+        result = result && getFrame()
+            .equals(other.getFrame());
+      }
+      result = result && (hasInstanceId() == other.hasInstanceId());
+      if (hasInstanceId()) {
+        result = result && getInstanceId()
+            .equals(other.getInstanceId());
+      }
+      result = result && (hasSessionId() == other.hasSessionId());
+      if (hasSessionId()) {
+        result = result && getSessionId()
+            .equals(other.getSessionId());
+      }
+      result = result && (hasDisconnect() == other.hasDisconnect());
+      if (hasDisconnect()) {
+        result = result && (getDisconnect()
+            == other.getDisconnect());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasFrame()) {
+        hash = (37 * hash) + FRAME_FIELD_NUMBER;
+        hash = (53 * hash) + getFrame().hashCode();
+      }
+      if (hasInstanceId()) {
+        hash = (37 * hash) + INSTANCEID_FIELD_NUMBER;
+        hash = (53 * hash) + getInstanceId().hashCode();
+      }
+      if (hasSessionId()) {
+        hash = (37 * hash) + SESSIONID_FIELD_NUMBER;
+        hash = (53 * hash) + getSessionId().hashCode();
+      }
+      if (hasDisconnect()) {
+        hash = (37 * hash) + DISCONNECT_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getDisconnect());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code MirrorFrameMsgOutProto}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:MirrorFrameMsgOutProto)
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_MirrorFrameMsgOutProto_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_MirrorFrameMsgOutProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.class, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.Builder.class);
+      }
+
+      // Construct using org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        frame_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        instanceId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000002);
+        sessionId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
+        disconnect_ = false;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_MirrorFrameMsgOutProto_descriptor;
+      }
+
+      @java.lang.Override
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto getDefaultInstanceForType() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto build() {
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto buildPartial() {
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto result = new org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.frame_ = frame_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.instanceId_ = instanceId_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.sessionId_ = sessionId_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.disconnect_ = disconnect_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto) {
+          return mergeFrom((org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto other) {
+        if (other == org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto.getDefaultInstance()) return this;
+        if (other.hasFrame()) {
+          setFrame(other.getFrame());
+        }
+        if (other.hasInstanceId()) {
+          bitField0_ |= 0x00000002;
+          instanceId_ = other.instanceId_;
+          onChanged();
+        }
+        if (other.hasSessionId()) {
+          bitField0_ |= 0x00000004;
+          sessionId_ = other.sessionId_;
+          onChanged();
+        }
+        if (other.hasDisconnect()) {
+          setDisconnect(other.getDisconnect());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private com.google.protobuf.ByteString frame_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes frame = 1;</code>
+       */
+      public boolean hasFrame() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional bytes frame = 1;</code>
+       */
+      public com.google.protobuf.ByteString getFrame() {
+        return frame_;
+      }
+      /**
+       * <code>optional bytes frame = 1;</code>
+       */
+      public Builder setFrame(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        frame_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes frame = 1;</code>
+       */
+      public Builder clearFrame() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        frame_ = getDefaultInstance().getFrame();
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object instanceId_ = "";
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public boolean hasInstanceId() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public java.lang.String getInstanceId() {
+        java.lang.Object ref = instanceId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            instanceId_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getInstanceIdBytes() {
+        java.lang.Object ref = instanceId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          instanceId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public Builder setInstanceId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        instanceId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public Builder clearInstanceId() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        instanceId_ = getDefaultInstance().getInstanceId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string instanceId = 2;</code>
+       */
+      public Builder setInstanceIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        instanceId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object sessionId_ = "";
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public boolean hasSessionId() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public java.lang.String getSessionId() {
+        java.lang.Object ref = sessionId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            sessionId_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSessionIdBytes() {
+        java.lang.Object ref = sessionId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          sessionId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public Builder setSessionId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        sessionId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public Builder clearSessionId() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        sessionId_ = getDefaultInstance().getSessionId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string sessionId = 3;</code>
+       */
+      public Builder setSessionIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        sessionId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private boolean disconnect_ ;
+      /**
+       * <code>optional bool disconnect = 4;</code>
+       */
+      public boolean hasDisconnect() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional bool disconnect = 4;</code>
+       */
+      public boolean getDisconnect() {
+        return disconnect_;
+      }
+      /**
+       * <code>optional bool disconnect = 4;</code>
+       */
+      public Builder setDisconnect(boolean value) {
+        bitField0_ |= 0x00000008;
+        disconnect_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool disconnect = 4;</code>
+       */
+      public Builder clearDisconnect() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        disconnect_ = false;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:MirrorFrameMsgOutProto)
+    }
+
+    // @@protoc_insertion_point(class_scope:MirrorFrameMsgOutProto)
+    private static final org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto();
+    }
+
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<MirrorFrameMsgOutProto>
+        PARSER = new com.google.protobuf.AbstractParser<MirrorFrameMsgOutProto>() {
+      @java.lang.Override
+      public MirrorFrameMsgOutProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new MirrorFrameMsgOutProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<MirrorFrameMsgOutProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<MirrorFrameMsgOutProto> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgOutProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_AdminConsoleFrameMsgInProto_descriptor;
   private static final 
@@ -48827,6 +51330,11 @@ public final class AdminConsoleProto {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_RemoveAppMsgInProto_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_MirrorFrameMsgInProto_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_MirrorFrameMsgInProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_AdminConsoleFrameMsgOutProto_descriptor;
   private static final 
@@ -48942,6 +51450,11 @@ public final class AdminConsoleProto {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_AccessTokenCreatedMsgOutProto_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_MirrorFrameMsgOutProto_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_MirrorFrameMsgOutProto_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -48951,7 +51464,7 @@ public final class AdminConsoleProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\027AdminConsoleProto.proto\"\225\007\n\033AdminConso" +
+      "\n\027AdminConsoleProto.proto\"\302\007\n\033AdminConso" +
       "leFrameMsgInProto\0223\n\017toggleRecording\030\001 \001" +
       "(\0132\032.ToggleRecordingMsgInProto\022%\n\010shutdo" +
       "wn\030\002 \001(\0132\023.ShutdownMsgInProto\0227\n\021request" +
@@ -48974,135 +51487,143 @@ public final class AdminConsoleProto {
       "\020 \001(\0132\023.StartAppMsgInProto\022#\n\007stopApp\030\021 " +
       "\001(\0132\022.StopAppMsgInProto\022\'\n\tcreateApp\030\022 \001" +
       "(\0132\024.CreateAppMsgInProto\022\'\n\tremoveApp\030\023 " +
-      "\001(\0132\024.RemoveAppMsgInProto\"8\n\037AdminConsol" +
-      "eHandshakeMsgInProto\022\025\n\rsecretMessage\030\001 " +
-      "\001(\t\"=\n\031ToggleRecordingMsgInProto\022\014\n\004path" +
-      "\030\001 \001(\t\022\022\n\ninstanceId\030\002 \001(\t\"V\n!ToggleStat" +
-      "isticsLoggingMsgInProto\022\014\n\004path\030\001 \001(\t\022\022\n" +
-      "\ninstanceId\030\002 \001(\t\022\017\n\007enabled\030\003 \001(\010\"E\n\022Sh" +
-      "utdownMsgInProto\022\014\n\004path\030\001 \001(\t\022\022\n\ninstan" +
-      "ceId\030\002 \001(\t\022\r\n\005force\030\003 \001(\010\"?\n\033RequestThre" +
-      "adDumpMsgInProto\022\014\n\004path\030\001 \001(\t\022\022\n\ninstan" +
-      "ceId\030\002 \001(\t\"e\n\027GetThreadDumpMsgInProto\022\014\n" +
-      "\004path\030\001 \001(\t\022\022\n\ninstanceId\030\002 \001(\t\022\021\n\ttimes" +
-      "tamp\030\003 \001(\t\022\025\n\rcorrelationId\030\004 \001(\t\"O\n(Get" +
-      "InstanceCountsStatsWarningsMsgInProto\022\014\n" +
-      "\004path\030\001 \001(\t\022\025\n\rcorrelationId\030\002 \001(\t\"A\n\032Ge" +
-      "tSwingSessionsMsgInProto\022\014\n\004path\030\001 \001(\t\022\025" +
-      "\n\rcorrelationId\030\002 \001(\t\"\031\n\027GetServerInfoMs" +
-      "gInProto\":\n\023GetConfigMsgInProto\022\014\n\004path\030" +
-      "\001 \001(\t\022\025\n\rcorrelationId\030\002 \001(\t\"x\n\021GetMetaM" +
-      "sgInProto\022\014\n\004path\030\001 \001(\t\022\024\n\014serverConfig\030" +
-      "\002 \001(\014\022(\n\nappConfigs\030\003 \003(\0132\024.AppConfigMsg" +
-      "InProto\022\025\n\rcorrelationId\030\004 \001(\t\"?\n\023AppCon" +
-      "figMsgInProto\022\021\n\tappConfig\030\001 \001(\014\022\025\n\rsess" +
-      "ionPoolId\030\002 \001(\t\"\202\001\n\027ResolveConfigMsgInPr" +
-      "oto\022\014\n\004path\030\001 \001(\t\022\014\n\004type\030\002 \001(\t\022\017\n\007resol" +
-      "ve\030\003 \001(\t\022\014\n\004user\030\004 \001(\t\022\025\n\rsessionPoolId\030" +
-      "\005 \001(\t\022\025\n\rcorrelationId\030\006 \001(\t\"\223\001\n\024SaveCon" +
-      "figMsgInProto\022\014\n\004path\030\001 \001(\t\022\024\n\014serverCon" +
-      "fig\030\002 \001(\014\022\026\n\016saveAppConfigs\030\003 \001(\010\022(\n\napp" +
-      "Configs\030\004 \003(\0132\024.AppConfigMsgInProto\022\025\n\rc" +
-      "orrelationId\030\005 \001(\t\"\203\001\n\031SearchVariablesMs" +
-      "gInProto\022\014\n\004path\030\001 \001(\t\022\014\n\004type\030\002 \001(\t\022\016\n\006" +
-      "search\030\003 \001(\t\022\014\n\004user\030\004 \001(\t\022\025\n\rsessionPoo" +
-      "lId\030\005 \001(\t\022\025\n\rcorrelationId\030\006 \001(\t\"\"\n\022Star" +
-      "tAppMsgInProto\022\014\n\004path\030\001 \001(\t\"!\n\021StopAppM" +
-      "sgInProto\022\014\n\004path\030\001 \001(\t\"#\n\023CreateAppMsgI" +
-      "nProto\022\014\n\004path\030\001 \001(\t\"#\n\023RemoveAppMsgInPr" +
-      "oto\022\014\n\004path\030\001 \001(\t\"\335\004\n\034AdminConsoleFrameM" +
-      "sgOutProto\022\014\n\004path\030\001 \001(\t\022*\n\nthreadDump\030\002" +
-      " \001(\0132\026.ThreadDumpMsgOutProto\022L\n\033instance" +
-      "CountsStatsWarnings\030\003 \001(\0132\'.InstanceCoun" +
-      "tsStatsWarningsMsgOutProto\0220\n\rswingSessi" +
-      "ons\030\004 \001(\0132\031.SwingSessionsMsgOutProto\0227\n\021" +
-      "registerInstances\030\005 \003(\0132\034.RegisterInstan" +
-      "ceMsgOutProto\022*\n\nserverInfo\030\006 \001(\0132\026.Serv" +
-      "erInfoMsgOutProto\022\"\n\006config\030\007 \001(\0132\022.Conf" +
-      "igMsgOutProto\022\036\n\004meta\030\010 \001(\0132\020.MetaMsgOut" +
-      "Proto\0220\n\rresolveConfig\030\t \001(\0132\031.ResolveCo" +
-      "nfigMsgOutProto\0224\n\017searchVariables\030\n \001(\013" +
-      "2\033.SearchVariablesMsgOutProto\0226\n\020saveCon" +
-      "figResult\030\013 \001(\0132\034.SaveConfigResultMsgOut" +
-      "Proto\022:\n\022accessTokenCreated\030\014 \001(\0132\036.Acce" +
-      "ssTokenCreatedMsgOutProto\"\344\001\n&InstanceCo" +
-      "untsStatsWarningsMsgOutProto\022\024\n\014runningC" +
-      "ount\030\001 \001(\021\022\026\n\016connectedCount\030\002 \001(\021\022\023\n\013cl" +
-      "osedCount\030\003 \001(\021\022+\n\014summaryStats\030\004 \003(\0132\025." +
-      "StatEntryMsgOutProto\0223\n\017summaryWarnings\030" +
-      "\005 \003(\0132\032.SummaryWarningMsgOutProto\022\025\n\rcor" +
-      "relationId\030\006 \001(\t\"I\n\024StatEntryMsgOutProto" +
-      "\022\016\n\006metric\030\001 \001(\t\022!\n\005stats\030\002 \003(\0132\022.Metric" +
-      "MsgOutProto\"H\n\021MetricMsgOutProto\022\013\n\003key\030" +
-      "\001 \001(\t\022\r\n\005value\030\002 \001(\022\022\027\n\017aggregatedCount\030" +
-      "\003 \001(\021\"A\n\031SummaryWarningMsgOutProto\022\022\n\nin" +
-      "stanceId\030\001 \001(\t\022\020\n\010warnings\030\002 \003(\t\"\226\001\n\030Swi" +
-      "ngSessionsMsgOutProto\0221\n\017runningSessions" +
-      "\030\001 \003(\0132\030.SwingSessionMsgOutProto\0220\n\016clos" +
-      "edSessions\030\002 \003(\0132\030.SwingSessionMsgOutPro" +
-      "to\022\025\n\rcorrelationId\030\003 \001(\t\"\235\005\n\027SwingSessi" +
-      "onMsgOutProto\0228\n\006status\030\001 \001(\0162(.SwingSes" +
-      "sionMsgOutProto.StatusEnumProto\022\022\n\ninsta" +
-      "nceId\030\002 \001(\t\022\014\n\004user\030\003 \001(\t\022\016\n\006userIp\030\004 \001(" +
-      "\t\022\016\n\006userOs\030\005 \001(\t\022\023\n\013userBrowser\030\006 \001(\t\022\023" +
-      "\n\013application\030\007 \001(\t\022\027\n\017applicationPath\030\010" +
-      " \001(\t\022\021\n\tstartedAt\030\t \001(\022\022\017\n\007endedAt\030\n \001(\022" +
-      "\022\021\n\tconnected\030\013 \001(\010\022\016\n\006applet\030\014 \001(\010\022\031\n\021d" +
-      "isconnectedSince\030\r \001(\022\022\020\n\010recorded\030\016 \001(\010" +
-      "\022\025\n\rrecordingFile\030\017 \001(\t\022\026\n\016loggingEnable" +
-      "d\030\020 \001(\010\022 \n\030statisticsLoggingEnabled\030\021 \001(" +
-      "\010\022\020\n\010warnings\030\022 \003(\t\022\026\n\016warningHistory\030\023 " +
-      "\003(\t\022+\n\013threadDumps\030\024 \003(\0132\026.ThreadDumpMsg" +
-      "OutProto\022#\n\007metrics\030\025 \003(\0132\022.MetricMsgOut" +
-      "Proto\022$\n\005stats\030\026 \003(\0132\025.StatEntryMsgOutPr" +
-      "oto\"\\\n\017StatusEnumProto\022\017\n\013NOT_STARTED\020\001\022" +
-      "\013\n\007EXITING\020\002\022\013\n\007RUNNING\020\003\022\020\n\014FORCE_KILLE" +
-      "D\020\004\022\014\n\010FINISHED\020\005\"v\n\025ThreadDumpMsgOutPro" +
-      "to\022\021\n\ttimestamp\030\001 \001(\022\022\017\n\007content\030\002 \001(\t\022\016" +
-      "\n\006reason\030\003 \001(\t\022\022\n\ninstanceId\030\004 \001(\t\022\025\n\rco" +
-      "rrelationId\030\005 \001(\t\"Q\n\033RegisterInstanceMsg" +
-      "OutProto\022\022\n\ninstanceId\030\001 \001(\t\022\020\n\010register" +
-      "\030\002 \001(\010\022\014\n\004path\030\003 \001(\t\"\263\001\n\025ServerInfoMsgOu" +
-      "tProto\022-\n\010appInfos\030\001 \003(\0132\033.ApplicationIn" +
-      "foMsgOutProto\022,\n\007spInfos\030\002 \003(\0132\033.Session" +
-      "PoolInfoMsgOutProto\022\021\n\tinstances\030\003 \001(\021\022\r" +
-      "\n\005users\030\004 \001(\021\022\n\n\002id\030\005 \001(\t\022\017\n\007cluster\030\006 \001" +
-      "(\010\"\261\001\n\032ApplicationInfoMsgOutProto\022\014\n\004pat" +
-      "h\030\001 \001(\t\022\020\n\010byteIcon\030\002 \001(\014\022\014\n\004name\030\003 \001(\t\022" +
-      "\017\n\007enabled\030\004 \001(\010\022\022\n\nmaxClients\030\005 \001(\021\022@\n\025" +
-      "instanceManagerStatus\030\006 \001(\0132!.InstanceMa" +
-      "nagerStatusMsgOutProto\"\234\001\n\032SessionPoolIn" +
-      "foMsgOutProto\022\n\n\002id\030\001 \001(\t\022\024\n\014maxInstance" +
-      "s\030\002 \001(\021\022\020\n\010priority\030\003 \001(\021\022\030\n\020connectedSe" +
-      "rvers\030\004 \003(\t\0220\n\014appInstances\030\005 \003(\0132\032.Sess" +
-      "ionPoolAppMsgOutProto\"@\n\031SessionPoolAppM" +
-      "sgOutProto\022\014\n\004path\030\001 \001(\t\022\025\n\rinstanceCoun" +
-      "t\030\002 \001(\021\"\200\001\n\021ConfigMsgOutProto\022\024\n\014serverC" +
-      "onfig\030\001 \001(\014\022\023\n\013serverError\030\002 \001(\t\022)\n\nappC" +
-      "onfigs\030\003 \003(\0132\025.AppConfigMsgOutProto\022\025\n\rc" +
-      "orrelationId\030\004 \001(\t\"~\n\017MetaMsgOutProto\022\024\n" +
-      "\014serverConfig\030\001 \001(\014\022\023\n\013serverError\030\002 \001(\t" +
-      "\022)\n\nappConfigs\030\003 \003(\0132\025.AppConfigMsgOutPr" +
-      "oto\022\025\n\rcorrelationId\030\004 \001(\t\"O\n\024AppConfigM" +
-      "sgOutProto\022\021\n\tappConfig\030\001 \001(\014\022\r\n\005error\030\002" +
-      " \001(\t\022\025\n\rsessionPoolId\030\003 \001(\t\"T\n\030ResolveCo" +
-      "nfigMsgOutProto\022!\n\010resolved\030\001 \003(\0132\017.MapM" +
-      "sgOutProto\022\025\n\rcorrelationId\030\002 \001(\t\"W\n\032Sea" +
-      "rchVariablesMsgOutProto\022\"\n\tvariables\030\001 \003" +
-      "(\0132\017.MapMsgOutProto\022\025\n\rcorrelationId\030\002 \001" +
-      "(\t\",\n\016MapMsgOutProto\022\013\n\003key\030\001 \001(\t\022\r\n\005val" +
-      "ue\030\002 \001(\t\"W\n InstanceManagerStatusMsgOutP" +
-      "roto\022\016\n\006status\030\001 \001(\t\022\r\n\005error\030\002 \001(\t\022\024\n\014e" +
-      "rrorDetails\030\003 \001(\t\"\224\001\n\033SaveConfigResultMs" +
-      "gOutProto\022\024\n\014serverResult\030\001 \001(\010\022\023\n\013serve" +
-      "rError\030\002 \001(\t\0223\n\nappResults\030\003 \003(\0132\037.SaveC" +
-      "onfigAppResultMsgOutProto\022\025\n\rcorrelation" +
-      "Id\030\004 \001(\t\"V\n\036SaveConfigAppResultMsgOutPro" +
-      "to\022\016\n\006result\030\001 \001(\010\022\025\n\rsessionPoolId\030\002 \001(" +
-      "\t\022\r\n\005error\030\003 \001(\t\"[\n\035AccessTokenCreatedMs" +
-      "gOutProto\022\024\n\014refreshToken\030\001 \001(\t\022\020\n\010acces" +
-      "sId\030\002 \001(\t\022\022\n\nexpiration\030\003 \001(\022B\'\n%org.web" +
-      "swing.model.adminconsole.proto"
+      "\001(\0132\024.RemoveAppMsgInProto\022+\n\013mirrorFrame" +
+      "\030\024 \001(\0132\026.MirrorFrameMsgInProto\"8\n\037AdminC" +
+      "onsoleHandshakeMsgInProto\022\025\n\rsecretMessa" +
+      "ge\030\001 \001(\t\"=\n\031ToggleRecordingMsgInProto\022\014\n" +
+      "\004path\030\001 \001(\t\022\022\n\ninstanceId\030\002 \001(\t\"V\n!Toggl" +
+      "eStatisticsLoggingMsgInProto\022\014\n\004path\030\001 \001" +
+      "(\t\022\022\n\ninstanceId\030\002 \001(\t\022\017\n\007enabled\030\003 \001(\010\"" +
+      "E\n\022ShutdownMsgInProto\022\014\n\004path\030\001 \001(\t\022\022\n\ni" +
+      "nstanceId\030\002 \001(\t\022\r\n\005force\030\003 \001(\010\"?\n\033Reques" +
+      "tThreadDumpMsgInProto\022\014\n\004path\030\001 \001(\t\022\022\n\ni" +
+      "nstanceId\030\002 \001(\t\"e\n\027GetThreadDumpMsgInPro" +
+      "to\022\014\n\004path\030\001 \001(\t\022\022\n\ninstanceId\030\002 \001(\t\022\021\n\t" +
+      "timestamp\030\003 \001(\t\022\025\n\rcorrelationId\030\004 \001(\t\"O" +
+      "\n(GetInstanceCountsStatsWarningsMsgInPro" +
+      "to\022\014\n\004path\030\001 \001(\t\022\025\n\rcorrelationId\030\002 \001(\t\"" +
+      "A\n\032GetSwingSessionsMsgInProto\022\014\n\004path\030\001 " +
+      "\001(\t\022\025\n\rcorrelationId\030\002 \001(\t\"\031\n\027GetServerI" +
+      "nfoMsgInProto\":\n\023GetConfigMsgInProto\022\014\n\004" +
+      "path\030\001 \001(\t\022\025\n\rcorrelationId\030\002 \001(\t\"x\n\021Get" +
+      "MetaMsgInProto\022\014\n\004path\030\001 \001(\t\022\024\n\014serverCo" +
+      "nfig\030\002 \001(\014\022(\n\nappConfigs\030\003 \003(\0132\024.AppConf" +
+      "igMsgInProto\022\025\n\rcorrelationId\030\004 \001(\t\"?\n\023A" +
+      "ppConfigMsgInProto\022\021\n\tappConfig\030\001 \001(\014\022\025\n" +
+      "\rsessionPoolId\030\002 \001(\t\"\202\001\n\027ResolveConfigMs" +
+      "gInProto\022\014\n\004path\030\001 \001(\t\022\014\n\004type\030\002 \001(\t\022\017\n\007" +
+      "resolve\030\003 \001(\t\022\014\n\004user\030\004 \001(\t\022\025\n\rsessionPo" +
+      "olId\030\005 \001(\t\022\025\n\rcorrelationId\030\006 \001(\t\"\223\001\n\024Sa" +
+      "veConfigMsgInProto\022\014\n\004path\030\001 \001(\t\022\024\n\014serv" +
+      "erConfig\030\002 \001(\014\022\026\n\016saveAppConfigs\030\003 \001(\010\022(" +
+      "\n\nappConfigs\030\004 \003(\0132\024.AppConfigMsgInProto" +
+      "\022\025\n\rcorrelationId\030\005 \001(\t\"\203\001\n\031SearchVariab" +
+      "lesMsgInProto\022\014\n\004path\030\001 \001(\t\022\014\n\004type\030\002 \001(" +
+      "\t\022\016\n\006search\030\003 \001(\t\022\014\n\004user\030\004 \001(\t\022\025\n\rsessi" +
+      "onPoolId\030\005 \001(\t\022\025\n\rcorrelationId\030\006 \001(\t\"\"\n" +
+      "\022StartAppMsgInProto\022\014\n\004path\030\001 \001(\t\"!\n\021Sto" +
+      "pAppMsgInProto\022\014\n\004path\030\001 \001(\t\"#\n\023CreateAp" +
+      "pMsgInProto\022\014\n\004path\030\001 \001(\t\"#\n\023RemoveAppMs" +
+      "gInProto\022\014\n\004path\030\001 \001(\t\"\201\001\n\025MirrorFrameMs" +
+      "gInProto\022\r\n\005frame\030\001 \001(\014\022\022\n\ninstanceId\030\002 " +
+      "\001(\t\022\021\n\tsessionId\030\003 \001(\t\022\r\n\005token\030\004 \001(\t\022\017\n" +
+      "\007connect\030\005 \001(\010\022\022\n\ndisconnect\030\006 \001(\010\"\213\005\n\034A" +
+      "dminConsoleFrameMsgOutProto\022\014\n\004path\030\001 \001(" +
+      "\t\022*\n\nthreadDump\030\002 \001(\0132\026.ThreadDumpMsgOut" +
+      "Proto\022L\n\033instanceCountsStatsWarnings\030\003 \001" +
+      "(\0132\'.InstanceCountsStatsWarningsMsgOutPr" +
+      "oto\0220\n\rswingSessions\030\004 \001(\0132\031.SwingSessio" +
+      "nsMsgOutProto\0227\n\021registerInstances\030\005 \003(\013" +
+      "2\034.RegisterInstanceMsgOutProto\022*\n\nserver" +
+      "Info\030\006 \001(\0132\026.ServerInfoMsgOutProto\022\"\n\006co" +
+      "nfig\030\007 \001(\0132\022.ConfigMsgOutProto\022\036\n\004meta\030\010" +
+      " \001(\0132\020.MetaMsgOutProto\0220\n\rresolveConfig\030" +
+      "\t \001(\0132\031.ResolveConfigMsgOutProto\0224\n\017sear" +
+      "chVariables\030\n \001(\0132\033.SearchVariablesMsgOu" +
+      "tProto\0226\n\020saveConfigResult\030\013 \001(\0132\034.SaveC" +
+      "onfigResultMsgOutProto\022:\n\022accessTokenCre" +
+      "ated\030\014 \001(\0132\036.AccessTokenCreatedMsgOutPro" +
+      "to\022,\n\013mirrorFrame\030\r \001(\0132\027.MirrorFrameMsg" +
+      "OutProto\"\344\001\n&InstanceCountsStatsWarnings" +
+      "MsgOutProto\022\024\n\014runningCount\030\001 \001(\021\022\026\n\016con" +
+      "nectedCount\030\002 \001(\021\022\023\n\013closedCount\030\003 \001(\021\022+" +
+      "\n\014summaryStats\030\004 \003(\0132\025.StatEntryMsgOutPr" +
+      "oto\0223\n\017summaryWarnings\030\005 \003(\0132\032.SummaryWa" +
+      "rningMsgOutProto\022\025\n\rcorrelationId\030\006 \001(\t\"" +
+      "I\n\024StatEntryMsgOutProto\022\016\n\006metric\030\001 \001(\t\022" +
+      "!\n\005stats\030\002 \003(\0132\022.MetricMsgOutProto\"H\n\021Me" +
+      "tricMsgOutProto\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 " +
+      "\001(\022\022\027\n\017aggregatedCount\030\003 \001(\021\"A\n\031SummaryW" +
+      "arningMsgOutProto\022\022\n\ninstanceId\030\001 \001(\t\022\020\n" +
+      "\010warnings\030\002 \003(\t\"\226\001\n\030SwingSessionsMsgOutP" +
+      "roto\0221\n\017runningSessions\030\001 \003(\0132\030.SwingSes" +
+      "sionMsgOutProto\0220\n\016closedSessions\030\002 \003(\0132" +
+      "\030.SwingSessionMsgOutProto\022\025\n\rcorrelation" +
+      "Id\030\003 \001(\t\"\235\005\n\027SwingSessionMsgOutProto\0228\n\006" +
+      "status\030\001 \001(\0162(.SwingSessionMsgOutProto.S" +
+      "tatusEnumProto\022\022\n\ninstanceId\030\002 \001(\t\022\014\n\004us" +
+      "er\030\003 \001(\t\022\016\n\006userIp\030\004 \001(\t\022\016\n\006userOs\030\005 \001(\t" +
+      "\022\023\n\013userBrowser\030\006 \001(\t\022\023\n\013application\030\007 \001" +
+      "(\t\022\027\n\017applicationPath\030\010 \001(\t\022\021\n\tstartedAt" +
+      "\030\t \001(\022\022\017\n\007endedAt\030\n \001(\022\022\021\n\tconnected\030\013 \001" +
+      "(\010\022\016\n\006applet\030\014 \001(\010\022\031\n\021disconnectedSince\030" +
+      "\r \001(\022\022\020\n\010recorded\030\016 \001(\010\022\025\n\rrecordingFile" +
+      "\030\017 \001(\t\022\026\n\016loggingEnabled\030\020 \001(\010\022 \n\030statis" +
+      "ticsLoggingEnabled\030\021 \001(\010\022\020\n\010warnings\030\022 \003" +
+      "(\t\022\026\n\016warningHistory\030\023 \003(\t\022+\n\013threadDump" +
+      "s\030\024 \003(\0132\026.ThreadDumpMsgOutProto\022#\n\007metri" +
+      "cs\030\025 \003(\0132\022.MetricMsgOutProto\022$\n\005stats\030\026 " +
+      "\003(\0132\025.StatEntryMsgOutProto\"\\\n\017StatusEnum" +
+      "Proto\022\017\n\013NOT_STARTED\020\001\022\013\n\007EXITING\020\002\022\013\n\007R" +
+      "UNNING\020\003\022\020\n\014FORCE_KILLED\020\004\022\014\n\010FINISHED\020\005" +
+      "\"v\n\025ThreadDumpMsgOutProto\022\021\n\ttimestamp\030\001" +
+      " \001(\022\022\017\n\007content\030\002 \001(\t\022\016\n\006reason\030\003 \001(\t\022\022\n" +
+      "\ninstanceId\030\004 \001(\t\022\025\n\rcorrelationId\030\005 \001(\t" +
+      "\"Q\n\033RegisterInstanceMsgOutProto\022\022\n\ninsta" +
+      "nceId\030\001 \001(\t\022\020\n\010register\030\002 \001(\010\022\014\n\004path\030\003 " +
+      "\001(\t\"\263\001\n\025ServerInfoMsgOutProto\022-\n\010appInfo" +
+      "s\030\001 \003(\0132\033.ApplicationInfoMsgOutProto\022,\n\007" +
+      "spInfos\030\002 \003(\0132\033.SessionPoolInfoMsgOutPro" +
+      "to\022\021\n\tinstances\030\003 \001(\021\022\r\n\005users\030\004 \001(\021\022\n\n\002" +
+      "id\030\005 \001(\t\022\017\n\007cluster\030\006 \001(\010\"\261\001\n\032Applicatio" +
+      "nInfoMsgOutProto\022\014\n\004path\030\001 \001(\t\022\020\n\010byteIc" +
+      "on\030\002 \001(\014\022\014\n\004name\030\003 \001(\t\022\017\n\007enabled\030\004 \001(\010\022" +
+      "\022\n\nmaxClients\030\005 \001(\021\022@\n\025instanceManagerSt" +
+      "atus\030\006 \001(\0132!.InstanceManagerStatusMsgOut" +
+      "Proto\"\234\001\n\032SessionPoolInfoMsgOutProto\022\n\n\002" +
+      "id\030\001 \001(\t\022\024\n\014maxInstances\030\002 \001(\021\022\020\n\010priori" +
+      "ty\030\003 \001(\021\022\030\n\020connectedServers\030\004 \003(\t\0220\n\014ap" +
+      "pInstances\030\005 \003(\0132\032.SessionPoolAppMsgOutP" +
+      "roto\"@\n\031SessionPoolAppMsgOutProto\022\014\n\004pat" +
+      "h\030\001 \001(\t\022\025\n\rinstanceCount\030\002 \001(\021\"\200\001\n\021Confi" +
+      "gMsgOutProto\022\024\n\014serverConfig\030\001 \001(\014\022\023\n\013se" +
+      "rverError\030\002 \001(\t\022)\n\nappConfigs\030\003 \003(\0132\025.Ap" +
+      "pConfigMsgOutProto\022\025\n\rcorrelationId\030\004 \001(" +
+      "\t\"~\n\017MetaMsgOutProto\022\024\n\014serverConfig\030\001 \001" +
+      "(\014\022\023\n\013serverError\030\002 \001(\t\022)\n\nappConfigs\030\003 " +
+      "\003(\0132\025.AppConfigMsgOutProto\022\025\n\rcorrelatio" +
+      "nId\030\004 \001(\t\"O\n\024AppConfigMsgOutProto\022\021\n\tapp" +
+      "Config\030\001 \001(\014\022\r\n\005error\030\002 \001(\t\022\025\n\rsessionPo" +
+      "olId\030\003 \001(\t\"T\n\030ResolveConfigMsgOutProto\022!" +
+      "\n\010resolved\030\001 \003(\0132\017.MapMsgOutProto\022\025\n\rcor" +
+      "relationId\030\002 \001(\t\"W\n\032SearchVariablesMsgOu" +
+      "tProto\022\"\n\tvariables\030\001 \003(\0132\017.MapMsgOutPro" +
+      "to\022\025\n\rcorrelationId\030\002 \001(\t\",\n\016MapMsgOutPr" +
+      "oto\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"W\n Insta" +
+      "nceManagerStatusMsgOutProto\022\016\n\006status\030\001 " +
+      "\001(\t\022\r\n\005error\030\002 \001(\t\022\024\n\014errorDetails\030\003 \001(\t" +
+      "\"\224\001\n\033SaveConfigResultMsgOutProto\022\024\n\014serv" +
+      "erResult\030\001 \001(\010\022\023\n\013serverError\030\002 \001(\t\0223\n\na" +
+      "ppResults\030\003 \003(\0132\037.SaveConfigAppResultMsg" +
+      "OutProto\022\025\n\rcorrelationId\030\004 \001(\t\"V\n\036SaveC" +
+      "onfigAppResultMsgOutProto\022\016\n\006result\030\001 \001(" +
+      "\010\022\025\n\rsessionPoolId\030\002 \001(\t\022\r\n\005error\030\003 \001(\t\"" +
+      "[\n\035AccessTokenCreatedMsgOutProto\022\024\n\014refr" +
+      "eshToken\030\001 \001(\t\022\020\n\010accessId\030\002 \001(\t\022\022\n\nexpi" +
+      "ration\030\003 \001(\022\"b\n\026MirrorFrameMsgOutProto\022\r" +
+      "\n\005frame\030\001 \001(\014\022\022\n\ninstanceId\030\002 \001(\t\022\021\n\tses" +
+      "sionId\030\003 \001(\t\022\022\n\ndisconnect\030\004 \001(\010B\'\n%org." +
+      "webswing.model.adminconsole.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -49121,7 +51642,7 @@ public final class AdminConsoleProto {
     internal_static_AdminConsoleFrameMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AdminConsoleFrameMsgInProto_descriptor,
-        new java.lang.String[] { "ToggleRecording", "Shutdown", "RequestThreadDump", "GetThreadDump", "GetInstanceCountsStatsWarnings", "GetSwingSessions", "GetServerInfo", "ToggleStatisticsLogging", "Handshake", "GetConfig", "GetMeta", "ResolveConfig", "SaveConfig", "SearchVariables", "StartApp", "StopApp", "CreateApp", "RemoveApp", });
+        new java.lang.String[] { "ToggleRecording", "Shutdown", "RequestThreadDump", "GetThreadDump", "GetInstanceCountsStatsWarnings", "GetSwingSessions", "GetServerInfo", "ToggleStatisticsLogging", "Handshake", "GetConfig", "GetMeta", "ResolveConfig", "SaveConfig", "SearchVariables", "StartApp", "StopApp", "CreateApp", "RemoveApp", "MirrorFrame", });
     internal_static_AdminConsoleHandshakeMsgInProto_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_AdminConsoleHandshakeMsgInProto_fieldAccessorTable = new
@@ -49236,144 +51757,156 @@ public final class AdminConsoleProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_RemoveAppMsgInProto_descriptor,
         new java.lang.String[] { "Path", });
-    internal_static_AdminConsoleFrameMsgOutProto_descriptor =
+    internal_static_MirrorFrameMsgInProto_descriptor =
       getDescriptor().getMessageTypes().get(20);
+    internal_static_MirrorFrameMsgInProto_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_MirrorFrameMsgInProto_descriptor,
+        new java.lang.String[] { "Frame", "InstanceId", "SessionId", "Token", "Connect", "Disconnect", });
+    internal_static_AdminConsoleFrameMsgOutProto_descriptor =
+      getDescriptor().getMessageTypes().get(21);
     internal_static_AdminConsoleFrameMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AdminConsoleFrameMsgOutProto_descriptor,
-        new java.lang.String[] { "Path", "ThreadDump", "InstanceCountsStatsWarnings", "SwingSessions", "RegisterInstances", "ServerInfo", "Config", "Meta", "ResolveConfig", "SearchVariables", "SaveConfigResult", "AccessTokenCreated", });
+        new java.lang.String[] { "Path", "ThreadDump", "InstanceCountsStatsWarnings", "SwingSessions", "RegisterInstances", "ServerInfo", "Config", "Meta", "ResolveConfig", "SearchVariables", "SaveConfigResult", "AccessTokenCreated", "MirrorFrame", });
     internal_static_InstanceCountsStatsWarningsMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(21);
+      getDescriptor().getMessageTypes().get(22);
     internal_static_InstanceCountsStatsWarningsMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_InstanceCountsStatsWarningsMsgOutProto_descriptor,
         new java.lang.String[] { "RunningCount", "ConnectedCount", "ClosedCount", "SummaryStats", "SummaryWarnings", "CorrelationId", });
     internal_static_StatEntryMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(22);
+      getDescriptor().getMessageTypes().get(23);
     internal_static_StatEntryMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_StatEntryMsgOutProto_descriptor,
         new java.lang.String[] { "Metric", "Stats", });
     internal_static_MetricMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(23);
+      getDescriptor().getMessageTypes().get(24);
     internal_static_MetricMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MetricMsgOutProto_descriptor,
         new java.lang.String[] { "Key", "Value", "AggregatedCount", });
     internal_static_SummaryWarningMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(24);
+      getDescriptor().getMessageTypes().get(25);
     internal_static_SummaryWarningMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SummaryWarningMsgOutProto_descriptor,
         new java.lang.String[] { "InstanceId", "Warnings", });
     internal_static_SwingSessionsMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(25);
+      getDescriptor().getMessageTypes().get(26);
     internal_static_SwingSessionsMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SwingSessionsMsgOutProto_descriptor,
         new java.lang.String[] { "RunningSessions", "ClosedSessions", "CorrelationId", });
     internal_static_SwingSessionMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(26);
+      getDescriptor().getMessageTypes().get(27);
     internal_static_SwingSessionMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SwingSessionMsgOutProto_descriptor,
         new java.lang.String[] { "Status", "InstanceId", "User", "UserIp", "UserOs", "UserBrowser", "Application", "ApplicationPath", "StartedAt", "EndedAt", "Connected", "Applet", "DisconnectedSince", "Recorded", "RecordingFile", "LoggingEnabled", "StatisticsLoggingEnabled", "Warnings", "WarningHistory", "ThreadDumps", "Metrics", "Stats", });
     internal_static_ThreadDumpMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(27);
+      getDescriptor().getMessageTypes().get(28);
     internal_static_ThreadDumpMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ThreadDumpMsgOutProto_descriptor,
         new java.lang.String[] { "Timestamp", "Content", "Reason", "InstanceId", "CorrelationId", });
     internal_static_RegisterInstanceMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(28);
+      getDescriptor().getMessageTypes().get(29);
     internal_static_RegisterInstanceMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_RegisterInstanceMsgOutProto_descriptor,
         new java.lang.String[] { "InstanceId", "Register", "Path", });
     internal_static_ServerInfoMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(29);
+      getDescriptor().getMessageTypes().get(30);
     internal_static_ServerInfoMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ServerInfoMsgOutProto_descriptor,
         new java.lang.String[] { "AppInfos", "SpInfos", "Instances", "Users", "Id", "Cluster", });
     internal_static_ApplicationInfoMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(30);
+      getDescriptor().getMessageTypes().get(31);
     internal_static_ApplicationInfoMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ApplicationInfoMsgOutProto_descriptor,
         new java.lang.String[] { "Path", "ByteIcon", "Name", "Enabled", "MaxClients", "InstanceManagerStatus", });
     internal_static_SessionPoolInfoMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(31);
+      getDescriptor().getMessageTypes().get(32);
     internal_static_SessionPoolInfoMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SessionPoolInfoMsgOutProto_descriptor,
         new java.lang.String[] { "Id", "MaxInstances", "Priority", "ConnectedServers", "AppInstances", });
     internal_static_SessionPoolAppMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(32);
+      getDescriptor().getMessageTypes().get(33);
     internal_static_SessionPoolAppMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SessionPoolAppMsgOutProto_descriptor,
         new java.lang.String[] { "Path", "InstanceCount", });
     internal_static_ConfigMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(33);
+      getDescriptor().getMessageTypes().get(34);
     internal_static_ConfigMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ConfigMsgOutProto_descriptor,
         new java.lang.String[] { "ServerConfig", "ServerError", "AppConfigs", "CorrelationId", });
     internal_static_MetaMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(34);
+      getDescriptor().getMessageTypes().get(35);
     internal_static_MetaMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MetaMsgOutProto_descriptor,
         new java.lang.String[] { "ServerConfig", "ServerError", "AppConfigs", "CorrelationId", });
     internal_static_AppConfigMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(35);
+      getDescriptor().getMessageTypes().get(36);
     internal_static_AppConfigMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AppConfigMsgOutProto_descriptor,
         new java.lang.String[] { "AppConfig", "Error", "SessionPoolId", });
     internal_static_ResolveConfigMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(36);
+      getDescriptor().getMessageTypes().get(37);
     internal_static_ResolveConfigMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ResolveConfigMsgOutProto_descriptor,
         new java.lang.String[] { "Resolved", "CorrelationId", });
     internal_static_SearchVariablesMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(37);
+      getDescriptor().getMessageTypes().get(38);
     internal_static_SearchVariablesMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SearchVariablesMsgOutProto_descriptor,
         new java.lang.String[] { "Variables", "CorrelationId", });
     internal_static_MapMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(38);
+      getDescriptor().getMessageTypes().get(39);
     internal_static_MapMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MapMsgOutProto_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_InstanceManagerStatusMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(39);
+      getDescriptor().getMessageTypes().get(40);
     internal_static_InstanceManagerStatusMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_InstanceManagerStatusMsgOutProto_descriptor,
         new java.lang.String[] { "Status", "Error", "ErrorDetails", });
     internal_static_SaveConfigResultMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(40);
+      getDescriptor().getMessageTypes().get(41);
     internal_static_SaveConfigResultMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SaveConfigResultMsgOutProto_descriptor,
         new java.lang.String[] { "ServerResult", "ServerError", "AppResults", "CorrelationId", });
     internal_static_SaveConfigAppResultMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(41);
+      getDescriptor().getMessageTypes().get(42);
     internal_static_SaveConfigAppResultMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SaveConfigAppResultMsgOutProto_descriptor,
         new java.lang.String[] { "Result", "SessionPoolId", "Error", });
     internal_static_AccessTokenCreatedMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(42);
+      getDescriptor().getMessageTypes().get(43);
     internal_static_AccessTokenCreatedMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AccessTokenCreatedMsgOutProto_descriptor,
         new java.lang.String[] { "RefreshToken", "AccessId", "Expiration", });
+    internal_static_MirrorFrameMsgOutProto_descriptor =
+      getDescriptor().getMessageTypes().get(44);
+    internal_static_MirrorFrameMsgOutProto_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_MirrorFrameMsgOutProto_descriptor,
+        new java.lang.String[] { "Frame", "InstanceId", "SessionId", "Disconnect", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

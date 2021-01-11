@@ -76,35 +76,39 @@ public class WebswingServlet extends HttpServlet {
 	}
 	
 	private void initializeDefaultSystemProperties() {
-		try {
-			File propFile = new File(URI.create(System.getProperty(Constants.PROPERTIES_FILE_PATH)));
-			Properties p = new Properties(System.getProperties());
-			try (InputStream propFileStream = new FileInputStream(propFile)) {
-				p.load(propFileStream);
-			}
-			
-			// set the system properties
-			for (Map.Entry<Object, Object> prop : p.entrySet()) {
-				if (!System.getProperties().containsKey(prop.getKey())) {
-					System.getProperties().put(prop.getKey(), prop.getValue());
+		String propFileUri = System.getProperty(Constants.PROPERTIES_FILE_PATH);
+		if (propFileUri != null) {
+			try {
+				File propFile = new File(URI.create(propFileUri));
+				Properties p = new Properties(System.getProperties());
+				try (InputStream propFileStream = new FileInputStream(propFile)) {
+					p.load(propFileStream);
 				}
-			}
-			
-			System.setProperty(Constants.WEBSWING_SERVER_ID, UUID.randomUUID().toString());
-			
-			log.info("Starting webswing server with id [" + System.getProperty(Constants.WEBSWING_SERVER_ID) + "]...");
-			
-			if (StringUtils.isBlank(System.getProperty(Constants.WEBSWING_CONNECTION_SECRET))) {
-				log.error("Missing " + Constants.WEBSWING_CONNECTION_SECRET + " system property!");
+				
+				// set the system properties
+				for (Map.Entry<Object, Object> prop : p.entrySet()) {
+					if (!System.getProperties().containsKey(prop.getKey())) {
+						System.getProperties().put(prop.getKey(), prop.getValue());
+					}
+				}
+			} catch (Exception e) {
+				log.error("Exception occurred during initialization of System Properties", e);
 				System.exit(-1);
 			}
-			
-			if (StringUtils.equalsIgnoreCase(System.getProperty(Constants.WEBSWING_CONNECTION_SECRET), Constants.WEBSWING_CONNECTION_SECRET_DEFAULT)) {
-				String msg = "Please change " + Constants.WEBSWING_CONNECTION_SECRET + " system property to a non-default value in production!";
-				log.error(msg, new IllegalStateException(msg));
-			}
-		} catch (Exception e) {
-			log.error("Exception occurred during initialization of System Properties", e);
+		}
+		
+		System.setProperty(Constants.WEBSWING_SERVER_ID, UUID.randomUUID().toString());
+		
+		log.info("Starting webswing server with id [" + System.getProperty(Constants.WEBSWING_SERVER_ID) + "]...");
+		
+		if (StringUtils.isBlank(System.getProperty(Constants.WEBSWING_CONNECTION_SECRET))) {
+			log.error("Missing " + Constants.WEBSWING_CONNECTION_SECRET + " system property!");
+			System.exit(-1);
+		}
+		
+		if (StringUtils.equalsIgnoreCase(System.getProperty(Constants.WEBSWING_CONNECTION_SECRET), Constants.WEBSWING_CONNECTION_SECRET_DEFAULT)) {
+			String msg = "Please change " + Constants.WEBSWING_CONNECTION_SECRET + " system property to a non-default value in production!";
+			log.error(msg, new IllegalStateException(msg));
 		}
 		
 		if (System.getProperty(Constants.SERVER_WEBSOCKET_URL) == null) {

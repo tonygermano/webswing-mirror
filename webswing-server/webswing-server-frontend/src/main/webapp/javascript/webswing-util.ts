@@ -26,19 +26,19 @@ export function Util(translations: Translations) {
         clearToken
     }
 
-    function webswingLogin(baseUrl: string, element: (() => JQuery<HTMLElement>) | JQuery<HTMLElement>, loginData: ILoginData | string, successCallback: (data: any, request: JQuery.jqXHR) => void) {
+    function webswingLogin(baseUrl: string, element: (() => JQuery<HTMLElement>) | JQuery<HTMLElement>, loginData: ILoginData | string, successCallback: (data: any, request: JQuery.jqXHR) => void, failedCallback?: () => void) {
         if (token == null) {
         	// try refresh token first
         	refreshLogin(baseUrl, () => {
                 // continue with login, doesn't matter if we got the token or not, or if there was an error
-                doWebswingLogin(baseUrl, element, loginData, successCallback);
+                doWebswingLogin(baseUrl, element, loginData, successCallback, failedCallback);
             });
         } else {
-        	doWebswingLogin(baseUrl, element, loginData, successCallback);
+        	doWebswingLogin(baseUrl, element, loginData, successCallback, failedCallback);
         }
     }
     
-    function doWebswingLogin(baseUrl: string, element: (() => JQuery<HTMLElement>) | JQuery<HTMLElement>, loginData: ILoginData | string, successCallback: (data: any, request: JQuery.jqXHR) => void) {
+    function doWebswingLogin(baseUrl: string, element: (() => JQuery<HTMLElement>) | JQuery<HTMLElement>, loginData: ILoginData | string, successCallback: (data: any, request: JQuery.jqXHR) => void, failedCallback?: () => void) {
     	$.ajax({
         	beforeSend: (xhr) => {
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -64,12 +64,15 @@ export function Util(translations: Translations) {
             error: (xhr) => {
                 const response = xhr.responseText;
                 let elementResolved: JQuery<HTMLElement>;
-                if (typeof element === 'function') {
-                    elementResolved = element();
-                } else {
-                    elementResolved = element;
-                }
+                
                 if (response != null) {
+                    // resolve this only if needed because it updates dialog view
+                	if (typeof element === 'function') {
+                        elementResolved = element();
+                	} else {
+                        elementResolved = element;   
+                    }
+                	
                     let loginMsg: ILoginResponse = {};
                     try {
                         loginMsg = JSON.parse(response);
@@ -90,7 +93,17 @@ export function Util(translations: Translations) {
                         elementResolved.html(translate("<p>${login.unexpectedError}</p>"));
                     }
                 } else {
-                    elementResolved.html(translate("<p>${login.serverNotAvailable}</p>"));
+                	if (failedCallback != null) {
+                		failedCallback();
+                	} else {
+                		if (typeof element === 'function') {
+                            elementResolved = element();
+                        } else {
+                            elementResolved = element;   
+                        }
+                	
+                		elementResolved.html(translate("<p>${login.serverNotAvailable}</p>"));
+                	}
                 }
             }
         });
@@ -112,12 +125,12 @@ export function Util(translations: Translations) {
             xhrFields: {
                 withCredentials: true
             }
-        }).done((_, _1, xhr) => {
+        }).always((_, _1, xhr) => {
             if (!tabLogout) {
                 localStorage.setItem("webswingLogout", Date.now().toString());
             }
 
-            const response = xhr.responseText;
+            const response = (typeof xhr === 'string') ? null : xhr.responseText;
             let elementResolved: JQuery<HTMLElement>;
             if (typeof element === 'function') {
                 elementResolved = element();

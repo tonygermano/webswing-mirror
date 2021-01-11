@@ -11,6 +11,7 @@ public class WebswingUserDecorator extends AuthenticatedWebswingUser {
 	private static final long serialVersionUID = 5175691012719235120L;
 	
 	private final AuthenticatedWebswingUser user;
+	private List<String> permissions;
 
 	public WebswingUserDecorator(AuthenticatedWebswingUser user) {
 		this.user = user;
@@ -28,7 +29,10 @@ public class WebswingUserDecorator extends AuthenticatedWebswingUser {
 	
 	@Override
 	public List<String> getUserPermissions() {
-		return user.getUserPermissions();
+		if (permissions == null) {
+			permissions=resolvePermissions();
+		}
+		return permissions;
 	}
 
 	@Override
@@ -50,5 +54,5 @@ public class WebswingUserDecorator extends AuthenticatedWebswingUser {
 	public boolean isPermitted(String permission) {
 		return user.isPermitted(permission);
 	}
-	
+
 }

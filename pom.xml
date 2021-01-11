@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.webswing</groupId>
     <artifactId>webswing</artifactId>
-    <version>20.2.1</version>
+    <version>20.2.2</version>
     <packaging>pom</packaging>
     <name>Webswing</name>
     <description>Webswing is a web server that allows to run any swing application inside your web browser using only pure HTML5.</description>
@@ -60,8 +60,8 @@
         <guice.version>4.1.0</guice.version>
         <activemq.version>5.15.13</activemq.version>
         <bouncycastle.version>1.61</bouncycastle.version>
-        <jackson.databind.version>2.10.0</jackson.databind.version>
-        <jackson.annotations.version>2.10.0</jackson.annotations.version>
+        <jackson.databind.version>2.10.5.1</jackson.databind.version>
+        <jackson.annotations.version>2.10.5</jackson.annotations.version>
         <jetty.version>9.4.35.v20201120</jetty.version>
         <log4j.version>2.13.2</log4j.version>
     </properties>

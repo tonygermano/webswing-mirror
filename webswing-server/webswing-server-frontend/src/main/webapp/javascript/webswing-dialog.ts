@@ -14,7 +14,8 @@ export const dialogInjectable = {
     switchMode: 'touch.switchMode' as const,
     getFocusedWindow: 'base.getFocusedWindow' as const,
     getMainWindowVisibilityState: 'base.getMainWindowVisibilityState' as const,
-    focusDefault: 'focusManager.focusDefault' as const
+    focusDefault: 'focusManager.focusDefault' as const,
+    isAutoLogout: 'socket.isAutoLogout' as const
 }
 
 export interface IDialogService {
@@ -72,7 +73,8 @@ interface IDialogContent {
     };
     severity?: number,
     type?: 'visibility-overlay' | 'modality-overlay',
-    focused?: boolean
+    focused?: boolean,
+    autoReconnect?: boolean
 }
 interface IActiveDialog { win: Window, dialog: JQuery<HTMLElement>, content: JQuery<HTMLElement>, header: JQuery<HTMLElement>, currentContent?: IDialogContent }
 interface IActiveBar { win: Window, bar: JQuery<HTMLElement>, barContent: JQuery<HTMLElement>, barHeader: JQuery<HTMLElement>, currentContentBar?: IDialogContent }
@@ -82,6 +84,9 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
     private dialogMap: { [K: string]: IActiveDialog } = {}; // <window>: {dialog, content, header, currentContent}
     private barMap: { [K: string]: IActiveBar } = {}; // <window>: {bar, barContent, barHeader, currentContentBar}
     private networkBar?: JQuery<HTMLElement>;
+    private reconnectTimer: number | null = null;
+    private reconnectInterval: number | null = null;
+    private reconnectStart?: number;
 
     public provides() {
         return {
@@ -110,9 +115,9 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
             unauthorizedAccess: this.retryMessageDialog('dialog.unauthorizedAccess'),
             applicationAlreadyRunning: this.retryMessageDialog('dialog.applicationAlreadyRunning'),
             sessionStolenNotification: this.retryMessageDialog('dialog.sessionStolenNotification'),
-            disconnectedDialog: this.retryMessageDialog('dialog.disconnectedDialog'),
-            connectionErrorDialog: this.retryMessageDialog('dialog.connectionErrorDialog'),
-            tooManyClientsNotification: this.retryMessageDialog('dialog.tooManyClientsNotification'),
+            disconnectedDialog: this.retryMessageDialog('dialog.disconnectedDialog', true),
+            connectionErrorDialog: this.retryMessageDialog('dialog.connectionErrorDialog', true),
+            tooManyClientsNotification: this.retryMessageDialog('dialog.tooManyClientsNotification', true),
             stoppedDialog: this.finalMessageDialog('dialog.stoppedDialog'),
             timedoutDialog: this.finalMessageDialog('dialog.timedoutDialog'),
             cookiesDisabledDialog: this.messageDialog('dialog.cookiesDisabledDialog'),
@@ -122,7 +127,11 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
                 events: {
                     'restartLink_click': () => {
                         this.api.kill();
-                        this.api.newSession();
+                        if (this.api.isAutoLogout()) {
+                            this.api.logout();
+                        } else {
+                            this.api.newSession();
+                        }
                     },
                     'dialogHide_click': () => this.hideBar(),
                     'continueMsg_mouseenter': () => {
@@ -237,9 +246,11 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
         };
     }
 
-    private retryMessageDialog(msg: string) {
+    private retryMessageDialog(msg: string, autoReconnect?: boolean) {
         return {
-            content: '<p id="commonDialog-description">${' + msg + '}</p>',
+            content:
+                '<p id="commonDialog-autoReconnect">${dialog.autoReconnect}<span id="commonDialog-autoReconnect-time"></span></p>' +  
+                '<p id="commonDialog-description">${' + msg + '}</p>',
             buttons: [{
                 label: '<span class="ws-icon-arrows-cw"></class> ${dialog.retryB1}',
                 action: () => {
@@ -250,7 +261,8 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
                 action: () => {
                     this.api.logout();
                 }
-            }]
+            }],
+            autoReconnect
         };
     }
 
@@ -298,7 +310,9 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
         $(document).ajaxStart(() => {
             spinnerTimer = setTimeout(() => {
                 if (winDlg.dialog.is(":visible")) {
-                    rootElement.find('#ajaxProgress').slideDown('fast');
+                	if (winDlg.dialog.find('.ws-spinner:visible').length == 0) {
+                		rootElement.find('#ajaxProgress').slideDown('fast');
+                	}
                 }
             }, 200);
         }).ajaxComplete(() => {
@@ -312,11 +326,14 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
     private show(msg: IDialogContent) {
         const winDlg = this.getDialog();
 
+        this.resetAutoReconnect();
+
         if (winDlg.dialog.is(":visible") && winDlg.currentContent === msg) {
-        	// do not re-create the same dialog if it's already showing
+            // do not re-create the same dialog if it's already showing
+            this.checkAndSetupAutoReconnect(msg, winDlg.content);
         	return winDlg.content;
         }
-        
+
         winDlg.currentContent = msg;
         this.generateContent(msg, winDlg.dialog, winDlg.header, winDlg.content);
         winDlg.dialog.slideDown('fast');
@@ -372,6 +389,8 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
             }
         }
 
+        this.checkAndSetupAutoReconnect(msg, content);
+
         if (dialog.is(":visible")) {
             content.fadeIn('fast');
         }
@@ -383,6 +402,8 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
         if (!winDlg) {
             return;
         }
+
+        this.resetAutoReconnect();
 
         winDlg.currentContent = undefined;
         winDlg.content.html('');
@@ -514,6 +535,44 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
             (overlay as any).removeClass("suppressed", this.api.getMainWindowVisibilityState() === 'hidden'); // TODO: why type error (remove cast to any)
             overlay.find("button").off("click");
         }
+    }
+
+    private resetAutoReconnect() {
+        if (this.reconnectTimer != null) {
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = null;
+        }
+        if (this.reconnectInterval != null) {
+            clearInterval(this.reconnectInterval);
+            this.reconnectInterval = null;
+        }
+        if (this.reconnectStart) {
+            this.reconnectStart = 0;
+        }
+    }
+
+    private checkAndSetupAutoReconnect(msg: IDialogContent, content: JQuery<HTMLElement>) {
+        if (!msg.autoReconnect || this.api.cfg.autoReconnect === null || this.api.cfg.autoReconnect <= 0) {
+            return;
+        }
+
+        content.find("#commonDialog-autoReconnect").show();
+        this.reconnectStart = new Date().getTime()
+        this.reconnectTimer = setTimeout(() => {
+            this.api.reTrySession();
+            if (this.reconnectInterval != null) {
+                clearInterval(this.reconnectInterval);
+                this.reconnectInterval = null;
+            }
+        }, this.api.cfg.autoReconnect!);
+        this.reconnectInterval = setInterval(() => {
+            const seconds = Math.round((this.api.cfg.autoReconnect! - (new Date().getTime() - this.reconnectStart!)) / 1000);
+            if (seconds === 0) {
+                content.find("#commonDialog-autoReconnect-time").text("");
+            } else {
+                content.find("#commonDialog-autoReconnect-time").text("(" + seconds + ")");
+            }
+        }, 250);
     }
 
 }

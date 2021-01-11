@@ -26,6 +26,7 @@ public class AudioClip implements Clip, DataLine {
 	private boolean open;
 	private byte[] data;
 	private int loopCount;
+	private long lastPlaybackTimestamp;
 	
 	private float timePosition = 0;
 	
@@ -113,6 +114,8 @@ public class AudioClip implements Clip, DataLine {
 		
 		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventPlay(this, data, timePosition, 0);
 		
+		lastPlaybackTimestamp = -1; // initialize, next values will come from browser
+		
 		if (!listeners.isEmpty()) {
 			LineEvent event = new LineEvent(this, LineEvent.Type.START, getLongFramePosition());
 			for (LineListener listener : listeners) {
@@ -130,6 +133,8 @@ public class AudioClip implements Clip, DataLine {
 		loopCount = count;
 		
 		Util.getWebToolkit().getPaintDispatcher().notifyAudioEventPlay(this, data, timePosition, loopCount);
+		
+		lastPlaybackTimestamp = -1; // initialize, next values will come from browser
 		
 		if (!listeners.isEmpty()) {
 			LineEvent event = new LineEvent(this, LineEvent.Type.START, getLongFramePosition());
@@ -185,12 +190,22 @@ public class AudioClip implements Clip, DataLine {
 	}
 	
 	public void notifyPlaybackStopped() {
+		lastPlaybackTimestamp = -1; // flag this as stopped
+		
 		if (!listeners.isEmpty()) {
 			LineEvent event = new LineEvent(this, LineEvent.Type.STOP, getLongFramePosition());
 			for (LineListener listener : listeners) {
 				listener.update(event);
 			}
 		}
+	}
+	
+	public void playbackPing() {
+		lastPlaybackTimestamp = System.currentTimeMillis();
+	}
+	
+	public long getLastPlaybackTimestamp() {
+		return lastPlaybackTimestamp;
 	}
 
 	@Override

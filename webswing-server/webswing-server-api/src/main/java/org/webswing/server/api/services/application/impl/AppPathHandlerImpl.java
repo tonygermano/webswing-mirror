@@ -21,12 +21,11 @@ import org.webswing.server.api.services.security.login.LoginHandlerFactory;
 import org.webswing.server.api.services.security.modules.SecurityModuleFactory;
 import org.webswing.server.api.services.sessionpool.SessionPoolHolderService;
 import org.webswing.server.api.services.swinginstance.SwingInstanceInfo;
-import org.webswing.server.api.services.websocket.BrowserWebSocketConnection;
+import org.webswing.server.api.services.websocket.PrimaryWebSocketConnection;
 import org.webswing.server.api.services.websocket.WebSocketService;
 import org.webswing.server.common.datastore.BuiltInDataStoreModules;
 import org.webswing.server.common.datastore.WebswingDataStoreConfig;
 import org.webswing.server.common.model.SecuredPathConfig;
-import org.webswing.server.common.model.security.WebswingAction;
 import org.webswing.server.common.service.config.ConfigurationService;
 import org.webswing.server.common.service.security.AbstractWebswingUser;
 import org.webswing.server.common.util.CommonUtil;
@@ -91,14 +90,16 @@ public class AppPathHandlerImpl extends PrimaryUrlHandler implements AppPathHand
 	}
 
 	@Override
-	public void connectView(ConnectionHandshakeMsgIn handshake, BrowserWebSocketConnection r) {
+	public void connectView(ConnectionHandshakeMsgIn handshake, PrimaryWebSocketConnection r) {
 		try {
 			checkAuthorization(r.getUser());
 			if (!isEnabled()) {
 				throw new WsException("This application is disabled.");
 			}
 			if (handshake.isMirrored()) {
-				r.checkPermissionLocalOrMaster(WebswingAction.websocket_startMirrorView);
+				// mirror connects from admin console to a correct cluster server
+				// if a mirror handshake ends up here it is an error
+				throw new WsException("Direct mirror connection is not allowed!");
 			}
 		} catch (WsException e1) {
 			log.error("User authorization failed. {}", e1.getMessage());

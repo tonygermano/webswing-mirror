@@ -157,7 +157,7 @@ public class GlobalUrlHandler extends PrimaryUrlHandler implements SecuredPathHa
 			res.addHeader("X-XSS-Protection", "1; mode=block");
 			res.addHeader("Referrer-Policy", "strict-origin-when-cross-origin");
 			if (StringUtils.equalsIgnoreCase(req.getScheme(), "https")) {
-				res.addHeader("Strict-Transport-Security", "1; mode=block");
+				res.addHeader("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
 			}
 		}
 	}

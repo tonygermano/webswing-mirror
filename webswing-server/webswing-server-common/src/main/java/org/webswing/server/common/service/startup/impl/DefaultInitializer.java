@@ -48,17 +48,27 @@ public class DefaultInitializer implements Initializer {
 		log.info("Using Config file: " + System.getProperty(Constants.CONFIG_FILE_PATH));
 		
 		// verify properties file and convert to URI
-		validatePropertyFilePath(Constants.PROPERTIES_FILE_PATH, Constants.DEFAULT_PROPERTIES_FILE_NAME);
-		log.info("Using Properties file: " + System.getProperty(Constants.PROPERTIES_FILE_PATH));
+		try {
+			validatePropertyFilePathOptional(Constants.PROPERTIES_FILE_PATH, Constants.DEFAULT_PROPERTIES_FILE_NAME);
+			log.info("Using Properties file: " + System.getProperty(Constants.PROPERTIES_FILE_PATH));
+		} catch (FileNotFoundException e) {
+			System.clearProperty(Constants.PROPERTIES_FILE_PATH);
+			log.info(e.getMessage());
+			log.info("Properties file not found. Using provided system properties instead.");
+		}
 	}
 
 	protected void validatePropertyFilePath(String propertyName, String defaultValue) throws WsInitException {
 		try {
-			String configFilePath = getValidURI(System.getProperty(propertyName, defaultValue));
-			System.setProperty(propertyName, configFilePath);
+			validatePropertyFilePathOptional(propertyName, defaultValue);
 		} catch (FileNotFoundException e) {
 			throw new WsInitException("Invalid system property " + propertyName + ": " + e.getMessage());
 		}
+	}
+	
+	protected void validatePropertyFilePathOptional(String propertyName, String defaultValue) throws FileNotFoundException {
+		String configFilePath = getValidURI(System.getProperty(propertyName, defaultValue));
+		System.setProperty(propertyName, configFilePath);
 	}
 
 	public static String getValidURI(String pathOrUri) throws FileNotFoundException {

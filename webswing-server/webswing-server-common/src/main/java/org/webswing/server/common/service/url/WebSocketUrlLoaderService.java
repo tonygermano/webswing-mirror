@@ -1,10 +1,8 @@
 package org.webswing.server.common.service.url;
 
-import java.io.File;
-
 public interface WebSocketUrlLoaderService {
 	
-	void init(File propertiesFile);
+	void init();
 	
 	void addListener(WebSocketUrlLoaderListener listener);
 	

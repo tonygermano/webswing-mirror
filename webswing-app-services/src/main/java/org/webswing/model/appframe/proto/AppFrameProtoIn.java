@@ -17207,6 +17207,15 @@ public final class AppFrameProtoIn {
      * <code>optional bool stop = 2;</code>
      */
     boolean getStop();
+
+    /**
+     * <code>optional bool ping = 3;</code>
+     */
+    boolean hasPing();
+    /**
+     * <code>optional bool ping = 3;</code>
+     */
+    boolean getPing();
   }
   /**
    * Protobuf type {@code appFrameProtoIn.AudioEventMsgInProto}
@@ -17223,6 +17232,7 @@ public final class AppFrameProtoIn {
     private AudioEventMsgInProto() {
       id_ = "";
       stop_ = false;
+      ping_ = false;
     }
 
     @java.lang.Override
@@ -17258,6 +17268,11 @@ public final class AppFrameProtoIn {
             case 16: {
               bitField0_ |= 0x00000002;
               stop_ = input.readBool();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              ping_ = input.readBool();
               break;
             }
             default: {
@@ -17350,6 +17365,21 @@ public final class AppFrameProtoIn {
       return stop_;
     }
 
+    public static final int PING_FIELD_NUMBER = 3;
+    private boolean ping_;
+    /**
+     * <code>optional bool ping = 3;</code>
+     */
+    public boolean hasPing() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional bool ping = 3;</code>
+     */
+    public boolean getPing() {
+      return ping_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -17370,6 +17400,9 @@ public final class AppFrameProtoIn {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBool(2, stop_);
       }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBool(3, ping_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -17385,6 +17418,10 @@ public final class AppFrameProtoIn {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(2, stop_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(3, ping_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -17412,6 +17449,11 @@ public final class AppFrameProtoIn {
         result = result && (getStop()
             == other.getStop());
       }
+      result = result && (hasPing() == other.hasPing());
+      if (hasPing()) {
+        result = result && (getPing()
+            == other.getPing());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -17431,6 +17473,11 @@ public final class AppFrameProtoIn {
         hash = (37 * hash) + STOP_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
             getStop());
+      }
+      if (hasPing()) {
+        hash = (37 * hash) + PING_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getPing());
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -17569,6 +17616,8 @@ public final class AppFrameProtoIn {
         bitField0_ = (bitField0_ & ~0x00000001);
         stop_ = false;
         bitField0_ = (bitField0_ & ~0x00000002);
+        ping_ = false;
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
 
@@ -17605,6 +17654,10 @@ public final class AppFrameProtoIn {
           to_bitField0_ |= 0x00000002;
         }
         result.stop_ = stop_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.ping_ = ping_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -17661,6 +17714,9 @@ public final class AppFrameProtoIn {
         }
         if (other.hasStop()) {
           setStop(other.getStop());
+        }
+        if (other.hasPing()) {
+          setPing(other.getPing());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -17796,6 +17852,38 @@ public final class AppFrameProtoIn {
       public Builder clearStop() {
         bitField0_ = (bitField0_ & ~0x00000002);
         stop_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean ping_ ;
+      /**
+       * <code>optional bool ping = 3;</code>
+       */
+      public boolean hasPing() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional bool ping = 3;</code>
+       */
+      public boolean getPing() {
+        return ping_;
+      }
+      /**
+       * <code>optional bool ping = 3;</code>
+       */
+      public Builder setPing(boolean value) {
+        bitField0_ |= 0x00000004;
+        ping_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool ping = 3;</code>
+       */
+      public Builder clearPing() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        ping_ = false;
         onChanged();
         return this;
       }
@@ -19214,15 +19302,15 @@ public final class AppFrameProtoIn {
       "tMsgInProto.WindowEventTypeProto\"n\n\024Wind" +
       "owEventTypeProto\022\t\n\005close\020\000\022\t\n\005focus\020\001\022\014" +
       "\n\010maximize\020\002\022\016\n\nundecorate\020\003\022\014\n\010decorate" +
-      "\020\004\022\n\n\006undock\020\005\022\010\n\004dock\020\006\"0\n\024AudioEventMs" +
-      "gInProto\022\n\n\002id\030\001 \001(\t\022\014\n\004stop\030\002 \001(\010\"\333\001\n\025A" +
-      "ctionEventMsgInProto\022\022\n\nactionName\030\001 \001(\t" +
-      "\022\014\n\004data\030\002 \001(\t\022\022\n\nbinaryData\030\003 \001(\014\022\020\n\010wi" +
-      "ndowId\030\004 \001(\t\022N\n\teventType\030\005 \001(\0162;.appFra" +
-      "meProtoIn.ActionEventMsgInProto.ActionEv" +
-      "entTypeProto\"*\n\024ActionEventTypeProto\022\010\n\004" +
-      "init\020\000\022\010\n\004user\020\001B#\n!org.webswing.model.a" +
-      "ppframe.proto"
+      "\020\004\022\n\n\006undock\020\005\022\010\n\004dock\020\006\">\n\024AudioEventMs" +
+      "gInProto\022\n\n\002id\030\001 \001(\t\022\014\n\004stop\030\002 \001(\010\022\014\n\004pi" +
+      "ng\030\003 \001(\010\"\333\001\n\025ActionEventMsgInProto\022\022\n\nac" +
+      "tionName\030\001 \001(\t\022\014\n\004data\030\002 \001(\t\022\022\n\nbinaryDa" +
+      "ta\030\003 \001(\014\022\020\n\010windowId\030\004 \001(\t\022N\n\teventType\030" +
+      "\005 \001(\0162;.appFrameProtoIn.ActionEventMsgIn" +
+      "Proto.ActionEventTypeProto\"*\n\024ActionEven" +
+      "tTypeProto\022\010\n\004init\020\000\022\010\n\004user\020\001B#\n!org.we" +
+      "bswing.model.appframe.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -19337,7 +19425,7 @@ public final class AppFrameProtoIn {
     internal_static_appFrameProtoIn_AudioEventMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_appFrameProtoIn_AudioEventMsgInProto_descriptor,
-        new java.lang.String[] { "Id", "Stop", });
+        new java.lang.String[] { "Id", "Stop", "Ping", });
     internal_static_appFrameProtoIn_ActionEventMsgInProto_descriptor =
       getDescriptor().getMessageTypes().get(17);
     internal_static_appFrameProtoIn_ActionEventMsgInProto_fieldAccessorTable = new

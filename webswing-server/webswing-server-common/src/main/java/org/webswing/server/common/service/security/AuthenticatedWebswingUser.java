@@ -55,19 +55,20 @@ public abstract class AuthenticatedWebswingUser implements WebswingUser, Seriali
 	
 	public List<String> getUserPermissions() {
 		if (permissions == null) {
-			initPermissions();
+			permissions=resolvePermissions();
 		}
 		return permissions;
 	}
 	
-	private void initPermissions() {
-		permissions = new ArrayList<>();
+	protected List<String> resolvePermissions() {
+		List<String> permissions = new ArrayList<>();
 		// initialize a default set of permissions based on WebswingActions
 		for (WebswingAction action : WebswingAction.values()) {
 			if (isPermitted(action.name())) {
 				permissions.add(action.name());
 			}
 		}
+		return permissions;
 	}
 
 	/**

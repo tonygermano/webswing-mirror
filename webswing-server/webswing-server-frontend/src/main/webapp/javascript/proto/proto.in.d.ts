@@ -1246,6 +1246,9 @@ export namespace appFrameProtoIn {
 
         /** AudioEventMsgInProto stop */
         stop?: (boolean|null);
+
+        /** AudioEventMsgInProto ping */
+        ping?: (boolean|null);
     }
 
     /** Represents an AudioEventMsgInProto. */
@@ -1262,6 +1265,9 @@ export namespace appFrameProtoIn {
 
         /** AudioEventMsgInProto stop. */
         public stop: boolean;
+
+        /** AudioEventMsgInProto ping. */
+        public ping: boolean;
 
         /**
          * Creates a new AudioEventMsgInProto instance using the specified properties.

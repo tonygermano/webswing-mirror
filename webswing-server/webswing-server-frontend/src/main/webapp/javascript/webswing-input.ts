@@ -14,7 +14,8 @@ export const inputInjectable = {
     paste: 'clipboard.paste' as const,
     isAccessibilityEnabled: 'accessible.isEnabled' as const,
     toggleAccessibility: 'accessible.toggle' as const,
-    focusInput: 'focusManager.focusInput' as const
+    focusInput: 'focusManager.focusInput' as const,
+    inputConfig: 'input.config' as const
 }
 
 export interface IInputService {
@@ -22,7 +23,8 @@ export interface IInputService {
     'input.sendInput': (message?: appFrameProtoIn.IInputEventMsgInProto) => void,
     'input.dispose': () => void,
     'input.registerUndockedCanvas': (win: IDockableWindow) => void,
-    'input.updateFocusedHtmlCanvas': (focusedElement: Element | null) => void
+    'input.updateFocusedHtmlCanvas': (focusedElement: Element | null) => void,
+    'input.config': IInputConfig
 }
 
 interface IRegisteredListener {
@@ -30,6 +32,10 @@ interface IRegisteredListener {
     name: keyof GlobalEventHandlersEventMap
     listener: (this: GlobalEventHandlers, ev: any) => any
     useCapture?: boolean
+}
+
+interface IInputConfig {
+    preventWheelEvent: boolean
 }
 
 const KeyEventType = appFrameProtoIn.KeyboardEventMsgInProto.KeyEventTypeProto;
@@ -65,8 +71,15 @@ export class InputModule extends ModuleDef<typeof inputInjectable, IInputService
             'input.sendInput': this.sendInput,
             'input.dispose': this.dispose,
             'input.registerUndockedCanvas': this.registerUndockedCanvas,
-            'input.updateFocusedHtmlCanvas': this.updateFocusedHtmlCanvas
+            'input.updateFocusedHtmlCanvas': this.updateFocusedHtmlCanvas,
+            'input.config': this.config()
         }
+    }
+
+    private config(): IInputConfig {
+        return {
+            preventWheelEvent: true
+        };
     }
 
     private sendInput(message?: appFrameProtoIn.IInputEventMsgInProto) {
@@ -297,7 +310,9 @@ export class InputModule extends ModuleDef<typeof inputInjectable, IInputService
             }
             this.latestMouseWheelEvent = mousePos;
         }
-        evt.preventDefault();
+        if (this.api.inputConfig.preventWheelEvent) {
+            evt.preventDefault();
+        }
         evt.stopPropagation();
         return false;
     }
@@ -406,10 +421,6 @@ export class InputModule extends ModuleDef<typeof inputInjectable, IInputService
     }
 
     private handleCut(event: ClipboardEvent) {
-        if (isNotValidInputHandlerTarget(event)) {
-            return;
-        }
-
         event.preventDefault();
         event.stopPropagation();
         this.api.cut(event);
@@ -424,10 +435,6 @@ export class InputModule extends ModuleDef<typeof inputInjectable, IInputService
     }
 
     private handlePaste(event: ClipboardEvent) {
-        if (isNotValidInputHandlerTarget(event)) {
-            return;
-        }
-
         event.preventDefault();
         event.stopPropagation();
         this.api.paste(event, false);
@@ -485,6 +492,12 @@ export class InputModule extends ModuleDef<typeof inputInjectable, IInputService
                     }
                 }
                 this.enqueueInputEvent(keyevt);
+            }
+
+            // prevent firefox password manager
+            if(event.keyCode==8){
+                event.stopImmediatePropagation();
+                event.preventDefault();
             }
         }
         return false;

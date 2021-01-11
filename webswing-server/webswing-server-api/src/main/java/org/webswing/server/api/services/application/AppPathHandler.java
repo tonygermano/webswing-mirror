@@ -8,13 +8,13 @@ import org.webswing.server.api.model.ApplicationInfoMsg;
 import org.webswing.server.api.services.datastore.DataStoreHandler;
 import org.webswing.server.api.services.security.login.SecuredPathHandler;
 import org.webswing.server.api.services.swinginstance.SwingInstanceInfo;
-import org.webswing.server.api.services.websocket.BrowserWebSocketConnection;
+import org.webswing.server.api.services.websocket.PrimaryWebSocketConnection;
 
 public interface AppPathHandler extends SecuredPathHandler, UrlHandler, DataStoreHandler {
 	
 	ApplicationInfoMsg getApplicationInfoMsg();
 
-	void connectView(ConnectionHandshakeMsgIn handshake, BrowserWebSocketConnection r);
+	void connectView(ConnectionHandshakeMsgIn handshake, PrimaryWebSocketConnection r);
 
 	boolean isUserAuthorized();
 	

@@ -53,6 +53,13 @@ public class WebJSObject extends JSObject {
 		}
 	}
 
+	public static Future<?> setAppletRef(Applet a) {
+		return javaEvalThread.submit(() -> {
+			JSObject root = new WebJSObject(new JSObjectMsgIn("instanceObject"));
+			root.setMember("applet", a);
+		});
+	}
+
 	@Override
 	public Object call(String methodName, Object[] args) throws JSException {
 		AppFrameMsgOut msg = JsLinkUtil.generateCallRequest(jsThis, methodName, args);

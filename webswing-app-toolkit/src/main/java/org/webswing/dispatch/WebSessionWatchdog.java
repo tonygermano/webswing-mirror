@@ -60,11 +60,18 @@ public class WebSessionWatchdog implements SessionWatchdog {
 						}
 					}
 
-					if (watchHeartbeat.get() && System.currentTimeMillis() - lastHeartbeat.get() > LAST_HEARTBEAT_BEFORE_SHUTDOWN) {
-						watchHeartbeat.set(false);
-						scheduleShutdown(ShutdownReason.ProcessKilled, () -> {
-							AppLogger.warn("Exiting application due to session pool shutdown.");
-						});
+					if (watchHeartbeat.get()) {
+						if (System.currentTimeMillis() - lastHeartbeat.get() > LAST_HEARTBEAT_BEFORE_SHUTDOWN) {
+							watchHeartbeat.set(false);
+							scheduleShutdown(ShutdownReason.ProcessKilled, () -> {
+								AppLogger.warn("Exiting application due to session pool shutdown.");
+							});
+						}
+					} else {
+						if (terminated.get()) {
+							AppLogger.warn("Application has not been forcefully terminated by session pool. Session pool is probably down. Exiting Manually.");
+							System.exit(1);
+						}
 					}
 					
 					// IE halts js execution when filechooser is open and no heartbeat messages are sent causing timeout(see https://bitbucket.org/webswing/webswing-home/issues/18)

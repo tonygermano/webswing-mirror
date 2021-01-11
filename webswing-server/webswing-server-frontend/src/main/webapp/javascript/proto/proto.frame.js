@@ -651,6 +651,7 @@ $root.serverBrowserFrameProto = (function() {
          * @interface IConnectionInfoMsgOutProto
          * @property {string|null} [serverId] ConnectionInfoMsgOutProto serverId
          * @property {string|null} [sessionPoolId] ConnectionInfoMsgOutProto sessionPoolId
+         * @property {boolean|null} [autoLogout] ConnectionInfoMsgOutProto autoLogout
          */
 
         /**
@@ -685,6 +686,14 @@ $root.serverBrowserFrameProto = (function() {
         ConnectionInfoMsgOutProto.prototype.sessionPoolId = "";
 
         /**
+         * ConnectionInfoMsgOutProto autoLogout.
+         * @member {boolean} autoLogout
+         * @memberof serverBrowserFrameProto.ConnectionInfoMsgOutProto
+         * @instance
+         */
+        ConnectionInfoMsgOutProto.prototype.autoLogout = false;
+
+        /**
          * Creates a new ConnectionInfoMsgOutProto instance using the specified properties.
          * @function create
          * @memberof serverBrowserFrameProto.ConnectionInfoMsgOutProto
@@ -712,6 +721,8 @@ $root.serverBrowserFrameProto = (function() {
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.serverId);
             if (message.sessionPoolId != null && message.hasOwnProperty("sessionPoolId"))
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.sessionPoolId);
+            if (message.autoLogout != null && message.hasOwnProperty("autoLogout"))
+                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.autoLogout);
             return writer;
         };
 
@@ -739,6 +750,9 @@ $root.serverBrowserFrameProto = (function() {
                 case 2:
                     message.sessionPoolId = reader.string();
                     break;
+                case 3:
+                    message.autoLogout = reader.bool();
+                    break;
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -763,6 +777,8 @@ $root.serverBrowserFrameProto = (function() {
                 message.serverId = String(object.serverId);
             if (object.sessionPoolId != null)
                 message.sessionPoolId = String(object.sessionPoolId);
+            if (object.autoLogout != null)
+                message.autoLogout = Boolean(object.autoLogout);
             return message;
         };
 
@@ -782,11 +798,14 @@ $root.serverBrowserFrameProto = (function() {
             if (options.defaults) {
                 object.serverId = "";
                 object.sessionPoolId = "";
+                object.autoLogout = false;
             }
             if (message.serverId != null && message.hasOwnProperty("serverId"))
                 object.serverId = message.serverId;
             if (message.sessionPoolId != null && message.hasOwnProperty("sessionPoolId"))
                 object.sessionPoolId = message.sessionPoolId;
+            if (message.autoLogout != null && message.hasOwnProperty("autoLogout"))
+                object.autoLogout = message.autoLogout;
             return object;
         };
 

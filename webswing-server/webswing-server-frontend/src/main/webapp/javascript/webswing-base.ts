@@ -93,7 +93,8 @@ export type IDockableWindow = Window & typeof globalThis & {
 export type HtmlOrCanvasWindow = HtmlWindow | CanvasWindow 
 
 type IAudioClip = HTMLAudioElement & {
-	loopCount: number
+	loopCount: number,
+	playbackTimer?: number
 }
 
 type ITimestampAppFrameMsgOut = AppFrame & {
@@ -130,6 +131,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 	private focusedUndockedWindow: Window | null = null;
 	private dockResizeInterval = 250;
 	private popupStartupResizeInterval = 1000;
+	private audioPlaybackPingInterval = 1000;
 
 	public ready = () => {
 		this.directDraw = new WebswingDirectDraw({ logTrace: this.api.cfg.traceLog, logDebug: this.api.cfg.debugLog, ieVersion: this.api.cfg.ieVersion, dpr: getDpr() });
@@ -300,6 +302,12 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 		document.removeEventListener("visibilitychange", this.visibilityChangeHandler);
 		if (this.directDraw) {
 			this.directDraw.dispose();
+		}
+
+		for (const id in this.audio) {
+			if (id in this.audio) {
+				this.stopAudioPing(this.audio[id]);
+			}
 		}
 	}
 
@@ -502,9 +510,10 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 							clip.currentTime = data.audioEvent.time;
 						}
 						clip.addEventListener('ended', (evt) => this.audioEndedHandler(evt));
-
+						
 						this.audio[data.audioEvent.id!] = clip;
-
+						
+						this.startAudioPing(clip);
 						clip.play();
 					} else {
 						// existing clip
@@ -515,6 +524,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 								clip.currentTime = data.audioEvent.time;
 							}
 
+							this.startAudioPing(clip);
 							clip.play();
 						}
 					}
@@ -526,6 +536,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 
 					if (clip) {
 						clip.pause();
+						this.stopAudioPing(clip);
 					}
 					break;
 				}
@@ -703,12 +714,28 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 			clip.loopCount = 0;
 			clip.currentTime = 0;
 			clip.pause();
+			this.stopAudioPing(clip);
 			this.api.send({ audio: { id: clip.id, stop: true } });
 			return;
 		}
 
 		clip.loopCount = clip.loopCount - 1;
 		clip.play();
+	}
+
+	public startAudioPing(clip: IAudioClip) {
+		if (clip.playbackTimer) {
+			clearInterval(clip.playbackTimer);
+		}
+		clip.playbackTimer = setInterval(() => {
+			this.api.send({ audio: { id: clip.id, ping: true } });
+		}, this.audioPlaybackPingInterval);
+	}
+
+	public stopAudioPing(clip: IAudioClip) {
+		if (clip && clip.playbackTimer) {
+			clearInterval(clip.playbackTimer);
+		}
 	}
 
 	public closeWindow(id:string) {

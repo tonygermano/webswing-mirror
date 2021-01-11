@@ -282,8 +282,7 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 			// resize and refresh the applet object exposed in javascript in case of page reload/session continue
 			Applet a = (Applet) WebJSObject.getJavaReference(System.getProperty(Constants.SWING_START_SYS_PROP_APPLET_CLASS));
 			a.resize(handshake.getDesktopWidth(), handshake.getDesktopHeight());
-			JSObject root = new WebJSObject(new JSObjectMsgIn("instanceObject"));
-			root.setMember("applet", a);
+			WebJSObject.setAppletRef(a);
 		}
 		System.setProperty(Constants.SWING_START_SYS_PROP_TOUCH_MODE, handshake.isTouchMode() + "");
 		
@@ -512,11 +511,16 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 		AudioClip clip = Util.getWebToolkit().getPaintDispatcher().findAudioClip(event.getId());
 		
 		if (clip == null) {
-			AppLogger.warn("Audio clip [" + event.getId() + "] not found. Cannot notify on playback end.");
+			AppLogger.warn("Audio clip [" + event.getId() + "] not found. Ignoring audio event.");
 			return;
 		}
 		
-		clip.notifyPlaybackStopped();
+		if (event.isStop()) {
+			clip.notifyPlaybackStopped();
+		}
+		if (event.isPing()) {
+			clip.playbackPing();
+		}
 	}
 	
 }

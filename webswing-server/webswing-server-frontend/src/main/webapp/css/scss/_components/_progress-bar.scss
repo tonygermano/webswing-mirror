@@ -27,8 +27,8 @@
 
 // Container for the progress bar
 .ws-progress {
-    @include rel('height', 30px);
-    @include rel('margin', 15px 0px 5px 0px);
+    @include rel('height', 40px);
+    @include rel('margin', 15px 0px 25px 0px);
     @include border-radius(3px);
 
     // Progress text

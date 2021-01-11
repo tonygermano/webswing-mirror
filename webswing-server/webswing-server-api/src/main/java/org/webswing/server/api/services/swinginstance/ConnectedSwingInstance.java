@@ -10,7 +10,8 @@ import org.webswing.model.browser.out.ServerToBrowserFrameMsgOut;
 import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
 import org.webswing.server.api.model.ProcessStatusEnum;
 import org.webswing.server.api.services.websocket.ApplicationWebSocketConnection;
-import org.webswing.server.api.services.websocket.BrowserWebSocketConnection;
+import org.webswing.server.api.services.websocket.MirrorWebSocketConnection;
+import org.webswing.server.api.services.websocket.PrimaryWebSocketConnection;
 import org.webswing.server.common.model.SecuredPathConfig;
 
 public interface ConnectedSwingInstance extends RemoteSwingInstance {
@@ -21,17 +22,25 @@ public interface ConnectedSwingInstance extends RemoteSwingInstance {
 	
 	String getConnectionId();
 	
-	void connectBrowser(BrowserWebSocketConnection r, ConnectionHandshakeMsgIn h);
+	void connectBrowser(PrimaryWebSocketConnection r, ConnectionHandshakeMsgIn h);
 	
 	void connectApplication(ApplicationWebSocketConnection r, boolean reconnect);
 	
+	void connectMirroredWebSession(MirrorWebSocketConnection resource);
+	
 	void browserDisconnected(String connectionId);
+	
+	void disconnectMirroredWebSession(boolean disconnect); 
+	
+	void disconnectMirroredWebSession(String sessionId, boolean disconnect); 
 	
 	void applicationDisconnected(boolean reconnect);
 	
 	void handleAppMessage(AppToServerFrameMsgOut msgOut);
 	
-	void handleBrowserMessage(BrowserWebSocketConnection r, BrowserToServerFrameMsgIn msgIn);
+	void handleBrowserMessage(BrowserToServerFrameMsgIn msgIn);
+	
+	void handleBrowserMirrorMessage(byte[] frame);
 	
 	boolean sendMessageToBrowser(ServerToBrowserFrameMsgOut msgOut);
 

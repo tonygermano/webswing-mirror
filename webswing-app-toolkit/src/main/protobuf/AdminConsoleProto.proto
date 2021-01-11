@@ -22,6 +22,7 @@ message AdminConsoleFrameMsgInProto {
 	optional StopAppMsgInProto stopApp = 17;
 	optional CreateAppMsgInProto createApp = 18;
 	optional RemoveAppMsgInProto removeApp = 19;
+	optional MirrorFrameMsgInProto mirrorFrame = 20;
 }
 
 message AdminConsoleHandshakeMsgInProto {
@@ -129,6 +130,15 @@ message RemoveAppMsgInProto {
 	optional string path = 1;
 }
 
+message MirrorFrameMsgInProto {
+	optional bytes frame = 1;
+	optional string instanceId = 2;
+	optional string sessionId = 3;
+	optional string token = 4;
+	optional bool connect = 5;
+	optional bool disconnect = 6;
+}
+
 /* =================== SERVER -> ADMIN CONSOLE ====================*/
 
 message AdminConsoleFrameMsgOutProto {
@@ -144,6 +154,7 @@ message AdminConsoleFrameMsgOutProto {
 	optional SearchVariablesMsgOutProto searchVariables = 10;
 	optional SaveConfigResultMsgOutProto saveConfigResult = 11;
 	optional AccessTokenCreatedMsgOutProto accessTokenCreated = 12;
+	optional MirrorFrameMsgOutProto mirrorFrame = 13;
 }
 
 message InstanceCountsStatsWarningsMsgOutProto {
@@ -316,4 +327,11 @@ message AccessTokenCreatedMsgOutProto {
 	optional string refreshToken = 1;
 	optional string accessId = 2;
 	optional sint64 expiration = 3;
+}
+
+message MirrorFrameMsgOutProto {
+	optional bytes frame = 1;
+	optional string instanceId = 2;
+	optional string sessionId = 3;
+	optional bool disconnect = 4;
 }

@@ -40,7 +40,7 @@ public class WebSocketUrlLoaderServiceImpl implements WebSocketUrlLoaderService 
 	}
 	
 	@Override
-	public void init(File propertiesFile) {
+	public void init() {
 		reloadInterval = Long.parseLong(System.getProperty(Constants.WEBSOCKET_URL_LOADER_INTERVAL, Constants.WEBSOCKET_URL_LOADER_INTERVAL_DEFAULT + ""));
 		
 		String loaderProp = System.getProperty(Constants.WEBSOCKET_URL_LOADER_TYPE, WebSocketUrlLoaderType.propertyFile.name());
@@ -52,10 +52,14 @@ public class WebSocketUrlLoaderServiceImpl implements WebSocketUrlLoaderService 
 		}
 		
 		switch (loaderType) {
-			case propertyFile:
 			case propertyFile_noReload:
-				loader = new PropertyWebSocketUrlLoader(propertiesFile);
+				loader = new StaticWebSocketUrlLoader();
 				break;
+			case propertyFile: {
+				File propFile = new File(URI.create(System.getProperty(Constants.PROPERTIES_FILE_PATH)));
+				loader = new PropertyWebSocketUrlLoader(propFile);
+				break;
+			}
 			case script: {
 				String script = System.getProperty(Constants.WEBSOCKET_URL_LOADER_SCRIPT);
 				loader = new ScriptWebSocketUrlLoader(script);
@@ -72,7 +76,6 @@ public class WebSocketUrlLoaderServiceImpl implements WebSocketUrlLoaderService 
 			}, TimeUnit.SECONDS.toMillis(reloadInterval), TimeUnit.SECONDS.toMillis(reloadInterval));
 		}
 		
-		loader.initialize();
 		loadAndValidateUrls();
 	}
 	

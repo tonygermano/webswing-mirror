@@ -10,7 +10,7 @@ export const loginInjectable = {
 }
 
 export interface ILoginService {
-    'login.login': (successCallback: () => void) => void;
+    'login.login': (successCallback: () => void, failedCallback?: () => void) => void;
     'login.logout': () => void;
     'login.touchSession': (tabLogout?: boolean) => void;
     'login.user': () => string | null | undefined;
@@ -33,7 +33,7 @@ export class LoginModule extends ModuleDef<typeof loginInjectable, ILoginService
         }
     }
 
-    public login(successCallback: () => void) {
+    public login(successCallback: () => void, failedCallback?: () => void) {
         let surl
         try {
             surl = window.top.location.href
@@ -55,7 +55,7 @@ export class LoginModule extends ModuleDef<typeof loginInjectable, ILoginService
             if (successCallback != null) {
                 successCallback();
             }
-        });
+        }, failedCallback);
     }
 
     public logout(tabLogout?: boolean) {

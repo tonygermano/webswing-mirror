@@ -34,7 +34,7 @@ import org.webswing.server.api.services.swinginstance.SwingInstanceInfo;
 import org.webswing.server.api.services.swinginstance.holder.SwingInstanceHolder;
 import org.webswing.server.api.services.swinginstance.holder.SwingInstanceHolderFactory;
 import org.webswing.server.api.services.websocket.ApplicationWebSocketConnection;
-import org.webswing.server.api.services.websocket.BrowserWebSocketConnection;
+import org.webswing.server.api.services.websocket.PrimaryWebSocketConnection;
 import org.webswing.server.api.services.websocket.WebSocketUserInfo;
 import org.webswing.server.api.util.ServerApiUtil;
 import org.webswing.server.common.datastore.WebswingDataStoreConfig;
@@ -111,7 +111,7 @@ public abstract class ServerSessionPoolConnector {
 	 * instances that are running in session pool, connected to a browser
 	 */
 	public int getInstancesRunningAndConnectedInSessionPool(String path) {
-		return getRunningConnectedInstances(path);
+		return getConnectedConnectedInstances(path);
 	}
 	
 	public final int getRunningConnectedInstances(String path) {
@@ -202,7 +202,7 @@ public abstract class ServerSessionPoolConnector {
 		}
 	}
 
-	public boolean tryConnectSwingInstance(String path, BrowserWebSocketConnection r, ConnectionHandshakeMsgIn handshake, SessionMode sessionMode, boolean stealSessionAllowed) throws WsException {
+	public boolean tryConnectSwingInstance(String path, PrimaryWebSocketConnection r, ConnectionHandshakeMsgIn handshake, SessionMode sessionMode, boolean stealSessionAllowed) throws WsException {
 		if (!instanceHolders.containsKey(path)) {
 			return false;
 		}
@@ -210,8 +210,9 @@ public abstract class ServerSessionPoolConnector {
 		ConnectedSwingInstance instance = null;
 
 		if (handshake.isMirrored()) {
-			// find instance for mirror connection
-			instance = instanceHolders.get(path).findInstanceByInstanceId(handshake.getClientId());
+			// mirror connects from admin console to a correct cluster server
+			// if a mirror handshake ends up here it is an error
+			throw new WsException("Direct mirror connection is not allowed!");
 		} else {
 			String ownerId = ServerApiUtil.resolveOwnerIdForSessionMode(r, handshake, sessionMode);
 			instance = instanceHolders.get(path).findInstanceByOwnerId(ownerId);
@@ -225,7 +226,7 @@ public abstract class ServerSessionPoolConnector {
 		return true;
 	}
 
-	public final void createSwingInstance(String path, BrowserWebSocketConnection r, ConnectionHandshakeMsgIn handshake, SwingInstanceInfo instanceInfo) throws WsException {
+	public final void createSwingInstance(String path, PrimaryWebSocketConnection r, ConnectionHandshakeMsgIn handshake, SwingInstanceInfo instanceInfo) throws WsException {
 		SecuredPathConfig config = instanceInfo.getConfig();
 
 		String ownerId = ServerApiUtil.resolveOwnerIdForSessionMode(r, handshake, config);
@@ -332,7 +333,7 @@ public abstract class ServerSessionPoolConnector {
 		// instance cannot reconnect in community server
 	}
 	
-	public void reconnectInstance(String instanceId, ApplicationWebSocketConnection connection, BrowserWebSocketConnection browser, ConnectionHandshakeMsgIn handshake, SwingInstanceInfo instanceInfo) throws WsException {
+	public void reconnectInstance(String instanceId, ApplicationWebSocketConnection connection, PrimaryWebSocketConnection browser, ConnectionHandshakeMsgIn handshake, SwingInstanceInfo instanceInfo) throws WsException {
 		// remote session pool connector to override this and finalize the reconnect process
 		// instance cannot reconnect in community server
 	}

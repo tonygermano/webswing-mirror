@@ -58,12 +58,10 @@ public class JwtUtil {
 	private static ProtoMapper protoMapper = new ProtoMapper(ProtoMapper.PROTO_PACKAGE_JWT, ProtoMapper.PROTO_PACKAGE_JWT);
 	private static ObjectMapper mapper = new ObjectMapper();
 	
-	private static Cipher cipher;
 	private static SecretKey secretKey;
 	
 	static {
 		try {
-			cipher = Cipher.getInstance(encryptionAlg);
 			secretKey = new SecretKeySpec(Arrays.copyOfRange(signingKey, 0, 32), encryptionKeySpec);
 		} catch (Exception e) {
 			log.error("Failed to initialize JWT encryption!", e);
@@ -265,10 +263,11 @@ public class JwtUtil {
 		}
 		
 		if (useEncryption) {
-			if (cipher == null || secretKey == null) {
+			if (secretKey == null) {
 				return null;
 			}
 			try {
+				Cipher cipher = Cipher.getInstance(encryptionAlg);
 				cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 				claimBytes = Base64.getUrlEncoder().encode(cipher.doFinal(claimBytes));
 			} catch (Exception e) {
@@ -385,11 +384,12 @@ public class JwtUtil {
 		byte[] claimBytes = serializedWebswingClaim.getBytes(StandardCharsets.UTF_8);
 		
 		if (useEncryption) {
-			if (cipher == null || secretKey == null) {
+			if (secretKey == null) {
 				return null;
 			}
 			
 			try {
+				Cipher cipher = Cipher.getInstance(encryptionAlg);
 				cipher.init(Cipher.DECRYPT_MODE, secretKey);
 				claimBytes = cipher.doFinal(Base64.getUrlDecoder().decode(claimBytes));
 			} catch (Exception e) {

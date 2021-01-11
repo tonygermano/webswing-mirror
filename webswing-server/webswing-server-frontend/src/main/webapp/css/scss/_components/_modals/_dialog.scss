@@ -8,5 +8,13 @@
         @include rel('padding-bottom', 20px);
         @include rel('margin', 0px);
     }
+
+    #commonDialog-autoReconnect {
+        display: none;
+
+        &-time {
+            margin-left: 5px;
+        }
+    }
     
 }

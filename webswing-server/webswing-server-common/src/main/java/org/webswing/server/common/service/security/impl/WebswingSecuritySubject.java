@@ -53,6 +53,10 @@ public class WebswingSecuritySubject {
 		
 		return subject;
 	}
+	
+	public static WebswingSecuritySubject buildFrom(String token) {
+		return getFromToken(token, SubjectType.access);
+	}
 
 	public static WebswingSecuritySubject buildAndSetTransferSubjectFrom(HttpServletRequest request) {
 		String token = ServerUtil.parseTokenFromCookie(request, Constants.WEBSWING_SESSION_TRANSFER_TOKEN);

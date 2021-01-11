@@ -148,6 +148,11 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 	}
 	
 	@Override
+	public boolean isConnected() {
+		return session != null && session.isOpen();
+	}
+
+	@Override
 	protected Msg decodeIncomingMessage(byte[] bytes) throws IOException {
 		return protoMapper.decodeProto(bytes, AdminConsoleFrameMsgIn.class);
 	}

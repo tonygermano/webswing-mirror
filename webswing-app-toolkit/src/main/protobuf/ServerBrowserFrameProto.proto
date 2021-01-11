@@ -37,4 +37,5 @@ message ServerToBrowserFrameMsgOutProto {
 message ConnectionInfoMsgOutProto {
 	optional string serverId = 1;
 	optional string sessionPoolId = 2;
+	optional bool autoLogout = 3;
 }

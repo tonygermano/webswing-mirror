@@ -149,6 +149,7 @@ message WindowEventMsgInProto {
 message AudioEventMsgInProto {
 	optional string id = 1;
 	optional bool stop = 2;
+	optional bool ping = 3;
 }
 
 message ActionEventMsgInProto {

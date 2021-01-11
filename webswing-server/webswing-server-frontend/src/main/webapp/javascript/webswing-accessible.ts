@@ -575,7 +575,11 @@ function handleTextbox(accessible: AccessibleMsg) {
 		}
 
 		el.attr("aria-multiline", 'false');
-		(el[0] as HTMLInputElement).value = accessible.text!;
+		let accessibleText = " ";
+		if (accessible.text && accessible.text.length) {
+			accessibleText = accessible.text;
+		}
+		(el[0] as HTMLInputElement).value = accessibleText;
 	}
 
 	if (accessible.rows) {

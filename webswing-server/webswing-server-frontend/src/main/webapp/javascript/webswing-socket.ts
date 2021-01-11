@@ -25,7 +25,8 @@ export interface ISocketService {
     'socket.sendSimpleEvent': (event: SimpleEventMessage) => void,
     'socket.instanceId': () => string | undefined,
     'socket.awaitResponse': (callback: (result: JsResultMsgOrError) => void, request: AppFrameIn, correlationId: string, timeout: number) => void,
-    'socket.dispose': () => void
+    'socket.dispose': () => void,
+    'socket.isAutoLogout': () => boolean
 }
 
 export type AppFrame = AppFrameOut
@@ -45,9 +46,11 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
     
     private maxRetries = 1;
     private retryNumber = 0;
+    private socketOpen: boolean = false;
 
     private socket?: WebSocket;
     private instanceId?: string;
+    private autoLogout: boolean | null = null;
     private responseHandlers: { [K: string]: (result: JsResultMsgOrError) => void } = {};
 
     public provides() {
@@ -60,7 +63,8 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
             'socket.sendSimpleEvent': this.sendSimpleEvent,
             'socket.instanceId': this.getInstanceId,
             'socket.awaitResponse': this.awaitResponse,
-            'socket.dispose': this.dispose
+            'socket.dispose': this.dispose,
+            'socket.isAutoLogout': this.isAutoLogout
         }
     }
 
@@ -69,7 +73,7 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
     }
 
     public dispose() {
-        if (this.socket) {
+        if (this.socket && !this.socketOpen) {
             this.socket.close(1000, "Disconnecting instance.");
         }
         this.socket = undefined;
@@ -125,12 +129,13 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
 
     private sendAppFrame(appFrameProto: serverBrowserFrameProto.BrowserToServerFrameMsgInProto) {
         if (this.socket && this.socket != null) {
-            if (this.socket.readyState === this.socket.OPEN) {
+            if (this.socketOpen) {
                 const appFrame = serverBrowserFrameProto.BrowserToServerFrameMsgInProto.encode(appFrameProto).finish();
-                this.socket.send(typedArrayToBuffer(appFrame));
+                this.sendAppFrameInternal(appFrame);
             } else {
                 if (this.api.currentDialog() === this.api.dialogs.sessionStolenNotification
-                    || this.api.currentDialog() === this.api.dialogs.disconnectedDialog) {
+                    || this.api.currentDialog() === this.api.dialogs.disconnectedDialog
+                    || this.api.currentDialog() === this.api.dialogs.reconnectingDialog) {
                     return;
                 } else {
                     this.api.showDialog(this.api.dialogs.disconnectedDialog);
@@ -139,8 +144,29 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
         }
     }
 
+    private sendAppFrameInternal(appFrame: Uint8Array) {
+        if (this.socket) {
+            switch (this.socket.readyState) {
+                case this.socket.OPEN:
+                    this.socket.send(typedArrayToBuffer(appFrame));
+                    break;
+                case this.socket.CONNECTING:
+                    setTimeout(() => {
+                        this.sendAppFrameInternal(appFrame);
+                    }, 10);
+                    break;
+                default:
+                    // ignore
+                    break;
+            }
+        }
+    }
+
     private connectWebSocket() {
-        const connectionUrl = fixConnectionUrl(this.api.cfg.connectionUrl);
+        let connectionUrl = fixConnectionUrl(this.api.cfg.connectionUrl);
+        if (this.api.cfg.mirror) {
+            connectionUrl = fixConnectionUrl(this.api.cfg.mirrorConnectionUrl!);
+        }
         const wsBaseUrl = connectionUrl.replace(/(http)(s)?\:\/\//, "ws$2://");
         let url = wsBaseUrl + 'async/swing-bin';
         if (this.api.cfg.recordingPlayback) {
@@ -161,12 +187,16 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
         if (this.api.cfg.debugPort != null) {
         	url += "&X-webswing-debugPort=" + encodeURIComponent(this.api.cfg.debugPort);
         }
+        if (this.api.cfg.mirror) {
+        	url += "&X-webswing-instanceId=" + encodeURIComponent(this.api.cfg.clientId!);
+        }
 
         this.socket = new WebSocket(url);
         this.socket.binaryType = "arraybuffer";
 
         this.socket.onopen = () => {
             // empty
+            this.socketOpen = true;
         };
         
         this.socket.onmessage = (event) => {
@@ -179,6 +209,7 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
                 if (frame.connectionInfo != null) {
                     // tslint:disable-next-line: no-console
                     console.log("Connected to server [" + frame.connectionInfo.serverId + "] and session pool [" + frame.connectionInfo.sessionPoolId + "].")
+                    this.autoLogout = frame.connectionInfo.autoLogout!;
                 }
 
                 if (frame.appFrameMsgOut && frame.appFrameMsgOut != null) {
@@ -208,7 +239,11 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
             }
         };
 
-        this.socket.onclose = () => {
+        this.socket.onclose = (_event) => {
+            this.socketOpen = false;
+            
+            this.autoLogout = null;
+
             if (this.api.currentDialog() === this.api.dialogs.stoppedDialog || this.api.currentDialog() === this.api.dialogs.timedoutDialog
                 || this.api.currentDialog() === this.api.dialogs.sessionStolenNotification) {
                 return;
@@ -223,12 +258,12 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
                 this.retryNumber = 0;
             } else {
                 this.api.showDialog(this.api.dialogs.reconnectingDialog);
-                this.api.reTrySession();
                 this.retryNumber++;
+                this.api.reTrySession();
             }
         };
 
-        this.socket.onerror = () => {
+        this.socket.onerror = (_event) => {
             this.api.showDialog(this.api.dialogs.connectionErrorDialog);
         };
     }
@@ -243,6 +278,10 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
         const data: SocketFrameMessage = serverBrowserFrameProto.ServerToBrowserFrameMsgOutProto.toObject(proto);
         
         return data;
+    }
+
+    private isAutoLogout() {
+        return this.autoLogout !== null && this.autoLogout;
     }
 }
 

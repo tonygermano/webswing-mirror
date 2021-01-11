@@ -125,8 +125,9 @@ public abstract class AbstractSecurityModule<T extends WebswingSecurityModuleCon
 			AuthenticatedWebswingUser user = authenticate(request);
 			if (user != null) {
 				postVerify(user, request, response);
+				user= decorateUser(user, request, response);
 				onAuthenticationSuccess(user, request, response, securedPath);
-				return decorateUser(user, request, response);
+				return user;
 			}
 			onAuthenticationFailed(request, response, null);
 		} catch (WebswingAuthenticationException e) {

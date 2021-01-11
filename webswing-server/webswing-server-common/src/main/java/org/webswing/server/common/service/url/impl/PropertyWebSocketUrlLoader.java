@@ -27,10 +27,6 @@ public class PropertyWebSocketUrlLoader implements WebSocketUrlLoader {
 	}
 
 	@Override
-	public void initialize() {
-	}
-
-	@Override
 	public Set<String> reload() {
 		reloadPropertyFile();
 		

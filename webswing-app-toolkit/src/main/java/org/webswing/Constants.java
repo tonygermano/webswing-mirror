@@ -44,7 +44,7 @@ public interface Constants {
 	String SWING_START_SYS_PROP_WAIT_FOR_EXIT = "webswing.waitForExit";
 	int SWING_START_SYS_PROP_WAIT_FOR_EXIT_DEFAULT = 30000;
 	String LAST_HEARTBEAT_BEFORE_SHUTDOWN = "webswing.heartbeatTimeout";
-	long LAST_HEARTBEAT_BEFORE_SHUTDOWN_DEFAULT = TimeUnit.SECONDS.toMillis(5);
+	long LAST_HEARTBEAT_BEFORE_SHUTDOWN_DEFAULT = TimeUnit.SECONDS.toMillis(10);
 	String SWING_START_SYS_PROP_DOUBLE_CLICK_DELAY = "webswing.doubleClickMaxDelay";
 	String SWING_START_SYS_PROP_INITIAL_URL = "webswing.initialUrl";
 	String SWING_START_SYS_PROP_CLASS_MODIFICATION_BLACKLIST = "webswing.classModificationBlacklist";
@@ -170,6 +170,7 @@ public interface Constants {
 	String HTTP_ATTR_ARGS = "X-webswing-args";
 	String HTTP_ATTR_DEBUG_PORT = "X-webswing-debugPort";
 	String HTTP_ATTR_TOKEN = "X-webswing-token";
+	String HTTP_ATTR_INSTANCE_ID = "X-webswing-instanceId";
 	String HTTP_PARAM_SECURITY_TOKEN_HEADER = "securityToken";
 
 	//integration-branding
@@ -264,4 +265,10 @@ public interface Constants {
 	String JWT_ADMIN_CONSOLE_ACCESSID_EXPIRATION = "webswing.jwt.adminConsole.accessId.expiration";
 	long JWT_ADMIN_CONSOLE_ACCESSID_EXPIRATION_DEFAULT = TimeUnit.MINUTES.toMillis(5);
 
+	// audio
+	String AUDIO_CHECKER_INTERVAL_SECONDS = "webswing.audio.checker.interval";
+	long AUDIO_CHECKER_INTERVAL_SECONDS_DEFAULT = 3;
+	String AUDIO_PLAYBACK_TIMEOUT = "webswing.audio.playback.timeout";
+	long AUDIO_PLAYBACK_TIMEOUT_DEFAULT = TimeUnit.SECONDS.toMillis(10);
+	
 }

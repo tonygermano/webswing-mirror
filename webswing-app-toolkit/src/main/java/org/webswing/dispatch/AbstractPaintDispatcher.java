@@ -72,6 +72,8 @@ import org.webswing.util.CpuMonitor;
 import org.webswing.util.DeamonThreadFactory;
 
 public abstract class AbstractPaintDispatcher implements PaintDispatcher {
+	private static final long AUDIO_PLAYBACK_TIMEOUT = Long.getLong(Constants.AUDIO_PLAYBACK_TIMEOUT, Constants.AUDIO_PLAYBACK_TIMEOUT_DEFAULT);
+	
 	private volatile Map<String, Set<Rectangle>> areasToUpdate = new HashMap<>();
 	private volatile FocusEventMsgOut focusEvent;
 	private volatile AccessibilityMsgOut accessible;
@@ -81,6 +83,7 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 	private JFileChooser fileChooserDialog;
 	private JDialog clipboardDialog;
 	private ScheduledExecutorService executorService;
+	private ScheduledExecutorService audioChecker;
 
 	private Object accessibilityLock = new Object();
 	private boolean accessibilityUpdateScheduled;
@@ -94,6 +97,31 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 	private WeakHashMap<String, WeakReference<AudioClip>> registeredAudioClips = new WeakHashMap<>();
 	private SecondaryLoop clipboardDialogLoop;
 
+	public AbstractPaintDispatcher() {
+		Runnable audioCheckerTask = () -> {
+			try {
+				synchronized (registeredAudioClips) {
+					for (WeakReference<AudioClip> wr : registeredAudioClips.values()) {
+						if (wr != null && wr.get() != null) {
+							AudioClip clip = wr.get();
+							long lastPlaybackTimestamp = clip.getLastPlaybackTimestamp();
+							if (lastPlaybackTimestamp > 0) {
+								// if marked as playing in browser, check the last ping is within a timeout
+								if (lastPlaybackTimestamp + AUDIO_PLAYBACK_TIMEOUT < System.currentTimeMillis()) {
+									clip.notifyPlaybackStopped();
+								}
+							}
+						}
+					}
+				}
+			} catch (Exception e) {
+				AppLogger.error("Failed to check running audio clips!", e);
+			}
+		};
+		long audioCheckerInterval = Long.getLong(Constants.AUDIO_CHECKER_INTERVAL_SECONDS, Constants.AUDIO_CHECKER_INTERVAL_SECONDS_DEFAULT);
+		getAudioChecker().scheduleWithFixedDelay(audioCheckerTask, audioCheckerInterval, audioCheckerInterval, TimeUnit.SECONDS);
+	}
+	
 	public void clientReadyToReceive() {
 		synchronized (webPaintLock) {
 			clientReadyToReceive.set(true);
@@ -424,6 +452,7 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 		sendObject(msgOut, null);
 		
 		getExecutorService().shutdownNow();
+		getAudioChecker().shutdownNow();
 	}
 
 	public void notifyUrlRedirect(String url) {
@@ -494,6 +523,13 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 			this.executorService = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance("Webswing Paint Dispatcher"));
 		}
 		return this.executorService;
+	}
+	
+	protected ScheduledExecutorService getAudioChecker() {
+		if (this.audioChecker == null) {
+			this.audioChecker = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance("Webswing Audio Checker"));
+		}
+		return this.audioChecker;
 	}
 
 	protected void sendObject(AppToServerFrameMsgOut msgOut, AppFrameMsgOut frame) {
@@ -849,7 +885,9 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 		
 		sendObject(msgOut, f);
 
-		registeredAudioClips.remove(clip.getId());
+		synchronized (registeredAudioClips) {
+			registeredAudioClips.remove(clip.getId());
+		}
 	}
 	
 	public void notifyThreadDumpCreated(String reason) {
@@ -910,24 +948,29 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 		
 		sendObject(msgOut, f);
 	}
+	
 	private void registerAudioClip(AudioClip clip) {
-		if (!registeredAudioClips.containsKey(clip.getId())) {
-			registeredAudioClips.put(clip.getId(), new WeakReference<AudioClip>(clip));
-			return;
-		}
-
-		WeakReference<AudioClip> wr = registeredAudioClips.get(clip.getId());
-		if (wr == null || wr.get() == null) {
-			registeredAudioClips.put(clip.getId(), new WeakReference<AudioClip>(clip));
+		synchronized (registeredAudioClips) {
+			if (!registeredAudioClips.containsKey(clip.getId())) {
+				registeredAudioClips.put(clip.getId(), new WeakReference<AudioClip>(clip));
+				return;
+			}
+			
+			WeakReference<AudioClip> wr = registeredAudioClips.get(clip.getId());
+			if (wr == null || wr.get() == null) {
+				registeredAudioClips.put(clip.getId(), new WeakReference<AudioClip>(clip));
+			}
 		}
 	}
 
 	public AudioClip findAudioClip(String id) {
-		WeakReference<AudioClip> wr = registeredAudioClips.get(id);
-		if (wr != null && wr.get() != null) {
-			return wr.get();
+		synchronized (registeredAudioClips) {
+			WeakReference<AudioClip> wr = registeredAudioClips.get(id);
+			if (wr != null && wr.get() != null) {
+				return wr.get();
+			}
+			return null;
 		}
-		return null;
 	}
 
 	public void registerFileChooserWindows(JFileChooser chooser, Window parent) {

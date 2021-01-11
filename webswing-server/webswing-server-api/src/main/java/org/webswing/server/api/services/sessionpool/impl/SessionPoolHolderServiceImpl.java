@@ -26,6 +26,7 @@ import org.webswing.model.adminconsole.in.GetInstanceCountsStatsWarningsMsgIn;
 import org.webswing.model.adminconsole.in.GetMetaMsgIn;
 import org.webswing.model.adminconsole.in.GetSwingSessionsMsgIn;
 import org.webswing.model.adminconsole.in.GetThreadDumpMsgIn;
+import org.webswing.model.adminconsole.in.MirrorFrameMsgIn;
 import org.webswing.model.adminconsole.in.RequestThreadDumpMsgIn;
 import org.webswing.model.adminconsole.in.ResolveConfigMsgIn;
 import org.webswing.model.adminconsole.in.SaveConfigMsgIn;
@@ -70,7 +71,10 @@ import org.webswing.server.api.services.swinginstance.ConnectedSwingInstance;
 import org.webswing.server.api.services.swinginstance.SwingInstanceInfo;
 import org.webswing.server.api.services.websocket.AdminConsoleWebSocketConnection;
 import org.webswing.server.api.services.websocket.ApplicationWebSocketConnection;
-import org.webswing.server.api.services.websocket.BrowserWebSocketConnection;
+import org.webswing.server.api.services.websocket.MirrorWebSocketConnection;
+import org.webswing.server.api.services.websocket.PrimaryWebSocketConnection;
+import org.webswing.server.api.services.websocket.WebSocketService;
+import org.webswing.server.api.services.websocket.impl.AdminConsoleBrowserMirrorWebSocketConnectionImpl;
 import org.webswing.server.common.datastore.WebswingDataStoreModule;
 import org.webswing.server.common.model.SecuredPathConfig;
 import org.webswing.server.common.model.SecuredPathConfig.SessionMode;
@@ -99,17 +103,19 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 	private static final long SYNC_MESSAGE_TIMEOUT = TimeUnit.SECONDS.toMillis(3);
 
 	private final GlobalUrlHandler globalHandler;
+	private final WebSocketService webSocketService;
 
 	private LoadBalanceResolver loadBalanceResolver = new RoundRobinLoadBalanceResolver();
 
 	private Map<String, ServerSessionPoolConnector> sessionPools = Collections.synchronizedMap(new HashMap<>());
 	private AdminConsoleWebSocketConnection adminConsole;
 	
-	private Map<String, BrowserWebSocketConnection> reconnectWaiting = Collections.synchronizedMap(new HashMap<>());
+	private Map<String, PrimaryWebSocketConnection> reconnectWaiting = Collections.synchronizedMap(new HashMap<>());
 
 	@Inject
-	public SessionPoolHolderServiceImpl(GlobalUrlHandler globalHandler) {
+	public SessionPoolHolderServiceImpl(GlobalUrlHandler globalHandler, WebSocketService webSocketService) {
 		this.globalHandler = globalHandler;
+		this.webSocketService = webSocketService;
 	}
 
 	@Override
@@ -163,6 +169,11 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 	@Override
 	public void unregisterAdminConsole(AdminConsoleWebSocketConnection connection) {
 		adminConsole = null;
+		
+		// disconnect all mirror connections
+		for (ServerSessionPoolConnector pool : sessionPools.values()) {
+			pool.getAllConnectedInstances().forEach(instance -> instance.disconnectMirroredWebSession(false));
+		}
 	}
 
 	@Override
@@ -365,6 +376,27 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 				if (swingManager.isEnabled()) {
 					swingManager.disable();
 				}
+			} else if (frame.getMirrorFrame() != null) {
+				MirrorFrameMsgIn mirror = frame.getMirrorFrame();
+				
+				ConnectedSwingInstance instance = findInstanceByInstanceId(mirror.getInstanceId());
+				
+				if (instance == null) {
+					log.error("Could not find instance [" + mirror.getInstanceId() + "] for mirror connection message!");
+				} else {
+					if (mirror.isConnect()) {
+						try {
+							MirrorWebSocketConnection mirrorConn = new AdminConsoleBrowserMirrorWebSocketConnectionImpl(this, webSocketService, instance, mirror.getSessionId(), mirror.getToken());
+							instance.connectMirroredWebSession(mirrorConn);
+						} catch (Exception e) {
+							log.error("Error connecting mirror!", e);
+						}
+					} else if (mirror.isDisconnect()) {
+						instance.disconnectMirroredWebSession(mirror.getSessionId(), true);
+					} else {
+						instance.handleBrowserMirrorMessage(mirror.getFrame());
+					}
+				}
 			}
 		} catch (WsException e) {
 			log.error("Error while handling message from admin console!", e);
@@ -384,6 +416,11 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 		adminConsole.sendMessage(msgOut);
 		
 		return true;
+	}
+	
+	@Override
+	public AdminConsoleWebSocketConnection getAdminConsoleConnection() {
+		return adminConsole;
 	}
 	
 	private AccessTokenCreatedMsgOut createAdminConsoleAccessToken(String acLoginToken, String accessId, String servletPrefix) {
@@ -573,7 +610,7 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 		if (reconnect) {
 			// FIXME reconnect flag may not be necessary, we could only rely on finding a browser connection in reconnectWaiting
 			synchronized (reconnectWaiting) {
-				BrowserWebSocketConnection browserConnection = reconnectWaiting.remove(instanceId);
+				PrimaryWebSocketConnection browserConnection = reconnectWaiting.remove(instanceId);
 				if (browserConnection == null || browserConnection.getReconnectHandshake() == null) {
 					log.error("Could not find browser websocket connection waiting for reconnect of instance [" + instanceId + "]! Disconnecting..");
 					return false;
@@ -603,7 +640,7 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 	}
 	
 	@Override
-	public void registerReconnect(String instanceId, BrowserWebSocketConnection r) {
+	public void registerReconnect(String instanceId, PrimaryWebSocketConnection r) {
 		synchronized (reconnectWaiting) {
 			if (!reconnectWaiting.containsKey(instanceId)) {
 				reconnectWaiting.put(instanceId, r);
@@ -622,9 +659,9 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 	}
 	
 	@Override
-	public void unregisterReconnect(BrowserWebSocketConnection r) {
+	public void unregisterReconnect(PrimaryWebSocketConnection r) {
 		synchronized (reconnectWaiting) {
-			Iterator<Entry<String, BrowserWebSocketConnection>> it = reconnectWaiting.entrySet().iterator();
+			Iterator<Entry<String, PrimaryWebSocketConnection>> it = reconnectWaiting.entrySet().iterator();
 			while (it.hasNext()) {
 				if (it.next().getValue() == r) {
 					it.remove();
@@ -645,33 +682,31 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 	}
 
 	@Override
-	public void connectView(String path, ConnectionHandshakeMsgIn handshake, BrowserWebSocketConnection r, SwingInstanceInfo instanceInfo) throws WsException {
+	public void connectView(String path, ConnectionHandshakeMsgIn handshake, PrimaryWebSocketConnection r, SwingInstanceInfo instanceInfo) throws WsException {
 		SecuredPathConfig config = instanceInfo.getConfig();
 		
-		if (!handshake.isMirrored()) {
-			// check if there is a room for another instance
-			int maxClients = instanceInfo.getConfig().getMaxClients();
-			if (maxClients >= 0) {
-				int runningConnectedInstances = (int) sessionPools.values().stream()
-						.map(sp -> sp.getInstancesRunningAndConnectedInSessionPool(path))
-						.collect(Collectors.summarizingInt(i -> i)).getSum();
-				if (runningConnectedInstances >= maxClients) {
-					r.sendMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
-					return;
-				}
+		if (handshake.isMirrored()) {
+			throw new WsException("Direct mirror connection is not allowed!");
+		}
+		
+		// check if there is a room for another instance
+		int maxClients = instanceInfo.getConfig().getMaxClients();
+		if (maxClients >= 0) {
+			int runningConnectedInstances = (int) sessionPools.values().stream()
+					.map(sp -> sp.getInstancesRunningAndConnectedInSessionPool(path))
+					.collect(Collectors.summarizingInt(i -> i)).getSum();
+			if (runningConnectedInstances >= maxClients) {
+				r.sendMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
+				return;
 			}
 		}
 		
 		if (!connectSwingInstance(path, r, handshake, config.getSessionMode(), config.isAllowStealSession())) {
-			if (handshake.isMirrored()) {
-				throw new WsException("Instance not found!");
-			} else {
-				startSwingInstance(path, r, handshake, instanceInfo);
-			}
+			startSwingInstance(path, r, handshake, instanceInfo);
 		}
 	}
 
-	private boolean connectSwingInstance(String path, BrowserWebSocketConnection r, ConnectionHandshakeMsgIn h, SessionMode sessionMode, boolean stealSessionAllowed) throws WsException {
+	private boolean connectSwingInstance(String path, PrimaryWebSocketConnection r, ConnectionHandshakeMsgIn h, SessionMode sessionMode, boolean stealSessionAllowed) throws WsException {
 		for (ServerSessionPoolConnector pool : sessionPools.values()) {
 			if (pool.tryConnectSwingInstance(path, r, h, sessionMode, stealSessionAllowed)) {
 				return true;
@@ -680,14 +715,13 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 		return false;
 	}
 
-	private void startSwingInstance(String path, BrowserWebSocketConnection r, ConnectionHandshakeMsgIn h, SwingInstanceInfo instanceInfo) throws WsException {
+	private void startSwingInstance(String path, PrimaryWebSocketConnection r, ConnectionHandshakeMsgIn h, SwingInstanceInfo instanceInfo) throws WsException {
+		if (h.isMirrored()) {
+			throw new WsException("Direct mirror connection is not allowed!");
+		}
+		
 		if (!r.hasPermission(WebswingAction.websocket_startSwingApplication)) {
 			throw new WsException("Authorization error: User " + r.getUser() + " is not authorized to connect to application " + instanceInfo.getConfig().getName() + (h.isMirrored() ? " [Mirrored view only available for admin role]" : ""));
-		}
-
-		if (h.isMirrored()) {
-			r.sendMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
-			return;
 		}
 
 		try {
@@ -699,7 +733,7 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 		}
 	}
 
-	private boolean createInstance(String path, ConnectionHandshakeMsgIn h, BrowserWebSocketConnection r, SwingInstanceInfo instanceInfo) throws WsException {
+	private boolean createInstance(String path, ConnectionHandshakeMsgIn h, PrimaryWebSocketConnection r, SwingInstanceInfo instanceInfo) throws WsException {
 		ServerSessionPoolConnector pool = loadBalanceResolver.resolveLoadBalance(path, instanceInfo.getConfig());
 
 		if (pool == null) {

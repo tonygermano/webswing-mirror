@@ -6,7 +6,7 @@ import org.webswing.server.api.base.WebswingService;
 import org.webswing.server.api.services.swinginstance.SwingInstanceInfo;
 import org.webswing.server.api.services.websocket.AdminConsoleWebSocketConnection;
 import org.webswing.server.api.services.websocket.ApplicationWebSocketConnection;
-import org.webswing.server.api.services.websocket.BrowserWebSocketConnection;
+import org.webswing.server.api.services.websocket.PrimaryWebSocketConnection;
 import org.webswing.server.common.datastore.WebswingDataStoreModule;
 import org.webswing.server.model.exception.WsException;
 
@@ -24,15 +24,15 @@ public interface SessionPoolHolderService extends WebswingService {
 	
 	boolean connectApplication(ApplicationWebSocketConnection connection, boolean reconnect);
 	
-	void registerReconnect(String instanceId, BrowserWebSocketConnection r);
+	void registerReconnect(String instanceId, PrimaryWebSocketConnection r);
 	
-	void unregisterReconnect(BrowserWebSocketConnection r);
+	void unregisterReconnect(PrimaryWebSocketConnection r);
 	
 	void destroy(String path);
 	
 	void killAll(String path);
 	
-	void connectView(String path, ConnectionHandshakeMsgIn handshake, BrowserWebSocketConnection r, SwingInstanceInfo instanceInfo) throws WsException;
+	void connectView(String path, ConnectionHandshakeMsgIn handshake, PrimaryWebSocketConnection r, SwingInstanceInfo instanceInfo) throws WsException;
 	
 	void logStatValue(String instanceId, String path, String metric, Number value);
 	
@@ -45,5 +45,7 @@ public interface SessionPoolHolderService extends WebswingService {
 	WebswingDataStoreModule getDataStore(String path);
 
 	boolean issueAdminConsoleAccessToken(String accessId, String acLoginToken, String servletPrefix);
+	
+	AdminConsoleWebSocketConnection getAdminConsoleConnection();
 	
 }
