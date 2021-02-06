@@ -2,12 +2,12 @@ package org.webswing.server.common.service.startup.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
 import org.webswing.server.common.service.startup.Initializer;
+import org.webswing.server.common.util.CommonUtil;
 import org.webswing.server.model.exception.WsInitException;
 
 import main.Main;
@@ -67,31 +67,8 @@ public class DefaultInitializer implements Initializer {
 	}
 	
 	protected void validatePropertyFilePathOptional(String propertyName, String defaultValue) throws FileNotFoundException {
-		String configFilePath = getValidURI(System.getProperty(propertyName, defaultValue));
+		String configFilePath = CommonUtil.getValidURI(System.getProperty(propertyName, defaultValue));
 		System.setProperty(propertyName, configFilePath);
 	}
 
-	public static String getValidURI(String pathOrUri) throws FileNotFoundException {
-		if (pathOrUri != null) {
-			try {
-				URI uri = URI.create(pathOrUri);
-				if (new File(uri).exists()) {
-					return pathOrUri;
-				} else {
-					throw new FileNotFoundException("File " + uri.toString() + "not found.");
-				}
-			} catch (IllegalArgumentException e) {
-				File relativeConfigFile = new File(Main.getConfigProfileDir(), pathOrUri);
-				File absoluteConfigFile = new File(pathOrUri);
-				if (relativeConfigFile.exists()) {
-					return relativeConfigFile.toURI().toString();
-				} else if (absoluteConfigFile.exists()) {
-					return absoluteConfigFile.toURI().toString();
-				} else {
-					throw new FileNotFoundException("File " + relativeConfigFile.getAbsolutePath() + " or " + absoluteConfigFile.getAbsolutePath() + " not found.");
-				}
-			}
-		}
-		throw new FileNotFoundException("Path not specified.");
-	}
 }

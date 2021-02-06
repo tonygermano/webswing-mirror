@@ -17,7 +17,7 @@ public class StaticWebSocketUrlLoader implements WebSocketUrlLoader {
 	public Set<String> reload() {
 		synchronized (webSocketUrls) {
 			webSocketUrls.clear();
-			String urls = System.getProperty(Constants.WEBSWING_SERVER_WEBSOCKET_URL, "");
+			String urls = System.getProperty(Constants.SERVER_WEBSOCKET_URL, "");
 			Splitter.on(',').trimResults().omitEmptyStrings().split(urls).forEach(url -> {
 				if (url.endsWith("/")) {
 					url = url.substring(0, url.length() - 1);

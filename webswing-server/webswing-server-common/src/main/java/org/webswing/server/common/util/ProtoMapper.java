@@ -160,7 +160,7 @@ public class ProtoMapper {
 				for (Field field : fields) {
 					field.setAccessible(true);
 					Object value = field.get(msg);
-					if (Modifier.isStatic(field.getModifiers()) || value == null) {
+					if (Modifier.isStatic(field.getModifiers()) || value == null || Modifier.isTransient(field.getModifiers())) {
 						continue;
 					}
 					String fieldName = field.getName();

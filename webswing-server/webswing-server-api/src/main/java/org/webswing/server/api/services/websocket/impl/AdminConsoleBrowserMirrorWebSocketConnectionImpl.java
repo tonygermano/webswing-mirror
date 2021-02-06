@@ -83,7 +83,7 @@ public class AdminConsoleBrowserMirrorWebSocketConnectionImpl implements MirrorW
 	public void sendMessage(ServerToBrowserFrameMsgOut msgOut) {
 		AdminConsoleWebSocketConnection ac = sessionPoolService.getAdminConsoleConnection();
 		if (ac == null || !ac.isConnected()) {
-			log.error("Cannot send mirror message to admin console, not connected [" + getInstanceId() + "]!");
+			log.debug("Cannot send mirror message to admin console, not connected [" + getInstanceId() + "]!");
 			return;
 		}
 		

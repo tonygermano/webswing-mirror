@@ -341,22 +341,28 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 				this.api.disconnect();
 			} else if (data.event === SimpleEvent.applicationAlreadyRunning) {
 				this.api.showDialog(this.api.dialogs.applicationAlreadyRunning);
+				this.api.disconnect();
 			} else if (data.event === SimpleEvent.tooManyClientsNotification) {
 				this.api.showDialog(this.api.dialogs.tooManyClientsNotification);
+				this.api.disconnect();
 			} else if (data.event === SimpleEvent.continueOldSession) {
 				this.continueSession();
 				const oldBarContent = this.api.dialogBarContent();
 				this.api.showDialogBar(this.api.dialogs.continueOldSessionDialog);
-				this.api.dialogBarContent()!.focused = false;
-				window.setTimeout(() => {
-					const content = this.api.dialogBarContent();
-					if (content && !content.focused) {
-						this.api.hideDialogBar();
-						if (oldBarContent) {
-							this.api.showDialogBar(oldBarContent);
+				let contentBar = this.api.dialogBarContent();
+				if(contentBar){//can be null if customization removes continueOldSessionDialog content
+					contentBar.focused = false;
+					window.setTimeout(() => {
+						const content = this.api.dialogBarContent();
+						if (content && !content.focused) {
+							this.api.hideDialogBar();
+							if (oldBarContent) {
+								this.api.showDialogBar(oldBarContent);
+							}
 						}
-					}
-				}, 5000);
+					}, 5000);
+				}
+
 			} else if (data.event === SimpleEvent.sessionStolenNotification) {
 				this.api.cfg.canPaint = false;
 				this.api.showDialog(this.api.dialogs.sessionStolenNotification);
@@ -1807,7 +1813,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 			window.name = 'tid_' + GUID();
 		}
 		const handshake: commonProto.IConnectionHandshakeMsgInProto = {
-			clientId: this.api.cfg.clientId,
+			instanceId: this.api.getInstanceId(),
 			browserId: this.api.cfg.browserId,
 			viewId: this.api.cfg.viewId,
 			tabId: window.name,
@@ -1827,8 +1833,6 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 			handshake.params = this.api.cfg.params;
 			handshake.desktopWidth = desktopSize.width;
 			handshake.desktopHeight = desktopSize.height;
-			
-			// TODO add socket.instanceId as handshake.reconnectId -> try reconnect instance with that id
 		}
 		return handshake;
 	}

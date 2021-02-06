@@ -34,6 +34,8 @@ public abstract class Configuration {
 
     public abstract String getContextPath();
 
+    public abstract String getServerId();
+
     public static Configuration getInstance() {
         return singleton;
     }

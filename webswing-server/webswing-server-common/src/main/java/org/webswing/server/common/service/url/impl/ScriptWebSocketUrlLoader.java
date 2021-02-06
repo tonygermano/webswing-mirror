@@ -22,6 +22,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
 import main.Main;
+import org.webswing.server.common.util.CommonUtil;
 
 public class ScriptWebSocketUrlLoader implements WebSocketUrlLoader {
 	
@@ -44,7 +45,7 @@ public class ScriptWebSocketUrlLoader implements WebSocketUrlLoader {
 		
 		synchronized (webSocketUrls) {
 			webSocketUrls.clear();
-			String urls = System.getProperty(Constants.WEBSWING_SERVER_WEBSOCKET_URL, "");
+			String urls = System.getProperty(Constants.SERVER_WEBSOCKET_URL, "");
 			Splitter.on(',').trimResults().omitEmptyStrings().split(urls).forEach(url -> {
 				if (url.endsWith("/")) {
 					url = url.substring(0, url.length() - 1);
@@ -100,7 +101,7 @@ public class ScriptWebSocketUrlLoader implements WebSocketUrlLoader {
 			log.error("Error while executing websocket url loader script!", e);
 		}
 		
-		System.setProperty(Constants.WEBSWING_SERVER_WEBSOCKET_URL, urls);
+		System.setProperty(Constants.SERVER_WEBSOCKET_URL, urls);
 	}
 	
 	private boolean isRunning() {
@@ -116,27 +117,11 @@ public class ScriptWebSocketUrlLoader implements WebSocketUrlLoader {
 	}
 	
 	private String getValidFilePath(String pathOrUri) {
-		if (pathOrUri != null) {
-			try {
-				URI uri = URI.create(pathOrUri);
-				File file = new File(uri);
-				if (file.exists()) {
-					return file.getAbsolutePath();
-				} else {
-					throw new FileNotFoundException("File " + uri.toString() + "not found.");
-				}
-			} catch (Exception e) {
-				File relativeConfigFile = new File(Main.getConfigProfileDir(), pathOrUri);
-				File absoluteConfigFile = new File(pathOrUri);
-				if (relativeConfigFile.exists()) {
-					return relativeConfigFile.getAbsolutePath();
-				} else if (absoluteConfigFile.exists()) {
-					return absoluteConfigFile.getAbsolutePath();
-				}
-			}
+		try {
+			return CommonUtil.getValidFile(pathOrUri).getAbsolutePath();
+		} catch (FileNotFoundException e) {
+			return pathOrUri;
 		}
-		
-		return pathOrUri;
 	}
 
 }

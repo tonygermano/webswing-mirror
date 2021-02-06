@@ -224,4 +224,31 @@ public class CommonUtil {
 		}
 		return url;
 	}
+	public static String getValidURI(String pathOrUri) throws FileNotFoundException {
+		return getValidFile(pathOrUri).toURI().toString();
+	}
+
+	public static File getValidFile(String pathOrUri) throws FileNotFoundException {
+		if (pathOrUri != null) {
+			try {
+				URI uri = URI.create(pathOrUri);
+				File urifile = new File(uri);
+				if (urifile.exists()) {
+					return urifile;
+				} else {
+					throw new FileNotFoundException("File " + uri.toString() + "not found.");
+				}
+			} catch (IllegalArgumentException e) {
+				File relativeConfigFile = new File(Main.getConfigProfileDir(), pathOrUri);
+				File absoluteConfigFile = new File(pathOrUri);
+				if (relativeConfigFile.exists()) {
+					return relativeConfigFile;
+				} else if (absoluteConfigFile.exists()) {
+					return absoluteConfigFile;
+				}
+				throw new FileNotFoundException("File " + relativeConfigFile.getAbsolutePath() + " or " + absoluteConfigFile.getAbsolutePath() + " not found.");
+			}
+		}
+		throw new FileNotFoundException("Path not specified.");
+	}
 }

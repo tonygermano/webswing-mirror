@@ -42,7 +42,8 @@ public class ServerMain {
 		boolean isHttpsOnly = config.isHttps() && !config.isHttp();
 		System.setProperty(Constants.HTTPS_ONLY, System.getProperty(Constants.HTTPS_ONLY, ""+isHttpsOnly));
 		System.setProperty(Constants.SERVER_WEBSOCKET_URL, buildWebsocketUrl(config));
-		
+		System.setProperty(Constants.WEBSWING_SERVER_ID, config.getServerId());
+
 		if (config.getConfigFile() != null) {
 			File configFile = new File(config.getConfigFile());
 			if (configFile.exists()) {

@@ -21,12 +21,12 @@ import org.webswing.server.common.util.ConfigUtil;
 import org.webswing.server.common.util.WebswingObjectMapper;
 import org.webswing.server.model.exception.WsException;
 import org.webswing.server.model.exception.WsInitException;
-import org.webswing.util.DeamonThreadFactory;
+import org.webswing.util.NamedThreadFactory;
 
 public abstract class AbstractConfigurationProvider<T> implements ConfigurationProvider<T> {
 	private static final Logger log = LoggerFactory.getLogger(AbstractConfigurationProvider.class);
 
-	private ScheduledExecutorService configReloader = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing Config Monitor"));
+	private ScheduledExecutorService configReloader = Executors.newSingleThreadScheduledExecutor(NamedThreadFactory.getInstance("Webswing Config Monitor"));
 	private Map<String, Object> configuration = new HashMap<String, Object>();
 	private long fileLastModified;
 	private ConfigurationUpdateHandler<T> updateHandler;
@@ -197,7 +197,7 @@ public abstract class AbstractConfigurationProvider<T> implements ConfigurationP
 
 	@Override
 	public void dispose() {
-		configReloader.shutdown();
+		configReloader.shutdownNow();
 	}
 
 	private void reloadConfiguration() throws WsInitException {

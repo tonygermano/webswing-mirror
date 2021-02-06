@@ -66,7 +66,7 @@ public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection 
 	private String path;
 	
 	private ConnectedSwingInstance instance;
-	private Timer pingTimer = new Timer(true);
+	private Timer pingTimer = new Timer("Browser websocket ping-timer",true);
 	
 	private ConnectionHandshakeMsgIn reconnectHandshake;
 
@@ -119,13 +119,12 @@ public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection 
 		pingTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if (session != null) {
-					synchronized (session) {
-						try {
-							session.getBasicRemote().sendPing(ByteBuffer.wrap(Constants.WEBSOCKET_PING_PONG_CONTENT.getBytes(StandardCharsets.UTF_8)));
-						} catch (IllegalArgumentException | IOException e) {
-							log.warn("Could not send ping message for session [" + session.getId() + "]", e);
-						}
+				synchronized (session) {
+					try {
+						session.getBasicRemote().sendPing(ByteBuffer.wrap(Constants.WEBSOCKET_PING_PONG_CONTENT.getBytes(StandardCharsets.UTF_8)));
+					} catch (IllegalArgumentException | IOException e) {
+						log.warn("Could not send ping message for session [" + session.getId() + "]", e.getMessage());
+						log.debug(e.getMessage(), e);
 					}
 				}
 			}
@@ -179,7 +178,7 @@ public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection 
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason) {
 		if (session != null) {
-			log.info("Websocket closed to browser, session [" + session.getId() + "]" 
+			log.info("Websocket to browser closed, session [" + session.getId() + "]"
 					+ (closeReason != null ? ", close code [" + closeReason.getCloseCode().getCode() + "], reason [" + closeReason.getReasonPhrase() + "]!" : ""));
 			if (instance != null) {
 				instance.browserDisconnected(session.getId());
@@ -194,11 +193,8 @@ public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection 
 	
 	@OnError
 	public void onError(Session session, Throwable t) {
-		if (session != null) {
-			log.error("Websocket error in browser connection, session [" + session.getId() + "]!", t);
-		} else {
-			log.error("Websocket error in browser connection, no session!", t);
-		}
+		log.error("Websocket error from browser connection, session [" + (session==null?null:session.getId()) + "], instanceId ["+(instance==null?null:instance.getInstanceId())+"]", t.getMessage());
+		log.debug(t.getMessage(), t);
 	}
 
 	@Override
@@ -207,7 +203,8 @@ public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection 
 			try {
 				session.close(new CloseReason(CloseCodes.NORMAL_CLOSURE, reason));
 			} catch (IOException e) {
-				log.error("Failed to destroy websocket browser connection session [" + session.getId() + "]!", e);
+				log.error("Failed to disconnect browser connection, session [" + session.getId() + "], instanceId ["+(instance==null?null:instance.getInstanceId())+"]", e.getMessage());
+				log.debug(e.getMessage(), e);
 			}
 		}
 		pingTimer.cancel();
@@ -236,7 +233,8 @@ public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection 
 			}
 			sessionPoolHolderService.logStatValue(instance.getInstanceId(), path, StatisticsLogger.OUTBOUND_SIZE_METRIC, encoded.length);
 		} catch (IOException e) {
-			log.error("Error sending msg to browser [" + session.getId() + "]!", e);
+			log.error("Failed to send msg to browser, session ["  + (session==null?null:session.getId()) + "], instanceId ["+(instance==null?null:instance.getInstanceId())+"]", e.getMessage());
+			log.debug(e.getMessage(),e);
 		}
 	}
 	
@@ -294,8 +292,7 @@ public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection 
 	@Override
 	public String getUserId() {
 		AbstractWebswingUser user = getUser();
-		String userId = user != null ? user.getUserId() : "null";
-		return userId;
+		return user != null ? user.getUserId() : "null";
 	}
 
 	@Override

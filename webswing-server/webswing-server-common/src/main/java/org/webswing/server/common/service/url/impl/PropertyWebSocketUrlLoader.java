@@ -32,7 +32,7 @@ public class PropertyWebSocketUrlLoader implements WebSocketUrlLoader {
 		
 		synchronized (webSocketUrls) {
 			webSocketUrls.clear();
-			String urls = System.getProperty(Constants.WEBSWING_SERVER_WEBSOCKET_URL, "");
+			String urls = System.getProperty(Constants.SERVER_WEBSOCKET_URL, "");
 			Splitter.on(',').trimResults().omitEmptyStrings().split(urls).forEach(url -> {
 				if (url.endsWith("/")) {
 					url = url.substring(0, url.length() - 1);
@@ -55,7 +55,7 @@ public class PropertyWebSocketUrlLoader implements WebSocketUrlLoader {
 			log.error("Could not realod properties file!", e);
 		}
 		
-		System.setProperty(Constants.WEBSWING_SERVER_WEBSOCKET_URL, p.getProperty(Constants.WEBSWING_SERVER_WEBSOCKET_URL, ""));
+		System.setProperty(Constants.SERVER_WEBSOCKET_URL, p.getProperty(Constants.SERVER_WEBSOCKET_URL, ""));
 	}
 
 }

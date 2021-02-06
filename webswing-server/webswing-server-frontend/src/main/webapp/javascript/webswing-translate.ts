@@ -51,6 +51,8 @@ export class Translations {
             }
             selector += '</select>'
             this.msg["selector.lang"] = '<span id="selector-label">${selector.lang.label}</span>' + selector;
+        } else {
+            this.msg['selector.lang'] = ''
         }
     }
 

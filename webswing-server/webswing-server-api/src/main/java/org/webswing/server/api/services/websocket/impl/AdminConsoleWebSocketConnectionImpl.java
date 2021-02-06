@@ -68,7 +68,8 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 						try {
 							session.getBasicRemote().sendPing(ByteBuffer.wrap(Constants.WEBSOCKET_PING_PONG_CONTENT.getBytes(StandardCharsets.UTF_8)));
 						} catch (IllegalArgumentException | IOException e) {
-							log.warn("Could not send ping message for session [" + session.getId() + "]", e);
+							log.warn("Could not send ping message for session [" + session.getId() + "]", e.getMessage());
+							log.debug(e.getMessage(),e);
 						}
 					}
 				}
@@ -131,11 +132,8 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 	
 	@OnError
 	public void onError(Session session, Throwable t) {
-		if (session != null) {
-			log.error("Websocket error in admin console connection, session [" + session.getId() + "]!", t);
-		} else {
-			log.error("Websocket error in admin console connection, no session!", t);
-		}
+		log.error("Websocket error from admin console connection, session [" + (session==null?null:session.getId()) + "]", t.getMessage());
+		log.debug(t.getMessage(), t);
 	}
 
 	@Override
@@ -143,7 +141,8 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 		try {
 			super.sendMessage(protoMapper.encodeProto(msgOut));
 		} catch (IOException e) {
-			log.error("Error sending msg to admin console, session [" + session.getId() + "]!", e);
+			log.error("Failed to send msg to admin console, session [" + (session==null?null:session.getId()) + "]!", e.getMessage());
+			log.debug(e.getMessage(),e);
 		}
 	}
 	
@@ -162,7 +161,8 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 			try {
 				session.close(new CloseReason(closeCode, reason));
 			} catch (IOException e) {
-				log.error("Failed to destroy websocket admin console connection session [" + session.getId() + "]!", e);
+				log.error("Failed to disconnect admin console connection session [" + session.getId() + "]!", e.getMessage());
+				log.debug(e.getMessage(),e);
 			}
 		}
 		pingTimer.cancel();

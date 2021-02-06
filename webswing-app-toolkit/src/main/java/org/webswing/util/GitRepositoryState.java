@@ -64,7 +64,7 @@ public class GitRepositoryState {
 					cl=ClassLoader.getSystemClassLoader();
 				}
 				properties.load(cl.getResourceAsStream("git.properties"));
-			} catch (IOException e) {
+			} catch (Exception e) {
 				AppLogger.warn("Failed to load git.properties");
 			}
 			instance = new GitRepositoryState(properties);

@@ -180,7 +180,8 @@ public class ServerConnectionServiceImpl implements ServerConnectionService, Ser
 		
 		// first handle sync messages
 		if ((msgIn.getApiCallResult() != null && msgIn.getApiCallResult().getCorrelationId() != null)
-				|| (frame != null && frame.getJsResponse() != null && frame.getJsResponse().getCorrelationId() != null)) {
+				|| (frame != null && frame.getJsResponse() != null && frame.getJsResponse().getCorrelationId() != null)
+				|| (frame != null && frame.getPixelsResponse() != null && frame.getPixelsResponse().getCorrelationId() != null)) {
 			connection.handleSyncMessageResult(msgIn, frame);
 			return;
 		}

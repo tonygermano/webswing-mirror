@@ -100,8 +100,8 @@ loadTranslations().then(
 
         function show(apps: any, showAdmin: boolean, adminConsoleUrl?: string) {
             let header: any = '<h1 class="ws-selector-title">${selector.welcome} <span>' + user + '</span>${selector.message}</h1>';
-            const links = (showAdmin ? '${selector.lang}  <a href="' + adminConsoleUrl + '" id="admin">${selector.admin}</a> | ' : '') 
-                    + '<a href="javascript: selectorLogout();" id="logout">${selector.logout}</a>';
+            const links = '${selector.lang} '+(showAdmin ? ' <a href="' + adminConsoleUrl + '" id="admin">${selector.admin}</a> | ' : '')
+                 + '<a href="javascript: selectorLogout();" id="logout">${selector.logout}</a>';
             let content;
             $('#commonDialog').addClass('ws-selector')
             if (apps == null || apps.length === 0) {

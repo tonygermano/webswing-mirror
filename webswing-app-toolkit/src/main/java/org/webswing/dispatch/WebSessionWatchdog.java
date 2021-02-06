@@ -18,7 +18,7 @@ import org.webswing.toolkit.api.lifecycle.ShutdownReason;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
 import org.webswing.util.AppLogger;
-import org.webswing.util.DeamonThreadFactory;
+import org.webswing.util.NamedThreadFactory;
 
 public class WebSessionWatchdog implements SessionWatchdog {
 
@@ -26,7 +26,7 @@ public class WebSessionWatchdog implements SessionWatchdog {
 	private static final int SWING_SESSION_TIMEOUT_SEC_IF_FILECHOOSER_ACTIVE = Integer.getInteger(Constants.SWING_SESSION_TIMEOUT_SEC_IF_FILECHOOSER_ACTIVE, Constants.SWING_SESSION_TIMEOUT_SEC_IF_FILECHOOSER_ACTIVE_DEFAULT);
 	private static final int EDT_TIMEOUT_SECONDS = Integer.getInteger(Constants.EDT_TIMEOUT_SECONDS, Constants.EDT_TIMEOUT_SECONDS_DEFAULT);
 	
-	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing Shutdown scheduler"));
+	private ScheduledExecutorService exitScheduler = Executors.newSingleThreadScheduledExecutor(NamedThreadFactory.getInstance("Webswing Shutdown scheduler"));
 
 	private final Object delayedShutdownScheduleLock = new Object();
 	private ScheduledFuture<?> delayedShutdownFuture;

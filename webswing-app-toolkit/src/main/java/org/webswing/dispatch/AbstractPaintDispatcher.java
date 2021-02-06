@@ -69,7 +69,7 @@ import org.webswing.toolkit.util.ToolkitUtil;
 import org.webswing.toolkit.util.Util;
 import org.webswing.util.AppLogger;
 import org.webswing.util.CpuMonitor;
-import org.webswing.util.DeamonThreadFactory;
+import org.webswing.util.NamedThreadFactory;
 
 public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 	private static final long AUDIO_PLAYBACK_TIMEOUT = Long.getLong(Constants.AUDIO_PLAYBACK_TIMEOUT, Constants.AUDIO_PLAYBACK_TIMEOUT_DEFAULT);
@@ -520,14 +520,14 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 
 	protected ScheduledExecutorService getExecutorService(){
 		if(this.executorService==null){
-			this.executorService = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance("Webswing Paint Dispatcher"));
+			this.executorService = Executors.newScheduledThreadPool(1, NamedThreadFactory.getInstance("Webswing Paint Dispatcher"));
 		}
 		return this.executorService;
 	}
 	
 	protected ScheduledExecutorService getAudioChecker() {
 		if (this.audioChecker == null) {
-			this.audioChecker = Executors.newScheduledThreadPool(1, DeamonThreadFactory.getInstance("Webswing Audio Checker"));
+			this.audioChecker = Executors.newScheduledThreadPool(1, NamedThreadFactory.getInstance("Webswing Audio Checker"));
 		}
 		return this.audioChecker;
 	}

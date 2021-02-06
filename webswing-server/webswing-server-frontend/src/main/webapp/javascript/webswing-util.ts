@@ -53,6 +53,7 @@ export function Util(translations: Translations) {
             url: baseUrl + 'login',
             contentType: typeof loginData === 'object' ? 'application/json' : 'application/x-www-form-urlencoded; charset=UTF-8',
             data: typeof loginData === 'object' ? JSON.stringify(loginData) : loginData,
+            timeout: 7000,
             success: (data, _, request) => {
             	if (request.responseText) {
                     saveTokens(request.responseText);
@@ -64,20 +65,24 @@ export function Util(translations: Translations) {
             error: (xhr) => {
                 const response = xhr.responseText;
                 let elementResolved: JQuery<HTMLElement>;
-                
+
                 if (response != null) {
                     // resolve this only if needed because it updates dialog view
                 	if (typeof element === 'function') {
                         elementResolved = element();
                 	} else {
-                        elementResolved = element;   
+                        elementResolved = element;
                     }
-                	
+
                     let loginMsg: ILoginResponse = {};
                     try {
                         loginMsg = JSON.parse(response);
                     } catch (error) {
-                        loginMsg.partialHtml = translate('<p>${login.failedToAuthenticate}</p>');
+                            console.error(error);
+                            if (failedCallback != null) {
+                                failedCallback();
+                            }
+                            return;
                     }
                     if (loginMsg.redirectUrl != null) {
                         window.top.location.href = loginMsg.redirectUrl;
@@ -90,7 +95,10 @@ export function Util(translations: Translations) {
                             event.preventDefault();
                         });
                     } else {
-                        elementResolved.html(translate("<p>${login.unexpectedError}</p>"));
+                            console.error("WebswingLogin: Unexpected response:"+JSON.stringify(loginMsg));
+                            if (failedCallback != null) {
+                                failedCallback();
+                            }
                     }
                 } else {
                 	if (failedCallback != null) {
@@ -99,9 +107,9 @@ export function Util(translations: Translations) {
                 		if (typeof element === 'function') {
                             elementResolved = element();
                         } else {
-                            elementResolved = element;   
+                            elementResolved = element;
                         }
-                	
+
                 		elementResolved.html(translate("<p>${login.serverNotAvailable}</p>"));
                 	}
                 }
@@ -109,10 +117,9 @@ export function Util(translations: Translations) {
         });
     }
 
-    function webswingLogout(baseUrl: string, element: (() => JQuery<HTMLElement>) | JQuery<HTMLElement>, doneCallback: () => void, tabLogout?: boolean) {
+    function webswingLogout(baseUrl: string, element: (() => JQuery<HTMLElement>) | JQuery<HTMLElement>, doneCallback: () => void, failedCallback: () => void, tabLogout?: boolean) {
     	const oldToken = token;
-        clearToken();
-        
+
         $.ajax({
             type: 'GET',
             url: baseUrl + 'logout',
@@ -124,7 +131,8 @@ export function Util(translations: Translations) {
             },
             xhrFields: {
                 withCredentials: true
-            }
+            },
+            timeout: 7000
         }).always((_, _1, xhr) => {
             if (!tabLogout) {
                 localStorage.setItem("webswingLogout", Date.now().toString());
@@ -138,21 +146,27 @@ export function Util(translations: Translations) {
                 elementResolved = element;
             }
             if (response != null) {
+                clearToken();
+
                 let loginMsg: ILoginResponse = {};
                 try {
                     loginMsg = JSON.parse(response);
                 } catch (error) {
-                    doneCallback();
+                    console.error(error);
+                    failedCallback();
+                        return;
                 }
                 if (loginMsg.redirectUrl != null) {
                     window.top.location.href = loginMsg.redirectUrl;
+                        return;
                 } else if (loginMsg.partialHtml != null) {
                     elementResolved.html(translate(loginMsg.partialHtml));
                 } else {
+                        console.error("WebswingLogin: Unexpected response:"+JSON.stringify(loginMsg));
                     doneCallback();
                 }
             } else {
-                elementResolved.html(translate("<p>${login.serverNotAvailable}</p>"));
+                failedCallback();
             }
         });
     }
@@ -167,6 +181,7 @@ export function Util(translations: Translations) {
             },
             type: 'POST',
             url: baseUrl + "rest/refreshToken",
+            timeout: 7000,
             complete: (request, textStatus) => {
             	let success = false;
                 if (textStatus === "success" && request.responseText) {

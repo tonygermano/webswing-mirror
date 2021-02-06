@@ -68,11 +68,12 @@ public class Main {
 				
 				retainOnlyLauncherUrl(urls);
 			} else if (sessionpool) {
+				initTempDirPath(args,"tmp/sp");
 				populateClasspathFromDir("WEB-INF/sessionpool-lib", urls);
 			} else if (admin) {
 				populateClasspathFromDir("WEB-INF/server-lib", urls);
 			} else {
-				initTempDirPath(args);
+				initTempDirPath(args,"tmp/server");
 				populateClasspathFromDir("WEB-INF/server-lib", urls);
 			}
 			
@@ -339,7 +340,7 @@ public class Main {
 		return f.delete();
 	}
 
-	private static void initTempDirPath(String[] args) {
+	private static void initTempDirPath(String[] args, String defaulttmp) {
 		if (args != null) {
 			for (int i = 0; i < args.length - 1; i++) {
 				if ("-t".equals(args[i]) || "-temp".equals(args[i])) {
@@ -348,7 +349,7 @@ public class Main {
 				}
 			}
 		}
-		System.setProperty(Constants.TEMP_DIR_PATH_BASE, "tmp");
+		System.setProperty(Constants.TEMP_DIR_PATH_BASE, defaulttmp);
 	}
 
 	public static ClassLoader getDefaultCL() {

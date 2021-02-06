@@ -80,15 +80,6 @@ public interface Constants {
 	String SWING_START_STS_PROP_APPLET_PARAM_PREFIX = "webswing.appletParam_";
 	String SWING_START_SYS_PROP_APPLET_DOCUMENT_BASE = "webswing.appletDocumentBase";
 
-	// JMS queue names
-	String SWING2SERVER = "Swing2Server";
-	String SERVER2SWING = "Server2Swing";
-	String SERVER2SWING_SYNC = "Server2SwingSync";
-	String JMS_URL = "webswing.jmsUrl";
-	String JMS_URL_DEFAULT = "nio://127.0.0.1:34455";
-	String JMS_SERIALIZABLE_PACKAGES = "*";
-	String JMS_ENABLE_JMX = "webswing.enableActiveMqJmx";
-
 	// server startup constants
 	String WAR_FILE_LOCATION = "webswing.warLocation";
 	String ROOT_DIR_URI = "webswing.rootDirUri";
@@ -133,8 +124,6 @@ public interface Constants {
 	long WEBSOCKET_URL_LOADER_INTERVAL_DEFAULT = 5; // seconds
 	String WEBSOCKET_ADMIN_CONSOLE_SUFFIX = "/async/adminconsole";
 	String WEBSOCKET_SESSION_POOL_SUFFIX = "/async/sessionpool";
-	String WEBSWING_SERVER_WEBSOCKET_URL = "webswing.server.websocketUrl";
-//	String WEBSOCKET_THREAD_POOL = "webswing.websocketThreadPoolLimit"; // not used
 	String JETTY_REQUEST_HEADER_SIZE = "jetty.request.header.size";
 	int JETTY_REQUEST_HEADER_SIZE_DEFAULT = 512 * 1024;
 
@@ -198,7 +187,10 @@ public interface Constants {
 	// admin console properties
 	String ADMIN_CONSOLE_WEBSWING_SERVER_PUBLIC_URL = "webswing.server.publicUrl";
 	String ADMIN_CONSOLE_CORS = "admin.server.cors";
-	
+	String ADMIN_SERVER_WEBSOCKET_TRUSTSTORE = "webswing.server.websocket.truststore";
+	String ADMIN_SERVER_WEBSOCKET_TRUSTSTORE_PWD = "webswing.server.websocket.truststore.password";
+	String ADMIN_SERVER_WEBSOCKET_HOSTNAME_VERIFIER_DISABLED = "webswing.server.websocket.hostnameVerifier.disabled";
+	String ADMIN_SERVER_WEBSOCKET_PROXY_URI = "webswing.server.websocket.proxyUri";
 	String APP_WEBSOCKET_CLOSE_REASON_RECONNECT = "reconnect";
 	
 	// JWT 

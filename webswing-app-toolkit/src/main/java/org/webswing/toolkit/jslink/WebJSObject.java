@@ -24,7 +24,7 @@ import org.webswing.model.appframe.out.AppFrameMsgOut;
 import org.webswing.toolkit.util.JsLinkUtil;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.WeakValueHashMap;
-import org.webswing.util.DeamonThreadFactory;
+import org.webswing.util.NamedThreadFactory;
 
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
@@ -36,7 +36,7 @@ public class WebJSObject extends JSObject {
 	private static boolean jsLinkAllowed = Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_JSLINK);
 	private static String jsLinkWhitelistProp = System.getProperty(Constants.SWING_START_SYS_PROP_JSLINK_WHITELIST, "");
 	private static List<String> jsLinkWhitelist;
-	private static ScheduledExecutorService javaEvalThread = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing JsLink Processor"));
+	private static ScheduledExecutorService javaEvalThread = Executors.newSingleThreadScheduledExecutor(NamedThreadFactory.getInstance("Webswing JsLink Processor"));
 	private JSObjectMsgIn jsThis;
 	
 	static {

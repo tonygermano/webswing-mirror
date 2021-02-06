@@ -13,7 +13,7 @@
 	<parent>
 		<artifactId>webswing-modpatch</artifactId>
 		<groupId>org.webswing</groupId>
-		<version>20.2.2</version>
+		<version>20.2.3</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<build>

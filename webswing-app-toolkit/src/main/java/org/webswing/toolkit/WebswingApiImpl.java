@@ -58,7 +58,7 @@ import org.webswing.toolkit.api.url.WebswingUrlStateChangeListener;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
 import org.webswing.util.AppLogger;
-import org.webswing.util.DeamonThreadFactory;
+import org.webswing.util.NamedThreadFactory;
 import org.webswing.util.GitRepositoryState;
 
 public class WebswingApiImpl implements WebswingApi {
@@ -66,7 +66,7 @@ public class WebswingApiImpl implements WebswingApi {
 	private final List<WebswingUserListener> userConnectionListeners = Collections.synchronizedList(new ArrayList<WebswingUserListener>());
 	private final List<WebswingUrlStateChangeListener> urlStateChangeListeners = Collections.synchronizedList(new ArrayList<WebswingUrlStateChangeListener>());
 	private final List<WebActionListener> browserActionListeners = Collections.synchronizedList(new ArrayList<WebActionListener>());
-	private ExecutorService apiProcessor = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing API Processor"));
+	private ExecutorService apiProcessor = Executors.newSingleThreadExecutor(NamedThreadFactory.getInstance("Webswing API Processor"));
 	private WebswingUser primaryUser;
 	private WebswingUser mirrorUser;
 	private WebswingUrlState state = parseState(System.getProperty(Constants.SWING_START_SYS_PROP_INITIAL_URL));

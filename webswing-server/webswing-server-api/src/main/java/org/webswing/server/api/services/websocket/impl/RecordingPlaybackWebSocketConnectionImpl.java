@@ -41,51 +41,51 @@ import com.google.inject.Inject;
 public class RecordingPlaybackWebSocketConnectionImpl extends AbstractWebSocketConnection implements RecordingWebSocketConnection {
 
 	private static final Logger log = LoggerFactory.getLogger(RecordingPlaybackWebSocketConnectionImpl.class);
-	
+
 	private ProtoMapper protoMapper = new ProtoMapper(ProtoMapper.PROTO_PACKAGE_SERVER_BROWSER_FRAME, ProtoMapper.PROTO_PACKAGE_SERVER_BROWSER_FRAME);
 	private ProtoMapper appFrameProtoMapper = new ProtoMapper(ProtoMapper.PROTO_PACKAGE_APPFRAME_OUT, ProtoMapper.PROTO_PACKAGE_APPFRAME_IN);
 	private WebSocketService webSocketService;
 	private AppPathHandler appPathHandler;
-	
+
 	private SessionRecordingPlayback playback;
 	private String path;
 	private AbstractWebswingUser user;
-	
+
 	@Inject
 	public RecordingPlaybackWebSocketConnectionImpl(WebSocketService webSocketService) {
 		this.webSocketService = webSocketService;
 	}
-	
+
 	@OnOpen
 	public void onOpen(Session session, EndpointConfig config, @PathParam("appPath") String appPath) {
 		super.onOpen(session, config);
-		
+
 		this.path = "/" + appPath;
 		this.appPathHandler = webSocketService.getAppPathHandler(this.path);
 		this.user = SecurityUtil.resolveUser(getSecuritySubject(), appPathHandler);
-		
+
 		if (!((Boolean) session.getUserProperties().get(BrowserWebSocketConfigurator.AUTHENTICATED)) || this.user == null) {
 			disconnect("Unauthorized access!");
 			return;
 		}
-		
+
 		try {
 			if (hasPermission(WebswingAction.websocket_connect) && hasPermission(WebswingAction.websocket_startRecordingPlayback)) {
 				String fileParam = (String) session.getUserProperties().get(BrowserWebSocketConfigurator.HANDSHAKE_PARAM_FILE);
 				playback = getRecordingPlayback(this, fileParam, appPathHandler.getDataStore());
-				
+
 				if (playback == null) {
 					disconnect("Could not open recording file!");
 					return;
 				}
-				
+
 				try {
 					AppFrameMsgOut appFrame = new AppFrameMsgOut();
 					appFrame.setStartApplication(new StartApplicationMsgOut());
-					
+
 					ServerToBrowserFrameMsgOut msgOut = new ServerToBrowserFrameMsgOut();
 					msgOut.setAppFrameMsgOut(appFrameProtoMapper.encodeProto(appFrame));
-					
+
 					sendMessage(msgOut);
 				} catch (IOException e) {
 					log.error("Could not encode proto message for recording playback [" + session.getId() + "]!", e);
@@ -93,7 +93,7 @@ public class RecordingPlaybackWebSocketConnectionImpl extends AbstractWebSocketC
 			} else {
 				ServerToBrowserFrameMsgOut msgOut = new ServerToBrowserFrameMsgOut();
 				msgOut.setAppFrameMsgOut(appFrameProtoMapper.encodeProto(SimpleEventMsgOut.unauthorizedAccess.buildMsgOut()));
-				
+
 				sendMessage(msgOut);
 				disconnect("Unauthorized access!");
 				return;
@@ -102,7 +102,7 @@ public class RecordingPlaybackWebSocketConnectionImpl extends AbstractWebSocketC
 			log.error("Could not encode proto message for recording playback [" + session.getId() + "]!", e);
 		}
 	}
-	
+
 	@OnMessage
 	public void onMessage(Session session, byte[] bytes, boolean last) {
 		try {
@@ -112,7 +112,7 @@ public class RecordingPlaybackWebSocketConnectionImpl extends AbstractWebSocketC
 				return;
 			}
 			BrowserToServerFrameMsgIn frame = (BrowserToServerFrameMsgIn) frameWithLength.getKey();
-			
+
 			if (frame != null && frame.getPlayback() != null) {
 				playback.handlePlaybackControl(frame.getPlayback());
 			}
@@ -120,27 +120,24 @@ public class RecordingPlaybackWebSocketConnectionImpl extends AbstractWebSocketC
 			log.error("Could not decode proto message from recording playback [" + session.getId() + "]!", e);
 		}
 	}
-	
+
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason) {
 		if (session != null) {
-			log.info("Websocket closed for recording playback, session [" + session.getId() + "]" 
+			log.info("Websocket closed for recording playback, session [" + session.getId() + "]"
 					+ (closeReason != null ? ", close code [" + closeReason.getCloseCode().getCode() + "], reason [" + closeReason.getReasonPhrase() + "]!" : ""));
 		}
 		if (playback != null) {
 			playback.close();
 		}
 	}
-	
+
 	@OnError
 	public void onError(Session session, Throwable t) {
-		if (session != null) {
-			log.error("Websocket error in recording playback connection, session [" + session.getId() + "]!", t);
-		} else {
-			log.error("Websocket error in recording playback connection, no session!", t);
-		}
+		log.error("Websocket error from recording playback connection, session [" + (session == null ? null : session.getId()) + "]!", t.getMessage());
+		log.debug(t.getMessage(),t);
 	}
-	
+
 	@Override
 	public void sendMessage(AppFrameMsgOut frame) {
 		try {
@@ -151,35 +148,37 @@ public class RecordingPlaybackWebSocketConnectionImpl extends AbstractWebSocketC
 			log.error("Could not encode AppFrameMsgOut for session [" + session.getId() + "]!", e);
 		}
 	}
-	
+
 	private void sendMessage(ServerToBrowserFrameMsgOut msgOut) {
 		try {
 			byte[] encoded = protoMapper.encodeProto(msgOut);
 			super.sendMessage(encoded);
 		} catch (IOException e) {
-			log.error("Error sending msg to browser [" + session.getId() + "]!", e);
+			log.error("Failed to send playback msg to browser, session [" + (session == null ? null : session.getId()) + "]!", e.getMessage());
+			log.debug(e.getMessage(),e);
 		}
 	}
-	
+
 	@Override
 	protected Msg decodeIncomingMessage(byte[] bytes) throws IOException {
 		return protoMapper.decodeProto(bytes, BrowserToServerFrameMsgIn.class);
 	}
-	
+
 	private void disconnect(String reason) {
 		if (session != null && session.isOpen()) {
 			try {
 				session.close(new CloseReason(CloseCodes.NORMAL_CLOSURE, reason));
 			} catch (IOException e) {
-				log.error("Failed to destroy websocket recording connection session [" + session.getId() + "]!", e);
+				log.error("Failed to disconnect playback connection, session [" + session.getId() + "]!", e.getMessage());
+				log.debug(e.getMessage(),e);
 			}
 		}
 	}
-	
+
 	private SessionRecordingPlayback getRecordingPlayback(RecordingWebSocketConnection connection, String fileName, WebswingDataStoreModule dataStore) {
 		return new SessionRecordingPlayback(connection, fileName, dataStore);
 	}
-	
+
 	private AbstractWebswingUser getUser() {
 		return user;
 	}
@@ -194,5 +193,5 @@ public class RecordingPlaybackWebSocketConnectionImpl extends AbstractWebSocketC
 	private boolean hasPermission(WebswingAction action) {
 		return getUser() == null ? false : getUser().isPermitted(action.name());
 	}
-	
+
 }

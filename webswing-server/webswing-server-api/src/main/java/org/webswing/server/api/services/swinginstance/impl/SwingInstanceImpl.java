@@ -128,7 +128,7 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 			}
 		}
 		
-		log.info("Application websocket connected to instance.");
+		log.info("Application websocket connected to instance. ["+this.instanceId+"]");
 		
 		if (!startupMsgQueue.isEmpty()) {
 			log.info("Dispatching " + startupMsgQueue.size() + " queued messages.");
@@ -254,8 +254,6 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 				}
 				this.mirroredWebConnection = null;
 			}
-		} else {
-			log.warn("Mirror not connected [" + getInstanceId() + "]!");
 		}
 	}
 	

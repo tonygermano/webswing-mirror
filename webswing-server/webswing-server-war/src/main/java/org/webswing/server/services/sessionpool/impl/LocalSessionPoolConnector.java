@@ -35,7 +35,8 @@ import com.google.inject.multibindings.Multibinder;
 public class LocalSessionPoolConnector extends ServerSessionPoolConnector {
 	
 	private LocalSessionPool localSessionPool;
-	
+	private SessionPoolStartupService startup;
+
 	@Inject
 	public LocalSessionPoolConnector(SwingInstanceFactory swingInstanceFactory, SwingInstanceHolderFactory swingInstanceHolderService, 
 			StatisticsLoggerService loggerService, SessionPoolHolderService sessionPoolHolderService) throws WsInitException {
@@ -63,7 +64,8 @@ public class LocalSessionPoolConnector extends ServerSessionPoolConnector {
 		SwingProcessService processService = injector.getInstance(SwingProcessService.class);
 		ConfigurationService<SwingConfig> configService = injector.getInstance(new Key<ConfigurationService<SwingConfig>>() {});
 		
-		injector.getInstance(SessionPoolStartupService.class).start();
+		this.startup = injector.getInstance(SessionPoolStartupService.class);
+		this.startup.start();
 		
 		System.setProperty(Constants.SESSION_POOL_ID, getId());
 		
@@ -139,5 +141,11 @@ public class LocalSessionPoolConnector extends ServerSessionPoolConnector {
 		
 		return new SessionPoolInfoMsgOut(getId(), getMaxInstances(), getPriority(), connectedServers, appInstances);
 	}
-	
+
+
+	public void destroy(){
+		if(this.startup !=null){
+			this.startup.stop();
+		}
+	}
 }

@@ -3,11 +3,12 @@
 	<parent>
 		<artifactId>webswing</artifactId>
 		<groupId>org.webswing</groupId>
-		<version>20.2.2</version>
+		<version>20.2.3</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>webswing-server</artifactId>
 	<packaging>pom</packaging>
+	<name>Webswing Server</name>
 	<modules>
 		<module>webswing-server-common</module>
 		<module>webswing-sessionpool-api</module>

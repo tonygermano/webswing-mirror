@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.webswing.util.AppLogger;
-import org.webswing.util.DeamonThreadFactory;
+import org.webswing.util.NamedThreadFactory;
 
 import com.sun.glass.ui.Pixels;
 import com.sun.javafx.geom.RectBounds;
@@ -28,7 +28,7 @@ public class WebFxUtil {
 
 	private static final int SQ = 45;
 	private static final int threadCount = Runtime.getRuntime().availableProcessors();
-	private static ExecutorService processorPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), DeamonThreadFactory.getInstance("Webswing JavaFx Pixel processor"));
+	private static ExecutorService processorPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), NamedThreadFactory.getInstance("Webswing JavaFx Pixel processor"));
 
 	public static BufferedImage pixelsToImage(BufferedImage image, Pixels pixels) {
 		Pixels p = pixels;

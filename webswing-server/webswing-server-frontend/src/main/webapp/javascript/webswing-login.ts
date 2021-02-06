@@ -63,6 +63,8 @@ export class LoginModule extends ModuleDef<typeof loginInjectable, ILoginService
         this.util.webswingLogout(this.api.cfg.connectionUrl, dialogContent, () => {
             this.api.disconnect();
             this.api.start();
+        }, () => {
+            this.api.showDialog(this.api.dialogs.disconnectedDialog);
         }, tabLogout);
     }
 

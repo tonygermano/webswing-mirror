@@ -408,7 +408,7 @@ $root.commonProto = (function() {
          * Properties of a ConnectionHandshakeMsgInProto.
          * @memberof commonProto
          * @interface IConnectionHandshakeMsgInProto
-         * @property {string|null} [clientId] ConnectionHandshakeMsgInProto clientId
+         * @property {string|null} [instanceId] ConnectionHandshakeMsgInProto instanceId
          * @property {string|null} [viewId] ConnectionHandshakeMsgInProto viewId
          * @property {string|null} [browserId] ConnectionHandshakeMsgInProto browserId
          * @property {number|null} [desktopWidth] ConnectionHandshakeMsgInProto desktopWidth
@@ -444,12 +444,12 @@ $root.commonProto = (function() {
         }
 
         /**
-         * ConnectionHandshakeMsgInProto clientId.
-         * @member {string} clientId
+         * ConnectionHandshakeMsgInProto instanceId.
+         * @member {string} instanceId
          * @memberof commonProto.ConnectionHandshakeMsgInProto
          * @instance
          */
-        ConnectionHandshakeMsgInProto.prototype.clientId = "";
+        ConnectionHandshakeMsgInProto.prototype.instanceId = "";
 
         /**
          * ConnectionHandshakeMsgInProto viewId.
@@ -603,8 +603,8 @@ $root.commonProto = (function() {
         ConnectionHandshakeMsgInProto.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.clientId != null && message.hasOwnProperty("clientId"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.clientId);
+            if (message.instanceId != null && message.hasOwnProperty("instanceId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.instanceId);
             if (message.viewId != null && message.hasOwnProperty("viewId"))
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.viewId);
             if (message.browserId != null && message.hasOwnProperty("browserId"))
@@ -660,7 +660,7 @@ $root.commonProto = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.clientId = reader.string();
+                    message.instanceId = reader.string();
                     break;
                 case 2:
                     message.viewId = reader.string();
@@ -732,8 +732,8 @@ $root.commonProto = (function() {
             if (object instanceof $root.commonProto.ConnectionHandshakeMsgInProto)
                 return object;
             var message = new $root.commonProto.ConnectionHandshakeMsgInProto();
-            if (object.clientId != null)
-                message.clientId = String(object.clientId);
+            if (object.instanceId != null)
+                message.instanceId = String(object.instanceId);
             if (object.viewId != null)
                 message.viewId = String(object.viewId);
             if (object.browserId != null)
@@ -793,7 +793,7 @@ $root.commonProto = (function() {
             if (options.arrays || options.defaults)
                 object.params = [];
             if (options.defaults) {
-                object.clientId = "";
+                object.instanceId = "";
                 object.viewId = "";
                 object.browserId = "";
                 object.desktopWidth = 0;
@@ -810,8 +810,8 @@ $root.commonProto = (function() {
                 object.accessiblityEnabled = false;
                 object.tabId = "";
             }
-            if (message.clientId != null && message.hasOwnProperty("clientId"))
-                object.clientId = message.clientId;
+            if (message.instanceId != null && message.hasOwnProperty("instanceId"))
+                object.instanceId = message.instanceId;
             if (message.viewId != null && message.hasOwnProperty("viewId"))
                 object.viewId = message.viewId;
             if (message.browserId != null && message.hasOwnProperty("browserId"))

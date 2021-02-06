@@ -29,7 +29,7 @@ message SimpleEventMsgInProto {
 }
 
 message ConnectionHandshakeMsgInProto {
-    optional string clientId = 1;
+    optional string instanceId = 1;
     optional string viewId = 2;
     optional string browserId = 3;
     optional uint32 desktopWidth = 4;

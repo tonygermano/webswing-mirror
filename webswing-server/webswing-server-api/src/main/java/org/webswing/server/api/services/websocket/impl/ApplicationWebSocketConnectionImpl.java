@@ -49,7 +49,7 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 	
 	private ConnectedSwingInstance instance;
 	private boolean secured;
-	private Timer pingTimer = new Timer(true);
+	private Timer pingTimer = new Timer("App websocket ping-timer",true);
 	
 	@Inject
 	public ApplicationWebSocketConnectionImpl(SessionPoolHolderService sessionPoolHolderService) {
@@ -65,13 +65,12 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 		boolean reconnect = Boolean.parseBoolean((String) config.getUserProperties().get(ApplicationWebSocketConfigurator.ATTR_RECONNECT));
 		
 		if (!sessionPoolHolderService.connectApplication(this, reconnect)) {
-			log.error("Could not find a connected instance [" + instanceId + "] from session pool [" + sessionPoolId + "] on this server, it has probably been restarted. Wait for reconnect from browser. Disconnecting...");
-			disconnect(CloseCodes.CANNOT_ACCEPT, "Connected instance not found!");
-			return;
+			log.info("Application connected with instanceId [" + instanceId + "] and sessionPoolId [" + sessionPoolId + "]. Waiting for reconnect from browser.");
+		}else{
+			log.info("Application connected with instanceId [" + instanceId + "] and sessionPoolId [" + sessionPoolId + "].");
 		}
-		
-		log.info("Application connected with instanceId [" + instanceId + "] and sessionPoolId [" + sessionPoolId + "].");
-		
+
+
 		pingTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -80,7 +79,8 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 						try {
 							session.getBasicRemote().sendPing(ByteBuffer.wrap(Constants.WEBSOCKET_PING_PONG_CONTENT.getBytes(StandardCharsets.UTF_8)));
 						} catch (IllegalArgumentException | IOException e) {
-							log.warn("Could not send ping message for session [" + session.getId() + "]", e);
+							log.warn("Could not send ping message for session [" + session.getId() + "], instanceId ["+instanceId+"], sessionPool ["+sessionPoolId+"]", e.getMessage());
+							log.debug(e.getMessage(), e);
 						}
 					}
 				}
@@ -149,11 +149,8 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 	
 	@OnError
 	public void onError(Session session, Throwable t) {
-		if (session != null) {
-			log.error("Websocket error in app connection, instance [" + instanceId + "]!", t);
-		} else {
-			log.error("Websocket error in app connection, no session!", t);
-		}
+		log.error("Websocket error from app connection, session [" + (session==null?null:session.getId()) + "], instanceId ["+instanceId+"], sessionPool ["+sessionPoolId+"]", t.getMessage());
+		log.debug(t.getMessage(), t);
 	}
 
 	@Override
@@ -166,7 +163,8 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 		try {
 			super.sendMessage(protoMapper.encodeProto(msgIn));
 		} catch (IOException e) {
-			log.error("Error sending msg to server, session [" + session.getId() + "]!", e);
+			log.error("Failed to send msg to application, session [" + (session==null?null:session.getId()) + "], instanceId ["+instanceId+"], sessionPool ["+sessionPoolId+"]", e.getMessage());
+			log.debug(e.getMessage(), e);
 		}
 	}
 	
@@ -185,7 +183,8 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 			try {
 				session.close(new CloseReason(closeCode, reason));
 			} catch (IOException e) {
-				log.error("Failed to destroy websocket app connection instance [" + instanceId + "]!", e);
+				log.error("Failed to disconnect application connection, session [" + session.getId() + "], instanceId ["+instanceId+"], sessionPool ["+sessionPoolId+"]", e.getMessage());
+				log.debug(e.getMessage(),e);
 			}
 		}
 		pingTimer.cancel();

@@ -485,8 +485,8 @@ export namespace commonProto {
     /** Properties of a ConnectionHandshakeMsgInProto. */
     interface IConnectionHandshakeMsgInProto {
 
-        /** ConnectionHandshakeMsgInProto clientId */
-        clientId?: (string|null);
+        /** ConnectionHandshakeMsgInProto instanceId */
+        instanceId?: (string|null);
 
         /** ConnectionHandshakeMsgInProto viewId */
         viewId?: (string|null);
@@ -546,8 +546,8 @@ export namespace commonProto {
          */
         constructor(properties?: commonProto.IConnectionHandshakeMsgInProto);
 
-        /** ConnectionHandshakeMsgInProto clientId. */
-        public clientId: string;
+        /** ConnectionHandshakeMsgInProto instanceId. */
+        public instanceId: string;
 
         /** ConnectionHandshakeMsgInProto viewId. */
         public viewId: string;

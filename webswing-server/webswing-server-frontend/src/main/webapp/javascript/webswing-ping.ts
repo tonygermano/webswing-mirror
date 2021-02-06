@@ -54,33 +54,36 @@ export class PingModule extends ModuleDef<typeof pingInjectable, IPingService> {
     }
 
     public start() {
-        this.mute = 0;
-        this.ping = getArrayWithLimitedLength(this.count);
-        const connectionUrl = fixConnectionUrl(this.api.cfg.connectionUrl);
-        const blobURL = URL.createObjectURL(new Blob(['onmessage=(', PingMonitor.toString(), ')("' + connectionUrl + '",' + this.interval + ')'], { type: 'application/javascript' }));
-        this.worker = new Worker(blobURL);
-        this.worker.onmessage = (e) => {
-            const p: IPingMessage = JSON.parse(e.data);
-            this.ping?.push(p);
-            if (p.result === 'ok') {
-                this.api.sendTimestamp({
-                    ping: p.latency
-                });
-                // first success after offline status - clear pings
-                if (this.severity === 2) {
-                    this.ping = getArrayWithLimitedLength(this.count);
+        if(!this.worker){
+            this.mute = 0;
+            this.ping = getArrayWithLimitedLength(this.count);
+            const connectionUrl = fixConnectionUrl(this.api.cfg.connectionUrl);
+            const blobURL = URL.createObjectURL(new Blob(['onmessage=(', PingMonitor.toString(), ')("' + connectionUrl + '",' + this.interval + ')'], { type: 'application/javascript' }));
+            this.worker = new Worker(blobURL);
+            this.worker.onmessage = (e) => {
+                const p: IPingMessage = JSON.parse(e.data);
+                this.ping?.push(p);
+                if (p.result === 'ok') {
+                    this.api.sendTimestamp({
+                        ping: p.latency
+                    });
+                    // first success after offline status - clear pings
+                    if (this.severity === 2) {
+                        this.ping = getArrayWithLimitedLength(this.count);
+                    }
                 }
-            }
-            this.evaluateNetworkStatus();
-        };
-        this.intervalHandle = setInterval(() => {
-            this.worker?.postMessage('doPing');
-        }, this.interval * 1000);
+                this.evaluateNetworkStatus();
+            };
+            this.intervalHandle = setInterval(() => {
+                this.worker?.postMessage('doPing');
+            }, this.interval * 1000);
+        }
     }
 
     public dispose() {
         if (this.worker != null) {
             this.worker.terminate();
+            this.worker=undefined;
         }
         if (this.intervalHandle != null) {
             clearInterval(this.intervalHandle);

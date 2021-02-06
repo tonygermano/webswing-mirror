@@ -696,6 +696,7 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 					.map(sp -> sp.getInstancesRunningAndConnectedInSessionPool(path))
 					.collect(Collectors.summarizingInt(i -> i)).getSum();
 			if (runningConnectedInstances >= maxClients) {
+			    log.warn("Can not start new session of {}. Maximum number of clients reached [{}].", path, maxClients);
 				r.sendMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
 				return;
 			}

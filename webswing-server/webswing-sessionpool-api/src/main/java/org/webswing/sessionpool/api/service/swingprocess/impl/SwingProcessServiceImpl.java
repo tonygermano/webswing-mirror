@@ -37,7 +37,7 @@ import org.webswing.sessionpool.api.service.swingprocess.SwingProcess;
 import org.webswing.sessionpool.api.service.swingprocess.SwingProcessConfig;
 import org.webswing.sessionpool.api.service.swingprocess.SwingProcessService;
 import org.webswing.util.ClasspathUtil;
-import org.webswing.util.DeamonThreadFactory;
+import org.webswing.util.NamedThreadFactory;
 
 import com.google.common.base.Joiner;
 import com.google.inject.Singleton;
@@ -67,7 +67,7 @@ public class SwingProcessServiceImpl implements SwingProcessService {
 	
 	@Override
 	public void start() throws WsInitException {
-		processHandlerThread = Executors.newSingleThreadScheduledExecutor(DeamonThreadFactory.getInstance("Webswing Process Handler"));
+		processHandlerThread = Executors.newSingleThreadScheduledExecutor(NamedThreadFactory.getInstance("Webswing Process Handler"));
 	}
 
 	@Override
@@ -219,8 +219,7 @@ public class SwingProcessServiceImpl implements SwingProcessService {
 			processConfig.addProperty(Constants.SWING_START_SYS_PROP_CLASS_PATH, startupParams.getSubs().replace(CommonUtil.generateClassPathString(startupParams.getAppConfig().getClassPathEntries())));
 			processConfig.addProperty(Constants.ROOT_DIR_PATH, System.getProperty(Constants.ROOT_DIR_PATH));
 			processConfig.addProperty(Constants.TEMP_DIR_PATH, System.getProperty(Constants.TEMP_DIR_PATH));
-			processConfig.addProperty(Constants.JMS_URL, System.getProperty(Constants.JMS_URL, Constants.JMS_URL_DEFAULT));
-			processConfig.addProperty(Constants.SWING_START_SYS_PROP_WEBSOCKET_URL, startupParams.getWebsocketUrl());			
+			processConfig.addProperty(Constants.SWING_START_SYS_PROP_WEBSOCKET_URL, startupParams.getWebsocketUrl());
 			processConfig.addProperty(Constants.WEBSWING_CONNECTION_SECRET, serializeAppConnectionSecret(startupParams.getAppConnectionSecret()));			
 			processConfig.addProperty(Constants.SWING_START_SYS_PROP_DATA_STORE_CONFIG, startupParams.getDataStoreConfig());
 

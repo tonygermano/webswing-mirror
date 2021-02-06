@@ -13,8 +13,11 @@ export const socketInjectable = {
     hideDialog: 'dialog.hide' as const,
     currentDialog: 'dialog.current' as const,
     dialogs: 'dialog.content' as const,
-    reTrySession: 'webswing.reTrySession' as const
-}
+    reTrySession: 'webswing.reTrySession' as const,
+    startPing: 'ping.start' as const,
+    disposePing: 'ping.dispose' as const,
+    repaint: 'base.repaint' as const,
+};
 
 export interface ISocketService {
     'socket.connect': () => void,
@@ -64,7 +67,7 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
             'socket.instanceId': this.getInstanceId,
             'socket.awaitResponse': this.awaitResponse,
             'socket.dispose': this.dispose,
-            'socket.isAutoLogout': this.isAutoLogout
+            'socket.isAutoLogout': this.isAutoLogout,
         }
     }
 
@@ -73,7 +76,10 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
     }
 
     public dispose() {
-        if (this.socket && !this.socketOpen) {
+        if (this.socket ) {
+            this.socket.onclose = null;
+            this.socketOpen = false;
+            this.autoLogout = null;
             this.socket.close(1000, "Disconnecting instance.");
         }
         this.socket = undefined;
@@ -164,7 +170,7 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
 
     private connectWebSocket() {
         let connectionUrl = fixConnectionUrl(this.api.cfg.connectionUrl);
-        if (this.api.cfg.mirror) {
+        if (this.api.cfg.mirror && this.api.cfg.mirrorConnectionUrl) {
             connectionUrl = fixConnectionUrl(this.api.cfg.mirrorConnectionUrl!);
         }
         const wsBaseUrl = connectionUrl.replace(/(http)(s)?\:\/\//, "ws$2://");
@@ -197,6 +203,8 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
         this.socket.onopen = () => {
             // empty
             this.socketOpen = true;
+            this.api.repaint();
+            this.api.startPing();
         };
         
         this.socket.onmessage = (event) => {
@@ -241,7 +249,7 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
 
         this.socket.onclose = (_event) => {
             this.socketOpen = false;
-            
+            this.api.disposePing();
             this.autoLogout = null;
 
             if (this.api.currentDialog() === this.api.dialogs.stoppedDialog || this.api.currentDialog() === this.api.dialogs.timedoutDialog

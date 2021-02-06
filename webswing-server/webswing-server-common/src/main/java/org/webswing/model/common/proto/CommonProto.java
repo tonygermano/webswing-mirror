@@ -1465,18 +1465,18 @@ public final class CommonProto {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional string clientId = 1;</code>
+     * <code>optional string instanceId = 1;</code>
      */
-    boolean hasClientId();
+    boolean hasInstanceId();
     /**
-     * <code>optional string clientId = 1;</code>
+     * <code>optional string instanceId = 1;</code>
      */
-    java.lang.String getClientId();
+    java.lang.String getInstanceId();
     /**
-     * <code>optional string clientId = 1;</code>
+     * <code>optional string instanceId = 1;</code>
      */
     com.google.protobuf.ByteString
-        getClientIdBytes();
+        getInstanceIdBytes();
 
     /**
      * <code>optional string viewId = 2;</code>
@@ -1690,7 +1690,7 @@ public final class CommonProto {
       super(builder);
     }
     private ConnectionHandshakeMsgInProto() {
-      clientId_ = "";
+      instanceId_ = "";
       viewId_ = "";
       browserId_ = "";
       desktopWidth_ = 0;
@@ -1736,7 +1736,7 @@ public final class CommonProto {
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
-              clientId_ = bs;
+              instanceId_ = bs;
               break;
             }
             case 18: {
@@ -1867,19 +1867,19 @@ public final class CommonProto {
     }
 
     private int bitField0_;
-    public static final int CLIENTID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object clientId_;
+    public static final int INSTANCEID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object instanceId_;
     /**
-     * <code>optional string clientId = 1;</code>
+     * <code>optional string instanceId = 1;</code>
      */
-    public boolean hasClientId() {
+    public boolean hasInstanceId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional string clientId = 1;</code>
+     * <code>optional string instanceId = 1;</code>
      */
-    public java.lang.String getClientId() {
-      java.lang.Object ref = clientId_;
+    public java.lang.String getInstanceId() {
+      java.lang.Object ref = instanceId_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
@@ -1887,22 +1887,22 @@ public final class CommonProto {
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
-          clientId_ = s;
+          instanceId_ = s;
         }
         return s;
       }
     }
     /**
-     * <code>optional string clientId = 1;</code>
+     * <code>optional string instanceId = 1;</code>
      */
     public com.google.protobuf.ByteString
-        getClientIdBytes() {
-      java.lang.Object ref = clientId_;
+        getInstanceIdBytes() {
+      java.lang.Object ref = instanceId_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        clientId_ = b;
+        instanceId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -2400,7 +2400,7 @@ public final class CommonProto {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, clientId_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, instanceId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, viewId_);
@@ -2460,7 +2460,7 @@ public final class CommonProto {
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, clientId_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, instanceId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, viewId_);
@@ -2534,10 +2534,10 @@ public final class CommonProto {
       org.webswing.model.common.proto.CommonProto.ConnectionHandshakeMsgInProto other = (org.webswing.model.common.proto.CommonProto.ConnectionHandshakeMsgInProto) obj;
 
       boolean result = true;
-      result = result && (hasClientId() == other.hasClientId());
-      if (hasClientId()) {
-        result = result && getClientId()
-            .equals(other.getClientId());
+      result = result && (hasInstanceId() == other.hasInstanceId());
+      if (hasInstanceId()) {
+        result = result && getInstanceId()
+            .equals(other.getInstanceId());
       }
       result = result && (hasViewId() == other.hasViewId());
       if (hasViewId()) {
@@ -2627,9 +2627,9 @@ public final class CommonProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasClientId()) {
-        hash = (37 * hash) + CLIENTID_FIELD_NUMBER;
-        hash = (53 * hash) + getClientId().hashCode();
+      if (hasInstanceId()) {
+        hash = (37 * hash) + INSTANCEID_FIELD_NUMBER;
+        hash = (53 * hash) + getInstanceId().hashCode();
       }
       if (hasViewId()) {
         hash = (37 * hash) + VIEWID_FIELD_NUMBER;
@@ -2834,7 +2834,7 @@ public final class CommonProto {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        clientId_ = "";
+        instanceId_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
         viewId_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -2903,7 +2903,7 @@ public final class CommonProto {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.clientId_ = clientId_;
+        result.instanceId_ = instanceId_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
@@ -3022,9 +3022,9 @@ public final class CommonProto {
 
       public Builder mergeFrom(org.webswing.model.common.proto.CommonProto.ConnectionHandshakeMsgInProto other) {
         if (other == org.webswing.model.common.proto.CommonProto.ConnectionHandshakeMsgInProto.getDefaultInstance()) return this;
-        if (other.hasClientId()) {
+        if (other.hasInstanceId()) {
           bitField0_ |= 0x00000001;
-          clientId_ = other.clientId_;
+          instanceId_ = other.instanceId_;
           onChanged();
         }
         if (other.hasViewId()) {
@@ -3144,24 +3144,24 @@ public final class CommonProto {
       }
       private int bitField0_;
 
-      private java.lang.Object clientId_ = "";
+      private java.lang.Object instanceId_ = "";
       /**
-       * <code>optional string clientId = 1;</code>
+       * <code>optional string instanceId = 1;</code>
        */
-      public boolean hasClientId() {
+      public boolean hasInstanceId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional string clientId = 1;</code>
+       * <code>optional string instanceId = 1;</code>
        */
-      public java.lang.String getClientId() {
-        java.lang.Object ref = clientId_;
+      public java.lang.String getInstanceId() {
+        java.lang.Object ref = instanceId_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
-            clientId_ = s;
+            instanceId_ = s;
           }
           return s;
         } else {
@@ -3169,53 +3169,53 @@ public final class CommonProto {
         }
       }
       /**
-       * <code>optional string clientId = 1;</code>
+       * <code>optional string instanceId = 1;</code>
        */
       public com.google.protobuf.ByteString
-          getClientIdBytes() {
-        java.lang.Object ref = clientId_;
+          getInstanceIdBytes() {
+        java.lang.Object ref = instanceId_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          clientId_ = b;
+          instanceId_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>optional string clientId = 1;</code>
+       * <code>optional string instanceId = 1;</code>
        */
-      public Builder setClientId(
+      public Builder setInstanceId(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000001;
-        clientId_ = value;
+        instanceId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string clientId = 1;</code>
+       * <code>optional string instanceId = 1;</code>
        */
-      public Builder clearClientId() {
+      public Builder clearInstanceId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        clientId_ = getDefaultInstance().getClientId();
+        instanceId_ = getDefaultInstance().getInstanceId();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string clientId = 1;</code>
+       * <code>optional string instanceId = 1;</code>
        */
-      public Builder setClientIdBytes(
+      public Builder setInstanceIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000001;
-        clientId_ = value;
+        instanceId_ = value;
         onChanged();
         return this;
       }
@@ -5384,21 +5384,21 @@ public final class CommonProto {
       "equestComponentTree\020\007\022\033\n\027requestWindowSw" +
       "itchList\020\010\022\033\n\027enableStatisticsLogging\020\t\022" +
       "\034\n\030disableStatisticsLogging\020\n\022\023\n\017toggleR" +
-      "ecording\020\013\"\225\003\n\035ConnectionHandshakeMsgInP" +
-      "roto\022\020\n\010clientId\030\001 \001(\t\022\016\n\006viewId\030\002 \001(\t\022\021" +
-      "\n\tbrowserId\030\003 \001(\t\022\024\n\014desktopWidth\030\004 \001(\r\022" +
-      "\025\n\rdesktopHeight\030\005 \001(\r\022\027\n\017applicationNam" +
-      "e\030\006 \001(\t\022\020\n\010mirrored\030\007 \001(\010\022\033\n\023directDrawS" +
-      "upported\030\010 \001(\010\022\024\n\014documentBase\030\t \001(\t\022,\n\006" +
-      "params\030\n \003(\0132\034.commonProto.ParamMsgInPro" +
-      "to\022\016\n\006locale\030\013 \001(\t\022\013\n\003url\030\014 \001(\t\022\020\n\010timeZ" +
-      "one\030\r \001(\t\022\030\n\020dockingSupported\030\016 \001(\010\022\021\n\tt" +
-      "ouchMode\030\017 \001(\010\022\033\n\023accessiblityEnabled\030\020 " +
-      "\001(\010\022\r\n\005tabId\030\021 \001(\t\"j\n\024TimestampsMsgInPro" +
-      "to\022\026\n\016startTimestamp\030\001 \001(\t\022\025\n\rsendTimest" +
-      "amp\030\002 \001(\t\022\025\n\rrenderingTime\030\003 \001(\t\022\014\n\004ping" +
-      "\030\004 \001(\rB!\n\037org.webswing.model.common.prot" +
-      "o"
+      "ecording\020\013\"\227\003\n\035ConnectionHandshakeMsgInP" +
+      "roto\022\022\n\ninstanceId\030\001 \001(\t\022\016\n\006viewId\030\002 \001(\t" +
+      "\022\021\n\tbrowserId\030\003 \001(\t\022\024\n\014desktopWidth\030\004 \001(" +
+      "\r\022\025\n\rdesktopHeight\030\005 \001(\r\022\027\n\017applicationN" +
+      "ame\030\006 \001(\t\022\020\n\010mirrored\030\007 \001(\010\022\033\n\023directDra" +
+      "wSupported\030\010 \001(\010\022\024\n\014documentBase\030\t \001(\t\022," +
+      "\n\006params\030\n \003(\0132\034.commonProto.ParamMsgInP" +
+      "roto\022\016\n\006locale\030\013 \001(\t\022\013\n\003url\030\014 \001(\t\022\020\n\010tim" +
+      "eZone\030\r \001(\t\022\030\n\020dockingSupported\030\016 \001(\010\022\021\n" +
+      "\ttouchMode\030\017 \001(\010\022\033\n\023accessiblityEnabled\030" +
+      "\020 \001(\010\022\r\n\005tabId\030\021 \001(\t\"j\n\024TimestampsMsgInP" +
+      "roto\022\026\n\016startTimestamp\030\001 \001(\t\022\025\n\rsendTime" +
+      "stamp\030\002 \001(\t\022\025\n\rrenderingTime\030\003 \001(\t\022\014\n\004pi" +
+      "ng\030\004 \001(\rB!\n\037org.webswing.model.common.pr" +
+      "oto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5429,7 +5429,7 @@ public final class CommonProto {
     internal_static_commonProto_ConnectionHandshakeMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_commonProto_ConnectionHandshakeMsgInProto_descriptor,
-        new java.lang.String[] { "ClientId", "ViewId", "BrowserId", "DesktopWidth", "DesktopHeight", "ApplicationName", "Mirrored", "DirectDrawSupported", "DocumentBase", "Params", "Locale", "Url", "TimeZone", "DockingSupported", "TouchMode", "AccessiblityEnabled", "TabId", });
+        new java.lang.String[] { "InstanceId", "ViewId", "BrowserId", "DesktopWidth", "DesktopHeight", "ApplicationName", "Mirrored", "DirectDrawSupported", "DocumentBase", "Params", "Locale", "Url", "TimeZone", "DockingSupported", "TouchMode", "AccessiblityEnabled", "TabId", });
     internal_static_commonProto_TimestampsMsgInProto_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_commonProto_TimestampsMsgInProto_fieldAccessorTable = new

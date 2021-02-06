@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.webswing</groupId>
     <artifactId>webswing</artifactId>
-    <version>20.2.2</version>
+    <version>20.2.3</version>
     <packaging>pom</packaging>
     <name>Webswing</name>
     <description>Webswing is a web server that allows to run any swing application inside your web browser using only pure HTML5.</description>
@@ -58,12 +58,12 @@
         <webswing-war-name>webswing-server</webswing-war-name>
         <jersey.version>2.31</jersey.version>
         <guice.version>4.1.0</guice.version>
-        <activemq.version>5.15.13</activemq.version>
         <bouncycastle.version>1.61</bouncycastle.version>
         <jackson.databind.version>2.10.5.1</jackson.databind.version>
         <jackson.annotations.version>2.10.5</jackson.annotations.version>
         <jetty.version>9.4.35.v20201120</jetty.version>
         <log4j.version>2.13.2</log4j.version>
+        <slf4j.version>1.6.6</slf4j.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -103,14 +103,14 @@
                 <version>1.9.4</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.shiro</groupId>
-                <artifactId>shiro-web</artifactId>
-                <version>1.6.0</version>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.6.6</version>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
@@ -176,16 +176,6 @@
                 <groupId>org.glassfish.jersey.media</groupId>
                 <artifactId>jersey-media-json-jackson</artifactId>
                 <version>${jersey.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-broker</artifactId>
-                <version>${activemq.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-client</artifactId>
-                <version>${activemq.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>

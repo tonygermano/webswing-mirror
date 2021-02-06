@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.Window.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import org.webswing.toolkit.WebToolkit;
@@ -51,7 +51,10 @@ public class WindowHierarchyTree {
 					parentChildren.remove(node);
 					parentChildren.addFirst(node);
 				}
-				bringToFront(node.getParent().getW());
+				if (w.getType() != Type.POPUP) {
+					// bring parent NORMAL window to front
+					bringToFront(node.getParent().getW());
+				}
 			}
 		} else {
 			AppLogger.error("Window not registered. Not able to bring to front.", w);

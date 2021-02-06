@@ -132,7 +132,7 @@ import org.webswing.toolkit.listener.WebToolkitStartupListener;
 import org.webswing.toolkit.util.EvaluationProperties;
 import org.webswing.toolkit.util.Util;
 import org.webswing.util.AppLogger;
-import org.webswing.util.DeamonThreadFactory;
+import org.webswing.util.NamedThreadFactory;
 import org.webswing.util.SessionRecorder;
 
 import sun.awt.SunToolkit;
@@ -880,7 +880,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	abstract public boolean deliverFocus(Component heavyweight, Component descendant, boolean temporary, boolean focusedWindowChangeAllowed, long time, FocusEventCause cause) ;
 
 	public synchronized int executeOnBeforeShutdownListeners(final ShutdownReason reason){
-		ExecutorService executor = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing pre-shutdown thread"));
+		ExecutorService executor = Executors.newSingleThreadExecutor(NamedThreadFactory.getInstance("Webswing pre-shutdown thread"));
 		try {
 			long wait = Long.getLong(Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT, Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT_DEFAULT_VALUE);
 			Integer delay = executor.submit(new Callable<Integer>() {

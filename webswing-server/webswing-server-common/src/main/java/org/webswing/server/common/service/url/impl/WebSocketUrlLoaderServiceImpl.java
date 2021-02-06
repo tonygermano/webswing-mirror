@@ -34,7 +34,7 @@ public class WebSocketUrlLoaderServiceImpl implements WebSocketUrlLoaderService 
 	
 	private final Set<String> lastValue = Collections.synchronizedSet(new HashSet<>());
 	
-	private Timer reloadTimer = new Timer(true);
+	private Timer reloadTimer = new Timer("Admin - Websocket URL Reloader",true);
 	
 	public WebSocketUrlLoaderServiceImpl() {
 	}
@@ -78,7 +78,12 @@ public class WebSocketUrlLoaderServiceImpl implements WebSocketUrlLoaderService 
 		
 		loadAndValidateUrls();
 	}
-	
+
+	@Override
+	public void destroy() {
+		reloadTimer.cancel();
+	}
+
 	private void loadAndValidateUrls() {
 		synchronized (lastValue) {
 			Set<String> urls = loader.reload();

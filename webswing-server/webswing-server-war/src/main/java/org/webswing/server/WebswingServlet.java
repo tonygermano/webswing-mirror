@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.jms.IllegalStateException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -44,6 +43,7 @@ public class WebswingServlet extends HttpServlet {
 	private StartupService startup;
 	private GlobalUrlHandler handler;
 	private SecurityManagerService securityManager;
+	private LocalSessionPoolConnector sessionPool;
 
 	@Override
 	public void init() throws ServletException {
@@ -67,7 +67,8 @@ public class WebswingServlet extends HttpServlet {
 			
 			// initialize local session pool
 			SessionPoolHolderService sessionPoolHolder = injector.getInstance(SessionPoolHolderService.class);
-			sessionPoolHolder.registerSessionPool(injector.getInstance(LocalSessionPoolConnector.class));
+			this.sessionPool= injector.getInstance(LocalSessionPoolConnector.class);
+			sessionPoolHolder.registerSessionPool(this.sessionPool);
 		} catch (Exception e) {
 			log.error("Initialization of Webswing failed. ", e);
 			destroy();
@@ -122,12 +123,16 @@ public class WebswingServlet extends HttpServlet {
 
 	@Override
 	public void destroy() {
+		if (this.sessionPool!=null){
+			this.sessionPool.destroy();
+		}
 		if (this.handler != null) {
 			this.handler.destroy();
 		}
 		if (this.startup != null) {
 			this.startup.stop();
 		}
+		log.info("Webswing Server Stopped.");
 	}
 
 	@Override

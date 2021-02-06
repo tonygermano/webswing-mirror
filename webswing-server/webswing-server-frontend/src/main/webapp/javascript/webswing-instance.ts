@@ -166,7 +166,6 @@ export class WebswingInstanceModule extends ModuleDef<typeof webswingInstanceInj
             return;
         }
         this.api.login(() => {
-            this.api.startPing();
             this.api.showDialog(this.api.dialogs.initializingDialog);
             this.api.connect();
         }, () => {

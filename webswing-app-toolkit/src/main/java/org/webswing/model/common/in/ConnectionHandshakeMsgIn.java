@@ -9,7 +9,7 @@ public class ConnectionHandshakeMsgIn implements MsgIn, CommonMsg {
 
 	private static final long serialVersionUID = -7143564320373144470L;
 
-	private String clientId;
+	private String instanceId;
 	private String browserId;
 	private String viewId;
 	private String tabId;
@@ -27,12 +27,12 @@ public class ConnectionHandshakeMsgIn implements MsgIn, CommonMsg {
 	private boolean accessiblityEnabled;
 	private List<ParamMsgIn> params;
 
-	public String getClientId() {
-		return clientId;
+	public String getInstanceId() {
+		return instanceId;
 	}
 
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
 	}
 
 	public String getBrowserId() {

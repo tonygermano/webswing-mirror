@@ -39,7 +39,7 @@ import org.webswing.toolkit.extra.DndEventHandler;
 import org.webswing.toolkit.jslink.WebJSObject;
 import org.webswing.toolkit.util.Util;
 import org.webswing.util.AppLogger;
-import org.webswing.util.DeamonThreadFactory;
+import org.webswing.util.NamedThreadFactory;
 
 import sun.awt.UngrabEvent;
 
@@ -55,7 +55,7 @@ public abstract class AbstractEventDispatcher implements EventDispatcher {
 	private Component lastEnteredWindow;
 	private final DndEventHandler dndHandler;
 	private final HashMap<String, String> uploadMap = new HashMap<String, String>();
-	private ExecutorService eventDispatcher = Executors.newSingleThreadExecutor(DeamonThreadFactory.getInstance("Webswing Event Dispatcher"));
+	private ExecutorService eventDispatcher = Executors.newSingleThreadExecutor(NamedThreadFactory.getInstance("Webswing Event Dispatcher"));
 	//release char map derives the event char for keyrelease event from previous keypressed events (keycode=char)
 	private final HashMap<Integer, Integer> releaseCharMap = new HashMap<Integer, Integer>();
 

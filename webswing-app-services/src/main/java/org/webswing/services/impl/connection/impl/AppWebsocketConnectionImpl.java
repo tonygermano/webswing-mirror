@@ -1,29 +1,6 @@
 package org.webswing.services.impl.connection.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.websocket.ClientEndpoint;
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCode;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.ContainerProvider;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-
+import jakarta.websocket.*;
 import org.webswing.Constants;
 import org.webswing.model.SyncObjectResponse;
 import org.webswing.model.app.in.ServerToAppFrameMsgIn;
@@ -36,6 +13,18 @@ import org.webswing.toolkit.util.Util;
 import org.webswing.util.AppLogger;
 import org.webswing.util.ClassLoaderUtil;
 import org.webswing.util.ProtoMapper;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @ClientEndpoint
 public class AppWebsocketConnectionImpl implements ServerConnection {
@@ -58,8 +47,6 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
 	private AtomicBoolean reconnectScheduled = new AtomicBoolean(false);
 	private AtomicBoolean interruptReconnect = new AtomicBoolean(false);
 	
-	private WebSocketContainer container;
-	
 	public AppWebsocketConnectionImpl() {
 	}
 
@@ -78,12 +65,10 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
 		
 		AppLogger.info("Starting websocket connection to server [" + serverUrl + "].");
 		try {
-			if (container == null) {
-				container = ContainerProvider.getWebSocketContainer();
-			}
-			container.connectToServer(this, URI.create(serverUrl));
+			WebSocketClient.getClient().connectToServer(this, URI.create(serverUrl));
 		} catch (Exception e) {
-			AppLogger.error("Failed to connect websocket to server [" + serverUrl + "]!", e);
+			AppLogger.error("Failed to connect websocket to server [" + serverUrl + "]!", e.getMessage());
+			AppLogger.debug(e.getMessage(),e);
 			throw e;
 		}
 	}
@@ -103,7 +88,7 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
 			handshake.setSecretMessage(secretMessage);
 		} catch (Exception e) {
 			AppLogger.error("Could not create secret message! Disconnecting...", e);
-			disconnect(CloseCodes.CANNOT_ACCEPT, "Connection not secured!");
+			disconnect(CloseReason.CloseCodes.CANNOT_ACCEPT, "Connection not secured!");
 			throw e;
 		}
 		
@@ -145,7 +130,7 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
     public void onClose(CloseReason closeReason) {
     	AppLogger.error("Websocket closed to server [" + serverUrl + "]" 
     			+ (closeReason != null ? ", close code [" + closeReason.getCloseCode().getCode() + "], reason [" + closeReason.getReasonPhrase() + "]!" : ""));
-    	
+
     	scheduleReconnect(0);
     }
     
@@ -185,7 +170,8 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
  
     @OnError
     public void onError(Session session, Throwable t) {
-    	AppLogger.error("Websocket error on server [" + serverUrl + "]!", t);
+    	AppLogger.error("Websocket error on server [" + serverUrl + "]!", t.getMessage());
+    	AppLogger.debug(t.getMessage(), t);
     }
     
     @Override
@@ -195,8 +181,10 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
     		correlationId = msgIn.getApiCallResult().getCorrelationId();
 		} else if (frame.getJsResponse() != null && frame.getJsResponse().getCorrelationId() != null) {
 			correlationId = frame.getJsResponse().getCorrelationId();
-		} else if (frame.getJavaRequest() != null && frame.getJavaRequest().getCorrelationId() != null) {
+		}  else if (frame.getJavaRequest() != null && frame.getJavaRequest().getCorrelationId() != null) {
 			correlationId = frame.getJavaRequest().getCorrelationId();
+		}  else if (frame.getPixelsResponse() != null && frame.getPixelsResponse().getCorrelationId() != null) {
+			correlationId = frame.getPixelsResponse().getCorrelationId();
 		}
 		
 		if (syncCallResposeMap.containsKey(correlationId)) {
@@ -213,7 +201,7 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
 	@Override
 	public void sendMessage(final AppToServerFrameMsgOut msgOut) {
 		if (session == null || !session.isOpen()) {
-			AppLogger.error("Cannot send message, session closed!");
+			AppLogger.debug("Cannot send message, session closed!");
 			return;
 		}
 		
@@ -236,7 +224,8 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
 					session.getBasicRemote().sendBinary(ByteBuffer.wrap(encoded));
 				}
 			} catch (IOException e) {
-				AppLogger.error("Error sending msg to server [" + serverUrl + "] , session [" + session.getId() + "]", e);
+				AppLogger.error("Error sending msg to server [" + serverUrl + "] , session [" + session.getId() + "]", e.getMessage());
+				AppLogger.debug(e.getMessage(),e);
 			}
 		}
 	}
@@ -271,16 +260,17 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
 	
 	@Override
 	public void close(String reason) {
-		disconnect(CloseCodes.NORMAL_CLOSURE, reason);
+		disconnect(CloseReason.CloseCodes.NORMAL_CLOSURE, reason);
 	}
 	
-	private void disconnect(CloseCode closeCode, String reason) {
+	private void disconnect(CloseReason.CloseCodes closeCode, String reason) {
     	AppLogger.info("Disconnecting websocket to server [" + serverUrl + "].");
     	if (session != null && session.isOpen()) {
 			try {
 				session.close(new CloseReason(closeCode, reason));
 			} catch (IOException e) {
-				AppLogger.error("Failed to destroy websocket connection, session [" + session.getId() + "]!", e);
+				AppLogger.error("Failed to destroy websocket connection, session [" + session.getId() + "]!", e.getMessage());
+				AppLogger.debug(e.getMessage(), e);
 			}
 		}
     }
