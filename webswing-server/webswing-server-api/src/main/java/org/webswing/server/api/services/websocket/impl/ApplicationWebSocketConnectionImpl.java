@@ -49,8 +49,7 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 	
 	private ConnectedSwingInstance instance;
 	private boolean secured;
-	private Timer pingTimer = new Timer("App websocket ping-timer",true);
-	
+
 	@Inject
 	public ApplicationWebSocketConnectionImpl(SessionPoolHolderService sessionPoolHolderService) {
 		this.sessionPoolHolderService = sessionPoolHolderService;
@@ -69,23 +68,6 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 		}else{
 			log.info("Application connected with instanceId [" + instanceId + "] and sessionPoolId [" + sessionPoolId + "].");
 		}
-
-
-		pingTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if (session != null) {
-					synchronized (session) {
-						try {
-							session.getBasicRemote().sendPing(ByteBuffer.wrap(Constants.WEBSOCKET_PING_PONG_CONTENT.getBytes(StandardCharsets.UTF_8)));
-						} catch (IllegalArgumentException | IOException e) {
-							log.warn("Could not send ping message for session [" + session.getId() + "], instanceId ["+instanceId+"], sessionPool ["+sessionPoolId+"]", e.getMessage());
-							log.debug(e.getMessage(), e);
-						}
-					}
-				}
-			}
-		}, Constants.WEBSOCKET_PING_PONG_INTERVAL, Constants.WEBSOCKET_PING_PONG_INTERVAL);
 	}
 	
 	@OnMessage
@@ -101,17 +83,7 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 		
 			if (msgOut.getHandshake() != null) {
 				AppHandshakeMsgOut handshake = msgOut.getHandshake();
-				
-				try {
-					if (!JwtUtil.validateHandshakeToken(handshake.getSecretMessage())) {
-						throw new IllegalArgumentException("Invalid token [" + handshake.getSecretMessage() + "] received during handshake!");
-					}
-					secured = true;
-				} catch (Exception e1) {
-					log.error("Could not validate handshake secret message! Disconnecting...", e1);
-					disconnect(CloseCodes.CANNOT_ACCEPT, "Connection not secured!");
-					return;
-				}
+				secured = validateHandshakeToken(handshake.getSecretMessage());
 			} else if (!secured) {
 				// we must get handshake first, otherwise we disconnect
 				disconnect(CloseCodes.CANNOT_ACCEPT, "Connection not secured!");
@@ -142,14 +114,13 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 					+ (closeReason != null ? ", close code [" + closeReason.getCloseCode().getCode() + "], reason [" + closeReason.getReasonPhrase() + "]!" : ""));
 		}
 		if (instance != null) {
-			instance.applicationDisconnected(Constants.APP_WEBSOCKET_CLOSE_REASON_RECONNECT.equals(closeReason.getReasonPhrase()));
+			instance.applicationDisconnected(closeReason.getReasonPhrase());
 		}
-		pingTimer.cancel();
 	}
 	
 	@OnError
 	public void onError(Session session, Throwable t) {
-		log.error("Websocket error from app connection, session [" + (session==null?null:session.getId()) + "], instanceId ["+instanceId+"], sessionPool ["+sessionPoolId+"]", t.getMessage());
+		log.error("Websocket error from app connection, session [" + (session==null?null:session.getId()) + "], instanceId ["+instanceId+"], sessionPool ["+sessionPoolId+"] "+ t.getMessage());
 		log.debug(t.getMessage(), t);
 	}
 
@@ -163,7 +134,7 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 		try {
 			super.sendMessage(protoMapper.encodeProto(msgIn));
 		} catch (IOException e) {
-			log.error("Failed to send msg to application, session [" + (session==null?null:session.getId()) + "], instanceId ["+instanceId+"], sessionPool ["+sessionPoolId+"]", e.getMessage());
+			log.error("Failed to send msg to application, session [" + (session==null?null:session.getId()) + "], instanceId ["+instanceId+"], sessionPool ["+sessionPoolId+"] "+ e.getMessage());
 			log.debug(e.getMessage(), e);
 		}
 	}
@@ -183,11 +154,10 @@ public class ApplicationWebSocketConnectionImpl extends AbstractWebSocketConnect
 			try {
 				session.close(new CloseReason(closeCode, reason));
 			} catch (IOException e) {
-				log.error("Failed to disconnect application connection, session [" + session.getId() + "], instanceId ["+instanceId+"], sessionPool ["+sessionPoolId+"]", e.getMessage());
+				log.error("Failed to disconnect application connection, session [" + session.getId() + "], instanceId ["+instanceId+"], sessionPool ["+sessionPoolId+"] "+ e.getMessage());
 				log.debug(e.getMessage(),e);
 			}
 		}
-		pingTimer.cancel();
 	}
 	
 	@Override

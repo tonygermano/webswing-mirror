@@ -167,6 +167,13 @@ public class WebSessionWatchdog implements SessionWatchdog {
 	}
 
 	@Override
+	public void notifyExit() {
+		// notify session pool that the instance is exiting
+		// session pool should immediately send a broadcast to all servers to remove the instance from instance registry
+		System.out.println(Constants.APP_LOGGER_SYSTEM_MSG_PREFIX + " " + Constants.APP_LOGGER_SYSTEM_MSG_EXIT);
+	}
+	
+	@Override
 	public void scheduleShutdown(ShutdownReason reason) {
 		scheduleShutdown(reason,()->{});
 	}
@@ -174,6 +181,11 @@ public class WebSessionWatchdog implements SessionWatchdog {
 	@Override
 	public void requestThreadDump() {
 		exitScheduler.execute(() -> Util.getWebToolkit().getPaintDispatcher().notifyThreadDumpCreated("User requested thread dump"));
+	}
+	
+	@Override
+	public boolean isTerminated() {
+		return terminated.get();
 	}
 
 	private void scheduleShutdown(ShutdownReason reason,Runnable shutdownlogic) {

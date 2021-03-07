@@ -20,6 +20,7 @@ import org.webswing.toolkit.api.clipboard.WebswingClipboardData;
 import org.webswing.toolkit.util.Services;
 import org.webswing.toolkit.util.Util;
 import org.webswing.util.AppLogger;
+import sun.awt.datatransfer.TransferableProxy;
 
 public class WebClipboard extends Clipboard {
 	private static DataFlavor htmlDf;
@@ -60,6 +61,8 @@ public class WebClipboard extends Clipboard {
 
 	@Override
 	public synchronized void setContents(Transferable contents, ClipboardOwner owner) {
+		contents = new TransferableProxy(contents, true);
+
 		super.setContents(contents, owner);
 		if (isSystemClipboard && Boolean.getBoolean(Constants.SWING_START_SYS_PROP_ALLOW_LOCAL_CLIPBOARD)) {
 			WebswingClipboardData data = toWebswingClipboardData(contents);

@@ -33,7 +33,6 @@ export default function Webswing(i18n: Translations) {
     const global = {
         scan: scanForInstances,
         bootstrap,
-        utils: util,
         $
     }
     return global;

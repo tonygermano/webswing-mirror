@@ -103,7 +103,9 @@ public class AppPathHandlerImpl extends PrimaryUrlHandler implements AppPathHand
 			}
 		} catch (WsException e1) {
 			log.error("User authorization failed. {}", e1.getMessage());
-			r.sendMessage(SimpleEventMsgOut.unauthorizedAccess.buildMsgOut());
+			if (r.isConnected()) {
+				r.sendMessage(SimpleEventMsgOut.unauthorizedAccess.buildMsgOut());
+			}
 			return;
 		}
 		
@@ -111,7 +113,9 @@ public class AppPathHandlerImpl extends PrimaryUrlHandler implements AppPathHand
 			sessionPoolHolderService.connectView(path, handshake, r, createSwingInstanceInfo());
 		} catch (WsException e) {
 			log.error("Failed to connect to instance. ", e);
-			r.sendMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
+			if (r.isConnected()) {
+				r.sendMessage(SimpleEventMsgOut.configurationError.buildMsgOut());
+			}
 		}
 	}
 	

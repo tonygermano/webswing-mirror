@@ -162,7 +162,9 @@ public class SessionRecordingPlayback {
 				sender.schedule(new Runnable() {
 					@Override
 					public void run() {
-						connection.sendMessage(frame);
+						if (connection.isConnected()) {
+							connection.sendMessage(frame);
+						}
 						sendNextFrame();
 					}
 				}, fastForward ? 0 : delay, TimeUnit.MILLISECONDS);

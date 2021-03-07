@@ -78,8 +78,8 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 			if (o instanceof JTextComponent) {
 				JTextComponent tc = (JTextComponent) o;
 				if (tc.isEditable() && tc.getWidth() > 0 && tc.getHeight() > 0) {
-					if(optimizeCaret && !(tc.getCaret() instanceof  WebCaretWrapper)){
-						tc.setCaret(new WebCaretWrapper(tc.getCaret()));
+					if(optimizeCaret && tc.getCaret().getBlinkRate()!=0){
+						tc.getCaret().setBlinkRate(0);
 					}
 					int position = tc.getCaretPosition();
 					try {

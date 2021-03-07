@@ -873,45 +873,49 @@ public final class CommonProto {
        */
       killSwing(1),
       /**
-       * <code>paintAck = 2;</code>
+       * <code>killSwingAdmin = 2;</code>
        */
-      paintAck(2),
+      killSwingAdmin(2),
       /**
-       * <code>repaint = 3;</code>
+       * <code>paintAck = 3;</code>
        */
-      repaint(3),
+      paintAck(3),
       /**
-       * <code>downloadFile = 4;</code>
+       * <code>repaint = 4;</code>
        */
-      downloadFile(4),
+      repaint(4),
       /**
-       * <code>deleteFile = 5;</code>
+       * <code>downloadFile = 5;</code>
        */
-      deleteFile(5),
+      downloadFile(5),
       /**
-       * <code>cancelFileSelection = 6;</code>
+       * <code>deleteFile = 6;</code>
        */
-      cancelFileSelection(6),
+      deleteFile(6),
       /**
-       * <code>requestComponentTree = 7;</code>
+       * <code>cancelFileSelection = 7;</code>
        */
-      requestComponentTree(7),
+      cancelFileSelection(7),
       /**
-       * <code>requestWindowSwitchList = 8;</code>
+       * <code>requestComponentTree = 8;</code>
        */
-      requestWindowSwitchList(8),
+      requestComponentTree(8),
       /**
-       * <code>enableStatisticsLogging = 9;</code>
+       * <code>requestWindowSwitchList = 9;</code>
        */
-      enableStatisticsLogging(9),
+      requestWindowSwitchList(9),
       /**
-       * <code>disableStatisticsLogging = 10;</code>
+       * <code>enableStatisticsLogging = 10;</code>
        */
-      disableStatisticsLogging(10),
+      enableStatisticsLogging(10),
       /**
-       * <code>toggleRecording = 11;</code>
+       * <code>disableStatisticsLogging = 11;</code>
        */
-      toggleRecording(11),
+      disableStatisticsLogging(11),
+      /**
+       * <code>toggleRecording = 12;</code>
+       */
+      toggleRecording(12),
       ;
 
       /**
@@ -923,45 +927,49 @@ public final class CommonProto {
        */
       public static final int killSwing_VALUE = 1;
       /**
-       * <code>paintAck = 2;</code>
+       * <code>killSwingAdmin = 2;</code>
        */
-      public static final int paintAck_VALUE = 2;
+      public static final int killSwingAdmin_VALUE = 2;
       /**
-       * <code>repaint = 3;</code>
+       * <code>paintAck = 3;</code>
        */
-      public static final int repaint_VALUE = 3;
+      public static final int paintAck_VALUE = 3;
       /**
-       * <code>downloadFile = 4;</code>
+       * <code>repaint = 4;</code>
        */
-      public static final int downloadFile_VALUE = 4;
+      public static final int repaint_VALUE = 4;
       /**
-       * <code>deleteFile = 5;</code>
+       * <code>downloadFile = 5;</code>
        */
-      public static final int deleteFile_VALUE = 5;
+      public static final int downloadFile_VALUE = 5;
       /**
-       * <code>cancelFileSelection = 6;</code>
+       * <code>deleteFile = 6;</code>
        */
-      public static final int cancelFileSelection_VALUE = 6;
+      public static final int deleteFile_VALUE = 6;
       /**
-       * <code>requestComponentTree = 7;</code>
+       * <code>cancelFileSelection = 7;</code>
        */
-      public static final int requestComponentTree_VALUE = 7;
+      public static final int cancelFileSelection_VALUE = 7;
       /**
-       * <code>requestWindowSwitchList = 8;</code>
+       * <code>requestComponentTree = 8;</code>
        */
-      public static final int requestWindowSwitchList_VALUE = 8;
+      public static final int requestComponentTree_VALUE = 8;
       /**
-       * <code>enableStatisticsLogging = 9;</code>
+       * <code>requestWindowSwitchList = 9;</code>
        */
-      public static final int enableStatisticsLogging_VALUE = 9;
+      public static final int requestWindowSwitchList_VALUE = 9;
       /**
-       * <code>disableStatisticsLogging = 10;</code>
+       * <code>enableStatisticsLogging = 10;</code>
        */
-      public static final int disableStatisticsLogging_VALUE = 10;
+      public static final int enableStatisticsLogging_VALUE = 10;
       /**
-       * <code>toggleRecording = 11;</code>
+       * <code>disableStatisticsLogging = 11;</code>
        */
-      public static final int toggleRecording_VALUE = 11;
+      public static final int disableStatisticsLogging_VALUE = 11;
+      /**
+       * <code>toggleRecording = 12;</code>
+       */
+      public static final int toggleRecording_VALUE = 12;
 
 
       public final int getNumber() {
@@ -980,16 +988,17 @@ public final class CommonProto {
         switch (value) {
           case 0: return unload;
           case 1: return killSwing;
-          case 2: return paintAck;
-          case 3: return repaint;
-          case 4: return downloadFile;
-          case 5: return deleteFile;
-          case 6: return cancelFileSelection;
-          case 7: return requestComponentTree;
-          case 8: return requestWindowSwitchList;
-          case 9: return enableStatisticsLogging;
-          case 10: return disableStatisticsLogging;
-          case 11: return toggleRecording;
+          case 2: return killSwingAdmin;
+          case 3: return paintAck;
+          case 4: return repaint;
+          case 5: return downloadFile;
+          case 6: return deleteFile;
+          case 7: return cancelFileSelection;
+          case 8: return requestComponentTree;
+          case 9: return requestWindowSwitchList;
+          case 10: return enableStatisticsLogging;
+          case 11: return disableStatisticsLogging;
+          case 12: return toggleRecording;
           default: return null;
         }
       }
@@ -5375,30 +5384,30 @@ public final class CommonProto {
     java.lang.String[] descriptorData = {
       "\n\021CommonProto.proto\022\013commonProto\".\n\017Para" +
       "mMsgInProto\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
-      "\"\357\002\n\025SimpleEventMsgInProto\022E\n\004type\030\001 \001(\016" +
+      "\"\203\003\n\025SimpleEventMsgInProto\022E\n\004type\030\001 \001(\016" +
       "27.commonProto.SimpleEventMsgInProto.Sim" +
-      "pleEventTypeProto\"\216\002\n\024SimpleEventTypePro" +
-      "to\022\n\n\006unload\020\000\022\r\n\tkillSwing\020\001\022\014\n\010paintAc" +
-      "k\020\002\022\013\n\007repaint\020\003\022\020\n\014downloadFile\020\004\022\016\n\nde" +
-      "leteFile\020\005\022\027\n\023cancelFileSelection\020\006\022\030\n\024r" +
-      "equestComponentTree\020\007\022\033\n\027requestWindowSw" +
-      "itchList\020\010\022\033\n\027enableStatisticsLogging\020\t\022" +
-      "\034\n\030disableStatisticsLogging\020\n\022\023\n\017toggleR" +
-      "ecording\020\013\"\227\003\n\035ConnectionHandshakeMsgInP" +
-      "roto\022\022\n\ninstanceId\030\001 \001(\t\022\016\n\006viewId\030\002 \001(\t" +
-      "\022\021\n\tbrowserId\030\003 \001(\t\022\024\n\014desktopWidth\030\004 \001(" +
-      "\r\022\025\n\rdesktopHeight\030\005 \001(\r\022\027\n\017applicationN" +
-      "ame\030\006 \001(\t\022\020\n\010mirrored\030\007 \001(\010\022\033\n\023directDra" +
-      "wSupported\030\010 \001(\010\022\024\n\014documentBase\030\t \001(\t\022," +
-      "\n\006params\030\n \003(\0132\034.commonProto.ParamMsgInP" +
-      "roto\022\016\n\006locale\030\013 \001(\t\022\013\n\003url\030\014 \001(\t\022\020\n\010tim" +
-      "eZone\030\r \001(\t\022\030\n\020dockingSupported\030\016 \001(\010\022\021\n" +
-      "\ttouchMode\030\017 \001(\010\022\033\n\023accessiblityEnabled\030" +
-      "\020 \001(\010\022\r\n\005tabId\030\021 \001(\t\"j\n\024TimestampsMsgInP" +
-      "roto\022\026\n\016startTimestamp\030\001 \001(\t\022\025\n\rsendTime" +
-      "stamp\030\002 \001(\t\022\025\n\rrenderingTime\030\003 \001(\t\022\014\n\004pi" +
-      "ng\030\004 \001(\rB!\n\037org.webswing.model.common.pr" +
-      "oto"
+      "pleEventTypeProto\"\242\002\n\024SimpleEventTypePro" +
+      "to\022\n\n\006unload\020\000\022\r\n\tkillSwing\020\001\022\022\n\016killSwi" +
+      "ngAdmin\020\002\022\014\n\010paintAck\020\003\022\013\n\007repaint\020\004\022\020\n\014" +
+      "downloadFile\020\005\022\016\n\ndeleteFile\020\006\022\027\n\023cancel" +
+      "FileSelection\020\007\022\030\n\024requestComponentTree\020" +
+      "\010\022\033\n\027requestWindowSwitchList\020\t\022\033\n\027enable" +
+      "StatisticsLogging\020\n\022\034\n\030disableStatistics" +
+      "Logging\020\013\022\023\n\017toggleRecording\020\014\"\227\003\n\035Conne" +
+      "ctionHandshakeMsgInProto\022\022\n\ninstanceId\030\001" +
+      " \001(\t\022\016\n\006viewId\030\002 \001(\t\022\021\n\tbrowserId\030\003 \001(\t\022" +
+      "\024\n\014desktopWidth\030\004 \001(\r\022\025\n\rdesktopHeight\030\005" +
+      " \001(\r\022\027\n\017applicationName\030\006 \001(\t\022\020\n\010mirrore" +
+      "d\030\007 \001(\010\022\033\n\023directDrawSupported\030\010 \001(\010\022\024\n\014" +
+      "documentBase\030\t \001(\t\022,\n\006params\030\n \003(\0132\034.com" +
+      "monProto.ParamMsgInProto\022\016\n\006locale\030\013 \001(\t" +
+      "\022\013\n\003url\030\014 \001(\t\022\020\n\010timeZone\030\r \001(\t\022\030\n\020docki" +
+      "ngSupported\030\016 \001(\010\022\021\n\ttouchMode\030\017 \001(\010\022\033\n\023" +
+      "accessiblityEnabled\030\020 \001(\010\022\r\n\005tabId\030\021 \001(\t" +
+      "\"j\n\024TimestampsMsgInProto\022\026\n\016startTimesta" +
+      "mp\030\001 \001(\t\022\025\n\rsendTimestamp\030\002 \001(\t\022\025\n\rrende" +
+      "ringTime\030\003 \001(\t\022\014\n\004ping\030\004 \001(\rB!\n\037org.webs" +
+      "wing.model.common.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

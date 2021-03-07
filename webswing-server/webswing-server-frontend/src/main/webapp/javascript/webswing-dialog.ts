@@ -15,7 +15,8 @@ export const dialogInjectable = {
     getFocusedWindow: 'base.getFocusedWindow' as const,
     getMainWindowVisibilityState: 'base.getMainWindowVisibilityState' as const,
     focusDefault: 'focusManager.focusDefault' as const,
-    isAutoLogout: 'socket.isAutoLogout' as const
+    isAutoLogout: 'socket.isAutoLogout' as const,
+    startNewSessionOnShutdown: 'base.startNewSessionOnShutdown' as const
 }
 
 export interface IDialogService {
@@ -64,10 +65,7 @@ interface IDialogs {
 interface IDialogContent {
     header?: string;
     content: string;
-    buttons?: Array<{
-        label: string;
-        action: () => void;
-    }>;
+    buttons?: Array<IDialogButton|(()=>IDialogButton|false)>;
     events?: {
         [K: string]: (evt: JQuery.TriggeredEvent) => void;
     };
@@ -76,6 +74,7 @@ interface IDialogContent {
     focused?: boolean,
     autoReconnect?: boolean
 }
+interface IDialogButton { label: string,  action: () => void}
 interface IActiveDialog { win: Window, dialog: JQuery<HTMLElement>, content: JQuery<HTMLElement>, header: JQuery<HTMLElement>, currentContent?: IDialogContent }
 interface IActiveBar { win: Window, bar: JQuery<HTMLElement>, barContent: JQuery<HTMLElement>, barHeader: JQuery<HTMLElement>, currentContentBar?: IDialogContent }
 
@@ -127,11 +126,7 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
                 events: {
                     'restartLink_click': () => {
                         this.api.kill();
-                        if (this.api.isAutoLogout()) {
-                            this.api.logout();
-                        } else {
-                            this.api.newSession();
-                        }
+                        this.api.startNewSessionOnShutdown();
                     },
                     'dialogHide_click': () => this.hideBar(),
                     'continueMsg_mouseenter': () => {
@@ -237,7 +232,7 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
                 action: () => {
                     this.api.newSession();
                 }
-            }, {
+            }, ()=>!this.api.cfg.disableLogout && {
                 label: '<span class="ws-icon-logout"></class> ${dialog.finalB2}',
                 action: () => {
                     this.api.logout();
@@ -256,7 +251,7 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
                 action: () => {
                     this.api.reTrySession();
                 }
-            }, {
+            }, ()=>!this.api.cfg.disableLogout && {
                 label: '<span class="ws-icon-logout"></class> ${dialog.retryB2}',
                 action: () => {
                     this.api.logout();
@@ -286,6 +281,9 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
         }
 
         const rootElement: JQuery<HTMLElement> = ($(win.document).find(".webswing-element-content") as unknown) as JQuery<HTMLElement>;
+
+        rootElement[0].querySelector('div[data-id="commonDialog"]')?.remove();
+        rootElement[0].querySelector('div[data-id="commonBar"]')?.remove();
 
         rootElement.append(html);
         const dialog = rootElement.find('div[data-id="commonDialog"]');
@@ -379,13 +377,21 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
 
         if (msg.buttons) {
             for (let i = 0; i < msg.buttons.length; i++) {
-                const btn = msg.buttons[i];
-                const button = $('<button class="ws-btn">' + this.api.translate(btn.label) + '</button><span> </span>');
-                if (i === 0) {
-                    button.addClass("init-focus");
+                const btnOrFn = msg.buttons[i];
+                let btn:IDialogButton|false;
+                if(typeof btnOrFn ==='function'){
+                    btn= btnOrFn();
+                }else{
+                    btn= btnOrFn;
                 }
-                button.on('click', btn.action);
-                content.append(button);
+                if(btn){
+                    const button = $('<button class="ws-btn">' + this.api.translate(btn.label) + '</button><span> </span>');
+                    if (i === 0) {
+                        button.addClass("init-focus");
+                        }
+                    button.on('click', btn.action);
+                    content.append(button);
+                }
             }
         }
 

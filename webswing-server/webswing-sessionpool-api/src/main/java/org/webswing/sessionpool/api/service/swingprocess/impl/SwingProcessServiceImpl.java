@@ -180,6 +180,8 @@ public class SwingProcessServiceImpl implements SwingProcessService {
 				j9modules += " --add-opens java.desktop/java.awt=ALL-UNNAMED "; // EventQueue reflective access from SwingMain
 				j9modules += " --add-opens java.desktop/sun.awt.windows=ALL-UNNAMED "; // sun.awt.windows.ThemeReader reflective access from WebToolkit
 				j9modules += " --add-opens java.desktop/java.awt.event=ALL-UNNAMED "; // ava.awt.event.KeyEvent.extendedKeyCode reflective access from Util
+				j9modules += " --add-opens java.desktop/sun.awt.image=ALL-UNNAMED "; // sun.awt.image.BufImgSurfaceManager.getPrimarySurfaceData reflective access from VolatileWebImageWrapper
+				j9modules += " --add-opens java.desktop/javax.swing=ALL-UNNAMED "; // field javax.swing.PopupFactory.popupType reflective access from org.webswing.dispatch.CwmPaintDispatcher$1
 			} else {
 				log.error("Java version " + javaVersion + " not supported in this version of Webswing.");
 				throw new RuntimeException("Java version not supported. (Versions starting with 1.8 and 11 are supported.)");
@@ -259,6 +261,9 @@ public class SwingProcessServiceImpl implements SwingProcessService {
 			processConfig.addProperty(Constants.SWING_SCREEN_WIDTH, ((startupParams.getScreenWidth() == null) ? Constants.SWING_SCREEN_WIDTH_MIN : startupParams.getScreenWidth()));
 			processConfig.addProperty(Constants.SWING_SCREEN_HEIGHT, ((startupParams.getScreenHeight() == null) ? Constants.SWING_SCREEN_HEIGHT_MIN : startupParams.getScreenHeight()));
 			processConfig.addProperty(Constants.WEBSOCKET_MESSAGE_SIZE, System.getProperty(Constants.WEBSOCKET_MESSAGE_SIZE, "" + Constants.WEBSOCKET_MESSAGE_SIZE_DEFAULT_VALUE));
+			processConfig.addProperty(Constants.WEBSOCKET_MESSAGE_TIMEOUT, System.getProperty(Constants.WEBSOCKET_MESSAGE_TIMEOUT, "" + Constants.WEBSOCKET_MESSAGE_TIMEOUT_DEFAULT));
+
+			copyProperties(processConfig,Constants.WEBSOCKET_CLIENT_TRUSTSTORE,Constants.WEBSOCKET_CLIENT_TRUSTSTORE_TYPE,Constants.WEBSOCKET_CLIENT_TRUSTSTORE_PWD,Constants.WEBSOCKET_CLIENT_HOSTNAME_VERIFIER_DISABLED,Constants.WEBSOCKET_CLIENT_PROXY_URI);
 
 			if (useJFX) {
 				processConfig.addProperty(Constants.SWING_FX_TOOLKIT_FACTORY, webFxToolkitFactory);
@@ -315,6 +320,14 @@ public class SwingProcessServiceImpl implements SwingProcessService {
 			throw new Exception(e);
 		}
 		return swing;
+	}
+
+	private void copyProperties(SwingProcessConfig processConfig, String... propNames) {
+		for(String prop:propNames){
+			if(System.getProperty(prop)!=null){
+				processConfig.addProperty(prop,System.getProperty(prop));
+			}
+		}
 	}
 
 	@Override

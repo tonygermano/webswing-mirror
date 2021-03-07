@@ -907,6 +907,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 					//tell server to kill this application after defined time
 					try {
 						stopRecording();
+						getSessionWatchdog().notifyExit();
 						getPaintDispatcher().notifyApplicationExiting();
 						api.fireShutdownListeners();
 					} catch (Exception e) {

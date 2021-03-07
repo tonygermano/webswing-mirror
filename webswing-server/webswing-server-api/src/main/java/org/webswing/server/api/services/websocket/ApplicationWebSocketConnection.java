@@ -17,4 +17,6 @@ public interface ApplicationWebSocketConnection extends WebSocketConnection {
 
 	String getSessionPoolId();
 	
+	boolean isConnected();
+	
 }

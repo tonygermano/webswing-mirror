@@ -9,6 +9,8 @@ public interface SwingInstanceHolder {
 	ConnectedSwingInstance findInstanceByOwnerId(String ownerId);
 
 	ConnectedSwingInstance findInstanceByInstanceId(String instanceId);
+	
+	ConnectedSwingInstance findClosedInstanceByInstanceId(String instanceId);
 
 	List<ConnectedSwingInstance> getAllInstances();
 

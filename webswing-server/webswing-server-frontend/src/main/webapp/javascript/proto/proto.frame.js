@@ -1107,45 +1107,49 @@ $root.commonProto = (function() {
             case 1:
                 message.type = 1;
                 break;
-            case "paintAck":
+            case "killSwingAdmin":
             case 2:
                 message.type = 2;
                 break;
-            case "repaint":
+            case "paintAck":
             case 3:
                 message.type = 3;
                 break;
-            case "downloadFile":
+            case "repaint":
             case 4:
                 message.type = 4;
                 break;
-            case "deleteFile":
+            case "downloadFile":
             case 5:
                 message.type = 5;
                 break;
-            case "cancelFileSelection":
+            case "deleteFile":
             case 6:
                 message.type = 6;
                 break;
-            case "requestComponentTree":
+            case "cancelFileSelection":
             case 7:
                 message.type = 7;
                 break;
-            case "requestWindowSwitchList":
+            case "requestComponentTree":
             case 8:
                 message.type = 8;
                 break;
-            case "enableStatisticsLogging":
+            case "requestWindowSwitchList":
             case 9:
                 message.type = 9;
                 break;
-            case "disableStatisticsLogging":
+            case "enableStatisticsLogging":
             case 10:
                 message.type = 10;
                 break;
-            case "toggleRecording":
+            case "disableStatisticsLogging":
             case 11:
                 message.type = 11;
+                break;
+            case "toggleRecording":
+            case 12:
+                message.type = 12;
                 break;
             }
             return message;
@@ -1188,31 +1192,33 @@ $root.commonProto = (function() {
          * @enum {string}
          * @property {number} unload=0 unload value
          * @property {number} killSwing=1 killSwing value
-         * @property {number} paintAck=2 paintAck value
-         * @property {number} repaint=3 repaint value
-         * @property {number} downloadFile=4 downloadFile value
-         * @property {number} deleteFile=5 deleteFile value
-         * @property {number} cancelFileSelection=6 cancelFileSelection value
-         * @property {number} requestComponentTree=7 requestComponentTree value
-         * @property {number} requestWindowSwitchList=8 requestWindowSwitchList value
-         * @property {number} enableStatisticsLogging=9 enableStatisticsLogging value
-         * @property {number} disableStatisticsLogging=10 disableStatisticsLogging value
-         * @property {number} toggleRecording=11 toggleRecording value
+         * @property {number} killSwingAdmin=2 killSwingAdmin value
+         * @property {number} paintAck=3 paintAck value
+         * @property {number} repaint=4 repaint value
+         * @property {number} downloadFile=5 downloadFile value
+         * @property {number} deleteFile=6 deleteFile value
+         * @property {number} cancelFileSelection=7 cancelFileSelection value
+         * @property {number} requestComponentTree=8 requestComponentTree value
+         * @property {number} requestWindowSwitchList=9 requestWindowSwitchList value
+         * @property {number} enableStatisticsLogging=10 enableStatisticsLogging value
+         * @property {number} disableStatisticsLogging=11 disableStatisticsLogging value
+         * @property {number} toggleRecording=12 toggleRecording value
          */
         SimpleEventMsgInProto.SimpleEventTypeProto = (function() {
             var valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "unload"] = 0;
             values[valuesById[1] = "killSwing"] = 1;
-            values[valuesById[2] = "paintAck"] = 2;
-            values[valuesById[3] = "repaint"] = 3;
-            values[valuesById[4] = "downloadFile"] = 4;
-            values[valuesById[5] = "deleteFile"] = 5;
-            values[valuesById[6] = "cancelFileSelection"] = 6;
-            values[valuesById[7] = "requestComponentTree"] = 7;
-            values[valuesById[8] = "requestWindowSwitchList"] = 8;
-            values[valuesById[9] = "enableStatisticsLogging"] = 9;
-            values[valuesById[10] = "disableStatisticsLogging"] = 10;
-            values[valuesById[11] = "toggleRecording"] = 11;
+            values[valuesById[2] = "killSwingAdmin"] = 2;
+            values[valuesById[3] = "paintAck"] = 3;
+            values[valuesById[4] = "repaint"] = 4;
+            values[valuesById[5] = "downloadFile"] = 5;
+            values[valuesById[6] = "deleteFile"] = 6;
+            values[valuesById[7] = "cancelFileSelection"] = 7;
+            values[valuesById[8] = "requestComponentTree"] = 8;
+            values[valuesById[9] = "requestWindowSwitchList"] = 9;
+            values[valuesById[10] = "enableStatisticsLogging"] = 10;
+            values[valuesById[11] = "disableStatisticsLogging"] = 11;
+            values[valuesById[12] = "toggleRecording"] = 12;
             return values;
         })();
 

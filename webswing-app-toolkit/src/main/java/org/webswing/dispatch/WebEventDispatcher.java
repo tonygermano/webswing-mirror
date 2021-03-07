@@ -66,6 +66,10 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 		AppLogger.debug("WebEventDispatcher.dispatchMessage", message);
 		switch (message.getType()) {
 		case killSwing:
+			AppLogger.info("Received kill signal from browser. Application shutting down.");
+			Util.getWebToolkit().getSessionWatchdog().scheduleShutdown(ShutdownReason.BrowserKill);
+			break;
+		case killSwingAdmin:
 			AppLogger.info("Received kill signal from Admin console. Application shutting down.");
 			Util.getWebToolkit().getSessionWatchdog().scheduleShutdown(ShutdownReason.Admin);
 			break;

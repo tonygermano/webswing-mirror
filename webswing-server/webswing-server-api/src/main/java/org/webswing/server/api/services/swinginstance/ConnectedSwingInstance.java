@@ -34,7 +34,7 @@ public interface ConnectedSwingInstance extends RemoteSwingInstance {
 	
 	void disconnectMirroredWebSession(String sessionId, boolean disconnect); 
 	
-	void applicationDisconnected(boolean reconnect);
+	void applicationDisconnected(String reason);
 	
 	void handleAppMessage(AppToServerFrameMsgOut msgOut);
 	
@@ -49,8 +49,6 @@ public interface ConnectedSwingInstance extends RemoteSwingInstance {
 	boolean sendMessageToApp(AppFrameMsgIn msgIn);
 	
 	void notifyUserConnected();
-	
-	void notifyExiting();
 	
 	void close();
 

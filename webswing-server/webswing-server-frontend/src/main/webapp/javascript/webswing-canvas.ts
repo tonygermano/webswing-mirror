@@ -19,7 +19,12 @@ export interface ICanvasService {
         width: number;
         height: number;
     },
-    'canvas.processComponentTree': (componentTree: appFrameProtoOut.IComponentTreeMsgOutProto[]) => void
+    'canvas.processComponentTree': (componentTree: appFrameProtoOut.IComponentTreeMsgOutProto[]) => void,
+    'canvas.canvasConfig': ICanvasConfig
+}
+
+interface ICanvasConfig {
+	disposeOnDisconnect: boolean
 }
 
 export class CanvasModule extends ModuleDef<typeof canvasInjectable, ICanvasService> {
@@ -42,7 +47,8 @@ export class CanvasModule extends ModuleDef<typeof canvasInjectable, ICanvasServ
             'canvas.width': this.width,
             'canvas.height': this.height,
             'canvas.getDesktopSize': this.getDesktopSize,
-            'canvas.processComponentTree': this.processComponentTree
+            'canvas.processComponentTree': this.processComponentTree,
+            'canvas.canvasConfig': this.canvasConfig(),
         }
     }
 
@@ -98,10 +104,12 @@ export class CanvasModule extends ModuleDef<typeof canvasInjectable, ICanvasServ
 
     public dispose() {
         if (this.canvas != null) {
-            this.api.cfg.rootElement.find('canvas').remove();
-            $(".webswing-canvas, .webswing-html-canvas").remove();
             this.canvas = undefined;
         }
+        this.api.cfg.rootElement.find('canvas').remove();
+        $(".webswing-canvas, .webswing-html-canvas, .internal-frames-wrapper").remove();
+        this.api.cfg.rootElement[0].querySelector("input.ws-input-hidden")?.remove();
+
         if (this.resizeCheck != null) {
             clearInterval(this.resizeCheck);
             this.resizeCheck = undefined;
@@ -150,5 +158,11 @@ export class CanvasModule extends ModuleDef<typeof canvasInjectable, ICanvasServ
         }
         return { width: this.get().offsetWidth, height: this.get().offsetHeight };
     }
+
+    private canvasConfig() {
+		return {
+            disposeOnDisconnect: true
+		};
+	}
 
 }

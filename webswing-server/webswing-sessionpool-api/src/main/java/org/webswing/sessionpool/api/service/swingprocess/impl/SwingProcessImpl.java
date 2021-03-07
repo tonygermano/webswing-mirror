@@ -36,6 +36,7 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.webswing.Constants;
 import org.webswing.server.common.model.SwingConfig;
 import org.webswing.server.common.util.ServerUtil;
+import org.webswing.sessionpool.api.service.swingprocess.ApplicationExitListener;
 import org.webswing.sessionpool.api.service.swingprocess.ProcessExitListener;
 import org.webswing.sessionpool.api.service.swingprocess.ProcessStatusListener;
 import org.webswing.sessionpool.api.service.swingprocess.SwingProcess;
@@ -70,6 +71,7 @@ public class SwingProcessImpl implements SwingProcess {
 	private boolean forceKilled = false;
 	private ProcessExitListener closeListener;
 	private ProcessStatusListener statusListener;
+	private ApplicationExitListener appExitListener;
 
 	public SwingProcessImpl(String instanceId, SwingProcessConfig config, SwingConfig swingConfig, ScheduledExecutorService processHandlerThread) {
 		super();
@@ -204,9 +206,9 @@ public class SwingProcessImpl implements SwingProcess {
 				if (hasSessionLog) {
 					defaultLog.info("[" + config.getName() + "] app process terminated. ");
 				}
-				if (getCloseListener() != null) {
+				if (closeListener != null) {
 					try {
-						getCloseListener().onClose();
+						closeListener.onClose();
 					} catch (Exception e) {
 						log.error("Failed to call onClose", e);
 					}
@@ -365,16 +367,43 @@ public class SwingProcessImpl implements SwingProcess {
 			while (bufferOut.indexOf("\n") >= 0) {
 				int indexofNewLine = bufferOut.indexOf("\n");
 				boolean isCR = indexofNewLine > 0 && bufferOut.charAt(indexofNewLine - 1) == '\r';
-				String msg = "[" + name + "] " + bufferOut.subSequence(0, isCR ? indexofNewLine - 1 : indexofNewLine);
-				if (isError) {
-					log.error(msg);
-				} else {
-					log.info(msg);
+				String appMsg = bufferOut.subSequence(0, isCR ? indexofNewLine - 1 : indexofNewLine).toString();
+				
+				if (!handleSystemMessage(appMsg)) {
+					String msg = "[" + name + "] " + appMsg;
+					if (isError) {
+						log.error(msg);
+					} else {
+						log.info(msg);
+					}
 				}
+				
 				bufferOut.delete(0, indexofNewLine + 1);
 			}
 			timeout = System.currentTimeMillis() - start > LOG_POLLING_PERIOD ? true : false;
 		}
+	}
+	
+	private boolean handleSystemMessage(String appMsg) {
+		if (!appMsg.startsWith(Constants.APP_LOGGER_SYSTEM_MSG_PREFIX)) {
+			return false;
+		}
+		
+		String[] sysMsgSplit = appMsg.split(" ", 2);
+		if (sysMsgSplit.length != 2) {
+			return false;
+		}
+		
+		String systemMsg = sysMsgSplit[1];
+		
+		if (Constants.APP_LOGGER_SYSTEM_MSG_EXIT.equals(systemMsg)) {
+			if (appExitListener != null) {
+				appExitListener.onExit();
+			}
+			return true;
+		}
+		
+		return false;
 	}
 	
 	private void sendHeartbeat(OutputStream in) throws IOException {
@@ -478,14 +507,12 @@ public class SwingProcessImpl implements SwingProcess {
 		return appender;
 	}
 
+	@Override
 	public boolean isForceKilled() {
 		return forceKilled;
 	}
 
-	public ProcessExitListener getCloseListener() {
-		return closeListener;
-	}
-
+	@Override
 	public void setProcessExitListener(ProcessExitListener closeListener) {
 		this.closeListener = closeListener;
 	}
@@ -493,6 +520,11 @@ public class SwingProcessImpl implements SwingProcess {
 	@Override
 	public void setProcessStatusListener(ProcessStatusListener listener) {
 		this.statusListener = listener;
+	}
+	
+	@Override
+	public void setApplicationExitListener(ApplicationExitListener listener) {
+		this.appExitListener = listener;
 	}
 
 	@Override

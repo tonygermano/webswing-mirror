@@ -22,7 +22,8 @@ export const webswingInstanceInjectable = {
     disposePing: 'ping.dispose' as const,
     startPing: 'ping.start' as const,
     showPlaybackControls: 'playback.showControls' as const,
-    externalApi: 'external.api' as const
+    externalApi: 'external.api' as const,
+    canvasConfig: 'canvas.canvasConfig' as const
 }
 
 export interface IWebswingInstanceService {
@@ -40,6 +41,7 @@ interface IInstanceContext {
     rootElement: JQuery<HTMLElement>;
     autoStart: boolean;
     autoReconnect: number | null;
+    disableLogout:boolean;
     args: string | null;
     connectionUrl: string;
     mirrorConnectionUrl: string | null;
@@ -120,6 +122,7 @@ export class WebswingInstanceModule extends ModuleDef<typeof webswingInstanceInj
             rootElement: setupRootElementContent(this.rootElement),
             autoStart: false,
             autoReconnect: null,
+            disableLogout:false,
             args: null,
             connectionUrl: location.origin + location.pathname,
             mirrorConnectionUrl: null,
@@ -189,7 +192,9 @@ export class WebswingInstanceModule extends ModuleDef<typeof webswingInstanceInj
         this.api.disposeBase();
         this.api.disposeInput();
         this.api.disposeTouch();
-        this.api.disposeCanvas();
+        if (this.api.canvasConfig.disposeOnDisconnect) {
+            this.api.disposeCanvas();
+        }
         this.api.disposeAccessible();
         this.api.disposeSocket();
         this.api.disposeCopyBar();
@@ -202,6 +207,7 @@ export class WebswingInstanceModule extends ModuleDef<typeof webswingInstanceInj
         if (options != null) {
             cfg.autoStart = options.autoStart != null ? JSON.parse(options.autoStart) : cfg.autoStart;
             cfg.autoReconnect = options.autoReconnect != null ? JSON.parse(options.autoReconnect) : cfg.autoReconnect;
+            cfg.disableLogout = options.disableLogout != null ? JSON.parse(options.disableLogout) : cfg.disableLogout;
             cfg.securityToken = options.securityToken != null ? options.securityToken : cfg.securityToken;
             cfg.realm = options.realm != null ? options.realm : cfg.realm;
             cfg.args = options.args != null ? options.args : cfg.args;

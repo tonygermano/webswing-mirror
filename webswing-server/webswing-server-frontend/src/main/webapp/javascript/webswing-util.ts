@@ -21,9 +21,7 @@ export function Util(translations: Translations) {
         webswingLogin,
         webswingLogout,
         refreshLogin,
-        preventGhosts,
-        getToken,
-        clearToken
+        getToken
     }
 
     function webswingLogin(baseUrl: string, element: (() => JQuery<HTMLElement>) | JQuery<HTMLElement>, loginData: ILoginData | string, successCallback: (data: any, request: JQuery.jqXHR) => void, failedCallback?: () => void) {
@@ -194,50 +192,6 @@ export function Util(translations: Translations) {
                 }
             }
         });
-    }
-
-    function preventGhosts(element: JQuery<HTMLElement>) {
-        const ANTI_GHOST_DELAY = 2000;
-        const POINTER_TYPE = {
-            MOUSE: 0,
-            TOUCH: 1
-        };
-        let latestInteractionType: number
-        let latestInteractionTime: number
-
-        function handleTap(type: number, e: Event) {
-            // console.log('got tap ' + e.type + ' of pointer ' + type);
-
-            const now = Date.now();
-
-            if (type !== latestInteractionType) {
-
-                if (now - latestInteractionTime <= ANTI_GHOST_DELAY) {
-                    // console.log('!prevented!');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    return false;
-                }
-
-                latestInteractionType = type;
-            }
-
-            latestInteractionTime = now;
-            return false;
-        }
-
-        function attachEvents(eventList: string[], interactionType: number) {
-            eventList.forEach((eventName) => {
-                element[0].addEventListener(eventName, handleTap.bind(null, interactionType), true);
-            });
-        }
-
-        const mouseEvents = ['mousedown', 'mouseup', 'mousemove'];
-        const touchEvents = ['touchstart', 'touchend'];
-
-        attachEvents(mouseEvents, POINTER_TYPE.MOUSE);
-        attachEvents(touchEvents, POINTER_TYPE.TOUCH);
     }
 
     function saveTokens(response: string) {

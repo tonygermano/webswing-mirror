@@ -68,6 +68,10 @@ public interface Constants {
 
 	String PRINTER_JOB_CLASS = "webswing.printerJobDelegate";
 
+	
+	// logging
+	String APP_LOGGER_SYSTEM_MSG_PREFIX = "SYSTEM:";
+	String APP_LOGGER_SYSTEM_MSG_EXIT = "EXIT";
 
 	//javafx startup
 	String SWING_FX_TOOLKIT_FACTORY = "webswing.fxToolkitFactory";
@@ -113,9 +117,13 @@ public interface Constants {
 	String COOKIE_SAMESITE = "webswing.cookieSameSite";
 	String SERVER_WEBSOCKET_URL = "webswing.server.websocketUrl";
 	String WEBSWING_SERVER_ID = "webswing.server.id";
-	
-	int WEBSOCKET_MESSAGE_SIZE_DEFAULT_VALUE = (1024 * 1024);
+
+
+	// websocket constants
+	int WEBSOCKET_MESSAGE_SIZE_DEFAULT_VALUE = (5 * 1024 * 1024);
 	String WEBSOCKET_MESSAGE_SIZE = "webswing.websocketMessageSizeLimit";
+	long WEBSOCKET_MESSAGE_TIMEOUT_DEFAULT = TimeUnit.SECONDS.toMillis(30);
+	String WEBSOCKET_MESSAGE_TIMEOUT = "webswing.websocketMessageTimeout";
 	long WEBSOCKET_PING_PONG_INTERVAL = TimeUnit.SECONDS.toMillis(30);
 	String WEBSOCKET_PING_PONG_CONTENT = "ping-pong";
 	String WEBSOCKET_URL_LOADER_INTERVAL = "webswing.websocketUrlLoader.interval";
@@ -126,6 +134,13 @@ public interface Constants {
 	String WEBSOCKET_SESSION_POOL_SUFFIX = "/async/sessionpool";
 	String JETTY_REQUEST_HEADER_SIZE = "jetty.request.header.size";
 	int JETTY_REQUEST_HEADER_SIZE_DEFAULT = 512 * 1024;
+
+	//websocket client config
+	String WEBSOCKET_CLIENT_TRUSTSTORE = "webswing.server.websocket.truststore";
+	String WEBSOCKET_CLIENT_TRUSTSTORE_TYPE = "webswing.server.websocket.truststore.type";
+	String WEBSOCKET_CLIENT_TRUSTSTORE_PWD = "webswing.server.websocket.truststore.password";
+	String WEBSOCKET_CLIENT_HOSTNAME_VERIFIER_DISABLED = "webswing.server.websocket.hostnameVerifier.disabled";
+	String WEBSOCKET_CLIENT_PROXY_URI = "webswing.server.websocket.proxyUri";
 
 	// logging properties
 	String LOGS_DIR_PATH = "webswing.logsDir";
@@ -187,12 +202,9 @@ public interface Constants {
 	// admin console properties
 	String ADMIN_CONSOLE_WEBSWING_SERVER_PUBLIC_URL = "webswing.server.publicUrl";
 	String ADMIN_CONSOLE_CORS = "admin.server.cors";
-	String ADMIN_SERVER_WEBSOCKET_TRUSTSTORE = "webswing.server.websocket.truststore";
-	String ADMIN_SERVER_WEBSOCKET_TRUSTSTORE_PWD = "webswing.server.websocket.truststore.password";
-	String ADMIN_SERVER_WEBSOCKET_HOSTNAME_VERIFIER_DISABLED = "webswing.server.websocket.hostnameVerifier.disabled";
-	String ADMIN_SERVER_WEBSOCKET_PROXY_URI = "webswing.server.websocket.proxyUri";
 	String APP_WEBSOCKET_CLOSE_REASON_RECONNECT = "reconnect";
-	
+	String APP_WEBSOCKET_CLOSE_REASON_SHUTDOWN = "shutdown";
+
 	// JWT 
 	String WEBSWING_SESSION_ID = "WebswingSessionId";
 	String WEBSWING_SESSION_REFRESH_TOKEN = "wrt";

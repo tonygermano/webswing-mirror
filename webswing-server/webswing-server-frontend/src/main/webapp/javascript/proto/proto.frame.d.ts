@@ -469,16 +469,17 @@ export namespace commonProto {
         enum SimpleEventTypeProto {
             unload = 0,
             killSwing = 1,
-            paintAck = 2,
-            repaint = 3,
-            downloadFile = 4,
-            deleteFile = 5,
-            cancelFileSelection = 6,
-            requestComponentTree = 7,
-            requestWindowSwitchList = 8,
-            enableStatisticsLogging = 9,
-            disableStatisticsLogging = 10,
-            toggleRecording = 11
+            killSwingAdmin = 2,
+            paintAck = 3,
+            repaint = 4,
+            downloadFile = 5,
+            deleteFile = 6,
+            cancelFileSelection = 7,
+            requestComponentTree = 8,
+            requestWindowSwitchList = 9,
+            enableStatisticsLogging = 10,
+            disableStatisticsLogging = 11,
+            toggleRecording = 12
         }
     }
 

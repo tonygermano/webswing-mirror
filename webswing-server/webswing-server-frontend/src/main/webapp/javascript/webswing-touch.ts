@@ -562,9 +562,12 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 			$(this.canvas!).data("minscale", initScale);
 			this.doScaleCanvas(initScale);
 		} else if (this.staticScaleEnabled) {
-			// init static viewport scale
-			const vp = document.querySelector("meta[name='viewport']");
-			vp!.setAttribute("content", "width=device-width, user-scalable=no, initial-scale=" + initScale + ", maximum-scale=" + initScale);
+			// init static zoom scale on root element
+			$(this.canvas!).data("scale", initScale);
+			const parent = this.api.cfg.rootElement[0] as HTMLElement;
+			parent.style.zoom = initScale + "";
+			// const vp = document.querySelector("meta[name='viewport']");
+			// vp!.setAttribute("content", "width=device-width, user-scalable=no, initial-scale=" + initScale + ", maximum-scale=" + initScale);
 		}
 	}
 

@@ -12,6 +12,7 @@ export const externalApiInjectable = {
     getWindows: 'base.getWindows' as const,
     getWindowById: 'base.getWindowById' as const,
     performAction: 'base.performAction' as const,
+    logout: 'login.logout' as const
 }
 
 export interface IExternalApiService {

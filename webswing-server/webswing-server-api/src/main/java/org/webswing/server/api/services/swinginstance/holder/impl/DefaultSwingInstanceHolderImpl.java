@@ -22,6 +22,11 @@ public class DefaultSwingInstanceHolderImpl implements SwingInstanceHolder {
 	}
 
 	@Override
+	public ConnectedSwingInstance findClosedInstanceByInstanceId(String instanceId) {
+		return closedInstances.findByInstanceId(instanceId);
+	}
+	
+	@Override
 	public List<ConnectedSwingInstance> getAllInstances() {
 		return runningInstances.getAllInstances();
 	}

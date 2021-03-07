@@ -44,8 +44,7 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 	private final SessionPoolHolderService sessionPoolHolderService;
 	
 	private boolean secured;
-	private Timer pingTimer = new Timer(true);
-	
+
 	@Inject
 	public AdminConsoleWebSocketConnectionImpl(SessionPoolHolderService sessionPoolHolderService) {
 		this.sessionPoolHolderService = sessionPoolHolderService;
@@ -59,22 +58,6 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 			disconnect(CloseCodes.CANNOT_ACCEPT, "An admin console is already connected!");
 			return;
 		}
-		
-		pingTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if (session != null) {
-					synchronized (session) {
-						try {
-							session.getBasicRemote().sendPing(ByteBuffer.wrap(Constants.WEBSOCKET_PING_PONG_CONTENT.getBytes(StandardCharsets.UTF_8)));
-						} catch (IllegalArgumentException | IOException e) {
-							log.warn("Could not send ping message for session [" + session.getId() + "]", e.getMessage());
-							log.debug(e.getMessage(),e);
-						}
-					}
-				}
-			}
-		}, Constants.WEBSOCKET_PING_PONG_INTERVAL, Constants.WEBSOCKET_PING_PONG_INTERVAL);
 	}
 	
 	@OnMessage
@@ -90,18 +73,10 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 			
 			if (msgIn.getHandshake() != null) {
 				AdminConsoleHandshakeMsgIn handshake = msgIn.getHandshake();
-				
-				try {
-					if (!JwtUtil.validateHandshakeToken(handshake.getSecretMessage())) {
-						throw new IllegalArgumentException("Invalid token [" + handshake.getSecretMessage() + "] received during handshake!");
-					}
-					secured = true;
-				} catch (Exception e1) {
-					log.error("Could not validate handshake secret message! Disconnecting...", e1);
-					disconnect(CloseCodes.CANNOT_ACCEPT, "Connection not secured!");
-					return;
-				}
-			} else if (!secured) {
+				secured = validateHandshakeToken(handshake.getSecretMessage());
+			}
+
+			if (!secured) {
 				// we must get handshake first, otherwise we disconnect
 				disconnect(CloseCodes.CANNOT_ACCEPT, "Connection not secured!");
 				return;
@@ -112,7 +87,7 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 			log.error("Could not decode proto message from admin console, session id [" + session.getId() + "]!", e);
 		}
 	}
-	
+
 	@OnMessage
 	public void onPong(Session session, PongMessage pongMessage) {
 		super.onPong(session, pongMessage, log);
@@ -127,12 +102,11 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 		
 		sessionPoolHolderService.unregisterAdminConsole(this);
 		
-		pingTimer.cancel();
 	}
 	
 	@OnError
 	public void onError(Session session, Throwable t) {
-		log.error("Websocket error from admin console connection, session [" + (session==null?null:session.getId()) + "]", t.getMessage());
+		log.error("Websocket error from admin console connection, session [" + (session==null?null:session.getId()) + "]"+ t.getMessage());
 		log.debug(t.getMessage(), t);
 	}
 
@@ -141,7 +115,7 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 		try {
 			super.sendMessage(protoMapper.encodeProto(msgOut));
 		} catch (IOException e) {
-			log.error("Failed to send msg to admin console, session [" + (session==null?null:session.getId()) + "]!", e.getMessage());
+			log.error("Failed to send msg to admin console, session [" + (session==null?null:session.getId()) + "]!"+ e.getMessage());
 			log.debug(e.getMessage(),e);
 		}
 	}
@@ -161,11 +135,10 @@ public class AdminConsoleWebSocketConnectionImpl extends AbstractWebSocketConnec
 			try {
 				session.close(new CloseReason(closeCode, reason));
 			} catch (IOException e) {
-				log.error("Failed to disconnect admin console connection session [" + session.getId() + "]!", e.getMessage());
+				log.error("Failed to disconnect admin console connection session [" + session.getId() + "]!"+ e.getMessage());
 				log.debug(e.getMessage(),e);
 			}
 		}
-		pingTimer.cancel();
 	}
 	
 }

@@ -10,6 +10,7 @@ public class SimpleEventMsgIn implements MsgIn, CommonMsg {
 	public enum SimpleEventType implements CommonMsg {
 		unload,
 		killSwing,
+		killSwingAdmin,
 		paintAck,
 		repaint,
 		downloadFile,

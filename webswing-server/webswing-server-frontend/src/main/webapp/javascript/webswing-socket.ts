@@ -79,7 +79,6 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
         if (this.socket ) {
             this.socket.onclose = null;
             this.socketOpen = false;
-            this.autoLogout = null;
             this.socket.close(1000, "Disconnecting instance.");
         }
         this.socket = undefined;
@@ -196,6 +195,8 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
         if (this.api.cfg.mirror) {
         	url += "&X-webswing-instanceId=" + encodeURIComponent(this.api.cfg.clientId!);
         }
+
+        this.autoLogout = null;
 
         this.socket = new WebSocket(url);
         this.socket.binaryType = "arraybuffer";

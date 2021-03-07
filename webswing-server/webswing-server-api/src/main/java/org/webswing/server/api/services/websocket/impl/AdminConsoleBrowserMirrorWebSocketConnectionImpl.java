@@ -45,6 +45,8 @@ public class AdminConsoleBrowserMirrorWebSocketConnectionImpl implements MirrorW
 	private AbstractWebswingUser user;
 	private AbstractWebswingUser masterUser;
 	
+	private boolean connected;
+	
 	public AdminConsoleBrowserMirrorWebSocketConnectionImpl(SessionPoolHolderService sessionPoolService, WebSocketService webSocketService, ConnectedSwingInstance instance,
 			String browserSessionId, String token) throws WsException {
 		this.browserSessionId = browserSessionId;
@@ -72,6 +74,8 @@ public class AdminConsoleBrowserMirrorWebSocketConnectionImpl implements MirrorW
 			if (user.getUserAttributes() != null) {
 				userAttributes = new ObjectMapper().writeValueAsBytes(user.getUserAttributes());
 			}
+			
+			connected = true;
 		} catch (Exception e) {
 			disconnect("Unauthorized access!");
 			log.error("Error opening mirror connection [" + instance.getInstanceId() + "]!", e);
@@ -139,6 +143,7 @@ public class AdminConsoleBrowserMirrorWebSocketConnectionImpl implements MirrorW
 	@Override
 	public void disconnect(String reason) {
 		String instanceId = getInstanceId();
+		connected = false;
 		this.instance = null;
 		
 		AdminConsoleWebSocketConnection ac = sessionPoolService.getAdminConsoleConnection();
@@ -199,6 +204,11 @@ public class AdminConsoleBrowserMirrorWebSocketConnectionImpl implements MirrorW
 		appFrame.setStartApplication(new StartApplicationMsgOut());
 		appFrame.setInstanceId(instance.getInstanceId());
 		sendMessage(appFrame);
+	}
+	
+	@Override
+	public boolean isConnected() {
+		return connected;
 	}
 	
 	private void checkPermission(AbstractWebswingUser checkUser, WebswingAction action) throws WsException {

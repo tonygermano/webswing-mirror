@@ -163,6 +163,16 @@ public abstract class ServerSessionPoolConnector {
 		}
 		return null;
 	}
+	
+	protected final ConnectedSwingInstance getClosedConnectedInstanceByInstanceId(String instanceId) {
+		for (SwingInstanceHolder ih : instanceHolders.values()) {
+			ConnectedSwingInstance instance = ih.findClosedInstanceByInstanceId(instanceId);
+			if (instance != null) {
+				return instance;
+			}
+		}
+		return null;
+	}
 
 	public boolean hasConnectedInstanceWithInstanceId(String instanceId) {
 		// search for connected instances
@@ -189,17 +199,15 @@ public abstract class ServerSessionPoolConnector {
 	public final void removeConnectedSwingInstance(ConnectedSwingInstance instance, boolean force) {
 		String path = instance.getPathMapping();
 		
-		sessionPoolHolderService.unregisterWithAdminConsole(path, instance.getInstanceId());
-		
-		if (!instanceHolders.containsKey(path)) {
-			return;
+		if (instanceHolders.containsKey(path)) {
+			instanceHolders.get(path).remove(instance, force);
 		}
-
-		instanceHolders.get(path).remove(instance, force);
 		
 		if (instanceStats.containsKey(path)) {
 			instanceStats.get(path).removeInstance(instance.getInstanceId());
 		}
+		
+		sessionPoolHolderService.unregisterWithAdminConsole(path, instance.getInstanceId());
 	}
 
 	public boolean tryConnectSwingInstance(String path, PrimaryWebSocketConnection r, ConnectionHandshakeMsgIn handshake, SessionMode sessionMode, boolean stealSessionAllowed) throws WsException {
@@ -493,11 +501,7 @@ public abstract class ServerSessionPoolConnector {
 		ConnectedSwingInstance instance = getConnectedInstanceByInstanceId(path, instanceId);
 		if (instance != null) {
 			// connected to this server
-			try {
-				instance.close();
-			} finally {
-				instance.notifyExiting();
-			}
+			instance.close();
 		}
 	}
 	
@@ -535,7 +539,7 @@ public abstract class ServerSessionPoolConnector {
 
 	private void shutdown(ConnectedSwingInstance instance) {
 		ServerToAppFrameMsgIn msgIn = new ServerToAppFrameMsgIn();
-		SimpleEventMsgIn simpleEventMsgIn = new SimpleEventMsgIn(SimpleEventType.killSwing);
+		SimpleEventMsgIn simpleEventMsgIn = new SimpleEventMsgIn(SimpleEventType.killSwingAdmin);
 		msgIn.setEvents(Lists.newArrayList(simpleEventMsgIn));
 		instance.sendMessageToApp(msgIn);
 	}

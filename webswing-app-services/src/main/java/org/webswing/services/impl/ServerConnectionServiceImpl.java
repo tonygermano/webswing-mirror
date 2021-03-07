@@ -74,7 +74,7 @@ public class ServerConnectionServiceImpl implements ServerConnectionService, Ser
 			} catch (Exception sre) {
 				sre.printStackTrace();
 			}
-			ServerConnectionServiceImpl.this.disconnect();
+			ServerConnectionServiceImpl.this.disconnect(Constants.APP_WEBSOCKET_CLOSE_REASON_SHUTDOWN);
 		}));
 	}
 	
@@ -98,10 +98,6 @@ public class ServerConnectionServiceImpl implements ServerConnectionService, Ser
 		initConnection(true);
 	}
 
-	private void disconnect() {
-		disconnect(null);
-	}
-	
 	private void disconnect(String reason) {
 		try {
 			connection.close(reason);

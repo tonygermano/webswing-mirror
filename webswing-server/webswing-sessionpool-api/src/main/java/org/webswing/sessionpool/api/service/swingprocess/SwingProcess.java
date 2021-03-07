@@ -15,6 +15,8 @@ public interface SwingProcess {
 	void setProcessStatusListener(ProcessStatusListener listener);
 	
 	void setProcessExitListener(ProcessExitListener listener);
+	
+	void setApplicationExitListener(ApplicationExitListener listener);
 
 	SwingProcessConfig getConfig();
 	

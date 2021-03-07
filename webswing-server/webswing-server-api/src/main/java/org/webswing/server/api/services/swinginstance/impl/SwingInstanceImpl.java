@@ -168,10 +168,13 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 	}
 	
 	@Override
-	public void applicationDisconnected(boolean reconnect) {
+	public void applicationDisconnected(String reason) {
 		this.appConnection = null;
-		
-		if (reconnect) {
+
+		if (reason==null){
+			disconnectPrimaryWebSession("Application disconnected from Server.");
+			disconnectMirroredWebSession(true);
+		}else if (Constants.APP_WEBSOCKET_CLOSE_REASON_RECONNECT.equals(reason)) {
 			if (this.webConnection != null) {
 				synchronized (webConnection) {
 					// session stolen
@@ -383,6 +386,9 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 	 * No session recording, no copying to mirrored connection.
 	 */
 	private boolean sendDirectMessageToBrowser(BrowserWebSocketConnection r, AppFrameMsgOut frame) {
+		if (!r.isConnected()) {
+			return false;
+		}
 		ServerToBrowserFrameMsgOut msgOut = encodeFrameMessage(frame);
 		r.sendMessage(msgOut);
 		return true;
@@ -407,12 +413,16 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 	public boolean sendMessageToBrowser(ServerToBrowserFrameMsgOut msgOut) {
 		if (webConnection != null) {
 			synchronized (webConnection) {
-				webConnection.sendMessage(msgOut);
+				if (webConnection.isConnected()) {
+					webConnection.sendMessage(msgOut);
+				}
 			}
 		}
 		if (mirroredWebConnection != null) {
 			synchronized (mirroredWebConnection) {
-				mirroredWebConnection.sendMessage(msgOut);
+				if (mirroredWebConnection.isConnected()) {
+					mirroredWebConnection.sendMessage(msgOut);
+				}
 			}
 		}
 		
@@ -427,6 +437,10 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 		if (appConnection == null) {
 			startupMsgQueue.add(msgIn);
 			return true;
+		}
+		
+		if (!appConnection.isConnected()) {
+			return false;
 		}
 		
 		appConnection.sendMessage(msgIn);
@@ -564,6 +578,8 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 
 	@Override
 	public void close() {
+		notifyExiting();
+		
 		if (config.isAutoLogout()) {
 			sendMessageToBrowser(SimpleEventMsgOut.shutDownAutoLogoutNotification.buildMsgOut());
 		} else {
@@ -584,9 +600,8 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 			appConnection.disconnect("Closing instance.");
 		}
 	}
-	
-	@Override
-	public void notifyExiting() {
+		
+	private void notifyExiting() {
 		endedAt = new Date();
 		poolConnector.removeConnectedSwingInstance(this, false);
 		logWarningHistory();
@@ -616,7 +631,9 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 		msgOut.setConnectionInfo(new ConnectionInfoMsgOut(System.getProperty(Constants.WEBSWING_SERVER_ID), appConnection.getSessionPoolId(), config.isAutoLogout()));
 		
 		synchronized (webConnection) {
-			webConnection.sendMessage(msgOut);
+			if (webConnection.isConnected()) {
+				webConnection.sendMessage(msgOut);
+			}
 		}
 	}
 

@@ -134,7 +134,7 @@ public class RecordingPlaybackWebSocketConnectionImpl extends AbstractWebSocketC
 
 	@OnError
 	public void onError(Session session, Throwable t) {
-		log.error("Websocket error from recording playback connection, session [" + (session == null ? null : session.getId()) + "]!", t.getMessage());
+		log.error("Websocket error from recording playback connection, session [" + (session == null ? null : session.getId()) + "]! "+ t.getMessage());
 		log.debug(t.getMessage(),t);
 	}
 
@@ -154,7 +154,7 @@ public class RecordingPlaybackWebSocketConnectionImpl extends AbstractWebSocketC
 			byte[] encoded = protoMapper.encodeProto(msgOut);
 			super.sendMessage(encoded);
 		} catch (IOException e) {
-			log.error("Failed to send playback msg to browser, session [" + (session == null ? null : session.getId()) + "]!", e.getMessage());
+			log.error("Failed to send playback msg to browser, session [" + (session == null ? null : session.getId()) + "]! "+ e.getMessage());
 			log.debug(e.getMessage(),e);
 		}
 	}
@@ -169,7 +169,7 @@ public class RecordingPlaybackWebSocketConnectionImpl extends AbstractWebSocketC
 			try {
 				session.close(new CloseReason(CloseCodes.NORMAL_CLOSURE, reason));
 			} catch (IOException e) {
-				log.error("Failed to disconnect playback connection, session [" + session.getId() + "]!", e.getMessage());
+				log.error("Failed to disconnect playback connection, session [" + session.getId() + "]! "+ e.getMessage());
 				log.debug(e.getMessage(),e);
 			}
 		}

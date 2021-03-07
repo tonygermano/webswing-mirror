@@ -31,6 +31,7 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
 	
 	private static int MAX_RECONNECT_RETRIES = 5;
 	private static int maxMessageSize = Integer.getInteger(Constants.WEBSOCKET_MESSAGE_SIZE, Constants.WEBSOCKET_MESSAGE_SIZE_DEFAULT_VALUE);
+	private static long messageTimeout = Long.getLong(Constants.WEBSOCKET_MESSAGE_TIMEOUT, Constants.WEBSOCKET_MESSAGE_TIMEOUT_DEFAULT);
 	private static long syncTimeout = Long.getLong(Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT, Constants.SWING_START_SYS_PROP_SYNC_TIMEOUT_DEFAULT_VALUE);
 	
 	private ProtoMapper protoMapper = new ProtoMapper(ProtoMapper.PROTO_PACKAGE_SERVER_APP_FRAME, ProtoMapper.PROTO_PACKAGE_SERVER_APP_FRAME, ClassLoaderUtil.getServiceClassLoader());
@@ -80,6 +81,7 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
     	this.session = session;
     	
 		session.setMaxBinaryMessageBufferSize(maxMessageSize);
+		session.getAsyncRemote().setSendTimeout(messageTimeout);
 		
 		AppHandshakeMsgOut handshake = new AppHandshakeMsgOut();
 		
@@ -131,7 +133,9 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
     	AppLogger.error("Websocket closed to server [" + serverUrl + "]" 
     			+ (closeReason != null ? ", close code [" + closeReason.getCloseCode().getCode() + "], reason [" + closeReason.getReasonPhrase() + "]!" : ""));
 
-    	scheduleReconnect(0);
+    	if (!Util.getWebToolkit().getSessionWatchdog().isTerminated()) {
+    		scheduleReconnect(0);
+    	}
     }
     
     private void scheduleReconnect(int retry) {
@@ -209,24 +213,12 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
 			Util.getWebToolkit().recordFrame(msgOut.getAppFrameMsgOut());
 		}
 		
-		synchronized (session) {
-			try {
-				byte[] encoded = protoMapper.encodeProto(msgOut);
-				int length = encoded.length;
-				if (length > maxMessageSize) {
-					int sent = 0;
-					while (sent != length) {
-						int sendLength = sent + maxMessageSize > length ? length - sent : maxMessageSize;
-						session.getBasicRemote().sendBinary(ByteBuffer.wrap(encoded, sent, sendLength), (sent + sendLength) == length);
-						sent += sendLength;
-					}
-				} else {
-					session.getBasicRemote().sendBinary(ByteBuffer.wrap(encoded));
-				}
-			} catch (IOException e) {
-				AppLogger.error("Error sending msg to server [" + serverUrl + "] , session [" + session.getId() + "]", e.getMessage());
-				AppLogger.debug(e.getMessage(),e);
-			}
+		try {
+			byte[] encoded = protoMapper.encodeProto(msgOut);
+			session.getAsyncRemote().sendBinary(ByteBuffer.wrap(encoded));
+		} catch (IOException e) {
+			AppLogger.error("Error sending msg to server [" + serverUrl + "] , session [" + session.getId() + "]", e.getMessage());
+			AppLogger.debug(e.getMessage(),e);
 		}
 	}
 	

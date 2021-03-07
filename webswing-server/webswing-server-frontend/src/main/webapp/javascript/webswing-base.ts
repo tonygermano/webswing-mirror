@@ -58,7 +58,10 @@ export const baseInjectable = {
 	handleAccessible: 'accessible.handleAccessible' as const,
 	isAccessiblityEnabled: 'accessible.isEnabled' as const,
 	showWindowSwitcher: 'accessible.showWindowSwitcher' as const,
-	manageFocusEvent: 'focusManager.manageFocusEvent' as const
+	manageFocusEvent: 'focusManager.manageFocusEvent' as const,
+	disposeSocket: 'socket.dispose' as const,
+	disposeCanvas: 'canvas.dispose' as const,
+	newSession: 'webswing.newSession' as const
 }
 
 export interface IBaseService {
@@ -81,6 +84,7 @@ export interface IBaseService {
 	'base.getAllWindows': () => Window[],
 	'base.getMainWindowVisibilityState': () => VisibilityState,
 	'base.closeWindow': (id: string) => void
+	'base.startNewSessionOnShutdown': () => void
 }
 
 export type IDockableWindow = Window & typeof globalThis & {
@@ -132,6 +136,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 	private dockResizeInterval = 250;
 	private popupStartupResizeInterval = 1000;
 	private audioPlaybackPingInterval = 1000;
+	private startNewSessionOnShutdown = false;
 
 	public ready = () => {
 		this.directDraw = new WebswingDirectDraw({ logTrace: this.api.cfg.traceLog, logDebug: this.api.cfg.debugLog, ieVersion: this.api.cfg.ieVersion, dpr: getDpr() });
@@ -157,7 +162,8 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 			'base.getFocusedWindow': this.getFocusedWindow,
 			'base.getAllWindows': this.getAllWindows,
 			'base.getMainWindowVisibilityState': this.getMainWindowVisibilityState,
-			'base.closeWindow': this.closeWindow
+			'base.closeWindow': this.closeWindow,
+			'base.startNewSessionOnShutdown': () => { this.startNewSessionOnShutdown = true; }
 		}
 	}
 
@@ -170,6 +176,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 	}
 
 	public initialize(clientId: string | null, isMirror: boolean) {
+		this.api.disposeCanvas();
 		this.api.initCanvas();
 		this.api.registerInput();
 		if (!isMirror) {
@@ -194,6 +201,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 
 	public beforeUnloadEventHandler() {
 		this.dispose();
+		this.api.disposeSocket();
 	}
 
 	public continueSession() {
@@ -215,8 +223,6 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 							// close any undocked popup windows
 							win.preventDockClose = true;
 							win.dockOwner.close();
-						} else {
-							$(win.element).remove();
 						}
 					} catch (err) {
 						console.error(err);
@@ -224,7 +230,6 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 				}
 			}
 		}
-		$(".internal-frames-wrapper").remove();
 
 		this.api.cfg.clientId = '';
 		this.api.cfg.viewId = GUID();
@@ -239,6 +244,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 		this.timer3 = setInterval(() => this.servletHeartbeat(), 120000);
 		this.timerDockResize = setInterval(() => this.dockResize(), this.dockResizeInterval);
 		this.compositingWM = false;
+		this.startNewSessionOnShutdown = false;
 		this.windowImageHolders = {};
 		this.internalFrameWrapperHolders = {};
 		this.closedWindows = {};
@@ -246,6 +252,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 			this.directDraw.dispose();
 		}
 		this.directDraw = new WebswingDirectDraw({ logTrace: this.api.cfg.traceLog, logDebug: this.api.cfg.debugLog, ieVersion: this.api.cfg.ieVersion, dpr: getDpr() });
+		this.drawingQ = [];
 	}
 
 	public sendMessageEvent(message: commonProto.SimpleEventMsgInProto.SimpleEventTypeProto) {
@@ -335,10 +342,15 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 					this.api.logout();
 				}
 			} else if (data.event === SimpleEvent.shutDownNotification) {
-				if (this.api.currentDialog() !== this.api.dialogs.timedoutDialog) {
-					this.api.showDialog(this.api.dialogs.stoppedDialog);
+				if (this.startNewSessionOnShutdown) {
+					this.startNewSessionOnShutdown = false;
+					this.api.newSession();
+				} else {
+					if (this.api.currentDialog() !== this.api.dialogs.timedoutDialog) {
+						this.api.showDialog(this.api.dialogs.stoppedDialog);
+					}
+					this.api.disconnect();
 				}
-				this.api.disconnect();
 			} else if (data.event === SimpleEvent.applicationAlreadyRunning) {
 				this.api.showDialog(this.api.dialogs.applicationAlreadyRunning);
 				this.api.disconnect();

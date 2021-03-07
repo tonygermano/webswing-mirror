@@ -60,6 +60,8 @@ public class LocalSessionPool {
 					closeProcess(startupParams.getPathMapping(), startupParams.getInstanceId());
 				}
 			});
+			// no need to set applicationExitListener in non-cluster version, because the server gets the ExitMsgOut notification
+			// applicationExitListener is useful in case of multiple cluster servers to notify the other servers immediately that the application is exiting
 			
 			if (process.isRunning()) {
 				registerProcessStatus(startupParams.getInstanceId(), process);

@@ -697,7 +697,9 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 					.collect(Collectors.summarizingInt(i -> i)).getSum();
 			if (runningConnectedInstances >= maxClients) {
 			    log.warn("Can not start new session of {}. Maximum number of clients reached [{}].", path, maxClients);
-				r.sendMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
+			    if (r.isConnected()) {
+			    	r.sendMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
+			    }
 				return;
 			}
 		}
@@ -727,7 +729,9 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 
 		try {
 			if (!createInstance(path, h, r, instanceInfo)) {
-				r.sendMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
+				if (r.isConnected()) {
+					r.sendMessage(SimpleEventMsgOut.tooManyClientsNotification.buildMsgOut());
+				}
 			}
 		} catch (WsException e) {
 			throw new WsException("Failed to create Application instance.", e);
